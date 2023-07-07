@@ -1,0 +1,131 @@
+/*
+ * Copyright 2020 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import androidx.build.LibraryType
+import androidx.build.RunApiTasks
+import androidx.build.BuildOnServerKt
+import androidx.build.SupportConfigKt
+
+plugins {
+    id("AndroidXPlugin")
+    id("java") // https://github.com/gradle/gradle/issues/18622
+    id("AndroidXComposePlugin")
+    id("kotlin-multiplatform")
+}
+
+dependencies {
+}
+
+kotlin {
+    jvm() {
+        withJava()
+    }
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.kotlinStdlibCommon)
+            implementation(project(":compose:ui:ui-util"))
+            api(project(":compose:foundation:foundation"))
+            api(project(":compose:material:material"))
+            api(project(":compose:runtime:runtime"))
+            api(project(":compose:ui:ui"))
+            api(project(":compose:ui:ui-tooling-preview"))
+        }
+
+        jvmMain.dependencies {
+            implementation(libs.kotlinStdlib)
+            implementation(libs.kotlinStdlibJdk8)
+            implementation(libs.kotlinCoroutinesCore)
+        }
+
+        jvmTest {
+            resources.srcDirs += new File(SupportConfigKt.getExternalProjectPath(project), "noto-fonts/other/")
+            resources.srcDirs += "src/jvmTest/res"
+            dependencies {
+                implementation(libs.kotlinCoroutinesTest)
+                implementation(libs.skikoCurrentOs)
+                implementation(project(":compose:ui:ui-test-junit4"))
+                implementation(libs.junit)
+                implementation(libs.truth)
+            }
+        }
+    }
+}
+
+File getGoldenPath(Project project) {
+    if (System.getenv("COMPOSE_DESKTOP_GITHUB_BUILD") != null) {
+        def externalPath = SupportConfigKt.getExternalProjectPath(project)
+        return new File(externalPath, "golden")
+    } else {
+        return new File("${rootDir.absolutePath}/../../golden").getCanonicalFile()
+    }
+}
+
+tasks.findByName("jvmTest").configure {
+    systemProperties["GOLDEN_PATH"] = getGoldenPath(project).toString()
+}
+
+androidx {
+    name = "Jetpack Compose desktop implementation"
+    type = LibraryType.PUBLISHED_LIBRARY
+    inceptionYear = "2020"
+    legacyDisableKotlinStrictApiMode = true
+    runApiTasks = new RunApiTasks.No(
+            "API tracking for desktop isn't supported at the moment, see b/163110180"
+    )
+}
+
+def jvmOs(container, name, skikoDep) {
+    container.create("jvm$name", MavenPublication) {
+        artifactId = "${project.name}-jvm-$name"
+        def projectGroup = project.group
+        def projectName = project.name
+        def composeVersion = androidx.LibraryVersions.COMPOSE
+        def skikoModule = skikoDep.module
+        def skikoVersion = skikoDep.versionConstraint.requiredVersion
+        pom {
+            withXml {
+                def dependenciesNode = asNode().appendNode("dependencies")
+                def desktopDependency = dependenciesNode.appendNode("dependency")
+                desktopDependency.appendNode("groupId", projectGroup)
+                desktopDependency.appendNode("artifactId", projectName)
+                desktopDependency.appendNode("version", composeVersion)
+                desktopDependency.appendNode("scope", "compile")
+
+                def skikoDependency = dependenciesNode.appendNode("dependency")
+                skikoDependency.appendNode("groupId", skikoModule.group)
+                skikoDependency.appendNode("artifactId", skikoModule.name)
+                skikoDependency.appendNode("version", skikoVersion)
+                skikoDependency.appendNode("scope", "runtime")
+            }
+        }
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            jvmOs(it, "linux-x64", libs.skikoLinuxX64.get())
+            jvmOs(it, "linux-arm64", libs.skikoLinuxArm64.get())
+            jvmOs(it, "macos-x64", libs.skikoMacOsX64.get())
+            jvmOs(it, "macos-arm64", libs.skikoMacOsArm64.get())
+            jvmOs(it, "windows-x64", libs.skikoWindowsX64.get())
+            jvmOs(it, "windows-arm64", libs.skikoWindowsArm64.get())
+        }
+    }
+}
+
+BuildOnServerKt.addToBuildOnServer(project, "${project.path}:jvmJar")

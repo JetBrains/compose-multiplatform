@@ -1,0 +1,103 @@
+// Signature format: 4.0
+package androidx.compose.ui.tooling.preview {
+
+  public final class Devices {
+    field public static final String AUTOMOTIVE_1024p = "id:automotive_1024p_landscape";
+    field public static final String DEFAULT = "";
+    field public static final String DESKTOP = "spec:shape=Normal,width=1920,height=1080,unit=dp,dpi=420";
+    field public static final String FOLDABLE = "spec:shape=Normal,width=673,height=841,unit=dp,dpi=480";
+    field public static final androidx.compose.ui.tooling.preview.Devices INSTANCE;
+    field public static final String NEXUS_10 = "name:Nexus 10";
+    field public static final String NEXUS_5 = "id:Nexus 5";
+    field public static final String NEXUS_5X = "id:Nexus 5X";
+    field public static final String NEXUS_6 = "id:Nexus 6";
+    field public static final String NEXUS_6P = "id:Nexus 6P";
+    field public static final String NEXUS_7 = "id:Nexus 7";
+    field public static final String NEXUS_7_2013 = "id:Nexus 7 2013";
+    field public static final String NEXUS_9 = "id:Nexus 9";
+    field public static final String PHONE = "spec:id=reference_phone,shape=Normal,width=411,height=891,unit=dp,dpi=420";
+    field public static final String PIXEL = "id:pixel";
+    field public static final String PIXEL_2 = "id:pixel_2";
+    field public static final String PIXEL_2_XL = "id:pixel_2_xl";
+    field public static final String PIXEL_3 = "id:pixel_3";
+    field public static final String PIXEL_3A = "id:pixel_3a";
+    field public static final String PIXEL_3A_XL = "id:pixel_3a_xl";
+    field public static final String PIXEL_3_XL = "id:pixel_3_xl";
+    field public static final String PIXEL_4 = "id:pixel_4";
+    field public static final String PIXEL_4_XL = "id:pixel_4_xl";
+    field public static final String PIXEL_C = "id:pixel_c";
+    field public static final String PIXEL_XL = "id:pixel_xl";
+    field public static final String TABLET = "spec:shape=Normal,width=1280,height=800,unit=dp,dpi=420";
+    field public static final String WEAR_OS_LARGE_ROUND = "id:wearos_large_round";
+    field public static final String WEAR_OS_RECT = "id:wearos_rect";
+    field public static final String WEAR_OS_SMALL_ROUND = "id:wearos_small_round";
+    field public static final String WEAR_OS_SQUARE = "id:wearos_square";
+  }
+
+  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Repeatable @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.SOURCE) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.ANNOTATION_CLASS, kotlin.annotation.AnnotationTarget.FUNCTION}) public @interface Preview {
+    method public abstract int apiLevel() default -1;
+    method public abstract long backgroundColor() default 0;
+    method public abstract String device() default androidx.compose.ui.tooling.preview.Devices.DEFAULT;
+    method public abstract float fontScale() default 1.0;
+    method public abstract String group() default "";
+    method public abstract int heightDp() default -1;
+    method public abstract String locale() default "";
+    method public abstract String name() default "";
+    method public abstract boolean showBackground() default false;
+    method public abstract boolean showSystemUi() default false;
+    method public abstract int uiMode() default 0;
+    method public abstract int widthDp() default -1;
+    property public abstract int apiLevel;
+    property public abstract long backgroundColor;
+    property public abstract String device;
+    property public abstract float fontScale;
+    property public abstract String group;
+    property public abstract int heightDp;
+    property public abstract String locale;
+    property public abstract String name;
+    property public abstract boolean showBackground;
+    property public abstract boolean showSystemUi;
+    property public abstract int uiMode;
+    property public abstract int widthDp;
+  }
+
+  @kotlin.annotation.MustBeDocumented @kotlin.annotation.Repeatable @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.SOURCE) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.ANNOTATION_CLASS, kotlin.annotation.AnnotationTarget.FUNCTION}) public static @interface Preview.Container {
+    method public abstract androidx.compose.ui.tooling.preview.Preview[] value();
+  }
+
+  @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME) public @interface PreviewParameter {
+    method public abstract int limit() default kotlin.jvm.internal.IntCompanionObject.MAX_VALUE;
+    method public abstract kotlin.reflect.KClass<? extends androidx.compose.ui.tooling.preview.PreviewParameterProvider<?>> provider();
+    property public abstract int limit;
+    property public abstract kotlin.reflect.KClass<? extends androidx.compose.ui.tooling.preview.PreviewParameterProvider<?>> provider;
+  }
+
+  public interface PreviewParameterProvider<T> {
+    method public default int getCount();
+    method public kotlin.sequences.Sequence<T> getValues();
+    property public default int count;
+    property public abstract kotlin.sequences.Sequence<T> values;
+  }
+
+}
+
+package androidx.compose.ui.tooling.preview.datasource {
+
+  public class CollectionPreviewParameterProvider<T> implements androidx.compose.ui.tooling.preview.PreviewParameterProvider<T> {
+    ctor public CollectionPreviewParameterProvider(java.util.Collection<? extends T> collection);
+    method public kotlin.sequences.Sequence<T> getValues();
+    property public kotlin.sequences.Sequence<T> values;
+  }
+
+  public final class LoremIpsum implements androidx.compose.ui.tooling.preview.PreviewParameterProvider<java.lang.String> {
+    ctor public LoremIpsum(int words);
+    ctor public LoremIpsum();
+    method public kotlin.sequences.Sequence<java.lang.String> getValues();
+    property public kotlin.sequences.Sequence<java.lang.String> values;
+  }
+
+  public final class LoremIpsumKt {
+  }
+
+}
+

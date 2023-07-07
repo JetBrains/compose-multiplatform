@@ -1,0 +1,68 @@
+/*
+ * Copyright 2019 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+plugins {
+    id("AndroidXPlugin")
+    id("com.android.library")
+    id("AndroidXComposePlugin")
+    id("kotlin-android")
+    id("androidx.benchmark")
+}
+
+android {
+    defaultConfig {
+        minSdkVersion 21
+    }
+    lintOptions {
+        disable("SyntheticAccessor")
+    }
+    namespace "androidx.compose.runtime.benchmark"
+}
+
+dependencies {
+
+    androidTestImplementation(projectOrArtifact(":compose:ui:ui"))
+    androidTestImplementation(projectOrArtifact(":compose:ui:ui-test-junit4"))
+    androidTestImplementation(projectOrArtifact(":compose:foundation:foundation"))
+    androidTestImplementation(projectOrArtifact(":compose:foundation:foundation-layout"))
+    androidTestImplementation(projectOrArtifact(":compose:material:material"))
+    androidTestImplementation(projectOrArtifact(":compose:runtime:runtime"))
+    androidTestImplementation(projectOrArtifact(":compose:ui:ui-text"))
+    androidTestImplementation(projectOrArtifact(":compose:ui:ui-util"))
+    androidTestImplementation(projectOrArtifact(":compose:test-utils"))
+    androidTestImplementation(projectOrArtifact(":compose:benchmark-utils"))
+
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.testExtJunit)
+    androidTestImplementation(libs.testCore)
+    androidTestImplementation(libs.testRunner)
+    androidTestImplementation(libs.testRules)
+    androidTestImplementation(libs.kotlinStdlib)
+    androidTestImplementation(libs.kotlinReflect)
+    androidTestImplementation(libs.kotlinCoroutinesTest)
+    androidTestImplementation(androidxArtifact(":benchmark:benchmark-junit4"))
+    androidTestImplementation("androidx.activity:activity:1.2.0")
+    androidTestImplementation(androidxArtifact(":activity:activity-compose"))
+    // old version of common-java8 conflicts with newer version, because both have
+    // DefaultLifecycleEventObserver.
+    // Outside of androidx this is resolved via constraint added to lifecycle-common,
+    // but it doesn't work in androidx.
+    // See aosp/1804059
+    androidTestImplementation "androidx.lifecycle:lifecycle-common-java8:2.5.1"
+}
+
+androidx {
+    benchmarkRunAlsoInterpreted = true
+}

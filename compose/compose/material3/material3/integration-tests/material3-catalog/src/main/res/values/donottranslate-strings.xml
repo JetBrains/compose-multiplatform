@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copyright 2021 The Android Open Source Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<resources>
+
+    <string name="compose_material_3">Compose Material 3</string>
+
+    <string name="description">Description</string>
+    <string name="examples">Examples</string>
+    <string name="no_examples">No examples</string>
+
+    <string name="view_design_guidelines">View design guidelines</string>
+    <string name="view_developer_docs">View developer docs</string>
+    <string name="view_source_code">View source code</string>
+    <string name="report_an_issue">Report an issue</string>
+    <string name="terms_of_service">Terms of service</string>
+    <string name="privacy_policy">Privacy policy</string>
+    <string name="open_source_licenses">Open source licenses</string>
+
+    <string name="theme" description="Theme. [CHAR_LIMIT=NONE]">Theme</string>
+    <string name="color_mode" description=" Material 3 Color Mode. [CHAR_LIMIT=NONE]">Color mode</string>
+    <string name="font_scale" description="Font scale. [CHAR_LIMIT=NONE]">Font scale</string>
+    <string name="text_direction" description="Text direction. [CHAR_LIMIT=NONE]">Text direction</string>
+
+    <string name="scale">%.2f</string>
+
+</resources>

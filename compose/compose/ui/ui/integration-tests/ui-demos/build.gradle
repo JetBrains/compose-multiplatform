@@ -1,0 +1,41 @@
+plugins {
+    id("AndroidXPlugin")
+    id("com.android.library")
+    id("AndroidXComposePlugin")
+    id("org.jetbrains.kotlin.android")
+}
+
+dependencies {
+
+    implementation(libs.kotlinStdlib)
+    implementation(libs.material)
+
+    implementation(project(":compose:animation:animation"))
+    implementation(project(":compose:foundation:foundation"))
+    implementation(project(":compose:foundation:foundation-layout"))
+    implementation(project(":compose:integration-tests:demos:common"))
+    implementation(project(":compose:ui:ui:ui-samples"))
+    implementation(project(":compose:material:material"))
+    implementation(project(":compose:runtime:runtime"))
+    implementation(project(":compose:runtime:runtime-livedata"))
+    implementation(project(":compose:ui:ui"))
+    implementation(project(":compose:ui:ui-text"))
+    implementation(project(":compose:ui:ui-tooling-preview"))
+    implementation(project(":compose:ui:ui-viewbinding"))
+
+    implementation("androidx.fragment:fragment-ktx:1.2.5")
+    implementation(androidxArtifact(":recyclerview:recyclerview"))
+    implementation(androidxArtifact(":customview:customview-poolingcontainer"))
+    implementation("androidx.viewpager2:viewpager2:1.0.0")
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
+    debugImplementation(project(":compose:ui:ui-tooling"))
+}
+
+android {
+    buildFeatures {
+        viewBinding true
+    }
+    namespace "androidx.compose.ui.demos"
+}

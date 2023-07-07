@@ -1,0 +1,34 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id("AndroidXPlugin")
+    id("com.android.library")
+    id("AndroidXComposePlugin")
+    id("org.jetbrains.kotlin.android")
+}
+
+dependencies {
+    implementation(libs.kotlinStdlib)
+
+    implementation(project(":compose:foundation:foundation-layout"))
+    implementation(project(":compose:integration-tests:demos:common"))
+    implementation(project(":compose:runtime:runtime"))
+    implementation(project(":compose:ui:ui"))
+    implementation(project(":compose:ui:ui-text"))
+    implementation(project(":compose:animation:animation"))
+    implementation(project(":compose:animation:animation-graphics"))
+    implementation(project(":compose:animation:animation:animation-samples"))
+    implementation(project(":compose:animation:animation-core:animation-core-samples"))
+    implementation(project(":compose:foundation:foundation"))
+    implementation(project(":compose:material:material"))
+    implementation(project(":compose:ui:ui-tooling-preview"))
+    debugImplementation(project(":compose:ui:ui-tooling"))
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
+}
+
+android {
+    namespace "androidx.compose.animation.demos"
+}

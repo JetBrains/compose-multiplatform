@@ -1,0 +1,3 @@
+// Baseline format: 1.0
+GetterSetterNames: android.view.RenderNode#getClipToOutline():
+    Symmetric method for `setClipToOutline` must be named `isClipToOutline`; was `getClipToOutline`

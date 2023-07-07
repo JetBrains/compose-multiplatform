@@ -1,0 +1,132 @@
+// Signature format: 4.0
+package androidx.compose.ui.test {
+
+  @androidx.compose.ui.test.ExperimentalTestApi public sealed interface AndroidComposeUiTest<A extends androidx.activity.ComponentActivity> extends androidx.compose.ui.test.ComposeUiTest {
+    method public A? getActivity();
+    property public abstract A? activity;
+  }
+
+  @androidx.compose.ui.test.ExperimentalTestApi public final class AndroidComposeUiTestEnvironment<A extends androidx.activity.ComponentActivity> {
+    ctor public AndroidComposeUiTestEnvironment(kotlin.jvm.functions.Function0<? extends A> activityProvider);
+    method public androidx.compose.ui.test.AndroidComposeUiTest<A> getTest();
+    method public <R> R! runTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.AndroidComposeUiTest<A>,? extends R> block);
+    property public final androidx.compose.ui.test.AndroidComposeUiTest<A> test;
+  }
+
+  @androidx.compose.ui.test.ExperimentalTestApi public sealed interface ComposeUiTest extends androidx.compose.ui.test.SemanticsNodeInteractionsProvider {
+    method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public androidx.compose.ui.unit.Density getDensity();
+    method public androidx.compose.ui.test.MainTestClock getMainClock();
+    method public void registerIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);
+    method public <T> T! runOnIdle(kotlin.jvm.functions.Function0<? extends T> action);
+    method public <T> T! runOnUiThread(kotlin.jvm.functions.Function0<? extends T> action);
+    method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method public void unregisterIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);
+    method public void waitForIdle();
+    method public void waitUntil(long timeoutMillis, kotlin.jvm.functions.Function0<java.lang.Boolean> condition);
+    property public abstract androidx.compose.ui.unit.Density density;
+    property public abstract androidx.compose.ui.test.MainTestClock mainClock;
+  }
+
+  public final class ComposeUiTestKt {
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void runComposeUiTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.ComposeUiTest,? extends kotlin.Unit> block);
+  }
+
+  public final class ComposeUiTest_androidKt {
+    method @androidx.compose.ui.test.ExperimentalTestApi public static <A extends androidx.activity.ComponentActivity> void runAndroidComposeUiTest(Class<A> activityClass, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.AndroidComposeUiTest<A>,kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static inline <reified A extends androidx.activity.ComponentActivity> void runAndroidComposeUiTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.AndroidComposeUiTest<A>,? extends kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void runComposeUiTest(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.ComposeUiTest,kotlin.Unit> block);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static void runComposeUiTestWithoutActivity(kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.ComposeUiTest,kotlin.Unit> block);
+  }
+
+  @androidx.compose.ui.test.ExperimentalTestApi public final class StateRestorationTester {
+    ctor public StateRestorationTester(androidx.compose.ui.test.ComposeUiTest composeTest);
+    method public void emulateSavedInstanceStateRestore();
+    method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+  }
+
+}
+
+package androidx.compose.ui.test.junit4 {
+
+  public final class AndroidComposeTestRule<R extends org.junit.rules.TestRule, A extends androidx.activity.ComponentActivity> implements androidx.compose.ui.test.junit4.ComposeContentTestRule {
+    ctor public AndroidComposeTestRule(R activityRule, kotlin.jvm.functions.Function1<? super R,? extends A> activityProvider);
+    method public org.junit.runners.model.Statement apply(org.junit.runners.model.Statement base, org.junit.runner.Description description);
+    method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public A getActivity();
+    method public R getActivityRule();
+    method public androidx.compose.ui.unit.Density getDensity();
+    method public androidx.compose.ui.test.MainTestClock getMainClock();
+    method public androidx.compose.ui.test.SemanticsNodeInteractionCollection onAllNodes(androidx.compose.ui.test.SemanticsMatcher matcher, boolean useUnmergedTree);
+    method public androidx.compose.ui.test.SemanticsNodeInteraction onNode(androidx.compose.ui.test.SemanticsMatcher matcher, boolean useUnmergedTree);
+    method public void registerIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);
+    method public <T> T! runOnIdle(kotlin.jvm.functions.Function0<? extends T> action);
+    method public <T> T! runOnUiThread(kotlin.jvm.functions.Function0<? extends T> action);
+    method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+    method public void unregisterIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);
+    method public void waitForIdle();
+    method public void waitUntil(long timeoutMillis, kotlin.jvm.functions.Function0<java.lang.Boolean> condition);
+    property public final A activity;
+    property public final R activityRule;
+    property public androidx.compose.ui.unit.Density density;
+    property public androidx.compose.ui.test.MainTestClock mainClock;
+  }
+
+  @Deprecated public final class AndroidComposeTestRule.AndroidComposeStatement extends org.junit.runners.model.Statement {
+    ctor @Deprecated public AndroidComposeTestRule.AndroidComposeStatement(org.junit.runners.model.Statement base);
+    method @Deprecated public void evaluate();
+  }
+
+  public final class AndroidComposeTestRule_androidKt {
+    method public static <A extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<androidx.test.ext.junit.rules.ActivityScenarioRule<A>,A> createAndroidComposeRule(Class<A> activityClass);
+    method public static inline <reified A extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<androidx.test.ext.junit.rules.ActivityScenarioRule<A>,A>! createAndroidComposeRule();
+    method public static androidx.compose.ui.test.junit4.ComposeContentTestRule createComposeRule();
+    method public static androidx.compose.ui.test.junit4.ComposeTestRule createEmptyComposeRule();
+  }
+
+  public final class AndroidSynchronization_androidKt {
+  }
+
+  public interface ComposeContentTestRule extends androidx.compose.ui.test.junit4.ComposeTestRule {
+    method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+  }
+
+  public final class ComposeIdlingResource_androidKt {
+  }
+
+  public final class ComposeRootRegistry_androidKt {
+  }
+
+  public interface ComposeTestRule extends org.junit.rules.TestRule androidx.compose.ui.test.SemanticsNodeInteractionsProvider {
+    method public suspend Object? awaitIdle(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public androidx.compose.ui.unit.Density getDensity();
+    method public androidx.compose.ui.test.MainTestClock getMainClock();
+    method public void registerIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);
+    method public <T> T! runOnIdle(kotlin.jvm.functions.Function0<? extends T> action);
+    method public <T> T! runOnUiThread(kotlin.jvm.functions.Function0<? extends T> action);
+    method public void unregisterIdlingResource(androidx.compose.ui.test.IdlingResource idlingResource);
+    method public void waitForIdle();
+    method public void waitUntil(optional long timeoutMillis, kotlin.jvm.functions.Function0<java.lang.Boolean> condition);
+    property public abstract androidx.compose.ui.unit.Density density;
+    property public abstract androidx.compose.ui.test.MainTestClock mainClock;
+  }
+
+  public final class EspressoLink_androidKt {
+  }
+
+  public final class StateRestorationTester {
+    ctor public StateRestorationTester(androidx.compose.ui.test.junit4.ComposeContentTestRule composeTestRule);
+    method public void emulateSavedInstanceStateRestore();
+    method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
+  }
+
+}
+
+package androidx.compose.ui.test.junit4.android {
+
+  public final class ComposeNotIdleException extends java.lang.Exception {
+    ctor public ComposeNotIdleException(String? message, Throwable? cause);
+  }
+
+}
+

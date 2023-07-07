@@ -1,0 +1,40 @@
+// Signature format: 4.0
+package androidx.compose.material.ripple {
+
+  @androidx.compose.runtime.Immutable public final class RippleAlpha {
+    ctor public RippleAlpha(float draggedAlpha, float focusedAlpha, float hoveredAlpha, float pressedAlpha);
+    method public float getDraggedAlpha();
+    method public float getFocusedAlpha();
+    method public float getHoveredAlpha();
+    method public float getPressedAlpha();
+    property public final float draggedAlpha;
+    property public final float focusedAlpha;
+    property public final float hoveredAlpha;
+    property public final float pressedAlpha;
+  }
+
+  public final class RippleAnimationKt {
+  }
+
+  public final class RippleKt {
+    method @androidx.compose.runtime.Composable public static androidx.compose.foundation.Indication rememberRipple(optional boolean bounded, optional float radius, optional long color);
+  }
+
+  public interface RippleTheme {
+    method @androidx.compose.runtime.Composable public long defaultColor();
+    method @androidx.compose.runtime.Composable public androidx.compose.material.ripple.RippleAlpha rippleAlpha();
+    field public static final androidx.compose.material.ripple.RippleTheme.Companion Companion;
+  }
+
+  public static final class RippleTheme.Companion {
+    method public androidx.compose.material.ripple.RippleAlpha defaultRippleAlpha(long contentColor, boolean lightTheme);
+    method public long defaultRippleColor(long contentColor, boolean lightTheme);
+  }
+
+  public final class RippleThemeKt {
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material.ripple.RippleTheme> getLocalRippleTheme();
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.material.ripple.RippleTheme> LocalRippleTheme;
+  }
+
+}
+

@@ -1,0 +1,39 @@
+// Baseline format: 1.0
+KotlinDefaultParameterOrder: androidx.compose.ui.graphics.vector.ImageVector.Builder#Builder(String, float, float, float, float, long, int, boolean) parameter #0:
+    Parameter `name` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, float, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #0:
+    Parameter `id` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, float, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #1:
+    Parameter `currentTime` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, float, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #2:
+    Parameter `currentPosition` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, float, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #3:
+    Parameter `currentPressed` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, float, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #4:
+    Parameter `pressure` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, float, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #5:
+    Parameter `previousTime` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, float, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #6:
+    Parameter `previousPosition` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, float, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #7:
+    Parameter `previousPressed` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, float, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #8:
+    Parameter `type` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #0:
+    Parameter `id` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #1:
+    Parameter `currentTime` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #2:
+    Parameter `currentPosition` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #3:
+    Parameter `currentPressed` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #4:
+    Parameter `previousTime` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #5:
+    Parameter `previousPosition` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #6:
+    Parameter `previousPressed` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.input.pointer.PointerInputChange#copy(long, long, long, boolean, long, long, boolean, int, java.util.List<androidx.compose.ui.input.pointer.HistoricalChange>, long) parameter #7:
+    Parameter `type` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.res.VectorResources_androidKt#vectorResource(androidx.compose.ui.graphics.vector.ImageVector.Companion, android.content.res.Resources.Theme, android.content.res.Resources, int) parameter #1:
+    Parameter `theme` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)

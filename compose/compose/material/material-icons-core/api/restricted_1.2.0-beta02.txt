@@ -1,0 +1,1037 @@
+// Signature format: 4.0
+package androidx.compose.material.icons {
+
+  public final class Icons {
+    method public androidx.compose.material.icons.Icons.Filled getDefault();
+    property public final androidx.compose.material.icons.Icons.Filled Default;
+    field public static final androidx.compose.material.icons.Icons INSTANCE;
+  }
+
+  public static final class Icons.Filled {
+    field public static final androidx.compose.material.icons.Icons.Filled INSTANCE;
+  }
+
+  public static final class Icons.Outlined {
+    field public static final androidx.compose.material.icons.Icons.Outlined INSTANCE;
+  }
+
+  public static final class Icons.Rounded {
+    field public static final androidx.compose.material.icons.Icons.Rounded INSTANCE;
+  }
+
+  public static final class Icons.Sharp {
+    field public static final androidx.compose.material.icons.Icons.Sharp INSTANCE;
+  }
+
+  public static final class Icons.TwoTone {
+    field public static final androidx.compose.material.icons.Icons.TwoTone INSTANCE;
+  }
+
+  public final class IconsKt {
+    method public static inline androidx.compose.ui.graphics.vector.ImageVector materialIcon(String name, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.ImageVector.Builder,androidx.compose.ui.graphics.vector.ImageVector.Builder> block);
+    method public static inline androidx.compose.ui.graphics.vector.ImageVector.Builder materialPath(androidx.compose.ui.graphics.vector.ImageVector.Builder, optional float fillAlpha, optional float strokeAlpha, optional int pathFillType, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.PathBuilder,kotlin.Unit> pathBuilder);
+    field @kotlin.PublishedApi internal static final float MaterialIconDimension = 24.0f;
+  }
+
+}
+
+package androidx.compose.material.icons.filled {
+
+  public final class AccountBoxKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAccountBox(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class AccountCircleKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAccountCircle(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class AddCircleKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAddCircle(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class AddKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAdd(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class ArrowBackKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getArrowBack(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class ArrowDropDownKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getArrowDropDown(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class ArrowForwardKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getArrowForward(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class BuildKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getBuild(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class CallKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCall(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class CheckCircleKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCheckCircle(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class CheckKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCheck(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class ClearKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getClear(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class CloseKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getClose(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class CreateKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCreate(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class DateRangeKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getDateRange(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class DeleteKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getDelete(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class DoneKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getDone(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class EditKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getEdit(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class EmailKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getEmail(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class ExitToAppKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getExitToApp(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class FaceKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getFace(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class FavoriteBorderKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getFavoriteBorder(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class FavoriteKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getFavorite(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class HomeKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getHome(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class InfoKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getInfo(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class KeyboardArrowDownKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowDown(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class KeyboardArrowLeftKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowLeft(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class KeyboardArrowRightKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowRight(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class KeyboardArrowUpKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowUp(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class ListKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getList(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class LocationOnKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getLocationOn(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class LockKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getLock(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class MailOutlineKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getMailOutline(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class MenuKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getMenu(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class MoreVertKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getMoreVert(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class NotificationsKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getNotifications(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class PersonKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPerson(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class PhoneKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPhone(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class PlaceKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPlace(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class PlayArrowKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPlayArrow(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class RefreshKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getRefresh(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class SearchKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getSearch(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class SendKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getSend(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class SettingsKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getSettings(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class ShareKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getShare(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class ShoppingCartKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getShoppingCart(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class StarKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getStar(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class ThumbUpKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getThumbUp(androidx.compose.material.icons.Icons.Filled);
+  }
+
+  public final class WarningKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getWarning(androidx.compose.material.icons.Icons.Filled);
+  }
+
+}
+
+package androidx.compose.material.icons.outlined {
+
+  public final class AccountBoxKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAccountBox(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class AccountCircleKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAccountCircle(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class AddCircleKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAddCircle(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class AddKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAdd(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class ArrowBackKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getArrowBack(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class ArrowDropDownKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getArrowDropDown(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class ArrowForwardKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getArrowForward(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class BuildKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getBuild(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class CallKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCall(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class CheckCircleKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCheckCircle(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class CheckKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCheck(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class ClearKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getClear(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class CloseKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getClose(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class CreateKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCreate(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class DateRangeKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getDateRange(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class DeleteKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getDelete(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class DoneKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getDone(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class EditKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getEdit(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class EmailKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getEmail(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class ExitToAppKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getExitToApp(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class FaceKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getFace(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class FavoriteBorderKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getFavoriteBorder(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class FavoriteKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getFavorite(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class HomeKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getHome(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class InfoKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getInfo(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class KeyboardArrowDownKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowDown(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class KeyboardArrowLeftKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowLeft(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class KeyboardArrowRightKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowRight(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class KeyboardArrowUpKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowUp(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class ListKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getList(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class LocationOnKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getLocationOn(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class LockKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getLock(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class MailOutlineKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getMailOutline(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class MenuKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getMenu(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class MoreVertKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getMoreVert(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class NotificationsKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getNotifications(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class PersonKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPerson(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class PhoneKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPhone(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class PlaceKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPlace(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class PlayArrowKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPlayArrow(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class RefreshKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getRefresh(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class SearchKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getSearch(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class SendKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getSend(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class SettingsKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getSettings(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class ShareKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getShare(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class ShoppingCartKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getShoppingCart(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class StarKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getStar(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class ThumbUpKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getThumbUp(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+  public final class WarningKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getWarning(androidx.compose.material.icons.Icons.Outlined);
+  }
+
+}
+
+package androidx.compose.material.icons.rounded {
+
+  public final class AccountBoxKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAccountBox(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class AccountCircleKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAccountCircle(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class AddCircleKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAddCircle(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class AddKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAdd(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class ArrowBackKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getArrowBack(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class ArrowDropDownKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getArrowDropDown(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class ArrowForwardKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getArrowForward(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class BuildKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getBuild(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class CallKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCall(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class CheckCircleKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCheckCircle(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class CheckKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCheck(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class ClearKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getClear(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class CloseKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getClose(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class CreateKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCreate(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class DateRangeKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getDateRange(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class DeleteKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getDelete(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class DoneKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getDone(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class EditKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getEdit(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class EmailKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getEmail(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class ExitToAppKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getExitToApp(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class FaceKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getFace(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class FavoriteBorderKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getFavoriteBorder(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class FavoriteKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getFavorite(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class HomeKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getHome(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class InfoKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getInfo(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class KeyboardArrowDownKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowDown(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class KeyboardArrowLeftKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowLeft(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class KeyboardArrowRightKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowRight(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class KeyboardArrowUpKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowUp(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class ListKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getList(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class LocationOnKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getLocationOn(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class LockKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getLock(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class MailOutlineKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getMailOutline(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class MenuKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getMenu(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class MoreVertKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getMoreVert(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class NotificationsKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getNotifications(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class PersonKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPerson(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class PhoneKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPhone(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class PlaceKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPlace(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class PlayArrowKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPlayArrow(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class RefreshKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getRefresh(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class SearchKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getSearch(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class SendKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getSend(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class SettingsKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getSettings(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class ShareKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getShare(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class ShoppingCartKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getShoppingCart(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class StarKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getStar(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class ThumbUpKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getThumbUp(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+  public final class WarningKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getWarning(androidx.compose.material.icons.Icons.Rounded);
+  }
+
+}
+
+package androidx.compose.material.icons.sharp {
+
+  public final class AccountBoxKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAccountBox(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class AccountCircleKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAccountCircle(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class AddCircleKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAddCircle(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class AddKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAdd(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class ArrowBackKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getArrowBack(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class ArrowDropDownKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getArrowDropDown(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class ArrowForwardKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getArrowForward(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class BuildKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getBuild(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class CallKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCall(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class CheckCircleKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCheckCircle(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class CheckKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCheck(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class ClearKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getClear(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class CloseKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getClose(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class CreateKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCreate(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class DateRangeKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getDateRange(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class DeleteKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getDelete(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class DoneKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getDone(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class EditKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getEdit(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class EmailKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getEmail(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class ExitToAppKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getExitToApp(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class FaceKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getFace(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class FavoriteBorderKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getFavoriteBorder(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class FavoriteKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getFavorite(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class HomeKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getHome(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class InfoKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getInfo(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class KeyboardArrowDownKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowDown(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class KeyboardArrowLeftKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowLeft(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class KeyboardArrowRightKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowRight(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class KeyboardArrowUpKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowUp(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class ListKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getList(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class LocationOnKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getLocationOn(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class LockKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getLock(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class MailOutlineKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getMailOutline(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class MenuKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getMenu(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class MoreVertKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getMoreVert(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class NotificationsKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getNotifications(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class PersonKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPerson(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class PhoneKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPhone(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class PlaceKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPlace(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class PlayArrowKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPlayArrow(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class RefreshKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getRefresh(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class SearchKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getSearch(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class SendKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getSend(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class SettingsKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getSettings(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class ShareKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getShare(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class ShoppingCartKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getShoppingCart(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class StarKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getStar(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class ThumbUpKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getThumbUp(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+  public final class WarningKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getWarning(androidx.compose.material.icons.Icons.Sharp);
+  }
+
+}
+
+package androidx.compose.material.icons.twotone {
+
+  public final class AccountBoxKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAccountBox(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class AccountCircleKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAccountCircle(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class AddCircleKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAddCircle(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class AddKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getAdd(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class ArrowBackKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getArrowBack(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class ArrowDropDownKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getArrowDropDown(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class ArrowForwardKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getArrowForward(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class BuildKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getBuild(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class CallKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCall(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class CheckCircleKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCheckCircle(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class CheckKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCheck(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class ClearKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getClear(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class CloseKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getClose(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class CreateKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getCreate(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class DateRangeKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getDateRange(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class DeleteKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getDelete(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class DoneKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getDone(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class EditKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getEdit(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class EmailKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getEmail(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class ExitToAppKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getExitToApp(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class FaceKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getFace(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class FavoriteBorderKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getFavoriteBorder(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class FavoriteKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getFavorite(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class HomeKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getHome(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class InfoKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getInfo(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class KeyboardArrowDownKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowDown(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class KeyboardArrowLeftKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowLeft(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class KeyboardArrowRightKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowRight(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class KeyboardArrowUpKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getKeyboardArrowUp(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class ListKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getList(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class LocationOnKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getLocationOn(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class LockKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getLock(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class MailOutlineKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getMailOutline(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class MenuKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getMenu(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class MoreVertKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getMoreVert(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class NotificationsKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getNotifications(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class PersonKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPerson(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class PhoneKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPhone(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class PlaceKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPlace(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class PlayArrowKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getPlayArrow(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class RefreshKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getRefresh(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class SearchKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getSearch(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class SendKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getSend(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class SettingsKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getSettings(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class ShareKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getShare(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class ShoppingCartKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getShoppingCart(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class StarKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getStar(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class ThumbUpKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getThumbUp(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+  public final class WarningKt {
+    method public static androidx.compose.ui.graphics.vector.ImageVector getWarning(androidx.compose.material.icons.Icons.TwoTone);
+  }
+
+}
+

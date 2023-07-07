@@ -1,0 +1,27 @@
+// Signature format: 4.0
+package androidx.compose.ui.tooling {
+
+  @androidx.compose.ui.ExperimentalComposeUiApi public final class ComposableInvoker {
+    method @androidx.compose.ui.ExperimentalComposeUiApi public void invokeComposable(String className, String methodName, androidx.compose.runtime.Composer composer, java.lang.Object?... args);
+    field public static final androidx.compose.ui.tooling.ComposableInvoker INSTANCE;
+  }
+
+  public final class ComposeViewAdapterKt {
+  }
+
+  public final class InspectableKt {
+    method @Deprecated @androidx.compose.runtime.Composable public static void InInspectionModeOnly(kotlin.jvm.functions.Function0<kotlin.Unit> content);
+  }
+
+  public final class PreviewUtilsKt {
+  }
+
+}
+
+package androidx.compose.ui.tooling.animation {
+
+  public final class ComposeAnimationParserKt {
+  }
+
+}
+

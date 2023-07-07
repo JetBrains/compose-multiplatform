@@ -1,0 +1,8 @@
+# Baseline profile rules for androidx.compose.runtime.saveable
+# =============================================
+HSPLandroidx/compose/runtime/saveable/RememberSaveableKt**->**(**)**
+HSPLandroidx/compose/runtime/saveable/SaveableStateHolderImpl**->**(**)**
+HSPLandroidx/compose/runtime/saveable/SaveableStateHolderKt**->**(**)**
+HSPLandroidx/compose/runtime/saveable/SaveableStateRegistryKt;->**(**)**
+HSPLandroidx/compose/runtime/saveable/SaveableStateRegistryImpl;->**(**)**
+Landroidx/compose/runtime/saveable/*;

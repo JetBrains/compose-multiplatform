@@ -1,0 +1,124 @@
+/*
+ * Copyright 2019 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import androidx.build.AndroidXComposePlugin
+import androidx.build.LibraryType
+import androidx.build.Publish
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id("AndroidXPlugin")
+    id("com.android.library")
+    id("AndroidXComposePlugin")
+}
+
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
+
+dependencies {
+
+    if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block below
+         */
+
+        api("androidx.activity:activity:1.2.0")
+        api(projectOrArtifact(":compose:ui:ui-test-junit4"))
+        api(androidxArtifact(":test:screenshot:screenshot"))
+
+        implementation(libs.kotlinStdlibCommon)
+        implementation(projectOrArtifact(":compose:runtime:runtime"))
+        implementation(projectOrArtifact(":compose:ui:ui-unit"))
+        implementation(projectOrArtifact(":compose:ui:ui-graphics"))
+        implementation("androidx.activity:activity-compose:1.3.1")
+        // old version of common-java8 conflicts with newer version, because both have
+        // DefaultLifecycleEventObserver.
+        // Outside of androidx this is resolved via constraint added to lifecycle-common,
+        // but it doesn't work in androidx.
+        // See aosp/1804059
+        implementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
+        implementation(libs.testCore)
+        implementation(libs.testRules)
+
+        // This has stub APIs for access to legacy Android APIs, so we don't want
+        // any dependency on this module.
+        compileOnly(projectOrArtifact(":compose:ui:ui-android-stubs"))
+
+        testImplementation(libs.truth)
+
+        androidTestImplementation(libs.truth)
+        androidTestImplementation(projectOrArtifact(":compose:material:material"))
+    }
+}
+
+if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+    androidXComposeMultiplatform {
+        android()
+    }
+
+    kotlin {
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block above
+         */
+        sourceSets {
+            commonMain.dependencies {
+                implementation(libs.kotlinStdlibCommon)
+                implementation(projectOrArtifact(":compose:runtime:runtime"))
+                implementation(projectOrArtifact(":compose:ui:ui-unit"))
+                implementation(projectOrArtifact(":compose:ui:ui-graphics"))
+                implementation(projectOrArtifact(":compose:ui:ui-test-junit4"))
+            }
+
+            androidMain.dependencies {
+                api("androidx.activity:activity:1.2.0")
+                implementation "androidx.activity:activity-compose:1.3.1"
+                api(projectOrArtifact(":compose:ui:ui-test-junit4"))
+//                api(projectOrArtifact(":test:screenshot:screenshot"))
+                // This has stub APIs for access to legacy Android APIs, so we don't want
+                // any dependency on this module.
+                compileOnly(projectOrArtifact(":compose:ui:ui-android-stubs"))
+                implementation(libs.testCore)
+                implementation(libs.testRules)
+            }
+
+            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
+            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
+            //  level dependencies block instead:
+            //  `dependencies { testImplementation(libs.robolectric) }`
+            androidTest.dependencies {
+                implementation(libs.truth)
+            }
+
+            androidAndroidTest.dependencies {
+                implementation(libs.truth)
+                implementation(projectOrArtifact(":compose:material:material"))
+            }
+        }
+    }
+}
+
+androidx {
+    name = "Compose Internal Test Utils"
+    type = LibraryType.INTERNAL_TEST_LIBRARY
+    publish = Publish.NONE
+    inceptionYear = "2020"
+    description = "Compose internal test utils."
+}
+
+android {
+    namespace "androidx.compose.testutils"
+}

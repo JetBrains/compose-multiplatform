@@ -1,0 +1,123 @@
+/*
+ * Copyright 2020 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import androidx.build.AndroidXComposePlugin
+import androidx.build.LibraryType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id("AndroidXPlugin")
+    id("com.android.library")
+    id("AndroidXComposePlugin")
+}
+
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
+
+if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+    dependencies {
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block below
+         */
+
+        implementation(libs.kotlinStdlib)
+
+        testImplementation(libs.junit)
+        testImplementation(libs.truth)
+        testImplementation(libs.kotlinTest)
+    }
+}
+
+if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+    androidXComposeMultiplatform {
+        android()
+        desktop()
+        darwin()
+        js()
+        wasm()
+    }
+
+    kotlin {
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block above
+         */
+        sourceSets {
+            commonMain.dependencies {
+                implementation(libs.kotlinStdlibCommon)
+            }
+
+            jvmMain.dependencies {
+                implementation(libs.kotlinStdlib)
+            }
+
+            androidMain.dependencies {
+                implementation(libs.kotlinStdlib)
+            }
+
+            jsMain {
+                dependencies {
+                    implementation(kotlin("stdlib-js"))
+                }
+            }
+
+            if (project.kotlinWasmEnabled.toBoolean()) {
+                wasmMain {
+                    dependencies {
+                        implementation(kotlin("stdlib-wasm"))
+                    }
+                }
+            }
+
+            commonTest.dependencies {
+                implementation(kotlin("test-junit"))
+            }
+
+            // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
+            //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
+            //  level dependencies block instead:
+            //  `dependencies { testImplementation(libs.robolectric) }`
+            androidTest.dependencies {
+                implementation(libs.truth)
+            }
+
+            desktopTest {
+                dependencies {
+                    implementation(libs.junit)
+                    implementation(libs.truth)
+                    implementation(libs.kotlinTest)
+                }
+            }
+            desktopTest.kotlin.srcDirs("src/test/kotlin")
+        }
+    }
+}
+
+androidx {
+    name = "Compose Util"
+    type = LibraryType.PUBLISHED_LIBRARY
+    inceptionYear = "2020"
+    description = "Internal Compose utilities used by other modules"
+    legacyDisableKotlinStrictApiMode = true
+}
+
+androidxCompose {
+    composeCompilerPluginEnabled = false
+}
+
+android {
+    namespace "androidx.compose.ui.util"
+}

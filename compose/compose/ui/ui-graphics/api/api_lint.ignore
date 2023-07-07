@@ -1,0 +1,75 @@
+// Baseline format: 1.0
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#arcTo(float, float, float, boolean, boolean, float, float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.arcTo(float,float,float,boolean,boolean,float,float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#arcToRelative(float, float, float, boolean, boolean, float, float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.arcToRelative(float,float,float,boolean,boolean,float,float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#close():
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.close()
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#curveTo(float, float, float, float, float, float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.curveTo(float,float,float,float,float,float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#curveToRelative(float, float, float, float, float, float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.curveToRelative(float,float,float,float,float,float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#horizontalLineTo(float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.horizontalLineTo(float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#horizontalLineToRelative(float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.horizontalLineToRelative(float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#lineTo(float, float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.lineTo(float,float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#lineToRelative(float, float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.lineToRelative(float,float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#moveTo(float, float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.moveTo(float,float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#moveToRelative(float, float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.moveToRelative(float,float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#quadTo(float, float, float, float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.quadTo(float,float,float,float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#quadToRelative(float, float, float, float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.quadToRelative(float,float,float,float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#reflectiveCurveTo(float, float, float, float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.reflectiveCurveTo(float,float,float,float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#reflectiveCurveToRelative(float, float, float, float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.reflectiveCurveToRelative(float,float,float,float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#reflectiveQuadTo(float, float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.reflectiveQuadTo(float,float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#reflectiveQuadToRelative(float, float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.reflectiveQuadToRelative(float,float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#verticalLineTo(float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.verticalLineTo(float)
+BuilderSetStyle: androidx.compose.ui.graphics.vector.PathBuilder#verticalLineToRelative(float):
+    Builder methods names should use setFoo() / addFoo() / clearFoo() style: method androidx.compose.ui.graphics.vector.PathBuilder.verticalLineToRelative(float)
+
+
+GetterOnBuilder: androidx.compose.ui.graphics.vector.PathBuilder#getNodes():
+    Getter should be on the built object, not the builder: method androidx.compose.ui.graphics.vector.PathBuilder.getNodes()
+
+
+KotlinDefaultParameterOrder: androidx.compose.ui.graphics.Canvas#drawImageRect(androidx.compose.ui.graphics.ImageBitmap, long, long, long, long, androidx.compose.ui.graphics.Paint) parameter #1:
+    Parameter `srcOffset` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.graphics.Canvas#drawImageRect(androidx.compose.ui.graphics.ImageBitmap, long, long, long, long, androidx.compose.ui.graphics.Paint) parameter #2:
+    Parameter `srcSize` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.graphics.Canvas#drawImageRect(androidx.compose.ui.graphics.ImageBitmap, long, long, long, long, androidx.compose.ui.graphics.Paint) parameter #3:
+    Parameter `dstOffset` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.graphics.Canvas#drawImageRect(androidx.compose.ui.graphics.ImageBitmap, long, long, long, long, androidx.compose.ui.graphics.Paint) parameter #4:
+    Parameter `dstSize` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+KotlinDefaultParameterOrder: androidx.compose.ui.graphics.CanvasKt#scale(androidx.compose.ui.graphics.Canvas, float, float, float, float) parameter #2:
+    Parameter `sy` has a default value and should come after all parameters without default values (except for a trailing lambda parameter)
+
+
+MissingBuildMethod: androidx.compose.ui.graphics.vector.PathBuilder:
+    androidx.compose.ui.graphics.vector.PathBuilder does not declare a `build()` method, but builder classes are expected to
+
+
+MissingNullability: androidx.compose.ui.graphics.PaintKt#Paint():
+    Missing nullability on method `Paint` return
+
+
+NotCloseable: androidx.compose.ui.graphics.AndroidPath:
+    Classes that release resources (close()) should implement AutoClosable and CloseGuard: class androidx.compose.ui.graphics.AndroidPath
+NotCloseable: androidx.compose.ui.graphics.Path:
+    Classes that release resources (close()) should implement AutoClosable and CloseGuard: class androidx.compose.ui.graphics.Path
+NotCloseable: androidx.compose.ui.graphics.vector.PathBuilder:
+    Classes that release resources (close()) should implement AutoClosable and CloseGuard: class androidx.compose.ui.graphics.vector.PathBuilder
+
+
+TopLevelBuilder: androidx.compose.ui.graphics.vector.PathBuilder:
+    Builder should be defined as inner class: androidx.compose.ui.graphics.vector.PathBuilder

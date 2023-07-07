@@ -1,0 +1,47 @@
+// Signature format: 4.0
+package androidx.compose.animation.tooling {
+
+  public final class ComposeAnimatedProperty {
+    ctor public ComposeAnimatedProperty(String label, Object value);
+    method public String component1();
+    method public Object component2();
+    method public androidx.compose.animation.tooling.ComposeAnimatedProperty copy(String label, Object value);
+    method public String getLabel();
+    method public Object getValue();
+    property public final String label;
+    property public final Object value;
+  }
+
+  @kotlin.jvm.JvmDefaultWithCompatibility public interface ComposeAnimation {
+    method public Object getAnimationObject();
+    method public default String? getLabel();
+    method public default java.util.Set<java.lang.Object> getStates();
+    method public androidx.compose.animation.tooling.ComposeAnimationType getType();
+    property public abstract Object animationObject;
+    property public default String? label;
+    property public default java.util.Set<java.lang.Object> states;
+    property public abstract androidx.compose.animation.tooling.ComposeAnimationType type;
+  }
+
+  public enum ComposeAnimationType {
+    enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType ANIMATED_VALUE;
+    enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType ANIMATED_VISIBILITY;
+    enum_constant public static final androidx.compose.animation.tooling.ComposeAnimationType TRANSITION_ANIMATION;
+  }
+
+  public final class TransitionInfo {
+    ctor public TransitionInfo(String label, String specType, long startTimeMillis, long endTimeMillis, java.util.Map<java.lang.Long,?> values);
+    method public long getEndTimeMillis();
+    method public String getLabel();
+    method public String getSpecType();
+    method public long getStartTimeMillis();
+    method public java.util.Map<java.lang.Long,java.lang.Object> getValues();
+    property public final long endTimeMillis;
+    property public final String label;
+    property public final String specType;
+    property public final long startTimeMillis;
+    property public final java.util.Map<java.lang.Long,java.lang.Object> values;
+  }
+
+}
+

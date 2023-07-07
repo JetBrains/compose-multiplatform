@@ -1,0 +1,5 @@
+# Baseline profile rules for androidx.compose.ui.geometry
+# =============================================
+# All of geometry is highly used, small, and mathy, so we include everything
+HSPLandroidx/compose/ui/geometry/*->**(**)**
+Landroidx/compose/ui/geometry/*;

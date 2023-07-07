@@ -1,0 +1,7 @@
+# Bug component: 1070768
+mount@google.com
+ryanmentley@google.com
+njawad@google.com
+
+# For text related files
+include /TEXT_OWNERS

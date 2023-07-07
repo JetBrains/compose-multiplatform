@@ -1,0 +1,238 @@
+/*
+ * Copyright 2019 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import androidx.build.AndroidXComposePlugin
+import androidx.build.LibraryType
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id("AndroidXPlugin")
+    id("AndroidXComposePlugin")
+    id("com.android.library")
+}
+
+AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
+
+dependencies {
+
+    if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block below
+         */
+
+        api(libs.kotlinCoroutinesAndroid)
+
+        implementation("androidx.annotation:annotation:1.1.0")
+        implementation(libs.kotlinStdlib)
+        implementation(libs.atomicFu)
+
+        testImplementation(libs.kotlinTestJunit)
+        testImplementation(libs.junit)
+        testImplementation(libs.robolectric)
+        testImplementation(libs.kotlinCoroutinesTest)
+
+        androidTestImplementation(libs.kotlinTestJunit)
+        androidTestImplementation(libs.testExtJunit)
+        androidTestImplementation(libs.testRules)
+        androidTestImplementation(libs.testRunner)
+        androidTestImplementation(libs.junit)
+        androidTestImplementation(libs.truth)
+
+        lintChecks(projectOrArtifact(":compose:runtime:runtime-lint"))
+        lintPublish(projectOrArtifact(":compose:runtime:runtime-lint"))
+
+        samples(projectOrArtifact(":compose:runtime:runtime:runtime-samples"))
+    }
+}
+
+if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
+    androidXComposeMultiplatform {
+        android()
+        desktop()
+        js()
+        wasm()
+        darwin()
+    }
+
+    kotlin {
+        // Not all modules can have these targets, so declare them here instead of androidXComposeMultiplatform.
+        // We can support the kotlin-native targets supported by kotlin coroutines:
+        // https://github.com/Kotlin/kotlinx.coroutines/blob/master/gradle/compile-native-multiplatform.gradle
+        watchosArm64()
+        watchosArm32()
+        watchosX86()
+        watchosX64()
+        watchosSimulatorArm64()
+        tvosArm64()
+        tvosX64()
+        tvosSimulatorArm64()
+        mingwX64()
+        linuxX64()
+
+        targets.js {
+            nodejs {
+                testTask {
+                    useMocha {
+                        timeout = 8000
+                    }
+                }
+            }
+            browser() {
+                testTask {
+                    testLogging.showStandardStreams = true
+                    useKarma {
+                        useChromeHeadless()
+                        useFirefox()
+                    }
+                }
+            }
+        }
+
+        /*
+         * When updating dependencies, make sure to make the an an analogous update in the
+         * corresponding block above
+         */
+        sourceSets {
+            commonMain.dependencies {
+                implementation(libs.kotlinStdlibCommon)
+                implementation(libs.kotlinCoroutinesCore)
+                implementation(libs.atomicFu)
+            }
+            jvmMain.dependencies {
+                implementation(libs.kotlinStdlib)
+                api(libs.kotlinCoroutinesCore)
+            }
+            androidMain {
+                dependencies {
+                    api(libs.kotlinCoroutinesAndroid)
+                    api("androidx.annotation:annotation:1.1.0")
+                }
+            }
+
+            commonTest.dependencies {
+                implementation kotlin("test")
+                implementation(libs.kotlinCoroutinesTest)
+            }
+
+            androidAndroidTest {
+                dependsOn(jvmTest)
+                dependencies {
+                    implementation(libs.testExtJunit)
+                    implementation(libs.testRules)
+                    implementation(libs.testRunner)
+                    implementation(libs.truth)
+                    implementation(libs.kotlinCoroutinesTest)
+                }
+            }
+
+            jsMain {
+                dependencies {
+                    implementation(libs.kotlinStdlibJs)
+                }
+            }
+
+            jsNativeMain.dependsOn(commonMain)
+            jsWasmMain {
+                dependsOn(jsNativeMain)
+            }
+            jsMain {
+                dependsOn(jsWasmMain)
+                dependencies {
+                    implementation(kotlin("stdlib-js"))
+                }
+            }
+
+            if (project.kotlinWasmEnabled.toBoolean()) {
+                wasmMain {
+                    dependsOn(jsWasmMain)
+                    dependencies {
+                        implementation(kotlin("stdlib-wasm"))
+                    }
+                }
+            }
+
+            nativeMain.dependsOn(jsNativeMain)
+
+            linuxX64Main.dependsOn(nativeMain)
+            linuxX64Test.dependsOn(nativeTest)
+            mingwX64Main.dependsOn(nativeMain)
+            mingwX64Test.dependsOn(nativeTest)
+
+            def darwinMain = sourceSets.getByName("darwinMain")
+            def darwinTest = sourceSets.getByName("darwinTest")
+
+            def watchOsMain = sourceSets.create("watchOsMain")
+            def watchOsTest = sourceSets.create("watchOsTest")
+            watchOsMain.dependsOn(darwinMain)
+            watchOsTest.dependsOn(darwinTest)
+
+            watchosArm64Main.dependsOn(watchOsMain)
+            watchosArm64Test.dependsOn(watchOsTest)
+            watchosArm32Main.dependsOn(watchOsMain)
+            watchosArm32Test.dependsOn(watchOsTest)
+            watchosX86Main.dependsOn(watchOsMain)
+            watchosX86Test.dependsOn(watchOsTest)
+            watchosX64Main.dependsOn(watchOsMain)
+            watchosX64Test.dependsOn(watchOsTest)
+            watchosSimulatorArm64Main.dependsOn(watchOsMain)
+            watchosSimulatorArm64Test.dependsOn(watchOsTest)
+
+            def tvOsMain = sourceSets.create("tvOsMain")
+            def tvOsTest = sourceSets.create("tvOsTest")
+            tvOsMain.dependsOn(darwinMain)
+            tvOsTest.dependsOn(darwinTest)
+
+            tvosArm64Main.dependsOn(tvOsMain)
+            tvosArm64Test.dependsOn(tvOsTest)
+            tvosX64Main.dependsOn(tvOsMain)
+            tvosX64Test.dependsOn(tvOsTest)
+            tvosSimulatorArm64Main.dependsOn(tvOsMain)
+            tvosSimulatorArm64Test.dependsOn(tvOsTest)
+
+            jvmTest.dependencies {
+                implementation(libs.kotlinTestJunit)
+                implementation(libs.kotlinCoroutinesTest)
+            }
+            jsTest {
+                dependencies {
+                    implementation(libs.kotlinTestJs)
+                }
+            }
+            nativeTest {
+                kotlin.srcDir("src/nativeTest/kotlin")
+            }
+        }
+    }
+    dependencies {
+        samples(projectOrArtifact(":compose:runtime:runtime:runtime-samples"))
+    }
+}
+
+android {
+    defaultConfig {
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+    namespace "androidx.compose.runtime"
+}
+
+androidx {
+    name = "Compose Runtime"
+    type = LibraryType.PUBLISHED_LIBRARY
+    inceptionYear = "2019"
+    description = "Tree composition support for code generated by the Compose compiler plugin and corresponding public API"
+    legacyDisableKotlinStrictApiMode = true
+}

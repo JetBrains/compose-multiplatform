@@ -1,0 +1,122 @@
+/*
+ * Copyright 2021 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package androidx.compose.ui.input.pointer
+
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.platform.LocalPointerIconService
+import androidx.compose.ui.platform.debugInspectorInfo
+
+/**
+ * Represents a pointer icon to use in [Modifier.pointerHoverIcon]
+ */
+@Stable
+interface PointerIcon {
+
+    /**
+     * A collection of common pointer icons used for the mouse cursor. These icons will be used to
+     * assign default pointer icons for various widgets.
+     */
+    companion object {
+
+        /** The default arrow icon that is commonly used for cursor icons. */
+        val Default = pointerIconDefault
+
+        /** Commonly used when selecting precise portions of the screen. */
+        val Crosshair = pointerIconCrosshair
+
+        /** Also called an I-beam cursor, this is commonly used on selectable or editable text. */
+        val Text = pointerIconText
+
+        /** Commonly used to indicate to a user that an element is clickable. */
+        val Hand = pointerIconHand
+    }
+}
+
+internal expect val pointerIconDefault: PointerIcon
+internal expect val pointerIconCrosshair: PointerIcon
+internal expect val pointerIconText: PointerIcon
+internal expect val pointerIconHand: PointerIcon
+
+internal interface PointerIconService {
+    var current: PointerIcon
+
+    fun requestUpdate() {}
+}
+
+/**
+ * Creates modifier which specifies desired pointer icon when the cursor is over the modified
+ * element.
+ *
+ * @sample androidx.compose.ui.samples.PointerIconSample
+ *
+ * @param icon The icon to set
+ * @param overrideDescendants when false (by default) descendants are able to set their own pointer
+ * icon. if true it overrides descendants' icon.
+ */
+@Stable
+fun Modifier.pointerHoverIcon(icon: PointerIcon, overrideDescendants: Boolean = false) =
+    composed(
+        inspectorInfo = debugInspectorInfo {
+            name = "pointerHoverIcon"
+            properties["icon"] = icon
+            properties["overrideDescendants"] = overrideDescendants
+        }
+    ) {
+        val pointerIconService = LocalPointerIconService.current
+        if (pointerIconService == null) {
+            Modifier
+        } else {
+            val rememberIcon = rememberUpdatedState(icon)
+            val rememberOverrideDescendants = rememberUpdatedState(overrideDescendants)
+            val hovered = remember { mutableStateOf(false) }
+
+            if (hovered.value) {
+                DisposableEffect(icon) {
+                    pointerIconService.requestUpdate()
+                    onDispose { }
+                }
+            }
+
+            this.pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val pass = if (rememberOverrideDescendants.value)
+                            PointerEventPass.Main
+                        else
+                            PointerEventPass.Initial
+                        val event = awaitPointerEvent(pass)
+                        val isOutsideRelease = event.type == PointerEventType.Release &&
+                            event.changes[0].isOutOfBounds(size, Size.Zero)
+
+                        if (event.type != PointerEventType.Exit && !isOutsideRelease) {
+                            hovered.value = true
+                            pointerIconService.current = rememberIcon.value
+                        } else {
+                            hovered.value = false
+                        }
+                    }
+                }
+            }
+        }
+    }

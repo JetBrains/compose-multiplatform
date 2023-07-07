@@ -1,0 +1,37 @@
+// Signature format: 4.0
+package androidx.compose.material.icons {
+
+  public final class Icons {
+    method public androidx.compose.material.icons.Icons.Filled getDefault();
+    property public final androidx.compose.material.icons.Icons.Filled Default;
+    field public static final androidx.compose.material.icons.Icons INSTANCE;
+  }
+
+  public static final class Icons.Filled {
+    field public static final androidx.compose.material.icons.Icons.Filled INSTANCE;
+  }
+
+  public static final class Icons.Outlined {
+    field public static final androidx.compose.material.icons.Icons.Outlined INSTANCE;
+  }
+
+  public static final class Icons.Rounded {
+    field public static final androidx.compose.material.icons.Icons.Rounded INSTANCE;
+  }
+
+  public static final class Icons.Sharp {
+    field public static final androidx.compose.material.icons.Icons.Sharp INSTANCE;
+  }
+
+  public static final class Icons.TwoTone {
+    field public static final androidx.compose.material.icons.Icons.TwoTone INSTANCE;
+  }
+
+  public final class IconsKt {
+    method public static inline androidx.compose.ui.graphics.vector.ImageVector materialIcon(String name, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.ImageVector.Builder,androidx.compose.ui.graphics.vector.ImageVector.Builder> block);
+    method public static inline androidx.compose.ui.graphics.vector.ImageVector.Builder materialPath(androidx.compose.ui.graphics.vector.ImageVector.Builder, optional float fillAlpha, optional float strokeAlpha, optional int pathFillType, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.vector.PathBuilder,kotlin.Unit> pathBuilder);
+    field @kotlin.PublishedApi internal static final float MaterialIconDimension = 24.0f;
+  }
+
+}
+

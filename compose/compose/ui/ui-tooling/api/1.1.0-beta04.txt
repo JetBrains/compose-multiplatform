@@ -1,0 +1,22 @@
+// Signature format: 4.0
+package androidx.compose.ui.tooling {
+
+  public final class ComposeViewAdapterKt {
+  }
+
+  public final class InspectableKt {
+    method @Deprecated @androidx.compose.runtime.Composable public static void InInspectionModeOnly(kotlin.jvm.functions.Function0<kotlin.Unit> content);
+  }
+
+  public final class PreviewUtilsKt {
+  }
+
+}
+
+package androidx.compose.ui.tooling.animation {
+
+  public final class ComposeAnimationParserKt {
+  }
+
+}
+

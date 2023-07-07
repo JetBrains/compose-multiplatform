@@ -1,0 +1,6 @@
+# Baseline profile rules for androidx.compose.foundation.layout
+# =============================================
+# Layout is incredibly important for performance, and represents many hot code paths. For now, we
+# will include all of the layout namespace
+HSPLandroidx/compose/foundation/layout/**->**(**)**
+Landroidx/compose/foundation/layout/**;

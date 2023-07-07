@@ -1,0 +1,336 @@
+/*
+ * Copyright 2021 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+syntax = "proto3";
+package layoutinspector.compose.inspection;
+option java_package = "layoutinspector.compose.inspection";
+option java_outer_classname = "LayoutInspectorComposeProtocol";
+
+// ======= MESSAGES =======
+
+// A mapping of |string| to |int32|, so strings can be efficiently reused across nodes
+// Any time a text value in any of these messages has an |int32| type, it means it will do a
+// lookup in a string table on the client.
+message StringEntry {
+    int32 id = 1;
+    string str = 2;
+}
+
+message Point {
+    int32 x = 1;
+    int32 y = 2;
+}
+
+message Rect {
+    int32 x = 1;
+    int32 y = 2;
+    int32 w = 3;
+    int32 h = 4;
+}
+
+// A Quad holds the 4 corners of a polygon in drawing order, that represent the transformed shape
+// of a Rect after applying some affine or perspective transformations.
+message Quad {
+    sint32 x0 = 1;
+    sint32 y0 = 2;
+    sint32 x1 = 3;
+    sint32 y1 = 4;
+    sint32 x2 = 5;
+    sint32 y2 = 6;
+    sint32 x3 = 7;
+    sint32 y3 = 8;
+}
+
+message Bounds {
+    // The bounds of some element in the layout tree
+    Rect layout = 1;
+    // Bounds transformed in preparation for final rendering
+    Quad render = 2;
+}
+
+message ComposableRoot {
+    // The ID of the View this Composable tree is rooted underneath
+    int64 view_id = 1;
+    // All composables owned by this view (usually just one but could be more)
+    repeated ComposableNode nodes = 2;
+    // All views owned by this view that should be hidden
+    repeated int64 views_to_skip = 3;
+}
+
+message ComposableNode {
+    sint64 id = 1;
+    repeated ComposableNode children = 2;
+
+    // The hash of the file's package, for disambiguating same filenames in different folders
+    int32 package_hash = 3;
+    int32 filename = 4; // The file this Composable is defined in
+    int32 line_number = 5;  // The line number within the file
+    int32 offset = 6; // Offset into the file for the exact character position
+
+    int32 name = 7;
+
+    Bounds bounds = 8;
+
+    enum Flags {
+      NONE = 0;
+      SYSTEM_CREATED = 0x1;
+      HAS_MERGED_SEMANTICS = 0x2;
+      HAS_UNMERGED_SEMANTICS = 0x4;
+      INLINED = 0x8;
+    }
+    int32 flags = 9;
+
+    int64 view_id = 10;
+
+    // The number of recompositions detected since the last counter reset
+    int32 recompose_count = 11;
+
+    // The number of recomposition skips detected since the last counter reset
+    int32 recompose_skips = 12;
+
+    // The unique id of an anchor. This used to be its hashcode. See InspectorNode.anchorId.
+    sint32 anchor_hash = 13;
+}
+
+// In Android, a resource id is a simple integer. This class holds the namespace, type, and name
+// of such a resource id.
+// For example, with "@android:id/textView":
+//   type: id
+//   namespace: android
+//   name: textView
+message Resource {
+    int32 type = 1;
+    int32 namespace = 2;
+    int32 name = 3;
+}
+
+// Data that helps us identify a lambda block in code
+message LambdaValue {
+  int32 package_name = 1;       // the package part of the containing class name
+  int32 file_name = 2;          // the file name of the containing class
+  int32 lambda_name = 3;        // the name of the lambda class
+  int32 function_name = 4;      // the function name if this is a function reference
+  int32 start_line_number = 5;  // the line number of the start of the lambda
+  int32 end_line_number = 6;    // the line number of the end of the lambda
+}
+
+// Parameters to a @Composable function
+message Parameter {
+    enum Type {
+      UNSPECIFIED = 0;
+      STRING = 1;
+      BOOLEAN = 2;
+      DOUBLE = 3;
+      FLOAT = 4;
+      INT32 = 5;
+      INT64 = 6;
+      COLOR = 7;
+      RESOURCE = 8;
+      DIMENSION_DP = 9;
+      DIMENSION_SP = 10;
+      DIMENSION_EM = 11;
+      LAMBDA = 12;
+      FUNCTION_REFERENCE = 13;
+      ITERABLE = 14;
+    }
+
+    Type type = 1;
+    int32 name = 2;
+    repeated Parameter elements = 3;
+    ParameterReference reference = 4;
+
+    // For elements inside another Parameter instance, this index refer to the
+    // "natural" index of the parent composite value in the agent.
+    //
+    // We record this to be able to identify a reference to another parameter in
+    // the client and agent. Note that e.g:
+    //   - null elements in a List are omitted
+    // A reference will indicate the index among all values, such that we don't
+    // have to count nulls during a GetParameterDetailsCommand.
+    sint32 index = 5;
+
+    oneof value {
+        int32 int32_value = 11;
+        int64 int64_value = 12;
+        double double_value = 13;
+        float float_value = 14;
+        Resource resource_value = 15;
+        LambdaValue lambda_value = 16;
+    }
+}
+
+// A reference to a "part" of a parameter value
+message ParameterReference {
+  enum Kind {
+    UNSPECIFIED = 0;
+    NORMAL = 1;
+    MERGED_SEMANTICS = 2;
+    UNMERGED_SEMANTICS = 3;
+  }
+
+  sint64 composable_id = 1;
+
+  // Identifies an index into a ParameterGroup
+  int32 parameter_index = 2;
+
+  // If the parameter value is a composite value such as:
+  //    List<MyClass>
+  // then:
+  //    composite_index[0] is the index into the List
+  //    composite_index[1] is the index into the fields in MyClass
+  //    composite_index[2] is the index into the field found by [1] etc...
+  repeated int32 composite_index = 3;
+
+  // The kind of parameter this is a reference to
+  Kind kind = 4;
+
+  // The anchor hash of the composable. See InspectorNode.anchorId.
+  sint32 anchor_hash = 5;
+}
+
+// A collection of all parameters associated with a single composable
+message ParameterGroup {
+  sint64 composable_id = 1;
+  repeated Parameter parameter = 3;
+  repeated Parameter merged_semantics = 4;
+  repeated Parameter unmerged_semantics = 5;
+}
+
+// ======= COMMANDS, RESPONSES, AND EVENTS =======
+
+// Response fired when incoming command bytes cannot be parsed or handled. This may occur if a newer
+// version of the client tries to interact with an older inspector.
+message UnknownCommandResponse {
+  // The initial command bytes received that couldn't be handled. By returning this back to the
+  // client, it should be able to identify what they sent that failed on the inspector side.
+  bytes command_bytes = 1;
+}
+
+// Request all composables found under a layout tree rooted under the specified view
+message GetComposablesCommand {
+   int64 root_view_id = 1;
+  // If true, only show composable nodes created by the user's own app
+  bool skip_system_composables = 2;
+  // If the cached data generation matches the specified generation then the cache is still valid.
+  int32 generation = 3;
+  // If true, extract all parameters even if `delayParameterExtractions` is off.
+  bool extract_all_parameters = 4;
+}
+
+message GetComposablesResponse {
+    // A collection of all text referenced by other fields in this message
+    repeated StringEntry strings = 1;
+    repeated ComposableRoot roots = 2;
+}
+
+message GetParametersCommand {
+  int64 root_view_id = 1; // Used for filtering out composables from unrelated layout trees
+  sint64 composable_id = 2;
+  // As an optimization, we can skip over searching system composables if we know we don't care
+  // about them.
+  bool skip_system_composables = 3;
+  // Max number of recursions into nested composite parameter values.
+  // It is possible to dig in further by using: GetParameterDetailsCommand.
+  // If not specified the default is 2.
+  int32 max_recursions = 4;
+  // Max number of initial elements in an iterable such as a List/Array.
+  // It is possible to request more elements by using: GetParameterDetailsCommand.
+  // If not specified the default is 5.
+  int32 max_initial_iterable_size = 5;
+  // If the cached data generation matches the specified generation then the cache is still valid.
+  int32 generation = 6;
+  // The anchor hash of the composable. See InspectorNode.anchorId.
+  sint32 anchor_hash = 7;
+}
+
+message GetParametersResponse {
+  // A collection of all text referenced by other fields in this message
+  repeated StringEntry strings = 1;
+  ParameterGroup parameter_group = 2;
+}
+
+// Request all parameters for all composables under a particular layout tree
+message GetAllParametersCommand {
+  int64 root_view_id = 1;
+  bool skip_system_composables = 2;
+  int32 max_recursions = 3;
+  int32 max_initial_iterable_size = 4;
+  // If the cached data generation matches the specified generation then the cache is still valid.
+  int32 generation = 5;
+}
+
+message GetAllParametersResponse {
+  int64 root_view_id = 1; // Echoed from GetAllParametersCommand
+  repeated StringEntry strings = 2;
+  repeated ParameterGroup parameter_groups = 3;
+}
+
+// Request parameter details for the parameter specified
+message GetParameterDetailsCommand {
+  int64 root_view_id = 1;
+  ParameterReference reference = 2;
+  int32 start_index = 3;
+  int32 max_elements = 4;
+  bool skip_system_composables = 5;
+  int32 max_recursions = 6;
+  int32 max_initial_iterable_size = 7;
+  // If the cached data generation matches the specified generation then the cache is still valid.
+  int32 generation = 8;
+}
+
+message GetParameterDetailsResponse {
+  int64 root_view_id = 1; // Echoed from GetParameterDetailsCommand
+  repeated StringEntry strings = 2;
+  Parameter parameter = 3;
+}
+
+message UpdateSettingsCommand {
+  // If true, start (or continue) counting repositions.
+  // If false stop counting recompositions.
+  bool include_recompose_counts = 1;
+  // If true, the recomposition counts will be kept.
+  // If false, the recomposition counts will be reset.
+  bool keep_recompose_counts = 2;
+  // If true, the compose parameters will not be extracted before
+  bool delay_parameter_extractions = 3;
+}
+
+// The active settings after handling of an UpdateSettingsCommand
+message UpdateSettingsResponse {
+  // If true, the agent has the capability for delaying parameter extractions
+  bool can_delay_parameter_extractions = 3;
+}
+
+message Command {
+  oneof specialized {
+    GetComposablesCommand get_composables_command = 1;
+    GetParametersCommand get_parameters_command = 2;
+    GetAllParametersCommand get_all_parameters_command = 3;
+    GetParameterDetailsCommand get_parameter_details_command = 4;
+    UpdateSettingsCommand update_settings_command = 5;
+  }
+}
+
+message Response {
+  oneof specialized {
+    GetComposablesResponse get_composables_response = 1;
+    GetParametersResponse get_parameters_response = 2;
+    GetAllParametersResponse get_all_parameters_response = 3;
+    GetParameterDetailsResponse get_parameter_details_response = 4;
+    UpdateSettingsResponse update_settings_response = 5;
+
+    UnknownCommandResponse unknown_command_response = 100;
+  }
+}

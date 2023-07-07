@@ -1,0 +1,3 @@
+// Baseline format: 1.0
+KotlinOperator: androidx.compose.ui.unit.IntRect#contains(long):
+    Note that adding the `operator` keyword would allow calling this method using operator syntax
