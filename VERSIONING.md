@@ -45,6 +45,9 @@ When a new version of Kotlin is released, the corresponding Compose Multiplatfor
 
 #### Using Jetpack Compose Compiler
 
+> **Note**   
+> The Jetpack Compose Compiler Plugin `androidx.compose.compiler:compiler` is guaranteed to function properly for **Kotlin/JVM** targets, including both the desktop and Android platforms. However, its reliability may not extend to **Kotlin/JS** and **Kotlin/Native** targets. For these scenarios, we recommend using the Compose Multiplatform Compiler Plugin `org.jetbrains.compose.compiler:compiler` to ensure compatibility. See [Using the Compose Multiplatform compiler](#using-the-compose-multiplatform-compiler).
+
 The compilation process of composable functions is handled by the Compose compiler plugin. Each release of the compiler plugin is strictly bound to a single version of the Kotlin compiler. Normally, the Gradle plugin chooses an appropriate version of the compiler plugin automatically. But there is a way to choose another version of Compose Compiler. For example, you can use Jetpack Compose Compiler published by Google.
 
 First, check [this page](https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility) to find a compatible version. If there is one, use it this way:
@@ -54,6 +57,7 @@ compose {
 }
 ```
 (`1.4.2` corresponds Kotlin 1.8.10)
+
 
 #### Disabling Kotlin compatibility check
 
@@ -67,6 +71,25 @@ compose {
 ```
 
 Here we set a fixed version of Compose Compiler and configure it by specifying additional arguments. The argument `suppressKotlinVersionCompatibilityCheck` disables the internal Kotlin check that happens inside the compiler. In this argument you should specify the version of Kotlin that is applied to your project. It is required to avoid situations when you upgraded Kotlin and forgot to update Compose Compiler.
+
+#### Using the Compose Multiplatform Compiler
+
+Typically, `-dev` versions of Compose Multiplatform (such as 1.5.0-dev1084) contain actual version mappings from Kotlin to the Compose Compiler. This includes Beta and RC (Release Candidate) builds of Kotlin.
+
+If you're looking to test a Beta or RC version of Kotlin that isn't directly supported by the stable release of Compose Multiplatform, there are two potential solutions:
+
+1) Consider using the most recent `-dev` build of Compose Multiplatform. See the [releases page](https://github.com/JetBrains/compose-multiplatform/releases).
+2) Manually specify the `kotlinCompilerPlugin` version. You can find the suitable version by consulting the following file:  [ComposeCompilerCompatibility](https://github.com/JetBrains/compose-multiplatform/blob/master/gradle-plugins/compose/src/main/kotlin/org/jetbrains/compose/ComposeCompilerCompatibility.kt#L7).
+
+For instance, if you wish to use Kotlin 1.9.0-RC, you can do so in the following way:
+
+```kotlin
+compose {
+    kotlinCompilerPlugin.set("1.4.8-beta")
+}
+```
+
+**Note:** Unstable versions of Compose Multiplatform compiler plugin (like `1.4.8-beta)` are not available in mavenCentral. Please add `maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")` to the list of repositories in order to use such versions.
 
 ### Relationship between the Jetpack Compose and Compose Multiplatform release cycles
 
