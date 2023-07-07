@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (C) 2018 The Android Open Source Project
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+-->
+<ttFont sfntVersion="\x00\x01\x00\x00" ttLibVersion="3.0">
+
+  <GlyphOrder>
+    <!-- The 'id' attribute is only for humans; it is ignored when parsed. -->
+    <GlyphID id="0" name=".notdef"/>
+    <GlyphID id="1" name="one"/>
+  </GlyphOrder>
+
+  <head>
+    <tableVersion value="1.0"/>
+    <fontRevision value="1.0"/>
+    <checkSumAdjustment value="0x197fe7e4"/>
+    <magicNumber value="0x5f0f3cf5"/>
+    <flags value="00000000 00001011"/>
+    <unitsPerEm value="1000"/>
+    <created value="Thu Feb 17 06:02:08 2022"/>
+    <modified value="Thu Feb 17 06:02:08 2022"/>
+    <xMin value="0"/>
+    <yMin value="-500"/>
+    <xMax value="1000"/>
+    <yMax value="1500"/>
+    <macStyle value="00000000 00000000"/>
+    <lowestRecPPEM value="8"/>
+    <fontDirectionHint value="2"/>
+    <indexToLocFormat value="0"/>
+    <glyphDataFormat value="0"/>
+  </head>
+
+  <hhea>
+    <tableVersion value="0x00010000"/>
+    <ascent value="1500"/>
+    <descent value="-500"/>
+    <lineGap value="0"/>
+    <advanceWidthMax value="1000"/>
+    <minLeftSideBearing value="0"/>
+    <minRightSideBearing value="0"/>
+    <xMaxExtent value="1000"/>
+    <caretSlopeRise value="1"/>
+    <caretSlopeRun value="0"/>
+    <caretOffset value="0"/>
+    <reserved0 value="0"/>
+    <reserved1 value="0"/>
+    <reserved2 value="0"/>
+    <reserved3 value="0"/>
+    <metricDataFormat value="0"/>
+    <numberOfHMetrics value="5"/>
+  </hhea>
+
+  <maxp>
+    <tableVersion value="0x10000"/>
+    <numGlyphs value="6"/>
+    <maxPoints value="4"/>
+    <maxContours value="1"/>
+    <maxCompositePoints value="0"/>
+    <maxCompositeContours value="0"/>
+    <maxZones value="0"/>
+    <maxTwilightPoints value="0"/>
+    <maxStorage value="0"/>
+    <maxFunctionDefs value="0"/>
+    <maxInstructionDefs value="0"/>
+    <maxStackElements value="0"/>
+    <maxSizeOfInstructions value="0"/>
+    <maxComponentElements value="0"/>
+    <maxComponentDepth value="0"/>
+  </maxp>
+
+  <OS_2>
+    <!-- The fields 'usFirstCharIndex' and 'usLastCharIndex'
+         will be recalculated by the compiler -->
+    <version value="3"/>
+    <xAvgCharWidth value="833"/>
+    <usWeightClass value="100"/>
+    <usWidthClass value="5"/>
+    <fsType value="00000000 00001000"/>
+    <ySubscriptXSize value="650"/>
+    <ySubscriptYSize value="600"/>
+    <ySubscriptXOffset value="0"/>
+    <ySubscriptYOffset value="75"/>
+    <ySuperscriptXSize value="650"/>
+    <ySuperscriptYSize value="600"/>
+    <ySuperscriptXOffset value="0"/>
+    <ySuperscriptYOffset value="350"/>
+    <yStrikeoutSize value="50"/>
+    <yStrikeoutPosition value="300"/>
+    <sFamilyClass value="0"/>
+    <panose>
+      <bFamilyType value="0"/>
+      <bSerifStyle value="0"/>
+      <bWeight value="5"/>
+      <bProportion value="0"/>
+      <bContrast value="0"/>
+      <bStrokeVariation value="0"/>
+      <bArmStyle value="0"/>
+      <bLetterForm value="0"/>
+      <bMidline value="0"/>
+      <bXHeight value="0"/>
+    </panose>
+    <ulUnicodeRange1 value="00000000 00000000 00000000 00000001"/>
+    <ulUnicodeRange2 value="00000000 00000000 00000000 00000000"/>
+    <ulUnicodeRange3 value="00000000 00000000 00000000 00000000"/>
+    <ulUnicodeRange4 value="00000000 00000000 00000000 00000000"/>
+    <achVendID value="UKWN"/>
+    <fsSelection value="00000000 01000000"/>
+    <usFirstCharIndex value="10"/>
+    <usLastCharIndex value="49"/>
+    <sTypoAscender value="1500"/>
+    <sTypoDescender value="-500"/>
+    <sTypoLineGap value="200"/>
+    <usWinAscent value="1500"/>
+    <usWinDescent value="500"/>
+    <ulCodePageRange1 value="00000000 00000000 00000000 00000001"/>
+    <ulCodePageRange2 value="00000000 00000000 00000000 00000000"/>
+    <sxHeight value="500"/>
+    <sCapHeight value="700"/>
+    <usDefaultChar value="0"/>
+    <usBreakChar value="32"/>
+    <usMaxContext value="1"/>
+  </OS_2>
+
+  <hmtx>
+    <mtx name=".notdef" width="500" lsb="0"/>
+    <mtx name="one" width="1000" lsb="471"/>
+  </hmtx>
+
+  <cmap>
+    <tableVersion version="0"/>
+    <cmap_format_4 platformID="3" platEncID="10" language="0">
+      <map code="0x31" name="one"/><!-- DIGIT ONE -->
+    </cmap_format_4>
+  </cmap>
+
+  <loca>
+    <!-- The 'loca' table will be calculated by the compiler -->
+  </loca>
+
+  <glyf>
+    <TTGlyph name=".notdef"/><!-- contains no outline data -->
+    <TTGlyph name="one" xMin="471" yMin="-500" xMax="767" yMax="1500">
+      <contour>
+        <pt x="639" y="-500" on="1"/>
+        <pt x="471" y="-156" on="1"/>
+        <pt x="471" y="1076" on="1"/>
+        <pt x="767" y="1500" on="1"/>
+      </contour>
+      <instructions/>
+    </TTGlyph>
+  </glyf>
+
+  <name>
+    <namerecord nameID="0" platformID="1" platEncID="0" langID="0x0" unicode="True">
+      Copyright (C) 2018 The Android Open Source Project
+    </namerecord>
+    <namerecord nameID="1" platformID="1" platEncID="0" langID="0x0" unicode="True">
+      Sample Font
+    </namerecord>
+    <namerecord nameID="2" platformID="1" platEncID="0" langID="0x0" unicode="True">
+      Regular
+    </namerecord>
+    <namerecord nameID="3" platformID="1" platEncID="0" langID="0x0" unicode="True">
+      Sample Tall Font
+    </namerecord>
+    <namerecord nameID="4" platformID="1" platEncID="0" langID="0x0" unicode="True">
+      Sample Tall Font
+    </namerecord>
+    <namerecord nameID="5" platformID="1" platEncID="0" langID="0x0" unicode="True">
+      Version 1.0
+    </namerecord>
+    <namerecord nameID="6" platformID="1" platEncID="0" langID="0x0" unicode="True">
+      TallFont-Regular
+    </namerecord>
+    <namerecord nameID="13" platformID="1" platEncID="0" langID="0x0" unicode="True">
+      Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+    </namerecord>
+    <namerecord nameID="14" platformID="1" platEncID="0" langID="0x0" unicode="True">
+      http://www.apache.org/licenses/LICENSE-2.0
+    </namerecord>
+    <namerecord nameID="0" platformID="3" platEncID="1" langID="0x409">
+      Copyright (C) 2018 The Android Open Source Project
+    </namerecord>
+    <namerecord nameID="1" platformID="3" platEncID="1" langID="0x409">
+      Sample Tall Font
+    </namerecord>
+    <namerecord nameID="2" platformID="3" platEncID="1" langID="0x409">
+      Regular
+    </namerecord>
+    <namerecord nameID="3" platformID="3" platEncID="1" langID="0x409">
+      Sample Tall Font
+    </namerecord>
+    <namerecord nameID="4" platformID="3" platEncID="1" langID="0x409">
+      Sample Tall Font
+    </namerecord>
+    <namerecord nameID="5" platformID="3" platEncID="1" langID="0x409">
+      TallFont-Regular
+    </namerecord>
+    <namerecord nameID="6" platformID="3" platEncID="1" langID="0x409">
+      Sample Tall Font
+    </namerecord>
+    <namerecord nameID="13" platformID="3" platEncID="1" langID="0x409">
+      Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+    </namerecord>
+    <namerecord nameID="14" platformID="3" platEncID="1" langID="0x409">
+      http://www.apache.org/licenses/LICENSE-2.0
+    </namerecord>
+  </name>
+
+  <post>
+    <formatType value="2.0"/>
+    <italicAngle value="0.0"/>
+    <underlinePosition value="-75"/>
+    <underlineThickness value="50"/>
+    <isFixedPitch value="0"/>
+    <minMemType42 value="0"/>
+    <maxMemType42 value="0"/>
+    <minMemType1 value="0"/>
+    <maxMemType1 value="0"/>
+    <psNames>
+    </psNames>
+    <extraNames>
+    </extraNames>
+  </post>
+
+</ttFont>

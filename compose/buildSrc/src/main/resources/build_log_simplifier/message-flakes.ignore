@@ -1,1 +1,149 @@
-../../../../../development/build_log_simplifier/message-flakes.ignore
+# This file is a list of regexes of innocuous messages that might appear in stdout/stderr
+# Messages that are expected to appear in a build should be exempted in messages.ignore instead, because that file is subject to garbage collection whereas this one is not
+# Before adding a suppression to this file, please attempt to suppress the output inside the generating tool instead.
+# If the developer is using remote build cache, we mention it in the output
+Using AndroidX remote build cache
+# > Task :sqlite:integration-tests:inspection-room-testapp:kaptDebugAndroidTestKotlin
+ZipFile closed
+# > Task :room:integration-tests:room-testapp:runErrorProne
+java\.util\.zip\.ZipException\: ZipFile closed
+# > Task :compose:internal-lint-checks:lint
+Classpath entry points to a non\-existent location\: \$OUT_DIR\/ui\/compose\/internal\-lint\-checks\/build\/classes\/kotlin\/main
+# > Task :compose:animation:animation-core:testDebugUnitTest
+androidx\.compose\.animation\.core\.AnimationClockTest \> testSubscriptionDuringFrameCallback FAILED
+kotlin\.UninitializedPropertyAccessException at AnimationClockTest\.kt\:[0-9]+
+There were failing tests\. See the report at\: file\:\/\/\$OUT_DIR\/ui\/compose\/animation\/animation\-core\/build\/reports\/tests\/testDebugUnitTest\/index\.html
+# > Task :room:integration-tests:room-testapp-autovalue:compileDebugAndroidTestJavaWithJavac
+Stream closed
+# > Task :room:integration-tests:room-testapp:compileDebugJavaWithJavac
+java.io.IOException: Stream closed
+# > Task :compose:compiler:compiler-hosted:integration-tests:testDebugUnitTest
+# If a test fails, we don't want the build to fail, we want to pass the test output to the tests server and for the tests server to report the failure
+[0-9]+ test.*failed.*
+There were failing tests\. See the report at: .*.html
+# Some status messages
+Starting a Gradle Daemon.*
+Remote build cache is disabled when running with \-\-offline\.
+[0-9]+ actionable tasks: [0-9]+ up\-to\-date
+[0-9]+ actionable tasks: [0-9]+ executed
+[0-9]+ actionable task: [0-9]+ executed
+[0-9]+ actionable tasks: [0-9]+ executed, [0-9]+ from cache, [0-9]+ up\-to\-date
+The remote build cache was disabled during the build due to errors\.
+The build is running offline\. A build scan will not be published at this time, but it can be published if you run the buildScanPublishPrevious task in the next build\.
+Calculating task graph as configuration cache cannot be reused because environment variable '.*' has changed\.
+Calculating task graph as configuration cache cannot be reused because file '[^ ]*' has changed\.
+Calculating task graph as no configuration cache is available for tasks:.*
+Reusing configuration cache\.
+Calculating task graph as configuration cache cannot be reused because an input to task '[^ ]*' has changed\.
+See the profiling report at\: file\:\/\/\$OUT_DIR\/buildSrc\/build\/reports\/profile\/profile\-[0-9]+\-[0-9]+\-[0-9]+\-[0-9]+\-[0-9]+\-[0-9]+\.html
+# Some messages that encode the number of a certain type of other error
+[0-9]+ errors, [0-9]+ warnings \([0-9]+ warnings filtered by baseline lint\-baseline\.xml\)
+[0-9]+ errors, [0-9]+ warnings \([0-9]+ warning filtered by baseline lint\-baseline\.xml\)
+[0-9]+ problems were found reusing the configuration cache, [0-9]+ of which seems unique\.
+[0-9]+ problems were found reusing the configuration cache\.
+[0-9]+ problem was found reusing the configuration cache\.
+Configuration cache entry reused with [0-9]+ problem\.
+# > Task :webkit:integration-tests:testapp:compileReleaseJavaWithJavac
+\[ant\:jacocoReport\] Note\: Some input files use or override a deprecated API\.
+\[ant\:jacocoReport\] Note\: Recompile with \-Xlint\:deprecation for details\.
+\[ant\:jacocoReport\] Note\: Some input files use unchecked or unsafe operations\.
+\[ant\:jacocoReport\] Note\: Recompile with \-Xlint\:unchecked for details\.
+# b/179833331 , https://youtrack.jetbrains.com/issue/KT-35156
+# b/181258249 , https://youtrack.jetbrains.com/issue/KT-43881
+# > Task :jetifier-core:compileKotlin
+Could not perform incremental compilation\: Could not connect to Kotlin compile daemon
+Could not connect to kotlin daemon\. Using fallback strategy\.
+\.\.\. [0-9]+ more
+at java\.rmi\/sun\.rmi\.transport\.StreamRemoteCall\.exceptionReceivedFromServer\(StreamRemoteCall\.java\:[0-9]+\)
+at java\.rmi\/sun\.rmi\.transport\.StreamRemoteCall\.executeCall\(StreamRemoteCall\.java\:[0-9]+\)
+at java\.rmi\/sun\.rmi\.server\.UnicastRef\.invoke\(UnicastRef\.java\:[0-9]+\)
+at java\.rmi\/java\.rmi\.server\.RemoteObjectInvocationHandler\.invokeRemoteMethod\(RemoteObjectInvocationHandler\.java\:[0-9]+\)
+at java\.rmi\/java\.rmi\.server\.RemoteObjectInvocationHandler\.invoke\(RemoteObjectInvocationHandler\.java\:[0-9]+\)
+at com\.sun\.proxy\.\$Proxy[0-9]+\.compile\(Unknown Source\)
+at org\.jetbrains\.kotlin\.compilerRunner\.GradleKotlinCompilerWork\.incrementalCompilationWithDaemon\(GradleKotlinCompilerWork\.kt\:[0-9]+\)
+at org\.jetbrains\.kotlin\.compilerRunner\.GradleKotlinCompilerWork\.compileWithDaemon\(GradleKotlinCompilerWork\.kt\:[0-9]+\)
+at org\.jetbrains\.kotlin\.compilerRunner\.GradleKotlinCompilerWork\.compileWithDaemonOrFallbackImpl\(GradleKotlinCompilerWork\.kt\:[0-9]+\)
+at org\.jetbrains\.kotlin\.compilerRunner\.GradleKotlinCompilerWork\.run\(GradleKotlinCompilerWork\.kt\:[0-9]+\)
+at org\.jetbrains\.kotlin\.compilerRunner\.GradleCompilerRunnerWithWorkers\$GradleKotlinCompilerWorkAction\.execute\(GradleCompilerRunnerWithWorkers\.kt\:[0-9]+\)
+Caused by\: java\.lang\.AssertionError\: Incremental compilation is not enabled
+at org\.jetbrains\.kotlin\.incremental\.IncrementalCompilerRunner\.compileImpl\(IncrementalCompilerRunner\.kt\:[0-9]+\)
+at org\.jetbrains\.kotlin\.incremental\.IncrementalCompilerRunner\.compile\(IncrementalCompilerRunner\.kt\:[0-9]+\)
+at org\.jetbrains\.kotlin\.daemon\.CompileServiceImplBase\.execIncrementalCompiler\(CompileServiceImpl\.kt\:[0-9]+\)
+at org\.jetbrains\.kotlin\.daemon\.CompileServiceImplBase\.access\$execIncrementalCompiler\(CompileServiceImpl\.kt\:[0-9]+\)
+at org\.jetbrains\.kotlin\.daemon\.CompileServiceImpl\.compile\(CompileServiceImpl\.kt\:[0-9]+\)
+at java\.rmi\/sun\.rmi\.transport\.Transport\.serviceCall\(Transport\.java\:[0-9]+\)
+at java\.rmi\/sun\.rmi\.transport\.tcp\.TCPTransport\.handleMessages\(TCPTransport\.java\:[0-9]+\)
+at java\.rmi\/sun\.rmi\.transport\.tcp\.TCPTransport\$ConnectionHandler\.run[0-9]+\(TCPTransport\.java\:[0-9]+\)
+at java\.rmi\/sun\.rmi\.transport\.tcp\.TCPTransport\$ConnectionHandler\.lambda\$run\$[0-9]+\(TCPTransport\.java\:[0-9]+\)
+at java\.rmi\/sun\.rmi\.transport\.tcp\.TCPTransport\$ConnectionHandler\.run\(TCPTransport\.java\:[0-9]+\)
+Compilation with Kotlin compile daemon was not successful
+java\.rmi\.ServerError\: Error occurred in server thread\; nested exception is\:
+java\.lang\.AssertionError\: Incremental compilation is not enabled
+at java\.rmi\/sun\.rmi\.server\.UnicastServerRef\.dispatch\(UnicastServerRef\.java\:[0-9]+\)
+at java\.rmi\/sun\.rmi\.transport\.Transport\$[0-9]+\.run\(Transport\.java\:[0-9]+\)
+# https://youtrack.jetbrains.com/issue/KT-46068
+# > Task :compose:ui:ui-graphics:compileReleaseKotlin
+java\.lang\.Exception: Unknown or invalid session [0-9]+
+at org\.jetbrains\.kotlin\.daemon\.common\.CompileService\$CallResult\$Error\.get\(CompileService\.kt:[0-9]+\)
+at java.base.*
+warning: ATTENTION!
+# b/185474400
+at org.gradle.*
+# > Task :internal-testutils-common:lintAnalyze
+Scanning .*:
+Failure reading binary cache file .*\.android\/cache\/api\-versions\-[0-9]+\-[0-9A-Z]+rev[0-9]+\.bin
+Please delete the file and restart the IDE\/lint\: .*\.android\/cache\/api\-versions\-[0-9]+\-[0-9A-Z]+rev[0-9]+\.bin
+java\.io\.FileNotFoundException\: .*\.android\/cache\/api\-versions\-[0-9]+\-[0-9A-Z]+rev[0-9]+\.bin \(No such file or directory\)
+at com\.google\.common\.io\.Files\$FileByteSource\.openStream\(Files\.java\:[0-9]+\)
+at com\.google\.common\.io\.Files\$FileByteSource\.read\(Files\.java\:[0-9]+\)
+at com\.google\.common\.io\.Files\.toByteArray\(Files\.java\:[0-9]+\)
+at com\.android\.tools\.lint\.checks\.ApiDatabase\.readData\(ApiDatabase\.java\:[0-9]+\)
+at com\.android\.tools\.lint\.checks\.ApiLookup\.\<init\>\(ApiLookup\.java\:[0-9]+\)
+at com\.android\.tools\.lint\.checks\.ApiLookup\.get\(ApiLookup\.java\:[0-9]+\)
+at com\.android\.tools\.lint\.checks\.ApiDetector\.beforeCheckRootProject\(ApiDetector\.kt\:[0-9]+\)
+at com\.android\.tools\.lint\.client\.api\.LintDriver\.checkProject\(LintDriver\.kt\:[0-9]+\)
+at com\.android\.tools\.lint\.client\.api\.LintDriver\.checkProjectRoot\(LintDriver\.kt\:[0-9]+\)
+at com\.android\.tools\.lint\.client\.api\.LintDriver\.access\$checkProjectRoot\(LintDriver\.kt\:[0-9]+\)
+at com\.android\.tools\.lint\.client\.api\.LintDriver\$analyzeOnly\$[0-9]+\.invoke\(LintDriver\.kt\:[0-9]+\)
+at com\.android\.tools\.lint\.client\.api\.LintDriver\.doAnalyze\(LintDriver\.kt\:[0-9]+\)
+at com\.android\.tools\.lint\.client\.api\.LintDriver\.analyzeOnly\(LintDriver\.kt\:[0-9]+\)
+at com\.android\.tools\.lint\.LintCliClient\$analyzeOnly\$[0-9]+\.invoke\(LintCliClient\.kt\:[0-9]+\)
+at com\.android\.tools\.lint\.LintCliClient\.run\(LintCliClient\.kt\:[0-9]+\)
+at com\.android\.tools\.lint\.LintCliClient\.run\$default\(LintCliClient\.kt\:[0-9]+\)
+at com\.android\.tools\.lint\.LintCliClient\.analyzeOnly\(LintCliClient\.kt\:[0-9]+\)
+at com\.android\.tools\.lint\.Main\.run\(Main\.java\:[0-9]+\)
+at com\.android\.build\.gradle\.internal\.lint\.AndroidLintWorkAction\.invokeLintMainRunMethod\(AndroidLintWorkAction\.kt\:[0-9]+\)
+at com\.android\.build\.gradle\.internal\.lint\.AndroidLintWorkAction\.runLint\(AndroidLintWorkAction\.kt\:[0-9]+\)
+at com\.android\.build\.gradle\.internal\.lint\.AndroidLintWorkAction\.execute\(AndroidLintWorkAction\.kt\:[0-9]+\)
+# > Task :buildSrc-tests:lintAnalyze
+.*\.android\/cache\/api\-versions\-[0-9]+\-[0-9A-Z]+rev[0-9]+\.bin does not exist
+# > Task :wear:wear-watchface:testDebugUnitTest
+System\.logW: A resource was acquired at attached stack trace but never released\. See java\.io\.Closeable for information on avoiding resource leaks\.java\.lang\.Throwable: Explicit termination method 'dispose' not called
+System\.logW: A resource was acquired at attached stack trace but never released\. See java\.io\.Closeable for information on avoiding resource leaks\.java\.lang\.Throwable: Explicit termination method 'release' not called
+# https://youtrack.jetbrains.com/issue/KT-46940
+warning\: The following options were not recognized by any processor\: \'\[.*\]\'
+# > Task :checkNativeApi / :generateNativeApi / :updateNativeApi
+Native API checking is currently not supported on non-linux devices
+# Known warning for Googlers
+It looks like you are a Googler running without remote build cache.*
+# built-in Gradle suggestions that a developer can't easily take when running remotely in CI
+\* Try:
+> Run with \-\-info or \-\-debug option to get more log output\.
+> Run with \-\-scan to get full insights\.
+# developers already see this message when local builds fail and don't need to also see it in CI
+\* Get more help at https://help\.gradle\.org
+# Flaky printout from kapt
+WARNING: Illegal reflective access by org\.jetbrains\.kotlin\.kapt3\.util\.ModuleManipulationUtilsKt .* to constructor com\.sun\.tools\.javac\.util\.Context\(\)
+WARNING: Please consider reporting this to the maintainers of org\.jetbrains\.kotlin\.kapt3\.util\.ModuleManipulationUtilsKt
+# b/225244932
+Index data read correctly
+Could not read index from network cache: null
+# androidx-studio-integration uses custom AGP and lint
+Using custom version .* of AGP due to GRADLE_PLUGIN_VERSION being set\.
+Using custom version .* of Lint due to LINT_VERSION being set\.
+Using custom version .* of metalava due to METALAVA_VERSION being set\.
+Publishing build scan\.\.\.
+https://ge\.androidx\.dev/s/.*
+# androidx-demos:compileReleaseJavaWithJavac
+Note: \$SUPPORT/samples/AndroidXDemos/src/main/java/com/example/androidx/util/DiffUtilActivity\.java uses unchecked or unsafe operations\.
+Calculating task graph as configuration cache cannot be reused because JVM has changed\.

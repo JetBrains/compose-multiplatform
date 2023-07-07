@@ -1,0 +1,281 @@
+[versions]
+ACTIVITY = "1.7.0-rc01"
+ADS_IDENTIFIER = "1.0.0-alpha05"
+ANNOTATION = "1.7.0-alpha01"
+ANNOTATION_KMP = "1.6.0-dev01"
+ANNOTATION_EXPERIMENTAL = "1.4.0-alpha01"
+ANNOTATION_EXPERIMENTAL_KMP = "1.4.0-dev01"
+APPACTIONS_INTERACTION = "1.0.0-alpha01"
+APPCOMPAT = "1.7.0-alpha03"
+APPSEARCH = "1.1.0-alpha03"
+ARCH_CORE = "2.3.0-alpha01"
+ASYNCLAYOUTINFLATER = "1.1.0-alpha02"
+AUTOFILL = "1.2.0-beta02"
+BENCHMARK = "1.2.0-alpha10"
+BIOMETRIC = "1.2.0-alpha06"
+BLUETOOTH = "1.0.0-alpha01"
+BROWSER = "1.6.0-alpha01"
+BUILDSRC_TESTS = "1.0.0-alpha01"
+CAMERA = "1.3.0-alpha04"
+CAMERA_PIPE = "1.0.0-alpha01"
+CARDVIEW = "1.1.0-alpha01"
+CAR_APP = "1.4.0-alpha01"
+COLLECTION = "1.3.0-alpha03"
+COLLECTION_KMP = "1.3.0-dev01"
+COMPOSE = "1.4.2"
+COMPOSE_COMPILER = "1.4.3"
+COMPOSE_MATERIAL3 = "1.1.0-alpha07"
+COMPOSE_RUNTIME_TRACING = "1.0.0-alpha03"
+CONSTRAINTLAYOUT = "2.2.0-beta01"
+CONSTRAINTLAYOUT_COMPOSE = "1.1.0-beta01"
+CONSTRAINTLAYOUT_CORE = "1.1.0-beta01"
+CONTENTPAGER = "1.1.0-alpha01"
+COORDINATORLAYOUT = "1.3.0-alpha01"
+CORE = "1.11.0-alpha01"
+CORE_ANIMATION = "1.0.0-beta02"
+CORE_ANIMATION_TESTING = "1.0.0-beta01"
+CORE_APPDIGEST = "1.0.0-alpha01"
+CORE_GOOGLE_SHORTCUTS = "1.2.0-alpha01"
+CORE_I18N = "1.0.0-alpha01"
+CORE_LOCATION_ALTITUDE = "1.0.0-alpha01"
+CORE_PERFORMANCE = "1.0.0-alpha03"
+CORE_REMOTEVIEWS = "1.0.0-beta04"
+CORE_ROLE = "1.2.0-alpha01"
+CORE_SPLASHSCREEN = "1.1.0-alpha01"
+CORE_UWB = "1.0.0-alpha05"
+CREDENTIALS = "1.0.0-alpha03"
+CURSORADAPTER = "1.1.0-alpha01"
+CUSTOMVIEW = "1.2.0-alpha03"
+CUSTOMVIEW_POOLINGCONTAINER = "1.1.0-alpha01"
+DATASTORE = "1.1.0-alpha02"
+DATASTORE_KMP = "1.1.0-dev01"
+DOCUMENTFILE = "1.1.0-alpha02"
+DRAGANDDROP = "1.1.0-alpha01"
+DRAWERLAYOUT = "1.2.0-rc01"
+DYNAMICANIMATION = "1.1.0-alpha04"
+DYNAMICANIMATION_KTX = "1.0.0-alpha04"
+EMOJI = "1.2.0-alpha03"
+EMOJI2 = "1.3.0"
+EMOJI2_QUARANTINE = "1.0.0-alpha02"
+ENTERPRISE = "1.1.0-rc01"
+EXIFINTERFACE = "1.4.0-alpha01"
+FRAGMENT = "1.6.0-alpha06"
+FUTURES = "1.2.0-alpha01"
+GLANCE = "1.0.0-alpha06"
+GLANCE_TEMPLATE = "1.0.0-alpha01"
+GRAPHICS = "1.0.0-alpha03"
+GRAPHICS_FILTERS = "1.0.0-alpha01"
+GRIDLAYOUT = "1.1.0-alpha01"
+HEALTH_CONNECT = "1.0.0-alpha11"
+HEALTH_SERVICES_CLIENT = "1.0.0-beta03"
+HEIFWRITER = "1.1.0-alpha02"
+HILT = "1.1.0-alpha02"
+HILT_NAVIGATION_COMPOSE = "1.1.0-alpha02"
+INPUT_MOTIONPREDICTION = "1.0.0-alpha03"
+INSPECTION = "1.0.0"
+INTERPOLATOR = "1.1.0-alpha01"
+JAVASCRIPTENGINE = "1.0.0-alpha04"
+LEANBACK = "1.2.0-alpha03"
+LEANBACK_GRID = "1.0.0-alpha02"
+LEANBACK_PAGING = "1.1.0-alpha10"
+LEANBACK_PREFERENCE = "1.2.0-alpha03"
+LEANBACK_TAB = "1.1.0-beta01"
+LEGACY = "1.1.0-alpha01"
+LIBYUV = "0.1.0-dev01"
+LIFECYCLE = "2.6.0-rc01"
+LIFECYCLE_EXTENSIONS = "2.2.0"
+LOADER = "1.2.0-alpha01"
+MEDIA = "1.7.0-alpha02"
+MEDIA2 = "1.3.0-alpha01"
+MEDIAROUTER = "1.4.0-beta02"
+METRICS = "1.0.0-alpha04"
+NAVIGATION = "2.6.0-alpha06"
+PAGING = "3.2.0-alpha05"
+PAGING_COMPOSE = "1.0.0-alpha19"
+PALETTE = "1.1.0-alpha01"
+PERCENTLAYOUT = "1.1.0-alpha01"
+PREFERENCE = "1.3.0-alpha01"
+PRINT = "1.1.0-beta01"
+PRIVACYSANDBOX_ADS = "1.0.0-beta01"
+PRIVACYSANDBOX_PLUGINS = "1.0.0-alpha01"
+PRIVACYSANDBOX_SDKRUNTIME = "1.0.0-alpha01"
+PRIVACYSANDBOX_TOOLS = "1.0.0-alpha03"
+PRIVACYSANDBOX_UI = "1.0.0-alpha01"
+PROFILEINSTALLER = "1.3.0-beta02"
+RECOMMENDATION = "1.1.0-alpha01"
+RECYCLERVIEW = "1.4.0-alpha01"
+RECYCLERVIEW_SELECTION = "1.2.0-alpha02"
+REMOTECALLBACK = "1.0.0-alpha02"
+RESOURCEINSPECTION = "1.1.0-alpha01"
+ROOM = "2.6.0-alpha01"
+SAVEDSTATE = "1.3.0-alpha01"
+SECURITY = "1.1.0-alpha05"
+SECURITY_APP_AUTHENTICATOR = "1.0.0-alpha03"
+SECURITY_APP_AUTHENTICATOR_TESTING = "1.0.0-alpha02"
+SECURITY_BIOMETRIC = "1.0.0-alpha01"
+SECURITY_IDENTITY_CREDENTIAL = "1.0.0-alpha04"
+SHARETARGET = "1.3.0-alpha01"
+SLICE = "1.1.0-alpha02"
+SLICE_BENCHMARK = "1.1.0-alpha02"
+SLICE_BUILDERS_KTX = "1.0.0-alpha08"
+SLICE_REMOTECALLBACK = "1.0.0-alpha01"
+SLIDINGPANELAYOUT = "1.3.0-alpha01"
+SQLITE = "2.4.0-alpha01"
+SQLITE_INSPECTOR = "2.1.0-alpha01"
+STABLE_AIDL = "1.0.0-alpha01"
+STARTUP = "1.2.0-alpha03"
+SWIPEREFRESHLAYOUT = "1.2.0-alpha01"
+TESTEXT = "1.0.0-alpha01"
+TESTSCREENSHOT = "1.0.0-alpha01"
+TEST_UIAUTOMATOR = "2.3.0-alpha03"
+TEXT = "1.0.0-alpha01"
+TRACING = "1.2.0-alpha02"
+TRACING_PERFETTO = "1.0.0-alpha11"
+TRANSITION = "1.5.0-alpha01"
+TV = "1.0.0-alpha04"
+TVPROVIDER = "1.1.0-alpha02"
+VECTORDRAWABLE = "1.2.0-beta02"
+VECTORDRAWABLE_ANIMATED = "1.2.0-beta01"
+VECTORDRAWABLE_SEEKABLE = "1.0.0-beta02"
+VERSIONED_PARCELABLE = "1.2.0-alpha01"
+VIEWPAGER = "1.1.0-alpha02"
+VIEWPAGER2 = "1.2.0-alpha01"
+WEAR = "1.3.0-alpha05"
+WEAR_COMPOSE = "1.2.0-alpha05"
+WEAR_COMPOSE_MATERIAL3 = "1.0.0-alpha01"
+WEAR_INPUT = "1.2.0-alpha03"
+WEAR_INPUT_TESTING = "1.2.0-alpha03"
+WEAR_ONGOING = "1.1.0-alpha01"
+WEAR_PHONE_INTERACTIONS = "1.1.0-alpha04"
+WEAR_PROTOLAYOUT = "1.0.0-alpha04"
+WEAR_REMOTE_INTERACTIONS = "1.1.0-alpha01"
+WEAR_TILES = "1.2.0-alpha01"
+WEAR_WATCHFACE = "1.2.0-alpha07"
+WEBKIT = "1.7.0-alpha03"
+WINDOW = "1.1.0-alpha06"
+WINDOW_EXTENSIONS = "1.1.0-alpha03"
+WINDOW_EXTENSIONS_CORE = "1.0.0-alpha01"
+WINDOW_SIDECAR = "1.0.0-rc01"
+WORK = "2.9.0-alpha01"
+
+[groups]
+ACTIVITY = { group = "androidx.activity", atomicGroupVersion = "versions.ACTIVITY" }
+ADS = { group = "androidx.ads" }
+ANNOTATION = { group = "androidx.annotation" }
+APPACTIONS_INTERACTION = { group = "androidx.appactions.interaction", atomicGroupVersion = "versions.APPACTIONS_INTERACTION" }
+APPCOMPAT = { group = "androidx.appcompat", atomicGroupVersion = "versions.APPCOMPAT" }
+APPSEARCH = { group = "androidx.appsearch", atomicGroupVersion = "versions.APPSEARCH" }
+ARCH_CORE = { group = "androidx.arch.core", atomicGroupVersion = "versions.ARCH_CORE" }
+ASYNCLAYOUTINFLATER = { group = "androidx.asynclayoutinflater", atomicGroupVersion = "versions.ASYNCLAYOUTINFLATER" }
+AUTOFILL = { group = "androidx.autofill", atomicGroupVersion = "versions.AUTOFILL" }
+BENCHMARK = { group = "androidx.benchmark", atomicGroupVersion = "versions.BENCHMARK" }
+BIOMETRIC = { group = "androidx.biometric", atomicGroupVersion = "versions.BIOMETRIC" }
+BLUETOOTH = { group = "androidx.bluetooth", atomicGroupVersion = "versions.BLUETOOTH" }
+BROWSER = { group = "androidx.browser", atomicGroupVersion = "versions.BROWSER" }
+BUILDSRC_TESTS_MAX_DEP_VERSIONS_DEP = { group = "androidx.buildSrc-tests-max-dep-versions-dep", atomicGroupVersion = "versions.BUILDSRC_TESTS", overrideInclude = [ ":buildSrc-tests:max-dep-versions:buildSrc-tests-max-dep-versions-dep" ] }
+BUILDSRC_TESTS_MAX_DEP_VERSIONS_MAIN = { group = "androidx.buildSrc-tests-max-dep-versions-main", atomicGroupVersion = "versions.BUILDSRC_TESTS", overrideInclude = [ ":buildSrc-tests:max-dep-versions:buildSrc-tests-max-dep-versions-main" ] }
+CAMERA = { group = "androidx.camera", atomicGroupVersion = "versions.CAMERA" }
+CARDVIEW = { group = "androidx.cardview", atomicGroupVersion = "versions.CARDVIEW" }
+CAR_APP = { group = "androidx.car.app", atomicGroupVersion = "versions.CAR_APP" }
+COLLECTION = { group = "androidx.collection", atomicGroupVersion = "versions.COLLECTION", multiplatformGroupVersion = "versions.COLLECTION_KMP" }
+COMPOSE_ANIMATION = { group = "org.jetbrains.compose.animation", atomicGroupVersion = "versions.COMPOSE" }
+COMPOSE_COMPILER = { group = "org.jetbrains.compose.compiler", atomicGroupVersion = "versions.COMPOSE_COMPILER" }
+COMPOSE_DESKTOP = { group = "org.jetbrains.compose.desktop", atomicGroupVersion = "versions.COMPOSE" }
+COMPOSE_FOUNDATION = { group = "org.jetbrains.compose.foundation", atomicGroupVersion = "versions.COMPOSE" }
+COMPOSE_MATERIAL = { group = "org.jetbrains.compose.material", atomicGroupVersion = "versions.COMPOSE" }
+COMPOSE_MATERIAL3 = { group = "org.jetbrains.compose.material3", atomicGroupVersion = "versions.COMPOSE_MATERIAL3" }
+COMPOSE_RUNTIME = { group = "org.jetbrains.compose.runtime", atomicGroupVersion = "versions.COMPOSE" }
+COMPOSE_UI = { group = "org.jetbrains.compose.ui", atomicGroupVersion = "versions.COMPOSE" }
+CONCURRENT = { group = "androidx.concurrent", atomicGroupVersion = "versions.FUTURES" }
+CONSTRAINTLAYOUT = { group = "androidx.constraintlayout" }
+CONTENTPAGER = { group = "androidx.contentpager", atomicGroupVersion = "versions.CONTENTPAGER" }
+COORDINATORLAYOUT = { group = "androidx.coordinatorlayout", atomicGroupVersion = "versions.COORDINATORLAYOUT" }
+CORE = { group = "androidx.core" }
+CORE_UWB = { group = "androidx.core.uwb", atomicGroupVersion = "versions.CORE_UWB" }
+CREDENTIALS = { group = "androidx.credentials", atomicGroupVersion = "versions.CREDENTIALS" }
+CURSORADAPTER = { group = "androidx.cursoradapter", atomicGroupVersion = "versions.CURSORADAPTER" }
+CUSTOMVIEW = { group = "androidx.customview" }
+DATASTORE = { group = "androidx.datastore", atomicGroupVersion = "versions.DATASTORE", multiplatformGroupVersion = "versions.DATASTORE_KMP" }
+DOCUMENTFILE = { group = "androidx.documentfile", atomicGroupVersion = "versions.DOCUMENTFILE" }
+DRAGANDDROP = { group = "androidx.draganddrop", atomicGroupVersion = "versions.DRAGANDDROP" }
+DRAWERLAYOUT = { group = "androidx.drawerlayout", atomicGroupVersion = "versions.DRAWERLAYOUT" }
+DYNAMICANIMATION = { group = "androidx.dynamicanimation" }
+EMOJI = { group = "androidx.emoji" }
+EMOJI2 = { group = "androidx.emoji2", atomicGroupVersion = "versions.EMOJI2" }
+ENTERPRISE = { group = "androidx.enterprise", atomicGroupVersion = "versions.ENTERPRISE" }
+EXIFINTERFACE = { group = "androidx.exifinterface", atomicGroupVersion = "versions.EXIFINTERFACE" }
+FRAGMENT = { group = "androidx.fragment", atomicGroupVersion = "versions.FRAGMENT" }
+GLANCE = { group = "androidx.glance", atomicGroupVersion = "versions.GLANCE" }
+GLANCE_TEMPLATE = { group = "androidx.template", atomicGroupVersion = "versions.GLANCE_TEMPLATE" }
+GRAPHICS = { group = "androidx.graphics", atomicGroupVersion = "versions.GRAPHICS" }
+GRAPHICS_FILTERS = { group = "androidx.graphics.filters", atomicGroupVersion = "versions.GRAPHICS_FILTERS" }
+GRIDLAYOUT = { group = "androidx.gridlayout", atomicGroupVersion = "versions.GRIDLAYOUT" }
+HEALTH = { group = "androidx.health" }
+HEALTH_CONNECT = { group = "androidx.health.connect", atomicGroupVersion = "versions.HEALTH_CONNECT" }
+HEIFWRITER = { group = "androidx.heifwriter", atomicGroupVersion = "versions.HEIFWRITER" }
+HILT = { group = "androidx.hilt" }
+INPUT = { group = "androidx.input" }
+INSPECTION = { group = "androidx.inspection", atomicGroupVersion = "versions.INSPECTION" }
+INSPECTION_EXTENSIONS = { group = "androidx.inspection.extensions", atomicGroupVersion = "versions.SQLITE_INSPECTOR", overrideInclude = [ ":sqlite:sqlite-inspection"] }
+INTERPOLATOR = { group = "androidx.interpolator", atomicGroupVersion = "versions.INTERPOLATOR" }
+JAVASCRIPTENGINE = { group = "androidx.javascriptengine", atomicGroupVersion = "versions.JAVASCRIPTENGINE" }
+LEANBACK = { group = "androidx.leanback" }
+LEGACY = { group = "androidx.legacy" }
+LIBYUV = { group = "libyuv", atomicGroupVersion = "versions.LIBYUV" }
+LIFECYCLE = { group = "androidx.lifecycle", atomicGroupVersion = "versions.LIFECYCLE" }
+LIFECYCLE_EXTENSIONS = { group = "androidx.lifecycle", atomicGroupVersion = "versions.LIFECYCLE_EXTENSIONS", overrideInclude = [ ":lifecycle:lifecycle-extensions" ] }
+LOADER = { group = "androidx.loader", atomicGroupVersion = "versions.LOADER" }
+MEDIA = { group = "androidx.media" }
+MEDIA2 = { group = "androidx.media2", atomicGroupVersion = "versions.MEDIA2" }
+MEDIAROUTER = { group = "androidx.mediarouter", atomicGroupVersion = "versions.MEDIAROUTER" }
+METRICS = { group = "androidx.metrics", atomicGroupVersion = "versions.METRICS" }
+NAVIGATION = { group = "androidx.navigation", atomicGroupVersion = "versions.NAVIGATION" }
+PAGING = { group = "androidx.paging", atomicGroupVersion = "versions.PAGING" }
+PALETTE = { group = "androidx.palette", atomicGroupVersion = "versions.PALETTE" }
+PERCENTLAYOUT = { group = "androidx.percentlayout", atomicGroupVersion = "versions.PERCENTLAYOUT" }
+PREFERENCE = { group = "androidx.preference", atomicGroupVersion = "versions.PREFERENCE" }
+PRINT = { group = "androidx.print", atomicGroupVersion = "versions.PRINT" }
+PRIVACYSANDBOX_ADS = { group = "androidx.privacysandbox.ads", atomicGroupVersion = "versions.PRIVACYSANDBOX_ADS" }
+PRIVACYSANDBOX_PLUGINS = { group = "androidx.privacysandbox.plugins", atomicGroupVersion = "versions.PRIVACYSANDBOX_PLUGINS" }
+PRIVACYSANDBOX_SDKRUNTIME = { group = "androidx.privacysandbox.sdkruntime", atomicGroupVersion = "versions.PRIVACYSANDBOX_SDKRUNTIME" }
+PRIVACYSANDBOX_TOOLS = { group = "androidx.privacysandbox.tools", atomicGroupVersion = "versions.PRIVACYSANDBOX_TOOLS" }
+PRIVACYSANDBOX_UI = { group = "androidx.privacysandbox.ui", atomicGroupVersion = "versions.PRIVACYSANDBOX_UI" }
+PROFILEINSTALLER = { group = "androidx.profileinstaller", atomicGroupVersion = "versions.PROFILEINSTALLER" }
+RECOMMENDATION = { group = "androidx.recommendation", atomicGroupVersion = "versions.RECOMMENDATION" }
+RECYCLERVIEW = { group = "androidx.recyclerview" }
+REMOTECALLBACK = { group = "androidx.remotecallback", atomicGroupVersion = "versions.REMOTECALLBACK" }
+RESOURCEINSPECTION = { group = "androidx.resourceinspection", atomicGroupVersion = "versions.RESOURCEINSPECTION" }
+ROOM = { group = "androidx.room", atomicGroupVersion = "versions.ROOM" }
+SAVEDSTATE = { group = "androidx.savedstate", atomicGroupVersion = "versions.SAVEDSTATE" }
+SECURITY = { group = "androidx.security" }
+SHAPES = { group = "androidx.graphics.shapes", atomicGroupVersion = "versions.GRAPHICS" }
+SHARETARGET = { group = "androidx.sharetarget", atomicGroupVersion = "versions.SHARETARGET" }
+SLICE = { group = "androidx.slice" }
+SLIDINGPANELAYOUT = { group = "androidx.slidingpanelayout", atomicGroupVersion = "versions.SLIDINGPANELAYOUT" }
+SQLITE = { group = "androidx.sqlite", atomicGroupVersion = "versions.SQLITE" }
+STABLE_AIDL = { group = "androidx.stableaidl", atomicGroupVersion = "versions.STABLE_AIDL" }
+STARTUP = { group = "androidx.startup", atomicGroupVersion = "versions.STARTUP" }
+SWIPEREFRESHLAYOUT = { group = "androidx.swiperefreshlayout", atomicGroupVersion = "versions.SWIPEREFRESHLAYOUT" }
+TESTEXT = { group = "androidx.test.ext", atomicGroupVersion = "versions.TESTEXT" }
+TESTSCREENSHOT = { group = "androidx.test.screenshot", atomicGroupVersion = "versions.TESTSCREENSHOT" }
+TEST_UIAUTOMATOR = { group = "androidx.test.uiautomator", atomicGroupVersion = "versions.TEST_UIAUTOMATOR" }
+TEXT = { group = "androidx.text", atomicGroupVersion = "versions.TEXT" }
+TRACING = { group = "androidx.tracing", atomicGroupVersion = "versions.TRACING" }
+TRANSITION = { group = "androidx.transition", atomicGroupVersion = "versions.TRANSITION" }
+TV = { group = "androidx.tv", atomicGroupVersion = "versions.TV" }
+TVPROVIDER = { group = "androidx.tvprovider", atomicGroupVersion = "versions.TVPROVIDER" }
+VECTORDRAWABLE = { group = "androidx.vectordrawable" }
+VERSIONEDPARCELABLE = { group = "androidx.versionedparcelable" }
+VIEWPAGER = { group = "androidx.viewpager", atomicGroupVersion = "versions.VIEWPAGER" }
+VIEWPAGER2 = { group = "androidx.viewpager2", atomicGroupVersion = "versions.VIEWPAGER2" }
+WEAR = { group = "androidx.wear" }
+WEAR_COMPOSE = { group = "androidx.wear.compose", atomicGroupVersion = "versions.WEAR_COMPOSE" }
+WEAR_PROTOLAYOUT = { group = "androidx.wear.protolayout", atomicGroupVersion = "versions.WEAR_PROTOLAYOUT" }
+WEAR_TILES = { group = "androidx.wear.tiles", atomicGroupVersion = "versions.WEAR_TILES" }
+WEAR_WATCHFACE = { group = "androidx.wear.watchface", atomicGroupVersion = "versions.WEAR_WATCHFACE" }
+WEBKIT = { group = "androidx.webkit", atomicGroupVersion = "versions.WEBKIT" }
+WINDOW = { group = "androidx.window", atomicGroupVersion = "versions.WINDOW" }
+WINDOW_EXTENSIONS = { group = "androidx.window.extensions", atomicGroupVersion = "versions.WINDOW_EXTENSIONS" }
+WINDOW_EXTENSIONS_CORE = { group = "androidx.window.extensions.core", atomicGroupVersion = "versions.WINDOW_EXTENSIONS_CORE" }
+WINDOW_SIDECAR = { group = "androidx.window.sidecar", atomicGroupVersion = "versions.WINDOW_SIDECAR" }
+WORK = { group = "androidx.work", atomicGroupVersion = "versions.WORK" }

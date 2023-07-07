@@ -1,0 +1,72 @@
+/*
+ * Copyright 2019 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import androidx.build.*
+
+plugins {
+    id("AndroidXPlugin")
+    id("kotlin")
+    id("java-gradle-plugin")
+}
+
+apply from: "../../buildSrc/kotlin-dsl-dependency.gradle"
+
+dependencies {
+    implementation(findGradleKotlinDsl())
+    implementation(gradleApi())
+    implementation("com.android.tools.build:gradle:7.3.0")
+    implementation(libs.kotlinStdlib)
+
+    testImplementation(gradleTestKit())
+    testImplementation(project(":internal-testutils-gradle-plugin"))
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinTest)
+}
+
+SdkResourceGenerator.generateForHostTest(project)
+
+def copyLockClocks = tasks.register("copyLockClocks", SingleFileCopy.class) {
+    def source = project.file("src/main/resources/scripts/lockClocks.sh")
+    if (!source.exists()) {
+        throw new GradleException(source.toString() + " does not exist")
+    }
+    it.sourceFile = source
+    it.destinationFile = new File(BuildServerConfigurationKt.getDistributionDirectory(rootProject), "lockClocks.sh")
+}
+BuildOnServerKt.addToBuildOnServer(project, copyLockClocks)
+
+gradlePlugin {
+    plugins {
+        benchmark {
+            id = "androidx.benchmark"
+            implementationClass = "androidx.benchmark.gradle.BenchmarkPlugin"
+        }
+    }
+}
+
+androidx {
+    name = "Android Benchmark Gradle Plugin"
+    type = LibraryType.GRADLE_PLUGIN
+    inceptionYear = "2019"
+    description = "Android Benchmark Gradle Plugin"
+}
+
+tasks {
+    validatePlugins {
+        failOnWarning.set(true)
+        enableStricterValidation.set(true)
+    }
+}

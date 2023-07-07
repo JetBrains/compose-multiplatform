@@ -1,0 +1,486 @@
+import groovy.transform.Field
+import androidx.build.gradle.gcpbuildcache.GcpBuildCache
+import androidx.build.gradle.gcpbuildcache.GcpBuildCacheServiceFactory
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
+pluginManagement {
+    repositories {
+        maven {
+            url = new File(buildscript.sourceFile.parent + "/prebuilts/androidx/external").getCanonicalFile()
+        }
+        def isJBFork = true
+        if (isJBFork) {
+            mavenCentral()
+            google()
+            maven {
+                url = "https://plugins.gradle.org/m2/"
+            }
+        }
+    }
+}
+
+buildscript {
+    ext.supportRootFolder = buildscript.sourceFile.getParentFile()
+    apply(from: "buildSrc/repos.gradle")
+    repos.addMavenRepositories(repositories)
+
+    dependencies {
+        classpath("com.gradle:gradle-enterprise-gradle-plugin:3.12.2")
+        classpath("com.gradle:common-custom-user-data-gradle-plugin:1.7.2")
+        classpath("androidx.build.gradle.gcpbuildcache:gcpbuildcache:1.0.0-alpha06")
+    }
+}
+
+def isJBFork = true
+
+// Abort immediately if we're running in Studio, but not a managed instance of Studio.
+if (!isJBFork) {
+    def expectedAgpVersion = System.getenv().get("EXPECTED_AGP_VERSION")
+    if (expectedAgpVersion == null) {
+        throw new Exception("Android Studio must be run from studiow or gradlew studio.")
+    }
+}
+
+// Makes strong assumptions about the project structure.
+def prebuiltsRoot = new File(
+        buildscript.sourceFile.parentFile,
+        "prebuilts"
+).absolutePath
+def rootProjectRepositories
+
+apply from: "buildSrc/out.gradle"
+def (outDir, buildSrcOut) = init.getOutDir()
+
+getGradle().beforeProject {
+    // Migrate to dependencyResolutionManagement.repositories when
+    // https://github.com/gradle/gradle/issues/17295 is fixed
+    if (it.path == ":") {
+        repos.addMavenRepositories(it.repositories)
+        rootProjectRepositories = it.repositories
+
+        // Set buildSrcOut and outDir extras on root project
+        it.ext.buildSrcOut = buildSrcOut
+        it.ext.outDir = outDir
+    } else {
+        // Performance optimization because it is more efficient to reuse
+        // repositories from the root project than recreate identical ones
+        // on each project
+        it.repositories.addAll(rootProjectRepositories)
+    }
+    it.ext.prebuiltsRoot = prebuiltsRoot
+    // Expected out directory structure for :foo:bar is out/androidx/foo/bar
+    it.buildDir = new File(outDir, "androidx/${it.path.replace(":", "/")}/build")
+}
+
+apply(plugin: "com.gradle.enterprise")
+apply(plugin: "com.gradle.common-custom-user-data-gradle-plugin")
+apply(plugin: "androidx.build.gradle.gcpbuildcache")
+
+def BUILD_NUMBER = System.getenv("BUILD_NUMBER")
+gradleEnterprise {
+    server = "https://ge.androidx.dev"
+
+    buildScan {
+        capture {
+            taskInputFiles = true
+        }
+        obfuscation {
+            hostname { host -> "unset" }
+            ipAddresses { addresses -> addresses.collect { address -> "0.0.0.0"} }
+        }
+        if (BUILD_NUMBER != null) {
+            value("BUILD_NUMBER", BUILD_NUMBER)
+            link("ci.android.com build", "https://ci.android.com/builds/branches/aosp-androidx-main/grid?head=$BUILD_NUMBER&tail=$BUILD_NUMBER")
+        }
+        value("androidx.compose.multiplatformEnabled", isMultiplatformEnabled().toString())
+        value("androidx.projects", getRequestedProjectSubsetName() ?: "Unset")
+        value("androidx.useMaxDepVersions", providers.gradleProperty("androidx.useMaxDepVersions").isPresent().toString())
+
+        // Publish scan for androidx-main
+        publishAlways()
+        publishIfAuthenticated()
+    }
+}
+
+def cacheSetting = System.getenv("USE_ANDROIDX_REMOTE_BUILD_CACHE")
+switch (cacheSetting) {
+    case ["true", "uplink"]: // legacy build cache
+        logger.warn("\u001B[31m\nYou are using legacy USE_ANDROIDX_REMOTE_BUILD_CACHE=$cacheSetting " +
+                "type, this cache has been turned down, so you are *not* using a remote cache. " +
+                "Please move to the new cache using http://go/androidx-dev#remote-build-cache\u001B[0m\n")
+        break
+    case "gcp":
+        buildCache {
+            registerBuildCacheService(GcpBuildCache, GcpBuildCacheServiceFactory)
+        }
+        settings.buildCache {
+            remote(GcpBuildCache) {
+                projectId = "androidx-ge"
+                bucketName = "androidx-gradle-remote-cache"
+                push = (BUILD_NUMBER != null && !BUILD_NUMBER.startsWith("P"))
+            }
+        }
+        break
+    case "false":
+        break
+    default:
+        def uplinkLinux = new File("/usr/bin/uplink-helper")
+        def uplinkMac = new File("/usr/local/bin/uplink-helper")
+        if (uplinkLinux.exists() || uplinkMac.exists()) {
+            logger.warn("\u001B[31m\nIt looks like you are a Googler running without remote build "
+                    + "cache. Enable it for faster builds, see " +
+                    "http://go/androidx-dev#remote-build-cache\u001B[0m\n")
+        }
+}
+
+rootProject.name = "compose-multiplatform-core"
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        libs {
+            def metalavaOverride = System.getenv("METALAVA_VERSION")
+            if (metalavaOverride != null) {
+                logger.warn("Using custom version ${metalavaOverride} of metalava due to METALAVA_VERSION being set.")
+                version('metalava', metalavaOverride)
+            }
+            def skikoOverride = System.getenv("SKIKO_VERSION")
+            if (skikoOverride != null) {
+                logger.warn("Using custom version ${skikoOverride} of SKIKO due to SKIKO_VERSION being set.")
+                version('skiko', skikoOverride)
+            }
+            String os = System.getProperty("os.name").toLowerCase(Locale.US)
+            String currentOsArtifact
+            if (os.contains("mac os x") ||  os.contains("darwin") || os.contains("osx")) {
+                def arch = System.getProperty("os.arch")
+                if (arch == "aarch64") {
+                    currentOsArtifact = "skiko-awt-runtime-macos-arm64"
+                } else {
+                    currentOsArtifact = "skiko-awt-runtime-macos-x64"
+                }
+            } else if (os.startsWith("win")) {
+                currentOsArtifact = "skiko-awt-runtime-windows-x64"
+            } else if (os.startsWith("linux") ) {
+                def arch = System.getProperty("os.arch")
+                if (arch == "aarch64") {
+                    currentOsArtifact = "skiko-awt-runtime-linux-arm64"
+                } else {
+                    currentOsArtifact = "skiko-awt-runtime-linux-x64"
+                }
+            } else {
+                throw GradleException("Unsupported operating system $os")
+            }
+            library("skikoCurrentOs", "org.jetbrains.skiko", currentOsArtifact).versionRef("skiko")
+        }
+    }
+}
+
+boolean isMultiplatformEnabled() {
+    def mppParameter = properties.get("androidx.compose.multiplatformEnabled")
+    if (mppParameter == null) return false
+    return Boolean.parseBoolean(mppParameter)
+}
+
+/////////////////////////////
+//
+// Buildscript utils
+//
+/////////////////////////////
+
+// If you add a new BuildType, you probably also want to
+// update ProjectSubsetsTest.kt to verify that dependencies in that subset resolve successfully
+enum BuildType {
+    MAIN,
+    COMPOSE,
+    FLAN,
+    MEDIA,
+    WEAR,
+    GLANCE,
+    TOOLS,
+    KMP,
+    CAMERA,
+    NATIVE,
+    WINDOW,
+}
+
+private String getRequestedProjectSubsetName() {
+    def prop = providers.gradleProperty("androidx.projects")
+    if (prop.isPresent()) {
+        return prop.get().toUpperCase()
+    }
+
+    def envProp = providers.environmentVariable("ANDROIDX_PROJECTS")
+    if (envProp.isPresent()) {
+        return envProp.get().toUpperCase()
+    }
+    return null
+}
+
+boolean isAllProjects() {
+    String projectSubsetName = getRequestedProjectSubsetName()
+    return requestedProjectSubsetName == null || requestedProjectSubsetName == "ALL"
+}
+
+private Set<BuildType> createRequestedFilter() {
+    Set<BuildType> filter = new HashSet<>()
+    String projectSubsetName = getRequestedProjectSubsetName()
+    if (projectSubsetName == null) return null
+    String[] requestedFilter = projectSubsetName.split(",")
+    for (String requestedType : requestedFilter) {
+        switch (requestedType) {
+            case "MAIN":
+                filter.add(BuildType.MAIN)
+                break
+            case "COMPOSE":
+                filter.add(BuildType.COMPOSE)
+                break
+            case "FLAN":
+                filter.add(BuildType.FLAN)
+                break
+            case "MEDIA":
+                filter.add(BuildType.MEDIA)
+                break
+            case "WEAR":
+                filter.add(BuildType.WEAR)
+                break
+            case "GLANCE":
+                // Glance currently depends on a large part of Compose, add it here rather than
+                // requiring every project to be tagged
+                filter.add(BuildType.COMPOSE)
+                filter.add(BuildType.GLANCE)
+                break
+            case "TOOLS":
+                filter.add(BuildType.TOOLS)
+                break
+            case "KMP":
+                filter.add(BuildType.KMP)
+                break
+            case "CAMERA":
+                filter.add(BuildType.CAMERA)
+                break
+            case "NATIVE":
+                filter.add(BuildType.NATIVE)
+                break
+            case "WINDOW":
+                filter.add(BuildType.WINDOW)
+                break
+            case "ALL":
+                // Return null so that no filtering is done
+                return null
+                break
+            default:
+                throw new Exception("Unsupported project type $requestedType\n" +
+                        "We only support the following:\n" +
+                        "ALL     - all androidx projects\n" +
+                        "COMPOSE - compose projects\n" +
+                        "CAMERA  - camera projects\n" +
+                        "MAIN    - androidx projects that are not compose\n" +
+                        "FLAN    - fragment, lifecycle, activity, and navigation projects\n" +
+                        "MEDIA   - media, media2, and mediarouter projects\n" +
+                        "WEAR    - Wear OS projects\n" +
+                        "NATIVE  - native projects\n" +
+                        "WINDOW  - window projects\n" +
+                        "GLANCE  - glance projects")
+        }
+    }
+    return filter
+}
+
+/**
+ * Requested project filter based on STUDIO_PROJECT_FILTER env variable.
+ *
+ * Note that null value means all the projects should be included
+ */
+@Field
+Set<BuildType> requestedFilter
+requestedFilter = createRequestedFilter()
+
+boolean shouldIncludeForFilter(List<BuildType> includeList) {
+    if (includeList.empty) return true
+    if (requestedFilter == null) return true
+    for (BuildType type : includeList) {
+        if (requestedFilter.contains(type)) return true
+    }
+    return false
+}
+
+def includeProject(name, List<BuildType> filter = []) {
+    includeProject(name, null, filter)
+}
+
+// Calling includeProject(name, filePath) is shorthand for:
+//
+//   include(name)
+//   project(name).projectDir = new File(filePath)
+//
+// Note that <name> directly controls the Gradle project name, and also indirectly sets:
+//   the project name in the IDE
+//   the Maven artifactId
+//
+def includeProject(name, filePath, List<BuildType> filter = []) {
+    if (!shouldIncludeForFilter(filter)) return
+    settings.include(name)
+
+    def file
+    if (filePath != null) {
+        if (filePath instanceof String) {
+            if ((":" + filePath.replace("/",":")).equals(name)) {
+                throw new IllegalArgumentException("Redundant filepath for $name, please remove it")
+            }
+            file = new File(rootDir, filePath)
+        } else {
+            file = filePath
+        }
+        project(name).projectDir = file
+    } else {
+        file = project(name).projectDir
+    }
+    if (!file.exists()) {
+        // This option is supported so that development/simplify_build_failure.sh can try
+        // deleting entire projects at once to identify the cause of a build failure
+        if (System.getenv("ALLOW_MISSING_PROJECTS") == null) {
+            throw new Exception("Path " + file + " does not exist; cannot include project " + name)
+        }
+    }
+}
+
+includeProject(":compose:animation", [BuildType.COMPOSE])
+includeProject(":compose:animation:animation", [BuildType.COMPOSE])
+includeProject(":compose:animation:animation-lint", [BuildType.COMPOSE])
+includeProject(":compose:animation:animation-core", [BuildType.COMPOSE])
+includeProject(":compose:animation:animation-core-lint", [BuildType.COMPOSE])
+includeProject(":compose:animation:animation-core:animation-core-benchmark", "compose/animation/animation-core/benchmark", [BuildType.COMPOSE])
+includeProject(":compose:animation:animation-core:animation-core-samples", "compose/animation/animation-core/samples", [BuildType.COMPOSE])
+includeProject(":compose:animation:animation-tooling-internal", [BuildType.COMPOSE])
+includeProject(":compose:animation:animation:integration-tests:animation-demos", [BuildType.COMPOSE])
+includeProject(":compose:animation:animation:animation-samples", "compose/animation/animation/samples", [BuildType.COMPOSE])
+includeProject(":compose:animation:animation-graphics", [BuildType.COMPOSE])
+includeProject(":compose:animation:animation-graphics:animation-graphics-samples", "compose/animation/animation-graphics/samples", [BuildType.COMPOSE])
+includeProject(":compose:benchmark-utils", [BuildType.COMPOSE])
+includeProject(":compose:benchmark-utils:benchmark-utils-benchmark", "compose/benchmark-utils/benchmark", [BuildType.COMPOSE])
+includeProject(":compose:compiler:compiler", [BuildType.COMPOSE, BuildType.CAMERA])
+includeProject(":compose:compiler:compiler:integration-tests", [BuildType.COMPOSE])
+includeProject(":compose:compiler:compiler-hosted", [BuildType.COMPOSE, BuildType.CAMERA])
+includeProject(":compose:compiler:compiler-hosted:integration-tests", [BuildType.COMPOSE])
+includeProject(":compose:compiler:compiler-hosted:integration-tests:kotlin-compiler-repackaged", [BuildType.COMPOSE])
+includeProject(":compose:compiler:compiler-daemon", [BuildType.COMPOSE])
+includeProject(":compose:compiler:compiler-daemon:integration-tests", [BuildType.COMPOSE])
+includeProject(":compose:desktop", [BuildType.COMPOSE])
+includeProject(":compose:desktop:desktop", [BuildType.COMPOSE])
+includeProject(":compose:desktop:desktop:desktop-samples", "compose/desktop/desktop/samples", [BuildType.COMPOSE])
+includeProject(":compose:desktop:desktop:desktop-samples-material3", "compose/desktop/desktop/samples-material3", [BuildType.COMPOSE])
+includeProject(":compose:mpp", [BuildType.COMPOSE])
+includeProject(":compose:mpp:demo", [BuildType.COMPOSE])
+
+// workaround for issue that on linux and windows CommonizeCInterop task fails
+// It seems that this workaround can be removed after Kotlin 1.8.20
+if (DefaultNativePlatform.getCurrentOperatingSystem().isMacOsX()) {
+    includeProject(":compose:mpp:demo-uikit", [BuildType.COMPOSE])
+}
+
+includeProject(":compose:foundation", [BuildType.COMPOSE])
+includeProject(":compose:foundation:foundation", [BuildType.COMPOSE])
+includeProject(":compose:foundation:foundation-benchmark", "compose/foundation/foundation/benchmark", [BuildType.COMPOSE])
+includeProject(":compose:foundation:foundation-layout", [BuildType.COMPOSE])
+includeProject(":compose:foundation:foundation-layout:foundation-layout-benchmark", "compose/foundation/foundation-layout/benchmark", [BuildType.COMPOSE])
+includeProject(":compose:foundation:foundation-layout:integration-tests:foundation-layout-demos", "compose/foundation/foundation-layout/integration-tests/layout-demos", [BuildType.COMPOSE])
+includeProject(":compose:foundation:foundation-layout:foundation-layout-samples", "compose/foundation/foundation-layout/samples", [BuildType.COMPOSE])
+includeProject(":compose:foundation:foundation-lint", [BuildType.COMPOSE])
+includeProject(":compose:foundation:foundation:integration-tests:foundation-demos", [BuildType.COMPOSE])
+includeProject(":compose:foundation:foundation:foundation-samples", "compose/foundation/foundation/samples", [BuildType.COMPOSE])
+includeProject(":compose:foundation:foundation-do-not-ship-newtext", "compose/foundation/foundation-newtext", [BuildType.COMPOSE])
+includeProject(":compose:integration-tests", [BuildType.COMPOSE])
+includeProject(":compose:integration-tests:demos", [BuildType.COMPOSE])
+includeProject(":compose:integration-tests:demos:common", [BuildType.COMPOSE])
+includeProject(":compose:integration-tests:docs-snippets", [BuildType.COMPOSE])
+includeProject(":compose:integration-tests:macrobenchmark", [BuildType.COMPOSE])
+includeProject(":compose:integration-tests:macrobenchmark-target", [BuildType.COMPOSE])
+includeProject(":compose:integration-tests:material-catalog", [BuildType.COMPOSE])
+includeProject(":compose:lint", [BuildType.COMPOSE, BuildType.CAMERA])
+includeProject(":compose:lint:internal-lint-checks", [BuildType.COMPOSE, BuildType.CAMERA])
+includeProject(":compose:lint:common", [BuildType.COMPOSE, BuildType.CAMERA])
+includeProject(":compose:lint:common-test", [BuildType.COMPOSE, BuildType.CAMERA])
+includeProject(":compose:material", [BuildType.COMPOSE])
+includeProject(":compose:material3:material3", [BuildType.COMPOSE])
+includeProject(":compose:material3:material3-lint", [BuildType.COMPOSE])
+includeProject(":compose:material3:material3-window-size-class", [BuildType.COMPOSE])
+includeProject(":compose:material3:material3-window-size-class:material3-window-size-class-samples", "compose/material3/material3-window-size-class/samples", [BuildType.COMPOSE])
+includeProject(":compose:material:material", [BuildType.COMPOSE])
+includeProject(":compose:material:material-benchmark", "compose/material/material/benchmark", [BuildType.COMPOSE])
+includeProject(":compose:material:material-lint", [BuildType.COMPOSE])
+includeProject(":compose:material:material-icons-core", [BuildType.COMPOSE])
+includeProject(":compose:material:material-icons-core:material-icons-core-samples", "compose/material/material-icons-core/samples", [BuildType.COMPOSE])
+includeProject(":compose:material:material-icons-extended", [BuildType.COMPOSE])
+includeProject(":compose:material:material-icons-extended-filled", [BuildType.COMPOSE])
+includeProject(":compose:material:material-icons-extended-outlined", [BuildType.COMPOSE])
+includeProject(":compose:material:material-icons-extended-rounded", [BuildType.COMPOSE])
+includeProject(":compose:material:material-icons-extended-sharp", [BuildType.COMPOSE])
+includeProject(":compose:material:material-icons-extended-twotone", [BuildType.COMPOSE])
+includeProject(":compose:material:material-ripple", [BuildType.COMPOSE])
+includeProject(":compose:material:material:icons:generator", [BuildType.COMPOSE])
+includeProject(":compose:material:material:integration-tests:material-demos", [BuildType.COMPOSE])
+includeProject(":compose:material:material:integration-tests:material-catalog", [BuildType.COMPOSE])
+includeProject(":compose:material3:material3:integration-tests:material3-demos", [BuildType.COMPOSE])
+includeProject(":compose:material3:material3:integration-tests:material3-catalog", [BuildType.COMPOSE])
+includeProject(":compose:material:material:material-samples", "compose/material/material/samples", [BuildType.COMPOSE])
+includeProject(":compose:material3:material3:material3-samples", "compose/material3/material3/samples", [BuildType.COMPOSE])
+includeProject(":compose:runtime", [BuildType.COMPOSE, BuildType.CAMERA])
+includeProject(":compose:runtime:runtime", [BuildType.COMPOSE, BuildType.CAMERA])
+includeProject(":compose:runtime:runtime-lint", [BuildType.COMPOSE, BuildType.CAMERA])
+includeProject(":compose:runtime:runtime-livedata", [BuildType.COMPOSE])
+includeProject(":compose:runtime:runtime-livedata:runtime-livedata-samples", "compose/runtime/runtime-livedata/samples", [BuildType.COMPOSE])
+includeProject(":compose:runtime:runtime-tracing", [BuildType.COMPOSE])
+includeProject(":compose:runtime:runtime-rxjava2", [BuildType.COMPOSE])
+includeProject(":compose:runtime:runtime-rxjava2:runtime-rxjava2-samples", "compose/runtime/runtime-rxjava2/samples", [BuildType.COMPOSE])
+includeProject(":compose:runtime:runtime-rxjava3", [BuildType.COMPOSE])
+includeProject(":compose:runtime:runtime-rxjava3:runtime-rxjava3-samples", "compose/runtime/runtime-rxjava3/samples", [BuildType.COMPOSE])
+includeProject(":compose:runtime:runtime-saveable", [BuildType.COMPOSE])
+includeProject(":compose:runtime:runtime-saveable-lint", [BuildType.COMPOSE])
+includeProject(":compose:runtime:runtime-saveable:runtime-saveable-samples", "compose/runtime/runtime-saveable/samples", [BuildType.COMPOSE])
+includeProject(":compose:runtime:runtime:benchmark", "compose/runtime/runtime/compose-runtime-benchmark", [BuildType.COMPOSE])
+includeProject(":compose:runtime:runtime:integration-tests", [BuildType.COMPOSE])
+includeProject(":compose:runtime:runtime:runtime-samples", "compose/runtime/runtime/samples", [BuildType.COMPOSE, BuildType.CAMERA])
+includeProject(":compose:test-utils", [BuildType.COMPOSE])
+includeProject(":compose:ui", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-benchmark", "compose/ui/ui/benchmark", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-android-stubs", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-geometry", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-graphics", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-graphics-lint", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-graphics:ui-graphics-benchmark", "compose/ui/ui-graphics/benchmark", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-graphics:ui-graphics-benchmark:test", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-graphics:ui-graphics-samples", "compose/ui/ui-graphics/samples", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-inspection", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-lint", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-test", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-test:ui-test-samples", "compose/ui/ui-test/samples", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-test-junit4", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-test-manifest", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-test-manifest-lint", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-test-manifest:integration-tests:testapp", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-text", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-text-google-fonts", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-text:ui-text-benchmark", "compose/ui/ui-text/benchmark", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-text:ui-text-samples", "compose/ui/ui-text/samples", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-tooling", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-tooling-data", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-tooling-preview", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-unit", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-unit:ui-unit-samples", "compose/ui/ui-unit/samples", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-util", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-viewbinding", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui-viewbinding:ui-viewbinding-samples", "compose/ui/ui-viewbinding/samples", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui:integration-tests:ui-demos", [BuildType.COMPOSE])
+includeProject(":compose:ui:ui:ui-samples", "compose/ui/ui/samples", [BuildType.COMPOSE])
+includeProject(":lint-checks")
+includeProject(":lint-checks:integration-tests")
+includeProject(":internal-testutils-fonts", "testutils/testutils-fonts", [BuildType.MAIN, BuildType.GLANCE, BuildType.MEDIA, BuildType.FLAN, BuildType.COMPOSE, BuildType.WEAR])
+includeProject(":internal-testutils-runtime", "testutils/testutils-runtime", [BuildType.MAIN, BuildType.FLAN, BuildType.COMPOSE, BuildType.MEDIA, BuildType.WEAR, BuildType.CAMERA])
+includeProject(":internal-testutils-gradle-plugin", "testutils/testutils-gradle-plugin", [BuildType.MAIN, BuildType.FLAN, BuildType.COMPOSE, BuildType.TOOLS])
+
+// Workaround for b/203825166
+// Without it there is an error appear when trying to publish to maven local:
+//   Configuration 'commonMainResolvableDependenciesMetadata' was resolved during configuration time.
+includeBuild("placeholder")
+
+includeProject(":mpp", [BuildType.COMPOSE])

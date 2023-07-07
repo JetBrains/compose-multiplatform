@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="6" by="lint 7.4.0-alpha08" type="baseline" client="cli" dependencies="false" name="AGP (7.4.0-alpha08)" variant="all" version="7.4.0-alpha08">
+
+    <issue
+        id="BanUncheckedReflection"
+        message="Calling `Method.invoke` without an SDK check"
+        errorLine1="            durationSetter.invoke(null, 1.0f)"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/androidx/testutils/AnimationActivityTestRule.kt"/>
+    </issue>
+
+    <issue
+        id="BanUncheckedReflection"
+        message="Calling `Method.invoke` without an SDK check"
+        errorLine1="    private val originalDurationScale = durationGetter.invoke(null) as Float"
+        errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/androidx/testutils/AnimationDurationScaleRule.kt"/>
+    </issue>
+
+    <issue
+        id="BanUncheckedReflection"
+        message="Calling `Method.invoke` without an SDK check"
+        errorLine1="        durationSetter.invoke(null, animationDurationScale)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/androidx/testutils/AnimationDurationScaleRule.kt"/>
+    </issue>
+
+    <issue
+        id="BanUncheckedReflection"
+        message="Calling `Method.invoke` without an SDK check"
+        errorLine1="        durationSetter.invoke(null, originalDurationScale)"
+        errorLine2="        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/androidx/testutils/AnimationDurationScaleRule.kt"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 24; however, the containing class androidx.testutils.LocaleTestUtils is reachable from earlier API levels and will fail run-time class verification."
+        errorLine1="                newConfig.setLocales(locales.unwrap() as LocaleList)"
+        errorLine2="                          ~~~~~~~~~~">
+        <location
+            file="src/main/java/androidx/testutils/LocaleTestUtils.kt"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 17; however, the containing class androidx.testutils.LocaleTestUtils is reachable from earlier API levels and will fail run-time class verification."
+        errorLine1="                newConfig.setLocale(locales.get(0))"
+        errorLine2="                          ~~~~~~~~~">
+        <location
+            file="src/main/java/androidx/testutils/LocaleTestUtils.kt"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        message="This call references a method added in API level 17; however, the containing class androidx.fragment.app.StrictFragment is reachable from earlier API levels and will fail run-time class verification."
+        errorLine1="            check(!requireActivity().isDestroyed)"
+        errorLine2="                                     ~~~~~~~~~~~">
+        <location
+            file="src/main/java/androidx/fragment/app/StrictFragment.kt"/>
+    </issue>
+
+    <issue
+        id="LambdaLast"
+        message="Functional interface parameters (such as parameter 1, &quot;owner&quot;, in androidx.testutils.LifecycleOwnerUtils.waitUntilState) should be last to improve Kotlin interoperability; see https://kotlinlang.org/docs/reference/java-interop.html#sam-conversions"
+        errorLine1="            final @NonNull Lifecycle.State state) throws Throwable {"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/androidx/testutils/LifecycleOwnerUtils.java"/>
+    </issue>
+
+</issues>
