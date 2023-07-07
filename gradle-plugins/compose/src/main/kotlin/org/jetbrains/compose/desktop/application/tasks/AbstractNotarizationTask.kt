@@ -10,11 +10,12 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.jetbrains.compose.desktop.application.dsl.MacOSNotarizationSettings
-import org.jetbrains.compose.internal.utils.nullableProperty
 import org.jetbrains.compose.desktop.application.internal.validation.validate
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
+import org.jetbrains.compose.internal.utils.nullableProperty
 
 abstract class AbstractNotarizationTask : AbstractComposeDesktopTask() {
+    @Deprecated("There’s no replacement for the --primary-bundle-id option. The notary service never interpreted that value; it was effectively a comment.")
     @get:Input
     @get:Optional
     internal val nonValidatedBundleID: Property<String?> = objects.nullableProperty()
@@ -24,5 +25,5 @@ abstract class AbstractNotarizationTask : AbstractComposeDesktopTask() {
     internal var nonValidatedNotarizationSettings: MacOSNotarizationSettings? = null
 
     internal fun validateNotarization() =
-        nonValidatedNotarizationSettings.validate(nonValidatedBundleID)
+        nonValidatedNotarizationSettings.validate()
 }

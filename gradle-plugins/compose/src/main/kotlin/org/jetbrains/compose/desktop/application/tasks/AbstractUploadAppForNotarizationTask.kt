@@ -37,18 +37,15 @@ abstract class AbstractUploadAppForNotarizationTask @Inject constructor(
         val notarization = validateNotarization()
         val packageFile = findOutputFileOrDir(inputDir.ioFile, targetFormat).checkExistingFile()
 
-        logger.quiet("Uploading '${packageFile.name}' for notarization (package id: '${notarization.bundleID}')")
+        logger.quiet("Uploading '${packageFile.name}' for notarization")
         val args = arrayListOf(
-            "altool",
-            "--notarize-app",
-            "--primary-bundle-id", notarization.bundleID,
-            "--username", notarization.appleID,
-            "--password", notarization.password,
-            "--file", packageFile.absolutePath
+            "notarytool",
+            "submit",
+            packageFile.absolutePath
         )
-        if (notarization.ascProvider != null) {
-            args.add("--asc-provider")
-            args.add(notarization.ascProvider)
+        if (notarization.teamId != null) {
+            args.add("--team-id")
+            args.add(notarization.teamId)
         }
 
         runExternalTool(

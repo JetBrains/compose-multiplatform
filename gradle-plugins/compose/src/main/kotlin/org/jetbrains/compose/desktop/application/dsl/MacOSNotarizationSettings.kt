@@ -9,6 +9,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.internal.utils.nullableProperty
@@ -35,7 +36,13 @@ abstract class MacOSNotarizationSettings {
 
     @get:Input
     @get:Optional
-    val ascProvider: Property<String?> = objects.nullableProperty<String>().apply {
+    val teamId: Property<String?> = objects.nullableProperty<String>().apply {
         set(ComposeProperties.macNotarizationAscProvider(providers))
     }
+
+    @Suppress("DeprecatedCallableAddReplaceWith") // there is no replacement from Apple
+    @Deprecated("This option is no longer supported and got replaced by teamId")
+    @get:Internal
+    val ascProvider: Property<String?>
+        get() = throw UnsupportedOperationException("This option got deprecated by notary tool and was replaced by teamId")
 }

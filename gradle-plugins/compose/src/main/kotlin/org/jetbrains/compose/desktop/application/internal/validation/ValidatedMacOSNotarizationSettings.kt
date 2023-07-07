@@ -5,25 +5,20 @@
 
 package org.jetbrains.compose.desktop.application.internal.validation
 
-import org.gradle.api.provider.Provider
 import org.jetbrains.compose.desktop.application.dsl.MacOSNotarizationSettings
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 
 internal data class ValidatedMacOSNotarizationSettings(
-    val bundleID: String,
     val appleID: String,
     val password: String,
-    val ascProvider: String?
+    val teamId: String?
 )
 
-internal fun MacOSNotarizationSettings?.validate(
-    bundleIDProvider: Provider<String?>
-): ValidatedMacOSNotarizationSettings {
+internal fun MacOSNotarizationSettings?.validate(): ValidatedMacOSNotarizationSettings {
     checkNotNull(this) {
         ERR_NOTARIZATION_SETTINGS_ARE_NOT_PROVIDED
     }
 
-    val bundleID = validateBundleID(bundleIDProvider)
     check(!appleID.orNull.isNullOrEmpty()) {
         ERR_APPLE_ID_IS_EMPTY
     }
@@ -31,10 +26,9 @@ internal fun MacOSNotarizationSettings?.validate(
         ERR_PASSWORD_IS_EMPTY
     }
     return ValidatedMacOSNotarizationSettings(
-        bundleID = bundleID,
         appleID = appleID.orNull!!,
         password = password.orNull!!,
-        ascProvider = ascProvider.orNull
+        teamId  = teamId.orNull
     )
 }
 

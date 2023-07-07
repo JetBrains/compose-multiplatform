@@ -45,10 +45,10 @@ abstract class AbstractCheckNotarizationStatusTask : AbstractNotarizationTask() 
                 runExternalTool(
                     tool = MacUtils.xcrun,
                     args = listOf(
-                        "altool",
-                        "--notarization-info", request.uuid,
+                        "info",
                         "--username", notarization.appleID,
-                        "--password", notarization.password
+                        "--password", notarization.password,
+                        request.uuid
                     ),
                     logToConsole = ExternalToolRunner.LogToConsole.Always
                 )
