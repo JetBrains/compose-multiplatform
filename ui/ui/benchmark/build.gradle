@@ -28,7 +28,7 @@ dependencies {
 
     androidTestImplementation("androidx.lifecycle:lifecycle-runtime-testing:2.5.1")
     androidTestImplementation("androidx.activity:activity-compose:1.3.1")
-//    androidTestImplementation(project(":benchmark:benchmark-junit4"))
+    androidTestImplementation(androidxArtifact(":benchmark:benchmark-junit4"))
     androidTestImplementation(project(":compose:foundation:foundation"))
     androidTestImplementation(project(":compose:foundation:foundation-layout"))
     androidTestImplementation(project(":compose:runtime:runtime"))
