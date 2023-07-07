@@ -1,0 +1,84 @@
+/*
+ * Copyright (C) 2017 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+def supportRootFolder = ext.supportRootFolder
+if (supportRootFolder == null) {
+    throw new RuntimeException("Canonical root project directory is not set. You must specify " +
+            "ext.supportRootFolder before including this script")
+}
+// Makes strong assumptions about the project structure.
+def checkoutRoot = supportRootFolder.parentFile.parentFile
+
+ext.repos = new Properties()
+ext.repos.checkoutRoot = checkoutRoot.absolutePath
+ext.repos.prebuiltsRoot = new File(checkoutRoot, "prebuilts").absolutePath
+
+/**
+ * Adds maven repositories to the given repository handler.
+ */
+def addMavenRepositories(RepositoryHandler handler) {
+    def metalavaRepoOverride = System.getenv("METALAVA_REPO")
+    if (metalavaRepoOverride != null) {
+        for(extraRepo in metalavaRepoOverride.split(File.pathSeparator)) {
+            handler.maven {
+                url extraRepo
+            }
+        }
+    }
+    handler.maven {
+        url("${repos.prebuiltsRoot}/androidx/internal")
+        metadataSources {
+            mavenPom()
+            artifact()
+        }
+        content {
+            includeGroupByRegex "android.*"
+            includeGroupByRegex "com.android.support.*"
+            excludeGroupByRegex "androidx.databinding.*"
+        }
+    }
+    handler.maven {
+        url("${repos.prebuiltsRoot}/androidx/external")
+        metadataSources {
+            mavenPom()
+            artifact()
+        }
+    }
+    def isJBFork = true
+    if (isJBFork) {
+        handler.mavenLocal()
+        handler.mavenCentral()
+        handler.google()
+        handler.gradlePluginPortal()
+        handler.maven {
+               url("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        }
+        handler.maven {
+               url("https://maven.pkg.jetbrains.space/public/p/kotlinx-coroutines/maven")
+        }
+    }
+    // Ordering appears to be important: b/229733266
+    def androidPluginRepoOverride = System.getenv("GRADLE_PLUGIN_REPO")
+    if (androidPluginRepoOverride != null) {
+        for(extraRepo in androidPluginRepoOverride.split(File.pathSeparator)) {
+            handler.maven {
+                url extraRepo
+            }
+        }
+    }
+}
+
+ext.repos.addMavenRepositories = this.&addMavenRepositories

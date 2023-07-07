@@ -1,0 +1,76 @@
+
+apply plugin: "kotlin"
+apply from: "../kotlin-dsl-dependency.gradle"
+apply plugin: "java-gradle-plugin"
+
+buildscript {
+    project.ext.supportRootFolder = project.projectDir.getParentFile().getParentFile()
+    apply from: "../repos.gradle"
+    repos.addMavenRepositories(repositories)
+    dependencies {
+        classpath(libs.kotlinGradlePluginz)
+    }
+}
+
+dependencies {
+    implementation(project(":jetpad-integration"))
+
+    // Gradle APIs
+    implementation(gradleApi())
+    compileOnly(findGradleKotlinDsl())
+
+    // Android Gradle Plugin APIs used by Stable AIDL
+    implementation(libs.androidGradlePluginApi)
+
+    // Plugins we use and configure
+    implementation(libs.androidGradlePluginz)
+    implementation(libs.androidToolsCommon) // for com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
+    implementation(libs.androidToolsRepository) // com.android.repository for Stable AIDL plugin
+    implementation(libs.androidToolsSdkCommon) // com.android.ide.common for Stable AIDL plugin
+    implementation(libs.kotlinGradlePluginz)
+
+    // variety of json parsers
+    implementation(libs.gson)
+    implementation(libs.jsonSimple)
+
+    // XML parsers used in MavenUploadHelper.kt
+    implementation(libs.dom4j) {
+        // Optional dependency where Ivy fails to parse the POM file.
+        exclude(group:"net.java.dev.msv", module:"xsdlib")
+    }
+    implementation(libs.xerces)
+
+    implementation(libs.shadow) // used by BundleInsideHelper.kt
+    implementation(libs.apacheAnt) // used in AarManifestTransformerTask.kt for unziping
+    implementation(libs.toml)
+    implementation(libs.apacheCommonIo) // used in CheckApiEquivalenceTask.kt
+    implementation(libs.dexMemberList) // used in ReportLibraryMetricsTask.kt
+
+    implementation(libs.protobufGradlePluginz) // needed to compile inspection plugin
+    implementation(libs.kotlinPoet) // needed to compile material-icon-generator
+    implementation(libs.xmlpull) // needed to compile material-icon-generator
+
+    implementation(libs.protobuf) // needed to compile baseline-profile gradle plugins
+    implementation(libs.agpTestingPlatformCoreProto) // needed to compile baseline-profile gradle plugins
+
+    // dependencies that aren't used by buildSrc directly but that we resolve here so that the
+    // root project doesn't need to re-resolve them and their dependencies on every build
+    runtimeOnly(libs.hiltAndroidGradlePluginz)
+    runtimeOnly(libs.javapoet) // for hiltAndroidGradlePluginz to workaround https://github.com/google/dagger/issues/3068
+    runtimeOnly(libs.kspGradlePluginz)
+    runtimeOnly(libs.wireGradlePluginz)
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+project.tasks.withType(Jar) { task ->
+    task.reproducibleFileOrder = true
+    task.preserveFileTimestamps = false
+}
+
+validatePlugins {
+    enableStricterValidation = true
+}

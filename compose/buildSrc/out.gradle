@@ -1,0 +1,52 @@
+/*
+ * Copyright (C) 2019 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+def init = new Properties()
+ext.init = init
+
+def getOutDir(subdir = "") {
+    /*
+     * The OUT_DIR is a temporary directory you can use to put things during the build.
+     */
+    def outDir = System.env.OUT_DIR
+    def buildSrcOut
+    if (outDir == null) {
+        def checkoutRoot = System.getProperty("CHECKOUT_ROOT")
+        if (checkoutRoot == null) {
+            checkoutRoot = new File("${buildscript.sourceFile.parent}/..")
+        }
+        outDir = new File("${checkoutRoot}/out${subdir}")
+        buildSrcOut = new File("${checkoutRoot}/out/buildSrc")
+    } else {
+        outDir = new File(outDir)
+        buildSrcOut = new File("${outDir}/buildSrc")
+    }
+    return new Tuple(outDir, buildSrcOut)
+}
+
+def chooseOutDir(subdir = "") {
+    def (outDir, buildSrcOut) = getOutDir(subdir)
+    project.ext.buildSrcOut = buildSrcOut
+    project.ext.outDir = outDir
+    buildDir = new File(outDir, "$project.name/build")
+                .getCanonicalFile()
+    subprojects {
+        // Change buildDir first so that all plugins pick up the new value.
+        project.buildDir = new File("$project.parent.buildDir/../$project.name/build")
+    }
+}
+
+ext.init.getOutDir = this.&getOutDir
+ext.init.chooseOutDir = this.&chooseOutDir

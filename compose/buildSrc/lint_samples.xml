@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2021 The Android Open Source Project
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+
+<!--
+  This configuration is applied to LibraryType.SAMPLES projects which must run
+  specific lint checks on dependencies, but don't want the full suite running.
+  -->
+<lint>
+    <issue id="LintBaseline" severity="ignore">
+        <ignore regexp=".* filtered out because .* listed in the baseline file.*"/>
+    </issue>
+    <!-- Disable all lint checks in non-sample projects. -->
+    <issue id="all">
+        <ignore regexp="^((?!samples).)*$" />
+    </issue>
+    <!-- Re-enable sampled lint checks for all projects. -->
+    <issue id="InvalidSamplesLocation" severity="fatal" />
+    <issue id="MultipleSampledFunctions" severity="fatal" />
+    <issue id="UnresolvedSampleLink" severity="fatal" />
+    <issue id="ObsoleteSampledAnnotation" severity="fatal" />
+</lint>
