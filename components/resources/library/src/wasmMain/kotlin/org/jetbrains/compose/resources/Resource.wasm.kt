@@ -6,6 +6,8 @@
 package org.jetbrains.compose.resources
 
 import org.jetbrains.compose.resources.vector.xmldom.Element
+import org.jetbrains.compose.resources.vector.xmldom.ElementImpl
+import org.jetbrains.compose.resources.vector.xmldom.MalformedXMLException
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.Uint8Array
@@ -19,6 +21,7 @@ import kotlin.coroutines.suspendCoroutine
 import kotlin.wasm.unsafe.*
 import kotlin.wasm.unsafe.withScopedMemoryAllocator
 import kotlin.wasm.unsafe.UnsafeWasmMemoryApi
+import org.w3c.dom.parsing.DOMParser
 
 @ExperimentalResourceApi
 actual fun resource(path: String): Resource = JSResourceImpl(path)
@@ -74,4 +77,16 @@ internal fun jsInt8ArrayToKotlinByteArray(x: Int8Array): ByteArray {
         jsExportInt8ArrayToWasm(x, size, dstAddress)
         ByteArray(size) { i -> (memBuffer + i).loadByte() }
     }
+}
+
+internal actual fun isSyncResourceLoadingSupported() = false
+
+@OptIn(ExperimentalResourceApi::class)
+internal actual fun Resource.readBytesSync(): ByteArray = throw UnsupportedOperationException()
+
+internal actual fun parseXML(byteArray: ByteArray): Element {
+    val xmlString = byteArray.decodeToString()
+    val xmlDom = DOMParser().parseFromString(xmlString, "application/xml".toJsString())
+    val domElement = xmlDom.documentElement ?: throw MalformedXMLException("missing documentElement")
+    return ElementImpl(domElement)
 }
