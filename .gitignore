@@ -4,7 +4,8 @@ out
 *.iml
 .gradle
 /local.properties
-.idea/
+/.idea/*
+!/.idea/vcs.xml
 .DS_Store
 build/
 /captures
