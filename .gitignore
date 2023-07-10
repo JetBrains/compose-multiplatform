@@ -6,6 +6,7 @@ out
 /local.properties
 /.idea/*
 !/.idea/vcs.xml
+!/.idea/codeStyles/
 .DS_Store
 build/
 /captures
