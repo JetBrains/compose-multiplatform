@@ -66,11 +66,11 @@ kotlin {
             dependsOn(jvmAndAndroidMain)
             dependsOn(commonButJSMain)
         }
-        val androidTest by getting {
-            dependencies {
-
-            }
-        }
+//        val androidTest by getting {
+//            dependencies {
+//
+//            }
+//        }
         val iosMain by getting {
             dependsOn(skikoMain)
             dependsOn(commonButJSMain)
@@ -149,3 +149,9 @@ configureMavenPublication(
 //compose {
 //    kotlinCompilerPlugin.set("1.4.0-dev-wasm05")
 //}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
+    kotlinOptions {
+        freeCompilerArgs += "-Xopt-in=kotlinx.cinterop.ExperimentalForeignApi"
+    }
+}
