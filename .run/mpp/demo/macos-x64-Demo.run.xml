@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="test" type="GradleRunConfiguration" factoryName="Gradle" folderName="desktop">
+  <configuration default="false" name="macos X64 Demo" type="GradleRunConfiguration" factoryName="Gradle" folderName="mpp/demo">
     <ExternalSystemSettings>
       <option name="executionName" />
-      <option name="externalProjectPath" value="$PROJECT_DIR$" />
+      <option name="externalProjectPath" value="$PROJECT_DIR$/compose/compose/mpp/demo" />
       <option name="externalSystemIdString" value="GRADLE" />
       <option name="scriptParameters" value="" />
       <option name="taskDescriptions">
@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":mpp:testDesktop" />
+          <option value="runDebugExecutableMacosX64" />
         </list>
       </option>
       <option name="vmOptions" />
