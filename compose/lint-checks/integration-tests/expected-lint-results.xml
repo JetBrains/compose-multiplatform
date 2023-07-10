@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="5" by="lint 4.2.0-beta06">
+
+    <issue
+        id="BanConcurrentHashMap"
+        severity="Error"
+        message="Detected ConcurrentHashMap usage."
+        category="Correctness"
+        priority="5"
+        summary="ConcurrentHashMap usage is not allowed"
+        explanation="ConcurrentHashMap has an issue on Android’s Lollipop release that can lead to lost updates under thread contention."
+        errorLine1="import java.util.concurrent.ConcurrentHashMap;"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/Sample.java"
+            line="19"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        severity="Error"
+        message="This call references a method added in API level 30; however, the containing class androidx.AutofixUnsafeConstructorReferenceJava is reachable from earlier API levels and will fail run-time class verification."
+        category="Correctness"
+        priority="5"
+        summary="Even in cases where references to new APIs are gated on SDK_INT checks, run-time class verification will still fail on references to APIs that may not be available at run time, including platform APIs introduced after a library&apos;s minSdkVersion."
+        explanation="The Java language requires a virtual machine to verify the class files it&#xA;loads and executes. A class may fail verification for a wide variety of&#xA;reasons, but in practice it‘s usually because the class’s code refers to&#xA;unknown classes or methods.&#xA;&#xA;References to APIs added after a library&apos;s minSdkVersion -- regardless of&#xA;any surrounding version checks -- will fail run-time class verification if&#xA;the API does not exist on the device, leading to reduced run-time&#xA;performance.&#xA;&#xA;Gating references on SDK checks alone DOES NOT address class verification&#xA;failures.&#xA;&#xA;To prevent class verification failures, references to new APIs must be&#xA;moved to inner classes that are only initialized inside of an appropriate&#xA;SDK check.&#xA;&#xA;For example, if our minimum SDK is 14 and platform method a.x(params...)&#xA;was added in SDK 16, the method call must be moved to an inner class like:&#xA;&#xA;@RequiresApi(16)&#xA;private static class Api16Impl{&#xA;  @DoNotInline&#xA;  static void callX(params...) {&#xA;    a.x(params...);&#xA;  }&#xA;}&#xA;&#xA;The call site is changed from a.x(params...) to Api16Impl.callX(params).&#xA;&#xA;Since ART will only try to optimize Api16Impl when it&apos;s on the execution&#xA;path, we are guaranteed to have a.x(...) available.&#xA;&#xA;In addition, optimizers like R8 or Proguard may inline the method in the&#xA;separate class and replace the wrapper call with the actual call, so you&#xA;must disable inlining using the @DoNotInline annotation.&#xA;&#xA;Failure to do the above may result in overall performance degradation."
+        errorLine1="            AccessibilityNodeInfo node = new AccessibilityNodeInfo(new View(context), 1);"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/AutofixUnsafeConstructorReferenceJava.java"
+            line="35"
+            column="42"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        severity="Error"
+        message="This call references a method added in API level 23; however, the containing class androidx.AutofixUnsafeGenericMethodReferenceJava is reachable from earlier API levels and will fail run-time class verification."
+        category="Correctness"
+        priority="5"
+        summary="Even in cases where references to new APIs are gated on SDK_INT checks, run-time class verification will still fail on references to APIs that may not be available at run time, including platform APIs introduced after a library&apos;s minSdkVersion."
+        explanation="The Java language requires a virtual machine to verify the class files it&#xA;loads and executes. A class may fail verification for a wide variety of&#xA;reasons, but in practice it‘s usually because the class’s code refers to&#xA;unknown classes or methods.&#xA;&#xA;References to APIs added after a library&apos;s minSdkVersion -- regardless of&#xA;any surrounding version checks -- will fail run-time class verification if&#xA;the API does not exist on the device, leading to reduced run-time&#xA;performance.&#xA;&#xA;Gating references on SDK checks alone DOES NOT address class verification&#xA;failures.&#xA;&#xA;To prevent class verification failures, references to new APIs must be&#xA;moved to inner classes that are only initialized inside of an appropriate&#xA;SDK check.&#xA;&#xA;For example, if our minimum SDK is 14 and platform method a.x(params...)&#xA;was added in SDK 16, the method call must be moved to an inner class like:&#xA;&#xA;@RequiresApi(16)&#xA;private static class Api16Impl{&#xA;  @DoNotInline&#xA;  static void callX(params...) {&#xA;    a.x(params...);&#xA;  }&#xA;}&#xA;&#xA;The call site is changed from a.x(params...) to Api16Impl.callX(params).&#xA;&#xA;Since ART will only try to optimize Api16Impl when it&apos;s on the execution&#xA;path, we are guaranteed to have a.x(...) available.&#xA;&#xA;In addition, optimizers like R8 or Proguard may inline the method in the&#xA;separate class and replace the wrapper call with the actual call, so you&#xA;must disable inlining using the @DoNotInline annotation.&#xA;&#xA;Failure to do the above may result in overall performance degradation."
+        errorLine1="            return context.getSystemService(serviceClass);"
+        errorLine2="                           ~~~~~~~~~~~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/AutofixUnsafeGenericMethodReferenceJava.java"
+            line="34"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        severity="Error"
+        message="This call references a method added in API level 21; however, the containing class androidx.AutofixUnsafeReferenceWithExistingClassJava is reachable from earlier API levels and will fail run-time class verification."
+        category="Correctness"
+        priority="5"
+        summary="Even in cases where references to new APIs are gated on SDK_INT checks, run-time class verification will still fail on references to APIs that may not be available at run time, including platform APIs introduced after a library&apos;s minSdkVersion."
+        explanation="The Java language requires a virtual machine to verify the class files it&#xA;loads and executes. A class may fail verification for a wide variety of&#xA;reasons, but in practice it‘s usually because the class’s code refers to&#xA;unknown classes or methods.&#xA;&#xA;References to APIs added after a library&apos;s minSdkVersion -- regardless of&#xA;any surrounding version checks -- will fail run-time class verification if&#xA;the API does not exist on the device, leading to reduced run-time&#xA;performance.&#xA;&#xA;Gating references on SDK checks alone DOES NOT address class verification&#xA;failures.&#xA;&#xA;To prevent class verification failures, references to new APIs must be&#xA;moved to inner classes that are only initialized inside of an appropriate&#xA;SDK check.&#xA;&#xA;For example, if our minimum SDK is 14 and platform method a.x(params...)&#xA;was added in SDK 16, the method call must be moved to an inner class like:&#xA;&#xA;@RequiresApi(16)&#xA;private static class Api16Impl{&#xA;  @DoNotInline&#xA;  static void callX(params...) {&#xA;    a.x(params...);&#xA;  }&#xA;}&#xA;&#xA;The call site is changed from a.x(params...) to Api16Impl.callX(params).&#xA;&#xA;Since ART will only try to optimize Api16Impl when it&apos;s on the execution&#xA;path, we are guaranteed to have a.x(...) available.&#xA;&#xA;In addition, optimizers like R8 or Proguard may inline the method in the&#xA;separate class and replace the wrapper call with the actual call, so you&#xA;must disable inlining using the @DoNotInline annotation.&#xA;&#xA;Failure to do the above may result in overall performance degradation."
+        errorLine1="            view.setBackgroundTintList(new ColorStateList(null, null));"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/AutofixUnsafeReferenceWithExistingClassJava.java"
+            line="36"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        severity="Error"
+        message="This call references a method added in API level 17; however, the containing class androidx.AutofixUnsafeStaticMethodReferenceJava is reachable from earlier API levels and will fail run-time class verification."
+        category="Correctness"
+        priority="5"
+        summary="Even in cases where references to new APIs are gated on SDK_INT checks, run-time class verification will still fail on references to APIs that may not be available at run time, including platform APIs introduced after a library&apos;s minSdkVersion."
+        explanation="The Java language requires a virtual machine to verify the class files it&#xA;loads and executes. A class may fail verification for a wide variety of&#xA;reasons, but in practice it‘s usually because the class’s code refers to&#xA;unknown classes or methods.&#xA;&#xA;References to APIs added after a library&apos;s minSdkVersion -- regardless of&#xA;any surrounding version checks -- will fail run-time class verification if&#xA;the API does not exist on the device, leading to reduced run-time&#xA;performance.&#xA;&#xA;Gating references on SDK checks alone DOES NOT address class verification&#xA;failures.&#xA;&#xA;To prevent class verification failures, references to new APIs must be&#xA;moved to inner classes that are only initialized inside of an appropriate&#xA;SDK check.&#xA;&#xA;For example, if our minimum SDK is 14 and platform method a.x(params...)&#xA;was added in SDK 16, the method call must be moved to an inner class like:&#xA;&#xA;@RequiresApi(16)&#xA;private static class Api16Impl{&#xA;  @DoNotInline&#xA;  static void callX(params...) {&#xA;    a.x(params...);&#xA;  }&#xA;}&#xA;&#xA;The call site is changed from a.x(params...) to Api16Impl.callX(params).&#xA;&#xA;Since ART will only try to optimize Api16Impl when it&apos;s on the execution&#xA;path, we are guaranteed to have a.x(...) available.&#xA;&#xA;In addition, optimizers like R8 or Proguard may inline the method in the&#xA;separate class and replace the wrapper call with the actual call, so you&#xA;must disable inlining using the @DoNotInline annotation.&#xA;&#xA;Failure to do the above may result in overall performance degradation."
+        errorLine1="            return View.generateViewId();"
+        errorLine2="                        ~~~~~~~~~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/AutofixUnsafeStaticMethodReferenceJava.java"
+            line="33"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        severity="Error"
+        message="This call references a method added in API level 21; however, the containing class androidx.AutofixUnsafeVoidMethodReferenceJava is reachable from earlier API levels and will fail run-time class verification."
+        category="Correctness"
+        priority="5"
+        summary="Even in cases where references to new APIs are gated on SDK_INT checks, run-time class verification will still fail on references to APIs that may not be available at run time, including platform APIs introduced after a library&apos;s minSdkVersion."
+        explanation="The Java language requires a virtual machine to verify the class files it&#xA;loads and executes. A class may fail verification for a wide variety of&#xA;reasons, but in practice it‘s usually because the class’s code refers to&#xA;unknown classes or methods.&#xA;&#xA;References to APIs added after a library&apos;s minSdkVersion -- regardless of&#xA;any surrounding version checks -- will fail run-time class verification if&#xA;the API does not exist on the device, leading to reduced run-time&#xA;performance.&#xA;&#xA;Gating references on SDK checks alone DOES NOT address class verification&#xA;failures.&#xA;&#xA;To prevent class verification failures, references to new APIs must be&#xA;moved to inner classes that are only initialized inside of an appropriate&#xA;SDK check.&#xA;&#xA;For example, if our minimum SDK is 14 and platform method a.x(params...)&#xA;was added in SDK 16, the method call must be moved to an inner class like:&#xA;&#xA;@RequiresApi(16)&#xA;private static class Api16Impl{&#xA;  @DoNotInline&#xA;  static void callX(params...) {&#xA;    a.x(params...);&#xA;  }&#xA;}&#xA;&#xA;The call site is changed from a.x(params...) to Api16Impl.callX(params).&#xA;&#xA;Since ART will only try to optimize Api16Impl when it&apos;s on the execution&#xA;path, we are guaranteed to have a.x(...) available.&#xA;&#xA;In addition, optimizers like R8 or Proguard may inline the method in the&#xA;separate class and replace the wrapper call with the actual call, so you&#xA;must disable inlining using the @DoNotInline annotation.&#xA;&#xA;Failure to do the above may result in overall performance degradation."
+        errorLine1="            view.setBackgroundTintList(new ColorStateList(null, null));"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/AutofixUnsafeVoidMethodReferenceJava.java"
+            line="34"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        severity="Error"
+        message="This call references a method added in API level 21; however, the containing class androidx.ClassVerificationFailureFromJava is reachable from earlier API levels and will fail run-time class verification."
+        category="Correctness"
+        priority="5"
+        summary="Even in cases where references to new APIs are gated on SDK_INT checks, run-time class verification will still fail on references to APIs that may not be available at run time, including platform APIs introduced after a library&apos;s minSdkVersion."
+        explanation="The Java language requires a virtual machine to verify the class files it&#xA;loads and executes. A class may fail verification for a wide variety of&#xA;reasons, but in practice it‘s usually because the class’s code refers to&#xA;unknown classes or methods.&#xA;&#xA;References to APIs added after a library&apos;s minSdkVersion -- regardless of&#xA;any surrounding version checks -- will fail run-time class verification if&#xA;the API does not exist on the device, leading to reduced run-time&#xA;performance.&#xA;&#xA;Gating references on SDK checks alone DOES NOT address class verification&#xA;failures.&#xA;&#xA;To prevent class verification failures, references to new APIs must be&#xA;moved to inner classes that are only initialized inside of an appropriate&#xA;SDK check.&#xA;&#xA;For example, if our minimum SDK is 14 and platform method a.x(params...)&#xA;was added in SDK 16, the method call must be moved to an inner class like:&#xA;&#xA;@RequiresApi(16)&#xA;private static class Api16Impl{&#xA;  @DoNotInline&#xA;  static void callX(params...) {&#xA;    a.x(params...);&#xA;  }&#xA;}&#xA;&#xA;The call site is changed from a.x(params...) to Api16Impl.callX(params).&#xA;&#xA;Since ART will only try to optimize Api16Impl when it&apos;s on the execution&#xA;path, we are guaranteed to have a.x(...) available.&#xA;&#xA;In addition, optimizers like R8 or Proguard may inline the method in the&#xA;separate class and replace the wrapper call with the actual call, so you&#xA;must disable inlining using the @DoNotInline annotation.&#xA;&#xA;Failure to do the above may result in overall performance degradation."
+        errorLine1="            view.setBackgroundTintList(tint);"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/ClassVerificationFailureFromJava.java"
+            line="38"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        severity="Error"
+        message="This call references a method added in API level 17; however, the containing class androidx.ClassVerificationFailureFromJava is reachable from earlier API levels and will fail run-time class verification."
+        category="Correctness"
+        priority="5"
+        summary="Even in cases where references to new APIs are gated on SDK_INT checks, run-time class verification will still fail on references to APIs that may not be available at run time, including platform APIs introduced after a library&apos;s minSdkVersion."
+        explanation="The Java language requires a virtual machine to verify the class files it&#xA;loads and executes. A class may fail verification for a wide variety of&#xA;reasons, but in practice it‘s usually because the class’s code refers to&#xA;unknown classes or methods.&#xA;&#xA;References to APIs added after a library&apos;s minSdkVersion -- regardless of&#xA;any surrounding version checks -- will fail run-time class verification if&#xA;the API does not exist on the device, leading to reduced run-time&#xA;performance.&#xA;&#xA;Gating references on SDK checks alone DOES NOT address class verification&#xA;failures.&#xA;&#xA;To prevent class verification failures, references to new APIs must be&#xA;moved to inner classes that are only initialized inside of an appropriate&#xA;SDK check.&#xA;&#xA;For example, if our minimum SDK is 14 and platform method a.x(params...)&#xA;was added in SDK 16, the method call must be moved to an inner class like:&#xA;&#xA;@RequiresApi(16)&#xA;private static class Api16Impl{&#xA;  @DoNotInline&#xA;  static void callX(params...) {&#xA;    a.x(params...);&#xA;  }&#xA;}&#xA;&#xA;The call site is changed from a.x(params...) to Api16Impl.callX(params).&#xA;&#xA;Since ART will only try to optimize Api16Impl when it&apos;s on the execution&#xA;path, we are guaranteed to have a.x(...) available.&#xA;&#xA;In addition, optimizers like R8 or Proguard may inline the method in the&#xA;separate class and replace the wrapper call with the actual call, so you&#xA;must disable inlining using the @DoNotInline annotation.&#xA;&#xA;Failure to do the above may result in overall performance degradation."
+        errorLine1="            return View.generateViewId();"
+        errorLine2="                        ~~~~~~~~~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/ClassVerificationFailureFromJava.java"
+            line="47"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        severity="Error"
+        message="This call references a method added in API level 23; however, the containing class androidx.ClassVerificationFailureFromJava is reachable from earlier API levels and will fail run-time class verification."
+        category="Correctness"
+        priority="5"
+        summary="Even in cases where references to new APIs are gated on SDK_INT checks, run-time class verification will still fail on references to APIs that may not be available at run time, including platform APIs introduced after a library&apos;s minSdkVersion."
+        explanation="The Java language requires a virtual machine to verify the class files it&#xA;loads and executes. A class may fail verification for a wide variety of&#xA;reasons, but in practice it‘s usually because the class’s code refers to&#xA;unknown classes or methods.&#xA;&#xA;References to APIs added after a library&apos;s minSdkVersion -- regardless of&#xA;any surrounding version checks -- will fail run-time class verification if&#xA;the API does not exist on the device, leading to reduced run-time&#xA;performance.&#xA;&#xA;Gating references on SDK checks alone DOES NOT address class verification&#xA;failures.&#xA;&#xA;To prevent class verification failures, references to new APIs must be&#xA;moved to inner classes that are only initialized inside of an appropriate&#xA;SDK check.&#xA;&#xA;For example, if our minimum SDK is 14 and platform method a.x(params...)&#xA;was added in SDK 16, the method call must be moved to an inner class like:&#xA;&#xA;@RequiresApi(16)&#xA;private static class Api16Impl{&#xA;  @DoNotInline&#xA;  static void callX(params...) {&#xA;    a.x(params...);&#xA;  }&#xA;}&#xA;&#xA;The call site is changed from a.x(params...) to Api16Impl.callX(params).&#xA;&#xA;Since ART will only try to optimize Api16Impl when it&apos;s on the execution&#xA;path, we are guaranteed to have a.x(...) available.&#xA;&#xA;In addition, optimizers like R8 or Proguard may inline the method in the&#xA;separate class and replace the wrapper call with the actual call, so you&#xA;must disable inlining using the @DoNotInline annotation.&#xA;&#xA;Failure to do the above may result in overall performance degradation."
+        errorLine1="        return view.getAccessibilityClassName();"
+        errorLine2="                    ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/ClassVerificationFailureFromJava.java"
+            line="58"
+            column="21"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        severity="Error"
+        message="This call references a method added in API level 19; however, the containing class androidx.sample.core.widget.ListViewCompat is reachable from earlier API levels and will fail run-time class verification."
+        category="Correctness"
+        priority="5"
+        summary="Even in cases where references to new APIs are gated on SDK_INT checks, run-time class verification will still fail on references to APIs that may not be available at run time, including platform APIs introduced after a library&apos;s minSdkVersion."
+        explanation="The Java language requires a virtual machine to verify the class files it&#xA;loads and executes. A class may fail verification for a wide variety of&#xA;reasons, but in practice it‘s usually because the class’s code refers to&#xA;unknown classes or methods.&#xA;&#xA;References to APIs added after a library&apos;s minSdkVersion -- regardless of&#xA;any surrounding version checks -- will fail run-time class verification if&#xA;the API does not exist on the device, leading to reduced run-time&#xA;performance.&#xA;&#xA;Gating references on SDK checks alone DOES NOT address class verification&#xA;failures.&#xA;&#xA;To prevent class verification failures, references to new APIs must be&#xA;moved to inner classes that are only initialized inside of an appropriate&#xA;SDK check.&#xA;&#xA;For example, if our minimum SDK is 14 and platform method a.x(params...)&#xA;was added in SDK 16, the method call must be moved to an inner class like:&#xA;&#xA;@RequiresApi(16)&#xA;private static class Api16Impl{&#xA;  @DoNotInline&#xA;  static void callX(params...) {&#xA;    a.x(params...);&#xA;  }&#xA;}&#xA;&#xA;The call site is changed from a.x(params...) to Api16Impl.callX(params).&#xA;&#xA;Since ART will only try to optimize Api16Impl when it&apos;s on the execution&#xA;path, we are guaranteed to have a.x(...) available.&#xA;&#xA;In addition, optimizers like R8 or Proguard may inline the method in the&#xA;separate class and replace the wrapper call with the actual call, so you&#xA;must disable inlining using the @DoNotInline annotation.&#xA;&#xA;Failure to do the above may result in overall performance degradation."
+        errorLine1="            listView.scrollListBy(y);"
+        errorLine2="                     ~~~~~~~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/core/widget/ListViewCompat.java"
+            line="39"
+            column="22"/>
+    </issue>
+
+    <issue
+        id="ClassVerificationFailure"
+        severity="Error"
+        message="This call references a method added in API level 19; however, the containing class androidx.sample.core.widget.ListViewCompat is reachable from earlier API levels and will fail run-time class verification."
+        category="Correctness"
+        priority="5"
+        summary="Even in cases where references to new APIs are gated on SDK_INT checks, run-time class verification will still fail on references to APIs that may not be available at run time, including platform APIs introduced after a library&apos;s minSdkVersion."
+        explanation="The Java language requires a virtual machine to verify the class files it&#xA;loads and executes. A class may fail verification for a wide variety of&#xA;reasons, but in practice it‘s usually because the class’s code refers to&#xA;unknown classes or methods.&#xA;&#xA;References to APIs added after a library&apos;s minSdkVersion -- regardless of&#xA;any surrounding version checks -- will fail run-time class verification if&#xA;the API does not exist on the device, leading to reduced run-time&#xA;performance.&#xA;&#xA;Gating references on SDK checks alone DOES NOT address class verification&#xA;failures.&#xA;&#xA;To prevent class verification failures, references to new APIs must be&#xA;moved to inner classes that are only initialized inside of an appropriate&#xA;SDK check.&#xA;&#xA;For example, if our minimum SDK is 14 and platform method a.x(params...)&#xA;was added in SDK 16, the method call must be moved to an inner class like:&#xA;&#xA;@RequiresApi(16)&#xA;private static class Api16Impl{&#xA;  @DoNotInline&#xA;  static void callX(params...) {&#xA;    a.x(params...);&#xA;  }&#xA;}&#xA;&#xA;The call site is changed from a.x(params...) to Api16Impl.callX(params).&#xA;&#xA;Since ART will only try to optimize Api16Impl when it&apos;s on the execution&#xA;path, we are guaranteed to have a.x(...) available.&#xA;&#xA;In addition, optimizers like R8 or Proguard may inline the method in the&#xA;separate class and replace the wrapper call with the actual call, so you&#xA;must disable inlining using the @DoNotInline annotation.&#xA;&#xA;Failure to do the above may result in overall performance degradation."
+        errorLine1="            return listView.canScrollList(direction);"
+        errorLine2="                            ~~~~~~~~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/core/widget/ListViewCompat.java"
+            line="69"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="PrivateConstructorForUtilityClass"
+        severity="Error"
+        message="Utility class is missing private constructor"
+        category="Correctness"
+        priority="5"
+        summary="Utility classes should have a private constructor"
+        explanation="Classes which are not intended to be instantiated should be made non-instantiable with a private constructor. This includes utility classes (classes with only static members), and the main class."
+        errorLine1="    static class DefaultInnerClass {"
+        errorLine2="                 ~~~~~~~~~~~~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/PrivateConstructorForUtilityClassJava.java"
+            line="37"
+            column="18"/>
+    </issue>
+
+    <issue
+        id="PrivateConstructorForUtilityClass"
+        severity="Error"
+        message="Utility class is missing private constructor"
+        category="Correctness"
+        priority="5"
+        summary="Utility classes should have a private constructor"
+        explanation="Classes which are not intended to be instantiated should be made non-instantiable with a private constructor. This includes utility classes (classes with only static members), and the main class."
+        errorLine1="    protected static class ProtectedInnerClass {"
+        errorLine2="                           ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/PrivateConstructorForUtilityClassJava.java"
+            line="46"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="PrivateConstructorForUtilityClass"
+        severity="Error"
+        message="Utility class is missing private constructor"
+        category="Correctness"
+        priority="5"
+        summary="Utility classes should have a private constructor"
+        explanation="Classes which are not intended to be instantiated should be made non-instantiable with a private constructor. This includes utility classes (classes with only static members), and the main class."
+        errorLine1="    public static class PublicInnerClass {"
+        errorLine2="                        ~~~~~~~~~~~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/PrivateConstructorForUtilityClassJava.java"
+            line="55"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        severity="Fatal"
+        message="Unknown nullability; explicitly declare as `@Nullable` or `@NonNull` to improve Kotlin interoperability; see https://android.github.io/kotlin-guides/interop.html#nullability-annotations"
+        category="Interoperability:Kotlin Interoperability"
+        priority="6"
+        summary="Unknown nullness"
+        explanation="To improve referencing this code from Kotlin, consider adding&#xA;explicit nullness information here with either `@NonNull` or `@Nullable`.&#xA;&#xA;You can set the environment variable&#xA;    `ANDROID_LINT_NULLNESS_IGNORE_DEPRECATED=true`&#xA;if you want lint to ignore classes and members that have been annotated with&#xA;`@Deprecated`."
+        url="https://android.github.io/kotlin-guides/interop.html#nullability-annotations"
+        urls="https://android.github.io/kotlin-guides/interop.html#nullability-annotations"
+        errorLine1="    public static Sample confirmIntrinisicLintChecksRun() {"
+        errorLine2="                  ~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/Sample.java"
+            line="32"
+            column="19"/>
+    </issue>
+
+    <issue
+        id="UnknownNullness"
+        severity="Fatal"
+        message="Unknown nullability; explicitly declare as `@Nullable` or `@NonNull` to improve Kotlin interoperability; see https://android.github.io/kotlin-guides/interop.html#nullability-annotations"
+        category="Interoperability:Kotlin Interoperability"
+        priority="6"
+        summary="Unknown nullness"
+        explanation="To improve referencing this code from Kotlin, consider adding&#xA;explicit nullness information here with either `@NonNull` or `@Nullable`.&#xA;&#xA;You can set the environment variable&#xA;    `ANDROID_LINT_NULLNESS_IGNORE_DEPRECATED=true`&#xA;if you want lint to ignore classes and members that have been annotated with&#xA;`@Deprecated`."
+        url="https://android.github.io/kotlin-guides/interop.html#nullability-annotations"
+        urls="https://android.github.io/kotlin-guides/interop.html#nullability-annotations"
+        errorLine1="    public static void confirmCustomAndroidXChecksRun(ConcurrentHashMap m) {"
+        errorLine2="                                                      ~~~~~~~~~~~~~~~~~">
+        <location
+            file="$SUPPORT/lint-checks/integration-tests/src/main/java/androidx/Sample.java"
+            line="41"
+            column="55"/>
+    </issue>
+
+</issues>

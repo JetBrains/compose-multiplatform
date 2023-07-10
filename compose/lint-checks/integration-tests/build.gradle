@@ -1,0 +1,78 @@
+/*
+ * Copyright 2021 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id("AndroidXPlugin")
+    id("com.android.library")
+    id("kotlin-android")
+}
+
+dependencies {
+    implementation(androidxArtifact(":annotation:annotation"))
+    implementation(androidxArtifact(":annotation:annotation-experimental"))
+    implementation(libs.kotlinStdlib)
+}
+
+androidx {
+    name = "Lint Checks Integration Tests"
+    description = "This is a sample library for confirming that lint checks execute correctly, b/177437928"
+}
+
+android {
+    lintOptions {
+        // lint is supposed to detect errors in this project
+        // We don't need to see the errors in stdout
+        textOutput("${buildDir}/lint-results-debug.txt") // Set to this value for b/189877657
+        // We don't want errors to cause lint to fail
+        abortOnError false
+    }
+    namespace "androidx.lint.integration.tests"
+}
+
+
+class CompareFilesTask extends DefaultTask {
+    @InputFile
+    File actualFile
+    @InputFile
+    File expectedFile
+
+    @TaskAction
+    def compare() {
+        def actualResults = actualFile.text
+        def expectedResults = expectedFile.text
+        if (actualResults != expectedResults) {
+            throw new GradleException("Incorrect lint results.\n" +
+                "\n" +
+                "Actual   text: '" + actualResults + "'\n" +
+                "\n" +
+                "Expected text: '" + expectedResults + "'\n" +
+                "\n" +
+                "Are all lint checks running?\n" +
+                "\n" +
+                "Actual   output at: " + actualFile + "\n" +
+                "Expected output at: " + expectedFile + "\n")
+        }
+    }
+}
+
+// workaround for b/189877657
+afterEvaluate {
+    tasks.named("copyDebugAndroidLintReports").configure {
+        enabled = false
+    }
+}
