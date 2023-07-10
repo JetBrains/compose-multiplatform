@@ -1,0 +1,63 @@
+/*
+ * Copyright 2018 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import androidx.build.ExportAtomicLibraryGroupsToTextTask
+import androidx.build.LibraryType
+
+plugins {
+    id("AndroidXPlugin")
+    id("kotlin")
+}
+
+sourceSets {
+    // Pull integration test source code in for use by lint testing framework.
+    test.resources.srcDirs(
+            project(":lint-checks:integration-tests")
+                    .projectDir.absolutePath + "/src/main"
+    )
+}
+
+dependencies {
+    compileOnly(libs.androidLintApi)
+    compileOnly(libs.androidLintChecks)
+    compileOnly(libs.kotlinStdlib)
+
+    testImplementation(libs.kotlinStdlib)
+    testImplementation(libs.androidLint)
+    testImplementation(libs.androidLintTests)
+    testImplementation(libs.junit)
+}
+
+androidx {
+    name = "Lint checks"
+    type = LibraryType.LINT
+    inceptionYear = "2018"
+    description = "Internal lint checks"
+}
+
+def exportTaskProvider = tasks.register(
+        "exportAtomicLibraryGroupsToText",
+        ExportAtomicLibraryGroupsToTextTask
+) { task ->
+    task.libraryGroups = androidx.AllLibraryGroups
+
+    def generatedDirectory = new File(project.buildDir, "generated/resources")
+    task.outputDir.set(generatedDirectory)
+}
+
+def extension = project.extensions.getByType(JavaPluginExtension.class)
+def mainSources = extension.sourceSets.getByName("main")
+mainSources.getOutput().dir(exportTaskProvider.flatMap { it.outputDir })
