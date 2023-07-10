@@ -32,10 +32,10 @@ compose.experimental {
     web.application {}
 }
 
-project.configurations.forEach { conf ->
-    conf.resolutionStrategy.eachDependency {
-        if (requested.module.name.contains("kotlin-stdlib")) {
-            useVersion("1.8.20-Beta")
-        }
-    }
-}
+//project.configurations.forEach { conf ->
+//    conf.resolutionStrategy.eachDependency {
+//        if (requested.module.name.contains("kotlin-stdlib")) {
+//            useVersion("1.8.20-Beta")
+//        }
+//    }
+//}
