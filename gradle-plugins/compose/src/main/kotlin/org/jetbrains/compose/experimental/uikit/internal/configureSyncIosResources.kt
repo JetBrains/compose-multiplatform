@@ -34,17 +34,19 @@ private class SyncIosResourcesContext(
 ) {
     fun syncDirFor(framework: Framework): Provider<Directory> {
         val providers = framework.project.providers
-        val composeResourcesDirFromXcode = providers.environmentVariable("BUILT_PRODUCTS_DIR")
-            .zip(providers.environmentVariable("CONTENTS_FOLDER_PATH")) { builtProductsDir, contentsFolderPath ->
-                File(builtProductsDir)
-                    .resolve(contentsFolderPath)
-                    .resolve("compose-resources")
-                    .canonicalPath
-            }.flatMap {
-                framework.project.objects.directoryProperty().apply { set(File(it)) }
-            }
-        val defaultComposeResourcesDir = project.layout.buildDirectory.dir("compose/ios/${framework.baseName}/compose-resources/")
-        return composeResourcesDirFromXcode.orElse(defaultComposeResourcesDir)
+        return if (framework.isCocoapodsFramework) {
+            project.layout.buildDirectory.dir("compose/ios/${framework.baseName}/compose-resources/")
+        } else {
+            providers.environmentVariable("BUILT_PRODUCTS_DIR")
+                .zip(providers.environmentVariable("CONTENTS_FOLDER_PATH")) { builtProductsDir, contentsFolderPath ->
+                    File(builtProductsDir)
+                        .resolve(contentsFolderPath)
+                        .resolve("compose-resources")
+                        .canonicalPath
+                }.flatMap {
+                    framework.project.objects.directoryProperty().apply { set(File(it)) }
+                }
+        }
     }
 
 
@@ -70,6 +72,11 @@ private fun SyncIosResourcesContext.configureCocoapodsResourcesAttribute() {
                 cocoapodsExt.framework {
                     val syncDir = syncDirFor(this).get().asFile
                     specAttributes[RESOURCES_SPEC_ATTR] = "['${syncDir.relativeTo(project.projectDir).path}']"
+                    project.tasks.named("podInstall").configure {
+                        it.doFirst {
+                            syncDir.mkdirs()
+                        }
+                    }
                 }
             } else {
                 error("""
@@ -93,16 +100,17 @@ private fun SyncIosResourcesContext.configureSyncResourcesTasks() {
             iosTargets.add(iosTargetResourcesProvider(framework))
         }
         with (lazyTasksDependencies) {
-            if (framework.name.startsWith("pod")) {
-                project.withCocoapodsPlugin {
-                    "syncFramework".lazyDependsOn(syncTask.name)
-                }
+            if (framework.isCocoapodsFramework) {
+                "syncFramework".lazyDependsOn(syncTask.name)
             } else {
                 "embedAndSign${frameworkClassifier}AppleFrameworkForXcode".lazyDependsOn(syncTask.name)
             }
         }
     }
 }
+
+private val Framework.isCocoapodsFramework: Boolean
+    get() = name.startsWith("pod")
 
 private val Framework.namePrefix: String
     get() = extractPrefixFromBinaryName(
