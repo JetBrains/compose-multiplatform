@@ -80,11 +80,12 @@ private fun SyncIosResourcesContext.configureCocoapodsResourcesAttribute() {
                 }
             } else {
                 error("""
-                    Compose Multiplatform's resource synchronization for iOS is not compatible with customized Cocoapods extra spec attribute 'resources'.
-                    Possible solutions:
-                    * Remove 'kotlin.cocoapods.extraSpecAttributes["resources"]' from ${project.buildFile};
-                    * Alternatively, you may turn off Compose Multiplatform resource management by adding '${IosGradleProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties.
-                """.trimIndent())
+                    |Compose Multiplatform's resource synchronization for iOS is not compatible with customized Cocoapods extra spec attribute 'resources'.
+                    |Possible solutions:
+                    |* Remove 'kotlin.cocoapods.extraSpecAttributes["resources"]' from ${project.buildFile}.
+                    |  Then run ${project.path}:podInstall once.
+                    |* Alternatively, you may turn off Compose Multiplatform resource management by adding '${IosGradleProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties.
+                """.trimMargin("|"))
             }
         }
     }
