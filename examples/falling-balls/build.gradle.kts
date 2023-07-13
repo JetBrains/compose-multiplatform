@@ -11,6 +11,8 @@ plugins {
 
 allprojects {
     repositories {
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
+        mavenLocal()
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")

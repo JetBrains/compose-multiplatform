@@ -81,6 +81,9 @@ kotlin {
         val macosArm64Main by getting {
             dependsOn(macosMain)
         }
+        val jsMain by getting {
+            dependsOn(commonMain)
+        }
     }
 }
 
@@ -98,4 +101,17 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+}
+
+
+kotlin {
+    sourceSets.all {
+        languageSettings {
+            languageVersion = "2.0"
+        }
+    }
+}
+
+compose {
+    kotlinCompilerPlugin.set("0.0.0-1.9.20-dev-6336")
 }

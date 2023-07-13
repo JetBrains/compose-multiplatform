@@ -34,3 +34,15 @@ compose.desktop {
         }
     }
 }
+
+kotlin {
+    sourceSets.all {
+        languageSettings {
+            languageVersion = "2.0"
+        }
+    }
+}
+
+compose {
+    kotlinCompilerPlugin.set("0.0.0-1.9.20-dev-6336")
+}

@@ -1,5 +1,6 @@
 pluginManagement {
     repositories {
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
         gradlePluginPortal()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         google()
