@@ -10,8 +10,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import java.util.UUID
 
-actual fun Modifier.notchPadding(): Modifier = Modifier.padding(top = 12.dp)
-
 class DesktopStorableImage(
     val imageBitmap: ImageBitmap
 )
