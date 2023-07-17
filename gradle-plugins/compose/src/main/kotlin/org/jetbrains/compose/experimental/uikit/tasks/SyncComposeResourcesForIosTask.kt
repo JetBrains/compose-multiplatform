@@ -13,6 +13,9 @@ import org.gradle.api.tasks.*
 import org.jetbrains.compose.experimental.uikit.internal.determineIosKonanTargetsFromEnv
 import org.jetbrains.compose.experimental.uikit.internal.IosTargetResources
 import java.io.File
+import kotlin.io.path.Path
+import kotlin.io.path.pathString
+import kotlin.io.path.relativeTo
 
 abstract class SyncComposeResourcesForIosTask : AbstractComposeIosTask() {
     private fun missingTargetEnvAttributeError(attribute: String): Provider<Nothing> =
@@ -64,10 +67,31 @@ abstract class SyncComposeResourcesForIosTask : AbstractComposeIosTask() {
     @TaskAction
     fun run() {
         val outputDir = outputDir.get().asFile.apply { mkdirs() }
+        val allResourceDirs = iosTargets.get().flatMapTo(HashSet()) { it.dirs.get().map { Path(it).toAbsolutePath() } }
+
+        fun copyFileToOutputDir(file: File) {
+            for (dir in allResourceDirs) {
+                val path = file.toPath().toAbsolutePath()
+                if (path.startsWith(dir)) {
+                    val targetFile = outputDir.resolve(path.relativeTo(dir).pathString)
+                    file.copyTo(targetFile, overwrite = true)
+                    return
+                }
+            }
+
+            error(
+                buildString {
+                    appendLine("Resource file '$file' does not belong to a known resource directory:")
+                    allResourceDirs.forEach {
+                        appendLine("* $it")
+                    }
+                }
+            )
+        }
+
         val resourceFiles = resourceFiles.get().files
         for (file in resourceFiles) {
-            val targetFile = outputDir.resolve(file.name)
-            file.copyTo(targetFile, overwrite = true)
+            copyFileToOutputDir(file)
         }
         logger.info("Synced Compose resource files. Copied ${resourceFiles.size} files to $outputDir")
     }
