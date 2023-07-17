@@ -68,24 +68,17 @@ private fun SyncIosResourcesContext.configureCocoapodsResourcesAttribute() {
             val cocoapodsExt = mppExt.cocoapodsExt
             val specAttributes = cocoapodsExt.extraSpecAttributes
             val resourcesSpec = specAttributes[RESOURCES_SPEC_ATTR]
-            if (resourcesSpec.isNullOrBlank()) {
-                cocoapodsExt.framework {
-                    val syncDir = syncDirFor(this).get().asFile
-                    specAttributes[RESOURCES_SPEC_ATTR] = "['${syncDir.relativeTo(project.projectDir).path}']"
-                    project.tasks.named("podInstall").configure {
-                        it.doFirst {
-                            syncDir.mkdirs()
-                        }
+            if (!resourcesSpec.isNullOrBlank()) {
+                project.logger.warn("Warning: kotlin.cocoapods.extraSpecAttributes[\"resources\"] is ignored by Compose Multiplatform's resource synchronization for iOS")
+            }
+            cocoapodsExt.framework {
+                val syncDir = syncDirFor(this).get().asFile
+                specAttributes[RESOURCES_SPEC_ATTR] = "['${syncDir.relativeTo(project.projectDir).path}']"
+                project.tasks.named("podInstall").configure {
+                    it.doFirst {
+                        syncDir.mkdirs()
                     }
                 }
-            } else {
-                error("""
-                    |Compose Multiplatform's resource synchronization for iOS is not compatible with customized Cocoapods extra spec attribute 'resources'.
-                    |Possible solutions:
-                    |* Remove 'kotlin.cocoapods.extraSpecAttributes["resources"]' from ${project.buildFile}.
-                    |  Then run ${project.path}:podInstall once.
-                    |* Alternatively, you may turn off Compose Multiplatform resource management by adding '${IosGradleProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties.
-                """.trimMargin("|"))
             }
         }
     }
