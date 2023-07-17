@@ -58,7 +58,7 @@ abstract class AbstractUploadAppForNotarizationTask @Inject constructor(
     }
 
     private fun processUploadToolOutput(packageFile: File, output: String) {
-        val m = "RequestUUID = ([A-Za-z0-9\\-]+)".toRegex().find(output)
+        val m = "\\s+id: ([A-Za-z0-9\\-]+)".toRegex().find(output)
             ?: error("Could not determine RequestUUID from output: $output")
 
         val requestId = m.groupValues[1]
