@@ -25,7 +25,6 @@ abstract class SyncComposeResourcesForIosTask : AbstractComposeIosTask() {
     @get:Input
     val xcodeTargetPlatform: Provider<String> =
         providers.gradleProperty("compose.ios.resources.platform")
-            .orElse(providers.gradleProperty("compose.ios.resources.platform"))
             .orElse(providers.environmentVariable("PLATFORM_NAME"))
             .orElse(missingTargetEnvAttributeError("platform"))
 
