@@ -21,7 +21,7 @@ import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
 import org.jetbrains.compose.experimental.internal.configureExperimentalTargetsFlagsCheck
 import org.jetbrains.compose.experimental.internal.configureExperimental
-import org.jetbrains.compose.experimental.uikit.internal.configureSyncTask
+import org.jetbrains.compose.experimental.uikit.internal.resources.configureSyncTask
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.utils.currentTarget

@@ -3,12 +3,16 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.experimental.uikit.internal
+package org.jetbrains.compose.experimental.uikit.internal.resources
 
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
+import org.jetbrains.compose.experimental.uikit.internal.utils.IosGradleProperties
+import org.jetbrains.compose.experimental.uikit.internal.utils.asIosNativeTargetOrNull
+import org.jetbrains.compose.experimental.uikit.internal.utils.cocoapodsExt
+import org.jetbrains.compose.experimental.uikit.internal.utils.withCocoapodsPlugin
 import org.jetbrains.compose.experimental.uikit.tasks.SyncComposeResourcesForIosTask
 import org.jetbrains.compose.internal.utils.joinLowerCamelCase
 import org.jetbrains.compose.internal.utils.new

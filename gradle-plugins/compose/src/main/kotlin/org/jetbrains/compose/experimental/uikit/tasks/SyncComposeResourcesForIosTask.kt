@@ -10,8 +10,8 @@ import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.*
-import org.jetbrains.compose.experimental.uikit.internal.determineIosKonanTargetsFromEnv
-import org.jetbrains.compose.experimental.uikit.internal.IosTargetResources
+import org.jetbrains.compose.experimental.uikit.internal.resources.determineIosKonanTargetsFromEnv
+import org.jetbrains.compose.experimental.uikit.internal.resources.IosTargetResources
 import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.pathString
