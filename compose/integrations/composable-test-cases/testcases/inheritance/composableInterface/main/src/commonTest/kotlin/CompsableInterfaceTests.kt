@@ -4,6 +4,7 @@ import com.example.common.TextLeafNode
 import com.example.common.composeText
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -89,7 +90,36 @@ class CompsableInterfaceTests {
         }
 
         assertEquals(
-            "root:{DefaultComposableContent}",
+            "root:{DefaultComposableContent - any}",
+            root.dump()
+        )
+    }
+
+    @Test
+    fun testDefaultComposableContentOverrideImpl() = runTest {
+        val instance = DefaultComposableContentOverrideImpl()
+
+        val root = composeText {
+            instance.ComposableContent("any")
+        }
+
+        assertEquals(
+            "root:{DefaultComposableContent - any-overriden}",
+            root.dump()
+        )
+    }
+
+    @Test
+    @Ignore // TODO: fails on jvm too: Parameter specified as non-null is null: method DefaultComposableContentOverrideImpl.ComposableContent, parameter any
+    fun testDefaultComposableContentOverrideImpl2() = runTest {
+        val instance = DefaultComposableContentOverrideImpl()
+
+        val root = composeText {
+            instance.ComposableContent()
+        }
+
+        assertEquals(
+            "root:{DefaultComposableContent - any-overriden}",
             root.dump()
         )
     }

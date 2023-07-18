@@ -12,8 +12,10 @@ interface ComposableContent {
 
 interface DefaultComposableContent {
     @Composable
-    fun ComposableContent() {
-        TextLeafNode("DefaultComposableContent")
+    fun ComposableContent(
+        any: String = "any"
+    ) {
+        TextLeafNode("DefaultComposableContent - $any")
     }
 }
 

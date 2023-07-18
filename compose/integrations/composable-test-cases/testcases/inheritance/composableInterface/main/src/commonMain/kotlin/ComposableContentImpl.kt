@@ -44,3 +44,11 @@ class CollectionOfComposablesImpl : CollectionOfComposable {
 
 
 class DefaultComposableContentImpl : DefaultComposableContent
+
+class DefaultComposableContentOverrideImpl : DefaultComposableContent {
+
+    @Composable
+    override fun ComposableContent(any: String) {
+        super.ComposableContent("$any-overriden")
+    }
+}
