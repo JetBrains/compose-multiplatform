@@ -1,4 +1,5 @@
 import androidx.compose.runtime.Composable
+import com.example.common.TextLeafNode
 
 
 interface ComposableContent {
@@ -7,6 +8,13 @@ interface ComposableContent {
 
     @Composable
     fun ComposableContentWithChildren(moreContent: @Composable () -> Unit)
+}
+
+interface DefaultComposableContent {
+    @Composable
+    fun ComposableContent() {
+        TextLeafNode("DefaultComposableContent")
+    }
 }
 
 interface CollectionOfComposable {

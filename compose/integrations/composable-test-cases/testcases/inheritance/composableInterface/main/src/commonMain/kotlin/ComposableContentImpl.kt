@@ -41,3 +41,6 @@ class CollectionOfComposablesImpl : CollectionOfComposable {
         return list.iterator()
     }
 }
+
+
+class DefaultComposableContentImpl : DefaultComposableContent

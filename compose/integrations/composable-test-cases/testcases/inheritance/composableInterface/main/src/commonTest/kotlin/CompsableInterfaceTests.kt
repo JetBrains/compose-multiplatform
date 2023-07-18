@@ -79,6 +79,20 @@ class CompsableInterfaceTests {
             root.dump()
         )
     }
+
+    @Test
+    fun testDefaultComposableContentImpl() = runTest {
+        val instance = DefaultComposableContentImpl()
+
+        val root = composeText {
+            instance.ComposableContent()
+        }
+
+        assertEquals(
+            "root:{DefaultComposableContent}",
+            root.dump()
+        )
+    }
 }
 
 private class FinalComposableContentImpl : OpenComposableContentImpl() {
