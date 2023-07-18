@@ -8,12 +8,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.height
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Application
+import androidx.compose.ui.window.ComposeUIViewController
 import org.jetbrains.compose.resources.demo.shared.UseResources
-import platform.UIKit.UIViewController
 
-fun MainViewController(): UIViewController =
-    Application("Resources demo") {
+fun MainViewController() =
+    ComposeUIViewController {
         Column {
             Box(
                 modifier = Modifier

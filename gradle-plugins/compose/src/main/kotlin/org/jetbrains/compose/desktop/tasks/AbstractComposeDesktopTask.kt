@@ -7,7 +7,6 @@ package org.jetbrains.compose.desktop.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.Directory
-import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -18,7 +17,6 @@ import org.gradle.api.tasks.LocalState
 import org.gradle.process.ExecOperations
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
-import org.jetbrains.compose.internal.utils.clearDirs
 import org.jetbrains.compose.internal.utils.notNullProperty
 import javax.inject.Inject
 

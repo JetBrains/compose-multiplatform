@@ -18,8 +18,10 @@ actual fun resource(path: String): Resource = UIKitResourceImpl(path)
 @ExperimentalResourceApi
 private class UIKitResourceImpl(path: String) : AbstractResourceImpl(path) {
     override suspend fun readBytes(): ByteArray {
-        val absolutePath = NSBundle.mainBundle.resourcePath + "/" + path
-        val contentsAtPath: NSData? = NSFileManager.defaultManager().contentsAtPath(absolutePath)
+        val fileManager = NSFileManager.defaultManager()
+        // todo: support fallback path at bundle root?
+        val composeResourcesPath = NSBundle.mainBundle.resourcePath + "/compose-resources/" + path
+        val contentsAtPath: NSData? = fileManager.contentsAtPath(composeResourcesPath)
         if (contentsAtPath != null) {
             val byteArray = ByteArray(contentsAtPath.length.toInt())
             byteArray.usePinned {

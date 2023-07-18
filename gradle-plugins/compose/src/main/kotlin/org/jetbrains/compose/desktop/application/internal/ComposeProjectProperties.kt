@@ -7,6 +7,8 @@ package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
+import org.jetbrains.compose.internal.utils.findProperty
+import org.jetbrains.compose.internal.utils.toBooleanProvider
 
 internal object ComposeProperties {
     internal const val VERBOSE = "compose.desktop.verbose"
@@ -20,13 +22,13 @@ internal object ComposeProperties {
     internal const val MAC_NOTARIZATION_ASC_PROVIDER = "compose.desktop.mac.notarization.ascProvider"
 
     fun isVerbose(providers: ProviderFactory): Provider<Boolean> =
-        providers.findProperty(VERBOSE).toBoolean()
+        providers.findProperty(VERBOSE).toBooleanProvider(false)
 
     fun preserveWorkingDir(providers: ProviderFactory): Provider<Boolean> =
-        providers.findProperty(PRESERVE_WD).toBoolean()
+        providers.findProperty(PRESERVE_WD).toBooleanProvider(false)
 
     fun macSign(providers: ProviderFactory): Provider<Boolean> =
-        providers.findProperty(MAC_SIGN).toBoolean()
+        providers.findProperty(MAC_SIGN).toBooleanProvider(false)
 
     fun macSignIdentity(providers: ProviderFactory): Provider<String?> =
         providers.findProperty(MAC_SIGN_ID)
@@ -45,20 +47,4 @@ internal object ComposeProperties {
 
     fun macNotarizationAscProvider(providers: ProviderFactory): Provider<String?> =
         providers.findProperty(MAC_NOTARIZATION_ASC_PROVIDER)
-
-    private fun ProviderFactory.findProperty(prop: String): Provider<String?> =
-        provider {
-            gradleProperty(prop).forUseAtConfigurationTimeSafe().orNull
-        }
-
-    private fun Provider<String?>.forUseAtConfigurationTimeSafe(): Provider<String?> =
-        try {
-            forUseAtConfigurationTime()
-        } catch (e: NoSuchMethodError) {
-            // todo: remove once we drop support for Gradle 6.4
-            this
-        }
-
-    private fun Provider<String?>.toBoolean(): Provider<Boolean> =
-        orElse("false").map { "true" == it }
 }
