@@ -12,6 +12,7 @@ import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.*
 import org.jetbrains.compose.experimental.uikit.internal.resources.determineIosKonanTargetsFromEnv
 import org.jetbrains.compose.experimental.uikit.internal.resources.IosTargetResources
+import org.jetbrains.compose.internal.utils.clearDirs
 import java.io.File
 import kotlin.io.path.Path
 import kotlin.io.path.pathString
@@ -66,7 +67,8 @@ abstract class SyncComposeResourcesForIosTask : AbstractComposeIosTask() {
 
     @TaskAction
     fun run() {
-        val outputDir = outputDir.get().asFile.apply { mkdirs() }
+        val outputDir = outputDir.get().asFile
+        fileOperations.clearDirs(outputDir)
         val allResourceDirs = iosTargets.get().flatMapTo(HashSet()) { it.dirs.get().map { Path(it).toAbsolutePath() } }
 
         fun copyFileToOutputDir(file: File) {
