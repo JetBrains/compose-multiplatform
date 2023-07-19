@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
+internal val skikoVersion get() = ComposeBuildConfig.skikoVersion
 
 class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
@@ -90,6 +91,7 @@ class ComposePlugin : Plugin<Project> {
         @Deprecated("Use compose.html", replaceWith = ReplaceWith("html"))
         val web: WebDependencies get() = WebDependencies
         val html: HtmlDependencies get() = HtmlDependencies
+        val skiko: SkikoDependencies
     }
 
     object DesktopDependencies {
@@ -158,6 +160,21 @@ class ComposePlugin : Plugin<Project> {
             composeDependency("org.jetbrains.compose.html:html-test-utils")
         }
     }
+
+    object SkikoDependencies {
+        val common = skikoDependency("org.jetbrains.skiko:skiko")
+        val desktop = skikoDependency("org.jetbrains.skiko:skiko-awt")
+        val linux_x64 = skikoDependency("org.jetbrains.skiko:skiko-awt-runtime-linux-x64")
+        val linux_arm64 = skikoDependency("org.jetbrains.skiko:skiko-awt-runtime-linux-arm64")
+        val windows_x64 = skikoDependency("org.jetbrains.skiko:skiko-awt-runtime-windows-x64")
+        val windows_arm64 = skikoDependency("org.jetbrains.skiko:skiko-awt-runtime-windows-arm64")
+        val macos_x64 = skikoDependency("org.jetbrains.skiko:skiko-awt-runtime-macos-x64")
+        val macos_arm64 = skikoDependency("org.jetbrains.skiko:skiko-awt-runtime-macos-arm64")
+
+        val currentOs by lazy {
+            skikoDependency("org.jetbrains.skiko:skiko-awt-runtime-${currentTarget.id}")
+        }
+    }
 }
 
 fun RepositoryHandler.jetbrainsCompose(): MavenArtifactRepository =
@@ -168,6 +185,8 @@ fun KotlinDependencyHandler.compose(groupWithArtifact: String) = composeDependen
 fun DependencyHandler.compose(groupWithArtifact: String) = composeDependency(groupWithArtifact)
 
 private fun composeDependency(groupWithArtifact: String) = "$groupWithArtifact:$composeVersion"
+
+private fun skikoDependency(groupWithArtifact: String) = "$groupWithArtifact:$skikoVersion"
 
 private fun setUpGroovyDslExtensions(project: Project) {
     project.plugins.withId("org.jetbrains.kotlin.multiplatform") {
