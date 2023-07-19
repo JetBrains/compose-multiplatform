@@ -34,7 +34,6 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(project(":html-core"))
-                implementation(project(":internal-html-core-runtime"))
                 implementation(kotlin("stdlib-common"))
             }
         }
@@ -43,6 +42,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-js"))
                 implementation(npm("highlight.js", "10.7.2"))
+                implementation(project(":internal-html-core-runtime"))
             }
         }
 
