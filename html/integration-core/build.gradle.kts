@@ -34,6 +34,7 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(project(":html-core"))
+                implementation(project(":internal-html-core-runtime"))
                 implementation(kotlin("stdlib-common"))
             }
         }
