@@ -25,7 +25,6 @@ kotlin {
                 implementation(kotlin("stdlib-js"))
                 implementation(compose.runtime)
                 implementation(project(":html-core"))
-                implementation(project(":internal-html-core-runtime"))
             }
         }
 
