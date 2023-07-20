@@ -1,5 +1,6 @@
 package org.jetbrains.compose.animatedimage
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 
 /**
@@ -23,6 +24,7 @@ expect suspend fun loadResourceAnimatedImage(path: String): AnimatedImage
  * Animates an [AnimatedImage] by returning an [ImageBitmap] for each frame of the image.
  * The caller will be recomposed with each new frame that has been rendered.
  */
+@Composable
 expect fun AnimatedImage.animate(): ImageBitmap
 
 private val BlankBitmap = ImageBitmap(1, 1)
