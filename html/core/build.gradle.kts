@@ -31,7 +31,7 @@ kotlin {
                 optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
             }
             dependencies {
-                implementation(project(":internal-html-core-runtime"))
+                api(project(":internal-html-core-runtime"))
             }
         }
 

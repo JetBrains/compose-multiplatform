@@ -28,9 +28,9 @@ kotlin {
 
         val jsMain by getting {
             dependencies {
-                implementation(project(":internal-html-core-runtime"))
+                api(project(":internal-html-core-runtime"))
                 implementation(kotlin("stdlib-js"))
-                implementation(project(":html-core"))
+                api(project(":html-core"))
             }
         }
 
