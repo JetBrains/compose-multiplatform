@@ -15,7 +15,16 @@ kotlin {
     jvm("desktop")
 
     ios()
-    iosSimulatorArm64()
+    iosSimulatorArm64() {
+        // TODO: remove after 1.5 release
+        binaries.forEach {
+            it.freeCompilerArgs += listOf(
+                "-linker-option", "-framework", "-linker-option", "Metal",
+                "-linker-option", "-framework", "-linker-option", "CoreText",
+                "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+            )
+        }
+    }
 
     js(IR) {
         browser()
@@ -57,6 +66,12 @@ kotlin {
                 implementation(compose.material)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(kotlin("test-annotations-common"))
             }
         }
         val androidMain by getting {
