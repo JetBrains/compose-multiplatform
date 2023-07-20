@@ -63,7 +63,7 @@ fun build(
     val isWin = System.getProperty("os.name").startsWith("Win")
     val arguments = buildCmd.toMutableList().also {
         it.add("-Pcompose.version=$composeVersion")
-        it.add("-Pkotlin.hardcodeVersion=$kotlinVersion")
+        it.add("-Pkotlin.version=$kotlinVersion")
     }.toTypedArray()
 
     val procBuilder = if (isWin) {
