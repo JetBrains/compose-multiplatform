@@ -56,7 +56,11 @@ fun GalleryScreen(
     val imageProvider = LocalImageProvider.current
     val viewScope = rememberCoroutineScope()
 
-    val pagerState = rememberPagerState(initialPage = selectedPictureIndex.value)
+    val pagerState = rememberPagerState(
+        initialPage = selectedPictureIndex.value,
+        initialPageOffsetFraction = 0f,
+        pageCount = { pictures.size },
+    )
     LaunchedEffect(pagerState) {
         // Subscribe to page changes
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -116,7 +120,7 @@ fun GalleryScreen(
                             onClickPreviewPicture(pagerState.currentPage)
                         }
                 ) {
-                    HorizontalPager(pictures.size, state = pagerState) { index ->
+                    HorizontalPager(state = pagerState) { index ->
                         val picture = pictures[index]
                         var image: ImageBitmap? by remember(picture) { mutableStateOf(null) }
                         LaunchedEffect(picture) {
