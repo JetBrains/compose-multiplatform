@@ -1,5 +1,5 @@
 pluginManagement {
-    val kotlinVersion: String = settings.extra["kotlin.version"] as String
+    val kotlinVersion: String = settings.extra["kotlin.hardcodeVersion"] as String
 
     repositories {
         gradlePluginPortal()

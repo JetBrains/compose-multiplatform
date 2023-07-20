@@ -8,7 +8,7 @@ pluginManagement {
     }
 
     resolutionStrategy {
-        val kotlinVersion = extra["kotlin.version"] as String
+        val kotlinVersion = extra["kotlin.hardcodeVersion"] as String
         println("KotlinVersion=[$kotlinVersion]")
         eachPlugin {
             if (requested.id.id == "org.jetbrains.compose") {
