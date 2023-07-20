@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.resources
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.Foundation.NSBundle
@@ -17,6 +18,7 @@ actual fun resource(path: String): Resource = UIKitResourceImpl(path)
 
 @ExperimentalResourceApi
 private class UIKitResourceImpl(path: String) : AbstractResourceImpl(path) {
+    @OptIn(ExperimentalForeignApi::class)
     override suspend fun readBytes(): ByteArray {
         val absolutePath = NSBundle.mainBundle.resourcePath + "/" + path
         val contentsAtPath: NSData? = NSFileManager.defaultManager().contentsAtPath(absolutePath)
