@@ -1,3 +1,4 @@
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -25,7 +26,9 @@ object Main {
         }
 
         val image = renderComposeScene(height = 10, width = 10) {
-            mainShape()
+            AnimatedVisibility(true) {
+                mainShape()
+            }
         }
         val encodedImage = image.encodeToData(EncodedImageFormat.PNG) ?: error("Could not encode image as png")
         workingDir.resolve("main-image.actual.png").writeBytes(encodedImage.bytes)

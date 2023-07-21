@@ -267,6 +267,7 @@ private fun JvmApplicationContext.configureProguardTask(
     // That's why a task property is follows ProGuard design,
     // when our DSL does the opposite.
     dontobfuscate.set(settings.obfuscate.map { !it })
+    dontoptimize.set(settings.optimize.map { !it })
 
     dependsOn(unpackDefaultResources)
     defaultComposeRulesFile.set(unpackDefaultResources.flatMap { it.resources.defaultComposeProguardRules })

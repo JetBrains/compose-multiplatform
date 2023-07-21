@@ -637,3 +637,14 @@ compose.desktop {
     }
 }
 ```
+
+ProGuard's optimization is disabled by default since Compose 1.5. To enable it, set the following property via Gradle DSL:
+```
+compose.desktop {
+    application {
+        buildTypes.release.proguard {
+            optimize.set(true)
+        }
+    }
+}
+```

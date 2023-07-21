@@ -22,4 +22,5 @@ abstract class ProguardSettings @Inject constructor(
     val configurationFiles: ConfigurableFileCollection = objects.fileCollection()
     val isEnabled: Property<Boolean> = objects.notNullProperty(false)
     val obfuscate: Property<Boolean> = objects.notNullProperty(false)
+    val optimize: Property<Boolean> = objects.notNullProperty(false)
 }
