@@ -63,11 +63,6 @@ kotlin {
             dependsOn(jvmAndAndroidMain)
             dependsOn(commonButJSMain)
         }
-        val androidTest by getting {
-            dependencies {
-
-            }
-        }
         val iosMain by getting {
             dependsOn(skikoMain)
             dependsOn(commonButJSMain)
