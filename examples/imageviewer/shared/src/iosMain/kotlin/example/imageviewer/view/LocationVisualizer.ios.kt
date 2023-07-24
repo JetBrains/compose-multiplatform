@@ -6,11 +6,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitView
 import example.imageviewer.model.GpsPosition
+import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreLocation.CLLocationCoordinate2DMake
 import platform.MapKit.MKCoordinateRegionMakeWithDistance
 import platform.MapKit.MKMapView
 import platform.MapKit.MKPointAnnotation
 
+@OptIn(ExperimentalForeignApi::class)
 @Composable
 actual fun LocationVisualizer(
     modifier: Modifier,

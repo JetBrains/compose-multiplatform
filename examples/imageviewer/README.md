@@ -9,6 +9,9 @@ To setup the environment, please consult these [instructions](https://github.com
 
 ## How to run
 
+If you already runned this sample before, then you need to execute command at least once: 
+`/gradlew podInstall`
+
 Choose a run configuration for an appropriate target in IDE and run it.
 
 ![run-configurations.png](screenshots/run-configurations.png)
