@@ -63,7 +63,7 @@ kotlin {
             dependsOn(jvmAndAndroidMain)
             dependsOn(commonButJSMain)
         }
-        val androidUnitTest by getting {
+        val androidTest by getting {
             dependencies {
 
             }

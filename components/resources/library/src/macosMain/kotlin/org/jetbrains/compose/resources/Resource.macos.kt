@@ -5,7 +5,6 @@
 
 package org.jetbrains.compose.resources
 
-import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.Foundation.NSData
@@ -17,7 +16,6 @@ actual fun resource(path: String): Resource = MacOSResourceImpl(path)
 
 @ExperimentalResourceApi
 private class MacOSResourceImpl(path: String) : AbstractResourceImpl(path) {
-    @OptIn(ExperimentalForeignApi::class)
     override suspend fun readBytes(): ByteArray {
         val currentDirectoryPath = NSFileManager.defaultManager().currentDirectoryPath
         val contentsAtPath: NSData? = NSFileManager.defaultManager().run {
