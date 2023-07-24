@@ -10,8 +10,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.coroutines.Dispatchers
 import java.util.UUID
 
-actual fun Modifier.notchPadding(): Modifier = this.displayCutoutPadding().statusBarsPadding()
-
 class AndroidStorableImage(
     val imageBitmap: ImageBitmap
 )
