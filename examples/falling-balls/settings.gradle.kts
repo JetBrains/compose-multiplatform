@@ -2,6 +2,7 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
         google()
     }
 
@@ -22,7 +23,7 @@ pluginManagement {
 
 rootProject.name = "falling-balls-mpp"
 
-include(":androidApp")
+//include(":androidApp")
 include(":shared")
-include(":desktopApp")
+//include(":desktopApp")
 include(":jsApp")

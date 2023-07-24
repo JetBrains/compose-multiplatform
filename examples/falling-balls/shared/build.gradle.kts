@@ -55,8 +55,9 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-                implementation(compose.components.resources)
+//                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+//                implementation(compose.components.resources)
+                // 1.6.4
             }
         }
         val androidMain by getting {
@@ -98,4 +99,8 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+}
+
+compose {
+    kotlinCompilerPlugin.set("0.0.0-1.9.20-dev-6336")
 }
