@@ -17,26 +17,23 @@ fun measureComposable(
     frameCount: Int = 100,
     content: @Composable () -> Unit
 ): Duration {
+    val times = kotlin.time.measureTime {
+        val scene = ComposeScene()
+        try {
+            scene.setContent(content)
+            scene.constraints = Constraints.fixed(width, height)
+            val surface = org.jetbrains.skia.Surface.makeNull(width, height)
 
-    val scene = ComposeScene()
-    val times = try {
-        scene.setContent(content)
-        scene.constraints = Constraints.fixed(width, height)
-        val surface = org.jetbrains.skia.Surface.makeNull(width, height)
-
-        (1..200).map {
-            kotlin.time.measureTime {
                 var nanoTime = 0L
-                repeat(frameCount) {
+                repeat(1) {
                     scene.render(surface.canvas, nanoTime)
                     nanoTime += nanosPerFrame
                 }
-            }.inWholeMilliseconds
+        } finally {
+            scene.close()
         }
-    } finally {
-        scene.close()
-    }
-    return times.median().toDuration(DurationUnit.MILLISECONDS)
+    }.inWholeMilliseconds
+    return times.toDuration(DurationUnit.MILLISECONDS)
 }
 
 private fun List<Long>.median() = sorted()[size/ 2]
