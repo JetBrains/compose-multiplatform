@@ -474,6 +474,7 @@ The following platform-specific options are available
     * `console = true` adds a console launcher for the application;
     * `dirChooser = true` enables customizing the installation path during installation;
     * `perUserInstall = true` enables installing the application on a per-user basis 
+    * `menu = true` adds the application to the Start menu;
     * `menuGroup = "start-menu-group"` adds the application to the specified Start menu group;
     * `upgradeUuid = "UUID"` — a unique ID, which enables users to update an app via installer, 
       when an updated version is newer, than an installed version. The value must remain constant for a single application.
