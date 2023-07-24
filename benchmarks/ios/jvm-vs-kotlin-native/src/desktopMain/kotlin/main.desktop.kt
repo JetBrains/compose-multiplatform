@@ -5,5 +5,6 @@
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.skiko.MainUIDispatcher
 
-fun main() = runBlocking(Dispatchers.Main) { runBenchmarks() }
+fun main() = runBlocking(MainUIDispatcher) { runBenchmarks() }

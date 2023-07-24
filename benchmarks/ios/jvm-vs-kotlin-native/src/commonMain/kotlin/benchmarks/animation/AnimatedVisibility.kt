@@ -20,18 +20,20 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun AnimatedVisibility() {
-    MaterialTheme {
-        var showImage by remember { mutableStateOf(false) }
-        LaunchedEffect(showImage) {
-            delay(200)
-            showImage = !showImage
-        }
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            AnimatedVisibility(showImage) {
-                Image(
-                    painterResource("compose-multiplatform.xml"),
-                    null
-                )
+    repeat(100) {
+        MaterialTheme {
+            var showImage by remember { mutableStateOf(false) }
+            LaunchedEffect(showImage) {
+                delay(1000)
+                showImage = !showImage
+            }
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                AnimatedVisibility(showImage) {
+                    Image(
+                        painterResource("compose-multiplatform.xml"),
+                        null
+                    )
+                }
             }
         }
     }

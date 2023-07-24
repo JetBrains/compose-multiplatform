@@ -8,7 +8,7 @@ fun runBenchmark(name: String, frameCount: Int, content: @Composable () -> Unit)
 }
 
 fun runBenchmarks() {
-    runBenchmark("AnimatedVisibility", 1000000) { AnimatedVisibility() }
-    runBenchmark("LazyGrid",2000) { LazyGrid() }
-    runBenchmark("VisualEffects",1000) { NYContent() }
+    runBenchmark("AnimatedVisibility", 2000) { AnimatedVisibility() }
+    runBenchmark("LazyGrid",40) { LazyGrid() }
+    runBenchmark("VisualEffects",20) { NYContent() }
 }
