@@ -7,6 +7,7 @@ import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.PictureData
 import example.imageviewer.toImageBitmap
 import kotlinx.cinterop.CValue
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -122,6 +123,7 @@ class IosImageStorage(
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
 private fun UIImage.fitInto(px: Int): UIImage {
     val targetScale = maxOf(
         px.toFloat() / size.useContents { width },
@@ -131,6 +133,7 @@ private fun UIImage.fitInto(px: Int): UIImage {
     return resize(newSize)
 }
 
+@OptIn(ExperimentalForeignApi::class)
 private fun UIImage.resize(targetSize: CValue<CGSize>): UIImage {
     val currentSize = this.size
     val widthRatio = targetSize.useContents { width } / currentSize.useContents { width }
