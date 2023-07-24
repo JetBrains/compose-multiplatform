@@ -5,7 +5,6 @@
 
 package org.jetbrains.compose.resources
 
-import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.Foundation.NSBundle
@@ -18,7 +17,6 @@ actual fun resource(path: String): Resource = UIKitResourceImpl(path)
 
 @ExperimentalResourceApi
 private class UIKitResourceImpl(path: String) : AbstractResourceImpl(path) {
-    @OptIn(ExperimentalForeignApi::class)
     override suspend fun readBytes(): ByteArray {
         val fileManager = NSFileManager.defaultManager()
         // todo: support fallback path at bundle root?
