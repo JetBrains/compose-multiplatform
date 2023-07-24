@@ -5,7 +5,7 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import org.jetbrains.compose.demo.widgets.platform.isSystemInDarkTheme
+import androidx.compose.foundation.isSystemInDarkTheme
 import org.jetbrains.compose.demo.widgets.theme.ColorPallet.*
 
 // dark palettes
