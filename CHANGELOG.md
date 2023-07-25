@@ -19,7 +19,7 @@
 
 ### Features
 - [iOS native scroll and feel](https://github.com/JetBrains/compose-multiplatform-core/pull/609)
-- [Simplify resource management](https://github.com/JetBrains/compose-multiplatform/pull/3340)
+- [Simplify resource management](https://github.com/JetBrains/compose-multiplatform/pull/3340) (works without CocoaPods now)
 - [TextField keyboardOptions, capitalization](https://github.com/JetBrains/compose-multiplatform/issues/2735)
 - [TextField, keyboard behavior when have fullscreen size TextField](https://github.com/JetBrains/compose-multiplatform/issues/2752)
 - [TextField, different behavior strategies on appearing the keyboard](https://github.com/JetBrains/compose-multiplatform/issues/3128)
