@@ -6,6 +6,7 @@
 - [Dialog in common](https://github.com/JetBrains/compose-multiplatform-core/pull/632)
 - [Popup in common](https://github.com/JetBrains/compose-multiplatform-core/pull/611)
 - [Insets in common](https://github.com/JetBrains/compose-multiplatform-core/pull/586)
+- [Add a warning for a user who sets compose.kotlinCompilerPlugin to androidx.compose.compiler.compiler](https://github.com/JetBrains/compose-multiplatform/pull/3313)
 
 ### Fixes
 - [Popup. Fix overriding pressOwner on multitouch](https://github.com/JetBrains/compose-multiplatform-core/pull/704)
@@ -23,12 +24,15 @@
 
 ### Features
 - [iOS native scroll and feel](https://github.com/JetBrains/compose-multiplatform-core/pull/609)
+- [Simplify resource management for iOS](https://github.com/JetBrains/compose-multiplatform/pull/3340)
 - [iOS TextField keyboardOptions, capitalization](https://github.com/JetBrains/compose-multiplatform/issues/2735)
 - [iOS TextField, keyboard behavior when have fullscreen size TextField](https://github.com/JetBrains/compose-multiplatform/issues/2752)
 - [iOS TextField, Different behavior strategies on appearing the keyboard (related to focusable TextField)](https://github.com/JetBrains/compose-multiplatform/issues/3128)
 - [Insets on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/577)
 - [iOS default fonts mapping](https://github.com/JetBrains/compose-multiplatform-core/pull/552)
 - [Support Density.textSize on iOS](https://github.com/JetBrains/compose-multiplatform/issues/2567)
+- [UIKit public LocalUIViewController](https://github.com/JetBrains/compose-multiplatform-core/pull/501)
+- [Set InputMode.Touch for iOS as default]
 - Low-level functions
   - [Implement TreeSet.native.kt](https://github.com/JetBrains/compose-multiplatform/issues/2878)
   - [Implement AnnotatedString.transform for native source set](https://github.com/JetBrains/compose-multiplatform-core/pull/523)
@@ -50,7 +54,6 @@
 - [Properly detect content based text direction on native](https://github.com/JetBrains/compose-multiplatform-core/pull/514)
 
 ### API Changes
-
 
 ## Desktop
 
@@ -105,6 +108,7 @@
 ## HTML library
 
 ### Features
+- [Make HTML TestUtils wait functions cancellable](https://github.com/JetBrains/compose-multiplatform/pull/3320)
 
 ### Fixes
 
@@ -201,6 +205,7 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 - [Fix window flashing background with unspecified size](https://github.com/JetBrains/compose-multiplatform-core/pull/442)
 - [Fix crash `SplitPane` with a modifier](https://github.com/JetBrains/compose-multiplatform/issues/2214)
 - [Fix applying `ComposePanel` visibility](https://github.com/JetBrains/compose-multiplatform/issues/2656)
+- [Fix Could not infer Java runtime version for Java home directory](https://github.com/JetBrains/compose-multiplatform/issues/3133)
 
 ## Web
 
