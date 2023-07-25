@@ -8,9 +8,7 @@ ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"/..
 declare -a folders=(
     "$ROOT/examples"
     "$ROOT/gradle-plugins"
-    "$ROOT/components"
     "$ROOT/ci"
-    "$ROOT/html"
     "$ROOT/tutorials"
 )
 
