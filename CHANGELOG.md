@@ -1,4 +1,4 @@
-# 1.5.0-beta01 (June 2023)
+# 1.5.0-beta01 (July 2023)
 
 ## Common
 
@@ -13,6 +13,9 @@
 ### Features
 
 ### Fixes
+- [Fix dynamic framework support](https://github.com/JetBrains/skiko/pull/763)
+- [iOS TextField context menu bugs](https://github.com/JetBrains/compose-multiplatform/issues/3276)
+- [Fix complex blending on iOS](https://github.com/JetBrains/skiko/pull/728)
 
 ### API Changes
 
@@ -20,8 +23,11 @@
 ## Desktop
 
 ### Features
+- [Introduce separate SkiaSwingLayer for swing interop](https://github.com/JetBrains/skiko/pull/720)
 
 ### Fixes
+- [Fix loosing frames on macOs](https://github.com/JetBrains/skiko/pull/753)
+- [Optimize the Canvas transformation functions](https://github.com/JetBrains/skiko/pull/724)
 
 ### API Changes
 
@@ -43,6 +49,16 @@
 
 ### API Changes
 
+## Dependencies
+
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+
+- [Compiler 1.5.0](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.0)
+- [Runtime 1.5.0-beta03](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.5.0-beta03)
+- [UI 1.5.0-beta03](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.5.0-beta03)
+- [Foundation 1.5.0-beta03](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.5.0-beta03)
+- [Material 1.5.0-beta03](https://developer.android.com/jetpack/androidx/releases/compose-material#1.5.0-beta03)
+- [Material3 1.1.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.1.1)
 
 # 1.4.1 (June 2023)
 
