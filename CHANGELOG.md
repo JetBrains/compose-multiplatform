@@ -1,3 +1,49 @@
+# 1.5.0-beta01 (June 2023)
+
+## Common
+
+### Features
+
+### Fixes
+
+### API Changes
+
+## iOS
+
+### Features
+
+### Fixes
+
+### API Changes
+
+
+## Desktop
+
+### Features
+
+### Fixes
+
+### API Changes
+
+
+## Web
+
+### Features
+
+### Fixes
+
+### API Changes
+
+
+## HTML library
+
+### Features
+
+### Fixes
+
+### API Changes
+
+
 # 1.4.1 (June 2023)
 
 ## Common
