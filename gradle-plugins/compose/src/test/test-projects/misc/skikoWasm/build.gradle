@@ -29,3 +29,10 @@ kotlin {
 compose.experimental {
     web.application {}
 }
+
+// test for https://github.com/JetBrains/compose-multiplatform/issues/3169
+afterEvaluate {
+    afterEvaluate {
+        dependencies.add(kotlin.targets.js.compilations.main.compileDependencyConfigurationName, "org.jetbrains.kotlin:kotlin-stdlib")
+    }
+}
