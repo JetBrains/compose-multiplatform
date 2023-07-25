@@ -18,8 +18,6 @@
 - [Fix awaitDragStartOnSlop to detect slop-passing on both axes](https://github.com/JetBrains/compose-multiplatform-core/pull/534)
 - [Usage of deprecated forEachGesture in Scrollbar.desktop.kt](https://github.com/JetBrains/compose-multiplatform/issues/3045)
 
-### API Changes
-
 ## iOS
 
 ### Features
@@ -54,6 +52,7 @@
 - [Properly detect content based text direction on native](https://github.com/JetBrains/compose-multiplatform-core/pull/514)
 
 ### API Changes
+ - Resource management was reimplemented. Follow [the guide in the PR](https://github.com/JetBrains/compose-multiplatform/pull/3340) to support new feautures
 
 ## Desktop
 
@@ -101,17 +100,10 @@
 - [Fix Modifier.pointerHoverIcon for browser apps](https://github.com/JetBrains/compose-multiplatform-core/pull/629)
 - [Fix ScrollConfig in web target](https://github.com/JetBrains/compose-multiplatform-core/pull/628)
 
-### API Changes
-
-
 ## HTML library
 
 ### Features
 - [Make HTML TestUtils wait functions cancellable](https://github.com/JetBrains/compose-multiplatform/pull/3320)
-
-### Fixes
-
-### API Changes
 
 ## Dependencies
 
