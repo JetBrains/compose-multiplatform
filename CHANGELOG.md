@@ -58,14 +58,13 @@
 ## Desktop
 
 ### Features
-- [Test framework API fixes](https://github.com/JetBrains/compose-multiplatform-core/pull/619)
-- [Implement idling resources for tests](https://github.com/JetBrains/compose-multiplatform-core/pull/599)
-- [Implement SemanticsNodeInteraction.captureToImage()](https://github.com/JetBrains/compose-multiplatform-core/pull/589)
-- [Wait until compose is idle before returning from DesktopTestOwner.getRoots()](https://github.com/JetBrains/compose-multiplatform-core/pull/588)
-- [When the test main clock is advanced, call ComposeScene.render with the current test time](https://github.com/JetBrains/compose-multiplatform-core/pull/584)
-- [Add timestamps to batched test input events, and advance the test clock accordingly when sending them](https://github.com/JetBrains/compose-multiplatform-core/pull/578)
+- Test framework API fixes
+  - [Implement idling resources for tests](https://github.com/JetBrains/compose-multiplatform-core/pull/599)
+  - [Implement SemanticsNodeInteraction.captureToImage()](https://github.com/JetBrains/compose-multiplatform-core/pull/589)
+  - [Wait until compose is idle before returning from DesktopTestOwner.getRoots()](https://github.com/JetBrains/compose-multiplatform-core/pull/588)
+  - [When the test main clock is advanced, call ComposeScene.render with the current test time](https://github.com/JetBrains/compose-multiplatform-core/pull/584)
+  - [Add timestamps to batched test input events, and advance the test clock accordingly when sending them](https://github.com/JetBrains/compose-multiplatform-core/pull/578)
 
-- 
 - [Swing interop: off-screen rendering on graphics](https://github.com/JetBrains/compose-multiplatform-core/pull/601)
 - [Introduce ComposePanel that can be disposed manually](https://github.com/JetBrains/compose-multiplatform-core/pull/620)
 
