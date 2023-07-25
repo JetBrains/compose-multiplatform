@@ -10,27 +10,25 @@
 
 ### Fixes
 - [Popup. Fix overriding pressOwner on multitouch](https://github.com/JetBrains/compose-multiplatform-core/pull/704)
-- [Fix sending touches in SkikoInputDispatcher](https://github.com/JetBrains/compose-multiplatform-core/pull/688)
+- [Fix sending multiple touches in tests](https://github.com/JetBrains/compose-multiplatform-core/pull/688)
 - [Fix multi-owner input processing](https://github.com/JetBrains/compose-multiplatform-core/pull/634)
 - [After each ComposeScene.render phase, send apply notifications and perform the corresponding changes](https://github.com/JetBrains/compose-multiplatform-core/pull/563)
 - [LocalLayoutDirection isn't propagated into Popup](https://github.com/JetBrains/compose-multiplatform/issues/3142)
 - [Fix paragraph word boundary unicode handling](https://github.com/JetBrains/compose-multiplatform-core/pull/541)
 - [Fix awaitDragStartOnSlop to detect slop-passing on both axes](https://github.com/JetBrains/compose-multiplatform-core/pull/534)
-- [Usage of deprecated forEachGesture in Scrollbar.desktop.kt](https://github.com/JetBrains/compose-multiplatform/issues/3045)
 
 ## iOS
 
 ### Features
 - [iOS native scroll and feel](https://github.com/JetBrains/compose-multiplatform-core/pull/609)
 - [Simplify resource management for iOS](https://github.com/JetBrains/compose-multiplatform/pull/3340)
-- [iOS TextField keyboardOptions, capitalization](https://github.com/JetBrains/compose-multiplatform/issues/2735)
-- [iOS TextField, keyboard behavior when have fullscreen size TextField](https://github.com/JetBrains/compose-multiplatform/issues/2752)
-- [iOS TextField, Different behavior strategies on appearing the keyboard (related to focusable TextField)](https://github.com/JetBrains/compose-multiplatform/issues/3128)
+- [TextField keyboardOptions, capitalization](https://github.com/JetBrains/compose-multiplatform/issues/2735)
+- [TextField, keyboard behavior when have fullscreen size TextField](https://github.com/JetBrains/compose-multiplatform/issues/2752)
+- [TextField, Different behavior strategies on appearing the keyboard (related to focusable TextField)](https://github.com/JetBrains/compose-multiplatform/issues/3128)
 - [Insets on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/577)
-- [iOS default fonts mapping](https://github.com/JetBrains/compose-multiplatform-core/pull/552)
+- [Change default fonts mapping](https://github.com/JetBrains/compose-multiplatform-core/pull/552)
 - [Support Density.textSize on iOS](https://github.com/JetBrains/compose-multiplatform/issues/2567)
 - [UIKit public LocalUIViewController](https://github.com/JetBrains/compose-multiplatform-core/pull/501)
-- [Set InputMode.Touch for iOS as default]
 - Low-level functions
   - [Implement TreeSet.native.kt](https://github.com/JetBrains/compose-multiplatform/issues/2878)
   - [Implement AnnotatedString.transform for native source set](https://github.com/JetBrains/compose-multiplatform-core/pull/523)
@@ -57,7 +55,7 @@
 ## Desktop
 
 ### Features
-- Test framework API fixes
+- Test framework fixes
   - [Implement idling resources for tests](https://github.com/JetBrains/compose-multiplatform-core/pull/599)
   - [Implement SemanticsNodeInteraction.captureToImage()](https://github.com/JetBrains/compose-multiplatform-core/pull/589)
   - [Wait until compose is idle before returning from DesktopTestOwner.getRoots()](https://github.com/JetBrains/compose-multiplatform-core/pull/588)
@@ -197,6 +195,7 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 - [Fix crash `SplitPane` with a modifier](https://github.com/JetBrains/compose-multiplatform/issues/2214)
 - [Fix applying `ComposePanel` visibility](https://github.com/JetBrains/compose-multiplatform/issues/2656)
 - [Fix Could not infer Java runtime version for Java home directory](https://github.com/JetBrains/compose-multiplatform/issues/3133)
+- [Usage of deprecated forEachGesture in Scrollbar.desktop.kt](https://github.com/JetBrains/compose-multiplatform/issues/3045)
 
 ## Web
 
