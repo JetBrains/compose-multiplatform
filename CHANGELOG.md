@@ -6,36 +6,27 @@
 - [Dialog in common](https://github.com/JetBrains/compose-multiplatform-core/pull/632)
 - [Popup in common](https://github.com/JetBrains/compose-multiplatform-core/pull/611)
 - [Insets in common](https://github.com/JetBrains/compose-multiplatform-core/pull/586)
-- [Add a warning for a user who sets compose.kotlinCompilerPlugin to androidx.compose.compiler.compiler](https://github.com/JetBrains/compose-multiplatform/pull/3313)
+- [A warning if compose.kotlinCompilerPlugin is set to androidx.compose.compiler.compiler](https://github.com/JetBrains/compose-multiplatform/pull/3313)
 
 ### Fixes
 - [Popup. Fix overriding pressOwner on multitouch](https://github.com/JetBrains/compose-multiplatform-core/pull/704)
 - [Fix sending multiple touches in tests](https://github.com/JetBrains/compose-multiplatform-core/pull/688)
 - [Fix multi-owner input processing](https://github.com/JetBrains/compose-multiplatform-core/pull/634)
-- [After each ComposeScene.render phase, send apply notifications and perform the corresponding changes](https://github.com/JetBrains/compose-multiplatform-core/pull/563)
-- [LocalLayoutDirection isn't propagated into Popup](https://github.com/JetBrains/compose-multiplatform/issues/3142)
 - [Fix paragraph word boundary unicode handling](https://github.com/JetBrains/compose-multiplatform-core/pull/541)
-- [Fix awaitDragStartOnSlop to detect slop-passing on both axes](https://github.com/JetBrains/compose-multiplatform-core/pull/534)
+- [Optimize the Canvas transformation functions](https://github.com/JetBrains/skiko/pull/724)
 
 ## iOS
 
 ### Features
 - [iOS native scroll and feel](https://github.com/JetBrains/compose-multiplatform-core/pull/609)
-- [Simplify resource management for iOS](https://github.com/JetBrains/compose-multiplatform/pull/3340)
+- [Simplify resource management](https://github.com/JetBrains/compose-multiplatform/pull/3340)
 - [TextField keyboardOptions, capitalization](https://github.com/JetBrains/compose-multiplatform/issues/2735)
 - [TextField, keyboard behavior when have fullscreen size TextField](https://github.com/JetBrains/compose-multiplatform/issues/2752)
-- [TextField, Different behavior strategies on appearing the keyboard (related to focusable TextField)](https://github.com/JetBrains/compose-multiplatform/issues/3128)
+- [TextField, different behavior strategies on appearing the keyboard (related to focusable TextField)](https://github.com/JetBrains/compose-multiplatform/issues/3128)
 - [Insets on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/577)
 - [Change default fonts mapping](https://github.com/JetBrains/compose-multiplatform-core/pull/552)
-- [Support Density.textSize on iOS](https://github.com/JetBrains/compose-multiplatform/issues/2567)
+- [Support Density.textSize (Dynamic Type)](https://github.com/JetBrains/compose-multiplatform/issues/2567)
 - [UIKit public LocalUIViewController](https://github.com/JetBrains/compose-multiplatform-core/pull/501)
-- Low-level functions
-  - [Implement TreeSet.native.kt](https://github.com/JetBrains/compose-multiplatform/issues/2878)
-  - [Implement AnnotatedString.transform for native source set](https://github.com/JetBrains/compose-multiplatform-core/pull/523)
-  - [Implement WeakHashMap.native.kt](https://github.com/JetBrains/compose-multiplatform/issues/2877)
-  - [Implement typefacesCache in NativeFont.native.kt](https://github.com/JetBrains/compose-multiplatform/issues/2873)
-  - [Implement ExpireAfterAccessCache](https://github.com/JetBrains/compose-multiplatform/issues/2871)
-  - [Implement NativeStringDelegate.native.kt](https://github.com/JetBrains/compose-multiplatform/issues/2876)
 
 ### Fixes
 - [Fix dynamic framework support](https://github.com/JetBrains/skiko/pull/763)
@@ -48,6 +39,13 @@
 - [Allow higher than 60hz framerates on CADisplayLink on iPhones](https://github.com/JetBrains/compose-multiplatform-ios-android-template/pull/17)
 - [Fix incorrect Skiko render target on iOS Metal](https://github.com/JetBrains/compose-multiplatform-core/pull/554)
 - [Properly detect content based text direction on native](https://github.com/JetBrains/compose-multiplatform-core/pull/514)
+- Implemented all low-level functions to avoid random crashes
+  - [Implement TreeSet](https://github.com/JetBrains/compose-multiplatform/issues/2878)
+  - [Implement AnnotatedString.transform](https://github.com/JetBrains/compose-multiplatform-core/pull/523)
+  - [Implement WeakHashMap](https://github.com/JetBrains/compose-multiplatform/issues/2877)
+  - [Implement typefacesCache](https://github.com/JetBrains/compose-multiplatform/issues/2873)
+  - [Implement ExpireAfterAccessCache](https://github.com/JetBrains/compose-multiplatform/issues/2871)
+  - [Implement NativeStringDelegate](https://github.com/JetBrains/compose-multiplatform/issues/2876)
 
 ### API Changes
  - Resource management was reimplemented. Follow [the guide in the PR](https://github.com/JetBrains/compose-multiplatform/pull/3340) to support new feautures
@@ -55,28 +53,24 @@
 ## Desktop
 
 ### Features
+- [Swing interop: off-screen rendering on graphics](https://github.com/JetBrains/compose-multiplatform-core/pull/601)
+- [Introduce ComposePanel that can be disposed manually](https://github.com/JetBrains/compose-multiplatform-core/pull/620)
+- [Add semantic properties to DialogWindow, Popup and Dialog](https://github.com/JetBrains/compose-multiplatform-core/pull/698)
+- [Use Segoe UI on windows by default](https://github.com/JetBrains/compose-multiplatform-core/pull/557)
+
+### Fixes
+- [Fix loosing frames on macOs](https://github.com/JetBrains/skiko/pull/753)
+- [Scrolling LazyColumn via mouse wheel stops working](https://github.com/JetBrains/compose-multiplatform/issues/3366)
+- [Slider can be moved using keyboard, but cannot be submitted](https://github.com/JetBrains/compose-multiplatform/issues/2798)
+- [Make one pixel beyond the scrollbar thumb react correctly to clicks](https://github.com/JetBrains/compose-multiplatform-core/pull/505)
+- [Vertical scrollbar doesn't work properly when LazyColumn exists StickyHeader](https://github.com/JetBrains/compose-multiplatform/issues/2940)
 - Test framework fixes
   - [Implement idling resources for tests](https://github.com/JetBrains/compose-multiplatform-core/pull/599)
   - [Implement SemanticsNodeInteraction.captureToImage()](https://github.com/JetBrains/compose-multiplatform-core/pull/589)
   - [Wait until compose is idle before returning from DesktopTestOwner.getRoots()](https://github.com/JetBrains/compose-multiplatform-core/pull/588)
   - [When the test main clock is advanced, call ComposeScene.render with the current test time](https://github.com/JetBrains/compose-multiplatform-core/pull/584)
   - [Add timestamps to batched test input events, and advance the test clock accordingly when sending them](https://github.com/JetBrains/compose-multiplatform-core/pull/578)
-
-- [Swing interop: off-screen rendering on graphics](https://github.com/JetBrains/compose-multiplatform-core/pull/601)
-- [Introduce ComposePanel that can be disposed manually](https://github.com/JetBrains/compose-multiplatform-core/pull/620)
-
-### Fixes
-- [Fix loosing frames on macOs](https://github.com/JetBrains/skiko/pull/753)
-- [Optimize the Canvas transformation functions](https://github.com/JetBrains/skiko/pull/724)
-- [Add semantic properties to DialogWindow, Popup and Dialog](https://github.com/JetBrains/compose-multiplatform-core/pull/698)
-- [ComposeScene.roots to return child compose scenes created for Window and DialogWindow](https://github.com/JetBrains/compose-multiplatform-core/pull/697)
-- [Scrolling LazyColumn via mouse wheel stops working](https://github.com/JetBrains/compose-multiplatform/issues/3366)
-- [Fix perspective transform usage](https://github.com/JetBrains/compose-multiplatform-core/pull/598)
-- [Use Segoe UI on windows by default](https://github.com/JetBrains/compose-multiplatform-core/pull/557)
-- [Fix DesktopDropdownMenuPositionProvider to align with the correct horizontal side of the window](https://github.com/JetBrains/compose-multiplatform-core/pull/555)
-- [Slider can be moved using keyboard, but cannot be submitted](https://github.com/JetBrains/compose-multiplatform/issues/2798)
-- [Make one pixel beyond the scrollbar thumb react correctly to clicks](https://github.com/JetBrains/compose-multiplatform-core/pull/505)
-- [Vertical scrollbar doesn't work properly when LazyColumn exists StickyHeader](https://github.com/JetBrains/compose-multiplatform/issues/2940)
+  - [Tests support semanatic nodes inside Window and DialogWindow](https://github.com/JetBrains/compose-multiplatform-core/pull/697)
 
 ### API Changes
 - [Rename desktop's Dialog to DialogWindow](https://github.com/JetBrains/compose-multiplatform-core/pull/661)
@@ -84,19 +78,19 @@
 ## Web
 
 ### Features
-- [Implement cache key in PlatformFont](https://github.com/JetBrains/compose-multiplatform-core/pull/671)
-- [Update showCharacterPalette function in KeyEventHelpers](https://github.com/JetBrains/compose-multiplatform-core/pull/670)
-- [implement platform detection to apply correct KeyMapping and FontFamiliesMapping](https://github.com/JetBrains/compose-multiplatform-core/pull/637)
 - [Let ComposeWindow accept a custom canvas id (html canvas element id)](https://github.com/JetBrains/compose-multiplatform-core/pull/626)
-- [Implement PlatformLocale and StringDelegate for k/wasm](https://github.com/JetBrains/compose-multiplatform-core/pull/625)
-- [Add missing getAndIncrement in AtomicLong implementation for web](https://github.com/JetBrains/compose-multiplatform-core/pull/570)
 - [Support Scrollbar](https://github.com/JetBrains/compose-multiplatform-core/pull/571)
-- [Some composables like Button with externally defined shape argument cause crash when shape is RoundedCornerShape with one or more zero corners](https://github.com/JetBrains/compose-multiplatform/issues/3013)
 
 ### Fixes
 - [Workaround ComposeWindow multiple event listeners on resize](https://github.com/JetBrains/compose-multiplatform-core/pull/692)
 - [Fix Modifier.pointerHoverIcon for browser apps](https://github.com/JetBrains/compose-multiplatform-core/pull/629)
+- [Fux RoundedCornerShape with zero corners](https://github.com/JetBrains/compose-multiplatform/issues/3013)
 - [Fix ScrollConfig in web target](https://github.com/JetBrains/compose-multiplatform-core/pull/628)
+- Implemented low-level functions to avoid random crashes:
+  - [Implement cache key in PlatformFont](https://github.com/JetBrains/compose-multiplatform-core/pull/671)
+  - [implement platform detection to apply correct KeyMapping and FontFamiliesMapping](https://github.com/JetBrains/compose-multiplatform-core/pull/637)
+  - [Implement PlatformLocale and StringDelegate for k/wasm](https://github.com/JetBrains/compose-multiplatform-core/pull/625)
+  - [Add missing getAndIncrement in AtomicLong implementation for web](https://github.com/JetBrains/compose-multiplatform-core/pull/570)
 
 ## HTML library
 
