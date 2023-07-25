@@ -22,15 +22,15 @@
 - [Simplify resource management](https://github.com/JetBrains/compose-multiplatform/pull/3340)
 - [TextField keyboardOptions, capitalization](https://github.com/JetBrains/compose-multiplatform/issues/2735)
 - [TextField, keyboard behavior when have fullscreen size TextField](https://github.com/JetBrains/compose-multiplatform/issues/2752)
-- [TextField, different behavior strategies on appearing the keyboard (related to focusable TextField)](https://github.com/JetBrains/compose-multiplatform/issues/3128)
+- [TextField, different behavior strategies on appearing the keyboard](https://github.com/JetBrains/compose-multiplatform/issues/3128)
 - [Insets on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/577)
-- [Change default fonts mapping](https://github.com/JetBrains/compose-multiplatform-core/pull/552)
 - [Support Density.textSize (Dynamic Type)](https://github.com/JetBrains/compose-multiplatform/issues/2567)
+- [Change default fonts mapping](https://github.com/JetBrains/compose-multiplatform-core/pull/552)
 - [UIKit public LocalUIViewController](https://github.com/JetBrains/compose-multiplatform-core/pull/501)
 
 ### Fixes
 - [Fix dynamic framework support](https://github.com/JetBrains/skiko/pull/763)
-- [iOS TextField context menu bugs](https://github.com/JetBrains/compose-multiplatform/issues/3276)
+- [Fiz TextField context menu](https://github.com/JetBrains/compose-multiplatform/issues/3276)
 - [Fix complex blending on iOS](https://github.com/JetBrains/skiko/pull/728)
 - [ViewConfiguration.touchSlop value is quite low on iOS](https://github.com/JetBrains/compose-multiplatform/issues/3397)
 - [Fix topLeftOffset calculation on iOS in Split View](https://github.com/JetBrains/compose-multiplatform-core/pull/678)
@@ -53,10 +53,10 @@
 ## Desktop
 
 ### Features
-- [Swing interop: off-screen rendering on graphics](https://github.com/JetBrains/compose-multiplatform-core/pull/601)
-- [Introduce ComposePanel that can be disposed manually](https://github.com/JetBrains/compose-multiplatform-core/pull/620)
+- [Swing interop. Experimental off-screen rendering on graphics](https://github.com/JetBrains/compose-multiplatform-core/pull/601)
+- [Swing interop. ComposePanel that can be disposed manually](https://github.com/JetBrains/compose-multiplatform-core/pull/620)
 - [Add semantic properties to DialogWindow, Popup and Dialog](https://github.com/JetBrains/compose-multiplatform-core/pull/698)
-- [Use Segoe UI on windows by default](https://github.com/JetBrains/compose-multiplatform-core/pull/557)
+- [Use Segoe UI on Windows by default](https://github.com/JetBrains/compose-multiplatform-core/pull/557)
 
 ### Fixes
 - [Fix loosing frames on macOs](https://github.com/JetBrains/skiko/pull/753)
