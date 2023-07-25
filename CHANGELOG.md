@@ -25,7 +25,7 @@
 - [TextField, different behavior strategies on appearing the keyboard](https://github.com/JetBrains/compose-multiplatform/issues/3128)
 - [Insets on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/577)
 - [Support Density.textSize (Dynamic Type)](https://github.com/JetBrains/compose-multiplatform/issues/2567)
-- [Change default fonts](https://github.com/JetBrains/compose-multiplatform-core/pull/552)
+- [Change default fonts](https://github.com/JetBrains/compose-multiplatform-core/pull/552) (San Francisco is the default font)
 - [UIKit public LocalUIViewController](https://github.com/JetBrains/compose-multiplatform-core/pull/501)
 
 ### Fixes
