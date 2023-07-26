@@ -18,6 +18,7 @@ import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
 import kotlinx.cinterop.CValue
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
 import platform.AVFoundation.*
@@ -121,6 +122,7 @@ private fun BoxScope.AuthorizedCamera(
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
 @Composable
 private fun BoxScope.RealDeviceCamera(
     camera: AVCaptureDevice,
@@ -272,6 +274,7 @@ private fun BoxScope.RealDeviceCamera(
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
 fun CLLocation.toGps() =
     GpsPosition(
         latitude = coordinate.useContents { latitude },
