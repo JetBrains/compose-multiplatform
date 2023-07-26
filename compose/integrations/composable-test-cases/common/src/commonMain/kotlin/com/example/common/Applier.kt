@@ -75,12 +75,14 @@ private object GlobalSnapshotManager {
  */
 private class MonotonicClockImpl : MonotonicFrameClock {
 
-    private val NANOS_PER_MILLI = 1_000_000
+    private val NANOS_PER_MILLI = 1_000_000L
+    var time = 0 // TODO: remove this workaround for k/wasm -
+    // 404: /absolute/tmp/_karma_webpack_580899/node_modules_js-joda_core_dist_js-joda_esm_js.js
     override suspend fun <R> withFrameNanos(
         onFrame: (Long) -> R
     ): R = suspendCoroutine { continuation ->
-        val now = Clock.System.now()
-        val currentNanos = now.toEpochMilliseconds() * NANOS_PER_MILLI + now.nanosecondsOfSecond
+        val now = time++//Clock.System.now()
+        val currentNanos = now * NANOS_PER_MILLI //+ now.nanosecondsOfSecond
         val result = onFrame(currentNanos)
         continuation.resume(result)
     }

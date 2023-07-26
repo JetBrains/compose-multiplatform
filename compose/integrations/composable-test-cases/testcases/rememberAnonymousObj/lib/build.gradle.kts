@@ -6,6 +6,9 @@ plugins {
 @OptIn(org.jetbrains.kotlin.gradle.kpm.external.ExternalVariantApi::class)
 fun org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension.configureDefaultTargets() {
     jvm("desktop")
+    wasm {
+        browser()
+    }
     ios()
     iosArm64()
     iosSimulatorArm64()

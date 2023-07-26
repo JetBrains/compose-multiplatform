@@ -20,6 +20,9 @@ val Project.isFailingJsCase: Boolean
 fun KotlinMultiplatformExtension.configureTargets() {
     jvm("desktop")
     configureJsTargets()
+    wasm {
+        browser()
+    }
     ios()
     iosArm64()
     iosSimulatorArm64()
@@ -52,6 +55,7 @@ fun KotlinDependencyHandler.getCommonLib(): ProjectDependency {
 fun KotlinSourceSet.configureCommonTestDependencies() {
     dependencies {
         implementation(kotlin("test"))
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+//        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.2-wasm0")
     }
 }

@@ -13,8 +13,8 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.2-wasm0")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0-wasm1")
             }
         }
         val commonTest by getting {
