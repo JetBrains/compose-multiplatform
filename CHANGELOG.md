@@ -60,7 +60,7 @@
 
 ### Fixes
 - [Fix loosing frames on macOs](https://github.com/JetBrains/skiko/pull/753)
-- [Scrolling LazyColumn via mouse wheel stops working](https://github.com/JetBrains/compose-multiplatform/issues/3366)
+- [Scrolling `LazyColumn` via mouse wheel stops working](https://github.com/JetBrains/compose-multiplatform/issues/3366)
 - [Slider can be moved using keyboard, but cannot be submitted](https://github.com/JetBrains/compose-multiplatform/issues/2798)
 - [Make one pixel beyond the scrollbar thumb react correctly to clicks](https://github.com/JetBrains/compose-multiplatform-core/pull/505)
 - [Vertical scrollbar doesn't work properly when LazyColumn exists StickyHeader](https://github.com/JetBrains/compose-multiplatform/issues/2940)
