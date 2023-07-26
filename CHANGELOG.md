@@ -3,8 +3,8 @@
 ## Common
 
 ### Features
-- [Dialog in common](https://github.com/JetBrains/compose-multiplatform-core/pull/632)
-- [Popup in common](https://github.com/JetBrains/compose-multiplatform-core/pull/611)
+- [`Dialog` API is available to use from common source set](https://github.com/JetBrains/compose-multiplatform-core/pull/632)
+- [`Popup` API is available to use from common source set](https://github.com/JetBrains/compose-multiplatform-core/pull/611)
 - [Insets in common](https://github.com/JetBrains/compose-multiplatform-core/pull/586)
 - [A warning if compose.kotlinCompilerPlugin is set to androidx.compose.compiler.compiler](https://github.com/JetBrains/compose-multiplatform/pull/3313)
 
