@@ -56,7 +56,7 @@
 - [Swing interop. Experimental off-screen rendering on graphics](https://github.com/JetBrains/compose-multiplatform-core/pull/601)
 - [Swing interop. ComposePanel that can be disposed manually](https://github.com/JetBrains/compose-multiplatform-core/pull/620)
 - [Add semantic properties to DialogWindow, Popup and Dialog](https://github.com/JetBrains/compose-multiplatform-core/pull/698)
-- [Use Segoe UI on Windows by default](https://github.com/JetBrains/compose-multiplatform-core/pull/557)
+- [Use `Segoe UI` as sans serif font on Windows](https://github.com/JetBrains/compose-multiplatform-core/pull/557)
 
 ### Fixes
 - [Fix loosing frames on macOs](https://github.com/JetBrains/skiko/pull/753)
