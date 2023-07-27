@@ -14,6 +14,7 @@
 - [Fix multi-owner input processing](https://github.com/JetBrains/compose-multiplatform-core/pull/634)
 - [Fix paragraph word boundary unicode handling](https://github.com/JetBrains/compose-multiplatform-core/pull/541)
 - [Optimize the Canvas transformation functions](https://github.com/JetBrains/skiko/pull/724)
+- [Fix click outside of common `Dialog` behaviour](https://github.com/JetBrains/compose-multiplatform-core/pull/707)
 
 ## iOS
 
@@ -57,6 +58,7 @@
 - [Swing interop. ComposePanel that can be disposed manually](https://github.com/JetBrains/compose-multiplatform-core/pull/620)
 - [Add semantic properties to `DialogWindow`, `Popup` and `Dialog`](https://github.com/JetBrains/compose-multiplatform-core/pull/698)
 - [Use `Segoe UI` as sans serif font on Windows](https://github.com/JetBrains/compose-multiplatform-core/pull/557)
+- [Add ProGuard optimize flag](https://github.com/JetBrains/compose-multiplatform/pull/3408)
 
 ### Fixes
 - [Fix loosing frames on macOs](https://github.com/JetBrains/skiko/pull/753)
@@ -124,6 +126,7 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 - [Propagate LocalLayoutDirection into PopupLayout](https://github.com/JetBrains/compose-multiplatform-core/pull/562)
 - [Fix missing scrolling events](https://github.com/JetBrains/compose-multiplatform-core/pull/527)
 - [Make popups accessible on desktop](https://github.com/JetBrains/compose-multiplatform-core/pull/439)
+- [All `Popup` overloads call dismiss on `Esc` key by default](https://github.com/JetBrains/compose-multiplatform-core/pull/712)
 
 ## Dependencies
 
