@@ -113,6 +113,31 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 - [Material 1.5.0-beta03](https://developer.android.com/jetpack/androidx/releases/compose-material#1.5.0-beta03)
 - [Material3 1.1.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.1.1)
 
+# 1.4.3 (July 2023)
+
+## Common
+
+### Features
+- Support Kotlin 1.8.21, 1.8.22, 1.9.0
+
+## iOS
+
+### Fixes
+- [Using Indication as a parameter in extension function doesn't compile on iOS](https://github.com/JetBrains/compose-multiplatform/issues/3086)
+- [Compile error when using delegated property with @Composable getters in objects](https://github.com/JetBrains/compose-multiplatform/issues/3216)
+- [Using a public property extensions inside a class or object with a @Composable backing delegate fails to link for iOS targets](https://github.com/JetBrains/compose-multiplatform/issues/3084)
+
+## Dependencies
+
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+
+- [Compiler 1.4.4](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.4.4)
+- [Runtime 1.4.3](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.4.3)
+- [UI 1.4.3](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.4.3)
+- [Foundation 1.4.3](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.4.3)
+- [Material 1.4.3](https://developer.android.com/jetpack/androidx/releases/compose-material#1.4.3)
+- [Material3 1.0.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.0.1)
+
 # 1.4.1 (June 2023)
 
 ## Common

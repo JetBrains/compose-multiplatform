@@ -37,7 +37,9 @@ Kotlin version | Minimal Compose version | Notes
 1.8.0  | 1.3.0 | 1.3.0 is not supported by earlier k/native versions
 1.8.10 | 1.3.1
 1.8.20 | 1.4.0
-1.8.20 | 1.4.1
+1.8.21 | 1.4.3
+1.8.22 | 1.4.3
+1.9.0 | 1.4.3
 
 ### Using the latest Kotlin version 
 

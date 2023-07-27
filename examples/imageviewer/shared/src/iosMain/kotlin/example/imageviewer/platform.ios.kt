@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import example.imageviewer.icon.IconIosShare
 import kotlinx.cinterop.useContents
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import platform.CoreFoundation.CFUUIDCreate
@@ -41,6 +42,7 @@ class IosStorableImage(
 
 actual typealias PlatformStorableImage = IosStorableImage
 
+@OptIn(ExperimentalForeignApi::class)
 actual fun createUUID(): String =
     CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String
 
