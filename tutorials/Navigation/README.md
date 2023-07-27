@@ -2,7 +2,7 @@
 
 ## General attitude
 
-The Jetpack Compose navigation library ([navigation-compose](https://developer.android.com/jetpack/compose/navigation)) is an Android-only library, and so can not be used together with Compose for Desktop. Our general attitude is not to “force” people to use a particular first-party library. However there are third-party libraries available. One could consider [Decompose](https://github.com/arkivanov/Decompose) as possible solution.
+The Jetpack Compose navigation library ([navigation-compose](https://developer.android.com/jetpack/compose/navigation)) is an Android-only library, and so can not be used together with Compose for Desktop. Our general attitude is not to “force” people to use a particular first-party library. However, there are third-party libraries available. One could consider [Decompose](https://github.com/arkivanov/Decompose) as possible solution.
 
 ## Patterns
 
@@ -102,7 +102,7 @@ fun ItemDetailsScreen(item: Item, onBackClick: () -> Unit) {
 
 ### Children configuration
 
-One of the main goals of the Decompose library is compile time safety. Each child is described by a class called `Configuration`. The purpose of the `Configuration` is to describe what child should be used and what arguments it has. So for each child there is an instance of its own `Configuration` class. Normally there are multiple children involved in the navigation, so the whole set of configurations is normally a sealed class.
+One of the main goals of the Decompose library is compiled time safety. Each child is described by a class called `Configuration`. The purpose of the `Configuration` is to describe what child should be used and what arguments it has. So for each child there is an instance of its own `Configuration` class. Normally there are multiple children involved in the navigation, so the whole set of configurations is normally a sealed class.
 
 For example, for a simple List-Details navigation we need just two entries:
 
@@ -126,8 +126,8 @@ Desktop Compose is actually a multiplatform library and can also be used in Andr
 
 To make this possible, all child Configurations must be [Parcelable](https://developer.android.com/reference/android/os/Parcelable). For convenience, Decompose defines both `Parcelable` and `@Parcelize` using [expect/actual](https://kotlinlang.org/docs/reference/mpp-connect-to-apis.html):
 
-- `Parcelable` - this interface is defined by Decompose in the `commonMain` source set. It is typealised to the Android's `Parcelable` interface for Android target, and is just an empty interface in all other targets (including JVM/Desktop).
-- `@Parcelize` - this annotation is also defined in the `commonMain` source set. It is typealised to the `@Parcelize` annotation provided by the [kotlin-parcelize](https://developer.android.com/kotlin/parcelize) plugin. And it is missing (as not needed) in non-Android targets.
+- `Parcelable` - this interface is defined by Decompose in the `commonMain` source set. It is type-aliased to the Android's `Parcelable` interface for Android target, and is just an empty interface in all other targets (including JVM/Desktop).
+- `@Parcelize` - this annotation is also defined in the `commonMain` source set. It is type-aliased to the `@Parcelize` annotation provided by the [kotlin-parcelize](https://developer.android.com/kotlin/parcelize) plugin. And it is missing (as not needed) in non-Android targets.
 
 If you need Android support, please make sure you have `kotlin-parcelize` plugin enabled. All Configurations should look like this:
 
@@ -148,7 +148,7 @@ sealed class Configuration : Parcelable {
 
 This pattern should be chosen if any of the following apply:
 
-1. You support Multipaltform targets with different UI frameworks, and you want to share the navigation logic between them. For example if you support Desktop with Compose UI, iOS with SwiftUI and/or JavaScript with React UI.
+1. You support Multiplatform targets with different UI frameworks, and you want to share the navigation logic between them. For example if you support Desktop with Compose UI, iOS with SwiftUI and/or JavaScript with React UI.
 2. You want to keep children running while in the back stack (stopped, but not destroyed).
 3. You are targeting Android and need instance retaining functionality in children (aka AndroidX [ViewModels](https://developer.android.com/topic/libraries/architecture/viewmodel)) and you want to hide this logic as implementation details.
 4. You want to keep the navigation logic (and probably the business logic) separate from UI.
