@@ -66,6 +66,7 @@
 - [Slider can be moved using keyboard, but cannot be submitted](https://github.com/JetBrains/compose-multiplatform/issues/2798)
 - [Make one pixel beyond the scrollbar thumb react correctly to clicks](https://github.com/JetBrains/compose-multiplatform-core/pull/505)
 - [Vertical scrollbar doesn't work properly when LazyColumn exists StickyHeader](https://github.com/JetBrains/compose-multiplatform/issues/2940)
+- [All `Popup` overloads call dismiss on `Esc` key by default](https://github.com/JetBrains/compose-multiplatform-core/pull/712)
 - Test framework fixes
   - [Implement idling resources for tests](https://github.com/JetBrains/compose-multiplatform-core/pull/599)
   - [Implement SemanticsNodeInteraction.captureToImage()](https://github.com/JetBrains/compose-multiplatform-core/pull/589)
@@ -126,7 +127,6 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 - [Propagate LocalLayoutDirection into PopupLayout](https://github.com/JetBrains/compose-multiplatform-core/pull/562)
 - [Fix missing scrolling events](https://github.com/JetBrains/compose-multiplatform-core/pull/527)
 - [Make popups accessible on desktop](https://github.com/JetBrains/compose-multiplatform-core/pull/439)
-- [All `Popup` overloads call dismiss on `Esc` key by default](https://github.com/JetBrains/compose-multiplatform-core/pull/712)
 
 ## Dependencies
 
