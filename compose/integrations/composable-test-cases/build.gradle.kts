@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 
 group "com.example"
@@ -29,6 +30,9 @@ allprojects {
             kotlinOptions.freeCompilerArgs += listOf(
                 "-Xklib-enable-signature-clash-checks=false",
             )
+        }
+        tasks.withType<KotlinCompile<*>>().configureEach {
+            kotlinOptions.freeCompilerArgs += "-Xpartial-linkage=disable"
         }
     }
     disableYarnLockMismatchReport()

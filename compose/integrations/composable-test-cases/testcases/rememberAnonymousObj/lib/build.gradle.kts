@@ -9,6 +9,9 @@ fun org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension.configureDefaul
     wasm {
         browser()
     }
+    js(IR) {
+        browser()
+    }
     ios()
     iosArm64()
     iosSimulatorArm64()
