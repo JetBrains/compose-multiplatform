@@ -37,7 +37,7 @@
 - [Fix `topLeftOffset` calculation on iOS in Split View](https://github.com/JetBrains/compose-multiplatform-core/pull/678)
 - [`Modifier.draggable` `onDragStopped` not called](https://github.com/JetBrains/compose-multiplatform/issues/3310)
 - [`UIKitView`. Fix lifetime discrepancy within the composition](https://github.com/JetBrains/compose-multiplatform-core/pull/576/files)
-- [Allow higher than 60hz framerates on `CADisplayLink` on iPhones](https://github.com/JetBrains/compose-multiplatform-ios-android-template/pull/17)
+- [Support `120hz` screens](https://github.com/JetBrains/compose-multiplatform-ios-android-template/pull/17)
 - [Fix incorrect Skiko render target on iOS Metal](https://github.com/JetBrains/compose-multiplatform-core/pull/554)
 - [Properly detect content based text direction on native](https://github.com/JetBrains/compose-multiplatform-core/pull/514)
 - Implemented all low-level functions to avoid random crashes
