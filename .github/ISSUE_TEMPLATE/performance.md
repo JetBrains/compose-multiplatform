@@ -10,7 +10,7 @@ assignees: ''
 **Describe the problem**
 Explain the performance issue you're experiencing, including the following details:
 
-- What specific issue did you encounter? (e.g., missing frames, high CPU usage, memory leaks)
+- What specific issue did you encounter? (e.g. missing frames, high CPU usage, memory leaks)
 - Have you noticed any patterns or specific circumstances under which the problem occurs?
 
 **Affected platforms**
@@ -42,7 +42,7 @@ Please provide a detailed step-by-step guide on how to reproduce the issue you a
 If you're reporting slow app work or missing frames, please provide a video of the problem.
 
 **Profiling data**
-Please provide any relevant profiling data that might be helpful. This could include information like memory usage, CPU time, or any other data that could provide insight into the performance issue.
+Please provide any relevant profiling data that might be helpful. This could include information like FPS, memory usage, CPU time, or any other data that could provide insight into the performance issue.
 
 **Additional information**
 Provide any other details that you think might be helpful for us to understand the problem. This could include things like the system configuration, external factors, etc.
