@@ -9,11 +9,11 @@
 - [A warning if `compose.kotlinCompilerPlugin` is set to `androidx.compose.compiler.compiler`](https://github.com/JetBrains/compose-multiplatform/pull/3313)
 
 ### Fixes
-- [`Popup`. Fix overriding pressOwner on multitouch](https://github.com/JetBrains/compose-multiplatform-core/pull/704)
+- [`Popup`. Fix overriding `pressOwner` on multitouch](https://github.com/JetBrains/compose-multiplatform-core/pull/704)
 - [Fix sending multiple touches in tests](https://github.com/JetBrains/compose-multiplatform-core/pull/688)
 - [Fix multi-owner input processing](https://github.com/JetBrains/compose-multiplatform-core/pull/634)
 - [Fix paragraph word boundary unicode handling](https://github.com/JetBrains/compose-multiplatform-core/pull/541)
-- [Optimize the Canvas transformation functions](https://github.com/JetBrains/skiko/pull/724)
+- [Optimize the `Canvas` transformation functions](https://github.com/JetBrains/skiko/pull/724)
 - [Fix click outside of common `Dialog` behaviour](https://github.com/JetBrains/compose-multiplatform-core/pull/707)
 
 ## iOS
@@ -55,7 +55,7 @@
 
 ### Features
 - [Swing interop. Experimental off-screen rendering on graphics](https://github.com/JetBrains/compose-multiplatform-core/pull/601) (hardware accelerated only on macOs at the moment)
-- [Swing interop. ComposePanel that can be disposed manually](https://github.com/JetBrains/compose-multiplatform-core/pull/620)
+- [Swing interop. `ComposePanel` that can be disposed manually](https://github.com/JetBrains/compose-multiplatform-core/pull/620)
 - [Add semantic properties to `DialogWindow`, `Popup` and `Dialog`](https://github.com/JetBrains/compose-multiplatform-core/pull/698)
 - [Use `Segoe UI` as sans serif font on Windows](https://github.com/JetBrains/compose-multiplatform-core/pull/557)
 - [Add ProGuard optimize flag](https://github.com/JetBrains/compose-multiplatform/pull/3408)
@@ -65,10 +65,10 @@
 - [Scrolling `LazyColumn` via mouse wheel stops working](https://github.com/JetBrains/compose-multiplatform/issues/3366)
 - [`Slider` can be moved using keyboard, but cannot be submitted](https://github.com/JetBrains/compose-multiplatform/issues/2798)
 - [Make one pixel beyond the scrollbar thumb react correctly to clicks](https://github.com/JetBrains/compose-multiplatform-core/pull/505)
-- [Vertical scrollbar doesn't work properly when `LazyColumn` exists `StickyHeader`](https://github.com/JetBrains/compose-multiplatform/issues/2940)
+- [`VerticalScrollbar` doesn't work properly when `LazyColumn` exists `StickyHeader`](https://github.com/JetBrains/compose-multiplatform/issues/2940)
 - [All `Popup` overloads call dismiss on `Esc` key by default](https://github.com/JetBrains/compose-multiplatform-core/pull/712)
 - [Fix Could not infer Java runtime version for Java home directory](https://github.com/JetBrains/compose-multiplatform/issues/3133)
-- [Usage of deprecated forEachGesture in Scrollbar.desktop.kt](https://github.com/JetBrains/compose-multiplatform/issues/3045)
+- [Usage of deprecated `forEachGesture` in `Scrollbar.desktop.kt`](https://github.com/JetBrains/compose-multiplatform/issues/3045)
 - Test framework fixes
   - [Implement idling resources for tests](https://github.com/JetBrains/compose-multiplatform-core/pull/599)
   - [Implement `SemanticsNodeInteraction.captureToImage()`](https://github.com/JetBrains/compose-multiplatform-core/pull/589)
@@ -92,10 +92,10 @@
 - [Fux `RoundedCornerShape` with zero corners](https://github.com/JetBrains/compose-multiplatform/issues/3013)
 - [Fix `ScrollConfig` in web target](https://github.com/JetBrains/compose-multiplatform-core/pull/628)
 - Implemented low-level functions to avoid random crashes:
-  - [Implement cache key in PlatformFont](https://github.com/JetBrains/compose-multiplatform-core/pull/671)
-  - [implement platform detection to apply correct KeyMapping and FontFamiliesMapping](https://github.com/JetBrains/compose-multiplatform-core/pull/637)
-  - [Implement PlatformLocale and StringDelegate for k/wasm](https://github.com/JetBrains/compose-multiplatform-core/pull/625)
-  - [Add missing getAndIncrement in AtomicLong implementation for web](https://github.com/JetBrains/compose-multiplatform-core/pull/570)
+  - [Implement cache key in `PlatformFont`](https://github.com/JetBrains/compose-multiplatform-core/pull/671)
+  - [implement platform detection to apply correct `KeyMapping` and `FontFamiliesMapping`](https://github.com/JetBrains/compose-multiplatform-core/pull/637)
+  - [Implement `PlatformLocale` and `StringDelegate` for k/wasm](https://github.com/JetBrains/compose-multiplatform-core/pull/625)
+  - [Add missing `getAndIncrement` in `AtomicLong` implementation for web](https://github.com/JetBrains/compose-multiplatform-core/pull/570)
 
 ## HTML library
 
