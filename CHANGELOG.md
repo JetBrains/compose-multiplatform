@@ -31,7 +31,7 @@
 
 ### Fixes
 - [Fix dynamic framework support](https://github.com/JetBrains/skiko/pull/763)
-- [Fiz `TextField` context menu](https://github.com/JetBrains/compose-multiplatform/issues/3276)
+- [Fix `TextField` context menu](https://github.com/JetBrains/compose-multiplatform/issues/3276)
 - [Fix complex blending on iOS](https://github.com/JetBrains/skiko/pull/728)
 - [`ViewConfiguration.touchSlop` value is quite low on iOS](https://github.com/JetBrains/compose-multiplatform/issues/3397)
 - [Fix `topLeftOffset` calculation on iOS in Split View](https://github.com/JetBrains/compose-multiplatform-core/pull/678)
