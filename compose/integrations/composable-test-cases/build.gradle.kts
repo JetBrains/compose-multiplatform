@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 
 group "com.example"
@@ -8,6 +9,7 @@ allprojects {
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/") // to test with kotlin dev builds
         // mavenLocal()
     }
 
@@ -27,6 +29,10 @@ allprojects {
             kotlinOptions.freeCompilerArgs += listOf(
                 "-Xklib-enable-signature-clash-checks=false",
             )
+        }
+
+        tasks.withType<KotlinCompile<*>>().configureEach {
+            kotlinOptions.freeCompilerArgs += "-Xpartial-linkage=disable"
         }
     }
     disableYarnLockMismatchReport()
