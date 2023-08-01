@@ -10,13 +10,19 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
+import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
+import org.jetbrains.compose.desktop.application.internal.JdkVersionProbe
+import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.internal.utils.executableName
 import org.jetbrains.compose.internal.utils.ioFile
 import org.jetbrains.compose.internal.utils.notNullProperty
-import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
-import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
+import java.io.ByteArrayInputStream
 import java.io.File
+import java.util.*
 
 // __COMPOSE_NATIVE_DISTRIBUTIONS_MIN_JAVA_VERSION__
 internal const val MIN_JAVA_RUNTIME_VERSION = 17
@@ -29,6 +35,9 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
     @get:InputDirectory
     val jdkHome: Property<String> = objects.notNullProperty()
+
+    @get:Input
+    abstract val checkJdkVendor: Property<Boolean>
 
     private val taskDir = project.layout.buildDirectory.dir("compose/tmp/$name")
 
@@ -69,16 +78,35 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
         val jpackageExecutabke = jdkHome.getJdkTool("jpackage")
         ensureToolsExist(javaExecutable, jlinkExecutable, jpackageExecutabke)
 
-        val jvmRuntimeVersionString = getJavaRuntimeVersion(javaExecutable)
+        val jdkRuntimeProperties = getJDKRuntimeProperties(javaExecutable)
 
-        val jvmRuntimeVersion = jvmRuntimeVersionString?.toIntOrNull()
-            ?: jdkDistributionProbingError("JDK version '$jvmRuntimeVersionString' has unexpected format")
+        val jdkMajorVersionString = jdkRuntimeProperties.getProperty(JdkVersionProbe.JDK_MAJOR_VERSION_KEY)
+        val jdkMajorVersion = jdkMajorVersionString?.toIntOrNull()
+            ?: jdkDistributionProbingError("JDK version '$jdkMajorVersionString' has unexpected format")
 
-        check(jvmRuntimeVersion >= MIN_JAVA_RUNTIME_VERSION) {
+        check(jdkMajorVersion >= MIN_JAVA_RUNTIME_VERSION) {
             jdkDistributionProbingError(
                 "minimum required JDK version is '$MIN_JAVA_RUNTIME_VERSION', " +
-                "but actual version is '$jvmRuntimeVersion'"
+                "but actual version is '$jdkMajorVersion'"
             )
+        }
+
+        if (checkJdkVendor.get()) {
+            val vendor = jdkRuntimeProperties.getProperty(JdkVersionProbe.JDK_VENDOR_KEY)
+            if (vendor == null) {
+                logger.warn("JDK vendor probe failed: $jdkHome")
+            } else {
+                if (currentOS == OS.MacOS && vendor.equals("homebrew", ignoreCase = true)) {
+                    error(
+                        """
+                            |Homebrew's JDK distribution may cause issues with packaging.
+                            |See: https://github.com/JetBrains/compose-multiplatform/issues/3107
+                            |Possible solutions:
+                            |* Use other vendor's JDK distribution, such as Amazon Corretto;
+                            |* To continue using Homebrew distribution for packaging on your own risk, add "${ComposeProperties.CHECK_JDK_VENDOR}=false" to your gradle.properties
+                        """.trimMargin())
+                }
+            }
         }
 
         val modules = arrayListOf<String>()
@@ -96,17 +124,21 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
             }
         )
 
-        val properties = JvmRuntimeProperties(jvmRuntimeVersion, modules)
+        val properties = JvmRuntimeProperties(jdkMajorVersion, modules)
         JvmRuntimeProperties.writeToFile(properties, javaRuntimePropertiesFile.ioFile)
     }
 
-    private fun getJavaRuntimeVersion(javaExecutable: File): String? {
-        var javaRuntimeVersion: String? = null
+    private fun getJDKRuntimeProperties(javaExecutable: File): Properties {
+        val jdkProperties = Properties()
         runExternalTool(
             tool = javaExecutable,
             args = listOf("-jar", jdkVersionProbeJar.files.single().absolutePath),
-            processStdout = { stdout -> javaRuntimeVersion = stdout.trim() }
+            processStdout = { stdout ->
+                ByteArrayInputStream(stdout.trim().toByteArray()).use {
+                    jdkProperties.loadFromXML(it)
+                }
+            }
         )
-        return javaRuntimeVersion
+        return jdkProperties
     }
 }
