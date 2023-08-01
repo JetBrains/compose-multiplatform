@@ -24,11 +24,14 @@ import org.jetbrains.compose.experimental.internal.configureExperimental
 import org.jetbrains.compose.experimental.uikit.internal.resources.configureSyncTask
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
+import org.jetbrains.compose.internal.mppExtOrNull
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
@@ -66,6 +69,23 @@ class ComposePlugin : Plugin<Project> {
                                 listOf("-P", "plugin:androidx.compose.compiler.plugins.kotlin:$arg")
                             }
                 }
+            }
+
+            disableSignatureClashCheck(project)
+        }
+    }
+
+    private fun disableSignatureClashCheck(project: Project) {
+        val hasAnyWebTarget = project.mppExtOrNull?.targets?.firstOrNull {
+            it.platformType == KotlinPlatformType.js ||
+                    it.platformType == KotlinPlatformType.wasm
+        } != null
+        if (hasAnyWebTarget) {
+            // currently k/wasm compile task is covered by KotlinJsCompile type
+            project.tasks.withType(KotlinJsCompile::class.java).configureEach {
+                it.kotlinOptions.freeCompilerArgs += listOf(
+                    "-Xklib-enable-signature-clash-checks=false",
+                )
             }
         }
     }
