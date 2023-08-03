@@ -100,6 +100,7 @@ class ComposePlugin : Plugin<Project> {
         val material get() = composeDependency("org.jetbrains.compose.material:material")
         val material3 get() = composeDependency("org.jetbrains.compose.material3:material3")
         val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
+        val runtimeSaveable get() = composeDependency("org.jetbrains.compose.runtime:runtime-saveable")
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
         @ExperimentalComposeLibrary
         val uiTestJUnit4 get() = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
