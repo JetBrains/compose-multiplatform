@@ -113,6 +113,19 @@ class Tests {
         }
         assertEquals("root:{Value = 100}", root.dump())
     }
+
+    @Test
+    fun testNestedComposableLambdas() {
+        val root = composeText {
+            NestedComposableLambdas {
+                it {
+                    TextLeafNode("NestedComposableLambdas")
+                }
+            }
+        }
+
+        assertEquals("root:{NestedComposableLambdas}", root.dump())
+    }
 }
 
 private fun someText(): String {

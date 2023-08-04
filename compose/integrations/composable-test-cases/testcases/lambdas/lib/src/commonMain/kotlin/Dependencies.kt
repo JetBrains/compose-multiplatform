@@ -12,3 +12,11 @@ fun ComposableSomeText(someText : () -> String) {
 val composableInt: Int
     @Composable
     get() = currentComposer.cache(false) { 100 }
+
+
+@Composable
+fun NestedComposableLambdas(f: @Composable (@Composable (@Composable () -> Unit) -> Unit) -> Unit) {
+    f {
+        it()
+    }
+}
