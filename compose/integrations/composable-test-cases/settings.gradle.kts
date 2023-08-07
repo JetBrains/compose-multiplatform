@@ -118,6 +118,9 @@ if (casesToRun.isDefault()) {
 
     module(":testcase-lambdas-lib", "testcases/lambdas/lib")
     module(":testcase-lambdas-main", "testcases/lambdas/main")
+
+    module(":testcase-expectActual-lib", "testcases/expectActual/lib")
+    module(":testcase-expectActual-main", "testcases/expectActual/main")
 }
 
 /**
