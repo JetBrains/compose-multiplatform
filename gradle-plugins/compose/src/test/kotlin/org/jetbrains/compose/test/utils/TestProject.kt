@@ -16,16 +16,19 @@ data class TestEnvironment(
     val workingDir: File,
     val kotlinVersion: String = TestKotlinVersions.Default,
     val composeGradlePluginVersion: String = TestProperties.composeGradlePluginVersion,
+    val mokoResourcesPluginVersion: String = "0.23.0",
     val composeCompilerPlugin: String? = null,
     val composeCompilerArgs: String? = null,
     val composeVerbose: Boolean = true,
     val useGradleConfigurationCache: Boolean = TestProperties.gradleConfigurationCache,
+    val additionalEnvVars: Map<String, String> = mapOf()
 ) {
     private val placeholders = linkedMapOf(
         "COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER" to composeGradlePluginVersion,
         "KOTLIN_VERSION_PLACEHOLDER" to kotlinVersion,
         "COMPOSE_COMPILER_PLUGIN_PLACEHOLDER" to composeCompilerPlugin,
         "COMPOSE_COMPILER_PLUGIN_ARGS_PLACEHOLDER" to composeCompilerArgs,
+        "MOKO_RESOURCES_PLUGIN_VERSION_PLACEHOLDER" to mokoResourcesPluginVersion,
     )
 
     fun replacePlaceholdersInFile(file: File) {
@@ -121,6 +124,10 @@ class TestProject(
             withGradleVersion(TestProperties.gradleVersionForTests)
             withProjectDir(testEnvironment.workingDir)
             withArguments(allArgs)
+            if (testEnvironment.additionalEnvVars.isNotEmpty()) {
+                val newEnv = HashMap(System.getenv() + testEnvironment.additionalEnvVars)
+                withEnvironment(newEnv)
+            }
             forwardOutput()
         }
     }
