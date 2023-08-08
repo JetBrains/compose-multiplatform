@@ -54,7 +54,10 @@ internal class BuildResultChecks(private val result: BuildResult) {
     }
 
     fun taskSkipped(task: String) {
-        taskOutcome(task, TaskOutcome.SKIPPED)
+        // task outcome for skipped task is null in Gradle 7.x
+        if (result.task(task)?.outcome != null) {
+            taskOutcome(task, TaskOutcome.SKIPPED)
+        }
     }
 
     private fun taskOutcome(task: String, expectedOutcome: TaskOutcome) {

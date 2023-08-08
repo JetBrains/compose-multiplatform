@@ -69,8 +69,8 @@ class GradlePluginTest : GradlePluginTestBase() {
             useGradleConfigurationCache = false,
             additionalEnvVars = iosTestEnv.envVars
         )
-        with(testProject(TestProjects.iosResources, testEnv)) {
 
+        with(testProject(TestProjects.iosResources, testEnv)) {
             gradle(":embedAndSignAppleFrameworkForXcode", "--dry-run").checks {
                 // This test is not intended to actually run embedAndSignAppleFrameworkForXcode.
                 // Instead, it should check that embedAndSign depends on syncComposeResources using dry run
