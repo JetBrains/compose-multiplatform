@@ -60,7 +60,7 @@ class ComposeCompilerKotlinSupportPlugin @Inject constructor(
             throw IllegalStateException(
                 "Failed to get ComposeMultiplatformBuildService instance." +
                         " Compose Gradle plugin was probably loaded more than once." +
-                        " Consider declaring it in the root build.gradle.kts. Original exception message: ${e.message}",
+                        " Consider declaring it in the root build.gradle.kts",
                 e
             )
         }
