@@ -13,6 +13,7 @@ import org.jetbrains.compose.internal.mppExtOrNull
 import org.jetbrains.compose.internal.webExt
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
+import java.lang.ClassCastException
 import javax.inject.Inject
 
 @Suppress("UnstableApiUsage")
@@ -50,7 +51,21 @@ class ComposeCompilerKotlinSupportPlugin @Inject constructor(
         val service = ComposeMultiplatformBuildService.provider(target)
         buildEventsListenerRegistry.onTaskCompletion(service)
 
-        service.get().parameters.unsupportedCompilerPlugins.add(
+        val providedService = try {
+            service.get()
+        } catch (e: ClassCastException) {
+            // Compose Gradle plugin was probably loaded more than once
+            // See https://github.com/JetBrains/compose-multiplatform/issues/3459
+
+            throw IllegalStateException(
+                "Failed to get ComposeMultiplatformBuildService instance." +
+                        " Compose Gradle plugin was probably loaded more than once." +
+                        " Consider declaring it in the root build.gradle.kts",
+                e
+            )
+        }
+
+        providedService.parameters.unsupportedCompilerPlugins.add(
             target.provider {
                 composeCompilerArtifactProvider.compilerArtifact.takeIf {
                     target.hasNonJvmTargets() && it.isNonJBComposeCompiler()
