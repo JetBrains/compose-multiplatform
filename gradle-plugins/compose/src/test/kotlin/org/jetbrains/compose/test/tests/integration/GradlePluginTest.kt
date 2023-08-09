@@ -109,6 +109,32 @@ class GradlePluginTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun nativeCacheKind() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        fun nativeCacheKindProject(kotlinVersion: String) = testProject(
+            TestProjects.nativeCacheKind,
+            defaultTestEnvironment.copy(kotlinVersion = kotlinVersion, useGradleConfigurationCache = false)
+        )
+
+        val task = ":linkDebugFrameworkIosX64"
+        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_8_20)) {
+            gradle(task, "--info").checks {
+                check.taskSuccessful(task)
+                check.logDoesntContain("-Xauto-cache-from=")
+            }
+        }
+        testWorkDir.deleteRecursively()
+        testWorkDir.mkdirs()
+        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_9_0) ) {
+            gradle(task, "--info").checks {
+                check.taskSuccessful(task)
+                check.logContains("-Xauto-cache-from=")
+                check.logContains("-Xlazy-ir-for-caches=disable")
+            }
+        }
+    }
+
+    @Test
     fun skikoWasm() = with(
         testProject(
             TestProjects.skikoWasm,

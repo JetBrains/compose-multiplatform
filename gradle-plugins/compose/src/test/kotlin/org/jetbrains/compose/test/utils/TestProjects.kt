@@ -26,4 +26,5 @@ object TestProjects {
     const val jvmPreview = "misc/jvmPreview"
     const val iosResources = "misc/iosResources"
     const val iosMokoResources = "misc/iosMokoResources"
+    const val nativeCacheKind = "misc/nativeCacheKind"
 }

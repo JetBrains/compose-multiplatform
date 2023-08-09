@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.internal.utils
 
+import org.gradle.api.DomainObjectCollection
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.logging.Logger
@@ -61,3 +62,13 @@ internal fun Project.detachedDependency(
 
 internal fun Configuration.excludeTransitiveDependencies(): Configuration =
     apply { isTransitive = false }
+
+internal inline fun <reified SubT> DomainObjectCollection<*>.configureEachWithType(
+    crossinline fn: SubT.() -> Unit
+) {
+    configureEach {
+        if (it is SubT) {
+            it.fn()
+        }
+    }
+}

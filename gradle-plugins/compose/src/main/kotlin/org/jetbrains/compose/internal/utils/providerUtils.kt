@@ -30,7 +30,7 @@ internal inline fun <reified T> Provider<T>.toProperty(objects: ObjectFactory): 
 internal inline fun <reified T> Task.provider(noinline fn: () -> T): Provider<T> =
     project.provider(fn)
 
-internal fun ProviderFactory.findProperty(prop: String): Provider<String?> =
+internal fun ProviderFactory.valueOrNull(prop: String): Provider<String?> =
     provider {
         gradleProperty(prop).forUseAtConfigurationTimeSafe().orNull
     }

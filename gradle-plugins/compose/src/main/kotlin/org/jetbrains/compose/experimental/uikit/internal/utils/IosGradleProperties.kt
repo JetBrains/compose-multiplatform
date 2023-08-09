@@ -7,12 +7,12 @@ package org.jetbrains.compose.experimental.uikit.internal.utils
 
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
-import org.jetbrains.compose.internal.utils.findProperty
+import org.jetbrains.compose.internal.utils.valueOrNull
 import org.jetbrains.compose.internal.utils.toBooleanProvider
 
 internal object IosGradleProperties {
     const val SYNC_RESOURCES_PROPERTY = "org.jetbrains.compose.ios.resources.sync"
 
     fun syncResources(providers: ProviderFactory): Provider<Boolean> =
-        providers.findProperty(SYNC_RESOURCES_PROPERTY).toBooleanProvider(true)
+        providers.valueOrNull(SYNC_RESOURCES_PROPERTY).toBooleanProvider(true)
 }
