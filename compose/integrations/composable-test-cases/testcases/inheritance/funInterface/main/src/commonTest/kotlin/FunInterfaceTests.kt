@@ -33,4 +33,24 @@ class FunInterfaceTests {
         assertEquals("root:{FunInterfaceReturnComposable}", root.dump())
     }
 
+    @Test
+    fun testFunInterfaceReturnComposable2() = runTest {
+        val impl = ClassImplementingFunInterface2()
+        val root = composeText {
+            impl.getContent().invoke()
+        }
+
+        assertEquals("root:{ClassImplementingFunInterface2}", root.dump())
+    }
+
+    @Test
+    fun testFunInterfaceComposableReturnsComposable() = runTest {
+        val impl = ClassImplFunInterfaceComposableReturnsComposable()
+        val root = composeText {
+            impl.getContent().invoke()
+        }
+
+        assertEquals("root:{ClassImplFunInterfaceComposableReturnsComposable}", root.dump())
+    }
+
 }

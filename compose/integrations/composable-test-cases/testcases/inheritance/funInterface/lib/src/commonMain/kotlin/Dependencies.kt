@@ -9,3 +9,8 @@ fun interface FunInterfaceWithComposable {
 fun interface FunInterfaceReturnComposable {
     fun getContent(): @Composable () -> Unit
 }
+
+fun interface FunInterfaceComposableReturnsComposable {
+    @Composable
+    fun getContent(): @Composable () -> Unit
+}

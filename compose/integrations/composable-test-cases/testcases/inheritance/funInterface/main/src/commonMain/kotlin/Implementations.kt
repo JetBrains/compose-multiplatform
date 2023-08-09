@@ -16,3 +16,16 @@ class ClassImplementingFunInterface : FunInterfaceWithComposable {
         TextLeafNode("ClassImplementingFunInterface")
     }
 }
+
+class ClassImplementingFunInterface2 : FunInterfaceReturnComposable {
+    override fun getContent() : @Composable () -> Unit {
+        return { TextLeafNode("ClassImplementingFunInterface2") }
+    }
+}
+
+class ClassImplFunInterfaceComposableReturnsComposable : FunInterfaceComposableReturnsComposable {
+    @Composable
+    override fun getContent() : @Composable () -> Unit {
+        return { TextLeafNode("ClassImplFunInterfaceComposableReturnsComposable") }
+    }
+}

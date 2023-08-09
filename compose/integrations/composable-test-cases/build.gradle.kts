@@ -12,7 +12,7 @@ allprojects {
         maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/") // to test with kotlin dev builds
-        // mavenLocal()
+        mavenLocal()
     }
 
     afterEvaluate {
