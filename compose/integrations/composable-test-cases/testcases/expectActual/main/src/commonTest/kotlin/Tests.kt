@@ -1,5 +1,7 @@
 import com.example.common.TextLeafNode
 import com.example.common.composeText
+import com.example.common.currentPlatform
+import com.lib.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -27,6 +29,38 @@ class Tests {
         }
 
         assertEquals("root:{1000}", root.dump())
+    }
+
+    @Test
+    fun callExpectActualNotComposableFun() = runTest {
+        val root = composeText {
+            TextLeafNode(getPlatformName())
+        }
+        assertEquals("root:{${currentPlatform().name}}", root.dump())
+    }
+
+    @Test
+    fun callTopLevelExpectActualNotComposableFun() = runTest {
+        val root = composeText {
+            TextLeafNode(TopLevelExpectActual())
+        }
+        assertEquals("root:{TopLevelExpectActual-${currentPlatform().name}}", root.dump())
+    }
+
+    @Test
+    fun callComposableExpectActualFun() = runTest {
+        val root = composeText {
+            ComposableExpectActual()
+        }
+        assertEquals("root:{${currentPlatform().name}}", root.dump())
+    }
+
+    @Test
+    fun callComposableExpectActualFunWithDefaultParameter() = runTest {
+        val root = composeText {
+            ComposableExpectActualWithDefaultParameter()
+        }
+        assertEquals("root:{defaultValue-${currentPlatform().name}}", root.dump())
     }
 
 }

@@ -16,6 +16,9 @@ val Project.isInIdea: Boolean
 val Project.isFailingJsCase: Boolean
     get() = this.name.contains("-failingJs-")
 
+val Project.isMingwX64Enabled: Boolean
+    get() = this.isInIdea
+
 @OptIn(ExternalVariantApi::class)
 fun KotlinMultiplatformExtension.configureTargets() {
     jvm("desktop")
@@ -27,7 +30,7 @@ fun KotlinMultiplatformExtension.configureTargets() {
     macosX64()
     macosArm64()
     // We use linux agents on CI. So it doesn't run the tests, but it builds the klib anyway which is time consuming.
-    if (project.isInIdea) mingwX64()
+    if (project.isMingwX64Enabled) mingwX64()
     linuxX64()
 }
 
