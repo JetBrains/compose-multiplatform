@@ -6,6 +6,7 @@
 package org.jetbrains.compose.experimental.internal
 
 import org.gradle.api.Project
+import org.jetbrains.compose.ComposeMultiplatformBuildService
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.utils.KGPPropertyProvider
@@ -45,7 +46,9 @@ private fun KotlinNativeTarget.checkCacheKindUserValueIsNotNone() {
             val value = provider.valueOrNull(cacheKindProperty)
             if (value != null) {
                 if (value.equals(NONE_VALUE, ignoreCase = true)) {
-                    project.logger.warn(cacheKindPropertyWarningMessage(cacheKindProperty, provider))
+                    ComposeMultiplatformBuildService
+                        .getInstance(project)
+                        .warnOnceAfterBuild(cacheKindPropertyWarningMessage(cacheKindProperty, provider))
                 }
                 return
             }

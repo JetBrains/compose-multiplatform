@@ -33,12 +33,13 @@ import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import java.util.*
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
-class ComposePlugin : Plugin<Project> {
+abstract class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        ComposeMultiplatformBuildService.init(project)
+
         val composeExtension = project.extensions.create("compose", ComposeExtension::class.java, project)
         val desktopExtension = composeExtension.extensions.create("desktop", DesktopExtension::class.java)
         val androidExtension = composeExtension.extensions.create("android", AndroidExtension::class.java)
