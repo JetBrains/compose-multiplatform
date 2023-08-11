@@ -31,7 +31,7 @@
 - [`isSystemDarkTheme` now automatically react to the system theme changes](https://github.com/JetBrains/compose-multiplatform-core/pull/715)
 
 ### API Changes
-- [Dispose composition on viewDidDisappear](https://github.com/JetBrains/compose-multiplatform-core/pull/747)
+- [ComposeUIViewController. Dispose composition on viewDidDisappear](https://github.com/JetBrains/compose-multiplatform-core/pull/747)
 
 ## Web
 
