@@ -23,7 +23,7 @@
 - [Manage Kotlin native cache kind automatically based on Kotlin version](https://github.com/JetBrains/compose-multiplatform/pull/3477) (`kotlin.native.cacheKind=none` is no longer needed on Kotlin >= 1.9.0)
 - [Limit max `Dialog` and `Popup` size by safe area on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/732)
 - [`TextField`, Korean characters are not normally entered](https://github.com/JetBrains/compose-multiplatform/issues/3101)
-- [ColorMatrix value range for 5th column is incorrect on Skiko backed platforms](https://github.com/JetBrains/compose-multiplatform/issues/3461)
+- [`ColorMatrix` value range for 5th column was incorrect on Skiko backed platforms](https://github.com/JetBrains/compose-multiplatform/issues/3461)
 - [`isSystemDarkTheme` now automatically react to the system theme changes](https://github.com/JetBrains/compose-multiplatform-core/pull/715)
 
 ### API Changes
