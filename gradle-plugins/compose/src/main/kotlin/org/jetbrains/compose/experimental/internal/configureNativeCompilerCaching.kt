@@ -66,20 +66,18 @@ private fun cacheKindPropertyWarningMessage(
     |this warning by adding '$COMPOSE_NATIVE_MANAGE_CACHE_KIND=false' to your 'gradle.properties'.
 """.trimMargin()
 
-private fun KotlinNativeTarget.configureTargetCompilerCache(kotlinVersion: KotlinVersionNumbers) {
-    val (majorVer, minorVer, patchVer) = kotlinVersion
+private fun KotlinNativeTarget.configureTargetCompilerCache(kotlinVersion: KotlinVersion) {
     // See comments in https://youtrack.jetbrains.com/issue/KT-57329
-    // When:
-    //    KotlinVersion < 1.9.0,          => set cacheKind=none
-    //    1.9.0 <= KotlinVersion < 1.9.20 => add -Xlazy-ir-for-caches=disable
-    //    KotlinVersion >= 1.9.20         => do nothing, everything should work as is
     when {
-        majorVer < 1 || majorVer == 1 && minorVer < 9 -> {
+        // Kotlin < 1.9.0 => disable cache
+        kotlinVersion < KotlinVersion(1, 9, 0) -> {
             disableKotlinNativeCache()
         }
-        majorVer == 1 && minorVer == 9 && patchVer < 20 -> {
+        // 1.9.0 <= Kotlin < 1.9.20 => add -Xlazy-ir-for-caches=disable
+        kotlinVersion < KotlinVersion(1, 9, 20) -> {
             disableLazyIrForCaches()
         }
+        // Kotlin >= 1.9.20 => do nothing
         else -> {}
     }
 }
@@ -100,13 +98,11 @@ private fun KotlinNativeTarget.disableLazyIrForCaches() {
     }
 }
 
-private data class KotlinVersionNumbers(val major: Int, val minor: Int, val patch: Int)
-
-private fun kotlinVersionNumbers(project: Project): KotlinVersionNumbers {
+private fun kotlinVersionNumbers(project: Project): KotlinVersion {
     val version = project.getKotlinPluginVersion()
     val m = Regex("(\\d+)\\.(\\d+)\\.(\\d+)").find(version) ?: error("Kotlin version has unexpected format: '$version'")
     val (_, majorPart, minorPart, patchPart) = m.groupValues
-    return KotlinVersionNumbers(
+    return KotlinVersion(
         major = majorPart.toIntOrNull() ?: error("Could not parse major part '$majorPart' of Kotlin plugin version: '$version'"),
         minor = minorPart.toIntOrNull() ?: error("Could not parse minor part '$minorPart' of Kotlin plugin version: '$version'"),
         patch = patchPart.toIntOrNull() ?: error("Could not parse patch part '$patchPart' of Kotlin plugin version: '$version'"),
