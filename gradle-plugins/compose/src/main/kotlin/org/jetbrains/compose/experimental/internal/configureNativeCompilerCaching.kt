@@ -84,6 +84,7 @@ private fun KotlinNativeTarget.configureTargetCompilerCache(kotlinVersion: Kotli
 
 private val KotlinNativeTarget.targetCacheKindPropertyName: String
     get() = "$PROJECT_CACHE_KIND_PROPERTY_NAME.${konanTarget.presetName}"
+
 private fun KotlinNativeTarget.disableKotlinNativeCache() {
     if (project.hasProperty(targetCacheKindPropertyName)) {
         project.setProperty(targetCacheKindPropertyName, NONE_VALUE)
