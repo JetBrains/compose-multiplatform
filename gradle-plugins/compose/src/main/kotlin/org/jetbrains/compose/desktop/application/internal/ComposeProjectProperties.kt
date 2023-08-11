@@ -7,7 +7,7 @@ package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
-import org.jetbrains.compose.internal.utils.findProperty
+import org.jetbrains.compose.internal.utils.valueOrNull
 import org.jetbrains.compose.internal.utils.toBooleanProvider
 
 internal object ComposeProperties {
@@ -23,32 +23,32 @@ internal object ComposeProperties {
     internal const val CHECK_JDK_VENDOR = "compose.desktop.packaging.checkJdkVendor"
 
     fun isVerbose(providers: ProviderFactory): Provider<Boolean> =
-        providers.findProperty(VERBOSE).toBooleanProvider(false)
+        providers.valueOrNull(VERBOSE).toBooleanProvider(false)
 
     fun preserveWorkingDir(providers: ProviderFactory): Provider<Boolean> =
-        providers.findProperty(PRESERVE_WD).toBooleanProvider(false)
+        providers.valueOrNull(PRESERVE_WD).toBooleanProvider(false)
 
     fun macSign(providers: ProviderFactory): Provider<Boolean> =
-        providers.findProperty(MAC_SIGN).toBooleanProvider(false)
+        providers.valueOrNull(MAC_SIGN).toBooleanProvider(false)
 
     fun macSignIdentity(providers: ProviderFactory): Provider<String?> =
-        providers.findProperty(MAC_SIGN_ID)
+        providers.valueOrNull(MAC_SIGN_ID)
 
     fun macSignKeychain(providers: ProviderFactory): Provider<String?> =
-        providers.findProperty(MAC_SIGN_KEYCHAIN)
+        providers.valueOrNull(MAC_SIGN_KEYCHAIN)
 
     fun macSignPrefix(providers: ProviderFactory): Provider<String?> =
-        providers.findProperty(MAC_SIGN_PREFIX)
+        providers.valueOrNull(MAC_SIGN_PREFIX)
 
     fun macNotarizationAppleID(providers: ProviderFactory): Provider<String?> =
-        providers.findProperty(MAC_NOTARIZATION_APPLE_ID)
+        providers.valueOrNull(MAC_NOTARIZATION_APPLE_ID)
 
     fun macNotarizationPassword(providers: ProviderFactory): Provider<String?> =
-        providers.findProperty(MAC_NOTARIZATION_PASSWORD)
+        providers.valueOrNull(MAC_NOTARIZATION_PASSWORD)
 
     fun macNotarizationAscProvider(providers: ProviderFactory): Provider<String?> =
-        providers.findProperty(MAC_NOTARIZATION_ASC_PROVIDER)
+        providers.valueOrNull(MAC_NOTARIZATION_ASC_PROVIDER)
 
     fun checkJdkVendor(providers: ProviderFactory): Provider<Boolean> =
-        providers.findProperty(CHECK_JDK_VENDOR).toBooleanProvider(true)
+        providers.valueOrNull(CHECK_JDK_VENDOR).toBooleanProvider(true)
 }

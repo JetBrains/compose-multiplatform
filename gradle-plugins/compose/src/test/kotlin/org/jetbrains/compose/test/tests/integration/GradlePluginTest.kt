@@ -109,6 +109,61 @@ class GradlePluginTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun nativeCacheKind() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        fun nativeCacheKindProject(kotlinVersion: String) = testProject(
+            TestProjects.nativeCacheKind,
+            defaultTestEnvironment.copy(kotlinVersion = kotlinVersion, useGradleConfigurationCache = false)
+        )
+
+        val task = ":linkDebugFrameworkIosX64"
+        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_8_20)) {
+            gradle(task, "--info").checks {
+                check.taskSuccessful(task)
+                check.logDoesntContain("-Xauto-cache-from=")
+            }
+        }
+        testWorkDir.deleteRecursively()
+        testWorkDir.mkdirs()
+        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_9_0) ) {
+            gradle(task, "--info").checks {
+                check.taskSuccessful(task)
+                check.logContains("-Xauto-cache-from=")
+                check.logContains("-Xlazy-ir-for-caches=disable")
+            }
+        }
+    }
+
+    @Test
+    fun nativeCacheKindWarning() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        fun nativeCacheKindWarningProject(kotlinVersion: String) = testProject(
+            TestProjects.nativeCacheKindWarning,
+            defaultTestEnvironment.copy(kotlinVersion = kotlinVersion)
+        )
+
+        val cacheKindWarning = "Warning: 'kotlin.native.cacheKind' is explicitly set to `none`"
+
+        val args = arrayOf("build", "--dry-run", "-Pkotlin.native.cacheKind=none")
+        with(nativeCacheKindWarningProject(kotlinVersion = TestKotlinVersions.v1_8_20)) {
+            gradle(*args).checks {
+                check.logContainsOnce(cacheKindWarning)
+            }
+            // check that the warning is shown even when the configuration is loaded from cache
+            gradle(*args).checks {
+                check.logContainsOnce(cacheKindWarning)
+            }
+        }
+        testWorkDir.deleteRecursively()
+        testWorkDir.mkdirs()
+        with(nativeCacheKindWarningProject(kotlinVersion = TestKotlinVersions.v1_9_0) ) {
+            gradle(*args).checks {
+                check.logContainsOnce(cacheKindWarning)
+            }
+        }
+    }
+
+    @Test
     fun skikoWasm() = with(
         testProject(
             TestProjects.skikoWasm,

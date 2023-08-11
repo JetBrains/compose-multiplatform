@@ -21,6 +21,7 @@ import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
 import org.jetbrains.compose.experimental.internal.configureExperimentalTargetsFlagsCheck
 import org.jetbrains.compose.experimental.internal.configureExperimental
+import org.jetbrains.compose.experimental.internal.configureNativeCompilerCaching
 import org.jetbrains.compose.experimental.uikit.internal.resources.configureSyncTask
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
@@ -35,8 +36,10 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
-class ComposePlugin : Plugin<Project> {
+abstract class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        ComposeMultiplatformBuildService.init(project)
+
         val composeExtension = project.extensions.create("compose", ComposeExtension::class.java, project)
         val desktopExtension = composeExtension.extensions.create("desktop", DesktopExtension::class.java)
         val androidExtension = composeExtension.extensions.create("android", AndroidExtension::class.java)
@@ -52,6 +55,7 @@ class ComposePlugin : Plugin<Project> {
         composeExtension.extensions.create("web", WebExtension::class.java)
 
         project.plugins.apply(ComposeCompilerKotlinSupportPlugin::class.java)
+        project.configureNativeCompilerCaching()
 
         project.afterEvaluate {
             configureDesktop(project, desktopExtension)
