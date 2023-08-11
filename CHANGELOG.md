@@ -41,7 +41,7 @@
 ## Gradle Plugin
 
 ### Features
-- [Add runtimeSaveable to Dependencies in compose gradle plugin](https://github.com/JetBrains/compose-multiplatform/pull/3449)
+- [Add `runtimeSaveable` to Dependencies in compose gradle plugin](https://github.com/JetBrains/compose-multiplatform/pull/3449)
 
 ### API Changes
 - [Raise error when Homebrew JDK is used for packaging](https://github.com/JetBrains/compose-multiplatform/pull/3451/files)
