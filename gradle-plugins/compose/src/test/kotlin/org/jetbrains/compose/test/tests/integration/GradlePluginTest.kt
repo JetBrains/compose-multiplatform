@@ -135,6 +135,35 @@ class GradlePluginTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun nativeCacheKindWarning() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        fun nativeCacheKindWarningProject(kotlinVersion: String) = testProject(
+            TestProjects.nativeCacheKindWarning,
+            defaultTestEnvironment.copy(kotlinVersion = kotlinVersion)
+        )
+
+        val cacheKindWarning = "Warning: 'kotlin.native.cacheKind' is explicitly set to `none`"
+
+        val args = arrayOf("build", "--dry-run", "-Pkotlin.native.cacheKind=none")
+        with(nativeCacheKindWarningProject(kotlinVersion = TestKotlinVersions.v1_8_20)) {
+            gradle(*args).checks {
+                check.logContainsOnce(cacheKindWarning)
+            }
+            // check that the warning is shown even when the configuration is loaded from cache
+            gradle(*args).checks {
+                check.logContainsOnce(cacheKindWarning)
+            }
+        }
+        testWorkDir.deleteRecursively()
+        testWorkDir.mkdirs()
+        with(nativeCacheKindWarningProject(kotlinVersion = TestKotlinVersions.v1_9_0) ) {
+            gradle(*args).checks {
+                check.logContainsOnce(cacheKindWarning)
+            }
+        }
+    }
+
+    @Test
     fun skikoWasm() = with(
         testProject(
             TestProjects.skikoWasm,
