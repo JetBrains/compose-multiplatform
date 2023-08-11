@@ -8,11 +8,7 @@
 - [`androidx.compose.material.AlertDialog` is available to use from common source set](https://github.com/JetBrains/compose-multiplatform-core/pull/708)
 - [`androidx.compose.material3.AlertDialog` is available to use from common source set](https://github.com/JetBrains/compose-multiplatform-core/pull/710)
 - [Add `PopupProperties.clippingEnabled` setting](https://github.com/JetBrains/compose-multiplatform-core/pull/740)
-- [Support `androidx.compose.material3.DatePicker`](https://github.com/JetBrains/compose-multiplatform-core/pull/717)
-- [Support `androidx.compose.material3.DatePickerDialog`](https://github.com/JetBrains/compose-multiplatform-core/pull/745)
-
-### Fixes
-- [Fix sending synthetic event on detach owner without recomposition](https://github.com/JetBrains/compose-multiplatform-core/pull/730)
+- material3. Support [`DatePicker`](https://github.com/JetBrains/compose-multiplatform-core/pull/717), [`DatePickerDialog`](https://github.com/JetBrains/compose-multiplatform-core/pull/745) and `TimePicker`
 
 ### API Changes
 - [Change the default layout behavior of `AlertDialog`](https://github.com/JetBrains/compose-multiplatform-core/pull/708)
