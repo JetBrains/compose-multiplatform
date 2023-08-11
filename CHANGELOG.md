@@ -38,8 +38,6 @@
 ### Features
 - [Make `CanvasBasedWindow` apply default styles, set title](https://github.com/JetBrains/compose-multiplatform-core/pull/722)
 
-### Fixes
-
 ## Gradle Plugin
 
 ### Features
