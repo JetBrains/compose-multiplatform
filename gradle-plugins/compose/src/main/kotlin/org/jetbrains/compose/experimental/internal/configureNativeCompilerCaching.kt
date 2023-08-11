@@ -24,13 +24,13 @@ internal fun Project.configureNativeCompilerCaching() {
     plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
         val kotlinVersion = kotlinVersionNumbers(this)
         mppExt.targets.configureEachWithType<KotlinNativeTarget> {
-            assertCacheKindUserValueIsNotNone()
+            checkCacheKindUserValueIsNotNone()
             configureTargetCompilerCache(kotlinVersion)
         }
     }
 }
 
-private fun KotlinNativeTarget.assertCacheKindUserValueIsNotNone() {
+private fun KotlinNativeTarget.checkCacheKindUserValueIsNotNone() {
     // To determine cache kind KGP checks kotlin.native.cacheKind.<PRESET_NAME> first, then kotlin.native.cacheKind
     // For each property it tries to read Project.property, then checks local.properties
     // See https://github.com/JetBrains/kotlin/blob/d4d30dcfcf1afb083f09279c6f1ba05031efeabb/libraries/tools/kotlin-gradle-plugin/src/common/kotlin/org/jetbrains/kotlin/gradle/plugin/PropertiesProvider.kt#L416
