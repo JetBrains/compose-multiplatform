@@ -15,16 +15,7 @@ kotlin {
     jvm("desktop")
 
     ios()
-    iosSimulatorArm64() {
-        // TODO: remove after 1.5 release
-        binaries.forEach {
-            it.freeCompilerArgs += listOf(
-                "-linker-option", "-framework", "-linker-option", "Metal",
-                "-linker-option", "-framework", "-linker-option", "CoreText",
-                "-linker-option", "-framework", "-linker-option", "CoreGraphics",
-            )
-        }
-    }
+    iosSimulatorArm64()
 
     js(IR) {
         browser()
@@ -54,7 +45,6 @@ kotlin {
             baseName = "shared"
             isStatic = true
         }
-        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
     }
 
     sourceSets {
