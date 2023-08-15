@@ -46,9 +46,7 @@ private fun KotlinNativeTarget.checkCacheKindUserValueIsNotNone() {
             val value = provider.valueOrNull(cacheKindProperty)
             if (value != null) {
                 if (value.equals(NONE_VALUE, ignoreCase = true)) {
-                    ComposeMultiplatformBuildService
-                        .getInstance(project)
-                        .warnOnceAfterBuild(cacheKindPropertyWarningMessage(cacheKindProperty, provider))
+                    error(cacheKindPropertyWarningMessage(cacheKindProperty, provider))
                 }
                 return
             }
@@ -60,13 +58,13 @@ private fun cacheKindPropertyWarningMessage(
     cacheKindProperty: String,
     provider: KGPPropertyProvider
 ) = """
-    |Warning: '$cacheKindProperty' is explicitly set to `none`.
+    |'$cacheKindProperty' is explicitly set to `none`.
     |This option significantly slows the Kotlin/Native compiler.
     |Compose Multiplatform Gradle plugin can set this property automatically,
     |when it is necessary.
     |  * Recommended action: remove explicit '$cacheKindProperty=$NONE_VALUE' from ${provider.location}. 
     |  * Alternative action: if you are sure you need '$cacheKindProperty=$NONE_VALUE', disable
-    |this warning by adding '$COMPOSE_NATIVE_MANAGE_CACHE_KIND=false' to your 'gradle.properties'.
+    |this error by adding '$COMPOSE_NATIVE_MANAGE_CACHE_KIND=false' to your 'gradle.properties'.
 """.trimMargin()
 
 private fun KotlinNativeTarget.configureTargetCompilerCache(kotlinVersion: KotlinVersion) {
