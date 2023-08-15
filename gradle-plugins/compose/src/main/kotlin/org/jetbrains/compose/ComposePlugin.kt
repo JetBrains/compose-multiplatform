@@ -21,19 +21,25 @@ import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
 import org.jetbrains.compose.experimental.internal.configureExperimentalTargetsFlagsCheck
 import org.jetbrains.compose.experimental.internal.configureExperimental
+import org.jetbrains.compose.experimental.internal.configureNativeCompilerCaching
 import org.jetbrains.compose.experimental.uikit.internal.resources.configureSyncTask
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
+import org.jetbrains.compose.internal.mppExtOrNull
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
-class ComposePlugin : Plugin<Project> {
+abstract class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
+        ComposeMultiplatformBuildService.init(project)
+
         val composeExtension = project.extensions.create("compose", ComposeExtension::class.java, project)
         val desktopExtension = composeExtension.extensions.create("desktop", DesktopExtension::class.java)
         val androidExtension = composeExtension.extensions.create("android", AndroidExtension::class.java)
@@ -49,6 +55,7 @@ class ComposePlugin : Plugin<Project> {
         composeExtension.extensions.create("web", WebExtension::class.java)
 
         project.plugins.apply(ComposeCompilerKotlinSupportPlugin::class.java)
+        project.configureNativeCompilerCaching()
 
         project.afterEvaluate {
             configureDesktop(project, desktopExtension)
@@ -67,6 +74,23 @@ class ComposePlugin : Plugin<Project> {
                             }
                 }
             }
+
+            disableSignatureClashCheck(project)
+        }
+    }
+
+    private fun disableSignatureClashCheck(project: Project) {
+        val hasAnyWebTarget = project.mppExtOrNull?.targets?.firstOrNull {
+            it.platformType == KotlinPlatformType.js ||
+                    it.platformType == KotlinPlatformType.wasm
+        } != null
+        if (hasAnyWebTarget) {
+            // currently k/wasm compile task is covered by KotlinJsCompile type
+            project.tasks.withType(KotlinJsCompile::class.java).configureEach {
+                it.kotlinOptions.freeCompilerArgs += listOf(
+                    "-Xklib-enable-signature-clash-checks=false",
+                )
+            }
         }
     }
 
@@ -80,6 +104,7 @@ class ComposePlugin : Plugin<Project> {
         val material get() = composeDependency("org.jetbrains.compose.material:material")
         val material3 get() = composeDependency("org.jetbrains.compose.material3:material3")
         val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
+        val runtimeSaveable get() = composeDependency("org.jetbrains.compose.runtime:runtime-saveable")
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
         @ExperimentalComposeLibrary
         val uiTestJUnit4 get() = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")

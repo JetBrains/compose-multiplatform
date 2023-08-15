@@ -47,10 +47,7 @@ class ComposeCompilerKotlinSupportPlugin @Inject constructor(
             return !groupId.startsWith("org.jetbrains.compose.compiler")
         }
 
-        val service = ComposeMultiplatformBuildService.provider(target)
-        buildEventsListenerRegistry.onTaskCompletion(service)
-
-        service.get().parameters.unsupportedCompilerPlugins.add(
+        ComposeMultiplatformBuildService.getInstance(target).unsupportedCompilerPlugins.add(
             target.provider {
                 composeCompilerArtifactProvider.compilerArtifact.takeIf {
                     target.hasNonJvmTargets() && it.isNonJBComposeCompiler()

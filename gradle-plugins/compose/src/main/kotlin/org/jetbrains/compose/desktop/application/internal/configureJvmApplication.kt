@@ -67,6 +67,7 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         taskNameObject = "runtime"
     ) {
         jdkHome.set(app.javaHomeProvider)
+        checkJdkVendor.set(ComposeProperties.checkJdkVendor(project.providers))
         jdkVersionProbeJar.from(
             project.detachedComposeGradleDependency(
                 artifactId = "gradle-plugin-internal-jdk-version-probe"
@@ -267,6 +268,7 @@ private fun JvmApplicationContext.configureProguardTask(
     // That's why a task property is follows ProGuard design,
     // when our DSL does the opposite.
     dontobfuscate.set(settings.obfuscate.map { !it })
+    dontoptimize.set(settings.optimize.map { !it })
 
     dependsOn(unpackDefaultResources)
     defaultComposeRulesFile.set(unpackDefaultResources.flatMap { it.resources.defaultComposeProguardRules })

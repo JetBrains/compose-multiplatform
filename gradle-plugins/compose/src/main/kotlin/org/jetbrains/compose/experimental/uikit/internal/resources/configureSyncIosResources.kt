@@ -23,8 +23,27 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import java.io.File
 
+private val incompatiblePlugins = listOf(
+    "dev.icerock.mobile.multiplatform-resources",
+    "io.github.skeptick.libres",
+)
+
 internal fun Project.configureSyncTask(mppExt: KotlinMultiplatformExtension) {
-    if (!IosGradleProperties.syncResources(providers).get()) return
+    fun reportSyncIsDisabled(reason: String) {
+        logger.info("Compose Multiplatform resource management for iOS is disabled: $reason")
+    }
+
+    if (!IosGradleProperties.syncResources(providers).get()) {
+        reportSyncIsDisabled("'${IosGradleProperties.SYNC_RESOURCES_PROPERTY}' value is 'false'")
+        return
+    }
+
+    for (incompatiblePluginId in incompatiblePlugins) {
+        if (project.plugins.hasPlugin(incompatiblePluginId)) {
+            reportSyncIsDisabled("resource management is not compatible with '$incompatiblePluginId'")
+            return
+        }
+    }
 
     with (SyncIosResourcesContext(project, mppExt)) {
         configureSyncResourcesTasks()

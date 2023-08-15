@@ -29,6 +29,14 @@ internal class BuildResultChecks(private val result: BuildResult) {
     val log: String
         get() = result.output
 
+    fun logContainsOnce(substring: String) {
+        val actualCount = log.countOccurrencesOf(substring)
+        if (actualCount != 1) throw AssertionError(
+            "Test output must contain substring '$substring' exactly once. " +
+                    "Actual number of occurrences: $actualCount"
+        )
+    }
+
     fun logContains(substring: String) {
         if (!result.output.contains(substring)) {
             throw AssertionError("Test output does not contain the expected string: '$substring'")
@@ -51,6 +59,13 @@ internal class BuildResultChecks(private val result: BuildResult) {
 
     fun taskFromCache(task: String) {
         taskOutcome(task, TaskOutcome.FROM_CACHE)
+    }
+
+    fun taskSkipped(task: String) {
+        // task outcome for skipped task is null in Gradle 7.x
+        if (result.task(task)?.outcome != null) {
+            taskOutcome(task, TaskOutcome.SKIPPED)
+        }
     }
 
     private fun taskOutcome(task: String, expectedOutcome: TaskOutcome) {
@@ -89,3 +104,17 @@ internal fun assertNotEqualTextFiles(actual: File, expected: File) {
 
 private fun File.normalizedText() =
     readLines().joinToString("\n") { it.trim() }
+
+private fun String.countOccurrencesOf(substring: String): Int {
+    var count = 0
+    var i = 0
+    while (i >= 0 && i < length) {
+        i = indexOf(substring, startIndex = i)
+
+        if (i == -1) break
+
+        i++
+        count++
+    }
+    return count
+}

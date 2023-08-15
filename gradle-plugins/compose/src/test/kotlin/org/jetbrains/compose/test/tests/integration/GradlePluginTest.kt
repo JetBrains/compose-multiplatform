@@ -8,7 +8,10 @@ package org.jetbrains.compose.test.tests.integration
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewLogger
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.RemoteConnection
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.receiveConfigFromGradle
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.test.utils.*
+import org.junit.jupiter.api.Assumptions
 
 import java.net.ServerSocket
 import java.net.Socket
@@ -17,8 +20,149 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
 import org.junit.jupiter.api.Test
+import java.io.File
 
 class GradlePluginTest : GradlePluginTestBase() {
+    private data class IosTestEnv(
+        val targetBuildDir: File,
+        val appDir: File,
+        val envVars: Map<String, String>
+    )
+
+    enum class IosPlatform(val id: String) {
+        SIMULATOR("iphonesimulator"), IOS("iphoneos")
+    }
+    enum class IosArch(val id: String) {
+        X64("x86_64"), ARM64("arm64")
+    }
+
+    enum class IosBuildConfiguration(val id: String) {
+        DEBUG("Debug"), RELEASE("Release")
+    }
+
+    private fun iosTestEnv(
+        platform: IosPlatform = IosPlatform.SIMULATOR,
+        arch: IosArch = IosArch.X64,
+        configuration: IosBuildConfiguration = IosBuildConfiguration.DEBUG
+    ): IosTestEnv {
+        val targetBuildDir = testWorkDir.resolve("build/ios/${configuration.id}-${platform.id}").apply { mkdirs() }
+        val appDir = targetBuildDir.resolve("App.app").apply { mkdirs() }
+        val envVars = mapOf(
+            "PLATFORM_NAME" to platform.id,
+            "ARCHS" to arch.id,
+            "BUILT_PRODUCTS_DIR" to targetBuildDir.canonicalPath,
+            "CONTENTS_FOLDER_PATH" to appDir.name,
+        )
+        return IosTestEnv(
+            targetBuildDir = targetBuildDir,
+            appDir = appDir,
+            envVars = envVars
+        )
+    }
+
+    @Test
+    fun iosResources() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        val iosTestEnv = iosTestEnv()
+        val testEnv = defaultTestEnvironment.copy(
+            // for some reason configuration cache + test kit + custom vars does not work
+            useGradleConfigurationCache = false,
+            additionalEnvVars = iosTestEnv.envVars
+        )
+
+        with(testProject(TestProjects.iosResources, testEnv)) {
+            gradle(":embedAndSignAppleFrameworkForXcode", "--dry-run").checks {
+                // This test is not intended to actually run embedAndSignAppleFrameworkForXcode.
+                // Instead, it should check that embedAndSign depends on syncComposeResources using dry run
+                check.taskSkipped(":syncComposeResourcesForIos")
+                check.taskSkipped(":embedAndSignAppleFrameworkForXcode")
+            }
+            gradle(":syncComposeResourcesForIos").checks {
+                check.taskSuccessful(":syncComposeResourcesForIos")
+                iosTestEnv.appDir.resolve("compose-resources/compose-multiplatform.xml").checkExists()
+            }
+        }
+    }
+
+    @Test
+    fun iosMokoResources() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        val iosTestEnv = iosTestEnv()
+        val testEnv = defaultTestEnvironment.copy(
+            // for some reason configuration cache + test kit + custom vars does not work
+            useGradleConfigurationCache = false,
+            additionalEnvVars = iosTestEnv.envVars
+        )
+        with(testProject(TestProjects.iosMokoResources, testEnv)) {
+            gradle(
+                ":embedAndSignAppleFrameworkForXcode",
+                ":copyFrameworkResourcesToApp",
+                "--dry-run",
+                "--info"
+            ).checks {
+                // This test is not intended to actually run embedAndSignAppleFrameworkForXcode.
+                // Instead, it should check that the sync disables itself.
+                check.logContains("Compose Multiplatform resource management for iOS is disabled")
+                check.logDoesntContain(":syncComposeResourcesForIos")
+            }
+        }
+    }
+
+    @Test
+    fun nativeCacheKind() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        fun nativeCacheKindProject(kotlinVersion: String) = testProject(
+            TestProjects.nativeCacheKind,
+            defaultTestEnvironment.copy(kotlinVersion = kotlinVersion, useGradleConfigurationCache = false)
+        )
+
+        val task = ":linkDebugFrameworkIosX64"
+        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_8_20)) {
+            gradle(task, "--info").checks {
+                check.taskSuccessful(task)
+                check.logDoesntContain("-Xauto-cache-from=")
+            }
+        }
+        testWorkDir.deleteRecursively()
+        testWorkDir.mkdirs()
+        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_9_0) ) {
+            gradle(task, "--info").checks {
+                check.taskSuccessful(task)
+                check.logContains("-Xauto-cache-from=")
+                check.logContains("-Xlazy-ir-for-caches=disable")
+            }
+        }
+    }
+
+    @Test
+    fun nativeCacheKindWarning() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        fun nativeCacheKindWarningProject(kotlinVersion: String) = testProject(
+            TestProjects.nativeCacheKindWarning,
+            defaultTestEnvironment.copy(kotlinVersion = kotlinVersion)
+        )
+
+        val cacheKindWarning = "Warning: 'kotlin.native.cacheKind' is explicitly set to `none`"
+
+        val args = arrayOf("build", "--dry-run", "-Pkotlin.native.cacheKind=none")
+        with(nativeCacheKindWarningProject(kotlinVersion = TestKotlinVersions.v1_8_20)) {
+            gradle(*args).checks {
+                check.logContainsOnce(cacheKindWarning)
+            }
+            // check that the warning is shown even when the configuration is loaded from cache
+            gradle(*args).checks {
+                check.logContainsOnce(cacheKindWarning)
+            }
+        }
+        testWorkDir.deleteRecursively()
+        testWorkDir.mkdirs()
+        with(nativeCacheKindWarningProject(kotlinVersion = TestKotlinVersions.v1_9_0) ) {
+            gradle(*args).checks {
+                check.logContainsOnce(cacheKindWarning)
+            }
+        }
+    }
+
     @Test
     fun skikoWasm() = with(
         testProject(
