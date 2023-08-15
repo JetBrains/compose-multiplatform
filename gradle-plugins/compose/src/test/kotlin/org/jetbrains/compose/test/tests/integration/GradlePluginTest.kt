@@ -142,23 +142,19 @@ class GradlePluginTest : GradlePluginTestBase() {
             defaultTestEnvironment.copy(kotlinVersion = kotlinVersion)
         )
 
-        val cacheKindWarning = "Warning: 'kotlin.native.cacheKind' is explicitly set to `none`"
+        val cacheKindError = "'kotlin.native.cacheKind' is explicitly set to `none`"
 
         val args = arrayOf("build", "--dry-run", "-Pkotlin.native.cacheKind=none")
         with(nativeCacheKindWarningProject(kotlinVersion = TestKotlinVersions.v1_8_20)) {
-            gradle(*args).checks {
-                check.logContainsOnce(cacheKindWarning)
-            }
-            // check that the warning is shown even when the configuration is loaded from cache
-            gradle(*args).checks {
-                check.logContainsOnce(cacheKindWarning)
+            gradleFailure(*args).checks {
+                check.logContains(cacheKindError)
             }
         }
         testWorkDir.deleteRecursively()
         testWorkDir.mkdirs()
         with(nativeCacheKindWarningProject(kotlinVersion = TestKotlinVersions.v1_9_0) ) {
-            gradle(*args).checks {
-                check.logContainsOnce(cacheKindWarning)
+            gradleFailure(*args).checks {
+                check.logContains(cacheKindError)
             }
         }
     }

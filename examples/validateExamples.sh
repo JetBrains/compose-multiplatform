@@ -21,7 +21,7 @@ runGradle() {
 
 runGradle chat packageDistributionForCurrentOS
 runGradle codeviewer packageDistributionForCurrentOS
-#runGradle imageviewer packageDistributionForCurrentOS
+runGradle imageviewer packageDistributionForCurrentOS
 runGradle issues packageDistributionForCurrentOS
 runGradle notepad packageDistributionForCurrentOS
 runGradle todoapp-lite packageDistributionForCurrentOS

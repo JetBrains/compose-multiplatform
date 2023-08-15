@@ -11,7 +11,7 @@ import org.jetbrains.compose.internal.utils.valueOrNull
 import org.jetbrains.compose.internal.utils.toBooleanProvider
 
 internal object IosGradleProperties {
-    const val SYNC_RESOURCES_PROPERTY = "org.jetbrains.compose.ios.resources.sync"
+    const val SYNC_RESOURCES_PROPERTY = "compose.ios.resources.sync"
 
     fun syncResources(providers: ProviderFactory): Provider<Boolean> =
         providers.valueOrNull(SYNC_RESOURCES_PROPERTY).toBooleanProvider(true)
