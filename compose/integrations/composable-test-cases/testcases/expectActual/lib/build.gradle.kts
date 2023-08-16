@@ -32,8 +32,10 @@ kotlin {
         val macosArm64Main by getting {
             dependsOn(nativeMain)
         }
-        val mingwX64Main by getting {
-            dependsOn(nativeMain)
+        if (project.isMingwX64Enabled) {
+            val mingwX64Main by getting {
+                dependsOn(nativeMain)
+            }
         }
     }
 }
