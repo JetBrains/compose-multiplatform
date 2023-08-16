@@ -128,8 +128,7 @@ class GradlePluginTest : GradlePluginTestBase() {
         with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_9_0) ) {
             gradle(task, "--info").checks {
                 check.taskSuccessful(task)
-                check.logContains("-Xauto-cache-from=")
-                check.logContains("-Xlazy-ir-for-caches=disable")
+                check.logDoesntContain("-Xauto-cache-from=")
             }
         }
     }
@@ -142,19 +141,19 @@ class GradlePluginTest : GradlePluginTestBase() {
             defaultTestEnvironment.copy(kotlinVersion = kotlinVersion)
         )
 
-        val cacheKindError = "'kotlin.native.cacheKind' is explicitly set to `none`"
+        val cacheKindWarning = "'kotlin.native.cacheKind' is explicitly set to `none`"
 
         val args = arrayOf("build", "--dry-run", "-Pkotlin.native.cacheKind=none")
         with(nativeCacheKindWarningProject(kotlinVersion = TestKotlinVersions.v1_8_20)) {
-            gradleFailure(*args).checks {
-                check.logContains(cacheKindError)
+            gradle(*args).checks {
+                check.logContains(cacheKindWarning)
             }
         }
         testWorkDir.deleteRecursively()
         testWorkDir.mkdirs()
         with(nativeCacheKindWarningProject(kotlinVersion = TestKotlinVersions.v1_9_0) ) {
-            gradleFailure(*args).checks {
-                check.logContains(cacheKindError)
+            gradle(*args).checks {
+                check.logContains(cacheKindWarning)
             }
         }
     }
