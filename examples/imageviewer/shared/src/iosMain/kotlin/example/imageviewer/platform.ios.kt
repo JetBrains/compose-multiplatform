@@ -17,6 +17,7 @@ import platform.Foundation.CFBridgingRelease
 import platform.UIKit.UIApplication
 import platform.UIKit.UIImage
 
+@OptIn(ExperimentalForeignApi::class)
 private val iosNotchInset = object : WindowInsets {
     override fun getTop(density: Density): Int {
         val safeAreaInsets = UIApplication.sharedApplication.keyWindow?.safeAreaInsets
