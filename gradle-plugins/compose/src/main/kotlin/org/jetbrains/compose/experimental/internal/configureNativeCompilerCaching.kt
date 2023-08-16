@@ -11,7 +11,6 @@ import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.utils.KGPPropertyProvider
 import org.jetbrains.compose.internal.utils.configureEachWithType
-import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.presetName
 
@@ -23,10 +22,9 @@ internal fun Project.configureNativeCompilerCaching() {
     if (findProperty(COMPOSE_NATIVE_MANAGE_CACHE_KIND) == "false") return
 
     plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
-        val kotlinVersion = kotlinVersionNumbers(this)
         mppExt.targets.configureEachWithType<KotlinNativeTarget> {
             checkCacheKindUserValueIsNotNone()
-            configureTargetCompilerCache(kotlinVersion)
+            disableKotlinNativeCache()
         }
     }
 }
@@ -46,7 +44,9 @@ private fun KotlinNativeTarget.checkCacheKindUserValueIsNotNone() {
             val value = provider.valueOrNull(cacheKindProperty)
             if (value != null) {
                 if (value.equals(NONE_VALUE, ignoreCase = true)) {
-                    error(cacheKindPropertyWarningMessage(cacheKindProperty, provider))
+                    ComposeMultiplatformBuildService
+                        .getInstance(project)
+                        .warnOnceAfterBuild(cacheKindPropertyWarningMessage(cacheKindProperty, provider))
                 }
                 return
             }
@@ -58,30 +58,14 @@ private fun cacheKindPropertyWarningMessage(
     cacheKindProperty: String,
     provider: KGPPropertyProvider
 ) = """
-    |'$cacheKindProperty' is explicitly set to `none`.
-    |This option significantly slows the Kotlin/Native compiler.
-    |Compose Multiplatform Gradle plugin can set this property automatically,
-    |when it is necessary.
+    |Warning: '$cacheKindProperty' is explicitly set to `none`.
+    |Compose Multiplatform Gradle plugin can manage this property automatically 
+    |based on a Kotlin compiler version being used.
+    |In future versions of Compose Multiplatform this warning will become an error.
     |  * Recommended action: remove explicit '$cacheKindProperty=$NONE_VALUE' from ${provider.location}. 
-    |  * Alternative action: if you are sure you need '$cacheKindProperty=$NONE_VALUE', disable
-    |this error by adding '$COMPOSE_NATIVE_MANAGE_CACHE_KIND=false' to your 'gradle.properties'.
+    |  * Alternative action: disable cache kind management by adding '$COMPOSE_NATIVE_MANAGE_CACHE_KIND=false' to your 'gradle.properties'.
 """.trimMargin()
 
-private fun KotlinNativeTarget.configureTargetCompilerCache(kotlinVersion: KotlinVersion) {
-    // See comments in https://youtrack.jetbrains.com/issue/KT-57329
-    when {
-        // Kotlin < 1.9.0 => disable cache
-        kotlinVersion < KotlinVersion(1, 9, 0) -> {
-            disableKotlinNativeCache()
-        }
-        // 1.9.0 <= Kotlin < 1.9.20 => add -Xlazy-ir-for-caches=disable
-        kotlinVersion < KotlinVersion(1, 9, 20) -> {
-            disableLazyIrForCaches()
-        }
-        // Kotlin >= 1.9.20 => do nothing
-        else -> {}
-    }
-}
 
 private val KotlinNativeTarget.targetCacheKindPropertyName: String
     get() = "$PROJECT_CACHE_KIND_PROPERTY_NAME.${konanTarget.presetName}"
@@ -92,21 +76,4 @@ private fun KotlinNativeTarget.disableKotlinNativeCache() {
     } else {
         project.extensions.extraProperties.set(targetCacheKindPropertyName, NONE_VALUE)
     }
-}
-
-private fun KotlinNativeTarget.disableLazyIrForCaches() {
-    compilations.configureEach { compilation ->
-        compilation.kotlinOptions.freeCompilerArgs += listOf("-Xlazy-ir-for-caches=disable")
-    }
-}
-
-private fun kotlinVersionNumbers(project: Project): KotlinVersion {
-    val version = project.getKotlinPluginVersion()
-    val m = Regex("(\\d+)\\.(\\d+)\\.(\\d+)").find(version) ?: error("Kotlin version has unexpected format: '$version'")
-    val (_, majorPart, minorPart, patchPart) = m.groupValues
-    return KotlinVersion(
-        major = majorPart.toIntOrNull() ?: error("Could not parse major part '$majorPart' of Kotlin plugin version: '$version'"),
-        minor = minorPart.toIntOrNull() ?: error("Could not parse minor part '$minorPart' of Kotlin plugin version: '$version'"),
-        patch = patchPart.toIntOrNull() ?: error("Could not parse patch part '$patchPart' of Kotlin plugin version: '$version'"),
-    )
 }
