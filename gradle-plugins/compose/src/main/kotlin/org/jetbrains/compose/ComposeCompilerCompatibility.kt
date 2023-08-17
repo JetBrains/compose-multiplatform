@@ -14,7 +14,7 @@ internal object ComposeCompilerCompatibility {
         "1.8.22" to "1.4.8",
         "1.9.0-Beta" to "1.4.7.1-beta",
         "1.9.0-RC" to "1.4.8-beta",
-        "1.9.0" to "1.5.1-rc01"
+        "1.9.0" to "1.5.1-rc02"
     )
 
     fun compilerVersionFor(kotlinVersion: String): String {
