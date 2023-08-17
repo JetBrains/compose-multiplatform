@@ -79,7 +79,7 @@ private fun CameraWithGrantedPermission(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val viewScope = rememberCoroutineScope()
-    var cameraProvider: ProcessCameraProvider? = null
+    var cameraProvider: ProcessCameraProvider? by remember { mutableStateOf(null) }
 
     val preview = Preview.Builder().build()
     val previewView = remember { PreviewView(context) }
