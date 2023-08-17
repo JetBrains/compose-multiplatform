@@ -12,7 +12,7 @@ plugins {
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    android()
+    androidTarget()
     jvm("desktop")
     ios()
     iosSimulatorArm64()
@@ -41,9 +41,6 @@ kotlin {
                 implementation(compose.components.resources)
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
-
-                // Kotlin Coroutines 1.7.1 contains Dispatchers.IO for iOS
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
             }
         }
         val androidMain by getting {
@@ -61,6 +58,10 @@ kotlin {
             }
         }
         val iosMain by getting {
+            dependencies {
+                // Kotlin Coroutines 1.7.0 contains Dispatchers.IO for iOS
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
+            }
         }
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)
@@ -77,14 +78,14 @@ kotlin {
 }
 
 android {
-    compileSdk = 33
+    compileSdk = 34
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
         minSdk = 26
-        targetSdk = 33
+        targetSdk = 34
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

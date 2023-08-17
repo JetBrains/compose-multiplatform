@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package example.imageviewer
 
 import androidx.compose.foundation.layout.WindowInsets

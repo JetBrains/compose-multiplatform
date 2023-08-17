@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package example.imageviewer.view
 
 import androidx.compose.runtime.Composable

@@ -60,11 +60,11 @@ fun ImageViewerWithProvidedDependencies(
         val currentIdx = targetState.index
         val multiplier = if (previousIdx < currentIdx) 1 else -1
         if (initialState.value is GalleryPage && targetState.value is MemoryPage) {
-            fadeIn() with fadeOut(tween(durationMillis = 500, 500))
+            fadeIn() togetherWith fadeOut(tween(durationMillis = 500, 500))
         } else if (initialState.value is MemoryPage && targetState.value is GalleryPage) {
-            fadeIn() with fadeOut(tween(delayMillis = 150))
+            fadeIn() togetherWith fadeOut(tween(delayMillis = 150))
         } else {
-            slideInHorizontally { w -> multiplier * w } with
+            slideInHorizontally { w -> multiplier * w } togetherWith
                     slideOutHorizontally { w -> multiplier * -1 * w }
         }
     }) { (_, page) ->

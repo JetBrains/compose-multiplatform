@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalForeignApi::class)
+
 package example.imageviewer.storage
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
