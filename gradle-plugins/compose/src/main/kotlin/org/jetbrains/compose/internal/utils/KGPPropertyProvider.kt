@@ -6,6 +6,7 @@
 package org.jetbrains.compose.internal.utils
 
 import org.gradle.api.Project
+import org.jetbrains.compose.ComposeMultiplatformBuildService
 import java.util.*
 
 /**
@@ -23,13 +24,14 @@ internal abstract class KGPPropertyProvider {
     abstract val location: String
 
     class GradleProperties(private val project: Project) : KGPPropertyProvider() {
-        override fun valueOrNull(propertyName: String): String? = project.findProperty(propertyName)?.toString()
+        override fun valueOrNull(propertyName: String): String? =
+            ComposeMultiplatformBuildService.getInstance(project).gradlePropertiesSnapshot[propertyName]
         override val location: String = "gradle.properties"
     }
 
-    class LocalProperties(project: Project) : KGPPropertyProvider() {
-        private val localProperties: Properties by lazyLoadProperties(project.localPropertiesFile)
-        override fun valueOrNull(propertyName: String): String? = localProperties.getProperty(propertyName)
+    class LocalProperties(private val project: Project) : KGPPropertyProvider() {
+        override fun valueOrNull(propertyName: String): String? =
+            ComposeMultiplatformBuildService.getInstance(project).localPropertiesSnapshot[propertyName]
         override val location: String = "local.properties"
     }
 }

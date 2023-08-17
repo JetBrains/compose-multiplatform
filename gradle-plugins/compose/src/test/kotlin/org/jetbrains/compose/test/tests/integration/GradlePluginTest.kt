@@ -116,7 +116,7 @@ class GradlePluginTest : GradlePluginTestBase() {
             defaultTestEnvironment.copy(kotlinVersion = kotlinVersion, useGradleConfigurationCache = false)
         )
 
-        val task = ":linkDebugFrameworkIosX64"
+        val task = ":subproject:linkDebugFrameworkIosX64"
         with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_8_20)) {
             gradle(task, "--info").checks {
                 check.taskSuccessful(task)
@@ -136,26 +136,55 @@ class GradlePluginTest : GradlePluginTestBase() {
     @Test
     fun nativeCacheKindWarning() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
-        fun nativeCacheKindWarningProject(kotlinVersion: String) = testProject(
-            TestProjects.nativeCacheKindWarning,
-            defaultTestEnvironment.copy(kotlinVersion = kotlinVersion)
-        )
-
-        val cacheKindWarning = "'kotlin.native.cacheKind' is explicitly set to `none`"
-
-        val args = arrayOf("build", "--dry-run", "-Pkotlin.native.cacheKind=none")
-        with(nativeCacheKindWarningProject(kotlinVersion = TestKotlinVersions.v1_8_20)) {
-            gradle(*args).checks {
-                check.logContains(cacheKindWarning)
+        fun withNativeCacheKindWarningProject(kotlinVersion: String, fn: TestProject.() -> Unit) {
+            with(testProject(
+                TestProjects.nativeCacheKindWarning,
+                defaultTestEnvironment.copy(kotlinVersion = kotlinVersion)
+            )) {
+                fn()
+                testWorkDir.deleteRecursively()
+                testWorkDir.mkdirs()
             }
         }
-        testWorkDir.deleteRecursively()
-        testWorkDir.mkdirs()
-        with(nativeCacheKindWarningProject(kotlinVersion = TestKotlinVersions.v1_9_0) ) {
-            gradle(*args).checks {
-                check.logContains(cacheKindWarning)
+
+        fun testKotlinVersion(kotlinVersion: String) {
+            val args = arrayOf("build", "--dry-run")
+            val commonPartOfWarning = "Compose Multiplatform Gradle plugin manages this property automatically"
+            withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
+                gradle(*args).checks {
+                    check.logDoesntContain("Warning: 'kotlin.native.cacheKind")
+                    check.logDoesntContain(commonPartOfWarning)
+                }
+            }
+            withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
+                gradle(*args, "-Pkotlin.native.cacheKind=none").checks {
+                    check.logContainsOnce("Warning: 'kotlin.native.cacheKind' is explicitly set to 'none'")
+                    check.logContainsOnce(commonPartOfWarning)
+                }
+            }
+            withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
+                gradle(*args, "-Pkotlin.native.cacheKind=static").checks {
+                    check.logContainsOnce("Warning: 'kotlin.native.cacheKind' is explicitly set to 'static'")
+                    check.logContainsOnce(commonPartOfWarning)
+                }
+            }
+            withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
+                gradle(*args, "-Pkotlin.native.cacheKind.iosX64=none").checks {
+                    check.logContainsOnce("Warning: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'none'")
+                    check.logContainsOnce(commonPartOfWarning)
+                }
+            }
+            withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
+                gradle(*args, "-Pkotlin.native.cacheKind.iosX64=static").checks {
+                    check.logContainsOnce("Warning: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'static'")
+                    check.logContainsOnce(commonPartOfWarning)
+                }
             }
         }
+
+
+        testKotlinVersion(TestKotlinVersions.v1_8_20)
+        testKotlinVersion(TestKotlinVersions.v1_9_0)
     }
 
     @Test

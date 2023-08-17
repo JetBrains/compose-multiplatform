@@ -59,6 +59,10 @@ private fun Array<out Provider<out FileSystemLocation>>.ioFiles(): Array<File> =
     let { providers -> Array(size) { i -> providers[i].ioFile } }
 
 internal fun lazyLoadProperties(propertiesFile: File): Lazy<Properties> = lazy {
+    loadProperties(propertiesFile)
+}
+
+internal fun loadProperties(propertiesFile: File): Properties =
     Properties().apply {
         if (propertiesFile.isFile) {
             propertiesFile.inputStream().use {
@@ -66,4 +70,3 @@ internal fun lazyLoadProperties(propertiesFile: File): Lazy<Properties> = lazy {
             }
         }
     }
-}
