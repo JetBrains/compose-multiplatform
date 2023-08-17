@@ -151,26 +151,32 @@ class GradlePluginTest : GradlePluginTestBase() {
             val args = arrayOf("build", "--dry-run")
             val commonPartOfWarning = "Compose Multiplatform Gradle plugin manages this property automatically"
             withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
+                gradle(*args).checks {
+                    check.logDoesntContain("Warning: 'kotlin.native.cacheKind")
+                    check.logDoesntContain(commonPartOfWarning)
+                }
+            }
+            withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
                 gradle(*args, "-Pkotlin.native.cacheKind=none").checks {
-                    check.logContainsOnce("'kotlin.native.cacheKind' is explicitly set to 'none'")
+                    check.logContainsOnce("Warning: 'kotlin.native.cacheKind' is explicitly set to 'none'")
                     check.logContainsOnce(commonPartOfWarning)
                 }
             }
             withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
                 gradle(*args, "-Pkotlin.native.cacheKind=static").checks {
-                    check.logContainsOnce("'kotlin.native.cacheKind' is explicitly set to 'static'")
+                    check.logContainsOnce("Warning: 'kotlin.native.cacheKind' is explicitly set to 'static'")
                     check.logContainsOnce(commonPartOfWarning)
                 }
             }
             withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
                 gradle(*args, "-Pkotlin.native.cacheKind.iosX64=none").checks {
-                    check.logContainsOnce("'kotlin.native.cacheKind.iosX64' is explicitly set to 'none'")
+                    check.logContainsOnce("Warning: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'none'")
                     check.logContainsOnce(commonPartOfWarning)
                 }
             }
             withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
                 gradle(*args, "-Pkotlin.native.cacheKind.iosX64=static").checks {
-                    check.logContainsOnce("'kotlin.native.cacheKind.iosX64' is explicitly set to 'static'")
+                    check.logContainsOnce("Warning: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'static'")
                     check.logContainsOnce(commonPartOfWarning)
                 }
             }
