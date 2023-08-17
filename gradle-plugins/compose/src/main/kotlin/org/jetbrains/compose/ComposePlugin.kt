@@ -106,6 +106,7 @@ abstract class ComposePlugin : Plugin<Project> {
         val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
         val runtimeSaveable get() = composeDependency("org.jetbrains.compose.runtime:runtime-saveable")
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
+        @Deprecated("Use desktop.uiTestJUnit4", replaceWith = ReplaceWith("desktop.uiTestJUnit4"))
         @ExperimentalComposeLibrary
         val uiTestJUnit4 get() = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
         val uiTooling get() = composeDependency("org.jetbrains.compose.ui:ui-tooling")
@@ -126,6 +127,8 @@ abstract class ComposePlugin : Plugin<Project> {
         val windows_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-windows-x64")
         val macos_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-x64")
         val macos_arm64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-arm64")
+
+        val uiTestJUnit4 get() = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
 
         val currentOs by lazy {
             composeDependency("org.jetbrains.compose.desktop:desktop-jvm-${currentTarget.id}")
