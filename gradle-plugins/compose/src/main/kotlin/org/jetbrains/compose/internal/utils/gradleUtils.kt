@@ -24,6 +24,7 @@ internal inline fun Logger.debug(fn: () -> String) {
     }
 }
 
+val Project.rootGradlePropertiesFile get() = project.rootProject.file("gradle.properties")
 val Project.localPropertiesFile get() = project.rootProject.file("local.properties")
 
 fun Project.getLocalProperty(key: String): String? {
