@@ -12,7 +12,7 @@ plugins {
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    android()
+    androidTarget()
     jvm("desktop")
     ios()
     iosSimulatorArm64()
@@ -69,6 +69,13 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.common)
                 implementation(project(":mapview-desktop"))
+            }
+        }
+
+        val desktopTest by getting {
+            dependencies {
+                implementation(compose.desktop.currentOs)
+                implementation(compose.desktop.uiTestJUnit4)
             }
         }
     }

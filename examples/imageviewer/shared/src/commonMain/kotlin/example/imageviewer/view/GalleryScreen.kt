@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import example.imageviewer.*
 import example.imageviewer.icon.IconMenu
@@ -143,7 +144,10 @@ fun GalleryScreen(
             TopLayout(
                 alignLeftContent = {},
                 alignRightContent = {
-                    CircularButton(imageVector = IconMenu) {
+                    CircularButton(
+                        imageVector = IconMenu,
+                        modifier = Modifier.testTag("toggleGalleryStyleButton")
+                    ) {
                         galleryStyle = when (galleryStyle) {
                             GalleryStyle.SQUARES -> GalleryStyle.LIST
                             GalleryStyle.LIST -> GalleryStyle.SQUARES
@@ -159,7 +163,6 @@ fun GalleryScreen(
                     pagerState = pagerState,
                     onSelect = { selectPicture(it) },
                 )
-
                 GalleryStyle.LIST -> ListGalleryView(
                     pictures = pictures,
                     onSelect = { selectPicture(it) },
@@ -183,7 +186,7 @@ private fun SquaresGalleryView(
     onSelect: (index: Int) -> Unit,
 ) {
     LazyVerticalGrid(
-        modifier = Modifier.padding(top = 4.dp),
+        modifier = Modifier.padding(top = 4.dp).testTag("squaresGalleryView"),
         columns = GridCells.Adaptive(minSize = 130.dp),
         verticalArrangement = Arrangement.spacedBy(1.dp),
         horizontalArrangement = Arrangement.spacedBy(1.dp)
@@ -253,7 +256,7 @@ private fun ListGalleryView(
 ) {
     val notification = LocalNotification.current
     ScrollableColumn(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().testTag("listGalleryView")
     ) {
         Spacer(modifier = Modifier.height(10.dp))
         for (p in pictures.withIndex()) {
