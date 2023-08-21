@@ -2,7 +2,6 @@
 
 plugins {
     kotlin("multiplatform")
-    kotlin("native.cocoapods")
     id("com.android.library")
     id("org.jetbrains.compose")
     kotlin("plugin.serialization")
@@ -14,15 +13,13 @@ version = "1.0-SNAPSHOT"
 kotlin {
     androidTarget()
     jvm("desktop")
-    ios()
-    iosSimulatorArm64()
 
-    cocoapods {
-        summary = "Shared code for the sample"
-        homepage = "https://github.com/JetBrains/compose-jb"
-        ios.deploymentTarget = "14.1"
-        podfile = project.file("../iosApp/Podfile")
-        framework {
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
             baseName = "shared"
             isStatic = true
         }
@@ -58,12 +55,18 @@ kotlin {
                 implementation("com.google.maps.android:maps-compose:2.11.2")
             }
         }
-        val iosMain by getting {
+        val iosMain by creating {
+            dependsOn(commonMain)
+        }
+        val iosX64Main by getting {
+            dependsOn(iosMain)
+        }
+        val iosArm64Main by getting {
+            dependsOn(iosMain)
         }
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)
         }
-
 
         val desktopMain by getting {
             dependencies {
