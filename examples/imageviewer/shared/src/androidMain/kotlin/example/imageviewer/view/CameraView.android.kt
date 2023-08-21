@@ -111,8 +111,8 @@ private fun CameraWithGrantedPermission(
                 }, executor)
             }
         }
-        cameraProvider!!.unbindAll()
-        cameraProvider!!.bindToLifecycle(
+        cameraProvider?.unbindAll()
+        cameraProvider?.bindToLifecycle(
             lifecycleOwner,
             cameraSelector,
             preview,
