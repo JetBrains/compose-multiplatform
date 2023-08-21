@@ -41,6 +41,7 @@ fun measureComposable(
         repeat(frameCount) {
             val cpuTime = measureTime {
                 scene.render(surface.canvas, nanoTime)
+                surface.flushAndSubmit(false)
             }
 
             val gpuTime = measureTime {

@@ -128,6 +128,6 @@ fun runBenchmarks(
 ) {
     println("Running emulating $targetFps FPS")
     runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext) { AnimatedVisibility() }
-    runBenchmark("LazyGrid", width, height, targetFps, 2000, graphicsContext) { LazyGrid() }
-    runBenchmark("VisualEffects", width, height, targetFps, 2000, graphicsContext) { NYContent(width, height) }
+    runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext) { LazyGrid() }
+    runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext) { NYContent(width, height) }
 }
