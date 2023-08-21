@@ -1,7 +1,4 @@
-# Compose benchmarks for JVM vs Kotlin Native comparison
-
-## Run Desktop
-- `./gradlew :run`
+# Compose benchmarks for K/N
 
 ## Run native on MacOS
  - `./gradlew runReleaseExecutableMacosArm64` (Works on Arm64 processors)

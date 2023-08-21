@@ -9,6 +9,13 @@ enum class BenchmarkFrameTimeKind {
     CPU, GPU
 }
 
+
+fun BenchmarkFrameTimeKind.toPrettyPrintString(): String =
+    when (this) {
+        BenchmarkFrameTimeKind.CPU -> "CPU"
+        BenchmarkFrameTimeKind.GPU -> "GPU"
+    }
+
 data class BenchmarkFrame(
     val cpuDuration: Duration,
     val gpuDuration: Duration
@@ -31,20 +38,22 @@ data class BenchmarkStats(
     val missedFramesCount: Int,
     val missedFramesRatio: Double
 ) {
-    override fun toString(): String =
-        """
-        ${percentileCPUAverage.toPrettyPrintString()}
-        
-        ${percentileGPUAverage.toPrettyPrintString()}
-        
-        Missed frames count: $missedFramesCount
-        Missed frames ratio: $missedFramesRatio
-        """.trimIndent()
+    fun prettyPrint() {
+        percentileCPUAverage.prettyPrint(BenchmarkFrameTimeKind.CPU)
+        percentileGPUAverage.prettyPrint(BenchmarkFrameTimeKind.GPU)
+        println(
+            """                
+            Missed frames count: $missedFramesCount
+            Missed frames ratio: $missedFramesRatio
+            """.trimIndent()
+        )
+    }
 
-    private fun List<BenchmarkPercentileAverage>.toPrettyPrintString(): String =
-        joinToString("\n") {
-            "p${(it.percentile * 100).roundToInt()} CPU average: ${it.average}"
+    private fun List<BenchmarkPercentileAverage>.prettyPrint(kind: BenchmarkFrameTimeKind) {
+        forEach {
+            println("p${(it.percentile * 100).roundToInt()} ${kind.toPrettyPrintString()} average: ${it.average}")
         }
+    }
 }
 
 class BenchmarkResult(
@@ -102,13 +111,9 @@ fun runBenchmark(
 ): BenchmarkStats {
     val stats = measureComposable(frameCount, width, height, targetFps, graphicsContext, content).generateStats()
 
-    println(
-        """
-        $name
-        $stats
-        
-        """.trimIndent()
-    )
+    println(name)
+    stats.prettyPrint()
+    println()
 
     return stats
 }

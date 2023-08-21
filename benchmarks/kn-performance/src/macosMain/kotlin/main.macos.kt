@@ -26,7 +26,7 @@ fun main() {
             descriptor.height = height.toULong()
             descriptor.usage = MTLTextureUsageShaderRead or MTLTextureUsageShaderWrite or MTLTextureUsageRenderTarget
             descriptor.textureType = MTLTextureType2D
-            descriptor.pixelFormat = MTLPixelFormatBGRA8Unorm_sRGB
+            descriptor.pixelFormat = MTLPixelFormatBGRA8Unorm
             descriptor.mipmapLevelCount = 1UL
 
             val texture = device.newTextureWithDescriptor(descriptor) ?: throw IllegalStateException("Can't create MTLTexture")
