@@ -33,6 +33,7 @@ data class BenchmarkPercentileAverage(
 )
 
 data class BenchmarkStats(
+    val frameBudget: Duration,
     val percentileCPUAverage: List<BenchmarkPercentileAverage>,
     val percentileGPUAverage: List<BenchmarkPercentileAverage>,
     val missedFramesCount: Int,
@@ -78,6 +79,7 @@ class BenchmarkResult(
         }
 
         return BenchmarkStats(
+            frameBudget,
             listOf(0.0, 0.5, 0.75, 0.9, 0.95, 0.97, 0.99).map { percentile ->
                 val average = percentileAverageFrameTime(percentile, BenchmarkFrameTimeKind.CPU)
 
@@ -124,7 +126,8 @@ fun runBenchmarks(
     targetFps: Int = 60,
     graphicsContext: GraphicsContext? = null
 ) {
+    println("Running emulating $targetFps FPS")
     runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext) { AnimatedVisibility() }
-    runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext) { LazyGrid() }
-    runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext) { NYContent(width, height) }
+    runBenchmark("LazyGrid", width, height, targetFps, 2000, graphicsContext) { LazyGrid() }
+    runBenchmark("VisualEffects", width, height, targetFps, 2000, graphicsContext) { NYContent(width, height) }
 }

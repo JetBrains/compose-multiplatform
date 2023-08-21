@@ -46,6 +46,7 @@ fun main() {
         }
 
         override fun waitUntilGPUFinishes() {
+            cachedSurface?.flushAndSubmit(false)
             val commandBuffer = commandQueue.commandBuffer() ?: return
             commandBuffer.commit()
             commandBuffer.waitUntilCompleted()
