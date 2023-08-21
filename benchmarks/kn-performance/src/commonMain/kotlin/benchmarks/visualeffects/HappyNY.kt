@@ -13,8 +13,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import height
-import width
 
 import kotlin.math.*
 import kotlin.random.Random
@@ -193,7 +191,7 @@ class Particle(var x: Double, var y: Double, var vx: Double, var vy: Double, val
 
 val rocket = DoubleRocket(Particle(0.0, 1000.0, 2.1, -12.5, Color.White))
 
-fun prepareStarsAndSnowFlakes(stars: SnapshotStateList<Star>, snowFlakes: SnapshotStateList<SnowFlake>) {
+fun prepareStarsAndSnowFlakes(stars: SnapshotStateList<Star>, snowFlakes: SnapshotStateList<SnowFlake>, width: Int, height: Int) {
     for (i in 0..snowCount) {
         snowFlakes.add(
             SnowFlake(
@@ -222,14 +220,14 @@ fun prepareStarsAndSnowFlakes(stars: SnapshotStateList<Star>, snowFlakes: Snapsh
 }
 
 @Composable
-fun NYContent() {
+fun NYContent(width: Int, height: Int) {
     var time by remember { mutableStateOf(0L) }
     val startTime = remember { 0L }
     var prevTime by remember { mutableStateOf(0L) }
     val snowFlakes = remember { mutableStateListOf<SnowFlake>() }
     val stars = remember { mutableStateListOf<Star>() }
     var flickering2 by remember { mutableStateOf(true) }
-    remember { prepareStarsAndSnowFlakes(stars, snowFlakes) }
+    remember { prepareStarsAndSnowFlakes(stars, snowFlakes, width, height) }
 
     Surface(
         modifier = Modifier.fillMaxSize().padding(5.dp).shadow(3.dp, RoundedCornerShape(20.dp)),
@@ -256,7 +254,7 @@ fun NYContent() {
 
         Box(Modifier.fillMaxSize()) {
 
-            snow(time, prevTime, snowFlakes, startTime)
+            snow(time, prevTime, snowFlakes, startTime, height)
 
             starrySky(stars)
 
@@ -281,7 +279,7 @@ fun star(x: Dp, y: Dp, color: Color = Color.White, size: Dp) {
 }
 
 @Composable
-fun snow(time: Long, prevTime: Long, snowFlakes: SnapshotStateList<SnowFlake>, startTime: Long) {
+fun snow(time: Long, prevTime: Long, snowFlakes: SnapshotStateList<SnowFlake>, startTime: Long, height: Int) {
     val deltaAngle = (time - startTime) / 100000000
     with(LocalDensity.current) {
         snowFlakes.forEach {
