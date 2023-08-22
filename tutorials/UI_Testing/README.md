@@ -1,7 +1,7 @@
 ﻿# UI Testing
 The API for unit testing in Compose for Desktop is nearly identical to the [Jetpack Compose Android testing API](https://developer.android.com/jetpack/compose/testing). We highly recommended reading that first before moving on to this tutorial.
 
-##Setting up
+## Setting up
 To start using the testing API, you will need to add the dependency on compose.uiTestJUnit4 to your build.gradle file and create the directory for your tests. 
 
 If the module is desktop-only (kotlin("jvm") is applied), add the dependency via:
