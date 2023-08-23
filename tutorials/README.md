@@ -18,6 +18,7 @@
 * [Navigation](Navigation)
 * [Accessibility](Accessibility)
 * [Building a native distribution](Native_distributions_and_local_execution)
+* [UI testing](UI_Testing)
 
 ## Web
 * [Getting started](https://kotl.in/wasm-compose-example)
