@@ -7,7 +7,8 @@ To start using the testing API, you will need to add the dependency on `compose.
 If the module is desktop-only (`kotlin("jvm")` is applied), add the dependency via:
 ```kotlin
 dependencies {
-    implementation(compose.desktop.uiTestJUnit4)
+    testImplementation(compose.desktop.uiTestJUnit4)
+    testImplementation(compose.desktop.currentOs)
 }
 ```
 
@@ -21,6 +22,7 @@ kotlin {
         val desktopTest by getting {
             dependencies {
                 implementation(compose.desktop.uiTestJUnit4)
+                implementation(compose.desktop.currentOs)
             }
         }
     }
