@@ -1,5 +1,8 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
+import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
+
+
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
@@ -43,15 +46,23 @@ kotlin {
         }
     }
 
+    val enableKjsWorkaround = project.properties["workaround.kotlin.js.kt60852"] == "true"
+
+    fun  KotlinDependencyHandler.addCommonDependencies() {
+        implementation(compose.ui)
+        implementation(compose.runtime)
+        implementation(compose.foundation)
+        implementation(compose.material)
+        @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+        implementation(compose.components.resources)
+    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(compose.ui)
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material)
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-                implementation(compose.components.resources)
+                if (!enableKjsWorkaround) {
+                    addCommonDependencies()
+                }
             }
         }
         val androidMain by getting {
@@ -83,6 +94,13 @@ kotlin {
         }
         val macosArm64Main by getting {
             dependsOn(macosMain)
+        }
+        val jsMain by getting {
+            dependencies {
+                if (enableKjsWorkaround) {
+                    addCommonDependencies()
+                }
+            }
         }
     }
 }

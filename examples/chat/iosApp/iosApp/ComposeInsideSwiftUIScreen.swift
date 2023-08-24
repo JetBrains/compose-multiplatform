@@ -38,9 +38,8 @@ struct TextInputLayer: View {
                         textFieldFocused = false
                         textState = ""
                     }) {
-                        HStack {
-                            Image(systemName: "arrow.up.circle.fill")
-                        }.tint(Color(red: 0.671, green: 0.365, blue: 0.792))
+                        Image(systemName: "arrow.up.circle.fill")
+                            .tint(Color(red: 0.671, green: 0.365, blue: 0.792))
                     }
                 }
             }.padding(15).background(RoundedRectangle(cornerRadius: 200).fill(.white).opacity(0.95)).padding(15)
