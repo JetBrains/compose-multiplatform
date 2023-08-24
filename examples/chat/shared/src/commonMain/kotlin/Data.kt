@@ -37,7 +37,6 @@ object ColorProvider {
         if(colors.size == 0) {
             colors.addAll(allColors)
         }
-        println(colors.lastIndex)
         val idx = Random.nextInt(colors.indices)
         val color = colors[idx]
         colors.removeAt(idx)
