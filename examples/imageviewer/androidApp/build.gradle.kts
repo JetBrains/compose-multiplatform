@@ -20,7 +20,7 @@ android {
     compileSdk = 34
     namespace = "example.imageviewer"
     defaultConfig {
-        applicationId = "example.imageviewer.Imageviewer"
+        applicationId = "org.jetbrains.Imageviewer"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

@@ -11,7 +11,7 @@ android {
     defaultConfig {
         minSdk = 26
         targetSdk = 34
-        applicationId = "org.jetbrains.issues.Issues"
+        applicationId = "org.jetbrains.Issues"
         versionCode = 1
         versionName = "1.0"
     }
