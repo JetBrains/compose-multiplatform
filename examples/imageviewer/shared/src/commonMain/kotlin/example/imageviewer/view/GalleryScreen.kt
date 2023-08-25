@@ -12,7 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -33,10 +33,13 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import example.imageviewer.*
+import example.imageviewer.ExternalImageViewerEvent
+import example.imageviewer.LocalImageProvider
+import example.imageviewer.LocalInternalEvents
+import example.imageviewer.LocalNotification
 import example.imageviewer.icon.IconMenu
 import example.imageviewer.icon.IconVisibility
-import example.imageviewer.model.*
+import example.imageviewer.model.PictureData
 import example.imageviewer.style.ImageviewerColors
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -178,6 +181,15 @@ fun GalleryScreen(
     }
 }
 
+@Composable
+expect fun GalleryLazyVerticalGrid(
+    columns: GridCells,
+    modifier: Modifier,
+    verticalArrangement: Arrangement.Vertical,
+    horizontalArrangement: Arrangement.Horizontal,
+    content: LazyGridScope.() -> Unit
+)
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SquaresGalleryView(
@@ -185,9 +197,9 @@ private fun SquaresGalleryView(
     pagerState: PagerState,
     onSelect: (index: Int) -> Unit,
 ) {
-    LazyVerticalGrid(
-        modifier = Modifier.padding(top = 4.dp).testTag("squaresGalleryView"),
+    GalleryLazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 130.dp),
+        modifier = Modifier.padding(top = 4.dp).testTag("squaresGalleryView"),
         verticalArrangement = Arrangement.spacedBy(1.dp),
         horizontalArrangement = Arrangement.spacedBy(1.dp)
     ) {

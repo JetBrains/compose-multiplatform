@@ -79,6 +79,7 @@ private fun CameraWithGrantedPermission(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val viewScope = rememberCoroutineScope()
+    var cameraProvider: ProcessCameraProvider? by remember { mutableStateOf(null) }
 
     val preview = Preview.Builder().build()
     val previewView = remember { PreviewView(context) }
@@ -96,16 +97,22 @@ private fun CameraWithGrantedPermission(
             .build()
     }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            cameraProvider?.unbindAll()
+        }
+    }
+
     LaunchedEffect(isFrontCamera) {
-        val cameraProvider = suspendCoroutine<ProcessCameraProvider> { continuation ->
+        cameraProvider = suspendCoroutine<ProcessCameraProvider> { continuation ->
             ProcessCameraProvider.getInstance(context).also { cameraProvider ->
                 cameraProvider.addListener({
                     continuation.resume(cameraProvider.get())
                 }, executor)
             }
         }
-        cameraProvider.unbindAll()
-        cameraProvider.bindToLifecycle(
+        cameraProvider?.unbindAll()
+        cameraProvider?.bindToLifecycle(
             lifecycleOwner,
             cameraSelector,
             preview,
