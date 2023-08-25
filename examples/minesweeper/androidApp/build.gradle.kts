@@ -5,7 +5,7 @@ plugins {
 }
 
 kotlin {
-    android()
+    androidTarget()
     sourceSets {
         val androidMain by getting {
             dependencies {
@@ -17,8 +17,9 @@ kotlin {
 
 android {
     compileSdk = 34
+    namespace = "org.jetbrains.composeminesweeper"
     defaultConfig {
-        applicationId = "org.jetbrains.ComposeMinesweeper"
+        applicationId = "org.jetbrains.composeminesweeper.ComposeMinesweeper"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -27,5 +28,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    kotlin {
+        jvmToolchain(11)
     }
 }

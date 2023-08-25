@@ -5,7 +5,7 @@ plugins {
 }
 
 kotlin {
-    android()
+    androidTarget()
     sourceSets {
         val androidMain by getting {
             dependencies {
@@ -17,8 +17,9 @@ kotlin {
 
 android {
     compileSdk = 34
+    namespace = "org.jetbrains.visualeffects"
     defaultConfig {
-        applicationId = "org.jetbrains.VisualEffects"
+        applicationId = "org.jetbrains.visualeffects.VisualEffects"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -27,5 +28,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    kotlin {
+        jvmToolchain(11)
     }
 }

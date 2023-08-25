@@ -18,8 +18,9 @@ kotlin {
 
 android {
     compileSdk = 34
+    namespace = "org.jetbrains.imageviewer"
     defaultConfig {
-        applicationId = "org.jetbrains.Imageviewer"
+        applicationId = "org.jetbrains.imageviewer.Imageviewer"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
@@ -28,6 +29,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    kotlin {
+        jvmToolchain(11)
     }
 }
 
