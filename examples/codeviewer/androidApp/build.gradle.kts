@@ -19,7 +19,7 @@ android {
     compileSdk = 34
     namespace = "org.jetbrains.codeviewer"
     defaultConfig {
-        applicationId = "org.jetbrains.codeviewer.Codeviewer"
+        applicationId = "org.jetbrains.Codeviewer"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

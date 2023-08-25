@@ -19,7 +19,7 @@ android {
     compileSdk = 34
     namespace = "org.jetbrains.fallingballs"
     defaultConfig {
-        applicationId = "org.jetbrains.fallingballs.FallingBalls"
+        applicationId = "org.jetbrains.FallingBalls"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

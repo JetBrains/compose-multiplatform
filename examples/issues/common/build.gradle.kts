@@ -40,7 +40,7 @@ apollo {
 
 android {
     compileSdk = 34
-    namespace = "org.jetbrains.issues.common"
+    namespace = "com.example.myapplication.common"
 
     defaultConfig {
         minSdk = 26

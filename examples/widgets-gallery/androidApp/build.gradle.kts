@@ -17,9 +17,9 @@ kotlin {
 
 android {
     compileSdk = 34
-    namespace = "org.jetbrains.widgetsgallery"
+    namespace = "org.jetbrains.compose.demo.widgets"
     defaultConfig {
-        applicationId = "org.jetbrains.widgetsgallery.WidgetsGallery"
+        applicationId = "org.jetbrains.WidgetsGallery"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

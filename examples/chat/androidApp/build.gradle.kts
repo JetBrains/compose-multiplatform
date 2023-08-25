@@ -19,7 +19,7 @@ android {
     compileSdk = 34
     namespace = "org.jetbrains.chat"
     defaultConfig {
-        applicationId = "org.jetbrains.chat.Chat"
+        applicationId = "org.jetbrains.Chat"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

@@ -17,9 +17,9 @@ kotlin {
 
 android {
     compileSdk = 34
-    namespace = "org.jetbrains.composeminesweeper"
+    namespace = "org.jetbrains.minesweeper"
     defaultConfig {
-        applicationId = "org.jetbrains.composeminesweeper.ComposeMinesweeper"
+        applicationId = "org.jetbrains.ComposeMinesweeper"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

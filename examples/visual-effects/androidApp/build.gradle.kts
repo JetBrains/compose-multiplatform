@@ -17,9 +17,9 @@ kotlin {
 
 android {
     compileSdk = 34
-    namespace = "org.jetbrains.visualeffects"
+    namespace = "org.jetbrains.compose.demo.visuals"
     defaultConfig {
-        applicationId = "org.jetbrains.visualeffects.VisualEffects"
+        applicationId = "org.jetbrains.VisualEffects"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

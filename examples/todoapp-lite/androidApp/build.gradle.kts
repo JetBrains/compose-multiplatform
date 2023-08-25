@@ -18,9 +18,9 @@ kotlin {
 
 android {
     compileSdk = 34
-    namespace = "org.jetbrains.todoapplite"
+    namespace = "example.todoapp.lite"
     defaultConfig {
-        applicationId = "org.jetbrains.todoapplite.TodoAppLite"
+        applicationId = "org.jetbrains.TodoAppLite"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

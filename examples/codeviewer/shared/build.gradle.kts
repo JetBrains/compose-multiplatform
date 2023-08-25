@@ -66,7 +66,7 @@ kotlin {
 
 android {
     compileSdk = 34
-    namespace = "org.jetbrains.codeviewer.shared"
+    namespace = "org.jetbrains.codeviewer.common"
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res", "src/commonMain/resources")
     defaultConfig {

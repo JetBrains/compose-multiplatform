@@ -6,7 +6,7 @@ plugins {
 
 android {
     compileSdk = 34
-    namespace = "org.jetbrains.issues"
+    namespace = "com.example.myapplication"
 
     defaultConfig {
         minSdk = 26
