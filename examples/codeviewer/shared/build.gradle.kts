@@ -9,7 +9,7 @@ plugins {
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    android()
+    androidTarget()
 
     jvm("desktop")
 
@@ -38,9 +38,9 @@ kotlin {
         val androidMain by getting {
             kotlin.srcDirs("src/jvmMain/kotlin")
             dependencies {
-                api("androidx.activity:activity-compose:1.6.1")
+                api("androidx.activity:activity-compose:1.7.2")
                 api("androidx.appcompat:appcompat:1.6.1")
-                api("androidx.core:core-ktx:1.9.0")
+                api("androidx.core:core-ktx:1.10.1")
             }
         }
         val iosMain by creating {
@@ -66,14 +66,17 @@ kotlin {
 
 android {
     compileSdk = 34
+    namespace = "org.jetbrains.codeviewer.common"
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res", "src/commonMain/resources")
     defaultConfig {
         minSdk = 26
-        targetSdk = 34
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    kotlin {
+        jvmToolchain(11)
     }
 }

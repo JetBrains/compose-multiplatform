@@ -5,7 +5,7 @@ plugins {
 }
 
 kotlin {
-    android()
+    androidTarget()
     sourceSets {
         val androidMain by getting {
             dependencies {
@@ -17,6 +17,7 @@ kotlin {
 
 android {
     compileSdk = 34
+    namespace = "org.jetbrains.codeviewer"
     defaultConfig {
         applicationId = "org.jetbrains.Codeviewer"
         minSdk = 26
@@ -27,5 +28,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    kotlin {
+        jvmToolchain(11)
     }
 }

@@ -6,21 +6,24 @@ plugins {
 
 android {
     compileSdk = 34
+    namespace = "com.example.myapplication"
 
     defaultConfig {
         minSdk = 26
         targetSdk = 34
+        applicationId = "org.jetbrains.Issues"
         versionCode = 1
         versionName = "1.0"
     }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    kotlin {
+        jvmToolchain(11)
     }
 }
 
 dependencies {
     implementation(project(":common"))
-    implementation("androidx.activity:activity-compose:1.5.0")
 }
