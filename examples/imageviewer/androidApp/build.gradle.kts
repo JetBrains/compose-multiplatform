@@ -18,9 +18,9 @@ kotlin {
 
 android {
     compileSdk = 34
-    namespace = "org.jetbrains.imageviewer"
+    namespace = "example.imageviewer"
     defaultConfig {
-        applicationId = "org.jetbrains.imageviewer.Imageviewer"
+        applicationId = "example.imageviewer.Imageviewer"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

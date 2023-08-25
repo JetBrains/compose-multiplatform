@@ -86,7 +86,7 @@ kotlin {
 
 android {
     compileSdk = 34
-    namespace = "org.jetbrains.imageviewer.shared"
+    namespace = "example.imageviewer.shared"
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
