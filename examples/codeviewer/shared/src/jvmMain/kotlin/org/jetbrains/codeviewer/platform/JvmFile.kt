@@ -65,7 +65,9 @@ fun java.io.File.toProjectFile(): File = object : File {
 
             override fun get(index: Int): String {
                 val position = lineRange(index)
-                val slice = byteBuffer.slice(position.first, position.last - position.first)
+                byteBuffer.position(position.first)
+                val slice = byteBuffer.slice()
+                slice.limit(position.last - position.first)
                 return StandardCharsets.UTF_8.decode(slice).toString()
             }
 
