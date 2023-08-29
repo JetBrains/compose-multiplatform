@@ -14,6 +14,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "compose-in-uikit"
+rootProject.name = "compose-in-swiftui"
 
 include(":shared")

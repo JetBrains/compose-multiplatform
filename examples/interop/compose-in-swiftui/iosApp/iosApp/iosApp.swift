@@ -8,7 +8,7 @@ let gradient = LinearGradient(
         startPoint: .topLeading, endPoint: .bottomTrailing
 )
 
-//@main
+@main
 struct iOSApp: App {
 	var body: some Scene {
 		WindowGroup {
@@ -20,7 +20,6 @@ struct iOSApp: App {
                     .tabItem { Label("Settings", systemImage: "gear") }
                 
             }
-            .accentColor(Color(red: 0.671, green: 0.365, blue: 0.792)).preferredColorScheme(.light)
 		}
 	}
 }
