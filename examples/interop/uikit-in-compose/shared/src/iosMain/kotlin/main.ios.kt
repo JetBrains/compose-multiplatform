@@ -1,4 +1,4 @@
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
@@ -8,29 +8,23 @@ import androidx.compose.ui.interop.UIKitView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.ComposeUIViewController
 import kotlinx.cinterop.ExperimentalForeignApi
-import platform.UIKit.UIView
+import platform.MapKit.MKMapView
 import platform.UIKit.UIViewController
 
 @OptIn(ExperimentalForeignApi::class)
-fun ComposeWithUIKitView(createUIView: () -> UIView): UIViewController =
+fun ComposeEntryPoint(): UIViewController =
     ComposeUIViewController {
-        Column {
-            Text("How to use SwiftUI inside UIView inside Compose")
-            UIKitView(
-                factory = createUIView,
-                modifier = Modifier.size(300.dp),
-            )
-        }
-    }
-
-fun ComposeOnly(): UIViewController =
-    ComposeUIViewController {
-        Box(
-            Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)
-                .background(Color.LightGray)
+        Column(
+            Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.systemBars),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("top", Modifier.align(Alignment.TopCenter))
-            Text("ComposeOnly", Modifier.align(Alignment.Center))
-            Text("bottom", Modifier.align(Alignment.BottomCenter))
+            Text("How to use UIKitView inside Compose")
+            UIKitView(
+                factory = { MKMapView() },
+                modifier = Modifier.size(300.dp).border(2.dp, Color.Blue),
+                update = {},
+            )
         }
     }

@@ -14,6 +14,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "compose-in-uikit"
+rootProject.name = "uikit-in-compose"
 
 include(":shared")
