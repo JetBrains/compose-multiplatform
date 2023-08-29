@@ -5,7 +5,7 @@ import MapKit
 
 struct ComposeViewControllerToSwiftUI: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        return Main_iosKt.ComposeWithUIKitView(createUIView: { () -> UIView in
+        return Main_iosKt.ComposeEntryPointWithUIView(createUIView: { () -> UIView in
             SwiftUIInUIView(
                 content: VStack {
                     Text("SwiftUI in Compose")
@@ -18,7 +18,7 @@ struct ComposeViewControllerToSwiftUI: UIViewControllerRepresentable {
     }
 }
 
-class SwiftUIInUIView<Content: View>: UIView {
+private class SwiftUIInUIView<Content: View>: UIView {
 
     init(content: Content) {
         super.init(frame: CGRect())

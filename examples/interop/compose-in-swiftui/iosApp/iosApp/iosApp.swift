@@ -5,7 +5,7 @@ struct iOSApp: App {
 	var body: some Scene {
 		WindowGroup {
 			TabView {
-                ComposeInsideSwiftUIScreen()
+                ComposeInSwiftUIScreen()
                     .tabItem { Label("Compose in SwiftUI", systemImage: "star.fill") }
 
                 YetAnotherSwiftUIScreen()

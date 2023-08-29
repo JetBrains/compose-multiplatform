@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ComposeInsideSwiftUIScreen: View {
+struct ComposeInSwiftUIScreen: View {
     var body: some View {
         ZStack {
             ComposeLayer()

@@ -1,4 +1,4 @@
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
@@ -12,25 +12,18 @@ import platform.UIKit.UIView
 import platform.UIKit.UIViewController
 
 @OptIn(ExperimentalForeignApi::class)
-fun ComposeWithUIKitView(createUIView: () -> UIView): UIViewController =
+fun ComposeEntryPointWithUIView(createUIView: () -> UIView): UIViewController =
     ComposeUIViewController {
-        Column {
-            Text("How to use SwiftUI inside UIView inside Compose")
+        Column(
+            Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.systemBars),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("How to use SwiftUI inside Compose")
             UIKitView(
                 factory = createUIView,
-                modifier = Modifier.size(300.dp),
+                modifier = Modifier.size(300.dp).border(2.dp, Color.Blue),
             )
-        }
-    }
-
-fun ComposeOnly(): UIViewController =
-    ComposeUIViewController {
-        Box(
-            Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)
-                .background(Color.LightGray)
-        ) {
-            Text("top", Modifier.align(Alignment.TopCenter))
-            Text("ComposeOnly", Modifier.align(Alignment.Center))
-            Text("bottom", Modifier.align(Alignment.BottomCenter))
         }
     }
