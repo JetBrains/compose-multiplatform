@@ -5,7 +5,7 @@ import MapKit
 
 struct ComposeViewControllerInSwiftUI: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
-        return Main_iosKt.ComposeOnly()
+        return Main_iosKt.ComposeEntryPoint()
     }
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
