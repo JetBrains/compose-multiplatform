@@ -10,7 +10,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)], for: .normal)
 
-        let composeViewController = Main_iosKt.ComposeOnly()
+        let composeViewController = Main_iosKt.ComposeEntryPoint()
         composeViewController.title = "Compose inside UIKit"
 
         let anotherViewController = UIKitViewController()
@@ -42,10 +42,11 @@ class UIKitViewController: UIViewController {
         super.viewDidLoad()
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Hello, this is UIKitViewController"
+        label.text = "UIKitViewController"
         label.textAlignment = .center
         label.numberOfLines = 0
         view.addSubview(label)
+        view.backgroundColor = .lightGray
 
         NSLayoutConstraint.activate([
             label.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),

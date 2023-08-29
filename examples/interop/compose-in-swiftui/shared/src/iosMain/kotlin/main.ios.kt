@@ -25,7 +25,7 @@ private fun ComposeApp() { // This function also may be placed in commonMain sou
                     .background(Color.Green.copy(alpha = 0.3f))
             ) {
                 Text("top", Modifier.align(Alignment.TopCenter))
-                Text("ComposeOnly", Modifier.align(Alignment.Center))
+                Text("ComposeApp", Modifier.align(Alignment.Center))
                 Text("bottom", Modifier.align(Alignment.BottomCenter))
             }
         }
