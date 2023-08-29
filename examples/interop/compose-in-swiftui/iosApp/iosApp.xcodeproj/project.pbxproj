@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1848810122D49D4AD3668D91 /* ComposeViewControllerToSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18488656503C85EEDA66341D /* ComposeViewControllerToSwiftUI.swift */; };
-		184881FBE98BA5BF02A0A186 /* GradientTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1848892FA748717E4087E7D7 /* GradientTemplate.swift */; };
+		1848810122D49D4AD3668D91 /* ComposeViewControllerInSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18488656503C85EEDA66341D /* ComposeViewControllerInSwiftUI.swift */; };
+		184881FBE98BA5BF02A0A186 /* ScreenTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1848892FA748717E4087E7D7 /* ScreenTemplate.swift */; };
 		1848823F43E447F9A8B4AC7C /* YetAnotherSwiftUIScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18488451271FAAD8FA34A2FB /* YetAnotherSwiftUIScreen.swift */; };
 		184882D8AF2A7A3642004010 /* ComposeInsideSwiftUIScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18488CAB0978B80826E5BBB4 /* ComposeInsideSwiftUIScreen.swift */; };
 		2152FB042600AC8F00CF470E /* iosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iosApp.swift */; };
@@ -16,8 +16,8 @@
 
 /* Begin PBXFileReference section */
 		18488451271FAAD8FA34A2FB /* YetAnotherSwiftUIScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YetAnotherSwiftUIScreen.swift; sourceTree = "<group>"; };
-		18488656503C85EEDA66341D /* ComposeViewControllerToSwiftUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeViewControllerToSwiftUI.swift; sourceTree = "<group>"; };
-		1848892FA748717E4087E7D7 /* GradientTemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradientTemplate.swift; sourceTree = "<group>"; };
+		18488656503C85EEDA66341D /* ComposeViewControllerInSwiftUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeViewControllerInSwiftUI.swift; sourceTree = "<group>"; };
+		1848892FA748717E4087E7D7 /* ScreenTemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ScreenTemplate.swift; sourceTree = "<group>"; };
 		18488CAB0978B80826E5BBB4 /* ComposeInsideSwiftUIScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeInsideSwiftUIScreen.swift; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosApp.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* ComposeInSwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ComposeInSwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -58,10 +58,10 @@
 			children = (
 				7555FF8C242A565B00829871 /* Info.plist */,
 				2152FB032600AC8F00CF470E /* iosApp.swift */,
-				18488656503C85EEDA66341D /* ComposeViewControllerToSwiftUI.swift */,
+				18488656503C85EEDA66341D /* ComposeViewControllerInSwiftUI.swift */,
 				18488CAB0978B80826E5BBB4 /* ComposeInsideSwiftUIScreen.swift */,
 				18488451271FAAD8FA34A2FB /* YetAnotherSwiftUIScreen.swift */,
-				1848892FA748717E4087E7D7 /* GradientTemplate.swift */,
+				1848892FA748717E4087E7D7 /* ScreenTemplate.swift */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -165,10 +165,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				2152FB042600AC8F00CF470E /* iosApp.swift in Sources */,
-				1848810122D49D4AD3668D91 /* ComposeViewControllerToSwiftUI.swift in Sources */,
+				1848810122D49D4AD3668D91 /* ComposeViewControllerInSwiftUI.swift in Sources */,
 				184882D8AF2A7A3642004010 /* ComposeInsideSwiftUIScreen.swift in Sources */,
 				1848823F43E447F9A8B4AC7C /* YetAnotherSwiftUIScreen.swift in Sources */,
-				184881FBE98BA5BF02A0A186 /* GradientTemplate.swift in Sources */,
+				184881FBE98BA5BF02A0A186 /* ScreenTemplate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

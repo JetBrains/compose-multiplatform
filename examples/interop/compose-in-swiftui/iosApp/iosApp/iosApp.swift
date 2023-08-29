@@ -14,10 +14,10 @@ struct iOSApp: App {
 		WindowGroup {
 			TabView {
                 ComposeInsideSwiftUIScreen()
-                    .tabItem { Label("Group Chat", systemImage: "rectangle.3.group.bubble.left") }
+                    .tabItem { Label("Compose in SwiftUI", systemImage: "star.fill") }
 
                 YetAnotherSwiftUIScreen()
-                    .tabItem { Label("Settings", systemImage: "gear") }
+                    .tabItem { Label("SwiftUI", systemImage: "gear") }
                 
             }
 		}

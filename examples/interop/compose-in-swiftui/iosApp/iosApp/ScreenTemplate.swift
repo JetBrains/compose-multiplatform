@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct GradientTemplate<Content: View>: View {
+struct ScreenTemplate<Content: View>: View {
     var title: String
     var content: () -> Content
 
@@ -8,13 +8,11 @@ struct GradientTemplate<Content: View>: View {
         NavigationView {
             ZStack {
                 VStack {
-                    gradient.ignoresSafeArea(edges: .top).frame(height: 0)
                     Spacer()
                 }
                 content()
                 VStack {
                     Spacer()
-                    Rectangle().frame(height: 0).background(gradient)
                 }
             }
                     .navigationTitle(title)

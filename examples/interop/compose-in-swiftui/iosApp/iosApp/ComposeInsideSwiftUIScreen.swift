@@ -14,27 +14,25 @@ struct ComposeInsideSwiftUIScreen: View {
 
 struct ComposeLayer: View {
     var body: some View {
-        GradientTemplate(title: "The Composers Chat") {
-            ComposeViewControllerToSwiftUI()
+        ScreenTemplate(title: "Compose in SwiftUI") {
+            ComposeViewControllerInSwiftUI()
                 .ignoresSafeArea(.keyboard) // Compose have own keyboard handler
         }
     }
 }
 
 struct TextInputLayer: View {
-    @State private var textState: String = ""
+    @State private var textState: String = "Example of SwiftUI view overlaying the Compose"
     @FocusState private var textFieldFocused: Bool
 
     var body: some View {
         VStack {
             Spacer()
-            HStack {
+            VStack {
                 TextField("Type message...", text: $textState, axis: .vertical)
                         .focused($textFieldFocused)
                         .lineLimit(3)
-                if (!textState.isEmpty) {
-                }
-            }.padding(15).background(RoundedRectangle(cornerRadius: 200).fill(.white).opacity(0.95)).padding(15)
+            }.padding(12).background(RoundedRectangle(cornerRadius: 10).colorInvert().opacity(0.6)).padding(32)
         }
     }
 }
