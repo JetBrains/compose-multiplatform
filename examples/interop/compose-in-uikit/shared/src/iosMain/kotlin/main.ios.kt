@@ -12,7 +12,7 @@ import platform.UIKit.UIView
 import platform.UIKit.UIViewController
 
 @OptIn(ExperimentalForeignApi::class)
-fun ComposeWithUIKitView(createUIView: () -> UIView) =
+fun ComposeWithUIKitView(createUIView: () -> UIView): UIViewController =
     ComposeUIViewController {
         Column {
             Text("How to use SwiftUI inside UIView inside Compose")
@@ -23,13 +23,14 @@ fun ComposeWithUIKitView(createUIView: () -> UIView) =
         }
     }
 
-fun ComposeOnly() = ComposeUIViewController {
-    Box(
-        Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)
-            .background(Color.LightGray)
-    ) {
-        Text("top", Modifier.align(Alignment.TopCenter))
-        Text("ComposeOnly", Modifier.align(Alignment.Center))
-        Text("bottom", Modifier.align(Alignment.BottomCenter))
+fun ComposeOnly(): UIViewController =
+    ComposeUIViewController {
+        Box(
+            Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)
+                .background(Color.LightGray)
+        ) {
+            Text("top", Modifier.align(Alignment.TopCenter))
+            Text("ComposeOnly", Modifier.align(Alignment.Center))
+            Text("bottom", Modifier.align(Alignment.BottomCenter))
+        }
     }
-}
