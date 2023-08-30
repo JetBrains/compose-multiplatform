@@ -1,6 +1,10 @@
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,6 +29,15 @@ fun ComposeEntryPoint(): UIViewController =
                 factory = { MKMapView() },
                 modifier = Modifier.size(300.dp).border(2.dp, Color.Blue),
                 update = {},
+            )
+
+            Spacer(Modifier.size(20.dp))
+
+            var text: String by remember { mutableStateOf("This is iOS UITextField inside Compose") }
+            ComposeUITextField(
+                text,
+                { text = it },
+                Modifier.padding(4.dp).fillMaxWidth().height(30.dp).border(2.dp, Color.Blue)
             )
         }
     }
