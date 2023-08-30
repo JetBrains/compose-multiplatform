@@ -1,6 +1,6 @@
 # Compose in SwiftUI
 
-Example shows how to use Compose inside iOS Application written in SwiftUI.
+This example shows how to use Compose inside an iOS Application written in SwiftUI.
 
 Entry point is `struct iOSApp` in file [iosApp.swift](iosApp%2FiosApp%2FiosApp.swift).
 
