@@ -16,7 +16,7 @@ struct ComposeLayer: View {
     var body: some View {
         ScreenTemplate(title: "Compose in SwiftUI") {
             ComposeViewControllerInSwiftUI()
-                .ignoresSafeArea(.keyboard) // Compose have own keyboard handler
+                .ignoresSafeArea(.keyboard) // Compose has its own keyboard handler
         }
     }
 }
