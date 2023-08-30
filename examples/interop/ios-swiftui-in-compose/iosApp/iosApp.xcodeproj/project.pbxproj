@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1848810122D49D4AD3668D91 /* ComposeViewControllerToSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18488656503C85EEDA66341D /* ComposeViewControllerToSwiftUI.swift */; };
+		1848810122D49D4AD3668D91 /* ComposeViewControllerRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18488656503C85EEDA66341D /* ComposeViewControllerRepresentable.swift */; };
 		2152FB042600AC8F00CF470E /* iosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iosApp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		18488656503C85EEDA66341D /* ComposeViewControllerToSwiftUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeViewControllerToSwiftUI.swift; sourceTree = "<group>"; };
+		18488656503C85EEDA66341D /* ComposeViewControllerRepresentable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeViewControllerRepresentable.swift; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosApp.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* SwiftUIInCompose.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUIInCompose.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -52,7 +52,7 @@
 			children = (
 				7555FF8C242A565B00829871 /* Info.plist */,
 				2152FB032600AC8F00CF470E /* iosApp.swift */,
-				18488656503C85EEDA66341D /* ComposeViewControllerToSwiftUI.swift */,
+				18488656503C85EEDA66341D /* ComposeViewControllerRepresentable.swift */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -156,7 +156,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2152FB042600AC8F00CF470E /* iosApp.swift in Sources */,
-				1848810122D49D4AD3668D91 /* ComposeViewControllerToSwiftUI.swift in Sources */,
+				1848810122D49D4AD3668D91 /* ComposeViewControllerRepresentable.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

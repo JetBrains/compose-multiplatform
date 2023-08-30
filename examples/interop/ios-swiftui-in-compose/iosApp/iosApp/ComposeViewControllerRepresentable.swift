@@ -3,7 +3,7 @@ import SwiftUI
 import shared
 import MapKit
 
-struct ComposeViewControllerToSwiftUI: UIViewControllerRepresentable {
+struct ComposeViewControllerRepresentable: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {
         return Main_iosKt.ComposeEntryPointWithUIView(createUIView: { () -> UIView in
             SwiftUIInUIView(

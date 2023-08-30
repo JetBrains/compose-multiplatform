@@ -6,7 +6,7 @@ import UIKit
 struct iOSApp: App {
 	var body: some Scene {
 		WindowGroup {
-            ComposeViewControllerToSwiftUI()
+            ComposeViewControllerRepresentable()
 					.ignoresSafeArea(.all)
 		}
 	}
