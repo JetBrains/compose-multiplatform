@@ -29,7 +29,7 @@ struct TextInputLayer: View {
         VStack {
             Spacer()
             VStack {
-                TextField("Type message...", text: $textState, axis: .vertical)
+                TextField("empty TextField", text: $textState, axis: .vertical)
                         .focused($textFieldFocused)
                         .lineLimit(3)
             }.padding(12).background(RoundedRectangle(cornerRadius: 10).colorInvert().opacity(0.6)).padding(32)
