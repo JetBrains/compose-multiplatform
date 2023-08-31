@@ -40,6 +40,7 @@ Kotlin version | Minimal Compose version | Notes
 1.8.21 | 1.4.3
 1.8.22 | 1.4.3
 1.9.0 | 1.4.3
+1.9.0 | 1.5.0
 
 ### Using the latest Kotlin version 
 
