@@ -46,7 +46,13 @@ class UIKitViewController: UIViewController {
         label.textAlignment = .center
         label.numberOfLines = 0
         view.addSubview(label)
-        view.backgroundColor = .lightGray
+        view.backgroundColor = UIColor { collection in
+            switch collection.userInterfaceStyle {
+            case .light: return UIColor.white
+            case .dark: return UIColor.black
+            default: return UIColor.white
+            }
+        }
 
         NSLayoutConstraint.activate([
             label.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
