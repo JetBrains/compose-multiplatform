@@ -2,13 +2,13 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import de.undercouch.gradle.tasks.download.Download
 
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization")
-    id("com.gradle.plugin-publish")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.publish.plugin.portal)
     id("java-gradle-plugin")
     id("maven-publish")
-    id("com.github.johnrengelman.shadow") version "7.0.0"
-    id("de.undercouch.download") version "5.3.0"
+    alias(libs.plugins.shadow.jar)
+    alias(libs.plugins.download)
 }
 
 gradlePluginConfig {
@@ -35,7 +35,7 @@ tasks.named("compileKotlin") {
     dependsOn(buildConfig)
 }
 sourceSets.main.configure {
-    java.srcDir(buildConfigDir)
+    java.srcDir(buildConfig.flatMap { it.generatedOutputDir })
 }
 
 val embeddedDependencies by configurations.creating {
@@ -63,21 +63,23 @@ dependencies {
     testImplementation(gradleTestKit())
     testImplementation(kotlin("gradle-plugin-api"))
 
-    // include relocated download task to avoid potential runtime conflicts
-    embedded("de.undercouch:gradle-download-task:5.3.0")
-
-    embedded("org.jetbrains.kotlinx:kotlinx-serialization-json:${BuildProperties.serializationVersion}")
-    embedded("org.jetbrains.kotlinx:kotlinx-serialization-core:${BuildProperties.serializationVersion}")
-    embedded("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:${BuildProperties.serializationVersion}")
+    embedded(libs.download.task)
+    embedded(libs.serialization.json)
+    embedded(libs.serialization.core)
+    embedded(libs.serialization.core.jvm)
     embedded(project(":preview-rpc"))
     embedded(project(":jdk-version-probe"))
 }
 
+val packagesToRelocate = listOf("de.undercouch", "kotlinx.serialization")
+
 val shadow = tasks.named<ShadowJar>("shadowJar") {
-    val fromPackage = "de.undercouch"
-    val toPackage = "org.jetbrains.compose.$fromPackage"
-    relocate(fromPackage, toPackage)
-    archiveClassifier.set("shadow")
+    for (packageToRelocate in packagesToRelocate) {
+        relocate(packageToRelocate, "org.jetbrains.compose.internal.$packageToRelocate")
+    }
+    archiveBaseName.set("shadow")
+    archiveClassifier.set("")
+    archiveVersion.set("")
     configurations = listOf(embeddedDependencies)
     exclude("META-INF/gradle-plugins/de.undercouch.download.properties")
     exclude("META-INF/versions/**")
@@ -165,7 +167,7 @@ for (gradleVersion in supportedGradleVersions) {
 configureAllTests {
     dependsOn(":publishToMavenLocal")
     systemProperty("compose.tests.compose.gradle.plugin.version", BuildProperties.deployVersion(project))
-    val summaryDir = project.buildDir.resolve("test-summary")
+    val summaryDir = project.layout.buildDirectory.get().asFile.resolve("test-summary")
     systemProperty("compose.tests.summary.file", summaryDir.resolve("$name.md").absolutePath)
     systemProperties(project.properties.filter { it.key.startsWith("compose.") })
 }
