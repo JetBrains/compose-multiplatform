@@ -59,7 +59,8 @@ class TestProject(
             null
         } else {
             "-Porg.gradle.java.installations.paths=${testJdks.joinToString(",")}"
-        }
+        },
+        "-Porg.gradle.jvmargs=-Xmx=2g -XX:+UseParallelGC",
     )
 
     init {
