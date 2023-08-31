@@ -6,8 +6,7 @@
 package org.jetbrains.compose.internal.utils
 
 import org.gradle.api.Project
-import org.jetbrains.compose.ComposeMultiplatformBuildService
-import java.util.*
+import org.jetbrains.compose.internal.service.GradlePropertySnapshotService
 
 /**
  * Reads Kotlin Gradle plugin properties.
@@ -25,13 +24,13 @@ internal abstract class KGPPropertyProvider {
 
     class GradleProperties(private val project: Project) : KGPPropertyProvider() {
         override fun valueOrNull(propertyName: String): String? =
-            ComposeMultiplatformBuildService.getInstance(project).gradlePropertiesSnapshot[propertyName]
+            GradlePropertySnapshotService.getInstance(project).gradleProperties[propertyName]
         override val location: String = "gradle.properties"
     }
 
     class LocalProperties(private val project: Project) : KGPPropertyProvider() {
         override fun valueOrNull(propertyName: String): String? =
-            ComposeMultiplatformBuildService.getInstance(project).localPropertiesSnapshot[propertyName]
+            GradlePropertySnapshotService.getInstance(project).localProperties[propertyName]
         override val location: String = "local.properties"
     }
 }

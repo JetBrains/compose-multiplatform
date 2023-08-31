@@ -148,7 +148,7 @@ class GradlePluginTest : GradlePluginTestBase() {
         }
 
         fun testKotlinVersion(kotlinVersion: String) {
-            val args = arrayOf("build", "--dry-run")
+            val args = arrayOf("help")
             val commonPartOfWarning = "Compose Multiplatform Gradle plugin manages this property automatically"
             withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
                 gradle(*args).checks {
@@ -157,6 +157,11 @@ class GradlePluginTest : GradlePluginTestBase() {
                 }
             }
             withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
+                gradle(*args, "-Pkotlin.native.cacheKind=none").checks {
+                    check.logContainsOnce("Warning: 'kotlin.native.cacheKind' is explicitly set to 'none'")
+                    check.logContainsOnce(commonPartOfWarning)
+                }
+
                 gradle(*args, "-Pkotlin.native.cacheKind=none").checks {
                     check.logContainsOnce("Warning: 'kotlin.native.cacheKind' is explicitly set to 'none'")
                     check.logContainsOnce(commonPartOfWarning)

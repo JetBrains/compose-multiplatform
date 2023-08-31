@@ -6,9 +6,9 @@
 package org.jetbrains.compose.experimental.internal
 
 import org.gradle.api.Project
-import org.jetbrains.compose.ComposeMultiplatformBuildService
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
+import org.jetbrains.compose.internal.service.ConfigurationProblemReporterService
 import org.jetbrains.compose.internal.utils.KGPPropertyProvider
 import org.jetbrains.compose.internal.utils.configureEachWithType
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -59,11 +59,10 @@ private fun KotlinNativeTarget.checkExplicitCacheKind() {
         for (provider in propertyProviders) {
             val value = provider.valueOrNull(cacheKindProperty)
             if (value != null) {
-                ComposeMultiplatformBuildService
-                    .getInstance(project)
-                    .warnOnceAfterBuild(
-                        explicitCacheKindWarningMessage(cacheKindProperty, value, provider)
-                    )
+                ConfigurationProblemReporterService.reportProblem(
+                    project,
+                    explicitCacheKindWarningMessage(cacheKindProperty, value, provider)
+                )
                 return
             }
         }

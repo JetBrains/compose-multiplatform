@@ -1,0 +1,39 @@
+plugins {
+    id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.compose"
+}
+
+repositories {
+    google()
+    jetbrainsCompose()
+}
+
+kotlin {
+    def platforms = project.property("platforms").split(",")
+    if (platforms.contains("jvm")) {
+        jvm()
+    }
+    if (platforms.contains("js")) {
+        js(IR) {
+            browser()
+            binaries.executable()
+        }
+    }
+    if (platforms.contains("ios")) {
+        ios()
+    }
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation compose.runtime
+                implementation compose.material
+                implementation compose.foundation
+            }
+        }
+    }
+}
+
+compose {
+    kotlinCompilerPlugin.set(COMPOSE_COMPILER_PLUGIN_PLACEHOLDER)
+}
