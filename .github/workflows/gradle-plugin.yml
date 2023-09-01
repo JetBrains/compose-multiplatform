@@ -29,8 +29,8 @@ jobs:
         shell: bash
         run: |
           cd gradle-plugins
-          ./gradlew assemble
-          ./gradlew :compose:check --continue
+          ./gradlew assemble testClasses --no-daemon
+          ./gradlew :compose:check --continue -Porg.gradle.jvmargs=-Xmx=256m -Pkotlin.daemon.jvmargs=-Xmx=512m
       - name: Print summary
         shell: bash
         if: always()
