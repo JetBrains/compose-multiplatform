@@ -10,6 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-20.04, macos-12, windows-2022]
+        gradle: [7.3.3, 8.3]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -22,7 +23,7 @@ jobs:
         run: |
           cd gradle-plugins
           ./gradlew assemble
-          ./gradlew :compose:check --continue
+          ./gradlew --continue :preview-rpc:test :compose:test :compose:testGradle-${{ matrix.gradle }}
       - name: Print summary
         shell: bash
         if: always()
