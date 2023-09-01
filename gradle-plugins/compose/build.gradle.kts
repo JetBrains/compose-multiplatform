@@ -71,10 +71,12 @@ dependencies {
     embedded(project(":jdk-version-probe"))
 }
 
+val packagesToRelocate = listOf("de.undercouch", "kotlinx.serialization")
+
 val shadow = tasks.named<ShadowJar>("shadowJar") {
-    val fromPackage = "de.undercouch"
-    val toPackage = "org.jetbrains.compose.$fromPackage"
-    relocate(fromPackage, toPackage)
+    for (packageToRelocate in packagesToRelocate) {
+        relocate(packageToRelocate, "org.jetbrains.compose.internal.$packageToRelocate")
+    }
     archiveBaseName.set("shadow")
     archiveClassifier.set("")
     archiveVersion.set("")
