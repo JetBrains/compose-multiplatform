@@ -148,8 +148,27 @@ for (jdkVersion in jdkVersionsForTests) {
     downloadJdksForTests.dependsOn(unpackJdkTask)
 }
 
+abstract class LimitParallelismBuildService : BuildService<BuildServiceParameters.None>
+abstract class LimitedParallelismTest : Test() {
+    @get:Internal
+    abstract val limitParallelismBuildService: Property<LimitParallelismBuildService>
+}
+
+val gradleTestsParallelismLimit = gradle.sharedServices.registerIfAbsent("compose-gradle-tests-parallelism-limit", LimitParallelismBuildService::class.java) {
+    val maxParallelTests = project.providers
+        .gradleProperty("compose.tests.gradle.maxParallelIntegrationTestTasks")
+        .orNull
+        ?.toIntOrNull()
+    if (maxParallelTests != null) {
+        maxParallelUsages.set(maxParallelTests)
+    }
+}
+
 for (gradleVersion in supportedGradleVersions) {
-    tasks.registerVerificationTask<Test>("testGradle-${gradleVersion.version}") {
+    tasks.registerVerificationTask<LimitedParallelismTest>("testGradle-${gradleVersion.version}") {
+        limitParallelismBuildService.set(gradleTestsParallelismLimit)
+        usesService(gradleTestsParallelismLimit)
+
         classpath = tasks.test.get().classpath
 
         dependsOn(downloadJdksForTests)

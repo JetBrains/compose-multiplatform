@@ -17,6 +17,14 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: '17'
+      - name: Limit Parallelism for integration tests on Windows
+        shell: bash
+#       GH Linux & Windows Agents have 7 Gb RAM.
+#       That's enough for simultaneous testing two versions of Gradle on Linux,
+#       but Windows agents fail
+        if: runner.os == 'Windows'
+        run: |
+          echo "compose.tests.gradle.maxParallelIntegrationTestTasks=1" >> gradle-plugins/gradle.properties
       - name: Test Gradle plugin
         shell: bash
         run: |
