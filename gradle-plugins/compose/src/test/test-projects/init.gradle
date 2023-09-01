@@ -7,4 +7,13 @@ allprojects {
         }
         google()
     }
+
+    plugins.withId("org.jetbrains.kotlin.multiplatform") {
+        // Workaround for yarn concurrency issue - https://youtrack.jetbrains.com/issue/KT-43320
+        tasks.configureEach {
+            if (name == "kotlinNpmInstall") {
+                args.addAll(["--mutex", "file:${file(project.getProperty("compose.tests.yarn.mutex.file"))}".toString()])
+            }
+        }
+    }
 }

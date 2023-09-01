@@ -61,6 +61,7 @@ class TestProject(
             "-Porg.gradle.java.installations.paths=${testJdks.joinToString(",")}"
         },
         "-Porg.gradle.jvmargs=-Xmx=2g -XX:+UseParallelGC",
+        "-Pcompose.tests.yarn.mutex.file=${System.getProperty("compose.tests.yarn.mutex.file")}"
     )
 
     init {

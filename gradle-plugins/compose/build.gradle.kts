@@ -167,8 +167,10 @@ for (gradleVersion in supportedGradleVersions) {
 configureAllTests {
     dependsOn(":publishToMavenLocal")
     systemProperty("compose.tests.compose.gradle.plugin.version", BuildProperties.deployVersion(project))
-    val summaryDir = project.layout.buildDirectory.get().asFile.resolve("test-summary")
+    val buildDir = project.layout.buildDirectory.get().asFile
+    val summaryDir = buildDir.resolve("test-summary")
     systemProperty("compose.tests.summary.file", summaryDir.resolve("$name.md").absolutePath)
+    systemProperty("compose.tests.yarn.mutex.file", buildDir.resolve("yarn-mutex"))
     systemProperties(project.properties.filter { it.key.startsWith("compose.") })
 }
 
