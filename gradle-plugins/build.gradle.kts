@@ -34,6 +34,7 @@ subprojects {
             // which is bundled to the oldest supported Gradle
             kotlinOptions.languageVersion = "1.5"
             kotlinOptions.apiVersion = "1.5"
+            kotlinOptions.jvmTarget = "1.8"
         }
     }
 
