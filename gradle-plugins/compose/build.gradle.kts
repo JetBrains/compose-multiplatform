@@ -75,7 +75,9 @@ val shadow = tasks.named<ShadowJar>("shadowJar") {
     val fromPackage = "de.undercouch"
     val toPackage = "org.jetbrains.compose.$fromPackage"
     relocate(fromPackage, toPackage)
-    archiveClassifier.set("shadow")
+    archiveBaseName.set("shadow")
+    archiveClassifier.set("")
+    archiveVersion.set("")
     configurations = listOf(embeddedDependencies)
     exclude("META-INF/gradle-plugins/de.undercouch.download.properties")
     exclude("META-INF/versions/**")
