@@ -136,7 +136,7 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
         val args = arrayListOf<String>().apply {
             val maxHeapSize = maxHeapSize.orNull
             if (maxHeapSize != null) {
-                add("-Xmx:$maxHeapSize")
+                add("-Xmx$maxHeapSize")
             }
             cliArg("-cp", proguardFiles.map { it.normalizedPath() }.joinToString(File.pathSeparator))
             add("proguard.ProGuard")

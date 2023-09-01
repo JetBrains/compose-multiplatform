@@ -30,6 +30,7 @@ compose.desktop {
 
         buildTypes.release.proguard {
             configurationFiles.from("rules.pro")
+            maxHeapSize.set("256m")
         }
     }
 }
