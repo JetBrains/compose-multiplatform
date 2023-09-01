@@ -35,7 +35,7 @@ tasks.named("compileKotlin") {
     dependsOn(buildConfig)
 }
 sourceSets.main.configure {
-    java.srcDir(buildConfigDir)
+    java.srcDir(buildConfig.flatMap { it.generatedOutputDir })
 }
 
 val embeddedDependencies by configurations.creating {
@@ -165,7 +165,7 @@ for (gradleVersion in supportedGradleVersions) {
 configureAllTests {
     dependsOn(":publishToMavenLocal")
     systemProperty("compose.tests.compose.gradle.plugin.version", BuildProperties.deployVersion(project))
-    val summaryDir = project.buildDir.resolve("test-summary")
+    val summaryDir = project.layout.buildDirectory.get().asFile.resolve("test-summary")
     systemProperty("compose.tests.summary.file", summaryDir.resolve("$name.md").absolutePath)
     systemProperties(project.properties.filter { it.key.startsWith("compose.") })
 }
