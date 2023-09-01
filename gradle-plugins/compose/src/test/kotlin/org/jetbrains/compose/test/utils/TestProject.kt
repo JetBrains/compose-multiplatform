@@ -60,11 +60,13 @@ class TestProject(
         } else {
             "-Porg.gradle.java.installations.paths=${testJdks.joinToString(",")}"
         },
-        "-Porg.gradle.jvmargs=-Xmx=1g -XX:+UseSerialGC",
+        "-Porg.gradle.jvmargs=-Xmx=256m -XX:+UseSerialGC",
         "-Pkotlin.daemon.jvmargs=-Xmx=512m -XX:+UseSerialGC",
         // compile in-process, when a non-default Kotlin version is used, to avoid creating lots of Kotlin daemons,
         // which waste limited RAM on CI
-        "-Pkotlin.compiler.execution.strategy=in-process".takeIf { testEnvironment.kotlinVersion != TestKotlinVersions.Default },
+        "-Pkotlin.compiler.execution.strategy=out-of-process".takeIf { testEnvironment.kotlinVersion != TestKotlinVersions.Default },
+        "-Pkotlin.native.disableCompilerDaemon=true",
+        "-Pkotlin.native.jvmArgs=-Xmx1g -XX:+UseSerialGC",
         "-Pcompose.tests.yarn.mutex.file=${System.getProperty("compose.tests.yarn.mutex.file")}",
     )
 
