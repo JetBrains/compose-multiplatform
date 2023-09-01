@@ -1,0 +1,17 @@
+[versions]
+kotlin = "1.7.20"
+gradle-download-plugin = "5.3.0"
+kotlinx-serialization = "1.2.1"
+
+[libraries]
+download-task = { module = "de.undercouch:gradle-download-task", version.ref = "gradle-download-plugin" }
+serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+serialization-core-jvm = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core-jvm", version.ref = "kotlinx-serialization" }
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+shadow-jar = "com.github.johnrengelman.shadow:7.0.0"
+download = { id = "de.undercouch.download", version.ref = "gradle-download-plugin" }
+publish-plugin-portal = "com.gradle.plugin-publish:0.17.0"

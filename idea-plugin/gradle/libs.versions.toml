@@ -1,0 +1,9 @@
+[versions]
+kotlin =  "1.5.10"
+
+[libraries]
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+intellij-sdk = "org.jetbrains.intellij:1.12.0"
+intellij-changelog = "org.jetbrains.changelog:1.3.1"

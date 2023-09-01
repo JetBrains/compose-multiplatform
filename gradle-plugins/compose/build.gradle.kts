@@ -2,13 +2,13 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import de.undercouch.gradle.tasks.download.Download
 
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization")
-    id("com.gradle.plugin-publish")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.publish.plugin.portal)
     id("java-gradle-plugin")
     id("maven-publish")
-    id("com.github.johnrengelman.shadow") version "7.0.0"
-    id("de.undercouch.download") version "5.3.0"
+    alias(libs.plugins.shadow.jar)
+    alias(libs.plugins.download)
 }
 
 gradlePluginConfig {
@@ -63,12 +63,10 @@ dependencies {
     testImplementation(gradleTestKit())
     testImplementation(kotlin("gradle-plugin-api"))
 
-    // include relocated download task to avoid potential runtime conflicts
-    embedded("de.undercouch:gradle-download-task:5.3.0")
-
-    embedded("org.jetbrains.kotlinx:kotlinx-serialization-json:${BuildProperties.serializationVersion}")
-    embedded("org.jetbrains.kotlinx:kotlinx-serialization-core:${BuildProperties.serializationVersion}")
-    embedded("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:${BuildProperties.serializationVersion}")
+    embedded(libs.download.task)
+    embedded(libs.serialization.json)
+    embedded(libs.serialization.core)
+    embedded(libs.serialization.core.jvm)
     embedded(project(":preview-rpc"))
     embedded(project(":jdk-version-probe"))
 }
