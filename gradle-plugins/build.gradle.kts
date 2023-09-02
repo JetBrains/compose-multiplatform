@@ -2,10 +2,11 @@ import com.gradle.publish.PluginBundleExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
-    val kotlinVersion = "1.7.20"
-    kotlin("jvm") version kotlinVersion apply false
-    kotlin("plugin.serialization") version kotlinVersion apply false
-    id("com.gradle.plugin-publish") version "0.17.0" apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.publish.plugin.portal) apply false
+    alias(libs.plugins.shadow.jar) apply false
+    alias(libs.plugins.download) apply false
 }
 
 subprojects {
@@ -33,6 +34,7 @@ subprojects {
             // which is bundled to the oldest supported Gradle
             kotlinOptions.languageVersion = "1.5"
             kotlinOptions.apiVersion = "1.5"
+            kotlinOptions.jvmTarget = "1.8"
         }
     }
 
