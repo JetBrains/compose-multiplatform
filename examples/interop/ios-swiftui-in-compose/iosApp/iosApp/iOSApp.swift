@@ -4,10 +4,10 @@ import UIKit
 
 @main
 struct iOSApp: App {
-	var body: some Scene {
-		WindowGroup {
+    var body: some Scene {
+        WindowGroup {
             ComposeViewControllerRepresentable()
-					.ignoresSafeArea(.all)
-		}
-	}
+                .ignoresSafeArea(.all)
+        }
+    }
 }

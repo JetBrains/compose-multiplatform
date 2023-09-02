@@ -15,9 +15,9 @@ struct ScreenTemplate<Content: View>: View {
                     Spacer()
                 }
             }
-                    .navigationTitle(title)
-                    .navigationBarTitleDisplayMode(.inline)
-                    .statusBar(hidden: false)
+                .navigationTitle(title)
+                .navigationBarTitleDisplayMode(.inline)
+                .statusBar(hidden: false)
         }
     }
 }
