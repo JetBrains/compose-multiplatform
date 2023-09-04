@@ -24,8 +24,7 @@ struct iOSApp: App {
                     gradient.ignoresSafeArea(edges: .top).frame(height: 0)
                     Spacer()
                 }
-            }
-                .preferredColorScheme(.dark)
+            }.preferredColorScheme(.dark)
         }
     }
 }
