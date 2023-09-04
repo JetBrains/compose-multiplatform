@@ -10,8 +10,7 @@ struct iOSApp: App {
                 Color.white.ignoresSafeArea(.all) // status bar color
                 ComposeView()
                     .ignoresSafeArea(.all, edges: .bottom) // Compose has own keyboard handler
-            }
-                .preferredColorScheme(.light)
+            }.preferredColorScheme(.light)
         }
     }
 }
