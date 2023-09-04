@@ -5,19 +5,11 @@ struct ComposeInSwiftUIScreen: View {
         ZStack {
             ComposeLayer()
             TextInputLayer()
-        }.onTapGesture {
-            // Hide keyboard on tap outside of TextField
-            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
-    }
-}
-
-struct ComposeLayer: View {
-    var body: some View {
-        ScreenTemplate(title: "Compose in SwiftUI") {
-            ComposeViewControllerInSwiftUI()
-                .ignoresSafeArea(.keyboard) // Compose has its own keyboard handler
-        }
+            .onTapGesture {
+                // Hide keyboard on tap outside of TextField
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
     }
 }
 
@@ -30,9 +22,12 @@ struct TextInputLayer: View {
             Spacer()
             VStack {
                 TextField("empty TextField", text: $textState, axis: .vertical)
-                        .focused($textFieldFocused)
-                        .lineLimit(3)
-            }.padding(12).background(RoundedRectangle(cornerRadius: 10).colorInvert().opacity(0.6)).padding(32)
+                    .focused($textFieldFocused)
+                    .lineLimit(3)
+            }
+                .padding(12)
+                .background(RoundedRectangle(cornerRadius: 10).colorInvert().opacity(0.6))
+                .padding(32)
         }
     }
 }

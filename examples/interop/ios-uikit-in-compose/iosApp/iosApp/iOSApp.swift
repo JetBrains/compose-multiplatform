@@ -1,7 +1,16 @@
-import UIKit
 import SwiftUI
 import shared
-import MapKit
+import UIKit
+
+@main
+struct iOSApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ComposeViewControllerToSwiftUI()
+                .ignoresSafeArea(.all)
+        }
+    }
+}
 
 struct ComposeViewControllerToSwiftUI: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIViewController {

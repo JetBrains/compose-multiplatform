@@ -30,8 +30,8 @@ struct TextInputLayer: View {
             Spacer()
             HStack {
                 TextField("Type message...", text: $textState, axis: .vertical)
-                        .focused($textFieldFocused)
-                        .lineLimit(3)
+                    .focused($textFieldFocused)
+                    .lineLimit(3)
                 if (!textState.isEmpty) {
                     Button(action: {
                         sendMessage(textState)
