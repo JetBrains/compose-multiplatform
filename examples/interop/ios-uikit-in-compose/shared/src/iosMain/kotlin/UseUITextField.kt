@@ -37,7 +37,7 @@ fun UseUITextField() {
             )
             textField
         },
-        modifier = Modifier.padding(4.dp).fillMaxWidth().height(30.dp).border(2.dp, Color.Blue),
+        modifier = Modifier.fillMaxWidth().height(30.dp),
         update = { textField ->
             textField.text = message
         }
