@@ -23,19 +23,15 @@ fun ComposeEntryPoint(): UIViewController =
         ) {
             Text("How to use UIKitView inside Compose")
 
-            BlueBorder {
-                UIKitView(
-                    factory = { MKMapView() },
-                    modifier = Modifier.size(300.dp),
-                    update = {},
-                )
-            }
+            UIKitView(
+                factory = { MKMapView() },
+                modifier = Modifier.padding(4.dp).border(2.dp, Color.Blue).size(300.dp),
+                update = {},
+            )
 
             Spacer(Modifier.size(20.dp))
 
-            BlueBorder {
-                UseUITextField()
-            }
+            UseUITextField(Modifier.padding(4.dp).border(2.dp, Color.Blue))
         }
     }
 

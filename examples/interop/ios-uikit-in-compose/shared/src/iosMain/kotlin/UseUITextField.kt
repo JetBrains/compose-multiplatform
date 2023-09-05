@@ -20,7 +20,7 @@ import platform.UIKit.UITextField
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
-fun UseUITextField() {
+fun UseUITextField(modifier: Modifier = Modifier) {
     var message by remember { mutableStateOf("Hello, World!") }
     UIKitView(
         factory = {
@@ -37,7 +37,7 @@ fun UseUITextField() {
             )
             textField
         },
-        modifier = Modifier.fillMaxWidth().height(30.dp),
+        modifier = modifier.fillMaxWidth().height(30.dp),
         update = { textField ->
             textField.text = message
         }
