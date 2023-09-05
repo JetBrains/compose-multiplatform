@@ -1,0 +1,34 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
+plugins {
+    id "org.jetbrains.kotlin.multiplatform"
+    id "com.android.kotlin.multiplatform.library"
+    id "org.jetbrains.compose"
+}
+
+repositories {
+    jetbrainsCompose()
+    google()
+}
+
+kotlin {
+    targetHierarchy.default()
+
+    androidLibrary {
+        namespace = "com.google.samples.apps.diceroller.shared"
+        compileSdk = 34
+    }
+
+    jvm()
+
+    sourceSets {
+        getByName("commonMain") {
+            dependencies {
+                implementation(compose.ui)
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material3)
+            }
+        }
+    }
+}

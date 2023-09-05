@@ -87,7 +87,7 @@ class TestProject(
 
     private inline fun withGradleRunner(args: Array<out String>, runnerFn: GradleRunner.() -> BuildResult): BuildResult {
         if (testEnvironment.useGradleConfigurationCache) {
-            if (GradleVersion.version(TestProperties.gradleVersionForTests).baseVersion < GradleVersion.version("8.0")) {
+            if (TestProperties.gradleBaseVersionForTests < GradleVersion.version("8.0")) {
                 // Gradle 7.* does not use the configuration cache in the same build.
                 // In other words, if cache misses, Gradle performs configuration,
                 // but does not, use the serialized task graph.
@@ -167,4 +167,3 @@ class TestProject(
         }
     }
 }
-
