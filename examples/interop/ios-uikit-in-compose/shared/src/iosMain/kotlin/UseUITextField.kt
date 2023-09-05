@@ -1,14 +1,11 @@
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.interop.UIKitView
 import androidx.compose.ui.unit.dp
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -20,7 +17,7 @@ import platform.UIKit.UITextField
 
 @OptIn(ExperimentalForeignApi::class)
 @Composable
-fun UseUITextField() {
+fun UseUITextField(modifier: Modifier = Modifier) {
     var message by remember { mutableStateOf("Hello, World!") }
     UIKitView(
         factory = {
@@ -37,7 +34,7 @@ fun UseUITextField() {
             )
             textField
         },
-        modifier = Modifier.padding(4.dp).fillMaxWidth().height(30.dp).border(2.dp, Color.Blue),
+        modifier = modifier.fillMaxWidth().height(30.dp),
         update = { textField ->
             textField.text = message
         }

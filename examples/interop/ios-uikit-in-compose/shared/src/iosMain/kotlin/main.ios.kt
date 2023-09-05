@@ -1,6 +1,7 @@
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,14 +22,15 @@ fun ComposeEntryPoint(): UIViewController =
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text("How to use UIKitView inside Compose")
+
             UIKitView(
                 factory = { MKMapView() },
-                modifier = Modifier.size(300.dp).border(2.dp, Color.Blue),
+                modifier = Modifier.padding(4.dp).border(2.dp, Color.Blue).size(300.dp),
                 update = {},
             )
 
             Spacer(Modifier.size(20.dp))
 
-            UseUITextField()
+            UseUITextField(Modifier.padding(4.dp).border(2.dp, Color.Blue))
         }
     }
