@@ -8,6 +8,7 @@ package org.jetbrains.compose.test.utils
 object TestProjects {
     const val jvm = "application/jvm"
     const val mpp = "application/mpp"
+    const val newAndroidTarget = "application/newAndroidTarget"
     const val proguard = "application/proguard"
     const val customCompiler = "application/custom-compiler"
     const val customCompilerArgs = "application/custom-compiler-args"

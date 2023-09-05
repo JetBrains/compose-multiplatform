@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.test.tests.integration
 
+import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewLogger
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.RemoteConnection
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.receiveConfigFromGradle
@@ -210,6 +211,15 @@ class GradlePluginTest : GradlePluginTestBase() {
         gradle(":build").checks {
             check.taskSuccessful(":unpackSkikoWasmRuntimeJs")
             check.taskSuccessful(":compileKotlinJs")
+        }
+    }
+
+    @Test
+    fun newAndroidTarget() {
+        Assumptions.assumeTrue(TestProperties.gradleBaseVersionForTests >= GradleVersion.version("8.0.0"))
+        with(testProject(TestProjects.newAndroidTarget)) {
+            gradle("build", "--dry-run").checks {
+            }
         }
     }
 
