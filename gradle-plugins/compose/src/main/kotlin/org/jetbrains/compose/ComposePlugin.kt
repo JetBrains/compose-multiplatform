@@ -26,6 +26,8 @@ import org.jetbrains.compose.experimental.uikit.internal.resources.configureSync
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.mppExtOrNull
+import org.jetbrains.compose.internal.service.ConfigurationProblemReporterService
+import org.jetbrains.compose.internal.service.GradlePropertySnapshotService
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
@@ -36,9 +38,14 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
+private fun initBuildServices(project: Project) {
+    ConfigurationProblemReporterService.init(project)
+    GradlePropertySnapshotService.init(project)
+}
+
 abstract class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        ComposeMultiplatformBuildService.init(project)
+        initBuildServices(project)
 
         val composeExtension = project.extensions.create("compose", ComposeExtension::class.java, project)
         val desktopExtension = composeExtension.extensions.create("desktop", DesktopExtension::class.java)

@@ -11,34 +11,42 @@ class UnsupportedCompilerPluginWarningTest : GradlePluginTestBase() {
     private val androidxComposeCompilerGroupId = "androidx.compose.compiler"
     private val androidxComposeCompilerPlugin = "$androidxComposeCompilerGroupId:compiler:1.4.8"
 
-    @Suppress("RedundantUnitExpression")
-    @Test
-    fun testKotlinJs_shows_warning_for_androidx_compose_compiler() = testProject(
-        TestProjects.customCompilerArgs, defaultTestEnvironment.copy(
-            kotlinVersion = "1.8.22",
-            composeCompilerPlugin = "\"$androidxComposeCompilerPlugin\"",
-            composeCompilerArgs = "\"suppressKotlinVersionCompatibilityCheck=1.8.22\""
-        )
-    ).let {
-        it.gradle(":compileKotlinJs").checks {
-            check.taskSuccessful(":compileKotlinJs")
-            check.logContains(createWarningAboutNonCompatibleCompiler(androidxComposeCompilerGroupId))
+    private fun testCustomCompilerUnsupportedPlatformsWarning(
+        platforms: String,
+        warningIsExpected: Boolean
+    ) {
+        testProject(
+            TestProjects.customCompilerUnsupportedPlatformsWarning, defaultTestEnvironment.copy(
+                kotlinVersion = "1.8.22",
+                composeCompilerPlugin = "\"$androidxComposeCompilerPlugin\"",
+            )
+        ).apply {
+            // repeat twice to check that configuration cache hit does not affect the result
+            repeat(2) {
+                gradle("-Pplatforms=$platforms").checks {
+                    val warning = createWarningAboutNonCompatibleCompiler(androidxComposeCompilerGroupId)
+                    if (warningIsExpected) {
+                        check.logContainsOnce(warning)
+                    } else {
+                        check.logDoesntContain(warning)
+                    }
+                }
+            }
         }
-        Unit
     }
 
-    @Suppress("RedundantUnitExpression")
     @Test
-    fun testKotlinJvm_doesnt_show_warning_for_androidx_compose_compiler() = testProject(
-        TestProjects.customCompiler, defaultTestEnvironment.copy(
-            kotlinVersion = "1.8.22",
-            composeCompilerPlugin = "\"$androidxComposeCompilerPlugin\"",
-        )
-    ).let {
-        it.gradle(":run").checks {
-            check.taskSuccessful(":run")
-            check.logDoesntContain(createWarningAboutNonCompatibleCompiler(androidxComposeCompilerGroupId))
-        }
-        Unit
+    fun testJs() {
+        testCustomCompilerUnsupportedPlatformsWarning("js", warningIsExpected = true)
+    }
+
+    @Test
+    fun testIos() {
+        testCustomCompilerUnsupportedPlatformsWarning("ios", warningIsExpected = true)
+    }
+
+    @Test
+    fun testJvm() {
+        testCustomCompilerUnsupportedPlatformsWarning("jvm", warningIsExpected = false)
     }
 }

@@ -12,6 +12,7 @@ object TestProjects {
     const val proguard = "application/proguard"
     const val customCompiler = "application/custom-compiler"
     const val customCompilerArgs = "application/custom-compiler-args"
+    const val customCompilerUnsupportedPlatformsWarning = "application/customCompilerUnsupportedPlatformsWarning"
     const val jvmKotlinDsl = "application/jvmKotlinDsl"
     const val moduleClashCli = "application/moduleClashCli"
     const val javaLogger = "application/javaLogger"

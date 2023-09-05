@@ -7,18 +7,14 @@ package org.jetbrains.compose
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.gradle.build.event.BuildEventsListenerRegistry
 import org.jetbrains.compose.internal.ComposeCompilerArtifactProvider
 import org.jetbrains.compose.internal.mppExtOrNull
+import org.jetbrains.compose.internal.service.ConfigurationProblemReporterService
 import org.jetbrains.compose.internal.webExt
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
-import javax.inject.Inject
 
-@Suppress("UnstableApiUsage")
-class ComposeCompilerKotlinSupportPlugin @Inject constructor(
-    @Suppress("UnstableApiUsage") private val buildEventsListenerRegistry: BuildEventsListenerRegistry
-) : KotlinCompilerPluginSupportPlugin {
+class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
     private lateinit var composeCompilerArtifactProvider: ComposeCompilerArtifactProvider
 
     override fun apply(target: Project) {
@@ -35,7 +31,7 @@ class ComposeCompilerKotlinSupportPlugin @Inject constructor(
         }
     }
 
-    private fun collectUnsupportedCompilerPluginUsages(target: Project) {
+    private fun collectUnsupportedCompilerPluginUsages(project: Project) {
         fun Project.hasNonJvmTargets(): Boolean {
             val nonJvmTargets = setOf(KotlinPlatformType.native, KotlinPlatformType.js, KotlinPlatformType.wasm)
             return mppExtOrNull?.targets?.any {
@@ -47,10 +43,11 @@ class ComposeCompilerKotlinSupportPlugin @Inject constructor(
             return !groupId.startsWith("org.jetbrains.compose.compiler")
         }
 
-        ComposeMultiplatformBuildService.getInstance(target).unsupportedCompilerPlugins.add(
-            target.provider {
+        ConfigurationProblemReporterService.registerUnsupportedPluginProvider(
+            project,
+            project.provider {
                 composeCompilerArtifactProvider.compilerArtifact.takeIf {
-                    target.hasNonJvmTargets() && it.isNonJBComposeCompiler()
+                    project.hasNonJvmTargets() && it.isNonJBComposeCompiler()
                 }
             }
         )
