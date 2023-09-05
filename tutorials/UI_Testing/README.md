@@ -5,7 +5,7 @@ The API for unit testing in Compose for Desktop is nearly identical to the [Jetp
 To start using the testing API, you will need to add the dependency on `compose.uiTestJUnit4` to your `build.gradle` file and create the directory for your tests. 
 
 If the module is desktop-only (`kotlin("jvm")` is applied), add the dependency via:
-```kotlin
+``` kotlin
 dependencies {
     testImplementation(compose.desktop.uiTestJUnit4)
     testImplementation(compose.desktop.currentOs)
@@ -16,7 +16,7 @@ and the directory for tests will be `src/test/kotlin`
 
 If the module is multiplatform (`kotlin(“multiplatform”)` is applied), add it via:
 
-```kotlin
+``` kotlin
 kotlin {
     sourceSets {
         val desktopTest by getting {
