@@ -34,13 +34,3 @@ fun ComposeEntryPoint(): UIViewController =
             UseUITextField(Modifier.padding(4.dp).border(2.dp, Color.Blue))
         }
     }
-
-/**
- * Border to easily understand the size of UIKitView
- */
-@Composable
-fun BlueBorder(content: @Composable () -> Unit) {
-    Box(Modifier.padding(4.dp).border(2.dp, Color.Blue)) {
-        content()
-    }
-}
