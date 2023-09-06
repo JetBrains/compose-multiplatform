@@ -105,6 +105,7 @@ When you build your application for Android, the artifacts published by Google a
 
 Compose Multiplatform version | Jetpack Compose version | Jetpack Compose Material3 version
 --- | --- | ---
+[1.5.1](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.5.1)|1.5.0|1.1.1
 [1.5.0](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.5.0)|1.5.0|1.1.1
 [1.4.3](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.4.3)|1.4.3|1.0.1
 [1.4.1](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.4.1)|1.4.3|1.0.1
