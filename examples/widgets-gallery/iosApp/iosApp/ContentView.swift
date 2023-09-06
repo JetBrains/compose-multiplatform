@@ -14,5 +14,6 @@ struct ComposeView: UIViewControllerRepresentable {
         Main_iosKt.MainViewController()
     }
 
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+    }
 }
