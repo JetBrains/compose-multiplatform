@@ -102,4 +102,20 @@ We keep our release cycles aligned, making sure that the common part is properly
 When a new version of Jetpack Compose is released, we pick the release commit, use it as a base for the next [Compose Multiplatform](https://github.com/JetBrains/androidx) version, finish new platform features, stabilize all platforms, and release Compose Multiplatform.
 The gap between a Compose Multiplatform release and a Jetpack Compose release is usually 1 to 3 months.
 
-When you build your application for Android, the artifacts published by Google are used. For example, if you apply the Compose Multiplatform 1.2.0 Gradle plugin and add `implementation(compose.material3)` to your `dependencies`, then your project will use the `androidx.compose.material3:material3:1.0.0-alpha14` artifact in the Android target (but `org.jetbrains.compose.material3:material3:1.2.0` in the other targets). See the `Updated dependencies` sections in the [CHANGELOG](https://github.com/JetBrains/compose-jb/blob/master/CHANGELOG.md) to know exactly which version of the Jetpack Compose artifact will be used.
+When you build your application for Android, the artifacts published by Google are used. For example, if you apply the Compose Multiplatform 1.5.0 Gradle plugin and add `implementation(compose.material3)` to your `dependencies`, then your project will use the `androidx.compose.material3:material3:1.1.1` artifact in the Android target (but `org.jetbrains.compose.material3:material3:1.5.0` in the other targets). See the table below to know exactly which version of the Jetpack Compose artifact is used.
+
+Compose Multiplatform version | Jetpack Compose version | Jetpack Compose Material3 version
+--- | --- | ---
+[1.5.1](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.5.1)|1.5.0|1.1.1
+[1.5.0](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.5.0)|1.5.0|1.1.1
+[1.4.3](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.4.3)|1.4.3|1.0.1
+[1.4.1](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.4.1)|1.4.3|1.0.1
+[1.4.0](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.4.0)|1.4.0|1.0.1
+[1.3.1](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.3.1)|1.3.3|1.0.1
+[1.3.0](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.3.0)|1.3.3|1.0.1
+[1.2.1](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.2.1)|1.2.1|1.0.0-alpha14
+[1.2.0](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.2.0)|1.2.1|1.0.0-alpha14
+[1.1.1](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.1.1)|1.1.0|1.0.0-alpha05
+[1.1.0](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.1.0)|1.1.0|1.0.0-alpha05
+[1.0.1](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.0.1)|1.1.0-beta02|1.0.0-alpha03
+[1.0.0](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.0.0)|1.1.0-beta02|1.0.0-alpha03
