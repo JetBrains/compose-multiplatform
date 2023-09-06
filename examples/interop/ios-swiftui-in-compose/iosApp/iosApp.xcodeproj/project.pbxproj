@@ -9,11 +9,13 @@
 /* Begin PBXBuildFile section */
 		1848810122D49D4AD3668D91 /* ComposeViewControllerRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18488656503C85EEDA66341D /* ComposeViewControllerRepresentable.swift */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
+		3251B13E2AA8D9AE001521C0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3251B13D2AA8D9AE001521C0 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		18488656503C85EEDA66341D /* ComposeViewControllerRepresentable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeViewControllerRepresentable.swift; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
+		3251B13D2AA8D9AE001521C0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		7555FF7B242A565900829871 /* SwiftUIInCompose.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUIInCompose.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
@@ -53,6 +55,7 @@
 				7555FF8C242A565B00829871 /* Info.plist */,
 				2152FB032600AC8F00CF470E /* iOSApp.swift */,
 				18488656503C85EEDA66341D /* ComposeViewControllerRepresentable.swift */,
+				3251B13D2AA8D9AE001521C0 /* ContentView.swift */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -157,6 +160,7 @@
 			files = (
 				2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */,
 				1848810122D49D4AD3668D91 /* ComposeViewControllerRepresentable.swift in Sources */,
+				3251B13E2AA8D9AE001521C0 /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

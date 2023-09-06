@@ -2,10 +2,14 @@ import UIKit
 import SwiftUI
 import shared
 
+
 struct ContentView: View {
     var body: some View {
-        ComposeView()
-            .ignoresSafeArea(.keyboard) // Compose has own keyboard handler
+        ZStack {
+            Color.white.ignoresSafeArea(.all) // status bar color
+            ComposeView()
+                .ignoresSafeArea(.all, edges: .bottom) // Compose has own keyboard handler
+        }.preferredColorScheme(.light)
     }
 }
 
