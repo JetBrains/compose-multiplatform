@@ -1,3 +1,11 @@
+# 1.5.1 (September 2023)
+
+##Common
+
+### Features
+- [Support kotlin 1.9.10](https://github.com/JetBrains/compose-multiplatform/pull/3616)
+
+
 # 1.5.0 (August 2023)
 > This is a combined changelog from the prerelease versions:
 > - [1.5.0-beta01](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.5.0-beta01)
