@@ -69,7 +69,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:InputDirectory
     @get:Optional
-    /** @see internal/wixToolset.kt */
+            /** @see internal/wixToolset.kt */
     val wixToolsetDir: DirectoryProperty = objects.directoryProperty()
 
     @get:Input
@@ -310,8 +310,8 @@ abstract class AbstractJPackageTask @Inject constructor(
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
         fun appDir(vararg pathParts: String): String {
             /** For windows we need to pass '\\' to jpackage file, each '\' need to be escaped.
-                Otherwise '$APPDIR\resources' is passed to jpackage,
-                and '\r' is treated as a special character at run time.
+            Otherwise '$APPDIR\resources' is passed to jpackage,
+            and '\r' is treated as a special character at run time.
              */
             val separator = if (currentTarget.os == OS.Windows) "\\\\" else "/"
             return listOf("${'$'}APPDIR", *pathParts).joinToString(separator) { it }
@@ -384,6 +384,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--linux-menu-group", linuxMenuGroup)
                     cliArg("--linux-rpm-license-type", linuxRpmLicenseType)
                 }
+
                 OS.Windows -> {
                     cliArg("--win-dir-chooser", winDirChooser)
                     cliArg("--win-per-user-install", winPerUserInstall)
@@ -392,6 +393,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--win-menu-group", winMenuGroup)
                     cliArg("--win-upgrade-uuid", winUpgradeUuid)
                 }
+
                 OS.MacOS -> {}
             }
         }
@@ -612,7 +614,8 @@ abstract class AbstractJPackageTask @Inject constructor(
         val packageVersion = packageVersion.get()!!
         plist[PlistKeys.CFBundleShortVersionString] = packageVersion
         // If building for the App Store, use "utilities" as default just like jpackage.
-        val category = macAppCategory.orNull ?: (if (macAppStore.orNull == true) "public.app-category.utilities" else null)
+        val category =
+            macAppCategory.orNull ?: (if (macAppStore.orNull == true) "public.app-category.utilities" else null)
         plist[PlistKeys.LSApplicationCategoryType] = category ?: "Unknown"
         val packageBuildVersion = packageBuildVersion.orNull ?: packageVersion
         plist[PlistKeys.CFBundleVersion] = packageBuildVersion
