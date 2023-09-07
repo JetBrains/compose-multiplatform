@@ -232,7 +232,7 @@ macOS {
          password.set("@keychain:NOTARIZATION_PASSWORD")
          
          // optional
-         ascProvider.set("<TEAM_ID>")
+         teamId.set("<TEAM_ID>")
     }
 }
 ```
@@ -246,8 +246,8 @@ macOS {
      ```
      @keychain:NOTARIZATION_PASSWORD
      ```
-* Set `ascProvider` to your Team ID, if your account is associated with multiple teams.
-    * Alternatively, the `compose.desktop.mac.notarization.ascProvider` Gradle property can be used.
+* Set `teamId` to your Team ID, if your account is associated with multiple teams.
+    * Alternatively, the `compose.desktop.mac.notarization.teamId` Gradle property can be used.
     * To get a table of team IDs associated with a given username and password, run:
 ```
 xcrun altool --list-providers -u <Apple ID> -p <Notarization password>"
@@ -375,14 +375,3 @@ The following tasks are available:
   (no separate step is required).
 * Use `notarize<PACKAGING_FORMAT>` (e.g. `notarizeDmg`) to upload an application for notarization. 
   Notarization is only required for apps outside the App Store.
-  Once the upload finishes, a `RequestUUID` will be printed. 
-  The notarization process takes some time.
-  Once the notarization process finishes, an email will be sent to you.
-  Uploaded file is saved to `<BUILD_DIR>/compose/notarization/main/<UPLOAD_DATE>-<PACKAGING_FORMAT>`
-* Use `checkNotarizationStatus` to check a status of 
-  last notarization requests. You can also use a command-line command to check any notarization request:
-```
-xcrun altool --notarization-info <RequestUUID> 
-             --username <Apple_ID>
-             --password "@keychain:NOTARIZATION_PASSWORD"
-```
