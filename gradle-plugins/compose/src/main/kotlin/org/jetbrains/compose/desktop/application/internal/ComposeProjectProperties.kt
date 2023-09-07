@@ -19,7 +19,7 @@ internal object ComposeProperties {
     internal const val MAC_SIGN_PREFIX = "compose.desktop.mac.signing.prefix"
     internal const val MAC_NOTARIZATION_APPLE_ID = "compose.desktop.mac.notarization.appleID"
     internal const val MAC_NOTARIZATION_PASSWORD = "compose.desktop.mac.notarization.password"
-    internal const val MAC_NOTARIZATION_ASC_PROVIDER = "compose.desktop.mac.notarization.ascProvider"
+    internal const val MAC_NOTARIZATION_TEAM_ID_PROVIDER = "compose.desktop.mac.notarization.teamId"
     internal const val CHECK_JDK_VENDOR = "compose.desktop.packaging.checkJdkVendor"
 
     fun isVerbose(providers: ProviderFactory): Provider<Boolean> =
@@ -46,8 +46,8 @@ internal object ComposeProperties {
     fun macNotarizationPassword(providers: ProviderFactory): Provider<String?> =
         providers.valueOrNull(MAC_NOTARIZATION_PASSWORD)
 
-    fun macNotarizationAscProvider(providers: ProviderFactory): Provider<String?> =
-        providers.valueOrNull(MAC_NOTARIZATION_ASC_PROVIDER)
+    fun macNotarizationTeamId(providers: ProviderFactory): Provider<String?> =
+        providers.valueOrNull(MAC_NOTARIZATION_TEAM_ID_PROVIDER)
 
     fun checkJdkVendor(providers: ProviderFactory): Provider<Boolean> =
         providers.valueOrNull(CHECK_JDK_VENDOR).toBooleanProvider(true)

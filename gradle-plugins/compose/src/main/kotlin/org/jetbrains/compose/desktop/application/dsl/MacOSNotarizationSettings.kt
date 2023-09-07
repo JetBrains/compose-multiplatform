@@ -37,7 +37,7 @@ abstract class MacOSNotarizationSettings {
     @get:Input
     @get:Optional
     val teamId: Property<String?> = objects.nullableProperty<String>().apply {
-        set(ComposeProperties.macNotarizationAscProvider(providers))
+        set(ComposeProperties.macNotarizationTeamId(providers))
     }
 
     @Suppress("DeprecatedCallableAddReplaceWith") // there is no replacement from Apple
