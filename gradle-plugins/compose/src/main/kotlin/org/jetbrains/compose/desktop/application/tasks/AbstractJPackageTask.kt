@@ -7,6 +7,7 @@ package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.*
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
@@ -22,6 +23,7 @@ import org.jetbrains.compose.desktop.application.internal.files.MacJarSignFileCo
 import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.validation.validate
 import org.jetbrains.compose.internal.utils.*
+import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import java.io.*
 import java.nio.file.LinkOption
 import java.util.*
@@ -67,7 +69,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:InputDirectory
     @get:Optional
-    /** @see internal/wixToolset.kt */
+            /** @see internal/wixToolset.kt */
     val wixToolsetDir: DirectoryProperty = objects.directoryProperty()
 
     @get:Input
@@ -117,6 +119,10 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Input
     @get:Optional
     val packageVersion: Property<String?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
+    val additionalLaunchers: MapProperty<String, String> = objects.mapProperty(String::class.java, String::class.java)
 
     @get:Input
     @get:Optional
@@ -304,8 +310,8 @@ abstract class AbstractJPackageTask @Inject constructor(
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
         fun appDir(vararg pathParts: String): String {
             /** For windows we need to pass '\\' to jpackage file, each '\' need to be escaped.
-                Otherwise '$APPDIR\resources' is passed to jpackage,
-                and '\r' is treated as a special character at run time.
+            Otherwise '$APPDIR\resources' is passed to jpackage,
+            and '\r' is treated as a special character at run time.
              */
             val separator = if (currentTarget.os == OS.Windows) "\\\\" else "/"
             return listOf("${'$'}APPDIR", *pathParts).joinToString(separator) { it }
@@ -344,6 +350,16 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--app-content", provisioningProfile)
                 }
             }
+
+            additionalLaunchers.orNull?.forEach {
+                val filePath = "compose/tmp/launchers/${name}_${it.key.replace(' ', '_')}.properties"
+                val file = project.layout.buildDirectory.file(filePath).ioFile.apply {
+                    ensureParentDirsCreated()
+                    writeText(it.value)
+                }
+                project.logger.warn("properties at ${file.absolutePath}")
+                cliArg("--add-launcher", "${it.key}=${file.absolutePath}")
+            }
         }
 
         if (targetFormat != TargetFormat.AppImage) {
@@ -368,6 +384,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--linux-menu-group", linuxMenuGroup)
                     cliArg("--linux-rpm-license-type", linuxRpmLicenseType)
                 }
+
                 OS.Windows -> {
                     cliArg("--win-dir-chooser", winDirChooser)
                     cliArg("--win-per-user-install", winPerUserInstall)
@@ -376,6 +393,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--win-menu-group", winMenuGroup)
                     cliArg("--win-upgrade-uuid", winUpgradeUuid)
                 }
+
                 OS.MacOS -> {}
             }
         }
@@ -596,7 +614,8 @@ abstract class AbstractJPackageTask @Inject constructor(
         val packageVersion = packageVersion.get()!!
         plist[PlistKeys.CFBundleShortVersionString] = packageVersion
         // If building for the App Store, use "utilities" as default just like jpackage.
-        val category = macAppCategory.orNull ?: (if (macAppStore.orNull == true) "public.app-category.utilities" else null)
+        val category =
+            macAppCategory.orNull ?: (if (macAppStore.orNull == true) "public.app-category.utilities" else null)
         plist[PlistKeys.LSApplicationCategoryType] = category ?: "Unknown"
         val packageBuildVersion = packageBuildVersion.orNull ?: packageVersion
         plist[PlistKeys.CFBundleVersion] = packageBuildVersion
