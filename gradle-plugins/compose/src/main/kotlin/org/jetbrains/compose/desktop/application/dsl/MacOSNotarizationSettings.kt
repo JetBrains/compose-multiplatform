@@ -36,15 +36,15 @@ abstract class MacOSNotarizationSettings {
 
     @get:Input
     @get:Optional
-    val teamId: Property<String?> = objects.nullableProperty<String>().apply {
-        set(ComposeProperties.macNotarizationTeamId(providers))
+    val teamID: Property<String?> = objects.nullableProperty<String>().apply {
+        set(ComposeProperties.macNotarizationTeamID(providers))
     }
 
-    @Deprecated("This option is no longer supported and got replaced by teamId", level = DeprecationLevel.ERROR)
+    @Deprecated("This option is no longer supported and got replaced by teamID", level = DeprecationLevel.ERROR)
     @get:Internal
     val ascProvider: Property<String?> = objects.nullableProperty<String>().apply {
         set(providers.provider {
-            throw UnsupportedOperationException("This option is not supported by notary tool and was replaced by teamId")
+            throw UnsupportedOperationException("This option is not supported by notary tool and was replaced by teamID")
         })
     }
 }

@@ -63,9 +63,9 @@ abstract class AbstractNotarizationTask @Inject constructor(
                 "--apple-id",
                 notarization.appleID
             ))
-            if (notarization.teamId != null) {
+            if (notarization.teamID != null) {
                 add("--team-id")
-                add(notarization.teamId)
+                add(notarization.teamID)
             }
             add(packageFile.absolutePath)
         }

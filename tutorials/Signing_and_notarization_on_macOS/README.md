@@ -229,10 +229,10 @@ Notarization is only required for apps outside the App Store.
 macOS {
     notarization { 
          appleID.set("john.doe@example.com")
-         password.set("@keychain:NOTARIZATION_PASSWORD")
+         password.set()
          
          // optional
-         teamId.set("<TEAM_ID>")
+         teamID.set("<TEAM_ID>")
     }
 }
 ```
@@ -246,8 +246,8 @@ macOS {
      ```
      @keychain:NOTARIZATION_PASSWORD
      ```
-* Set `teamId` to your Team ID, if your account is associated with multiple teams.
-    * Alternatively, the `compose.desktop.mac.notarization.teamId` Gradle property can be used.
+* Set `teamID` to your Team ID, if your account is associated with multiple teams.
+    * Alternatively, the `compose.desktop.mac.notarization.teamID` Gradle property can be used.
     * To get a table of team IDs associated with a given username and password, run:
 ```
 xcrun altool --list-providers -u <Apple ID> -p <Notarization password>"

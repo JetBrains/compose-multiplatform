@@ -11,7 +11,7 @@ import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 internal data class ValidatedMacOSNotarizationSettings(
     val appleID: String,
     val password: String,
-    val teamId: String?
+    val teamID: String?
 )
 
 internal fun MacOSNotarizationSettings?.validate(): ValidatedMacOSNotarizationSettings {
@@ -28,7 +28,7 @@ internal fun MacOSNotarizationSettings?.validate(): ValidatedMacOSNotarizationSe
     return ValidatedMacOSNotarizationSettings(
         appleID = appleID.orNull!!,
         password = password.orNull!!,
-        teamId  = teamId.orNull
+        teamID  = teamID.orNull
     )
 }
 
