@@ -351,7 +351,6 @@ private fun JvmApplicationContext.configurePackageTask(
 internal fun JvmApplicationContext.configureCommonNotarizationSettings(
     notarizationTask: AbstractNotarizationTask
 ) {
-    notarizationTask.nonValidatedBundleID.set(app.nativeDistributions.macOS.bundleID)
     notarizationTask.nonValidatedNotarizationSettings = app.nativeDistributions.macOS.notarization
 }
 

@@ -15,11 +15,6 @@ import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import org.jetbrains.compose.internal.utils.nullableProperty
 
 abstract class AbstractNotarizationTask : AbstractComposeDesktopTask() {
-    @Deprecated("There’s no replacement for the --primary-bundle-id option. The notary service never interpreted that value; it was effectively a comment.")
-    @get:Input
-    @get:Optional
-    internal val nonValidatedBundleID: Property<String?> = objects.nullableProperty()
-
     @get:Nested
     @get:Optional
     internal var nonValidatedNotarizationSettings: MacOSNotarizationSettings? = null
