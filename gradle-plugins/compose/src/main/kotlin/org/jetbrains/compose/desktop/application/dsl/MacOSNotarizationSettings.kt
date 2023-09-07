@@ -40,11 +40,11 @@ abstract class MacOSNotarizationSettings {
         set(ComposeProperties.macNotarizationTeamId(providers))
     }
 
-    @Suppress("DeprecatedCallableAddReplaceWith") // there is no replacement from Apple
-    @Deprecated("This option is no longer supported and got replaced by teamId")
+    @Deprecated("This option is no longer supported and got replaced by teamId", level = DeprecationLevel.ERROR)
     @get:Internal
     val ascProvider: Property<String?> = objects.nullableProperty<String>().apply {
         set(providers.provider {
             throw UnsupportedOperationException("This option is not supported by notary tool and was replaced by teamId")
         })
+    }
 }
