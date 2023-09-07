@@ -7,6 +7,7 @@ package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.*
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
@@ -22,6 +23,7 @@ import org.jetbrains.compose.desktop.application.internal.files.MacJarSignFileCo
 import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.validation.validate
 import org.jetbrains.compose.internal.utils.*
+import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import java.io.*
 import java.nio.file.LinkOption
 import java.util.*
@@ -117,6 +119,10 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Input
     @get:Optional
     val packageVersion: Property<String?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
+    val additionalLaunchers: MapProperty<String, String> = objects.mapProperty(String::class.java, String::class.java)
 
     @get:Input
     @get:Optional
@@ -343,6 +349,16 @@ abstract class AbstractJPackageTask @Inject constructor(
                 macProvisioningProfile.orNull?.let { provisioningProfile ->
                     cliArg("--app-content", provisioningProfile)
                 }
+            }
+
+            additionalLaunchers.orNull?.forEach {
+                val filePath = "compose/tmp/launchers/${name}_${it.key.replace(' ', '_')}.properties"
+                val file = project.layout.buildDirectory.file(filePath).ioFile.apply {
+                    ensureParentDirsCreated()
+                    writeText(it.value)
+                }
+                project.logger.warn("properties at ${file.absolutePath}")
+                cliArg("--add-launcher", "${it.key}=${file.absolutePath}")
             }
         }
 
