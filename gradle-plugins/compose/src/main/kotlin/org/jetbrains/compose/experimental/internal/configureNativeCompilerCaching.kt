@@ -11,6 +11,7 @@ import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.service.ConfigurationProblemReporterService
 import org.jetbrains.compose.internal.utils.KGPPropertyProvider
 import org.jetbrains.compose.internal.utils.configureEachWithType
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import org.jetbrains.kotlin.konan.target.presetName
@@ -36,10 +37,15 @@ internal fun Project.configureNativeCompilerCaching() {
     if (findProperty(COMPOSE_NATIVE_MANAGE_CACHE_KIND) == "false") return
 
     plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
+        val kotlinPluginVersion = kotlinVersionNumbers(project.getKotlinPluginVersion())
         mppExt.targets.configureEachWithType<KotlinNativeTarget> {
             if (konanTarget in SUPPORTED_NATIVE_TARGETS) {
                 checkExplicitCacheKind()
-                disableKotlinNativeCache()
+                if (kotlinPluginVersion < KotlinVersion(1, 9, 20)) {
+                    // Pre-1.9.20 Kotlin compiler caches have known compatibility issues
+                    // See KT-57329, KT-61270
+                    disableKotlinNativeCache()
+                }
             }
         }
     }
@@ -97,4 +103,14 @@ private fun KotlinNativeTarget.disableKotlinNativeCache() {
     } else {
         project.extensions.extraProperties.set(targetCacheKindPropertyName, NONE_VALUE)
     }
+}
+
+internal fun kotlinVersionNumbers(version: String): KotlinVersion {
+    val m = Regex("(\\d+)\\.(\\d+)\\.(\\d+)").find(version) ?: error("Kotlin version has unexpected format: '$version'")
+    val (_, majorPart, minorPart, patchPart) = m.groupValues
+    return KotlinVersion(
+        major = majorPart.toIntOrNull() ?: error("Could not parse major part '$majorPart' of Kotlin plugin version: '$version'"),
+        minor = minorPart.toIntOrNull() ?: error("Could not parse minor part '$minorPart' of Kotlin plugin version: '$version'"),
+        patch = patchPart.toIntOrNull() ?: error("Could not parse patch part '$patchPart' of Kotlin plugin version: '$version'"),
+    )
 }

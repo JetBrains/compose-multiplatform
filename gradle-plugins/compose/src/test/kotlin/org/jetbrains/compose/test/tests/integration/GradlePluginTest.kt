@@ -9,6 +9,7 @@ import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewLogger
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.RemoteConnection
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.receiveConfigFromGradle
+import org.jetbrains.compose.experimental.internal.kotlinVersionNumbers
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.test.utils.*
@@ -130,6 +131,18 @@ class GradlePluginTest : GradlePluginTestBase() {
             gradle(task, "--info").checks {
                 check.taskSuccessful(task)
                 check.logDoesntContain("-Xauto-cache-from=")
+            }
+        }
+
+        val defaultKotlinVersion = kotlinVersionNumbers(TestKotlinVersions.Default)
+        if (defaultKotlinVersion >= KotlinVersion(1, 9, 20)) {
+            testWorkDir.deleteRecursively()
+            testWorkDir.mkdirs()
+            with(nativeCacheKindProject(TestKotlinVersions.Default) ) {
+                gradle(task, "--info").checks {
+                    check.taskSuccessful(task)
+                    check.logContains("-Xauto-cache-from=")
+                }
             }
         }
     }
