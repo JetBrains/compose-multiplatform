@@ -377,6 +377,7 @@ internal fun JvmApplicationContext.configurePlatformSettings(
                 packageTask.linuxRpmLicenseType.set(provider { linux.rpmLicenseType })
                 packageTask.iconFile.set(linux.iconFile.orElse(defaultResources.get { linuxIcon }))
                 packageTask.installationPath.set(linux.installationPath)
+                packageTask.jpackageResourcesDir.set(linux.jpackageResourceDir)
             }
         }
         OS.Windows -> {
@@ -390,6 +391,7 @@ internal fun JvmApplicationContext.configurePlatformSettings(
                 packageTask.winUpgradeUuid.set(provider { win.upgradeUuid })
                 packageTask.iconFile.set(win.iconFile.orElse(defaultResources.get { windowsIcon }))
                 packageTask.installationPath.set(win.installationPath)
+                packageTask.jpackageResourcesDir.set(win.jpackageResourceDir)
             }
         }
         OS.MacOS -> {
@@ -415,6 +417,7 @@ internal fun JvmApplicationContext.configurePlatformSettings(
                 packageTask.nonValidatedMacSigningSettings = app.nativeDistributions.macOS.signing
                 packageTask.iconFile.set(mac.iconFile.orElse(defaultResources.get { macIcon }))
                 packageTask.installationPath.set(mac.installationPath)
+                packageTask.jpackageResourcesDir.set(mac.jpackageResourceDir)
             }
         }
     }

@@ -6,6 +6,7 @@
 package org.jetbrains.compose.desktop.application.dsl
 
 import org.gradle.api.Action
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import javax.inject.Inject
@@ -17,6 +18,7 @@ abstract class AbstractPlatformSettings {
     val iconFile: RegularFileProperty = objects.fileProperty()
     var packageVersion: String? = null
     var installationPath: String? = null
+    val jpackageResourceDir: DirectoryProperty = objects.directoryProperty()
 }
 
 abstract class AbstractMacOSPlatformSettings : AbstractPlatformSettings() {
