@@ -7,10 +7,6 @@ struct ContentView: View {
         ZStack {
             ComposeView()
                     .ignoresSafeArea(.all) // Compose has own keyboard handler
-            VStack {
-                gradient.ignoresSafeArea(edges: .top).frame(height: 0)
-                Spacer()
-            }
         }.preferredColorScheme(.dark)
     }
 }

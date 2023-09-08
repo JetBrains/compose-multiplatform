@@ -1,13 +1,34 @@
 package example.imageviewer
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.listSaver
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import example.imageviewer.model.*
-import example.imageviewer.view.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 enum class ExternalImageViewerEvent {
     Next,
@@ -19,106 +40,103 @@ enum class ExternalImageViewerEvent {
 fun ImageViewerCommon(
     dependencies: Dependencies
 ) {
-    CompositionLocalProvider(
-        LocalLocalization provides dependencies.localization,
-        LocalNotification provides dependencies.notification,
-        LocalImageProvider provides dependencies.imageProvider,
-        LocalInternalEvents provides dependencies.externalEvents,
-        LocalSharePicture provides dependencies.sharePicture,
-    ) {
-        ImageViewerWithProvidedDependencies(dependencies.pictures)
+    MaterialTheme {
+        Box(Modifier.fillMaxSize().background(Color.White)) {
+            CommonDialog()
+            //NaturalScrolling()
+            //DynamicType()
+            //TextFieldCapitalization()
+            //TestFramework()
+        }
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun ImageViewerWithProvidedDependencies(
-    pictures: SnapshotStateList<PictureData>
-) {
-    // rememberSaveable is required to properly handle Android configuration changes (such as device rotation)
-    val selectedPictureIndex = rememberSaveable { mutableStateOf(0) }
-    val navigationStack = rememberSaveable(
-        saver = listSaver<NavigationStack<Page>, Page>(
-            restore = { NavigationStack(*it.toTypedArray()) },
-            save = { it.stack },
+fun CommonDialog() {
+    Box(Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeContent)) {
+        var isDialogOpen by remember { mutableStateOf(false) }
+        Button(onClick = {
+            isDialogOpen = true
+        }) {
+            Text("Open")
+        }
+        if (isDialogOpen) {
+            AlertDialog(
+                onDismissRequest = { isDialogOpen = false },
+                confirmButton = {
+                    Button(onClick = { isDialogOpen = false }) {
+                        Text("OK")
+                    }
+                },
+                title = { Text("Alert Dialog") },
+                text = { Text("Lorem Ipsum") },
+            )
+        }
+    }
+}
+
+
+@Composable
+fun NaturalScrolling() {
+    val items = (1..30).map { "Item $it" }
+    LazyColumn {
+        items(items) {
+            Text(
+                text = it,
+                fontSize = 30.sp,
+                modifier = Modifier.padding(start = 20.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun DynamicType() {
+    Text("This is some sample text", fontSize = 30.sp)
+}
+
+@Composable
+fun TextFieldCapitalization() {
+    var text by remember { mutableStateOf("") }
+    TextField(
+        value = text,
+        onValueChange = { text = it },
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.Sentences,
+            autoCorrect = false,
+            keyboardType = KeyboardType.Ascii,
+        ),
+    )
+}
+
+@Composable
+fun TestFramework(){
+    var searchText by remember { mutableStateOf("cats") }
+    val searchHistory = remember { mutableStateListOf<String>() }
+
+
+    Column(modifier = Modifier.padding(30.dp)) {
+        TextField(
+            modifier = Modifier.testTag("searchText"),
+            value = searchText,
+            onValueChange = {
+                searchText = it
+            }
         )
-    ) {
-        NavigationStack(GalleryPage())
-    }
-
-    val externalEvents = LocalInternalEvents.current
-    LaunchedEffect(Unit) {
-        externalEvents.collect {
-            if (it == ExternalImageViewerEvent.ReturnBack) {
-                navigationStack.back()
+        Button(
+            modifier = Modifier.testTag("search"),
+            onClick = {
+                searchHistory.add("You searched for: $searchText")
             }
+        ) {
+            Text("Search")
         }
-    }
-
-    AnimatedContent(targetState = navigationStack.lastWithIndex(), transitionSpec = {
-        val previousIdx = initialState.index
-        val currentIdx = targetState.index
-        val multiplier = if (previousIdx < currentIdx) 1 else -1
-        if (initialState.value is GalleryPage && targetState.value is MemoryPage) {
-            fadeIn() with fadeOut(tween(durationMillis = 500, 500))
-        } else if (initialState.value is MemoryPage && targetState.value is GalleryPage) {
-            fadeIn() with fadeOut(tween(delayMillis = 150))
-        } else {
-            slideInHorizontally { w -> multiplier * w } with
-                    slideOutHorizontally { w -> multiplier * -1 * w }
-        }
-    }) { (_, page) ->
-        when (page) {
-            is GalleryPage -> {
-                GalleryScreen(
-                    pictures = pictures,
-                    selectedPictureIndex = selectedPictureIndex,
-                    onClickPreviewPicture = { previewPictureIndex ->
-                        navigationStack.push(MemoryPage(previewPictureIndex))
-                    }
-                ) {
-                    navigationStack.push(CameraPage())
-                }
-            }
-
-            is FullScreenPage -> {
-                FullscreenImageScreen(
-                    picture = pictures[page.pictureIndex],
-                    back = {
-                        navigationStack.back()
-                    }
-                )
-            }
-
-            is MemoryPage -> {
-                MemoryScreen(
-                    pictures = pictures,
-                    memoryPage = page,
-                    onSelectRelatedMemory = { pictureIndex ->
-                        navigationStack.push(MemoryPage(pictureIndex))
-                    },
-                    onBack = { resetNavigation ->
-                        if (resetNavigation) {
-                            selectedPictureIndex.value = 0
-                            navigationStack.reset()
-                        } else {
-                            navigationStack.back()
-                        }
-                    },
-                    onHeaderClick = { pictureIndex ->
-                        navigationStack.push(FullScreenPage(pictureIndex))
-                    },
-                )
-            }
-
-            is CameraPage -> {
-                CameraScreen(
-                    onBack = { resetSelectedPicture ->
-                        if (resetSelectedPicture) {
-                            selectedPictureIndex.value = 0
-                        }
-                        navigationStack.back()
-                    },
+        LazyColumn {
+            items(searchHistory) {
+                Text(
+                    text = it,
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(start = 10.dp).testTag("attempt")
                 )
             }
         }

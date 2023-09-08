@@ -27,15 +27,13 @@ internal fun ImageViewerIos() {
         getDependencies(ioScope, toastState)
     }
 
-    ImageViewerTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            ImageViewerCommon(
-                dependencies = dependencies
-            )
-            Toast(toastState)
-        }
+    Surface(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        ImageViewerCommon(
+            dependencies = dependencies
+        )
+        Toast(toastState)
     }
 }
 
