@@ -28,8 +28,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
-                implementation("org.jetbrains.compose.foundation:foundation:$composeVersion")
+                implementation(compose.runtime)
+                implementation(compose.foundation)
             }
         }
         val commonTest by getting {
@@ -58,7 +58,8 @@ kotlin {
         val desktopTest by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation("org.jetbrains.compose.ui:ui-test-junit4:$composeVersion")
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+                implementation(compose.uiTestJUnit4)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
             }
         }
@@ -84,7 +85,7 @@ kotlin {
         val jsMain by getting {
             dependsOn(skikoMain)
         }
-        val wasmMain by getting {
+        val wasmJsMain by getting {
             dependsOn(skikoMain)
         }
         val macosMain by creating {
