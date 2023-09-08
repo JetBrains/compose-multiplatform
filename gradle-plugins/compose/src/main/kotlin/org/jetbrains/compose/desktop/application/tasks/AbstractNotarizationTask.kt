@@ -49,27 +49,16 @@ abstract class AbstractNotarizationTask @Inject constructor(
         packageFile: File
     ) {
         logger.info("Uploading '${packageFile.name}' for notarization")
-
-        val args = arrayListOf<String>().apply {
-            add("notarytool")
-            add("submit")
-            add("notarytool")
-            add("--wait")
-            add("--apple-id")
-            addAll(listOf(
-                "notarytool",
-                "submit",
-                "--wait",
-                "--apple-id",
-                notarization.appleID
-            ))
-            if (notarization.teamID != null) {
-                add("--team-id")
-                add(notarization.teamID)
-            }
-            add(packageFile.absolutePath)
-        }
-
+        val args = listOfNotNull(
+            "notarytool",
+            "submit",
+            "--wait",
+            "--apple-id",
+            notarization.appleID,
+            "--team-id".takeIf { notarization.teamID != null },
+            notarization.teamID,
+            packageFile.absolutePath
+        )
         runExternalTool(tool = MacUtils.xcrun, args = args, stdinStr = notarization.password)
     }
 
