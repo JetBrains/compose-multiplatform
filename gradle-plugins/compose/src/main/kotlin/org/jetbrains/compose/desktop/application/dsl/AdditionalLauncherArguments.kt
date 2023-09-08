@@ -5,7 +5,7 @@
 
 package org.jetbrains.compose.desktop.application.dsl
 
-abstract class AdditionalLauncherArguments {
+class AdditionalLauncherArguments {
     private val options: MutableList<String> = mutableListOf()
 
     fun add(key: String, value: String) {

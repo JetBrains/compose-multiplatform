@@ -357,7 +357,6 @@ abstract class AbstractJPackageTask @Inject constructor(
                     ensureParentDirsCreated()
                     writeText(it.value)
                 }
-                project.logger.warn("properties at ${file.absolutePath}")
                 cliArg("--add-launcher", "${it.key}=${file.absolutePath}")
             }
         }

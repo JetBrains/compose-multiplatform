@@ -41,7 +41,7 @@ abstract class AbstractDistributions {
     internal val additionalLauncherSettings = objects.mapProperty(String::class.java, String::class.java)
 
     fun additionalLauncher(name: String, fn: Action<AdditionalLauncherArguments>) {
-        val settings = objects.newInstance(AdditionalLauncherArguments::class.java)
+        val settings = AdditionalLauncherArguments()
         fn.execute(settings)
         additionalLauncherSettings.put(name, settings.getFileContent())
     }
