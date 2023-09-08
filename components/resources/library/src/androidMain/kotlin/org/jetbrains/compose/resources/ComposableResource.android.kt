@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 
 @ExperimentalResourceApi
-internal actual fun ByteArray.toImageBitmap(): ImageBitmap = TODO()//toAndroidBitmap().asImageBitmap()
+internal actual fun ByteArray.toImageBitmap(): ImageBitmap = toAndroidBitmap().asImageBitmap()
 
 private fun ByteArray.toAndroidBitmap(): Bitmap {
     return BitmapFactory.decodeByteArray(this, 0, size);

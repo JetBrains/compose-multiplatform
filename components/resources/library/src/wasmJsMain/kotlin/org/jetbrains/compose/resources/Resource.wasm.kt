@@ -44,7 +44,7 @@ private class JSResourceImpl(path: String) : AbstractResourceImpl(path) {
                 }
                 null
             }
-            req.send(null)
+            req.send("")
         }
     }
 }
