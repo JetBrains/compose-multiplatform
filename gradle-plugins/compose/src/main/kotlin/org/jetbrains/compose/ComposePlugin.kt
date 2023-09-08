@@ -107,9 +107,9 @@ abstract class ComposePlugin : Plugin<Project> {
             // TODO: remove these HACKS for version substitution when possible
             val conf = it
             conf.resolutionStrategy.eachDependency {
-                if (project.getKotlinPluginVersion() == "1.9.0") {
+                if (project.getKotlinPluginVersion() == "1.9.20-Beta-205") {
                     if (it.requested.module.name.contains("kotlin-stdlib")) {
-                        it.useVersion("1.9.0")
+                        it.useVersion("1.9.20-Beta-205")
                     }
                 }
                 val isWasm = conf.name.contains("wasm", true)
@@ -117,20 +117,19 @@ abstract class ComposePlugin : Plugin<Project> {
                 if (it.requested.module.group == "org.jetbrains.kotlinx" &&
                     it.requested.module.name.contains("kotlinx-coroutines", true)
                 ) {
-                    if (isWasm) it.useVersion("1.7.2-wasm0")
+                    if (isWasm) it.useVersion("1.7.2-wasm1")
                 }
 
                 if (it.requested.module.group == "org.jetbrains.kotlinx" &&
                     it.requested.module.name.contains("atomicfu", true)
                 ) {
-                    if (isWasm) it.useVersion("0.21.0-wasm0")
+                    if (isWasm) it.useVersion("0.22.0-wasm0")
                 }
 
-                if (it.requested.module.group.startsWith("org.jetbrains.skiko")) {
-                    // skiko 0.0.7.58-wasm01 is broken for k/wasm, but don't want to republish every lib:
-                    if (it.requested.version == "0.0.7.58-wasm01") {
-                        it.useVersion("0.0.7.58-wasm02")
-                    }
+                if (it.requested.module.group == "org.jetbrains.kotlinx" &&
+                    it.requested.module.name.contains("datetime", true)
+                ) {
+                    if (isWasm) it.useVersion("0.4.0-wasm2")
                 }
             }
         }

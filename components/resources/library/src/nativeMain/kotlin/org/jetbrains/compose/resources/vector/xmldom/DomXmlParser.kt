@@ -79,6 +79,7 @@ private class DomXmlParser(
         nodeStack.add(node)
     }
 
+    @OptIn(kotlin.experimental.ExperimentalNativeApi::class)
     override fun parser(
         parser: NSXMLParser,
         didEndElement: String,

@@ -5,11 +5,11 @@ plugins {
 
 val copyResources = tasks.create("copyWasmResourcesWorkaround", Copy::class.java) {
     from(project(":resources:demo:shared").file("src/commonMain/resources"))
-    into("build/processedResources/wasm/main")
+    into("build/processedResources/wasmJs/main")
 }
 
 afterEvaluate {
-    project.tasks.getByName("wasmProcessResources").finalizedBy(copyResources)
+    project.tasks.getByName("wasmJsProcessResources").finalizedBy(copyResources)
 }
 
 kotlin {
@@ -19,7 +19,7 @@ kotlin {
         binaries.executable()
     }
     sourceSets {
-        val wasmMain by getting  {
+        val wasmJsMain by getting  {
             dependencies {
                 implementation(compose.ui)
                 implementation(project(":resources:demo:shared"))
