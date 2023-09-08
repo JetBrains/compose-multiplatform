@@ -269,6 +269,9 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:LocalState
     protected val skikoDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/skiko")
 
+    @get:LocalState
+    protected val additionalLaunchersDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/launchers")
+
     @get:Internal
     private val libsDir: Provider<Directory> = workingDir.map {
         it.dir("libs")
@@ -352,11 +355,8 @@ abstract class AbstractJPackageTask @Inject constructor(
             }
 
             additionalLaunchers.orNull?.forEach {
-                val filePath = "compose/tmp/launchers/${name}_${it.key.replace(' ', '_')}.properties"
-                val file = project.layout.buildDirectory.file(filePath).ioFile.apply {
-                    ensureParentDirsCreated()
-                    writeText(it.value)
-                }
+                val fileName = "${name}_${it.key.replace(' ', '_')}.properties"
+                val file = additionalLaunchersDir.ioFile.resolve(fileName)
                 cliArg("--add-launcher", "${it.key}=${file.absolutePath}")
             }
         }
@@ -488,6 +488,15 @@ abstract class AbstractJPackageTask @Inject constructor(
                 unpackedFiles.map { copyFileToLibsDir(it) }
             } else {
                 listOf(copyFileToLibsDir(sourceFile))
+            }
+        }
+
+        fileOperations.clearDirs(additionalLaunchersDir)
+        additionalLaunchers.orNull?.forEach {
+            val fileName = "${name}_${it.key.replace(' ', '_')}.properties"
+            val file = additionalLaunchersDir.ioFile.resolve(fileName).apply {
+                ensureParentDirsCreated()
+                writeText(it.value)
             }
         }
 
