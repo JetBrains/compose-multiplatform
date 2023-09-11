@@ -357,7 +357,7 @@ abstract class AbstractJPackageTask @Inject constructor(
             additionalLaunchers.orNull?.forEach {
                 val fileName = "${name}_${it.key.replace(' ', '_')}.properties"
                 val file = additionalLaunchersDir.ioFile.resolve(fileName)
-                cliArg("--add-launcher", "${it.key}=${file.absolutePath}")
+                cliArg("--add-launcher", "${it.key}=${file.normalizedPath()}")
             }
         }
 
