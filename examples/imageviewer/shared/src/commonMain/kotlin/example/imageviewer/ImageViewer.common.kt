@@ -41,7 +41,7 @@ fun ImageViewerCommon(
     dependencies: Dependencies
 ) {
     MaterialTheme {
-        Box(Modifier.fillMaxSize().background(Color.White)) {
+        Box(Modifier.fillMaxSize().background(Color.White).windowInsetsPadding(WindowInsets.safeContent)) {
             CommonDialog()
             //NaturalScrolling()
             //DynamicType()
