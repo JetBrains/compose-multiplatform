@@ -7,6 +7,7 @@ package org.jetbrains.compose.experimental.internal
 
 import org.gradle.api.Project
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
+import org.jetbrains.compose.internal.SUPPORTED_NATIVE_TARGETS
 import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.service.ConfigurationProblemReporterService
 import org.jetbrains.compose.internal.utils.KGPPropertyProvider
@@ -18,15 +19,6 @@ import org.jetbrains.kotlin.konan.target.presetName
 private const val PROJECT_CACHE_KIND_PROPERTY_NAME = "kotlin.native.cacheKind"
 private const val COMPOSE_NATIVE_MANAGE_CACHE_KIND = "compose.kotlin.native.manageCacheKind"
 private const val NONE_VALUE = "none"
-
-private val SUPPORTED_NATIVE_TARGETS = setOf(
-    KonanTarget.IOS_ARM32,
-    KonanTarget.IOS_X64,
-    KonanTarget.IOS_ARM64,
-    KonanTarget.IOS_SIMULATOR_ARM64,
-    KonanTarget.MACOS_X64,
-    KonanTarget.MACOS_ARM64,
-)
 
 internal val SUPPORTED_NATIVE_CACHE_KIND_PROPERTIES =
     SUPPORTED_NATIVE_TARGETS.map { it.targetCacheKindPropertyName } +
