@@ -20,3 +20,5 @@ compose.desktop {
         mainClass = "MainKt"
     }
 }
+
+compose.kotlinCompilerPlugin.set("1.5.2.1-Beta")

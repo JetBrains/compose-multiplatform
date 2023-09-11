@@ -23,3 +23,5 @@ compose.experimental {
     web.application {}
 }
 
+
+compose.kotlinCompilerPlugin.set("1.5.2.1-Beta")

@@ -33,3 +33,5 @@ android {
         jvmToolchain(11)
     }
 }
+
+compose.kotlinCompilerPlugin.set("1.5.2.1-Beta")
