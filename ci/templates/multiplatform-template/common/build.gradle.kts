@@ -29,6 +29,7 @@ kotlin {
 
 android {
     compileSdk = 34
+    namespace = "com.myapplication.common"
 
     defaultConfig {
         minSdk = 26
