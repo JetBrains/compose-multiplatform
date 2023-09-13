@@ -55,10 +55,6 @@ abstract class ConfigurationProblemReporterService : AbstractComposeMultiplatfor
             configureParameters(project) { warnings.add(message) }
         }
 
-        fun reportError(project: Project, message: String): Nothing {
-            error(message)
-        }
-
         fun registerUnsupportedPluginProvider(project: Project, unsupportedPlugin: Provider<SubpluginArtifact?>) {
             configureParameters(project) {
                 unsupportedPluginWarningProviders.add(unsupportedPlugin.map { unsupportedCompiler ->
