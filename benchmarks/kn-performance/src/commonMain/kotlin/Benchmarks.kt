@@ -32,27 +32,41 @@ data class BenchmarkPercentileAverage(
     val average: Duration
 )
 
+data class MissedFrames(
+    val count: Int,
+    val ratio: Double
+) {
+    fun prettyPrint(description: String) {
+        println(
+            """
+            Missed frames ($description):
+                - count: $count
+                - ratio: $ratio     
+                            
+            """.trimIndent()
+        )
+    }
+}
+
 data class BenchmarkStats(
     val frameBudget: Duration,
     val percentileCPUAverage: List<BenchmarkPercentileAverage>,
     val percentileGPUAverage: List<BenchmarkPercentileAverage>,
-    val missedFramesCount: Int,
-    val missedFramesRatio: Double
+    val doubleBufferingMissedFrames: MissedFrames,
+    val tripleBufferingMissedFrames: MissedFrames
 ) {
     fun prettyPrint() {
         percentileCPUAverage.prettyPrint(BenchmarkFrameTimeKind.CPU)
+        println()
         percentileGPUAverage.prettyPrint(BenchmarkFrameTimeKind.GPU)
-        println(
-            """                
-            Missed frames count: $missedFramesCount
-            Missed frames ratio: $missedFramesRatio
-            """.trimIndent()
-        )
+        println()
+        doubleBufferingMissedFrames.prettyPrint("double buffering")
+        tripleBufferingMissedFrames.prettyPrint("triple buffering")
     }
 
     private fun List<BenchmarkPercentileAverage>.prettyPrint(kind: BenchmarkFrameTimeKind) {
         forEach {
-            println("p${(it.percentile * 100).roundToInt()} ${kind.toPrettyPrintString()} average: ${it.average}")
+            println("Lowest p${(it.percentile * 100).roundToInt()} ${kind.toPrettyPrintString()} average: ${it.average}")
         }
     }
 }
@@ -66,7 +80,7 @@ class BenchmarkResult(
 
         val startIndex = ((frames.size - 1) * percentile).roundToInt()
 
-        val percentileFrames = frames.sortedBy { it.duration(kind) }.subList(startIndex, frames.size)
+        val percentileFrames = frames.sortedBy { it.duration(kind) }.subList(frames.size - startIndex - 1, frames.size)
 
         return averageDuration(percentileFrames) {
             it.duration(kind)
@@ -74,24 +88,28 @@ class BenchmarkResult(
     }
 
     fun generateStats(): BenchmarkStats {
-        val missedFramesCount = frames.count {
+        val doubleBufferingMissedFramesCount = frames.count {
             it.cpuDuration + it.gpuDuration > frameBudget
+        }
+
+        val tripleBufferingMissedFrames = frames.count {
+            maxOf(it.cpuDuration, it.gpuDuration) > frameBudget
         }
 
         return BenchmarkStats(
             frameBudget,
-            listOf(0.0, 0.5, 0.75, 0.9, 0.95, 0.97, 0.99).map { percentile ->
+            listOf(0.01, 0.02, 0.05, 0.1, 0.25, 0.5).map { percentile ->
                 val average = percentileAverageFrameTime(percentile, BenchmarkFrameTimeKind.CPU)
 
                 BenchmarkPercentileAverage(percentile, average)
             },
-            listOf(0.0, 0.5, 0.95).map { percentile ->
+            listOf(0.01, 0.1, 0.5).map { percentile ->
                 val average = percentileAverageFrameTime(percentile, BenchmarkFrameTimeKind.GPU)
 
                 BenchmarkPercentileAverage(percentile, average)
             },
-            missedFramesCount,
-            missedFramesCount.toDouble() / frames.size
+            MissedFrames(doubleBufferingMissedFramesCount, doubleBufferingMissedFramesCount / frames.size.toDouble()),
+            MissedFrames(tripleBufferingMissedFrames, tripleBufferingMissedFrames / frames.size.toDouble())
         )
     }
 
@@ -123,7 +141,7 @@ fun runBenchmark(
 fun runBenchmarks(
     width: Int = 1920,
     height: Int = 1080,
-    targetFps: Int = 60,
+    targetFps: Int = 120,
     graphicsContext: GraphicsContext? = null
 ) {
     println("Running emulating $targetFps FPS")

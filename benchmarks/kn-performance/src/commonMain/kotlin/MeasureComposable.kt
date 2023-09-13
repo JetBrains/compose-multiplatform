@@ -7,13 +7,16 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
+import kotlinx.coroutines.*
 
 const val nanosPerSecond = 1E9.toLong()
+const val millisPerSecond = 1e3.toLong()
+const val nanosPerMillisecond = nanosPerSecond / millisPerSecond
 
 interface GraphicsContext {
     fun surface(width: Int, height: Int): Surface
 
-    fun waitUntilGPUFinishes()
+    suspend fun awaitGPUCompletion()
 }
 
 @OptIn(ExperimentalTime::class)
@@ -24,7 +27,7 @@ fun measureComposable(
     targetFps: Int,
     graphicsContext: GraphicsContext?,
     content: @Composable () -> Unit
-): BenchmarkResult {
+): BenchmarkResult = runBlocking {
     val scene = ComposeScene()
     try {
         val nanosPerFrame = (1.0 / targetFps.toDouble() * nanosPerSecond).toLong()
@@ -32,28 +35,38 @@ fun measureComposable(
         scene.constraints = Constraints.fixed(width, height)
         val surface = graphicsContext?.surface(width, height) ?: Surface.makeNull(width, height)
 
-        var nanoTime = 0L
-
         val frames = MutableList(frameCount) {
             BenchmarkFrame(Duration.INFINITE, Duration.INFINITE)
         }
 
+        var nanoTime = 0L
+
         repeat(frameCount) {
-            val cpuTime = measureTime {
-                scene.render(surface.canvas, nanoTime)
-                surface.flushAndSubmit(false)
+            val frameTime = measureTime {
+                val cpuTime = measureTime {
+                    scene.render(surface.canvas, nanoTime)
+                    surface.flushAndSubmit(false)
+                }
+
+                val gpuTime = measureTime {
+                    graphicsContext?.awaitGPUCompletion()
+                }
+
+                frames[it] = BenchmarkFrame(cpuTime, gpuTime)
             }
 
-            val gpuTime = measureTime {
-                graphicsContext?.waitUntilGPUFinishes()
+            val actualNanosPerFrame = frameTime.inWholeNanoseconds
+            val nanosUntilDeadline = nanosPerFrame - actualNanosPerFrame
+
+            // Emulate waiting for next vsync
+            if (nanosUntilDeadline > 0) {
+                delay(nanosUntilDeadline / nanosPerMillisecond)
             }
 
-            frames[it] = BenchmarkFrame(cpuTime, gpuTime)
-
-            nanoTime += nanosPerFrame
+            nanoTime += maxOf(actualNanosPerFrame, nanosPerFrame)
         }
 
-        return BenchmarkResult(
+        BenchmarkResult(
             nanosPerFrame.nanoseconds,
             frames
         )
