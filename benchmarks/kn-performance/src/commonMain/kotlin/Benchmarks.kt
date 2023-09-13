@@ -52,16 +52,16 @@ data class BenchmarkStats(
     val frameBudget: Duration,
     val percentileCPUAverage: List<BenchmarkPercentileAverage>,
     val percentileGPUAverage: List<BenchmarkPercentileAverage>,
-    val doubleBufferingMissedFrames: MissedFrames,
-    val tripleBufferingMissedFrames: MissedFrames
+    val noBufferingMissedFrames: MissedFrames,
+    val doubleBufferingMissedFrames: MissedFrames
 ) {
     fun prettyPrint() {
         percentileCPUAverage.prettyPrint(BenchmarkFrameTimeKind.CPU)
         println()
         percentileGPUAverage.prettyPrint(BenchmarkFrameTimeKind.GPU)
         println()
+        noBufferingMissedFrames.prettyPrint("no buffering")
         doubleBufferingMissedFrames.prettyPrint("double buffering")
-        tripleBufferingMissedFrames.prettyPrint("triple buffering")
     }
 
     private fun List<BenchmarkPercentileAverage>.prettyPrint(kind: BenchmarkFrameTimeKind) {
@@ -88,11 +88,11 @@ class BenchmarkResult(
     }
 
     fun generateStats(): BenchmarkStats {
-        val doubleBufferingMissedFramesCount = frames.count {
+        val noBufferingMissedFramesCount = frames.count {
             it.cpuDuration + it.gpuDuration > frameBudget
         }
 
-        val tripleBufferingMissedFrames = frames.count {
+        val doubleBufferingMissedFrames = frames.count {
             maxOf(it.cpuDuration, it.gpuDuration) > frameBudget
         }
 
@@ -108,8 +108,8 @@ class BenchmarkResult(
 
                 BenchmarkPercentileAverage(percentile, average)
             },
-            MissedFrames(doubleBufferingMissedFramesCount, doubleBufferingMissedFramesCount / frames.size.toDouble()),
-            MissedFrames(tripleBufferingMissedFrames, tripleBufferingMissedFrames / frames.size.toDouble())
+            MissedFrames(noBufferingMissedFramesCount, noBufferingMissedFramesCount / frames.size.toDouble()),
+            MissedFrames(doubleBufferingMissedFrames, doubleBufferingMissedFrames / frames.size.toDouble())
         )
     }
 
