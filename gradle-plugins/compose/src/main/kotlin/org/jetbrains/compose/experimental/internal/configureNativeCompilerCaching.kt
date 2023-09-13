@@ -19,13 +19,31 @@ private const val PROJECT_CACHE_KIND_PROPERTY_NAME = "kotlin.native.cacheKind"
 private const val COMPOSE_NATIVE_MANAGE_CACHE_KIND = "compose.kotlin.native.manageCacheKind"
 private const val NONE_VALUE = "none"
 
+// Compose runtime supports these k/native targets:
+// https://github.com/JetBrains/compose-multiplatform-core/blob/jb-main/compose/runtime/runtime/build.gradle#L75
 private val SUPPORTED_NATIVE_TARGETS = setOf(
+    // ios
     KonanTarget.IOS_ARM32,
     KonanTarget.IOS_X64,
     KonanTarget.IOS_ARM64,
     KonanTarget.IOS_SIMULATOR_ARM64,
+    // macos
     KonanTarget.MACOS_X64,
     KonanTarget.MACOS_ARM64,
+    // tvos
+    KonanTarget.TVOS_X64,
+    KonanTarget.TVOS_ARM64,
+    KonanTarget.TVOS_SIMULATOR_ARM64,
+    // watchOS
+    KonanTarget.WATCHOS_ARM64,
+    KonanTarget.WATCHOS_ARM32,
+    KonanTarget.WATCHOS_X64,
+    KonanTarget.WATCHOS_X86, // it's going to be deprecated, see comments in KonanTarget
+    KonanTarget.WATCHOS_SIMULATOR_ARM64,
+    // mingw
+    KonanTarget.MINGW_X64,
+    // linux
+    KonanTarget.LINUX_X64,
 )
 
 internal val SUPPORTED_NATIVE_CACHE_KIND_PROPERTIES =
