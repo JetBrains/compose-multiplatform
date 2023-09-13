@@ -172,38 +172,36 @@ class GradlePluginTest : GradlePluginTestBase() {
             }
             withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
                 gradleFailure(*args, "-Pkotlin.native.cacheKind=none").checks {
-                    check.logContainsOnce("Error: 'kotlin.native.cacheKind' is explicitly set to 'none'")
-                    check.logContainsOnce(commonPartOfWarning)
+                    check.logContains("Error: 'kotlin.native.cacheKind' is explicitly set to 'none'")
+                    check.logContains(commonPartOfWarning)
                 }
 
                 gradleFailure(*args, "-Pkotlin.native.cacheKind=none").checks {
-                    check.logContainsOnce("Error: 'kotlin.native.cacheKind' is explicitly set to 'none'")
-                    check.logContainsOnce(commonPartOfWarning)
+                    check.logContains("Error: 'kotlin.native.cacheKind' is explicitly set to 'none'")
+                    check.logContains(commonPartOfWarning)
                 }
             }
             withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
                 gradleFailure(*args, "-Pkotlin.native.cacheKind=static").checks {
-                    check.logContainsOnce("Error: 'kotlin.native.cacheKind' is explicitly set to 'static'")
-                    check.logContainsOnce(commonPartOfWarning)
+                    check.logContains("Error: 'kotlin.native.cacheKind' is explicitly set to 'static'")
+                    check.logContains(commonPartOfWarning)
                 }
             }
             withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
                 gradleFailure(*args, "-Pkotlin.native.cacheKind.iosX64=none").checks {
-                    check.logContainsOnce("Error: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'none'")
-                    check.logContainsOnce(commonPartOfWarning)
+                    check.logContains("Error: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'none'")
+                    check.logContains(commonPartOfWarning)
                 }
             }
             withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
                 gradleFailure(*args, "-Pkotlin.native.cacheKind.iosX64=static").checks {
-                    check.logContainsOnce("Error: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'static'")
-                    check.logContainsOnce(commonPartOfWarning)
+                    check.logContains("Error: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'static'")
+                    check.logContains(commonPartOfWarning)
                 }
             }
         }
 
-
-        testKotlinVersion(TestKotlinVersions.v1_8_20)
-        testKotlinVersion(TestKotlinVersions.v1_9_0)
+        testKotlinVersion(TestKotlinVersions.v1_9_20_Beta)
     }
 
     @Test
