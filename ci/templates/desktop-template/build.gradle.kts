@@ -19,7 +19,8 @@ dependencies {
     implementation(compose.desktop.currentOs)
 
     // Include the Test API
-    implementation(compose.desktop.uiTestJUnit4)
+    // compileOnly instead of testImplementation for checking compilation of the tutorials
+    compileOnly(compose.desktop.uiTestJUnit4)
 }
 
 compose.desktop {
