@@ -51,7 +51,7 @@ abstract class ConfigurationProblemReporterService : AbstractComposeMultiplatfor
                 .parameters.fn()
         }
 
-        fun reportProblem(project: Project, message: String) {
+        fun reportWarning(project: Project, message: String) {
             configureParameters(project) { warnings.add(message) }
         }
 
