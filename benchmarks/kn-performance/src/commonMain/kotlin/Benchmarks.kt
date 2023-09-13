@@ -98,12 +98,12 @@ class BenchmarkResult(
 
         return BenchmarkStats(
             frameBudget,
-            listOf(0.01, 0.02, 0.05, 0.1, 0.25, 0.5, 0.75).map { percentile ->
+            listOf(0.01, 0.02, 0.05, 0.1, 0.25, 0.5).map { percentile ->
                 val average = percentileAverageFrameTime(percentile, BenchmarkFrameTimeKind.CPU)
 
                 BenchmarkPercentileAverage(percentile, average)
             },
-            listOf(0.01, 0.1, 0.5, 0.75).map { percentile ->
+            listOf(0.01, 0.1, 0.5).map { percentile ->
                 val average = percentileAverageFrameTime(percentile, BenchmarkFrameTimeKind.GPU)
 
                 BenchmarkPercentileAverage(percentile, average)
