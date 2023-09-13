@@ -51,8 +51,12 @@ abstract class ConfigurationProblemReporterService : AbstractComposeMultiplatfor
                 .parameters.fn()
         }
 
-        fun reportProblem(project: Project, message: String) {
+        fun reportWarning(project: Project, message: String) {
             configureParameters(project) { warnings.add(message) }
+        }
+
+        fun reportError(project: Project, message: String): Nothing {
+            error(message)
         }
 
         fun registerUnsupportedPluginProvider(project: Project, unsupportedPlugin: Provider<SubpluginArtifact?>) {

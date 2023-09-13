@@ -148,11 +148,11 @@ class GradlePluginTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun nativeCacheKindWarning() {
+    fun nativeCacheKindError() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
-        fun withNativeCacheKindWarningProject(kotlinVersion: String, fn: TestProject.() -> Unit) {
+        fun withNativeCacheKindErrorProject(kotlinVersion: String, fn: TestProject.() -> Unit) {
             with(testProject(
-                TestProjects.nativeCacheKindWarning,
+                TestProjects.nativeCacheKindError,
                 defaultTestEnvironment.copy(kotlinVersion = kotlinVersion)
             )) {
                 fn()
@@ -164,38 +164,38 @@ class GradlePluginTest : GradlePluginTestBase() {
         fun testKotlinVersion(kotlinVersion: String) {
             val args = arrayOf("help")
             val commonPartOfWarning = "Compose Multiplatform Gradle plugin manages this property automatically"
-            withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
+            withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
                 gradle(*args).checks {
-                    check.logDoesntContain("Warning: 'kotlin.native.cacheKind")
+                    check.logDoesntContain("Error: 'kotlin.native.cacheKind")
                     check.logDoesntContain(commonPartOfWarning)
                 }
             }
-            withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
+            withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
                 gradle(*args, "-Pkotlin.native.cacheKind=none").checks {
-                    check.logContainsOnce("Warning: 'kotlin.native.cacheKind' is explicitly set to 'none'")
+                    check.logContainsOnce("Error: 'kotlin.native.cacheKind' is explicitly set to 'none'")
                     check.logContainsOnce(commonPartOfWarning)
                 }
 
                 gradle(*args, "-Pkotlin.native.cacheKind=none").checks {
-                    check.logContainsOnce("Warning: 'kotlin.native.cacheKind' is explicitly set to 'none'")
+                    check.logContainsOnce("Error: 'kotlin.native.cacheKind' is explicitly set to 'none'")
                     check.logContainsOnce(commonPartOfWarning)
                 }
             }
-            withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
+            withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
                 gradle(*args, "-Pkotlin.native.cacheKind=static").checks {
-                    check.logContainsOnce("Warning: 'kotlin.native.cacheKind' is explicitly set to 'static'")
+                    check.logContainsOnce("Error: 'kotlin.native.cacheKind' is explicitly set to 'static'")
                     check.logContainsOnce(commonPartOfWarning)
                 }
             }
-            withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
+            withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
                 gradle(*args, "-Pkotlin.native.cacheKind.iosX64=none").checks {
-                    check.logContainsOnce("Warning: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'none'")
+                    check.logContainsOnce("Error: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'none'")
                     check.logContainsOnce(commonPartOfWarning)
                 }
             }
-            withNativeCacheKindWarningProject(kotlinVersion = kotlinVersion) {
+            withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
                 gradle(*args, "-Pkotlin.native.cacheKind.iosX64=static").checks {
-                    check.logContainsOnce("Warning: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'static'")
+                    check.logContainsOnce("Error: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'static'")
                     check.logContainsOnce(commonPartOfWarning)
                 }
             }

@@ -65,9 +65,9 @@ private fun KotlinNativeTarget.checkExplicitCacheKind() {
         for (provider in propertyProviders) {
             val value = provider.valueOrNull(cacheKindProperty)
             if (value != null) {
-                ConfigurationProblemReporterService.reportProblem(
+                ConfigurationProblemReporterService.reportError(
                     project,
-                    explicitCacheKindWarningMessage(cacheKindProperty, value, provider)
+                    explicitCacheKindErrorMessage(cacheKindProperty, value, provider)
                 )
                 return
             }
@@ -75,14 +75,13 @@ private fun KotlinNativeTarget.checkExplicitCacheKind() {
     }
 }
 
-private fun explicitCacheKindWarningMessage(
+private fun explicitCacheKindErrorMessage(
     cacheKindProperty: String,
     value: String,
     provider: KGPPropertyProvider
 ) = """
-    |Warning: '$cacheKindProperty' is explicitly set to '$value'.
+    |Error: '$cacheKindProperty' is explicitly set to '$value'.
     |Compose Multiplatform Gradle plugin manages this property automatically based on a Kotlin compiler version being used.
-    |In future versions of Compose Multiplatform this warning will become an error.
     |  * Recommended action: remove explicit '$cacheKindProperty=$value' from ${provider.location}. 
     |  * Alternative action: disable cache kind management by adding '$COMPOSE_NATIVE_MANAGE_CACHE_KIND=false' to your 'gradle.properties'.
 """.trimMargin()
