@@ -66,7 +66,7 @@ data class BenchmarkStats(
 
     private fun List<BenchmarkPercentileAverage>.prettyPrint(kind: BenchmarkFrameTimeKind) {
         forEach {
-            println("Lowest p${(it.percentile * 100).roundToInt()} ${kind.toPrettyPrintString()} average: ${it.average}")
+            println("Worst p${(it.percentile * 100).roundToInt()} ${kind.toPrettyPrintString()} average: ${it.average}")
         }
     }
 }
