@@ -103,20 +103,18 @@ fun Project.configureMavenPublication(
     }
 }
 
+@Suppress("UnstableApiUsage")
 fun Project.configureGradlePlugin(
     publicationConfig: MavenPublicationConfigExtension,
     gradlePluginConfig: GradlePluginConfigExtension
 ) {
-    // metadata for gradle plugin portal (relates to pluginBundle extension block from com.gradle.plugin-publish)
-    configureIfExists<PluginBundleExtension> {
-        vcsUrl = BuildProperties.vcs
-        website = BuildProperties.website
-        description = publicationConfig.description
-        tags = gradlePluginConfig.pluginPortalTags
-    }
-
     // gradle plugin definition (relates to gradlePlugin extension block from java-gradle-plugin)
+    // and metadata for gradle plugin portal (relates to pluginBundle extension block from com.gradle.plugin-publish)
     configureIfExists<GradlePluginDevelopmentExtension> {
+        vcsUrl.set(BuildProperties.vcs)
+        website.set(BuildProperties.website)
+        description = publicationConfig.description
+
         plugins {
             create("gradlePlugin") {
                 id = gradlePluginConfig.pluginId
@@ -124,6 +122,7 @@ fun Project.configureGradlePlugin(
                 description = publicationConfig.description
                 implementationClass = gradlePluginConfig.implementationClass
                 version = project.version
+                tags.set(gradlePluginConfig.pluginPortalTags)
             }
         }
     }
