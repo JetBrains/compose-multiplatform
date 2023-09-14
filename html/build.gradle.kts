@@ -1,11 +1,14 @@
 import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.compose.gradle.kotlinKarmaConfig
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.targets
 
 plugins {
     kotlin("multiplatform") apply false
+    id("org.jetbrains.compose") apply false
 }
 
 val COMPOSE_WEB_VERSION: String = extra["compose.version"] as String
@@ -49,6 +52,23 @@ subprojects {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    afterEvaluate {
+        val project = this
+        val kotlinVersion = project.kotlinExtension.coreLibrariesVersion
+        val composeCompilerVersion = if (kotlinVersion == "1.9.10") {
+            project.properties["composeCompiler.kt1910"] as String
+        } else {
+            project.properties["composeCompiler.kt1920"] as String
+        }
+        project.extensions.findByType<org.jetbrains.compose.ComposeExtension>()?.also {
+            if (!composeCompilerVersion.isNullOrEmpty()) {
+                println("${project.name} is using compilerPluginVersion = $composeCompilerVersion")
+                it.kotlinCompilerPlugin.set(composeCompilerVersion)
+                it.kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=true")
             }
         }
     }
