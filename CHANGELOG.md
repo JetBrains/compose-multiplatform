@@ -5,41 +5,41 @@
 ### Features
 * [Support Kotlin 1.9.20-Beta](https://github.com/JetBrains/compose-multiplatform/pull/3656)
 * Introduce Material 3 components in common
-  * [ModalBottomSheet](https://github.com/JetBrains/compose-multiplatform-core/pull/794)
-  * [SearchBar and DockedSearchBar](https://github.com/JetBrains/compose-multiplatform-core/pull/801)
-  * [ExposedDropDownMenu](https://github.com/JetBrains/compose-multiplatform-core/pull/787)
-* [Introduce Material component ExposedDropDownMenu in common](https://github.com/JetBrains/compose-multiplatform-core/pull/793)
-* [Introduce WindowInfo.containerSize experimental api](https://github.com/JetBrains/compose-multiplatform-core/pull/785)
+  * [`ModalBottomSheet`](https://github.com/JetBrains/compose-multiplatform-core/pull/794)
+  * [`SearchBar` and `DockedSearchBar`](https://github.com/JetBrains/compose-multiplatform-core/pull/801)
+  * [`ExposedDropDownMenu`](https://github.com/JetBrains/compose-multiplatform-core/pull/787)
+* [Introduce Material component `ExposedDropDownMenu` in common](https://github.com/JetBrains/compose-multiplatform-core/pull/793)
+* [Introduce `WindowInfo.containerSize` experimental api](https://github.com/JetBrains/compose-multiplatform-core/pull/785)
 
 ## iOS
 
 ### Breaking changes
-* [Having kotlin.native.cacheKind = none will result in a build error.](https://github.com/JetBrains/compose-multiplatform/pull/3667)
+* [Having `kotlin.native.cacheKind = none` will result in a build error.](https://github.com/JetBrains/compose-multiplatform/pull/3667)
 
 ### Features
 
 * [Compilation speed up due to enabling compiler caches for Kotlin 1.9.20+](https://github.com/JetBrains/compose-multiplatform/pull/3648)
 * [Added crossfade animation during orientation change when used within UIKit hierarchy](https://github.com/JetBrains/compose-multiplatform-core/pull/778)
-* [Compose Multiplatform should warn when CADisableMinimumFrameDurationOnPhone is not configured properly](https://github.com/JetBrains/compose-multiplatform/issues/3634)
+* [Compose Multiplatform should warn when `CADisableMinimumFrameDurationOnPhone` is not configured properly](https://github.com/JetBrains/compose-multiplatform/issues/3634)
 * [Fast delete mode on software keyboard. When you hold a backspace, “turbo mode” is enabled after deleting the first 21 symbols. In turbo mode each tick deletes two words.](https://github.com/JetBrains/compose-multiplatform/issues/2991)
 * [On a long scrollable TextFields, If it’s scrolled up to caret position while typing. Then it stopped on the line above the line with a caret.](https://github.com/JetBrains/compose-multiplatform-core/pull/804)
-* [Add UIViewController lifetime hooks](https://github.com/JetBrains/compose-multiplatform-core/pull/779)
+* [Add `UIViewController` lifetime hooks](https://github.com/JetBrains/compose-multiplatform-core/pull/779)
 * [Implement iOS native feel scrolls for large text fields](https://github.com/JetBrains/compose-multiplatform-core/pull/771)
 
 ### Fixes
-* [Rendering synchronization of multiple UIKitViews within a screen](https://github.com/JetBrains/compose-multiplatform/issues/3534)
+* [Rendering synchronization of multiple `UIKitView`s within a screen](https://github.com/JetBrains/compose-multiplatform/issues/3534)
 * [Today's date is not highlighted with a circle in the material3 datePicker on iOS](https://github.com/JetBrains/compose-multiplatform/issues/3591)
 * [Fix text-to-speech crash in iOS 16.0.*](https://github.com/JetBrains/compose-multiplatform/issues/2984)
 * [Compose window is shown before the first frame is rendered](https://github.com/JetBrains/compose-multiplatform/issues/3492)
 * [iOS TextField, Compound emojis are being treated as many symbols](https://github.com/JetBrains/compose-multiplatform/issues/3104)
-* [Use CADisplayLink.targetTimestamp value as the time for animation frames](https://github.com/JetBrains/compose-multiplatform-core/pull/796)
+* [Use `CADisplayLink.targetTimestamp` value as the time for animation frames](https://github.com/JetBrains/compose-multiplatform-core/pull/796)
 * [iOS. Improved performance on 120 hz devices](https://github.com/JetBrains/compose-multiplatform-core/pull/797)
 
 ## Desktop
 
 ### Fixes
-* [LocalLayoutDirection isn't propagated into DialogWindow](https://github.com/JetBrains/compose-multiplatform/issues/3382)
-* [CompositionLocals given in application scope are not take into account in window scope (such as LocalLayoutDirection)](https://github.com/JetBrains/compose-multiplatform/issues/3571)
+* [`LocalLayoutDirection` isn't propagated into `DialogWindow`](https://github.com/JetBrains/compose-multiplatform/issues/3382)
+* [CompositionLocals given in application scope are not take into account in window scope (such as `LocalLayoutDirection`)](https://github.com/JetBrains/compose-multiplatform/issues/3571)
 * [Fix accessibility issue with actions in popups](https://github.com/JetBrains/compose-multiplatform-core/pull/792)
 * [Apply custom Dialog's scrim blend mode only when window is transparent](https://github.com/JetBrains/compose-multiplatform-core/pull/812)
 
