@@ -1,0 +1,46 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+
+clone() {
+    mkdir -p $1
+    pushd $1
+    git init
+    git config advice.detachedHead false
+    git fetch --depth=1 $2 $3
+    git checkout FETCH_HEAD
+    popd
+}
+
+# Commit hashes and sdk versions from https://android.googlesource.com/platform/manifest/+/refs/heads/androidx-main/default.xml
+
+downloadLinuxSDK() {
+    clone linux/platforms/android-32 https://android.googlesource.com/platform/prebuilts/fullsdk/platforms/android-32 master
+    clone linux/sources/android-32 https://android.googlesource.com/platform/prebuilts/fullsdk/sources/android-32 master
+    clone linux/build-tools/30.0.3 https://android.googlesource.com/platform/prebuilts/fullsdk-linux/build-tools/30.0.3 master
+    clone linux/platform-tools https://android.googlesource.com/platform/prebuilts/fullsdk-linux/platform-tools master
+    clone linux/tools https://android.googlesource.com/platform/prebuilts/fullsdk-linux/tools master
+}
+
+downloadMacOsSDK() {
+    clone darwin/platforms/android-32 https://android.googlesource.com/platform/prebuilts/fullsdk/platforms/android-32 master
+    clone darwin/sources/android-32 https://android.googlesource.com/platform/prebuilts/fullsdk/sources/android-32 master
+    clone darwin/build-tools/30.0.3 https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/build-tools/30.0.3 master
+    clone darwin/platform-tools https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/platform-tools master
+    clone darwin/tools https://android.googlesource.com/platform/prebuilts/fullsdk-darwin/tools master
+}
+
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    downloadLinuxSDK
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    downloadMacOsSDK
+elif [[ "$OSTYPE" == "cygwin" ]]; then
+    echo "Please download Android SDK manually (https://developer.android.com/studio)"
+elif [[ "$OSTYPE" == "msys" ]]; then
+    echo "Please download Android SDK manually (https://developer.android.com/studio)"
+elif [[ "$OSTYPE" == "win32" ]]; then
+    echo "Please download Android SDK manually (https://developer.android.com/studio)"
+else
+    echo "Unknown OS"
+fi
+

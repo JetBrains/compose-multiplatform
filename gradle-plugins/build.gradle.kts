@@ -1,4 +1,3 @@
-import com.gradle.publish.PluginBundleExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
@@ -7,6 +6,14 @@ plugins {
     alias(libs.plugins.publish.plugin.portal) apply false
     alias(libs.plugins.shadow.jar) apply false
     alias(libs.plugins.download) apply false
+}
+
+buildscript {
+    setAndroidSDKForTestProjects(
+        listOf(
+            "compose/src/test/test-projects/application/newAndroidTarget"
+        )
+    )
 }
 
 subprojects {
