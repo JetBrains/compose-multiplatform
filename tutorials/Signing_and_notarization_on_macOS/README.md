@@ -239,10 +239,13 @@ To notarize your app, you can use `notarize<PACKAGING_FORMAT>` task:
 where:
 * `<APPLE_ID>` — your Apple ID;
 * `<PASSWORD>` — the app-specific password created previously;
-* `<TEAM_ID>` — **optional** Team ID, if your account is associated with multiple teams. To get a table of team IDs associated with a given username and password, run:
+* `<TEAM_ID>` — your Team. To get a table of team IDs associated with a given username and password, run:
 ```
 xcrun altool --list-providers -u <Apple ID> -p <Notarization password>"
 ```
+
+<img alt="Team ID" src="notarization-team-id.png" />
+
 
 The following tasks can be used for notarization:
 * `notarizeDmg` — build, sign and notarize `.dmg` installer;
