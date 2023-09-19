@@ -55,7 +55,7 @@ abstract class AbstractNotarizationTask @Inject constructor(
             "--wait",
             "--apple-id",
             notarization.appleID,
-            "--team-id".takeIf { notarization.teamID != null },
+            "--team-id",
             notarization.teamID,
             packageFile.absolutePath
         )
