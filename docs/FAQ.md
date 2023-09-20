@@ -32,7 +32,7 @@ Desktop, is Experimental. You can try it in your pet projects.
 ## When will Compose Multiplatform become Stable? What are the current stability guarantees?
 
 Compose Multiplatform is Stable for Android and Desktop, while the iOS and Web targets are not Stable yet. The iOS target 
-is in Alpha, and Web is Experimental.
+is in Alpha, and Web is Experimental. At this time, we cannot provide estimates of the time required for all targets to become stable.
 
 Stable means that the framework provides a comprehensive API surface that allows you to write beautiful, production-ready
 applications, without encountering performance or correctness issues in the framework itself. API-breaking changes can 
