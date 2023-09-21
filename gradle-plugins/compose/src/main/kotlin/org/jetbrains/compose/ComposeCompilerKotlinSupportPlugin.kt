@@ -8,10 +8,12 @@ package org.jetbrains.compose
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.internal.ComposeCompilerArtifactProvider
+import org.jetbrains.compose.internal.SUPPORTED_NATIVE_TARGETS
 import org.jetbrains.compose.internal.mppExtOrNull
 import org.jetbrains.compose.internal.service.ConfigurationProblemReporterService
 import org.jetbrains.compose.internal.webExt
 import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
 class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
@@ -68,7 +70,7 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
             KotlinPlatformType.jvm -> true
             KotlinPlatformType.js -> isApplicableJsTarget(kotlinCompilation.target)
             KotlinPlatformType.androidJvm -> true
-            KotlinPlatformType.native -> true
+            KotlinPlatformType.native -> (kotlinCompilation.target as KotlinNativeTarget).konanTarget in SUPPORTED_NATIVE_TARGETS
             KotlinPlatformType.wasm -> false
         }
 
