@@ -52,8 +52,8 @@ abstract class ComposeExtension @Inject constructor(
      * ```
      */
     @Suppress("MemberVisibilityCanBePrivate")
-    val platformTypes: SetProperty<KotlinPlatformType> = objects.setProperty(KotlinPlatformType::class.java).also {
-        it.set(KotlinPlatformType.values().toMutableSet())
+    val platformTypes: SetProperty<KotlinPlatformType> = objects.setProperty(KotlinPlatformType::class.java).apply {
+        set(KotlinPlatformType.values().toMutableSet())
     }
 
     val dependencies = ComposePlugin.Dependencies(project)
@@ -63,6 +63,9 @@ abstract class ComposeExtension @Inject constructor(
      * Removes [platformType] from [platformTypes].
      */
     fun excludePlatform(vararg platformType: KotlinPlatformType) {
-        platformTypes.set(platformTypes.get() - platformType.toSet())
+        platformTypes.set(platformTypes.map {
+            it.removeAll(platformType.toSet())
+            it
+        })
     }
 }
