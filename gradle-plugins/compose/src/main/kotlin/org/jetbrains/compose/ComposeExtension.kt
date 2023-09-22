@@ -10,7 +10,9 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.jetbrains.compose.internal.utils.nullableProperty
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import javax.inject.Inject
 
 abstract class ComposeExtension @Inject constructor(
@@ -41,5 +43,26 @@ abstract class ComposeExtension @Inject constructor(
      */
     val kotlinCompilerPluginArgs: ListProperty<String> = objects.listProperty(String::class.java)
 
+    /**
+     * A set of kotlin platform types to which the Compose Compiler plugin will be applied.
+     * By default, it contains all KotlinPlatformType values.
+     * It can be used to disable the Compose Compiler plugin for one or more targets:
+     * ```
+     * platformTypes.set(platformTypes.get() - KotlinPlatformType.native)
+     * ```
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    val platformTypes: SetProperty<KotlinPlatformType> = objects.setProperty(KotlinPlatformType::class.java).also {
+        it.set(KotlinPlatformType.values().toMutableSet())
+    }
+
     val dependencies = ComposePlugin.Dependencies(project)
+
+    /**
+     * @param platformType - the type of platform(s) which should not have the Compose Compiler plugin applied.
+     * Removes [platformType] from [platformTypes].
+     */
+    fun excludePlatform(vararg platformType: KotlinPlatformType) {
+        platformTypes.set(platformTypes.get() - platformType.toSet())
+    }
 }
