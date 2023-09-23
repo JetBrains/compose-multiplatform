@@ -41,8 +41,12 @@ fun AttrsScope<SVGElement>.fillRule(fill: String) {
     attr("fill-rule", fill)
 }
 
-fun AttrsScope<SVGElement>.fillOpacity(fill: String) {
-    attr("fill-opacity", fill)
+public fun AttrsScope<SVGElement>.fillOpacity(fill: CSSNumeric) {
+    attr("fill-opacity", fill.toString())
+}
+
+public fun AttrsScope<SVGElement>.fillOpacity(fill: CSSUnitPercentage) {
+    attr("fill-opacity", fill.toString())
 }
 
 fun AttrsScope<SVGElement>.href(href: String) {
