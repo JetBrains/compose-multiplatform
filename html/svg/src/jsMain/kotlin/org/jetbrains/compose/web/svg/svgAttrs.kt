@@ -45,7 +45,7 @@ public fun AttrsScope<SVGElement>.fillOpacity(fill: Number) {
     attr("fill-opacity", fill.toString())
 }
 
-public fun AttrsScope<SVGElement>.fillOpacity(fill: CSSUnitPercentage) {
+public fun AttrsScope<SVGElement>.fillOpacity(fill: CSSPercentageValue) {
     attr("fill-opacity", fill.toString())
 }
 
