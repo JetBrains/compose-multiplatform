@@ -41,11 +41,11 @@ fun AttrsScope<SVGElement>.fillRule(fill: String) {
     attr("fill-rule", fill)
 }
 
-public fun AttrsScope<SVGElement>.fillOpacity(fill: Number) {
+fun AttrsScope<SVGElement>.fillOpacity(fill: Number) {
     attr("fill-opacity", fill.toString())
 }
 
-public fun AttrsScope<SVGElement>.fillOpacity(fill: CSSPercentageValue) {
+fun AttrsScope<SVGElement>.fillOpacity(fill: CSSPercentageValue) {
     attr("fill-opacity", fill.toString())
 }
 
