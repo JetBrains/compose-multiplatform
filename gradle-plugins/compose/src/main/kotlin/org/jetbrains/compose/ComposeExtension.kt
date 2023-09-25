@@ -44,7 +44,7 @@ abstract class ComposeExtension @Inject constructor(
     val kotlinCompilerPluginArgs: ListProperty<String> = objects.listProperty(String::class.java)
 
     /**
-     * A set of kotlin platform types to which the Compose Compiler plugin will be applied.
+     * A set of kotlin platform types to which the Compose plugin will be applied.
      * By default, it contains all KotlinPlatformType values.
      * It can be used to disable the Compose plugin for one or more targets:
      * ```
