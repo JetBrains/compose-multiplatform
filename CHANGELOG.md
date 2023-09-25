@@ -1,3 +1,22 @@
+# 1.5.2 (September 2023)
+
+## Desktop
+
+### Fixes
+- [Application crash on touch (using touchscreen) when onClick modifier is used](https://github.com/JetBrains/compose-multiplatform/issues/3655)
+
+## Dependencies
+
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+
+- [Compiler 1.5.3](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.3)
+- [Runtime 1.5.0](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.5.0)
+- [UI 1.5.0](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.5.0)
+- [Foundation 1.5.0](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.5.0)
+- [Material 1.5.0](https://developer.android.com/jetpack/androidx/releases/compose-material#1.5.0)
+- [Material3 1.1.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.1.1)
+
+
 # 1.5.10-beta01 (September 2023)
 
 ## Common
