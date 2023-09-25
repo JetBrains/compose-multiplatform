@@ -25,8 +25,7 @@ internal fun Project.configureExperimental(
 
     if (experimentalExt.web._isApplicationInitialized) {
         val webExt = composeExt.extensions.getByType(WebExtension::class.java)
-        for (target in webExt.targetsToConfigure(project)) {
-            target.configureExperimentalWebApplication(experimentalExt.web.application)
-        }
+        webExt.targetsToConfigure(project)
+            .configureExperimentalWebApplication(project, experimentalExt.web.application)
     }
 }

@@ -20,6 +20,10 @@ abstract class WebExtension : ExtensionAware {
 
     // public api
     @Suppress("unused")
+    @Deprecated(
+        """By default, Compose is applied to all declared K/JS-IR targets. 
+        If you need to not apply Compose for K/JS, please exclude `KotlinPlatformType.js` from `compose.platformTypes`"""
+    )
     fun targets(vararg targets: KotlinTarget) {
         check(requestedTargets == null) {
             "compose.web.targets() was already set!"
@@ -53,20 +57,12 @@ abstract class WebExtension : ExtensionAware {
         if (mppExt != null) {
             val mppTargets = mppExt.targets.asMap.values
             val jsIRTargets = mppTargets.filterIsInstanceTo(LinkedHashSet<KotlinJsIrTarget>())
-
-            return if (jsIRTargets.size > 1) {
-                project.logger.error(
-                    "w: Default configuration for Compose for Web is disabled: " +
-                            "multiple Kotlin JS IR targets are defined. " +
-                            "Specify Compose for Web Kotlin targets by using `compose.web.targets()`"
-                )
-                emptySet()
-            } else jsIRTargets
+            return jsIRTargets
         }
 
         val jsExt = project.kotlinJsExtOrNull
         if (jsExt != null) {
-            val target = jsExt.target
+            val target = jsExt.js()
             return if (target is KotlinJsIrTarget) {
                 setOf(target)
             } else {
