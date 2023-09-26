@@ -19,12 +19,12 @@
   * [Don't send redundant synthetic moves](https://github.com/JetBrains/compose-multiplatform-core/pull/819)
   * [Postpone `CAMetalDrawable` acquisition](https://github.com/JetBrains/compose-multiplatform-core/pull/820)
   * [Move frame encoding to separate thread when possible](https://github.com/JetBrains/compose-multiplatform-core/pull/829)
+* [Double tap and triple tap gesture handling in `TextField`s](https://github.com/JetBrains/compose-multiplatform/issues/2682)
 
 ### Fixes
 * [Expanded `ModalBottomSheet`: scrim doesn't occupy complete screen](https://github.com/JetBrains/compose-multiplatform/issues/3701)
 * [Fix interop view intercepting touches for popups](https://github.com/JetBrains/compose-multiplatform-core/pull/835) 
 * [Fix applying `WindowInsets` inside `Popup`/`Dialog`](https://github.com/JetBrains/compose-multiplatform-core/pull/832)
-* [Fix incorrect text selection by double tap in `TextField`](https://github.com/JetBrains/compose-multiplatform/issues/2682)
 
 
 ## Desktop
