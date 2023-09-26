@@ -186,23 +186,13 @@ private fun JvmApplicationContext.configurePackagingTasks(
                 "Unexpected target format for MacOS: $targetFormat"
             }
 
-            val notarizationRequestsDir = project.layout.buildDirectory.dir("compose/notarization/$app")
-            tasks.register<AbstractUploadAppForNotarizationTask>(
+            tasks.register<AbstractNotarizationTask>(
                 taskNameAction = "notarize",
                 taskNameObject = targetFormat.name,
                 args = listOf(targetFormat)
             ) {
                 dependsOn(packageFormat)
                 inputDir.set(packageFormat.flatMap { it.destinationDir })
-                requestsDir.set(notarizationRequestsDir)
-                configureCommonNotarizationSettings(this)
-            }
-
-            tasks.register<AbstractCheckNotarizationStatusTask>(
-                taskNameAction = "check",
-                taskNameObject = "notarizationStatus"
-            ) {
-                requestDir.set(notarizationRequestsDir)
                 configureCommonNotarizationSettings(this)
             }
         }
@@ -351,7 +341,6 @@ private fun JvmApplicationContext.configurePackageTask(
 internal fun JvmApplicationContext.configureCommonNotarizationSettings(
     notarizationTask: AbstractNotarizationTask
 ) {
-    notarizationTask.nonValidatedBundleID.set(app.nativeDistributions.macOS.bundleID)
     notarizationTask.nonValidatedNotarizationSettings = app.nativeDistributions.macOS.notarization
 }
 

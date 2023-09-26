@@ -10,7 +10,9 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.jetbrains.compose.internal.utils.nullableProperty
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import javax.inject.Inject
 
 abstract class ComposeExtension @Inject constructor(
@@ -40,6 +42,18 @@ abstract class ComposeExtension @Inject constructor(
      * https://github.com/androidx/androidx/blob/androidx-main/compose/compiler/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/ComposePlugin.kt
      */
     val kotlinCompilerPluginArgs: ListProperty<String> = objects.listProperty(String::class.java)
+
+    /**
+     * A set of kotlin platform types to which the Compose plugin will be applied.
+     * By default, it contains all KotlinPlatformType values.
+     * It can be used to disable the Compose plugin for one or more targets:
+     * ```
+     * platformTypes.set(platformTypes.get() - KotlinPlatformType.native)
+     * ```
+     */
+    val platformTypes: SetProperty<KotlinPlatformType> = objects.setProperty(KotlinPlatformType::class.java).apply {
+        set(KotlinPlatformType.values().toMutableSet())
+    }
 
     val dependencies = ComposePlugin.Dependencies(project)
 }

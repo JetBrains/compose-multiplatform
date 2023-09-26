@@ -16,6 +16,8 @@ import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
 class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
     private lateinit var composeCompilerArtifactProvider: ComposeCompilerArtifactProvider
+    private lateinit var applicableForPlatformTypes: Provider<Set<KotlinPlatformType>>
+
 
     override fun apply(target: Project) {
         super.apply(target)
@@ -26,6 +28,8 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
                 composeExt.kotlinCompilerPlugin.orNull ?:
                     ComposeCompilerCompatibility.compilerVersionFor(target.getKotlinPluginVersion())
             }
+
+            applicableForPlatformTypes = composeExt.platformTypes
 
             collectUnsupportedCompilerPluginUsages(target)
         }
@@ -62,15 +66,14 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
     override fun getPluginArtifactForNative(): SubpluginArtifact =
         composeCompilerArtifactProvider.compilerHostedArtifact
 
-    override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean =
-        when (kotlinCompilation.target.platformType) {
-            KotlinPlatformType.common -> true
-            KotlinPlatformType.jvm -> true
-            KotlinPlatformType.js -> isApplicableJsTarget(kotlinCompilation.target)
-            KotlinPlatformType.androidJvm -> true
-            KotlinPlatformType.native -> true
-            KotlinPlatformType.wasm -> false
+    override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
+        val applicableTo = applicableForPlatformTypes.get()
+
+        return when (val type = kotlinCompilation.target.platformType) {
+            KotlinPlatformType.js -> isApplicableJsTarget(kotlinCompilation.target) && applicableTo.contains(type)
+            else -> applicableTo.contains(type)
         }
+    }
 
     private fun isApplicableJsTarget(kotlinTarget: KotlinTarget): Boolean {
         if (kotlinTarget !is KotlinJsIrTarget) return false
