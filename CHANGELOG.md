@@ -22,6 +22,9 @@
 
 ### Fixes
 * [Expanded `ModalBottomSheet`: scrim doesn't occupy complete screen](https://github.com/JetBrains/compose-multiplatform/issues/3701)
+* [Fix interop view intercepting touches for popups](https://github.com/JetBrains/compose-multiplatform-core/pull/835) 
+* [Fix applying WindowInsets inside Popup/Dialog](https://github.com/JetBrains/compose-multiplatform-core/pull/832)
+
 
 ## Desktop
 
@@ -34,6 +37,20 @@
 
 ### Fixes
 * [Can't type in TextField placed in `ModalBottomSheet`](https://github.com/JetBrains/compose-multiplatform/issues/3703)
+
+## Gradle Plugin
+
+### Features
+* [Add API to not apply the Compose Compiler plugin](https://github.com/JetBrains/compose-multiplatform/pull/3722)
+
+### Fixes
+* [Switch to notarytool for notarization](https://github.com/JetBrains/compose-multiplatform/pull/3642)
+
+## HTML library
+
+### Features
+* [SVG - Add fillOpacity attribute](https://github.com/JetBrains/compose-multiplatform/pull/3725)
+
 
 ## Dependencies
 
