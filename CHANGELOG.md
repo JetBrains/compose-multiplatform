@@ -36,7 +36,7 @@
   * [Implement support for `SemanticsProperties.ProgressBarRangeInfo`](https://github.com/JetBrains/compose-multiplatform-core/pull/830)
 
 ### Fixes
-* [Can't type in TextField placed in `ModalBottomSheet`](https://github.com/JetBrains/compose-multiplatform/issues/3703)
+* [Can't type in `TextField` placed in `ModalBottomSheet`](https://github.com/JetBrains/compose-multiplatform/issues/3703)
 
 ## Gradle Plugin
 
