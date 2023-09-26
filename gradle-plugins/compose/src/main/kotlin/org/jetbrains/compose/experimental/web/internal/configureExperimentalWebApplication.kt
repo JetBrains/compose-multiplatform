@@ -18,25 +18,30 @@ import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
-internal fun KotlinJsIrTarget.configureExperimentalWebApplication(app: ExperimentalWebApplication) {
-    val mainCompilation = compilations.getByName("main")
-    val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-wasm/$targetName")
-    val taskName = "unpackSkikoWasmRuntime${targetName.uppercaseFirstChar()}"
-    mainCompilation.defaultSourceSet.resources.srcDir(unpackedRuntimeDir)
-
-    val skikoJsWasmRuntimeDependency = skikoVersionProvider(project)
-        .map { skikoVersion ->
-            project.dependencies.create("org.jetbrains.skiko:skiko-js-wasm-runtime:$skikoVersion")
-        }
-    val skikoJsWasmRuntimeConfiguration = project.configurations.create("COMPOSE_SKIKO_JS_WASM_RUNTIME").defaultDependencies {
+internal fun Collection<KotlinJsIrTarget>.configureExperimentalWebApplication(
+    project: Project,
+    app: ExperimentalWebApplication
+) {
+    val skikoJsWasmRuntimeConfiguration = project.configurations.create("COMPOSE_SKIKO_JS_WASM_RUNTIME")
+    val skikoJsWasmRuntimeDependency = skikoVersionProvider(project).map { skikoVersion ->
+        project.dependencies.create("org.jetbrains.skiko:skiko-js-wasm-runtime:$skikoVersion")
+    }
+    skikoJsWasmRuntimeConfiguration.defaultDependencies {
         it.addLater(skikoJsWasmRuntimeDependency)
     }
-    val unpackRuntime = project.registerTask<ExperimentalUnpackSkikoWasmRuntimeTask>(taskName) {
-        skikoRuntimeFiles = skikoJsWasmRuntimeConfiguration
-        outputDir.set(unpackedRuntimeDir)
-    }
-    project.tasks.named(mainCompilation.processResourcesTaskName).configure { processResourcesTask ->
-        processResourcesTask.dependsOn(unpackRuntime)
+    forEach {
+        val mainCompilation = it.compilations.getByName("main")
+        val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-wasm/${it.targetName}")
+        val taskName = "unpackSkikoWasmRuntime${it.targetName.uppercaseFirstChar()}"
+        mainCompilation.defaultSourceSet.resources.srcDir(unpackedRuntimeDir)
+
+        val unpackRuntime = project.registerTask<ExperimentalUnpackSkikoWasmRuntimeTask>(taskName) {
+            skikoRuntimeFiles = skikoJsWasmRuntimeConfiguration
+            outputDir.set(unpackedRuntimeDir)
+        }
+        project.tasks.named(mainCompilation.processResourcesTaskName).configure { processResourcesTask ->
+            processResourcesTask.dependsOn(unpackRuntime)
+        }
     }
 }
 
