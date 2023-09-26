@@ -23,7 +23,7 @@
 ### Fixes
 * [Expanded `ModalBottomSheet`: scrim doesn't occupy complete screen](https://github.com/JetBrains/compose-multiplatform/issues/3701)
 * [Fix interop view intercepting touches for popups](https://github.com/JetBrains/compose-multiplatform-core/pull/835) 
-* [Fix applying WindowInsets inside Popup/Dialog](https://github.com/JetBrains/compose-multiplatform-core/pull/832)
+* [Fix applying `WindowInsets` inside `Popup`/`Dialog`](https://github.com/JetBrains/compose-multiplatform-core/pull/832)
 
 
 ## Desktop
