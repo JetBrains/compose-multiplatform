@@ -21,6 +21,7 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(npm("highlight.js", "10.7.2"))
+                implementation(npm("three", "0.156.1"))
                 implementation(compose.html.core)
                 implementation(compose.runtime)
             }
@@ -35,3 +36,7 @@ afterEvaluate {
         versions.webpackCli.version = "4.10.0"
     }
 }
+
+//tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile> {
+//    kotlinOptions.useEsClasses = true
+//}
