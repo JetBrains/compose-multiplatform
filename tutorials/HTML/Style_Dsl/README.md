@@ -119,7 +119,7 @@ object AppStylesheet : StyleSheet() {
     val container by style {
         padding(48.px)
 
-        media(maxWidth(640.px)) {
+        media(mediaMaxWidth(640.px)) {
             self style {
                 padding(12.px)
             }
