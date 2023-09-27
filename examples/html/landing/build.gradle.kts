@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 
 plugins {
@@ -11,10 +12,15 @@ repositories {
     google()
 }
 
+val useEs = project.properties["test.useEsModules"] == "true"
+
 kotlin {
     js(IR) {
         browser()
         binaries.executable()
+        if (useEs) {
+            useEsModules()
+        }
     }
 
     sourceSets {
@@ -25,6 +31,12 @@ kotlin {
                 implementation(compose.runtime)
             }
         }
+    }
+}
+
+tasks.withType<KotlinJsCompile>().configureEach {
+    kotlinOptions {
+        useEsClasses = useEs
     }
 }
 
