@@ -17,8 +17,5 @@ internal fun Project.configureExperimentalUikitApplication(
 ) {
     if (currentOS != OS.MacOS) return
 
-    configureIosDeployTasks(
-        mppExt = mppExt,
-        application = application,
-    )
+    // Here we can add some code to iOS configuration
 }

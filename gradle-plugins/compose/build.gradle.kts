@@ -3,7 +3,6 @@ import de.undercouch.gradle.tasks.download.Download
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.publish.plugin.portal)
     id("java-gradle-plugin")
     id("maven-publish")
@@ -64,14 +63,11 @@ dependencies {
     testImplementation(kotlin("gradle-plugin-api"))
 
     embedded(libs.download.task)
-    embedded(libs.serialization.json)
-    embedded(libs.serialization.core)
-    embedded(libs.serialization.core.jvm)
     embedded(project(":preview-rpc"))
     embedded(project(":jdk-version-probe"))
 }
 
-val packagesToRelocate = listOf("de.undercouch", "kotlinx.serialization")
+val packagesToRelocate = listOf("de.undercouch")
 
 val shadow = tasks.named<ShadowJar>("shadowJar") {
     for (packageToRelocate in packagesToRelocate) {
