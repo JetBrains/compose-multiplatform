@@ -27,40 +27,46 @@ abstract class SyncComposeResourcesForIosTask : AbstractComposeIosTask() {
         }
 
     @get:Input
-    val xcodeTargetPlatform: Provider<String> =
+    val xcodeTargetPlatform: Provider<String> = project.provider {
         providers.gradleProperty("compose.ios.resources.platform")
             .orElse(providers.environmentVariable("PLATFORM_NAME"))
             .orElse(missingTargetEnvAttributeError("platform"))
+            .get()
+    }
 
     @get:Input
-    val xcodeTargetArchs: Provider<List<String>> =
+    val xcodeTargetArchs: Provider<List<String>> = project.provider {
         providers.gradleProperty("compose.ios.resources.archs")
             .orElse(providers.environmentVariable("ARCHS"))
             .orElse(missingTargetEnvAttributeError("architectures"))
             .map { it.split(",", " ").filter { it.isNotBlank() } }
+            .get()
+    }
 
     @get:Input
     internal val iosTargets: SetProperty<IosTargetResources> = objects.setProperty(IosTargetResources::class.java)
 
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
     @get:InputFiles
-    val resourceFiles: Provider<FileCollection> = xcodeTargetPlatform.zip(xcodeTargetArchs, ::Pair)
-        .map { (xcodeTargetPlatform, xcodeTargetArchs) ->
-            val allResources = objects.fileCollection()
-            val activeKonanTargets = determineIosKonanTargetsFromEnv(xcodeTargetPlatform, xcodeTargetArchs)
-                .mapTo(HashSet()) { it.name }
-            val dirsToInclude = iosTargets.get()
-                .filter { it.konanTarget.get() in activeKonanTargets }
-                .flatMapTo(HashSet()) { it.dirs.get() }
-            for (dirPath in dirsToInclude) {
-                val fileTree = objects.fileTree().apply {
-                    setDir(layout.projectDirectory.dir(dirPath))
-                    include("**/*")
+    val resourceFiles: Provider<FileCollection> = project.provider {
+        xcodeTargetPlatform.zip(xcodeTargetArchs, ::Pair)
+            .map { (xcodeTargetPlatform, xcodeTargetArchs) ->
+                val allResources = objects.fileCollection()
+                val activeKonanTargets = determineIosKonanTargetsFromEnv(xcodeTargetPlatform, xcodeTargetArchs)
+                    .mapTo(HashSet()) { it.name }
+                val dirsToInclude = iosTargets.get()
+                    .filter { it.konanTarget.get() in activeKonanTargets }
+                    .flatMapTo(HashSet()) { it.dirs.get() }
+                for (dirPath in dirsToInclude) {
+                    val fileTree = objects.fileTree().apply {
+                        setDir(layout.projectDirectory.dir(dirPath))
+                        include("**/*")
+                    }
+                    allResources.from(fileTree)
                 }
-                allResources.from(fileTree)
-            }
-            allResources
-        }
+                allResources
+            }.get()
+    }
 
     @get:OutputDirectory
     val outputDir: DirectoryProperty = objects.directoryProperty()
