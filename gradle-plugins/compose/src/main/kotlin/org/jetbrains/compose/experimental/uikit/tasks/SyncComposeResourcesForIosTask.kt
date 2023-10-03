@@ -19,25 +19,34 @@ import kotlin.io.path.pathString
 import kotlin.io.path.relativeTo
 
 abstract class SyncComposeResourcesForIosTask : AbstractComposeIosTask() {
-    private fun missingTargetEnvAttributeError(attribute: String): Provider<Nothing> =
-        providers.provider {
-            error(
-                "Could not infer iOS target $attribute. Make sure to build " +
-                        "via XCode (directly or via Kotlin Multiplatform Mobile plugin for Android Studio)")
+
+    private fun Provider<String>.orElseThrowMissingAttributeError(attribute: String): Provider<String> {
+        val noProvidedValue = "__NO_PROVIDED_VALUE__"
+        return this.orElse(noProvidedValue).map {
+            if (it == noProvidedValue) {
+                error(
+                    "Could not infer iOS target $attribute. Make sure to build " +
+                            "via XCode (directly or via Kotlin Multiplatform Mobile plugin for Android Studio)")
+            }
+            it
         }
+    }
 
     @get:Input
     val xcodeTargetPlatform: Provider<String> =
         providers.gradleProperty("compose.ios.resources.platform")
             .orElse(providers.environmentVariable("PLATFORM_NAME"))
-            .orElse(missingTargetEnvAttributeError("platform"))
+            .orElseThrowMissingAttributeError("platform")
+
 
     @get:Input
     val xcodeTargetArchs: Provider<List<String>> =
         providers.gradleProperty("compose.ios.resources.archs")
             .orElse(providers.environmentVariable("ARCHS"))
-            .orElse(missingTargetEnvAttributeError("architectures"))
-            .map { it.split(",", " ").filter { it.isNotBlank() } }
+            .orElseThrowMissingAttributeError("architectures")
+            .map {
+                it.split(",", " ").filter { it.isNotBlank() }
+            }
 
     @get:Input
     internal val iosTargets: SetProperty<IosTargetResources> = objects.setProperty(IosTargetResources::class.java)
