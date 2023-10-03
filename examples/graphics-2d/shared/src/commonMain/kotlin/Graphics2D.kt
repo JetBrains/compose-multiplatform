@@ -13,11 +13,17 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import bouncingBalls.BouncingBallsApp
 import fallingballs.FallingBalls
+import minesweeper.MineSweeper
+
+private val TOP_APP_BAR_HEIGHT = 100.dp
 
 @Composable
-fun Graphics2D() {
+fun Graphics2D(requestWindowSize: ((width: Dp, height: Dp) -> Unit)) {
     val exampleState: MutableState<Example?> = remember { mutableStateOf(null) }
     val example = exampleState.value
 
@@ -53,7 +59,11 @@ fun Graphics2D() {
                 }
             }
         } else {
-            example.content()
+            example.content(
+                requestWindowSize = { w, h ->
+                    requestWindowSize(w, h + TOP_APP_BAR_HEIGHT)
+                }
+            )
         }
 
     }
@@ -61,7 +71,7 @@ fun Graphics2D() {
 
 private class Example(
     val name: String,
-    val content: @Composable () -> Unit
+    val content: @Composable (requestWindowSize: ((width: Dp, height: Dp) -> Unit)) -> Unit
 )
 
 private val examples: List<Example> = listOf(
@@ -70,5 +80,8 @@ private val examples: List<Example> = listOf(
     },
     Example("BouncingBalls") {
         BouncingBallsApp()
+    },
+    Example("MineSweeper") {
+        MineSweeper(it)
     },
 )
