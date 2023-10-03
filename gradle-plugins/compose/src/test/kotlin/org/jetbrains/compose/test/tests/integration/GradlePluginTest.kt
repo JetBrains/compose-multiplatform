@@ -62,13 +62,18 @@ class GradlePluginTest : GradlePluginTestBase() {
         )
     }
 
+    // We rely on this property to use gradle configuration cache in some tests.
+    // Enabling configuration cache unconditionally breaks out tests with gradle 7.3.3.
+    // Old comment: 'for some reason configuration cache + test kit + custom vars does not work'
+    private val GradleVersion.isAtLeastGradle8
+        get() = this >= GradleVersion.version("8.0")
+
     @Test
     fun iosResources() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
         val iosTestEnv = iosTestEnv()
         val testEnv = defaultTestEnvironment.copy(
-            // for some reason configuration cache + test kit + custom vars does not work
-            useGradleConfigurationCache = false,
+            useGradleConfigurationCache = TestProperties.gradleBaseVersionForTests.isAtLeastGradle8,
             additionalEnvVars = iosTestEnv.envVars
         )
 
@@ -91,8 +96,7 @@ class GradlePluginTest : GradlePluginTestBase() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
         val iosTestEnv = iosTestEnv()
         val testEnv = defaultTestEnvironment.copy(
-            // for some reason configuration cache + test kit + custom vars does not work
-            useGradleConfigurationCache = false,
+            useGradleConfigurationCache = TestProperties.gradleBaseVersionForTests.isAtLeastGradle8,
             additionalEnvVars = iosTestEnv.envVars
         )
         with(testProject(TestProjects.iosMokoResources, testEnv)) {
