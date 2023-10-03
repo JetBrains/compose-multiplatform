@@ -1,5 +1,6 @@
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import fallingballs.Time
 
 object AndroidTime : Time {
     override fun now(): Long = System.nanoTime()
@@ -7,6 +8,5 @@ object AndroidTime : Time {
 
 @Composable
 fun MainView() {
-    val game = remember { Game(AndroidTime) }
-    Graphics2D(game)
+    Graphics2D()
 }
