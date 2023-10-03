@@ -68,7 +68,7 @@ class GradlePluginTest : GradlePluginTestBase() {
         val iosTestEnv = iosTestEnv()
         val testEnv = defaultTestEnvironment.copy(
             // for some reason configuration cache + test kit + custom vars does not work
-            useGradleConfigurationCache = true,
+            useGradleConfigurationCache = false,
             additionalEnvVars = iosTestEnv.envVars
         )
 
@@ -92,7 +92,7 @@ class GradlePluginTest : GradlePluginTestBase() {
         val iosTestEnv = iosTestEnv()
         val testEnv = defaultTestEnvironment.copy(
             // for some reason configuration cache + test kit + custom vars does not work
-            useGradleConfigurationCache = true,
+            useGradleConfigurationCache = false,
             additionalEnvVars = iosTestEnv.envVars
         )
         with(testProject(TestProjects.iosMokoResources, testEnv)) {
