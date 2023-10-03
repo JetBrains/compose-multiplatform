@@ -23,7 +23,7 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "Falling Balls"
+            packageName = "Graphics2D"
             packageVersion = "1.0.0"
 
             windows {

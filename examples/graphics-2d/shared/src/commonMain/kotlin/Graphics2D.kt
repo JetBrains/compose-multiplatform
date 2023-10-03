@@ -18,7 +18,7 @@ import fallingballs.FallingBalls
 
 @Composable
 fun Graphics2D() {
-    var exampleState: MutableState<Example?> = remember { mutableStateOf<Example?>(null) }
+    val exampleState: MutableState<Example?> = remember { mutableStateOf(null) }
     val example = exampleState.value
 
     Scaffold(

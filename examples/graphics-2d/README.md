@@ -1,6 +1,6 @@
-# Falling Balls game
+# Graphics2D
 
-Game can run on Android, iOS, desktop or in a browser.
+Example can run on Android, iOS, desktop or in a browser.
 
 ## Setting up your development environment
 

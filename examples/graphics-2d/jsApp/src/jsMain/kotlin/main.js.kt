@@ -8,7 +8,7 @@ import org.jetbrains.skiko.wasm.onWasmReady
 
 fun main() {
     onWasmReady {
-        Window("Falling Balls") {
+        Window("Graphics2D") {
             MainView()
         }
     }

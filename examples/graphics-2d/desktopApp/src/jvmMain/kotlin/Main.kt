@@ -12,7 +12,7 @@ import androidx.compose.ui.window.singleWindowApplication
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() =
     singleWindowApplication(
-        title = "Falling Balls",
+        title = "Graphics2D",
         state = WindowState(size = DpSize(800.dp, 800.dp))
     ) {
         MainView()
