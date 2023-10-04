@@ -18,6 +18,9 @@ actual fun Modifier.onPointerEvent(
     }
 
     return this.onPointerEvent(eventType) {
-        Position(it.changes.first().position.x.toInt(), it.changes.first().position.y.toInt()).onEvent()
+        Position(
+            it.changes.first().position.x.toInt(),
+            it.changes.first().position.y.toInt()
+        ).onEvent()
     }
 }
