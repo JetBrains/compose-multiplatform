@@ -22,7 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import bouncingBalls.BouncingBallsApp
+import bouncingballs.BouncingBallsApp
 import fallingballs.FallingBalls
 import minesweeper.MineSweeper
 import visualeffects.NYContent
