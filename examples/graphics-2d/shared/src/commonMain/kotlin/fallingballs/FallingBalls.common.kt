@@ -46,9 +46,6 @@ fun FallingBalls() {
                 )
             }
             Button(
-                modifier = Modifier
-                    .border(2.dp, Color(255, 215, 0))
-                    .background(Color.Yellow),
                 onClick = {
                     game.started = !game.started
                     if (game.started) {
