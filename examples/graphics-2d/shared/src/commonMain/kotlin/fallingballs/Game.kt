@@ -3,19 +3,16 @@ package fallingballs
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.*
+import platform.nanoTime
 import kotlin.random.Random
+import kotlin.time.Duration
+import kotlin.time.TimeSource
 
-interface Time {
-    fun now(): Long
-}
-
-class Game(val time: Time) {
-    private var previousTimeNanos: Long = Long.MAX_VALUE
+class Game() {
     private val colors = arrayOf(
         Color.Red, Color.Blue, Color.Cyan,
         Color.Magenta, Color.Yellow, Color.Black
     )
-    private var startTime = 0L
 
     var width by mutableStateOf(0.dp)
     var height by mutableStateOf(0.dp)
@@ -34,8 +31,6 @@ class Game(val time: Time) {
     var numBlocks by mutableStateOf(5f)
 
     fun start() {
-        previousTimeNanos = time.now()
-        startTime = previousTimeNanos
         clicked = 0
         started = true
         finished = false
@@ -48,16 +43,9 @@ class Game(val time: Time) {
         }
     }
 
-    fun togglePause() {
-        paused = !paused
-        previousTimeNanos = time.now()
-    }
-
-    fun update(nanos: Long) {
-        val dt = (nanos - previousTimeNanos).coerceAtLeast(0)
-        previousTimeNanos = nanos
-        elapsed = nanos - startTime
-        pieces.forEach { it.update(dt) }
+    fun update(deltaTimeNanos: Long) {
+        elapsed += deltaTimeNanos
+        pieces.forEach { it.update(deltaTimeNanos) }
     }
 
     fun clicked(piece: PieceData) {

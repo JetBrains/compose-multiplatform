@@ -1,4 +1,4 @@
-package org.jetbrains.compose.demo.visuals
+package visualeffects
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,8 +11,8 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import platform.nanoTime
 import org.jetbrains.compose.demo.visuals.platform.PointerEventKind
-import org.jetbrains.compose.demo.visuals.platform.nanoTime
 import org.jetbrains.compose.demo.visuals.platform.onPointerEvent
 import kotlin.math.*
 

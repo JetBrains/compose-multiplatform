@@ -1,3 +1,3 @@
-package org.jetbrains.compose.demo.visuals.platform
+package platform
 
 actual fun nanoTime(): Long = kotlin.system.getTimeNanos()

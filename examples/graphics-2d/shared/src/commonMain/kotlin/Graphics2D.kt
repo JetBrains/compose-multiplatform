@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import bouncingBalls.BouncingBallsApp
 import fallingballs.FallingBalls
 import minesweeper.MineSweeper
-import org.jetbrains.compose.demo.visuals.NYContent
-import org.jetbrains.compose.demo.visuals.RotatingWords
-import org.jetbrains.compose.demo.visuals.WaveEffectGrid
+import visualeffects.RotatingWords
+import visualeffects.WaveEffectGrid
+import visualeffects.NYContent
 
 private val TOP_APP_BAR_HEIGHT = 100.dp
 private val EMPTY_WINDOW_RESIZER: (width: Dp, height: Dp) -> Unit = { w, h -> Unit }

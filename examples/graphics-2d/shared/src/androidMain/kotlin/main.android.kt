@@ -1,5 +1,4 @@
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import fallingballs.Time
 
 object AndroidTime : Time {

@@ -16,12 +16,12 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
-expect fun createTime(): Time
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @Composable
 fun FallingBalls() {
-    val game = remember { Game(createTime()) }
+    val game = remember { Game() }
     val density = LocalDensity.current
     Column {
         Text(
@@ -51,18 +51,6 @@ fun FallingBalls() {
             ) {
                 Text(if (game.started) "Stop" else "Start", fontSize = 25.sp)
             }
-            if (game.started) {
-                Button(
-                    modifier = Modifier
-                        .offset(10.dp, 0.dp)
-                        .border(2.dp, Color(255, 215, 0))
-                        .background(Color.Yellow),
-                    onClick = {
-                    game.togglePause()
-                }) {
-                    Text(if (game.paused) "Resume" else "Pause", fontSize = 25.sp)
-                }
-            }
         }
         if (game.started) {
             Box(modifier = Modifier.height(20.dp))
@@ -82,9 +70,12 @@ fun FallingBalls() {
 
         LaunchedEffect(Unit) {
             while (true) {
+                var previousTimeNanos = withFrameNanos { it }
                 withFrameNanos {
-                    if (game.started && !game.paused && !game.finished)
-                        game.update(it)
+                    if (game.started && !game.paused && !game.finished) {
+                        game.update((it - previousTimeNanos).coerceAtLeast(0))
+                        previousTimeNanos = it
+                    }
                 }
             }
         }

@@ -1,4 +1,4 @@
-package org.jetbrains.compose.demo.visuals
+package visualeffects
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image

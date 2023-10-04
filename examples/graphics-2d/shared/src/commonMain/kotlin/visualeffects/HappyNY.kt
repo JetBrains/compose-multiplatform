@@ -1,4 +1,4 @@
-package org.jetbrains.compose.demo.visuals
+package visualeffects
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import org.jetbrains.compose.demo.visuals.platform.nanoTime
+import platform.nanoTime
 import kotlin.math.*
 import kotlin.random.Random
 
