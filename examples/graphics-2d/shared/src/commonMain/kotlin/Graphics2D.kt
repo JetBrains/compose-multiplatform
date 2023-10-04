@@ -1,13 +1,16 @@
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -15,15 +18,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import bouncingBalls.BouncingBallsApp
 import fallingballs.FallingBalls
 import minesweeper.MineSweeper
+import org.jetbrains.compose.demo.visuals.NYContent
+import org.jetbrains.compose.demo.visuals.RotatingWords
+import org.jetbrains.compose.demo.visuals.WaveEffectGrid
 
 private val TOP_APP_BAR_HEIGHT = 100.dp
+private val EMPTY_WINDOW_RESIZER: (width: Dp, height: Dp) -> Unit = { w, h -> Unit }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Graphics2D(requestWindowSize: ((width: Dp, height: Dp) -> Unit)) {
+fun Graphics2D(requestWindowSize: ((width: Dp, height: Dp) -> Unit) = EMPTY_WINDOW_RESIZER) {
     val exampleState: MutableState<Example?> = remember { mutableStateOf(null) }
     val example = exampleState.value
 
@@ -47,23 +54,24 @@ fun Graphics2D(requestWindowSize: ((width: Dp, height: Dp) -> Unit)) {
             )
         }
     ) {
-
-        if (example == null) {
-            LazyColumn {
-                items(examples) {
-                    Button(onClick = {
-                        exampleState.value = it
-                    }) {
-                        Text(it.name)
+        Box(Modifier.padding(it)) {
+            if (example == null) {
+                LazyColumn {
+                    items(examples) {
+                        Button(onClick = {
+                            exampleState.value = it
+                        }) {
+                            Text(it.name)
+                        }
                     }
                 }
+            } else {
+                example.content(
+                    requestWindowSize = { w, h ->
+                        requestWindowSize(w, h + TOP_APP_BAR_HEIGHT)
+                    }
+                )
             }
-        } else {
-            example.content(
-                requestWindowSize = { w, h ->
-                    requestWindowSize(w, h + TOP_APP_BAR_HEIGHT)
-                }
-            )
         }
 
     }
@@ -83,5 +91,14 @@ private val examples: List<Example> = listOf(
     },
     Example("MineSweeper") {
         MineSweeper(it)
+    },
+    Example("RotatingWords") {
+        RotatingWords()
+    },
+    Example("WaveEffectGrid") {
+        WaveEffectGrid()
+    },
+    Example("Happy New Year!") {
+        NYContent()
     },
 )

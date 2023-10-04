@@ -16,6 +16,10 @@ Choose a run configuration for an appropriate target in Android Studio and run i
 
 `./gradlew desktopApp:run`
 
-## Run native on MacOS
-Choose **shared[macosX64]** or **shared[macosArm64]** configuration in IDE and run it.
+## Run experimental JS on Browser
+`./gradlew jsApp:jsBrowserRun`
+
+## Run experimental native on MacOS
+`./gradlew runDebugExecutableMacosX64` (Works on Intel processors)
+`./gradlew runDebugExecutableMacosArm64` (Works on Arm processors)
 
