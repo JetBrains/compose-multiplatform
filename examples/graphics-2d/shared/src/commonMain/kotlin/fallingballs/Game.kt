@@ -1,12 +1,12 @@
 package fallingballs
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.*
-import platform.nanoTime
+import androidx.compose.ui.unit.dp
 import kotlin.random.Random
-import kotlin.time.Duration
-import kotlin.time.TimeSource
 
 class Game() {
     private val colors = arrayOf(

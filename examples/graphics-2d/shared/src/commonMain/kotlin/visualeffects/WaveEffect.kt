@@ -11,7 +11,6 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import platform.nanoTime
 import org.jetbrains.compose.demo.visuals.platform.PointerEventKind
 import org.jetbrains.compose.demo.visuals.platform.onPointerEvent
 import kotlin.math.*
@@ -25,23 +24,31 @@ fun WaveEffectGrid() {
     var centerY by remember { mutableStateOf(900) }
     var vX by remember { mutableStateOf(0) }
     var vY by remember { mutableStateOf(0) }
+    var timeElapsedNanos by remember { mutableStateOf(0L) }
 
-    var time by remember { mutableStateOf(nanoTime()) }
-    var prevTime by remember { mutableStateOf(nanoTime()) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            var previousTimeNanos = withFrameNanos { it }
+            withFrameNanos {
+                val deltaTimeNanos = it - previousTimeNanos
+                timeElapsedNanos += deltaTimeNanos
+                previousTimeNanos = it
 
-    if (State.entered) {
-        centerX = (centerX + vX * (time - prevTime) / 1000000000).toInt()
-        if (centerX < -100) centerX = -100
-        if (centerX > 2600) centerX = 2600
-        vX =
-            (vX * (1 - (time - prevTime).toDouble() / 500000000) + 10 * (mouseX - centerX) * (time - prevTime) / 1000000000).toInt()
-        centerY = (centerY + vY * (time - prevTime) / 1000000000).toInt()
-        if (centerY < -100) centerY = -100
-        if (centerY > 1800) centerY = 1800
-        vY =
-            (vY * (1 - (time - prevTime).toDouble() / 500000000) + 5 * (mouseY - centerY) * (time - prevTime) / 1000000000).toInt()
+                if (State.entered) {
+                    centerX = (centerX + vX * deltaTimeNanos / 1000000000).toInt()
+                    if (centerX < -100) centerX = -100
+                    if (centerX > 2600) centerX = 2600
+                    vX =
+                        (vX * (1 - deltaTimeNanos.toDouble() / 500000000) + 10 * (mouseX - centerX) * deltaTimeNanos / 1000000000).toInt()
+                    centerY = (centerY + vY * deltaTimeNanos / 1000000000).toInt()
+                    if (centerY < -100) centerY = -100
+                    if (centerY > 1800) centerY = 1800
+                    vY =
+                        (vY * (1 - deltaTimeNanos.toDouble() / 500000000) + 5 * (mouseY - centerY) * deltaTimeNanos / 1000000000).toInt()
 
-        prevTime = time
+                }
+            }
+        }
     }
 
     Surface(
@@ -71,8 +78,8 @@ fun WaveEffectGrid() {
                     x = if (evenRow) 10 + shift else 10
                     while (x < 1190) {
                         val size: Int = size(x, y, pointerOffsetX, pointerOffsety)
-                        val color = boxColor(x, y, time, pointerOffsetX, pointerOffsety)
-                        Dot(size, Modifier.offset(x.dp, y.dp), color, time)
+                        val color = boxColor(x, y, timeElapsedNanos, pointerOffsetX, pointerOffsety)
+                        Dot(size, Modifier.offset(x.dp, y.dp), color, timeElapsedNanos)
                         x += shift * 2
                     }
                     y += shift
@@ -80,14 +87,6 @@ fun WaveEffectGrid() {
                 }
                 HighPanel(pointerOffsetX, pointerOffsety)
             }
-
-        LaunchedEffect(Unit) {
-            while (true) {
-                withFrameNanos {
-                    time = it
-                }
-            }
-        }
 
     }
 }
