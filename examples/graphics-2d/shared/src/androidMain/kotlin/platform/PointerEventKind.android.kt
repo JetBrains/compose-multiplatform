@@ -1,4 +1,4 @@
-package org.jetbrains.compose.demo.visuals.platform
+package visualeffects
 
 import androidx.compose.ui.Modifier
 

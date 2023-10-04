@@ -11,8 +11,6 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.demo.visuals.platform.PointerEventKind
-import org.jetbrains.compose.demo.visuals.platform.onPointerEvent
 import kotlin.math.*
 
 @OptIn(ExperimentalComposeUiApi::class)

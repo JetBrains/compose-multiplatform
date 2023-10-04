@@ -1,4 +1,4 @@
-package org.jetbrains.compose.demo.visuals.platform
+package visualeffects
 
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.forEachGesture
@@ -15,7 +15,10 @@ enum class PointerEventKind {
 
 class Position(val x: Int, val y: Int)
 
-expect fun Modifier.onPointerEvent(eventKind: PointerEventKind, onEvent: Position.() -> Unit): Modifier
+expect fun Modifier.onPointerEvent(
+    eventKind: PointerEventKind,
+    onEvent: Position.() -> Unit
+): Modifier
 
 fun Modifier.onPointerEventMobileImpl(
     eventKind: PointerEventKind,
@@ -38,7 +41,10 @@ fun Modifier.onPointerEventMobileImpl(
                     val event: PointerEvent = awaitPointerEvent()
 
                     if (eventKind == PointerEventKind.Move) {
-                        Position(event.changes.first().position.x.toInt(), event.changes.first().position.y.toInt()).onEvent()
+                        Position(
+                            event.changes.first().position.x.toInt(),
+                            event.changes.first().position.y.toInt()
+                        ).onEvent()
                     }
 
                 } while (event.changes.any { it.pressed })

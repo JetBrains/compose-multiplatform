@@ -1,4 +1,4 @@
-package org.jetbrains.Graphics2D
+package org.jetbrains.graphics2d
 
 import MainView
 import android.os.Bundle

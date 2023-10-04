@@ -5,34 +5,46 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlin.random.Random
 
-class GameController(private val options: GameSettings, private val onWin: (() -> Unit)? = null, private val onLose: (() -> Unit)? = null) {
+class GameController(
+    private val options: GameSettings,
+    private val onWin: (() -> Unit)? = null,
+    private val onLose: (() -> Unit)? = null
+) {
     /** Number of rows in current board */
     val rows: Int
         get() = options.rows
+
     /** Number of columns in current board */
     val columns: Int
         get() = options.columns
+
     /** Number of bombs in current board */
     val bombs: Int
         get() = options.mines
+
     /** True if current game has started, false if game is finished or until first cell is opened or flagged */
     var running by mutableStateOf(false)
         private set
+
     /** True if game is ended (win or lose) */
     var finished by mutableStateOf(false)
         private set
+
     /** Total number of flags set on cells, used for calculation of number of remaining bombs */
     var flagsSet by mutableStateOf(0)
         private set
+
     /** Number of remaining cells */
     var cellsToOpen by mutableStateOf(options.rows * options.columns - options.mines)
         private set
+
     /** Game timer, increments every second while game is running */
     var seconds by mutableStateOf(0)
         private set
 
     /** Global monotonic time, updated with [onTimeTick] */
     private var time = 0L
+
     /** The time when user starts the game by opening or flagging any cell */
     private var startTime = 0L
 
@@ -61,7 +73,7 @@ class GameController(private val options: GameSettings, private val onWin: (() -
         mines: Collection<Pair<Int, Int>>,
         onWin: (() -> Unit)? = null,
         onLose: (() -> Unit)? = null
-    ) : this(GameSettings(rows, columns, mines.size), onWin, onLose)  {
+    ) : this(GameSettings(rows, columns, mines.size), onWin, onLose) {
         for (row in cells) {
             for (cell in row) {
                 cell.hasBomb = false

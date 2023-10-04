@@ -156,7 +156,14 @@ class Rocket(val particle: Particle, val color: Color, val startTime: Long = 0) 
         parts = Array(rocketPartsCount) {
             val v = 0.5f + 1.5 * random()
             val angle = 2 * PI * random()
-            Particle(particle.x, particle.y, v * sin(angle) + particle.vx, v * cos(angle) + particle.vy, color, 1)
+            Particle(
+                particle.x,
+                particle.y,
+                v * sin(angle) + particle.vx,
+                v * cos(angle) + particle.vy,
+                color,
+                1
+            )
         }
         exploded = true
     }
@@ -194,7 +201,14 @@ class Rocket(val particle: Particle, val color: Color, val startTime: Long = 0) 
     }
 }
 
-class Particle(var x: Double, var y: Double, var vx: Double, var vy: Double, val color: Color, val type: Int = 0) {
+class Particle(
+    var x: Double,
+    var y: Double,
+    var vx: Double,
+    var vy: Double,
+    val color: Color,
+    val type: Int = 0
+) {
     fun move(deltaNanos: Long) {
         x = (x + vx * deltaNanos / 30000000)
         y = (y + vy * deltaNanos / 30000000)
@@ -207,7 +221,10 @@ class Particle(var x: Double, var y: Double, var vx: Double, var vy: Double, val
     @Composable
     fun draw() {
         val alphaFactor = if (type == 0) 1.0f else 1 / (1 + abs(vy / 5)).toFloat()
-        Box(Modifier.size(5.dp).offset(x.dp, y.dp).alpha(alphaFactor).clip(CircleShape).background(color))
+        Box(
+            Modifier.size(5.dp).offset(x.dp, y.dp).alpha(alphaFactor).clip(CircleShape)
+                .background(color)
+        )
         for (i in 1..5) {
             Box(
                 Modifier.size(4.dp).offset((x - vx / 2 * i).dp, (y - vy / 2 * i).dp)
@@ -219,7 +236,10 @@ class Particle(var x: Double, var y: Double, var vx: Double, var vy: Double, val
 
 val rocket = DoubleRocket(Particle(0.0, 1000.0, 2.1, -12.5, Color.White))
 
-fun prepareStarsAndSnowFlakes(stars: SnapshotStateList<Star>, snowFlakes: SnapshotStateList<SnowFlake>) {
+fun prepareStarsAndSnowFlakes(
+    stars: SnapshotStateList<Star>,
+    snowFlakes: SnapshotStateList<SnowFlake>
+) {
     for (i in 0..snowCount) {
         snowFlakes.add(
             SnowFlake(
@@ -234,7 +254,15 @@ fun prepareStarsAndSnowFlakes(stars: SnapshotStateList<Star>, snowFlakes: Snapsh
             )
         )
     }
-    val colors = arrayOf(Color.Red, Color.Yellow, Color.Green, Color.Yellow, Color.Cyan, Color.Magenta, Color.White)
+    val colors = arrayOf(
+        Color.Red,
+        Color.Yellow,
+        Color.Green,
+        Color.Yellow,
+        Color.Cyan,
+        Color.Magenta,
+        Color.White
+    )
     for (i in 0..starCount) {
         stars.add(
             Star(
@@ -294,7 +322,11 @@ fun NYContent() {
                 snow(timeElapsedNanos, snowFlakes)
                 starrySky(stars)
 
-                Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.Center) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.Center
+                ) {
                     Text(
                         fontSize = 10.em,
                         text = "202",
@@ -321,9 +353,10 @@ fun NYContent() {
                         val alpha = alphaHNY(i, timeElapsedNanos)
                         Text(
                             fontSize = 14.sp,
-                            text= it.toString(),
+                            text = it.toString(),
                             color = color,
-                            modifier = Modifier.scale(5f).align(Alignment.Center).offset(0.dp, 85.dp)
+                            modifier = Modifier.scale(5f).align(Alignment.Center)
+                                .offset(0.dp, 85.dp)
                                 .rotate((angle + 5.0f * i)).offset(0.dp, -90.dp).alpha(alpha)
                         )
                         i++
@@ -405,7 +438,10 @@ fun snow(timeElapsed: Long, snowFlakes: SnapshotStateList<SnowFlake>) {
     with(LocalDensity.current) {
         snowFlakes.forEach {
             val x = it.x + (15 * sin(timeElapsed.toDouble() / 3000000000 + it.phase)).dp
-            snowFlake(Modifier.offset(x, it.y).scale(it.scale).rotate(it.angle + deltaAngle * it.rotate), it.alpha)
+            snowFlake(
+                Modifier.offset(x, it.y).scale(it.scale).rotate(it.angle + deltaAngle * it.rotate),
+                it.alpha
+            )
         }
     }
 }
@@ -427,7 +463,8 @@ fun snowFlake(modifier: Modifier, alpha: Float = 0.8f) {
 fun snowFlakeInt(level: Int, angle: Float, shiftX: Dp, shiftY: Dp, alpha: Float) {
     if (level > 3) return
     Box(
-        Modifier.offset(shiftX, shiftY).rotate(angle).width(100.dp).height(10.dp).scale(0.6f).alpha(1f)
+        Modifier.offset(shiftX, shiftY).rotate(angle).width(100.dp).height(10.dp).scale(0.6f)
+            .alpha(1f)
             .background(Color.White.copy(alpha = alpha))
     ) {
         snowFlakeInt(level + 1, 30f, 12.dp, 20.dp, alpha * 0.8f)

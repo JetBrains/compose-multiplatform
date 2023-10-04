@@ -62,19 +62,27 @@ fun Words() {
     val color3 = Color(0xFD, 0xB6, 0x0D)
     val color4 = Color(0xFC, 0xF8, 0x4A)
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
         Word(position = baseRu, angle = angle, scale = scale, text = "Ваш", color = color1)
         Word(position = baseEn, angle = angle, scale = scale, text = "Your", color = color2)
         Word(position = baseCh, angle = angle, scale = scale, text = "您的", color = color3)
         Word(position = baseJa, angle = angle, scale = scale, text = "あなたの", color = color4)
-        Word(position = baseText, angle = 0f, scale = 6f, text = "    Compose\nMultiplatform", color = Color(52, 67, 235),
-            alpha = 0.4f)
+        Word(
+            position = baseText,
+            angle = 0f,
+            scale = 6f,
+            text = "    Compose\nMultiplatform",
+            color = Color(52, 67, 235),
+            alpha = 0.4f
+        )
 
         val size = 80.dp * scale
-        Image(logoImg, contentDescription = "Logo",
+        Image(
+            logoImg, contentDescription = "Logo",
             modifier = Modifier
                 .offset(baseLogo.x - size / 2, baseLogo.y - size / 2)
                 .size(size)
@@ -84,8 +92,10 @@ fun Words() {
 }
 
 @Composable
-fun Word(position: DpOffset, angle: Float, scale: Float, text: String,
-         color: Color, alpha: Float = 0.8f) {
+fun Word(
+    position: DpOffset, angle: Float, scale: Float, text: String,
+    color: Color, alpha: Float = 0.8f
+) {
     Text(
         modifier = Modifier
             .offset(position.x, position.y)

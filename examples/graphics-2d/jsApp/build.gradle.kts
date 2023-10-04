@@ -9,7 +9,7 @@ kotlin {
         binaries.executable()
     }
     sourceSets {
-        val jsMain by getting  {
+        val jsMain by getting {
             dependencies {
                 implementation(project(":shared"))
                 implementation(compose.ui)

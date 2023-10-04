@@ -37,9 +37,14 @@ class Game() {
         paused = false
         pieces.clear()
         repeat(numBlocks.toInt()) { index ->
-            pieces.add(PieceData(this, index * 1.5f + 5f, colors[index % colors.size]).also { piece ->
-                piece.position = Random.nextDouble(0.0, 100.0).toFloat()
-            })
+            pieces.add(
+                PieceData(
+                    this,
+                    index * 1.5f + 5f,
+                    colors[index % colors.size]
+                ).also { piece ->
+                    piece.position = Random.nextDouble(0.0, 100.0).toFloat()
+                })
         }
     }
 

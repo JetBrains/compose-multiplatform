@@ -2,7 +2,13 @@ package fallingballs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -16,8 +22,6 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 @Composable
 fun FallingBalls() {
@@ -29,7 +33,10 @@ fun FallingBalls() {
             fontSize = 20.sp,
             color = Color(218, 120, 91)
         )
-        Text("Score: ${game.score} Time: ${game.elapsed / 1_000_000} Blocks: ${game.numBlocks.toInt()}", fontSize = 20.sp)
+        Text(
+            "Score: ${game.score} Time: ${game.elapsed / 1_000_000} Blocks: ${game.numBlocks.toInt()}",
+            fontSize = 20.sp
+        )
         Row {
             if (!game.started) {
                 Slider(
@@ -81,4 +88,3 @@ fun FallingBalls() {
         }
     }
 }
-

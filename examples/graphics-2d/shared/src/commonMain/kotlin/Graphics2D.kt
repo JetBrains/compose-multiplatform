@@ -26,7 +26,7 @@ import visualeffects.WaveEffectGrid
 import visualeffects.NYContent
 
 private val TOP_APP_BAR_HEIGHT = 100.dp
-private val EMPTY_WINDOW_RESIZER: (width: Dp, height: Dp) -> Unit = { w, h -> Unit }
+private val EMPTY_WINDOW_RESIZER: (width: Dp, height: Dp) -> Unit = { w, h ->  }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,11 +66,9 @@ fun Graphics2D(requestWindowSize: ((width: Dp, height: Dp) -> Unit) = EMPTY_WIND
                     }
                 }
             } else {
-                example.content(
-                    requestWindowSize = { w, h ->
-                        requestWindowSize(w, h + TOP_APP_BAR_HEIGHT)
-                    }
-                )
+                example.content { w, h ->
+                    requestWindowSize(w, h + TOP_APP_BAR_HEIGHT)
+                }
             }
         }
 
