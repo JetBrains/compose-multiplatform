@@ -1,25 +1,45 @@
 package visualeffects
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.*
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import platform.nanoTime
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.random.Random
 
 const val width = 1200
@@ -97,16 +117,16 @@ class DoubleRocket(val particle: Particle) {
         state = STATE_SMALL_ROCKETS
     }
 
-    fun move(time: Long, prevTime: Long) {
+    fun move(timeElapsed: Long, deltaNanos: Long) {
         if (rocket.state == rocket.STATE_ROCKET) {
-            rocket.particle.move(time, prevTime)
-            rocket.particle.gravity(time, prevTime)
+            rocket.particle.move(deltaNanos)
+            rocket.particle.gravity(deltaNanos)
         } else {
             rocket.rockets.forEach {
-                it.move(time, prevTime)
+                it.move(timeElapsed, deltaNanos)
             }
         }
-        rocket.checkState(time)
+        rocket.checkState(timeElapsed)
     }
 
     @Composable
@@ -126,8 +146,8 @@ class Rocket(val particle: Particle, val color: Color, val startTime: Long = 0) 
     var exploded = false
     var parts: Array<Particle> = emptyArray()
 
-    fun checkExplode(time: Long) {
-        if (time - startTime > 1200000000) {
+    fun checkExplode(timeElapsed: Long) {
+        if (timeElapsed - startTime > 1200000000) {
             explode()
         }
     }
@@ -149,15 +169,15 @@ class Rocket(val particle: Particle, val color: Color, val startTime: Long = 0) 
         return true
     }
 
-    fun move(time: Long, prevTime: Long) {
+    fun move(timeElapsed: Long, deltaNanos: Long) {
         if (!exploded) {
-            particle.move(time, prevTime)
-            particle.gravity(time, prevTime)
-            checkExplode(time)
+            particle.move(deltaNanos)
+            particle.gravity(deltaNanos)
+            checkExplode(timeElapsed)
         } else {
             parts.forEach {
-                it.move(time, prevTime)
-                it.gravity(time, prevTime)
+                it.move(deltaNanos)
+                it.gravity(deltaNanos)
             }
         }
     }
@@ -175,13 +195,13 @@ class Rocket(val particle: Particle, val color: Color, val startTime: Long = 0) 
 }
 
 class Particle(var x: Double, var y: Double, var vx: Double, var vy: Double, val color: Color, val type: Int = 0) {
-    fun move(time: Long, prevTime: Long) {
-        x = (x + vx * (time - prevTime) / 30000000)
-        y = (y + vy * (time - prevTime) / 30000000)
+    fun move(deltaNanos: Long) {
+        x = (x + vx * deltaNanos / 30000000)
+        y = (y + vy * deltaNanos / 30000000)
     }
 
-    fun gravity(time: Long, prevTime: Long) {
-        vy = vy + 1.0f * (time - prevTime) / 300000000
+    fun gravity(deltaNanos: Long) {
+        vy = vy + 1.0f * deltaNanos / 300000000
     }
 
     @Composable
@@ -227,55 +247,51 @@ fun prepareStarsAndSnowFlakes(stars: SnapshotStateList<Star>, snowFlakes: Snapsh
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun NYContent() {
-    var time by remember { mutableStateOf(nanoTime()) }
     var started by remember { mutableStateOf(false) }
-    var startTime = remember { nanoTime() }
-    var prevTime by remember { mutableStateOf(nanoTime()) }
-    val snowFlakes = remember { mutableStateListOf<SnowFlake>() }
     val stars = remember { mutableStateListOf<Star>() }
     var flickering2 by remember { mutableStateOf(true) }
+    val snowFlakes = remember { mutableStateListOf<SnowFlake>() }
     remember { prepareStarsAndSnowFlakes(stars, snowFlakes) }
+    var timeElapsedNanos by remember { mutableStateOf(0L) }
 
     Surface(
         modifier = Modifier.fillMaxSize().padding(5.dp).shadow(3.dp, RoundedCornerShape(20.dp)),
         color = Color.Black,
         shape = RoundedCornerShape(20.dp)
     ) {
-
         LaunchedEffect(Unit) {
             while (true) {
+                var previousTimeNanos = withFrameNanos { it }
                 withFrameNanos {
-                    prevTime = time
-                    time = it
+                    val deltaTimeNanos = it - previousTimeNanos
+                    timeElapsedNanos += deltaTimeNanos
+                    previousTimeNanos = it
+
+                    if (flickering2) {
+                        if (timeElapsedNanos > 15500000000) { //note, that startTime has been updated above
+                            flickering2 = false
+                        }
+                    }
+                    if (started) {
+                        rocket.move(timeElapsedNanos, deltaTimeNanos)
+                    }
+
+                    snowFlakes.forEach {
+                        var y = it.y + ((it.v * deltaTimeNanos) / 30000000).dp
+                        if (y > (height + 20).dp) {
+                            y = -20.dp
+                        }
+                        it.y = y
+                    }
                 }
             }
         }
 
-        if (!started) { //animation starts with delay, so there is some time to start recording
-            if (time - startTime in 7000000001..7099999999) println("ready!")
-            if (time - startTime > 10000000000) {
-                startTime = time //restarting timer
-                started = true
-            }
-        }
-
-        if (flickering2) {
-            if (time - startTime > 15500000000) { //note, that startTime has been updated above
-                flickering2 = false
-            }
-        }
-        if (started) {
-            rocket.move(time, prevTime)
-        }
-
         with(LocalDensity.current) {
             Box(Modifier.fillMaxSize()) {
-
-                snow(time, prevTime, snowFlakes, startTime)
-
+                snow(timeElapsedNanos, snowFlakes)
                 starrySky(stars)
 
                 Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.Center) {
@@ -287,7 +303,7 @@ fun NYContent() {
                         color = Color.White
                     )
 
-                    val alpha = if (flickering2) flickeringAlpha(time) else 1.0f
+                    val alpha = if (flickering2) flickeringAlpha(timeElapsedNanos) else 1.0f
                     Text(
                         fontSize = 10.em,
                         text = "4",
@@ -300,9 +316,9 @@ fun NYContent() {
                     //HNY
                     var i = 0
                     val angle = (HNYString.length / 2 * 5) * -1.0f
-                    val color = colorHNY(time, startTime)
+                    val color = colorHNY(timeElapsedNanos)
                     HNYString.forEach {
-                        val alpha = alphaHNY(i, time, startTime)
+                        val alpha = alphaHNY(i, timeElapsedNanos)
                         Text(
                             fontSize = 14.sp,
                             text= it.toString(),
@@ -326,9 +342,9 @@ fun NYContent() {
     }
 }
 
-fun colorHNY(time: Long, startTime: Long): Color {
+fun colorHNY(timeElapsed: Long): Color {
     val periodLength = 60
-    val offset = ((time - startTime) / 80000000).toFloat() / periodLength
+    val offset = (timeElapsed.toFloat() / 80000000) / periodLength
     val color1 = Color.Red
     val color2 = Color.Yellow
     val color3 = Color.Magenta
@@ -348,16 +364,16 @@ fun blend(color1: Color, color2: Color, fraction: Float): Color {
     )
 }
 
-fun alphaHNY(i: Int, time: Long, startTime: Long): Float {
-    val period = period(time, startTime, 200) - i
+fun alphaHNY(i: Int, timeElapsed: Long): Float {
+    val period = period(timeElapsed, 200) - i
     if (period < 0) return 0.0f
     if (period > 10) return 1.0f
     return 0.1f * period
 }
 
-fun period(time: Long, startTime: Long, periodLength: Int, speed: Int = 1): Int {
+fun period(timeElapsed: Long, periodLength: Int, speed: Int = 1): Int {
     val period = 200000000 / speed
-    return (((time - startTime) / period) % periodLength).toInt()
+    return ((timeElapsed / period) % periodLength).toInt()
 }
 
 fun flickeringAlpha(time: Long): Float {
@@ -384,17 +400,12 @@ fun star(x: Dp, y: Dp, color: Color = Color.White, size: Dp) {
 }
 
 @Composable
-fun snow(time: Long, prevTime: Long, snowFlakes: SnapshotStateList<SnowFlake>, startTime: Long) {
-    val deltaAngle = (time - startTime) / 100000000
+fun snow(timeElapsed: Long, snowFlakes: SnapshotStateList<SnowFlake>) {
+    val deltaAngle = timeElapsed.toFloat() / 100000000
     with(LocalDensity.current) {
         snowFlakes.forEach {
-            var y = it.y + ((it.v * (time - prevTime)) / 300000000).dp
-            if (y > (height + 20).dp) {
-                y = -20.dp
-            }
-            it.y = y
-            val x = it.x + (15 * sin(time.toDouble() / 3000000000 + it.phase)).dp
-            snowFlake(Modifier.offset(x, y).scale(it.scale).rotate(it.angle + deltaAngle * it.rotate), it.alpha)
+            val x = it.x + (15 * sin(timeElapsed.toDouble() / 3000000000 + it.phase)).dp
+            snowFlake(Modifier.offset(x, it.y).scale(it.scale).rotate(it.angle + deltaAngle * it.rotate), it.alpha)
         }
     }
 }
