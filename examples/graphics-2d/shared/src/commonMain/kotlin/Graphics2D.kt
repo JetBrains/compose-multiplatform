@@ -61,9 +61,9 @@ fun Graphics2D(requestWindowSize: ((width: Dp, height: Dp) -> Unit) = EMPTY_WIND
                 )
             }
         ) {
-            Box(Modifier.padding(it).padding(horizontal = 16.dp)) {
+            Box(Modifier.padding(it)) {
                 if (example == null) {
-                    LazyColumn {
+                    LazyColumn(Modifier.padding(horizontal = 16.dp)) {
                         items(examples) {
                             Button(onClick = {
                                 exampleState.value = it
