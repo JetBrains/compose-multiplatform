@@ -61,7 +61,7 @@ fun Graphics2D(requestWindowSize: ((width: Dp, height: Dp) -> Unit) = EMPTY_WIND
                 )
             }
         ) {
-            Box(Modifier.padding(it)) {
+            Box(Modifier.padding(it).padding(horizontal = 16.dp)) {
                 if (example == null) {
                     LazyColumn {
                         items(examples) {
