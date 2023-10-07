@@ -15,7 +15,6 @@ kotlin {
     androidTarget()
 
     jvm("desktop")
-    
     js(IR) {
         browser()
     }
