@@ -48,7 +48,7 @@ kotlin {
 
     val enableKjsWorkaround = project.properties["workaround.kotlin.js.kt60852"] == "true"
 
-    fun  KotlinDependencyHandler.addCommonDependencies() {
+    fun KotlinDependencyHandler.addCommonDependencies() {
         implementation(compose.ui)
         implementation(compose.runtime)
         implementation(compose.foundation)
