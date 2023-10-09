@@ -4,9 +4,10 @@ Example can run on Android, iOS, desktop or in a browser.
 
 ## Setting up your development environment
 
-To setup the environment, please consult these [instructions](https://github.com/JetBrains/compose-multiplatform-template#setting-up-your-development-environment).
+To setup the environment, please consult
+these [instructions](https://github.com/JetBrains/compose-multiplatform-template#setting-up-your-development-environment).
 
-## How to run 
+## How to run
 
 Choose a run configuration for an appropriate target in Android Studio and run it.
 
@@ -16,10 +17,8 @@ Choose a run configuration for an appropriate target in Android Studio and run i
 
 `./gradlew desktopApp:run`
 
-## Run experimental JS on Browser
-`./gradlew jsApp:jsBrowserRun`
-
 ## Run experimental native on MacOS
+
 `./gradlew runDebugExecutableMacosX64` (Works on Intel processors)
 `./gradlew runDebugExecutableMacosArm64` (Works on Arm processors)
 
