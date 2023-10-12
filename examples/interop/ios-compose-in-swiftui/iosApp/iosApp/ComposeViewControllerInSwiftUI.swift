@@ -5,7 +5,7 @@ import MapKit
 
 struct ComposeLayer: View {
     var body: some View {
-        ScreenTemplate(title: "Compose in SwiftUI") {
+        ScreenTemplate(title: "Compose Multiplatform in SwiftUI") {
             ComposeViewControllerInSwiftUI()
                     .ignoresSafeArea(.keyboard) // Compose has its own keyboard handler
         }

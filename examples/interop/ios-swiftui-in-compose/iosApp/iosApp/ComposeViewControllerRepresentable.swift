@@ -8,7 +8,7 @@ struct ComposeViewControllerRepresentable: UIViewControllerRepresentable {
         return Main_iosKt.ComposeEntryPointWithUIView(createUIView: { () -> UIView in
             SwiftUIInUIView(
                 content: VStack {
-                    Text("SwiftUI in Compose")
+                    Text("SwiftUI in Compose Multiplatform")
                 }
             )
         })

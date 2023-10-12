@@ -11,7 +11,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UITabBarItem.appearance().setTitleTextAttributes([NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)], for: .normal)
 
         let composeViewController = Main_iosKt.ComposeEntryPoint()
-        composeViewController.title = "Compose inside UIKit"
+        composeViewController.title = "Compose Multiplatform inside UIKit"
 
         let anotherViewController = UIKitViewController()
         anotherViewController.title = "UIKit"
