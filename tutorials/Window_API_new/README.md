@@ -94,7 +94,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
@@ -107,7 +107,7 @@ fun main() = application {
             onCloseRequest = { isAskingToClose = true }
         ) {
             if (isAskingToClose) {
-                Dialog(
+                DialogWindow(
                     onCloseRequest = { isAskingToClose = false },
                     title = "Close the document without saving?",
                 ) {
@@ -432,8 +432,8 @@ private fun onWindowRelocate(position: WindowPosition) {
 ## Dialogs
 There are two types of window – modal and regular. Below are the functions for creating each:
 
-1. Window – regular window type.
-2. Dialog – modal window type. This type locks its parent window until the user is finished working with it and closes the modal window.
+1. `Window` – regular window type.
+2. `DialogWindow` – modal window type. This type locks its parent window until the user is finished working with it and closes the modal window.
 
 You can see an example of both types of window below.
 
@@ -445,7 +445,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
@@ -462,7 +462,7 @@ fun main() = application {
         }
 
         if (isDialogOpen) {
-            Dialog(
+            DialogWindow(
                 onCloseRequest = { isDialogOpen = false },
                 state = rememberDialogState(position = WindowPosition(Alignment.Center))
             ) {
@@ -584,7 +584,7 @@ fun main() = application {
     }
 }
 ```
-Note that `WindowDraggableArea` can be used only inside `singleWindowApplication`, `Window` and `Dialog`. If you need to use it in another Composable function, pass `WindowScope` as a receiver there:
+Note that `WindowDraggableArea` can be used only inside `singleWindowApplication`, `Window` and `DialogWindow`. If you need to use it in another Composable function, pass `WindowScope` as a receiver there:
 ```kotlin
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
