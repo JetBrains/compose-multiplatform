@@ -1,3 +1,51 @@
+# 1.5.10-rc01 (October 2023)
+
+## Common
+
+### Features
+* [Support Kotlin 1.9.20-RC](https://github.com/JetBrains/compose-multiplatform/pull/3804)
+
+### Fixes
+* [Override `RootLayout` insets only in case of `usePlatformInsets`](https://github.com/JetBrains/compose-multiplatform-core/pull/854)
+* [Don't send synthetic Move events before Press/Release for touch](https://github.com/JetBrains/compose-multiplatform-core/pull/870)
+
+## iOS
+
+### Fixes
+* [Scrolling behavior bugs](https://github.com/JetBrains/compose-multiplatform/issues/3335)
+* [`OutlinedTextField` label is clipped](https://github.com/JetBrains/compose-multiplatform/issues/3737)
+* [Black screens with `UIKitView` after navigating away and navigating back](https://github.com/JetBrains/compose-multiplatform/issues/3749)
+* [Long text field overscroll effect not clipped correctly](https://github.com/JetBrains/compose-multiplatform-core/pull/859)
+* [First screen is recomposed twice](https://github.com/JetBrains/compose-multiplatform/issues/3778)
+* [Bug with selection handle](https://github.com/JetBrains/compose-multiplatform-core/pull/869)
+* [Ignore unpressed events during velocity calculation](https://github.com/JetBrains/compose-multiplatform-core/pull/848)
+* [Crash with Asian languages in `TextField`](https://github.com/JetBrains/compose-multiplatform-core/pull/872/files)
+
+## Desktop
+
+### Fixes
+* [Accessibility not reporting changes](https://github.com/JetBrains/compose-multiplatform-core/pull/842)
+* [Crash "LayoutNode should be attached to an owner exception"](https://github.com/JetBrains/compose-multiplatform/issues/3728)
+* [Window loses its focus after recomposition of another window](https://github.com/JetBrains/compose-multiplatform/issues/2994)
+* [Report semantic `ProgressBarRangeInfo` changes for accessibility](https://github.com/JetBrains/compose-multiplatform-core/pull/862)
+
+## Gradle Plugin
+
+### Fixes
+* [Fix configuration cache for `syncComposeResourcesForIos`](https://github.com/JetBrains/compose-multiplatform/pull/3764)
+
+## Dependencies
+
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+
+* [Compiler 1.5.3](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.3)
+* [Runtime 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.5.1)
+* [UI 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.5.1)
+* [Foundation 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.5.1)
+* [Material 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.5.1)
+* [Material3 1.1.2](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.1.2)
+
+
 # 1.5.3 (October 2023)
 
 ## Desktop
