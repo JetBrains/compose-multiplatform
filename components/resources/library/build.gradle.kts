@@ -19,7 +19,7 @@ kotlin {
     js(IR) {
         browser()
     }
-    wasm {
+    wasmJs {
         browser()
     }
     macosX64()
