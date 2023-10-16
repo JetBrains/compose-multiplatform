@@ -20,7 +20,7 @@ fun ComposeEntryPointWithUIView(createUIView: () -> UIView): UIViewController =
                 .windowInsetsPadding(WindowInsets.systemBars),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("How to use SwiftUI inside Compose")
+            Text("How to use SwiftUI inside Compose Multiplatform")
             UIKitView(
                 factory = createUIView,
                 modifier = Modifier.size(300.dp).border(2.dp, Color.Blue),

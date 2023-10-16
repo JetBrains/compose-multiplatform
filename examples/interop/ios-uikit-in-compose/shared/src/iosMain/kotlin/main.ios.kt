@@ -21,7 +21,7 @@ fun ComposeEntryPoint(): UIViewController =
                 .windowInsetsPadding(WindowInsets.systemBars),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("How to use UIKitView inside Compose")
+            Text("How to use UIKitView inside Compose Multiplatform")
 
             UIKitView(
                 factory = { MKMapView() },
