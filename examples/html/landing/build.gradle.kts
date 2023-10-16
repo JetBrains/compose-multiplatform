@@ -10,6 +10,8 @@ repositories {
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     google()
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+//    mavenLocal()
 }
 
 val useEs = project.properties["test.useEsModules"] == "true"
@@ -36,14 +38,19 @@ kotlin {
 
 tasks.withType<KotlinJsCompile>().configureEach {
     kotlinOptions {
-        useEsClasses = useEs
+        useEsClasses = true
     }
 }
 
 // a temporary workaround for a bug in jsRun invocation - see https://youtrack.jetbrains.com/issue/KT-48273
-afterEvaluate {
-    rootProject.extensions.configure<NodeJsRootExtension> {
-        versions.webpackDevServer.version = "4.0.0"
-        versions.webpackCli.version = "4.10.0"
-    }
+//afterEvaluate {
+//    rootProject.extensions.configure<NodeJsRootExtension> {
+//        versions.webpackDevServer.version = "4.0.0"
+//        versions.webpackCli.version = "4.10.0"
+//    }
+//}
+
+compose {
+//    kotlinCompilerPlugin.set(dependencies.compiler.forKotlin("1.7.20"))
+    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=true")
 }
