@@ -3,15 +3,6 @@ plugins {
     id("com.android.library") apply false
 }
 
-allprojects {
-    repositories {
-        mavenLocal() // mavenLocal should be the first to get the correct version of skiko during a local build.
-        google()
-        mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    }
-}
-
 subprojects {
     version = findProperty("deploy.version") ?: property("compose.version")!!
 

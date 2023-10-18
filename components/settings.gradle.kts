@@ -1,10 +1,9 @@
 pluginManagement {
     repositories {
+        google()
         gradlePluginPortal()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        google()
-        mavenLocal()
     }
 
     plugins {
@@ -15,10 +14,18 @@ pluginManagement {
     }
 }
 
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    }
+}
+
 include(":SplitPane:library")
 include(":SplitPane:demo")
 include(":AnimatedImage:library")
-include("AnimatedImage:demo")
+include(":AnimatedImage:demo")
 include(":resources:library")
 include(":resources:demo:androidApp")
 include(":resources:demo:desktopApp")

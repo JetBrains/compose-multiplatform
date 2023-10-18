@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
     kotlin("multiplatform")
@@ -10,42 +10,68 @@ plugins {
 val composeVersion = extra["compose.version"] as String
 
 kotlin {
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    targetHierarchy.default()
     jvm("desktop")
-    android {
+    androidTarget {
         publishLibraryVariants("release")
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
     }
-    ios()
+    iosX64()
+    iosArm64()
     iosSimulatorArm64()
-    js(IR) {
-        browser()
+    js {
+        browser {
+            testTask(Action {
+                enabled = false
+            })
+        }
     }
     macosX64()
     macosArm64()
 
     sourceSets {
+        all {
+            languageSettings {
+                optIn("kotlin.RequiresOptIn")
+                optIn("kotlinx.cinterop.ExperimentalForeignApi")
+            }
+        }
+
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
                 implementation("org.jetbrains.compose.foundation:foundation:$composeVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
                 implementation(kotlin("test"))
             }
         }
         val commonButJSMain by creating {
             dependsOn(commonMain)
         }
+        val commonButJSTest by creating {
+            dependsOn(commonTest)
+        }
         val skikoMain by creating {
             dependsOn(commonMain)
+        }
+        val skikoTest by creating {
+            dependsOn(commonTest)
         }
         val jvmAndAndroidMain by creating {
             dependsOn(commonMain)
         }
-        val nativeMain by creating {
-            dependsOn(commonMain)
+        val jvmAndAndroidTest by creating {
+            dependsOn(commonTest)
         }
         val desktopMain by getting {
             dependsOn(skikoMain)
@@ -53,60 +79,61 @@ kotlin {
             dependsOn(commonButJSMain)
         }
         val desktopTest by getting {
+            dependsOn(skikoTest)
+            dependsOn(jvmAndAndroidTest)
+            dependsOn(commonButJSTest)
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation("org.jetbrains.compose.ui:ui-test-junit4:$composeVersion")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
             }
         }
         val androidMain by getting {
             dependsOn(jvmAndAndroidMain)
             dependsOn(commonButJSMain)
         }
-        val androidTest by getting {
-            dependencies {
-
-            }
+        val androidInstrumentedTest by getting {
+            dependsOn(commonTest)
+            dependsOn(jvmAndAndroidTest)
+            dependsOn(commonButJSTest)
         }
         val iosMain by getting {
             dependsOn(skikoMain)
             dependsOn(commonButJSMain)
-            dependsOn(nativeMain)
         }
-        val iosTest by getting
-        val iosSimulatorArm64Main by getting
-        iosSimulatorArm64Main.dependsOn(iosMain)
-        val iosSimulatorArm64Test by getting
-        iosSimulatorArm64Test.dependsOn(iosTest)
+        val iosTest by getting {
+            dependsOn(skikoTest)
+            dependsOn(commonButJSTest)
+        }
         val jsMain by getting {
             dependsOn(skikoMain)
         }
-        val macosMain by creating {
+        val jsTest by getting {
+            dependsOn(skikoTest)
+        }
+        val macosMain by getting {
             dependsOn(skikoMain)
             dependsOn(commonButJSMain)
-            dependsOn(nativeMain)
         }
-        val macosX64Main by getting {
-            dependsOn(macosMain)
-        }
-        val macosArm64Main by getting {
-            dependsOn(macosMain)
+        val macosTest by getting {
+            dependsOn(skikoTest)
+            dependsOn(commonButJSTest)
         }
     }
 }
 
 android {
-    compileSdk = 33
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    compileSdk = 34
+    namespace = "org.jetbrains.compose.components.resources"
     defaultConfig {
         minSdk = 21
-        targetSdk = 33
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
+    @Suppress("UnstableApiUsage")
     testOptions {
         managedDevices {
             devices {
@@ -118,20 +145,13 @@ android {
             }
         }
     }
-}
-
-dependencies {
-    //Android integration tests
-    testImplementation("androidx.test:core:1.5.0")
-    androidTestImplementation("androidx.compose.ui:ui-test-manifest:1.3.1")
-    androidTestImplementation("androidx.compose.ui:ui-test:1.3.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.3.1")
-    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
-}
-
-// TODO it seems that argument isn't applied to the common sourceSet. Figure out why
-tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+    dependencies {
+        //Android integration tests
+        testImplementation("androidx.test:core:1.5.0")
+        androidTestImplementation("androidx.compose.ui:ui-test-manifest:1.5.3")
+        androidTestImplementation("androidx.compose.ui:ui-test:1.5.3")
+        androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.3")
+    }
 }
 
 configureMavenPublication(
