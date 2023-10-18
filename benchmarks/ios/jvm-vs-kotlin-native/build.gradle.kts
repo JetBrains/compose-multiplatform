@@ -12,6 +12,7 @@ repositories {
     google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
 }
 
 kotlin {
@@ -35,6 +36,19 @@ kotlin {
                 )
             }
         }
+    }
+    js(IR) {
+        browser()
+        binaries.executable()
+    }
+
+    wasmJs {
+        browser {
+            commonWebpackConfig {
+                configDirectory = projectDir.resolve("webpack.config.d/wasm")
+            }
+        }
+        binaries.executable()
     }
 
     sourceSets {
@@ -81,3 +95,7 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
 }
 
+
+compose.experimental {
+    web.application {}
+}

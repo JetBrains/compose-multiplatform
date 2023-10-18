@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import height
 import width
+import kotlin.js.JsName
 
 import kotlin.math.*
 import kotlin.random.Random
@@ -38,6 +39,7 @@ data class Star(val x: Dp, val y: Dp, val color: Color, val size: Dp)
 
 val random = Random(123)
 
+@JsName("funRandom")
 fun random(): Float = random.nextFloat()
 
 class DoubleRocket(val particle: Particle) {
