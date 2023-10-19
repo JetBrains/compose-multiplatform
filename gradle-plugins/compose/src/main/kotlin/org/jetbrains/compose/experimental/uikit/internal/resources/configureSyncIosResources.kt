@@ -25,6 +25,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import java.io.File
+import java.io.FileNotFoundException
+import java.io.IOException
 
 private val incompatiblePlugins = listOf(
     "dev.icerock.mobile.multiplatform-resources",
@@ -138,7 +140,7 @@ internal abstract class CheckCanAccessComposeResourcesDirectory : AbstractCompos
             val testFile = File(path.get().asFile, "testAccess.txt")
             testFile.writeText("testAccess")
             testFile.delete()
-        } catch (t: Throwable) {
+        } catch (t: IOException) {
             logger.error("""
                 |Failed to sync compose resources! 
                 |Please make sure ENABLE_USER_SCRIPT_SANDBOXING is set to 'NO' in 'project.pbxproj'
