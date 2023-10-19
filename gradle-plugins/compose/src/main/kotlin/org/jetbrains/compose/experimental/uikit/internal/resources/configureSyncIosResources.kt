@@ -25,7 +25,6 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import java.io.File
-import java.io.FileNotFoundException
 import java.io.IOException
 
 private val incompatiblePlugins = listOf(
