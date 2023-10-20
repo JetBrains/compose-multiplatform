@@ -8,11 +8,14 @@ package org.jetbrains.compose.experimental.uikit.internal.resources
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskContainer
+import org.gradle.api.tasks.TaskAction
 import org.jetbrains.compose.experimental.uikit.internal.utils.IosGradleProperties
 import org.jetbrains.compose.experimental.uikit.internal.utils.asIosNativeTargetOrNull
 import org.jetbrains.compose.experimental.uikit.internal.utils.cocoapodsExt
 import org.jetbrains.compose.experimental.uikit.internal.utils.withCocoapodsPlugin
+import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
 import org.jetbrains.compose.experimental.uikit.tasks.SyncComposeResourcesForIosTask
 import org.jetbrains.compose.internal.utils.joinLowerCamelCase
 import org.jetbrains.compose.internal.utils.new
@@ -111,12 +114,48 @@ private fun SyncIosResourcesContext.configureCocoapodsResourcesAttribute() {
     }
 }
 
+/**
+ * Since Xcode 15, there is a new default setting: `ENABLE_USER_SCRIPT_SANDBOXING = YES`
+ * It's set in project.pbxproj
+ *
+ * SyncComposeResourcesForIosTask fails to work with it right now.
+ *
+ * Gradle attempts to create an output folder for SyncComposeResourcesForIosTask on our behalf,
+ * so we can't handle an exception when it occurs. Therefore, we make SyncComposeResourcesForIosTask
+ * depend on CheckCanAccessComposeResourcesDirectory, where we check ENABLE_USER_SCRIPT_SANDBOXING.
+ */
+internal abstract class CheckCanAccessComposeResourcesDirectory : AbstractComposeIosTask() {
+
+    @get:Input
+    val enabled = providers.environmentVariable("ENABLE_USER_SCRIPT_SANDBOXING")
+        .orElse("NOT_DEFINED")
+        .map { it == "YES" }
+
+    private val errorMessage = """
+                |Failed to sync compose resources! 
+                |Please make sure ENABLE_USER_SCRIPT_SANDBOXING is set to 'NO' in 'project.pbxproj'
+                |""".trimMargin()
+
+    @TaskAction
+    fun run() {
+        if (enabled.get()) {
+            logger.error(errorMessage)
+            throw IllegalStateException(
+                "Sandbox environment detected (ENABLE_USER_SCRIPT_SANDBOXING = YES). It's not supported so far."
+            )
+        }
+    }
+}
+
 private fun SyncIosResourcesContext.configureSyncResourcesTasks() {
     val lazyTasksDependencies = LazyTasksDependencyConfigurator(project.tasks)
     configureEachIosFramework { framework ->
         val frameworkClassifier = framework.namePrefix.uppercaseFirstChar()
         val syncResourcesTaskName = "sync${frameworkClassifier}ComposeResourcesForIos"
+        val checkSyncResourcesTaskName = "checkCanSync${frameworkClassifier}ComposeResourcesForIos"
+        val checkNoSandboxTask = framework.project.tasks.registerOrConfigure<CheckCanAccessComposeResourcesDirectory>(checkSyncResourcesTaskName) {}
         val syncTask = framework.project.tasks.registerOrConfigure<SyncComposeResourcesForIosTask>(syncResourcesTaskName) {
+            dependsOn(checkNoSandboxTask)
             outputDir.set(syncDirFor(framework))
             iosTargets.add(iosTargetResourcesProvider(framework))
         }
