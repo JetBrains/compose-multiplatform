@@ -1,10 +1,11 @@
 package org.jetbrains.codeviewer
 
+import MainView
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import org.jetbrains.codeviewer.platform._HomeFolder
-import MainView
 import java.io.File
 import java.io.FileOutputStream
 
@@ -13,6 +14,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         copyAssets()
         _HomeFolder = filesDir
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
             MainView()

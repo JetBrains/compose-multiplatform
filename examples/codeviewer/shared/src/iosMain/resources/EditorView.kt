@@ -48,7 +48,7 @@ fun EditorView(model: Editor, settings: Settings) = key(model) {
                                 )
                                 .width(1.dp)
                                 .fillMaxHeight()
-                                .background(AppTheme.colors.backgroundLight)
+                                .background(AppTheme.colors.codeGuide)
                         )
                     }
                 } else {
