@@ -11,10 +11,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.configureWebResources
 import org.jetbrains.compose.resources.demo.shared.UseResources
+import org.jetbrains.compose.resources.urlResource
 import org.jetbrains.skiko.wasm.onWasmReady
 
+
 fun main() {
+
+    @OptIn(ExperimentalResourceApi::class)
+    configureWebResources {
+        // Not necessary - It's the same as the default. We add it here just to present this feature.
+        setResourceImplFactory { urlResource("./$it") }
+    }
     onWasmReady {
         Window("Resources demo") {
             MainView()

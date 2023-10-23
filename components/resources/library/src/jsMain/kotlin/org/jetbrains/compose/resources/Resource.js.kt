@@ -5,6 +5,8 @@
 
 package org.jetbrains.compose.resources
 
+import kotlinx.browser.window
+import kotlinx.coroutines.await
 import org.jetbrains.compose.resources.vector.xmldom.Element
 import org.jetbrains.compose.resources.vector.xmldom.ElementImpl
 import org.jetbrains.compose.resources.vector.xmldom.MalformedXMLException
@@ -17,28 +19,72 @@ import org.w3c.xhr.XMLHttpRequestResponseType
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import kotlin.js.Promise
+
+/**
+ * WebResourcesConfiguration is used in [configureWebResources].
+ */
+@Suppress("unused")
+@ExperimentalResourceApi
+class WebResourcesConfiguration internal constructor() {
+
+    /**
+     * See [configureWebResources] for more details.
+     */
+    @ExperimentalResourceApi
+    fun setResourceImplFactory(factory: (path: String) -> Resource) {
+        jsResourceImplFactory = factory
+    }
+
+    internal companion object {
+        @ExperimentalResourceApi
+        var jsResourceImplFactory: (path: String) -> Resource = { urlResource("./$it") }
+    }
+}
+
+/**
+ * `configureWebResources` can be used to override the default configuration.
+ *
+ * Usage example 1:
+ * ```
+ *  configureWebResources {
+ *     setResourceImplFactory { path -> urlResource("/myApp1/resources/$path") }
+ *  }
+ * ```
+ *  Usage example 2:
+ * ```
+ *  configureWebResources {
+ *     setResourceImplFactory { path -> urlResource("https://mycdn.com/myApp1/res/$path") }
+ *  }
+ * ```
+ *
+ * The default resource implementation factory is: `{ urlResource("./$it") }`
+ */
+@Suppress("unused")
+@ExperimentalResourceApi
+fun configureWebResources(configure: WebResourcesConfiguration.() -> Unit) {
+    with(WebResourcesConfiguration()) {
+        configure()
+    }
+}
+
+/**
+ * Creates [Resource] instance. The [Resource] implementation can be changed by using [configureWebResources].
+ * By default, it uses [urlResource] under the hood where [path] is relative to the current url segment: `urlResource("./$path")`
+ */
+@ExperimentalResourceApi
+actual fun resource(path: String): Resource = WebResourcesConfiguration.jsResourceImplFactory(path)
+
+/**
+ * Creates [Resource] instance accessible by [url]
+ */
+@ExperimentalResourceApi
+fun urlResource(url: String): Resource = JSUrlResourceImpl(url)
 
 @ExperimentalResourceApi
-actual fun resource(path: String): Resource = JSResourceImpl(path)
-
-@ExperimentalResourceApi
-private class JSResourceImpl(path: String) : AbstractResourceImpl(path) {
+private class JSUrlResourceImpl(url: String) : AbstractResourceImpl(url) {
     override suspend fun readBytes(): ByteArray {
-        return suspendCoroutine { continuation ->
-            val req = XMLHttpRequest()
-            req.open("GET", "/$path", true)
-            req.responseType = XMLHttpRequestResponseType.ARRAYBUFFER
-
-            req.onload = { event ->
-                val arrayBuffer = req.response
-                if (arrayBuffer is ArrayBuffer) {
-                    continuation.resume(arrayBuffer.toByteArray())
-                } else {
-                    continuation.resumeWithException(MissingResourceException(path))
-                }
-            }
-            req.send(null)
-        }
+        return window.fetch(path).await().arrayBuffer().await().toByteArray()
     }
 }
 
