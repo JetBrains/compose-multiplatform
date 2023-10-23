@@ -84,7 +84,11 @@ fun urlResource(url: String): Resource = JSUrlResourceImpl(url)
 @ExperimentalResourceApi
 private class JSUrlResourceImpl(url: String) : AbstractResourceImpl(url) {
     override suspend fun readBytes(): ByteArray {
-        return window.fetch(path).await().arrayBuffer().await().toByteArray()
+        val response = window.fetch(path).await()
+        if (!response.ok) {
+            throw MissingResourceException(path)
+        }
+        return response.arrayBuffer().await().toByteArray()
     }
 }
 
