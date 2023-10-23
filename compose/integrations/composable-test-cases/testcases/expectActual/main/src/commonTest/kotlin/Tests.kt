@@ -20,6 +20,26 @@ class Tests {
     }
 
     @Test
+    fun composableImplicitExpectActualValGetter() = runTest {
+        val root = composeText {
+            val v = GetIntVal()
+            TextLeafNode("$v")
+        }
+
+        assertEquals("root:{100}", root.dump())
+    }
+
+    @Test
+    fun composableImplicitExpectActualValGetterWithDefault() = runTest {
+        val root = composeText {
+            val v = GetIntValWithDefault()
+            TextLeafNode("$v")
+        }
+
+        assertEquals("root:{100}", root.dump())
+    }
+
+    @Test
     fun commonComposableValGetter() = runTest {
         val root = composeText {
             val v = Abc().commonIntVal
