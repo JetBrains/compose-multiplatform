@@ -26,7 +26,10 @@ import kotlin.js.Promise
  */
 @Suppress("unused")
 @ExperimentalResourceApi
-class WebResourcesConfiguration internal constructor() {
+object WebResourcesConfiguration {
+
+    @ExperimentalResourceApi
+    internal var jsResourceImplFactory: (path: String) -> Resource = { urlResource("./$it") }
 
     /**
      * See [configureWebResources] for more details.
@@ -34,11 +37,6 @@ class WebResourcesConfiguration internal constructor() {
     @ExperimentalResourceApi
     fun setResourceImplFactory(factory: (path: String) -> Resource) {
         jsResourceImplFactory = factory
-    }
-
-    internal companion object {
-        @ExperimentalResourceApi
-        var jsResourceImplFactory: (path: String) -> Resource = { urlResource("./$it") }
     }
 }
 
@@ -63,9 +61,7 @@ class WebResourcesConfiguration internal constructor() {
 @Suppress("unused")
 @ExperimentalResourceApi
 fun configureWebResources(configure: WebResourcesConfiguration.() -> Unit) {
-    with(WebResourcesConfiguration()) {
-        configure()
-    }
+    WebResourcesConfiguration.configure()
 }
 
 /**
