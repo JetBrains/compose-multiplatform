@@ -31,11 +31,10 @@ object WebResourcesConfiguration {
     internal var jsResourceImplFactory: (path: String) -> Resource = { urlResource("./$it") }
 
     /**
-     * Sets a custom factory used by [resource] function for creating [Resource] instances.
-     * Basically, [factory] will become an implementation of [resource] function.
+     * Sets a custom factory for the [resource] function to create [Resource] instances.
+     * Once set, the [factory] will effectively define the implementation of the [resource] function.
      *
-     * @param factory - a lambda that takes a path and returns a [Resource] instance.
-     *
+     * @param factory A lambda that accepts a path and produces a [Resource] instance.
      * @see configureWebResources for examples on how to use this function.
      */
     @ExperimentalResourceApi
