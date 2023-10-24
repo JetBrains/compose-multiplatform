@@ -23,7 +23,7 @@ fun main() {
     @OptIn(ExperimentalResourceApi::class)
     configureWebResources {
         // Not necessary - It's the same as the default. We add it here just to present this feature.
-        setResourceImplFactory { urlResource("./$it") }
+        setResourceFactory { urlResource("./$it") }
     }
     onWasmReady {
         Window("Resources demo") {
