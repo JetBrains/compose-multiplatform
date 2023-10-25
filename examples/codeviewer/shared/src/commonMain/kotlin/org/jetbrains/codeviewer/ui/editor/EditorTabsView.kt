@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -21,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.jetbrains.codeviewer.ui.common.AppTheme
 
 @Composable
 fun EditorTabsView(model: Editors) = Row(Modifier.horizontalScroll(rememberScrollState())) {
@@ -33,7 +33,7 @@ fun EditorTabsView(model: Editors) = Row(Modifier.horizontalScroll(rememberScrol
 @Composable
 fun EditorTabView(model: Editor) = Surface(
     color = if (model.isActive) {
-        AppTheme.colors.backgroundDark
+        MaterialTheme.colors.background
     } else {
         Color.Transparent
     }

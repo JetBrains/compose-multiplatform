@@ -1,13 +1,22 @@
 package org.jetbrains.codeviewer.ui.editor
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -37,7 +46,7 @@ fun EditorView(model: Editor, settings: Settings) = key(model) {
         SelectionContainer {
             Surface(
                 Modifier.fillMaxSize(),
-                color = AppTheme.colors.backgroundDark,
+                color = MaterialTheme.colors.background,
             ) {
                 val lines by loadableScoped(model.lines)
 
@@ -51,7 +60,7 @@ fun EditorView(model: Editor, settings: Settings) = key(model) {
                                 )
                                 .width(1.dp)
                                 .fillMaxHeight()
-                                .background(AppTheme.colors.backgroundLight)
+                                .background(AppTheme.colors.codeGuide)
                         )
                     }
                 } else {
@@ -143,6 +152,7 @@ private fun LineContent(content: Editor.Content, modifier: Modifier, settings: S
     softWrap = false
 )
 
+@Composable
 private fun codeString(str: String) = buildAnnotatedString {
     withStyle(AppTheme.code.simple) {
         val strFormatted = str.replace("\t", "    ")
