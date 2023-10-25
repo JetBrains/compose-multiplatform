@@ -182,6 +182,10 @@ private fun codeString(str: String) = buildAnnotatedString {
         addStyle(AppTheme.code.value, strFormatted, Regex("[0-9]+"))
         addStyle(AppTheme.code.annotation, strFormatted, Regex("^@[a-zA-Z_]*"))
         addStyle(AppTheme.code.comment, strFormatted, Regex("^\\s*//.*"))
+        
+        // Keeps copied lines separated and fixes crash during selection:
+        // https://partnerissuetracker.corp.google.com/issues/199919707
+        append("\n")
     }
 }
 
