@@ -1,18 +1,4 @@
-/*
- * Copyright 2020-2022 JetBrains s.r.o. and respective authors and developers.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
- */
-
 package org.jetbrains.compose.resources
-
-import kotlinx.browser.window
-import kotlinx.coroutines.await
-import org.jetbrains.compose.resources.vector.xmldom.Element
-import org.jetbrains.compose.resources.vector.xmldom.ElementImpl
-import org.jetbrains.compose.resources.vector.xmldom.MalformedXMLException
-import org.khronos.webgl.ArrayBuffer
-import org.khronos.webgl.Int8Array
-import org.w3c.dom.parsing.DOMParser
 
 /**
  * Represents the configuration object for web resources.
@@ -22,31 +8,24 @@ import org.w3c.dom.parsing.DOMParser
 @Suppress("unused")
 @ExperimentalResourceApi
 object WebResourcesConfiguration {
+    internal var resourcePathCustomization: (path: String) -> String = { "./$it" }
 
     /**
-     * An internal default factory method for creating [Resource] from a given path.
-     * It can be changed at runtime by using [setResourceFactory].
-     */
-    @ExperimentalResourceApi
-    internal var jsResourceImplFactory: (path: String) -> Resource = { urlResource("./$it") }
-
-    /**
-     * Sets a custom factory for the [resource] function to create [Resource] instances.
-     * Once set, the [factory] will effectively define the implementation of the [resource] function.
+     * Sets a customization function for resource path. This allows you to modify the resource path
+     * before it is used.
      *
-     * @param factory A lambda that accepts a path and produces a [Resource] instance.
-     * @see configureWebResources for examples on how to use this function.
+     * @param customization the customization function that takes a path String and returns a modified path String
      */
     @ExperimentalResourceApi
-    fun setResourceFactory(factory: (path: String) -> Resource) {
-        jsResourceImplFactory = factory
+    fun setResourcePathCustomization(customization: (path: String) -> String) {
+        resourcePathCustomization = customization
     }
 }
 
 /**
  * Configures the web resources behavior.
  *
- * Allows users to override default behavior and provide custom logic for generating [Resource] instances.
+ * Allows users to override default behavior and provide custom logic for generating resource's paths.
  *
  * @param configure Configuration lambda applied to [WebResourcesConfiguration].
  * @see WebResourcesConfiguration For detailed configuration options.
@@ -54,10 +33,10 @@ object WebResourcesConfiguration {
  * Examples:
  * ```
  *  configureWebResources {
- *     setResourceFactory { path -> urlResource("/myApp1/resources/$path") }
+ *     setResourceFactory { path -> "/myApp1/resources/$path" }
  *  }
  *  configureWebResources {
- *     setResourceFactory { path -> urlResource("https://mycdn.com/myApp1/res/$path") }
+ *     setResourceFactory { path -> "https://mycdn.com/myApp1/res/$path" }
  *  }
  * ```
  */
@@ -66,52 +45,3 @@ object WebResourcesConfiguration {
 fun configureWebResources(configure: WebResourcesConfiguration.() -> Unit) {
     WebResourcesConfiguration.configure()
 }
-
-/**
- * Generates a [Resource] instance based on the provided [path].
- *
- * By default, the path is treated as relative to the current URL segment.
- * The default behaviour can be overridden by using [configureWebResources].
- *
- * @param path The path or resource id used to generate the [Resource] instance.
- * @return A [Resource] instance corresponding to the provided path.
- */
-@ExperimentalResourceApi
-actual fun resource(path: String): Resource = WebResourcesConfiguration.jsResourceImplFactory(path)
-
-/**
- * Creates a [Resource] instance based on the provided [url].
- *
- * @param url The URL used to access the [Resource].
- * @return A [Resource] instance accessible by the given URL.
- */
-@ExperimentalResourceApi
-fun urlResource(url: String): Resource = JSUrlResourceImpl(url)
-
-@ExperimentalResourceApi
-private class JSUrlResourceImpl(url: String) : AbstractResourceImpl(url) {
-    override suspend fun readBytes(): ByteArray {
-        val response = window.fetch(path).await()
-        if (!response.ok) {
-            throw MissingResourceException(path)
-        }
-        return response.arrayBuffer().await().toByteArray()
-    }
-}
-
-private fun ArrayBuffer.toByteArray() = Int8Array(this, 0, byteLength).unsafeCast<ByteArray>()
-
-internal actual class MissingResourceException actual constructor(path: String) :
-    Exception("Missing resource with path: $path")
-
-internal actual fun parseXML(byteArray: ByteArray): Element {
-    val xmlString = byteArray.decodeToString()
-    val xmlDom = DOMParser().parseFromString(xmlString, "application/xml")
-    val domElement = xmlDom.documentElement ?: throw MalformedXMLException("missing documentElement")
-    return ElementImpl(domElement)
-}
-
-internal actual fun isSyncResourceLoadingSupported() = false
-
-@OptIn(ExperimentalResourceApi::class)
-internal actual fun Resource.readBytesSync(): ByteArray = throw UnsupportedOperationException()

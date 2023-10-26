@@ -68,7 +68,7 @@ private class BuildContext {
     }
 }
 
-internal fun Element.parseVectorRoot(density: Density): ImageVector {
+internal fun Element.toImageVector(density: Density): ImageVector {
     val context = BuildContext()
     val builder = ImageVector.Builder(
         defaultWidth = attributeOrNull(ANDROID_NS, "width").parseDp(density),
@@ -181,7 +181,6 @@ private fun Element.parseLinearGradient() = Brush.linearGradient(
     tileMode = attributeOrNull(ANDROID_NS, "tileMode")?.let(::parseTileMode) ?: TileMode.Clamp
 )
 
-@Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
 private fun Element.parseRadialGradient() = Brush.radialGradient(
     colorStops = parseColorStops(),
     center = Offset(
@@ -192,7 +191,6 @@ private fun Element.parseRadialGradient() = Brush.radialGradient(
     tileMode = attributeOrNull(ANDROID_NS, "tileMode")?.let(::parseTileMode) ?: TileMode.Clamp
 )
 
-@Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
 private fun Element.parseSweepGradient() = Brush.sweepGradient(
     colorStops = parseColorStops(),
     center = Offset(
