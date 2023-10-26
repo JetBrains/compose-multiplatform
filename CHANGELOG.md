@@ -1,3 +1,30 @@
+# 1.5.10-rc02 (October 2023)
+
+## Common
+### Features
+
+* [Support Kotlin 1.9.20-RC2](https://github.com/JetBrains/compose-multiplatform/pull/3861)
+
+## Desktop
+### Fixes
+* [Fix NPE for getComponentAfter/Before in ComposePanel](https://github.com/JetBrains/compose-multiplatform-core/pull/878)
+* [Take into account `enabled` in `scrollable` for mouse input](https://github.com/JetBrains/compose-multiplatform-core/pull/880)
+* [Improve accessibility on Windows](https://github.com/JetBrains/compose-multiplatform-core/pull/885)
+* [Fix Chinese characters input when using JBR](https://github.com/JetBrains/compose-multiplatform-core/pull/881)
+
+## Web
+### Features
+* [Allow resources routing configuration (resources library)](https://github.com/JetBrains/compose-multiplatform/pull/3852)
+
+## Dependencies
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+* [Compiler 1.5.3](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.3)
+* [Runtime 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.5.4)
+* [UI 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.5.4)
+* [Foundation 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.5.4)
+* [Material 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-material#1.5.4)
+* [Material3 1.1.2](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.1.2)
+
 # 1.5.10-rc01 (October 2023)
 
 ## Common
