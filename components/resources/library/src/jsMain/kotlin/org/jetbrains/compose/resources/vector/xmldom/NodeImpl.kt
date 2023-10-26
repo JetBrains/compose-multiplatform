@@ -4,6 +4,9 @@ import org.w3c.dom.Node as DomNode
 import org.w3c.dom.Element as DomElement
 
 internal open class NodeImpl(val n: DomNode): Node {
+    override val textContent: String?
+        get() = n.textContent
+
     override val nodeName: String
         get() = n.nodeName
 
