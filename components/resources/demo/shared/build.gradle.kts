@@ -50,10 +50,9 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(compose.ui)
-                implementation(compose.foundation)
-                implementation(compose.material)
                 implementation(compose.runtime)
+                implementation(compose.material3)
+                implementation(compose.materialIconsExtended)
                 implementation(project(":resources:library"))
             }
         }
