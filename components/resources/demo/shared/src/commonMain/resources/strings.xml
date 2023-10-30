@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Compose Resources App</string>
-    <string name="hello">Hello world 👍</string>
+    <string name="hello">😊 Hello world!</string>
     <string name="multi_line">Lorem ipsum dolor sit amet,
         consectetur adipiscing elit.
         Donec eget turpis ac sem ultricies consequat.</string>

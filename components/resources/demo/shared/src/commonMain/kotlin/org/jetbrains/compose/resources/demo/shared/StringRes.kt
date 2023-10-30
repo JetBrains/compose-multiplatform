@@ -93,7 +93,7 @@ fun StringRes(paddingValues: PaddingValues) {
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
             value = getString("str_template", "User_name", 100),
             onValueChange = {},
-            label = { Text("Text(getString(\"multi_line\", \"User_name\", 100))") },
+            label = { Text("Text(getString(\"str_template\", \"User_name\", 100))") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
