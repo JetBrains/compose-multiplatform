@@ -13,8 +13,13 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.vector.toImageVector
 import org.jetbrains.compose.resources.vector.xmldom.Element
 
+
 /**
- * Reads image files and provides the Painter abstraction
+ * Retrieves a [Painter] for the given [ResourceId].
+ * Automatically select a type of the Painter depending on the file extension.
+ *
+ * @param id The ID of the resource to retrieve the [Painter] from.
+ * @return The [Painter] loaded from the resource.
  */
 @ExperimentalResourceApi
 @Composable
@@ -30,6 +35,12 @@ fun rememberPainter(id: ResourceId): Painter {
 
 private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 
+/**
+ * Retrieves an ImageBitmap for the given resource ID.
+ *
+ * @param id The ID of the resource to load the ImageBitmap from.
+ * @return The ImageBitmap loaded from the resource.
+ */
 @ExperimentalResourceApi
 @Composable
 fun rememberImageBitmap(id: ResourceId): ImageBitmap {
@@ -45,6 +56,12 @@ private val emptyImageVector: ImageVector by lazy {
     ImageVector.Builder("emptyImageVector", 1.dp, 1.dp, 1f, 1f).build()
 }
 
+/**
+ * Retrieves an ImageVector for the given resource ID.
+ *
+ * @param id The ID of the resource to load the ImageVector from.
+ * @return The ImageVector loaded from the resource.
+ */
 @ExperimentalResourceApi
 @Composable
 fun rememberImageVector(id: ResourceId): ImageVector {
