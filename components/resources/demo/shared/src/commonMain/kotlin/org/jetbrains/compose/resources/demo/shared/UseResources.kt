@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 
 enum class Screens(val content: @Composable (contentPadding: PaddingValues) -> Unit) {
     Images({ ImagesRes(it) }),
-    Strings({}),
+    Strings({ StringRes(it) }),
     Font({}),
     File({ FileRes(it) }),
 }

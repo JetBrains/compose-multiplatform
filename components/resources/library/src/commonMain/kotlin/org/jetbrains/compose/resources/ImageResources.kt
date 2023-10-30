@@ -33,7 +33,7 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 @ExperimentalResourceApi
 @Composable
 fun rememberImageBitmap(id: ResourceId): ImageBitmap {
-    val fileContent by rememberBytes(id)
+    val fileContent by rememberState(ByteArray(0)) { readBytes(getPathById(id)) }
 
     //it is fallback only for JS async loading
     if (fileContent.isEmpty()) return emptyImageBitmap
@@ -48,7 +48,7 @@ private val emptyImageVector: ImageVector by lazy {
 @ExperimentalResourceApi
 @Composable
 fun rememberImageVector(id: ResourceId): ImageVector {
-    val fileContent by rememberBytes(id)
+    val fileContent by rememberState(ByteArray(0)) { readBytes(getPathById(id)) }
 
     //it is fallback only for JS async loading
     if (fileContent.isEmpty()) return emptyImageVector
