@@ -24,7 +24,9 @@ class ComposeResourceTest {
 
     @Test
     fun testMissingResource() = runTest(UnconfinedTestDispatcher()) {
-        assertFailsWith<MissingResourceException> { imageResource("missing.png") }
+        assertFailsWith<MissingResourceException> {
+            rule.setContent { imageResource("missing.png") }
+        }
     }
 
     @Test
