@@ -8,3 +8,13 @@ val Abc.commonIntVal: Int
 
 expect val Abc.composableIntVal: Int
     @Composable get
+
+@Composable
+fun GetIntVal(): Int {
+    return Abc().composableIntVal
+}
+
+@Composable
+fun GetIntValWithDefault(def: Int = Abc().composableIntVal): Int {
+    return def
+}

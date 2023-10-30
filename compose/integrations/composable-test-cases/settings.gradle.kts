@@ -38,7 +38,7 @@ val casesToRun = CasesToRun.values().firstOrNull {
 } ?: CasesToRun.Default
 
 
-val listOfFailingJsCases = (extra["tests.failing.kjs"] as String).split(",")
+val listOfFailingJsCases = (extra.properties.getOrDefault("tests.failing.kjs", "") as String).split(",")
 val failingJsSuffix = "failingJs"
 
 fun getFailingSuffix(testCaseName: String): String? {

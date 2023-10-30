@@ -109,3 +109,8 @@ android {
 compose.experimental {
     web.application {}
 }
+
+// TODO: remove this block after we update on a newer kotlin. Currently there is an error: `error:0308010C:digital envelope routines::unsupported`
+rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
+    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
+}

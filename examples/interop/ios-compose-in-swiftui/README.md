@@ -1,6 +1,6 @@
-# Compose in SwiftUI
+# Compose Multiplatform in SwiftUI
 
-This example shows how to use Compose inside an iOS Application written in SwiftUI.
+This example shows how to use Compose Multiplatform inside an iOS Application written in SwiftUI.
 
 Entry point is `struct ContentView` in file [ContentView.swift](iosApp%2FiosApp%2FContentView.swift).
 
