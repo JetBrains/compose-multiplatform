@@ -14,6 +14,7 @@ import platform.darwin.NSObject
 
 internal fun parse(xml: String): Element {
     val parser = DomXmlParser()
+    @Suppress("CAST_NEVER_SUCCEEDS")
     NSXMLParser((xml as NSString).dataUsingEncoding(NSUTF8StringEncoding)!!).apply {
         shouldReportNamespacePrefixes = true
         shouldProcessNamespaces = true
@@ -53,7 +54,7 @@ private class ElementImpl(
 
     override fun getAttribute(name: String): String = attributes[name] as String? ?: ""
 
-    override fun lookupPrefix(uri: String): String = prefixMap[uri] ?: ""
+    override fun lookupPrefix(namespaceURI: String): String = prefixMap[namespaceURI] ?: ""
 }
 
 @Suppress("CONFLICTING_OVERLOADS", "PARAMETER_NAME_CHANGED_ON_OVERRIDE")

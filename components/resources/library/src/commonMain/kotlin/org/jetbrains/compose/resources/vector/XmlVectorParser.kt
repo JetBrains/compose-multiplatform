@@ -168,7 +168,6 @@ private fun Element.parseGradient(): Brush? {
     }
 }
 
-@Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
 private fun Element.parseLinearGradient() = Brush.linearGradient(
     colorStops = parseColorStops(),
     start = Offset(
