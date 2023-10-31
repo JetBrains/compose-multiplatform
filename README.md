@@ -22,7 +22,7 @@ For example, you can share UIs between iOS and Android or Windows and MacOS.
 
 ## iOS
 
-> iOS support is in Alpha. It may change incompatibly and require manual migration in the future. 
+> **Note**: iOS support is in Alpha. It may change incompatibly and require manual migration in the future. 
 > We would appreciate your feedback on it in the public Slack channel [#compose-ios](https://kotlinlang.slack.com/archives/C0346LWVBJ4/p1678888063176359). 
 > If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
 
@@ -51,7 +51,7 @@ It has desktop extensions for menus, keyboard shortcuts, window manipulation, an
 
 ## Web
 
-> Web support is Experimental and may be changed at any time. Use it only for evaluation purposes. 
+> **Note**: Web support is Experimental and may be changed at any time. Use it only for evaluation purposes. 
 > We would appreciate your feedback on it in the public Slack channel [#compose-web](https://kotlinlang.slack.com/archives/C01F2HV7868/p1678887590205449). 
 > If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
 
@@ -65,8 +65,7 @@ all the benefits that WebAssembly has to offer, such as good and predictable per
 
 If you want to share UIs across all supported platforms at once, you can start with [this template](https://github.com/JetBrains/compose-multiplatform-template#readme).
 
-> Note that this template currently doesn’t support the web. It will be added later.
-> 
+> **Note**: This template currently doesn’t support the web. It will be added later.  
 > We would appreciate your feedback on Compose Multiplatform in the public Slack channel [#compose](https://kotlinlang.slack.com/archives/CJLTWPH7S/p1678882768039969).
 
 ## Libraries
@@ -76,7 +75,7 @@ If you want to share UIs across all supported platforms at once, you can start w
 Compose HTML is a library targeting [Kotlin/JS](https://kotlinlang.org/docs/js-overview.html) that provides Composable building blocks 
 for creating web user interfaces with HTML and CSS.    
 
-> Note that Compose HTML is not a multiplatform library. It can be used only with Kotlin/JS.
+> **Note**: Compose HTML is not a multiplatform library. It can be used only with Kotlin/JS.
 
 ## Learn more
 
@@ -85,7 +84,3 @@ for creating web user interfaces with HTML and CSS.
 * [Tutorials](tutorials/README.md)
 * [Changelog](CHANGELOG.md)
 * [Compatibility and versioning](VERSIONING.md)
-
-
-
-
