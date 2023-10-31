@@ -1,7 +1,7 @@
 package org.jetbrains.compose.resources.vector.xmldom
 
-import org.w3c.dom.Node as DomNode
 import org.w3c.dom.Element as DomElement
+import org.w3c.dom.Node as DomNode
 
 internal open class NodeImpl(val n: DomNode): Node {
     override val textContent: String?

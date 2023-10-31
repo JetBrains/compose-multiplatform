@@ -1,7 +1,6 @@
 package org.jetbrains.compose.resources
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import org.jetbrains.compose.resources.vector.xmldom.Element
 import org.jetbrains.compose.resources.vector.xmldom.NodeList

@@ -17,8 +17,8 @@
 package org.jetbrains.compose.resources.vector
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
@@ -34,9 +34,10 @@ import androidx.compose.ui.graphics.vector.DefaultTranslationY
 import androidx.compose.ui.graphics.vector.EmptyPath
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.addPathNodes
-import org.jetbrains.compose.resources.vector.BuildContext.Group
 import androidx.compose.ui.unit.Density
-import org.jetbrains.compose.resources.vector.xmldom.*
+import org.jetbrains.compose.resources.vector.BuildContext.Group
+import org.jetbrains.compose.resources.vector.xmldom.Element
+import org.jetbrains.compose.resources.vector.xmldom.Node
 
 
 //  Parsing logic is the same as in Android implementation
