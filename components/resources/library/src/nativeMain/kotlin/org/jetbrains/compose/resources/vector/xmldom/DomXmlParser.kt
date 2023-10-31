@@ -4,7 +4,12 @@
  */
 package org.jetbrains.compose.resources.vector.xmldom
 
-import platform.Foundation.*
+import platform.Foundation.NSError
+import platform.Foundation.NSString
+import platform.Foundation.NSUTF8StringEncoding
+import platform.Foundation.NSXMLParser
+import platform.Foundation.NSXMLParserDelegateProtocol
+import platform.Foundation.dataUsingEncoding
 import platform.darwin.NSObject
 
 internal fun parse(xml: String): Element {
