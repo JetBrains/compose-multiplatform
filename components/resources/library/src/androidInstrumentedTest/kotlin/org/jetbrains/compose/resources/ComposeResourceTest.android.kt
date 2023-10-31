@@ -7,14 +7,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.test.junit4.createComposeRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import kotlin.test.assertFailsWith
 
+//Copy of desktop tests
 @OptIn(ExperimentalResourceApi::class, ExperimentalCoroutinesApi::class)
 class ComposeResourceTest {
 
@@ -22,32 +23,25 @@ class ComposeResourceTest {
     val rule = createComposeRule()
 
     @Test
-    fun testMissingResource() = runTest (UnconfinedTestDispatcher()) {
-        var recompositionCount = 0
-        rule.setContent {
-            CountRecompositions(resource("missing.png").rememberImageBitmap().orEmpty()) {
-                recompositionCount++
-            }
-        }
-        rule.awaitIdle()
-        assertEquals(2, recompositionCount)
+    fun testMissingResource() = runTest(UnconfinedTestDispatcher()) {
+        assertFailsWith<MissingResourceException> { rememberImageBitmap("missing.png") }
     }
 
     @Test
-    fun testCountRecompositions() = runTest (UnconfinedTestDispatcher()) {
+    fun testCountRecompositions() = runTest(UnconfinedTestDispatcher()) {
         val mutableStateFlow = MutableStateFlow(true)
         var recompositionCount = 0
         rule.setContent {
             val state: Boolean by mutableStateFlow.collectAsState(true)
-            val resource = resource(if (state) "1.png" else "2.png")
-            CountRecompositions(resource.rememberImageBitmap().orEmpty()) {
+            val resource = rememberImageBitmap(if (state) "1.png" else "2.png")
+            CountRecompositions(resource) {
                 recompositionCount++
             }
         }
         rule.awaitIdle()
         mutableStateFlow.value = false
         rule.awaitIdle()
-        assertEquals(4, recompositionCount)
+        assertEquals(2, recompositionCount)
     }
 
 }

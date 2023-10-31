@@ -101,6 +101,15 @@ kotlin {
         }
         val androidInstrumentedTest by getting {
             dependsOn(jvmAndAndroidTest)
+            dependencies {
+                implementation("androidx.test:core:1.5.0")
+                implementation("androidx.compose.ui:ui-test-manifest:1.5.4")
+                implementation("androidx.compose.ui:ui-test:1.5.4")
+                implementation("androidx.compose.ui:ui-test-junit4:1.5.4")
+            }
+        }
+        val androidUnitTest by getting {
+            dependsOn(jvmAndAndroidTest)
         }
         val nativeMain by getting {
             dependsOn(skikoMain)
@@ -141,13 +150,6 @@ android {
                 }
             }
         }
-    }
-    dependencies {
-        //Android integration tests
-        testImplementation("androidx.test:core:1.5.0")
-        androidTestImplementation("androidx.compose.ui:ui-test-manifest:1.5.4")
-        androidTestImplementation("androidx.compose.ui:ui-test:1.5.4")
-        androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.4")
     }
 }
 

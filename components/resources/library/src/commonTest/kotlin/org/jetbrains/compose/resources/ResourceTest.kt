@@ -9,15 +9,14 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-@OptIn(ExperimentalResourceApi::class)
 class ResourceTest {
     @Test
-    fun testResourceEquals() {
-        assertEquals(resource("a"), resource("a"))
+    fun testResourceEquals() = runBlockingTest {
+        assertEquals(getPathById("a"), getPathById("a"))
     }
 
     @Test
-    fun testResourceNotEquals() {
-        assertNotEquals(resource("a"), resource("b"))
+    fun testResourceNotEquals() = runBlockingTest {
+        assertNotEquals(getPathById("a"), getPathById("b"))
     }
 }
