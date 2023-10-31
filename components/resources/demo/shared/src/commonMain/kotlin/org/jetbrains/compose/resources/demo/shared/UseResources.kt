@@ -22,7 +22,7 @@ import androidx.compose.ui.Modifier
 enum class Screens(val content: @Composable (contentPadding: PaddingValues) -> Unit) {
     Images({ ImagesRes(it) }),
     Strings({ StringRes(it) }),
-    Font({}),
+    Font({ FontRes(it) }),
     File({ FileRes(it) }),
 }
 
