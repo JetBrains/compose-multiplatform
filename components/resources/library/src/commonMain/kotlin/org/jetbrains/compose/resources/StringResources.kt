@@ -101,9 +101,6 @@ suspend fun loadStringArray(id: ResourceId): List<String> {
     return items
 }
 
-private fun getPluralString(id: ResourceId, count: Int): List<String> = TODO()
-private fun getPluralString(id: ResourceId, count: Int, vararg formatArgs: Any): List<String> = TODO()
-
 private fun NodeList.getElementsWithName(name: String): List<Element> =
     List(length) { item(it) }
         .filterIsInstance<Element>()
