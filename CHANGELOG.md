@@ -7,7 +7,7 @@
 
 ## Common
 ### Features
-* [Support Kotlin 1.9.20] TODO
+* [Support Kotlin 1.9.20](https://github.com/JetBrains/compose-multiplatform/pull/3884)
 * Introduce Material 3 components in common
   * [`ModalBottomSheet`](https://github.com/JetBrains/compose-multiplatform-core/pull/794)
   * [`SearchBar` and `DockedSearchBar`](https://github.com/JetBrains/compose-multiplatform-core/pull/801)
