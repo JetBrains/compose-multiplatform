@@ -6,14 +6,14 @@
 
 # Compose Multiplatform
 
-**Compose Multiplatform** is a declarative framework for sharing UIs across multiple platforms with Kotlin. 
+[**Compose Multiplatform**](https://jb.gg/cmp) is a declarative framework for sharing UIs across multiple platforms with Kotlin. 
 It is based on [Jetpack Compose](https://developer.android.com/jetpack/compose) and developed by [JetBrains](https://www.jetbrains.com/) and open-source contributors.
 
 You can choose the platforms across which to share your UIs using Compose Multiplatform:
 
-* [iOS](https://github.com/JetBrains/compose-multiplatform-ios-android-template/#readme) (Alpha)
-* [Android](https://developer.android.com/jetpack/compose) (via Jetpack Compose)
-* [Desktop](https://github.com/JetBrains/compose-multiplatform-desktop-template/#readme) (Windows, MacOS, Linux)
+* [iOS](https://jb.gg/start-cmp) (Alpha)
+* [Android](https://jb.gg/start-cmp) 
+* [Desktop](https://jb.gg/start-cmp) (Windows, MacOS, Linux)
 * [Web](https://kotl.in/wasm-compose-example) (Experimental)
 
 For example, you can share UIs between iOS and Android or Windows and MacOS.
@@ -29,16 +29,18 @@ For example, you can share UIs between iOS and Android or Windows and MacOS.
 Compose Multiplatform shares most of its API with Jetpack Compose, the Android UI framework developed by Google. 
 You can use the same APIs to build user interfaces for both Android and iOS.
 
-Since Compose is built on top of [Kotlin Multiplatform](https://kotlinlang.org/lp/multiplatform/), 
+Since Compose is built on top of [Kotlin Multiplatform](https://jb.gg/kmp), 
 you can easily access native APIs, such as the [Camera API](https://developer.apple.com/documentation/avfoundation/capture_setup/avcam_building_a_camera_app), 
 and embed complex native UI views, such as [MKMapView](https://developer.apple.com/documentation/mapkit/mkmapview).
 
-**[Get started with Compose for iOS](https://github.com/JetBrains/compose-multiplatform-ios-android-template#readme)**
+**[Get started with Compose Multiplatform](https://jb.gg/start-cmp)**
 
 ## Android
 
 When Android is one of your targets, you can get the same experience for Android as if you were developing an Android app 
 using [Jetpack Compose](https://developer.android.com/jetpack/compose).
+
+**[Get started with Compose Multiplatform](https://jb.gg/start-cmp)**
 
 ## Desktop
 
@@ -47,7 +49,9 @@ platforms – macOS, Windows, and Linux.
 
 It has desktop extensions for menus, keyboard shortcuts, window manipulation, and notification management.
 
-**[Get started with Compose for Desktop](https://github.com/JetBrains/compose-multiplatform-desktop-template#readme)**
+**[Get started with Compose Multiplatform](https://jb.gg/start-cmp)**
+
+> We would appreciate your feedback on Compose Multiplatform in the public Slack channel [#compose](https://kotlinlang.slack.com/archives/CJLTWPH7S/p1678882768039969).
 
 ## Web
 
@@ -61,14 +65,6 @@ all the benefits that WebAssembly has to offer, such as good and predictable per
 
 **[Get started with Compose for Web](https://kotl.in/wasm-compose-example)**
 
-## All platforms at once
-
-If you want to share UIs across all supported platforms at once, you can start with [this template](https://github.com/JetBrains/compose-multiplatform-template#readme).
-
-> Note that this template currently doesn’t support the web. It will be added later.
-> 
-> We would appreciate your feedback on Compose Multiplatform in the public Slack channel [#compose](https://kotlinlang.slack.com/archives/CJLTWPH7S/p1678882768039969).
-
 ## Libraries
 
 ### Compose HTML
@@ -80,11 +76,12 @@ for creating web user interfaces with HTML and CSS.
 
 ## Learn more
 
-* [FAQ](docs/FAQ.md)
-* [Samples](examples/README.md)
+* [FAQ](https://jb.gg/cmp-faq)
+* [Samples](https://jb.gg/cmp-samples)
 * [Tutorials](tutorials/README.md)
+* [Compatibility and versioning](https://jb.gg/cmp-versioning)
 * [Changelog](CHANGELOG.md)
-* [Compatibility and versioning](VERSIONING.md)
+
 
 
 

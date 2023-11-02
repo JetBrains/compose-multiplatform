@@ -1,10 +1,9 @@
 # Tutorials
 
-## iOS + Android
-* [Getting started](https://github.com/JetBrains/compose-multiplatform-ios-android-template)
+## iOS + Android + Desktop
+* [Getting started](https://jb.gg/start-cmp)
 
 ## Desktop
-* [Getting started](https://github.com/JetBrains/compose-multiplatform-desktop-template)
 * [Image and icon manipulations](Image_And_Icons_Manipulations)
 * [Mouse events and hover](Mouse_Events)
 * [Scrolling and scrollbars](Desktop_Components#scrollbars)
@@ -20,7 +19,7 @@
 * [Building a native distribution](Native_distributions_and_local_execution)
 * [UI testing](UI_Testing)
 
-## Web
+## Web (based on Wasm)
 * [Getting started](https://kotl.in/wasm-compose-example)
 
 ## General
