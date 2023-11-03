@@ -117,6 +117,7 @@ abstract class ComposePlugin : Plugin<Project> {
         @ExperimentalComposeLibrary
         val uiTestJUnit4 get() = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
         val uiTooling get() = composeDependency("org.jetbrains.compose.ui:ui-tooling")
+        val uiUtil get() = composeDependency("org.jetbrains.compose.ui:ui-util")
         val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
         val materialIconsExtended get() = composeDependency("org.jetbrains.compose.material:material-icons-extended")
         val components get() = CommonComponentsDependencies
