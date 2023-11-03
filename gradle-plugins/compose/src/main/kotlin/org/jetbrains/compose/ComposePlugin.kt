@@ -107,9 +107,9 @@ abstract class ComposePlugin : Plugin<Project> {
             // TODO: remove these HACKS for version substitution when possible
             val conf = it
             conf.resolutionStrategy.eachDependency {
-                if (project.getKotlinPluginVersion() == "1.9.20-RC") {
+                if (project.getKotlinPluginVersion() == "1.9.20") {
                     if (it.requested.module.name.contains("kotlin-stdlib")) {
-                        it.useVersion("1.9.20-RC")
+                        it.useVersion("1.9.20")
                     }
                 }
                 val isWasm = conf.name.contains("wasm", true)
@@ -117,19 +117,19 @@ abstract class ComposePlugin : Plugin<Project> {
                 if (it.requested.module.group == "org.jetbrains.kotlinx" &&
                     it.requested.module.name.contains("kotlinx-coroutines", true)
                 ) {
-                    if (isWasm) it.useVersion("1.7.2-wasm2")
+                    if (isWasm) it.useVersion("1.7.2-wasm3")
                 }
 
                 if (it.requested.module.group == "org.jetbrains.kotlinx" &&
                     it.requested.module.name.contains("atomicfu", true)
                 ) {
-                    if (isWasm) it.useVersion("0.22.0-wasm1")
+                    if (isWasm) it.useVersion("0.22.0-wasm2")
                 }
 
                 if (it.requested.module.group == "org.jetbrains.kotlinx" &&
                     it.requested.module.name.contains("datetime", true)
                 ) {
-                    if (isWasm) it.useVersion("0.4.1-wasm0")
+                    if (isWasm) it.useVersion("0.4.1-wasm1")
                 }
             }
         }
@@ -153,7 +153,7 @@ abstract class ComposePlugin : Plugin<Project> {
         val uiTooling get() = composeDependency("org.jetbrains.compose.ui:ui-tooling")
         val uiUtil get() = composeDependency("org.jetbrains.compose.ui:ui-util")
         val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
-        val materialIconsExtended get() = composeDependency("org.jetbrains.compose.material:material-icons-extended", "1.5.1-dev-wasm01")
+        val materialIconsExtended get() = composeDependency("org.jetbrains.compose.material:material-icons-extended")
         val components get() = CommonComponentsDependencies
         @Deprecated("Use compose.html", replaceWith = ReplaceWith("html"))
         val web: WebDependencies get() = WebDependencies
