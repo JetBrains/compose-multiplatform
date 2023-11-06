@@ -23,13 +23,13 @@ import org.jetbrains.compose.resources.vector.xmldom.Element
  */
 @ExperimentalResourceApi
 @Composable
-fun rememberPainter(id: ResourceId): Painter {
+fun painterResource(id: ResourceId): Painter {
     val filePath by rememberFilePath(id)
     val isXml = filePath.endsWith(".xml", true)
     if (isXml) {
-        return rememberVectorPainter(rememberImageVector(id))
+        return rememberVectorPainter(vectorResource(id))
     } else {
-        return BitmapPainter(rememberImageBitmap(id))
+        return BitmapPainter(imageResource(id))
     }
 }
 
@@ -43,7 +43,7 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
  */
 @ExperimentalResourceApi
 @Composable
-fun rememberImageBitmap(id: ResourceId): ImageBitmap {
+fun imageResource(id: ResourceId): ImageBitmap {
     val fileContent by rememberState(ByteArray(0)) { readBytes(getPathById(id)) }
 
     //it is fallback only for JS async loading
@@ -64,7 +64,7 @@ private val emptyImageVector: ImageVector by lazy {
  */
 @ExperimentalResourceApi
 @Composable
-fun rememberImageVector(id: ResourceId): ImageVector {
+fun vectorResource(id: ResourceId): ImageVector {
     val fileContent by rememberState(ByteArray(0)) { readBytes(getPathById(id)) }
 
     //it is fallback only for JS async loading

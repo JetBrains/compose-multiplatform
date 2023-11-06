@@ -17,9 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.rememberImageBitmap
-import org.jetbrains.compose.resources.rememberImageVector
-import org.jetbrains.compose.resources.rememberPainter
+import org.jetbrains.compose.resources.imageResource
+import org.jetbrains.compose.resources.vectorResource
+import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -35,7 +35,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Image(
                     modifier = Modifier.size(100.dp),
-                    painter = rememberPainter("images/compose.png"),
+                    painter = painterResource("images/compose.png"),
                     contentDescription = null
                 )
                 Text(
@@ -56,7 +56,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Image(
                     modifier = Modifier.size(100.dp),
-                    painter = rememberPainter("images/insta_icon.xml"),
+                    painter = painterResource("images/insta_icon.xml"),
                     contentDescription = null
                 )
                 Text(
@@ -77,7 +77,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Image(
                     modifier = Modifier.size(140.dp),
-                    bitmap = rememberImageBitmap("images/land.webp"),
+                    bitmap = imageResource("images/land.webp"),
                     contentDescription = null
                 )
                 Text(
@@ -98,7 +98,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Image(
                     modifier = Modifier.size(100.dp),
-                    imageVector = rememberImageVector("images/droid_icon.xml"),
+                    imageVector = vectorResource("images/droid_icon.xml"),
                     contentDescription = null
                 )
                 Text(
@@ -119,7 +119,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Icon(
                     modifier = Modifier.size(100.dp),
-                    painter = rememberPainter("images/compose.png"),
+                    painter = painterResource("images/compose.png"),
                     contentDescription = null
                 )
                 Text(
@@ -140,7 +140,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Icon(
                     modifier = Modifier.size(100.dp),
-                    painter = rememberPainter("images/insta_icon.xml"),
+                    painter = painterResource("images/insta_icon.xml"),
                     contentDescription = null
                 )
                 Text(
@@ -161,7 +161,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Icon(
                     modifier = Modifier.size(140.dp),
-                    bitmap = rememberImageBitmap("images/land.webp"),
+                    bitmap = imageResource("images/land.webp"),
                     contentDescription = null
                 )
                 Text(
@@ -182,7 +182,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Icon(
                     modifier = Modifier.size(100.dp),
-                    imageVector = rememberImageVector("images/droid_icon.xml"),
+                    imageVector = vectorResource("images/droid_icon.xml"),
                     contentDescription = null
                 )
                 Text(
