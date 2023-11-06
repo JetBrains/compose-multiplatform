@@ -33,5 +33,12 @@ internal fun UseResources() {
             modifier = Modifier.size(150.dp),
             contentDescription = null
         )
+
+        // To try reproduce https://github.com/JetBrains/compose-multiplatform/issues/3893
+        Image(
+            painter = painterResource("drawable/img.png"),
+            contentDescription = null,
+            modifier = Modifier.size(150.dp),
+        )
     }
 }

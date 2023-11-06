@@ -13,16 +13,40 @@ dependencies {
 }
 
 android {
-    compileSdk = 33
+    compileSdk = 34
     defaultConfig {
         applicationId = "me.user.androidApp"
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+    namespace = "org.jetbrains.compose.resources.demo"
+
+    signingConfigs {
+        // We use a bundled debug keystore, to allow debug builds from CI to be upgradable
+        named("debug") {
+            storeFile = project.file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
+    buildTypes {
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+        }
+
+        getByName("release") {
+            isMinifyEnabled = true
+            signingConfig = signingConfigs.getByName("debug")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro")
+        }
     }
 }

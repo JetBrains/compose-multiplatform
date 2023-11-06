@@ -89,21 +89,22 @@ kotlin {
 }
 
 android {
-    compileSdk = 33
+    compileSdk = 34
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = 21
-        targetSdk = 33
+        targetSdk = 34
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     sourceSets {
         named("main") {
             resources.srcDir("src/commonMain/resources")
         }
     }
+    namespace = "org.jetbrains.compose.resources.demo.shared"
 }
 
 compose.experimental {
