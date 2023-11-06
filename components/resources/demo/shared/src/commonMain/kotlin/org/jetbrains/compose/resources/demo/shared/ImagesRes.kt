@@ -1,12 +1,7 @@
 package org.jetbrains.compose.resources.demo.shared
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -25,12 +20,11 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun ImagesRes(contentPadding: PaddingValues) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(contentPadding).verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.padding(contentPadding).verticalScroll(rememberScrollState()),
     ) {
         OutlinedCard(modifier = Modifier.padding(8.dp)) {
             Column(
-                modifier = Modifier.padding(16.dp).width(350.dp),
+                modifier = Modifier.padding(16.dp).fillMaxWidth().fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
@@ -41,9 +35,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
                 Text(
                     """
                         Image(
-                          painter = rememberPainter(
-                            "images/compose.png"
-                          )
+                          painter = painterResource("images/compose.png")
                         )
                     """.trimIndent()
                 )
@@ -51,7 +43,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
         }
         OutlinedCard(modifier = Modifier.padding(8.dp)) {
             Column(
-                modifier = Modifier.padding(16.dp).width(350.dp),
+                modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
@@ -62,9 +54,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
                 Text(
                     """
                         Image(
-                          painter = rememberPainter(
-                            "images/insta_icon.xml"
-                          )
+                          painter = painterResource("images/insta_icon.xml")
                         )
                     """.trimIndent()
                 )
@@ -72,7 +62,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
         }
         OutlinedCard(modifier = Modifier.padding(8.dp)) {
             Column(
-                modifier = Modifier.padding(16.dp).width(350.dp),
+                modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
@@ -83,9 +73,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
                 Text(
                     """
                         Image(
-                          bitmap = rememberImageBitmap(
-                            "images/land.webp"
-                          )
+                          bitmap = imageResource("images/land.webp")
                         )
                     """.trimIndent()
                 )
@@ -93,7 +81,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
         }
         OutlinedCard(modifier = Modifier.padding(8.dp)) {
             Column(
-                modifier = Modifier.padding(16.dp).width(350.dp),
+                modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
@@ -104,9 +92,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
                 Text(
                     """
                         Image(
-                          imageVector = rememberImageVector(
-                            "images/droid_icon.xml"
-                          )
+                          imageVector = vectorResource("images/droid_icon.xml")
                         )
                     """.trimIndent()
                 )
@@ -114,7 +100,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
         }
         OutlinedCard(modifier = Modifier.padding(8.dp)) {
             Column(
-                modifier = Modifier.padding(16.dp).width(350.dp),
+                modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(
@@ -125,9 +111,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
                 Text(
                     """
                         Icon(
-                          painter = rememberPainter(
-                            "images/compose.png"
-                          )
+                          painter = painterResource("images/compose.png")
                         )
                     """.trimIndent()
                 )
@@ -135,7 +119,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
         }
         OutlinedCard(modifier = Modifier.padding(8.dp)) {
             Column(
-                modifier = Modifier.padding(16.dp).width(350.dp),
+                modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(
@@ -146,9 +130,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
                 Text(
                     """
                         Icon(
-                          painter = rememberPainter(
-                            "images/insta_icon.xml"
-                          )
+                          painter = painterResource("images/insta_icon.xml")
                         )
                     """.trimIndent()
                 )
@@ -156,7 +138,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
         }
         OutlinedCard(modifier = Modifier.padding(8.dp)) {
             Column(
-                modifier = Modifier.padding(16.dp).width(350.dp),
+                modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(
@@ -167,9 +149,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
                 Text(
                     """
                         Icon(
-                          bitmap = rememberImageBitmap(
-                            "images/land.webp"
-                          )
+                          bitmap = imageResource("images/land.webp")
                         )
                     """.trimIndent()
                 )
@@ -177,7 +157,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
         }
         OutlinedCard(modifier = Modifier.padding(8.dp)) {
             Column(
-                modifier = Modifier.padding(16.dp).width(350.dp),
+                modifier = Modifier.padding(16.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Icon(
@@ -188,9 +168,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
                 Text(
                     """
                         Icon(
-                          imageVector = rememberImageVector(
-                            "images/droid_icon.xml"
-                          )
+                          imageVector = vectorResource("images/droid_icon.xml")
                         )
                     """.trimIndent()
                 )
