@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     kotlin("multiplatform")
@@ -11,7 +11,7 @@ val composeVersion = extra["compose.version"] as String
 
 kotlin {
     jvm("desktop")
-    android {
+    androidTarget {
         publishLibraryVariants("release")
     }
     ios()
@@ -27,11 +27,12 @@ kotlin {
             dependencies {
                 implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
                 implementation("org.jetbrains.compose.foundation:foundation:$composeVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
                 implementation(kotlin("test"))
             }
         }
@@ -56,14 +57,14 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation("org.jetbrains.compose.ui:ui-test-junit4:$composeVersion")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
             }
         }
         val androidMain by getting {
             dependsOn(jvmAndAndroidMain)
             dependsOn(commonButJSMain)
         }
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
 
             }
@@ -96,17 +97,17 @@ kotlin {
 }
 
 android {
-    compileSdk = 33
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    compileSdk = 34
+    namespace = "org.jetbrains.compose.components.resources"
     defaultConfig {
         minSdk = 21
-        targetSdk = 33
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
+    @Suppress("UnstableApiUsage")
     testOptions {
         managedDevices {
             devices {
@@ -118,20 +119,6 @@ android {
             }
         }
     }
-}
-
-dependencies {
-    //Android integration tests
-    testImplementation("androidx.test:core:1.5.0")
-    androidTestImplementation("androidx.compose.ui:ui-test-manifest:1.3.1")
-    androidTestImplementation("androidx.compose.ui:ui-test:1.3.1")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.3.1")
-    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
-}
-
-// TODO it seems that argument isn't applied to the common sourceSet. Figure out why
-tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
 }
 
 configureMavenPublication(

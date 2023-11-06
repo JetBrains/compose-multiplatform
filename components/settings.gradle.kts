@@ -18,7 +18,7 @@ pluginManagement {
 include(":SplitPane:library")
 include(":SplitPane:demo")
 include(":AnimatedImage:library")
-include("AnimatedImage:demo")
+include(":AnimatedImage:demo")
 include(":resources:library")
 include(":resources:demo:androidApp")
 include(":resources:demo:desktopApp")

@@ -1,13 +1,21 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
     id("org.jetbrains.compose")
 }
 
-version = "1.0-SNAPSHOT"
-
 kotlin {
-    android()
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    targetHierarchy.default()
+    androidTarget {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
+    }
     jvm("desktop")
     listOf(
         iosX64(),
@@ -19,19 +27,20 @@ kotlin {
             isStatic = true
         }
     }
-    js(IR) {
-        browser()
+    js {
+        browser {
+            testTask(Action {
+                enabled = false
+            })
+        }
         binaries.executable()
     }
-    macosX64 {
-        binaries {
-            executable {
-                entryPoint = "main"
-            }
-        }
-    }
-    macosArm64 {
-        binaries {
+
+    listOf(
+        macosX64(),
+        macosArm64()
+    ).forEach { macosTarget ->
+        macosTarget.binaries {
             executable {
                 entryPoint = "main"
             }
@@ -41,63 +50,29 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(compose.ui)
-                implementation(compose.foundation)
-                implementation(compose.material)
                 implementation(compose.runtime)
+                implementation(compose.material3)
+                implementation(compose.materialIconsExtended)
                 implementation(project(":resources:library"))
             }
-        }
-        val iosMain by creating {
-            dependsOn(commonMain)
-        }
-        val iosTest by creating {
-        }
-        val iosX64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosArm64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosX64Test by getting {
-            dependsOn(iosMain)
-        }
-        val iosArm64Test by getting {
-            dependsOn(iosMain)
-        }
-        val iosSimulatorArm64Test by getting {
-            dependsOn(iosMain)
         }
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.common)
             }
         }
-        val macosMain by creating {
-            dependsOn(commonMain)
-        }
-        val macosX64Main by getting {
-            dependsOn(macosMain)
-        }
-        val macosArm64Main by getting {
-            dependsOn(macosMain)
-        }
     }
 }
 
 android {
-    compileSdk = 33
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    compileSdk = 34
+    namespace = "org.jetbrains.compose.resources.demo.shared"
     defaultConfig {
         minSdk = 21
-        targetSdk = 33
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     sourceSets {
         named("main") {
@@ -108,9 +83,4 @@ android {
 
 compose.experimental {
     web.application {}
-}
-
-// TODO: remove this block after we update on a newer kotlin. Currently there is an error: `error:0308010C:digital envelope routines::unsupported`
-rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
-    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
 }
