@@ -2,12 +2,13 @@ package org.jetbrains.compose.resources
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 
-/**
- * Finds resource file by ID depending on current environment
- */
 internal suspend fun getPathById(id: ResourceId): String = id //TODO
 
 @Composable
-internal fun rememberFilePath(id: ResourceId): State<String> = mutableStateOf(id) //TODO
+internal fun rememberFilePath(id: ResourceId): State<String> =
+    rememberState(id, "") { getPathById(id) }
+
+internal val ResourceId.stringKey get() = this

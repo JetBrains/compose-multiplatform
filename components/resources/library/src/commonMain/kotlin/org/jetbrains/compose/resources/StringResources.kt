@@ -2,11 +2,41 @@ package org.jetbrains.compose.resources
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.vector.xmldom.Element
 import org.jetbrains.compose.resources.vector.xmldom.NodeList
 
 private const val STRINGS_XML = "strings.xml" //todo
 private val SimpleStringFormatRegex = Regex("""%(\d)\$[ds]""")
+
+private sealed interface StringItem {
+    data class Value(val text: String) : StringItem
+    data class Array(val items: List<String>) : StringItem
+}
+
+private val parsedStringsCache = mutableMapOf<String, Map<String, StringItem>>()
+
+//@TestOnly
+internal fun dropStringsCache() {
+    parsedStringsCache.clear()
+}
+
+private suspend fun getParsedStrings(path: String, resourceReader: ResourceReader): Map<String, StringItem> =
+    withContext(cacheDispatcher) {
+        parsedStringsCache.getOrPut(path) {
+            val nodes = resourceReader.read(path).toXmlElement().childNodes
+            val strings = nodes.getElementsWithName("string").associate { element ->
+                element.getAttribute("name") to StringItem.Value(element.textContent.orEmpty())
+            }
+            val arrays = nodes.getElementsWithName("string-array").associate { arrayElement ->
+                val items = arrayElement.childNodes.getElementsWithName("item").map { element ->
+                    element.textContent.orEmpty()
+                }
+                arrayElement.getAttribute("name") to StringItem.Array(items)
+            }
+            strings + arrays
+        }
+    }
 
 /**
  * Retrieves a string resource using the provided ID.
@@ -19,7 +49,8 @@ private val SimpleStringFormatRegex = Regex("""%(\d)\$[ds]""")
 @ExperimentalResourceApi
 @Composable
 fun getString(id: ResourceId): String {
-    val str by rememberState("") { loadString(id) }
+    val resourceReader = LocalResourceReader.current
+    val str by rememberState(id, "") { loadString(id, resourceReader) }
     return str
 }
 
@@ -32,15 +63,13 @@ fun getString(id: ResourceId): String {
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
 @ExperimentalResourceApi
-suspend fun loadString(id: ResourceId): String {
-    val bytes = readBytes(getPathById(STRINGS_XML))
-    val nodes = bytes.toXmlElement().childNodes
+suspend fun loadString(id: ResourceId): String = loadString(id, DefaultResourceReader)
 
-    val nameToValue = nodes.getElementsWithName("string").associate { element ->
-        element.getAttribute("name") to element.textContent.orEmpty()
-    }
-
-    return nameToValue[id] ?: error("String ID=$id is not found!")
+private suspend fun loadString(id: ResourceId, resourceReader: ResourceReader): String {
+    val nameToValue = getParsedStrings(getPathById(STRINGS_XML), resourceReader)
+    val item = nameToValue[id.stringKey] as? StringItem.Value
+        ?: error("String ID=`${id.stringKey}` is not found!")
+    return item.text
 }
 
 /**
@@ -55,8 +84,30 @@ suspend fun loadString(id: ResourceId): String {
 @ExperimentalResourceApi
 @Composable
 fun getString(id: ResourceId, vararg formatArgs: Any): String {
-    val str = getString(id)
+    val resourceReader = LocalResourceReader.current
     val args = formatArgs.map { it.toString() }
+    val str by rememberState(id, "") { loadString(id, args, resourceReader) }
+    return str
+}
+
+/**
+ * Loads a formatted string resource using the provided ID and arguments.
+ *
+ * @param id The ID of the string resource to load.
+ * @param formatArgs The arguments to be inserted into the formatted string.
+ * @return The formatted string resource.
+ *
+ * @throws IllegalArgumentException If the provided ID is not found in the resource file.
+ */
+@ExperimentalResourceApi
+suspend fun loadString(id: ResourceId, vararg formatArgs: Any): String = loadString(
+    id,
+    formatArgs.map { it.toString() },
+    DefaultResourceReader
+)
+
+private suspend fun loadString(id: ResourceId, args: List<String>, resourceReader: ResourceReader): String {
+    val str = loadString(id, resourceReader)
     return SimpleStringFormatRegex.replace(str) { matchResult ->
         args[matchResult.groupValues[1].toInt() - 1]
     }
@@ -73,7 +124,8 @@ fun getString(id: ResourceId, vararg formatArgs: Any): String {
 @ExperimentalResourceApi
 @Composable
 fun getStringArray(id: ResourceId): List<String> {
-    val array by rememberState(emptyList()) { loadStringArray(id) }
+    val resourceReader = LocalResourceReader.current
+    val array by rememberState(id, emptyList()) { loadStringArray(id, resourceReader) }
     return array
 }
 
@@ -86,18 +138,13 @@ fun getStringArray(id: ResourceId): List<String> {
  * @throws IllegalStateException if the string array with the given ID is not found.
  */
 @ExperimentalResourceApi
-suspend fun loadStringArray(id: ResourceId): List<String> {
-    val bytes = readBytes(getPathById(STRINGS_XML))
-    val nodes = bytes.toXmlElement().childNodes
-    val arrayElement = nodes.getElementsWithName("string-array").firstOrNull { element ->
-        element.getAttribute("name") == id
-    } ?: error("String array ID=$id is not found!")
+suspend fun loadStringArray(id: ResourceId): List<String> = loadStringArray(id, DefaultResourceReader)
 
-    val items = arrayElement.childNodes.getElementsWithName("item").map { element ->
-        element.textContent.orEmpty()
-    }
-
-    return items
+private suspend fun loadStringArray(id: ResourceId, resourceReader: ResourceReader): List<String> {
+    val nameToValue = getParsedStrings(getPathById(STRINGS_XML), resourceReader)
+    val item = nameToValue[id.stringKey] as? StringItem.Array
+        ?: error("String array ID=`${id.stringKey}` is not found!")
+    return item.items
 }
 
 private fun NodeList.getElementsWithName(name: String): List<Element> =

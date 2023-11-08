@@ -7,9 +7,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 
 @Composable
-internal actual fun <T> rememberState(init: T, block: suspend () -> T): State<T> {
-    val state = remember { mutableStateOf(init) }
-    LaunchedEffect(Unit) {
+internal actual fun <T> rememberState(key: Any, init: T, block: suspend () -> T): State<T> {
+    val state = remember(key) { mutableStateOf(init) }
+    LaunchedEffect(key) {
         state.value = block()
     }
     return state

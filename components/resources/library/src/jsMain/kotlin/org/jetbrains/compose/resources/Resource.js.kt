@@ -1,5 +1,8 @@
 package org.jetbrains.compose.resources
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+
 /**
  * Represents the configuration object for web resources.
  *
@@ -45,3 +48,5 @@ object WebResourcesConfiguration {
 fun configureWebResources(configure: WebResourcesConfiguration.() -> Unit) {
     WebResourcesConfiguration.configure()
 }
+
+internal actual val cacheDispatcher: CoroutineDispatcher = Dispatchers.Default

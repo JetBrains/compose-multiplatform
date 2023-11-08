@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.vector.toImageVector
 import org.jetbrains.compose.resources.vector.xmldom.Element
 
@@ -44,7 +45,8 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 @ExperimentalResourceApi
 @Composable
 fun imageResource(id: ResourceId): ImageBitmap {
-    val fileContent by rememberState(ByteArray(0)) { readBytes(getPathById(id)) }
+    val resourceReader = LocalResourceReader.current
+    val fileContent by rememberState(id, ByteArray(0)) { getImageBytes(getPathById(id), resourceReader) }
 
     //it is fallback only for JS async loading
     if (fileContent.isEmpty()) return emptyImageBitmap
@@ -65,7 +67,8 @@ private val emptyImageVector: ImageVector by lazy {
 @ExperimentalResourceApi
 @Composable
 fun vectorResource(id: ResourceId): ImageVector {
-    val fileContent by rememberState(ByteArray(0)) { readBytes(getPathById(id)) }
+    val resourceReader = LocalResourceReader.current
+    val fileContent by rememberState(id, ByteArray(0)) { getImageBytes(getPathById(id), resourceReader) }
 
     //it is fallback only for JS async loading
     if (fileContent.isEmpty()) return emptyImageVector
@@ -74,6 +77,19 @@ fun vectorResource(id: ResourceId): ImageVector {
     return remember(id, density) {
         val element = fileContent.toXmlElement()
         element.toImageVector(density)
+    }
+}
+
+private val imageCache = mutableMapOf<String, ByteArray>()
+
+//@TestOnly
+internal fun dropImageCache() {
+    imageCache.clear()
+}
+
+private suspend fun getImageBytes(path: String, resourceReader: ResourceReader): ByteArray {
+    return withContext(cacheDispatcher) {
+        imageCache.getOrPut(path) { resourceReader.read(path) }
     }
 }
 

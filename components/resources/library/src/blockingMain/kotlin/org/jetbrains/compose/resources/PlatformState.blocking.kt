@@ -7,7 +7,7 @@ import androidx.compose.runtime.remember
 import kotlinx.coroutines.runBlocking
 
 @Composable
-internal actual fun <T> rememberState(init: T, block: suspend () -> T): State<T> = remember {
+internal actual fun <T> rememberState(key: Any, init: T, block: suspend () -> T): State<T> = remember(key) {
     mutableStateOf(
         runBlocking { block() }
     )

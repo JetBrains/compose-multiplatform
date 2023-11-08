@@ -54,8 +54,8 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
-                implementation("org.jetbrains.compose.foundation:foundation:$composeVersion")
+                implementation(compose.runtime)
+                implementation(compose.foundation)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
             }
         }
@@ -79,6 +79,9 @@ kotlin {
         }
         val jvmAndAndroidMain by creating {
             dependsOn(blockingMain)
+            dependencies {
+                implementation(compose.material3)
+            }
         }
         val jvmAndAndroidTest by creating {
             dependsOn(blockingTest)
@@ -150,6 +153,11 @@ android {
                 }
             }
         }
+    }
+    sourceSets {
+        val commonTestResources = "src/commonTest/resources"
+        named("androidTest") { resources.srcDir(commonTestResources) }
+        named("test") { resources.srcDir(commonTestResources) }
     }
 }
 
