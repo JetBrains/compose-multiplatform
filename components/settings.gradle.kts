@@ -4,6 +4,9 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        if (extra["compose.useMavenLocal"] == "true") {
+            mavenLocal()
+        }
     }
 
     plugins {
@@ -16,6 +19,9 @@ pluginManagement {
 
 dependencyResolutionManagement {
     repositories {
+        if (extra["compose.useMavenLocal"] == "true") {
+            mavenLocal() // mavenLocal should be the first to get the correct version of skiko during a local build.
+        }
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
