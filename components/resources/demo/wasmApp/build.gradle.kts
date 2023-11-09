@@ -10,10 +10,12 @@ val copyResources = tasks.create("copyWasmResourcesWorkaround", Copy::class.java
 
 afterEvaluate {
     project.tasks.getByName("wasmJsProcessResources").finalizedBy(copyResources)
+    project.tasks.getByName("wasmJsDevelopmentExecutableCompileSync").dependsOn(copyResources)
+    project.tasks.getByName("wasmJsProductionExecutableCompileSync").dependsOn(copyResources)
 }
 
 kotlin {
-    wasm {
+    wasmJs {
         moduleName = "myapp"
         browser()
         binaries.executable()
@@ -23,6 +25,7 @@ kotlin {
             dependencies {
                 implementation(compose.ui)
                 implementation(project(":resources:demo:shared"))
+                implementation(project(":resources:library"))
             }
         }
     }

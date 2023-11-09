@@ -91,25 +91,18 @@ fun urlResource(url: String): Resource = JSUrlResourceImpl(url)
 @ExperimentalResourceApi
 private class JSUrlResourceImpl(url: String) : AbstractResourceImpl(url) {
     override suspend fun readBytes(): ByteArray {
-        val response = window.fetch(path).await()
+        val response = window.fetch(path).await<org.w3c.fetch.Response>()
         if (!response.ok) {
             throw MissingResourceException(path)
         }
-        return response.arrayBuffer().await().toByteArray()
+        return response.arrayBuffer().await<ArrayBuffer>().toByteArray()
     }
 }
 
-private fun ArrayBuffer.toByteArray() = Int8Array(this, 0, byteLength).unsafeCast<ByteArray>()
+internal expect fun ArrayBuffer.toByteArray(): ByteArray
 
 internal actual class MissingResourceException actual constructor(path: String) :
     Exception("Missing resource with path: $path")
-
-internal actual fun parseXML(byteArray: ByteArray): Element {
-    val xmlString = byteArray.decodeToString()
-    val xmlDom = DOMParser().parseFromString(xmlString, "application/xml")
-    val domElement = xmlDom.documentElement ?: throw MalformedXMLException("missing documentElement")
-    return ElementImpl(domElement)
-}
 
 internal actual fun isSyncResourceLoadingSupported() = false
 

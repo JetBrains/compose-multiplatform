@@ -189,7 +189,7 @@ abstract class ComposePlugin : Plugin<Project> {
 
     object CommonComponentsDependencies {
         @ExperimentalComposeLibrary
-        val resources = composeDependency("org.jetbrains.compose.components:components-resources")
+        val resources = composeDependency("org.jetbrains.compose.components:components-resources", "1.5.10-dev-wasm03")
     }
 
     object DesktopComponentsDependencies {

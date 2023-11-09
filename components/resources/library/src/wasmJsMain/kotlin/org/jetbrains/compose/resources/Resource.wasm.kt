@@ -10,50 +10,17 @@ import org.jetbrains.compose.resources.vector.xmldom.ElementImpl
 import org.jetbrains.compose.resources.vector.xmldom.MalformedXMLException
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
-import org.khronos.webgl.Uint8Array
-import org.w3c.xhr.ARRAYBUFFER
-import org.khronos.webgl.get
 import org.w3c.xhr.XMLHttpRequest
 import org.w3c.xhr.XMLHttpRequestResponseType
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
-import kotlin.wasm.unsafe.*
 import kotlin.wasm.unsafe.withScopedMemoryAllocator
 import kotlin.wasm.unsafe.UnsafeWasmMemoryApi
 import org.w3c.dom.parsing.DOMParser
 
-@ExperimentalResourceApi
-actual fun resource(path: String): Resource = JSResourceImpl(path)
 
-@ExperimentalResourceApi
-private class JSResourceImpl(path: String) : AbstractResourceImpl(path) {
-    override suspend fun readBytes(): ByteArray {
-        return suspendCoroutine { continuation ->
-            val req = XMLHttpRequest()
-            req.open("GET", "/$path", true)
-            req.responseType = "arraybuffer".toJsString().unsafeCast<XMLHttpRequestResponseType>()
-
-            req.onload = { _ ->
-                val arrayBuffer = req.response
-                if (arrayBuffer is ArrayBuffer) {
-                    val size = arrayBuffer.byteLength
-                    continuation.resume(arrayBuffer.toByteArray())
-                } else {
-                    continuation.resumeWithException(MissingResourceException(path))
-                }
-                null
-            }
-            req.send("")
-        }
-    }
-}
-
-internal actual class MissingResourceException actual constructor(path: String) :
-    Exception("Missing resource with path: $path")
-
-
-private fun ArrayBuffer.toByteArray(): ByteArray {
+internal actual fun ArrayBuffer.toByteArray(): ByteArray {
     val source = Int8Array(this, 0, byteLength)
     return jsInt8ArrayToKotlinByteArray(source)
 }
@@ -79,10 +46,6 @@ internal fun jsInt8ArrayToKotlinByteArray(x: Int8Array): ByteArray {
     }
 }
 
-internal actual fun isSyncResourceLoadingSupported() = false
-
-@OptIn(ExperimentalResourceApi::class)
-internal actual fun Resource.readBytesSync(): ByteArray = throw UnsupportedOperationException()
 
 internal actual fun parseXML(byteArray: ByteArray): Element {
     val xmlString = byteArray.decodeToString()

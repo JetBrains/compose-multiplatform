@@ -82,11 +82,15 @@ kotlin {
         iosSimulatorArm64Main.dependsOn(iosMain)
         val iosSimulatorArm64Test by getting
         iosSimulatorArm64Test.dependsOn(iosTest)
-        val jsMain by getting {
+
+        val jsAndWasmMain by creating {
             dependsOn(skikoMain)
         }
+        val jsMain by getting {
+            dependsOn(jsAndWasmMain)
+        }
         val wasmJsMain by getting {
-            dependsOn(skikoMain)
+            dependsOn(jsAndWasmMain)
         }
         val macosMain by creating {
             dependsOn(skikoMain)
@@ -111,8 +115,8 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
     testOptions {
         managedDevices {
@@ -154,5 +158,11 @@ configureMavenPublication(
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
     kotlinOptions {
         freeCompilerArgs += "-Xopt-in=kotlinx.cinterop.ExperimentalForeignApi"
+    }
+}
+
+project.tasks.whenTaskAdded {
+    if (name == "compileJsAndWasmMainKotlinMetadata") {
+        enabled = false
     }
 }
