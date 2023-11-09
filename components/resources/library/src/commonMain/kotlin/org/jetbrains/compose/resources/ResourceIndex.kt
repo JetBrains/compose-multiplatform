@@ -2,10 +2,10 @@ package org.jetbrains.compose.resources
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.withContext
 
-internal suspend fun getPathById(id: ResourceId): String = id //TODO
+//TODO Here will be logic to map a static ID to a file path in resources dir
+//at the moment ID = file path
+internal suspend fun getPathById(id: ResourceId): String = id
 
 @Composable
 internal fun rememberFilePath(id: ResourceId): State<String> =
