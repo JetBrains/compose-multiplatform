@@ -11,17 +11,17 @@ import kotlinx.coroutines.Dispatchers
 @Suppress("unused")
 @ExperimentalResourceApi
 object WebResourcesConfiguration {
-    internal var resourcePathCustomization: (path: String) -> String = { "./$it" }
+    internal var getResourcePath: (path: String) -> String = { "./$it" }
 
     /**
      * Sets a customization function for resource path. This allows you to modify the resource path
      * before it is used.
      *
-     * @param customization the customization function that takes a path String and returns a modified path String
+     * @param map the mapping function that takes a path String and returns a modified path String
      */
     @ExperimentalResourceApi
-    fun setResourcePathCustomization(customization: (path: String) -> String) {
-        resourcePathCustomization = customization
+    fun resourcePathMapping(map: (path: String) -> String) {
+        getResourcePath = map
     }
 }
 
@@ -36,10 +36,10 @@ object WebResourcesConfiguration {
  * Examples:
  * ```
  *  configureWebResources {
- *     setResourceFactory { path -> "/myApp1/resources/$path" }
+ *     resourcePathMapping { path -> "/myApp1/resources/$path" }
  *  }
  *  configureWebResources {
- *     setResourceFactory { path -> "https://mycdn.com/myApp1/res/$path" }
+ *     resourcePathMapping { path -> "https://mycdn.com/myApp1/res/$path" }
  *  }
  * ```
  */

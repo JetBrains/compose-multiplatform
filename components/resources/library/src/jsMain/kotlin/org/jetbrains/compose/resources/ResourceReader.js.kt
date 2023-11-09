@@ -10,7 +10,7 @@ private fun ArrayBuffer.toByteArray(): ByteArray =
 
 @ExperimentalResourceApi
 actual suspend fun readBytes(path: String): ByteArray {
-    val resPath = WebResourcesConfiguration.resourcePathCustomization(path)
+    val resPath = WebResourcesConfiguration.getResourcePath(path)
     val response = window.fetch(resPath).await()
     if (!response.ok) {
         throw MissingResourceException(resPath)

@@ -15,7 +15,7 @@ import org.jetbrains.skiko.wasm.onWasmReady
 fun main() {
     configureWebResources {
         // Not necessary - It's the same as the default. We add it here just to present this feature.
-        setResourcePathCustomization { "./$it" }
+        resourcePathMapping { path -> "./$path" }
     }
     onWasmReady {
         CanvasBasedWindow("Resources demo") {
