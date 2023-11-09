@@ -11,16 +11,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.text.font.FontFamily
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-
-/**
- * THIS IS A COPY OF THE DESKTOP UI TEST!
- */
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalTestApi::class)
 class ComposeResourceTest {
@@ -28,7 +24,7 @@ class ComposeResourceTest {
     @Before
     fun dropCaches() {
         dropStringsCache()
-        dropImageCache()
+        dropBytesCache()
     }
 
     @Test
@@ -69,6 +65,26 @@ class ComposeResourceTest {
 
             assertEquals(
                 expected = listOf("1.png", "2.png"), //no second read of 1.png
+                actual = testResourceReader.readPaths
+            )
+        }
+    }
+
+    @Test
+    fun testFontResourceCache() = runComposeUiTest {
+        runBlockingTest {
+            val testResourceReader = TestResourceReader()
+            setContent {
+                CompositionLocalProvider(LocalResourceReader provides testResourceReader) {
+                    Text(text = "F1", fontFamily = FontFamily(Font("font_awesome.otf")))
+                    Text(text = "F2", fontFamily = FontFamily(Font("font_awesome.otf")))
+                    Text(text = "F3", fontFamily = FontFamily(Font("font_awesome.otf")))
+                }
+            }
+            awaitIdle()
+
+            assertEquals(
+                expected = listOf(), //android caches fonts by android specific logic
                 actual = testResourceReader.readPaths
             )
         }

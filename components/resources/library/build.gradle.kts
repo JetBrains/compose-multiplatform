@@ -156,7 +156,10 @@ android {
     }
     sourceSets {
         val commonTestResources = "src/commonTest/resources"
-        named("androidTest") { resources.srcDir(commonTestResources) }
+        named("androidTest") {
+            resources.srcDir(commonTestResources)
+            assets.srcDir("src/androidInstrumentedTest/assets")
+        }
         named("test") { resources.srcDir(commonTestResources) }
     }
 }
