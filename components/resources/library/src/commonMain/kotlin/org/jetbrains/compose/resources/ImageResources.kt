@@ -2,7 +2,6 @@ package org.jetbrains.compose.resources
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -45,12 +44,14 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 @Composable
 fun imageResource(id: ResourceId): ImageBitmap {
     val resourceReader = LocalResourceReader.current
-    val fileContent by rememberState(id, ByteArray(0)) { loadBytes(getPathById(id), resourceReader) }
-
-    //it is fallback only for JS async loading
-    if (fileContent.isEmpty()) return emptyImageBitmap
-
-    return remember(id) { fileContent.toImageBitmap() }
+    val imageBitmap by rememberState(id, emptyImageBitmap) {
+        val path = getPathById(id)
+        val cached = loadImage(path, resourceReader) {
+            ImageCache.Bitmap(it.toImageBitmap())
+        } as ImageCache.Bitmap
+        cached.bitmap
+    }
+    return imageBitmap
 }
 
 private val emptyImageVector: ImageVector by lazy {
@@ -67,17 +68,34 @@ private val emptyImageVector: ImageVector by lazy {
 @Composable
 fun vectorResource(id: ResourceId): ImageVector {
     val resourceReader = LocalResourceReader.current
-    val fileContent by rememberState(id, ByteArray(0)) { loadBytes(getPathById(id), resourceReader) }
-
-    //it is fallback only for JS async loading
-    if (fileContent.isEmpty()) return emptyImageVector
-
     val density = LocalDensity.current
-    return remember(id, density) {
-        val element = fileContent.toXmlElement()
-        element.toImageVector(density)
+    val imageVector by rememberState(id, emptyImageVector) {
+        val path = getPathById(id)
+        val cached = loadImage(path, resourceReader) {
+            ImageCache.Vector(it.toXmlElement().toImageVector(density))
+        } as ImageCache.Vector
+        cached.vector
     }
+    return imageVector
 }
 
 internal expect fun ByteArray.toImageBitmap(): ImageBitmap
 internal expect fun ByteArray.toXmlElement(): Element
+
+private sealed interface ImageCache {
+    class Bitmap(val bitmap: ImageBitmap) : ImageCache
+    class Vector(val vector: ImageVector) : ImageCache
+}
+
+private val imageCache = mutableMapOf<String, ImageCache>()
+
+//@TestOnly
+internal fun dropImageCache() {
+    imageCache.clear()
+}
+
+private suspend fun loadImage(
+    path: String,
+    resourceReader: ResourceReader,
+    decode: (ByteArray) -> ImageCache
+): ImageCache = imageCache.getOrPut(path) { decode(resourceReader.read(path)) }

@@ -7,7 +7,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runComposeUiTest
-import androidx.compose.ui.text.font.FontFamily
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -20,7 +19,7 @@ class ComposeResourceTest {
     @Before
     fun dropCaches() {
         dropStringsCache()
-        dropBytesCache()
+        dropImageCache()
     }
 
     @Test
@@ -61,26 +60,6 @@ class ComposeResourceTest {
 
             assertEquals(
                 expected = listOf("1.png", "2.png"), //no second read of 1.png
-                actual = testResourceReader.readPaths
-            )
-        }
-    }
-
-    @Test
-    fun testFontResourceCache() = runComposeUiTest {
-        runBlockingTest {
-            val testResourceReader = TestResourceReader()
-            setContent {
-                CompositionLocalProvider(LocalResourceReader provides testResourceReader) {
-                    Text(text = "F1", fontFamily = FontFamily(Font("font_awesome.otf")))
-                    Text(text = "F2", fontFamily = FontFamily(Font("font_awesome.otf")))
-                    Text(text = "F3", fontFamily = FontFamily(Font("font_awesome.otf")))
-                }
-            }
-            awaitIdle()
-
-            assertEquals(
-                expected = listOf("font_awesome.otf"), //just one font_awesome.otf read
                 actual = testResourceReader.readPaths
             )
         }

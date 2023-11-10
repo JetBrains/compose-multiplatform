@@ -34,7 +34,7 @@ private val defaultEmptyFont = Font("org.jetbrains.compose.emptyFont", Base64.de
 actual fun Font(id: ResourceId, weight: FontWeight, style: FontStyle): Font {
     val resourceReader = LocalResourceReader.current
     val fontFile by rememberState(id, defaultEmptyFont) {
-        val fontBytes = loadBytes(getPathById(id), resourceReader)
+        val fontBytes = resourceReader.read(getPathById(id))
         Font(id, fontBytes, weight, style)
     }
     return fontFile
