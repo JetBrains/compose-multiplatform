@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.vector.toImageVector
 import org.jetbrains.compose.resources.vector.xmldom.Element
 
@@ -98,4 +99,6 @@ private suspend fun loadImage(
     path: String,
     resourceReader: ResourceReader,
     decode: (ByteArray) -> ImageCache
-): ImageCache = imageCache.getOrPut(path) { decode(resourceReader.read(path)) }
+): ImageCache = withContext(cacheDispatcher) {
+    imageCache.getOrPut(path) { decode(resourceReader.read(path)) }
+}
