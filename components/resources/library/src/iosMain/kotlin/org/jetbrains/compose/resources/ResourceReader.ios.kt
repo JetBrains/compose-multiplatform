@@ -6,7 +6,8 @@ import platform.Foundation.NSBundle
 import platform.Foundation.NSFileManager
 import platform.posix.memcpy
 
-actual suspend fun readBytes(path: String): ByteArray {
+@ExperimentalResourceApi
+actual suspend fun readResourceBytes(path: String): ByteArray {
     val fileManager = NSFileManager.defaultManager()
     // todo: support fallback path at bundle root?
     val composeResourcesPath = NSBundle.mainBundle.resourcePath + "/compose-resources/" + path

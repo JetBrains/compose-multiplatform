@@ -25,7 +25,7 @@ class ResourceTest {
     @Test
     fun testMissingResource() = runBlockingTest {
         assertFailsWith<MissingResourceException> {
-            readBytes("missing.png")
+            readResourceBytes("missing.png")
         }
         val error = assertFailsWith<IllegalStateException> {
             loadString("unknown_id")
@@ -35,7 +35,7 @@ class ResourceTest {
 
     @Test
     fun testReadFileResource() = runBlockingTest {
-        val bytes = readBytes("strings.xml")
+        val bytes = readResourceBytes("strings.xml")
         assertEquals(
             """
                 <resources>

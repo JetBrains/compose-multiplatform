@@ -5,7 +5,8 @@ import kotlinx.cinterop.usePinned
 import platform.Foundation.NSFileManager
 import platform.posix.memcpy
 
-actual suspend fun readBytes(path: String): ByteArray {
+@ExperimentalResourceApi
+actual suspend fun readResourceBytes(path: String): ByteArray {
     val currentDirectoryPath = NSFileManager.defaultManager().currentDirectoryPath
     val contentsAtPath = NSFileManager.defaultManager().run {
         //todo in future bundle resources with app and use all sourceSets (skikoMain, nativeMain)

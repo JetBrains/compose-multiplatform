@@ -19,10 +19,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.readBytes
+import org.jetbrains.compose.resources.readResourceBytes
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun FileRes(paddingValues: PaddingValues) {
     Column(
@@ -40,7 +38,7 @@ fun FileRes(paddingValues: PaddingValues) {
         ) {
             var bytes by remember { mutableStateOf(ByteArray(0)) }
             LaunchedEffect(Unit) {
-                bytes = readBytes("images/droid_icon.xml")
+                bytes = readResourceBytes("images/droid_icon.xml")
             }
             Text(
                 modifier = Modifier.padding(8.dp).height(200.dp).verticalScroll(rememberScrollState()),

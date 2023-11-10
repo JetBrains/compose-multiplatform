@@ -21,12 +21,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.getStringArray
-import org.jetbrains.compose.resources.readBytes
+import org.jetbrains.compose.resources.readResourceBytes
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun StringRes(paddingValues: PaddingValues) {
     Column(
@@ -44,7 +42,7 @@ fun StringRes(paddingValues: PaddingValues) {
         ) {
             var bytes by remember { mutableStateOf(ByteArray(0)) }
             LaunchedEffect(Unit) {
-                bytes = readBytes("strings.xml")
+                bytes = readResourceBytes("strings.xml")
             }
             Text(
                 modifier = Modifier.padding(8.dp),
