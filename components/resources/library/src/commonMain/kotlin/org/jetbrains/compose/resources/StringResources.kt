@@ -50,7 +50,7 @@ private suspend fun getParsedStrings(path: String, resourceReader: ResourceReade
 @Composable
 fun getString(id: ResourceId): String {
     val resourceReader = LocalResourceReader.current
-    val str by rememberState(id, "") { loadString(id, resourceReader) }
+    val str by rememberState(id, { "" }) { loadString(id, resourceReader) }
     return str
 }
 
@@ -86,7 +86,7 @@ private suspend fun loadString(id: ResourceId, resourceReader: ResourceReader): 
 fun getString(id: ResourceId, vararg formatArgs: Any): String {
     val resourceReader = LocalResourceReader.current
     val args = formatArgs.map { it.toString() }
-    val str by rememberState(id, "") { loadString(id, args, resourceReader) }
+    val str by rememberState(id, { "" }) { loadString(id, args, resourceReader) }
     return str
 }
 
@@ -125,7 +125,7 @@ private suspend fun loadString(id: ResourceId, args: List<String>, resourceReade
 @Composable
 fun getStringArray(id: ResourceId): List<String> {
     val resourceReader = LocalResourceReader.current
-    val array by rememberState(id, emptyList()) { loadStringArray(id, resourceReader) }
+    val array by rememberState(id, { emptyList() }) { loadStringArray(id, resourceReader) }
     return array
 }
 

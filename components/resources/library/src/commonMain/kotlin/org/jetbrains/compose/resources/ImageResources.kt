@@ -44,7 +44,7 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 @Composable
 fun imageResource(id: ResourceId): ImageBitmap {
     val resourceReader = LocalResourceReader.current
-    val imageBitmap by rememberState(id, emptyImageBitmap) {
+    val imageBitmap by rememberState(id, { emptyImageBitmap }) {
         val path = getPathById(id)
         val cached = loadImage(path, resourceReader) {
             ImageCache.Bitmap(it.toImageBitmap())
@@ -69,7 +69,7 @@ private val emptyImageVector: ImageVector by lazy {
 fun vectorResource(id: ResourceId): ImageVector {
     val resourceReader = LocalResourceReader.current
     val density = LocalDensity.current
-    val imageVector by rememberState(id, emptyImageVector) {
+    val imageVector by rememberState(id, { emptyImageVector }) {
         val path = getPathById(id)
         val cached = loadImage(path, resourceReader) {
             ImageCache.Vector(it.toXmlElement().toImageVector(density))
