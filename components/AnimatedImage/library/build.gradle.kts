@@ -16,7 +16,6 @@ kotlin {
             dependencies {
                 api(compose.runtime)
                 api(compose.foundation)
-                api(project(":resources:library"))
             }
         }
     }
