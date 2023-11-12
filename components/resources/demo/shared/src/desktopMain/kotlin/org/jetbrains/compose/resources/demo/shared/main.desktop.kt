@@ -6,6 +6,7 @@
 package org.jetbrains.compose.resources.demo.shared
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 
 @Composable
@@ -15,6 +16,18 @@ fun MainView() {
 
 @Preview
 @Composable
-fun Preview() {
+fun MainViewPreview() {
     MainView()
+}
+
+@Preview
+@Composable
+fun ImagesResPreview() {
+    ImagesRes(PaddingValues())
+}
+
+@Preview
+@Composable
+fun FileResPreview() {
+    FileRes(PaddingValues())
 }

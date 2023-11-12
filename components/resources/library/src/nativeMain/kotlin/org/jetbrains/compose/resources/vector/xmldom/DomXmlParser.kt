@@ -4,12 +4,17 @@
  */
 package org.jetbrains.compose.resources.vector.xmldom
 
-import org.jetbrains.compose.resources.vector.xmldom.MalformedXMLException
-import platform.Foundation.*
+import platform.Foundation.NSError
+import platform.Foundation.NSString
+import platform.Foundation.NSUTF8StringEncoding
+import platform.Foundation.NSXMLParser
+import platform.Foundation.NSXMLParserDelegateProtocol
+import platform.Foundation.dataUsingEncoding
 import platform.darwin.NSObject
 
 internal fun parse(xml: String): Element {
     val parser = DomXmlParser()
+    @Suppress("CAST_NEVER_SUCCEEDS")
     NSXMLParser((xml as NSString).dataUsingEncoding(NSUTF8StringEncoding)!!).apply {
         shouldReportNamespacePrefixes = true
         shouldProcessNamespaces = true
@@ -18,11 +23,15 @@ internal fun parse(xml: String): Element {
     return parser.root!!
 }
 
-private class ElementImpl(override val localName: String,
-                          override val nodeName: String,
-                          override val namespaceURI: String,
-                          val prefixMap: Map<String, String>,
-                          val attributes: Map<Any?, *>): Element {
+private class ElementImpl(
+    override val localName: String,
+    override val nodeName: String,
+    override val namespaceURI: String,
+    val prefixMap: Map<String, String>,
+    val attributes: Map<Any?, *>
+) : Element {
+
+    override var textContent: String? = null
 
     override val childNodes: NodeList
         get() = object : NodeList {
@@ -43,15 +52,13 @@ private class ElementImpl(override val localName: String,
         return getAttribute(attrKey)
     }
 
-    override fun getAttribute(name: String): String =  attributes[name] as String? ?:""
+    override fun getAttribute(name: String): String = attributes[name] as String? ?: ""
 
-    override fun lookupPrefix(uri: String): String = prefixMap[uri]?:""
+    override fun lookupPrefix(namespaceURI: String): String = prefixMap[namespaceURI] ?: ""
 }
 
-@Suppress("CONFLICTING_OVERLOADS")
-private class DomXmlParser(
-
-) : NSObject(), NSXMLParserDelegateProtocol {
+@Suppress("CONFLICTING_OVERLOADS", "PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+private class DomXmlParser : NSObject(), NSXMLParserDelegateProtocol {
 
     val curPrefixMapInverted = mutableMapOf<String, String>()
 
@@ -68,8 +75,13 @@ private class DomXmlParser(
         qualifiedName: String?,
         attributes: Map<Any?, *>
     ) {
-        val node = ElementImpl(didStartElement, qualifiedName!!, namespaceURI?:"",
-            curPrefixMap, attributes)
+        val node = ElementImpl(
+            didStartElement,
+            qualifiedName!!,
+            namespaceURI ?: "",
+            curPrefixMap,
+            attributes
+        )
 
         if (root == null) root = node
 
@@ -77,6 +89,10 @@ private class DomXmlParser(
             nodeStack.last().childs.add(node)
 
         nodeStack.add(node)
+    }
+
+    override fun parser(parser: NSXMLParser, foundCharacters: String) {
+        nodeStack.lastOrNull()?.textContent = foundCharacters
     }
 
     override fun parser(
@@ -89,9 +105,10 @@ private class DomXmlParser(
         assert(node.localName.equals(didEndElement))
     }
 
-    override fun parser(parser: NSXMLParser,
-                        didStartMappingPrefix: String,
-                        toURI: String
+    override fun parser(
+        parser: NSXMLParser,
+        didStartMappingPrefix: String,
+        toURI: String
     ) {
         curPrefixMapInverted.put(didStartMappingPrefix, toURI)
         curPrefixMap = curPrefixMapInverted.entries.associateBy({ it.value }, { it.key })

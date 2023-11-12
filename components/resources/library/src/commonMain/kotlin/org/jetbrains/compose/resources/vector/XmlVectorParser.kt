@@ -17,8 +17,8 @@
 package org.jetbrains.compose.resources.vector
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathFillType
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
@@ -34,9 +34,10 @@ import androidx.compose.ui.graphics.vector.DefaultTranslationY
 import androidx.compose.ui.graphics.vector.EmptyPath
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.addPathNodes
-import org.jetbrains.compose.resources.vector.BuildContext.Group
 import androidx.compose.ui.unit.Density
-import org.jetbrains.compose.resources.vector.xmldom.*
+import org.jetbrains.compose.resources.vector.BuildContext.Group
+import org.jetbrains.compose.resources.vector.xmldom.Element
+import org.jetbrains.compose.resources.vector.xmldom.Node
 
 
 //  Parsing logic is the same as in Android implementation
@@ -68,7 +69,7 @@ private class BuildContext {
     }
 }
 
-internal fun Element.parseVectorRoot(density: Density): ImageVector {
+internal fun Element.toImageVector(density: Density): ImageVector {
     val context = BuildContext()
     val builder = ImageVector.Builder(
         defaultWidth = attributeOrNull(ANDROID_NS, "width").parseDp(density),
@@ -167,7 +168,6 @@ private fun Element.parseGradient(): Brush? {
     }
 }
 
-@Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
 private fun Element.parseLinearGradient() = Brush.linearGradient(
     colorStops = parseColorStops(),
     start = Offset(
@@ -181,7 +181,6 @@ private fun Element.parseLinearGradient() = Brush.linearGradient(
     tileMode = attributeOrNull(ANDROID_NS, "tileMode")?.let(::parseTileMode) ?: TileMode.Clamp
 )
 
-@Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
 private fun Element.parseRadialGradient() = Brush.radialGradient(
     colorStops = parseColorStops(),
     center = Offset(
@@ -192,7 +191,6 @@ private fun Element.parseRadialGradient() = Brush.radialGradient(
     tileMode = attributeOrNull(ANDROID_NS, "tileMode")?.let(::parseTileMode) ?: TileMode.Clamp
 )
 
-@Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
 private fun Element.parseSweepGradient() = Brush.sweepGradient(
     colorStops = parseColorStops(),
     center = Offset(

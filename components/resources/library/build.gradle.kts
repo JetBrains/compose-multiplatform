@@ -39,13 +39,23 @@ kotlin {
             languageSettings {
                 optIn("kotlin.RequiresOptIn")
                 optIn("kotlinx.cinterop.ExperimentalForeignApi")
+                optIn("kotlin.experimental.ExperimentalNativeApi")
             }
         }
 
+        //          common
+        //       ┌────┴────┐
+        //    skiko       blocking
+        //      │      ┌─────┴────────┐
+        //  ┌───┴───┬──│────────┐     │
+        //  │      native       │ jvmAndAndroid
+        //  │    ┌───┴───┐      │   ┌───┴───┐
+        // js   ios    macos   desktop    android
+
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
-                implementation("org.jetbrains.compose.foundation:foundation:$composeVersion")
+                implementation(compose.runtime)
+                implementation(compose.foundation)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
             }
         }
@@ -55,10 +65,10 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
-        val commonButJSMain by creating {
+        val blockingMain by creating {
             dependsOn(commonMain)
         }
-        val commonButJSTest by creating {
+        val blockingTest by creating {
             dependsOn(commonTest)
         }
         val skikoMain by creating {
@@ -68,20 +78,21 @@ kotlin {
             dependsOn(commonTest)
         }
         val jvmAndAndroidMain by creating {
-            dependsOn(commonMain)
+            dependsOn(blockingMain)
+            dependencies {
+                implementation(compose.material3)
+            }
         }
         val jvmAndAndroidTest by creating {
-            dependsOn(commonTest)
+            dependsOn(blockingTest)
         }
         val desktopMain by getting {
             dependsOn(skikoMain)
             dependsOn(jvmAndAndroidMain)
-            dependsOn(commonButJSMain)
         }
         val desktopTest by getting {
             dependsOn(skikoTest)
             dependsOn(jvmAndAndroidTest)
-            dependsOn(commonButJSTest)
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation("org.jetbrains.compose.ui:ui-test-junit4:$composeVersion")
@@ -90,34 +101,32 @@ kotlin {
         }
         val androidMain by getting {
             dependsOn(jvmAndAndroidMain)
-            dependsOn(commonButJSMain)
         }
         val androidInstrumentedTest by getting {
-            dependsOn(commonTest)
             dependsOn(jvmAndAndroidTest)
-            dependsOn(commonButJSTest)
+            dependencies {
+                implementation("androidx.test:core:1.5.0")
+                implementation("androidx.compose.ui:ui-test-manifest:1.5.4")
+                implementation("androidx.compose.ui:ui-test:1.5.4")
+                implementation("androidx.compose.ui:ui-test-junit4:1.5.4")
+            }
         }
-        val iosMain by getting {
+        val androidUnitTest by getting {
+            dependsOn(jvmAndAndroidTest)
+        }
+        val nativeMain by getting {
             dependsOn(skikoMain)
-            dependsOn(commonButJSMain)
+            dependsOn(blockingMain)
         }
-        val iosTest by getting {
+        val nativeTest by getting {
             dependsOn(skikoTest)
-            dependsOn(commonButJSTest)
+            dependsOn(blockingTest)
         }
         val jsMain by getting {
             dependsOn(skikoMain)
         }
         val jsTest by getting {
             dependsOn(skikoTest)
-        }
-        val macosMain by getting {
-            dependsOn(skikoMain)
-            dependsOn(commonButJSMain)
-        }
-        val macosTest by getting {
-            dependsOn(skikoTest)
-            dependsOn(commonButJSTest)
         }
     }
 }
@@ -145,12 +154,13 @@ android {
             }
         }
     }
-    dependencies {
-        //Android integration tests
-        testImplementation("androidx.test:core:1.5.0")
-        androidTestImplementation("androidx.compose.ui:ui-test-manifest:1.5.3")
-        androidTestImplementation("androidx.compose.ui:ui-test:1.5.3")
-        androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.5.3")
+    sourceSets {
+        val commonTestResources = "src/commonTest/resources"
+        named("androidTest") {
+            resources.srcDir(commonTestResources)
+            assets.srcDir("src/androidInstrumentedTest/assets")
+        }
+        named("test") { resources.srcDir(commonTestResources) }
     }
 }
 
