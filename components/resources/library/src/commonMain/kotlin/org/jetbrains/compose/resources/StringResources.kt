@@ -2,6 +2,8 @@ package org.jetbrains.compose.resources
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.vector.xmldom.Element
 import org.jetbrains.compose.resources.vector.xmldom.NodeList
@@ -14,6 +16,8 @@ private sealed interface StringItem {
     data class Array(val items: List<String>) : StringItem
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
+private val stringsCacheDispatcher = Dispatchers.Default.limitedParallelism(1)
 private val parsedStringsCache = mutableMapOf<String, Map<String, StringItem>>()
 
 //@TestOnly
@@ -22,7 +26,7 @@ internal fun dropStringsCache() {
 }
 
 private suspend fun getParsedStrings(path: String, resourceReader: ResourceReader): Map<String, StringItem> =
-    withContext(cacheDispatcher) {
+    withContext(stringsCacheDispatcher) {
         parsedStringsCache.getOrPut(path) {
             val nodes = resourceReader.read(path).toXmlElement().childNodes
             val strings = nodes.getElementsWithName("string").associate { element ->
