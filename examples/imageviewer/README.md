@@ -24,7 +24,7 @@ Choose a run configuration for an appropriate target in IDE and run it.
 
 ```
 ./gradlew :desktop:packageDistributionForCurrentOS
-# outputs are written to desktop/build/compose/binaries
+# outputs are written to desktopApp/build/compose/binaries
 ```
 
 ### Running Android application
