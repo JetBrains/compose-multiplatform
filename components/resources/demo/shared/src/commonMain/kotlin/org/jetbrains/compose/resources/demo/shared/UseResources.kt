@@ -3,10 +3,10 @@ package org.jetbrains.compose.resources.demo.shared
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Abc
-import androidx.compose.material.icons.filled.Attachment
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.TextFields
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -38,25 +38,25 @@ internal fun UseResources() {
                 NavigationBarItem(
                     selected = screen == Screens.Images,
                     onClick = { screen = Screens.Images },
-                    icon = { Icon(imageVector = Icons.Default.Image, contentDescription = null) },
+                    icon = { Icon(imageVector = Icons.Default.Face, contentDescription = null) },
                     label = { Text("Images") }
                 )
                 NavigationBarItem(
                     selected = screen == Screens.Strings,
                     onClick = { screen = Screens.Strings },
-                    icon = { Icon(imageVector = Icons.Default.Abc, contentDescription = null) },
+                    icon = { Icon(imageVector = Icons.Default.Edit, contentDescription = null) },
                     label = { Text("Strings") }
                 )
                 NavigationBarItem(
                     selected = screen == Screens.Font,
                     onClick = { screen = Screens.Font },
-                    icon = { Icon(imageVector = Icons.Default.TextFields, contentDescription = null) },
+                    icon = { Icon(imageVector = Icons.Default.Favorite, contentDescription = null) },
                     label = { Text("Fonts") }
                 )
                 NavigationBarItem(
                     selected = screen == Screens.File,
                     onClick = { screen = Screens.File },
-                    icon = { Icon(imageVector = Icons.Default.Attachment, contentDescription = null) },
+                    icon = { Icon(imageVector = Icons.Default.Info, contentDescription = null) },
                     label = { Text("Files") }
                 )
             }
