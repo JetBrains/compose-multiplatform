@@ -29,6 +29,7 @@ import org.jetbrains.compose.internal.mppExtOrNull
 import org.jetbrains.compose.internal.service.ConfigurationProblemReporterService
 import org.jetbrains.compose.internal.service.GradlePropertySnapshotService
 import org.jetbrains.compose.internal.utils.currentTarget
+import org.jetbrains.compose.resources.configureResourceGenerator
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
@@ -63,6 +64,8 @@ abstract class ComposePlugin : Plugin<Project> {
 
         project.plugins.apply(ComposeCompilerKotlinSupportPlugin::class.java)
         project.configureNativeCompilerCaching()
+
+        project.configureResourceGenerator()
 
         project.afterEvaluate {
             configureDesktop(project, desktopExtension)

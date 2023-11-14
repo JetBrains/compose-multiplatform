@@ -63,6 +63,7 @@ dependencies {
     testImplementation(kotlin("gradle-plugin-api"))
 
     embedded(libs.download.task)
+    embedded(libs.kotlin.poet)
     embedded(project(":preview-rpc"))
     embedded(project(":jdk-version-probe"))
 }

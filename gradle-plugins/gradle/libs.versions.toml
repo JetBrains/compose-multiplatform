@@ -1,9 +1,11 @@
 [versions]
 kotlin = "1.9.0"
 gradle-download-plugin = "5.5.0"
+kotlin-poet = "1.14.2"
 
 [libraries]
 download-task = { module = "de.undercouch:gradle-download-task", version.ref = "gradle-download-plugin" }
+kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-poet" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
