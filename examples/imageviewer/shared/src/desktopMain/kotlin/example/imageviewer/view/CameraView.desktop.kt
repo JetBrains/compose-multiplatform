@@ -18,10 +18,7 @@ import example.imageviewer.icon.IconPhotoCamera
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.orEmpty
-import org.jetbrains.compose.resources.rememberImageBitmap
-import org.jetbrains.compose.resources.resource
-import java.util.*
+import org.jetbrains.compose.resources.imageResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -30,10 +27,10 @@ actual fun CameraView(
     onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
 ) {
     val randomPicture = remember { resourcePictures.random() }
-    val imageBitmap = resource(randomPicture.resource).rememberImageBitmap().orEmpty()
+    val imageBitmap = imageResource(randomPicture.resource)
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         Image(
-            bitmap = imageBitmap,
+            bitmap = imageResource(randomPicture.resource),
             contentDescription = "Camera stub",
             Modifier.fillMaxSize()
         )

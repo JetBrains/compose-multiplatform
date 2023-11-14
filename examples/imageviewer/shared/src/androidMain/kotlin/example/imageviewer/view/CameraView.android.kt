@@ -37,7 +37,7 @@ import example.imageviewer.model.createCameraPictureData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.resource
+import org.jetbrains.compose.resources.readResourceBytes
 import java.nio.ByteBuffer
 import java.util.*
 import java.util.concurrent.Executors
@@ -176,7 +176,7 @@ private fun CameraWithGrantedPermission(
                 delay(5000)
                 if (capturePhotoStarted) {
                     addLocationInfoAndReturnResult(
-                        resource("android-emulator-photo.jpg").readBytes().toImageBitmap()
+                        readResourceBytes("android-emulator-photo.jpg").toImageBitmap()
                     )
                 }
             }

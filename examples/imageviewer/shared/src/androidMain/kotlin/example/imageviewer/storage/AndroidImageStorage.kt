@@ -21,7 +21,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.resource
+import org.jetbrains.compose.resources.readResourceBytes
 import java.io.File
 
 private const val maxStorableImageSizePx = 2000
@@ -117,7 +117,7 @@ class AndroidImageStorage(
                 if (!tempFileToShare.exists()) {
                     tempFileToShare.createNewFile()
                 }
-                tempFileToShare.writeBytes(resource(picture.resource).readBytes())
+                tempFileToShare.writeBytes(readResourceBytes(picture.resource))
             }
         }
         FileProvider.getUriForFile(
