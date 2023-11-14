@@ -9,6 +9,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.vector.toImageVector
 import org.jetbrains.compose.resources.vector.xmldom.Element
@@ -88,6 +90,8 @@ private sealed interface ImageCache {
     class Vector(val vector: ImageVector) : ImageCache
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
+private val imageCacheDispatcher = Dispatchers.Default.limitedParallelism(1)
 private val imageCache = mutableMapOf<String, ImageCache>()
 
 //@TestOnly
@@ -99,6 +103,6 @@ private suspend fun loadImage(
     path: String,
     resourceReader: ResourceReader,
     decode: (ByteArray) -> ImageCache
-): ImageCache = withContext(cacheDispatcher) {
+): ImageCache = withContext(imageCacheDispatcher) {
     imageCache.getOrPut(path) { decode(resourceReader.read(path)) }
 }
