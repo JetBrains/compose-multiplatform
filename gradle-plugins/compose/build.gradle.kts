@@ -3,7 +3,7 @@ import de.undercouch.gradle.tasks.download.Download
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.publish.plugin.portal)
+    alias(libs.plugins.publish.plugin)
     id("java-gradle-plugin")
     id("maven-publish")
     alias(libs.plugins.shadow.jar)
@@ -58,6 +58,7 @@ dependencies {
     compileOnly(kotlin("gradle-plugin-api"))
     compileOnly(kotlin("gradle-plugin"))
     compileOnly(kotlin("native-utils"))
+    compileOnly(libs.plugin.android)
 
     testImplementation(gradleTestKit())
     testImplementation(kotlin("gradle-plugin-api"))

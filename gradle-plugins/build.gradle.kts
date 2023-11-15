@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.publish.plugin.portal) apply false
+    alias(libs.plugins.publish.plugin) apply false
     alias(libs.plugins.shadow.jar) apply false
     alias(libs.plugins.download) apply false
 }
@@ -14,6 +14,7 @@ subprojects {
 
     repositories {
         mavenCentral()
+        google()
         mavenLocal()
     }
 

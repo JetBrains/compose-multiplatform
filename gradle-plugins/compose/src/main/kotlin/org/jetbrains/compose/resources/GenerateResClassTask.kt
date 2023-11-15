@@ -9,7 +9,7 @@ import java.nio.file.Path
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.io.path.relativeTo
 
-private const val RES_FILE = "Res.kt"
+private const val RES_FILE = "Res"
 private const val INDEX_FILE = "resources.index"
 
 /**

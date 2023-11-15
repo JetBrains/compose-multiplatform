@@ -2,13 +2,17 @@
 kotlin = "1.9.0"
 gradle-download-plugin = "5.5.0"
 kotlin-poet = "1.14.2"
+plugin-android = "7.3.0"
+shadow-jar = "8.1.1"
+publish-plugin = "1.2.1"
 
 [libraries]
 download-task = { module = "de.undercouch:gradle-download-task", version.ref = "gradle-download-plugin" }
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-poet" }
+plugin-android = { module = "com.android.tools.build:gradle", version.ref = "plugin-android" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-shadow-jar = "com.github.johnrengelman.shadow:8.1.1"
 download = { id = "de.undercouch.download", version.ref = "gradle-download-plugin" }
-publish-plugin-portal = "com.gradle.plugin-publish:1.2.1"
+shadow-jar = { id = "com.github.johnrengelman.shadow", version.ref = "shadow-jar" }
+publish-plugin = { id = "com.gradle.plugin-publish", version.ref = "publish-plugin" }

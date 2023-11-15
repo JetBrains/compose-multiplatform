@@ -6,12 +6,13 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.File
 
-private const val COMPOSE_RESOURCES_DIR = "res"
+private const val COMPOSE_RESOURCES_DIR = "composeRes"
 private const val RES_GEN_DIR = "generated/compose/resourceGenerator"
 
 internal fun Project.configureResourceGenerator() {
     val kotlinExtension = project.extensions.getByType(KotlinProjectExtension::class.java)
     val commonSourceSet = kotlinExtension.sourceSets.findByName(KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME) ?: return
+    val commonResourcesDir = provider { commonSourceSet.resources.sourceDirectories.first() }
 
     val packageName = buildString {
         val group = project.group.toString()
@@ -22,15 +23,11 @@ internal fun Project.configureResourceGenerator() {
 
     fun buildDir(path: String) = layout.dir(layout.buildDirectory.map { File(it.asFile, path) })
 
-    //lazy input dir
-    val resDir = provider {
-        val commonResourcesDir = commonSourceSet.resources.sourceDirectories.first()
-        commonResourcesDir.resolve(COMPOSE_RESOURCES_DIR)
-    }
+    val resDir = layout.dir(commonResourcesDir.map { it.resolve(COMPOSE_RESOURCES_DIR) })
 
     val genTask = tasks.register("generateComposeResClass", GenerateResClassTask::class.java) {
         it.packageName.set(packageName)
-        it.resDir.set(layout.dir(resDir))
+        it.resDir.set(resDir)
         it.codeDir.set(buildDir("$RES_GEN_DIR/kotlin"))
         it.indexDir.set(buildDir("$RES_GEN_DIR/resources"))
     }
@@ -42,7 +39,13 @@ internal fun Project.configureResourceGenerator() {
     //setup task execution during IDE import
     tasks.named("prepareKotlinIdeaImport").dependsOn(genTask)
 
-    //todo: register the resources dir for android
-    //todo: copy fonts to android assets
+    val androidExtension = project.extensions.findByName("android")
+    if (androidExtension != null) {
+        configureAndroidResources(
+            commonResourcesDir,
+            genTask.flatMap { it.indexDir.asFile },
+            buildDir("$RES_GEN_DIR/androidFonts").map { it.asFile }
+        )
+    }
 }
 
