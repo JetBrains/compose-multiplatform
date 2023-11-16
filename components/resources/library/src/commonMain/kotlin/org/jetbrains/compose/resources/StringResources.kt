@@ -11,7 +11,6 @@ import kotlinx.coroutines.sync.withLock
 import org.jetbrains.compose.resources.vector.xmldom.Element
 import org.jetbrains.compose.resources.vector.xmldom.NodeList
 
-private const val STRINGS_XML = "strings.xml" //todo
 private val SimpleStringFormatRegex = Regex("""%(\d)\$[ds]""")
 
 private sealed interface StringItem {
@@ -84,7 +83,8 @@ fun getString(id: ResourceId): String {
 suspend fun loadString(id: ResourceId): String = loadString(id, DefaultResourceReader)
 
 private suspend fun loadString(id: ResourceId, resourceReader: ResourceReader): String {
-    val nameToValue = getParsedStrings(getPathById(STRINGS_XML), resourceReader)
+    val path = getPathById(id, resourceReader)
+    val nameToValue = getParsedStrings(path, resourceReader)
     val item = nameToValue[id.stringKey] as? StringItem.Value
         ?: error("String ID=`${id.stringKey}` is not found!")
     return item.text
@@ -159,7 +159,8 @@ fun getStringArray(id: ResourceId): List<String> {
 suspend fun loadStringArray(id: ResourceId): List<String> = loadStringArray(id, DefaultResourceReader)
 
 private suspend fun loadStringArray(id: ResourceId, resourceReader: ResourceReader): List<String> {
-    val nameToValue = getParsedStrings(getPathById(STRINGS_XML), resourceReader)
+    val path = getPathById(id, resourceReader)
+    val nameToValue = getParsedStrings(path, resourceReader)
     val item = nameToValue[id.stringKey] as? StringItem.Array
         ?: error("String array ID=`${id.stringKey}` is not found!")
     return item.items

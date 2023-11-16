@@ -53,7 +53,7 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 fun imageResource(id: ResourceId): ImageBitmap {
     val resourceReader = LocalResourceReader.current
     val imageBitmap by rememberState(id, { emptyImageBitmap }) {
-        val path = getPathById(id)
+        val path = getPathById(id, resourceReader)
         val cached = loadImage(path, resourceReader) {
             ImageCache.Bitmap(it.toImageBitmap())
         } as ImageCache.Bitmap
@@ -78,7 +78,7 @@ fun vectorResource(id: ResourceId): ImageVector {
     val resourceReader = LocalResourceReader.current
     val density = LocalDensity.current
     val imageVector by rememberState(id, { emptyImageVector }) {
-        val path = getPathById(id)
+        val path = getPathById(id, resourceReader)
         val cached = loadImage(path, resourceReader) {
             ImageCache.Vector(it.toXmlElement().toImageVector(density))
         } as ImageCache.Vector

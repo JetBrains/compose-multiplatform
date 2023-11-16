@@ -10,6 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 @ExperimentalResourceApi
 @Composable
 actual fun Font(id: ResourceId, weight: FontWeight, style: FontStyle): Font {
-    val path by rememberState(id, { "" }) { getPathById(id) }
+    val resourceReader = LocalResourceReader.current
+    val path by rememberState(id, { "" }) { getPathById(id, resourceReader) }
     return Font(path, LocalContext.current.assets, weight, style)
 }
