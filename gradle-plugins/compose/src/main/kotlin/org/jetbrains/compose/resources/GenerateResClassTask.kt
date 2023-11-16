@@ -48,7 +48,7 @@ abstract class GenerateResClassTask : DefaultTask() {
                 .flatMap { dir ->
                     dir.listFiles { f -> !f.isDirectory }
                         .orEmpty()
-                        .mapNotNull { it.fileToResourceItems(rootResDir.toPath()) }
+                        .mapNotNull { it.fileToResourceItems(rootResDir.parentFile.toPath()) }
                         .flatten()
                 }
                 .groupBy { it.type }
