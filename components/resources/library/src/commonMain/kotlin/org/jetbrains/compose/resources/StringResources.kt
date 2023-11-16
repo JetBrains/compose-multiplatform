@@ -2,9 +2,12 @@ package org.jetbrains.compose.resources
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.jetbrains.compose.resources.vector.xmldom.Element
 import org.jetbrains.compose.resources.vector.xmldom.NodeList
 
@@ -16,31 +19,42 @@ private sealed interface StringItem {
     data class Array(val items: List<String>) : StringItem
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
-private val stringsCacheDispatcher = Dispatchers.Default.limitedParallelism(1)
-private val parsedStringsCache = mutableMapOf<String, Map<String, StringItem>>()
+private val stringsCacheMutex = Mutex()
+private val parsedStringsCache = mutableMapOf<String, Deferred<Map<String, StringItem>>>()
 
 //@TestOnly
 internal fun dropStringsCache() {
     parsedStringsCache.clear()
 }
 
-private suspend fun getParsedStrings(path: String, resourceReader: ResourceReader): Map<String, StringItem> =
-    withContext(stringsCacheDispatcher) {
+private suspend fun getParsedStrings(
+    path: String,
+    resourceReader: ResourceReader
+): Map<String, StringItem> = coroutineScope {
+    val deferred = stringsCacheMutex.withLock {
         parsedStringsCache.getOrPut(path) {
-            val nodes = resourceReader.read(path).toXmlElement().childNodes
-            val strings = nodes.getElementsWithName("string").associate { element ->
-                element.getAttribute("name") to StringItem.Value(element.textContent.orEmpty())
+            //LAZY - to free the mutex lock as fast as possible
+            async(start = CoroutineStart.LAZY) {
+                parseStringXml(path, resourceReader)
             }
-            val arrays = nodes.getElementsWithName("string-array").associate { arrayElement ->
-                val items = arrayElement.childNodes.getElementsWithName("item").map { element ->
-                    element.textContent.orEmpty()
-                }
-                arrayElement.getAttribute("name") to StringItem.Array(items)
-            }
-            strings + arrays
         }
     }
+    deferred.await()
+}
+
+private suspend fun parseStringXml(path: String, resourceReader: ResourceReader): Map<String, StringItem> {
+    val nodes = resourceReader.read(path).toXmlElement().childNodes
+    val strings = nodes.getElementsWithName("string").associate { element ->
+        element.getAttribute("name") to StringItem.Value(element.textContent.orEmpty())
+    }
+    val arrays = nodes.getElementsWithName("string-array").associate { arrayElement ->
+        val items = arrayElement.childNodes.getElementsWithName("item").map { element ->
+            element.textContent.orEmpty()
+        }
+        arrayElement.getAttribute("name") to StringItem.Array(items)
+    }
+    return strings + arrays
+}
 
 /**
  * Retrieves a string resource using the provided ID.

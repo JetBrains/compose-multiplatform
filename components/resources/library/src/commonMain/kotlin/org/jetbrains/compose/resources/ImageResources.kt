@@ -9,9 +9,14 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.jetbrains.compose.resources.vector.toImageVector
 import org.jetbrains.compose.resources.vector.xmldom.Element
 
@@ -90,9 +95,8 @@ private sealed interface ImageCache {
     class Vector(val vector: ImageVector) : ImageCache
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
-private val imageCacheDispatcher = Dispatchers.Default.limitedParallelism(1)
-private val imageCache = mutableMapOf<String, ImageCache>()
+private val imageCacheMutex = Mutex()
+private val imageCache = mutableMapOf<String, Deferred<ImageCache>>()
 
 //@TestOnly
 internal fun dropImageCache() {
@@ -103,6 +107,14 @@ private suspend fun loadImage(
     path: String,
     resourceReader: ResourceReader,
     decode: (ByteArray) -> ImageCache
-): ImageCache = withContext(imageCacheDispatcher) {
-    imageCache.getOrPut(path) { decode(resourceReader.read(path)) }
+): ImageCache = coroutineScope {
+    val deferred = imageCacheMutex.withLock {
+        imageCache.getOrPut(path) {
+            //LAZY - to free the mutex lock as fast as possible
+            async(start = CoroutineStart.LAZY) {
+                decode(resourceReader.read(path))
+            }
+        }
+    }
+    deferred.await()
 }
