@@ -39,12 +39,18 @@ internal fun JvmApplicationContext.configureWix() {
     val fileName = "wix311"
     val zipFile = wixDir.resolve("$fileName.zip")
     val unzipDir = root.layout.buildDirectory.dir(fileName)
-    val download = root.tasks.maybeCreate(DOWNLOAD_WIX_TOOLSET_TASK_NAME, Download::class.java).apply {
+    val download = root.tasks.findByName(DOWNLOAD_WIX_TOOLSET_TASK_NAME) ?: root.tasks.maybeCreate(
+        DOWNLOAD_WIX_TOOLSET_TASK_NAME,
+        Download::class.java
+    ).apply {
         onlyIf { !zipFile.isFile }
         src("https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip")
         dest(zipFile)
     }
-    val unzip = root.tasks.maybeCreate(UNZIP_WIX_TOOLSET_TASK_NAME, Copy::class.java).apply {
+    val unzip = root.tasks.findByName(UNZIP_WIX_TOOLSET_TASK_NAME) ?: root.tasks.maybeCreate(
+        UNZIP_WIX_TOOLSET_TASK_NAME,
+        Copy::class.java
+    ).apply {
         dependsOn(download)
         from(project.zipTree(zipFile))
         destinationDir = unzipDir.ioFile
