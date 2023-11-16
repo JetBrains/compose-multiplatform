@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import components.resources.demo.generated.resources.Res
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.resources.painterResource
@@ -27,13 +28,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Image(
                     modifier = Modifier.size(100.dp),
-                    painter = painterResource("images/compose.png"),
+                    painter = painterResource(Res.images.compose),
                     contentDescription = null
                 )
                 Text(
                     """
                         Image(
-                          painter = painterResource("images/compose.png")
+                          painter = painterResource(Res.images.compose)
                         )
                     """.trimIndent()
                 )
@@ -46,13 +47,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Image(
                     modifier = Modifier.size(100.dp),
-                    painter = painterResource("images/insta_icon.xml"),
+                    painter = painterResource(Res.images.insta_icon),
                     contentDescription = null
                 )
                 Text(
                     """
                         Image(
-                          painter = painterResource("images/insta_icon.xml")
+                          painter = painterResource(Res.images.insta_icon)
                         )
                     """.trimIndent()
                 )
@@ -65,13 +66,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Image(
                     modifier = Modifier.size(140.dp),
-                    bitmap = imageResource("images/land.webp"),
+                    bitmap = imageResource(Res.images.land),
                     contentDescription = null
                 )
                 Text(
                     """
                         Image(
-                          bitmap = imageResource("images/land.webp")
+                          bitmap = imageResource(Res.images.land)
                         )
                     """.trimIndent()
                 )
@@ -84,13 +85,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Image(
                     modifier = Modifier.size(100.dp),
-                    imageVector = vectorResource("images/droid_icon.xml"),
+                    imageVector = vectorResource(Res.images.droid_icon),
                     contentDescription = null
                 )
                 Text(
                     """
                         Image(
-                          imageVector = vectorResource("images/droid_icon.xml")
+                          imageVector = vectorResource(Res.images.droid_icon)
                         )
                     """.trimIndent()
                 )
@@ -103,13 +104,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Icon(
                     modifier = Modifier.size(100.dp),
-                    painter = painterResource("images/compose.png"),
+                    painter = painterResource(Res.images.compose),
                     contentDescription = null
                 )
                 Text(
                     """
                         Icon(
-                          painter = painterResource("images/compose.png")
+                          painter = painterResource(Res.images.compose)
                         )
                     """.trimIndent()
                 )
@@ -122,13 +123,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Icon(
                     modifier = Modifier.size(100.dp),
-                    painter = painterResource("images/insta_icon.xml"),
+                    painter = painterResource(Res.images.insta_icon),
                     contentDescription = null
                 )
                 Text(
                     """
                         Icon(
-                          painter = painterResource("images/insta_icon.xml")
+                          painter = painterResource(Res.images.insta_icon)
                         )
                     """.trimIndent()
                 )
@@ -141,13 +142,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Icon(
                     modifier = Modifier.size(140.dp),
-                    bitmap = imageResource("images/land.webp"),
+                    bitmap = imageResource(Res.images.land),
                     contentDescription = null
                 )
                 Text(
                     """
                         Icon(
-                          bitmap = imageResource("images/land.webp")
+                          bitmap = imageResource(Res.images.land)
                         )
                     """.trimIndent()
                 )
@@ -160,13 +161,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Icon(
                     modifier = Modifier.size(100.dp),
-                    imageVector = vectorResource("images/droid_icon.xml"),
+                    imageVector = vectorResource(Res.images.droid_icon),
                     contentDescription = null
                 )
                 Text(
                     """
                         Icon(
-                          imageVector = vectorResource("images/droid_icon.xml")
+                          imageVector = vectorResource(Res.images.droid_icon)
                         )
                     """.trimIndent()
                 )
