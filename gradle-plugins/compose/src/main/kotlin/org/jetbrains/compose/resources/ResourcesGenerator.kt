@@ -1,6 +1,7 @@
 package org.jetbrains.compose.resources
 
 import org.gradle.api.Project
+import org.jetbrains.compose.experimental.uikit.tasks.SyncComposeResourcesForIosTask
 import org.jetbrains.compose.internal.utils.dependsOn
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -38,6 +39,10 @@ internal fun Project.configureResourceGenerator() {
 
     //setup task execution during IDE import
     tasks.named("prepareKotlinIdeaImport").dependsOn(genTask)
+
+    tasks.withType(SyncComposeResourcesForIosTask::class.java).all {
+        it.dependsOn(genTask)
+    }
 
     val androidExtension = project.extensions.findByName("android")
     if (androidExtension != null) {
