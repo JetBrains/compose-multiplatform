@@ -15,11 +15,13 @@ internal fun Project.configureResourceGenerator() {
     val commonSourceSet = kotlinExtension.sourceSets.findByName(KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME) ?: return
     val commonResourcesDir = provider { commonSourceSet.resources.sourceDirectories.first() }
 
-    val packageName = buildString {
-        val group = project.group.toString()
-        append(group)
-        if (group.isNotEmpty()) append(".")
-        append("generated.resources")
+    val packageName = provider {
+        buildString {
+            val group = project.group.toString()
+            append(group)
+            if (group.isNotEmpty()) append(".")
+            append("generated.resources")
+        }
     }
 
     fun buildDir(path: String) = layout.dir(layout.buildDirectory.map { File(it.asFile, path) })

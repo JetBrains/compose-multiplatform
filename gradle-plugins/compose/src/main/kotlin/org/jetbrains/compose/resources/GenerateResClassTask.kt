@@ -15,7 +15,6 @@ private const val INDEX_FILE = "resources.index"
 /**
  * This task should be FAST and SAFE! Because it is being run during IDE import.
  */
-@CacheableTask
 abstract class GenerateResClassTask : DefaultTask() {
     @get:Input
     abstract val packageName: Property<String>
@@ -55,10 +54,12 @@ abstract class GenerateResClassTask : DefaultTask() {
                 .mapValues { (_, items) -> items.groupBy { it.id } }
 
             val kotlinDir = codeDir.get().asFile
+            kotlinDir.deleteRecursively()
             kotlinDir.mkdirs()
             getResFileSpec(resources, packageName.get(), RES_FILE).writeTo(kotlinDir)
 
             val outIndexFile = indexDir.get().asFile
+            outIndexFile.deleteRecursively()
             outIndexFile.mkdirs()
             outIndexFile.resolve(INDEX_FILE).writeText(generateResourceIndex(resources))
         } catch (e: Exception) {
