@@ -49,7 +49,7 @@ android {
 
 configureMavenPublication(
     groupId = "org.jetbrains.compose.components",
-    artifactId = "ui-tooling-preview",
+    artifactId = "components-ui-tooling-preview",
     name = "Experimental Compose Multiplatform tooling library API. This library provides the API required to declare " +
             "@Preview composables in user apps."
 )
