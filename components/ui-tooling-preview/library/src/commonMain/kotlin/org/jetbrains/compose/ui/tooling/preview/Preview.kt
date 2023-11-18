@@ -16,8 +16,6 @@
 
 package org.jetbrains.compose.ui.tooling.preview
 
-import androidx.compose.runtime.Composable
-
 /**
  * [Preview] can be applied to either of the following:
  * - @[Composable] methods with no parameters to show them in the IDE preview.
