@@ -113,6 +113,35 @@ class Tests {
         }
         assertEquals("root:{Value = 100}", root.dump())
     }
+
+    @Test
+    fun testComposableAlwaysReturnsNull() {
+        val root = composeText {
+            val v = ComposableAlwaysReturnsNull()
+            TextLeafNode("Value = ${v ?: "null"}")
+        }
+        assertEquals("root:{Value = null}", root.dump())
+    }
+
+    @Test
+    fun testComposableAlwaysReturnsNullUnit() {
+        val root = composeText {
+            val v = ComposableAlwaysReturnsNullUnit()
+            TextLeafNode("Value = ${v ?: "null"}")
+        }
+        assertEquals("root:{Value = null}", root.dump())
+    }
+
+    @Test
+    fun testComposableAlwaysReturnsUnit() {
+        val root = composeText {
+            val v = ComposableAlwaysReturnsUnit().let {
+                if (it == Unit) "Unit" else it.toString()
+            }
+            TextLeafNode("Value = $v")
+        }
+        assertEquals("root:{Value = Unit}", root.dump())
+    }
 }
 
 private fun someText(): String {
