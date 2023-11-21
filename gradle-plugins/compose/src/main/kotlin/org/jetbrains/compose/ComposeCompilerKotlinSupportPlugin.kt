@@ -92,7 +92,7 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
     }
 
     private val platformPluginOptions = mapOf(
-        KotlinPlatformType.js to options("generateDecoys" to "true")
+        KotlinPlatformType.js to options("generateDecoys" to "false")
     )
 
     private fun options(vararg options: Pair<String, String>): List<SubpluginOption> =
