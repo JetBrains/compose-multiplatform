@@ -1,7 +1,6 @@
 package org.jetbrains.compose.resources
 
 import org.gradle.api.Project
-import org.jetbrains.compose.experimental.uikit.tasks.SyncComposeResourcesForIosTask
 import org.jetbrains.compose.internal.utils.dependsOn
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
@@ -28,30 +27,42 @@ internal fun Project.configureResourceGenerator() {
 
     val resDir = layout.dir(commonResourcesDir.map { it.resolve(COMPOSE_RESOURCES_DIR) })
 
-    val genTask = tasks.register("generateComposeResClass", GenerateResClassTask::class.java) {
+    //lazy check a dependency on the Resources library
+    val dependsOnResourcesLibrary = provider {
+        val composeResourcesLibraryNotations = setOf(
+            "org.jetbrains.compose.components:components-resources",
+            "components.resources:library" //for demo app only
+        )
+        configurations
+            .getByName(commonSourceSet.implementationConfigurationName)
+            .allDependencies.any { dep ->
+                val depStringNotation = dep.group + ":" + dep.name
+                depStringNotation in composeResourcesLibraryNotations
+            }
+    }
+
+    val genTask = tasks.register(
+        "generateComposeResClass",
+        GenerateResClassTask::class.java
+    ) {
         it.packageName.set(packageName)
         it.resDir.set(resDir)
         it.codeDir.set(buildDir("$RES_GEN_DIR/kotlin"))
-        it.indexDir.set(buildDir("$RES_GEN_DIR/resources"))
+        it.onlyIf { dependsOnResourcesLibrary.get() }
     }
 
     //register generated source set
     commonSourceSet.kotlin.srcDir(genTask.map { it.codeDir })
-    commonSourceSet.resources.srcDir(genTask.map { it.indexDir })
 
     //setup task execution during IDE import
     tasks.named("prepareKotlinIdeaImport").dependsOn(genTask)
-
-    tasks.withType(SyncComposeResourcesForIosTask::class.java).all {
-        it.dependsOn(genTask)
-    }
 
     val androidExtension = project.extensions.findByName("android")
     if (androidExtension != null) {
         configureAndroidResources(
             commonResourcesDir,
-            genTask.flatMap { it.indexDir.asFile },
-            buildDir("$RES_GEN_DIR/androidFonts").map { it.asFile }
+            buildDir("$RES_GEN_DIR/androidFonts").map { it.asFile },
+            dependsOnResourcesLibrary
         )
     }
 }

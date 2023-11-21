@@ -9,9 +9,6 @@ import java.nio.file.Path
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.io.path.relativeTo
 
-private const val RES_FILE = "Res"
-private const val INDEX_FILE = "resources.index"
-
 /**
  * This task should be FAST and SAFE! Because it is being run during IDE import.
  */
@@ -25,9 +22,6 @@ abstract class GenerateResClassTask : DefaultTask() {
 
     @get:OutputDirectory
     abstract val codeDir: DirectoryProperty
-
-    @get:OutputDirectory
-    abstract val indexDir: DirectoryProperty
 
     init {
         this.onlyIf { resDir.asFile.get().exists() }
@@ -43,7 +37,7 @@ abstract class GenerateResClassTask : DefaultTask() {
             val dirs = rootResDir.listFiles { f -> f.isDirectory }.orEmpty()
 
             //type -> id -> resource item
-            val resources: Map<String, Map<String, List<ResourceItem>>> = dirs
+            val resources: Map<ResourceType, Map<String, List<ResourceItem>>> = dirs
                 .flatMap { dir ->
                     dir.listFiles { f -> !f.isDirectory }
                         .orEmpty()
@@ -51,17 +45,12 @@ abstract class GenerateResClassTask : DefaultTask() {
                         .flatten()
                 }
                 .groupBy { it.type }
-                .mapValues { (_, items) -> items.groupBy { it.id } }
+                .mapValues { (_, items) -> items.groupBy { it.name } }
 
             val kotlinDir = codeDir.get().asFile
             kotlinDir.deleteRecursively()
             kotlinDir.mkdirs()
-            getResFileSpec(resources, packageName.get(), RES_FILE).writeTo(kotlinDir)
-
-            val outIndexFile = indexDir.get().asFile
-            outIndexFile.deleteRecursively()
-            outIndexFile.mkdirs()
-            outIndexFile.resolve(INDEX_FILE).writeText(generateResourceIndex(resources))
+            getResFileSpec(resources, packageName.get()).writeTo(kotlinDir)
         } catch (e: Exception) {
             //message must contain two ':' symbols to be parsed by IDE UI!
             logger.error("e: GenerateResClassTask was failed:", e)
@@ -77,16 +66,22 @@ abstract class GenerateResClassTask : DefaultTask() {
         val typeAndQualifiers = dirName.lowercase().split("-")
         if (typeAndQualifiers.isEmpty()) return null
 
-        val type = typeAndQualifiers.first().lowercase()
+        val typeString = typeAndQualifiers.first().lowercase()
         val qualifiers = typeAndQualifiers.takeLast(typeAndQualifiers.size - 1).map { it.lowercase() }.toSet()
         val path = file.toPath().relativeTo(relativeTo)
 
-        return if (type == "values" && file.name.equals("strings.xml", true)) {
+        return if (typeString == "values" && file.name.equals("strings.xml", true)) {
             val stringIds = getStringIds(file)
             stringIds.map { strId ->
-                ResourceItem("strings", qualifiers, strId.lowercase(), path)
+                ResourceItem(ResourceType.STRING, qualifiers, strId.lowercase(), path)
             }
         } else {
+            val type = try {
+                ResourceType.fromString(typeString)
+            } catch (e: Exception) {
+                logger.error("e: Error: $path", e)
+                return null
+            }
             listOf(ResourceItem(type, qualifiers, file.nameWithoutExtension.lowercase(), path))
         }
     }

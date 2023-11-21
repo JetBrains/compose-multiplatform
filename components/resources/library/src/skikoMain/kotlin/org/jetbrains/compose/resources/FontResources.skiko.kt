@@ -33,12 +33,12 @@ private val defaultEmptyFont by lazy { Font("org.jetbrains.compose.emptyFont", B
 
 @ExperimentalResourceApi
 @Composable
-actual fun Font(id: ResourceId, weight: FontWeight, style: FontStyle): Font {
+actual fun Font(resource: FontResource, weight: FontWeight, style: FontStyle): Font {
     val resourceReader = LocalResourceReader.current
-    val fontFile by rememberState(id, { defaultEmptyFont }) {
-        val path = getPathById(id, resourceReader)
+    val fontFile by rememberState(resource, { defaultEmptyFont }) {
+        val path = resource.getPathByEnvironment()
         val fontBytes = resourceReader.read(path)
-        Font(id, fontBytes, weight, style)
+        Font(path, fontBytes, weight, style)
     }
     return fontFile
 }

@@ -11,13 +11,12 @@ import java.io.File
 
 internal fun Project.configureAndroidResources(
     commonResourcesDir: Provider<File>,
-    generatedResourcesDir: Provider<File>,
-    androidFontsDir: Provider<File>
+    androidFontsDir: Provider<File>,
+    onlyIfProvider: Provider<Boolean>
 ) {
     val androidExtension = project.extensions.findByName("android") as? BaseExtension ?: return
     val androidMainSourceSet = androidExtension.sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
     androidMainSourceSet.resources.srcDir(commonResourcesDir)
-    androidMainSourceSet.resources.srcDir(generatedResourcesDir)
     androidMainSourceSet.assets.srcDir(androidFontsDir)
 
     val copyFonts = registerTask<Copy>("copyFontsToAndroidAssets") {
@@ -25,6 +24,7 @@ internal fun Project.configureAndroidResources(
         from(commonResourcesDir)
         include("**/fonts/*")
         into(androidFontsDir)
+        onlyIf { onlyIfProvider.get() }
     }
 
     tasks.withType(MergeSourceSetFolders::class.java).all {
