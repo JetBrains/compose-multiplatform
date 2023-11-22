@@ -1,6 +1,11 @@
 package org.jetbrains.compose.resources
 
 import org.gradle.api.Project
+import org.gradle.api.provider.Provider
+import org.jetbrains.compose.ComposeExtension
+import org.jetbrains.compose.ComposePlugin
+import org.jetbrains.compose.ExperimentalComposeLibrary
+import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.File
@@ -8,6 +13,7 @@ import java.io.File
 private const val COMPOSE_RESOURCES_DIR = "composeRes"
 private const val RES_GEN_DIR = "generated/compose/resourceGenerator"
 
+@OptIn(ExperimentalComposeLibrary::class)
 internal fun Project.configureResourceGenerator() {
     val kotlinExtension = project.extensions.getByType(KotlinProjectExtension::class.java)
     val commonSourceSet = kotlinExtension.sourceSets.findByName(KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME) ?: return
@@ -27,17 +33,17 @@ internal fun Project.configureResourceGenerator() {
     val resDir = layout.dir(commonResourcesDir.map { it.resolve(COMPOSE_RESOURCES_DIR) })
 
     //lazy check a dependency on the Resources library
-    val dependsOnResourcesLibrary = provider {
-        val composeResourcesLibraryNotations = setOf(
-            "org.jetbrains.compose.components:components-resources",
-            "components.resources:library" //for demo app only
-        )
-        configurations
-            .getByName(commonSourceSet.implementationConfigurationName)
-            .allDependencies.any { dep ->
-                val depStringNotation = dep.group + ":" + dep.name
-                depStringNotation in composeResourcesLibraryNotations
-            }
+    val dependsOnResourcesLibrary: Provider<Boolean> = provider {
+        if (ComposeProperties.generateResourcesCertainly(providers).get()) {
+            true
+        } else {
+            configurations
+                .getByName(commonSourceSet.implementationConfigurationName)
+                .allDependencies.any { dep ->
+                    val depStringNotation = dep.let { "${it.group}:${it.name}:${it.version}" }
+                    depStringNotation == ComposePlugin.CommonComponentsDependencies.resources
+                }
+        }
     }
 
     val genTask = tasks.register(
