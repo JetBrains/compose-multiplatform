@@ -26,8 +26,9 @@ internal fun Project.configureAndroidResources(
         into(androidFontsDir)
         onlyIf { onlyIfProvider.get() }
     }
-
-    tasks.withType(MergeSourceSetFolders::class.java).all {
-        it.dependsOn(copyFonts)
+    tasks.configureEach {
+        if (it is MergeSourceSetFolders) {
+            it.dependsOn(copyFonts)
+        }
     }
 }

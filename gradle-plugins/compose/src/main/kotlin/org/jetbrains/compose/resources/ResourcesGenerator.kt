@@ -1,7 +1,6 @@
 package org.jetbrains.compose.resources
 
 import org.gradle.api.Project
-import org.jetbrains.compose.internal.utils.dependsOn
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.File
@@ -55,7 +54,11 @@ internal fun Project.configureResourceGenerator() {
     commonSourceSet.kotlin.srcDir(genTask.map { it.codeDir })
 
     //setup task execution during IDE import
-    tasks.named("prepareKotlinIdeaImport").dependsOn(genTask)
+    tasks.configureEach {
+        if (it.name == "prepareKotlinIdeaImport") {
+            it.dependsOn(genTask)
+        }
+    }
 
     val androidExtension = project.extensions.findByName("android")
     if (androidExtension != null) {
