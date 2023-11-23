@@ -14,7 +14,7 @@
 ## Desktop
 
 ### Fixes
-[Fix race condition in animation tests](https://github.com/JetBrains/compose-multiplatform-core/pull/910)
+* [Fix race condition in animation tests](https://github.com/JetBrains/compose-multiplatform-core/pull/910)
 
 ## Dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
