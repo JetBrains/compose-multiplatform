@@ -4,6 +4,7 @@
 ### Features
 * [Support Kotlin 1.9.21](https://github.com/JetBrains/compose-multiplatform/pull/3966)
 * [Support Kotlin 2.0.0-Beta1](https://github.com/JetBrains/compose-multiplatform/pull/3934)
+
 ## iOS
 
 ### Fixes
