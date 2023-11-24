@@ -1,3 +1,31 @@
+# 1.5.11 (November 2023)
+
+## Common
+### Features
+* [Support Kotlin 1.9.21](https://github.com/JetBrains/compose-multiplatform/pull/3966)
+* [Support Kotlin 2.0.0-Beta1](https://github.com/JetBrains/compose-multiplatform/pull/3934)
+
+## iOS
+
+### Fixes
+* [Fix crash at GrGpuResource::release()](https://github.com/JetBrains/compose-multiplatform/issues/3862)
+* [Fix crash with custom font](https://github.com/JetBrains/compose-multiplatform/issues/3822)
+* [Composable functions returning null cause crash](https://github.com/JetBrains/compose-multiplatform/issues/3900) (fixed in Kotlin 1.9.21 and JetBrains Compose Compiler 1.5.4)
+
+## Desktop
+
+### Fixes
+* [Fix race condition in animation tests](https://github.com/JetBrains/compose-multiplatform-core/pull/910)
+
+## Dependencies
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+* [Compiler 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.4)
+* [Runtime 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.5.4)
+* [UI 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.5.4)
+* [Foundation 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.5.4)
+* [Material 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-material#1.5.4)
+* [Material3 1.1.2](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.1.2)
+
 # 1.5.10 (October 2023)
 > This is a combined changelog from the prerelease versions:
 > - [1.5.0-beta01](https://github.com/JetBrains/compose-multiplatform/releases/tag/v1.5.0-beta01)
