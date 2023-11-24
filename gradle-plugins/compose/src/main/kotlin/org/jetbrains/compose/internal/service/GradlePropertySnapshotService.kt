@@ -24,6 +24,9 @@ internal abstract class GradlePropertySnapshotService : AbstractComposeMultiplat
     companion object {
         fun init(project: Project) {
             registerServiceIfAbsent<GradlePropertySnapshotService, Parameters>(project) {
+                // WORKAROUND! Call getter at least once, because of Issue: https://github.com/gradle/gradle/issues/27099
+                gradlePropertiesCacheKindSnapshot
+                localPropertiesCacheKindSnapshot
                 initParams(project)
             }
         }

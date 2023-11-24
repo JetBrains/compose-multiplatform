@@ -43,7 +43,10 @@ abstract class ConfigurationProblemReporterService : AbstractComposeMultiplatfor
     }
     companion object {
         fun init(project: Project) {
-            registerServiceIfAbsent<ConfigurationProblemReporterService, Parameters>(project)
+            registerServiceIfAbsent<ConfigurationProblemReporterService, Parameters>(project) {
+                // WORKAROUND! Call getter at least once, because of Issue: https://github.com/gradle/gradle/issues/27099
+                warnings
+            }
         }
 
         private inline fun configureParameters(project: Project, fn: Parameters.() -> Unit) {
