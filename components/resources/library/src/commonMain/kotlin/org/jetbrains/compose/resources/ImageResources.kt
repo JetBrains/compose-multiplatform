@@ -25,13 +25,13 @@ import org.jetbrains.compose.resources.vector.xmldom.Element
  */
 @ExperimentalResourceApi
 @Composable
-fun painterResource(id: ResourceId): Painter {
+fun painterResource(id: ResourceId, defaultId: ResourceId? = null): Painter {
     val filePath by rememberFilePath(id)
     val isXml = filePath.endsWith(".xml", true)
     if (isXml) {
         return rememberVectorPainter(vectorResource(id))
     } else {
-        return BitmapPainter(imageResource(id))
+        return BitmapPainter(imageResource(id, defaultId))
     }
 }
 
@@ -45,11 +45,11 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
  */
 @ExperimentalResourceApi
 @Composable
-fun imageResource(id: ResourceId): ImageBitmap {
+fun imageResource(id: ResourceId, defaultId: ResourceId? = null): ImageBitmap {
     val resourceReader = LocalResourceReader.current
     val imageBitmap by rememberState(id, { emptyImageBitmap }) {
         val path = getPathById(id)
-        val cached = loadImage(path, resourceReader) {
+        val cached = loadImage(path, defaultId, resourceReader) {
             ImageCache.Bitmap(it.toImageBitmap())
         } as ImageCache.Bitmap
         cached.bitmap
@@ -65,16 +65,17 @@ private val emptyImageVector: ImageVector by lazy {
  * Retrieves an ImageVector for the given resource ID.
  *
  * @param id The ID of the resource to load the ImageVector from.
+ * @param defaultId The ID of the default resource to load the ImageVector from in case id was not found.
  * @return The ImageVector loaded from the resource.
  */
 @ExperimentalResourceApi
 @Composable
-fun vectorResource(id: ResourceId): ImageVector {
+fun vectorResource(id: ResourceId, defaultId: ResourceId? = null): ImageVector {
     val resourceReader = LocalResourceReader.current
     val density = LocalDensity.current
     val imageVector by rememberState(id, { emptyImageVector }) {
         val path = getPathById(id)
-        val cached = loadImage(path, resourceReader) {
+        val cached = loadImage(path, defaultId, resourceReader) {
             ImageCache.Vector(it.toXmlElement().toImageVector(density))
         } as ImageCache.Vector
         cached.vector
@@ -101,8 +102,9 @@ internal fun dropImageCache() {
 
 private suspend fun loadImage(
     path: String,
+    defaultPath: String?,
     resourceReader: ResourceReader,
     decode: (ByteArray) -> ImageCache
 ): ImageCache = withContext(imageCacheDispatcher) {
-    imageCache.getOrPut(path) { decode(resourceReader.read(path)) }
+    imageCache.getOrPut(path) { decode(resourceReader.read(path, defaultPath)) }
 }

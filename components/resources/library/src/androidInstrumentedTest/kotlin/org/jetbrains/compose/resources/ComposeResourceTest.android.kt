@@ -66,6 +66,37 @@ class ComposeResourceTest {
     }
 
     @Test
+    fun testImageResourceDefault() = runComposeUiTest {
+        runBlockingTest {
+            val testResourceReader = TestResourceReader()
+            val imagePathFlow = MutableStateFlow<Pair<String, String?>>("1.png" to null)
+            setContent {
+                CompositionLocalProvider(LocalResourceReader provides testResourceReader) {
+                    val path by imagePathFlow.collectAsState()
+                    Image(painterResource(path.first, path.second), null)
+                }
+            }
+            awaitIdle()
+            imagePathFlow.emit("0.png" to null)
+            awaitIdle()
+            imagePathFlow.emit("0.png" to "1.png")
+            awaitIdle()
+            imagePathFlow.emit("2.png" to null)
+            awaitIdle()
+
+            assertEquals(
+                expected = listOf("1.png","0.png", "2.png"), //no second read of 1.png
+                actual = testResourceReader.readPaths
+            )
+
+            assertEquals(
+                expected = listOf("0.png"), //no second read of 1.png
+                actual = testResourceReader.missingPaths
+            )
+        }
+    }
+
+    @Test
     fun testStringResourceCache() = runComposeUiTest {
         runBlockingTest {
             val testResourceReader = TestResourceReader()

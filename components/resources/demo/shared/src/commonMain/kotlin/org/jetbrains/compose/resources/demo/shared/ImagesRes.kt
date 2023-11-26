@@ -27,7 +27,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Image(
                     modifier = Modifier.size(100.dp),
-                    painter = painterResource("images/compose.png"),
+                    painter = painterResource("images/composee.png"),
                     contentDescription = null
                 )
                 Text(
