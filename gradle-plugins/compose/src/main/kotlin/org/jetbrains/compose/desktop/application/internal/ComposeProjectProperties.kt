@@ -21,7 +21,7 @@ internal object ComposeProperties {
     internal const val MAC_NOTARIZATION_PASSWORD = "compose.desktop.mac.notarization.password"
     internal const val MAC_NOTARIZATION_TEAM_ID_PROVIDER = "compose.desktop.mac.notarization.teamID"
     internal const val CHECK_JDK_VENDOR = "compose.desktop.packaging.checkJdkVendor"
-    internal const val GENERATE_RESOURCES_CERTAINLY = "compose.resources.generate.certainly"
+    internal const val ALWAYS_GENERATE_RESOURCE_ACCESSORS = "compose.resources.always.generate.accessors"
 
     fun isVerbose(providers: ProviderFactory): Provider<Boolean> =
         providers.valueOrNull(VERBOSE).toBooleanProvider(false)
@@ -53,6 +53,6 @@ internal object ComposeProperties {
     fun checkJdkVendor(providers: ProviderFactory): Provider<Boolean> =
         providers.valueOrNull(CHECK_JDK_VENDOR).toBooleanProvider(true)
 
-    fun generateResourcesCertainly(providers: ProviderFactory): Provider<Boolean> =
-        providers.valueOrNull(GENERATE_RESOURCES_CERTAINLY).toBooleanProvider(false)
+    fun alwaysGenerateResourceAccessors(providers: ProviderFactory): Provider<Boolean> =
+        providers.valueOrNull(ALWAYS_GENERATE_RESOURCE_ACCESSORS).toBooleanProvider(false)
 }
