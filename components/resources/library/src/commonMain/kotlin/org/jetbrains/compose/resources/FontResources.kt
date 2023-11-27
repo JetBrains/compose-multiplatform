@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 class FontResource(id: String, items: Set<ResourceItem>): Resource(id, items)
 
 /**
- * Creates a font with the specified resource ID, weight, and style.
+ * Creates a font using the specified font resource, weight, and style.
  *
  * @param resource The font resource to be used.
  * @param weight The weight of the font. Default value is [FontWeight.Normal].

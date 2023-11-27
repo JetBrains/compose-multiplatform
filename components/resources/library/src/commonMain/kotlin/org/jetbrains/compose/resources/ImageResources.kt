@@ -30,7 +30,7 @@ import org.jetbrains.compose.resources.vector.xmldom.Element
 class ImageResource(id: String, items: Set<ResourceItem>) : Resource(id, items)
 
 /**
- * Retrieves a [Painter] for the given [ResourceId].
+ * Retrieves a [Painter] using the specified image resource.
  * Automatically select a type of the Painter depending on the file extension.
  *
  * @param resource The image resource to be used.
@@ -51,7 +51,7 @@ fun painterResource(resource: ImageResource): Painter {
 private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 
 /**
- * Retrieves an ImageBitmap for the given resource ID.
+ * Retrieves an ImageBitmap using the specified image resource.
  *
  * @param resource The image resource to be used.
  * @return The ImageBitmap loaded from the resource.
@@ -75,7 +75,7 @@ private val emptyImageVector: ImageVector by lazy {
 }
 
 /**
- * Retrieves an ImageVector for the given resource ID.
+ * Retrieves an ImageVector using the specified image resource.
  *
  * @param resource The image resource to be used.
  * @return The ImageVector loaded from the resource.

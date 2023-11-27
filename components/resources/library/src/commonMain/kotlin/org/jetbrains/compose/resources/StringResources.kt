@@ -67,7 +67,7 @@ private suspend fun parseStringXml(path: String, resourceReader: ResourceReader)
 }
 
 /**
- * Retrieves a string resource using the provided ID.
+ * Retrieves a string using the specified string resource.
  *
  * @param resource The string resource to be used.
  * @return The retrieved string resource.
@@ -83,7 +83,7 @@ fun getString(resource: StringResource): String {
 }
 
 /**
- * Loads a string resource using the provided ID.
+ * Loads a string using the specified string resource.
  *
  * @param resource The string resource to be used.
  * @return The loaded string resource.
@@ -102,7 +102,7 @@ private suspend fun loadString(resource: StringResource, resourceReader: Resourc
 }
 
 /**
- * Retrieves a formatted string resource using the provided ID and arguments.
+ * Retrieves a formatted string using the specified string resource and arguments.
  *
  * @param resource The string resource to be used.
  * @param formatArgs The arguments to be inserted into the formatted string.
@@ -120,7 +120,7 @@ fun getString(resource: StringResource, vararg formatArgs: Any): String {
 }
 
 /**
- * Loads a formatted string resource using the provided ID and arguments.
+ * Loads a formatted string using the specified string resource and arguments.
  *
  * @param resource The string resource to be used.
  * @param formatArgs The arguments to be inserted into the formatted string.
@@ -143,7 +143,7 @@ private suspend fun loadString(resource: StringResource, args: List<String>, res
 }
 
 /**
- * Retrieves a list of strings from a string array resource.
+ * Retrieves a list of strings using the specified string array resource.
  *
  * @param resource The string resource to be used.
  * @return A list of strings representing the items in the string array.
@@ -159,7 +159,7 @@ fun getStringArray(resource: StringResource): List<String> {
 }
 
 /**
- * Loads a string array from a resource file.
+ * Loads a list of strings using the specified string array resource.
  *
  * @param resource The string resource to be used.
  * @return A list of strings representing the items in the string array.
