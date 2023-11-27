@@ -13,7 +13,6 @@ import java.io.File
 private const val COMPOSE_RESOURCES_DIR = "composeRes"
 private const val RES_GEN_DIR = "generated/compose/resourceGenerator"
 
-@OptIn(ExperimentalComposeLibrary::class)
 internal fun Project.configureResourceGenerator() {
     val kotlinExtension = project.extensions.getByType(KotlinProjectExtension::class.java)
     val commonSourceSet = kotlinExtension.sourceSets.findByName(KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME) ?: return

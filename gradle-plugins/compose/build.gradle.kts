@@ -1,5 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import de.undercouch.gradle.tasks.download.Download
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
@@ -30,8 +31,9 @@ val buildConfig = tasks.register("buildConfig", GenerateBuildConfig::class.java)
     fieldsToGenerate.put("composeVersion", BuildProperties.composeVersion(project))
     fieldsToGenerate.put("composeGradlePluginVersion", BuildProperties.deployVersion(project))
 }
-tasks.named("compileKotlin") {
+tasks.named("compileKotlin", KotlinCompilationTask::class) {
     dependsOn(buildConfig)
+    compilerOptions.freeCompilerArgs.add("-opt-in=org.jetbrains.compose.ExperimentalComposeLibrary")
 }
 sourceSets.main.configure {
     java.srcDir(buildConfig.flatMap { it.generatedOutputDir })
