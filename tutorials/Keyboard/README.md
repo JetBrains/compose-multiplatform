@@ -166,3 +166,9 @@ fun App() {
 ```
 
 <img alt="window_keyboard" src="window_keyboard.gif" height="280" />
+
+## TextFields
+
+TextFields in Compose for Desktop consume special events of type `java.awt.event.KeyEvent.KEY_TYPED`. If you want to avoid consuming Events that have already been consumed by a TextField, you have to check for this special eventType, as TextFields will not consume `KeyEventType.KeyDown` or `KeyEventType.KeyUp` events on Desktop.
+
+You can do this using a condition like `keyEvent.isTypedEvent && keyEvent.awtEventOrNull?.keyChar == 'a'` where `isTypedEvent` uses the `actual val KeyEvent.isTypedEvent: Boolean` in `TextFieldKeyInput.desktop.kt`.
