@@ -2,7 +2,7 @@ pluginManagement {
     plugins {
         id 'org.jetbrains.kotlin.multiplatform' version 'KOTLIN_VERSION_PLACEHOLDER'
         id 'org.jetbrains.compose' version 'COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER'
-        id 'com.android.application' version '7.0.4'
+        id 'com.android.application' version '7.3.1'
     }
     repositories {
         mavenLocal()

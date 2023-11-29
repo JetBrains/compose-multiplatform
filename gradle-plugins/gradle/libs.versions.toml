@@ -10,6 +10,7 @@ publish-plugin = "1.2.1"
 download-task = { module = "de.undercouch:gradle-download-task", version.ref = "gradle-download-plugin" }
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-poet" }
 plugin-android = { module = "com.android.tools.build:gradle", version.ref = "plugin-android" }
+plugin-android-api = { module = "com.android.tools.build:gradle-api", version.ref = "plugin-android" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
