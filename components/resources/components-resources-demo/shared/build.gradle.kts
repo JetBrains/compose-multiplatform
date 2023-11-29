@@ -57,7 +57,7 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.material3)
-                implementation(project(":resources:library"))
+                implementation(project(":resources:components-resources"))
             }
         }
         val desktopMain by getting {
