@@ -9,7 +9,7 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation(project(":ui-tooling-preview:components-ui-tooling-preview-demo:shared"))
+                implementation(project(":ui-tooling-preview:demo:shared"))
             }
         }
     }
