@@ -11,10 +11,14 @@ fun Project.configureMavenPublication(
     extensions.configure<PublishingExtension> {
         publications {
             all {
-                this as MavenPublication
+                val publication = this as MavenPublication
 
-                this.groupId = groupId
-                mppArtifactId = artifactId
+                //work around to fix an android publication artifact ID
+                //https://youtrack.jetbrains.com/issue/KT-53520
+                afterEvaluate {
+                    publication.groupId = groupId
+                    publication.mppArtifactId = artifactId
+                }
 
                 pom {
                     this.name.set(name)
