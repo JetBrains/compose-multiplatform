@@ -103,7 +103,7 @@ val gradleTestsPattern = "org.jetbrains.compose.test.tests.integration.*"
 tasks.registerVerificationTask<CheckJarPackagesTask>("checkJar") {
     dependsOn(jar)
     jarFile.set(jar.archiveFile)
-    allowedPackagePrefixes.addAll("org.jetbrains.compose", "kotlinx.serialization")
+    allowedPackagePrefixes.addAll("org.jetbrains.compose", "kotlinx.serialization", "com.squareup.kotlinpoet")
 }
 
 tasks.test {
