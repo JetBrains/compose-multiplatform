@@ -9,7 +9,7 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation(project(":resources:demo:shared"))
+                implementation(project(":resources:components-resources-demo:shared"))
             }
         }
     }

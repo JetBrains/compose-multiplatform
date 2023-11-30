@@ -52,7 +52,7 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.material3)
-                implementation(project(":ui-tooling-preview:library"))
+                implementation(project(":ui-tooling-preview:components-ui-tooling-preview"))
             }
         }
         val desktopMain by getting {
