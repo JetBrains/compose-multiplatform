@@ -8,6 +8,8 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.withIndent
 import java.nio.file.Path
+import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.pathString
 
 internal enum class ResourceType(val typeName: String) {
     IMAGE("images"),
@@ -74,7 +76,8 @@ private fun TypeSpec.Builder.addResourceProperty(name: String, items: List<Resou
             add("setOf(\n").withIndent {
                 items.forEach { item ->
                     val qualifiers = item.qualifiers.joinToString { "\"$it\"" }
-                    add("%T(setOf($qualifiers), \"${item.path}\"),\n", resourceItemClass)
+                    //file separator should be '/' on all platforms
+                    add("%T(setOf($qualifiers), \"${item.path.invariantSeparatorsPathString}\"),\n", resourceItemClass)
                 }
             }
             add(")\n")
