@@ -15,5 +15,9 @@ var MavenPublication.mppArtifactId: String
     get() = throw UnsupportedOperationException()
     set(value) {
         val target = this.name
-        artifactId = if ("kotlinMultiplatform" in target) value else "$value-$target"
+        artifactId = when (target) {
+            "kotlinMultiplatform" -> value
+            "androidRelease" -> "$value-android"
+            else -> "$value-$target"
+        }
     }
