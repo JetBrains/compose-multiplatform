@@ -6,6 +6,15 @@ import org.jetbrains.compose.resources.ResourceItem
 import org.jetbrains.compose.resources.StringResource
 
 internal object Res {
+    public object fonts {
+        public val emptyfont: FontResource = FontResource(
+            "FONT:emptyfont",
+            setOf(
+                ResourceItem(setOf(), "composeRes/fonts/emptyFont.otf"),
+            )
+        )
+    }
+
     public object images {
         public val vector: ImageResource = ImageResource(
             "IMAGE:vector",
@@ -47,14 +56,6 @@ internal object Res {
             )
         )
 
-        public val str_template: StringResource = StringResource(
-            "STRING:str_template",
-            "str_template",
-            setOf(
-                ResourceItem(setOf(), "composeRes/values/strings.xml"),
-            )
-        )
-
         public val str_arr: StringResource = StringResource(
             "STRING:str_arr",
             "str_arr",
@@ -62,13 +63,12 @@ internal object Res {
                 ResourceItem(setOf(), "composeRes/values/strings.xml"),
             )
         )
-    }
 
-    public object fonts {
-        public val emptyfont: FontResource = FontResource(
-            "FONT:emptyfont",
+        public val str_template: StringResource = StringResource(
+            "STRING:str_template",
+            "str_template",
             setOf(
-                ResourceItem(setOf(), "composeRes/fonts/emptyFont.otf"),
+                ResourceItem(setOf(), "composeRes/values/strings.xml"),
             )
         )
     }

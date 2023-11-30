@@ -48,16 +48,18 @@ internal fun getResFileSpec(
         addModifiers(KModifier.INTERNAL)
         val types = resources.map { (type, idToResources) ->
             getResourceTypeObject(type, idToResources)
-        }
+        }.sortedBy { it.name }
         addTypes(types)
     }.build())
 }.build()
 
 private fun getResourceTypeObject(type: ResourceType, nameToResources: Map<String, List<ResourceItem>>) =
     TypeSpec.objectBuilder(type.typeName).apply {
-        nameToResources.forEach { (name, items) ->
-            addResourceProperty(name, items)
-        }
+        nameToResources.entries
+            .sortedBy { it.key }
+            .forEach { (name, items) ->
+                addResourceProperty(name, items.sortedBy { it.name })
+            }
     }.build()
 
 private fun TypeSpec.Builder.addResourceProperty(name: String, items: List<ResourceItem>) {
