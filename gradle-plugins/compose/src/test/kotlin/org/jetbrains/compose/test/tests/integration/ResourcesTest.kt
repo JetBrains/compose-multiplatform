@@ -5,6 +5,7 @@ import org.jetbrains.compose.test.utils.assertEqualTextFiles
 import org.jetbrains.compose.test.utils.assertNotEqualTextFiles
 import org.jetbrains.compose.test.utils.checks
 import org.junit.jupiter.api.Test
+import kotlin.io.path.Path
 
 class ResourcesTest : GradlePluginTestBase() {
     @Test
@@ -16,7 +17,6 @@ class ResourcesTest : GradlePluginTestBase() {
                 file("expected/Res.kt")
             )
             check.logContains("""
-                e: Error: composeRes/ignored/ignored_3.txt
                 java.lang.IllegalStateException: Unknown resource type: ignored
             """.trimIndent())
         }
