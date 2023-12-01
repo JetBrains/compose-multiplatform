@@ -1,4 +1,5 @@
 import org.jetbrains.compose.ExperimentalComposeLibrary
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -37,6 +38,7 @@ kotlin {
     js(IR) {
         browser()
     }
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         browser()
     }
@@ -183,3 +185,9 @@ project.tasks.configureEach {
         enabled = false
     }
 }
+
+project.tasks.findByName("publishJsPublicationToComposeRepoRepository")
+    ?.dependsOn("publishWasmJsPublicationToComposeRepoRepository")
+
+project.tasks.findByName("publishJsPublicationToMavenLocal")
+    ?.dependsOn("publishWasmJsPublicationToMavenLocal")
