@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.experimental.uikit.internal.resources
+package org.jetbrains.compose.resources.ios
 
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty

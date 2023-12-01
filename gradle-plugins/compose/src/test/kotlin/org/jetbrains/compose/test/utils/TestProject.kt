@@ -15,6 +15,7 @@ import java.util.Properties
 data class TestEnvironment(
     val workingDir: File,
     val kotlinVersion: String = TestKotlinVersions.Default,
+    val agpVersion: String = "7.3.1",
     val composeGradlePluginVersion: String = TestProperties.composeGradlePluginVersion,
     val mokoResourcesPluginVersion: String = "0.23.0",
     val composeCompilerPlugin: String? = null,
@@ -26,6 +27,7 @@ data class TestEnvironment(
     private val placeholders = linkedMapOf(
         "COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER" to composeGradlePluginVersion,
         "KOTLIN_VERSION_PLACEHOLDER" to kotlinVersion,
+        "AGP_VERSION_PLACEHOLDER" to agpVersion,
         "COMPOSE_COMPILER_PLUGIN_PLACEHOLDER" to composeCompilerPlugin,
         "COMPOSE_COMPILER_PLUGIN_ARGS_PLACEHOLDER" to composeCompilerArgs,
         "MOKO_RESOURCES_PLUGIN_VERSION_PLACEHOLDER" to mokoResourcesPluginVersion,

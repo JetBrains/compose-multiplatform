@@ -3,15 +3,14 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.experimental.uikit.tasks
+package org.jetbrains.compose.resources.ios
 
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.*
-import org.jetbrains.compose.experimental.uikit.internal.resources.determineIosKonanTargetsFromEnv
-import org.jetbrains.compose.experimental.uikit.internal.resources.IosTargetResources
+import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
 import org.jetbrains.compose.internal.utils.clearDirs
 import java.io.File
 import kotlin.io.path.Path

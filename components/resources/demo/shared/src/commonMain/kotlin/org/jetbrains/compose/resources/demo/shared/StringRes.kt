@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import components.resources.demo.generated.resources.Res
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.getStringArray
 import org.jetbrains.compose.resources.readResourceBytes
@@ -32,7 +33,7 @@ fun StringRes(paddingValues: PaddingValues) {
     ) {
         Text(
             modifier = Modifier.padding(16.dp),
-            text = "strings.xml",
+            text = "composeRes/values/strings.xml",
             style = MaterialTheme.typography.titleLarge
         )
         OutlinedCard(
@@ -42,7 +43,7 @@ fun StringRes(paddingValues: PaddingValues) {
         ) {
             var bytes by remember { mutableStateOf(ByteArray(0)) }
             LaunchedEffect(Unit) {
-                bytes = readResourceBytes("strings.xml")
+                bytes = readResourceBytes("composeRes/values/strings.xml")
             }
             Text(
                 modifier = Modifier.padding(8.dp),
@@ -53,9 +54,9 @@ fun StringRes(paddingValues: PaddingValues) {
         }
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = getString("app_name"),
+            value = getString(Res.strings.app_name),
             onValueChange = {},
-            label = { Text("Text(getString(\"app_name\"))") },
+            label = { Text("Text(getString(Res.strings.app_name)") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -65,9 +66,9 @@ fun StringRes(paddingValues: PaddingValues) {
         )
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = getString("hello"),
+            value = getString(Res.strings.hello),
             onValueChange = {},
-            label = { Text("Text(getString(\"hello\"))") },
+            label = { Text("Text(getString(Res.strings.hello)") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -77,9 +78,9 @@ fun StringRes(paddingValues: PaddingValues) {
         )
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = getString("multi_line"),
+            value = getString(Res.strings.multi_line),
             onValueChange = {},
-            label = { Text("Text(getString(\"multi_line\"))") },
+            label = { Text("Text(getString(Res.strings.multi_line)") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -89,9 +90,9 @@ fun StringRes(paddingValues: PaddingValues) {
         )
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = getString("str_template", "User_name", 100),
+            value = getString(Res.strings.str_template, "User_name", 100),
             onValueChange = {},
-            label = { Text("Text(getString(\"str_template\", \"User_name\", 100))") },
+            label = { Text("Text(getString(Res.strings.str_template, \"User_name\", 100)") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -101,9 +102,9 @@ fun StringRes(paddingValues: PaddingValues) {
         )
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = getStringArray("str_arr").toString(),
+            value = getStringArray(Res.strings.str_arr).toString(),
             onValueChange = {},
-            label = { Text("Text(getStringArray(\"str_arr\").toString())") },
+            label = { Text("Text(getStringArray(Res.strings.str_arr).toString())") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,

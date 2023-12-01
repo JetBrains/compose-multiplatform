@@ -22,13 +22,14 @@ import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
 import org.jetbrains.compose.experimental.internal.configureExperimentalTargetsFlagsCheck
 import org.jetbrains.compose.experimental.internal.configureExperimental
 import org.jetbrains.compose.experimental.internal.configureNativeCompilerCaching
-import org.jetbrains.compose.experimental.uikit.internal.resources.configureSyncTask
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.mppExtOrNull
 import org.jetbrains.compose.internal.service.ConfigurationProblemReporterService
 import org.jetbrains.compose.internal.service.GradlePropertySnapshotService
 import org.jetbrains.compose.internal.utils.currentTarget
+import org.jetbrains.compose.resources.configureResourceGenerator
+import org.jetbrains.compose.resources.ios.configureSyncTask
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
@@ -63,6 +64,8 @@ abstract class ComposePlugin : Plugin<Project> {
 
         project.plugins.apply(ComposeCompilerKotlinSupportPlugin::class.java)
         project.configureNativeCompilerCaching()
+
+        project.configureResourceGenerator()
 
         project.afterEvaluate {
             configureDesktop(project, desktopExtension)

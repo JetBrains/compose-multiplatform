@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.experimental.uikit.internal.resources
+package org.jetbrains.compose.resources.ios
 
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
@@ -11,12 +11,11 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskAction
-import org.jetbrains.compose.experimental.uikit.internal.utils.IosGradleProperties
+import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.experimental.uikit.internal.utils.asIosNativeTargetOrNull
 import org.jetbrains.compose.experimental.uikit.internal.utils.cocoapodsExt
 import org.jetbrains.compose.experimental.uikit.internal.utils.withCocoapodsPlugin
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
-import org.jetbrains.compose.experimental.uikit.tasks.SyncComposeResourcesForIosTask
 import org.jetbrains.compose.internal.utils.joinLowerCamelCase
 import org.jetbrains.compose.internal.utils.new
 import org.jetbrains.compose.internal.utils.registerOrConfigure
@@ -36,8 +35,8 @@ internal fun Project.configureSyncTask(mppExt: KotlinMultiplatformExtension) {
         logger.info("Compose Multiplatform resource management for iOS is disabled: $reason")
     }
 
-    if (!IosGradleProperties.syncResources(providers).get()) {
-        reportSyncIsDisabled("'${IosGradleProperties.SYNC_RESOURCES_PROPERTY}' value is 'false'")
+    if (!ComposeProperties.syncResources(providers).get()) {
+        reportSyncIsDisabled("'${ComposeProperties.SYNC_RESOURCES_PROPERTY}' value is 'false'")
         return
     }
 
@@ -48,7 +47,7 @@ internal fun Project.configureSyncTask(mppExt: KotlinMultiplatformExtension) {
         }
     }
 
-    with (SyncIosResourcesContext(project, mppExt)) {
+    with(SyncIosResourcesContext(project, mppExt)) {
         configureSyncResourcesTasks()
         configureCocoapodsResourcesAttribute()
     }
@@ -98,7 +97,7 @@ private fun SyncIosResourcesContext.configureCocoapodsResourcesAttribute() {
                 error("""
                     |Kotlin.cocoapods.extraSpecAttributes["resources"] is not compatible with Compose Multiplatform's resources management for iOS.
                     |  * Recommended action: remove extraSpecAttributes["resources"] from '${project.buildFile}' and run '${project.path}:podInstall' once;
-                    |  * Alternative action: turn off Compose Multiplatform's resources management for iOS by adding '${IosGradleProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties;
+                    |  * Alternative action: turn off Compose Multiplatform's resources management for iOS by adding '${ComposeProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties;
                 """.trimMargin())
             }
             cocoapodsExt.framework {

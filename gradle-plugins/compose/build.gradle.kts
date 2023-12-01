@@ -1,9 +1,10 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import de.undercouch.gradle.tasks.download.Download
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.publish.plugin.portal)
+    alias(libs.plugins.publish.plugin)
     id("java-gradle-plugin")
     id("maven-publish")
     alias(libs.plugins.shadow.jar)
@@ -30,8 +31,9 @@ val buildConfig = tasks.register("buildConfig", GenerateBuildConfig::class.java)
     fieldsToGenerate.put("composeVersion", BuildProperties.composeVersion(project))
     fieldsToGenerate.put("composeGradlePluginVersion", BuildProperties.deployVersion(project))
 }
-tasks.named("compileKotlin") {
+tasks.named("compileKotlin", KotlinCompilationTask::class) {
     dependsOn(buildConfig)
+    compilerOptions.freeCompilerArgs.add("-opt-in=org.jetbrains.compose.ExperimentalComposeLibrary")
 }
 sourceSets.main.configure {
     java.srcDir(buildConfig.flatMap { it.generatedOutputDir })
@@ -58,11 +60,14 @@ dependencies {
     compileOnly(kotlin("gradle-plugin-api"))
     compileOnly(kotlin("gradle-plugin"))
     compileOnly(kotlin("native-utils"))
+    compileOnly(libs.plugin.android)
+    compileOnly(libs.plugin.android.api)
 
     testImplementation(gradleTestKit())
     testImplementation(kotlin("gradle-plugin-api"))
 
     embedded(libs.download.task)
+    embedded(libs.kotlin.poet)
     embedded(project(":preview-rpc"))
     embedded(project(":jdk-version-probe"))
 }
@@ -98,7 +103,7 @@ val gradleTestsPattern = "org.jetbrains.compose.test.tests.integration.*"
 tasks.registerVerificationTask<CheckJarPackagesTask>("checkJar") {
     dependsOn(jar)
     jarFile.set(jar.archiveFile)
-    allowedPackagePrefixes.addAll("org.jetbrains.compose", "kotlinx.serialization")
+    allowedPackagePrefixes.addAll("org.jetbrains.compose", "kotlinx.serialization", "com.squareup.kotlinpoet")
 }
 
 tasks.test {

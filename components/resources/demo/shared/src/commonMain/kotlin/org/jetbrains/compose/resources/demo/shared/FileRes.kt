@@ -28,7 +28,7 @@ fun FileRes(paddingValues: PaddingValues) {
     ) {
         Text(
             modifier = Modifier.padding(16.dp),
-            text = "File: 'images/droid_icon.xml'",
+            text = "File: 'composeRes/images/droid_icon.xml'",
             style = MaterialTheme.typography.titleLarge
         )
         OutlinedCard(
@@ -38,7 +38,7 @@ fun FileRes(paddingValues: PaddingValues) {
         ) {
             var bytes by remember { mutableStateOf(ByteArray(0)) }
             LaunchedEffect(Unit) {
-                bytes = readResourceBytes("images/droid_icon.xml")
+                bytes = readResourceBytes("composeRes/images/droid_icon.xml")
             }
             Text(
                 modifier = Modifier.padding(8.dp).height(200.dp).verticalScroll(rememberScrollState()),
@@ -54,7 +54,7 @@ fun FileRes(paddingValues: PaddingValues) {
                   mutableStateOf(ByteArray(0))
                 }
                 LaunchedEffect(Unit) {
-                  bytes = readBytes("images/droid_icon.xml")
+                  bytes = readBytes("composeRes/images/droid_icon.xml")
                 }
                 Text(bytes.decodeToString())
             """.trimIndent()

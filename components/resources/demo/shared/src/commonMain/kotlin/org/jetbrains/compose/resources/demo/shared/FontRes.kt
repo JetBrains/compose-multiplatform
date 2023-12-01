@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import components.resources.demo.generated.resources.Res
 import org.jetbrains.compose.resources.Font
 
 @Composable
@@ -28,7 +29,7 @@ fun FontRes(paddingValues: PaddingValues) {
             Text(
                 modifier = Modifier.padding(8.dp),
                 text = """
-                    val fontAwesome = FontFamily(Font("font_awesome.otf"))
+                    val fontAwesome = FontFamily(Font(Res.fonts.font_awesome))
                     val symbols = arrayOf(0xf1ba, 0xf238, 0xf21a, 0xf1bb, 0xf1b8, 0xf09b, 0xf269, 0xf1d0, 0xf15a, 0xf293, 0xf1c6)
                     Text(
                         modifier = Modifier.padding(16.dp),
@@ -42,7 +43,7 @@ fun FontRes(paddingValues: PaddingValues) {
             )
         }
 
-        val fontAwesome = FontFamily(Font("font_awesome.otf"))
+        val fontAwesome = FontFamily(Font(Res.fonts.font_awesome))
         val symbols = arrayOf(0xf1ba, 0xf238, 0xf21a, 0xf1bb, 0xf1b8, 0xf09b, 0xf269, 0xf1d0, 0xf15a, 0xf293, 0xf1c6)
         Text(
             modifier = Modifier.padding(16.dp),
