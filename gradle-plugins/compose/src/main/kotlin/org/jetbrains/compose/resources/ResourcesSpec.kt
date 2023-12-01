@@ -58,7 +58,7 @@ private fun getResourceTypeObject(type: ResourceType, nameToResources: Map<Strin
         nameToResources.entries
             .sortedBy { it.key }
             .forEach { (name, items) ->
-                addResourceProperty(name, items.sortedBy { it.name })
+                addResourceProperty(name, items.sortedBy { it.path })
             }
     }.build()
 
@@ -77,7 +77,7 @@ private fun TypeSpec.Builder.addResourceProperty(name: String, items: List<Resou
             }
             add("setOf(\n").withIndent {
                 items.forEach { item ->
-                    val qualifiers = item.qualifiers.joinToString { "\"$it\"" }
+                    val qualifiers = item.qualifiers.sorted().joinToString { "\"$it\"" }
                     //file separator should be '/' on all platforms
                     add("%T(setOf($qualifiers), \"${item.path.invariantSeparatorsPathString}\"),\n", resourceItemClass)
                 }

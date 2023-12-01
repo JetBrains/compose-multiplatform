@@ -19,6 +19,9 @@ internal object Res {
         public val vector: ImageResource = ImageResource(
             "IMAGE:vector",
             setOf(
+                ResourceItem(setOf("q1", "q2"), "composeRes/images-q1-q2/vector.xml"),
+                ResourceItem(setOf("q1"), "composeRes/images-q1/vector.xml"),
+                ResourceItem(setOf("q2"), "composeRes/images-q2/vector.xml"),
                 ResourceItem(setOf(), "composeRes/images/vector.xml"),
             )
         )
