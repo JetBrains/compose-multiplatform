@@ -18,6 +18,17 @@ import androidx.compose.ui.text.font.FontWeight
 class FontResource(id: String, items: Set<ResourceItem>): Resource(id, items)
 
 /**
+ * Creates an [FontResource] object with the specified path.
+ *
+ * @param path The path to the font resource file.
+ * @return A new [FontResource] object.
+ */
+fun FontResource(path: String): FontResource = FontResource(
+    id = "FontResource:$path",
+    items = setOf(ResourceItem(emptySet(), path))
+)
+
+/**
  * Creates a font using the specified font resource, weight, and style.
  *
  * @param resource The font resource to be used.

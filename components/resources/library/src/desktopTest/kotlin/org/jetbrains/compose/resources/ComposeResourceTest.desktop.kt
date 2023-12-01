@@ -25,17 +25,17 @@ class ComposeResourceTest {
     @Test
     fun testCountRecompositions() = runComposeUiTest {
         runBlockingTest {
-            val imagePathFlow = MutableStateFlow("1.png")
+            val imagePathFlow = MutableStateFlow(ImageResource("1.png"))
             val recompositionsCounter = RecompositionsCounter()
             setContent {
-                val path by imagePathFlow.collectAsState()
-                val res = imageResource(path)
+                val res by imagePathFlow.collectAsState()
+                val imgRes = imageResource(res)
                 recompositionsCounter.content {
-                    Image(bitmap = res, contentDescription = null)
+                    Image(bitmap = imgRes, contentDescription = null)
                 }
             }
             awaitIdle()
-            imagePathFlow.emit("2.png")
+            imagePathFlow.emit(ImageResource("2.png"))
             awaitIdle()
             assertEquals(2, recompositionsCounter.count)
         }
@@ -45,17 +45,17 @@ class ComposeResourceTest {
     fun testImageResourceCache() = runComposeUiTest {
         runBlockingTest {
             val testResourceReader = TestResourceReader()
-            val imagePathFlow = MutableStateFlow("1.png")
+            val imagePathFlow = MutableStateFlow(ImageResource("1.png"))
             setContent {
                 CompositionLocalProvider(LocalResourceReader provides testResourceReader) {
-                    val path by imagePathFlow.collectAsState()
-                    Image(painterResource(path), null)
+                    val res by imagePathFlow.collectAsState()
+                    Image(painterResource(res), null)
                 }
             }
             awaitIdle()
-            imagePathFlow.emit("2.png")
+            imagePathFlow.emit(ImageResource("2.png"))
             awaitIdle()
-            imagePathFlow.emit("1.png")
+            imagePathFlow.emit(ImageResource("1.png"))
             awaitIdle()
 
             assertEquals(
@@ -69,18 +69,18 @@ class ComposeResourceTest {
     fun testStringResourceCache() = runComposeUiTest {
         runBlockingTest {
             val testResourceReader = TestResourceReader()
-            val stringIdFlow = MutableStateFlow("app_name")
+            val stringIdFlow = MutableStateFlow(TestStringResource("app_name"))
             setContent {
                 CompositionLocalProvider(LocalResourceReader provides testResourceReader) {
-                    val textId by stringIdFlow.collectAsState()
-                    Text(getString(textId))
-                    Text(getStringArray("str_arr").joinToString())
+                    val res by stringIdFlow.collectAsState()
+                    Text(getString(res))
+                    Text(getStringArray(TestStringResource("str_arr")).joinToString())
                 }
             }
             awaitIdle()
-            stringIdFlow.emit("hello")
+            stringIdFlow.emit(TestStringResource("hello"))
             awaitIdle()
-            stringIdFlow.emit("app_name")
+            stringIdFlow.emit(TestStringResource("app_name"))
             awaitIdle()
 
             assertEquals(
@@ -94,12 +94,12 @@ class ComposeResourceTest {
     fun testReadStringResource() = runComposeUiTest {
         runBlockingTest {
             setContent {
-                assertEquals("Compose Resources App", getString("app_name"))
+                assertEquals("Compose Resources App", getString(TestStringResource("app_name")))
                 assertEquals(
                     "Hello, test-name! You have 42 new messages.",
-                    getString("str_template", "test-name", 42)
+                    getString(TestStringResource("str_template"), "test-name", 42)
                 )
-                assertEquals(listOf("item 1", "item 2", "item 3"), getStringArray("str_arr"))
+                assertEquals(listOf("item 1", "item 2", "item 3"), getStringArray(TestStringResource("str_arr")))
             }
             awaitIdle()
         }

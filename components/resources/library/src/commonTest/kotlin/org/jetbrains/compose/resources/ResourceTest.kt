@@ -14,12 +14,12 @@ import kotlin.test.assertNotEquals
 class ResourceTest {
     @Test
     fun testResourceEquals() = runBlockingTest {
-        assertEquals(getPathById("a"), getPathById("a"))
+        assertEquals(ImageResource("a"), ImageResource("a"))
     }
 
     @Test
     fun testResourceNotEquals() = runBlockingTest {
-        assertNotEquals(getPathById("a"), getPathById("b"))
+        assertNotEquals(ImageResource("a"), ImageResource("b"))
     }
 
     @Test
@@ -28,7 +28,7 @@ class ResourceTest {
             readResourceBytes("missing.png")
         }
         val error = assertFailsWith<IllegalStateException> {
-            loadString("unknown_id")
+            loadString(TestStringResource("unknown_id"))
         }
         assertEquals("String ID=`unknown_id` is not found!", error.message)
     }
@@ -56,11 +56,11 @@ class ResourceTest {
 
     @Test
     fun testLoadStringResource() = runBlockingTest {
-        assertEquals("Compose Resources App", loadString("app_name"))
+        assertEquals("Compose Resources App", loadString(TestStringResource("app_name")))
         assertEquals(
             "Hello, test-name! You have 42 new messages.",
-            loadString("str_template", "test-name", 42)
+            loadString(TestStringResource("str_template"), "test-name", 42)
         )
-        assertEquals(listOf("item 1", "item 2", "item 3"), loadStringArray("str_arr"))
+        assertEquals(listOf("item 1", "item 2", "item 3"), loadStringArray(TestStringResource("str_arr")))
     }
 }

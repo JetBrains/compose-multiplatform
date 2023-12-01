@@ -30,6 +30,17 @@ import org.jetbrains.compose.resources.vector.xmldom.Element
 class ImageResource(id: String, items: Set<ResourceItem>) : Resource(id, items)
 
 /**
+ * Creates an [ImageResource] object with the specified path.
+ *
+ * @param path The path of the image resource.
+ * @return An [ImageResource] object.
+ */
+fun ImageResource(path: String): ImageResource = ImageResource(
+    id = "ImageResource:$path",
+    items = setOf(ResourceItem(emptySet(), path))
+)
+
+/**
  * Retrieves a [Painter] using the specified image resource.
  * Automatically select a type of the Painter depending on the file extension.
  *
