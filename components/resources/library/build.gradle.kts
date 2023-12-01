@@ -1,3 +1,4 @@
+import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -8,6 +9,23 @@ plugins {
 }
 
 val composeVersion = extra["compose.version"] as String
+val coroutinesVersion = extra["kotlinx.coroutines.version"] as String
+
+// TODO: remove this once coroutines are rebuilt with kotlin 1.9.21 and published
+configurations.all {
+    val isWasm = this.name.contains("wasm", true)
+    resolutionStrategy.eachDependency {
+        if (requested.module.group == "org.jetbrains.kotlinx" &&
+            requested.module.name.contains("kotlinx-coroutines", true)
+        ) {
+            if (!isWasm) useVersion("1.7.2")
+        }
+
+        if (requested.version == "0.22.0-wasm2") {
+            useVersion("0.23.1")
+        }
+    }
+}
 
 kotlin {
     jvm("desktop")
@@ -19,19 +37,22 @@ kotlin {
     js(IR) {
         browser()
     }
+    wasmJs {
+        browser()
+    }
     macosX64()
     macosArm64()
 
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
-                implementation("org.jetbrains.compose.foundation:foundation:$composeVersion")
+                implementation(compose.runtime)
+                implementation(compose.foundation)
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
                 implementation(kotlin("test"))
             }
         }
@@ -55,15 +76,17 @@ kotlin {
         val desktopTest by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation("org.jetbrains.compose.ui:ui-test-junit4:$composeVersion")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
+
+                @OptIn(ExperimentalComposeLibrary::class)
+                implementation(compose.uiTestJUnit4)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
             }
         }
         val androidMain by getting {
             dependsOn(jvmAndAndroidMain)
             dependsOn(commonButJSMain)
         }
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
 
             }
@@ -78,9 +101,17 @@ kotlin {
         iosSimulatorArm64Main.dependsOn(iosMain)
         val iosSimulatorArm64Test by getting
         iosSimulatorArm64Test.dependsOn(iosTest)
-        val jsMain by getting {
+
+        val jsAndWasmMain by creating {
             dependsOn(skikoMain)
         }
+        val jsMain by getting {
+            dependsOn(jsAndWasmMain)
+        }
+        val wasmJsMain by getting {
+            dependsOn(jsAndWasmMain)
+        }
+
         val macosMain by creating {
             dependsOn(skikoMain)
             dependsOn(commonButJSMain)
@@ -126,12 +157,19 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-manifest:1.3.1")
     androidTestImplementation("androidx.compose.ui:ui-test:1.3.1")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.3.1")
-    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
 }
 
 // TODO it seems that argument isn't applied to the common sourceSet. Figure out why
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+}
+
+project.tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
+    kotlinOptions {
+        freeCompilerArgs += "-opt-in=kotlinx.cinterop.ExperimentalForeignApi"
+        freeCompilerArgs += "-opt-in=kotlin.experimental.ExperimentalNativeApi"
+    }
 }
 
 configureMavenPublication(

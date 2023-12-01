@@ -4,6 +4,22 @@ plugins {
     id("org.jetbrains.compose")
 }
 
+// TODO: remove this once coroutines are rebuilt with kotlin 1.9.21 and published
+configurations.all {
+    val isWasm = this.name.contains("wasm", true)
+    resolutionStrategy.eachDependency {
+        if (requested.module.group == "org.jetbrains.kotlinx" &&
+            requested.module.name.contains("kotlinx-coroutines", true)
+        ) {
+            if (!isWasm) useVersion("1.7.2")
+        }
+
+        if (requested.version == "0.22.0-wasm2") {
+            useVersion("0.23.1")
+        }
+    }
+}
+
 version = "1.0-SNAPSHOT"
 
 kotlin {
@@ -20,6 +36,10 @@ kotlin {
         }
     }
     js(IR) {
+        browser()
+        binaries.executable()
+    }
+    wasmJs {
         browser()
         binaries.executable()
     }
