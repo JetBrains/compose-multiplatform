@@ -177,3 +177,9 @@ configureMavenPublication(
     artifactId = "components-resources",
     name = "Resources for Compose JB"
 )
+
+project.tasks.configureEach {
+    if (name == "compileJsAndWasmMainKotlinMetadata") {
+        enabled = false
+    }
+}
