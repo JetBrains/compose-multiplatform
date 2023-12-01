@@ -27,6 +27,7 @@ private val TargetType.gradlePropertyName get() = "org.jetbrains.compose.experim
 private val EXPERIMENTAL_TARGETS: Set<TargetType> = setOf(
     TargetType("macos", presets = listOf("macosX64", "macosArm64")),
     TargetType("jscanvas", presets = listOf("jsIr", "js")),
+    TargetType("wasm", presets = listOf("wasm", "wasmJs")),
 )
 
 private sealed interface CheckResult {
