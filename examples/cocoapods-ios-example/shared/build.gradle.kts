@@ -6,9 +6,6 @@ plugins {
 }
 
 kotlin {
-    @Suppress("OPT_IN_USAGE")
-    targetHierarchy.default()
-
     androidTarget()
     iosX64()
     iosArm64()
@@ -22,7 +19,6 @@ kotlin {
         podfile = project.file("../iosApp/Podfile")
         framework {
             baseName = "shared"
-            isStatic = true
         }
     }
 
