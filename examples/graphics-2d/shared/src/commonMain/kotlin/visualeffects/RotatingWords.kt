@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.ImageResource
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class)
@@ -46,7 +47,7 @@ fun Words() {
         )
     )
 
-    val logoImg = painterResource("compose-community-primary.xml")
+    val logoImg = painterResource(ImageResource("composeRes/images/compose_community_primary.xml"))
 
     val baseLogo = DpOffset(350.dp, 270.dp)
 

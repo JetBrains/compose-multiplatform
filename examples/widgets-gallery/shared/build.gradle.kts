@@ -32,7 +32,7 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.materialIconsExtended)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-                implementation(compose.components.resources)
+                implementation("org.jetbrains.compose.components:components-resources:1.6.0-dev1306")
             }
         }
         val androidMain by getting {

@@ -15,10 +15,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.demo.widgets.platform.Res
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.demo.widgets.ui.utils.SubtitleText
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.ImageResource
 
 @Composable
 fun Chips() {
@@ -33,9 +33,9 @@ fun Chips() {
             modifier = Modifier.padding(horizontal = 8.dp)
         )
         Spacer(modifier = Modifier.padding(8.dp))
-        CustomImageChip(text = "custom", imageId = Res.drawable.p2, selected = true)
+        CustomImageChip(text = "custom", imageId = ImageResource("composeRes/images/p2.jpeg"), selected = true)
         Spacer(modifier = Modifier.padding(8.dp))
-        CustomImageChip(text = "custom2", imageId = Res.drawable.p6, selected = false)
+        CustomImageChip(text = "custom2", imageId = ImageResource("composeRes/images/p6.jpeg"), selected = false)
     }
     SubtitleText(subtitle = "Buttons with circle clipping.")
     Column(modifier = Modifier.padding(8.dp)) {
@@ -62,7 +62,7 @@ fun Chips() {
 @Composable
 private fun CustomImageChip(
     text: String,
-    imageId: String,
+    imageId: ImageResource,
     selected: Boolean,
     modifier: Modifier = Modifier
 ) {

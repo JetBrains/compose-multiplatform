@@ -21,6 +21,7 @@ import org.jetbrains.compose.demo.widgets.theme.twitterColor
 import org.jetbrains.compose.demo.widgets.ui.utils.SubtitleText
 import org.jetbrains.compose.demo.widgets.ui.utils.TitleText
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.ImageResource
 
 @Composable
 fun AppBars() {
@@ -53,12 +54,12 @@ private fun TopAppBarsDemo() {
         elevation = 8.dp,
         navigationIcon = {
             IconButton(onClick = {}) {
-                Icon(painterResource(Res.drawable.ic_instagram), contentDescription = "Instagram")
+                Icon(painterResource(ImageResource("composeRes/images/ic_instagram.xml")), contentDescription = "Instagram")
             }
         },
         actions = {
             IconButton(onClick = {}) {
-                Icon(painterResource(Res.drawable.ic_send), contentDescription = "Send")
+                Icon(painterResource(ImageResource("composeRes/images/ic_send.xml")), contentDescription = "Send")
             }
         }
     )
@@ -68,7 +69,7 @@ private fun TopAppBarsDemo() {
     TopAppBar(
         title = {
             Icon(
-                painterResource(Res.drawable.ic_twitter),
+                painterResource(ImageResource("composeRes/images/ic_twitter.xml")),
                 contentDescription = "Twitter",
                 tint = twitterColor,
                 modifier = Modifier.fillMaxWidth()
@@ -79,7 +80,7 @@ private fun TopAppBarsDemo() {
         elevation = 8.dp,
         navigationIcon = {
             Image(
-                painterResource(Res.drawable.p6),
+                painterResource(ImageResource("composeRes/images/p6.jpeg")),
                 contentDescription = "",
                 modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
                     .requiredSize(32.dp).clip(CircleShape)
@@ -111,6 +112,7 @@ private fun BottomAppBarDemo() {
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun NavigationBarDemo() {
     Spacer(modifier = Modifier.height(16.dp))
@@ -121,19 +123,19 @@ private fun NavigationBarDemo() {
             icon = { Icon(Icons.Outlined.Home, contentDescription = "Home") },
             selected = navItemState.value == NavType.HOME,
             onClick = { navItemState.value = NavType.HOME },
-            label = { Text(text = Res.string.spotify_nav_home) },
+            label = { Text(text = Res.strings.spotify_nav_home) },
         )
         BottomNavigationItem(
             icon = { Icon(Icons.Outlined.Search, contentDescription = "Search") },
             selected = navItemState.value == NavType.SEARCH,
             onClick = { navItemState.value = NavType.SEARCH },
-            label = { Text(text = Res.string.spotify_nav_search) }
+            label = { Text(text = Res.strings.spotify_nav_search) }
         )
         BottomNavigationItem(
             icon = { Icon(Icons.Outlined.LibraryMusic, contentDescription = "LibraryMusic") },
             selected = navItemState.value == NavType.LIBRARY,
             onClick = { navItemState.value = NavType.LIBRARY },
-            label = { Text(text = Res.string.spotify_nav_library) }
+            label = { Text(text = Res.strings.spotify_nav_library) }
         )
     }
 
