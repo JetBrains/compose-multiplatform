@@ -73,7 +73,7 @@ abstract class GenerateResClassTask : DefaultTask() {
         return if (typeString == "values" && file.name.equals("strings.xml", true)) {
             val stringIds = getStringIds(file)
             stringIds.map { strId ->
-                ResourceItem(ResourceType.STRING, qualifiers, strId.lowercase(), path)
+                ResourceItem(ResourceType.STRING, qualifiers, strId.asUnderscoredIdentifier(), path)
             }
         } else {
             val type = try {
@@ -82,7 +82,7 @@ abstract class GenerateResClassTask : DefaultTask() {
                 logger.error("e: Error: $path", e)
                 return null
             }
-            listOf(ResourceItem(type, qualifiers, file.nameWithoutExtension.lowercase(), path))
+            listOf(ResourceItem(type, qualifiers, file.nameWithoutExtension.asUnderscoredIdentifier(), path))
         }
     }
 
@@ -96,3 +96,8 @@ abstract class GenerateResClassTask : DefaultTask() {
         return ids.toSet()
     }
 }
+
+internal fun String.asUnderscoredIdentifier(): String =
+    lowercase()
+        .replace('-', '_')
+        .let { if (it.first().isDigit()) "_$it" else it }

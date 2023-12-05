@@ -1,4 +1,4 @@
-package generated.resources
+package app.group.generated.resources
 
 import org.jetbrains.compose.resources.FontResource
 import org.jetbrains.compose.resources.ImageResource
@@ -16,6 +16,13 @@ internal object Res {
     }
 
     public object images {
+        public val _3_strange_name: ImageResource = ImageResource(
+            "IMAGE:_3_strange_name",
+            setOf(
+                ResourceItem(setOf(), "composeRes/images/3-strange-name.xml"),
+            )
+        )
+
         public val vector: ImageResource = ImageResource(
             "IMAGE:vector",
             setOf(

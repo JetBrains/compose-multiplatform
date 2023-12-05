@@ -20,7 +20,7 @@ internal fun Project.configureResourceGenerator() {
 
     val packageName = provider {
         buildString {
-            val group = project.group.toString()
+            val group = project.group.toString().asUnderscoredIdentifier()
             append(group)
             if (group.isNotEmpty()) append(".")
             append("generated.resources")

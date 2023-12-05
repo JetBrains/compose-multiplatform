@@ -13,7 +13,7 @@ class ResourcesTest : GradlePluginTestBase() {
         //check generated resource's accessors
         gradle("generateComposeResClass").checks {
             assertEqualTextFiles(
-                file("build/generated/compose/resourceGenerator/kotlin/generated/resources/Res.kt"),
+                file("build/generated/compose/resourceGenerator/kotlin/app/group/generated/resources/Res.kt"),
                 file("expected/Res.kt")
             )
             check.logContains("""

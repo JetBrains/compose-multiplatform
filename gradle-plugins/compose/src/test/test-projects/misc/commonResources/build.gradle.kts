@@ -4,6 +4,8 @@ plugins {
     id("org.jetbrains.compose")
 }
 
+group = "app.group"
+
 kotlin {
     androidTarget {
         compilations.all {
