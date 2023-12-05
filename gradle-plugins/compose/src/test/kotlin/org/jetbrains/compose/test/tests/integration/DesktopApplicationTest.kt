@@ -77,15 +77,15 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
     fun testSettingLatestCompiler() = testProject(
         TestProjects.customCompiler, defaultTestEnvironment.copy(
-            kotlinVersion = "1.7.20",
-            composeCompilerPlugin = "dependencies.compiler.forKotlin(\"1.7.20\")",
+            kotlinVersion = "1.8.20",
+            composeCompilerPlugin = "dependencies.compiler.forKotlin(\"1.8.20\")",
         )
     ).checkCustomComposeCompiler()
 
     @Test
     fun testSettingAutoCompiler() = testProject(
         TestProjects.customCompiler, defaultTestEnvironment.copy(
-            kotlinVersion = "1.7.10",
+            kotlinVersion = "1.8.10",
             composeCompilerPlugin = "dependencies.compiler.auto",
         )
     ).checkCustomComposeCompiler()
@@ -93,9 +93,9 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
     fun testKotlinCheckDisabled() = testProject(
         TestProjects.customCompilerArgs, defaultTestEnvironment.copy(
-            kotlinVersion = "1.7.21",
-            composeCompilerPlugin = "dependencies.compiler.forKotlin(\"1.7.20\")",
-            composeCompilerArgs = "\"suppressKotlinVersionCompatibilityCheck=1.7.21\""
+            kotlinVersion = "1.9.21",
+            composeCompilerPlugin = "dependencies.compiler.forKotlin(\"1.9.20\")",
+            composeCompilerArgs = "\"suppressKotlinVersionCompatibilityCheck=1.9.21\""
         )
     ).checkCustomComposeCompiler(checkKJS = true)
 

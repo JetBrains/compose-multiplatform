@@ -12,16 +12,16 @@ import org.junit.jupiter.api.Test
 
 class KotlinCompatibilityTest : GradlePluginTestBase() {
     @Test
-    fun testKotlinMpp_1_7_10() = testMpp("1.7.10")
+    fun testKotlinMpp_1_9_10() = testMpp("1.9.10")
 
     @Test
-    fun testKotlinJsMpp_1_7_10() = testJsMpp("1.7.10")
+    fun testKotlinJsMpp_1_9_10() = testJsMpp("1.9.10")
 
     @Test
-    fun testKotlinMpp_1_7_20() = testMpp("1.7.20")
+    fun testKotlinMpp_1_9_20() = testMpp("1.9.20")
 
     @Test
-    fun testKotlinJsMpp_1_7_20() = testJsMpp("1.7.20")
+    fun testKotlinJsMpp_1_9_20() = testJsMpp("1.9.20")
 
     private fun testMpp(kotlinVersion: String) = with(
         testProject(
