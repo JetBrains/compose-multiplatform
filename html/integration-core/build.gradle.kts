@@ -39,6 +39,7 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(project(":html-core"))
                 implementation(kotlin("stdlib-common"))
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
 

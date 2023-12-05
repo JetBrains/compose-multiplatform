@@ -25,6 +25,7 @@ kotlin {
                 implementation(kotlin("stdlib-js"))
                 implementation(compose.runtime)
                 implementation(project(":html-core"))
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
 
