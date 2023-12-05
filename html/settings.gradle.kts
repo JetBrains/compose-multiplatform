@@ -48,6 +48,21 @@ pluginManagement {
     }
 }
 
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        }
+    }
+    versionCatalogs {
+        create("libs") {
+            library("kotlinx-coroutines-core", "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC")
+        }
+    }
+}
+
 fun module(name: String, path: String) {
     include(name)
     val projectDir = rootDir.resolve(path).normalize().absoluteFile
