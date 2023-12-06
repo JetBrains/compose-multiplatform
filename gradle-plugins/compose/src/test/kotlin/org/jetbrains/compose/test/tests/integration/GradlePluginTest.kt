@@ -123,7 +123,7 @@ class GradlePluginTest : GradlePluginTestBase() {
         )
 
         val task = ":subproject:linkDebugFrameworkIosX64"
-        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_8_20)) {
+        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_9_0)) {
             gradle(task, "--info").checks {
                 check.taskSuccessful(task)
                 check.logDoesntContain("-Xauto-cache-from=")
@@ -131,7 +131,7 @@ class GradlePluginTest : GradlePluginTestBase() {
         }
         testWorkDir.deleteRecursively()
         testWorkDir.mkdirs()
-        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_9_0) ) {
+        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_9_10) ) {
             gradle(task, "--info").checks {
                 check.taskSuccessful(task)
                 check.logDoesntContain("-Xauto-cache-from=")
@@ -205,7 +205,7 @@ class GradlePluginTest : GradlePluginTestBase() {
             }
         }
 
-        testKotlinVersion(TestKotlinVersions.v1_9_20_Beta)
+        testKotlinVersion(TestKotlinVersions.v1_9_21)
     }
 
     @Test
