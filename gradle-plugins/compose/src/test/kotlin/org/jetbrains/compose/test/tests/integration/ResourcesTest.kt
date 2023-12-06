@@ -28,7 +28,7 @@ class ResourcesTest : GradlePluginTestBase() {
         //check resource's accessors were regenerated
         gradle("generateComposeResClass").checks {
             assertNotEqualTextFiles(
-                file("build/generated/compose/resourceGenerator/kotlin/generated/resources/Res.kt"),
+                file("build/generated/compose/resourceGenerator/kotlin/app/group/generated/resources/Res.kt"),
                 file("expected/Res.kt")
             )
         }
