@@ -17,7 +17,7 @@ class ResourcesTest : GradlePluginTestBase() {
                 file("expected/Res.kt")
             )
             check.logContains("""
-                java.lang.IllegalStateException: Unknown resource type: ignored
+                Unknown resource type: ignored
             """.trimIndent())
         }
 

@@ -79,7 +79,7 @@ abstract class GenerateResClassTask : DefaultTask() {
             val type = try {
                 ResourceType.fromString(typeString)
             } catch (e: Exception) {
-                logger.error("e: Error: $path", e)
+                logger.warn("w: Skip file: $path\n${e.message}")
                 return null
             }
             listOf(ResourceItem(type, qualifiers, file.nameWithoutExtension.asUnderscoredIdentifier(), path))
@@ -100,4 +100,4 @@ abstract class GenerateResClassTask : DefaultTask() {
 internal fun String.asUnderscoredIdentifier(): String =
     lowercase()
         .replace('-', '_')
-        .let { if (it.first().isDigit()) "_$it" else it }
+        .let { if (it.isNotEmpty() && it.first().isDigit()) "_$it" else it }
