@@ -116,7 +116,6 @@ class GradlePluginTest : GradlePluginTestBase() {
     }
 
     @Test
-    @Ignore //TODO: o.karpovich - investigate why this test fails, when I have my macbook fixed
     fun nativeCacheKind() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
         fun nativeCacheKindProject(kotlinVersion: String) = testProject(
