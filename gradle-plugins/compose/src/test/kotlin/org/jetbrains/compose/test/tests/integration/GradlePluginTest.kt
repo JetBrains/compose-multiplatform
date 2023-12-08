@@ -124,7 +124,7 @@ class GradlePluginTest : GradlePluginTestBase() {
         )
 
         val task = ":subproject:linkDebugFrameworkIosX64"
-        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_9_0)) {
+        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_8_20)) {
             gradle(task, "--info").checks {
                 check.taskSuccessful(task)
                 check.logDoesntContain("-Xauto-cache-from=")
