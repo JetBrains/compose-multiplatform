@@ -5,13 +5,14 @@
 
 package org.jetbrains.compose.test.tests.integration
 
-import org.gradle.internal.impldep.org.junit.Ignore
 import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewLogger
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.RemoteConnection
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.receiveConfigFromGradle
 import org.jetbrains.compose.experimental.internal.kotlinVersionNumbers
+import org.jetbrains.compose.internal.utils.Arch
 import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentArch
 import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.test.utils.*
 import org.junit.jupiter.api.Assumptions
@@ -123,8 +124,12 @@ class GradlePluginTest : GradlePluginTestBase() {
             defaultTestEnvironment.copy(kotlinVersion = kotlinVersion, useGradleConfigurationCache = false)
         )
 
-        val task = ":subproject:linkDebugFrameworkIosX64"
-        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_8_20)) {
+        val task = if (currentArch == Arch.X64) {
+            ":subproject:linkDebugFrameworkIosX64"
+        } else {
+            ":subproject:linkDebugFrameworkIosArm64"
+        }
+        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_9_0)) {
             gradle(task, "--info").checks {
                 check.taskSuccessful(task)
                 check.logDoesntContain("-Xauto-cache-from=")
@@ -132,7 +137,7 @@ class GradlePluginTest : GradlePluginTestBase() {
         }
         testWorkDir.deleteRecursively()
         testWorkDir.mkdirs()
-        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_9_0) ) {
+        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_9_10) ) {
             gradle(task, "--info").checks {
                 check.taskSuccessful(task)
                 check.logDoesntContain("-Xauto-cache-from=")
