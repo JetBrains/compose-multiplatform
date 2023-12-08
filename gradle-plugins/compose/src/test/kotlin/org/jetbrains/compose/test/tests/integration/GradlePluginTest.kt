@@ -132,7 +132,7 @@ class GradlePluginTest : GradlePluginTestBase() {
         }
         testWorkDir.deleteRecursively()
         testWorkDir.mkdirs()
-        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_9_10) ) {
+        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_9_0) ) {
             gradle(task, "--info").checks {
                 check.taskSuccessful(task)
                 check.logDoesntContain("-Xauto-cache-from=")
