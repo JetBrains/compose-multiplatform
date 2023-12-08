@@ -1,9 +1,6 @@
 package org.jetbrains.compose.resources
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -11,10 +8,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.jetbrains.compose.resources.vector.toImageVector
@@ -50,7 +44,8 @@ fun ImageResource(path: String): ImageResource = ImageResource(
 @ExperimentalResourceApi
 @Composable
 fun painterResource(resource: ImageResource): Painter {
-    val filePath = remember(resource) { resource.getPathByEnvironment() }
+    val environment = rememberEnvironment()
+    val filePath = remember(resource, environment) { resource.getPathByEnvironment(environment) }
     val isXml = filePath.endsWith(".xml", true)
     if (isXml) {
         return rememberVectorPainter(vectorResource(resource))
@@ -71,8 +66,8 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 @Composable
 fun imageResource(resource: ImageResource): ImageBitmap {
     val resourceReader = LocalResourceReader.current
-    val imageBitmap by rememberState(resource, { emptyImageBitmap }) {
-        val path = resource.getPathByEnvironment()
+    val imageBitmap by rememberResourceState(resource, { emptyImageBitmap }) { env ->
+        val path = resource.getPathByEnvironment(env)
         val cached = loadImage(path, resourceReader) {
             ImageCache.Bitmap(it.toImageBitmap())
         } as ImageCache.Bitmap
@@ -96,8 +91,8 @@ private val emptyImageVector: ImageVector by lazy {
 fun vectorResource(resource: ImageResource): ImageVector {
     val resourceReader = LocalResourceReader.current
     val density = LocalDensity.current
-    val imageVector by rememberState(resource, { emptyImageVector }) {
-        val path = resource.getPathByEnvironment()
+    val imageVector by rememberResourceState(resource, { emptyImageVector }) { env ->
+        val path = resource.getPathByEnvironment(env)
         val cached = loadImage(path, resourceReader) {
             ImageCache.Vector(it.toXmlElement().toImageVector(density))
         } as ImageCache.Vector

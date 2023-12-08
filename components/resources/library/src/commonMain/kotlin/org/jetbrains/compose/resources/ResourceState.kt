@@ -9,8 +9,8 @@ import androidx.compose.runtime.State
  * On the JS platform it loads the state asynchronously and uses `getDefault` as an initial state value.
  */
 @Composable
-internal expect fun <T> rememberState(
+internal expect fun <T> rememberResourceState(
     key: Any,
     getDefault: () -> T,
-    block: suspend () -> T
+    block: suspend (ResourceEnvironment) -> T
 ): State<T>

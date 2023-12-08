@@ -1,8 +1,6 @@
 package org.jetbrains.compose.resources
 
-import org.jetbrains.compose.resources.vector.xmldom.Element
-import org.jetbrains.compose.resources.vector.xmldom.ElementImpl
-import org.jetbrains.compose.resources.vector.xmldom.MalformedXMLException
+import org.jetbrains.compose.resources.vector.xmldom.*
 import org.w3c.dom.parsing.DOMParser
 
 internal actual fun ByteArray.toXmlElement(): Element {

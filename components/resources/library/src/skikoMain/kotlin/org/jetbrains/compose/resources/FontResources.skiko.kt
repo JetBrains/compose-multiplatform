@@ -2,9 +2,7 @@ package org.jetbrains.compose.resources
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.platform.Font
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -35,8 +33,8 @@ private val defaultEmptyFont by lazy { Font("org.jetbrains.compose.emptyFont", B
 @Composable
 actual fun Font(resource: FontResource, weight: FontWeight, style: FontStyle): Font {
     val resourceReader = LocalResourceReader.current
-    val fontFile by rememberState(resource, { defaultEmptyFont }) {
-        val path = resource.getPathByEnvironment()
+    val fontFile by rememberResourceState(resource, { defaultEmptyFont }) { env ->
+        val path = resource.getPathByEnvironment(env)
         val fontBytes = resourceReader.read(path)
         Font(path, fontBytes, weight, style)
     }
