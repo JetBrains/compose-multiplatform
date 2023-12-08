@@ -172,7 +172,7 @@ subprojects {
         configurations.all {
             resolutionStrategy.dependencySubstitution {
                 substitute(module("org.jetbrains.compose.html:html-core")).apply {
-                    with(project(":html-core"))
+                    using(project(":html-core"))
                 }
             }
         }

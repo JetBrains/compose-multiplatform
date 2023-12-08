@@ -22,6 +22,7 @@ kotlin {
                 implementation(kotlin("stdlib-common"))
                 implementation(compose.runtime)
                 implementation(project(":lib"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC")
             }
         }
     }

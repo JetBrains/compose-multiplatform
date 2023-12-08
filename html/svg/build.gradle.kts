@@ -41,6 +41,7 @@ kotlin {
             dependencies {
                 implementation(project(":html-test-utils"))
                 implementation(kotlin("test-js"))
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
     }
