@@ -1,9 +1,7 @@
 package org.jetbrains.compose.resources
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.promise
+import kotlinx.coroutines.*
 
-@OptIn(DelicateCoroutinesApi::class)
-actual fun runBlockingTest(block: suspend CoroutineScope.() -> Unit): dynamic = GlobalScope.promise(block = block)
+actual typealias TestReturnType = Any
+actual fun runBlockingTest(block: suspend CoroutineScope.() -> Unit): TestReturnType =
+    TODO("Implement if necessary. We focus on k/wasm target for now")
