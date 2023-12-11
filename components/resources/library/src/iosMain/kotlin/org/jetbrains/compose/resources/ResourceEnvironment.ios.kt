@@ -10,7 +10,7 @@ internal actual fun getResourceEnvironment(): ResourceEnvironment {
     val mainScreen = UIScreen.mainScreen
     val isDarkTheme = mainScreen.traitCollection().userInterfaceStyle == UIUserInterfaceStyle.UIUserInterfaceStyleDark
 
-    //there is no an API to get a screen size in MM and calculate a real DPI
+    //there is no an API to get a physical screen size and calculate a real DPI
     val density = mainScreen.scale.toFloat()
     return ResourceEnvironment(
         language = LanguageQualifier(locale.languageCode),

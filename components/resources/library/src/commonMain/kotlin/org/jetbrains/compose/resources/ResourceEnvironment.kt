@@ -32,8 +32,10 @@ internal fun rememberEnvironment(): ResourceEnvironment {
     }
 }
 
-//expensive operation - do not use during recomposition
-//it is required for a non-composable access to string resources
+/**
+ * Provides the resource environment for non-composable access to string resources.
+ * It is an expensive operation! Don't use it in composable functions with no cache!
+ */
 internal expect fun getResourceEnvironment(): ResourceEnvironment
 
 internal fun Resource.getPathByEnvironment(environment: ResourceEnvironment): String {

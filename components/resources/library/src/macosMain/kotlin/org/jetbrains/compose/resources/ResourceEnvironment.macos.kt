@@ -23,8 +23,6 @@ internal actual fun getResourceEnvironment(): ResourceEnvironment {
         ((displaySizePX / displaySizeMM) * 25.4f).toInt()
     } ?: 0
 
-    println("DPI = $dpi")
-
     return ResourceEnvironment(
         language = LanguageQualifier(locale.languageCode),
         region = RegionQualifier(locale.regionCode.orEmpty()),
