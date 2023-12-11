@@ -31,15 +31,20 @@ internal fun Collection<KotlinJsIrTarget>.configureExperimentalWebApplication(
     }
     forEach {
         val mainCompilation = it.compilations.getByName("main")
+        val testCompilation = it.compilations.getByName("test")
         val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-wasm/${it.targetName}")
         val taskName = "unpackSkikoWasmRuntime${it.targetName.uppercaseFirstChar()}"
         mainCompilation.defaultSourceSet.resources.srcDir(unpackedRuntimeDir)
+        testCompilation.defaultSourceSet.resources.srcDir(unpackedRuntimeDir)
 
         val unpackRuntime = project.registerTask<ExperimentalUnpackSkikoWasmRuntimeTask>(taskName) {
             skikoRuntimeFiles = skikoJsWasmRuntimeConfiguration
             outputDir.set(unpackedRuntimeDir)
         }
         project.tasks.named(mainCompilation.processResourcesTaskName).configure { processResourcesTask ->
+            processResourcesTask.dependsOn(unpackRuntime)
+        }
+        project.tasks.named(testCompilation.processResourcesTaskName).configure { processResourcesTask ->
             processResourcesTask.dependsOn(unpackRuntime)
         }
     }
