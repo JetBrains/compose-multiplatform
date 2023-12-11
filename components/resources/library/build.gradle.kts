@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
     kotlin("multiplatform")
@@ -31,6 +32,15 @@ kotlin {
             })
         }
     }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser {
+            testTask(Action {
+                // TODO: fix the test setup and enable
+                enabled = false
+            })
+        }
+    }
     macosX64()
     macosArm64()
 
@@ -50,18 +60,18 @@ kotlin {
         //  ┌───┴───┬──│────────┐     │
         //  │      native       │ jvmAndAndroid
         //  │    ┌───┴───┐      │   ┌───┴───┐
-        // js   ios    macos   desktop    android
+        // web   ios    macos   desktop    android
 
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+                implementation(libs.kotlinx.coroutines.test)
                 implementation(kotlin("test"))
             }
         }
@@ -96,7 +106,7 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 implementation("org.jetbrains.compose.ui:ui-test-junit4:$composeVersion")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
+                implementation(libs.kotlinx.coroutines.swing)
             }
         }
         val androidMain by getting {
@@ -122,10 +132,19 @@ kotlin {
             dependsOn(skikoTest)
             dependsOn(blockingTest)
         }
-        val jsMain by getting {
+        val webMain by creating {
             dependsOn(skikoMain)
         }
+        val jsMain by getting {
+            dependsOn(webMain)
+        }
+        val wasmJsMain by getting {
+            dependsOn(webMain)
+        }
         val jsTest by getting {
+            dependsOn(skikoTest)
+        }
+        val wasmJsTest by getting {
             dependsOn(skikoTest)
         }
     }
@@ -169,3 +188,10 @@ configureMavenPublication(
     artifactId = "components-resources",
     name = "Resources for Compose JB"
 )
+
+afterEvaluate {
+    // TODO(o.k.): remove this after we refactor jsAndWasmMain source set in skiko to get rid of broken "common" js-interop
+    tasks.configureEach {
+        if (name == "compileWebMainKotlinMetadata") enabled = false
+    }
+}
