@@ -73,8 +73,8 @@ class ComposeResourceTest {
             setContent {
                 CompositionLocalProvider(LocalResourceReader provides testResourceReader) {
                     val res by stringIdFlow.collectAsState()
-                    Text(getString(res))
-                    Text(getStringArray(TestStringResource("str_arr")).joinToString())
+                    Text(stringResource(res))
+                    Text(stringArrayResource(TestStringResource("str_arr")).joinToString())
                 }
             }
             awaitIdle()
@@ -94,12 +94,12 @@ class ComposeResourceTest {
     fun testReadStringResource() = runComposeUiTest {
         runBlockingTest {
             setContent {
-                assertEquals("Compose Resources App", getString(TestStringResource("app_name")))
+                assertEquals("Compose Resources App", stringResource(TestStringResource("app_name")))
                 assertEquals(
                     "Hello, test-name! You have 42 new messages.",
-                    getString(TestStringResource("str_template"), "test-name", 42)
+                    stringResource(TestStringResource("str_template"), "test-name", 42)
                 )
-                assertEquals(listOf("item 1", "item 2", "item 3"), getStringArray(TestStringResource("str_arr")))
+                assertEquals(listOf("item 1", "item 2", "item 3"), stringArrayResource(TestStringResource("str_arr")))
             }
             awaitIdle()
         }

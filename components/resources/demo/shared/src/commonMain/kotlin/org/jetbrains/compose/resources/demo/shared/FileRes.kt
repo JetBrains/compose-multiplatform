@@ -54,7 +54,7 @@ fun FileRes(paddingValues: PaddingValues) {
                   mutableStateOf(ByteArray(0))
                 }
                 LaunchedEffect(Unit) {
-                  bytes = readBytes("composeRes/images/droid_icon.xml")
+                  bytes = readResourceBytes("composeRes/images/droid_icon.xml")
                 }
                 Text(bytes.decodeToString())
             """.trimIndent()

@@ -30,7 +30,7 @@ class ResourceTest {
             readResourceBytes("missing.png")
         }
         val error = assertFailsWith<IllegalStateException> {
-            loadString(TestStringResource("unknown_id"))
+            getString(TestStringResource("unknown_id"))
         }
         assertEquals("String ID=`unknown_id` is not found!", error.message)
     }
@@ -58,12 +58,12 @@ class ResourceTest {
 
     @Test
     fun testLoadStringResource() = runBlockingTest {
-        assertEquals("Compose Resources App", loadString(TestStringResource("app_name")))
+        assertEquals("Compose Resources App", getString(TestStringResource("app_name")))
         assertEquals(
             "Hello, test-name! You have 42 new messages.",
-            loadString(TestStringResource("str_template"), "test-name", 42)
+            getString(TestStringResource("str_template"), "test-name", 42)
         )
-        assertEquals(listOf("item 1", "item 2", "item 3"), loadStringArray(TestStringResource("str_arr")))
+        assertEquals(listOf("item 1", "item 2", "item 3"), getStringArray(TestStringResource("str_arr")))
     }
     @Test
     fun testGetPathByEnvironment() {

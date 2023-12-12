@@ -71,7 +71,7 @@ private suspend fun parseStringXml(path: String, resourceReader: ResourceReader)
  */
 @ExperimentalResourceApi
 @Composable
-fun getString(resource: StringResource): String {
+fun stringResource(resource: StringResource): String {
     val resourceReader = LocalResourceReader.current
     val str by rememberResourceState(resource, { "" }) { env ->
         loadString(resource, resourceReader, env)
@@ -88,7 +88,7 @@ fun getString(resource: StringResource): String {
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
 @ExperimentalResourceApi
-suspend fun loadString(resource: StringResource): String =
+suspend fun getString(resource: StringResource): String =
     loadString(resource, DefaultResourceReader, getResourceEnvironment())
 
 private suspend fun loadString(
@@ -114,7 +114,7 @@ private suspend fun loadString(
  */
 @ExperimentalResourceApi
 @Composable
-fun getString(resource: StringResource, vararg formatArgs: Any): String {
+fun stringResource(resource: StringResource, vararg formatArgs: Any): String {
     val resourceReader = LocalResourceReader.current
     val args = formatArgs.map { it.toString() }
     val str by rememberResourceState(resource, { "" }) { env ->
@@ -133,7 +133,7 @@ fun getString(resource: StringResource, vararg formatArgs: Any): String {
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
 @ExperimentalResourceApi
-suspend fun loadString(resource: StringResource, vararg formatArgs: Any): String = loadString(
+suspend fun getString(resource: StringResource, vararg formatArgs: Any): String = loadString(
     resource,
     formatArgs.map { it.toString() },
     DefaultResourceReader,
@@ -162,7 +162,7 @@ private suspend fun loadString(
  */
 @ExperimentalResourceApi
 @Composable
-fun getStringArray(resource: StringResource): List<String> {
+fun stringArrayResource(resource: StringResource): List<String> {
     val resourceReader = LocalResourceReader.current
     val array by rememberResourceState(resource, { emptyList() }) { env ->
         loadStringArray(resource, resourceReader, env)
@@ -179,7 +179,7 @@ fun getStringArray(resource: StringResource): List<String> {
  * @throws IllegalStateException if the string array with the given ID is not found.
  */
 @ExperimentalResourceApi
-suspend fun loadStringArray(resource: StringResource): List<String> =
+suspend fun getStringArray(resource: StringResource): List<String> =
     loadStringArray(resource, DefaultResourceReader, getResourceEnvironment())
 
 private suspend fun loadStringArray(

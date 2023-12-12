@@ -22,8 +22,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import components.resources.demo.generated.resources.Res
-import org.jetbrains.compose.resources.getString
-import org.jetbrains.compose.resources.getStringArray
+import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.stringArrayResource
 import org.jetbrains.compose.resources.readResourceBytes
 
 @Composable
@@ -54,7 +54,7 @@ fun StringRes(paddingValues: PaddingValues) {
         }
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = getString(Res.strings.app_name),
+            value = stringResource(Res.strings.app_name),
             onValueChange = {},
             label = { Text("Text(getString(Res.strings.app_name)") },
             enabled = false,
@@ -66,7 +66,7 @@ fun StringRes(paddingValues: PaddingValues) {
         )
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = getString(Res.strings.hello),
+            value = stringResource(Res.strings.hello),
             onValueChange = {},
             label = { Text("Text(getString(Res.strings.hello)") },
             enabled = false,
@@ -78,7 +78,7 @@ fun StringRes(paddingValues: PaddingValues) {
         )
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = getString(Res.strings.multi_line),
+            value = stringResource(Res.strings.multi_line),
             onValueChange = {},
             label = { Text("Text(getString(Res.strings.multi_line)") },
             enabled = false,
@@ -90,7 +90,7 @@ fun StringRes(paddingValues: PaddingValues) {
         )
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = getString(Res.strings.str_template, "User_name", 100),
+            value = stringResource(Res.strings.str_template, "User_name", 100),
             onValueChange = {},
             label = { Text("Text(getString(Res.strings.str_template, \"User_name\", 100)") },
             enabled = false,
@@ -102,7 +102,7 @@ fun StringRes(paddingValues: PaddingValues) {
         )
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = getStringArray(Res.strings.str_arr).toString(),
+            value = stringArrayResource(Res.strings.str_arr).toString(),
             onValueChange = {},
             label = { Text("Text(getStringArray(Res.strings.str_arr).toString())") },
             enabled = false,
