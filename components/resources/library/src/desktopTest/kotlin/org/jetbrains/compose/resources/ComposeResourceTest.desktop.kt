@@ -24,7 +24,7 @@ class ComposeResourceTest {
     @Test
     fun testCountRecompositions() = runComposeUiTest {
         runBlockingTest {
-            val imagePathFlow = MutableStateFlow(ImageResource("1.png"))
+            val imagePathFlow = MutableStateFlow(DrawableResource("1.png"))
             val recompositionsCounter = RecompositionsCounter()
             setContent {
                 val res by imagePathFlow.collectAsState()
@@ -34,7 +34,7 @@ class ComposeResourceTest {
                 }
             }
             awaitIdle()
-            imagePathFlow.emit(ImageResource("2.png"))
+            imagePathFlow.emit(DrawableResource("2.png"))
             awaitIdle()
             assertEquals(2, recompositionsCounter.count)
         }
@@ -44,7 +44,7 @@ class ComposeResourceTest {
     fun testImageResourceCache() = runComposeUiTest {
         runBlockingTest {
             val testResourceReader = TestResourceReader()
-            val imagePathFlow = MutableStateFlow(ImageResource("1.png"))
+            val imagePathFlow = MutableStateFlow(DrawableResource("1.png"))
             setContent {
                 CompositionLocalProvider(LocalResourceReader provides testResourceReader) {
                     val res by imagePathFlow.collectAsState()
@@ -52,9 +52,9 @@ class ComposeResourceTest {
                 }
             }
             awaitIdle()
-            imagePathFlow.emit(ImageResource("2.png"))
+            imagePathFlow.emit(DrawableResource("2.png"))
             awaitIdle()
-            imagePathFlow.emit(ImageResource("1.png"))
+            imagePathFlow.emit(DrawableResource("1.png"))
             awaitIdle()
 
             assertEquals(

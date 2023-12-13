@@ -43,7 +43,7 @@ fun FontRes(paddingValues: PaddingValues) {
             )
         }
 
-        val fontAwesome = FontFamily(Font(Res.fonts.font_awesome))
+        val fontAwesome = FontFamily(Font(Res.font.font_awesome))
         val symbols = arrayOf(0xf1ba, 0xf238, 0xf21a, 0xf1bb, 0xf1b8, 0xf09b, 0xf269, 0xf1d0, 0xf15a, 0xf293, 0xf1c6)
         Text(
             modifier = Modifier.padding(16.dp),

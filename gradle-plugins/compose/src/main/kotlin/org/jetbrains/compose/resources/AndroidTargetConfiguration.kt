@@ -25,7 +25,7 @@ internal fun Project.configureAndroidResources(
     val copyFonts = registerTask<Copy>("copyFontsToAndroidAssets") {
         includeEmptyDirs = false
         from(commonResourcesDir)
-        include("**/fonts/*")
+        include("**/font*/*")
         into(androidFontsDir)
         onlyIf { onlyIfProvider.get() }
     }

@@ -12,17 +12,17 @@ import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.pathString
 
 internal enum class ResourceType(val typeName: String) {
-    IMAGE("images"),
-    STRING("strings"),
-    FONT("fonts");
+    DRAWABLE("drawable"),
+    STRING("string"),
+    FONT("font");
+
+    override fun toString(): String = typeName
 
     companion object {
-        fun fromString(str: String) = when (str) {
-            "images" -> ResourceType.IMAGE
-            "strings" -> ResourceType.STRING
-            "fonts" -> ResourceType.FONT
-            else -> error("Unknown resource type: $str")
-        }
+        fun fromString(str: String): ResourceType =
+            ResourceType.values()
+                .firstOrNull { it.typeName.equals(str, true) }
+                ?: error("Unknown resource type: $str")
     }
 }
 
@@ -34,7 +34,7 @@ internal data class ResourceItem(
 )
 
 private fun ResourceItem.getClassName(): ClassName = when (type) {
-    ResourceType.IMAGE -> ClassName("org.jetbrains.compose.resources", "ImageResource")
+    ResourceType.DRAWABLE -> ClassName("org.jetbrains.compose.resources", "DrawableResource")
     ResourceType.STRING -> ClassName("org.jetbrains.compose.resources", "StringResource")
     ResourceType.FONT -> ClassName("org.jetbrains.compose.resources", "FontResource")
 }

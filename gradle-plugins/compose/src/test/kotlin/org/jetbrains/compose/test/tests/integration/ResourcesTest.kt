@@ -21,8 +21,8 @@ class ResourcesTest : GradlePluginTestBase() {
             """.trimIndent())
         }
 
-        file("src/commonMain/resources/composeRes/images/vector_2.xml").renameTo(
-            file("src/commonMain/resources/composeRes/images/vector_3.xml")
+        file("src/commonMain/resources/composeRes/drawable/vector_2.xml").renameTo(
+            file("src/commonMain/resources/composeRes/drawable/vector_3.xml")
         )
 
         //check resource's accessors were regenerated
@@ -33,8 +33,8 @@ class ResourcesTest : GradlePluginTestBase() {
             )
         }
 
-        file("src/commonMain/resources/composeRes/images/vector_3.xml").renameTo(
-            file("src/commonMain/resources/composeRes/images/vector_2.xml")
+        file("src/commonMain/resources/composeRes/drawable/vector_3.xml").renameTo(
+            file("src/commonMain/resources/composeRes/drawable/vector_2.xml")
         )
 
         //TODO: check a real build after a release a new version of the resources library

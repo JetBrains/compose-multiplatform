@@ -10,21 +10,20 @@ import org.jetbrains.compose.resources.ThemeQualifier.DARK
 import org.jetbrains.compose.resources.ThemeQualifier.LIGHT
 import kotlin.test.*
 
-@OptIn(ExperimentalResourceApi::class)
 class ResourceTest {
     @Test
     fun testResourceEquals() = runBlockingTest {
-        assertEquals(ImageResource("a"), ImageResource("a"))
+        assertEquals(DrawableResource("a"), DrawableResource("a"))
     }
 
     @Test
     fun testResourceNotEquals() = runBlockingTest {
-        assertNotEquals(ImageResource("a"), ImageResource("b"))
+        assertNotEquals(DrawableResource("a"), DrawableResource("b"))
     }
 
     @Test
     fun testGetPathByEnvironment() {
-        val resource = ImageResource(
+        val resource = DrawableResource(
             id = "ImageResource:test",
             items = setOf(
                 ResourceItem(setOf(), "default"),

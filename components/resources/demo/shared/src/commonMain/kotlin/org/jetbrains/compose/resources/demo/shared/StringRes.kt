@@ -54,9 +54,9 @@ fun StringRes(paddingValues: PaddingValues) {
         }
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = stringResource(Res.strings.app_name),
+            value = stringResource(Res.string.app_name),
             onValueChange = {},
-            label = { Text("Text(getString(Res.strings.app_name)") },
+            label = { Text("Text(getString(Res.string.app_name)") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -66,9 +66,9 @@ fun StringRes(paddingValues: PaddingValues) {
         )
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = stringResource(Res.strings.hello),
+            value = stringResource(Res.string.hello),
             onValueChange = {},
-            label = { Text("Text(getString(Res.strings.hello)") },
+            label = { Text("Text(getString(Res.string.hello)") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -78,9 +78,9 @@ fun StringRes(paddingValues: PaddingValues) {
         )
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = stringResource(Res.strings.multi_line),
+            value = stringResource(Res.string.multi_line),
             onValueChange = {},
-            label = { Text("Text(getString(Res.strings.multi_line)") },
+            label = { Text("Text(getString(Res.string.multi_line)") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -90,9 +90,9 @@ fun StringRes(paddingValues: PaddingValues) {
         )
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = stringResource(Res.strings.str_template, "User_name", 100),
+            value = stringResource(Res.string.str_template, "User_name", 100),
             onValueChange = {},
-            label = { Text("Text(getString(Res.strings.str_template, \"User_name\", 100)") },
+            label = { Text("Text(getString(Res.string.str_template, \"User_name\", 100)") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -102,9 +102,9 @@ fun StringRes(paddingValues: PaddingValues) {
         )
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = stringArrayResource(Res.strings.str_arr).toString(),
+            value = stringArrayResource(Res.string.str_arr).toString(),
             onValueChange = {},
-            label = { Text("Text(getStringArray(Res.strings.str_arr).toString())") },
+            label = { Text("Text(getStringArray(Res.string.str_arr).toString())") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
