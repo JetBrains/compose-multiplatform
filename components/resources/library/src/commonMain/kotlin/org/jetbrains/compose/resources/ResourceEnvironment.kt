@@ -1,8 +1,7 @@
 package org.jetbrains.compose.resources
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.*
-import androidx.compose.ui.LocalSystemTheme
-import androidx.compose.ui.SystemTheme
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.intl.Locale
 
@@ -13,20 +12,18 @@ internal data class ResourceEnvironment(
     val density: DensityQualifier
 )
 
-@OptIn(InternalComposeApi::class)
 @Composable
 internal fun rememberEnvironment(): ResourceEnvironment {
     val composeLocale = Locale.current
-    val composeTheme = LocalSystemTheme.current
+    val composeTheme = isSystemInDarkTheme()
     val composeDensity = LocalDensity.current
 
     //cache ResourceEnvironment unless compose environment is changed
-    //TODO provide top level function with a single cache in a root of compose tree
     return remember(composeLocale, composeTheme, composeDensity) {
         ResourceEnvironment(
             LanguageQualifier(composeLocale.language),
             RegionQualifier(composeLocale.region),
-            ThemeQualifier.selectByValue(composeTheme == SystemTheme.Dark),
+            ThemeQualifier.selectByValue(composeTheme),
             DensityQualifier.selectByDensity(composeDensity.density)
         )
     }

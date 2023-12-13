@@ -12,6 +12,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalTestApi::class)
 class ComposeResourceTest {
@@ -103,5 +104,47 @@ class ComposeResourceTest {
             }
             awaitIdle()
         }
+    }
+
+    @Test
+    fun testLoadStringResource() = runBlockingTest {
+        kotlin.test.assertEquals("Compose Resources App", getString(TestStringResource("app_name")))
+        kotlin.test.assertEquals(
+            "Hello, test-name! You have 42 new messages.",
+            getString(TestStringResource("str_template"), "test-name", 42)
+        )
+        kotlin.test.assertEquals(listOf("item 1", "item 2", "item 3"), getStringArray(TestStringResource("str_arr")))
+    }
+
+    @Test
+    fun testMissingResource() = runBlockingTest {
+        assertFailsWith<MissingResourceException> {
+            readResourceBytes("missing.png")
+        }
+        val error = assertFailsWith<IllegalStateException> {
+            getString(TestStringResource("unknown_id"))
+        }
+        kotlin.test.assertEquals("String ID=`unknown_id` is not found!", error.message)
+    }
+
+    @Test
+    fun testReadFileResource() = runBlockingTest {
+        val bytes = readResourceBytes("strings.xml")
+        kotlin.test.assertEquals(
+            """
+                <resources>
+                    <string name="app_name">Compose Resources App</string>
+                    <string name="hello">😊 Hello world!</string>
+                    <string name="str_template">Hello, %1${'$'}s! You have %2${'$'}d new messages.</string>
+                    <string-array name="str_arr">
+                        <item>item 1</item>
+                        <item>item 2</item>
+                        <item>item 3</item>
+                    </string-array>
+                </resources>
+                
+            """.trimIndent(),
+            bytes.decodeToString()
+        )
     }
 }
