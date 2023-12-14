@@ -20,10 +20,10 @@
 ## Dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
 * [Compiler 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.4)
-* [Runtime 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.5.4)
-* [UI 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.5.4)
-* [Foundation 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.5.4)
-* [Material 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-material#1.5.4)
+* [Runtime 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.5.1)
+* [UI 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.5.1)
+* [Foundation 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.5.1)
+* [Material 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.5.1)
 * [Material3 1.1.2](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.1.2)
 
 # 1.5.10 (October 2023)
@@ -133,10 +133,10 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 ## Dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
 * [Compiler 1.5.3](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.3)
-* [Runtime 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.5.4)
-* [UI 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.5.4)
-* [Foundation 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.5.4)
-* [Material 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-material#1.5.4)
+* [Runtime 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.5.1)
+* [UI 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.5.1)
+* [Foundation 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.5.1)
+* [Material 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.5.1)
 * [Material3 1.1.2](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.1.2)
 
 # 1.5.10-rc02 (October 2023)
@@ -160,10 +160,10 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 ## Dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
 * [Compiler 1.5.3](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.3)
-* [Runtime 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.5.4)
-* [UI 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.5.4)
-* [Foundation 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.5.4)
-* [Material 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-material#1.5.4)
+* [Runtime 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.5.1)
+* [UI 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.5.1)
+* [Foundation 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.5.1)
+* [Material 1.5.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.5.1)
 * [Material3 1.1.2](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.1.2)
 
 # 1.5.10-rc01 (October 2023)
