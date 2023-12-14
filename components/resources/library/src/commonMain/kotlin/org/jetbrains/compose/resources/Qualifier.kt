@@ -4,23 +4,15 @@ interface Qualifier
 
 data class LanguageQualifier(
     val language: String
-) : Qualifier {
-    companion object {
-        val regex = Regex("[a-z][a-z]")
-    }
-}
+) : Qualifier
 
 data class RegionQualifier(
     val region: String
-) : Qualifier {
-    companion object {
-        val regex = Regex("r[A-Z][A-Z]")
-    }
-}
+) : Qualifier
 
-enum class ThemeQualifier(val code: String) : Qualifier {
-    LIGHT("light"),
-    DARK("dark");
+enum class ThemeQualifier : Qualifier {
+    LIGHT,
+    DARK;
 
     companion object {
         fun selectByValue(isDark: Boolean) =
@@ -29,13 +21,13 @@ enum class ThemeQualifier(val code: String) : Qualifier {
 }
 
 //https://developer.android.com/guide/topics/resources/providing-resources
-enum class DensityQualifier(val code: String, val dpi: Int) : Qualifier {
-    LDPI("ldpi", 120),
-    MDPI("mdpi", 160),
-    HDPI("hdpi", 240),
-    XHDPI("xhdpi", 320),
-    XXHDPI("xxhdpi", 480),
-    XXXHDPI("xxxhdpi", 640);
+enum class DensityQualifier(val dpi: Int) : Qualifier {
+    LDPI(120),
+    MDPI(160),
+    HDPI(240),
+    XHDPI(320),
+    XXHDPI(480),
+    XXXHDPI(640);
 
     companion object {
         fun selectByValue(dpi: Int) = when {
@@ -54,43 +46,5 @@ enum class DensityQualifier(val code: String, val dpi: Int) : Qualifier {
             density <= 3.0 -> XXHDPI
             else -> XXXHDPI
         }
-    }
-}
-
-//TODO: move it to the gradle plugin
-internal fun List<String>.parseQualifiers(): List<Qualifier> {
-    var language: LanguageQualifier? = null
-    var region: RegionQualifier? = null
-    var theme: ThemeQualifier? = null
-    var density: DensityQualifier? = null
-
-    this.forEach { q ->
-        if (density == null) {
-            DensityQualifier.entries.firstOrNull { it.code == q }?.let {
-                density = it
-                return@forEach
-            }
-        }
-        if (theme == null) {
-            ThemeQualifier.entries.firstOrNull { it.code == q }?.let {
-                theme = it
-                return@forEach
-            }
-        }
-        if (language == null && q.matches(LanguageQualifier.regex)) {
-            language = LanguageQualifier(q)
-            return@forEach
-        }
-        if (region == null && q.matches(RegionQualifier.regex)) {
-            region = RegionQualifier(q.takeLast(2))
-            return@forEach
-        }
-    }
-
-    return buildList {
-        language?.let { add(it) }
-        region?.let { add(it) }
-        theme?.let { add(it) }
-        density?.let { add(it) }
     }
 }

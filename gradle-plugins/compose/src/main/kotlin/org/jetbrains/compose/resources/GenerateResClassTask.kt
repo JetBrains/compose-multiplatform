@@ -63,11 +63,11 @@ abstract class GenerateResClassTask : DefaultTask() {
         val file = this
         if (file.isDirectory) return null
         val dirName = file.parentFile.name ?: return null
-        val typeAndQualifiers = dirName.lowercase().split("-")
+        val typeAndQualifiers = dirName.split("-")
         if (typeAndQualifiers.isEmpty()) return null
 
         val typeString = typeAndQualifiers.first().lowercase()
-        val qualifiers = typeAndQualifiers.takeLast(typeAndQualifiers.size - 1).map { it.lowercase() }.toSet()
+        val qualifiers = typeAndQualifiers.takeLast(typeAndQualifiers.size - 1)
         val path = file.toPath().relativeTo(relativeTo)
 
         return if (typeString == "values" && file.name.equals("strings.xml", true)) {

@@ -49,16 +49,15 @@ internal fun Resource.getPathByEnvironment(environment: ResourceEnvironment): St
 }
 
 private fun List<ResourceItem>.filterBy(qualifier: Qualifier): List<ResourceItem> {
-    val items = map { it to it.qualifiers.toList().parseQualifiers() }
-    val withQualifier = items.filter { (_, qualifiers) ->
-        qualifiers.any { it == qualifier }
-    }.map { (item, _) -> item }
+    val withQualifier = filter { item ->
+        item.qualifiers.any { it == qualifier }
+    }
 
     if (withQualifier.isNotEmpty()) return withQualifier
 
-    val withoutQualifier = items.filter { (_, qualifiers) ->
-        qualifiers.none { it::class == qualifier::class }
-    }.map { (item, _) -> item }
+    val withoutQualifier = filter { item ->
+        item.qualifiers.none { it::class == qualifier::class }
+    }
 
     if (withoutQualifier.isNotEmpty()) return withoutQualifier
 

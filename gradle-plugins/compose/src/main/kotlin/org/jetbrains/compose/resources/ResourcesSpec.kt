@@ -1,15 +1,8 @@
 package org.jetbrains.compose.resources
 
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.TypeSpec
-import com.squareup.kotlinpoet.withIndent
+import com.squareup.kotlinpoet.*
 import java.nio.file.Path
 import kotlin.io.path.invariantSeparatorsPathString
-import kotlin.io.path.pathString
 
 internal enum class ResourceType(val typeName: String) {
     DRAWABLE("drawable"),
@@ -28,7 +21,7 @@ internal enum class ResourceType(val typeName: String) {
 
 internal data class ResourceItem(
     val type: ResourceType,
-    val qualifiers: Set<String>,
+    val qualifiers: List<String>,
     val name: String,
     val path: Path
 )
@@ -37,6 +30,64 @@ private fun ResourceItem.getClassName(): ClassName = when (type) {
     ResourceType.DRAWABLE -> ClassName("org.jetbrains.compose.resources", "DrawableResource")
     ResourceType.STRING -> ClassName("org.jetbrains.compose.resources", "StringResource")
     ResourceType.FONT -> ClassName("org.jetbrains.compose.resources", "FontResource")
+}
+
+private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlock.Builder {
+    val languageQualifier = ClassName("org.jetbrains.compose.resources", "LanguageQualifier")
+    val regionQualifier = ClassName("org.jetbrains.compose.resources", "RegionQualifier")
+    val themeQualifier = ClassName("org.jetbrains.compose.resources", "ThemeQualifier")
+    val densityQualifier = ClassName("org.jetbrains.compose.resources", "DensityQualifier")
+
+    val languageRegex = Regex("[a-z][a-z]")
+    val regionRegex = Regex("r[A-Z][A-Z]")
+
+    var alreadyHasLanguage: String? = null
+    var alreadyHasRegion: String? = null
+    var alreadyHasTheme: String? = null
+    var alreadyHasDensity: String? = null
+
+    fun repetitiveQualifiers(first: String, second: String) {
+        error("${resourceItem.path} contains repetitive qualifiers: $first and $second")
+    }
+
+    resourceItem.qualifiers.sorted().forEach { q ->
+        when (q) {
+            "light",
+            "dark" -> {
+                alreadyHasTheme?.let { repetitiveQualifiers(it, q) }
+                alreadyHasTheme = q
+                add("%T.${q.uppercase()}, ", themeQualifier)
+            }
+
+            "mdpi",
+            "hdpi",
+            "xhdpi",
+            "xxhdpi",
+            "xxxhdpi",
+            "ldpi" -> {
+                alreadyHasDensity?.let { repetitiveQualifiers(it, q) }
+                alreadyHasDensity = q
+                add("%T.${q.uppercase()}, ", densityQualifier)
+            }
+
+            else -> when {
+                q.matches(languageRegex) -> {
+                    alreadyHasLanguage?.let { repetitiveQualifiers(it, q) }
+                    alreadyHasLanguage = q
+                    add("%T(\"$q\"), ", languageQualifier)
+                }
+
+                q.matches(regionRegex) -> {
+                    alreadyHasRegion?.let { repetitiveQualifiers(it, q) }
+                    alreadyHasRegion = q
+                    add("%T(\"${q.takeLast(2)}\"), ", regionQualifier)
+                }
+
+                else -> error("${resourceItem.path} contains unknown qualifier: $q")
+            }
+        }
+    }
+    return this
 }
 
 internal fun getResFileSpec(
@@ -77,9 +128,12 @@ private fun TypeSpec.Builder.addResourceProperty(name: String, items: List<Resou
             }
             add("setOf(\n").withIndent {
                 items.forEach { item ->
-                    val qualifiers = item.qualifiers.sorted().joinToString { "\"$it\"" }
-                    //file separator should be '/' on all platforms
-                    add("%T(setOf($qualifiers), \"${item.path.invariantSeparatorsPathString}\"),\n", resourceItemClass)
+                    add("%T(\n", resourceItemClass).withIndent {
+                        add("setOf(").addQualifiers(item).add("),\n")
+                        //file separator should be '/' on all platforms
+                        add("\"${item.path.invariantSeparatorsPathString}\"\n")
+                    }
+                    add("),\n")
                 }
             }
             add(")\n")
