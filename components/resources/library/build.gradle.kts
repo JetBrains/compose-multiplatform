@@ -36,10 +36,13 @@ kotlin {
     wasmJs {
         browser {
             testTask(Action {
-                // TODO: fix the test setup and enable
-                enabled = false
+                useKarma {
+                    useChromeHeadless()
+                    useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("wasm"))
+                }
             })
         }
+        binaries.executable()
     }
     macosX64()
     macosArm64()
@@ -105,7 +108,7 @@ kotlin {
             dependsOn(jvmAndAndroidTest)
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation("org.jetbrains.compose.ui:ui-test-junit4:$composeVersion")
+                implementation(compose.desktop.uiTestJUnit4)
                 implementation(libs.kotlinx.coroutines.swing)
             }
         }
@@ -191,6 +194,11 @@ configureMavenPublication(
     artifactId = "components-resources",
     name = "Resources for Compose JB"
 )
+
+// adding it here to make sure skiko is unpacked and available in web tests
+compose.experimental {
+    web.application {}
+}
 
 afterEvaluate {
     // TODO(o.k.): remove this after we refactor jsAndWasmMain source set in skiko to get rid of broken "common" js-interop
