@@ -7,6 +7,13 @@ import org.jetbrains.kotlin.gradle.kpm.external.project
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetContainer
+import org.jetbrains.kotlin.gradle.plugin.extraProperties
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+
+val Project.coroutinesVersion: String
+    get() {
+        return extraProperties.properties["kotlinx.coroutines.version"] as String
+    }
 
 val Project.isInIdea: Boolean
     get() {
@@ -19,7 +26,7 @@ val Project.isFailingJsCase: Boolean
 val Project.isMingwX64Enabled: Boolean
     get() = this.isInIdea
 
-@OptIn(ExternalVariantApi::class)
+@OptIn(ExternalVariantApi::class, ExperimentalWasmDsl::class)
 fun KotlinMultiplatformExtension.configureTargets() {
     jvm("desktop")
     configureJsTargets()
@@ -53,8 +60,10 @@ fun KotlinDependencyHandler.getCommonLib(): ProjectDependency {
 }
 
 fun KotlinSourceSet.configureCommonTestDependencies() {
-    dependencies {
-        implementation(kotlin("test"))
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
+    with(project) {
+        dependencies {
+            implementation(kotlin("test"))
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+        }
     }
 }
