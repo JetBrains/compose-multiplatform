@@ -24,16 +24,16 @@ internal object Res {
             "drawable:vector",
             setOf(
                 ResourceItem(
+                    setOf(LanguageQualifier("au"), RegionQualifier("US"), ),
+                    "composeRes/drawable-au-rUS/vector.xml"
+                ),
+                ResourceItem(
                     setOf(ThemeQualifier.DARK, LanguageQualifier("ge"), ),
                     "composeRes/drawable-dark-ge/vector.xml"
                 ),
                 ResourceItem(
                     setOf(LanguageQualifier("en"), ),
                     "composeRes/drawable-en/vector.xml"
-                ),
-                ResourceItem(
-                    setOf(RegionQualifier("US"), ),
-                    "composeRes/drawable-rUS/vector.xml"
                 ),
                 ResourceItem(
                     setOf(),

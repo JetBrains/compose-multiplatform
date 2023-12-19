@@ -44,6 +44,26 @@ class ResourcesTest : GradlePluginTestBase() {
         }
 
         file("src/commonMain/resources/composeRes/drawable-ren").renameTo(
+            file("src/commonMain/resources/composeRes/drawable-rUS-en")
+        )
+
+        gradle("generateComposeResClass").checks {
+            check.logContains("""
+                Region qualifier must be declared after language: 'en-rUS'
+            """.trimIndent())
+        }
+
+        file("src/commonMain/resources/composeRes/drawable-rUS-en").renameTo(
+            file("src/commonMain/resources/composeRes/drawable-rUS")
+        )
+
+        gradle("generateComposeResClass").checks {
+            check.logContains("""
+                Region qualifier must be used only with language
+            """.trimIndent())
+        }
+
+        file("src/commonMain/resources/composeRes/drawable-rUS").renameTo(
             file("src/commonMain/resources/composeRes/drawable-en-fr")
         )
 

@@ -41,22 +41,20 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
     val languageRegex = Regex("[a-z][a-z]")
     val regionRegex = Regex("r[A-Z][A-Z]")
 
-    var alreadyHasLanguage: String? = null
-    var alreadyHasRegion: String? = null
-    var alreadyHasTheme: String? = null
-    var alreadyHasDensity: String? = null
+    val qualifiersMap = mutableMapOf<ClassName, String>()
 
-    fun repetitiveQualifiers(first: String, second: String) {
-        error("${resourceItem.path} contains repetitive qualifiers: $first and $second")
+    fun saveQualifier(className: ClassName, qualifier: String) {
+        qualifiersMap[className]?.let {
+            error("${resourceItem.path} contains repetitive qualifiers: $it and $qualifier")
+        }
+        qualifiersMap[className] = qualifier
     }
 
-    resourceItem.qualifiers.sorted().forEach { q ->
+    resourceItem.qualifiers.forEach { q ->
         when (q) {
             "light",
             "dark" -> {
-                alreadyHasTheme?.let { repetitiveQualifiers(it, q) }
-                alreadyHasTheme = q
-                add("%T.${q.uppercase()}, ", themeQualifier)
+                saveQualifier(themeQualifier, q)
             }
 
             "mdpi",
@@ -65,28 +63,37 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
             "xxhdpi",
             "xxxhdpi",
             "ldpi" -> {
-                alreadyHasDensity?.let { repetitiveQualifiers(it, q) }
-                alreadyHasDensity = q
-                add("%T.${q.uppercase()}, ", densityQualifier)
+                saveQualifier(densityQualifier, q)
             }
 
             else -> when {
                 q.matches(languageRegex) -> {
-                    alreadyHasLanguage?.let { repetitiveQualifiers(it, q) }
-                    alreadyHasLanguage = q
-                    add("%T(\"$q\"), ", languageQualifier)
+                    saveQualifier(languageQualifier, q)
                 }
 
                 q.matches(regionRegex) -> {
-                    alreadyHasRegion?.let { repetitiveQualifiers(it, q) }
-                    alreadyHasRegion = q
-                    add("%T(\"${q.takeLast(2)}\"), ", regionQualifier)
+                    saveQualifier(regionQualifier, q)
                 }
 
                 else -> error("${resourceItem.path} contains unknown qualifier: $q")
             }
         }
     }
+    qualifiersMap[themeQualifier]?.let { q -> add("%T.${q.uppercase()}, ", themeQualifier) }
+    qualifiersMap[densityQualifier]?.let { q -> add("%T.${q.uppercase()}, ", densityQualifier) }
+    qualifiersMap[languageQualifier]?.let { q -> add("%T(\"$q\"), ", languageQualifier) }
+    qualifiersMap[regionQualifier]?.let { q ->
+        val lang = qualifiersMap[languageQualifier]
+        if (lang == null) {
+            error("Region qualifier must be used only with language")
+        }
+        val langAndRegion = "$lang-$q"
+        if(!resourceItem.path.toString().contains(langAndRegion)) {
+            error("Region qualifier must be declared after language: '$langAndRegion'")
+        }
+        add("%T(\"${q.takeLast(2)}\"), ", regionQualifier)
+    }
+
     return this
 }
 
