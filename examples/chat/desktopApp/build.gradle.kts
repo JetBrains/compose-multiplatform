@@ -20,3 +20,5 @@ compose.desktop {
         mainClass = "MainKt"
     }
 }
+
+compose.kotlinCompilerPlugin.set(project.properties["compose.compiler.version"] as String)

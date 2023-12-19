@@ -23,3 +23,4 @@ compose.experimental {
     web.application {}
 }
 
+compose.kotlinCompilerPlugin.set(project.properties["compose.compiler.version"] as String)

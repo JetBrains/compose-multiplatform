@@ -1,5 +1,7 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
@@ -9,6 +11,17 @@ plugins {
 version = "1.0-SNAPSHOT"
 
 kotlin {
+    @Suppress("OPT_IN_USAGE", "INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+    compilerOptions {
+        val version = if (project.properties["custom.useK2"] == "true") {
+            KotlinVersion.KOTLIN_2_0
+        } else {
+            KotlinVersion.KOTLIN_1_9
+        }
+        languageVersion.set(version)
+        apiVersion.set(version)
+    }
+
     androidTarget()
 
     jvm("desktop")
@@ -110,3 +123,6 @@ android {
         jvmToolchain(17)
     }
 }
+
+
+compose.kotlinCompilerPlugin.set(project.properties["compose.compiler.version"] as String)

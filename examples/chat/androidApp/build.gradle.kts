@@ -33,3 +33,5 @@ android {
         jvmToolchain(17)
     }
 }
+
+compose.kotlinCompilerPlugin.set(project.properties["compose.compiler.version"] as String)
