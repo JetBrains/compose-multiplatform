@@ -56,7 +56,7 @@ fun StringRes(paddingValues: PaddingValues) {
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
             value = stringResource(Res.string.app_name),
             onValueChange = {},
-            label = { Text("Text(getString(Res.string.app_name)") },
+            label = { Text("Text(stringResource(Res.string.app_name)") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -68,7 +68,7 @@ fun StringRes(paddingValues: PaddingValues) {
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
             value = stringResource(Res.string.hello),
             onValueChange = {},
-            label = { Text("Text(getString(Res.string.hello)") },
+            label = { Text("Text(stringResource(Res.string.hello)") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -80,7 +80,7 @@ fun StringRes(paddingValues: PaddingValues) {
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
             value = stringResource(Res.string.multi_line),
             onValueChange = {},
-            label = { Text("Text(getString(Res.string.multi_line)") },
+            label = { Text("Text(stringResource(Res.string.multi_line)") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -92,7 +92,7 @@ fun StringRes(paddingValues: PaddingValues) {
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
             value = stringResource(Res.string.str_template, "User_name", 100),
             onValueChange = {},
-            label = { Text("Text(getString(Res.string.str_template, \"User_name\", 100)") },
+            label = { Text("Text(stringResource(Res.string.str_template, \"User_name\", 100)") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -104,7 +104,7 @@ fun StringRes(paddingValues: PaddingValues) {
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
             value = stringArrayResource(Res.string.str_arr).toString(),
             onValueChange = {},
-            label = { Text("Text(getStringArray(Res.string.str_arr).toString())") },
+            label = { Text("Text(stringArrayResource(Res.string.str_arr).toString())") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,

@@ -36,6 +36,7 @@ internal fun rememberEnvironment(): ResourceEnvironment {
 internal expect fun getResourceEnvironment(): ResourceEnvironment
 
 internal fun Resource.getPathByEnvironment(environment: ResourceEnvironment): String {
+    //Priority of environments: https://developer.android.com/guide/topics/resources/providing-resources#table2
     items.toList()
         .filterBy(environment.language)
         .also { if (it.size == 1) return it.first().path }
@@ -45,21 +46,28 @@ internal fun Resource.getPathByEnvironment(environment: ResourceEnvironment): St
         .also { if (it.size == 1) return it.first().path }
         .filterBy(environment.density)
         .also { if (it.size == 1) return it.first().path }
-        .let { return it.first().path }
+        .let { items ->
+            if (items.isEmpty()) {
+                error("Resource with ID='$id' not found")
+            } else {
+                error("Resource with ID='$id' has more than one file: ${items.joinToString { it.path }}")
+            }
+        }
 }
 
 private fun List<ResourceItem>.filterBy(qualifier: Qualifier): List<ResourceItem> {
+    //Android has a slightly different algorithm,
+    //but it provides the same result: https://developer.android.com/guide/topics/resources/providing-resources#BestMatch
+
+    //filter items with the requested qualifier
     val withQualifier = filter { item ->
         item.qualifiers.any { it == qualifier }
     }
 
     if (withQualifier.isNotEmpty()) return withQualifier
 
-    val withoutQualifier = filter { item ->
+    //items with no requested qualifier type (default)
+    return filter { item ->
         item.qualifiers.none { it::class == qualifier::class }
     }
-
-    if (withoutQualifier.isNotEmpty()) return withoutQualifier
-
-    return this
 }

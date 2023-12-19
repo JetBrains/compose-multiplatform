@@ -27,10 +27,10 @@ class ResourceTest {
             id = "ImageResource:test",
             items = setOf(
                 ResourceItem(setOf(), "default"),
-                ResourceItem(setOf("en"), "en"),
-                ResourceItem(setOf("dark"), "dark"),
-                ResourceItem(setOf("fr", "light"), "fr-light"),
-                ResourceItem(setOf("en", "rUS", "xhdpi"), "en-rUS-xhdpi"),
+                ResourceItem(setOf(LanguageQualifier("en")), "en"),
+                ResourceItem(setOf(LanguageQualifier("en"), RegionQualifier("US"), XHDPI), "en-rUS-xhdpi"),
+                ResourceItem(setOf(LanguageQualifier("fr"), LIGHT), "fr-light"),
+                ResourceItem(setOf(DARK), "dark"),
             )
         )
         fun env(lang: String, reg: String, theme: ThemeQualifier, density: DensityQualifier) = ResourceEnvironment(
@@ -71,5 +71,32 @@ class ResourceTest {
             "dark",
             resource.getPathByEnvironment(env("ru", "US", DARK, XHDPI))
         )
+
+        val resourceWithNoDefault = DrawableResource(
+            id = "ImageResource:test2",
+            items = setOf(
+                ResourceItem(setOf(LanguageQualifier("en")), "en"),
+                ResourceItem(setOf(LanguageQualifier("fr"), LIGHT), "fr-light")
+            )
+        )
+        assertFailsWith<IllegalStateException> {
+            resourceWithNoDefault.getPathByEnvironment(env("ru", "US", DARK, XHDPI))
+        }.message.let { msg ->
+            assertEquals("Resource with ID='ImageResource:test2' not found", msg)
+        }
+
+        val resourceWithFewFiles = DrawableResource(
+            id = "ImageResource:test3",
+            items = setOf(
+                ResourceItem(setOf(LanguageQualifier("en")), "en1"),
+                ResourceItem(setOf(LanguageQualifier("en")), "en2")
+            )
+        )
+        assertFailsWith<IllegalStateException> {
+            resourceWithFewFiles.getPathByEnvironment(env("en", "US", DARK, XHDPI))
+        }.message.let { msg ->
+            assertEquals("Resource with ID='ImageResource:test3' has more than one file: en1, en2", msg)
+        }
+
     }
 }
