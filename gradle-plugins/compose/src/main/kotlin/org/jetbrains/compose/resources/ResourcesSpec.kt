@@ -85,11 +85,11 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
     qualifiersMap[regionQualifier]?.let { q ->
         val lang = qualifiersMap[languageQualifier]
         if (lang == null) {
-            error("Region qualifier must be used only with language")
+            error("Region qualifier must be used only with language\nFile: ${resourceItem.path}")
         }
         val langAndRegion = "$lang-$q"
-        if(!resourceItem.path.toString().contains(langAndRegion)) {
-            error("Region qualifier must be declared after language: '$langAndRegion'")
+        if(!resourceItem.path.toString().contains("-$langAndRegion")) {
+            error("Region qualifier must be declared after language: '$langAndRegion'\nFile: ${resourceItem.path}")
         }
         add("%T(\"${q.takeLast(2)}\"), ", regionQualifier)
     }
