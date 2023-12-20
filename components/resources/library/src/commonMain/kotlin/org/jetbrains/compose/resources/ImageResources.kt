@@ -1,9 +1,6 @@
 package org.jetbrains.compose.resources
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -11,46 +8,44 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.jetbrains.compose.resources.vector.toImageVector
 import org.jetbrains.compose.resources.vector.xmldom.Element
 
 /**
- * Represents an image resource.
+ * Represents a drawable resource.
  *
- * @param id The unique identifier of the image resource.
+ * @param id The unique identifier of the drawable resource.
  * @param items The set of resource items associated with the image resource.
  */
 @Immutable
-class ImageResource(id: String, items: Set<ResourceItem>) : Resource(id, items)
+class DrawableResource(id: String, items: Set<ResourceItem>) : Resource(id, items)
 
 /**
- * Creates an [ImageResource] object with the specified path.
+ * Creates an [DrawableResource] object with the specified path.
  *
- * @param path The path of the image resource.
- * @return An [ImageResource] object.
+ * @param path The path of the drawable resource.
+ * @return An [DrawableResource] object.
  */
-fun ImageResource(path: String): ImageResource = ImageResource(
-    id = "ImageResource:$path",
+fun DrawableResource(path: String): DrawableResource = DrawableResource(
+    id = "DrawableResource:$path",
     items = setOf(ResourceItem(emptySet(), path))
 )
 
 /**
- * Retrieves a [Painter] using the specified image resource.
+ * Retrieves a [Painter] using the specified drawable resource.
  * Automatically select a type of the Painter depending on the file extension.
  *
- * @param resource The image resource to be used.
+ * @param resource The drawable resource to be used.
  * @return The [Painter] loaded from the resource.
  */
 @ExperimentalResourceApi
 @Composable
-fun painterResource(resource: ImageResource): Painter {
-    val filePath = remember(resource) { resource.getPathByEnvironment() }
+fun painterResource(resource: DrawableResource): Painter {
+    val environment = rememberEnvironment()
+    val filePath = remember(resource, environment) { resource.getPathByEnvironment(environment) }
     val isXml = filePath.endsWith(".xml", true)
     if (isXml) {
         return rememberVectorPainter(vectorResource(resource))
@@ -62,17 +57,17 @@ fun painterResource(resource: ImageResource): Painter {
 private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 
 /**
- * Retrieves an ImageBitmap using the specified image resource.
+ * Retrieves an ImageBitmap using the specified drawable resource.
  *
- * @param resource The image resource to be used.
+ * @param resource The drawable resource to be used.
  * @return The ImageBitmap loaded from the resource.
  */
 @ExperimentalResourceApi
 @Composable
-fun imageResource(resource: ImageResource): ImageBitmap {
+fun imageResource(resource: DrawableResource): ImageBitmap {
     val resourceReader = LocalResourceReader.current
-    val imageBitmap by rememberState(resource, { emptyImageBitmap }) {
-        val path = resource.getPathByEnvironment()
+    val imageBitmap by rememberResourceState(resource, { emptyImageBitmap }) { env ->
+        val path = resource.getPathByEnvironment(env)
         val cached = loadImage(path, resourceReader) {
             ImageCache.Bitmap(it.toImageBitmap())
         } as ImageCache.Bitmap
@@ -86,18 +81,18 @@ private val emptyImageVector: ImageVector by lazy {
 }
 
 /**
- * Retrieves an ImageVector using the specified image resource.
+ * Retrieves an ImageVector using the specified drawable resource.
  *
- * @param resource The image resource to be used.
+ * @param resource The drawable resource to be used.
  * @return The ImageVector loaded from the resource.
  */
 @ExperimentalResourceApi
 @Composable
-fun vectorResource(resource: ImageResource): ImageVector {
+fun vectorResource(resource: DrawableResource): ImageVector {
     val resourceReader = LocalResourceReader.current
     val density = LocalDensity.current
-    val imageVector by rememberState(resource, { emptyImageVector }) {
-        val path = resource.getPathByEnvironment()
+    val imageVector by rememberResourceState(resource, { emptyImageVector }) { env ->
+        val path = resource.getPathByEnvironment(env)
         val cached = loadImage(path, resourceReader) {
             ImageCache.Vector(it.toXmlElement().toImageVector(density))
         } as ImageCache.Vector

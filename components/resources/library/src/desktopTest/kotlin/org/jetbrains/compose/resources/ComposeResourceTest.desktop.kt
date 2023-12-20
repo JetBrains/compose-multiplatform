@@ -2,9 +2,7 @@ package org.jetbrains.compose.resources
 
 import androidx.compose.foundation.Image
 import androidx.compose.material3.Text
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runComposeUiTest
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,6 +10,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalTestApi::class)
 class ComposeResourceTest {
@@ -25,7 +24,7 @@ class ComposeResourceTest {
     @Test
     fun testCountRecompositions() = runComposeUiTest {
         runBlockingTest {
-            val imagePathFlow = MutableStateFlow(ImageResource("1.png"))
+            val imagePathFlow = MutableStateFlow(DrawableResource("1.png"))
             val recompositionsCounter = RecompositionsCounter()
             setContent {
                 val res by imagePathFlow.collectAsState()
@@ -35,7 +34,7 @@ class ComposeResourceTest {
                 }
             }
             awaitIdle()
-            imagePathFlow.emit(ImageResource("2.png"))
+            imagePathFlow.emit(DrawableResource("2.png"))
             awaitIdle()
             assertEquals(2, recompositionsCounter.count)
         }
@@ -45,7 +44,7 @@ class ComposeResourceTest {
     fun testImageResourceCache() = runComposeUiTest {
         runBlockingTest {
             val testResourceReader = TestResourceReader()
-            val imagePathFlow = MutableStateFlow(ImageResource("1.png"))
+            val imagePathFlow = MutableStateFlow(DrawableResource("1.png"))
             setContent {
                 CompositionLocalProvider(LocalResourceReader provides testResourceReader) {
                     val res by imagePathFlow.collectAsState()
@@ -53,9 +52,9 @@ class ComposeResourceTest {
                 }
             }
             awaitIdle()
-            imagePathFlow.emit(ImageResource("2.png"))
+            imagePathFlow.emit(DrawableResource("2.png"))
             awaitIdle()
-            imagePathFlow.emit(ImageResource("1.png"))
+            imagePathFlow.emit(DrawableResource("1.png"))
             awaitIdle()
 
             assertEquals(
@@ -73,8 +72,8 @@ class ComposeResourceTest {
             setContent {
                 CompositionLocalProvider(LocalResourceReader provides testResourceReader) {
                     val res by stringIdFlow.collectAsState()
-                    Text(getString(res))
-                    Text(getStringArray(TestStringResource("str_arr")).joinToString())
+                    Text(stringResource(res))
+                    Text(stringArrayResource(TestStringResource("str_arr")).joinToString())
                 }
             }
             awaitIdle()
@@ -94,14 +93,56 @@ class ComposeResourceTest {
     fun testReadStringResource() = runComposeUiTest {
         runBlockingTest {
             setContent {
-                assertEquals("Compose Resources App", getString(TestStringResource("app_name")))
+                assertEquals("Compose Resources App", stringResource(TestStringResource("app_name")))
                 assertEquals(
                     "Hello, test-name! You have 42 new messages.",
-                    getString(TestStringResource("str_template"), "test-name", 42)
+                    stringResource(TestStringResource("str_template"), "test-name", 42)
                 )
-                assertEquals(listOf("item 1", "item 2", "item 3"), getStringArray(TestStringResource("str_arr")))
+                assertEquals(listOf("item 1", "item 2", "item 3"), stringArrayResource(TestStringResource("str_arr")))
             }
             awaitIdle()
         }
+    }
+
+    @Test
+    fun testLoadStringResource() = runBlockingTest {
+        kotlin.test.assertEquals("Compose Resources App", getString(TestStringResource("app_name")))
+        kotlin.test.assertEquals(
+            "Hello, test-name! You have 42 new messages.",
+            getString(TestStringResource("str_template"), "test-name", 42)
+        )
+        kotlin.test.assertEquals(listOf("item 1", "item 2", "item 3"), getStringArray(TestStringResource("str_arr")))
+    }
+
+    @Test
+    fun testMissingResource() = runBlockingTest {
+        assertFailsWith<MissingResourceException> {
+            readResourceBytes("missing.png")
+        }
+        val error = assertFailsWith<IllegalStateException> {
+            getString(TestStringResource("unknown_id"))
+        }
+        kotlin.test.assertEquals("String ID=`unknown_id` is not found!", error.message)
+    }
+
+    @Test
+    fun testReadFileResource() = runBlockingTest {
+        val bytes = readResourceBytes("strings.xml")
+        kotlin.test.assertEquals(
+            """
+                <resources>
+                    <string name="app_name">Compose Resources App</string>
+                    <string name="hello">😊 Hello world!</string>
+                    <string name="str_template">Hello, %1${'$'}s! You have %2${'$'}d new messages.</string>
+                    <string-array name="str_arr">
+                        <item>item 1</item>
+                        <item>item 2</item>
+                        <item>item 3</item>
+                    </string-array>
+                </resources>
+                
+            """.trimIndent(),
+            bytes.decodeToString()
+        )
     }
 }

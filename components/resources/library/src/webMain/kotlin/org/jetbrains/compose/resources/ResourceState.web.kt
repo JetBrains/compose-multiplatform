@@ -7,10 +7,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 
 @Composable
-internal actual fun <T> rememberState(key: Any, getDefault: () -> T, block: suspend () -> T): State<T> {
+internal actual fun <T> rememberResourceState(
+    key: Any,
+    getDefault: () -> T,
+    block: suspend (ResourceEnvironment) -> T
+): State<T> {
+    val environment = rememberEnvironment()
     val state = remember(key) { mutableStateOf(getDefault()) }
     LaunchedEffect(key) {
-        state.value = block()
+        state.value = block(environment)
     }
     return state
 }

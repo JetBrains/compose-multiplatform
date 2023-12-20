@@ -28,13 +28,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Image(
                     modifier = Modifier.size(100.dp),
-                    painter = painterResource(Res.images.compose),
+                    painter = painterResource(Res.drawable.compose),
                     contentDescription = null
                 )
                 Text(
                     """
                         Image(
-                          painter = painterResource(Res.images.compose)
+                          painter = painterResource(Res.drawable.compose)
                         )
                     """.trimIndent()
                 )
@@ -47,13 +47,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Image(
                     modifier = Modifier.size(100.dp),
-                    painter = painterResource(Res.images.insta_icon),
+                    painter = painterResource(Res.drawable.insta_icon),
                     contentDescription = null
                 )
                 Text(
                     """
                         Image(
-                          painter = painterResource(Res.images.insta_icon)
+                          painter = painterResource(Res.drawable.insta_icon)
                         )
                     """.trimIndent()
                 )
@@ -66,13 +66,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Image(
                     modifier = Modifier.size(140.dp),
-                    bitmap = imageResource(Res.images.land),
+                    bitmap = imageResource(Res.drawable.land),
                     contentDescription = null
                 )
                 Text(
                     """
                         Image(
-                          bitmap = imageResource(Res.images.land)
+                          bitmap = imageResource(Res.drawable.land)
                         )
                     """.trimIndent()
                 )
@@ -85,13 +85,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Image(
                     modifier = Modifier.size(100.dp),
-                    imageVector = vectorResource(Res.images.droid_icon),
+                    imageVector = vectorResource(Res.drawable.droid_icon),
                     contentDescription = null
                 )
                 Text(
                     """
                         Image(
-                          imageVector = vectorResource(Res.images.droid_icon)
+                          imageVector = vectorResource(Res.drawable.droid_icon)
                         )
                     """.trimIndent()
                 )
@@ -104,13 +104,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Icon(
                     modifier = Modifier.size(100.dp),
-                    painter = painterResource(Res.images.compose),
+                    painter = painterResource(Res.drawable.compose),
                     contentDescription = null
                 )
                 Text(
                     """
                         Icon(
-                          painter = painterResource(Res.images.compose)
+                          painter = painterResource(Res.drawable.compose)
                         )
                     """.trimIndent()
                 )
@@ -123,13 +123,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Icon(
                     modifier = Modifier.size(100.dp),
-                    painter = painterResource(Res.images.insta_icon),
+                    painter = painterResource(Res.drawable.insta_icon),
                     contentDescription = null
                 )
                 Text(
                     """
                         Icon(
-                          painter = painterResource(Res.images.insta_icon)
+                          painter = painterResource(Res.drawable.insta_icon)
                         )
                     """.trimIndent()
                 )
@@ -142,13 +142,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Icon(
                     modifier = Modifier.size(140.dp),
-                    bitmap = imageResource(Res.images.land),
+                    bitmap = imageResource(Res.drawable.land),
                     contentDescription = null
                 )
                 Text(
                     """
                         Icon(
-                          bitmap = imageResource(Res.images.land)
+                          bitmap = imageResource(Res.drawable.land)
                         )
                     """.trimIndent()
                 )
@@ -161,13 +161,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Icon(
                     modifier = Modifier.size(100.dp),
-                    imageVector = vectorResource(Res.images.droid_icon),
+                    imageVector = vectorResource(Res.drawable.droid_icon),
                     contentDescription = null
                 )
                 Text(
                     """
                         Icon(
-                          imageVector = vectorResource(Res.images.droid_icon)
+                          imageVector = vectorResource(Res.drawable.droid_icon)
                         )
                     """.trimIndent()
                 )

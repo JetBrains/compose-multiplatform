@@ -17,12 +17,12 @@ class ResourcesTest : GradlePluginTestBase() {
                 file("expected/Res.kt")
             )
             check.logContains("""
-                Unknown resource type: ignored
+                Unknown resource type: 'ignored'.
             """.trimIndent())
         }
 
-        file("src/commonMain/resources/composeRes/images/vector_2.xml").renameTo(
-            file("src/commonMain/resources/composeRes/images/vector_3.xml")
+        file("src/commonMain/resources/composeRes/drawable/vector_2.xml").renameTo(
+            file("src/commonMain/resources/composeRes/drawable/vector_3.xml")
         )
 
         //check resource's accessors were regenerated
@@ -33,8 +33,52 @@ class ResourcesTest : GradlePluginTestBase() {
             )
         }
 
-        file("src/commonMain/resources/composeRes/images/vector_3.xml").renameTo(
-            file("src/commonMain/resources/composeRes/images/vector_2.xml")
+        file("src/commonMain/resources/composeRes/drawable-en").renameTo(
+            file("src/commonMain/resources/composeRes/drawable-ren")
+        )
+
+        gradle("generateComposeResClass").checks {
+            check.logContains("""
+                contains unknown qualifier: 'ren'.
+            """.trimIndent())
+        }
+
+        file("src/commonMain/resources/composeRes/drawable-ren").renameTo(
+            file("src/commonMain/resources/composeRes/drawable-rUS-en")
+        )
+
+        gradle("generateComposeResClass").checks {
+            check.logContains("""
+                Region qualifier must be declared after language: 'en-rUS'.
+            """.trimIndent())
+        }
+
+        file("src/commonMain/resources/composeRes/drawable-rUS-en").renameTo(
+            file("src/commonMain/resources/composeRes/drawable-rUS")
+        )
+
+        gradle("generateComposeResClass").checks {
+            check.logContains("""
+                Region qualifier must be used only with language.
+            """.trimIndent())
+        }
+
+        file("src/commonMain/resources/composeRes/drawable-rUS").renameTo(
+            file("src/commonMain/resources/composeRes/drawable-en-fr")
+        )
+
+        gradle("generateComposeResClass").checks {
+            check.logContains("""
+                contains repetitive qualifiers: 'en' and 'fr'.
+            """.trimIndent())
+        }
+
+        file("src/commonMain/resources/composeRes/drawable-en-fr").renameTo(
+            file("src/commonMain/resources/composeRes/drawable-en")
+        )
+
+        file("src/commonMain/resources/composeRes/drawable/vector_3.xml").renameTo(
+            file("src/commonMain/resources/composeRes/drawable/vector_2.xml")
         )
 
         //TODO: check a real build after a release a new version of the resources library

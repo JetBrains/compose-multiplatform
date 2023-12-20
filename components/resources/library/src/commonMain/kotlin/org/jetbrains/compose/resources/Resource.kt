@@ -38,11 +38,6 @@ sealed class Resource(
  */
 @Immutable
 data class ResourceItem(
-    internal val qualifiers: Set<String>,
+    internal val qualifiers: Set<Qualifier>,
     internal val path: String
 )
-
-internal fun Resource.getPathByEnvironment(): String {
-    //TODO
-    return items.first().path
-}

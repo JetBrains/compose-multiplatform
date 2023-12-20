@@ -5,62 +5,98 @@
 
 package org.jetbrains.compose.resources
 
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertNotEquals
+import org.jetbrains.compose.resources.DensityQualifier.*
+import org.jetbrains.compose.resources.ThemeQualifier.DARK
+import org.jetbrains.compose.resources.ThemeQualifier.LIGHT
+import kotlin.test.*
 
-@OptIn(ExperimentalResourceApi::class)
 class ResourceTest {
     @Test
     fun testResourceEquals() = runBlockingTest {
-        assertEquals(ImageResource("a"), ImageResource("a"))
+        assertEquals(DrawableResource("a"), DrawableResource("a"))
     }
 
     @Test
     fun testResourceNotEquals() = runBlockingTest {
-        assertNotEquals(ImageResource("a"), ImageResource("b"))
+        assertNotEquals(DrawableResource("a"), DrawableResource("b"))
     }
 
     @Test
-    fun testMissingResource() = runBlockingTest {
-        assertFailsWith<MissingResourceException> {
-            readResourceBytes("missing.png")
-        }
-        val error = assertFailsWith<IllegalStateException> {
-            loadString(TestStringResource("unknown_id"))
-        }
-        assertEquals("String ID=`unknown_id` is not found!", error.message)
-    }
-
-    @Test
-    fun testReadFileResource() = runBlockingTest {
-        val bytes = readResourceBytes("strings.xml")
-        assertEquals(
-            """
-                <resources>
-                    <string name="app_name">Compose Resources App</string>
-                    <string name="hello">😊 Hello world!</string>
-                    <string name="str_template">Hello, %1${'$'}s! You have %2${'$'}d new messages.</string>
-                    <string-array name="str_arr">
-                        <item>item 1</item>
-                        <item>item 2</item>
-                        <item>item 3</item>
-                    </string-array>
-                </resources>
-                
-            """.trimIndent(),
-            bytes.decodeToString()
+    fun testGetPathByEnvironment() {
+        val resource = DrawableResource(
+            id = "ImageResource:test",
+            items = setOf(
+                ResourceItem(setOf(), "default"),
+                ResourceItem(setOf(LanguageQualifier("en")), "en"),
+                ResourceItem(setOf(LanguageQualifier("en"), RegionQualifier("US"), XHDPI), "en-rUS-xhdpi"),
+                ResourceItem(setOf(LanguageQualifier("fr"), LIGHT), "fr-light"),
+                ResourceItem(setOf(DARK), "dark"),
+            )
         )
-    }
-
-    @Test
-    fun testLoadStringResource() = runBlockingTest {
-        assertEquals("Compose Resources App", loadString(TestStringResource("app_name")))
-        assertEquals(
-            "Hello, test-name! You have 42 new messages.",
-            loadString(TestStringResource("str_template"), "test-name", 42)
+        fun env(lang: String, reg: String, theme: ThemeQualifier, density: DensityQualifier) = ResourceEnvironment(
+            language = LanguageQualifier(lang),
+            region = RegionQualifier(reg),
+            theme = theme,
+            density = density
         )
-        assertEquals(listOf("item 1", "item 2", "item 3"), loadStringArray(TestStringResource("str_arr")))
+        assertEquals(
+            "en-rUS-xhdpi",
+            resource.getPathByEnvironment(env("en", "US", DARK, XXHDPI))
+        )
+        assertEquals(
+            "en",
+            resource.getPathByEnvironment(env("en", "IN", LIGHT, LDPI))
+        )
+        assertEquals(
+            "default",
+            resource.getPathByEnvironment(env("ch", "", LIGHT, MDPI))
+        )
+        assertEquals(
+            "dark",
+            resource.getPathByEnvironment(env("ch", "", DARK, MDPI))
+        )
+        assertEquals(
+            "fr-light",
+            resource.getPathByEnvironment(env("fr", "", DARK, MDPI))
+        )
+        assertEquals(
+            "fr-light",
+            resource.getPathByEnvironment(env("fr", "IN", LIGHT, MDPI))
+        )
+        assertEquals(
+            "default",
+            resource.getPathByEnvironment(env("ru", "US", LIGHT, XHDPI))
+        )
+        assertEquals(
+            "dark",
+            resource.getPathByEnvironment(env("ru", "US", DARK, XHDPI))
+        )
+
+        val resourceWithNoDefault = DrawableResource(
+            id = "ImageResource:test2",
+            items = setOf(
+                ResourceItem(setOf(LanguageQualifier("en")), "en"),
+                ResourceItem(setOf(LanguageQualifier("fr"), LIGHT), "fr-light")
+            )
+        )
+        assertFailsWith<IllegalStateException> {
+            resourceWithNoDefault.getPathByEnvironment(env("ru", "US", DARK, XHDPI))
+        }.message.let { msg ->
+            assertEquals("Resource with ID='ImageResource:test2' not found", msg)
+        }
+
+        val resourceWithFewFiles = DrawableResource(
+            id = "ImageResource:test3",
+            items = setOf(
+                ResourceItem(setOf(LanguageQualifier("en")), "en1"),
+                ResourceItem(setOf(LanguageQualifier("en")), "en2")
+            )
+        )
+        assertFailsWith<IllegalStateException> {
+            resourceWithFewFiles.getPathByEnvironment(env("en", "US", DARK, XHDPI))
+        }.message.let { msg ->
+            assertEquals("Resource with ID='ImageResource:test3' has more than one file: en1, en2", msg)
+        }
+
     }
 }
