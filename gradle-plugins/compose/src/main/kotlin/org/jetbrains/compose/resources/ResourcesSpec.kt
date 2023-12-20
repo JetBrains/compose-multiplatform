@@ -15,7 +15,7 @@ internal enum class ResourceType(val typeName: String) {
         fun fromString(str: String): ResourceType =
             ResourceType.values()
                 .firstOrNull { it.typeName.equals(str, true) }
-                ?: error("Unknown resource type: $str")
+                ?: error("Unknown resource type: '$str'.")
     }
 }
 
@@ -45,7 +45,7 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
 
     fun saveQualifier(className: ClassName, qualifier: String) {
         qualifiersMap[className]?.let {
-            error("${resourceItem.path} contains repetitive qualifiers: $it and $qualifier")
+            error("${resourceItem.path} contains repetitive qualifiers: '$it' and '$qualifier'.")
         }
         qualifiersMap[className] = qualifier
     }
@@ -75,7 +75,7 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
                     saveQualifier(regionQualifier, q)
                 }
 
-                else -> error("${resourceItem.path} contains unknown qualifier: $q")
+                else -> error("${resourceItem.path} contains unknown qualifier: '$q'.")
             }
         }
     }
@@ -85,11 +85,11 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
     qualifiersMap[regionQualifier]?.let { q ->
         val lang = qualifiersMap[languageQualifier]
         if (lang == null) {
-            error("Region qualifier must be used only with language\nFile: ${resourceItem.path}")
+            error("Region qualifier must be used only with language.\nFile: ${resourceItem.path}")
         }
         val langAndRegion = "$lang-$q"
         if(!resourceItem.path.toString().contains("-$langAndRegion")) {
-            error("Region qualifier must be declared after language: '$langAndRegion'\nFile: ${resourceItem.path}")
+            error("Region qualifier must be declared after language: '$langAndRegion'.\nFile: ${resourceItem.path}")
         }
         add("%T(\"${q.takeLast(2)}\"), ", regionQualifier)
     }

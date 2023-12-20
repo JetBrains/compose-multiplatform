@@ -17,7 +17,7 @@ class ResourcesTest : GradlePluginTestBase() {
                 file("expected/Res.kt")
             )
             check.logContains("""
-                Unknown resource type: ignored
+                Unknown resource type: 'ignored'.
             """.trimIndent())
         }
 
@@ -39,7 +39,7 @@ class ResourcesTest : GradlePluginTestBase() {
 
         gradle("generateComposeResClass").checks {
             check.logContains("""
-                contains unknown qualifier: ren
+                contains unknown qualifier: 'ren'.
             """.trimIndent())
         }
 
@@ -49,7 +49,7 @@ class ResourcesTest : GradlePluginTestBase() {
 
         gradle("generateComposeResClass").checks {
             check.logContains("""
-                Region qualifier must be declared after language: 'en-rUS'
+                Region qualifier must be declared after language: 'en-rUS'.
             """.trimIndent())
         }
 
@@ -59,7 +59,7 @@ class ResourcesTest : GradlePluginTestBase() {
 
         gradle("generateComposeResClass").checks {
             check.logContains("""
-                Region qualifier must be used only with language
+                Region qualifier must be used only with language.
             """.trimIndent())
         }
 
@@ -69,7 +69,7 @@ class ResourcesTest : GradlePluginTestBase() {
 
         gradle("generateComposeResClass").checks {
             check.logContains("""
-                contains repetitive qualifiers: en and fr
+                contains repetitive qualifiers: 'en' and 'fr'.
             """.trimIndent())
         }
 
