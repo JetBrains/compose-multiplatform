@@ -90,9 +90,9 @@ private fun initializeMediaPlayerComponent(): Component {
 private fun MediaPlayer.setupVideoFinishHandler(onFinish: (() -> Unit)?) {
     DisposableEffect(onFinish) {
         val listener = object : MediaPlayerEventAdapter() {
-            override fun stopped(mediaPlayer: MediaPlayer) {
+            override fun finished(mediaPlayer: MediaPlayer) {
                 onFinish?.invoke()
-                mediaPlayer.controls().play()
+                mediaPlayer.submit { mediaPlayer.controls().play() }
             }
         }
         events().addMediaPlayerEventListener(listener)
