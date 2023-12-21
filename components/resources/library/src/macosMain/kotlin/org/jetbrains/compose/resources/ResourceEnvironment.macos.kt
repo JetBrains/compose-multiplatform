@@ -6,7 +6,7 @@ import platform.CoreGraphics.CGDisplayPixelsWide
 import platform.CoreGraphics.CGDisplayScreenSize
 import platform.Foundation.*
 
-internal actual fun getResourceEnvironment(): ResourceEnvironment {
+internal actual fun getSystemEnvironment(): ResourceEnvironment {
     val locale = NSLocale.currentLocale()
     val isDarkTheme = NSUserDefaults.standardUserDefaults.stringForKey("AppleInterfaceStyle") == "Dark"
 

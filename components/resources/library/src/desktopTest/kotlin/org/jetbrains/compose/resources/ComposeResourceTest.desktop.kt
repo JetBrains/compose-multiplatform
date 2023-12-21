@@ -21,6 +21,11 @@ class ComposeResourceTest {
         dropImageCache()
     }
 
+    @Before
+    fun configureTestEnvironment() {
+        getResourceEnvironment = ::getTestEnvironment
+    }
+
     @Test
     fun testCountRecompositions() = runComposeUiTest {
         runBlockingTest {

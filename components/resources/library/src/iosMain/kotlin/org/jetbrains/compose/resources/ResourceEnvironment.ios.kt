@@ -4,7 +4,7 @@ import platform.Foundation.*
 import platform.UIKit.UIScreen
 import platform.UIKit.UIUserInterfaceStyle
 
-internal actual fun getResourceEnvironment(): ResourceEnvironment {
+internal actual fun getSystemEnvironment(): ResourceEnvironment {
     val locale = NSLocale.currentLocale()
 
     val mainScreen = UIScreen.mainScreen
