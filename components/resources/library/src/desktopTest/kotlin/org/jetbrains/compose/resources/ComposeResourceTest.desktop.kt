@@ -27,10 +27,12 @@ class ComposeResourceTest {
             val imagePathFlow = MutableStateFlow(DrawableResource("1.png"))
             val recompositionsCounter = RecompositionsCounter()
             setContent {
-                val res by imagePathFlow.collectAsState()
-                val imgRes = imageResource(res)
-                recompositionsCounter.content {
-                    Image(bitmap = imgRes, contentDescription = null)
+                CompositionLocalProvider(LocalComposeEnvironment provides TestComposeEnvironment) {
+                    val res by imagePathFlow.collectAsState()
+                    val imgRes = imageResource(res)
+                    recompositionsCounter.content {
+                        Image(bitmap = imgRes, contentDescription = null)
+                    }
                 }
             }
             awaitIdle()
@@ -46,7 +48,10 @@ class ComposeResourceTest {
             val testResourceReader = TestResourceReader()
             val imagePathFlow = MutableStateFlow(DrawableResource("1.png"))
             setContent {
-                CompositionLocalProvider(LocalResourceReader provides testResourceReader) {
+                CompositionLocalProvider(
+                    LocalResourceReader provides testResourceReader,
+                    LocalComposeEnvironment provides TestComposeEnvironment
+                ) {
                     val res by imagePathFlow.collectAsState()
                     Image(painterResource(res), null)
                 }
@@ -70,7 +75,10 @@ class ComposeResourceTest {
             val testResourceReader = TestResourceReader()
             val stringIdFlow = MutableStateFlow(TestStringResource("app_name"))
             setContent {
-                CompositionLocalProvider(LocalResourceReader provides testResourceReader) {
+                CompositionLocalProvider(
+                    LocalResourceReader provides testResourceReader,
+                    LocalComposeEnvironment provides TestComposeEnvironment
+                ) {
                     val res by stringIdFlow.collectAsState()
                     Text(stringResource(res))
                     Text(stringArrayResource(TestStringResource("str_arr")).joinToString())
@@ -93,12 +101,20 @@ class ComposeResourceTest {
     fun testReadStringResource() = runComposeUiTest {
         runBlockingTest {
             setContent {
-                assertEquals("Compose Resources App", stringResource(TestStringResource("app_name")))
-                assertEquals(
-                    "Hello, test-name! You have 42 new messages.",
-                    stringResource(TestStringResource("str_template"), "test-name", 42)
-                )
-                assertEquals(listOf("item 1", "item 2", "item 3"), stringArrayResource(TestStringResource("str_arr")))
+                CompositionLocalProvider(LocalComposeEnvironment provides TestComposeEnvironment) {
+                    assertEquals(
+                        "Compose Resources App",
+                        stringResource(TestStringResource("app_name"))
+                    )
+                    assertEquals(
+                        "Hello, test-name! You have 42 new messages.",
+                        stringResource(TestStringResource("str_template"), "test-name", 42)
+                    )
+                    assertEquals(
+                        listOf("item 1", "item 2", "item 3"),
+                        stringArrayResource(TestStringResource("str_arr"))
+                    )
+                }
             }
             awaitIdle()
         }

@@ -12,7 +12,7 @@ internal actual fun <T> rememberResourceState(
     getDefault: () -> T,
     block: suspend (ResourceEnvironment) -> T
 ): State<T> {
-    val environment = rememberEnvironment()
+    val environment = LocalComposeEnvironment.current.rememberEnvironment()
     val state = remember(key) { mutableStateOf(getDefault()) }
     LaunchedEffect(key) {
         state.value = block(environment)

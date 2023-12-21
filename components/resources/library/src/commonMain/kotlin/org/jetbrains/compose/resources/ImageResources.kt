@@ -44,7 +44,7 @@ fun DrawableResource(path: String): DrawableResource = DrawableResource(
 @ExperimentalResourceApi
 @Composable
 fun painterResource(resource: DrawableResource): Painter {
-    val environment = rememberEnvironment()
+    val environment = LocalComposeEnvironment.current.rememberEnvironment()
     val filePath = remember(resource, environment) { resource.getPathByEnvironment(environment) }
     val isXml = filePath.endsWith(".xml", true)
     if (isXml) {
