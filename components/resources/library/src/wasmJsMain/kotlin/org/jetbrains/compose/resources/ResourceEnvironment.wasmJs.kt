@@ -9,7 +9,7 @@ private external class Intl {
     }
 }
 
-internal actual fun getResourceEnvironment(): ResourceEnvironment {
+internal actual fun getSystemEnvironment(): ResourceEnvironment {
     val locale = Intl.Locale(window.navigator.language)
     val isDarkTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
     //96 - standard browser DPI https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio

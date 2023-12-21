@@ -39,11 +39,14 @@ internal val DefaultComposeEnvironment = object : ComposeEnvironment {
 //ComposeEnvironment provider will be overridden for tests
 internal val LocalComposeEnvironment = staticCompositionLocalOf { DefaultComposeEnvironment }
 
+internal expect fun getSystemEnvironment(): ResourceEnvironment
+
+//the function reference will be overridden for tests
 /**
  * Provides the resource environment for non-composable access to string resources.
  * It is an expensive operation! Don't use it in composable functions with no cache!
  */
-internal expect fun getResourceEnvironment(): ResourceEnvironment
+internal var getResourceEnvironment = ::getSystemEnvironment
 
 internal fun Resource.getPathByEnvironment(environment: ResourceEnvironment): String {
     //Priority of environments: https://developer.android.com/guide/topics/resources/providing-resources#table2

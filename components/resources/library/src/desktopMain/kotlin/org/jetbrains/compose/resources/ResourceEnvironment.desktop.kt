@@ -5,7 +5,7 @@ import org.jetbrains.skiko.currentSystemTheme
 import java.awt.Toolkit
 import java.util.*
 
-internal actual fun getResourceEnvironment(): ResourceEnvironment {
+internal actual fun getSystemEnvironment(): ResourceEnvironment {
     val locale = Locale.getDefault()
     //FIXME: don't use skiko internals
     val isDarkTheme = currentSystemTheme == SystemTheme.DARK
