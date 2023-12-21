@@ -12,22 +12,32 @@ internal data class ResourceEnvironment(
     val density: DensityQualifier
 )
 
-@Composable
-internal fun rememberEnvironment(): ResourceEnvironment {
-    val composeLocale = Locale.current
-    val composeTheme = isSystemInDarkTheme()
-    val composeDensity = LocalDensity.current
+internal interface ComposeEnvironment {
+    @Composable
+    fun rememberEnvironment(): ResourceEnvironment
+}
 
-    //cache ResourceEnvironment unless compose environment is changed
-    return remember(composeLocale, composeTheme, composeDensity) {
-        ResourceEnvironment(
-            LanguageQualifier(composeLocale.language),
-            RegionQualifier(composeLocale.region),
-            ThemeQualifier.selectByValue(composeTheme),
-            DensityQualifier.selectByDensity(composeDensity.density)
-        )
+internal val DefaultComposeEnvironment = object : ComposeEnvironment {
+    @Composable
+    override fun rememberEnvironment(): ResourceEnvironment {
+        val composeLocale = Locale.current
+        val composeTheme = isSystemInDarkTheme()
+        val composeDensity = LocalDensity.current
+
+        //cache ResourceEnvironment unless compose environment is changed
+        return remember(composeLocale, composeTheme, composeDensity) {
+            ResourceEnvironment(
+                LanguageQualifier(composeLocale.language),
+                RegionQualifier(composeLocale.region),
+                ThemeQualifier.selectByValue(composeTheme),
+                DensityQualifier.selectByDensity(composeDensity.density)
+            )
+        }
     }
 }
+
+//ComposeEnvironment provider will be overridden for tests
+internal val LocalComposeEnvironment = staticCompositionLocalOf { DefaultComposeEnvironment }
 
 /**
  * Provides the resource environment for non-composable access to string resources.
