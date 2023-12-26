@@ -259,7 +259,7 @@ compose.desktop {
 
 The following properties are available in the `nativeDistributions` DSL block:
 * `packageName` — application's name (default value: Gradle project's [name](https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html#getName--));
-* `version` — application's version (default value: Gradle project's [version](https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html#getVersion--));
+* `packageVersion` — application's version (default value: Gradle project's [version](https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html#getVersion--));
 * `description` — application's description (default value: none);
 * `copyright` — application's copyright (default value: none);
 * `vendor` — application's vendor (default value: none);
@@ -270,7 +270,7 @@ compose.desktop {
     application {
         nativeDistributions {
             packageName = "ExampleApp"
-            version = "0.1-SNAPSHOT"
+            packageVersion = "0.1-SNAPSHOT"
             description = "Compose Example App"
             copyright = "© 2020 My Name. All rights reserved."
             vendor = "Example vendor"
