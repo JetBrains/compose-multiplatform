@@ -129,20 +129,10 @@ class GradlePluginTest : GradlePluginTestBase() {
         } else {
             ":subproject:linkDebugFrameworkIosArm64"
         }
-        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_9_0)) {
-            gradle(task, "--info").checks {
-                check.taskSuccessful(task)
-                check.logDoesntContain("-Xauto-cache-from=")
-            }
-        }
-        testWorkDir.deleteRecursively()
-        testWorkDir.mkdirs()
-        with(nativeCacheKindProject(kotlinVersion = TestKotlinVersions.v1_9_10) ) {
-            gradle(task, "--info").checks {
-                check.taskSuccessful(task)
-                check.logDoesntContain("-Xauto-cache-from=")
-            }
-        }
+        // Note: we used to test with kotlin version 1.9.0 and 1.9.10 too,
+        // but since we now use Compose core libs (1.6.0-dev-1340 and newer) built using kotlin 1.9.21,
+        // the compiler crashed (older k/native doesn't support libs built using newer k/native):
+        // e: kotlin.NotImplementedError: Generation of stubs for class org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterPublicSymbolImpl is not supported yet
 
         val defaultKotlinVersion = kotlinVersionNumbers(TestKotlinVersions.Default)
         if (defaultKotlinVersion >= KotlinVersion(1, 9, 20)) {
