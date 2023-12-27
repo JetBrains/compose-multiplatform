@@ -4,6 +4,13 @@ on:
     paths:
       - 'gradle-plugins/**'
       - '.github/workflows/gradle-plugin.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'gradle-plugins/**'
+      - '.github/workflows/gradle-plugin.yml'
+
 jobs:
   test-gradle-plugin:
     strategy:
