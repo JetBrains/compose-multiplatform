@@ -1,5 +1,8 @@
 package app.group.generated.resources
 
+import kotlin.ByteArray
+import kotlin.OptIn
+import kotlin.String
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.FontResource
 import org.jetbrains.compose.resources.LanguageQualifier
@@ -7,15 +10,20 @@ import org.jetbrains.compose.resources.RegionQualifier
 import org.jetbrains.compose.resources.ResourceItem
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.ThemeQualifier
+import org.jetbrains.compose.resources.readResourceBytes
 
 internal object Res {
+    @OptIn(org.jetbrains.compose.resources.InternalResourceApi::class)
+    public suspend fun readFileBytes(path: String): ByteArray =
+        readResourceBytes("composeResources/" + path)
+
     public object drawable {
         public val _3_strange_name: DrawableResource = DrawableResource(
             "drawable:_3_strange_name",
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeRes/drawable/3-strange-name.xml"
+                    "composeResources/drawable/3-strange-name.xml"
                 ),
             )
         )
@@ -25,19 +33,19 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(LanguageQualifier("au"), RegionQualifier("US"), ),
-                    "composeRes/drawable-au-rUS/vector.xml"
+                    "composeResources/drawable-au-rUS/vector.xml"
                 ),
                 ResourceItem(
                     setOf(ThemeQualifier.DARK, LanguageQualifier("ge"), ),
-                    "composeRes/drawable-dark-ge/vector.xml"
+                    "composeResources/drawable-dark-ge/vector.xml"
                 ),
                 ResourceItem(
                     setOf(LanguageQualifier("en"), ),
-                    "composeRes/drawable-en/vector.xml"
+                    "composeResources/drawable-en/vector.xml"
                 ),
                 ResourceItem(
                     setOf(),
-                    "composeRes/drawable/vector.xml"
+                    "composeResources/drawable/vector.xml"
                 ),
             )
         )
@@ -47,7 +55,7 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeRes/drawable/vector_2.xml"
+                    "composeResources/drawable/vector_2.xml"
                 ),
             )
         )
@@ -59,7 +67,7 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeRes/font/emptyFont.otf"
+                    "composeResources/font/emptyFont.otf"
                 ),
             )
         )
@@ -72,7 +80,7 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeRes/values/strings.xml"
+                    "composeResources/values/strings.xml"
                 ),
             )
         )
@@ -83,7 +91,7 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeRes/values/strings.xml"
+                    "composeResources/values/strings.xml"
                 ),
             )
         )
@@ -94,7 +102,7 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeRes/values/strings.xml"
+                    "composeResources/values/strings.xml"
                 ),
             )
         )
@@ -105,7 +113,7 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeRes/values/strings.xml"
+                    "composeResources/values/strings.xml"
                 ),
             )
         )
@@ -116,7 +124,7 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeRes/values/strings.xml"
+                    "composeResources/values/strings.xml"
                 ),
             )
         )

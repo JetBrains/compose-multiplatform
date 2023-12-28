@@ -15,7 +15,7 @@ import kotlin.io.path.relativeTo
 abstract class GenerateResClassTask : DefaultTask() {
     @get:Input
     abstract val packageName: Property<String>
-    
+
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val resDir: DirectoryProperty
@@ -34,14 +34,20 @@ abstract class GenerateResClassTask : DefaultTask() {
             logger.info("Generate resources for $rootResDir")
 
             //get first level dirs
-            val dirs = rootResDir.listFiles { f -> f.isDirectory }.orEmpty()
+            val dirs = rootResDir.listFiles().orEmpty()
+
+            dirs.forEach { f ->
+                if (!f.isDirectory) {
+                    error("${f.name} is not directory! Raw files should be placed in '${rootResDir.name}/files' directory.")
+                }
+            }
 
             //type -> id -> resource item
             val resources: Map<ResourceType, Map<String, List<ResourceItem>>> = dirs
                 .flatMap { dir ->
-                    dir.listFiles { f -> !f.isDirectory }
+                    dir.listFiles()
                         .orEmpty()
-                        .mapNotNull { it.fileToResourceItems(rootResDir.parentFile.toPath()) }
+                        .mapNotNull { it.fileToResourceItems(rootResDir.toPath()) }
                         .flatten()
                 }
                 .groupBy { it.type }
@@ -61,7 +67,6 @@ abstract class GenerateResClassTask : DefaultTask() {
         relativeTo: Path
     ): List<ResourceItem>? {
         val file = this
-        if (file.isDirectory) return null
         val dirName = file.parentFile.name ?: return null
         val typeAndQualifiers = dirName.split("-")
         if (typeAndQualifiers.isEmpty()) return null
@@ -70,20 +75,25 @@ abstract class GenerateResClassTask : DefaultTask() {
         val qualifiers = typeAndQualifiers.takeLast(typeAndQualifiers.size - 1)
         val path = file.toPath().relativeTo(relativeTo)
 
-        return if (typeString == "values" && file.name.equals("strings.xml", true)) {
+
+        if (typeString == "string") {
+            error("Forbidden directory name '$dirName'! String resources should be declared in 'values/strings.xml'.")
+        }
+
+        if (typeString == "files") {
+            if (qualifiers.isNotEmpty()) error("The 'files' directory doesn't support qualifiers: '$dirName'.")
+            return null
+        }
+
+        if (typeString == "values" && file.name.equals("strings.xml", true)) {
             val stringIds = getStringIds(file)
-            stringIds.map { strId ->
+            return stringIds.map { strId ->
                 ResourceItem(ResourceType.STRING, qualifiers, strId.asUnderscoredIdentifier(), path)
             }
-        } else {
-            val type = try {
-                ResourceType.fromString(typeString)
-            } catch (e: Exception) {
-                logger.warn("w: Skip file: $path\n${e.message}")
-                return null
-            }
-            listOf(ResourceItem(type, qualifiers, file.nameWithoutExtension.asUnderscoredIdentifier(), path))
         }
+
+        val type = ResourceType.fromString(typeString)
+        return listOf(ResourceItem(type, qualifiers, file.nameWithoutExtension.asUnderscoredIdentifier(), path))
     }
 
     private val stringTypeNames = listOf("string", "string-array")

@@ -33,7 +33,7 @@ fun StringRes(paddingValues: PaddingValues) {
     ) {
         Text(
             modifier = Modifier.padding(16.dp),
-            text = "composeRes/values/strings.xml",
+            text = "values/strings.xml",
             style = MaterialTheme.typography.titleLarge
         )
         OutlinedCard(
@@ -43,7 +43,7 @@ fun StringRes(paddingValues: PaddingValues) {
         ) {
             var bytes by remember { mutableStateOf(ByteArray(0)) }
             LaunchedEffect(Unit) {
-                bytes = readResourceBytes("composeRes/values/strings.xml")
+                bytes = Res.readFileBytes("values/strings.xml")
             }
             Text(
                 modifier = Modifier.padding(8.dp),

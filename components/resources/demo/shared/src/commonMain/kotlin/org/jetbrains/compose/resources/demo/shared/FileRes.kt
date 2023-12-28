@@ -19,7 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.readResourceBytes
+import components.resources.demo.generated.resources.Res
 
 @Composable
 fun FileRes(paddingValues: PaddingValues) {
@@ -28,7 +28,7 @@ fun FileRes(paddingValues: PaddingValues) {
     ) {
         Text(
             modifier = Modifier.padding(16.dp),
-            text = "File: 'composeRes/drawable/droid_icon.xml'",
+            text = "File: 'files/icon.xml'",
             style = MaterialTheme.typography.titleLarge
         )
         OutlinedCard(
@@ -38,7 +38,7 @@ fun FileRes(paddingValues: PaddingValues) {
         ) {
             var bytes by remember { mutableStateOf(ByteArray(0)) }
             LaunchedEffect(Unit) {
-                bytes = readResourceBytes("composeRes/drawable/droid_icon.xml")
+                bytes = Res.readFileBytes("files/icon.xml")
             }
             Text(
                 modifier = Modifier.padding(8.dp).height(200.dp).verticalScroll(rememberScrollState()),
@@ -54,7 +54,7 @@ fun FileRes(paddingValues: PaddingValues) {
                   mutableStateOf(ByteArray(0))
                 }
                 LaunchedEffect(Unit) {
-                  bytes = readResourceBytes("composeRes/drawable/droid_icon.xml")
+                  bytes = Res.readFileBytes("files/icon.xml")
                 }
                 Text(bytes.decodeToString())
             """.trimIndent()

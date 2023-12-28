@@ -11,7 +11,7 @@ class MissingResourceException(path: String) : Exception("Missing resource with 
  * @param path The path of the file to read in the resource's directory.
  * @return The content of the file as a byte array.
  */
-@ExperimentalResourceApi
+@InternalResourceApi
 expect suspend fun readResourceBytes(path: String): ByteArray
 
 internal interface ResourceReader {
@@ -19,7 +19,7 @@ internal interface ResourceReader {
 }
 
 internal val DefaultResourceReader: ResourceReader = object : ResourceReader {
-    @OptIn(ExperimentalResourceApi::class)
+    @OptIn(InternalResourceApi::class)
     override suspend fun read(path: String): ByteArray = readResourceBytes(path)
 }
 

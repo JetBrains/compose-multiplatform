@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.File
 
-private const val COMPOSE_RESOURCES_DIR = "composeRes"
+internal const val COMPOSE_RESOURCES_DIR = "composeResources"
 private const val RES_GEN_DIR = "generated/compose/resourceGenerator"
 
 internal fun Project.configureResourceGenerator() {
