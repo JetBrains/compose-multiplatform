@@ -41,7 +41,7 @@ enum class DensityQualifier(val dpi: Int) : Qualifier {
         fun selectByDensity(density: Float) = when {
             density <= 0.75 -> LDPI
             density <= 1.0 -> MDPI
-            density <= 1.33 -> HDPI
+            density <= 1.5 -> HDPI
             density <= 2.0 -> XHDPI
             density <= 3.0 -> XXHDPI
             else -> XXXHDPI
