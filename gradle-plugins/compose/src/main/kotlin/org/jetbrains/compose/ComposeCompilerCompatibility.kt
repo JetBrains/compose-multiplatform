@@ -22,7 +22,7 @@ internal object ComposeCompilerCompatibility {
         "1.9.20-RC2" to "1.5.3-rc01",
         "1.9.20" to "1.5.3",
         "1.9.21" to "1.5.4",
-        "1.9.22" to "1.5.7",
+        "1.9.22" to "1.5.7.1",
         "2.0.0-Beta1" to "1.5.4-dev1-kt2.0.0-Beta1",
     )
 
