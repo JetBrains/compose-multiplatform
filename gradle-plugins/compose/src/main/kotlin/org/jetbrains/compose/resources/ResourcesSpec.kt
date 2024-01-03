@@ -108,12 +108,20 @@ internal fun getResFileSpec(
         //readFileBytes
         val readResourceBytes = MemberName("org.jetbrains.compose.resources", "readResourceBytes")
         addFunction(
-            FunSpec.builder("readFileBytes")
+            FunSpec.builder("readBytes")
                 .addAnnotation(
                     AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
                         .addMember("org.jetbrains.compose.resources.InternalResourceApi::class")
                         .build()
                 )
+                .addKdoc("""
+                    Reads the content of the resource file at the specified path and returns it as a byte array.
+                    
+                    Example: `val bytes = Res.readBytes("files/key.bin")`
+                    
+                    @param path The path of the file to read in the compose resource's directory.
+                    @return The content of the file as a byte array.
+                """.trimIndent())
                 .addParameter("path", String::class)
                 .addModifiers(KModifier.SUSPEND)
                 .returns(ByteArray::class)

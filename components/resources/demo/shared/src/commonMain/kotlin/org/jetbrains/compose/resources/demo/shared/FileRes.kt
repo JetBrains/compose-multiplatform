@@ -38,7 +38,7 @@ fun FileRes(paddingValues: PaddingValues) {
         ) {
             var bytes by remember { mutableStateOf(ByteArray(0)) }
             LaunchedEffect(Unit) {
-                bytes = Res.readFileBytes("files/icon.xml")
+                bytes = Res.readBytes("files/icon.xml")
             }
             Text(
                 modifier = Modifier.padding(8.dp).height(200.dp).verticalScroll(rememberScrollState()),

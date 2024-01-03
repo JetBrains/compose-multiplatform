@@ -43,7 +43,7 @@ fun StringRes(paddingValues: PaddingValues) {
         ) {
             var bytes by remember { mutableStateOf(ByteArray(0)) }
             LaunchedEffect(Unit) {
-                bytes = Res.readFileBytes("values/strings.xml")
+                bytes = Res.readBytes("values/strings.xml")
             }
             Text(
                 modifier = Modifier.padding(8.dp),
