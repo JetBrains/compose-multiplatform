@@ -16,16 +16,12 @@ class ResourcesTest : GradlePluginTestBase() {
                 file("build/generated/compose/resourceGenerator/kotlin/app/group/generated/resources/Res.kt"),
                 file("expected/Res.kt")
             )
-            check.logContains("""
-                Unknown resource type: 'ignored'.
-            """.trimIndent())
         }
 
-        file("src/commonMain/resources/composeRes/drawable/vector_2.xml").renameTo(
-            file("src/commonMain/resources/composeRes/drawable/vector_3.xml")
-        )
-
         //check resource's accessors were regenerated
+        file("src/commonMain/resources/composeResources/drawable/vector_2.xml").renameTo(
+            file("src/commonMain/resources/composeResources/drawable/vector_3.xml")
+        )
         gradle("generateComposeResClass").checks {
             assertNotEqualTextFiles(
                 file("build/generated/compose/resourceGenerator/kotlin/app/group/generated/resources/Res.kt"),
@@ -33,52 +29,84 @@ class ResourcesTest : GradlePluginTestBase() {
             )
         }
 
-        file("src/commonMain/resources/composeRes/drawable-en").renameTo(
-            file("src/commonMain/resources/composeRes/drawable-ren")
+        file("src/commonMain/resources/composeResources/drawable-en").renameTo(
+            file("src/commonMain/resources/composeResources/drawable-ren")
         )
-
         gradle("generateComposeResClass").checks {
             check.logContains("""
                 contains unknown qualifier: 'ren'.
             """.trimIndent())
         }
 
-        file("src/commonMain/resources/composeRes/drawable-ren").renameTo(
-            file("src/commonMain/resources/composeRes/drawable-rUS-en")
+        file("src/commonMain/resources/composeResources/drawable-ren").renameTo(
+            file("src/commonMain/resources/composeResources/drawable-rUS-en")
         )
-
         gradle("generateComposeResClass").checks {
             check.logContains("""
                 Region qualifier must be declared after language: 'en-rUS'.
             """.trimIndent())
         }
 
-        file("src/commonMain/resources/composeRes/drawable-rUS-en").renameTo(
-            file("src/commonMain/resources/composeRes/drawable-rUS")
+        file("src/commonMain/resources/composeResources/drawable-rUS-en").renameTo(
+            file("src/commonMain/resources/composeResources/drawable-rUS")
         )
-
         gradle("generateComposeResClass").checks {
             check.logContains("""
                 Region qualifier must be used only with language.
             """.trimIndent())
         }
 
-        file("src/commonMain/resources/composeRes/drawable-rUS").renameTo(
-            file("src/commonMain/resources/composeRes/drawable-en-fr")
+        file("src/commonMain/resources/composeResources/drawable-rUS").renameTo(
+            file("src/commonMain/resources/composeResources/drawable-en-fr")
         )
-
         gradle("generateComposeResClass").checks {
             check.logContains("""
                 contains repetitive qualifiers: 'en' and 'fr'.
             """.trimIndent())
         }
 
-        file("src/commonMain/resources/composeRes/drawable-en-fr").renameTo(
-            file("src/commonMain/resources/composeRes/drawable-en")
+        file("src/commonMain/resources/composeResources/drawable-en-fr").renameTo(
+            file("src/commonMain/resources/composeResources/image")
         )
+        gradle("generateComposeResClass").checks {
+            check.logContains("""
+                Unknown resource type: 'image'
+            """.trimIndent())
+        }
 
-        file("src/commonMain/resources/composeRes/drawable/vector_3.xml").renameTo(
-            file("src/commonMain/resources/composeRes/drawable/vector_2.xml")
+        file("src/commonMain/resources/composeResources/image").renameTo(
+            file("src/commonMain/resources/composeResources/files-de")
+        )
+        gradle("generateComposeResClass").checks {
+            check.logContains("""
+                The 'files' directory doesn't support qualifiers: 'files-de'.
+            """.trimIndent())
+        }
+
+        file("src/commonMain/resources/composeResources/files-de").renameTo(
+            file("src/commonMain/resources/composeResources/strings")
+        )
+        gradle("generateComposeResClass").checks {
+            check.logContains("""
+                Unknown resource type: 'strings'.
+            """.trimIndent())
+        }
+
+        file("src/commonMain/resources/composeResources/strings").renameTo(
+            file("src/commonMain/resources/composeResources/string-us")
+        )
+        gradle("generateComposeResClass").checks {
+            check.logContains("""
+                Forbidden directory name 'string-us'! String resources should be declared in 'values/strings.xml'.
+            """.trimIndent())
+        }
+
+        //restore defaults
+        file("src/commonMain/resources/composeResources/string-us").renameTo(
+            file("src/commonMain/resources/composeResources/drawable-en")
+        )
+        file("src/commonMain/resources/composeResources/drawable/vector_3.xml").renameTo(
+            file("src/commonMain/resources/composeResources/drawable/vector_2.xml")
         )
 
         //TODO: check a real build after a release a new version of the resources library

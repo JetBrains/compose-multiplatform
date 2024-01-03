@@ -5,6 +5,9 @@ import androidx.compose.runtime.Immutable
 @RequiresOptIn("This API is experimental and is likely to change in the future.")
 annotation class ExperimentalResourceApi
 
+@RequiresOptIn("This is internal API of the Compose gradle plugin.")
+annotation class InternalResourceApi
+
 /**
  * Represents a resource with an ID and a set of resource items.
  *
