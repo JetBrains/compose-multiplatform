@@ -119,6 +119,8 @@ abstract class ComposePlugin : Plugin<Project> {
         @Deprecated("Use desktop.uiTestJUnit4", replaceWith = ReplaceWith("desktop.uiTestJUnit4"))
         @ExperimentalComposeLibrary
         val uiTestJUnit4 get() = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
+        @ExperimentalComposeLibrary
+        val uiTest get() = composeDependency("org.jetbrains.compose.ui:ui-test")
         val uiTooling get() = composeDependency("org.jetbrains.compose.ui:ui-tooling")
         val uiUtil get() = composeDependency("org.jetbrains.compose.ui:ui-util")
         val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
