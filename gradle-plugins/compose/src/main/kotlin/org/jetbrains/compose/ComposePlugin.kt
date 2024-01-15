@@ -159,7 +159,6 @@ abstract class ComposePlugin : Plugin<Project> {
     }
 
     object CommonComponentsDependencies {
-        @ExperimentalComposeLibrary
         val resources = composeDependency("org.jetbrains.compose.components:components-resources")
     }
 

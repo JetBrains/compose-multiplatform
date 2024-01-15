@@ -29,6 +29,7 @@ class DrawableResource(id: String, items: Set<ResourceItem>) : Resource(id, item
  * @param path The path of the drawable resource.
  * @return An [DrawableResource] object.
  */
+@ExperimentalResourceApi
 fun DrawableResource(path: String): DrawableResource = DrawableResource(
     id = "DrawableResource:$path",
     items = setOf(ResourceItem(emptySet(), path))
@@ -41,7 +42,6 @@ fun DrawableResource(path: String): DrawableResource = DrawableResource(
  * @param resource The drawable resource to be used.
  * @return The [Painter] loaded from the resource.
  */
-@ExperimentalResourceApi
 @Composable
 fun painterResource(resource: DrawableResource): Painter {
     val environment = LocalComposeEnvironment.current.rememberEnvironment()
@@ -62,7 +62,6 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
  * @param resource The drawable resource to be used.
  * @return The ImageBitmap loaded from the resource.
  */
-@ExperimentalResourceApi
 @Composable
 fun imageResource(resource: DrawableResource): ImageBitmap {
     val resourceReader = LocalResourceReader.current
@@ -86,7 +85,6 @@ private val emptyImageVector: ImageVector by lazy {
  * @param resource The drawable resource to be used.
  * @return The ImageVector loaded from the resource.
  */
-@ExperimentalResourceApi
 @Composable
 fun vectorResource(resource: DrawableResource): ImageVector {
     val resourceReader = LocalResourceReader.current

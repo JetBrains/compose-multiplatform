@@ -69,7 +69,6 @@ private suspend fun parseStringXml(path: String, resourceReader: ResourceReader)
  *
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
-@ExperimentalResourceApi
 @Composable
 fun stringResource(resource: StringResource): String {
     val resourceReader = LocalResourceReader.current
@@ -87,7 +86,6 @@ fun stringResource(resource: StringResource): String {
  *
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
-@ExperimentalResourceApi
 suspend fun getString(resource: StringResource): String =
     loadString(resource, DefaultResourceReader, getResourceEnvironment())
 
@@ -112,7 +110,6 @@ private suspend fun loadString(
  *
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
-@ExperimentalResourceApi
 @Composable
 fun stringResource(resource: StringResource, vararg formatArgs: Any): String {
     val resourceReader = LocalResourceReader.current
@@ -132,7 +129,6 @@ fun stringResource(resource: StringResource, vararg formatArgs: Any): String {
  *
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
-@ExperimentalResourceApi
 suspend fun getString(resource: StringResource, vararg formatArgs: Any): String = loadString(
     resource,
     formatArgs.map { it.toString() },
@@ -160,7 +156,6 @@ private suspend fun loadString(
  *
  * @throws IllegalStateException if the string array with the given ID is not found.
  */
-@ExperimentalResourceApi
 @Composable
 fun stringArrayResource(resource: StringResource): List<String> {
     val resourceReader = LocalResourceReader.current
@@ -178,7 +173,6 @@ fun stringArrayResource(resource: StringResource): List<String> {
  *
  * @throws IllegalStateException if the string array with the given ID is not found.
  */
-@ExperimentalResourceApi
 suspend fun getStringArray(resource: StringResource): List<String> =
     loadStringArray(resource, DefaultResourceReader, getResourceEnvironment())
 

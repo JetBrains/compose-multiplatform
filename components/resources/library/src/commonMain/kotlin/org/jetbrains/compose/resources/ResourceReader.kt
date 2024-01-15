@@ -2,7 +2,6 @@ package org.jetbrains.compose.resources
 
 import androidx.compose.runtime.staticCompositionLocalOf
 
-@ExperimentalResourceApi
 class MissingResourceException(path: String) : Exception("Missing resource with path: $path")
 
 /**
