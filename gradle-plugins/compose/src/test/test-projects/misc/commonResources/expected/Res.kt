@@ -1,4 +1,4 @@
-package app.group.generated.resources
+package app.group.resources_test.generated.resources
 
 import kotlin.ByteArray
 import kotlin.OptIn

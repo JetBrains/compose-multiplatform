@@ -33,7 +33,8 @@ private fun Project.configureResourceGenerator(commonComposeResourcesDir: File, 
             val group = project.group.toString().asUnderscoredIdentifier()
             append(group)
             if (group.isNotEmpty()) append(".")
-            append("generated.resources")
+            append(project.name.lowercase())
+            append(".generated.resources")
         }
     }
 

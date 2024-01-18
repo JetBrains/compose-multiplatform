@@ -1,3 +1,4 @@
+rootProject.name = "resources_test"
 pluginManagement {
     repositories {
         mavenLocal()
