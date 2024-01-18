@@ -22,12 +22,12 @@ folders+=(
 fi
 
 if [ -z "$1" ]; then
-echo "Specify Compose version. For example: ./replace.sh 1.2.0-beta02 1.7.10"
+echo "Specify Compose version. For example: ./replaceVersion.sh 1.2.0-beta02 1.7.10"
 exit 1
 fi
 
 if [ -z "$2" ]; then
-echo "Specify Kotlin version. For example: ./replace.sh 1.2.0-beta02 1.7.10"
+echo "Specify Kotlin version. For example: ./replaceVersion.sh 1.2.0-beta02 1.7.10"
 exit 1
 fi
 
