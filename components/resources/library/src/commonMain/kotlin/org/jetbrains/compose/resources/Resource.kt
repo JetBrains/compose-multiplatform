@@ -14,6 +14,7 @@ annotation class InternalResourceApi
  * @property id The ID of the resource.
  * @property items The set of resource items associated with the resource.
  */
+@ExperimentalResourceApi
 @Immutable
 sealed class Resource
 @InternalResourceApi constructor(

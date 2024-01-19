@@ -15,6 +15,7 @@ import kotlin.wasm.unsafe.withScopedMemoryAllocator
  * @return The content of the file as a byte array.
  */
 @OptIn(ExperimentalResourceApi::class)
+@InternalResourceApi
 actual suspend fun readResourceBytes(path: String): ByteArray {
     val resPath = WebResourcesConfiguration.getResourcePath(path)
     val response = window.fetch(resPath).await<Response>()

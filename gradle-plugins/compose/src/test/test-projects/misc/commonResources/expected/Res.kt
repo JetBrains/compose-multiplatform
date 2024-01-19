@@ -4,6 +4,7 @@ import kotlin.ByteArray
 import kotlin.OptIn
 import kotlin.String
 import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.FontResource
 import org.jetbrains.compose.resources.LanguageQualifier
 import org.jetbrains.compose.resources.RegionQualifier
@@ -13,6 +14,7 @@ import org.jetbrains.compose.resources.ThemeQualifier
 import org.jetbrains.compose.resources.readResourceBytes
 
 @OptIn(org.jetbrains.compose.resources.InternalResourceApi::class)
+@ExperimentalResourceApi
 internal object Res {
     /**
      * Reads the content of the resource file at the specified path and returns it as a byte array.

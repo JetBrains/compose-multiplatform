@@ -109,6 +109,10 @@ internal fun getResFileSpec(
                 .addMember("org.jetbrains.compose.resources.InternalResourceApi::class")
                 .build()
         )
+        addAnnotation(
+            AnnotationSpec.builder(ClassName("org.jetbrains.compose.resources", "ExperimentalResourceApi"))
+                .build()
+        )
 
         //readFileBytes
         val readResourceBytes = MemberName("org.jetbrains.compose.resources", "readResourceBytes")

@@ -9,6 +9,7 @@ private fun ArrayBuffer.toByteArray(): ByteArray =
     Int8Array(this, 0, byteLength).unsafeCast<ByteArray>()
 
 @OptIn(ExperimentalResourceApi::class)
+@InternalResourceApi
 actual suspend fun readResourceBytes(path: String): ByteArray {
     val resPath = WebResourcesConfiguration.getResourcePath(path)
     val response = window.fetch(resPath).await()
