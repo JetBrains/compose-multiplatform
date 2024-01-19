@@ -12,7 +12,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-@OptIn(ExperimentalResourceApi::class, ExperimentalTestApi::class)
+@OptIn(ExperimentalTestApi::class)
 class ComposeResourceTest {
 
     @Before

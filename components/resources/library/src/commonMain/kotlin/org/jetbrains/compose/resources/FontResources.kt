@@ -21,6 +21,7 @@ class FontResource(id: String, items: Set<ResourceItem>): Resource(id, items)
  * @param path The path to the font resource file.
  * @return A new [FontResource] object.
  */
+@ExperimentalResourceApi
 fun FontResource(path: String): FontResource = FontResource(
     id = "FontResource:$path",
     items = setOf(ResourceItem(emptySet(), path))
@@ -37,7 +38,6 @@ fun FontResource(path: String): FontResource = FontResource(
  *
  * @throws NotFoundException if the specified resource ID is not found.
  */
-@ExperimentalResourceApi
 @Composable
 expect fun Font(
     resource: FontResource,
