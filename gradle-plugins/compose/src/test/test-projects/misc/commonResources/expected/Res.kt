@@ -12,6 +12,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.ThemeQualifier
 import org.jetbrains.compose.resources.readResourceBytes
 
+@OptIn(org.jetbrains.compose.resources.InternalResourceApi::class)
 internal object Res {
     /**
      * Reads the content of the resource file at the specified path and returns it as a byte array.
@@ -21,7 +22,6 @@ internal object Res {
      * @param path The path of the file to read in the compose resource's directory.
      * @return The content of the file as a byte array.
      */
-    @OptIn(org.jetbrains.compose.resources.InternalResourceApi::class)
     public suspend fun readBytes(path: String): ByteArray = readResourceBytes(path)
 
     public object drawable {

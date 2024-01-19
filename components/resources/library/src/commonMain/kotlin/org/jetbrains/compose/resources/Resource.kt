@@ -15,7 +15,8 @@ annotation class InternalResourceApi
  * @property items The set of resource items associated with the resource.
  */
 @Immutable
-sealed class Resource(
+sealed class Resource
+@InternalResourceApi constructor(
     internal val id: String,
     internal val items: Set<ResourceItem>
 ) {
@@ -39,6 +40,7 @@ sealed class Resource(
  * @property qualifiers The qualifiers of the resource item.
  * @property path The path of the resource item.
  */
+@InternalResourceApi
 @Immutable
 data class ResourceItem(
     internal val qualifiers: Set<Qualifier>,
