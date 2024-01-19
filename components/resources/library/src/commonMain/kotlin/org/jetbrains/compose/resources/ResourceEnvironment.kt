@@ -50,7 +50,7 @@ internal expect fun getSystemEnvironment(): ResourceEnvironment
  */
 internal var getResourceEnvironment = ::getSystemEnvironment
 
-@OptIn(InternalResourceApi::class)
+@OptIn(InternalResourceApi::class, ExperimentalResourceApi::class)
 internal fun Resource.getPathByEnvironment(environment: ResourceEnvironment): String {
     //Priority of environments: https://developer.android.com/guide/topics/resources/providing-resources#table2
     items.toList()
