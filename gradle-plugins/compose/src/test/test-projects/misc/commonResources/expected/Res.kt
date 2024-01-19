@@ -1,4 +1,4 @@
-package app.group.generated.resources
+package app.group.resources_test.generated.resources
 
 import kotlin.ByteArray
 import kotlin.OptIn
@@ -22,8 +22,7 @@ internal object Res {
      * @return The content of the file as a byte array.
      */
     @OptIn(org.jetbrains.compose.resources.InternalResourceApi::class)
-    public suspend fun readBytes(path: String): ByteArray = readResourceBytes("composeResources/" +
-            path)
+    public suspend fun readBytes(path: String): ByteArray = readResourceBytes(path)
 
     public object drawable {
         public val _3_strange_name: DrawableResource = DrawableResource(
@@ -31,7 +30,7 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeResources/drawable/3-strange-name.xml"
+                    "drawable/3-strange-name.xml"
                 ),
             )
         )
@@ -41,19 +40,19 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(LanguageQualifier("au"), RegionQualifier("US"), ),
-                    "composeResources/drawable-au-rUS/vector.xml"
+                    "drawable-au-rUS/vector.xml"
                 ),
                 ResourceItem(
                     setOf(ThemeQualifier.DARK, LanguageQualifier("ge"), ),
-                    "composeResources/drawable-dark-ge/vector.xml"
+                    "drawable-dark-ge/vector.xml"
                 ),
                 ResourceItem(
                     setOf(LanguageQualifier("en"), ),
-                    "composeResources/drawable-en/vector.xml"
+                    "drawable-en/vector.xml"
                 ),
                 ResourceItem(
                     setOf(),
-                    "composeResources/drawable/vector.xml"
+                    "drawable/vector.xml"
                 ),
             )
         )
@@ -63,7 +62,7 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeResources/drawable/vector_2.xml"
+                    "drawable/vector_2.xml"
                 ),
             )
         )
@@ -75,7 +74,7 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeResources/font/emptyFont.otf"
+                    "font/emptyFont.otf"
                 ),
             )
         )
@@ -88,7 +87,7 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeResources/values/strings.xml"
+                    "values/strings.xml"
                 ),
             )
         )
@@ -99,7 +98,7 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeResources/values/strings.xml"
+                    "values/strings.xml"
                 ),
             )
         )
@@ -110,7 +109,7 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeResources/values/strings.xml"
+                    "values/strings.xml"
                 ),
             )
         )
@@ -121,7 +120,7 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeResources/values/strings.xml"
+                    "values/strings.xml"
                 ),
             )
         )
@@ -132,7 +131,7 @@ internal object Res {
             setOf(
                 ResourceItem(
                     setOf(),
-                    "composeResources/values/strings.xml"
+                    "values/strings.xml"
                 ),
             )
         )

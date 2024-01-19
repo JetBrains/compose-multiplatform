@@ -125,7 +125,7 @@ internal fun getResFileSpec(
                 .addParameter("path", String::class)
                 .addModifiers(KModifier.SUSPEND)
                 .returns(ByteArray::class)
-                .addStatement("return %M(\"$COMPOSE_RESOURCES_DIR/\" + path)", readResourceBytes) //todo: add module ID here
+                .addStatement("return %M(path)", readResourceBytes) //todo: add module ID here
                 .build()
         )
 
@@ -163,7 +163,7 @@ private fun TypeSpec.Builder.addResourceProperty(name: String, items: List<Resou
                     add("%T(\n", resourceItemClass).withIndent {
                         add("setOf(").addQualifiers(item).add("),\n")
                         //file separator should be '/' on all platforms
-                        add("\"$COMPOSE_RESOURCES_DIR/${item.path.invariantSeparatorsPathString}\"\n") //todo: add module ID here
+                        add("\"${item.path.invariantSeparatorsPathString}\"\n") //todo: add module ID here
                     }
                     add("),\n")
                 }

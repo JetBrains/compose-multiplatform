@@ -19,7 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import components.resources.demo.generated.resources.Res
+import components.resources.demo.shared.generated.resources.Res
 
 @Composable
 fun FileRes(paddingValues: PaddingValues) {
