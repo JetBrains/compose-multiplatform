@@ -5,6 +5,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.intl.Locale
 
+@OptIn(InternalResourceApi::class)
 internal data class ResourceEnvironment(
     val language: LanguageQualifier,
     val region: RegionQualifier,
@@ -17,6 +18,7 @@ internal interface ComposeEnvironment {
     fun rememberEnvironment(): ResourceEnvironment
 }
 
+@OptIn(InternalResourceApi::class)
 internal val DefaultComposeEnvironment = object : ComposeEnvironment {
     @Composable
     override fun rememberEnvironment(): ResourceEnvironment {
@@ -48,6 +50,7 @@ internal expect fun getSystemEnvironment(): ResourceEnvironment
  */
 internal var getResourceEnvironment = ::getSystemEnvironment
 
+@OptIn(InternalResourceApi::class, ExperimentalResourceApi::class)
 internal fun Resource.getPathByEnvironment(environment: ResourceEnvironment): String {
     //Priority of environments: https://developer.android.com/guide/topics/resources/providing-resources#table2
     items.toList()
@@ -68,6 +71,7 @@ internal fun Resource.getPathByEnvironment(environment: ResourceEnvironment): St
         }
 }
 
+@OptIn(InternalResourceApi::class)
 private fun List<ResourceItem>.filterBy(qualifier: Qualifier): List<ResourceItem> {
     //Android has a slightly different algorithm,
     //but it provides the same result: https://developer.android.com/guide/topics/resources/providing-resources#BestMatch

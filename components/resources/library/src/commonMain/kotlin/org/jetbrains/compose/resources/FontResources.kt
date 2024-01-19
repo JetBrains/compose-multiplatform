@@ -12,8 +12,11 @@ import androidx.compose.ui.text.font.*
  *
  * @see Resource
  */
+@OptIn(InternalResourceApi::class)
+@ExperimentalResourceApi
 @Immutable
-class FontResource(id: String, items: Set<ResourceItem>): Resource(id, items)
+class FontResource
+@InternalResourceApi constructor(id: String, items: Set<ResourceItem>): Resource(id, items)
 
 /**
  * Creates an [FontResource] object with the specified path.
@@ -21,6 +24,7 @@ class FontResource(id: String, items: Set<ResourceItem>): Resource(id, items)
  * @param path The path to the font resource file.
  * @return A new [FontResource] object.
  */
+@OptIn(InternalResourceApi::class)
 @ExperimentalResourceApi
 fun FontResource(path: String): FontResource = FontResource(
     id = "FontResource:$path",
@@ -39,6 +43,7 @@ fun FontResource(path: String): FontResource = FontResource(
  * @throws NotFoundException if the specified resource ID is not found.
  */
 @Composable
+@ExperimentalResourceApi
 expect fun Font(
     resource: FontResource,
     weight: FontWeight = FontWeight.Normal,

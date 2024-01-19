@@ -88,7 +88,7 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
             error("Region qualifier must be used only with language.\nFile: ${resourceItem.path}")
         }
         val langAndRegion = "$lang-$q"
-        if(!resourceItem.path.toString().contains("-$langAndRegion")) {
+        if (!resourceItem.path.toString().contains("-$langAndRegion")) {
             error("Region qualifier must be declared after language: '$langAndRegion'.\nFile: ${resourceItem.path}")
         }
         add("%T(\"${q.takeLast(2)}\"), ", regionQualifier)
@@ -104,16 +104,20 @@ internal fun getResFileSpec(
 ): FileSpec = FileSpec.builder(packageName, "Res").apply {
     addType(TypeSpec.objectBuilder("Res").apply {
         addModifiers(KModifier.INTERNAL)
+        addAnnotation(
+            AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
+                .addMember("org.jetbrains.compose.resources.InternalResourceApi::class")
+                .build()
+        )
+        addAnnotation(
+            AnnotationSpec.builder(ClassName("org.jetbrains.compose.resources", "ExperimentalResourceApi"))
+                .build()
+        )
 
         //readFileBytes
         val readResourceBytes = MemberName("org.jetbrains.compose.resources", "readResourceBytes")
         addFunction(
             FunSpec.builder("readBytes")
-                .addAnnotation(
-                    AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
-                        .addMember("org.jetbrains.compose.resources.InternalResourceApi::class")
-                        .build()
-                )
                 .addKdoc("""
                     Reads the content of the resource file at the specified path and returns it as a byte array.
                     

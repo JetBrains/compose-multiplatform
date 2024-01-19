@@ -5,6 +5,8 @@ import kotlinx.cinterop.usePinned
 import platform.Foundation.NSFileManager
 import platform.posix.memcpy
 
+@OptIn(ExperimentalResourceApi::class)
+@InternalResourceApi
 actual suspend fun readResourceBytes(path: String): ByteArray {
     val currentDirectoryPath = NSFileManager.defaultManager().currentDirectoryPath
     val contentsAtPath = NSFileManager.defaultManager().run {

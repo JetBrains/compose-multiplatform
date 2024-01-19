@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.content.res.Resources
 import java.util.*
 
+@OptIn(InternalResourceApi::class)
 internal actual fun getSystemEnvironment(): ResourceEnvironment {
     val locale = Locale.getDefault()
     val configuration = Resources.getSystem().configuration

@@ -10,6 +10,7 @@ import org.jetbrains.compose.resources.ThemeQualifier.DARK
 import org.jetbrains.compose.resources.ThemeQualifier.LIGHT
 import kotlin.test.*
 
+@OptIn(ExperimentalResourceApi::class, InternalResourceApi::class)
 class ResourceTest {
     @Test
     fun testResourceEquals() = runBlockingTest {
