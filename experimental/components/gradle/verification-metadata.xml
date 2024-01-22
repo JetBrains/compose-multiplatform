@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<verification-metadata xmlns="https://schema.gradle.org/dependency-verification"
+                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                       xsi:schemaLocation="https://schema.gradle.org/dependency-verification https://schema.gradle.org/dependency-verification/dependency-verification-1.3.xsd">
+    <configuration>
+        <verify-metadata>false</verify-metadata>
+        <verify-signatures>true</verify-signatures>
+        <trusted-artifacts>
+            <trust group="gradle" name="gradle"/>
+            <trust file=".*-javadoc[.]jar" regex="true"/>
+            <trust file=".*-sources[.]jar" regex="true"/>
+            <trust group="^org[.]gradle[.]kotlin.*" regex="true"/>
+            <trust group="^org[.]jetbrains.*" regex="true"/>
+            <trust group="^org[.]jetbrains[.]compose.*" regex="true"/>
+        </trusted-artifacts>
+        <ignored-keys>
+            <ignored-key id="4A3DA032DA2BBE01" reason="vlcj key is not certified with a trusted signature"/>
+        </ignored-keys>
+        <trusted-keys>
+            <trusted-key id="FA7929F83AD44C4590F6CC6815C71C0A4E0B8EDD" group="net.java.dev.jna"/>
+        </trusted-keys>
+    </configuration>
+    <components>
+        <component group="uk.co.caprica" name="vlcj" version="4.8.2">
+            <artifact name="vlcj-4.8.2.jar">
+                <sha256 value="304d585e780be8765baa4fa83b376c21920789f9e570aecf888912d40eedabb5"/>
+            </artifact>
+        </component>
+        <component group="uk.co.caprica" name="vlcj-natives" version="4.8.1">
+            <artifact name="vlcj-natives-4.8.1.jar">
+                <sha256 value="f47cef91dfdf335611b6d11945c9d1794e85811b3884c1fd31f9ed76ab19da50"/>
+            </artifact>
+        </component>
+    </components>
+</verification-metadata>

@@ -31,6 +31,7 @@ fun VideoPlayer(
     onFinish = onFinish
 )
 
+@Composable
 internal expect fun VideoPlayerImpl(
     url: String,
     isResumed: Boolean,
