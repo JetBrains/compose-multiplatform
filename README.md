@@ -1,7 +1,7 @@
 [![official project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
-[![Latest release](https://img.shields.io/github/v/release/JetBrains/compose-multiplatform?color=brightgreen&label=Latest%20release)](https://github.com/JetBrains/compose-multiplatform/releases?expanded=true&page=1&q=prerelease%3Afalse)
+[![Latest release](https://img.shields.io/github/v/release/JetBrains/compose-multiplatform?color=brightgreen&label=Latest%20release)](https://github.com/JetBrains/compose-multiplatform/releases/latest)
 [![Latest build](https://img.shields.io/github/v/release/JetBrains/compose-multiplatform?color=orange&include_prereleases&label=Latest%20build)](https://github.com/JetBrains/compose-multiplatform/releases)
-
+[![Changelog](https://img.shields.io/badge/Changelog-blue)](https://github.com/JetBrains/compose-multiplatform/releases?expanded=true&page=1&q=prerelease%3Afalse)
 
 
 # Compose Multiplatform
