@@ -55,6 +55,12 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 
 ## Common
 ### Features
+* [Support Kotlin 1.9.21](https://github.com/JetBrains/compose-multiplatform/pull/3966)
+* [Support Kotlin 2.0.0-Beta1](https://github.com/JetBrains/compose-multiplatform/pull/3934)
+
+## iOS
+
+### Fixes
 * [Fix crash at GrGpuResource::release()](https://github.com/JetBrains/compose-multiplatform/issues/3862)
 * [Fix crash with custom font](https://github.com/JetBrains/compose-multiplatform/issues/3822)
 * [Composable functions returning null cause crash](https://github.com/JetBrains/compose-multiplatform/issues/3900) (fixed in Kotlin 1.9.21 and JetBrains Compose Compiler 1.5.4)
