@@ -1,5 +1,10 @@
 # 1.6.0 (February 2024)
 
+- [x] #739
+
+Aaa: #1020
+* aaa: #1020
+
 ## Highlights
 
 ### Features
