@@ -59,12 +59,6 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 * [Fix crash with custom font](https://github.com/JetBrains/compose-multiplatform/issues/3822)
 * [Composable functions returning null cause crash](https://github.com/JetBrains/compose-multiplatform/issues/3900) (fixed in Kotlin 1.9.21 and JetBrains Compose Compiler 1.5.4)
 
-## iOS
-
-### Fixes
-* https://github.com/JetBrains/compose-multiplatform/pull/4159
-* https://github.com/JetBrains/compose-multiplatform/pull/907
-
 ## Desktop
 
 ### Fixes
