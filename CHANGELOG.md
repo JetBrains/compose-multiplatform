@@ -1,3 +1,56 @@
+# 1.6.0 (February 2024)
+
+## Highlights
+
+### Features
+
+### Fixes
+
+### Breaking changes
+
+## Common
+
+### Features
+
+### Fixes
+
+## iOS
+
+### Features
+
+### Fixes
+
+## Desktop
+
+### Features
+
+### Fixes
+
+## Web
+### Features
+
+### Fixes
+
+## HTML library
+### Features
+
+### Fixes
+
+## Gradle Plugin
+
+### Features
+
+### Fixes
+
+## Dependencies
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+* [Compiler 1.5.8](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.8)
+* [Runtime 1.6.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.0-rc01)
+* [UI 1.6.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.0-rc01)
+* [Foundation 1.6.0-rc014](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.0-rc014)
+* [Material 1.6.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.0-rc01)
+* [Material3 1.1.2](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.1.2)
+
 # 1.5.11 (November 2023)
 
 ## Common
@@ -8,9 +61,8 @@
 ## iOS
 
 ### Fixes
-* [Fix crash at GrGpuResource::release()](https://github.com/JetBrains/compose-multiplatform/issues/3862)
-* [Fix crash with custom font](https://github.com/JetBrains/compose-multiplatform/issues/3822)
-* [Composable functions returning null cause crash](https://github.com/JetBrains/compose-multiplatform/issues/3900) (fixed in Kotlin 1.9.21 and JetBrains Compose Compiler 1.5.4)
+* https://github.com/JetBrains/compose-multiplatform/pull/4159
+* https://github.com/JetBrains/compose-multiplatform/pull/907
 
 ## Desktop
 
