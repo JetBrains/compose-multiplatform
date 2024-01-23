@@ -9,8 +9,6 @@ import java.nio.file.Path
 import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.io.path.relativeTo
 
-private const val DS_STORE_FILE = ".DS_Store"
-
 /**
  * This task should be FAST and SAFE! Because it is being run during IDE import.
  */
@@ -35,15 +33,8 @@ abstract class GenerateResClassTask : DefaultTask() {
             val rootResDir = resDir.get().asFile
             logger.info("Generate resources for $rootResDir")
 
-            rootResDir.walkTopDown()
-                .filter { file -> file.name == DS_STORE_FILE }
-                .forEach { file ->
-                    logger.info("Delete $DS_STORE_FILE: ${file.path}")
-                    file.delete()
-                }
-
             //get first level dirs
-            val dirs = rootResDir.listFiles().orEmpty()
+            val dirs = rootResDir.listNotHiddenFiles()
 
             dirs.forEach { f ->
                 if (!f.isDirectory) {
@@ -54,8 +45,7 @@ abstract class GenerateResClassTask : DefaultTask() {
             //type -> id -> resource item
             val resources: Map<ResourceType, Map<String, List<ResourceItem>>> = dirs
                 .flatMap { dir ->
-                    dir.listFiles()
-                        .orEmpty()
+                    dir.listNotHiddenFiles()
                         .mapNotNull { it.fileToResourceItems(rootResDir.toPath()) }
                         .flatten()
                 }
@@ -114,6 +104,9 @@ abstract class GenerateResClassTask : DefaultTask() {
             .map { it.attributes.getNamedItem("name").nodeValue }
         return ids.toSet()
     }
+
+    private fun File.listNotHiddenFiles(): List<File> =
+        listFiles()?.filter { !it.isHidden }.orEmpty()
 }
 
 internal fun String.asUnderscoredIdentifier(): String =

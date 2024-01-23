@@ -116,19 +116,4 @@ class ResourcesTest : GradlePluginTestBase() {
             check.taskSuccessful(":copyFontsToAndroidAssets")
         }
     }
-
-    @Test
-    fun testCleanDsStoreFilesInResources(): Unit = with(testProject("misc/commonResources")) {
-        val f1 = file("src/commonMain/composeResources/drawable/.DS_Store").also { it.createNewFile() }
-        val f2 = file("src/commonMain/composeResources/.DS_Store").also { it.createNewFile() }
-
-        gradle("generateComposeResClass").checks {
-            assert(!f1.exists())
-            assert(!f2.exists())
-            assertEqualTextFiles(
-                file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt"),
-                file("expected/Res.kt")
-            )
-        }
-    }
 }
