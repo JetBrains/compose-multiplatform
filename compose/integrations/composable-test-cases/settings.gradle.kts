@@ -122,6 +122,9 @@ if (casesToRun.isDefault()) {
 
     module(":testcase-expectActual-lib", "testcases/expectActual/lib")
     module(":testcase-expectActual-main", "testcases/expectActual/main")
+
+    module(":testcase-stability-lib", "testcases/stability/lib")
+    module(":testcase-stability-main", "testcases/stability/main")
 }
 
 /**
