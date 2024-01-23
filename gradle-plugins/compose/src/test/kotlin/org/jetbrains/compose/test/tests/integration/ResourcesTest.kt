@@ -9,7 +9,7 @@ import kotlin.io.path.Path
 
 class ResourcesTest : GradlePluginTestBase() {
     @Test
-    fun testGeneratedAccessorsAndCopiedFonts() = with(testProject("misc/commonResources")) {
+    fun testGeneratedAccessorsAndCopiedFonts(): Unit = with(testProject("misc/commonResources")) {
         //check generated resource's accessors
         gradle("generateComposeResClass").checks {
             assertEqualTextFiles(
@@ -108,11 +108,27 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/drawable/vector_3.xml").renameTo(
             file("src/commonMain/composeResources/drawable/vector_2.xml")
         )
+    }
 
-        //TODO: check a real build after a release a new version of the resources library
-        //because generated accessors depend on classes from the new version
-        gradle("assembleDebug", "--dry-run").checks {
-            check.taskSkipped("copyFontsToAndroidAssets")
+    @Test
+    fun testCopyFontsInAndroidApp(): Unit = with(testProject("misc/commonResources")) {
+        gradle("assembleDebug").checks {
+            check.taskSuccessful(":copyFontsToAndroidAssets")
+        }
+    }
+
+    @Test
+    fun testCleanDsStoreFilesInResources(): Unit = with(testProject("misc/commonResources")) {
+        val f1 = file("src/commonMain/composeResources/drawable/.DS_Store").also { it.createNewFile() }
+        val f2 = file("src/commonMain/composeResources/.DS_Store").also { it.createNewFile() }
+
+        gradle("generateComposeResClass").checks {
+            assert(!f1.exists())
+            assert(!f2.exists())
+            assertEqualTextFiles(
+                file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt"),
+                file("expected/Res.kt")
+            )
         }
     }
 }
