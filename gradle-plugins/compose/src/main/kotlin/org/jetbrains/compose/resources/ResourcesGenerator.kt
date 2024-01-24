@@ -11,9 +11,13 @@ import java.io.File
 
 internal const val COMPOSE_RESOURCES_DIR = "composeResources"
 private const val RES_GEN_DIR = "generated/compose/resourceGenerator"
+private val androidPluginIds = listOf(
+    "com.android.application",
+    "com.android.library"
+)
 
 internal fun Project.configureComposeResources() {
-    pluginManager.withPlugin(KOTLIN_MPP_PLUGIN_ID) {
+    plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
         val kotlinExtension = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
         kotlinExtension.sourceSets.all { sourceSet ->
             val sourceSetName = sourceSet.name
@@ -76,12 +80,14 @@ private fun Project.configureResourceGenerator(commonComposeResourcesDir: File, 
         }
     }
 
-    val androidExtension = project.extensions.findByName("android")
-    if (androidExtension != null) {
-        configureAndroidResources(
-            commonComposeResources,
-            buildDir("$RES_GEN_DIR/androidFonts").map { it.asFile },
-            shouldGenerateResourceAccessors
-        )
+    //when applied AGP then configure android resources
+    androidPluginIds.forEach { pluginId ->
+        plugins.withId(pluginId) {
+            configureAndroidResources(
+                commonComposeResources,
+                buildDir("$RES_GEN_DIR/androidFonts").map { it.asFile },
+                shouldGenerateResourceAccessors
+            )
+        }
     }
 }

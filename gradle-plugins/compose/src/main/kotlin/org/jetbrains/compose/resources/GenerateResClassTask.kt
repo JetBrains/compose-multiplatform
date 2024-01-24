@@ -34,7 +34,7 @@ abstract class GenerateResClassTask : DefaultTask() {
             logger.info("Generate resources for $rootResDir")
 
             //get first level dirs
-            val dirs = rootResDir.listFiles().orEmpty()
+            val dirs = rootResDir.listNotHiddenFiles()
 
             dirs.forEach { f ->
                 if (!f.isDirectory) {
@@ -45,8 +45,7 @@ abstract class GenerateResClassTask : DefaultTask() {
             //type -> id -> resource item
             val resources: Map<ResourceType, Map<String, List<ResourceItem>>> = dirs
                 .flatMap { dir ->
-                    dir.listFiles()
-                        .orEmpty()
+                    dir.listNotHiddenFiles()
                         .mapNotNull { it.fileToResourceItems(rootResDir.toPath()) }
                         .flatten()
                 }
@@ -105,6 +104,9 @@ abstract class GenerateResClassTask : DefaultTask() {
             .map { it.attributes.getNamedItem("name").nodeValue }
         return ids.toSet()
     }
+
+    private fun File.listNotHiddenFiles(): List<File> =
+        listFiles()?.filter { !it.isHidden }.orEmpty()
 }
 
 internal fun String.asUnderscoredIdentifier(): String =
