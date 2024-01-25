@@ -2,10 +2,12 @@ package org.jetbrains.compose.resources
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.SourceSet
 import org.jetbrains.compose.ComposePlugin
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
+import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import java.io.File
 
@@ -18,14 +20,21 @@ private val androidPluginIds = listOf(
 
 internal fun Project.configureComposeResources() {
     plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
-        val kotlinExtension = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
-        kotlinExtension.sourceSets.all { sourceSet ->
-            val sourceSetName = sourceSet.name
-            val composeResourcesPath = project.projectDir.resolve("src/$sourceSetName/$COMPOSE_RESOURCES_DIR")
-            sourceSet.resources.srcDirs(composeResourcesPath)
-            if (sourceSetName == KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME) {
-                configureResourceGenerator(composeResourcesPath, sourceSet)
-            }
+        configureComposeResources(KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME)
+    }
+    plugins.withId(KOTLIN_JVM_PLUGIN_ID) {
+        configureComposeResources(SourceSet.MAIN_SOURCE_SET_NAME)
+    }
+}
+
+private fun Project.configureComposeResources(commonSourceSetName: String) {
+    val kotlinExtension = project.extensions.getByType(KotlinProjectExtension::class.java)
+    kotlinExtension.sourceSets.all { sourceSet ->
+        val sourceSetName = sourceSet.name
+        val composeResourcesPath = project.projectDir.resolve("src/$sourceSetName/$COMPOSE_RESOURCES_DIR")
+        sourceSet.resources.srcDirs(composeResourcesPath)
+        if (sourceSetName == commonSourceSetName) {
+            configureResourceGenerator(composeResourcesPath, sourceSet)
         }
     }
 }
