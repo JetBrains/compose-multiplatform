@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.semantics
@@ -115,6 +116,10 @@ private fun WidgetsListView(widgetsTypeState: MutableState<WidgetsType>) {
 
 }
 
+val WidgetsType.listItemTestTag: String
+    get() = "${testTag}_list_item"
+
+
 @Composable
 private fun WidgetsListItemViewImpl(
     widgetsType: WidgetsType,
@@ -133,6 +138,7 @@ private fun WidgetsListItemViewImpl(
             }
             .height(height)
             .padding(start = 16.dp)
+            .testTag(widgetsType.listItemTestTag)
     ) {
         val inFocusInteractionSource = remember { MutableInteractionSource() }
         val inFocus by inFocusInteractionSource.collectIsHoveredAsState()

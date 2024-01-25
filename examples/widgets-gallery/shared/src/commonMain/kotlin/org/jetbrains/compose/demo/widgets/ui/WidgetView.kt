@@ -2,7 +2,6 @@ package org.jetbrains.compose.demo.widgets.ui
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -19,7 +18,7 @@ fun WidgetsView(
     modifier: Modifier
 ) {
     ClearFocusBox {
-        Column(modifier = modifier.verticalScroll(state = rememberScrollState())) {
+        Box(modifier = modifier.verticalScroll(state = rememberScrollState())) {
             @Suppress("UNUSED_VARIABLE")
             val exhaustive = when (widgetsTypeState.value) {
                 WidgetsType.APP_BARS -> AppBars()

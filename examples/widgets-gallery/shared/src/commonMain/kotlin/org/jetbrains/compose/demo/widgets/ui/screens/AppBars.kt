@@ -5,7 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ReadMore
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.*
@@ -14,20 +15,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.demo.widgets.platform.Res
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.demo.widgets.theme.twitterColor
+import org.jetbrains.compose.demo.widgets.ui.WidgetsType
 import org.jetbrains.compose.demo.widgets.ui.utils.SubtitleText
 import org.jetbrains.compose.demo.widgets.ui.utils.TitleText
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.ImageResource
 
 @Composable
 fun AppBars() {
-    TopAppBarsDemo()
-    BottomAppBarDemo()
-    NavigationBarDemo()
+    Column(Modifier.testTag(WidgetsType.APP_BARS.testTag)) {
+        TopAppBarsDemo()
+        BottomAppBarDemo()
+        NavigationBarDemo()
+    }
 }
 
 @OptIn(ExperimentalResourceApi::class)
@@ -40,7 +45,7 @@ private fun TopAppBarsDemo() {
         elevation = 8.dp,
         navigationIcon = {
             IconButton(onClick = {}) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "ArrowBack")
+                Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "ArrowBack")
             }
         }
     )
@@ -54,12 +59,12 @@ private fun TopAppBarsDemo() {
         elevation = 8.dp,
         navigationIcon = {
             IconButton(onClick = {}) {
-                Icon(painterResource(ImageResource("composeRes/images/ic_instagram.xml")), contentDescription = "Instagram")
+                Icon(painterResource(DrawableResource("composeRes/images/ic_instagram.xml")), contentDescription = "Instagram")
             }
         },
         actions = {
             IconButton(onClick = {}) {
-                Icon(painterResource(ImageResource("composeRes/images/ic_send.xml")), contentDescription = "Send")
+                Icon(painterResource(DrawableResource("composeRes/images/ic_send.xml")), contentDescription = "Send")
             }
         }
     )
@@ -69,7 +74,7 @@ private fun TopAppBarsDemo() {
     TopAppBar(
         title = {
             Icon(
-                painterResource(ImageResource("composeRes/images/ic_twitter.xml")),
+                painterResource(DrawableResource("composeRes/images/ic_twitter.xml")),
                 contentDescription = "Twitter",
                 tint = twitterColor,
                 modifier = Modifier.fillMaxWidth()
@@ -80,7 +85,7 @@ private fun TopAppBarsDemo() {
         elevation = 8.dp,
         navigationIcon = {
             Image(
-                painterResource(ImageResource("composeRes/images/p6.jpeg")),
+                painterResource(DrawableResource("composeRes/images/p6.jpeg")),
                 contentDescription = "",
                 modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
                     .requiredSize(32.dp).clip(CircleShape)
@@ -100,7 +105,7 @@ private fun TopAppBarsDemo() {
 @Composable
 private fun BottomAppBarDemo() {
     Spacer(modifier = Modifier.height(16.dp))
-    SubtitleText("Bottom app bars: Note bottom app bar support FAB cutouts when used with scafolds see demoUI crypto app")
+    SubtitleText("Bottom app bars: Note bottom app bar support FAB cutouts when used with scaffolds see demoUI crypto app")
 
     BottomAppBar(
         cutoutShape = CircleShape
@@ -112,7 +117,6 @@ private fun BottomAppBarDemo() {
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun NavigationBarDemo() {
     Spacer(modifier = Modifier.height(16.dp))
@@ -143,7 +147,7 @@ private fun NavigationBarDemo() {
 
     BottomNavigation {
         BottomNavigationItem(
-            icon = { Icon(Icons.Outlined.ReadMore, contentDescription = "ReadMore") },
+            icon = { Icon(Icons.AutoMirrored.Outlined.ReadMore, contentDescription = "ReadMore") },
             selected = navItemState.value == NavType.HOME,
             onClick = { navItemState.value = NavType.HOME },
         )

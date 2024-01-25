@@ -14,14 +14,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.demo.widgets.theme.purple
 import org.jetbrains.compose.demo.widgets.theme.purple200
 import org.jetbrains.compose.demo.widgets.theme.typography
+import org.jetbrains.compose.demo.widgets.ui.WidgetsType
 
 @Composable
 fun Buttons() {
-    Column {
+    Column(Modifier.testTag(WidgetsType.BUTTONS.testTag)) {
         Button(onClick = {}, modifier = Modifier.padding(8.dp)) {
             Text(text = "Main Button")
         }

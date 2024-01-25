@@ -1,5 +1,8 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
@@ -9,7 +12,17 @@ plugins {
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    androidTarget()
+    androidTarget {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        instrumentedTestVariant {
+            sourceSetTree.set(KotlinSourceSetTree.test)
+
+            dependencies {
+                implementation("androidx.compose.ui:ui-test-junit4-android:1.5.4")
+                debugImplementation("androidx.compose.ui:ui-test-manifest")
+            }
+        }
+    }
 
     jvm("desktop")
 
@@ -32,7 +45,7 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.materialIconsExtended)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-                implementation("org.jetbrains.compose.components:components-resources:1.6.0-dev1306")
+                implementation("org.jetbrains.compose.components:components-resources:${project.property("compose.version")}")
             }
         }
         val androidMain by getting {
@@ -42,21 +55,22 @@ kotlin {
                 api("androidx.core:core-ktx:1.10.1")
             }
         }
-        val iosMain by creating {
-            dependsOn(commonMain)
-        }
-        val iosX64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosArm64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.common)
+            }
+        }
+        val desktopTest by getting {
+            dependencies {
+                implementation(compose.desktop.currentOs)
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+                implementation(compose.uiTest)
             }
         }
     }
@@ -71,6 +85,7 @@ android {
 
     defaultConfig {
         minSdk = 26
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
