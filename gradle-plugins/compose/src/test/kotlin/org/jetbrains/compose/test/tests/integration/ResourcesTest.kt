@@ -131,7 +131,7 @@ class ResourcesTest : GradlePluginTestBase() {
     fun testJvmOnlyProject(): Unit = with(testProject("misc/jvmOnlyResources")) {
         gradle("generateComposeResClass").checks {
             assertEqualTextFiles(
-                file("build/generated/compose/resourceGenerator/kotlin/me/app/jvmOnlyResources/generated/resources/Res.kt"),
+                file("build/generated/compose/resourceGenerator/kotlin/me/app/jvmonlyresources/generated/resources/Res.kt"),
                 file("expected/Res.kt")
             )
         }
