@@ -44,8 +44,6 @@ private fun Project.configureResourceGenerator(commonComposeResourcesDir: File, 
 
     fun buildDir(path: String) = layout.dir(layout.buildDirectory.map { File(it.asFile, path) })
 
-    val resDir = layout.dir(commonComposeResources)
-
     //lazy check a dependency on the Resources library
     val shouldGenerateResourceAccessors: Provider<Boolean> = provider {
         if (ComposeProperties.alwaysGenerateResourceAccessors(providers).get()) {
@@ -65,7 +63,7 @@ private fun Project.configureResourceGenerator(commonComposeResourcesDir: File, 
         GenerateResClassTask::class.java
     ) {
         it.packageName.set(packageName)
-        it.resDir.set(resDir)
+        it.resDir.set(commonComposeResources)
         it.codeDir.set(buildDir("$RES_GEN_DIR/kotlin"))
         it.onlyIf { shouldGenerateResourceAccessors.get() }
     }

@@ -116,4 +116,14 @@ class ResourcesTest : GradlePluginTestBase() {
             check.taskSuccessful(":copyFontsToAndroidAssets")
         }
     }
+
+    @Test
+    fun testEmptyResClass(): Unit = with(testProject("misc/emptyResources")) {
+        gradle("generateComposeResClass").checks {
+            assertEqualTextFiles(
+                file("build/generated/compose/resourceGenerator/kotlin/app/group/empty_res/generated/resources/Res.kt"),
+                file("expected/Res.kt")
+            )
+        }
+    }
 }

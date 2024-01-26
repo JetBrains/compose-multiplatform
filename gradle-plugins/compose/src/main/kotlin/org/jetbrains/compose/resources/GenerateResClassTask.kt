@@ -16,21 +16,17 @@ abstract class GenerateResClassTask : DefaultTask() {
     @get:Input
     abstract val packageName: Property<String>
 
-    @get:InputDirectory
+    @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val resDir: DirectoryProperty
+    abstract val resDir: Property<File>
 
     @get:OutputDirectory
     abstract val codeDir: DirectoryProperty
 
-    init {
-        this.onlyIf { resDir.asFile.get().exists() }
-    }
-
     @TaskAction
     fun generate() {
         try {
-            val rootResDir = resDir.get().asFile
+            val rootResDir = resDir.get()
             logger.info("Generate resources for $rootResDir")
 
             //get first level dirs
