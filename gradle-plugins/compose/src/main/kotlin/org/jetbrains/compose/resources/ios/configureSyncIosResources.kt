@@ -8,6 +8,7 @@ package org.jetbrains.compose.resources.ios
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskAction
@@ -21,14 +22,15 @@ import org.jetbrains.compose.internal.utils.new
 import org.jetbrains.compose.internal.utils.registerOrConfigure
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
-import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
+import org.jetbrains.kotlin.gradle.plugin.mpp.*
 import java.io.File
 
 private val incompatiblePlugins = listOf(
     "dev.icerock.mobile.multiplatform-resources",
     "io.github.skeptick.libres",
 )
+
+private const val IOS_COMPOSE_RESOURCES_ROOT_DIR = "compose-resources"
 
 internal fun Project.configureSyncTask(mppExt: KotlinMultiplatformExtension) {
     fun reportSyncIsDisabled(reason: String) {
@@ -60,13 +62,13 @@ private class SyncIosResourcesContext(
     fun syncDirFor(framework: Framework): Provider<Directory> {
         val providers = framework.project.providers
         return if (framework.isCocoapodsFramework) {
-            project.layout.buildDirectory.dir("compose/ios/${framework.baseName}/compose-resources/")
+            project.layout.buildDirectory.dir("compose/ios/${framework.baseName}/$IOS_COMPOSE_RESOURCES_ROOT_DIR/")
         } else {
             providers.environmentVariable("BUILT_PRODUCTS_DIR")
                 .zip(providers.environmentVariable("CONTENTS_FOLDER_PATH")) { builtProductsDir, contentsFolderPath ->
                     File(builtProductsDir)
                         .resolve(contentsFolderPath)
-                        .resolve("compose-resources")
+                        .resolve(IOS_COMPOSE_RESOURCES_ROOT_DIR)
                         .canonicalPath
                 }.flatMap {
                     framework.project.objects.directoryProperty().apply { set(File(it)) }
@@ -74,6 +76,15 @@ private class SyncIosResourcesContext(
         }
     }
 
+    fun configureEachIosTestExecutable(fn: (TestExecutable) -> Unit) {
+        mppExt.targets.all { target ->
+            target.asIosNativeTargetOrNull()?.let { iosTarget ->
+                iosTarget.binaries.withType(TestExecutable::class.java).configureEach { bin ->
+                    fn(bin)
+                }
+            }
+        }
+    }
 
     fun configureEachIosFramework(fn: (Framework) -> Unit) {
         mppExt.targets.all { target ->
@@ -166,6 +177,18 @@ private fun SyncIosResourcesContext.configureSyncResourcesTasks() {
             }
         }
     }
+    configureEachIosTestExecutable { bin ->
+        val copyTestResourcesTask = "copyTestComposeResourcesFor${bin.target.targetName.uppercaseFirstChar()}"
+        val task = project.tasks.registerOrConfigure<Copy>(copyTestResourcesTask) {
+            from({
+                (bin.compilation.associateWith + bin.compilation).flatMap { compilation ->
+                    compilation.allKotlinSourceSets.map { it.resources }
+                }
+            })
+            into(bin.outputDirectory.resolve(IOS_COMPOSE_RESOURCES_ROOT_DIR))
+        }
+        bin.linkTask.dependsOn(task)
+    }
 }
 
 private val Framework.isCocoapodsFramework: Boolean
@@ -186,11 +209,11 @@ private fun extractPrefixFromBinaryName(name: String, buildType: NativeBuildType
         name.substringBeforeLast(suffix.uppercaseFirstChar())
 }
 
-private fun iosTargetResourcesProvider(framework: Framework): Provider<IosTargetResources> {
-    val kotlinTarget = framework.target
-    val project = framework.project
+private fun iosTargetResourcesProvider(bin: NativeBinary): Provider<IosTargetResources> {
+    val kotlinTarget = bin.target
+    val project = bin.project
     return project.provider {
-        val resourceDirs = framework.compilation.allKotlinSourceSets
+        val resourceDirs = bin.compilation.allKotlinSourceSets
             .flatMap { sourceSet ->
                 sourceSet.resources.srcDirs.map { it.canonicalPath }
             }
