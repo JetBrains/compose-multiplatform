@@ -31,6 +31,12 @@ jobs:
           cd gradle-plugins
           ./gradlew assemble
           ./gradlew --continue :preview-rpc:test :compose:test :compose:testGradle-${{ matrix.gradle }}
+      - name: Upload Reports
+        uses: actions/upload-artifact@v2
+        with:
+          name: Test-Reports
+          path: gradle-plugins/compose/build/reports
+        if: always()
       - name: Print summary
         shell: bash
         if: always()
