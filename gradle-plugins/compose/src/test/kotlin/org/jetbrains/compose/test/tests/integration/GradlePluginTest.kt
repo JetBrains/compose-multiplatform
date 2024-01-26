@@ -94,6 +94,25 @@ class GradlePluginTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun iosTestResources() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        val testEnv = defaultTestEnvironment.copy(
+            useGradleConfigurationCache = TestProperties.gradleBaseVersionForTests.isAtLeastGradle8
+        )
+
+        with(testProject(TestProjects.iosResources, testEnv)) {
+            gradle(":linkDebugTestIosX64", "--dry-run").checks {
+                check.taskSkipped(":copyTestComposeResourcesForIosX64")
+                check.taskSkipped(":linkDebugTestIosX64")
+            }
+            gradle(":copyTestComposeResourcesForIosX64").checks {
+                check.taskSuccessful(":copyTestComposeResourcesForIosX64")
+                file("build/bin/iosX64/debugTest/compose-resources/compose-multiplatform.xml").checkExists()
+            }
+        }
+    }
+
+    @Test
     fun iosMokoResources() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
         val iosTestEnv = iosTestEnv()
