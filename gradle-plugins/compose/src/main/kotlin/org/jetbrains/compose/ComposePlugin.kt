@@ -160,6 +160,7 @@ abstract class ComposePlugin : Plugin<Project> {
 
     object CommonComponentsDependencies {
         val resources = composeDependency("org.jetbrains.compose.components:components-resources")
+        val uiToolingPreview = composeDependency("org.jetbrains.compose.components:components-ui-tooling-preview")
     }
 
     object DesktopComponentsDependencies {
