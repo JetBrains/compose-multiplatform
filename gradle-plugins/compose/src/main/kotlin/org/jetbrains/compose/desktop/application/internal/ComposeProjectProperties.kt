@@ -5,10 +5,11 @@
 
 package org.jetbrains.compose.desktop.application.internal
 
+import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
-import org.jetbrains.compose.internal.utils.valueOrNull
 import org.jetbrains.compose.internal.utils.toBooleanProvider
+import org.jetbrains.compose.internal.utils.valueOrNull
 
 internal object ComposeProperties {
     internal const val VERBOSE = "compose.desktop.verbose"
@@ -54,8 +55,10 @@ internal object ComposeProperties {
     fun checkJdkVendor(providers: ProviderFactory): Provider<Boolean> =
         providers.valueOrNull(CHECK_JDK_VENDOR).toBooleanProvider(true)
 
-    fun alwaysGenerateResourceAccessors(providers: ProviderFactory): Provider<Boolean> =
-        providers.valueOrNull(ALWAYS_GENERATE_RESOURCE_ACCESSORS).toBooleanProvider(false)
+    //providers.valueOrNull works only with root gradle.properties
+    fun alwaysGenerateResourceAccessors(project: Project): Provider<Boolean> = project.provider {
+        project.findProperty(ALWAYS_GENERATE_RESOURCE_ACCESSORS)?.toString().equals("true", true)
+    }
 
     fun syncResources(providers: ProviderFactory): Provider<Boolean> =
         providers.valueOrNull(SYNC_RESOURCES_PROPERTY).toBooleanProvider(true)

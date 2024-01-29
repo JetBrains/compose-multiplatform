@@ -55,7 +55,7 @@ private fun Project.configureResourceGenerator(commonComposeResourcesDir: File, 
 
     //lazy check a dependency on the Resources library
     val shouldGenerateResourceAccessors: Provider<Boolean> = provider {
-        if (ComposeProperties.alwaysGenerateResourceAccessors(providers).get()) {
+        if (ComposeProperties.alwaysGenerateResourceAccessors(project).get()) {
             true
         } else {
             configurations
