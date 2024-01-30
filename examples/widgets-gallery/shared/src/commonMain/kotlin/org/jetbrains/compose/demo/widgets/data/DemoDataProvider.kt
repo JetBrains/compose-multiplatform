@@ -1,8 +1,6 @@
 package org.jetbrains.compose.demo.widgets.data
 
 import org.jetbrains.compose.demo.widgets.data.model.Item
-import org.jetbrains.compose.demo.widgets.data.model.Tweet
-import org.jetbrains.compose.demo.widgets.platform.Res
 
 object DemoDataProvider {
     val item = Item(

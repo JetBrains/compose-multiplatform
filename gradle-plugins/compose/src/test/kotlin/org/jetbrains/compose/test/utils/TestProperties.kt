@@ -5,7 +5,10 @@
 
 package org.jetbrains.compose.test.utils
 
+import org.gradle.util.GradleVersion
 import java.io.File
+
+private const val COMPOSE_TESTS_GRADLE_VERSION_PROPERTY = "compose.tests.gradle.version"
 
 object TestProperties {
     val composeCompilerVersion: String
@@ -20,8 +23,12 @@ object TestProperties {
     val composeGradlePluginVersion: String
         get() = notNullSystemProperty("compose.tests.compose.gradle.plugin.version")
 
-    val gradleVersionForTests: String?
-        get() = System.getProperty("compose.tests.gradle.version")
+    val gradleVersionForTests: String
+        get() = System.getProperty(COMPOSE_TESTS_GRADLE_VERSION_PROPERTY)
+            ?: error("System property '$COMPOSE_TESTS_GRADLE_VERSION_PROPERTY' is not set")
+
+    val gradleBaseVersionForTests: GradleVersion
+        get() = GradleVersion.version(gradleVersionForTests).baseVersion
 
     val gradleConfigurationCache: Boolean
         get() = System.getProperty("compose.tests.gradle.configuration.cache") == "true"

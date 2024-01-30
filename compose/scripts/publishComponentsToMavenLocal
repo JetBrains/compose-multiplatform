@@ -8,6 +8,6 @@ if [[ -z "$COMPOSE_CUSTOM_VERSION" ]]; then
 fi
 
 pushd ../../components
-./gradlew publishToMavenLocal -Pcompose.version="$COMPOSE_CUSTOM_VERSION"  || exit 1
+./gradlew publishToMavenLocal -Pcompose.version="$COMPOSE_CUSTOM_VERSION" -Pcompose.useMavenLocal=true || exit 1
 popd
 

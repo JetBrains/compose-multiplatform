@@ -67,7 +67,7 @@ fun ImageViewerWithProvidedDependencies(
             slideInHorizontally { w -> multiplier * w } with
                     slideOutHorizontally { w -> multiplier * -1 * w }
         }
-    }) { (index, page) ->
+    }) { (_, page) ->
         when (page) {
             is GalleryPage -> {
                 GalleryScreen(

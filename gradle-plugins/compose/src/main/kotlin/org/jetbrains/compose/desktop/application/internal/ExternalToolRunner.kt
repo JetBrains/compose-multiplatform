@@ -11,6 +11,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.process.ExecOperations
 import org.gradle.process.ExecResult
 import org.jetbrains.compose.internal.utils.ioFile
+import java.io.ByteArrayInputStream
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -33,7 +34,8 @@ internal class ExternalToolRunner(
         workingDir: File? = null,
         checkExitCodeIsNormal: Boolean = true,
         processStdout: Function1<String, Unit>? = null,
-        logToConsole: LogToConsole = LogToConsole.OnlyWhenVerbose
+        logToConsole: LogToConsole = LogToConsole.OnlyWhenVerbose,
+        stdinStr: String? = null
     ): ExecResult {
         val logsDir = logsDir.ioFile
         logsDir.mkdirs()
@@ -51,6 +53,10 @@ internal class ExternalToolRunner(
                     spec.environment(environment)
                     // check exit value later
                     spec.isIgnoreExitValue = true
+
+                    if (stdinStr != null) {
+                        spec.standardInput = ByteArrayInputStream(stdinStr.toByteArray())
+                    }
 
                     @Suppress("NAME_SHADOWING")
                     val logToConsole = when (logToConsole) {

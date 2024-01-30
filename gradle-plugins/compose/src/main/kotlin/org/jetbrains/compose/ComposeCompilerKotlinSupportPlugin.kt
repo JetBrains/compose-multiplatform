@@ -8,12 +8,16 @@ package org.jetbrains.compose
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.internal.ComposeCompilerArtifactProvider
+import org.jetbrains.compose.internal.mppExtOrNull
+import org.jetbrains.compose.internal.service.ConfigurationProblemReporterService
 import org.jetbrains.compose.internal.webExt
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
 class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
     private lateinit var composeCompilerArtifactProvider: ComposeCompilerArtifactProvider
+    private lateinit var applicableForPlatformTypes: Provider<Set<KotlinPlatformType>>
+
 
     override fun apply(target: Project) {
         super.apply(target)
@@ -24,7 +28,33 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
                 composeExt.kotlinCompilerPlugin.orNull ?:
                     ComposeCompilerCompatibility.compilerVersionFor(target.getKotlinPluginVersion())
             }
+
+            applicableForPlatformTypes = composeExt.platformTypes
+
+            collectUnsupportedCompilerPluginUsages(target)
         }
+    }
+
+    private fun collectUnsupportedCompilerPluginUsages(project: Project) {
+        fun Project.hasNonJvmTargets(): Boolean {
+            val nonJvmTargets = setOf(KotlinPlatformType.native, KotlinPlatformType.js, KotlinPlatformType.wasm)
+            return mppExtOrNull?.targets?.any {
+                it.platformType in nonJvmTargets
+            } ?: false
+        }
+
+        fun SubpluginArtifact.isNonJBComposeCompiler(): Boolean {
+            return !groupId.startsWith("org.jetbrains.compose.compiler")
+        }
+
+        ConfigurationProblemReporterService.registerUnsupportedPluginProvider(
+            project,
+            project.provider {
+                composeCompilerArtifactProvider.compilerArtifact.takeIf {
+                    project.hasNonJvmTargets() && it.isNonJBComposeCompiler()
+                }
+            }
+        )
     }
 
     override fun getCompilerPluginId(): String =
@@ -36,15 +66,14 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
     override fun getPluginArtifactForNative(): SubpluginArtifact =
         composeCompilerArtifactProvider.compilerHostedArtifact
 
-    override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean =
-        when (kotlinCompilation.target.platformType) {
-            KotlinPlatformType.common -> true
-            KotlinPlatformType.jvm -> true
-            KotlinPlatformType.js -> isApplicableJsTarget(kotlinCompilation.target)
-            KotlinPlatformType.androidJvm -> true
-            KotlinPlatformType.native -> true
-            KotlinPlatformType.wasm -> false
+    override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
+        val applicableTo = applicableForPlatformTypes.get()
+
+        return when (val type = kotlinCompilation.target.platformType) {
+            KotlinPlatformType.js -> isApplicableJsTarget(kotlinCompilation.target) && applicableTo.contains(type)
+            else -> applicableTo.contains(type)
         }
+    }
 
     private fun isApplicableJsTarget(kotlinTarget: KotlinTarget): Boolean {
         if (kotlinTarget !is KotlinJsIrTarget) return false
@@ -63,9 +92,21 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
     }
 
     private val platformPluginOptions = mapOf(
-        KotlinPlatformType.js to options("generateDecoys" to "true")
+        KotlinPlatformType.js to options("generateDecoys" to "false"),
+        KotlinPlatformType.wasm to options("generateDecoys" to "false")
     )
 
     private fun options(vararg options: Pair<String, String>): List<SubpluginOption> =
         options.map { SubpluginOption(it.first, it.second) }
+}
+
+private const val COMPOSE_COMPILER_COMPATIBILITY_LINK =
+    "https://github.com/JetBrains/compose-jb/blob/master/VERSIONING.md#using-compose-multiplatform-compiler"
+
+internal fun createWarningAboutNonCompatibleCompiler(currentCompilerPluginGroupId: String): String {
+    return """
+WARNING: Usage of the Custom Compose Compiler plugin ('$currentCompilerPluginGroupId') 
+with non-JVM targets (Kotlin/Native, Kotlin/JS, Kotlin/WASM) is not supported.
+For more information, please visit: $COMPOSE_COMPILER_COMPATIBILITY_LINK
+""".trimMargin()
 }

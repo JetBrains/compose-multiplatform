@@ -24,8 +24,10 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(compose.runtime)
                 implementation(kotlin("stdlib-common"))
                 implementation(project(":internal-html-core-runtime"))
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
         val jsTest by getting {

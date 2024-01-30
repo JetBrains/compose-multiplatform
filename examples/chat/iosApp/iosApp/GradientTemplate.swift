@@ -18,10 +18,9 @@ struct GradientTemplate<Content: View>: View {
                     Rectangle().frame(height: 0).background(gradient)
                 }
             }
-                    .navigationTitle(title)
-                    .navigationBarTitleDisplayMode(.inline)
-                    .statusBar(hidden: false)
+                .navigationTitle(title)
+                .navigationBarTitleDisplayMode(.inline)
+                .statusBar(hidden: false)
         }
-            .toolbar(.visible, for: .tabBar)
     }
 }

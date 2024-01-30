@@ -2,26 +2,34 @@ package example.imageviewer.storage
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import example.imageviewer.ImageStorage
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.PictureData
 import example.imageviewer.toImageBitmap
 import kotlinx.cinterop.CValue
-import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
-import kotlinx.cinterop.usePinned
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.jetbrains.skia.Image
 import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSize
 import platform.CoreGraphics.CGSizeMake
-import platform.Foundation.*
-import platform.UIKit.*
-import platform.posix.memcpy
+import platform.Foundation.NSBundle
+import platform.Foundation.NSData
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSURL
+import platform.Foundation.writeToURL
+import platform.UIKit.UIGraphicsBeginImageContextWithOptions
+import platform.UIKit.UIGraphicsEndImageContext
+import platform.UIKit.UIGraphicsGetImageFromCurrentImageContext
+import platform.UIKit.UIImage
+import platform.UIKit.UIImageJPEGRepresentation
 
 private const val maxStorableImageSizePx = 1200
 private const val storableThumbnailSizePx = 180
@@ -31,11 +39,18 @@ class IosImageStorage(
     private val pictures: SnapshotStateList<PictureData>,
     private val ioScope: CoroutineScope
 ) : ImageStorage {
-    private val savePictureDir = File(NSFileManager.defaultManager.DocumentDirectory, "ImageViewer/takenPhotos/")
 
-    private val PictureData.Camera.jpgFile get() = File(savePictureDir, "$id.jpg")
-    private val PictureData.Camera.thumbnailJpgFile get() = File(savePictureDir, "$id-thumbnail.jpg")
-    private val PictureData.Camera.jsonFile get() = File(savePictureDir, "$id.json")
+    private val savePictureDir =
+        File(NSFileManager.defaultManager.DocumentDirectory, "ImageViewer/takenPhotos/")
+
+    private val PictureData.Camera.jpgFile
+        get() = File(savePictureDir, "$id.jpg")
+
+    private val PictureData.Camera.thumbnailJpgFile
+        get() = File(savePictureDir, "$id-thumbnail.jpg")
+
+    private val PictureData.Camera.jsonFile
+        get() = File(savePictureDir, "$id.json")
 
     init {
         if (savePictureDir.isDirectory) {
@@ -108,6 +123,7 @@ class IosImageStorage(
     }
 }
 
+@OptIn(ExperimentalForeignApi::class)
 private fun UIImage.fitInto(px: Int): UIImage {
     val targetScale = maxOf(
         px.toFloat() / size.useContents { width },
@@ -117,6 +133,7 @@ private fun UIImage.fitInto(px: Int): UIImage {
     return resize(newSize)
 }
 
+@OptIn(ExperimentalForeignApi::class)
 private fun UIImage.resize(targetSize: CValue<CGSize>): UIImage {
     val currentSize = this.size
     val widthRatio = targetSize.useContents { width } / currentSize.useContents { width }

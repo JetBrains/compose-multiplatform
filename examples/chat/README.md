@@ -21,10 +21,6 @@ Choose a run configuration for an appropriate target in Android Studio and run i
 
 `./gradlew desktopApp:run`
 
-## Run JS in browser with WebAssembly Skia via Gradle
-
-`./gradlew jsApp:jsBrowserDevelopmentRun`
-
 ### Run MacOS via Gradle:
 - on Intel CPU: `./gradlew :shared:runDebugExecutableMacosX64`
 - on Apple Silicon: `./gradlew :shared:runDebugExecutableMacosArm64`

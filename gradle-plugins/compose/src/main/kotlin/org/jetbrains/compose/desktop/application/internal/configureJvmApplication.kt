@@ -17,6 +17,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.validation.validatePackageVersions
 import org.jetbrains.compose.desktop.application.tasks.*
 import org.jetbrains.compose.desktop.tasks.AbstractUnpackDefaultComposeApplicationResourcesTask
+import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.internal.utils.currentTarget
@@ -65,7 +66,13 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         taskNameAction = "check",
         taskNameObject = "runtime"
     ) {
-        javaHome.set(app.javaHomeProvider)
+        jdkHome.set(app.javaHomeProvider)
+        checkJdkVendor.set(ComposeProperties.checkJdkVendor(project.providers))
+        jdkVersionProbeJar.from(
+            project.detachedComposeGradleDependency(
+                artifactId = "gradle-plugin-internal-jdk-version-probe"
+            ).excludeTransitiveDependencies()
+        )
     }
 
     val suggestRuntimeModules = tasks.register<AbstractSuggestModulesTask>(
@@ -179,23 +186,13 @@ private fun JvmApplicationContext.configurePackagingTasks(
                 "Unexpected target format for MacOS: $targetFormat"
             }
 
-            val notarizationRequestsDir = project.layout.buildDirectory.dir("compose/notarization/$app")
-            tasks.register<AbstractUploadAppForNotarizationTask>(
+            tasks.register<AbstractNotarizationTask>(
                 taskNameAction = "notarize",
                 taskNameObject = targetFormat.name,
                 args = listOf(targetFormat)
             ) {
                 dependsOn(packageFormat)
                 inputDir.set(packageFormat.flatMap { it.destinationDir })
-                requestsDir.set(notarizationRequestsDir)
-                configureCommonNotarizationSettings(this)
-            }
-
-            tasks.register<AbstractCheckNotarizationStatusTask>(
-                taskNameAction = "check",
-                taskNameObject = "notarizationStatus"
-            ) {
-                requestDir.set(notarizationRequestsDir)
                 configureCommonNotarizationSettings(this)
             }
         }
@@ -249,9 +246,7 @@ private fun JvmApplicationContext.configureProguardTask(
     mainClass.set(app.mainClass)
     proguardVersion.set(settings.version)
     proguardFiles.from(proguardVersion.map { proguardVersion ->
-        project.configurations.detachedConfiguration(
-            project.dependencies.create("com.guardsquare:proguard-gradle:${proguardVersion}")
-        )
+        project.detachedDependency(groupId = "com.guardsquare", artifactId = "proguard-gradle", version = proguardVersion)
     })
     configurationFiles.from(settings.configurationFiles)
     // ProGuard uses -dontobfuscate option to turn off obfuscation, which is enabled by default
@@ -263,6 +258,7 @@ private fun JvmApplicationContext.configureProguardTask(
     // That's why a task property is follows ProGuard design,
     // when our DSL does the opposite.
     dontobfuscate.set(settings.obfuscate.map { !it })
+    dontoptimize.set(settings.optimize.map { !it })
 
     dependsOn(unpackDefaultResources)
     defaultComposeRulesFile.set(unpackDefaultResources.flatMap { it.resources.defaultComposeProguardRules })
@@ -345,7 +341,6 @@ private fun JvmApplicationContext.configurePackageTask(
 internal fun JvmApplicationContext.configureCommonNotarizationSettings(
     notarizationTask: AbstractNotarizationTask
 ) {
-    notarizationTask.nonValidatedBundleID.set(app.nativeDistributions.macOS.bundleID)
     notarizationTask.nonValidatedNotarizationSettings = app.nativeDistributions.macOS.notarization
 }
 

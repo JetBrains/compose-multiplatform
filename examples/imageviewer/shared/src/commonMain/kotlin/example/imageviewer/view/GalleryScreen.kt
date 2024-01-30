@@ -12,7 +12,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -31,11 +31,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import example.imageviewer.*
+import example.imageviewer.ExternalImageViewerEvent
+import example.imageviewer.LocalImageProvider
+import example.imageviewer.LocalInternalEvents
+import example.imageviewer.LocalNotification
 import example.imageviewer.icon.IconMenu
 import example.imageviewer.icon.IconVisibility
-import example.imageviewer.model.*
+import example.imageviewer.model.PictureData
 import example.imageviewer.style.ImageviewerColors
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -56,7 +60,11 @@ fun GalleryScreen(
     val imageProvider = LocalImageProvider.current
     val viewScope = rememberCoroutineScope()
 
-    val pagerState = rememberPagerState(initialPage = selectedPictureIndex.value)
+    val pagerState = rememberPagerState(
+        initialPage = selectedPictureIndex.value,
+        initialPageOffsetFraction = 0f,
+        pageCount = { pictures.size },
+    )
     LaunchedEffect(pagerState) {
         // Subscribe to page changes
         snapshotFlow { pagerState.currentPage }.collect { page ->
@@ -116,7 +124,7 @@ fun GalleryScreen(
                             onClickPreviewPicture(pagerState.currentPage)
                         }
                 ) {
-                    HorizontalPager(pictures.size, state = pagerState) { index ->
+                    HorizontalPager(state = pagerState) { index ->
                         val picture = pictures[index]
                         var image: ImageBitmap? by remember(picture) { mutableStateOf(null) }
                         LaunchedEffect(picture) {
@@ -139,7 +147,10 @@ fun GalleryScreen(
             TopLayout(
                 alignLeftContent = {},
                 alignRightContent = {
-                    CircularButton(imageVector = IconMenu) {
+                    CircularButton(
+                        imageVector = IconMenu,
+                        modifier = Modifier.testTag("toggleGalleryStyleButton")
+                    ) {
                         galleryStyle = when (galleryStyle) {
                             GalleryStyle.SQUARES -> GalleryStyle.LIST
                             GalleryStyle.LIST -> GalleryStyle.SQUARES
@@ -155,7 +166,6 @@ fun GalleryScreen(
                     pagerState = pagerState,
                     onSelect = { selectPicture(it) },
                 )
-
                 GalleryStyle.LIST -> ListGalleryView(
                     pictures = pictures,
                     onSelect = { selectPicture(it) },
@@ -171,6 +181,15 @@ fun GalleryScreen(
     }
 }
 
+@Composable
+expect fun GalleryLazyVerticalGrid(
+    columns: GridCells,
+    modifier: Modifier,
+    verticalArrangement: Arrangement.Vertical,
+    horizontalArrangement: Arrangement.Horizontal,
+    content: LazyGridScope.() -> Unit
+)
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SquaresGalleryView(
@@ -178,9 +197,9 @@ private fun SquaresGalleryView(
     pagerState: PagerState,
     onSelect: (index: Int) -> Unit,
 ) {
-    LazyVerticalGrid(
-        modifier = Modifier.padding(top = 4.dp),
+    GalleryLazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 130.dp),
+        modifier = Modifier.padding(top = 4.dp).testTag("squaresGalleryView"),
         verticalArrangement = Arrangement.spacedBy(1.dp),
         horizontalArrangement = Arrangement.spacedBy(1.dp)
     ) {
@@ -249,7 +268,7 @@ private fun ListGalleryView(
 ) {
     val notification = LocalNotification.current
     ScrollableColumn(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().testTag("listGalleryView")
     ) {
         Spacer(modifier = Modifier.height(10.dp))
         for (p in pictures.withIndex()) {

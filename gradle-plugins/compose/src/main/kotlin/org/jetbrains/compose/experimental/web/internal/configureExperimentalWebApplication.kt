@@ -12,30 +12,41 @@ import org.gradle.api.artifacts.UnresolvedDependency
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.ComposeBuildConfig
 import org.jetbrains.compose.experimental.dsl.ExperimentalWebApplication
-import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.experimental.web.tasks.ExperimentalUnpackSkikoWasmRuntimeTask
+import org.jetbrains.compose.internal.utils.*
+import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
-internal fun KotlinJsIrTarget.configureExperimentalWebApplication(app: ExperimentalWebApplication) {
-    val mainCompilation = compilations.getByName("main")
-    val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-wasm/$targetName")
-    val taskName = "unpackSkikoWasmRuntime${targetName.uppercaseFirstChar()}"
-    mainCompilation.defaultSourceSet.resources.srcDir(unpackedRuntimeDir)
-
-    val skikoJsWasmRuntimeDependency = skikoVersionProvider(project)
-        .map { skikoVersion ->
-            project.dependencies.create("org.jetbrains.skiko:skiko-js-wasm-runtime:$skikoVersion")
-        }
-    val skikoJsWasmRuntimeConfiguration = project.configurations.create("COMPOSE_SKIKO_JS_WASM_RUNTIME").defaultDependencies {
+internal fun Collection<KotlinJsIrTarget>.configureExperimentalWebApplication(
+    project: Project,
+    app: ExperimentalWebApplication
+) {
+    val skikoJsWasmRuntimeConfiguration = project.configurations.create("COMPOSE_SKIKO_JS_WASM_RUNTIME")
+    val skikoJsWasmRuntimeDependency = skikoVersionProvider(project).map { skikoVersion ->
+        project.dependencies.create("org.jetbrains.skiko:skiko-js-wasm-runtime:$skikoVersion")
+    }
+    skikoJsWasmRuntimeConfiguration.defaultDependencies {
         it.addLater(skikoJsWasmRuntimeDependency)
     }
-    val unpackRuntime = project.registerTask<ExperimentalUnpackSkikoWasmRuntimeTask>(taskName) {
-        skikoRuntimeFiles = skikoJsWasmRuntimeConfiguration
-        outputDir.set(unpackedRuntimeDir)
-    }
-    project.tasks.named(mainCompilation.processResourcesTaskName).configure { processResourcesTask ->
-        processResourcesTask.dependsOn(unpackRuntime)
+    forEach {
+        val mainCompilation = it.compilations.getByName("main")
+        val testCompilation = it.compilations.getByName("test")
+        val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-wasm/${it.targetName}")
+        val taskName = "unpackSkikoWasmRuntime${it.targetName.uppercaseFirstChar()}"
+        mainCompilation.defaultSourceSet.resources.srcDir(unpackedRuntimeDir)
+        testCompilation.defaultSourceSet.resources.srcDir(unpackedRuntimeDir)
+
+        val unpackRuntime = project.registerTask<ExperimentalUnpackSkikoWasmRuntimeTask>(taskName) {
+            skikoRuntimeFiles = skikoJsWasmRuntimeConfiguration
+            outputDir.set(unpackedRuntimeDir)
+        }
+        project.tasks.named(mainCompilation.processResourcesTaskName).configure { processResourcesTask ->
+            processResourcesTask.dependsOn(unpackRuntime)
+        }
+        project.tasks.named(testCompilation.processResourcesTaskName).configure { processResourcesTask ->
+            processResourcesTask.dependsOn(unpackRuntime)
+        }
     }
 }
 
@@ -43,8 +54,9 @@ private const val SKIKO_GROUP = "org.jetbrains.skiko"
 
 private fun skikoVersionProvider(project: Project): Provider<String> {
     val composeVersion = ComposeBuildConfig.composeVersion
-    val configurationWithSkiko = project.configurations.detachedConfiguration(
-        project.dependencies.create("org.jetbrains.compose.ui:ui-graphics:$composeVersion")
+    val configurationWithSkiko = project.detachedComposeDependency(
+        artifactId = "ui-graphics",
+        groupId = "org.jetbrains.compose.ui"
     )
     return project.provider {
         val skikoDependency = configurationWithSkiko.allDependenciesDescriptors.firstOrNull(::isSkikoDependency)

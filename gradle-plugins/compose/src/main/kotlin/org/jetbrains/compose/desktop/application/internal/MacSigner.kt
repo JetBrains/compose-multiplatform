@@ -55,28 +55,33 @@ internal class NoCertificateSigner(runTool: ExternalToolRunner) : MacSigner(runT
 internal class MacSignerImpl(
     override val settings: ValidatedMacOSSigningSettings,
     runTool: ExternalToolRunner
-) : MacSigner(runTool)  {
-    private lateinit var signKey: String
-
-    init {
-        runTool(
-            MacUtils.security,
-            args = listOfNotNull(
-                "find-certificate",
-                "-a",
-                "-c",
-                settings.fullDeveloperID,
-                settings.keychain?.absolutePath
-            ),
-            processStdout = { signKey = matchCertificates(it) }
-        )
-    }
+) : MacSigner(runTool) {
+    @Transient
+    private var signKeyValue: String? = null
 
     override fun sign(
         file: File,
         entitlements: File?,
         forceEntitlements: Boolean
     ) {
+        // sign key calculation is delayed to avoid
+        // creating an external process during the configuration
+        // phase, which became an error in Gradle 8.1
+        // https://github.com/JetBrains/compose-multiplatform/issues/3060
+        val signKey = signKeyValue ?: run {
+            runTool(
+                MacUtils.security,
+                args = listOfNotNull(
+                    "find-certificate",
+                    "-a",
+                    "-c",
+                    settings.fullDeveloperID,
+                    settings.keychain?.absolutePath
+                ),
+                processStdout = { signKeyValue = matchCertificates(it) }
+            )
+            signKeyValue!!
+        }
         runTool.unsign(file)
         runTool.sign(
             file = file,

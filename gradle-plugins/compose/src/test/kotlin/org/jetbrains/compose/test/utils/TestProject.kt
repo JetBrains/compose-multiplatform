@@ -15,16 +15,22 @@ import java.util.Properties
 data class TestEnvironment(
     val workingDir: File,
     val kotlinVersion: String = TestKotlinVersions.Default,
+    val agpVersion: String = "7.3.1",
     val composeGradlePluginVersion: String = TestProperties.composeGradlePluginVersion,
+    val mokoResourcesPluginVersion: String = "0.23.0",
     val composeCompilerPlugin: String? = null,
     val composeCompilerArgs: String? = null,
     val composeVerbose: Boolean = true,
+    val useGradleConfigurationCache: Boolean = TestProperties.gradleConfigurationCache,
+    val additionalEnvVars: Map<String, String> = mapOf()
 ) {
     private val placeholders = linkedMapOf(
         "COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER" to composeGradlePluginVersion,
         "KOTLIN_VERSION_PLACEHOLDER" to kotlinVersion,
+        "AGP_VERSION_PLACEHOLDER" to agpVersion,
         "COMPOSE_COMPILER_PLUGIN_PLACEHOLDER" to composeCompilerPlugin,
         "COMPOSE_COMPILER_PLUGIN_ARGS_PLACEHOLDER" to composeCompilerArgs,
+        "MOKO_RESOURCES_PLUGIN_VERSION_PLACEHOLDER" to mokoResourcesPluginVersion,
     )
 
     fun replacePlaceholdersInFile(file: File) {
@@ -75,19 +81,25 @@ class TestProject(
         }
     }
 
-    internal fun gradle(vararg args: String): BuildResult {
-        if (TestProperties.gradleConfigurationCache) {
-            if (GradleVersion.version(TestProperties.gradleVersionForTests).baseVersion < GradleVersion.version("8.0")) {
+    internal fun gradle(vararg args: String): BuildResult =
+        withGradleRunner(args) { build() }
+
+    internal fun gradleFailure(vararg args: String): BuildResult =
+        withGradleRunner(args) { buildAndFail() }
+
+    private inline fun withGradleRunner(args: Array<out String>, runnerFn: GradleRunner.() -> BuildResult): BuildResult {
+        if (testEnvironment.useGradleConfigurationCache) {
+            if (TestProperties.gradleBaseVersionForTests < GradleVersion.version("8.0")) {
                 // Gradle 7.* does not use the configuration cache in the same build.
                 // In other words, if cache misses, Gradle performs configuration,
                 // but does not, use the serialized task graph.
                 // So in order to test the cache, we need to perform dry-run before the actual run.
                 // This should be fixed in https://github.com/gradle/gradle/issues/21985 (which is planned for 8.0 RC 1)
-                gradleRunner(args.withDryRun()).build()
+                gradleRunner(args.withDryRun()).runnerFn()
             }
         }
 
-        return gradleRunner(args).build()
+        return gradleRunner(args).runnerFn()
     }
 
     private fun Array<out String>.withDryRun(): Array<String> {
@@ -106,7 +118,7 @@ class TestProject(
     private fun gradleRunner(args: Array<out String>): GradleRunner {
         val allArgs = args.toMutableList()
         allArgs.addAll(additionalArgs)
-        if (TestProperties.gradleConfigurationCache) {
+        if (testEnvironment.useGradleConfigurationCache) {
             allArgs.add("--configuration-cache")
         }
 
@@ -114,6 +126,10 @@ class TestProject(
             withGradleVersion(TestProperties.gradleVersionForTests)
             withProjectDir(testEnvironment.workingDir)
             withArguments(allArgs)
+            if (testEnvironment.additionalEnvVars.isNotEmpty()) {
+                val newEnv = HashMap(System.getenv() + testEnvironment.additionalEnvVars)
+                withEnvironment(newEnv)
+            }
             forwardOutput()
         }
     }
@@ -153,4 +169,3 @@ class TestProject(
         }
     }
 }
-

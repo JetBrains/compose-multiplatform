@@ -6,16 +6,13 @@ import org.jetbrains.compose.desktop.application.internal.JvmApplicationRuntimeF
 import org.jetbrains.compose.desktop.preview.tasks.AbstractConfigureDesktopPreviewTask
 import org.jetbrains.compose.internal.*
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 fun Project.initializePreview(desktopExtension: DesktopExtension) {
     plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
-        mppExt.targets.all { target ->
-            if (target.platformType == KotlinPlatformType.jvm) {
-                val runtimeFilesProvider = JvmApplicationRuntimeFilesProvider.FromKotlinMppTarget(target as KotlinJvmTarget)
-                registerConfigurePreviewTask(project, runtimeFilesProvider, targetName = target.name)
-            }
+        mppExt.targets.withType(KotlinJvmTarget::class.java) { target ->
+            val runtimeFilesProvider = JvmApplicationRuntimeFilesProvider.FromKotlinMppTarget(target)
+            registerConfigurePreviewTask(project, runtimeFilesProvider, targetName = target.name)
         }
     }
     plugins.withId(KOTLIN_JVM_PLUGIN_ID) {

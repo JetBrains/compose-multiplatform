@@ -33,9 +33,7 @@ runGradle() {
 
 runGradle chat
 runGradle codeviewer
-runGradle falling-balls
 runGradle imageviewer
 runGradle todoapp-lite
-runGradle visual-effects
 runGradle widgets-gallery
-runGradle minesweeper
+runGradle graphics-2d

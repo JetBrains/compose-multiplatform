@@ -5,8 +5,11 @@
 
 package org.jetbrains.compose.internal.utils
 
+import org.gradle.api.DomainObjectCollection
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.logging.Logger
+import org.jetbrains.compose.ComposeBuildConfig
 import java.util.*
 
 internal inline fun Logger.info(fn: () -> String) {
@@ -33,5 +36,39 @@ fun Project.getLocalProperty(key: String): String? {
     } else {
         localPropertiesFile.createNewFile()
         return null
+    }
+}
+
+internal fun Project.detachedComposeGradleDependency(
+    artifactId: String,
+    groupId: String = "org.jetbrains.compose",
+): Configuration =
+    detachedDependency(groupId = groupId, artifactId = artifactId, version = ComposeBuildConfig.composeGradlePluginVersion)
+
+internal fun Project.detachedComposeDependency(
+    artifactId: String,
+    groupId: String = "org.jetbrains.compose",
+): Configuration =
+    detachedDependency(groupId = groupId, artifactId = artifactId, version = ComposeBuildConfig.composeVersion)
+
+internal fun Project.detachedDependency(
+    groupId: String,
+    artifactId: String,
+    version: String
+): Configuration =
+    project.configurations.detachedConfiguration(
+        project.dependencies.create("$groupId:$artifactId:$version")
+    )
+
+internal fun Configuration.excludeTransitiveDependencies(): Configuration =
+    apply { isTransitive = false }
+
+internal inline fun <reified SubT> DomainObjectCollection<*>.configureEachWithType(
+    crossinline fn: SubT.() -> Unit
+) {
+    configureEach {
+        if (it is SubT) {
+            it.fn()
+        }
     }
 }

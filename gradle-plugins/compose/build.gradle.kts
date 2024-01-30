@@ -1,14 +1,14 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import de.undercouch.gradle.tasks.download.Download
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization")
-    id("com.gradle.plugin-publish")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.publish.plugin)
     id("java-gradle-plugin")
     id("maven-publish")
-    id("com.github.johnrengelman.shadow") version "7.0.0"
-    id("de.undercouch.download") version "5.3.0"
+    alias(libs.plugins.shadow.jar)
+    alias(libs.plugins.download)
 }
 
 gradlePluginConfig {
@@ -31,11 +31,12 @@ val buildConfig = tasks.register("buildConfig", GenerateBuildConfig::class.java)
     fieldsToGenerate.put("composeVersion", BuildProperties.composeVersion(project))
     fieldsToGenerate.put("composeGradlePluginVersion", BuildProperties.deployVersion(project))
 }
-tasks.named("compileKotlin") {
+tasks.named("compileKotlin", KotlinCompilationTask::class) {
     dependsOn(buildConfig)
+    compilerOptions.freeCompilerArgs.add("-opt-in=org.jetbrains.compose.ExperimentalComposeLibrary")
 }
 sourceSets.main.configure {
-    java.srcDir(buildConfigDir)
+    java.srcDir(buildConfig.flatMap { it.generatedOutputDir })
 }
 
 val embeddedDependencies by configurations.creating {
@@ -59,24 +60,27 @@ dependencies {
     compileOnly(kotlin("gradle-plugin-api"))
     compileOnly(kotlin("gradle-plugin"))
     compileOnly(kotlin("native-utils"))
+    compileOnly(libs.plugin.android)
+    compileOnly(libs.plugin.android.api)
 
     testImplementation(gradleTestKit())
     testImplementation(kotlin("gradle-plugin-api"))
 
-    // include relocated download task to avoid potential runtime conflicts
-    embedded("de.undercouch:gradle-download-task:5.3.0")
-
-    embedded("org.jetbrains.kotlinx:kotlinx-serialization-json:${BuildProperties.serializationVersion}")
-    embedded("org.jetbrains.kotlinx:kotlinx-serialization-core:${BuildProperties.serializationVersion}")
-    embedded("org.jetbrains.kotlinx:kotlinx-serialization-core-jvm:${BuildProperties.serializationVersion}")
+    embedded(libs.download.task)
+    embedded(libs.kotlin.poet)
     embedded(project(":preview-rpc"))
+    embedded(project(":jdk-version-probe"))
 }
 
+val packagesToRelocate = listOf("de.undercouch")
+
 val shadow = tasks.named<ShadowJar>("shadowJar") {
-    val fromPackage = "de.undercouch"
-    val toPackage = "org.jetbrains.compose.$fromPackage"
-    relocate(fromPackage, toPackage)
-    archiveClassifier.set("shadow")
+    for (packageToRelocate in packagesToRelocate) {
+        relocate(packageToRelocate, "org.jetbrains.compose.internal.$packageToRelocate")
+    }
+    archiveBaseName.set("shadow")
+    archiveClassifier.set("")
+    archiveVersion.set("")
     configurations = listOf(embeddedDependencies)
     exclude("META-INF/gradle-plugins/de.undercouch.download.properties")
     exclude("META-INF/versions/**")
@@ -99,7 +103,7 @@ val gradleTestsPattern = "org.jetbrains.compose.test.tests.integration.*"
 tasks.registerVerificationTask<CheckJarPackagesTask>("checkJar") {
     dependsOn(jar)
     jarFile.set(jar.archiveFile)
-    allowedPackagePrefixes.addAll("org.jetbrains.compose", "kotlinx.serialization")
+    allowedPackagePrefixes.addAll("org.jetbrains.compose", "kotlinx.serialization", "com.squareup.kotlinpoet")
 }
 
 tasks.test {
@@ -117,7 +121,7 @@ tasks.test {
  * It is not desirable to depend on little known service for provisioning JDK distributions, even for tests.
  * Thus, the only option is to download the necessary JDK distributions ourselves.
  */
-val jdkVersionsForTests = listOf(11, 15, 18, 19)
+val jdkVersionsForTests = listOf(11, 19)
 val jdkForTestsRoot = project.gradle.gradleUserHomeDir.resolve("compose-jb-jdks")
 val downloadJdksForTests = tasks.register("downloadJdksForTests") {}
 
@@ -164,7 +168,7 @@ for (gradleVersion in supportedGradleVersions) {
 configureAllTests {
     dependsOn(":publishToMavenLocal")
     systemProperty("compose.tests.compose.gradle.plugin.version", BuildProperties.deployVersion(project))
-    val summaryDir = project.buildDir.resolve("test-summary")
+    val summaryDir = project.layout.buildDirectory.get().asFile.resolve("test-summary")
     systemProperty("compose.tests.summary.file", summaryDir.resolve("$name.md").absolutePath)
     systemProperties(project.properties.filter { it.key.startsWith("compose.") })
 }

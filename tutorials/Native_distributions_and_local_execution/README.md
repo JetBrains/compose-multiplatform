@@ -12,7 +12,7 @@ There are two tools available for packaging Compose applications:
 1. The Compose Multiplatform Gradle plugin which provides tasks for basic packaging, obfuscation and (macOS only) signing.
 2. [Conveyor](https://www.hydraulic.software), which is a separate tool not made by JetBrains.
 
-This tutorial covers how to use the built-in tasks. Conveyor has [its own tutorial](https://conveyor.hydraulic.dev/latest/tutorial/1-get-started/). The choice of which to use boils down to features/ease of use vs price. Conveyor provides support for online updates, cross-building and [various other features](packaging-tools-comparison.md) but requires [a license](https://hydraulic.software/pricing.html) for non-open source projects. The packaging tasks come with the Compose Desktop Gradle plugin, but the resulting packages don't support online updates and will require a multi-platform CI setup to create packages for each OS.
+This tutorial covers how to use the built-in tasks. Conveyor has [its own tutorial](https://conveyor.hydraulic.dev/latest/tutorial/hare/jvm). The choice of which to use boils down to features/ease of use vs price. Conveyor provides support for online updates, cross-building and [various other features](packaging-tools-comparison.md) but requires [a license](https://hydraulic.software/pricing.html) for non-open source projects. The packaging tasks come with the Compose Desktop Gradle plugin, but the resulting packages don't support online updates and will require a multi-platform CI setup to create packages for each OS.
 
 ## Gradle plugin
 
@@ -214,14 +214,14 @@ Versions must follow the rules:
 
 ## Customizing JDK version
 
-The plugin uses `jpackage`, for which you should be using at least [JDK 15](https://openjdk.java.net/projects/jdk/15/).
+The plugin uses `jpackage`, for which you should be using at least [JDK 17](https://openjdk.java.net/projects/jdk/17/).
 Make sure you meet at least one of the following requirements:
 * `JAVA_HOME` environment variable points to the compatible JDK version.
 * `javaHome` is set via DSL:
 ``` kotlin
 compose.desktop {
     application {
-        javaHome = System.getenv("JDK_15")
+        javaHome = System.getenv("JDK_17")
     }
 }
 ``` 
@@ -259,7 +259,7 @@ compose.desktop {
 
 The following properties are available in the `nativeDistributions` DSL block:
 * `packageName` — application's name (default value: Gradle project's [name](https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html#getName--));
-* `version` — application's version (default value: Gradle project's [version](https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html#getVersion--));
+* `packageVersion` — application's version (default value: Gradle project's [version](https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html#getVersion--));
 * `description` — application's description (default value: none);
 * `copyright` — application's copyright (default value: none);
 * `vendor` — application's vendor (default value: none);
@@ -270,7 +270,7 @@ compose.desktop {
     application {
         nativeDistributions {
             packageName = "ExampleApp"
-            version = "0.1-SNAPSHOT"
+            packageVersion = "0.1-SNAPSHOT"
             description = "Compose Example App"
             copyright = "© 2020 My Name. All rights reserved."
             vendor = "Example vendor"
@@ -633,6 +633,17 @@ compose.desktop {
     application {
         buildTypes.release.proguard {
             obfuscate.set(true)
+        }
+    }
+}
+```
+
+ProGuard's optimizations are enabled by default. To disable them, set the following property via Gradle DSL:
+```
+compose.desktop {
+    application {
+        buildTypes.release.proguard {
+            optimize.set(false)
         }
     }
 }

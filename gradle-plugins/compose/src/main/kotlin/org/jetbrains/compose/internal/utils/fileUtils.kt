@@ -12,6 +12,7 @@ import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 import java.io.File
+import java.util.*
 
 internal fun Provider<String>.toDir(project: Project): Provider<Directory> =
     project.layout.dir(map { File(it) })
@@ -56,3 +57,16 @@ internal fun FileSystemOperations.clearDirs(vararg dirs: Provider<out FileSystem
 
 private fun Array<out Provider<out FileSystemLocation>>.ioFiles(): Array<File> =
     let { providers -> Array(size) { i -> providers[i].ioFile } }
+
+internal fun lazyLoadProperties(propertiesFile: File): Lazy<Properties> = lazy {
+    loadProperties(propertiesFile)
+}
+
+internal fun loadProperties(propertiesFile: File): Properties =
+    Properties().apply {
+        if (propertiesFile.isFile) {
+            propertiesFile.inputStream().use {
+                load(it)
+            }
+        }
+    }

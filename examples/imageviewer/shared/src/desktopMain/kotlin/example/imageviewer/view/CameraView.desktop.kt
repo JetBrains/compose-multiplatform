@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -19,10 +18,7 @@ import example.imageviewer.icon.IconPhotoCamera
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.orEmpty
-import org.jetbrains.compose.resources.rememberImageBitmap
-import org.jetbrains.compose.resources.resource
-import java.util.*
+import org.jetbrains.compose.resources.imageResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -31,10 +27,10 @@ actual fun CameraView(
     onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
 ) {
     val randomPicture = remember { resourcePictures.random() }
-    val imageBitmap = resource(randomPicture.resource).rememberImageBitmap().orEmpty()
+    val imageBitmap = imageResource(randomPicture.resource)
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         Image(
-            bitmap = imageBitmap,
+            bitmap = imageResource(randomPicture.resource),
             contentDescription = "Camera stub",
             Modifier.fillMaxSize()
         )

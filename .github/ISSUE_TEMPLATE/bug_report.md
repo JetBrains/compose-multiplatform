@@ -14,8 +14,9 @@ A clear and concise description of what the bug is.
 Select one of the platforms below:
 - All
 - Desktop
-- Web (K/JS) - HTML based API
+- Web (K/Wasm) - Canvas based API
 - Web (K/JS) - Canvas based API
+- Web (K/JS) - HTML library
 - iOS
 - Other
 

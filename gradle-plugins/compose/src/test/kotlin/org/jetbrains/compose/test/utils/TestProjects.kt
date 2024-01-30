@@ -8,9 +8,11 @@ package org.jetbrains.compose.test.utils
 object TestProjects {
     const val jvm = "application/jvm"
     const val mpp = "application/mpp"
+    const val newAndroidTarget = "application/newAndroidTarget"
     const val proguard = "application/proguard"
     const val customCompiler = "application/custom-compiler"
     const val customCompilerArgs = "application/custom-compiler-args"
+    const val customCompilerUnsupportedPlatformsWarning = "application/customCompilerUnsupportedPlatformsWarning"
     const val jvmKotlinDsl = "application/jvmKotlinDsl"
     const val moduleClashCli = "application/moduleClashCli"
     const val javaLogger = "application/javaLogger"
@@ -24,4 +26,8 @@ object TestProjects {
     const val jsMpp = "misc/jsMpp"
     const val skikoWasm = "misc/skikoWasm"
     const val jvmPreview = "misc/jvmPreview"
+    const val iosResources = "misc/iosResources"
+    const val iosMokoResources = "misc/iosMokoResources"
+    const val nativeCacheKind = "misc/nativeCacheKind"
+    const val nativeCacheKindError = "misc/nativeCacheKindError"
 }

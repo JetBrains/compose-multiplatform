@@ -1,1 +1,0 @@
-frameworks/support/gradlew.bat %*

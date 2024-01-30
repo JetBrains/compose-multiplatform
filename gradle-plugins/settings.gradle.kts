@@ -7,3 +7,4 @@ pluginManagement {
 
 include(":compose")
 include(":preview-rpc")
+include(":jdk-version-probe")

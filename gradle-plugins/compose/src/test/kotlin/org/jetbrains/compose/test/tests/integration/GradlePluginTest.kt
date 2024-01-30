@@ -5,10 +5,17 @@
 
 package org.jetbrains.compose.test.tests.integration
 
+import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewLogger
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.RemoteConnection
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.receiveConfigFromGradle
+import org.jetbrains.compose.experimental.internal.kotlinVersionNumbers
+import org.jetbrains.compose.internal.utils.Arch
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentArch
+import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.test.utils.*
+import org.junit.jupiter.api.Assumptions
 
 import java.net.ServerSocket
 import java.net.Socket
@@ -17,13 +24,237 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
 import org.junit.jupiter.api.Test
+import java.io.File
 
 class GradlePluginTest : GradlePluginTestBase() {
+    private data class IosTestEnv(
+        val targetBuildDir: File,
+        val appDir: File,
+        val envVars: Map<String, String>
+    )
+
+    enum class IosPlatform(val id: String) {
+        SIMULATOR("iphonesimulator"), IOS("iphoneos")
+    }
+    enum class IosArch(val id: String) {
+        X64("x86_64"), ARM64("arm64")
+    }
+
+    enum class IosBuildConfiguration(val id: String) {
+        DEBUG("Debug"), RELEASE("Release")
+    }
+
+    private fun iosTestEnv(
+        platform: IosPlatform = IosPlatform.SIMULATOR,
+        arch: IosArch = IosArch.X64,
+        configuration: IosBuildConfiguration = IosBuildConfiguration.DEBUG
+    ): IosTestEnv {
+        val targetBuildDir = testWorkDir.resolve("build/ios/${configuration.id}-${platform.id}").apply { mkdirs() }
+        val appDir = targetBuildDir.resolve("App.app").apply { mkdirs() }
+        val envVars = mapOf(
+            "PLATFORM_NAME" to platform.id,
+            "ARCHS" to arch.id,
+            "BUILT_PRODUCTS_DIR" to targetBuildDir.canonicalPath,
+            "CONTENTS_FOLDER_PATH" to appDir.name,
+        )
+        return IosTestEnv(
+            targetBuildDir = targetBuildDir,
+            appDir = appDir,
+            envVars = envVars
+        )
+    }
+
+    // We rely on this property to use gradle configuration cache in some tests.
+    // Enabling configuration cache unconditionally breaks out tests with gradle 7.3.3.
+    // Old comment: 'for some reason configuration cache + test kit + custom vars does not work'
+    private val GradleVersion.isAtLeastGradle8
+        get() = this >= GradleVersion.version("8.0")
+
     @Test
-    fun skikoWasm() = with(testProject(TestProjects.skikoWasm)) {
+    fun iosResources() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        val iosTestEnv = iosTestEnv()
+        val testEnv = defaultTestEnvironment.copy(
+            useGradleConfigurationCache = TestProperties.gradleBaseVersionForTests.isAtLeastGradle8,
+            additionalEnvVars = iosTestEnv.envVars
+        )
+
+        with(testProject(TestProjects.iosResources, testEnv)) {
+            gradle(":embedAndSignAppleFrameworkForXcode", "--dry-run").checks {
+                // This test is not intended to actually run embedAndSignAppleFrameworkForXcode.
+                // Instead, it should check that embedAndSign depends on syncComposeResources using dry run
+                check.taskSkipped(":syncComposeResourcesForIos")
+                check.taskSkipped(":embedAndSignAppleFrameworkForXcode")
+            }
+            gradle(":syncComposeResourcesForIos").checks {
+                check.taskSuccessful(":syncComposeResourcesForIos")
+                iosTestEnv.appDir.resolve("compose-resources/compose-multiplatform.xml").checkExists()
+            }
+        }
+    }
+
+    @Test
+    fun iosTestResources() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        val testEnv = defaultTestEnvironment.copy(
+            useGradleConfigurationCache = TestProperties.gradleBaseVersionForTests.isAtLeastGradle8
+        )
+
+        with(testProject(TestProjects.iosResources, testEnv)) {
+            gradle(":linkDebugTestIosX64", "--dry-run").checks {
+                check.taskSkipped(":copyTestComposeResourcesForIosX64")
+                check.taskSkipped(":linkDebugTestIosX64")
+            }
+            gradle(":copyTestComposeResourcesForIosX64").checks {
+                check.taskSuccessful(":copyTestComposeResourcesForIosX64")
+                file("build/bin/iosX64/debugTest/compose-resources/compose-multiplatform.xml").checkExists()
+            }
+        }
+    }
+
+    @Test
+    fun iosMokoResources() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        val iosTestEnv = iosTestEnv()
+        val testEnv = defaultTestEnvironment.copy(
+            useGradleConfigurationCache = TestProperties.gradleBaseVersionForTests.isAtLeastGradle8,
+            additionalEnvVars = iosTestEnv.envVars
+        )
+        with(testProject(TestProjects.iosMokoResources, testEnv)) {
+            gradle(
+                ":embedAndSignAppleFrameworkForXcode",
+                ":copyFrameworkResourcesToApp",
+                "--dry-run",
+                "--info"
+            ).checks {
+                // This test is not intended to actually run embedAndSignAppleFrameworkForXcode.
+                // Instead, it should check that the sync disables itself.
+                check.logContains("Compose Multiplatform resource management for iOS is disabled")
+                check.logDoesntContain(":syncComposeResourcesForIos")
+            }
+        }
+    }
+
+    @Test
+    fun nativeCacheKind() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        fun nativeCacheKindProject(kotlinVersion: String) = testProject(
+            TestProjects.nativeCacheKind,
+            defaultTestEnvironment.copy(kotlinVersion = kotlinVersion, useGradleConfigurationCache = false)
+        )
+
+        val task = if (currentArch == Arch.X64) {
+            ":subproject:linkDebugFrameworkIosX64"
+        } else {
+            ":subproject:linkDebugFrameworkIosArm64"
+        }
+        // Note: we used to test with kotlin version 1.9.0 and 1.9.10 too,
+        // but since we now use Compose core libs (1.6.0-dev-1340 and newer) built using kotlin 1.9.21,
+        // the compiler crashed (older k/native doesn't support libs built using newer k/native):
+        // e: kotlin.NotImplementedError: Generation of stubs for class org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterPublicSymbolImpl is not supported yet
+
+        val defaultKotlinVersion = kotlinVersionNumbers(TestKotlinVersions.Default)
+        if (defaultKotlinVersion >= KotlinVersion(1, 9, 20)) {
+            testWorkDir.deleteRecursively()
+            testWorkDir.mkdirs()
+            with(nativeCacheKindProject(TestKotlinVersions.Default) ) {
+                gradle(task, "--info").checks {
+                    check.taskSuccessful(task)
+                    check.logContains("-Xauto-cache-from=")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun nativeCacheKindError() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        fun withNativeCacheKindErrorProject(kotlinVersion: String, fn: TestProject.() -> Unit) {
+            with(testProject(
+                TestProjects.nativeCacheKindError,
+                defaultTestEnvironment.copy(kotlinVersion = kotlinVersion)
+            )) {
+                fn()
+                testWorkDir.deleteRecursively()
+                testWorkDir.mkdirs()
+            }
+        }
+
+        fun testKotlinVersion(kotlinVersion: String) {
+            val args = arrayOf("help")
+            val commonPartOfWarning = "Compose Multiplatform Gradle plugin manages this property automatically"
+            withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
+                gradle(*args).checks {
+                    check.logDoesntContain("Error: 'kotlin.native.cacheKind")
+                    check.logDoesntContain(commonPartOfWarning)
+                }
+            }
+            withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
+                gradleFailure(*args, "-Pkotlin.native.cacheKind=none").checks {
+                    check.logContains("Error: 'kotlin.native.cacheKind' is explicitly set to 'none'")
+                    check.logContains(commonPartOfWarning)
+                }
+
+                gradleFailure(*args, "-Pkotlin.native.cacheKind=none").checks {
+                    check.logContains("Error: 'kotlin.native.cacheKind' is explicitly set to 'none'")
+                    check.logContains(commonPartOfWarning)
+                }
+            }
+            withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
+                gradleFailure(*args, "-Pkotlin.native.cacheKind=static").checks {
+                    check.logContains("Error: 'kotlin.native.cacheKind' is explicitly set to 'static'")
+                    check.logContains(commonPartOfWarning)
+                }
+            }
+            withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
+                gradleFailure(*args, "-Pkotlin.native.cacheKind.iosX64=none").checks {
+                    check.logContains("Error: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'none'")
+                    check.logContains(commonPartOfWarning)
+                }
+            }
+            withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
+                gradleFailure(*args, "-Pkotlin.native.cacheKind.iosX64=static").checks {
+                    check.logContains("Error: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'static'")
+                    check.logContains(commonPartOfWarning)
+                }
+            }
+        }
+
+        testKotlinVersion(TestKotlinVersions.v1_9_21)
+    }
+
+    @Test
+    fun skikoWasm() = with(
+        testProject(
+            TestProjects.skikoWasm,
+            // configuration cache is disabled as a temporary workaround for KT-58057
+            // todo: enable once KT-58057 is fixed
+            testEnvironment = defaultTestEnvironment.copy(useGradleConfigurationCache = false)
+        )
+    ) {
+        fun jsCanvasEnabled(value: Boolean) {
+            modifyGradleProperties { put("org.jetbrains.compose.experimental.jscanvas.enabled", value.toString()) }
+
+        }
+
+        jsCanvasEnabled(false)
+        gradleFailure(":build").checks {
+            check.logContains("ERROR: Compose targets '[jscanvas]' are experimental and may have bugs!")
+        }
+
+        jsCanvasEnabled(true)
         gradle(":build").checks {
             check.taskSuccessful(":unpackSkikoWasmRuntimeJs")
             check.taskSuccessful(":compileKotlinJs")
+        }
+    }
+
+    @Test
+    fun newAndroidTarget() {
+        Assumptions.assumeTrue(TestProperties.gradleBaseVersionForTests >= GradleVersion.version("8.0.0"))
+        with(testProject(TestProjects.newAndroidTarget)) {
+            gradle("build", "--dry-run").checks {
+            }
         }
     }
 

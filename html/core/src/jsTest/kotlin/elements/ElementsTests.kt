@@ -61,8 +61,11 @@ class ElementsTests {
             Pair({ Em() }, "EM"),
             Pair({ I() }, "I"),
             Pair({ B() }, "B"),
-
             Pair({ Small() }, "SMALL"),
+            Pair({ Sup() }, "SUP"),
+            Pair({ Sub() }, "SUB"),
+            Pair({ Blockquote()}, "BLOCKQUOTE"),
+
             Pair({ Span() }, "SPAN"),
             Pair({ Br() }, "BR"),
             Pair({ Ul() }, "UL"),

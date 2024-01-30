@@ -38,6 +38,10 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
     @get:Input
     val dontobfuscate: Property<Boolean?> = objects.nullableProperty()
 
+    @get:Optional
+    @get:Input
+    val dontoptimize: Property<Boolean?> = objects.nullableProperty()
+
     // todo: DSL for excluding default rules
     // also consider pulling coroutines rules from coroutines artifact
     // https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/resources/META-INF/proguard/coroutines.pro
@@ -107,6 +111,10 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
         rootConfigurationFile.ioFile.bufferedWriter().use { writer ->
             if (dontobfuscate.orNull == true) {
                 writer.writeLn("-dontobfuscate")
+            }
+
+            if (dontoptimize.orNull == true) {
+                writer.writeLn("-dontoptimize")
             }
 
             writer.writeLn("""

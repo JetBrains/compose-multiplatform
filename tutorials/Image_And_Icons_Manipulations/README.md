@@ -26,7 +26,7 @@ fun main() = singleWindowApplication {
 }
 ```
 
-`painterResource` supports raster (BMP, GIF, HEIF, ICO, JPEG, PNG, WBMP, WebP) and vector formats (SVG, [XML vector drawable](https://developer.android.com/guide/topics/graphics/vector-drawable-resources)).
+`painterResource` supports raster (BMP, GIF, HEIF, ICO, JPEG, PNG, WBMP, WebP) and vector formats ([XML vector drawable](https://developer.android.com/guide/topics/graphics/vector-drawable-resources)).
 
 <img alt="Resources" src="image_from_resources.png" height="375" />
 

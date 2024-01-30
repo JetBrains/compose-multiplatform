@@ -5,7 +5,7 @@ plugins {
 }
 
 kotlin {
-    android()
+    androidTarget()
     sourceSets {
         val androidMain by getting {
             dependencies {
@@ -16,16 +16,20 @@ kotlin {
 }
 
 android {
-    compileSdk = 33
+    compileSdk = 34
+    namespace = "org.jetbrains.compose.demo.widgets"
     defaultConfig {
         applicationId = "org.jetbrains.WidgetsGallery"
         minSdk = 26
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlin {
+        jvmToolchain(17)
     }
 }

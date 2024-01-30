@@ -6,25 +6,28 @@ ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"/..
 
 # Add folders which should contain up-to-date versions
 declare -a folders=(
-    "templates"
-    "examples"
-    #"experimental/examples"
-    "gradle-plugins"
-    "components"
-    "ci"
-    "web"
-    "tutorials"
-    "compose/integrations/composable-test-cases"
-    "compose/integrations/compose-with-ktx-serialization"
+    "$ROOT/examples"
+    "$ROOT/gradle-plugins"
+    "$ROOT/ci"
+    "$ROOT/tutorials"
 )
 
+if [ ! -z "$COMPOSE_TEMPLATES_FOLDER" ]; then
+folders+=(
+    "$COMPOSE_TEMPLATES_FOLDER/compose-multiplatform-desktop-template"
+    "$COMPOSE_TEMPLATES_FOLDER/compose-multiplatform-html-library-template"
+    "$COMPOSE_TEMPLATES_FOLDER/compose-multiplatform-ios-android-template"
+    "$COMPOSE_TEMPLATES_FOLDER/compose-multiplatform-template"
+)
+fi
+
 if [ -z "$1" ]; then
-echo "Specify Compose version. For example: ./replace.sh 1.2.0-beta02 1.7.10"
+echo "Specify Compose version. For example: ./replaceVersion.sh 1.2.0-beta02 1.7.10"
 exit 1
 fi
 
 if [ -z "$2" ]; then
-echo "Specify Kotlin version. For example: ./replace.sh 1.2.0-beta02 1.7.10"
+echo "Specify Kotlin version. For example: ./replaceVersion.sh 1.2.0-beta02 1.7.10"
 exit 1
 fi
 
@@ -56,7 +59,7 @@ replaceVersionInFile() {
 }
 
 replaceVersionInFolder() {
-    find $ROOT/$1 -wholename $2 -not -path "**/build**" -not -path "**/.gradle**" | while read file; do replaceVersionInFile "$file"; done
+    find $1 -wholename $2 -not -path "**/build**" -not -path "**/.gradle**" | while read file; do replaceVersionInFile "$file"; done
 }
 
 for folder in "${folders[@]}"

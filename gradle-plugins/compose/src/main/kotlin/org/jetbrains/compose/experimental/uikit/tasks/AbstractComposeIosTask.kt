@@ -8,6 +8,7 @@ package org.jetbrains.compose.experimental.uikit.tasks
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileSystemOperations
+import org.gradle.api.file.ProjectLayout
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -32,6 +33,9 @@ abstract class AbstractComposeIosTask : DefaultTask() {
 
     @get:Inject
     protected abstract val fileOperations: FileSystemOperations
+
+    @get:Inject
+    protected abstract val layout: ProjectLayout
 
     @get:LocalState
     protected val logsDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/logs/$name")

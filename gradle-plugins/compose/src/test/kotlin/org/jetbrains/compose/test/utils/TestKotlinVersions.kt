@@ -7,4 +7,9 @@ package org.jetbrains.compose.test.utils
 
 object TestKotlinVersions {
     val Default = TestProperties.composeCompilerCompatibleKotlinVersion
+    val v1_8_20 = "1.8.20"
+    val v1_9_0 = "1.9.0"
+    val v1_9_10 = "1.9.10"
+    val v1_9_20_Beta = "1.9.20-Beta"
+    val v1_9_21 = "1.9.21"
 }

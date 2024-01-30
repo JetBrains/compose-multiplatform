@@ -23,13 +23,6 @@ internal expect fun VerticalScrollbar(
     adapter: ScrollbarAdapter
 )
 
-@Composable
-internal expect fun Dialog(
-    title: String,
-    onCloseRequest: () -> Unit,
-    content: @Composable () -> Unit
-)
-
 internal fun Modifier.onKeyUp(key: Key, action: () -> Unit): Modifier =
     onKeyEvent { event ->
         if ((event.type == KeyEventType.KeyUp) && (event.key == key)) {

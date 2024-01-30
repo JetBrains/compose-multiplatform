@@ -1,6 +1,12 @@
 package org.jetbrains.codeviewer.ui.statusbar
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Slider
 import androidx.compose.material.Text
@@ -9,7 +15,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.sp
 import org.jetbrains.codeviewer.ui.common.Settings
 
 private val MinFontSize = 6.sp
@@ -20,7 +30,6 @@ fun StatusBar(settings: Settings) = Box(
     Modifier
         .height(32.dp)
         .fillMaxWidth()
-        .padding(4.dp)
 ) {
     Row(Modifier.fillMaxHeight().align(Alignment.CenterEnd)) {
         Text(

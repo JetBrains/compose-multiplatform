@@ -4,6 +4,7 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
         mavenLocal()
     }
 
@@ -38,7 +39,7 @@ val casesToRun = CasesToRun.values().firstOrNull {
 } ?: CasesToRun.Default
 
 
-val listOfFailingJsCases = (extra["tests.failing.kjs"] as String).split(",")
+val listOfFailingJsCases = (extra.properties.getOrDefault("tests.failing.kjs", "") as String).split(",")
 val failingJsSuffix = "failingJs"
 
 fun getFailingSuffix(testCaseName: String): String? {
@@ -118,6 +119,12 @@ if (casesToRun.isDefault()) {
 
     module(":testcase-lambdas-lib", "testcases/lambdas/lib")
     module(":testcase-lambdas-main", "testcases/lambdas/main")
+
+    module(":testcase-expectActual-lib", "testcases/expectActual/lib")
+    module(":testcase-expectActual-main", "testcases/expectActual/main")
+
+    module(":testcase-stability-lib", "testcases/stability/lib")
+    module(":testcase-stability-main", "testcases/stability/main")
 }
 
 /**

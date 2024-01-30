@@ -11,10 +11,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.demo.widgets.data.DemoDataProvider
-import org.jetbrains.compose.demo.widgets.platform.Res
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.demo.widgets.theme.typography
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.ImageResource
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalResourceApi::class)
 @Composable
@@ -54,7 +54,7 @@ fun UICards() {
     ) {
         Row {
             Image(
-                painterResource(Res.drawable.p3),
+                painterResource(ImageResource("composeRes/images/p3.jpeg")),
                 contentDescription = null,
                 modifier = Modifier.requiredSize(60.dp)
             )
@@ -78,7 +78,7 @@ fun UICards() {
     Divider(modifier = Modifier.padding(4.dp))
     ListItem(text = { Text(item.title) }, secondaryText = { Text(item.subtitle) }, icon = {
         Image(
-            painterResource(Res.drawable.p3),
+            painterResource(ImageResource("composeRes/images/p3.jpeg")),
             contentDescription = null
         )
     })
@@ -87,7 +87,7 @@ fun UICards() {
     ListItem(
         text = { Text(item.title) },
         secondaryText = { Text(item.subtitle) },
-        icon = { Image(painterResource(Res.drawable.p1), contentDescription = null) },
+        icon = { Image(painterResource(ImageResource("composeRes/images/p1.jpeg")), contentDescription = null) },
         overlineText = { Text("Overline text") },
         singleLineSecondaryText = false
     )
@@ -95,7 +95,7 @@ fun UICards() {
     ListItem(
         text = { Text(item.title) },
         secondaryText = { Text(item.subtitle) },
-        icon = { Image(painterResource(Res.drawable.p2), contentDescription = null) },
+        icon = { Image(painterResource(ImageResource("composeRes/images/p2.jpeg")), contentDescription = null) },
         trailing = { Icon(Icons.Default.ShoppingCart, contentDescription = null) },
         singleLineSecondaryText = false
     )

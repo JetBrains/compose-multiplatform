@@ -1,101 +1,96 @@
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+
 plugins {
     kotlin("multiplatform")
-    kotlin("native.cocoapods")
     id("com.android.library")
     id("org.jetbrains.compose")
 }
 
-version = "1.0-SNAPSHOT"
-
 kotlin {
-    android()
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    targetHierarchy.default()
+    androidTarget {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = "11"
+            }
+        }
+    }
     jvm("desktop")
-    ios()
-    iosSimulatorArm64()
-    js(IR) {
-        browser()
-        binaries.executable()
-    }
-    macosX64 {
-        binaries {
-            executable {
-                entryPoint = "main"
-            }
-        }
-    }
-    macosArm64 {
-        binaries {
-            executable {
-                entryPoint = "main"
-            }
-        }
-    }
-
-    cocoapods {
-        summary = "Shared code for the sample"
-        homepage = "https://github.com/JetBrains/compose-jb"
-        ios.deploymentTarget = "14.1"
-        podfile = project.file("../iosApp/Podfile")
-        framework {
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
             baseName = "shared"
             isStatic = true
         }
-        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
+    }
+    js {
+        browser {
+            testTask(Action {
+                enabled = false
+            })
+        }
+        binaries.executable()
+    }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+        binaries.executable()
+    }
+
+    listOf(
+        macosX64(),
+        macosArm64()
+    ).forEach { macosTarget ->
+        macosTarget.binaries {
+            executable {
+                entryPoint = "main"
+            }
+        }
     }
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(compose.ui)
-                implementation(compose.foundation)
-                implementation(compose.material)
-                implementation(compose.runtime)
-                implementation(project(":resources:library"))
+        all {
+            languageSettings {
+                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
             }
         }
-        val iosMain by getting
-        val iosTest by getting
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosSimulatorArm64Test by getting {
-            dependsOn(iosTest)
+        val commonMain by getting {
+            dependencies {
+                implementation(compose.runtime)
+                implementation(compose.material3)
+                implementation(project(":resources:library"))
+            }
         }
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.common)
             }
         }
-        val macosMain by creating {
-            dependsOn(commonMain)
-        }
-        val macosX64Main by getting {
-            dependsOn(macosMain)
-        }
-        val macosArm64Main by getting {
-            dependsOn(macosMain)
-        }
     }
 }
 
 android {
-    compileSdk = 33
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    compileSdk = 34
+    namespace = "org.jetbrains.compose.resources.demo.shared"
     defaultConfig {
         minSdk = 21
-        targetSdk = 33
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    sourceSets {
-        named("main") {
-            resources.srcDir("src/commonMain/resources")
-        }
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 
 compose.experimental {
     web.application {}
+}
+
+// TODO: remove this block after we update on a newer kotlin. Currently there is an error: `error:0308010C:digital envelope routines::unsupported`
+rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
+    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
 }

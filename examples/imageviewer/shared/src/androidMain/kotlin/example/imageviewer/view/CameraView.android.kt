@@ -37,7 +37,7 @@ import example.imageviewer.model.createCameraPictureData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.resource
+import org.jetbrains.compose.resources.readResourceBytes
 import java.nio.ByteBuffer
 import java.util.*
 import java.util.concurrent.Executors
@@ -79,6 +79,7 @@ private fun CameraWithGrantedPermission(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val viewScope = rememberCoroutineScope()
+    var cameraProvider: ProcessCameraProvider? by remember { mutableStateOf(null) }
 
     val preview = Preview.Builder().build()
     val previewView = remember { PreviewView(context) }
@@ -96,16 +97,22 @@ private fun CameraWithGrantedPermission(
             .build()
     }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            cameraProvider?.unbindAll()
+        }
+    }
+
     LaunchedEffect(isFrontCamera) {
-        val cameraProvider = suspendCoroutine<ProcessCameraProvider> { continuation ->
+        cameraProvider = suspendCoroutine<ProcessCameraProvider> { continuation ->
             ProcessCameraProvider.getInstance(context).also { cameraProvider ->
                 cameraProvider.addListener({
                     continuation.resume(cameraProvider.get())
                 }, executor)
             }
         }
-        cameraProvider.unbindAll()
-        cameraProvider.bindToLifecycle(
+        cameraProvider?.unbindAll()
+        cameraProvider?.bindToLifecycle(
             lifecycleOwner,
             cameraSelector,
             preview,
@@ -169,7 +176,7 @@ private fun CameraWithGrantedPermission(
                 delay(5000)
                 if (capturePhotoStarted) {
                     addLocationInfoAndReturnResult(
-                        resource("android-emulator-photo.jpg").readBytes().toImageBitmap()
+                        readResourceBytes("android-emulator-photo.jpg").toImageBitmap()
                     )
                 }
             }

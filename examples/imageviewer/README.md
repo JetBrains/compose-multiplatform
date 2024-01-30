@@ -9,6 +9,9 @@ To setup the environment, please consult these [instructions](https://github.com
 
 ## How to run
 
+If you already runned this sample before, then you need to execute command at least once: 
+`/gradlew podInstall`
+
 Choose a run configuration for an appropriate target in IDE and run it.
 
 ![run-configurations.png](screenshots/run-configurations.png)
@@ -21,7 +24,7 @@ Choose a run configuration for an appropriate target in IDE and run it.
 
 ```
 ./gradlew :desktop:packageDistributionForCurrentOS
-# outputs are written to desktop/build/compose/binaries
+# outputs are written to desktopApp/build/compose/binaries
 ```
 
 ### Running Android application
