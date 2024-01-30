@@ -21,7 +21,7 @@ class CSSRulesHolderState : CSSRulesHolder {
  * Represents a collection of the css style rules.
  * StyleSheet needs to be mounted.
  *
- * @param prefix Will be used as prefix with current style. Pass `null` to use default value (classname of realization)
+ * @param customPrefix Will be used as prefix with current style. Pass `null` to use default value (classname of realization)
  *
  * @see [Style]
  *
