@@ -17,14 +17,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.demo.widgets.platform.Res
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.demo.widgets.theme.twitterColor
 import org.jetbrains.compose.demo.widgets.ui.WidgetsType
 import org.jetbrains.compose.demo.widgets.ui.utils.SubtitleText
 import org.jetbrains.compose.demo.widgets.ui.utils.TitleText
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
+import widgets_gallery.shared.generated.resources.Res
 
 @Composable
 fun AppBars() {
@@ -59,12 +59,12 @@ private fun TopAppBarsDemo() {
         elevation = 8.dp,
         navigationIcon = {
             IconButton(onClick = {}) {
-                Icon(painterResource(DrawableResource("composeRes/images/ic_instagram.xml")), contentDescription = "Instagram")
+                Icon(painterResource(Res.drawable.ic_instagram), contentDescription = "Instagram")
             }
         },
         actions = {
             IconButton(onClick = {}) {
-                Icon(painterResource(DrawableResource("composeRes/images/ic_send.xml")), contentDescription = "Send")
+                Icon(painterResource(Res.drawable.ic_send), contentDescription = "Send")
             }
         }
     )
@@ -74,7 +74,7 @@ private fun TopAppBarsDemo() {
     TopAppBar(
         title = {
             Icon(
-                painterResource(DrawableResource("composeRes/images/ic_twitter.xml")),
+                painterResource(Res.drawable.ic_twitter),
                 contentDescription = "Twitter",
                 tint = twitterColor,
                 modifier = Modifier.fillMaxWidth()
@@ -85,7 +85,7 @@ private fun TopAppBarsDemo() {
         elevation = 8.dp,
         navigationIcon = {
             Image(
-                painterResource(DrawableResource("composeRes/images/p6.jpeg")),
+                painterResource(Res.drawable.p6),
                 contentDescription = "",
                 modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
                     .requiredSize(32.dp).clip(CircleShape)
@@ -117,6 +117,7 @@ private fun BottomAppBarDemo() {
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun NavigationBarDemo() {
     Spacer(modifier = Modifier.height(16.dp))
@@ -127,19 +128,19 @@ private fun NavigationBarDemo() {
             icon = { Icon(Icons.Outlined.Home, contentDescription = "Home") },
             selected = navItemState.value == NavType.HOME,
             onClick = { navItemState.value = NavType.HOME },
-            label = { Text(text = Res.strings.spotify_nav_home) },
+            label = { Text(text = stringResource(Res.string.spotify_nav_home)) },
         )
         BottomNavigationItem(
             icon = { Icon(Icons.Outlined.Search, contentDescription = "Search") },
             selected = navItemState.value == NavType.SEARCH,
             onClick = { navItemState.value = NavType.SEARCH },
-            label = { Text(text = Res.strings.spotify_nav_search) }
+            label = { Text(text = stringResource(Res.string.spotify_nav_search)) }
         )
         BottomNavigationItem(
             icon = { Icon(Icons.Outlined.LibraryMusic, contentDescription = "LibraryMusic") },
             selected = navItemState.value == NavType.LIBRARY,
             onClick = { navItemState.value = NavType.LIBRARY },
-            label = { Text(text = Res.strings.spotify_nav_library) }
+            label = { Text(text = stringResource(Res.string.spotify_nav_library)) }
         )
     }
 

@@ -16,7 +16,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.demo.widgets.theme.typography
 import org.jetbrains.compose.demo.widgets.ui.WidgetsType
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.DrawableResource
+import widgets_gallery.shared.generated.resources.Res
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalResourceApi::class)
 @Composable
@@ -57,7 +57,7 @@ fun UICards() {
         ) {
             Row {
                 Image(
-                    painterResource(DrawableResource("composeRes/images/p3.jpeg")),
+                    painterResource(Res.drawable.p3),
                     contentDescription = null,
                     modifier = Modifier.requiredSize(60.dp)
                 )
@@ -81,7 +81,7 @@ fun UICards() {
         Divider(modifier = Modifier.padding(4.dp))
         ListItem(text = { Text(item.title) }, secondaryText = { Text(item.subtitle) }, icon = {
             Image(
-                painterResource(DrawableResource("composeRes/images/p3.jpeg")),
+                painterResource(Res.drawable.p3),
                 contentDescription = null
             )
         })
@@ -92,7 +92,7 @@ fun UICards() {
             secondaryText = { Text(item.subtitle) },
             icon = {
                 Image(
-                    painterResource(DrawableResource("composeRes/images/p1.jpeg")),
+                    painterResource(Res.drawable.p1),
                     contentDescription = null
                 )
             },
@@ -105,7 +105,7 @@ fun UICards() {
             secondaryText = { Text(item.subtitle) },
             icon = {
                 Image(
-                    painterResource(DrawableResource("composeRes/images/p2.jpeg")),
+                    painterResource(Res.drawable.p2),
                     contentDescription = null
                 )
             },

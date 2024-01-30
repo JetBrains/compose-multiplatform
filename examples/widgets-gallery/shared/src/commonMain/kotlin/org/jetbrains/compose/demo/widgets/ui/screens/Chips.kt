@@ -21,6 +21,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.demo.widgets.ui.utils.SubtitleText
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import widgets_gallery.shared.generated.resources.Res
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -43,13 +44,13 @@ fun Chips() {
             Spacer(modifier = Modifier.padding(8.dp))
             CustomImageChip(
                 text = "custom",
-                imageId = DrawableResource("composeRes/images/p2.jpeg"),
+                imageId = Res.drawable.p2,
                 selected = true
             )
             Spacer(modifier = Modifier.padding(8.dp))
             CustomImageChip(
                 text = "custom2",
-                imageId = DrawableResource("composeRes/images/p6.jpeg"),
+                imageId = Res.drawable.p6,
                 selected = false
             )
         }
