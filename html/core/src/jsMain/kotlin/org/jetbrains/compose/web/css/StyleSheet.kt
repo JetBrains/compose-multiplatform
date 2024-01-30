@@ -45,8 +45,9 @@ open class StyleSheet(
     private val rulesHolder: CSSRulesHolder = CSSRulesHolderState(),
 ) : StyleSheetBuilder, CSSRulesHolder by rulesHolder {
     private val boundClasses = mutableMapOf<String, CSSRuleDeclarationList>()
-    val prefix = prefix ?: "${this::class.simpleName}-"
+    protected val prefix: String = prefix ?: "${this::class.simpleName}-"
 
+    val usePrefix: Boolean = prefix == null
     constructor(
         rulesHolder: CSSRulesHolder = CSSRulesHolderState(),
         usePrefix: Boolean = true
