@@ -41,13 +41,13 @@ class CSSRulesHolderState : CSSRulesHolder {
  * ```
  */
 open class StyleSheet(
-    prefix: String?,
+    customPrefix: String?,
     private val rulesHolder: CSSRulesHolder = CSSRulesHolderState(),
 ) : StyleSheetBuilder, CSSRulesHolder by rulesHolder {
     private val boundClasses = mutableMapOf<String, CSSRuleDeclarationList>()
-    protected val prefix: String = prefix ?: "${this::class.simpleName}-"
+    protected val prefix: String = customPrefix ?: "${this::class.simpleName}-"
 
-    val usePrefix: Boolean = prefix == null
+    val usePrefix: Boolean = customPrefix == null
     constructor(
         rulesHolder: CSSRulesHolder = CSSRulesHolderState(),
         usePrefix: Boolean = true

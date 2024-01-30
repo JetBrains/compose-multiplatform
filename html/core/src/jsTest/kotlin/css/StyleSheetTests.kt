@@ -17,13 +17,13 @@ class StyleSheetTests {
 
     @Test
     fun extendExistingStyleSheet() {
-        val styleSheet = object : StyleSheet(prefix = "") {
+        val styleSheet = object : StyleSheet(customPrefix = "") {
             val someClassName by style {
                 color(Color.red)
             }
         }
 
-        val childStyleSheet = object : StyleSheet(prefix = "", styleSheet) {
+        val childStyleSheet = object : StyleSheet(customPrefix = "", styleSheet) {
             val someClassName by style {
                 color(Color.green)
             }
@@ -47,13 +47,13 @@ class StyleSheetTests {
         val testPrefixParent = "test_prefix_parent-"
         val testPrefixChild = "test_prefix_child-"
 
-        val styleSheet = object : StyleSheet(prefix = testPrefixParent) {
+        val styleSheet = object : StyleSheet(customPrefix = testPrefixParent) {
             val someClassName by style {
                 color(Color.red)
             }
         }
 
-        val childStyleSheet = object : StyleSheet(prefix = testPrefixChild, styleSheet) {
+        val childStyleSheet = object : StyleSheet(customPrefix = testPrefixChild, styleSheet) {
             val someClassName by style {
                 color(Color.green)
             }

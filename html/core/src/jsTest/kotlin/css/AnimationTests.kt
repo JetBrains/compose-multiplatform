@@ -36,8 +36,8 @@ object AnimationsStyleSheet : StyleSheet() {
 }
 
 class AnimationsStyleSheetWithCustomPrefix(
-    prefix: String
-) : StyleSheet(prefix) {
+    customPrefix: String
+) : StyleSheet(customPrefix) {
     val bounce by keyframes {
         from {
             property("transform", "translateX(50%)")
