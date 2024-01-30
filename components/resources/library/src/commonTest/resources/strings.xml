@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Compose Resources App</string>
     <string name="hello">😊 Hello world!</string>
+    <string name="accentuated_characters">Créer une table</string>
     <string name="str_template">Hello, %1$s! You have %2$d new messages.</string>
     <string-array name="str_arr">
         <item>item 1</item>

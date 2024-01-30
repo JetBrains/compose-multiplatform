@@ -95,8 +95,7 @@ private class DomXmlParser : NSObject(), NSXMLParserDelegateProtocol {
 
     override fun parser(parser: NSXMLParser, foundCharacters: String) {
         nodeStack.lastOrNull()?.let { node ->
-            node.textContent = node.textContent?.let { it + foundCharacters }
-                ?: foundCharacters
+            node.textContent = node.textContent.orEmpty() + foundCharacters
         }
     }
 
