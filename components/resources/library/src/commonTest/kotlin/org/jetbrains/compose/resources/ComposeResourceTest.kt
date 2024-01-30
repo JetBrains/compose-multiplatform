@@ -6,23 +6,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runComposeUiTest
 import kotlinx.coroutines.flow.MutableStateFlow
-import org.junit.Assert.assertEquals
-import org.junit.Before
-import org.junit.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
+import kotlin.test.*
 
 @OptIn(ExperimentalTestApi::class, ExperimentalResourceApi::class, InternalResourceApi::class)
 class ComposeResourceTest {
 
-    @Before
-    fun dropCaches() {
+    init {
         dropStringsCache()
         dropImageCache()
-    }
-
-    @Before
-    fun configureTestEnvironment() {
         getResourceEnvironment = ::getTestEnvironment
     }
 
@@ -112,6 +103,10 @@ class ComposeResourceTest {
                         stringResource(TestStringResource("app_name"))
                     )
                     assertEquals(
+                        "Créer une table",
+                        stringResource(TestStringResource("accentuated_characters"))
+                    )
+                    assertEquals(
                         "Hello, test-name! You have 42 new messages.",
                         stringResource(TestStringResource("str_template"), "test-name", 42)
                     )
@@ -127,12 +122,12 @@ class ComposeResourceTest {
 
     @Test
     fun testLoadStringResource() = runBlockingTest {
-        kotlin.test.assertEquals("Compose Resources App", getString(TestStringResource("app_name")))
-        kotlin.test.assertEquals(
+        assertEquals("Compose Resources App", getString(TestStringResource("app_name")))
+        assertEquals(
             "Hello, test-name! You have 42 new messages.",
             getString(TestStringResource("str_template"), "test-name", 42)
         )
-        kotlin.test.assertEquals(listOf("item 1", "item 2", "item 3"), getStringArray(TestStringResource("str_arr")))
+        assertEquals(listOf("item 1", "item 2", "item 3"), getStringArray(TestStringResource("str_arr")))
     }
 
     @Test
@@ -143,17 +138,18 @@ class ComposeResourceTest {
         val error = assertFailsWith<IllegalStateException> {
             getString(TestStringResource("unknown_id"))
         }
-        kotlin.test.assertEquals("String ID=`unknown_id` is not found!", error.message)
+        assertEquals("String ID=`unknown_id` is not found!", error.message)
     }
 
     @Test
     fun testReadFileResource() = runBlockingTest {
         val bytes = readResourceBytes("strings.xml")
-        kotlin.test.assertEquals(
+        assertEquals(
             """
                 <resources>
                     <string name="app_name">Compose Resources App</string>
                     <string name="hello">😊 Hello world!</string>
+                    <string name="accentuated_characters">Créer une table</string>
                     <string name="str_template">Hello, %1${'$'}s! You have %2${'$'}d new messages.</string>
                     <string-array name="str_arr">
                         <item>item 1</item>
