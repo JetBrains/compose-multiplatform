@@ -1,3 +1,8 @@
+@file:OptIn(
+    org.jetbrains.compose.resources.InternalResourceApi::class,
+    org.jetbrains.compose.resources.ExperimentalResourceApi::class,
+)
+
 package app.group.empty_res.generated.resources
 
 import kotlin.ByteArray
@@ -6,7 +11,6 @@ import kotlin.String
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.readResourceBytes
 
-@OptIn(org.jetbrains.compose.resources.InternalResourceApi::class)
 @ExperimentalResourceApi
 internal object Res {
     /**
