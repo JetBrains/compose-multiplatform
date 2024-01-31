@@ -42,4 +42,34 @@ class StyleSheetTests {
         )
     }
 
+    @Test
+    fun stylesheetCorrectlyUsingIncomingPrefix() {
+        val testPrefixParent = "test_prefix_parent-"
+        val testPrefixChild = "test_prefix_child-"
+
+        val styleSheet = object : StyleSheet(customPrefix = testPrefixParent) {
+            val someClassName by style {
+                color(Color.red)
+            }
+        }
+
+        val childStyleSheet = object : StyleSheet(customPrefix = testPrefixChild, styleSheet) {
+            val someClassName by style {
+                color(Color.green)
+            }
+        }
+
+        assertContentEquals(
+            listOf(".${testPrefixParent}someClassName { color: red;}", ".${testPrefixChild}someClassName { color: green;}"),
+            styleSheet.serializeRules(),
+            "styleSheet rules"
+        )
+
+        assertContentEquals(
+            listOf(".${testPrefixParent}someClassName { color: red;}", ".${testPrefixChild}someClassName { color: green;}"),
+            childStyleSheet.serializeRules(),
+            "childStyleSheet rules"
+        )
+    }
+
 }
