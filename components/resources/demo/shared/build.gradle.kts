@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
@@ -8,8 +7,6 @@ plugins {
 }
 
 kotlin {
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
-    targetHierarchy.default()
     androidTarget {
         compilations.all {
             kotlinOptions {
@@ -59,17 +56,14 @@ kotlin {
                 optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
             }
         }
-        val commonMain by getting {
-            dependencies {
-                implementation(compose.runtime)
-                implementation(compose.material3)
-                implementation(project(":resources:library"))
-            }
+        commonMain.dependencies {
+            implementation(compose.runtime)
+            implementation(compose.material3)
+            implementation(project(":resources:library"))
         }
-        val desktopMain by getting {
-            dependencies {
-                implementation(compose.desktop.common)
-            }
+        val desktopMain by getting
+        desktopMain.dependencies {
+            implementation(compose.desktop.common)
         }
     }
 }
@@ -88,9 +82,4 @@ android {
 
 compose.experimental {
     web.application {}
-}
-
-// TODO: remove this block after we update on a newer kotlin. Currently there is an error: `error:0308010C:digital envelope routines::unsupported`
-rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
-    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
 }

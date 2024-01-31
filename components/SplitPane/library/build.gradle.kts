@@ -14,11 +14,9 @@ kotlin {
             }
         }
 
-        val commonMain by getting {
-            dependencies {
-                api(compose.runtime)
-                api(compose.foundation)
-            }
+        commonMain.dependencies {
+            api(compose.runtime)
+            api(compose.foundation)
         }
     }
 }

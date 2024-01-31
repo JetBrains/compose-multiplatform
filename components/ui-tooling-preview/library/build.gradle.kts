@@ -9,8 +9,6 @@ plugins {
 val composeVersion = extra["compose.version"] as String
 
 kotlin {
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
-    targetHierarchy.default()
     jvm("desktop")
     androidTarget {
         publishLibraryVariants("release")
