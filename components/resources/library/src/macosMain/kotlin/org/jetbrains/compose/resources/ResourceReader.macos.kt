@@ -13,6 +13,7 @@ actual suspend fun readResourceBytes(path: String): ByteArray {
         //todo in future bundle resources with app and use all sourceSets (skikoMain, nativeMain)
         contentsAtPath("$currentDirectoryPath/src/macosMain/resources/$path")
             ?: contentsAtPath("$currentDirectoryPath/src/commonMain/resources/$path")
+            ?: contentsAtPath("$currentDirectoryPath/src/commonTest/resources/$path")
     } ?: throw MissingResourceException(path)
     return ByteArray(contentsAtPath.length.toInt()).apply {
         usePinned {

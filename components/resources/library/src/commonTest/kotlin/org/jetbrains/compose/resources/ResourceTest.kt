@@ -13,12 +13,12 @@ import kotlin.test.*
 @OptIn(ExperimentalResourceApi::class, InternalResourceApi::class)
 class ResourceTest {
     @Test
-    fun testResourceEquals() = runBlockingTest {
+    fun testResourceEquals() {
         assertEquals(DrawableResource("a"), DrawableResource("a"))
     }
 
     @Test
-    fun testResourceNotEquals() = runBlockingTest {
+    fun testResourceNotEquals() {
         assertNotEquals(DrawableResource("a"), DrawableResource("b"))
     }
 
