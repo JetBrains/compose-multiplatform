@@ -12,8 +12,6 @@ plugins {
 val composeVersion = extra["compose.version"] as String
 
 kotlin {
-    @OptIn(ExperimentalKotlinGradlePluginApi::class)
-    targetHierarchy.default()
     jvm("desktop")
     androidTarget {
         publishLibraryVariants("release")
@@ -48,6 +46,7 @@ kotlin {
     macosX64()
     macosArm64()
 
+    applyDefaultHierarchyTemplate()
     sourceSets {
         all {
             languageSettings {
@@ -75,8 +74,8 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                implementation(libs.kotlinx.coroutines.test)
                 implementation(kotlin("test"))
+                implementation(libs.kotlinx.coroutines.test)
                 implementation(compose.material3)
                 @OptIn(ExperimentalComposeLibrary::class)
                 implementation(compose.uiTest)
@@ -96,9 +95,6 @@ kotlin {
         }
         val jvmAndAndroidMain by creating {
             dependsOn(blockingMain)
-            dependencies {
-                implementation(compose.material3)
-            }
         }
         val jvmAndAndroidTest by creating {
             dependsOn(blockingTest)
@@ -112,8 +108,6 @@ kotlin {
             dependsOn(jvmAndAndroidTest)
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation(compose.desktop.uiTestJUnit4)
-                implementation(libs.kotlinx.coroutines.swing)
             }
         }
         val androidMain by getting {
@@ -122,10 +116,10 @@ kotlin {
         val androidInstrumentedTest by getting {
             dependsOn(jvmAndAndroidTest)
             dependencies {
-                implementation("androidx.test:core:1.5.0")
-                implementation("androidx.compose.ui:ui-test-manifest:1.5.4")
-                implementation("androidx.compose.ui:ui-test:1.5.4")
-                implementation("androidx.compose.ui:ui-test-junit4:1.5.4")
+                implementation(libs.androidx.test.core)
+                implementation(libs.androidx.compose.ui.test)
+                implementation(libs.androidx.compose.ui.test.manifest)
+                implementation(libs.androidx.compose.ui.test.junit4)
             }
         }
         val androidUnitTest by getting {

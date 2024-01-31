@@ -6,11 +6,9 @@ plugins {
 kotlin {
     jvm()
     sourceSets {
-        val jvmMain by getting {
-            dependencies {
-                implementation(compose.desktop.currentOs)
-                implementation(project(":ui-tooling-preview:demo:shared"))
-            }
+        jvmMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation(project(":ui-tooling-preview:demo:shared"))
         }
     }
 }
