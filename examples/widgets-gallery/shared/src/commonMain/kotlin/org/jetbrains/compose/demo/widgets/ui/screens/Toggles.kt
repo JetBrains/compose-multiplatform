@@ -9,11 +9,13 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.demo.widgets.ui.WidgetsType
 
 @Composable
 fun Toggles() {
-    Column {
+    Column(Modifier.testTag(WidgetsType.TOGGLES.testTag)) {
         var checked by remember { mutableStateOf(true) }
         Checkbox(
             checked = checked,

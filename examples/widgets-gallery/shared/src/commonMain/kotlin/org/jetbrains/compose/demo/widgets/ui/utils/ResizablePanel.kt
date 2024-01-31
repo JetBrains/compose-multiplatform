@@ -8,8 +8,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,7 +60,10 @@ fun ResizablePanel(
                 .clickable { state.isExpanded = !state.isExpanded }
             ) {
                 Icon(
-                    if (state.isExpanded) Icons.Default.ArrowBack else Icons.Default.ArrowForward,
+                    imageVector = if (state.isExpanded)
+                        Icons.AutoMirrored.Default.ArrowBack
+                    else
+                        Icons.AutoMirrored.Default.ArrowForward,
                     contentDescription = if (state.isExpanded) "Collapse" else "Expand",
                     tint = LocalContentColor.current,
                     modifier = Modifier
