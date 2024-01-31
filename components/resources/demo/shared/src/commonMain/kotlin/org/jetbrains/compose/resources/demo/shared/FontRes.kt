@@ -29,13 +29,37 @@ fun FontRes(paddingValues: PaddingValues) {
             Text(
                 modifier = Modifier.padding(8.dp),
                 text = """
-                    val fontAwesome = FontFamily(Font(Res.fonts.font_awesome))
-                    val symbols = arrayOf(0xf1ba, 0xf238, 0xf21a, 0xf1bb, 0xf1b8, 0xf09b, 0xf269, 0xf1d0, 0xf15a, 0xf293, 0xf1c6)
                     Text(
                         modifier = Modifier.padding(16.dp),
-                        fontFamily = fontAwesome,
+                        fontFamily = FontFamily(Font(Res.font.workbench_regular)),
                         style = MaterialTheme.typography.headlineLarge,
-                        text = symbols.joinToString(" ") { it.toChar().toString() }
+                        text = "brown fox jumps over the lazy dog"
+                    ) 
+                """.trimIndent(),
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                softWrap = false
+            )
+        }
+        Text(
+            modifier = Modifier.padding(16.dp),
+            fontFamily = FontFamily(Font(Res.font.workbench_regular)),
+            style = MaterialTheme.typography.headlineLarge,
+            text = "brown fox jumps over the lazy dog"
+        )
+
+        OutlinedCard(
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            shape = RoundedCornerShape(4.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+        ) {
+            Text(
+                modifier = Modifier.padding(8.dp),
+                text = """
+                    Text(
+                        modifier = Modifier.padding(16.dp),
+                        fontFamily = FontFamily(Font(Res.font.font_awesome)),
+                        style = MaterialTheme.typography.headlineLarge,
+                        text ="\uf1ba \uf238 \uf21a \uf1bb \uf1b8 \uf09b \uf269 \uf1d0 \uf15a \uf293 \uf1c6"
                     ) 
                 """.trimIndent(),
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
@@ -43,13 +67,11 @@ fun FontRes(paddingValues: PaddingValues) {
             )
         }
 
-        val fontAwesome = FontFamily(Font(Res.font.font_awesome))
-        val symbols = arrayOf(0xf1ba, 0xf238, 0xf21a, 0xf1bb, 0xf1b8, 0xf09b, 0xf269, 0xf1d0, 0xf15a, 0xf293, 0xf1c6)
         Text(
             modifier = Modifier.padding(16.dp),
-            fontFamily = fontAwesome,
+            fontFamily = FontFamily(Font(Res.font.font_awesome)),
             style = MaterialTheme.typography.headlineLarge,
-            text = symbols.joinToString(" ") { it.toChar().toString() }
+            text ="\uf1ba \uf238 \uf21a \uf1bb \uf1b8 \uf09b \uf269 \uf1d0 \uf15a \uf293 \uf1c6"
         )
     }
 }

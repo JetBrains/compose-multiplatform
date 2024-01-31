@@ -1,30 +1,16 @@
 package org.jetbrains.compose.resources.demo.shared
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import components.resources.demo.shared.generated.resources.Res
-import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.resources.stringArrayResource
-import org.jetbrains.compose.resources.readResourceBytes
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun StringRes(paddingValues: PaddingValues) {
@@ -56,7 +42,7 @@ fun StringRes(paddingValues: PaddingValues) {
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
             value = stringResource(Res.string.app_name),
             onValueChange = {},
-            label = { Text("Text(stringResource(Res.string.app_name)") },
+            label = { Text("Text(stringResource(Res.string.app_name))") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -68,7 +54,7 @@ fun StringRes(paddingValues: PaddingValues) {
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
             value = stringResource(Res.string.hello),
             onValueChange = {},
-            label = { Text("Text(stringResource(Res.string.hello)") },
+            label = { Text("Text(stringResource(Res.string.hello))") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -80,7 +66,7 @@ fun StringRes(paddingValues: PaddingValues) {
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
             value = stringResource(Res.string.multi_line),
             onValueChange = {},
-            label = { Text("Text(stringResource(Res.string.multi_line)") },
+            label = { Text("Text(stringResource(Res.string.multi_line))") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
@@ -92,7 +78,7 @@ fun StringRes(paddingValues: PaddingValues) {
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
             value = stringResource(Res.string.str_template, "User_name", 100),
             onValueChange = {},
-            label = { Text("Text(stringResource(Res.string.str_template, \"User_name\", 100)") },
+            label = { Text("Text(stringResource(Res.string.str_template, \"User_name\", 100))") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
