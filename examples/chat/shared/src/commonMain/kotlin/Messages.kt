@@ -51,7 +51,8 @@ internal inline fun Messages(messages: List<Message>) {
 fun UserPic(user: User) {
     val imageSize = 48f
     val painter = user.picture?.let {
-        painterResource(it)
+        null
+        //painterResource(it)
     } ?: object : Painter() {
         override val intrinsicSize: Size = Size(imageSize, imageSize)
         override fun DrawScope.onDraw() {
