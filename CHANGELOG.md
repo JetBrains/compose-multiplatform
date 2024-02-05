@@ -42,24 +42,24 @@
 
 ## HTML library
 ### Features
-[Add opportunity to use custom prefixes in StyleShee](https://github.com/JetBrains/compose-multiplatform/pull/3015)
+- [Add opportunity to use custom prefixes in StyleSheet](https://github.com/JetBrains/compose-multiplatform/pull/3015)
 
 ## Gradle Plugin
 
 ### Features
-- [Add ui-tooling-preview alias](https://youtrack.jetbrains.com/issue/COMPOSE-857/Provide-compose.components.uiToolingPreview-alias)
+- [Add ui-tooling-preview alias](https://github.com/JetBrains/compose-multiplatform/pull/4190)
 
 ## Resource library
 
 ### Fixes
-[Configure android resources after the agp is applied and ignore hidden files in resources](https://github.com/JetBrains/compose-multiplatform/commit/3040ea85bbc81cb6d1e22d6928646509ee8b601f)
-[Generate Res class if there is no common composeResource dir](https://github.com/JetBrains/compose-multiplatform/pull/4176)
-[Support Res class generation in JVM only compose projects](https://github.com/JetBrains/compose-multiplatform/pull/4183)
-[Support compose resources for ios tests](https://github.com/JetBrains/compose-multiplatform/pull/4185)
-[Use "project.findProperty" instead of "providers.valueOrNull" to fix sub-module gradle properties for res class generation](https://github.com/JetBrains/compose-multiplatform/commit/ee26bf8beea595dce67fbe880aa86a8363d428ae)
-[Fix native xml parser and add ios native tests](https://github.com/JetBrains/compose-multiplatform/pull/4207)
-[Generate initializer functions in the Res file to avoid the MethodTooLargeException](https://github.com/JetBrains/compose-multiplatform/pull/4205)
-[Improve handling of special characters in string resources](https://github.com/JetBrains/compose-multiplatform/pull/4220)
+- [Configure android resources after the agp is applied and ignore hidden files in resources](https://github.com/JetBrains/compose-multiplatform/commit/3040ea85bbc81cb6d1e22d6928646509ee8b601f)
+- [Generate Res class if there is no common composeResource dir](https://github.com/JetBrains/compose-multiplatform/pull/4176)
+- [Support Res class generation in JVM only compose projects](https://github.com/JetBrains/compose-multiplatform/pull/4183)
+- [Support compose resources for ios tests](https://github.com/JetBrains/compose-multiplatform/pull/4185)
+- [Use "project.findProperty" instead of "providers.valueOrNull" to fix sub-module gradle properties for res class generation](https://github.com/JetBrains/compose-multiplatform/commit/ee26bf8beea595dce67fbe880aa86a8363d428ae)
+- [Fix native xml parser and add ios native tests](https://github.com/JetBrains/compose-multiplatform/pull/4207)
+- [Generate initializer functions in the Res file to avoid the MethodTooLargeException](https://github.com/JetBrains/compose-multiplatform/pull/4205)
+- [Improve handling of special characters in string resources](https://github.com/JetBrains/compose-multiplatform/pull/4220)
 
 ## Dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
