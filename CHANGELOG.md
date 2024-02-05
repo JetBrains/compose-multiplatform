@@ -52,14 +52,14 @@
 ## Resource library
 
 ### Fixes
-- [Configure Android resources after AGP is applied and ignore hidden files in resources](https://github.com/JetBrains/compose-multiplatform/commit/3040ea85bbc81cb6d1e22d6928646509ee8b601f)
-- [Generate Res class if there is no common composeResource dir](https://github.com/JetBrains/compose-multiplatform/pull/4176)
-- [Support Res class generation in JVM only compose projects](https://github.com/JetBrains/compose-multiplatform/pull/4183)
-- [Support Compose resources for iOS tests](https://github.com/JetBrains/compose-multiplatform/pull/4185)
-- [Use "project.findProperty" instead of "providers.valueOrNull" to fix sub-module gradle properties for res class generation](https://github.com/JetBrains/compose-multiplatform/commit/ee26bf8beea595dce67fbe880aa86a8363d428ae)
-- [Fix native xml parser and add iOS native tests](https://github.com/JetBrains/compose-multiplatform/pull/4207)
-- [Generate initializer functions in the Res file to avoid the `MethodTooLargeException`](https://github.com/JetBrains/compose-multiplatform/pull/4205)
-- [Improve handling of special characters in string resources](https://github.com/JetBrains/compose-multiplatform/pull/4220)
+- _(prerelease bug)_ [Configure Android resources after AGP is applied and ignore hidden files in resources](https://github.com/JetBrains/compose-multiplatform/commit/3040ea85bbc81cb6d1e22d6928646509ee8b601f)
+- _(prerelease bug)_ [Generate Res class if there is no common composeResource dir](https://github.com/JetBrains/compose-multiplatform/pull/4176)
+- _(prerelease bug)_ [Support Res class generation in JVM only compose projects](https://github.com/JetBrains/compose-multiplatform/pull/4183)
+- _(prerelease bug)_ [Support Compose resources for iOS tests](https://github.com/JetBrains/compose-multiplatform/pull/4185)
+- _(prerelease bug)_ [Use `project.findProperty` instead of `providers.valueOrNull` to fix sub-module gradle properties for res class generation](https://github.com/JetBrains/compose-multiplatform/commit/ee26bf8beea595dce67fbe880aa86a8363d428ae)
+- _(prerelease bug)_ [Fix Native xml parser](https://github.com/JetBrains/compose-multiplatform/pull/4207)
+- _(prerelease bug)_ [Generate initializer functions in the Res file to avoid the `MethodTooLargeException`](https://github.com/JetBrains/compose-multiplatform/pull/4205)
+- _(prerelease bug)_ [Improve handling of special characters in string resources](https://github.com/JetBrains/compose-multiplatform/pull/4220)
 
 ## Dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
