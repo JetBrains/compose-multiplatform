@@ -47,7 +47,7 @@
 ## Gradle Plugin
 
 ### Features
-- [Add ui-tooling-preview alias](https://github.com/JetBrains/compose-multiplatform/pull/4190)
+- [Add `ui-tooling-preview` alias](https://github.com/JetBrains/compose-multiplatform/pull/4190)
 
 ## Resource library
 
