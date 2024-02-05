@@ -59,6 +59,7 @@
 - _(prerelease bug)_ [Fix Native xml parser](https://github.com/JetBrains/compose-multiplatform/pull/4207)
 - _(prerelease bug)_ [Generate initializer functions in the Res file to avoid the `MethodTooLargeException`](https://github.com/JetBrains/compose-multiplatform/pull/4205)
 - _(prerelease bug)_ [Improve handling of special characters in string resources](https://github.com/JetBrains/compose-multiplatform/pull/4220)
+- _(prerelease bug)_ [Add a `ttf` font to the resources demo app](https://github.com/JetBrains/compose-multiplatform/commit/3c7260ea51157d423b3799bd339b682ffabdce06)
 
 ## Dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
