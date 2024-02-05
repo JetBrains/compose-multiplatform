@@ -55,7 +55,7 @@
 - [Configure Android resources after AGP is applied and ignore hidden files in resources](https://github.com/JetBrains/compose-multiplatform/commit/3040ea85bbc81cb6d1e22d6928646509ee8b601f)
 - [Generate Res class if there is no common composeResource dir](https://github.com/JetBrains/compose-multiplatform/pull/4176)
 - [Support Res class generation in JVM only compose projects](https://github.com/JetBrains/compose-multiplatform/pull/4183)
-- [Support compose resources for iOS tests](https://github.com/JetBrains/compose-multiplatform/pull/4185)
+- [Support Compose resources for iOS tests](https://github.com/JetBrains/compose-multiplatform/pull/4185)
 - [Use "project.findProperty" instead of "providers.valueOrNull" to fix sub-module gradle properties for res class generation](https://github.com/JetBrains/compose-multiplatform/commit/ee26bf8beea595dce67fbe880aa86a8363d428ae)
 - [Fix native xml parser and add iOS native tests](https://github.com/JetBrains/compose-multiplatform/pull/4207)
 - [Generate initializer functions in the Res file to avoid the `MethodTooLargeException`](https://github.com/JetBrains/compose-multiplatform/pull/4205)
