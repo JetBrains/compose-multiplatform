@@ -1,3 +1,59 @@
+# 1.6.0-beta01 (February 2024)
+
+## Highlights
+
+### Breaking changes
+
+## Known issues
+- `compose.components.resources` library doesn't work yet if you apply `kotlin("jvm")` Gradle plugin. For now, it only works with `kotlin("multiplatform")`
+
+## Common
+
+### Features
+
+## iOS/desktop/web
+
+### Features
+
+### Fixes
+
+### Breaking changes and deprecated API
+
+## iOS
+
+### Features
+
+### Fixes
+
+## Desktop
+
+### Features
+
+### Fixes
+
+## Web
+### Features
+
+### Fixes
+
+## HTML library
+### Features
+
+## Gradle Plugin
+
+### Features
+
+### Fixes
+
+## Dependencies
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+- [Compiler 1.5.8](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.8)
+- [Runtime 1.6.0](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.0)
+- [UI 1.6.0](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.0)
+- [Foundation 1.6.0](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.0)
+- [Material 1.6.0](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.0)
+- [Material3 1.2.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.0)
+
 # 1.5.12
 
 ## Common
