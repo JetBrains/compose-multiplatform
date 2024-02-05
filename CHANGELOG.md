@@ -52,7 +52,7 @@
 ## Resource library
 
 ### Fixes
-- [Configure android resources after the agp is applied and ignore hidden files in resources](https://github.com/JetBrains/compose-multiplatform/commit/3040ea85bbc81cb6d1e22d6928646509ee8b601f)
+- [Configure Android resources after the agp is applied and ignore hidden files in resources](https://github.com/JetBrains/compose-multiplatform/commit/3040ea85bbc81cb6d1e22d6928646509ee8b601f)
 - [Generate Res class if there is no common composeResource dir](https://github.com/JetBrains/compose-multiplatform/pull/4176)
 - [Support Res class generation in JVM only compose projects](https://github.com/JetBrains/compose-multiplatform/pull/4183)
 - [Support compose resources for iOS tests](https://github.com/JetBrains/compose-multiplatform/pull/4185)
