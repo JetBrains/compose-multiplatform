@@ -1,4 +1,4 @@
-# 1.6.0-beta01 (February 2024)
+# 1.6.0-beta02 (February 2024)
 
 ## Highlights
 - [Allow selecting text in Selection Container by double and triple tap](https://github.com/JetBrains/compose-multiplatform-core/pull/984) <sub>_iOS_</sub>
@@ -91,7 +91,7 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 * [Material 1.5.4](https://developer.android.com/jetpack/androidx/releases/compose-material#1.5.4)
 * [Material3 1.1.2](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.1.2)
 
-# 1.6.0-beta01 (February 2024)
+# 1.6.0-beta01 (January 2024)
 
 ## Highlights
 
