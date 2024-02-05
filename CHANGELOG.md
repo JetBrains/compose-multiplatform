@@ -2,33 +2,20 @@
 
 ## Highlights
 - [Allow selecting text in Selection Container by double and triple tap](https://github.com/JetBrains/compose-multiplatform-core/pull/984) <sub>_iOS_</sub>
-- [Add support for text decoration line styles via PlatformTextStyle](https://github.com/JetBrains/compose-multiplatform-core/pull/999) <sub>_iOS desktop web_</sub>
+- [Add support for text decoration line styles via PlatformTextStyle](https://github.com/JetBrains/compose-multiplatform-core/pull/999) <sub>_iOS, desktop, web_</sub>
 - [Popups/Dialogs can now be displayed outside the main window or panel over native components on iOS by default](https://github.com/JetBrains/compose-multiplatform-core/pull/1031) <sub>_iOS_</sub>
-- [Basic Accessibility support](https://github.com/JetBrains/compose-multiplatform-core/pull/1025) <sub>_iOS_</sub>
-
-### Breaking changes
-
-## Known issues
-
-## Common
-
-### Features
+- [Basic accessibility support](https://github.com/JetBrains/compose-multiplatform-core/pull/1025) <sub>_iOS_</sub>
 
 ## iOS/desktop/web
-
-### Features
 
 ### Fixes
 - [Fix `TextLayoutResult#getLineForVerticalPosition returns wrong value + slow performance`](https://github.com/JetBrains/compose-multiplatform-core/pull/1012)
 - [Run all effects before sending synthetic events](https://github.com/JetBrains/compose-multiplatform-core/pull/1034)
 - _(prerelease bug)_ [Fix the pointer icon in SelectionContainer](https://github.com/JetBrains/compose-multiplatform-core/pull/1014)
 
-### Breaking changes and deprecated API
-
 ## iOS
 
 ### Features
-- [iOS multitap selection in selection container](https://github.com/JetBrains/compose-multiplatform-core/pull/984)
 - [Adjust Overscroll effect params to match iOS animations](https://github.com/JetBrains/compose-multiplatform-core/pull/1010/files)
 - [Add ability to change opacity for compose view](https://github.com/JetBrains/compose-multiplatform-core/pull/1022)
 
@@ -46,8 +33,6 @@
 
 ## Desktop
 
-### Features
-
 ### Fixes
 - [Add Arial and Consolas as backup fonts on Linux and mention font name when one fails to load](https://github.com/JetBrains/compose-multiplatform-core/pull/994)
 - [Fix `NPE in WindowDraggableArea.desktop.kt in java.awt.PointerInfo.getLocation()`](https://github.com/JetBrains/compose-multiplatform-core/pull/1049)
@@ -55,19 +40,26 @@
 ### Breaking changes and deprecated API
 - [Remove deprecated APIs in TooltipArea and PointerEvent](https://github.com/JetBrains/compose-multiplatform-core/pull/1029)
 
-## Web
-### Features
-
-### Fixes
-
 ## HTML library
 ### Features
+[Add opportunity to use custom prefixes in StyleShee](https://github.com/JetBrains/compose-multiplatform/pull/3015)
 
 ## Gradle Plugin
 
 ### Features
+- [Add ui-tooling-preview alias](https://youtrack.jetbrains.com/issue/COMPOSE-857/Provide-compose.components.uiToolingPreview-alias)
+
+## Resource library
 
 ### Fixes
+[Configure android resources after the agp is applied and ignore hidden files in resources](https://github.com/JetBrains/compose-multiplatform/commit/3040ea85bbc81cb6d1e22d6928646509ee8b601f)
+[Generate Res class if there is no common composeResource dir](https://github.com/JetBrains/compose-multiplatform/pull/4176)
+[Support Res class generation in JVM only compose projects](https://github.com/JetBrains/compose-multiplatform/pull/4183)
+[Support compose resources for ios tests](https://github.com/JetBrains/compose-multiplatform/pull/4185)
+[Use "project.findProperty" instead of "providers.valueOrNull" to fix sub-module gradle properties for res class generation](https://github.com/JetBrains/compose-multiplatform/commit/ee26bf8beea595dce67fbe880aa86a8363d428ae)
+[Fix native xml parser and add ios native tests](https://github.com/JetBrains/compose-multiplatform/pull/4207)
+[Generate initializer functions in the Res file to avoid the MethodTooLargeException](https://github.com/JetBrains/compose-multiplatform/pull/4205)
+[Improve handling of special characters in string resources](https://github.com/JetBrains/compose-multiplatform/pull/4220)
 
 ## Dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
