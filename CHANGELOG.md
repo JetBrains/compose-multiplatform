@@ -9,14 +9,14 @@
 ## iOS/desktop/web
 
 ### Fixes
-- [Fix `TextLayoutResult#getLineForVerticalPosition returns wrong value + slow performance`](https://github.com/JetBrains/compose-multiplatform-core/pull/1012)
+- [Fix "`TextLayoutResult#getLineForVerticalPosition` returns wrong value + slow performance"](https://github.com/JetBrains/compose-multiplatform-core/pull/1012)
 - [Run all effects before sending synthetic events](https://github.com/JetBrains/compose-multiplatform-core/pull/1034)
-- _(prerelease bug)_ [Fix the pointer icon in SelectionContainer](https://github.com/JetBrains/compose-multiplatform-core/pull/1014)
+- _(prerelease bug)_ [Fix the pointer icon in `SelectionContainer`](https://github.com/JetBrains/compose-multiplatform-core/pull/1014)
 
 ## iOS
 
 ### Features
-- [Adjust Overscroll effect params to match iOS animations](https://github.com/JetBrains/compose-multiplatform-core/pull/1010/files)
+- [Adjust overscroll effect params to match iOS animations](https://github.com/JetBrains/compose-multiplatform-core/pull/1010/files)
 - [Add ability to change opacity for compose view](https://github.com/JetBrains/compose-multiplatform-core/pull/1022)
 
 ### Fixes
@@ -25,7 +25,7 @@
 - [Fix selection container crash](https://github.com/JetBrains/compose-multiplatform-core/pull/1016)
 - [Fix `WindowInfo.containerSize` without `platformLayers` flag](https://github.com/JetBrains/compose-multiplatform-core/pull/1028)
 - [Fix unexpected fling animation over scrolling content](https://github.com/JetBrains/compose-multiplatform-core/pull/1039)
-- _(prerelease bug)_ [Fix `textfield with visual transformation crashes after single tap`](https://github.com/JetBrains/compose-multiplatform-core/pull/1045)
+- _(prerelease bug)_ [Fix "textfield with visual transformation crashes after single tap"](https://github.com/JetBrains/compose-multiplatform-core/pull/1045)
 - _(prerelease bug)_ [Fix selection handles crossed](https://github.com/JetBrains/compose-multiplatform-core/pull/1017)
 - _(prerelease bug)_ [Fix CMPViewControllerMisuse error](https://github.com/JetBrains/compose-multiplatform-core/pull/1027)
 - _(prerelease bug)_ [Fix selection handles with platformLayers=true](https://github.com/JetBrains/compose-multiplatform-core/pull/1023)
@@ -38,11 +38,11 @@
 - [Fix NPE in `WindowDraggableArea.desktop.kt` in `java.awt.PointerInfo.getLocation()`](https://github.com/JetBrains/compose-multiplatform-core/pull/1049)
 
 ### Breaking changes and deprecated API
-- [Remove deprecated APIs in TooltipArea and PointerEvent](https://github.com/JetBrains/compose-multiplatform-core/pull/1029)
+- [Remove deprecated APIs in `TooltipArea` and `PointerEvent`](https://github.com/JetBrains/compose-multiplatform-core/pull/1029)
 
 ## HTML library
 ### Features
-- [Add opportunity to use custom prefixes in StyleSheet](https://github.com/JetBrains/compose-multiplatform/pull/3015)
+- [Add opportunity to use custom prefixes in `StyleSheet`](https://github.com/JetBrains/compose-multiplatform/pull/3015)
 
 ## Gradle Plugin
 
@@ -58,7 +58,7 @@
 - [Support compose resources for ios tests](https://github.com/JetBrains/compose-multiplatform/pull/4185)
 - [Use "project.findProperty" instead of "providers.valueOrNull" to fix sub-module gradle properties for res class generation](https://github.com/JetBrains/compose-multiplatform/commit/ee26bf8beea595dce67fbe880aa86a8363d428ae)
 - [Fix native xml parser and add ios native tests](https://github.com/JetBrains/compose-multiplatform/pull/4207)
-- [Generate initializer functions in the Res file to avoid the MethodTooLargeException](https://github.com/JetBrains/compose-multiplatform/pull/4205)
+- [Generate initializer functions in the Res file to avoid the `MethodTooLargeException`](https://github.com/JetBrains/compose-multiplatform/pull/4205)
 - [Improve handling of special characters in string resources](https://github.com/JetBrains/compose-multiplatform/pull/4220)
 
 ## Dependencies
