@@ -1,11 +1,12 @@
 # 1.6.0-beta01 (February 2024)
 
 ## Highlights
+- [Allow selecting text in Selection Container by double and triple tap](https://github.com/JetBrains/compose-multiplatform-core/pull/984) <sub>iOS</sub>
+- [Add support for text decoration line styles via PlatformTextStyle](https://github.com/JetBrains/compose-multiplatform-core/pull/999) <sub>iOS desktop web</sub>
 
 ### Breaking changes
 
 ## Known issues
-- `compose.components.resources` library doesn't work yet if you apply `kotlin("jvm")` Gradle plugin. For now, it only works with `kotlin("multiplatform")`
 
 ## Common
 
@@ -16,20 +17,29 @@
 ### Features
 
 ### Fixes
+- [Fix `TextLayoutResult#getLineForVerticalPosition returns wrong value + slow performance`](https://github.com/JetBrains/compose-multiplatform-core/pull/1012)
+- _(beta01 bug)_ [Fix the pointer icon in SelectionContainer](https://github.com/JetBrains/compose-multiplatform-core/pull/1014)
 
 ### Breaking changes and deprecated API
 
 ## iOS
 
 ### Features
+- [iOS multitap selection in selection container](https://github.com/JetBrains/compose-multiplatform-core/pull/984)
 
 ### Fixes
+- [Fix UIKitView z-order](https://github.com/JetBrains/compose-multiplatform-core/pull/965)
+- [Fix missing case for loading `SystemFont` on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1013)
+- [Fix selection container crash](https://github.com/JetBrains/compose-multiplatform-core/pull/1016)
+- _(beta01 bug)_ [Fix selection handles crossed](https://github.com/JetBrains/compose-multiplatform-core/pull/1017)
+- _(beta01 bug)_ [Fix CMPViewControllerMisuse error](https://github.com/JetBrains/compose-multiplatform-core/pull/1027)
 
 ## Desktop
 
 ### Features
 
 ### Fixes
+- [Add Arial and Consolas as backup fonts on Linux and mention font name when one fails to load](https://github.com/JetBrains/compose-multiplatform-core/pull/994)
 
 ## Web
 ### Features
@@ -52,7 +62,7 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 - [UI 1.6.0](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.0)
 - [Foundation 1.6.0](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.0)
 - [Material 1.6.0](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.0)
-- [Material3 1.2.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.0)
+- [Material3 1.2.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.0-rc01)
 
 # 1.5.12
 
