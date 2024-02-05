@@ -24,7 +24,6 @@
 - [Fix missing case for loading `SystemFont` on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1013)
 - [Fix selection container crash](https://github.com/JetBrains/compose-multiplatform-core/pull/1016)
 - [Fix `WindowInfo.containerSize` without `platformLayers` flag](https://github.com/JetBrains/compose-multiplatform-core/pull/1028)
-- [Fix unexpected fling animation over scrolling content](https://github.com/JetBrains/compose-multiplatform-core/pull/1039)
 - _(prerelease bug)_ [Fix "textfield with visual transformation crashes after single tap"](https://github.com/JetBrains/compose-multiplatform-core/pull/1045)
 - _(prerelease bug)_ [Fix selection handles crossed](https://github.com/JetBrains/compose-multiplatform-core/pull/1017)
 - _(prerelease bug)_ [Fix CMPViewControllerMisuse error](https://github.com/JetBrains/compose-multiplatform-core/pull/1027)
@@ -35,7 +34,6 @@
 
 ### Fixes
 - [Add Arial and Consolas as backup fonts on Linux and mention font name when one fails to load](https://github.com/JetBrains/compose-multiplatform-core/pull/994)
-- [Fix NPE in `WindowDraggableArea.desktop.kt` in `java.awt.PointerInfo.getLocation()`](https://github.com/JetBrains/compose-multiplatform-core/pull/1049)
 
 ### Breaking changes and deprecated API
 - [Remove deprecated APIs in `TooltipArea` and `PointerEvent`](https://github.com/JetBrains/compose-multiplatform-core/pull/1029)
