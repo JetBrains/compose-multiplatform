@@ -35,7 +35,7 @@
 
 ### Fixes
 - [Add Arial and Consolas as backup fonts on Linux and mention font name when one fails to load](https://github.com/JetBrains/compose-multiplatform-core/pull/994)
-- [Fix `NPE in WindowDraggableArea.desktop.kt in java.awt.PointerInfo.getLocation()`](https://github.com/JetBrains/compose-multiplatform-core/pull/1049)
+- [Fix NPE in `WindowDraggableArea.desktop.kt` in `java.awt.PointerInfo.getLocation()`](https://github.com/JetBrains/compose-multiplatform-core/pull/1049)
 
 ### Breaking changes and deprecated API
 - [Remove deprecated APIs in TooltipArea and PointerEvent](https://github.com/JetBrains/compose-multiplatform-core/pull/1029)
