@@ -1,8 +1,10 @@
 # 1.6.0-beta01 (February 2024)
 
 ## Highlights
-- [Allow selecting text in Selection Container by double and triple tap](https://github.com/JetBrains/compose-multiplatform-core/pull/984) <sub>iOS</sub>
-- [Add support for text decoration line styles via PlatformTextStyle](https://github.com/JetBrains/compose-multiplatform-core/pull/999) <sub>iOS desktop web</sub>
+- [Allow selecting text in Selection Container by double and triple tap](https://github.com/JetBrains/compose-multiplatform-core/pull/984) <sub>_iOS_</sub>
+- [Add support for text decoration line styles via PlatformTextStyle](https://github.com/JetBrains/compose-multiplatform-core/pull/999) <sub>_iOS desktop web_</sub>
+- [Popups/Dialogs can now be displayed outside the main window or panel over native components on iOS by default](https://github.com/JetBrains/compose-multiplatform-core/pull/1031) <sub>_iOS_</sub>
+- [Basic Accessibility support](https://github.com/JetBrains/compose-multiplatform-core/pull/1025) <sub>_iOS_</sub>
 
 ### Breaking changes
 
@@ -18,7 +20,8 @@
 
 ### Fixes
 - [Fix `TextLayoutResult#getLineForVerticalPosition returns wrong value + slow performance`](https://github.com/JetBrains/compose-multiplatform-core/pull/1012)
-- _(beta01 bug)_ [Fix the pointer icon in SelectionContainer](https://github.com/JetBrains/compose-multiplatform-core/pull/1014)
+- [Run all effects before sending synthetic events](https://github.com/JetBrains/compose-multiplatform-core/pull/1034)
+- _(prerelease bug)_ [Fix the pointer icon in SelectionContainer](https://github.com/JetBrains/compose-multiplatform-core/pull/1014)
 
 ### Breaking changes and deprecated API
 
@@ -26,13 +29,20 @@
 
 ### Features
 - [iOS multitap selection in selection container](https://github.com/JetBrains/compose-multiplatform-core/pull/984)
+- [Adjust Overscroll effect params to match iOS animations](https://github.com/JetBrains/compose-multiplatform-core/pull/1010/files)
+- [Add ability to change opacity for compose view](https://github.com/JetBrains/compose-multiplatform-core/pull/1022)
 
 ### Fixes
 - [Fix UIKitView z-order](https://github.com/JetBrains/compose-multiplatform-core/pull/965)
 - [Fix missing case for loading `SystemFont` on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1013)
 - [Fix selection container crash](https://github.com/JetBrains/compose-multiplatform-core/pull/1016)
-- _(beta01 bug)_ [Fix selection handles crossed](https://github.com/JetBrains/compose-multiplatform-core/pull/1017)
-- _(beta01 bug)_ [Fix CMPViewControllerMisuse error](https://github.com/JetBrains/compose-multiplatform-core/pull/1027)
+- [Fix `WindowInfo.containerSize` without `platformLayers` flag](https://github.com/JetBrains/compose-multiplatform-core/pull/1028)
+- [Fix unexpected fling animation over scrolling content](https://github.com/JetBrains/compose-multiplatform-core/pull/1039)
+- _(prerelease bug)_ [Fix `textfield with visual transformation crashes after single tap`](https://github.com/JetBrains/compose-multiplatform-core/pull/1045)
+- _(prerelease bug)_ [Fix selection handles crossed](https://github.com/JetBrains/compose-multiplatform-core/pull/1017)
+- _(prerelease bug)_ [Fix CMPViewControllerMisuse error](https://github.com/JetBrains/compose-multiplatform-core/pull/1027)
+- _(prerelease bug)_ [Fix selection handles with platformLayers=true](https://github.com/JetBrains/compose-multiplatform-core/pull/1023)
+- _(prerelease bug)_ [Fix interaction handling for interop views](https://github.com/JetBrains/compose-multiplatform-core/pull/1032)
 
 ## Desktop
 
@@ -40,6 +50,10 @@
 
 ### Fixes
 - [Add Arial and Consolas as backup fonts on Linux and mention font name when one fails to load](https://github.com/JetBrains/compose-multiplatform-core/pull/994)
+- [Fix `NPE in WindowDraggableArea.desktop.kt in java.awt.PointerInfo.getLocation()`](https://github.com/JetBrains/compose-multiplatform-core/pull/1049)
+
+### Breaking changes and deprecated API
+- [Remove deprecated APIs in TooltipArea and PointerEvent](https://github.com/JetBrains/compose-multiplatform-core/pull/1029)
 
 ## Web
 ### Features
