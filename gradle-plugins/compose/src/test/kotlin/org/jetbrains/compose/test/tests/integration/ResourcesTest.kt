@@ -222,4 +222,10 @@ class ResourcesTest : GradlePluginTestBase() {
             assert(file("src/commonMain/composeResources/values/strings.xml").readLines().size == 513)
         }
     }
+
+    //https://github.com/gmazzo/gradle-buildconfig-plugin/issues/131
+    @Test
+    fun testBundledKotlinPoet(): Unit = with(testProject("misc/bundledKotlinPoet")) {
+        gradle("generateBuildConfig")
+    }
 }
