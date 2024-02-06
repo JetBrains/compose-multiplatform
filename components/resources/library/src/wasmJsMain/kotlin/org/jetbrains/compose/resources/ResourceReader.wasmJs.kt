@@ -33,6 +33,11 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         return part.asByteArray()
     }
 
+    override fun getUri(path: String): String {
+        val location = window.location
+        return getResourceUrl(location.origin, location.pathname, path)
+    }
+
     private suspend fun readAsBlob(path: String): Blob {
         val resPath = WebResourcesConfiguration.getResourcePath(path)
         val response = window.fetch(resPath).await<Response>()
