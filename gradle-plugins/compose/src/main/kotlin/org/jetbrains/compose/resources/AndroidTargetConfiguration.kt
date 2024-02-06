@@ -2,7 +2,7 @@ package org.jetbrains.compose.resources
 
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.gradle.BaseExtension
-import com.android.build.gradle.tasks.MergeSourceSetFolders
+import com.android.build.gradle.internal.tasks.AndroidVariantTask
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
@@ -39,4 +39,7 @@ internal fun Project.configureAndroidResources(
             }
         )
     }
+    //fixme: it seems like a problem in AGP, so dirty hack now
+    //https://github.com/JetBrains/compose-multiplatform/issues/4085
+    tasks.matching { it is AndroidVariantTask }.configureEach { it.dependsOn(copyFonts) }
 }
