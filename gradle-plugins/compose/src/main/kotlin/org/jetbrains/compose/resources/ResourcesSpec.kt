@@ -160,6 +160,9 @@ internal fun getResFileSpec(
             .forEach { addFunction(it) }
     }.build()
 
+private fun getterName(resourceType: ResourceType, resourceName: String): String =
+    "get_${resourceType.typeName}_$resourceName"
+
 private fun getResourceTypeObject(type: ResourceType, nameToResources: Map<String, List<ResourceItem>>) =
     TypeSpec.objectBuilder(type.typeName).apply {
         nameToResources.keys
@@ -167,7 +170,7 @@ private fun getResourceTypeObject(type: ResourceType, nameToResources: Map<Strin
                 addProperty(
                     PropertySpec
                         .builder(name, type.getClassName())
-                        .initializer("get_$name()")
+                        .initializer(getterName(type, name) + "()")
                         .build()
                 )
             }
@@ -176,7 +179,7 @@ private fun getResourceTypeObject(type: ResourceType, nameToResources: Map<Strin
 private fun getResourceInitializer(name: String, type: ResourceType, items: List<ResourceItem>): FunSpec {
     val propertyTypeName = type.getClassName()
     val resourceId = "${type}:${name}"
-    return FunSpec.builder("get_$name")
+    return FunSpec.builder(getterName(type, name))
         .addModifiers(KModifier.PRIVATE)
         .returns(propertyTypeName)
         .addStatement(

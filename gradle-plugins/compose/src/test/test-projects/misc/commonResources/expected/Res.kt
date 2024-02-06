@@ -27,31 +27,31 @@ internal object Res {
     public suspend fun readBytes(path: String): ByteArray = readResourceBytes(path)
 
     public object drawable {
-        public val _3_strange_name: DrawableResource = get__3_strange_name()
+        public val _3_strange_name: DrawableResource = get_drawable__3_strange_name()
 
-        public val vector: DrawableResource = get_vector()
+        public val vector: DrawableResource = get_drawable_vector()
 
-        public val vector_2: DrawableResource = get_vector_2()
+        public val vector_2: DrawableResource = get_drawable_vector_2()
     }
 
     public object string {
-        public val app_name: StringResource = get_app_name()
+        public val app_name: StringResource = get_string_app_name()
 
-        public val hello: StringResource = get_hello()
+        public val hello: StringResource = get_string_hello()
 
-        public val multi_line: StringResource = get_multi_line()
+        public val multi_line: StringResource = get_string_multi_line()
 
-        public val str_arr: StringResource = get_str_arr()
+        public val str_arr: StringResource = get_string_str_arr()
 
-        public val str_template: StringResource = get_str_template()
+        public val str_template: StringResource = get_string_str_template()
     }
 
     public object font {
-        public val emptyfont: FontResource = get_emptyfont()
+        public val emptyfont: FontResource = get_font_emptyfont()
     }
 }
 
-private fun get__3_strange_name(): DrawableResource =
+private fun get_drawable__3_strange_name(): DrawableResource =
     org.jetbrains.compose.resources.DrawableResource(
         "drawable:_3_strange_name",
         setOf(
@@ -59,65 +59,69 @@ private fun get__3_strange_name(): DrawableResource =
         )
     )
 
-private fun get_vector(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-    "drawable:vector",
-    setOf(
+private fun get_drawable_vector(): DrawableResource =
+    org.jetbrains.compose.resources.DrawableResource(
+        "drawable:vector",
+        setOf(
 
-        org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.LanguageQualifier("au"),
-            org.jetbrains.compose.resources.RegionQualifier("US"), ), "drawable-au-rUS/vector.xml"),
+            org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.LanguageQualifier("au"),
+                org.jetbrains.compose.resources.RegionQualifier("US"), ), "drawable-au-rUS/vector.xml"),
 
-        org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.ThemeQualifier.DARK,
-            org.jetbrains.compose.resources.LanguageQualifier("ge"), ), "drawable-dark-ge/vector.xml"),
+            org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.ThemeQualifier.DARK,
+                org.jetbrains.compose.resources.LanguageQualifier("ge"), ), "drawable-dark-ge/vector.xml"),
 
-        org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.LanguageQualifier("en"),
-        ), "drawable-en/vector.xml"),
-        org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/vector.xml"),
+            org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.LanguageQualifier("en"),
+            ), "drawable-en/vector.xml"),
+            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/vector.xml"),
+        )
     )
-)
 
-private fun get_vector_2(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-    "drawable:vector_2",
-    setOf(
-        org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/vector_2.xml"),
+private fun get_drawable_vector_2(): DrawableResource =
+    org.jetbrains.compose.resources.DrawableResource(
+        "drawable:vector_2",
+        setOf(
+            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/vector_2.xml"),
+        )
     )
-)
 
-private fun get_app_name(): StringResource = org.jetbrains.compose.resources.StringResource(
+private fun get_string_app_name(): StringResource = org.jetbrains.compose.resources.StringResource(
     "string:app_name", "app_name",
     setOf(
         org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.xml"),
     )
 )
 
-private fun get_hello(): StringResource = org.jetbrains.compose.resources.StringResource(
+private fun get_string_hello(): StringResource = org.jetbrains.compose.resources.StringResource(
     "string:hello", "hello",
     setOf(
         org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.xml"),
     )
 )
 
-private fun get_multi_line(): StringResource = org.jetbrains.compose.resources.StringResource(
-    "string:multi_line", "multi_line",
-    setOf(
-        org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.xml"),
+private fun get_string_multi_line(): StringResource =
+    org.jetbrains.compose.resources.StringResource(
+        "string:multi_line", "multi_line",
+        setOf(
+            org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.xml"),
+        )
     )
-)
 
-private fun get_str_arr(): StringResource = org.jetbrains.compose.resources.StringResource(
+private fun get_string_str_arr(): StringResource = org.jetbrains.compose.resources.StringResource(
     "string:str_arr", "str_arr",
     setOf(
         org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.xml"),
     )
 )
 
-private fun get_str_template(): StringResource = org.jetbrains.compose.resources.StringResource(
-    "string:str_template", "str_template",
-    setOf(
-        org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.xml"),
+private fun get_string_str_template(): StringResource =
+    org.jetbrains.compose.resources.StringResource(
+        "string:str_template", "str_template",
+        setOf(
+            org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.xml"),
+        )
     )
-)
 
-private fun get_emptyfont(): FontResource = org.jetbrains.compose.resources.FontResource(
+private fun get_font_emptyfont(): FontResource = org.jetbrains.compose.resources.FontResource(
     "font:emptyfont",
     setOf(
         org.jetbrains.compose.resources.ResourceItem(setOf(), "font/emptyFont.otf"),
