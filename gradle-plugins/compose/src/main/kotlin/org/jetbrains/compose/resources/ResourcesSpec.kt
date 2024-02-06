@@ -145,6 +145,29 @@ internal fun getResFileSpec(
                     .addStatement("return %M(path)", readResourceBytes) //todo: add module ID here
                     .build()
             )
+
+
+
+            //getResourceUriString
+            val getResourceUriString = MemberName("org.jetbrains.compose.resources", "getResourceUriString")
+            addFunction(
+                FunSpec.builder("getUri")
+                    .addKdoc(
+                        """
+                    Returns the URI string of the resource file at the specified path.
+                    
+                    Example: `val uri = Res.getUri("files/key.bin")`
+                    
+                    @param path The path of the file to get the URI string from in the compose resource's directory.
+                    @return The URI string of the file.
+                """.trimIndent()
+                    )
+                    .addParameter("path", String::class)
+                    .returns(String::class)
+                    .addStatement("return %M(path)", getResourceUriString) //todo: add module ID here
+                    .build()
+            )
+
             val types = sortedResources.map { (type, idToResources) ->
                 getResourceTypeObject(type, idToResources)
             }

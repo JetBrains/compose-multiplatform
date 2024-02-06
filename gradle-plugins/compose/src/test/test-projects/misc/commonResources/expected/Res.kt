@@ -12,6 +12,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.FontResource
 import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.getResourceUriString
 import org.jetbrains.compose.resources.readResourceBytes
 
 @ExperimentalResourceApi
@@ -25,6 +26,17 @@ internal object Res {
      * @return The content of the file as a byte array.
      */
     public suspend fun readBytes(path: String): ByteArray = readResourceBytes(path)
+
+    /**
+     * Returns the URI string of the resource file at the specified path.
+     *
+     * Example: `val uri = Res.getUri("files/key.bin")`
+     *
+     * @param path The path of the file to get the URI string from in the compose resource's
+     * directory.
+     * @return The URI string of the file.
+     */
+    public fun getUri(path: String): String = getResourceUriString(path)
 
     public object drawable {
         public val _3_strange_name: DrawableResource = get_drawable__3_strange_name()
