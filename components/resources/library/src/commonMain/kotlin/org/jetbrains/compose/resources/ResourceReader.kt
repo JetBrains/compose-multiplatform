@@ -25,3 +25,12 @@ internal val DefaultResourceReader: ResourceReader = object : ResourceReader {
 
 //ResourceReader provider will be overridden for tests
 internal val LocalResourceReader = staticCompositionLocalOf { DefaultResourceReader }
+
+/**
+ * Returns the URI string of the resource file at the specified path.
+ *
+ * @param path The path of the file to get the URI string from in the compose resource's directory.
+ * @return The URI string of the file.
+ */
+@InternalResourceApi
+expect fun getResourceUriString(path: String): String

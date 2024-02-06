@@ -25,7 +25,7 @@ actual suspend fun readResourceBytes(path: String): ByteArray {
     return response.arrayBuffer().await<ArrayBuffer>().toByteArray()
 }
 
-private fun ArrayBuffer.toByteArray(): ByteArray  {
+private fun ArrayBuffer.toByteArray(): ByteArray {
     val source = Int8Array(this, 0, byteLength)
     return jsInt8ArrayToKotlinByteArray(source)
 }
@@ -50,3 +50,6 @@ internal fun jsInt8ArrayToKotlinByteArray(x: Int8Array): ByteArray {
         ByteArray(size) { i -> (memBuffer + i).loadByte() }
     }
 }
+
+internal actual fun getWindowLocation(): WindowLocation =
+    window.location.let { WindowLocation(it.origin, it.pathname) }
