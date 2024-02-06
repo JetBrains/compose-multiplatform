@@ -25,13 +25,14 @@ internal object Res {
     public suspend fun readBytes(path: String): ByteArray = readResourceBytes(path)
 
     public object drawable {
-        public val vector: DrawableResource = get_vector()
+        public val vector: DrawableResource = get_drawable_vector()
     }
 }
 
-private fun get_vector(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-    "drawable:vector",
-    setOf(
-        org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/vector.xml"),
+private fun get_drawable_vector(): DrawableResource =
+    org.jetbrains.compose.resources.DrawableResource(
+        "drawable:vector",
+        setOf(
+            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/vector.xml"),
+        )
     )
-)
