@@ -106,6 +106,5 @@ abstract class GenerateResClassTask : DefaultTask() {
 }
 
 internal fun String.asUnderscoredIdentifier(): String =
-    lowercase()
-        .replace('-', '_')
+    replace('-', '_')
         .let { if (it.isNotEmpty() && it.first().isDigit()) "_$it" else it }

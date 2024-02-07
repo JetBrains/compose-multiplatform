@@ -29,13 +29,21 @@ internal object Res {
     public object drawable {
         public val _3_strange_name: DrawableResource = get_drawable__3_strange_name()
 
+        public val camelCaseName: DrawableResource = get_drawable_camelCaseName()
+
         public val vector: DrawableResource = get_drawable_vector()
 
         public val vector_2: DrawableResource = get_drawable_vector_2()
     }
 
     public object string {
+        public val PascalCase: StringResource = get_string_PascalCase()
+
+        public val _1_kebab_case: StringResource = get_string__1_kebab_case()
+
         public val app_name: StringResource = get_string_app_name()
+
+        public val camelCase: StringResource = get_string_camelCase()
 
         public val hello: StringResource = get_string_hello()
 
@@ -47,7 +55,7 @@ internal object Res {
     }
 
     public object font {
-        public val emptyfont: FontResource = get_font_emptyfont()
+        public val emptyFont: FontResource = get_font_emptyFont()
     }
 }
 
@@ -56,6 +64,14 @@ private fun get_drawable__3_strange_name(): DrawableResource =
         "drawable:_3_strange_name",
         setOf(
             org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/3-strange-name.xml"),
+        )
+    )
+
+private fun get_drawable_camelCaseName(): DrawableResource =
+    org.jetbrains.compose.resources.DrawableResource(
+        "drawable:camelCaseName",
+        setOf(
+            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/camelCaseName.xml"),
         )
     )
 
@@ -84,8 +100,31 @@ private fun get_drawable_vector_2(): DrawableResource =
         )
     )
 
+private fun get_string_PascalCase(): StringResource =
+    org.jetbrains.compose.resources.StringResource(
+        "string:PascalCase", "PascalCase",
+        setOf(
+            org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.xml"),
+        )
+    )
+
+private fun get_string__1_kebab_case(): StringResource =
+    org.jetbrains.compose.resources.StringResource(
+        "string:_1_kebab_case", "_1_kebab_case",
+        setOf(
+            org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.xml"),
+        )
+    )
+
 private fun get_string_app_name(): StringResource = org.jetbrains.compose.resources.StringResource(
     "string:app_name", "app_name",
+    setOf(
+        org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.xml"),
+    )
+)
+
+private fun get_string_camelCase(): StringResource = org.jetbrains.compose.resources.StringResource(
+    "string:camelCase", "camelCase",
     setOf(
         org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.xml"),
     )
@@ -121,8 +160,8 @@ private fun get_string_str_template(): StringResource =
         )
     )
 
-private fun get_font_emptyfont(): FontResource = org.jetbrains.compose.resources.FontResource(
-    "font:emptyfont",
+private fun get_font_emptyFont(): FontResource = org.jetbrains.compose.resources.FontResource(
+    "font:emptyFont",
     setOf(
         org.jetbrains.compose.resources.ResourceItem(setOf(), "font/emptyFont.otf"),
     )

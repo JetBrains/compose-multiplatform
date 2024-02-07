@@ -42,7 +42,7 @@ fun FontRes(paddingValues: PaddingValues) {
         }
         Text(
             modifier = Modifier.padding(16.dp),
-            fontFamily = FontFamily(Font(Res.font.workbench_regular)),
+            fontFamily = FontFamily(Font(Res.font.Workbench_Regular)),
             style = MaterialTheme.typography.headlineLarge,
             text = "brown fox jumps over the lazy dog"
         )
