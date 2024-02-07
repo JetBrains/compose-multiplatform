@@ -118,6 +118,56 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun testUpToDateChecks(): Unit = with(testProject("misc/commonResources")) {
+        gradle("prepareKotlinIdeaImport").checks {
+            check.taskSuccessful(":generateComposeResClass")
+            assert(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
+        }
+        gradle("prepareKotlinIdeaImport").checks {
+            check.taskUpToDate(":generateComposeResClass")
+        }
+
+        modifyText("build.gradle.kts") { str ->
+            str.replace(
+                "implementation(compose.components.resources)",
+                "//implementation(compose.components.resources)"
+            )
+        }
+        gradle("prepareKotlinIdeaImport").checks {
+            check.taskSuccessful(":generateComposeResClass")
+            assert(!file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
+        }
+
+        gradle("prepareKotlinIdeaImport", "-Pcompose.resources.always.generate.accessors=true").checks {
+            check.taskSuccessful(":generateComposeResClass")
+            assert(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
+        }
+
+        modifyText("build.gradle.kts") { str ->
+            str.replace(
+                "//implementation(compose.components.resources)",
+                "implementation(compose.components.resources)"
+            )
+        }
+        gradle("prepareKotlinIdeaImport").checks {
+            check.taskUpToDate(":generateComposeResClass")
+            assert(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
+        }
+
+        modifyText("build.gradle.kts") { str ->
+            str.replace(
+                "group = \"app.group\"",
+                "group = \"io.company\""
+            )
+        }
+        gradle("prepareKotlinIdeaImport").checks {
+            check.taskSuccessful(":generateComposeResClass")
+            assert(!file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
+            assert(file("build/generated/compose/resourceGenerator/kotlin/io/company/resources_test/generated/resources/Res.kt").exists())
+        }
+    }
+
+    @Test
     fun testEmptyResClass(): Unit = with(testProject("misc/emptyResources")) {
         gradle("generateComposeResClass").checks {
             assertEqualTextFiles(
