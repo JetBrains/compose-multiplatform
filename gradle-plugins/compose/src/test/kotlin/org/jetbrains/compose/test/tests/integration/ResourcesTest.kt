@@ -113,7 +113,8 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun testCopyFontsInAndroidApp(): Unit = with(testProject("misc/commonResources")) {
         gradle("build").checks {
-            check.taskSuccessful(":copyFontsToAndroidAssets")
+            check.taskSuccessful(":copyDebugFontsToAndroidAssets")
+            check.taskSuccessful(":copyReleaseFontsToAndroidAssets")
         }
     }
 
