@@ -5,7 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
 /** Receiver scope which is used by [HorizontalSplitPane] and [VerticalSplitPane] */
@@ -46,6 +48,7 @@ interface SplitPaneScope {
 @ExperimentalSplitPaneApi
 interface HandleScope {
     /** allow mark composable as movable handle */
+    @Composable
     fun Modifier.markAsHandle(): Modifier
 }
 
@@ -83,12 +86,18 @@ interface SplitterScope {
 internal class HandleScopeImpl(
     private val containerScope: SplitPaneScopeImpl
 ) : HandleScope {
-    override fun Modifier.markAsHandle(): Modifier = this.pointerInput(containerScope.splitPaneState) {
-        detectDragGestures { change, _ ->
-            change.consume()
-            containerScope.splitPaneState.dispatchRawMovement(
-                if (containerScope.isHorizontal) change.position.x else change.position.y
-            )
+    @Composable
+    override fun Modifier.markAsHandle(): Modifier = this.run {
+        val layoutDirection = LocalLayoutDirection.current
+        pointerInput(containerScope.splitPaneState) {
+            detectDragGestures { change, _ ->
+                change.consume()
+                containerScope.splitPaneState.dispatchRawMovement(
+                    if (containerScope.isHorizontal)
+                        if (layoutDirection == LayoutDirection.Ltr) change.position.x else -change.position.x
+                    else change.position.y
+                )
+            }
         }
     }
 }

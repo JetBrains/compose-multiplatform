@@ -121,18 +121,18 @@ internal actual fun SplitPane(
                 }
 
                 layout(constraints.maxWidth, constraints.maxHeight) {
-                    firstPlaceable.place(0, 0)
+                    firstPlaceable.placeRelative(0, 0)
                     if (isHorizontal) {
-                        secondPlaceable.place(secondPlaceablePosition, 0)
-                        splitterPlaceable.place(position, 0)
+                        secondPlaceable.placeRelative(secondPlaceablePosition, 0)
+                        splitterPlaceable.placeRelative(position, 0)
                         if (moveEnabled) {
-                            handlePlaceable.place(handlePosition, 0)
+                            handlePlaceable.placeRelative(handlePosition, 0)
                         }
                     } else {
-                        secondPlaceable.place(0, secondPlaceablePosition)
-                        splitterPlaceable.place(0, position)
+                        secondPlaceable.placeRelative(0, secondPlaceablePosition)
+                        splitterPlaceable.placeRelative(0, position)
                         if (moveEnabled) {
-                            handlePlaceable.place(0, handlePosition)
+                            handlePlaceable.placeRelative(0, handlePosition)
                         }
                     }
                 }
