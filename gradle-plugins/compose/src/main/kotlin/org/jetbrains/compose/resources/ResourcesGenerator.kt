@@ -54,7 +54,7 @@ private fun Project.configureResourceGenerator(commonComposeResourcesDir: File, 
     fun buildDir(path: String) = layout.dir(layout.buildDirectory.map { File(it.asFile, path) })
 
     //lazy check a dependency on the Resources library
-    val shouldGenerateResourceAccessors: Provider<Boolean> = provider {
+    val shouldGenerateResClass: Provider<Boolean> = provider {
         if (ComposeProperties.alwaysGenerateResourceAccessors(project).get()) {
             true
         } else {
@@ -72,9 +72,9 @@ private fun Project.configureResourceGenerator(commonComposeResourcesDir: File, 
         GenerateResClassTask::class.java
     ) {
         it.packageName.set(packageName)
+        it.shouldGenerateResClass.set(shouldGenerateResClass)
         it.resDir.set(commonComposeResources)
         it.codeDir.set(buildDir("$RES_GEN_DIR/kotlin"))
-        it.onlyIf { shouldGenerateResourceAccessors.get() }
     }
 
     //register generated source set
@@ -93,7 +93,7 @@ private fun Project.configureResourceGenerator(commonComposeResourcesDir: File, 
             configureAndroidResources(
                 commonComposeResources,
                 buildDir("$RES_GEN_DIR/androidFonts").map { it.asFile },
-                shouldGenerateResourceAccessors
+                shouldGenerateResClass
             )
         }
     }
