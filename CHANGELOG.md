@@ -95,7 +95,7 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 
 ## Highlights
 
-- Resource library improvements ([an example project](https://github.com/JetBrains/compose-multiplatform/tree/c31c761e09212eaa13014f4d0d2a6516511f859a/gradle-plugins/compose/src/test/test-projects/misc/commonResources))
+- Resource library improvements ([an example project](https://github.com/JetBrains/compose-multiplatform/tree/8ee7531c424421657842a24a5c365db53ba19e18/components/resources/demo))
   - [Compile-time checking of resources through a generated `Res` class](https://github.com/JetBrains/compose-multiplatform/pull/3961)
   - [Introduce top level `composeResources` dir with `drawable`, `font`, `files`, `values/strings.xml` support](https://github.com/JetBrains/compose-multiplatform/pull/4127)
   - [Support for various screen densities, multiple languages and regions, and light and dark themes](https://github.com/JetBrains/compose-multiplatform/pull/4018)
