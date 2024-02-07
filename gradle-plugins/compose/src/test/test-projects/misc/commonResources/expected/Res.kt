@@ -37,7 +37,7 @@ internal object Res {
     }
 
     public object string {
-        public val PascalCaseName: StringResource = get_string_PascalCaseName()
+        public val PascalCase: StringResource = get_string_PascalCase()
 
         public val _1_kebab_case: StringResource = get_string__1_kebab_case()
 
@@ -100,9 +100,9 @@ private fun get_drawable_vector_2(): DrawableResource =
         )
     )
 
-private fun get_string_PascalCaseName(): StringResource =
+private fun get_string_PascalCase(): StringResource =
     org.jetbrains.compose.resources.StringResource(
-        "string:PascalCaseName", "PascalCaseName",
+        "string:PascalCase", "PascalCase",
         setOf(
             org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.xml"),
         )

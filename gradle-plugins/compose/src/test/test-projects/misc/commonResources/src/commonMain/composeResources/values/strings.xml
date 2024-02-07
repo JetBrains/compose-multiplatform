@@ -10,7 +10,7 @@
         <item>item 2</item>
         <item>item 3</item>
     </string-array>
-    <string name="PascalCaseName">Pascal Case Name</string>
-    <string name="1-kebab-case">Pascal Case Name</string>
-    <string name="camelCase">Pascal Case Name</string>
+    <string name="PascalCase">PascalCase</string>
+    <string name="1-kebab-case">1-kebab-case</string>
+    <string name="camelCase">camelCase</string>
 </resources>
