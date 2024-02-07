@@ -43,7 +43,7 @@ private fun Project.configureResourceGenerator(commonComposeResourcesDir: File, 
     val commonComposeResources = provider { commonComposeResourcesDir }
     val packageName = provider {
         buildString {
-            val group = project.group.toString().asUnderscoredIdentifier()
+            val group = project.group.toString().lowercase().asUnderscoredIdentifier()
             append(group)
             if (group.isNotEmpty()) append(".")
             append(project.name.lowercase())
