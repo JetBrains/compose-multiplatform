@@ -12,9 +12,12 @@ import kotlin.io.path.relativeTo
 /**
  * This task should be FAST and SAFE! Because it is being run during IDE import.
  */
-abstract class GenerateResClassTask : DefaultTask() {
+internal abstract class GenerateResClassTask : DefaultTask() {
     @get:Input
     abstract val packageName: Property<String>
+
+    @get:Input
+    abstract val shouldGenerateResClass: Property<Boolean>
 
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -26,32 +29,37 @@ abstract class GenerateResClassTask : DefaultTask() {
     @TaskAction
     fun generate() {
         try {
-            val rootResDir = resDir.get()
-            logger.info("Generate resources for $rootResDir")
-
-            //get first level dirs
-            val dirs = rootResDir.listNotHiddenFiles()
-
-            dirs.forEach { f ->
-                if (!f.isDirectory) {
-                    error("${f.name} is not directory! Raw files should be placed in '${rootResDir.name}/files' directory.")
-                }
-            }
-
-            //type -> id -> resource item
-            val resources: Map<ResourceType, Map<String, List<ResourceItem>>> = dirs
-                .flatMap { dir ->
-                    dir.listNotHiddenFiles()
-                        .mapNotNull { it.fileToResourceItems(rootResDir.toPath()) }
-                        .flatten()
-                }
-                .groupBy { it.type }
-                .mapValues { (_, items) -> items.groupBy { it.name } }
-
             val kotlinDir = codeDir.get().asFile
+            logger.info("Clean directory $kotlinDir")
             kotlinDir.deleteRecursively()
             kotlinDir.mkdirs()
-            getResFileSpec(resources, packageName.get()).writeTo(kotlinDir)
+
+            if (shouldGenerateResClass.get()) {
+                val rootResDir = resDir.get()
+                logger.info("Generate resources for $rootResDir")
+
+                //get first level dirs
+                val dirs = rootResDir.listNotHiddenFiles()
+
+                dirs.forEach { f ->
+                    if (!f.isDirectory) {
+                        error("${f.name} is not directory! Raw files should be placed in '${rootResDir.name}/files' directory.")
+                    }
+                }
+
+                //type -> id -> resource item
+                val resources: Map<ResourceType, Map<String, List<ResourceItem>>> = dirs
+                    .flatMap { dir ->
+                        dir.listNotHiddenFiles()
+                            .mapNotNull { it.fileToResourceItems(rootResDir.toPath()) }
+                            .flatten()
+                    }
+                    .groupBy { it.type }
+                    .mapValues { (_, items) -> items.groupBy { it.name } }
+                getResFileSpec(resources, packageName.get()).writeTo(kotlinDir)
+            } else {
+                logger.info("Generation Res class is disabled")
+            }
         } catch (e: Exception) {
             //message must contain two ':' symbols to be parsed by IDE UI!
             logger.error("e: GenerateResClassTask was failed:", e)
