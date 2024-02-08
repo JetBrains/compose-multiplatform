@@ -86,7 +86,7 @@ internal class HandleScopeImpl(
     private val containerScope: SplitPaneScopeImpl
 ) : HandleScope {
     @Composable
-    override fun Modifier.markAsHandle(): Modifier = this.run {
+    override fun Modifier.markAsHandle(): Modifier = composed {
         val layoutDirection = LocalLayoutDirection.current
         pointerInput(containerScope.splitPaneState) {
             detectDragGestures { change, _ ->
