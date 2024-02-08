@@ -2,12 +2,12 @@ package org.jetbrains.compose.resources
 
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.gradle.BaseExtension
-import com.android.build.gradle.internal.tasks.AndroidVariantTask
 import org.gradle.api.Project
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.*
 import org.jetbrains.compose.internal.utils.registerTask
+import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import java.io.File
 
 internal fun Project.configureAndroidResources(
@@ -22,24 +22,31 @@ internal fun Project.configureAndroidResources(
     androidMainSourceSet.resources.srcDir(commonResourcesDir)
     androidMainSourceSet.assets.srcDir(androidFontsDir)
 
-    val copyFonts = registerTask<Copy>("copyFontsToAndroidAssets") {
-        includeEmptyDirs = false
-        from(commonResourcesDir)
-        include("**/font*/*")
-        into(androidFontsDir)
-        onlyIf { onlyIfProvider.get() }
-    }
     androidComponents.onVariants { variant ->
+        val copyFonts = registerTask<CopyAndroidAssetsTask>(
+            "copy${variant.name.uppercaseFirstChar()}FontsToAndroidAssets"
+        ) {
+            includeEmptyDirs = false
+            from(commonResourcesDir)
+            include("**/font*/*")
+            onlyIf { onlyIfProvider.get() }
+        }
         variant.sources?.assets?.addGeneratedSourceDirectory(
             taskProvider = copyFonts,
-            wiredWith = {
-                objects.directoryProperty().fileProvider(
-                    copyFonts.map { t -> t.destinationDir }
-                )
-            }
+            wiredWith = CopyAndroidAssetsTask::outputDirectory
         )
     }
-    //fixme: it seems like a problem in AGP, so dirty hack now
-    //https://github.com/JetBrains/compose-multiplatform/issues/4085
-    tasks.matching { it is AndroidVariantTask }.configureEach { it.dependsOn(copyFonts) }
+}
+
+//https://github.com/JetBrains/compose-multiplatform/issues/4085
+private abstract class CopyAndroidAssetsTask : Copy() {
+    @get:OutputDirectory
+    abstract val outputDirectory: DirectoryProperty
+
+    override fun getDestinationDir(): File =
+        outputDirectory.get().asFile
+
+    override fun setDestinationDir(destination: File) {
+        outputDirectory.set(destination)
+    }
 }
