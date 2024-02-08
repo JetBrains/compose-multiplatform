@@ -162,6 +162,10 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     val macAppCategory: Property<String?> = objects.nullableProperty()
 
+    @get:Input
+    @get:Optional
+    val macMinimumSystemVersion: Property<String?> = objects.nullableProperty()
+
     @get:InputFile
     @get:Optional
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
@@ -499,11 +503,12 @@ abstract class AbstractJPackageTask @Inject constructor(
                 .writeToFile(jpackageResources.ioFile.resolve("Info.plist"))
 
             if (macAppStore.orNull == true) {
+                val systemVersion = macMinimumSystemVersion.orNull ?: "10.13"
                 val productDefPlistXml = """
-                    <key>os</key>
-                    <array>
-                        <string>10.13</string>
-                    </array>
+                <key>os</key>
+                <array>
+                <string>$systemVersion</string>
+                </array>
                 """.trimIndent()
                 InfoPlistBuilder(productDefPlistXml)
                     .writeToFile(jpackageResources.ioFile.resolve("product-def.plist"))
@@ -581,7 +586,8 @@ abstract class AbstractJPackageTask @Inject constructor(
     private fun setInfoPlistValues(plist: InfoPlistBuilder) {
         check(currentOS == OS.MacOS) { "Current OS is not macOS: $currentOS" }
 
-        plist[PlistKeys.LSMinimumSystemVersion] = "10.13"
+        val systemVersion = macMinimumSystemVersion.orNull ?: "10.13"
+        plist[PlistKeys.LSMinimumSystemVersion] = systemVersion
         plist[PlistKeys.CFBundleDevelopmentRegion] = "English"
         plist[PlistKeys.CFBundleAllowMixedLocalizations] = "true"
         val packageName = packageName.get()

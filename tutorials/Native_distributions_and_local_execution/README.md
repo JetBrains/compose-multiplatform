@@ -442,6 +442,8 @@ The following platform-specific options are available
     * `packageName` — a name of the application;
     * `dockName` — a name of the application displayed in the menu bar, the "About <App>" menu item, in the dock, etc. 
       Equals to `packageName` by default.
+    * `minimumSystemVersion` — a minimum macOS version required to run the application.
+      See [LSMinimumSystemVersion](https://developer.apple.com/documentation/bundleresources/information_property_list/lsminimumsystemversion) for details;
     * `signing`, `notarization`, `provisioningProfile`, and `runtimeProvisioningProfile` — see
       [the corresponding tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) 
       for details;

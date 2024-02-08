@@ -39,6 +39,10 @@ abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMac
     @get:Optional
     val copyright: Property<String?> = objects.nullableProperty()
 
+    @get:Input
+    @get:Optional
+    val minimumSystemVersion: Property<String?> = objects.nullableProperty()
+
     override fun createPackage(destinationDir: File, workingDir: File) {
         val packageName = packageName.get()
         val appDir = destinationDir.resolve("$packageName.app").apply { mkdirs() }
@@ -60,7 +64,7 @@ abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMac
     }
 
     private fun InfoPlistBuilder.setupInfoPlist(executableName: String) {
-        this[PlistKeys.LSMinimumSystemVersion] = KOTLIN_NATIVE_MIN_SUPPORTED_MAC_OS
+        this[PlistKeys.LSMinimumSystemVersion] = minimumSystemVersion.getOrElse(KOTLIN_NATIVE_MIN_SUPPORTED_MAC_OS)
         this[PlistKeys.CFBundleDevelopmentRegion] = "English"
         this[PlistKeys.CFBundleAllowMixedLocalizations] = "true"
         this[PlistKeys.CFBundleExecutable] = executableName
