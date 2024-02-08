@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import java.awt.Cursor
 
@@ -20,12 +22,17 @@ private fun DesktopHandle(
     splitPaneState: SplitPaneState
 ) = Box(
     Modifier
-        .pointerInput(splitPaneState) {
-            detectDragGestures { change, _ ->
-                change.consumeAllChanges()
-                splitPaneState.dispatchRawMovement(
-                    if (isHorizontal) change.position.x else change.position.y
-                )
+        .run {
+            val layoutDirection = LocalLayoutDirection.current
+            pointerInput(splitPaneState) {
+                detectDragGestures { change, _ ->
+                    change.consume()
+                    splitPaneState.dispatchRawMovement(
+                        if (isHorizontal)
+                            if (layoutDirection == LayoutDirection.Ltr) change.position.x else -change.position.x
+                        else change.position.y
+                    )
+                }
             }
         }
         .cursorForHorizontalResize(isHorizontal)
