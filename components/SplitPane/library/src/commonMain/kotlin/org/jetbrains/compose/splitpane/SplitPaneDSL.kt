@@ -4,6 +4,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
@@ -85,7 +86,6 @@ interface SplitterScope {
 internal class HandleScopeImpl(
     private val containerScope: SplitPaneScopeImpl
 ) : HandleScope {
-    @Composable
     override fun Modifier.markAsHandle(): Modifier = composed {
         val layoutDirection = LocalLayoutDirection.current
         pointerInput(containerScope.splitPaneState) {
