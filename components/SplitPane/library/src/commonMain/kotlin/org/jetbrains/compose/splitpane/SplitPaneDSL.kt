@@ -48,7 +48,6 @@ interface SplitPaneScope {
 @ExperimentalSplitPaneApi
 interface HandleScope {
     /** allow mark composable as movable handle */
-    @Composable
     fun Modifier.markAsHandle(): Modifier
 }
 
