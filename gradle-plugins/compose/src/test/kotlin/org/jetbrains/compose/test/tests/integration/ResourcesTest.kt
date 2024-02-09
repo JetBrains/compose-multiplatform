@@ -1,10 +1,11 @@
 package org.jetbrains.compose.test.tests.integration
 
-import org.jetbrains.compose.test.utils.GradlePluginTestBase
+import org.jetbrains.compose.test.utils.*
 import org.jetbrains.compose.test.utils.assertEqualTextFiles
 import org.jetbrains.compose.test.utils.assertNotEqualTextFiles
 import org.jetbrains.compose.test.utils.checks
 import org.junit.jupiter.api.Test
+import java.io.File
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
 import kotlin.io.path.Path
@@ -113,22 +114,94 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testCopyFontsInAndroidApp(): Unit = with(testProject("misc/commonResources")) {
+    fun testFinalArtefacts(): Unit = with(testProject("misc/commonResources")) {
+        //https://developer.android.com/build/build-variants?utm_source=android-studio#product-flavors
+        file("build.gradle.kts").appendText("""
+            
+            kotlin {
+                js {
+                    browser {
+                        testTask(Action {
+                            enabled = false
+                        })
+                    }
+                    binaries.executable()
+                }
+            }
+            
+            android {
+                flavorDimensions += "version"
+                productFlavors {
+                    create("demo")
+                    create("full")
+                }
+            }
+        """.trimIndent())
+        file("src/androidDemoDebug/composeResources/files/platform.txt").writeNewFile("android demo-debug")
+        file("src/androidDemoRelease/composeResources/files/platform.txt").writeNewFile("android demo-release")
+        file("src/androidFullDebug/composeResources/files/platform.txt").writeNewFile("android full-debug")
+        file("src/androidFullRelease/composeResources/files/platform.txt").writeNewFile("android full-release")
+        file("src/desktopMain/composeResources/files/platform.txt").writeNewFile("desktop")
+        file("src/jsMain/composeResources/files/platform.txt").writeNewFile("js")
+
+        val commonResourcesDir = file("src/commonMain/composeResources")
+        val commonResourcesFiles = commonResourcesDir.walkTopDown()
+            .filter { !it.isDirectory && !it.isHidden }
+            .map { it.relativeTo(commonResourcesDir).path }
+
         gradle("build").checks {
-            check.taskSuccessful(":copyDebugFontsToAndroidAssets")
-            check.taskSuccessful(":copyReleaseFontsToAndroidAssets")
+            check.taskSuccessful(":copyDemoDebugFontsToAndroidAssets")
+            check.taskSuccessful(":copyDemoReleaseFontsToAndroidAssets")
+            check.taskSuccessful(":copyFullDebugFontsToAndroidAssets")
+            check.taskSuccessful(":copyFullReleaseFontsToAndroidAssets")
 
-            val debugApk = file("build/outputs/apk/debug/resources_test-debug.apk")
-            assert(debugApk.exists())
-            val debugZip = ZipFile(debugApk)
-            assert(debugZip.getEntry("font/emptyFont.otf") != null)
-            assert(debugZip.getEntry("assets/font/emptyFont.otf") != null)
+            checkAndroidApk("demo", "debug", commonResourcesFiles)
+            checkAndroidApk("demo", "release", commonResourcesFiles)
+            checkAndroidApk("full", "debug", commonResourcesFiles)
+            checkAndroidApk("full", "release", commonResourcesFiles)
 
-            val releaseApk = file("build/outputs/apk/release/resources_test-release-unsigned.apk")
-            assert(releaseApk.exists())
-            val releaseZip = ZipFile(releaseApk)
-            assert(releaseZip.getEntry("font/emptyFont.otf") != null)
-            assert(releaseZip.getEntry("assets/font/emptyFont.otf") != null)
+            val desktopJar = file("build/libs/resources_test-desktop.jar")
+            assert(desktopJar.exists())
+            ZipFile(desktopJar).let { zip ->
+                commonResourcesFiles.forEach { res ->
+                    assert(zip.getEntry(res) != null)
+                }
+                assert(zip.getEntry("files/platform.txt") != null)
+                val text = zip.getInputStream(
+                    zip.getEntry("files/platform.txt")
+                ).readBytes().decodeToString()
+                assert(text == "desktop")
+            }
+
+            val jsBuildDir = file("build/dist/js/productionExecutable")
+            commonResourcesFiles.forEach { res ->
+                assert(jsBuildDir.resolve(res).exists())
+            }
+            assert(jsBuildDir.resolve("files/platform.txt").readText() == "js")
+        }
+    }
+
+    private fun File.writeNewFile(text: String) {
+        parentFile.mkdirs()
+        createNewFile()
+        writeText(text)
+    }
+
+    private fun TestProject.checkAndroidApk(flavor: String, type: String, commonResourcesFiles: Sequence<String>) {
+        val typeFilePostfix = if (type == "release") "$type-unsigned" else type
+        val apk = file("build/outputs/apk/$flavor/$type/resources_test-$flavor-$typeFilePostfix.apk")
+        assert(apk.exists())
+        ZipFile(apk).let { zip ->
+            commonResourcesFiles.forEach { res ->
+                assert(zip.getEntry(res) != null)
+                //todo fix duplicate fonts
+            }
+            assert(zip.getEntry("assets/font/emptyFont.otf") != null)
+            assert(zip.getEntry("files/platform.txt") != null)
+            val text = zip.getInputStream(
+                zip.getEntry("files/platform.txt")
+            ).readBytes().decodeToString()
+            assert(text == "android $flavor-$type")
         }
     }
 
