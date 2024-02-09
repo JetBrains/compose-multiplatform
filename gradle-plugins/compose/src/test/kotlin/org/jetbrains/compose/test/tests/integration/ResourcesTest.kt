@@ -5,6 +5,8 @@ import org.jetbrains.compose.test.utils.assertEqualTextFiles
 import org.jetbrains.compose.test.utils.assertNotEqualTextFiles
 import org.jetbrains.compose.test.utils.checks
 import org.junit.jupiter.api.Test
+import java.util.zip.ZipEntry
+import java.util.zip.ZipFile
 import kotlin.io.path.Path
 
 class ResourcesTest : GradlePluginTestBase() {
@@ -115,6 +117,18 @@ class ResourcesTest : GradlePluginTestBase() {
         gradle("build").checks {
             check.taskSuccessful(":copyDebugFontsToAndroidAssets")
             check.taskSuccessful(":copyReleaseFontsToAndroidAssets")
+
+            val debugApk = file("build/outputs/apk/debug/resources_test-debug.apk")
+            assert(debugApk.exists())
+            val debugZip = ZipFile(debugApk)
+            assert(debugZip.getEntry("font/emptyFont.otf") != null)
+            assert(debugZip.getEntry("assets/font/emptyFont.otf") != null)
+
+            val releaseApk = file("build/outputs/apk/release/resources_test-release-unsigned.apk")
+            assert(releaseApk.exists())
+            val releaseZip = ZipFile(releaseApk)
+            assert(releaseZip.getEntry("font/emptyFont.otf") != null)
+            assert(releaseZip.getEntry("assets/font/emptyFont.otf") != null)
         }
     }
 

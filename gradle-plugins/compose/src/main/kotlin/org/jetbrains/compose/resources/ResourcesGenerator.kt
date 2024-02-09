@@ -171,7 +171,7 @@ internal abstract class CopyAndroidFontsToAssetsTask : DefaultTask() {
         fileSystem.copy {
             it.includeEmptyDirs = false
             it.from(from)
-            it.exclude("**/font*/*")
+            it.include("**/font*/*")
             it.into(outputDirectory)
         }
     }
