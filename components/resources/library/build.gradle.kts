@@ -204,16 +204,3 @@ afterEvaluate {
         if (name == "compileWebMainKotlinMetadata") enabled = false
     }
 }
-
-// TODO: remove this (https://youtrack.jetbrains.com/issue/COMPOSE-939)
-configurations.all {
-    val isWeb = name.startsWith("wasmJs") || name.startsWith("js")
-    if (isWeb) {
-        resolutionStrategy.eachDependency {
-            if (requested.group.startsWith("org.jetbrains.kotlinx") &&
-                requested.name.startsWith("kotlinx-coroutines-")) {
-                useVersion("1.8.0-RC2")
-            }
-        }
-    }
-}
