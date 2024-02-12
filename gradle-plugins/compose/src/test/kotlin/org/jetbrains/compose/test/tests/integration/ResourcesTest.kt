@@ -1,14 +1,10 @@
 package org.jetbrains.compose.test.tests.integration
 
 import org.jetbrains.compose.test.utils.*
-import org.jetbrains.compose.test.utils.assertEqualTextFiles
-import org.jetbrains.compose.test.utils.assertNotEqualTextFiles
-import org.jetbrains.compose.test.utils.checks
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
-import kotlin.io.path.Path
+import kotlin.test.*
 
 class ResourcesTest : GradlePluginTestBase() {
     @Test
@@ -36,72 +32,88 @@ class ResourcesTest : GradlePluginTestBase() {
             file("src/commonMain/composeResources/drawable-ren")
         )
         gradle("generateComposeResClass").checks {
-            check.logContains("""
+            check.logContains(
+                """
                 contains unknown qualifier: 'ren'.
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
 
         file("src/commonMain/composeResources/drawable-ren").renameTo(
             file("src/commonMain/composeResources/drawable-rUS-en")
         )
         gradle("generateComposeResClass").checks {
-            check.logContains("""
+            check.logContains(
+                """
                 Region qualifier must be declared after language: 'en-rUS'.
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
 
         file("src/commonMain/composeResources/drawable-rUS-en").renameTo(
             file("src/commonMain/composeResources/drawable-rUS")
         )
         gradle("generateComposeResClass").checks {
-            check.logContains("""
+            check.logContains(
+                """
                 Region qualifier must be used only with language.
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
 
         file("src/commonMain/composeResources/drawable-rUS").renameTo(
             file("src/commonMain/composeResources/drawable-en-fr")
         )
         gradle("generateComposeResClass").checks {
-            check.logContains("""
+            check.logContains(
+                """
                 contains repetitive qualifiers: 'en' and 'fr'.
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
 
         file("src/commonMain/composeResources/drawable-en-fr").renameTo(
             file("src/commonMain/composeResources/image")
         )
         gradle("generateComposeResClass").checks {
-            check.logContains("""
+            check.logContains(
+                """
                 Unknown resource type: 'image'
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
 
         file("src/commonMain/composeResources/image").renameTo(
             file("src/commonMain/composeResources/files-de")
         )
         gradle("generateComposeResClass").checks {
-            check.logContains("""
+            check.logContains(
+                """
                 The 'files' directory doesn't support qualifiers: 'files-de'.
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
 
         file("src/commonMain/composeResources/files-de").renameTo(
             file("src/commonMain/composeResources/strings")
         )
         gradle("generateComposeResClass").checks {
-            check.logContains("""
+            check.logContains(
+                """
                 Unknown resource type: 'strings'.
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
 
         file("src/commonMain/composeResources/strings").renameTo(
             file("src/commonMain/composeResources/string-us")
         )
         gradle("generateComposeResClass").checks {
-            check.logContains("""
+            check.logContains(
+                """
                 Forbidden directory name 'string-us'! String resources should be declared in 'values/strings.xml'.
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
 
         //restore defaults
@@ -161,23 +173,22 @@ class ResourcesTest : GradlePluginTestBase() {
             checkAndroidApk("full", "release", commonResourcesFiles)
 
             val desktopJar = file("build/libs/resources_test-desktop.jar")
-            assert(desktopJar.exists())
-            ZipFile(desktopJar).let { zip ->
+            assertTrue(desktopJar.exists())
+            ZipFile(desktopJar).use { zip ->
                 commonResourcesFiles.forEach { res ->
-                    assert(zip.getEntry(res) != null)
+                    assertNotNull(zip.getEntry(res))
                 }
-                assert(zip.getEntry("files/platform.txt") != null)
-                val text = zip.getInputStream(
-                    zip.getEntry("files/platform.txt")
-                ).readBytes().decodeToString()
-                assert(text == "desktop")
+                val platformTxt = zip.getEntry("files/platform.txt")
+                assertNotNull(platformTxt)
+                val text = zip.getInputStream(platformTxt).readBytes().decodeToString()
+                assertEquals("desktop", text)
             }
 
             val jsBuildDir = file("build/dist/js/productionExecutable")
             commonResourcesFiles.forEach { res ->
-                assert(jsBuildDir.resolve(res).exists())
+                assertTrue(jsBuildDir.resolve(res).exists())
             }
-            assert(jsBuildDir.resolve("files/platform.txt").readText() == "js")
+            assertEquals("js", jsBuildDir.resolve("files/platform.txt").readText())
         }
     }
 
@@ -189,18 +200,17 @@ class ResourcesTest : GradlePluginTestBase() {
 
     private fun TestProject.checkAndroidApk(flavor: String, type: String, commonResourcesFiles: Sequence<String>) {
         val apk = file("build/outputs/apk/$flavor/$type/resources_test-$flavor-$type.apk")
-        assert(apk.exists())
-        ZipFile(apk).let { zip ->
+        assertTrue(apk.exists())
+        ZipFile(apk).use { zip ->
             commonResourcesFiles.forEach { res ->
-                assert(zip.getEntry(res) != null)
+                assertNotNull(zip.getEntry(res))
                 //todo fix duplicate fonts
             }
-            assert(zip.getEntry("assets/font/emptyFont.otf") != null)
-            assert(zip.getEntry("files/platform.txt") != null)
-            val text = zip.getInputStream(
-                zip.getEntry("files/platform.txt")
-            ).readBytes().decodeToString()
-            assert(text == "android $flavor-$type")
+            assertNotNull(zip.getEntry("assets/font/emptyFont.otf"))
+            val platformTxt = zip.getEntry("files/platform.txt")
+            assertNotNull(platformTxt)
+            val text = zip.getInputStream(platformTxt).readBytes().decodeToString()
+            assertEquals("android $flavor-$type", text)
         }
     }
 
@@ -208,7 +218,7 @@ class ResourcesTest : GradlePluginTestBase() {
     fun testUpToDateChecks(): Unit = with(testProject("misc/commonResources")) {
         gradle("prepareKotlinIdeaImport").checks {
             check.taskSuccessful(":generateComposeResClass")
-            assert(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
+            assertTrue(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
         }
         gradle("prepareKotlinIdeaImport").checks {
             check.taskUpToDate(":generateComposeResClass")
@@ -222,12 +232,12 @@ class ResourcesTest : GradlePluginTestBase() {
         }
         gradle("prepareKotlinIdeaImport").checks {
             check.taskSuccessful(":generateComposeResClass")
-            assert(!file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
+            assertFalse(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
         }
 
         gradle("prepareKotlinIdeaImport", "-Pcompose.resources.always.generate.accessors=true").checks {
             check.taskSuccessful(":generateComposeResClass")
-            assert(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
+            assertTrue(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
         }
 
         modifyText("build.gradle.kts") { str ->
@@ -238,7 +248,7 @@ class ResourcesTest : GradlePluginTestBase() {
         }
         gradle("prepareKotlinIdeaImport").checks {
             check.taskUpToDate(":generateComposeResClass")
-            assert(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
+            assertTrue(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
         }
 
         modifyText("build.gradle.kts") { str ->
@@ -249,8 +259,8 @@ class ResourcesTest : GradlePluginTestBase() {
         }
         gradle("prepareKotlinIdeaImport").checks {
             check.taskSuccessful(":generateComposeResClass")
-            assert(!file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
-            assert(file("build/generated/compose/resourceGenerator/kotlin/io/company/resources_test/generated/resources/Res.kt").exists())
+            assertFalse(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
+            assertTrue(file("build/generated/compose/resourceGenerator/kotlin/io/company/resources_test/generated/resources/Res.kt").exists())
         }
     }
 
@@ -356,7 +366,7 @@ class ResourcesTest : GradlePluginTestBase() {
         gradle("desktopJar").checks {
             check.taskSuccessful(":generateStringFiles")
             check.taskSuccessful(":generateComposeResClass")
-            assert(file("src/commonMain/composeResources/values/strings.xml").readLines().size == 513)
+            assertEquals(513, file("src/commonMain/composeResources/values/strings.xml").readLines().size)
         }
     }
 
