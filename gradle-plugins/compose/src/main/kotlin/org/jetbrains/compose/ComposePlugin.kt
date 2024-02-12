@@ -121,6 +121,15 @@ abstract class ComposePlugin : Plugin<Project> {
         }
     }
 
+    private fun checkKotlinIsSupported(project: Project) {
+        project.mppExtOrNull?.targets?.forEach {
+            ComposeKotlinCompatibility.checkKotlinIsSupported(
+                it.project.getKotlinPluginVersion(),
+                it.platformType
+            )
+        }
+    }
+
     @Suppress("DEPRECATION")
     class Dependencies(project: Project) {
         val desktop = DesktopDependencies
