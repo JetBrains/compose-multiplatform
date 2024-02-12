@@ -65,16 +65,14 @@ dependencies {
 
     testImplementation(gradleTestKit())
     testImplementation(kotlin("gradle-plugin-api"))
-    testImplementation(libs.semver4j)
 
     embedded(libs.download.task)
     embedded(libs.kotlin.poet)
-    embedded(libs.semver4j)
     embedded(project(":preview-rpc"))
     embedded(project(":jdk-version-probe"))
 }
 
-val packagesToRelocate = listOf("de.undercouch", "com.squareup.kotlinpoet", "com.vdurmont.semver4j")
+val packagesToRelocate = listOf("de.undercouch", "com.squareup.kotlinpoet")
 
 val shadow = tasks.named<ShadowJar>("shadowJar") {
     for (packageToRelocate in packagesToRelocate) {

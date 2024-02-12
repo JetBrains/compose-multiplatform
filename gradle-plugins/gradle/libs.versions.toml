@@ -5,14 +5,12 @@ kotlin-poet = "1.16.0"
 plugin-android = "7.3.0"
 shadow-jar = "8.1.1"
 publish-plugin = "1.2.1"
-semver4j = "3.1.0"
 
 [libraries]
 download-task = { module = "de.undercouch:gradle-download-task", version.ref = "gradle-download-plugin" }
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-poet" }
 plugin-android = { module = "com.android.tools.build:gradle", version.ref = "plugin-android" }
 plugin-android-api = { module = "com.android.tools.build:gradle-api", version.ref = "plugin-android" }
-semver4j = { module = "com.vdurmont:semver4j", version.ref = "semver4j" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
