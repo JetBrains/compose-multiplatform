@@ -193,8 +193,12 @@ class ResourcesTest : GradlePluginTestBase() {
         assert(apk.exists())
         ZipFile(apk).let { zip ->
             commonResourcesFiles.forEach { res ->
-                assert(zip.getEntry(res) != null)
-                //todo fix duplicate fonts
+                if (res == "font/emptyFont.otf") {
+                    //android fonts should be only in assets
+                    assert(zip.getEntry(res) == null)
+                } else {
+                    assert(zip.getEntry(res) != null)
+                }
             }
             assert(zip.getEntry("assets/font/emptyFont.otf") != null)
             assert(zip.getEntry("files/platform.txt") != null)
