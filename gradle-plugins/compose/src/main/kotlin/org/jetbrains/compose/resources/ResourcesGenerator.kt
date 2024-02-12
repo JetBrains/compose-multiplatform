@@ -15,8 +15,6 @@ import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.utils.*
-import org.jetbrains.compose.internal.utils.dependsOn
-import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
@@ -74,17 +72,31 @@ private fun Project.configureAndroidComposeResources(
     kotlinExtension: KotlinMultiplatformExtension,
     androidExtension: BaseExtension
 ) {
+    val commonResourcesDir = projectDir.resolve("src/${KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME}/$COMPOSE_RESOURCES_DIR")
+
+    //Copy common compose resources except fonts to android resources
+    val copyCommonAndroidComposeResources = registerTask<CopyCommonAndroidComposeResources>(
+        "copyCommonAndroidComposeResources"
+    ) {
+        from.set(commonResourcesDir)
+        outputDirectory.set(layout.buildDirectory.dir("$RES_GEN_DIR/commonAndroidComposeResources"))
+    }
+    tasks.configureEachWithType<ProcessJavaResTask> { dependsOn(copyCommonAndroidComposeResources) }
+
     //mark all composeResources as Android resources
-    kotlinExtension.targets.matching { it is KotlinAndroidTarget }.all { androidTarget ->
+    kotlinExtension.targets.withType(KotlinAndroidTarget::class.java).all { androidTarget ->
         androidTarget.compilations.all { compilation: KotlinCompilation<*> ->
             compilation.defaultSourceSet.androidSourceSetInfoOrNull?.let { kotlinAndroidSourceSet ->
                 androidExtension.sourceSets
                     .matching { it.name == kotlinAndroidSourceSet.androidSourceSetName }
                     .all { androidSourceSet ->
-                        (compilation.allKotlinSourceSets as ObservableSet<KotlinSourceSet>).forAll { kotlinSourceSet ->
-                            androidSourceSet.resources.srcDir(
-                                projectDir.resolve("src/${kotlinSourceSet.name}/$COMPOSE_RESOURCES_DIR")
-                            )
+                        androidSourceSet.resources.srcDir(copyCommonAndroidComposeResources.flatMap { it.outputDirectory.asFile })
+                        (compilation.allKotlinSourceSets as? ObservableSet<KotlinSourceSet>)?.forAll { kotlinSourceSet ->
+                            if (kotlinSourceSet.name != KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME) {
+                                androidSourceSet.resources.srcDir(
+                                    projectDir.resolve("src/${kotlinSourceSet.name}/$COMPOSE_RESOURCES_DIR")
+                                )
+                            }
                         }
                     }
             }
@@ -93,7 +105,6 @@ private fun Project.configureAndroidComposeResources(
 
     //copy fonts from the compose resources dir to android assets
     val androidComponents = project.extensions.findByType(AndroidComponentsExtension::class.java) ?: return
-    val commonResourcesDir = projectDir.resolve("src/${KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME}/$COMPOSE_RESOURCES_DIR")
     androidComponents.onVariants { variant ->
         val copyFonts = registerTask<CopyAndroidFontsToAssetsTask>(
             "copy${variant.name.uppercaseFirstChar()}FontsToAndroidAssets"
@@ -151,6 +162,27 @@ private fun Project.configureResourceGenerator(commonComposeResourcesDir: File, 
     tasks.configureEach {
         if (it.name == "prepareKotlinIdeaImport") {
             it.dependsOn(genTask)
+        }
+    }
+}
+
+internal abstract class CopyCommonAndroidComposeResources : DefaultTask() {
+    @get:Inject
+    abstract val fileSystem: FileSystemOperations
+
+    @get:InputFiles
+    abstract val from: Property<File>
+
+    @get:OutputDirectory
+    abstract val outputDirectory: DirectoryProperty
+
+    @TaskAction
+    fun action() {
+        fileSystem.copy {
+            it.includeEmptyDirs = false
+            it.from(from)
+            it.exclude("**/font*/*")
+            it.into(outputDirectory)
         }
     }
 }
