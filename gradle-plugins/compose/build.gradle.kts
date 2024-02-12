@@ -63,6 +63,7 @@ dependencies {
     compileOnly(libs.plugin.android)
     compileOnly(libs.plugin.android.api)
 
+    testImplementation(kotlin("test"))
     testImplementation(gradleTestKit())
     testImplementation(kotlin("gradle-plugin-api"))
 
