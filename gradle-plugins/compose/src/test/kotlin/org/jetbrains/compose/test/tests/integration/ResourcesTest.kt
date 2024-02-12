@@ -188,8 +188,7 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     private fun TestProject.checkAndroidApk(flavor: String, type: String, commonResourcesFiles: Sequence<String>) {
-        val typeFilePostfix = if (type == "release") "$type-unsigned" else type
-        val apk = file("build/outputs/apk/$flavor/$type/resources_test-$flavor-$typeFilePostfix.apk")
+        val apk = file("build/outputs/apk/$flavor/$type/resources_test-$flavor-$type.apk")
         assert(apk.exists())
         ZipFile(apk).let { zip ->
             commonResourcesFiles.forEach { res ->

@@ -40,7 +40,7 @@ android {
     }
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            initWith(getByName("debug"))
         }
     }
     compileOptions {
