@@ -98,7 +98,7 @@ abstract class ComposePlugin : Plugin<Project> {
                 it.resolutionStrategy.eachDependency {
                     if (it.requested.group.startsWith("org.jetbrains.kotlinx") &&
                         it.requested.name.startsWith("kotlinx-coroutines-")) {
-                        if (Semver(it.requested.version).isLowerThan("1.8.0-RC2")) {
+                        if (it.requested.version != null && Semver(it.requested.version).isLowerThan("1.8.0-RC2")) {
                             it.useVersion("1.8.0-RC2")
                         }
                     }
