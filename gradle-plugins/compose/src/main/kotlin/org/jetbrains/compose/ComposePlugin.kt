@@ -7,6 +7,7 @@
 
 package org.jetbrains.compose
 
+import com.vdurmont.semver4j.Semver
 import groovy.lang.Closure
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -97,7 +98,7 @@ abstract class ComposePlugin : Plugin<Project> {
                 it.resolutionStrategy.eachDependency {
                     if (it.requested.group.startsWith("org.jetbrains.kotlinx") &&
                         it.requested.name.startsWith("kotlinx-coroutines-")) {
-                        if (it.requested.version?.startsWith("1.8") != true) {
+                        if (Semver(it.requested.version).isLowerThan("1.8.0-RC2")) {
                             it.useVersion("1.8.0-RC2")
                         }
                     }
