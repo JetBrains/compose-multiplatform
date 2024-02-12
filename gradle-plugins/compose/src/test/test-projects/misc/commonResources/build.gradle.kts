@@ -38,9 +38,21 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+    signingConfigs {
+        create("testkey") {
+            storeFile = project.file("key/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
     buildTypes {
         getByName("release") {
-            initWith(getByName("debug"))
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("testkey")
+        }
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("testkey")
         }
     }
     compileOptions {
