@@ -159,7 +159,7 @@ class ResourcesTest : GradlePluginTestBase() {
         val commonResourcesDir = file("src/commonMain/composeResources")
         val commonResourcesFiles = commonResourcesDir.walkTopDown()
             .filter { !it.isDirectory && !it.isHidden }
-            .map { it.relativeTo(commonResourcesDir).path }
+            .map { it.relativeTo(commonResourcesDir).invariantSeparatorsPath }
 
         gradle("build").checks {
             check.taskSuccessful(":copyDemoDebugFontsToAndroidAssets")
