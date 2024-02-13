@@ -4,6 +4,7 @@ import org.jetbrains.compose.test.utils.*
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.zip.ZipFile
+import kotlin.io.path.relativeTo
 import kotlin.test.*
 
 class ResourcesTest : GradlePluginTestBase() {
@@ -11,9 +12,9 @@ class ResourcesTest : GradlePluginTestBase() {
     fun testGeneratedAccessors(): Unit = with(testProject("misc/commonResources")) {
         //check generated resource's accessors
         gradle("generateComposeResClass").checks {
-            assertEqualTextFiles(
-                file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt"),
-                file("expected/Res.kt")
+            assertDirectoriesContentEquals(
+                file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources"),
+                file("expected")
             )
         }
 
@@ -23,8 +24,8 @@ class ResourcesTest : GradlePluginTestBase() {
         )
         gradle("generateComposeResClass").checks {
             assertNotEqualTextFiles(
-                file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt"),
-                file("expected/Res.kt")
+                file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Drawable0.kt"),
+                file("expected/Drawable0.kt")
             )
         }
 
@@ -123,6 +124,12 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/drawable/vector_3.xml").renameTo(
             file("src/commonMain/composeResources/drawable/vector_2.xml")
         )
+        gradle("generateComposeResClass").checks {
+            assertDirectoriesContentEquals(
+                file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources"),
+                file("expected")
+            )
+        }
     }
 
     @Test
@@ -271,9 +278,9 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun testEmptyResClass(): Unit = with(testProject("misc/emptyResources")) {
         gradle("generateComposeResClass").checks {
-            assertEqualTextFiles(
-                file("build/generated/compose/resourceGenerator/kotlin/app/group/empty_res/generated/resources/Res.kt"),
-                file("expected/Res.kt")
+            assertDirectoriesContentEquals(
+                file("build/generated/compose/resourceGenerator/kotlin/app/group/empty_res/generated/resources"),
+                file("expected")
             )
         }
     }
@@ -281,96 +288,30 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun testJvmOnlyProject(): Unit = with(testProject("misc/jvmOnlyResources")) {
         gradle("generateComposeResClass").checks {
-            assertEqualTextFiles(
-                file("build/generated/compose/resourceGenerator/kotlin/me/app/jvmonlyresources/generated/resources/Res.kt"),
-                file("expected/Res.kt")
+            assertDirectoriesContentEquals(
+                file("build/generated/compose/resourceGenerator/kotlin/me/app/jvmonlyresources/generated/resources"),
+                file("expected")
             )
         }
         gradle("jar")
     }
 
     //https://github.com/JetBrains/compose-multiplatform/issues/4194
+    //https://github.com/JetBrains/compose-multiplatform/issues/4285
+    //
+    // 25_000 icons + 25_000 strings!!!
     @Test
-    fun testHugeNumberOfStrings(): Unit = with(
-        //disable cache for the test because the generateStringFiles task doesn't support it
-        testProject("misc/commonResources", defaultTestEnvironment.copy(useGradleConfigurationCache = false))
+    fun testHugeNumberOfResources(): Unit = with(
+        //disable cache for the test because the generateResourceFiles task doesn't support it
+        testProject("misc/hugeResources", defaultTestEnvironment.copy(useGradleConfigurationCache = false))
     ) {
-        file("build.gradle.kts").let { f ->
-            val originText = f.readText()
-            f.writeText(
-                buildString {
-                    appendLine("import java.util.Locale")
-                    append(originText)
-                    appendLine()
-                    append("""
-                        val template = ""${'"'}
-                            <resources>
-                                <string name="app_name">Compose Resources App</string>
-                                <string name="hello">😊 Hello world!</string>
-                                <string name="multi_line">Lorem ipsum dolor sit amet,
-                                    consectetur adipiscing elit.
-                                    Donec eget turpis ac sem ultricies consequat.</string>
-                                <string name="str_template">Hello, %1${'$'}{"$"}s! You have %2${'$'}{"$"}d new messages.</string>
-                                <string-array name="str_arr">
-                                    <item>item 1</item>
-                                    <item>item 2</item>
-                                    <item>item 3</item>
-                                </string-array>
-                                [ADDITIONAL_STRINGS]
-                            </resources>    
-                        ""${'"'}.trimIndent()
-
-                        val generateStringFiles = tasks.register("generateStringFiles") {
-                            val numberOfLanguages = 20
-                            val numberOfStrings = 500
-                            val langs = Locale.getAvailableLocales()
-                                .map { it.language }
-                                .filter { it.count() == 2 }
-                                .sorted()
-                                .distinct()
-                                .take(numberOfLanguages)
-                                .toList()
-
-                            val resourcesFolder = project.file("src/commonMain/composeResources")
-
-                            doLast {
-                                // THIS REMOVES THE `values` FOLDER IN `composeResources`
-                                // THIS REMOVES THE `values` FOLDER IN `composeResources`
-                                // Necessary when reducing the number of languages.
-                                resourcesFolder.listFiles()?.filter { it.name.startsWith("values") }?.forEach {
-                                    it.deleteRecursively()
-                                }
-
-                                langs.forEachIndexed { langIndex, lang ->
-                                    val additionalStrings =
-                                        (0 until numberOfStrings).joinToString(System.lineSeparator()) { index ->
-                                            ""${'"'}
-                                            <string name="string_${'$'}{index.toString().padStart(4, '0')}">String ${'$'}index in lang ${'$'}lang</string>
-                                            ""${'"'}.trimIndent()
-                                        }
-
-                                    val langFile = if (langIndex == 0) {
-                                        File(resourcesFolder, "values/strings.xml")
-                                    } else {
-                                        File(resourcesFolder, "values-${'$'}lang/strings.xml")
-                                    }
-                                    langFile.parentFile.mkdirs()
-                                    langFile.writeText(template.replace("[ADDITIONAL_STRINGS]", additionalStrings))
-                                }
-                            }
-                        }
-
-                        tasks.named("generateComposeResClass") {
-                            dependsOn(generateStringFiles)
-                        }
-                    """.trimIndent())
-                }
-            )
-        }
-        gradle("desktopJar").checks {
-            check.taskSuccessful(":generateStringFiles")
+        gradle("compileKotlinDesktop").checks {
+            check.taskSuccessful(":generateResourceFiles")
             check.taskSuccessful(":generateComposeResClass")
-            assertEquals(513, file("src/commonMain/composeResources/values/strings.xml").readLines().size)
+            assertDirectoriesContentEquals(
+                file("build/generated/compose/resourceGenerator/kotlin/app/group/huge/generated/resources"),
+                file("expected")
+            )
         }
     }
 
@@ -378,5 +319,26 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun testBundledKotlinPoet(): Unit = with(testProject("misc/bundledKotlinPoet")) {
         gradle("generateBuildConfig")
+    }
+
+    private fun assertDirectoriesContentEquals(actual: File, expected: File) {
+        require(expected.isDirectory)
+        require(actual.isDirectory)
+        assertEquals(expected.exists(), actual.exists())
+
+        val expectedPath = expected.toPath()
+        val actualPath = actual.toPath()
+        expected.walkTopDown().forEach { expectedFile ->
+            if (!expectedFile.isDirectory) {
+                val actualFile = actualPath.resolve(expectedFile.toPath().relativeTo(expectedPath)).toFile()
+                assertEqualTextFiles(actualFile, expectedFile)
+            }
+        }
+
+        val expectedFilesCount = expected.walkTopDown()
+            .map { it.toPath().relativeTo(expectedPath) }.sorted().joinToString("\n")
+        val actualFilesCount = actual.walkTopDown()
+            .map { it.toPath().relativeTo(actualPath) }.sorted().joinToString("\n")
+        assertEquals(expectedFilesCount, actualFilesCount)
     }
 }

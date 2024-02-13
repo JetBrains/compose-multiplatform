@@ -22,4 +22,10 @@ internal object Res {
      * @return The content of the file as a byte array.
      */
     public suspend fun readBytes(path: String): ByteArray = readResourceBytes(path)
+
+    public object drawable
+
+    public object string
+
+    public object font
 }
