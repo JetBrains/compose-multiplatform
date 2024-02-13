@@ -5,25 +5,25 @@
 ### Fixes
 - [Fix "DropdownMenu performs onDismissRequest twice"](https://github.com/JetBrains/compose-multiplatform-core/pull/1057)
 - [Use a large rectangle for the picture bounds in RenderNodeLayer.drawLayer to prevent clipping](https://github.com/JetBrains/compose-multiplatform-core/pull/1090)
-- [Fix sharing composition locals with new platform layers](https://github.com/JetBrains/compose-multiplatform-core/pull/1086)
-- [Commonize BasicTooltipBox](https://github.com/JetBrains/compose-multiplatform-core/pull/1092)
 - [Fix closing scene during scroll animation](https://github.com/JetBrains/compose-multiplatform-core/pull/1096)
 - [Fix "Using `painterResource(:DrawableResource)` outside desktop Window can produce `UnsatisfiedLinkError`"](https://github.com/JetBrains/skiko/pull/866)
-- [Fix crashes "Rect::makeLTRB expected l <= r"](https://github.com/JetBrains/skiko/pull/867)
+- [Fix "Rect::makeLTRB expected l <= r" crashes](https://github.com/JetBrains/skiko/pull/867)
+- _(prerelease fix)_ [Commonize BasicTooltipBox](https://github.com/JetBrains/compose-multiplatform-core/pull/1092)
+- _(prerelease fix)_ [Fix sharing composition locals with new platform layers](https://github.com/JetBrains/compose-multiplatform-core/pull/1086)
 
 ## iOS
 
 ### Fixes
 - [Fixed unexpected fling animation over scrolling content](https://github.com/JetBrains/compose-multiplatform-core/pull/1039)
-- [Fix content scrolling behaviour inside a Pager with perpendicular scroll direction](https://github.com/JetBrains/compose-multiplatform-core/pull/1097)
-- [Fix scene size after sending the app to background or changing orientation with open modal](https://github.com/JetBrains/compose-multiplatform-core/pull/1093)
+- _(prerelease fix)_ [Fix "Wrong scroll behaviour of LazyColumn inside HorizontalPager"](https://github.com/JetBrains/compose-multiplatform-core/pull/1097)
+- _(prerelease fix)_ [Fix scene size after sending the app to background or changing orientation with open modal](https://github.com/JetBrains/compose-multiplatform-core/pull/1093)
 
 ## Desktop
 
 ### Fixes
 - [Protect against `MouseInfo.getPointerInfo()` returning null in `WindowDraggableArea`](https://github.com/JetBrains/compose-multiplatform-core/pull/1049)
 - [Support Rtl in `SplitPane`](https://github.com/JetBrains/compose-multiplatform/pull/4265)
-- [Fix crash on Windows machines without OpenGL](https://github.com/JetBrains/skiko/pull/811)
+- [Fix a native crash on `makeGL`](https://github.com/JetBrains/skiko/pull/869)
 - _(prerelease fix)_ [Fix "Skiko RenderException" when creating `ComposePanel`](https://github.com/JetBrains/skiko/pull/858)
 
 ## Web
@@ -37,7 +37,7 @@
 ## Gradle Plugin
 
 ### Fixes
-- [Relocate a bundled `KotlinPoet` to the internal package](https://github.com/JetBrains/compose-multiplatform/pull/4239)
+- _(prerelease fix)_ [Relocate a bundled `KotlinPoet` to the internal package](https://github.com/JetBrains/compose-multiplatform/pull/4239)
 
 ## Resource library
 
