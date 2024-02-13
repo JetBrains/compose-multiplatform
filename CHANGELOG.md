@@ -1,4 +1,4 @@
-# 1.6.0-rc02 (February 2024)
+# 1.6.0-rc01 (February 2024)
 
 ## iOS/desktop/web
 
