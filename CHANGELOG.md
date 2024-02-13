@@ -1,3 +1,62 @@
+# 1.6.0-rc02 (February 2024)
+
+## iOS/desktop/web
+
+### Fixes
+- [Fix "DropdownMenu performs onDismissRequest twice"](https://github.com/JetBrains/compose-multiplatform-core/pull/1057)
+- [Use a large rectangle for the picture bounds in RenderNodeLayer.drawLayer to prevent clipping](https://github.com/JetBrains/compose-multiplatform-core/pull/1090)
+- [Fix sharing composition locals with new platform layers](https://github.com/JetBrains/compose-multiplatform-core/pull/1086)
+- [Commonize BasicTooltipBox](https://github.com/JetBrains/compose-multiplatform-core/pull/1092)
+- [Fix closing scene during scroll animation](https://github.com/JetBrains/compose-multiplatform-core/pull/1096)
+- [Fix "Using `painterResource(:DrawableResource)` outside desktop Window can produce `UnsatisfiedLinkError`"](https://github.com/JetBrains/skiko/pull/866)
+- [Fix crashes "Rect::makeLTRB expected l <= r"](https://github.com/JetBrains/skiko/pull/867)
+
+## iOS
+
+### Fixes
+- [Fixed unexpected fling animation over scrolling content](https://github.com/JetBrains/compose-multiplatform-core/pull/1039)
+- [Fix content scrolling behaviour inside a Pager with perpendicular scroll direction](https://github.com/JetBrains/compose-multiplatform-core/pull/1097)
+- [Fix scene size after sending the app to background or changing orientation with open modal](https://github.com/JetBrains/compose-multiplatform-core/pull/1093)
+
+## Desktop
+
+### Fixes
+- [Protect against `MouseInfo.getPointerInfo()` returning null in `WindowDraggableArea`](https://github.com/JetBrains/compose-multiplatform-core/pull/1049)
+- [Support Rtl in `SplitPane`](https://github.com/JetBrains/compose-multiplatform/pull/4265)
+- [Fix crash on Windows machines without OpenGL](https://github.com/JetBrains/skiko/pull/811)
+- _(prerelease fix)_ [Fix "Skiko RenderException" when creating `ComposePanel`](https://github.com/JetBrains/skiko/pull/858)
+
+## Web
+
+### Fixes
+- [Add a `SystemThemeObserver` implementation for wasmJs](https://github.com/JetBrains/compose-multiplatform-core/pull/998)
+- [Fix keyboard events with meta key on wasm/js targets](https://github.com/JetBrains/compose-multiplatform-core/pull/1088)
+- [Added WASM to `components.uiToolingPreview` library](https://github.com/JetBrains/compose-multiplatform/pull/4286)
+- [Fix "The cursor is invisible in compose web"](https://github.com/JetBrains/skiko/pull/846)
+
+## Gradle Plugin
+
+### Fixes
+- [Relocate a bundled `KotlinPoet` to the internal package](https://github.com/JetBrains/compose-multiplatform/pull/4239)
+
+## Resource library
+
+### Fixes
+- _(prerelease fix)_ [Add a type name to the resource initializers](https://github.com/JetBrains/compose-multiplatform/pull/4240)
+- _(prerelease fix)_ [Don't make resource IDs lowercased](https://github.com/JetBrains/compose-multiplatform/pull/4253)
+- _(prerelease fix)_ [Clean code-gen directory if there was deleted a dependency on the res library](https://github.com/JetBrains/compose-multiplatform/pull/4257)
+- _(prerelease fix)_ [Register all hierarchical compose resources in android compilation](https://github.com/JetBrains/compose-multiplatform/pull/4274)
+- _(prerelease fix)_ [Fix fonts duplication in android app](https://github.com/JetBrains/compose-multiplatform/pull/4284)
+
+## Dependencies
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+- [Compiler 1.5.8](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.8)
+- [Runtime 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.1)
+- [UI 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.1)
+- [Foundation 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.1)
+- [Material 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.1)
+- [Material3 1.2.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.0)
+
 # 1.6.0-beta02 (February 2024)
 
 ## Highlights
@@ -25,11 +84,11 @@
 - [Fix missing case for loading `SystemFont` on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1013)
 - [Fix selection container crash](https://github.com/JetBrains/compose-multiplatform-core/pull/1016)
 - [Fix `WindowInfo.containerSize` without `platformLayers` flag](https://github.com/JetBrains/compose-multiplatform-core/pull/1028)
-- _(prerelease bug)_ [Fix "textfield with visual transformation crashes after single tap"](https://github.com/JetBrains/compose-multiplatform-core/pull/1045)
-- _(prerelease bug)_ [Fix selection handles crossed](https://github.com/JetBrains/compose-multiplatform-core/pull/1017)
-- _(prerelease bug)_ [Fix CMPViewControllerMisuse error](https://github.com/JetBrains/compose-multiplatform-core/pull/1027)
-- _(prerelease bug)_ [Fix selection handles with platformLayers=true](https://github.com/JetBrains/compose-multiplatform-core/pull/1023)
-- _(prerelease bug)_ [Fix interaction handling for interop views](https://github.com/JetBrains/compose-multiplatform-core/pull/1032)
+- _(prerelease fix)_ [Fix "textfield with visual transformation crashes after single tap"](https://github.com/JetBrains/compose-multiplatform-core/pull/1045)
+- _(prerelease fix)_ [Fix selection handles crossed](https://github.com/JetBrains/compose-multiplatform-core/pull/1017)
+- _(prerelease fix)_ [Fix CMPViewControllerMisuse error](https://github.com/JetBrains/compose-multiplatform-core/pull/1027)
+- _(prerelease fix)_ [Fix selection handles with platformLayers=true](https://github.com/JetBrains/compose-multiplatform-core/pull/1023)
+- _(prerelease fix)_ [Fix interaction handling for interop views](https://github.com/JetBrains/compose-multiplatform-core/pull/1032)
 
 ## Desktop
 
@@ -51,13 +110,13 @@
 ## Resource library
 
 ### Fixes
-- _(prerelease bug)_ [Configure Android resources after AGP is applied and ignore hidden files in resources](https://github.com/JetBrains/compose-multiplatform/commit/3040ea85bbc81cb6d1e22d6928646509ee8b601f)
-- _(prerelease bug)_ [Generate Res class if there is no common composeResource dir](https://github.com/JetBrains/compose-multiplatform/pull/4176)
-- _(prerelease bug)_ [Support Res class generation in JVM only compose projects](https://github.com/JetBrains/compose-multiplatform/pull/4183)
-- _(prerelease bug)_ [Support Compose resources for iOS tests](https://github.com/JetBrains/compose-multiplatform/pull/4185)
-- _(prerelease bug)_ [Fix sub-module gradle properties for res class generation](https://github.com/JetBrains/compose-multiplatform/commit/ee26bf8beea595dce67fbe880aa86a8363d428ae)
-- _(prerelease bug)_ [Fix Native xml parser](https://github.com/JetBrains/compose-multiplatform/pull/4207)
-- _(prerelease bug)_ [Generate initializer functions in the Res file to avoid the `MethodTooLargeException`](https://github.com/JetBrains/compose-multiplatform/pull/4205)
+- _(prerelease fix)_ [Configure Android resources after AGP is applied and ignore hidden files in resources](https://github.com/JetBrains/compose-multiplatform/commit/3040ea85bbc81cb6d1e22d6928646509ee8b601f)
+- _(prerelease fix)_ [Generate Res class if there is no common composeResource dir](https://github.com/JetBrains/compose-multiplatform/pull/4176)
+- _(prerelease fix)_ [Support Res class generation in JVM only compose projects](https://github.com/JetBrains/compose-multiplatform/pull/4183)
+- _(prerelease fix)_ [Support Compose resources for iOS tests](https://github.com/JetBrains/compose-multiplatform/pull/4185)
+- _(prerelease fix)_ [Fix sub-module gradle properties for res class generation](https://github.com/JetBrains/compose-multiplatform/commit/ee26bf8beea595dce67fbe880aa86a8363d428ae)
+- _(prerelease fix)_ [Fix Native xml parser](https://github.com/JetBrains/compose-multiplatform/pull/4207)
+- _(prerelease fix)_ [Generate initializer functions in the Res file to avoid the `MethodTooLargeException`](https://github.com/JetBrains/compose-multiplatform/pull/4205)
 - _(prerelease bug)_ [Improve handling of special characters in string resources](https://github.com/JetBrains/compose-multiplatform/pull/4220)
 - _(prerelease bug)_ [Add a `ttf` font to the resources demo app](https://github.com/JetBrains/compose-multiplatform/commit/3c7260ea51157d423b3799bd339b682ffabdce06)
 
@@ -100,7 +159,7 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
   - [Introduce top level `composeResources` dir with `drawable`, `font`, `files`, `values/strings.xml` support](https://github.com/JetBrains/compose-multiplatform/pull/4127)
   - [Support for various screen densities, multiple languages and regions, and light and dark themes](https://github.com/JetBrains/compose-multiplatform/pull/4018)
 - [Experimental support is available for tests in common code](https://github.com/JetBrains/compose-multiplatform-core/pull/978)
-- [Compose for Web (Wasm) artifacts are available in Maven Central](https://github.com/JetBrains/compose-multiplatform-core/pull/914)
+- [Compose for Web (Wasm) artifacts are available in Maven Central](https://github.com/JetBrains/compose-multiplatform-core/pull/914). **Warning**: Kotlin 1.9.21 has [an issue](https://github.com/JetBrains/compose-multiplatform/issues/4230) with web target. Use Kotlin 1.9.22.
 - iOS. Native-like caret behaviour by long/single taps in textfields([1](https://github.com/JetBrains/compose-multiplatform-core/pull/913), [2](https://github.com/JetBrains/compose-multiplatform-core/pull/858))
 - [Support `LineHeightStyle.Trim`](https://github.com/JetBrains/compose-multiplatform-core/pull/897)
 - [Desktop. Proper clipping of `SwingPanel` interop](https://github.com/JetBrains/compose-multiplatform-core/pull/915) _(under an experimental flag, see the link)_
