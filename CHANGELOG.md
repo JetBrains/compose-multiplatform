@@ -1,5 +1,7 @@
 # 1.6.0-rc01 (February 2024)
 
+_Changes since 1.6.0-beta02_
+
 ## iOS/desktop/web
 
 ### Fixes
@@ -58,6 +60,8 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 - [Material3 1.2.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.0)
 
 # 1.6.0-beta02 (February 2024)
+
+_Changes since 1.6.0-beta01_
 
 ## Highlights
 - [Basic accessibility support](https://github.com/JetBrains/compose-multiplatform-core/pull/1025) <sub>_iOS_</sub>
