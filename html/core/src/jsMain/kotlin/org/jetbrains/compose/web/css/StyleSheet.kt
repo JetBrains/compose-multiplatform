@@ -20,6 +20,9 @@ class CSSRulesHolderState : CSSRulesHolder {
 /**
  * Represents a collection of the css style rules.
  * StyleSheet needs to be mounted.
+ *
+ * @param customPrefix Will be used as prefix with current style. Pass `null` to use default value (classname of realization)
+ *
  * @see [Style]
  *
  * Example:
@@ -38,12 +41,22 @@ class CSSRulesHolderState : CSSRulesHolder {
  * ```
  */
 open class StyleSheet(
+    customPrefix: String?,
     private val rulesHolder: CSSRulesHolder = CSSRulesHolderState(),
-    val usePrefix: Boolean = true,
 ) : StyleSheetBuilder, CSSRulesHolder by rulesHolder {
     private val boundClasses = mutableMapOf<String, CSSRuleDeclarationList>()
+    protected val prefix: String = customPrefix ?: "${this::class.simpleName}-"
 
-    protected fun style(cssRule: CSSBuilder.() -> Unit) = CSSHolder(usePrefix, cssRule)
+    val usePrefix: Boolean = customPrefix == null
+    constructor(
+        rulesHolder: CSSRulesHolder = CSSRulesHolderState(),
+        usePrefix: Boolean = true
+    ) : this(
+        if (usePrefix) null else "",
+        rulesHolder
+    )
+
+    protected fun style(cssRule: CSSBuilder.() -> Unit) = CSSHolder(prefix, cssRule)
 
     /**
      * Example:
@@ -69,7 +82,7 @@ open class StyleSheet(
      *  }
      * ```
      */
-    protected fun keyframes(cssKeyframes: CSSKeyframesBuilder.() -> Unit) = CSSKeyframesHolder(usePrefix, cssKeyframes)
+    protected fun keyframes(cssKeyframes: CSSKeyframesBuilder.() -> Unit) = CSSKeyframesHolder(prefix, cssKeyframes)
 
     companion object {
         private var counter = 0
@@ -88,13 +101,12 @@ open class StyleSheet(
         }
     }
 
-    protected class CSSHolder(private val usePrefix: Boolean, private val cssBuilder: CSSBuilder.() -> Unit) {
+    protected class CSSHolder(private val prefix: String, private val cssBuilder: CSSBuilder.() -> Unit) {
         operator fun provideDelegate(
             sheet: StyleSheet,
             property: KProperty<*>
         ): ReadOnlyProperty<Any?, String> {
-            val sheetName = if (usePrefix) "${sheet::class.simpleName}-" else ""
-            val className = "$sheetName${property.name}"
+            val className = "$prefix${property.name}"
             val selector = object : CSSSelector() {
                 override fun asString() = ".${className}"
             }
@@ -110,15 +122,14 @@ open class StyleSheet(
      * See [keyframes]
      */
     protected class CSSKeyframesHolder(
-        private val usePrefix: Boolean,
+        private val prefix: String,
         private val keyframesBuilder: CSSKeyframesBuilder.() -> Unit
     ) {
         operator fun provideDelegate(
             sheet: StyleSheet,
             property: KProperty<*>
         ): ReadOnlyProperty<Any?, CSSNamedKeyframes> {
-            val sheetName = if (usePrefix) "${sheet::class.simpleName}-" else ""
-            val keyframesName = "$sheetName${property.name}"
+            val keyframesName = "$prefix${property.name}"
             val rule = buildKeyframes(keyframesName, keyframesBuilder)
             sheet.add(rule)
 

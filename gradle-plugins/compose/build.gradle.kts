@@ -63,6 +63,7 @@ dependencies {
     compileOnly(libs.plugin.android)
     compileOnly(libs.plugin.android.api)
 
+    testImplementation(kotlin("test"))
     testImplementation(gradleTestKit())
     testImplementation(kotlin("gradle-plugin-api"))
 
@@ -72,7 +73,7 @@ dependencies {
     embedded(project(":jdk-version-probe"))
 }
 
-val packagesToRelocate = listOf("de.undercouch")
+val packagesToRelocate = listOf("de.undercouch", "com.squareup.kotlinpoet")
 
 val shadow = tasks.named<ShadowJar>("shadowJar") {
     for (packageToRelocate in packagesToRelocate) {

@@ -18,6 +18,6 @@ fun App() {
             contentDescription = null
         )
         Text(stringResource(Res.string.app_name))
-        val font = FontFamily(Font(Res.font.emptyfont))
+        val font = FontFamily(Font(Res.font.emptyFont))
     }
 }

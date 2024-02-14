@@ -11,11 +11,9 @@ kotlin {
                 optIn("kotlin.RequiresOptIn")
             }
         }
-        val jvmMain by getting {
-            dependencies {
-                implementation(compose.desktop.currentOs)
-                implementation(project(":AnimatedImage:library"))
-            }
+        jvmMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation(project(":AnimatedImage:library"))
         }
     }
 }

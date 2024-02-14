@@ -1,6 +1,6 @@
 plugins {
     kotlin("multiplatform")
-    id("com.android.library")
+    id("com.android.application")
     id("org.jetbrains.compose")
 }
 
@@ -21,7 +21,6 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.material)
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
             }
         }
@@ -29,10 +28,32 @@ kotlin {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 34
     namespace = "org.jetbrains.compose.resources.test"
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
+        applicationId = "org.example.project"
         minSdk = 21
+        targetSdk = 34
+        versionCode = 1
+        versionName = "1.0"
+    }
+    signingConfigs {
+        create("testkey") {
+            storeFile = project.file("key/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("testkey")
+        }
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("testkey")
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

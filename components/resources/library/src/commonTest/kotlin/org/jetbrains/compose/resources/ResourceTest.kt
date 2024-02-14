@@ -13,12 +13,12 @@ import kotlin.test.*
 @OptIn(ExperimentalResourceApi::class, InternalResourceApi::class)
 class ResourceTest {
     @Test
-    fun testResourceEquals() = runBlockingTest {
+    fun testResourceEquals() {
         assertEquals(DrawableResource("a"), DrawableResource("a"))
     }
 
     @Test
-    fun testResourceNotEquals() = runBlockingTest {
+    fun testResourceNotEquals() {
         assertNotEquals(DrawableResource("a"), DrawableResource("b"))
     }
 
@@ -98,6 +98,13 @@ class ResourceTest {
         }.message.let { msg ->
             assertEquals("Resource with ID='ImageResource:test3' has more than one file: en1, en2", msg)
         }
+    }
 
+    @Test
+    fun testEscapedSymbols() {
+        assertEquals(
+            "abc \n \\n \t \\t \u1234 \ua45f \\u1234 \\ \\u355g",
+            handleSpecialCharacters("""abc \n \\n \t \\t \u1234 \ua45f \\u1234 \\ \u355g""")
+        )
     }
 }

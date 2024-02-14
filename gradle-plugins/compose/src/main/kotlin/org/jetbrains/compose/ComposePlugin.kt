@@ -19,8 +19,8 @@ import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.internal.configureDesktop
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
-import org.jetbrains.compose.experimental.internal.configureExperimentalTargetsFlagsCheck
 import org.jetbrains.compose.experimental.internal.configureExperimental
+import org.jetbrains.compose.experimental.internal.configureExperimentalTargetsFlagsCheck
 import org.jetbrains.compose.experimental.internal.configureNativeCompilerCaching
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
@@ -31,11 +31,11 @@ import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.resources.configureComposeResources
 import org.jetbrains.compose.resources.ios.configureSyncTask
 import org.jetbrains.compose.web.WebExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
-import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
+import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
@@ -86,6 +86,23 @@ abstract class ComposePlugin : Plugin<Project> {
             }
 
             disableSignatureClashCheck(project)
+        }
+
+        // TODO: remove this (https://youtrack.jetbrains.com/issue/COMPOSE-939)
+        // we substitute the coroutines version for web targets in user projects,
+        // so they don't need to do that manually
+        project.configurations.all {
+            val isWeb = it.name.startsWith("wasmJs") || it.name.startsWith("js")
+            if (isWeb) {
+                it.resolutionStrategy.eachDependency {
+                    if (it.requested.group.startsWith("org.jetbrains.kotlinx") &&
+                        it.requested.name.startsWith("kotlinx-coroutines-")) {
+                        if (it.requested.version?.startsWith("1.7") == true) {
+                            it.useVersion("1.8.0-RC2")
+                        }
+                    }
+                }
+            }
         }
     }
 

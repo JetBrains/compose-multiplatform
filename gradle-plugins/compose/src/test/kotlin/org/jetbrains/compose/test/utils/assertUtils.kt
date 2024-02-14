@@ -57,6 +57,10 @@ internal class BuildResultChecks(private val result: BuildResult) {
         taskOutcome(task, TaskOutcome.FAILED)
     }
 
+    fun taskUpToDate(task: String) {
+        taskOutcome(task, TaskOutcome.UP_TO_DATE)
+    }
+
     fun taskFromCache(task: String) {
         taskOutcome(task, TaskOutcome.FROM_CACHE)
     }

@@ -35,6 +35,28 @@ object AnimationsStyleSheet : StyleSheet() {
     }
 }
 
+class AnimationsStyleSheetWithCustomPrefix(
+    customPrefix: String
+) : StyleSheet(customPrefix) {
+    val bounce by keyframes {
+        from {
+            property("transform", "translateX(50%)")
+        }
+
+        to {
+            property("transform", "translateX(-50%)")
+        }
+    }
+
+    val animationClass by style {
+        animation(bounce) {
+            duration(2.s)
+            timingFunction(AnimationTimingFunction.EaseIn)
+            direction(AnimationDirection.Alternate)
+        }
+    }
+}
+
 @ExperimentalComposeWebApi
 class AnimationTests {
     @Test
@@ -72,6 +94,33 @@ class AnimationTests {
 
         assertEquals(
             ".AnimationsStyleSheet-animationClass { animation: 2s ease-in 0s 1 alternate none running AnimationsStyleSheet-bounce; }".trimIndent(),
+            rules[1],
+            "Animation class wasn't injected correctly"
+        )
+    }
+
+    @Test
+    fun animationClassInjectedWithCustomPrefix() = runTest {
+        val customPrefix = "CustomPrefix-"
+        composition {
+            Style(AnimationsStyleSheetWithCustomPrefix(customPrefix))
+        }
+
+        val el = nextChild() as HTMLStyleElement
+        val cssRules = (el.sheet as? CSSStyleSheet)?.cssRules
+        val rules = (0 until (cssRules?.length ?: 0)).map {
+            cssRules?.item(it)?.cssText?.replace("\n", "") ?: ""
+        }
+
+        // TODO: we need to come up with test that not relying on any kind of formatting
+        assertEquals(
+            "@keyframes ${customPrefix}bounce {0% { transform: translateX(50%); }100% { transform: translateX(-50%); }}",
+            rules[0].replace("   0%", "0%").replace("  100%", "100%"),
+            "Animation keyframes wasn't injected correctly"
+        )
+
+        assertEquals(
+            ".${customPrefix}animationClass { animation: 2s ease-in 0s 1 alternate none running ${customPrefix}bounce; }".trimIndent(),
             rules[1],
             "Animation class wasn't injected correctly"
         )

@@ -1,3 +1,4 @@
+import androidx.compose.runtime.Composable
 import com.example.common.TextContainerNode
 import com.example.common.TextLeafNode
 import com.example.common.composeText
@@ -37,4 +38,54 @@ class CollectionOfComposablesTests {
             actual = root.dump()
         )
     }
+
+    /** Default args for overridden composable produces corrupted function definitions
+     *  https://github.com/JetBrains/compose-multiplatform/issues/3318
+     */
+    @Test
+    fun testDefaultArgsForOverridden() = runTest {
+        class Impl : DefaultComposableContent
+        
+        val root = composeText {
+            Impl().ComposableContent()
+        }
+
+        assertEquals(
+            expected = "root:{DefaultComposableContent - any}",
+            actual = root.dump()
+        )
+    }
+
+    /** Override a protected @Composable method leads to Compilation Failed on iOS target
+     * https://github.com/JetBrains/compose-multiplatform/issues/4055
+     */
+    @Test
+    fun testOverrideProtected() = runTest {
+        val root = composeText {
+            Greeter("Bob").Hi()
+        }
+
+        assertEquals(
+            expected = "root:{Hello, Bob!}",
+            actual = root.dump()
+        )
+    }
+
+    /** Default params for value type defined in separate module may result in compilation failure on iOS
+     * https://github.com/JetBrains/compose-multiplatform/issues/3643
+     */
+    @Test
+    fun testDefaultParamValueClass() = runTest {
+        @Composable
+        fun test(qualifiers: ValClass = ValClass(123)): String = "${qualifiers.key}"
+
+        val root = composeText { TextLeafNode(test()) }
+
+        assertEquals(
+            expected = "root:{123}",
+            actual = root.dump()
+        )
+    }
 }
+
+

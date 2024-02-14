@@ -20,7 +20,7 @@ private val SimpleStringFormatRegex = Regex("""%(\d)\$[ds]""")
 @ExperimentalResourceApi
 @Immutable
 class StringResource
-@InternalResourceApi constructor(id: String, val key: String, items: Set<ResourceItem>): Resource(id, items)
+@InternalResourceApi constructor(id: String, val key: String, items: Set<ResourceItem>) : Resource(id, items)
 
 private sealed interface StringItem {
     data class Value(val text: String) : StringItem
@@ -53,11 +53,13 @@ private suspend fun getParsedStrings(
 private suspend fun parseStringXml(path: String, resourceReader: ResourceReader): Map<String, StringItem> {
     val nodes = resourceReader.read(path).toXmlElement().childNodes
     val strings = nodes.getElementsWithName("string").associate { element ->
-        element.getAttribute("name") to StringItem.Value(element.textContent.orEmpty())
+        val rawString = element.textContent.orEmpty()
+        element.getAttribute("name") to StringItem.Value(handleSpecialCharacters(rawString))
     }
     val arrays = nodes.getElementsWithName("string-array").associate { arrayElement ->
         val items = arrayElement.childNodes.getElementsWithName("item").map { element ->
-            element.textContent.orEmpty()
+            val rawString = element.textContent.orEmpty()
+            handleSpecialCharacters(rawString)
         }
         arrayElement.getAttribute("name") to StringItem.Array(items)
     }
@@ -204,3 +206,33 @@ private fun NodeList.getElementsWithName(name: String): List<Element> =
     List(length) { item(it) }
         .filterIsInstance<Element>()
         .filter { it.localName == name }
+
+//https://developer.android.com/guide/topics/resources/string-resource#escaping_quotes
+/**
+ * Replaces
+ *
+ * '\n' -> new line
+ *
+ * '\t' -> tab
+ *
+ * '\uXXXX' -> unicode symbol
+ *
+ * '\\' -> '\'
+ *
+ * @param string The input string to handle.
+ * @return The string with special characters replaced according to the logic.
+ */
+internal fun handleSpecialCharacters(string: String): String {
+    val unicodeNewLineTabRegex = Regex("""\\u[a-fA-F\d]{4}|\\n|\\t""")
+    val doubleSlashRegex = Regex("""\\\\""")
+    val doubleSlashIndexes = doubleSlashRegex.findAll(string).map { it.range.first }
+    val handledString = unicodeNewLineTabRegex.replace(string) { matchResult ->
+        if (doubleSlashIndexes.contains(matchResult.range.first - 1)) matchResult.value
+        else when (matchResult.value) {
+            "\\n" -> "\n"
+            "\\t" -> "\t"
+            else -> matchResult.value.substring(2).toInt(16).toChar().toString()
+        }
+    }.replace("""\\""", """\""")
+    return handledString
+}
