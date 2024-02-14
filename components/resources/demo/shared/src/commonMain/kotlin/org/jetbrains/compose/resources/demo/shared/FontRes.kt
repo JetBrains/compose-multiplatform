@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import components.resources.demo.shared.generated.resources.Res
+import components.resources.demo.shared.generated.resources.*
 import org.jetbrains.compose.resources.Font
 
 @Composable
@@ -31,7 +32,7 @@ fun FontRes(paddingValues: PaddingValues) {
                 text = """
                     Text(
                         modifier = Modifier.padding(16.dp),
-                        fontFamily = FontFamily(Font(Res.font.workbench_regular)),
+                        fontFamily = FontFamily(Font(Res.font.Workbench_Regular)),
                         style = MaterialTheme.typography.headlineLarge,
                         text = "brown fox jumps over the lazy dog"
                     ) 
@@ -71,7 +72,7 @@ fun FontRes(paddingValues: PaddingValues) {
             modifier = Modifier.padding(16.dp),
             fontFamily = FontFamily(Font(Res.font.font_awesome)),
             style = MaterialTheme.typography.headlineLarge,
-            text ="\uf1ba \uf238 \uf21a \uf1bb \uf1b8 \uf09b \uf269 \uf1d0 \uf15a \uf293 \uf1c6"
+            text = "\uf1ba \uf238 \uf21a \uf1bb \uf1b8 \uf09b \uf269 \uf1d0 \uf15a \uf293 \uf1c6"
         )
     }
 }
