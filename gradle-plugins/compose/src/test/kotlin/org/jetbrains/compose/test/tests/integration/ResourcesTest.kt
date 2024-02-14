@@ -341,4 +341,22 @@ class ResourcesTest : GradlePluginTestBase() {
             .map { it.toPath().relativeTo(actualPath) }.sorted().joinToString("\n")
         assertEquals(expectedFilesCount, actualFilesCount)
     }
+
+    @Test
+    fun `test package name with hyphens is replaced by underscores`(): Unit = with(testProject("misc/commonResources")) {
+        modifyText("settings.gradle.kts") { str ->
+            str.replace(
+                "rootProject.name = \"resources_test\"",
+                "rootProject.name = \"resources-test\""
+            )
+        }
+        gradle("generateComposeResClass").checks {
+            check.taskSuccessful(":generateComposeResClass")
+            assertTrue(file("settings.gradle.kts").readText().contains("rootProject.name = \"resources-test\""))
+            assertEqualTextFiles(
+                file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt"),
+                file("expected/Res.kt")
+            )
+        }
+    }
 }
