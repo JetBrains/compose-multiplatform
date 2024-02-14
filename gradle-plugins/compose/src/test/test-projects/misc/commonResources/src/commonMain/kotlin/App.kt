@@ -6,6 +6,9 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import app.group.resources_test.generated.resources.Res
+import app.group.resources_test.generated.resources.app_name
+import app.group.resources_test.generated.resources.emptyFont
+import app.group.resources_test.generated.resources.vector
 import org.jetbrains.compose.resources.*
 
 @OptIn(ExperimentalResourceApi::class)
