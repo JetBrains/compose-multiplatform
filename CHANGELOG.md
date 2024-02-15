@@ -11,7 +11,7 @@ To find this library, call `./gradlew shared:dependencies` (replace `shared` by 
 ### Could not find androidx.annotation:annotation:...
 _(or org.jetbrains.compose.collection-internal:collection)_
 
-It happens, because `1.6.0` depends on [collection](https://developer.android.com/jetpack/androidx/releases/collection) and [annnotation](https://developer.android.com/jetpack/androidx/releases/annotation) libraries that are available only in the Google Maven repository.
+It happens because `1.6.0` depends on [collection](https://developer.android.com/jetpack/androidx/releases/collection) and [annnotation](https://developer.android.com/jetpack/androidx/releases/annotation) libraries that are available only in the Google Maven repository.
 
 To solve this, add `google()` maven repository  to `build.gradle.kts`:
 ```
