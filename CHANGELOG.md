@@ -13,6 +13,11 @@ import <modulePackage>.generated.resources.Res
 import <modulePackage>.generated.resources.*
 ```
 
+## iOS/desktop/web
+
+### Fixes
+- _(prerelease fix)_ [Fix `AlertDialog no work with ProvidableCompositionLocal`](https://github.com/JetBrains/compose-multiplatform-core/pull/1104)
+
 ## Resource library
 
 ### Fixes
