@@ -1,4 +1,5 @@
 # 1.6.0-rc01 (February 2024)
+_Changes since 1.6.0-beta02_
 
 ## Known issues and solutions
 ### Could not find "org.jetbrains.compose.annotation-internal:annotation"
@@ -19,8 +20,6 @@ repositories {
     google()
 }
 ```
-_Changes since 1.6.0-beta02_
-
 ## iOS/desktop/web
 
 ### Fixes
