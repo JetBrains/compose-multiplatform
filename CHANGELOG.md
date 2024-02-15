@@ -1,3 +1,26 @@
+# 1.6.0 (February 2024)
+
+_Changes since 1.5.12_
+
+TODO combine prerelease notes without `prerelease fix`
+
+## Dependencies
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+- [Compiler 1.5.8](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.8)
+- [Runtime 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.1)
+- [UI 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.1)
+- [Foundation 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.1)
+- [Material 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.1)
+- [Material3 1.2.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.0)
+
+See [the anounce](https://android-developers.googleblog.com/2024/01/whats-new-in-jetpack-compose-january-24-release.html) of Jetpack Compose 1.6.
+
+Some of the feature are not ported (they will be ported in the next versions):
+- [BasicTextField2](https://github.com/JetBrains/compose-multiplatform/issues/4218)
+- [Support for nonlinear font scaling](https://github.com/JetBrains/compose-multiplatform/issues/4305)
+- [Multipaltform Drag and drop](https://github.com/JetBrains/compose-multiplatform/issues/4235). It works only for Android right now. For desktop there is the old API `Modifier.onExternalDrag`
+- [MultiParagraph.fillBoundingBoxes](https://github.com/JetBrains/compose-multiplatform/issues/4236)
+
 # 1.6.0-rc01 (February 2024)
 _Changes since 1.6.0-beta02_
 
