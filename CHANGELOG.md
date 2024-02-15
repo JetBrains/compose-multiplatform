@@ -2,10 +2,12 @@
 
 ## Known issues and solutions
 - [Could not find "org.jetbrains.compose.annotation-internal:annotation"](https://github.com/JetBrains/compose-multiplatform/issues/4277)
+
 It happens because some library depends on `1.6.0-beta02` which isn't binary compatible with `1.6.0-rc01`.
 To find this library, call `./gradlew shared:dependencies` (replace `shared` by your main module). Downgrade this library or ask the library author to upgrade it to `1.6.0-rc01`
 
 - `Could not find androidx.collection:collection:...` (or `Could not find androidx.annotation:annotation:...`)
+
 It happens, because `1.6.0` depends on [collection](https://developer.android.com/jetpack/androidx/releases/collection) and [annnotation](https://developer.android.com/jetpack/androidx/releases/annotation) libraries that are available only in the Google Maven repository.
 
 To solve this, add `google()` maven repository  to `build.gradle.kts`:
