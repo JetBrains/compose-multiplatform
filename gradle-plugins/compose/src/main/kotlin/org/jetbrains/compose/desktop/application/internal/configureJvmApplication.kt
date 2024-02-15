@@ -7,7 +7,6 @@ package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.Sync
@@ -16,6 +15,7 @@ import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.validation.validatePackageVersions
 import org.jetbrains.compose.desktop.application.tasks.*
+import org.jetbrains.compose.desktop.tasks.AbstractJarsFlattenTask
 import org.jetbrains.compose.desktop.tasks.AbstractUnpackDefaultComposeApplicationResourcesTask
 import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.compose.internal.utils.OS
@@ -26,7 +26,6 @@ import org.jetbrains.compose.internal.utils.ioFile
 import org.jetbrains.compose.internal.utils.ioFileOrNull
 import org.jetbrains.compose.internal.utils.javaExecutable
 import org.jetbrains.compose.internal.utils.provider
-import java.io.File
 
 private val defaultJvmArgs = listOf("-D$CONFIGURE_SWING_GLOBALS=true")
 internal const val composeDesktopTaskGroup = "compose desktop"
@@ -220,11 +219,18 @@ private fun JvmApplicationContext.configurePackagingTasks(
         }
     }
 
+    val flattenJars = tasks.register<AbstractJarsFlattenTask>(
+        taskNameAction = "flatten",
+        taskNameObject = "Jars"
+    ) {
+        configureFlattenJars(this, runProguard)
+    }
+
     val packageUberJarForCurrentOS = tasks.register<Jar>(
         taskNameAction = "package",
         taskNameObject = "uberJarForCurrentOS"
     ) {
-        configurePackageUberJarForCurrentOS(this, runProguard)
+        configurePackageUberJarForCurrentOS(this, flattenJars)
     }
 
     val runDistributable = tasks.register<AbstractRunDistributableTask>(
@@ -446,23 +452,28 @@ private fun JvmApplicationContext.configureRunTask(
     }
 }
 
-private fun JvmApplicationContext.configurePackageUberJarForCurrentOS(
-    jar: Jar,
+private fun JvmApplicationContext.configureFlattenJars(
+    flattenJars: AbstractJarsFlattenTask,
     runProguard: Provider<AbstractProguardTask>?
 ) {
-    fun flattenJars(files: FileCollection): FileCollection =
-        jar.project.files({
-            files.map { if (it.isZipOrJar()) jar.project.zipTree(it) else it }
-        })
-
     if (runProguard != null) {
-        jar.dependsOn(runProguard)
-        jar.from(flattenJars(project.fileTree(runProguard.flatMap { it.destinationDir })))
+        flattenJars.dependsOn(runProguard)
+        flattenJars.inputFiles.from(project.fileTree(runProguard.flatMap { it.destinationDir }))
     } else {
-        jar.useAppRuntimeFiles { (runtimeJars, _) ->
-            from(flattenJars(runtimeJars))
+        flattenJars.useAppRuntimeFiles { (runtimeJars, _) ->
+            inputFiles.from(runtimeJars)
         }
     }
+
+    flattenJars.destinationDir.set(appTmpDir.dir("flattenJars"))
+}
+
+private fun JvmApplicationContext.configurePackageUberJarForCurrentOS(
+    jar: Jar,
+    flattenJars: Provider<AbstractJarsFlattenTask>
+) {
+    jar.dependsOn(flattenJars)
+    jar.from(flattenJars.flatMap { it.destinationDir })
 
     app.mainClass?.let { jar.manifest.attributes["Main-Class"] = it }
     jar.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -476,7 +487,3 @@ private fun JvmApplicationContext.configurePackageUberJarForCurrentOS(
         jar.logger.lifecycle("The jar is written to ${jar.archiveFile.ioFile.canonicalPath}")
     }
 }
-
-private fun File.isZipOrJar() =
-    name.endsWith(".jar", ignoreCase = true)
-        || name.endsWith(".zip", ignoreCase = true)
