@@ -1,3 +1,32 @@
+# 1.6.0-rc02 (February 2024)
+_Changes since 1.6.0-rc01_
+
+## Breaking changes
+_since 1.6.0-beta01_
+- When the resource library is used, resources should be imported explicitly. Replace this:
+```
+import <modulePackage>.generated.resources.Res
+```
+by this:
+```
+import <modulePackage>.generated.resources.Res
+import <modulePackage>.generated.resources.*
+```
+
+## Resource library
+
+### Fixes
+- _(prerelease fix)_ [Fix resource accessors compilation when there are huge number of resource files]([https://github.com/JetBrains/compose-multiplatform/pull/4240](https://github.com/JetBrains/compose-multiplatform/pull/4294))
+
+## Dependencies
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+- [Compiler 1.5.8](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.8)
+- [Runtime 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.1)
+- [UI 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.1)
+- [Foundation 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.1)
+- [Material 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.1)
+- [Material3 1.2.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.0)
+
 # 1.6.0-rc01 (February 2024)
 _Changes since 1.6.0-beta02_
 
