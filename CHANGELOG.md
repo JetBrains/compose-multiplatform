@@ -13,9 +13,16 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 - [Material 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.1)
 - [Material3 1.2.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.0)
 
-See [the announce](https://android-developers.googleblog.com/2024/01/whats-new-in-jetpack-compose-january-24-release.html) of Jetpack Compose 1.6.
+See [the announce](https://android-developers.googleblog.com/2024/01/whats-new-in-jetpack-compose-january-24-release.html) of Jetpack Compose 1.6:
 
-Some of the feature are not ported (they will be ported in the next versions):
+Notable features:
+- improved performance
+
+Notes:
+- `Changes to default font padding` affects only Android target.
+- `Added support for selection by mouse, including text.` concerns only Android. Other targets supported it before 1.6.
+
+Some of the features are not ported yet (they will be ported in the next versions):
 - [BasicTextField2](https://github.com/JetBrains/compose-multiplatform/issues/4218)
 - [Support for nonlinear font scaling](https://github.com/JetBrains/compose-multiplatform/issues/4305)
 - [Multipaltform Drag and drop](https://github.com/JetBrains/compose-multiplatform/issues/4235). It works only for Android right now. For desktop there is the old API `Modifier.onExternalDrag`
