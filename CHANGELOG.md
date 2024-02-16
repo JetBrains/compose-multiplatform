@@ -16,7 +16,7 @@ import <modulePackage>.generated.resources.*
 ## iOS/desktop/web
 
 ### Fixes
-- _(prerelease fix)_ [Fix `AlertDialog doesn't work with ProvidableCompositionLocal`](https://github.com/JetBrains/compose-multiplatform-core/pull/1104)
+- _(prerelease fix)_ [Fix "AlertDialog doesn't work with ProvidableCompositionLocal"](https://github.com/JetBrains/compose-multiplatform-core/pull/1104)
 
 ## Resource library
 
