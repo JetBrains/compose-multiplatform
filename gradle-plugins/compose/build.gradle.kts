@@ -160,7 +160,13 @@ for (gradleVersion in supportedGradleVersions) {
             filter { includeTestsMatching(gradleTestsPattern) }
             dependsOn(downloadJdksForTests)
 
-            //e.g. AGP 7 doesn't support Gradle 8+
+            /*
+             * Fixes this kind of error:
+             * What went wrong:
+             * An exception occurred applying plugin request [id: 'com.android.application', version: '8.2.2']
+             * > Failed to apply plugin 'com.android.internal.version-check'.
+             * > Minimum supported Gradle version is 8.2. Current version is 7.4.
+             */
             val agpMajor = agpVersion.split('.').first().toInt()
             val gradleMajor = gradleVersion.split('.').first().toInt()
             onlyIf { agpMajor <= gradleMajor }
