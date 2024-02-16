@@ -21,7 +21,7 @@ import <modulePackage>.generated.resources.*
 ## Resource library
 
 ### Fixes
-- _(prerelease fix)_ [Fix resource accessors compilation when there are huge number of resource files]([https://github.com/JetBrains/compose-multiplatform/pull/4240](https://github.com/JetBrains/compose-multiplatform/pull/4294))
+- _(prerelease fix)_ [Fix resource accessors compilation when there are huge number of resource files](https://github.com/JetBrains/compose-multiplatform/pull/4294)
 
 ## Dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
