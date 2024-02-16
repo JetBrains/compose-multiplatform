@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmAndroidCompilation
 import org.jetbrains.kotlin.gradle.plugin.sources.android.androidSourceSetInfoOrNull
 import org.jetbrains.kotlin.gradle.utils.ObservableSet
 import java.io.File
@@ -75,22 +76,25 @@ private fun Project.configureAndroidComposeResources(
     val commonResourcesDir = projectDir.resolve("src/${KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME}/$COMPOSE_RESOURCES_DIR")
 
     //Copy common compose resources except fonts to android resources
-    val copyCommonAndroidComposeResources = registerTask<CopyCommonAndroidComposeResources>(
+    val commonAndroidComposeResourcesDir = layout.buildDirectory.dir("$RES_GEN_DIR/commonAndroidComposeResources")
+    val copyCommonAndroidComposeResources = registerTask<Copy>(
         "copyCommonAndroidComposeResources"
     ) {
-        from.set(commonResourcesDir)
-        outputDirectory.set(layout.buildDirectory.dir("$RES_GEN_DIR/commonAndroidComposeResources"))
+        includeEmptyDirs = false
+        from(commonResourcesDir)
+        exclude("**/font*/*")
+        into(commonAndroidComposeResourcesDir)
     }
-    tasks.configureEachWithType<ProcessJavaResTask> { dependsOn(copyCommonAndroidComposeResources) }
 
     //mark all composeResources as Android resources
     kotlinExtension.targets.withType(KotlinAndroidTarget::class.java).all { androidTarget ->
-        androidTarget.compilations.all { compilation: KotlinCompilation<*> ->
+        androidTarget.compilations.all { compilation: KotlinJvmAndroidCompilation ->
             compilation.defaultSourceSet.androidSourceSetInfoOrNull?.let { kotlinAndroidSourceSet ->
                 androidExtension.sourceSets
                     .matching { it.name == kotlinAndroidSourceSet.androidSourceSetName }
                     .all { androidSourceSet ->
-                        androidSourceSet.resources.srcDir(copyCommonAndroidComposeResources.flatMap { it.outputDirectory.asFile })
+                        compilation.androidVariant.processJavaResourcesProvider.dependsOn(copyCommonAndroidComposeResources)
+                        androidSourceSet.resources.srcDir(commonAndroidComposeResourcesDir)
                         (compilation.allKotlinSourceSets as? ObservableSet<KotlinSourceSet>)?.forAll { kotlinSourceSet ->
                             if (kotlinSourceSet.name != KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME) {
                                 androidSourceSet.resources.srcDir(
@@ -162,27 +166,6 @@ private fun Project.configureResourceGenerator(commonComposeResourcesDir: File, 
     tasks.configureEach {
         if (it.name == "prepareKotlinIdeaImport") {
             it.dependsOn(genTask)
-        }
-    }
-}
-
-internal abstract class CopyCommonAndroidComposeResources : DefaultTask() {
-    @get:Inject
-    abstract val fileSystem: FileSystemOperations
-
-    @get:InputFiles
-    abstract val from: Property<File>
-
-    @get:OutputDirectory
-    abstract val outputDirectory: DirectoryProperty
-
-    @TaskAction
-    fun action() {
-        fileSystem.copy {
-            it.includeEmptyDirs = false
-            it.from(from)
-            it.exclude("**/font*/*")
-            it.into(outputDirectory)
         }
     }
 }
