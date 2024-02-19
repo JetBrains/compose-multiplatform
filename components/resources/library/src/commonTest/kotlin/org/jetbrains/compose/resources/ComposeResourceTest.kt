@@ -111,6 +111,29 @@ class ComposeResourceTest {
         assertEquals(listOf("item 1", "item 2", "item 3"), str_arr)
     }
 
+    // https://github.com/JetBrains/compose-multiplatform/issues/4325
+    @Test
+    fun testReadStringFromDifferentArgs() = runComposeUiTest {
+        var arg by mutableStateOf(42)
+        var str1 = ""
+        var str2 = ""
+        setContent {
+            CompositionLocalProvider(LocalComposeEnvironment provides TestComposeEnvironment) {
+                str1 = stringResource(TestStringResource("str_template"), "test1", arg)
+                str2 = stringResource(TestStringResource("str_template"), "test2", arg)
+            }
+        }
+
+        waitForIdle()
+        assertEquals("Hello, test1! You have 42 new messages.", str1)
+        assertEquals("Hello, test2! You have 42 new messages.", str2)
+
+        arg = 31415
+        waitForIdle()
+        assertEquals("Hello, test1! You have 31415 new messages.", str1)
+        assertEquals("Hello, test2! You have 31415 new messages.", str2)
+    }
+
     @Test
     fun testLoadStringResource() = runTest {
         assertEquals("Compose Resources App", getString(TestStringResource("app_name")))
