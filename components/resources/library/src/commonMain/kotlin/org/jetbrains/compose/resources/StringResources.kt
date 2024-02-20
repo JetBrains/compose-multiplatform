@@ -123,7 +123,7 @@ private suspend fun loadString(
 fun stringResource(resource: StringResource, vararg formatArgs: Any): String {
     val resourceReader = LocalResourceReader.current
     val args = formatArgs.map { it.toString() }
-    val str by rememberResourceState(resource, { "" }) { env ->
+    val str by rememberResourceState(resource, args, { "" }) { env ->
         loadString(resource, args, resourceReader, env)
     }
     return str
