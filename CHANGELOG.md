@@ -3,15 +3,17 @@ _Changes since 1.6.0-rc01_
 
 ## Breaking changes
 _since 1.6.0-beta01_
-- When the resource library is used, resources should be imported explicitly. Replace this:
-```
-import <modulePackage>.generated.resources.Res
-```
-by this:
-```
-import <modulePackage>.generated.resources.Res
-import <modulePackage>.generated.resources.*
-```
+- When the resource library is used, resources should be imported explicitly.
+
+> To quickly change your code to a new state, replace this:
+> ```
+> import <modulePackage>.generated.resources.Res
+> ```
+> by this:
+> ```
+> import <modulePackage>.generated.resources.*
+> ```
+> and perform "Code - Optimize Imports" to apply the project code style. If code style doesn't allow wildcrads, `import <modulePackage>.generated.resources.*` will be replaced by explicit imports.
 
 ## iOS/desktop/web
 
