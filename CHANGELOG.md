@@ -3,7 +3,7 @@ _Changes since 1.6.0-rc01_
 
 ## Breaking changes
 _since 1.6.0-beta01_
-- When the resource library is used, resources should be imported explicitly.
+- When the resource library is used, resources should be imported explicitly
 
 > To quickly change your code to a new state, replace this:
 > ```
