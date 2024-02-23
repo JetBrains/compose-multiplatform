@@ -2,7 +2,7 @@
 _Changes since 1.6.0-rc02_
 
 - **[Support Kotlin 2.0.0-Beta4](https://github.com/JetBrains/compose-multiplatform/pull/4332)**
-- _(prerelease fix)_ [Resources. Fix import of Android flavors](https://github.com/JetBrains/compose-multiplatform/pull/4319) <sub>Android</sub>
+- _(prerelease fix)_ [Resources. Don't return a cached value when pass new args](https://github.com/JetBrains/compose-multiplatform/pull/4333) <sub>Common</sub>
 - _(prerelease fix)_ [Fix crash "ComposeUIViewController.view should be attached to window](https://github.com/JetBrains/compose-multiplatform-core/pull/1110) <sub>iOS</sub>
 - _(prerelease fix)_ [Fix App crashes when Compose SwfitUI View container removed from hierarchy](https://github.com/JetBrains/compose-multiplatform-core/pull/1114) <sub>iOS</sub>
 - _(prerelease fix)_ [Fix Keyboard disappears on IME action](https://github.com/JetBrains/compose-multiplatform-core/pull/1118) <sub>iOS</sub>
@@ -11,7 +11,7 @@ _Changes since 1.6.0-rc02_
 - _(prerelease fix)_ [Fix Password popup disappears only on the second focused TextField](https://github.com/JetBrains/compose-multiplatform-core/pull/1128) <sub>iOS</sub>
 - _(prerelease fix)_ [Fix mouse input above SwingPanel](https://github.com/JetBrains/compose-multiplatform-core/pull/1119) <sub>Desktop</sub>
 - _(prerelease fix)_ [Fix non working accessibility on Desktop](https://github.com/JetBrains/compose-multiplatform-core/pull/1129) <sub>Desktop</sub>
-- _(prerelease fix)_ [Resources. Don't return a cached value when pass new args](https://github.com/JetBrains/compose-multiplatform/pull/4333) <sub>Common</sub>
+- _(prerelease fix)_ [Resources. Fix import of Android flavors](https://github.com/JetBrains/compose-multiplatform/pull/4319) <sub>Android</sub>
 
 ## Dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
