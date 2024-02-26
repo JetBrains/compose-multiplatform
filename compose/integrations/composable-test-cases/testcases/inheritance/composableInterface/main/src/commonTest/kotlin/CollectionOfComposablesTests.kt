@@ -86,6 +86,44 @@ class CollectionOfComposablesTests {
             actual = root.dump()
         )
     }
+
+    /** Composable lambdas nested more than single level deep in generic types provoke compilation failure for K/Native
+     * https://github.com/JetBrains/compose-multiplatform/issues/3466
+     */
+    @Test
+    fun testNestedComposableTypes() = runTest {
+        data class Container<T>(val value: T)
+        class DoubleNested(
+            val f: List<Container<@Composable () -> Unit>>,
+        )
+
+        class SingleNested(
+            val f: List<@Composable () -> Unit>,
+        )
+
+        val composables: List<@Composable () -> Unit> = listOf(@Composable { TextLeafNode("a") }, @Composable { TextLeafNode("b") })
+        val single = SingleNested(composables)
+
+        val singleRoot = composeText {
+            for (c in single.f) {
+                c()
+            }
+        }
+
+        val double = DoubleNested(composables.map { Container(it) })
+
+        val doubleRoot = composeText {
+            for (c in double.f.map { it.value }) {
+                c()
+            }
+        }
+
+        assertEquals(
+            expected = "root:{a, b}",
+            actual = singleRoot.dump()
+        )
+        assertEquals(singleRoot.dump(), doubleRoot.dump())
+    }
 }
 
 
