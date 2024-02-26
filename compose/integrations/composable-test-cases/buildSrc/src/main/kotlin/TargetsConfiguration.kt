@@ -27,7 +27,7 @@ fun KotlinMultiplatformExtension.configureTargets() {
     jvm("desktop")
     configureJsTargets()
     wasmJs {
-        browser()
+        d8 {}
     }
     ios()
     iosArm64()
