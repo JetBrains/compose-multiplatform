@@ -30,6 +30,7 @@ compose.desktop {
             packageName = "TestPackage"
             macOS {
                 dockName = "CustomDockName"
+                minimumSystemVersion = "12.0"
                 infoPlist {
                     extraKeysRawXml = extraInfoPlistKeys
                 }
