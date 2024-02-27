@@ -78,14 +78,6 @@ repositories {
 - [Deprecate `public ComposeScene` in favour of `@InternalComposeUiApi MultiLayerComposeScene`](https://github.com/JetBrains/compose-multiplatform-core/pull/908)
 - [Hide deprecated DropdownMenu overloads](https://github.com/JetBrains/compose-multiplatform-core/pull/1003)
 
-## Resource library
-
-### Fixes
-
-## iOS/desktop/web
-
-### Fixes
-
 ## iOS
 
 ### Features
