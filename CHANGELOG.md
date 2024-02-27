@@ -158,10 +158,6 @@ repositories {
 ### Fixes
 - [Fix failing when `org.jetbrains.compose` is applied from a script plugin](https://github.com/JetBrains/compose-multiplatform/pull/3951)
 
-## Resource library
-
-### Fixes
-
 ## Dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
 - [Compiler 1.5.8](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.8)
