@@ -77,7 +77,7 @@ fun ChatApp(displayTextField: Boolean = true) {
                         SendMessage { text ->
                             store.send(
                                 Action.SendMessage(
-                                    Message(myUser, timeMs = timestampMs(), text)
+                                    Message(myUser, text)
                                 )
                             )
                         }
@@ -100,7 +100,6 @@ fun ChatApp(displayTextField: Boolean = true) {
                 Action.SendMessage(
                     message = Message(
                         user = thisFriend,
-                        timeMs = timestampMs(),
                         text = thisMessage
                     )
                 )
