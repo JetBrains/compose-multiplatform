@@ -30,6 +30,9 @@ _Changes since 1.5.12_
 - [Popups/Dialogs can now be displayed outside the main window or panel and over native components](https://github.com/JetBrains/compose-multiplatform-core/pull/992) <sub>_(under an experimental flag, see the link)_</sub>
 
 #### Breaking changes
+- Resource library (`compose.components.resources`) changes
+  - resources from `*Main\resources` should be moved to `*Main\composeResources\drawable`, `commonMain\composeResources\font` or `*Main\composeResources\files` depending on the resource type
+  - `painterResource("resource.xml")` should be replaced by `painterResource(Res.drawable.resource)`
 - `google()` maven repository is now required. Add this to `build.gradle.kts`:
   ```
   repositories {
