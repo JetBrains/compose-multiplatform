@@ -131,6 +131,7 @@ _Changes since 1.5.12_
 - [Added WASM to `components.uiToolingPreview` library](https://github.com/JetBrains/compose-multiplatform/pull/4286)
 - [Fix "The cursor is invisible in compose web"](https://github.com/JetBrains/skiko/pull/846)
 - [Use an alternative implementation of `Image.toBitmap`](https://github.com/JetBrains/compose-multiplatform-core/pull/917)
+- Specifying `plugin:androidx.compose.compiler.plugins.kotlin:generateDecoys=true` is no longer needed for JS target
 
 #### Gradle Plugin
 - [Fix failing when `org.jetbrains.compose` is applied from a script plugin](https://github.com/JetBrains/compose-multiplatform/pull/3951)
