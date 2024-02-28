@@ -53,6 +53,9 @@ _Changes since 1.5.12_
 #### Desktop
 - [Remove deprecated APIs in `TooltipArea` and `PointerEvent`](https://github.com/JetBrains/compose-multiplatform-core/pull/1029)
 
+#### Web (k/js)
+- Libraries which depend on earlier Compose Multiplatform version are not compatible with 1.6.0 anymore. This is because decoys generation was disabled. Projects which apply Compose Compiler plugin manually need to remove this argument: `plugin:androidx.compose.compiler.plugins.kotlin:generateDecoys=true`.
+
 ## Features
 
 #### Common
