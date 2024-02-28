@@ -3,6 +3,9 @@
 _Changes since 1.5.12_
 
 ## Highlights
+
+An overview of highlights for this release is also available in the Compose Multiplatform documentation: [What's new in 1.6.0](https://www.jetbrains.com/help/kotlin-multiplatform-dev/whats-new-compose-1-6-0.html).
+
 #### Common
 - Resource library improvements ([an example project](https://github.com/JetBrains/compose-multiplatform/tree/8ee7531c424421657842a24a5c365db53ba19e18/components/resources/demo))
   - [Compile-time checking of resources through a generated `Res` class](https://github.com/JetBrains/compose-multiplatform/pull/3961)
