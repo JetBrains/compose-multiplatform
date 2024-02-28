@@ -30,8 +30,6 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-                implementation(compose.components.resources)
             }
         }
         val androidMain by getting {
@@ -66,7 +64,6 @@ android {
     namespace = "example.todoapp.lite.common"
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
         minSdk = 26
