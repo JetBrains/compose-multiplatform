@@ -1,3 +1,5 @@
+# 1.6.0 (February 2024)
+
 _Changes since 1.5.12_
 
 ## Highlights
