@@ -26,6 +26,9 @@ val Project.isMingwX64Enabled: Boolean
 fun KotlinMultiplatformExtension.configureTargets() {
     jvm("desktop")
     configureJsTargets()
+    wasmJs {
+        d8 {}
+    }
     ios()
     iosArm64()
     iosSimulatorArm64()

@@ -87,23 +87,6 @@ abstract class ComposePlugin : Plugin<Project> {
 
             disableSignatureClashCheck(project)
         }
-
-        // TODO: remove this (https://youtrack.jetbrains.com/issue/COMPOSE-939)
-        // we substitute the coroutines version for web targets in user projects,
-        // so they don't need to do that manually
-        project.configurations.all {
-            val isWeb = it.name.startsWith("wasmJs") || it.name.startsWith("js")
-            if (isWeb) {
-                it.resolutionStrategy.eachDependency {
-                    if (it.requested.group.startsWith("org.jetbrains.kotlinx") &&
-                        it.requested.name.startsWith("kotlinx-coroutines-")) {
-                        if (it.requested.version?.startsWith("1.7") == true) {
-                            it.useVersion("1.8.0-RC2")
-                        }
-                    }
-                }
-            }
-        }
     }
 
     private fun disableSignatureClashCheck(project: Project) {

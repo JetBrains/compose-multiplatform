@@ -26,6 +26,7 @@ abstract class AbstractMacOSPlatformSettings : AbstractPlatformSettings() {
     var dmgPackageVersion: String? = null
     var dmgPackageBuildVersion: String? = null
     var appCategory: String? = null
+    var minimumSystemVersion: String? = null
 
 
     /**

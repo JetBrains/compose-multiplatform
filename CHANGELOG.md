@@ -1,7 +1,85 @@
-# 1.6.0-rc01 (February 2024)
+# 1.6.0-rc03 (February 2024)
+_Changes since 1.6.0-rc02_
 
+- **[Support Kotlin 2.0.0-Beta4](https://github.com/JetBrains/compose-multiplatform/pull/4332)** <sub>Common</sub>
+- _(prerelease fix)_ [Resources. Don't return a cached value when pass new args](https://github.com/JetBrains/compose-multiplatform/pull/4333) <sub>Common</sub>
+- _(prerelease fix)_ [Fix crash "ComposeUIViewController.view should be attached to window](https://github.com/JetBrains/compose-multiplatform-core/pull/1110) <sub>iOS</sub>
+- _(prerelease fix)_ [Fix App crashes when Compose SwfitUI View container removed from hierarchy](https://github.com/JetBrains/compose-multiplatform-core/pull/1114) <sub>iOS</sub>
+- _(prerelease fix)_ [Fix Keyboard disappears on IME action](https://github.com/JetBrains/compose-multiplatform-core/pull/1118) <sub>iOS</sub>
+- _(prerelease fix)_ [Fix `SelectionContainer` occasionally crashes on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1121) <sub>iOS</sub>
+- _(prerelease fix)_ [Fix crash after open/close dropdown on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1127) <sub>iOS</sub>
+- _(prerelease fix)_ [Fix Password popup disappears only on the second focused TextField](https://github.com/JetBrains/compose-multiplatform-core/pull/1128) <sub>iOS</sub>
+- _(prerelease fix)_ [Fix mouse input above SwingPanel](https://github.com/JetBrains/compose-multiplatform-core/pull/1119) <sub>Desktop</sub>
+- _(prerelease fix)_ [Fix non working accessibility on Desktop](https://github.com/JetBrains/compose-multiplatform-core/pull/1129) <sub>Desktop</sub>
+- _(prerelease fix)_ [Resources. Fix import of Android flavors](https://github.com/JetBrains/compose-multiplatform/pull/4319) <sub>Android</sub>
+
+## Dependencies
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+- [Compiler 1.5.8](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.8)
+- [Runtime 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.1)
+- [UI 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.1)
+- [Foundation 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.1)
+- [Material 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.1)
+- [Material3 1.2.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.0)
+
+# 1.6.0-rc02 (February 2024)
+_Changes since 1.6.0-rc01_
+
+## Breaking changes
+_since 1.6.0-beta01_
+- When the resource library is used, resources should be imported explicitly
+
+> To quickly change your code to a new state, replace this:
+> ```
+> import <modulePackage>.generated.resources.Res
+> ```
+> by this:
+> ```
+> import <modulePackage>.generated.resources.*
+> ```
+> and perform "Code - Optimize Imports" to apply the project code style. If code style doesn't allow wildcrads, `import <modulePackage>.generated.resources.*` will be replaced by explicit imports.
+
+## iOS/desktop/web
+
+### Fixes
+- _(prerelease fix)_ [Fix "AlertDialog doesn't work with ProvidableCompositionLocal"](https://github.com/JetBrains/compose-multiplatform-core/pull/1104)
+
+## Resource library
+
+### Fixes
+- _(prerelease fix)_ [Fix resource accessors compilation when there are huge number of resource files](https://github.com/JetBrains/compose-multiplatform/pull/4294)
+
+## Dependencies
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+- [Compiler 1.5.8](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.8)
+- [Runtime 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.1)
+- [UI 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.1)
+- [Foundation 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.1)
+- [Material 1.6.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.1)
+- [Material3 1.2.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.0)
+
+# 1.6.0-rc01 (February 2024)
 _Changes since 1.6.0-beta02_
 
+## Known issues and solutions
+### Could not find "org.jetbrains.compose.annotation-internal:annotation"
+_(or org.jetbrains.compose.collection-internal:collection)_, _[link](https://github.com/JetBrains/compose-multiplatform/issues/4277)_
+
+It happens because some library depends on `1.6.0-beta02` which isn't binary compatible with `1.6.0-rc01`.
+To find this library, call `./gradlew shared:dependencies` (replace `shared` by your main module). Downgrade this library or ask the library author to upgrade it to `1.6.0-rc01`.
+
+### Could not find androidx.annotation:annotation:...
+_(or org.jetbrains.compose.collection-internal:collection)_
+
+It happens because `1.6.0` depends on [collection](https://developer.android.com/jetpack/androidx/releases/collection) and [annnotation](https://developer.android.com/jetpack/androidx/releases/annotation) libraries that are available only in the Google Maven repository.
+
+To solve this, add `google()` maven repository  to `build.gradle.kts`:
+```
+repositories {
+    ...
+    google()
+}
+```
 ## iOS/desktop/web
 
 ### Fixes

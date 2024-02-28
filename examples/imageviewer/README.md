@@ -5,7 +5,7 @@ based on Compose Multiplatform (desktop, Android and iOS).
 
 ## Setting up your development environment
 
-To setup the environment, please consult these [instructions](https://github.com/JetBrains/compose-multiplatform-template#setting-up-your-development-environment).
+To setup the environment, please consult these [instructions](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-multiplatform-setup.html).
 
 ## How to run
 

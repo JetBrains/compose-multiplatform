@@ -9,7 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.ObserverHandle
 import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.*
-import kotlinx.datetime.Clock
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -76,11 +75,14 @@ private object GlobalSnapshotManager {
 private class MonotonicClockImpl : MonotonicFrameClock {
 
     private val NANOS_PER_MILLI = 1_000_000
+
+    private var i = 0L
+
     override suspend fun <R> withFrameNanos(
         onFrame: (Long) -> R
     ): R = suspendCoroutine { continuation ->
-        val now = Clock.System.now()
-        val currentNanos = now.toEpochMilliseconds() * NANOS_PER_MILLI + now.nanosecondsOfSecond
+        val now = ++i
+        val currentNanos = now * NANOS_PER_MILLI
         val result = onFrame(currentNanos)
         continuation.resume(result)
     }

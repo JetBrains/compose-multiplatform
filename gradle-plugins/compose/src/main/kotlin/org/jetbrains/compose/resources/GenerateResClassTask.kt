@@ -56,7 +56,7 @@ internal abstract class GenerateResClassTask : DefaultTask() {
                     }
                     .groupBy { it.type }
                     .mapValues { (_, items) -> items.groupBy { it.name } }
-                getResFileSpec(resources, packageName.get()).writeTo(kotlinDir)
+                getResFileSpecs(resources, packageName.get()).forEach { it.writeTo(kotlinDir) }
             } else {
                 logger.info("Generation Res class is disabled")
             }
