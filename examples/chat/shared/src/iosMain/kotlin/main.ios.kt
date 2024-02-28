@@ -6,7 +6,7 @@ fun ChatViewController(): UIViewController = ComposeUIViewController {
 }
 
 fun sendMessage(text: String) {
-    store.send(Action.SendMessage(Message(myUser, timestampMs(), text)))
+    store.send(Action.SendMessage(Message(myUser, text)))
 }
 
 fun gradient3Colors() = ChatColors.GRADIENT_3
