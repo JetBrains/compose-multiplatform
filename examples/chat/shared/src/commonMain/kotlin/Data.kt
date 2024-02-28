@@ -1,21 +1,21 @@
 import androidx.compose.ui.graphics.Color
+import kotlinx.datetime.Clock
 import kotlin.random.Random
 import kotlin.random.nextInt
 
-data class Message private constructor(
+data class Message(
     val user: User,
-    val timeMs: Long,
     val text: String,
+    val seconds: Long,
     val id: Long
 ) {
     constructor(
         user: User,
-        timeMs: Long,
         text: String
     ) : this(
         user = user,
-        timeMs = timeMs,
         text = text,
+        seconds = Clock.System.now().epochSeconds,
         id = Random.nextLong()
     )
 }

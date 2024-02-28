@@ -96,7 +96,7 @@ inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
                             modifier = Modifier.align(Alignment.End)
                         ) {
                             Text(
-                                text = timeToString(message.timeMs),
+                                text = timeToString(message.seconds),
                                 textAlign = TextAlign.End,
                                 style = MaterialTheme.typography.subtitle1.copy(fontSize = 10.sp),
                                 color = ChatColors.TIME_TEXT

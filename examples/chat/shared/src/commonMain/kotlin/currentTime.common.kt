@@ -1,10 +1,15 @@
-fun timeToString(timestampMs: Long): String {
-    val seconds = timestampMs
-    val minutes = seconds / 1000 / 60
-    val hours = minutes / 24
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
-    val m = minutes % 60
-    val h = hours % 24
+
+fun timeToString(seconds: Long): String {
+    val instant: Instant = Instant.fromEpochSeconds(seconds)
+    val localTime = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+    val m = localTime.minute
+    val h = localTime.hour
 
     val mm = if (m < 10) {
         "0$m"
@@ -19,4 +24,3 @@ fun timeToString(timestampMs: Long): String {
     return "$hh:$mm"
 }
 
-expect fun timestampMs(): Long
