@@ -1,5 +1,7 @@
 import androidx.compose.ui.graphics.Color
 import kotlinx.datetime.Clock
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 import kotlin.random.Random
 import kotlin.random.nextInt
 
@@ -23,7 +25,7 @@ data class Message(
 data class User(
     val name: String,
     val color: Color = ColorProvider.getColor(),
-    val picture: String?
+    val picture: DrawableResource?
 )
 
 object ColorProvider {

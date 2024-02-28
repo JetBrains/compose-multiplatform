@@ -18,6 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.sp
+import chat_mpp.shared.generated.resources.*
+import chat_mpp.shared.generated.resources.Res
+import chat_mpp.shared.generated.resources.background
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
@@ -26,9 +29,9 @@ import org.jetbrains.compose.resources.painterResource
 
 val myUser = User("Me", picture = null)
 val friends = listOf(
-    User("Alex", picture = "stock1.jpg"),
-    User("Casey", picture = "stock2.jpg"),
-    User("Sam", picture = "stock3.jpg")
+    User("Alex", picture = Res.drawable.stock1),
+    User("Casey", picture = Res.drawable.stock2),
+    User("Sam", picture = Res.drawable.stock3)
 )
 val friendMessages = listOf(
     "How's everybody doing today?",
@@ -66,7 +69,7 @@ fun ChatApp(displayTextField: Boolean = true) {
     Theme {
         Surface {
             Box(modifier = Modifier.fillMaxSize()) {
-                Image(painterResource("background.jpg"), null, contentScale = ContentScale.Crop)
+                Image(painterResource(Res.drawable.background), null, contentScale = ContentScale.Crop)
                 Column(
                     modifier = Modifier.fillMaxSize()
                 ) {
