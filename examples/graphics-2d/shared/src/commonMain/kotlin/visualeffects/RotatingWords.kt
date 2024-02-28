@@ -20,11 +20,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.ImageResource
+import graphics_2d.shared.generated.resources.*
 import org.jetbrains.compose.resources.painterResource
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun Words() {
     val duration = 5000
@@ -47,7 +45,7 @@ fun Words() {
         )
     )
 
-    val logoImg = painterResource(ImageResource("composeRes/images/compose_community_primary.xml"))
+    val logoImg = painterResource(Res.drawable.compose_community_primary)
 
     val baseLogo = DpOffset(350.dp, 270.dp)
 
