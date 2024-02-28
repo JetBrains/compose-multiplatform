@@ -44,8 +44,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.materialIconsExtended)
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-                implementation("org.jetbrains.compose.components:components-resources:${project.property("compose.version")}")
+                implementation(compose.components.resources)
             }
         }
         val androidMain by getting {
@@ -80,8 +79,6 @@ android {
     compileSdk = 34
     namespace = "org.jetbrains.compose.demo.widgets.platform"
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
 
     defaultConfig {
         minSdk = 26
