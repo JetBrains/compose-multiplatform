@@ -1,5 +1,5 @@
 plugins {
-    id("org.jetbrains.intellij") version "1.15.0"
+    id("org.jetbrains.intellij") version "1.17.2"
     java
     kotlin("jvm")
     id("org.jetbrains.compose")
