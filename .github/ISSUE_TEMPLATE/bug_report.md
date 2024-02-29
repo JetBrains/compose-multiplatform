@@ -7,26 +7,29 @@ assignees: ''
 
 ---
 
+<!--
+
+If the bug is Android-only, report it in the [Jetpack Compose tracker](https://issuetracker.google.com/issues/new?component=612128)
+
+-->
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
 **Affected platforms**
-Select one of the platforms below:
-- All
-- Desktop
-- Web (K/Wasm) - Canvas based API
-- Web (K/JS) - Canvas based API
-- Web (K/JS) - HTML library
-- iOS
-- Other
-
-If the bug is Android-only, report it in the [Jetpack Compose tracker](https://issuetracker.google.com/issues/new?component=612128)
+<!-- Select one or multiple affected platforms below: -->
+- [ ] Desktop (Windows, Linux, macOS)
+- [ ] iOS
+- [ ] Web (K/Wasm) - Canvas based API
+- [ ] Web (K/JS) - Canvas based API
+- [ ] Web (K/JS) - HTML library
 
 **Versions**
 - Kotlin version*: 
 - Compose Multiplatform version*: 
 - OS version(s)* (required for Desktop and iOS issues): 
-- OS architecture (x86 or arm64): 
+- OS architecture (x86 or arm64):
+- Device (model or simulator for iOS issues): 
 - JDK (for desktop issues): 
 
 **To Reproduce**
