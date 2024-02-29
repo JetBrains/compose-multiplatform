@@ -2,12 +2,12 @@
 
 package org.jetbrains.codeviewer.platform
 
+import codeviewer.shared.generated.resources.Res
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.codeviewer.util.EmptyTextLines
 import org.jetbrains.codeviewer.util.TextLines
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.resource
 
 class VirtualFile(override val name: String, override val isDirectory: Boolean, val textLines: TextLines, override val children: List<File> = listOf()): File {
     override val hasChildren: Boolean
@@ -34,7 +34,7 @@ actual val HomeFolder: File get() = VirtualFile("files",
         VirtualFile("EditorView.kt",
             isDirectory = false,
             textLines = runBlocking {
-                   resource("EditorView.kt").readBytes()
+                   Res.readBytes("EditorView.kt")
                }.toTextLines()
         )
     )

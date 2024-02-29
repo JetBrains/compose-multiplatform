@@ -9,16 +9,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.*
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.ImageResource
-import org.jetbrains.compose.resources.painterResource
+import graphics_2d.shared.generated.resources.*
 import kotlin.math.max
 
-@OptIn(ExperimentalResourceApi::class)
-@Composable
-fun loadImage(img: ImageResource): Painter = painterResource(img)
 
 expect fun hasRightClick(): Boolean
 
@@ -78,9 +72,9 @@ fun MineSweeper(requestWindowSize: ((width: Dp, height: Dp) -> Unit)? = null) = 
         Row {
             Column {
                 val bombsLeft = max(game.bombs - game.flagsSet, 0)
-                IndicatorWithIcon(ImageResource("composeRes/images/clock.png"), "Seconds", game.seconds)
+                IndicatorWithIcon(Res.drawable.clock, "Seconds", game.seconds)
                 Box(modifier = Modifier.size(2.dp)) {}
-                IndicatorWithIcon(ImageResource("composeRes/images/mine.png"), "Bombs Left", bombsLeft)
+                IndicatorWithIcon(Res.drawable.mine, "Bombs Left", bombsLeft)
             }
 
             Column(modifier = Modifier.padding(8.dp)) {

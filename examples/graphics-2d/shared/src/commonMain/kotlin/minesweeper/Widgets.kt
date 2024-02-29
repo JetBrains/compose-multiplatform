@@ -17,7 +17,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.jetbrains.compose.resources.ImageResource
+import graphics_2d.shared.generated.resources.*
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun OpenedCell(cell: Cell) {
@@ -31,9 +33,9 @@ fun OpenedCell(cell: Cell) {
 }
 
 @Composable
-fun CellWithIcon(img: ImageResource, alt: String) {
+fun CellWithIcon(img: DrawableResource, alt: String) {
     Image(
-        painter = loadImage(img),
+        painter = painterResource(img),
         contentDescription = alt,
         modifier = Modifier.fillMaxSize().padding(Dp(4.0f))
     )
@@ -41,16 +43,16 @@ fun CellWithIcon(img: ImageResource, alt: String) {
 
 @Composable
 fun Mine() {
-    CellWithIcon(ImageResource("composeRes/images/mine.png"), alt = "Bomb")
+    CellWithIcon(Res.drawable.mine, alt = "Bomb")
 }
 
 @Composable
 fun Flag() {
-    CellWithIcon(ImageResource("composeRes/images/flag.png"), alt = "Flag")
+    CellWithIcon(Res.drawable.flag, alt = "Flag")
 }
 
 @Composable
-fun IndicatorWithIcon(img: ImageResource, alt: String, value: Int) {
+fun IndicatorWithIcon(img: DrawableResource, alt: String, value: Int) {
     Box(modifier = Modifier.background(Color(0x8e, 0x6e, 0x0e))) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.size(40.dp, 40.dp)) {
