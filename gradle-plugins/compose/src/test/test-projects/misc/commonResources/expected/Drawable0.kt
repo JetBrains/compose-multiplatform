@@ -25,14 +25,17 @@ private object Drawable0 {
   public val vector: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
         "drawable:vector",
           setOf(
-           
+
+          org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.LanguageQualifier("ast"),
+          ), "drawable-ast/vector.xml"),
+
           org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.LanguageQualifier("au"),
           org.jetbrains.compose.resources.RegionQualifier("US"), ), "drawable-au-rUS/vector.xml"),
-           
+
           org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.ThemeQualifier.DARK,
           org.jetbrains.compose.resources.LanguageQualifier("ge"), ),
           "drawable-dark-ge/vector.xml"),
-           
+
           org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.LanguageQualifier("en"),
           ), "drawable-en/vector.xml"),
             org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/vector.xml"),
