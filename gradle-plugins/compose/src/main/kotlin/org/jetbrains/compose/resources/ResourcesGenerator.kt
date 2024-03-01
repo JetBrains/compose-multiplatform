@@ -73,19 +73,6 @@ private fun Project.configureAndroidComposeResources(
     kotlinExtension: KotlinMultiplatformExtension,
     androidExtension: BaseExtension
 ) {
-    val commonResourcesDir = projectDir.resolve("src/${KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME}/$COMPOSE_RESOURCES_DIR")
-
-    //Copy common compose resources except fonts to android resources
-    val commonAndroidComposeResourcesDir = layout.buildDirectory.dir("$RES_GEN_DIR/commonAndroidComposeResources")
-    val copyCommonAndroidComposeResources = registerTask<Copy>(
-        "copyCommonAndroidComposeResources"
-    ) {
-        includeEmptyDirs = false
-        from(commonResourcesDir)
-        exclude("**/font*/*")
-        into(commonAndroidComposeResourcesDir)
-    }
-
     //mark all composeResources as Android resources
     kotlinExtension.targets.withType(KotlinAndroidTarget::class.java).all { androidTarget ->
         androidTarget.compilations.all { compilation: KotlinJvmAndroidCompilation ->
@@ -93,14 +80,10 @@ private fun Project.configureAndroidComposeResources(
                 androidExtension.sourceSets
                     .matching { it.name == kotlinAndroidSourceSet.androidSourceSetName }
                     .all { androidSourceSet ->
-                        compilation.androidVariant.processJavaResourcesProvider.dependsOn(copyCommonAndroidComposeResources)
-                        androidSourceSet.resources.srcDir(commonAndroidComposeResourcesDir)
                         (compilation.allKotlinSourceSets as? ObservableSet<KotlinSourceSet>)?.forAll { kotlinSourceSet ->
-                            if (kotlinSourceSet.name != KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME) {
-                                androidSourceSet.resources.srcDir(
-                                    projectDir.resolve("src/${kotlinSourceSet.name}/$COMPOSE_RESOURCES_DIR")
-                                )
-                            }
+                            androidSourceSet.resources.srcDir(
+                                projectDir.resolve("src/${kotlinSourceSet.name}/$COMPOSE_RESOURCES_DIR")
+                            )
                         }
                     }
             }
@@ -108,6 +91,9 @@ private fun Project.configureAndroidComposeResources(
     }
 
     //copy fonts from the compose resources dir to android assets
+    val commonResourcesDir = projectDir.resolve(
+        "src/${KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME}/$COMPOSE_RESOURCES_DIR"
+    )
     val androidComponents = project.extensions.findByType(AndroidComponentsExtension::class.java) ?: return
     androidComponents.onVariants { variant ->
         val copyFonts = registerTask<CopyAndroidFontsToAssetsTask>(
@@ -119,6 +105,8 @@ private fun Project.configureAndroidComposeResources(
             taskProvider = copyFonts,
             wiredWith = CopyAndroidFontsToAssetsTask::outputDirectory
         )
+        //exclude a duplication of fonts in apks
+        variant.packaging.resources.excludes.add("**/font*/*")
     }
 }
 
