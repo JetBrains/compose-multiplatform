@@ -21,7 +21,9 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.material)
-                implementation(compose.components.resources)
+                //there is the api to check correctness of the api configuration
+                //https://github.com/JetBrains/compose-multiplatform/issues/4405
+                api(compose.components.resources)
             }
         }
     }
