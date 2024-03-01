@@ -18,6 +18,9 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
     @get:InputFiles
     internal lateinit var previewClasspath: FileCollection
 
+    @get:InputFiles
+    internal lateinit var skikoRuntime: FileCollection
+
     @get:Internal
     internal val javaHome: Property<String> = objects.notNullProperty<String>().apply {
         set(providers.systemProperty("java.home"))
@@ -58,7 +61,7 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
         val previewClasspathString =
             (previewClasspath.files.asSequence() +
                     uiTooling.files.asSequence() +
-                    tryGetSkikoRuntimeFilesIfNeeded().asSequence()
+                    skikoRuntime.files.asSequence()
             ).pathString()
 
         val gradleLogger = logger
@@ -78,7 +81,7 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
         }
     }
 
-    private fun tryGetSkikoRuntimeFilesIfNeeded(): Collection<File> {
+    internal fun tryGetSkikoRuntimeIfNeeded(): FileCollection {
         try {
             var hasSkikoJvm = false
             var hasSkikoJvmRuntime = false
@@ -96,21 +99,20 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
                     }
                 }
             }
-            if (hasSkikoJvmRuntime) return emptyList()
+            if (hasSkikoJvmRuntime) return project.files()
 
             if (hasSkikoJvm && !skikoVersion.isNullOrBlank()) {
-                val skikoRuntimeConfig = project.detachedDependency(
+                return project.detachedDependency(
                     groupId = "org.jetbrains.skiko",
                     artifactId = "skiko-awt-runtime-${currentTarget.id}",
                     version = skikoVersion
                 ).excludeTransitiveDependencies()
-                return skikoRuntimeConfig.files
             }
         } catch (e: Exception) {
             // OK
         }
 
-        return emptyList()
+        return project.files()
     }
 
     private fun Sequence<File>.pathString(): String =

@@ -322,9 +322,9 @@ class GradlePluginTest : GradlePluginTestBase() {
             connectionThread.join(5000)
         }
 
-        val expectedReceivedConfigCount = 2
+        val expectedReceivedConfigCount = 3
         val actualReceivedConfigCount = receivedConfigCount.get()
-        check(actualReceivedConfigCount == 2) {
+        check(actualReceivedConfigCount == expectedReceivedConfigCount) {
             "Expected to receive $expectedReceivedConfigCount preview configs, got $actualReceivedConfigCount"
         }
     }
@@ -342,6 +342,11 @@ class GradlePluginTest : GradlePluginTestBase() {
             val mppTask = ":mpp:configureDesktopPreviewDesktop"
             gradle(mppTask, portProperty, previewTargetProperty).checks {
                 check.taskSuccessful(mppTask)
+            }
+
+            val commonTask = ":common:configureDesktopPreviewDesktop"
+            gradle(commonTask, portProperty, previewTargetProperty).checks {
+                check.taskSuccessful(commonTask)
             }
         }
     }
