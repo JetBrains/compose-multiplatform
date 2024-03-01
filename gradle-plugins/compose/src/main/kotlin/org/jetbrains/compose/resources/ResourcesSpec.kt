@@ -45,8 +45,8 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
     val themeQualifier = ClassName("org.jetbrains.compose.resources", "ThemeQualifier")
     val densityQualifier = ClassName("org.jetbrains.compose.resources", "DensityQualifier")
 
-    val languageRegex = Regex("[a-z][a-z]")
-    val regionRegex = Regex("r[A-Z][A-Z]")
+    val languageRegex = Regex("[a-z]{2,3}")
+    val regionRegex = Regex("r[A-Z]{2}")
 
     val qualifiersMap = mutableMapOf<ClassName, String>()
 

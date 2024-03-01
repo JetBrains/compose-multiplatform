@@ -30,17 +30,17 @@ class ResourcesTest : GradlePluginTestBase() {
         }
 
         file("src/commonMain/composeResources/drawable-en").renameTo(
-            file("src/commonMain/composeResources/drawable-ren")
+            file("src/commonMain/composeResources/drawable-rent")
         )
         gradle("generateComposeResClass").checks {
             check.logContains(
                 """
-                contains unknown qualifier: 'ren'.
+                contains unknown qualifier: 'rent'.
             """.trimIndent()
             )
         }
 
-        file("src/commonMain/composeResources/drawable-ren").renameTo(
+        file("src/commonMain/composeResources/drawable-rent").renameTo(
             file("src/commonMain/composeResources/drawable-rUS-en")
         )
         gradle("generateComposeResClass").checks {
