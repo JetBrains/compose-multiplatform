@@ -14,7 +14,8 @@ allprojects {
         // mavenLocal()
     }
 
-    // Apply here for all subprojects. It applies the compiler plugin
+    // Apply here for all subprojects instead of applying in each build.gradle.kts separately.
+    // It applies the compiler plugin
     this.apply<InternalComposeSupportPlugin>()
 
     afterEvaluate {
