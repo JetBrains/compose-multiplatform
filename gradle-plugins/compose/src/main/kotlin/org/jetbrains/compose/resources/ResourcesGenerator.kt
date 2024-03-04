@@ -140,12 +140,14 @@ private fun Project.configureResourceGenerator(commonComposeResourcesDir: File, 
         if (ComposeProperties.alwaysGenerateResourceAccessors(project).get()) {
             true
         } else {
-            configurations
-                .getByName(commonSourceSet.implementationConfigurationName)
-                .allDependencies.any { dep ->
-                    val depStringNotation = dep.let { "${it.group}:${it.name}:${it.version}" }
-                    depStringNotation == ComposePlugin.CommonComponentsDependencies.resources
-                }
+            configurations.run {
+                //because the implementation configuration doesn't extend the api in the KGP ¯\_(ツ)_/¯
+                getByName(commonSourceSet.implementationConfigurationName).allDependencies +
+                        getByName(commonSourceSet.apiConfigurationName).allDependencies
+            }.any { dep ->
+                val depStringNotation = dep.let { "${it.group}:${it.name}:${it.version}" }
+                depStringNotation == ComposePlugin.CommonComponentsDependencies.resources
+            }
         }
     }
 

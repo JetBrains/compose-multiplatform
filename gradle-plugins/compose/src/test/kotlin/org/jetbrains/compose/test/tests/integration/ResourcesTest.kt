@@ -237,8 +237,8 @@ class ResourcesTest : GradlePluginTestBase() {
 
         modifyText("build.gradle.kts") { str ->
             str.replace(
-                "implementation(compose.components.resources)",
-                "//implementation(compose.components.resources)"
+                "api(compose.components.resources)",
+                "//api(compose.components.resources)"
             )
         }
         gradle("prepareKotlinIdeaImport").checks {
@@ -253,8 +253,8 @@ class ResourcesTest : GradlePluginTestBase() {
 
         modifyText("build.gradle.kts") { str ->
             str.replace(
-                "//implementation(compose.components.resources)",
-                "implementation(compose.components.resources)"
+                "//api(compose.components.resources)",
+                "api(compose.components.resources)"
             )
         }
         gradle("prepareKotlinIdeaImport").checks {
