@@ -1,3 +1,5 @@
+import java.util.Locale
+
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
@@ -21,7 +23,15 @@ kotlin {
 
 val generateResourceFiles = tasks.register("generateResourceFiles") {
     val resourcesFolder = project.file("src/commonMain/composeResources")
-    val count = 25_000
+    val count = 1500
+    val numberOfLanguages = 20
+    val langs = Locale.getAvailableLocales()
+        .map { it.language }
+        .filter { it.count() == 2 }
+        .sorted()
+        .distinct()
+        .take(numberOfLanguages)
+        .toList()
     doLast {
         val txt = buildString {
             appendLine("<resources>")
@@ -30,9 +40,12 @@ val generateResourceFiles = tasks.register("generateResourceFiles") {
             }
             appendLine("</resources>")
         }
-        File(resourcesFolder, "values/strings.xml").apply {
-            parentFile.mkdirs()
-            writeText(txt)
+        langs.forEachIndexed { langIndex, lang ->
+            val stringsFileName = if (langIndex == 0) "values/strings.xml" else "values-$lang/strings.xml"
+            File(resourcesFolder, stringsFileName).apply {
+                parentFile.mkdirs()
+                writeText(txt)
+            }
         }
     }
     doLast {

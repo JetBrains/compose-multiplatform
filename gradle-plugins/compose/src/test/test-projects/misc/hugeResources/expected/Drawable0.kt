@@ -8,3505 +8,1505 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @ExperimentalResourceApi
 private object Drawable0 {
-  public val icon_0: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_0",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_0.xml"),
-          )
-      )
-
-  public val icon_1: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1.xml"),
-          )
-      )
-
-  public val icon_10: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10.xml"),
-          )
-      )
-
-  public val icon_100: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_100",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_100.xml"),
-          )
-      )
-
-  public val icon_1000: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1000",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1000.xml"),
-          )
-      )
-
-  public val icon_10000: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10000",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10000.xml"),
-          )
-      )
-
-  public val icon_10001: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10001",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10001.xml"),
-          )
-      )
-
-  public val icon_10002: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10002",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10002.xml"),
-          )
-      )
-
-  public val icon_10003: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10003",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10003.xml"),
-          )
-      )
-
-  public val icon_10004: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10004",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10004.xml"),
-          )
-      )
-
-  public val icon_10005: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10005",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10005.xml"),
-          )
-      )
-
-  public val icon_10006: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10006",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10006.xml"),
-          )
-      )
-
-  public val icon_10007: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10007",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10007.xml"),
-          )
-      )
-
-  public val icon_10008: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10008",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10008.xml"),
-          )
-      )
-
-  public val icon_10009: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10009",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10009.xml"),
-          )
-      )
-
-  public val icon_1001: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1001",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1001.xml"),
-          )
-      )
-
-  public val icon_10010: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10010",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10010.xml"),
-          )
-      )
-
-  public val icon_10011: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10011",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10011.xml"),
-          )
-      )
-
-  public val icon_10012: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10012",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10012.xml"),
-          )
-      )
-
-  public val icon_10013: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10013",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10013.xml"),
-          )
-      )
-
-  public val icon_10014: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10014",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10014.xml"),
-          )
-      )
-
-  public val icon_10015: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10015",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10015.xml"),
-          )
-      )
-
-  public val icon_10016: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10016",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10016.xml"),
-          )
-      )
-
-  public val icon_10017: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10017",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10017.xml"),
-          )
-      )
-
-  public val icon_10018: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10018",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10018.xml"),
-          )
-      )
-
-  public val icon_10019: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10019",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10019.xml"),
-          )
-      )
-
-  public val icon_1002: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1002",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1002.xml"),
-          )
-      )
-
-  public val icon_10020: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10020",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10020.xml"),
-          )
-      )
-
-  public val icon_10021: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10021",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10021.xml"),
-          )
-      )
-
-  public val icon_10022: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10022",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10022.xml"),
-          )
-      )
-
-  public val icon_10023: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10023",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10023.xml"),
-          )
-      )
-
-  public val icon_10024: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10024",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10024.xml"),
-          )
-      )
-
-  public val icon_10025: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10025",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10025.xml"),
-          )
-      )
-
-  public val icon_10026: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10026",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10026.xml"),
-          )
-      )
-
-  public val icon_10027: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10027",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10027.xml"),
-          )
-      )
-
-  public val icon_10028: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10028",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10028.xml"),
-          )
-      )
-
-  public val icon_10029: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10029",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10029.xml"),
-          )
-      )
-
-  public val icon_1003: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1003",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1003.xml"),
-          )
-      )
-
-  public val icon_10030: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10030",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10030.xml"),
-          )
-      )
-
-  public val icon_10031: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10031",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10031.xml"),
-          )
-      )
-
-  public val icon_10032: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10032",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10032.xml"),
-          )
-      )
-
-  public val icon_10033: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10033",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10033.xml"),
-          )
-      )
-
-  public val icon_10034: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10034",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10034.xml"),
-          )
-      )
-
-  public val icon_10035: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10035",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10035.xml"),
-          )
-      )
-
-  public val icon_10036: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10036",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10036.xml"),
-          )
-      )
-
-  public val icon_10037: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10037",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10037.xml"),
-          )
-      )
-
-  public val icon_10038: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10038",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10038.xml"),
-          )
-      )
-
-  public val icon_10039: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10039",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10039.xml"),
-          )
-      )
-
-  public val icon_1004: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1004",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1004.xml"),
-          )
-      )
-
-  public val icon_10040: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10040",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10040.xml"),
-          )
-      )
-
-  public val icon_10041: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10041",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10041.xml"),
-          )
-      )
-
-  public val icon_10042: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10042",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10042.xml"),
-          )
-      )
-
-  public val icon_10043: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10043",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10043.xml"),
-          )
-      )
-
-  public val icon_10044: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10044",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10044.xml"),
-          )
-      )
-
-  public val icon_10045: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10045",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10045.xml"),
-          )
-      )
-
-  public val icon_10046: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10046",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10046.xml"),
-          )
-      )
-
-  public val icon_10047: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10047",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10047.xml"),
-          )
-      )
-
-  public val icon_10048: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10048",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10048.xml"),
-          )
-      )
-
-  public val icon_10049: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10049",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10049.xml"),
-          )
-      )
-
-  public val icon_1005: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1005",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1005.xml"),
-          )
-      )
-
-  public val icon_10050: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10050",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10050.xml"),
-          )
-      )
-
-  public val icon_10051: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10051",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10051.xml"),
-          )
-      )
-
-  public val icon_10052: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10052",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10052.xml"),
-          )
-      )
-
-  public val icon_10053: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10053",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10053.xml"),
-          )
-      )
-
-  public val icon_10054: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10054",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10054.xml"),
-          )
-      )
-
-  public val icon_10055: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10055",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10055.xml"),
-          )
-      )
-
-  public val icon_10056: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10056",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10056.xml"),
-          )
-      )
-
-  public val icon_10057: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10057",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10057.xml"),
-          )
-      )
-
-  public val icon_10058: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10058",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10058.xml"),
-          )
-      )
-
-  public val icon_10059: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10059",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10059.xml"),
-          )
-      )
-
-  public val icon_1006: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1006",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1006.xml"),
-          )
-      )
-
-  public val icon_10060: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10060",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10060.xml"),
-          )
-      )
-
-  public val icon_10061: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10061",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10061.xml"),
-          )
-      )
-
-  public val icon_10062: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10062",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10062.xml"),
-          )
-      )
-
-  public val icon_10063: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10063",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10063.xml"),
-          )
-      )
-
-  public val icon_10064: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10064",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10064.xml"),
-          )
-      )
-
-  public val icon_10065: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10065",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10065.xml"),
-          )
-      )
-
-  public val icon_10066: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10066",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10066.xml"),
-          )
-      )
-
-  public val icon_10067: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10067",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10067.xml"),
-          )
-      )
-
-  public val icon_10068: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10068",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10068.xml"),
-          )
-      )
-
-  public val icon_10069: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10069",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10069.xml"),
-          )
-      )
-
-  public val icon_1007: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1007",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1007.xml"),
-          )
-      )
-
-  public val icon_10070: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10070",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10070.xml"),
-          )
-      )
-
-  public val icon_10071: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10071",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10071.xml"),
-          )
-      )
-
-  public val icon_10072: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10072",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10072.xml"),
-          )
-      )
-
-  public val icon_10073: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10073",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10073.xml"),
-          )
-      )
-
-  public val icon_10074: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10074",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10074.xml"),
-          )
-      )
-
-  public val icon_10075: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10075",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10075.xml"),
-          )
-      )
-
-  public val icon_10076: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10076",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10076.xml"),
-          )
-      )
-
-  public val icon_10077: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10077",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10077.xml"),
-          )
-      )
-
-  public val icon_10078: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10078",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10078.xml"),
-          )
-      )
-
-  public val icon_10079: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10079",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10079.xml"),
-          )
-      )
-
-  public val icon_1008: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1008",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1008.xml"),
-          )
-      )
-
-  public val icon_10080: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10080",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10080.xml"),
-          )
-      )
-
-  public val icon_10081: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10081",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10081.xml"),
-          )
-      )
-
-  public val icon_10082: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10082",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10082.xml"),
-          )
-      )
-
-  public val icon_10083: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10083",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10083.xml"),
-          )
-      )
-
-  public val icon_10084: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10084",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10084.xml"),
-          )
-      )
-
-  public val icon_10085: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10085",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10085.xml"),
-          )
-      )
-
-  public val icon_10086: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10086",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10086.xml"),
-          )
-      )
-
-  public val icon_10087: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10087",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10087.xml"),
-          )
-      )
-
-  public val icon_10088: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10088",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10088.xml"),
-          )
-      )
-
-  public val icon_10089: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10089",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10089.xml"),
-          )
-      )
-
-  public val icon_1009: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1009",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1009.xml"),
-          )
-      )
-
-  public val icon_10090: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10090",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10090.xml"),
-          )
-      )
-
-  public val icon_10091: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10091",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10091.xml"),
-          )
-      )
-
-  public val icon_10092: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10092",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10092.xml"),
-          )
-      )
-
-  public val icon_10093: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10093",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10093.xml"),
-          )
-      )
-
-  public val icon_10094: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10094",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10094.xml"),
-          )
-      )
-
-  public val icon_10095: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10095",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10095.xml"),
-          )
-      )
-
-  public val icon_10096: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10096",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10096.xml"),
-          )
-      )
-
-  public val icon_10097: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10097",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10097.xml"),
-          )
-      )
-
-  public val icon_10098: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10098",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10098.xml"),
-          )
-      )
-
-  public val icon_10099: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10099",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10099.xml"),
-          )
-      )
-
-  public val icon_101: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_101",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_101.xml"),
-          )
-      )
-
-  public val icon_1010: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1010",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1010.xml"),
-          )
-      )
-
-  public val icon_10100: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10100",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10100.xml"),
-          )
-      )
-
-  public val icon_10101: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10101",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10101.xml"),
-          )
-      )
-
-  public val icon_10102: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10102",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10102.xml"),
-          )
-      )
-
-  public val icon_10103: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10103",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10103.xml"),
-          )
-      )
-
-  public val icon_10104: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10104",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10104.xml"),
-          )
-      )
-
-  public val icon_10105: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10105",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10105.xml"),
-          )
-      )
-
-  public val icon_10106: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10106",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10106.xml"),
-          )
-      )
-
-  public val icon_10107: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10107",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10107.xml"),
-          )
-      )
-
-  public val icon_10108: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10108",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10108.xml"),
-          )
-      )
-
-  public val icon_10109: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10109",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10109.xml"),
-          )
-      )
-
-  public val icon_1011: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1011",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1011.xml"),
-          )
-      )
-
-  public val icon_10110: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10110",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10110.xml"),
-          )
-      )
-
-  public val icon_10111: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10111",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10111.xml"),
-          )
-      )
-
-  public val icon_10112: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10112",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10112.xml"),
-          )
-      )
-
-  public val icon_10113: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10113",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10113.xml"),
-          )
-      )
-
-  public val icon_10114: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10114",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10114.xml"),
-          )
-      )
-
-  public val icon_10115: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10115",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10115.xml"),
-          )
-      )
-
-  public val icon_10116: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10116",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10116.xml"),
-          )
-      )
-
-  public val icon_10117: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10117",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10117.xml"),
-          )
-      )
-
-  public val icon_10118: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10118",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10118.xml"),
-          )
-      )
-
-  public val icon_10119: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10119",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10119.xml"),
-          )
-      )
-
-  public val icon_1012: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1012",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1012.xml"),
-          )
-      )
-
-  public val icon_10120: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10120",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10120.xml"),
-          )
-      )
-
-  public val icon_10121: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10121",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10121.xml"),
-          )
-      )
-
-  public val icon_10122: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10122",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10122.xml"),
-          )
-      )
-
-  public val icon_10123: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10123",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10123.xml"),
-          )
-      )
-
-  public val icon_10124: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10124",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10124.xml"),
-          )
-      )
-
-  public val icon_10125: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10125",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10125.xml"),
-          )
-      )
-
-  public val icon_10126: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10126",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10126.xml"),
-          )
-      )
-
-  public val icon_10127: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10127",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10127.xml"),
-          )
-      )
-
-  public val icon_10128: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10128",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10128.xml"),
-          )
-      )
-
-  public val icon_10129: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10129",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10129.xml"),
-          )
-      )
-
-  public val icon_1013: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1013",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1013.xml"),
-          )
-      )
-
-  public val icon_10130: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10130",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10130.xml"),
-          )
-      )
-
-  public val icon_10131: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10131",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10131.xml"),
-          )
-      )
-
-  public val icon_10132: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10132",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10132.xml"),
-          )
-      )
-
-  public val icon_10133: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10133",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10133.xml"),
-          )
-      )
-
-  public val icon_10134: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10134",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10134.xml"),
-          )
-      )
-
-  public val icon_10135: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10135",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10135.xml"),
-          )
-      )
-
-  public val icon_10136: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10136",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10136.xml"),
-          )
-      )
-
-  public val icon_10137: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10137",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10137.xml"),
-          )
-      )
-
-  public val icon_10138: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10138",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10138.xml"),
-          )
-      )
-
-  public val icon_10139: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10139",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10139.xml"),
-          )
-      )
-
-  public val icon_1014: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1014",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1014.xml"),
-          )
-      )
-
-  public val icon_10140: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10140",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10140.xml"),
-          )
-      )
-
-  public val icon_10141: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10141",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10141.xml"),
-          )
-      )
-
-  public val icon_10142: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10142",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10142.xml"),
-          )
-      )
-
-  public val icon_10143: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10143",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10143.xml"),
-          )
-      )
-
-  public val icon_10144: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10144",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10144.xml"),
-          )
-      )
-
-  public val icon_10145: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10145",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10145.xml"),
-          )
-      )
-
-  public val icon_10146: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10146",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10146.xml"),
-          )
-      )
-
-  public val icon_10147: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10147",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10147.xml"),
-          )
-      )
-
-  public val icon_10148: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10148",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10148.xml"),
-          )
-      )
-
-  public val icon_10149: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10149",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10149.xml"),
-          )
-      )
-
-  public val icon_1015: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1015",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1015.xml"),
-          )
-      )
-
-  public val icon_10150: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10150",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10150.xml"),
-          )
-      )
-
-  public val icon_10151: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10151",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10151.xml"),
-          )
-      )
-
-  public val icon_10152: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10152",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10152.xml"),
-          )
-      )
-
-  public val icon_10153: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10153",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10153.xml"),
-          )
-      )
-
-  public val icon_10154: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10154",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10154.xml"),
-          )
-      )
-
-  public val icon_10155: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10155",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10155.xml"),
-          )
-      )
-
-  public val icon_10156: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10156",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10156.xml"),
-          )
-      )
-
-  public val icon_10157: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10157",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10157.xml"),
-          )
-      )
-
-  public val icon_10158: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10158",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10158.xml"),
-          )
-      )
-
-  public val icon_10159: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10159",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10159.xml"),
-          )
-      )
-
-  public val icon_1016: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1016",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1016.xml"),
-          )
-      )
-
-  public val icon_10160: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10160",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10160.xml"),
-          )
-      )
-
-  public val icon_10161: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10161",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10161.xml"),
-          )
-      )
-
-  public val icon_10162: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10162",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10162.xml"),
-          )
-      )
-
-  public val icon_10163: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10163",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10163.xml"),
-          )
-      )
-
-  public val icon_10164: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10164",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10164.xml"),
-          )
-      )
-
-  public val icon_10165: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10165",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10165.xml"),
-          )
-      )
-
-  public val icon_10166: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10166",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10166.xml"),
-          )
-      )
-
-  public val icon_10167: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10167",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10167.xml"),
-          )
-      )
-
-  public val icon_10168: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10168",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10168.xml"),
-          )
-      )
-
-  public val icon_10169: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10169",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10169.xml"),
-          )
-      )
-
-  public val icon_1017: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1017",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1017.xml"),
-          )
-      )
-
-  public val icon_10170: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10170",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10170.xml"),
-          )
-      )
-
-  public val icon_10171: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10171",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10171.xml"),
-          )
-      )
-
-  public val icon_10172: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10172",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10172.xml"),
-          )
-      )
-
-  public val icon_10173: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10173",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10173.xml"),
-          )
-      )
-
-  public val icon_10174: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10174",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10174.xml"),
-          )
-      )
-
-  public val icon_10175: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10175",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10175.xml"),
-          )
-      )
-
-  public val icon_10176: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10176",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10176.xml"),
-          )
-      )
-
-  public val icon_10177: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10177",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10177.xml"),
-          )
-      )
-
-  public val icon_10178: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10178",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10178.xml"),
-          )
-      )
-
-  public val icon_10179: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10179",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10179.xml"),
-          )
-      )
-
-  public val icon_1018: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1018",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1018.xml"),
-          )
-      )
-
-  public val icon_10180: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10180",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10180.xml"),
-          )
-      )
-
-  public val icon_10181: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10181",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10181.xml"),
-          )
-      )
-
-  public val icon_10182: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10182",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10182.xml"),
-          )
-      )
-
-  public val icon_10183: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10183",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10183.xml"),
-          )
-      )
-
-  public val icon_10184: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10184",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10184.xml"),
-          )
-      )
-
-  public val icon_10185: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10185",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10185.xml"),
-          )
-      )
-
-  public val icon_10186: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10186",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10186.xml"),
-          )
-      )
-
-  public val icon_10187: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10187",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10187.xml"),
-          )
-      )
-
-  public val icon_10188: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10188",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10188.xml"),
-          )
-      )
-
-  public val icon_10189: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10189",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10189.xml"),
-          )
-      )
-
-  public val icon_1019: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1019",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1019.xml"),
-          )
-      )
-
-  public val icon_10190: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10190",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10190.xml"),
-          )
-      )
-
-  public val icon_10191: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10191",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10191.xml"),
-          )
-      )
-
-  public val icon_10192: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10192",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10192.xml"),
-          )
-      )
-
-  public val icon_10193: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10193",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10193.xml"),
-          )
-      )
-
-  public val icon_10194: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10194",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10194.xml"),
-          )
-      )
-
-  public val icon_10195: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10195",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10195.xml"),
-          )
-      )
-
-  public val icon_10196: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10196",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10196.xml"),
-          )
-      )
-
-  public val icon_10197: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10197",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10197.xml"),
-          )
-      )
-
-  public val icon_10198: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10198",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10198.xml"),
-          )
-      )
-
-  public val icon_10199: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10199",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10199.xml"),
-          )
-      )
-
-  public val icon_102: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_102",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_102.xml"),
-          )
-      )
-
-  public val icon_1020: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1020",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1020.xml"),
-          )
-      )
-
-  public val icon_10200: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10200",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10200.xml"),
-          )
-      )
-
-  public val icon_10201: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10201",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10201.xml"),
-          )
-      )
-
-  public val icon_10202: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10202",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10202.xml"),
-          )
-      )
-
-  public val icon_10203: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10203",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10203.xml"),
-          )
-      )
-
-  public val icon_10204: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10204",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10204.xml"),
-          )
-      )
-
-  public val icon_10205: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10205",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10205.xml"),
-          )
-      )
-
-  public val icon_10206: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10206",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10206.xml"),
-          )
-      )
-
-  public val icon_10207: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10207",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10207.xml"),
-          )
-      )
-
-  public val icon_10208: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10208",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10208.xml"),
-          )
-      )
-
-  public val icon_10209: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10209",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10209.xml"),
-          )
-      )
-
-  public val icon_1021: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1021",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1021.xml"),
-          )
-      )
-
-  public val icon_10210: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10210",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10210.xml"),
-          )
-      )
-
-  public val icon_10211: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10211",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10211.xml"),
-          )
-      )
-
-  public val icon_10212: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10212",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10212.xml"),
-          )
-      )
-
-  public val icon_10213: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10213",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10213.xml"),
-          )
-      )
-
-  public val icon_10214: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10214",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10214.xml"),
-          )
-      )
-
-  public val icon_10215: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10215",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10215.xml"),
-          )
-      )
-
-  public val icon_10216: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10216",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10216.xml"),
-          )
-      )
-
-  public val icon_10217: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10217",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10217.xml"),
-          )
-      )
-
-  public val icon_10218: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10218",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10218.xml"),
-          )
-      )
-
-  public val icon_10219: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10219",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10219.xml"),
-          )
-      )
-
-  public val icon_1022: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1022",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1022.xml"),
-          )
-      )
-
-  public val icon_10220: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10220",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10220.xml"),
-          )
-      )
-
-  public val icon_10221: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10221",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10221.xml"),
-          )
-      )
-
-  public val icon_10222: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10222",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10222.xml"),
-          )
-      )
-
-  public val icon_10223: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10223",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10223.xml"),
-          )
-      )
-
-  public val icon_10224: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10224",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10224.xml"),
-          )
-      )
-
-  public val icon_10225: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10225",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10225.xml"),
-          )
-      )
-
-  public val icon_10226: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10226",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10226.xml"),
-          )
-      )
-
-  public val icon_10227: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10227",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10227.xml"),
-          )
-      )
-
-  public val icon_10228: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10228",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10228.xml"),
-          )
-      )
-
-  public val icon_10229: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10229",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10229.xml"),
-          )
-      )
-
-  public val icon_1023: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1023",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1023.xml"),
-          )
-      )
-
-  public val icon_10230: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10230",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10230.xml"),
-          )
-      )
-
-  public val icon_10231: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10231",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10231.xml"),
-          )
-      )
-
-  public val icon_10232: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10232",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10232.xml"),
-          )
-      )
-
-  public val icon_10233: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10233",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10233.xml"),
-          )
-      )
-
-  public val icon_10234: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10234",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10234.xml"),
-          )
-      )
-
-  public val icon_10235: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10235",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10235.xml"),
-          )
-      )
-
-  public val icon_10236: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10236",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10236.xml"),
-          )
-      )
-
-  public val icon_10237: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10237",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10237.xml"),
-          )
-      )
-
-  public val icon_10238: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10238",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10238.xml"),
-          )
-      )
-
-  public val icon_10239: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10239",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10239.xml"),
-          )
-      )
-
-  public val icon_1024: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1024",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1024.xml"),
-          )
-      )
-
-  public val icon_10240: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10240",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10240.xml"),
-          )
-      )
-
-  public val icon_10241: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10241",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10241.xml"),
-          )
-      )
-
-  public val icon_10242: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10242",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10242.xml"),
-          )
-      )
-
-  public val icon_10243: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10243",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10243.xml"),
-          )
-      )
-
-  public val icon_10244: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10244",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10244.xml"),
-          )
-      )
-
-  public val icon_10245: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10245",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10245.xml"),
-          )
-      )
-
-  public val icon_10246: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10246",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10246.xml"),
-          )
-      )
-
-  public val icon_10247: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10247",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10247.xml"),
-          )
-      )
-
-  public val icon_10248: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10248",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10248.xml"),
-          )
-      )
-
-  public val icon_10249: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10249",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10249.xml"),
-          )
-      )
-
-  public val icon_1025: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1025",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1025.xml"),
-          )
-      )
-
-  public val icon_10250: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10250",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10250.xml"),
-          )
-      )
-
-  public val icon_10251: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10251",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10251.xml"),
-          )
-      )
-
-  public val icon_10252: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10252",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10252.xml"),
-          )
-      )
-
-  public val icon_10253: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10253",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10253.xml"),
-          )
-      )
-
-  public val icon_10254: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10254",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10254.xml"),
-          )
-      )
-
-  public val icon_10255: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10255",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10255.xml"),
-          )
-      )
-
-  public val icon_10256: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10256",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10256.xml"),
-          )
-      )
-
-  public val icon_10257: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10257",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10257.xml"),
-          )
-      )
-
-  public val icon_10258: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10258",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10258.xml"),
-          )
-      )
-
-  public val icon_10259: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10259",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10259.xml"),
-          )
-      )
-
-  public val icon_1026: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1026",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1026.xml"),
-          )
-      )
-
-  public val icon_10260: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10260",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10260.xml"),
-          )
-      )
-
-  public val icon_10261: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10261",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10261.xml"),
-          )
-      )
-
-  public val icon_10262: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10262",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10262.xml"),
-          )
-      )
-
-  public val icon_10263: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10263",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10263.xml"),
-          )
-      )
-
-  public val icon_10264: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10264",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10264.xml"),
-          )
-      )
-
-  public val icon_10265: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10265",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10265.xml"),
-          )
-      )
-
-  public val icon_10266: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10266",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10266.xml"),
-          )
-      )
-
-  public val icon_10267: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10267",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10267.xml"),
-          )
-      )
-
-  public val icon_10268: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10268",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10268.xml"),
-          )
-      )
-
-  public val icon_10269: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10269",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10269.xml"),
-          )
-      )
-
-  public val icon_1027: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1027",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1027.xml"),
-          )
-      )
-
-  public val icon_10270: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10270",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10270.xml"),
-          )
-      )
-
-  public val icon_10271: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10271",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10271.xml"),
-          )
-      )
-
-  public val icon_10272: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10272",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10272.xml"),
-          )
-      )
-
-  public val icon_10273: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10273",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10273.xml"),
-          )
-      )
-
-  public val icon_10274: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10274",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10274.xml"),
-          )
-      )
-
-  public val icon_10275: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10275",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10275.xml"),
-          )
-      )
-
-  public val icon_10276: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10276",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10276.xml"),
-          )
-      )
-
-  public val icon_10277: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10277",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10277.xml"),
-          )
-      )
-
-  public val icon_10278: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10278",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10278.xml"),
-          )
-      )
-
-  public val icon_10279: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10279",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10279.xml"),
-          )
-      )
-
-  public val icon_1028: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1028",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1028.xml"),
-          )
-      )
-
-  public val icon_10280: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10280",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10280.xml"),
-          )
-      )
-
-  public val icon_10281: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10281",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10281.xml"),
-          )
-      )
-
-  public val icon_10282: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10282",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10282.xml"),
-          )
-      )
-
-  public val icon_10283: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10283",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10283.xml"),
-          )
-      )
-
-  public val icon_10284: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10284",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10284.xml"),
-          )
-      )
-
-  public val icon_10285: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10285",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10285.xml"),
-          )
-      )
-
-  public val icon_10286: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10286",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10286.xml"),
-          )
-      )
-
-  public val icon_10287: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10287",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10287.xml"),
-          )
-      )
-
-  public val icon_10288: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10288",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10288.xml"),
-          )
-      )
-
-  public val icon_10289: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10289",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10289.xml"),
-          )
-      )
-
-  public val icon_1029: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1029",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1029.xml"),
-          )
-      )
-
-  public val icon_10290: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10290",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10290.xml"),
-          )
-      )
-
-  public val icon_10291: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10291",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10291.xml"),
-          )
-      )
-
-  public val icon_10292: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10292",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10292.xml"),
-          )
-      )
-
-  public val icon_10293: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10293",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10293.xml"),
-          )
-      )
-
-  public val icon_10294: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10294",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10294.xml"),
-          )
-      )
-
-  public val icon_10295: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10295",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10295.xml"),
-          )
-      )
-
-  public val icon_10296: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10296",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10296.xml"),
-          )
-      )
-
-  public val icon_10297: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10297",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10297.xml"),
-          )
-      )
-
-  public val icon_10298: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10298",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10298.xml"),
-          )
-      )
-
-  public val icon_10299: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10299",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10299.xml"),
-          )
-      )
-
-  public val icon_103: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_103",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_103.xml"),
-          )
-      )
-
-  public val icon_1030: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1030",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1030.xml"),
-          )
-      )
-
-  public val icon_10300: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10300",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10300.xml"),
-          )
-      )
-
-  public val icon_10301: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10301",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10301.xml"),
-          )
-      )
-
-  public val icon_10302: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10302",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10302.xml"),
-          )
-      )
-
-  public val icon_10303: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10303",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10303.xml"),
-          )
-      )
-
-  public val icon_10304: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10304",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10304.xml"),
-          )
-      )
-
-  public val icon_10305: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10305",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10305.xml"),
-          )
-      )
-
-  public val icon_10306: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10306",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10306.xml"),
-          )
-      )
-
-  public val icon_10307: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10307",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10307.xml"),
-          )
-      )
-
-  public val icon_10308: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10308",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10308.xml"),
-          )
-      )
-
-  public val icon_10309: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10309",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10309.xml"),
-          )
-      )
-
-  public val icon_1031: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1031",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1031.xml"),
-          )
-      )
-
-  public val icon_10310: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10310",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10310.xml"),
-          )
-      )
-
-  public val icon_10311: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10311",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10311.xml"),
-          )
-      )
-
-  public val icon_10312: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10312",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10312.xml"),
-          )
-      )
-
-  public val icon_10313: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10313",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10313.xml"),
-          )
-      )
-
-  public val icon_10314: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10314",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10314.xml"),
-          )
-      )
-
-  public val icon_10315: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10315",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10315.xml"),
-          )
-      )
-
-  public val icon_10316: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10316",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10316.xml"),
-          )
-      )
-
-  public val icon_10317: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10317",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10317.xml"),
-          )
-      )
-
-  public val icon_10318: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10318",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10318.xml"),
-          )
-      )
-
-  public val icon_10319: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10319",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10319.xml"),
-          )
-      )
-
-  public val icon_1032: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1032",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1032.xml"),
-          )
-      )
-
-  public val icon_10320: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10320",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10320.xml"),
-          )
-      )
-
-  public val icon_10321: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10321",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10321.xml"),
-          )
-      )
-
-  public val icon_10322: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10322",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10322.xml"),
-          )
-      )
-
-  public val icon_10323: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10323",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10323.xml"),
-          )
-      )
-
-  public val icon_10324: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10324",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10324.xml"),
-          )
-      )
-
-  public val icon_10325: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10325",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10325.xml"),
-          )
-      )
-
-  public val icon_10326: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10326",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10326.xml"),
-          )
-      )
-
-  public val icon_10327: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10327",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10327.xml"),
-          )
-      )
-
-  public val icon_10328: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10328",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10328.xml"),
-          )
-      )
-
-  public val icon_10329: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10329",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10329.xml"),
-          )
-      )
-
-  public val icon_1033: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1033",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1033.xml"),
-          )
-      )
-
-  public val icon_10330: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10330",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10330.xml"),
-          )
-      )
-
-  public val icon_10331: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10331",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10331.xml"),
-          )
-      )
-
-  public val icon_10332: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10332",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10332.xml"),
-          )
-      )
-
-  public val icon_10333: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10333",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10333.xml"),
-          )
-      )
-
-  public val icon_10334: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10334",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10334.xml"),
-          )
-      )
-
-  public val icon_10335: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10335",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10335.xml"),
-          )
-      )
-
-  public val icon_10336: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10336",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10336.xml"),
-          )
-      )
-
-  public val icon_10337: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10337",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10337.xml"),
-          )
-      )
-
-  public val icon_10338: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10338",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10338.xml"),
-          )
-      )
-
-  public val icon_10339: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10339",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10339.xml"),
-          )
-      )
-
-  public val icon_1034: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1034",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1034.xml"),
-          )
-      )
-
-  public val icon_10340: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10340",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10340.xml"),
-          )
-      )
-
-  public val icon_10341: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10341",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10341.xml"),
-          )
-      )
-
-  public val icon_10342: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10342",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10342.xml"),
-          )
-      )
-
-  public val icon_10343: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10343",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10343.xml"),
-          )
-      )
-
-  public val icon_10344: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10344",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10344.xml"),
-          )
-      )
-
-  public val icon_10345: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10345",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10345.xml"),
-          )
-      )
-
-  public val icon_10346: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10346",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10346.xml"),
-          )
-      )
-
-  public val icon_10347: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10347",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10347.xml"),
-          )
-      )
-
-  public val icon_10348: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10348",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10348.xml"),
-          )
-      )
-
-  public val icon_10349: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10349",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10349.xml"),
-          )
-      )
-
-  public val icon_1035: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1035",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1035.xml"),
-          )
-      )
-
-  public val icon_10350: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10350",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10350.xml"),
-          )
-      )
-
-  public val icon_10351: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10351",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10351.xml"),
-          )
-      )
-
-  public val icon_10352: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10352",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10352.xml"),
-          )
-      )
-
-  public val icon_10353: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10353",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10353.xml"),
-          )
-      )
-
-  public val icon_10354: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10354",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10354.xml"),
-          )
-      )
-
-  public val icon_10355: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10355",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10355.xml"),
-          )
-      )
-
-  public val icon_10356: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10356",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10356.xml"),
-          )
-      )
-
-  public val icon_10357: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10357",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10357.xml"),
-          )
-      )
-
-  public val icon_10358: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10358",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10358.xml"),
-          )
-      )
-
-  public val icon_10359: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10359",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10359.xml"),
-          )
-      )
-
-  public val icon_1036: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1036",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1036.xml"),
-          )
-      )
-
-  public val icon_10360: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10360",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10360.xml"),
-          )
-      )
-
-  public val icon_10361: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10361",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10361.xml"),
-          )
-      )
-
-  public val icon_10362: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10362",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10362.xml"),
-          )
-      )
-
-  public val icon_10363: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10363",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10363.xml"),
-          )
-      )
-
-  public val icon_10364: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10364",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10364.xml"),
-          )
-      )
-
-  public val icon_10365: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10365",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10365.xml"),
-          )
-      )
-
-  public val icon_10366: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10366",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10366.xml"),
-          )
-      )
-
-  public val icon_10367: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10367",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10367.xml"),
-          )
-      )
-
-  public val icon_10368: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10368",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10368.xml"),
-          )
-      )
-
-  public val icon_10369: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10369",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10369.xml"),
-          )
-      )
-
-  public val icon_1037: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1037",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1037.xml"),
-          )
-      )
-
-  public val icon_10370: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10370",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10370.xml"),
-          )
-      )
-
-  public val icon_10371: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10371",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10371.xml"),
-          )
-      )
-
-  public val icon_10372: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10372",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10372.xml"),
-          )
-      )
-
-  public val icon_10373: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10373",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10373.xml"),
-          )
-      )
-
-  public val icon_10374: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10374",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10374.xml"),
-          )
-      )
-
-  public val icon_10375: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10375",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10375.xml"),
-          )
-      )
-
-  public val icon_10376: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10376",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10376.xml"),
-          )
-      )
-
-  public val icon_10377: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10377",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10377.xml"),
-          )
-      )
-
-  public val icon_10378: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10378",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10378.xml"),
-          )
-      )
-
-  public val icon_10379: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10379",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10379.xml"),
-          )
-      )
-
-  public val icon_1038: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1038",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1038.xml"),
-          )
-      )
-
-  public val icon_10380: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10380",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10380.xml"),
-          )
-      )
-
-  public val icon_10381: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10381",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10381.xml"),
-          )
-      )
-
-  public val icon_10382: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10382",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10382.xml"),
-          )
-      )
-
-  public val icon_10383: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10383",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10383.xml"),
-          )
-      )
-
-  public val icon_10384: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10384",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10384.xml"),
-          )
-      )
-
-  public val icon_10385: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10385",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10385.xml"),
-          )
-      )
-
-  public val icon_10386: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10386",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10386.xml"),
-          )
-      )
-
-  public val icon_10387: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10387",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10387.xml"),
-          )
-      )
-
-  public val icon_10388: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10388",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10388.xml"),
-          )
-      )
-
-  public val icon_10389: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10389",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10389.xml"),
-          )
-      )
-
-  public val icon_1039: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1039",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1039.xml"),
-          )
-      )
-
-  public val icon_10390: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10390",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10390.xml"),
-          )
-      )
-
-  public val icon_10391: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10391",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10391.xml"),
-          )
-      )
-
-  public val icon_10392: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10392",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10392.xml"),
-          )
-      )
-
-  public val icon_10393: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10393",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10393.xml"),
-          )
-      )
-
-  public val icon_10394: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10394",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10394.xml"),
-          )
-      )
-
-  public val icon_10395: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10395",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10395.xml"),
-          )
-      )
-
-  public val icon_10396: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10396",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10396.xml"),
-          )
-      )
-
-  public val icon_10397: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10397",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10397.xml"),
-          )
-      )
-
-  public val icon_10398: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10398",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10398.xml"),
-          )
-      )
-
-  public val icon_10399: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10399",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10399.xml"),
-          )
-      )
-
-  public val icon_104: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_104",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_104.xml"),
-          )
-      )
-
-  public val icon_1040: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1040",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1040.xml"),
-          )
-      )
-
-  public val icon_10400: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10400",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10400.xml"),
-          )
-      )
-
-  public val icon_10401: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10401",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10401.xml"),
-          )
-      )
-
-  public val icon_10402: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10402",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10402.xml"),
-          )
-      )
-
-  public val icon_10403: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10403",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10403.xml"),
-          )
-      )
-
-  public val icon_10404: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10404",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10404.xml"),
-          )
-      )
-
-  public val icon_10405: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10405",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10405.xml"),
-          )
-      )
-
-  public val icon_10406: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10406",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10406.xml"),
-          )
-      )
-
-  public val icon_10407: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10407",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10407.xml"),
-          )
-      )
-
-  public val icon_10408: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10408",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10408.xml"),
-          )
-      )
-
-  public val icon_10409: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10409",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10409.xml"),
-          )
-      )
-
-  public val icon_1041: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1041",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1041.xml"),
-          )
-      )
-
-  public val icon_10410: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10410",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10410.xml"),
-          )
-      )
-
-  public val icon_10411: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10411",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10411.xml"),
-          )
-      )
-
-  public val icon_10412: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10412",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10412.xml"),
-          )
-      )
-
-  public val icon_10413: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10413",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10413.xml"),
-          )
-      )
-
-  public val icon_10414: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10414",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10414.xml"),
-          )
-      )
-
-  public val icon_10415: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10415",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10415.xml"),
-          )
-      )
-
-  public val icon_10416: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10416",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10416.xml"),
-          )
-      )
-
-  public val icon_10417: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10417",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10417.xml"),
-          )
-      )
-
-  public val icon_10418: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10418",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10418.xml"),
-          )
-      )
-
-  public val icon_10419: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10419",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10419.xml"),
-          )
-      )
-
-  public val icon_1042: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1042",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1042.xml"),
-          )
-      )
-
-  public val icon_10420: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10420",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10420.xml"),
-          )
-      )
-
-  public val icon_10421: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10421",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10421.xml"),
-          )
-      )
-
-  public val icon_10422: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10422",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10422.xml"),
-          )
-      )
-
-  public val icon_10423: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10423",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10423.xml"),
-          )
-      )
-
-  public val icon_10424: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10424",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10424.xml"),
-          )
-      )
-
-  public val icon_10425: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10425",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10425.xml"),
-          )
-      )
-
-  public val icon_10426: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10426",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10426.xml"),
-          )
-      )
-
-  public val icon_10427: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10427",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10427.xml"),
-          )
-      )
-
-  public val icon_10428: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10428",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10428.xml"),
-          )
-      )
-
-  public val icon_10429: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10429",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10429.xml"),
-          )
-      )
-
-  public val icon_1043: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1043",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1043.xml"),
-          )
-      )
-
-  public val icon_10430: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10430",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10430.xml"),
-          )
-      )
-
-  public val icon_10431: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10431",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10431.xml"),
-          )
-      )
-
-  public val icon_10432: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10432",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10432.xml"),
-          )
-      )
-
-  public val icon_10433: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10433",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10433.xml"),
-          )
-      )
-
-  public val icon_10434: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10434",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10434.xml"),
-          )
-      )
-
-  public val icon_10435: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10435",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10435.xml"),
-          )
-      )
-
-  public val icon_10436: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10436",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10436.xml"),
-          )
-      )
-
-  public val icon_10437: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10437",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10437.xml"),
-          )
-      )
-
-  public val icon_10438: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10438",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10438.xml"),
-          )
-      )
-
-  public val icon_10439: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10439",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10439.xml"),
-          )
-      )
-
-  public val icon_1044: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_1044",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1044.xml"),
-          )
-      )
-
-  public val icon_10440: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10440",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10440.xml"),
-          )
-      )
-
-  public val icon_10441: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10441",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10441.xml"),
-          )
-      )
-
-  public val icon_10442: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10442",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10442.xml"),
-          )
-      )
-
-  public val icon_10443: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10443",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10443.xml"),
-          )
-      )
-
-  public val icon_10444: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10444",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10444.xml"),
-          )
-      )
-
-  public val icon_10445: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10445",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10445.xml"),
-          )
-      )
-
-  public val icon_10446: DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-        "drawable:icon_10446",
-          setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10446.xml"),
-          )
-      )
+  public val icon_0: DrawableResource by 
+      lazy { init_icon_0() }
+
+  public val icon_1: DrawableResource by 
+      lazy { init_icon_1() }
+
+  public val icon_10: DrawableResource by 
+      lazy { init_icon_10() }
+
+  public val icon_100: DrawableResource by 
+      lazy { init_icon_100() }
+
+  public val icon_1000: DrawableResource by 
+      lazy { init_icon_1000() }
+
+  public val icon_1001: DrawableResource by 
+      lazy { init_icon_1001() }
+
+  public val icon_1002: DrawableResource by 
+      lazy { init_icon_1002() }
+
+  public val icon_1003: DrawableResource by 
+      lazy { init_icon_1003() }
+
+  public val icon_1004: DrawableResource by 
+      lazy { init_icon_1004() }
+
+  public val icon_1005: DrawableResource by 
+      lazy { init_icon_1005() }
+
+  public val icon_1006: DrawableResource by 
+      lazy { init_icon_1006() }
+
+  public val icon_1007: DrawableResource by 
+      lazy { init_icon_1007() }
+
+  public val icon_1008: DrawableResource by 
+      lazy { init_icon_1008() }
+
+  public val icon_1009: DrawableResource by 
+      lazy { init_icon_1009() }
+
+  public val icon_101: DrawableResource by 
+      lazy { init_icon_101() }
+
+  public val icon_1010: DrawableResource by 
+      lazy { init_icon_1010() }
+
+  public val icon_1011: DrawableResource by 
+      lazy { init_icon_1011() }
+
+  public val icon_1012: DrawableResource by 
+      lazy { init_icon_1012() }
+
+  public val icon_1013: DrawableResource by 
+      lazy { init_icon_1013() }
+
+  public val icon_1014: DrawableResource by 
+      lazy { init_icon_1014() }
+
+  public val icon_1015: DrawableResource by 
+      lazy { init_icon_1015() }
+
+  public val icon_1016: DrawableResource by 
+      lazy { init_icon_1016() }
+
+  public val icon_1017: DrawableResource by 
+      lazy { init_icon_1017() }
+
+  public val icon_1018: DrawableResource by 
+      lazy { init_icon_1018() }
+
+  public val icon_1019: DrawableResource by 
+      lazy { init_icon_1019() }
+
+  public val icon_102: DrawableResource by 
+      lazy { init_icon_102() }
+
+  public val icon_1020: DrawableResource by 
+      lazy { init_icon_1020() }
+
+  public val icon_1021: DrawableResource by 
+      lazy { init_icon_1021() }
+
+  public val icon_1022: DrawableResource by 
+      lazy { init_icon_1022() }
+
+  public val icon_1023: DrawableResource by 
+      lazy { init_icon_1023() }
+
+  public val icon_1024: DrawableResource by 
+      lazy { init_icon_1024() }
+
+  public val icon_1025: DrawableResource by 
+      lazy { init_icon_1025() }
+
+  public val icon_1026: DrawableResource by 
+      lazy { init_icon_1026() }
+
+  public val icon_1027: DrawableResource by 
+      lazy { init_icon_1027() }
+
+  public val icon_1028: DrawableResource by 
+      lazy { init_icon_1028() }
+
+  public val icon_1029: DrawableResource by 
+      lazy { init_icon_1029() }
+
+  public val icon_103: DrawableResource by 
+      lazy { init_icon_103() }
+
+  public val icon_1030: DrawableResource by 
+      lazy { init_icon_1030() }
+
+  public val icon_1031: DrawableResource by 
+      lazy { init_icon_1031() }
+
+  public val icon_1032: DrawableResource by 
+      lazy { init_icon_1032() }
+
+  public val icon_1033: DrawableResource by 
+      lazy { init_icon_1033() }
+
+  public val icon_1034: DrawableResource by 
+      lazy { init_icon_1034() }
+
+  public val icon_1035: DrawableResource by 
+      lazy { init_icon_1035() }
+
+  public val icon_1036: DrawableResource by 
+      lazy { init_icon_1036() }
+
+  public val icon_1037: DrawableResource by 
+      lazy { init_icon_1037() }
+
+  public val icon_1038: DrawableResource by 
+      lazy { init_icon_1038() }
+
+  public val icon_1039: DrawableResource by 
+      lazy { init_icon_1039() }
+
+  public val icon_104: DrawableResource by 
+      lazy { init_icon_104() }
+
+  public val icon_1040: DrawableResource by 
+      lazy { init_icon_1040() }
+
+  public val icon_1041: DrawableResource by 
+      lazy { init_icon_1041() }
+
+  public val icon_1042: DrawableResource by 
+      lazy { init_icon_1042() }
+
+  public val icon_1043: DrawableResource by 
+      lazy { init_icon_1043() }
+
+  public val icon_1044: DrawableResource by 
+      lazy { init_icon_1044() }
+
+  public val icon_1045: DrawableResource by 
+      lazy { init_icon_1045() }
+
+  public val icon_1046: DrawableResource by 
+      lazy { init_icon_1046() }
+
+  public val icon_1047: DrawableResource by 
+      lazy { init_icon_1047() }
+
+  public val icon_1048: DrawableResource by 
+      lazy { init_icon_1048() }
+
+  public val icon_1049: DrawableResource by 
+      lazy { init_icon_1049() }
+
+  public val icon_105: DrawableResource by 
+      lazy { init_icon_105() }
+
+  public val icon_1050: DrawableResource by 
+      lazy { init_icon_1050() }
+
+  public val icon_1051: DrawableResource by 
+      lazy { init_icon_1051() }
+
+  public val icon_1052: DrawableResource by 
+      lazy { init_icon_1052() }
+
+  public val icon_1053: DrawableResource by 
+      lazy { init_icon_1053() }
+
+  public val icon_1054: DrawableResource by 
+      lazy { init_icon_1054() }
+
+  public val icon_1055: DrawableResource by 
+      lazy { init_icon_1055() }
+
+  public val icon_1056: DrawableResource by 
+      lazy { init_icon_1056() }
+
+  public val icon_1057: DrawableResource by 
+      lazy { init_icon_1057() }
+
+  public val icon_1058: DrawableResource by 
+      lazy { init_icon_1058() }
+
+  public val icon_1059: DrawableResource by 
+      lazy { init_icon_1059() }
+
+  public val icon_106: DrawableResource by 
+      lazy { init_icon_106() }
+
+  public val icon_1060: DrawableResource by 
+      lazy { init_icon_1060() }
+
+  public val icon_1061: DrawableResource by 
+      lazy { init_icon_1061() }
+
+  public val icon_1062: DrawableResource by 
+      lazy { init_icon_1062() }
+
+  public val icon_1063: DrawableResource by 
+      lazy { init_icon_1063() }
+
+  public val icon_1064: DrawableResource by 
+      lazy { init_icon_1064() }
+
+  public val icon_1065: DrawableResource by 
+      lazy { init_icon_1065() }
+
+  public val icon_1066: DrawableResource by 
+      lazy { init_icon_1066() }
+
+  public val icon_1067: DrawableResource by 
+      lazy { init_icon_1067() }
+
+  public val icon_1068: DrawableResource by 
+      lazy { init_icon_1068() }
+
+  public val icon_1069: DrawableResource by 
+      lazy { init_icon_1069() }
+
+  public val icon_107: DrawableResource by 
+      lazy { init_icon_107() }
+
+  public val icon_1070: DrawableResource by 
+      lazy { init_icon_1070() }
+
+  public val icon_1071: DrawableResource by 
+      lazy { init_icon_1071() }
+
+  public val icon_1072: DrawableResource by 
+      lazy { init_icon_1072() }
+
+  public val icon_1073: DrawableResource by 
+      lazy { init_icon_1073() }
+
+  public val icon_1074: DrawableResource by 
+      lazy { init_icon_1074() }
+
+  public val icon_1075: DrawableResource by 
+      lazy { init_icon_1075() }
+
+  public val icon_1076: DrawableResource by 
+      lazy { init_icon_1076() }
+
+  public val icon_1077: DrawableResource by 
+      lazy { init_icon_1077() }
+
+  public val icon_1078: DrawableResource by 
+      lazy { init_icon_1078() }
+
+  public val icon_1079: DrawableResource by 
+      lazy { init_icon_1079() }
+
+  public val icon_108: DrawableResource by 
+      lazy { init_icon_108() }
+
+  public val icon_1080: DrawableResource by 
+      lazy { init_icon_1080() }
+
+  public val icon_1081: DrawableResource by 
+      lazy { init_icon_1081() }
+
+  public val icon_1082: DrawableResource by 
+      lazy { init_icon_1082() }
+
+  public val icon_1083: DrawableResource by 
+      lazy { init_icon_1083() }
+
+  public val icon_1084: DrawableResource by 
+      lazy { init_icon_1084() }
+
+  public val icon_1085: DrawableResource by 
+      lazy { init_icon_1085() }
+
+  public val icon_1086: DrawableResource by 
+      lazy { init_icon_1086() }
+
+  public val icon_1087: DrawableResource by 
+      lazy { init_icon_1087() }
+
+  public val icon_1088: DrawableResource by 
+      lazy { init_icon_1088() }
+
+  public val icon_1089: DrawableResource by 
+      lazy { init_icon_1089() }
+
+  public val icon_109: DrawableResource by 
+      lazy { init_icon_109() }
+
+  public val icon_1090: DrawableResource by 
+      lazy { init_icon_1090() }
+
+  public val icon_1091: DrawableResource by 
+      lazy { init_icon_1091() }
+
+  public val icon_1092: DrawableResource by 
+      lazy { init_icon_1092() }
+
+  public val icon_1093: DrawableResource by 
+      lazy { init_icon_1093() }
+
+  public val icon_1094: DrawableResource by 
+      lazy { init_icon_1094() }
+
+  public val icon_1095: DrawableResource by 
+      lazy { init_icon_1095() }
+
+  public val icon_1096: DrawableResource by 
+      lazy { init_icon_1096() }
+
+  public val icon_1097: DrawableResource by 
+      lazy { init_icon_1097() }
+
+  public val icon_1098: DrawableResource by 
+      lazy { init_icon_1098() }
+
+  public val icon_1099: DrawableResource by 
+      lazy { init_icon_1099() }
+
+  public val icon_11: DrawableResource by 
+      lazy { init_icon_11() }
+
+  public val icon_110: DrawableResource by 
+      lazy { init_icon_110() }
+
+  public val icon_1100: DrawableResource by 
+      lazy { init_icon_1100() }
+
+  public val icon_1101: DrawableResource by 
+      lazy { init_icon_1101() }
+
+  public val icon_1102: DrawableResource by 
+      lazy { init_icon_1102() }
+
+  public val icon_1103: DrawableResource by 
+      lazy { init_icon_1103() }
+
+  public val icon_1104: DrawableResource by 
+      lazy { init_icon_1104() }
+
+  public val icon_1105: DrawableResource by 
+      lazy { init_icon_1105() }
+
+  public val icon_1106: DrawableResource by 
+      lazy { init_icon_1106() }
+
+  public val icon_1107: DrawableResource by 
+      lazy { init_icon_1107() }
+
+  public val icon_1108: DrawableResource by 
+      lazy { init_icon_1108() }
+
+  public val icon_1109: DrawableResource by 
+      lazy { init_icon_1109() }
+
+  public val icon_111: DrawableResource by 
+      lazy { init_icon_111() }
+
+  public val icon_1110: DrawableResource by 
+      lazy { init_icon_1110() }
+
+  public val icon_1111: DrawableResource by 
+      lazy { init_icon_1111() }
+
+  public val icon_1112: DrawableResource by 
+      lazy { init_icon_1112() }
+
+  public val icon_1113: DrawableResource by 
+      lazy { init_icon_1113() }
+
+  public val icon_1114: DrawableResource by 
+      lazy { init_icon_1114() }
+
+  public val icon_1115: DrawableResource by 
+      lazy { init_icon_1115() }
+
+  public val icon_1116: DrawableResource by 
+      lazy { init_icon_1116() }
+
+  public val icon_1117: DrawableResource by 
+      lazy { init_icon_1117() }
+
+  public val icon_1118: DrawableResource by 
+      lazy { init_icon_1118() }
+
+  public val icon_1119: DrawableResource by 
+      lazy { init_icon_1119() }
+
+  public val icon_112: DrawableResource by 
+      lazy { init_icon_112() }
+
+  public val icon_1120: DrawableResource by 
+      lazy { init_icon_1120() }
+
+  public val icon_1121: DrawableResource by 
+      lazy { init_icon_1121() }
+
+  public val icon_1122: DrawableResource by 
+      lazy { init_icon_1122() }
+
+  public val icon_1123: DrawableResource by 
+      lazy { init_icon_1123() }
+
+  public val icon_1124: DrawableResource by 
+      lazy { init_icon_1124() }
+
+  public val icon_1125: DrawableResource by 
+      lazy { init_icon_1125() }
+
+  public val icon_1126: DrawableResource by 
+      lazy { init_icon_1126() }
+
+  public val icon_1127: DrawableResource by 
+      lazy { init_icon_1127() }
+
+  public val icon_1128: DrawableResource by 
+      lazy { init_icon_1128() }
+
+  public val icon_1129: DrawableResource by 
+      lazy { init_icon_1129() }
+
+  public val icon_113: DrawableResource by 
+      lazy { init_icon_113() }
+
+  public val icon_1130: DrawableResource by 
+      lazy { init_icon_1130() }
+
+  public val icon_1131: DrawableResource by 
+      lazy { init_icon_1131() }
+
+  public val icon_1132: DrawableResource by 
+      lazy { init_icon_1132() }
+
+  public val icon_1133: DrawableResource by 
+      lazy { init_icon_1133() }
+
+  public val icon_1134: DrawableResource by 
+      lazy { init_icon_1134() }
+
+  public val icon_1135: DrawableResource by 
+      lazy { init_icon_1135() }
+
+  public val icon_1136: DrawableResource by 
+      lazy { init_icon_1136() }
+
+  public val icon_1137: DrawableResource by 
+      lazy { init_icon_1137() }
+
+  public val icon_1138: DrawableResource by 
+      lazy { init_icon_1138() }
+
+  public val icon_1139: DrawableResource by 
+      lazy { init_icon_1139() }
+
+  public val icon_114: DrawableResource by 
+      lazy { init_icon_114() }
+
+  public val icon_1140: DrawableResource by 
+      lazy { init_icon_1140() }
+
+  public val icon_1141: DrawableResource by 
+      lazy { init_icon_1141() }
+
+  public val icon_1142: DrawableResource by 
+      lazy { init_icon_1142() }
+
+  public val icon_1143: DrawableResource by 
+      lazy { init_icon_1143() }
+
+  public val icon_1144: DrawableResource by 
+      lazy { init_icon_1144() }
+
+  public val icon_1145: DrawableResource by 
+      lazy { init_icon_1145() }
+
+  public val icon_1146: DrawableResource by 
+      lazy { init_icon_1146() }
+
+  public val icon_1147: DrawableResource by 
+      lazy { init_icon_1147() }
+
+  public val icon_1148: DrawableResource by 
+      lazy { init_icon_1148() }
+
+  public val icon_1149: DrawableResource by 
+      lazy { init_icon_1149() }
+
+  public val icon_115: DrawableResource by 
+      lazy { init_icon_115() }
+
+  public val icon_1150: DrawableResource by 
+      lazy { init_icon_1150() }
+
+  public val icon_1151: DrawableResource by 
+      lazy { init_icon_1151() }
+
+  public val icon_1152: DrawableResource by 
+      lazy { init_icon_1152() }
+
+  public val icon_1153: DrawableResource by 
+      lazy { init_icon_1153() }
+
+  public val icon_1154: DrawableResource by 
+      lazy { init_icon_1154() }
+
+  public val icon_1155: DrawableResource by 
+      lazy { init_icon_1155() }
+
+  public val icon_1156: DrawableResource by 
+      lazy { init_icon_1156() }
+
+  public val icon_1157: DrawableResource by 
+      lazy { init_icon_1157() }
+
+  public val icon_1158: DrawableResource by 
+      lazy { init_icon_1158() }
+
+  public val icon_1159: DrawableResource by 
+      lazy { init_icon_1159() }
+
+  public val icon_116: DrawableResource by 
+      lazy { init_icon_116() }
+
+  public val icon_1160: DrawableResource by 
+      lazy { init_icon_1160() }
+
+  public val icon_1161: DrawableResource by 
+      lazy { init_icon_1161() }
+
+  public val icon_1162: DrawableResource by 
+      lazy { init_icon_1162() }
+
+  public val icon_1163: DrawableResource by 
+      lazy { init_icon_1163() }
+
+  public val icon_1164: DrawableResource by 
+      lazy { init_icon_1164() }
+
+  public val icon_1165: DrawableResource by 
+      lazy { init_icon_1165() }
+
+  public val icon_1166: DrawableResource by 
+      lazy { init_icon_1166() }
+
+  public val icon_1167: DrawableResource by 
+      lazy { init_icon_1167() }
+
+  public val icon_1168: DrawableResource by 
+      lazy { init_icon_1168() }
+
+  public val icon_1169: DrawableResource by 
+      lazy { init_icon_1169() }
+
+  public val icon_117: DrawableResource by 
+      lazy { init_icon_117() }
+
+  public val icon_1170: DrawableResource by 
+      lazy { init_icon_1170() }
+
+  public val icon_1171: DrawableResource by 
+      lazy { init_icon_1171() }
+
+  public val icon_1172: DrawableResource by 
+      lazy { init_icon_1172() }
+
+  public val icon_1173: DrawableResource by 
+      lazy { init_icon_1173() }
+
+  public val icon_1174: DrawableResource by 
+      lazy { init_icon_1174() }
+
+  public val icon_1175: DrawableResource by 
+      lazy { init_icon_1175() }
+
+  public val icon_1176: DrawableResource by 
+      lazy { init_icon_1176() }
+
+  public val icon_1177: DrawableResource by 
+      lazy { init_icon_1177() }
+
+  public val icon_1178: DrawableResource by 
+      lazy { init_icon_1178() }
+
+  public val icon_1179: DrawableResource by 
+      lazy { init_icon_1179() }
+
+  public val icon_118: DrawableResource by 
+      lazy { init_icon_118() }
+
+  public val icon_1180: DrawableResource by 
+      lazy { init_icon_1180() }
+
+  public val icon_1181: DrawableResource by 
+      lazy { init_icon_1181() }
+
+  public val icon_1182: DrawableResource by 
+      lazy { init_icon_1182() }
+
+  public val icon_1183: DrawableResource by 
+      lazy { init_icon_1183() }
+
+  public val icon_1184: DrawableResource by 
+      lazy { init_icon_1184() }
+
+  public val icon_1185: DrawableResource by 
+      lazy { init_icon_1185() }
+
+  public val icon_1186: DrawableResource by 
+      lazy { init_icon_1186() }
+
+  public val icon_1187: DrawableResource by 
+      lazy { init_icon_1187() }
+
+  public val icon_1188: DrawableResource by 
+      lazy { init_icon_1188() }
+
+  public val icon_1189: DrawableResource by 
+      lazy { init_icon_1189() }
+
+  public val icon_119: DrawableResource by 
+      lazy { init_icon_119() }
+
+  public val icon_1190: DrawableResource by 
+      lazy { init_icon_1190() }
+
+  public val icon_1191: DrawableResource by 
+      lazy { init_icon_1191() }
+
+  public val icon_1192: DrawableResource by 
+      lazy { init_icon_1192() }
+
+  public val icon_1193: DrawableResource by 
+      lazy { init_icon_1193() }
+
+  public val icon_1194: DrawableResource by 
+      lazy { init_icon_1194() }
+
+  public val icon_1195: DrawableResource by 
+      lazy { init_icon_1195() }
+
+  public val icon_1196: DrawableResource by 
+      lazy { init_icon_1196() }
+
+  public val icon_1197: DrawableResource by 
+      lazy { init_icon_1197() }
+
+  public val icon_1198: DrawableResource by 
+      lazy { init_icon_1198() }
+
+  public val icon_1199: DrawableResource by 
+      lazy { init_icon_1199() }
+
+  public val icon_12: DrawableResource by 
+      lazy { init_icon_12() }
+
+  public val icon_120: DrawableResource by 
+      lazy { init_icon_120() }
+
+  public val icon_1200: DrawableResource by 
+      lazy { init_icon_1200() }
+
+  public val icon_1201: DrawableResource by 
+      lazy { init_icon_1201() }
+
+  public val icon_1202: DrawableResource by 
+      lazy { init_icon_1202() }
+
+  public val icon_1203: DrawableResource by 
+      lazy { init_icon_1203() }
+
+  public val icon_1204: DrawableResource by 
+      lazy { init_icon_1204() }
+
+  public val icon_1205: DrawableResource by 
+      lazy { init_icon_1205() }
+
+  public val icon_1206: DrawableResource by 
+      lazy { init_icon_1206() }
+
+  public val icon_1207: DrawableResource by 
+      lazy { init_icon_1207() }
+
+  public val icon_1208: DrawableResource by 
+      lazy { init_icon_1208() }
+
+  public val icon_1209: DrawableResource by 
+      lazy { init_icon_1209() }
+
+  public val icon_121: DrawableResource by 
+      lazy { init_icon_121() }
+
+  public val icon_1210: DrawableResource by 
+      lazy { init_icon_1210() }
+
+  public val icon_1211: DrawableResource by 
+      lazy { init_icon_1211() }
+
+  public val icon_1212: DrawableResource by 
+      lazy { init_icon_1212() }
+
+  public val icon_1213: DrawableResource by 
+      lazy { init_icon_1213() }
+
+  public val icon_1214: DrawableResource by 
+      lazy { init_icon_1214() }
+
+  public val icon_1215: DrawableResource by 
+      lazy { init_icon_1215() }
+
+  public val icon_1216: DrawableResource by 
+      lazy { init_icon_1216() }
+
+  public val icon_1217: DrawableResource by 
+      lazy { init_icon_1217() }
+
+  public val icon_1218: DrawableResource by 
+      lazy { init_icon_1218() }
+
+  public val icon_1219: DrawableResource by 
+      lazy { init_icon_1219() }
+
+  public val icon_122: DrawableResource by 
+      lazy { init_icon_122() }
+
+  public val icon_1220: DrawableResource by 
+      lazy { init_icon_1220() }
+
+  public val icon_1221: DrawableResource by 
+      lazy { init_icon_1221() }
+
+  public val icon_1222: DrawableResource by 
+      lazy { init_icon_1222() }
+
+  public val icon_1223: DrawableResource by 
+      lazy { init_icon_1223() }
+
+  public val icon_1224: DrawableResource by 
+      lazy { init_icon_1224() }
+
+  public val icon_1225: DrawableResource by 
+      lazy { init_icon_1225() }
+
+  public val icon_1226: DrawableResource by 
+      lazy { init_icon_1226() }
+
+  public val icon_1227: DrawableResource by 
+      lazy { init_icon_1227() }
+
+  public val icon_1228: DrawableResource by 
+      lazy { init_icon_1228() }
+
+  public val icon_1229: DrawableResource by 
+      lazy { init_icon_1229() }
+
+  public val icon_123: DrawableResource by 
+      lazy { init_icon_123() }
+
+  public val icon_1230: DrawableResource by 
+      lazy { init_icon_1230() }
+
+  public val icon_1231: DrawableResource by 
+      lazy { init_icon_1231() }
+
+  public val icon_1232: DrawableResource by 
+      lazy { init_icon_1232() }
+
+  public val icon_1233: DrawableResource by 
+      lazy { init_icon_1233() }
+
+  public val icon_1234: DrawableResource by 
+      lazy { init_icon_1234() }
+
+  public val icon_1235: DrawableResource by 
+      lazy { init_icon_1235() }
+
+  public val icon_1236: DrawableResource by 
+      lazy { init_icon_1236() }
+
+  public val icon_1237: DrawableResource by 
+      lazy { init_icon_1237() }
+
+  public val icon_1238: DrawableResource by 
+      lazy { init_icon_1238() }
+
+  public val icon_1239: DrawableResource by 
+      lazy { init_icon_1239() }
+
+  public val icon_124: DrawableResource by 
+      lazy { init_icon_124() }
+
+  public val icon_1240: DrawableResource by 
+      lazy { init_icon_1240() }
+
+  public val icon_1241: DrawableResource by 
+      lazy { init_icon_1241() }
+
+  public val icon_1242: DrawableResource by 
+      lazy { init_icon_1242() }
+
+  public val icon_1243: DrawableResource by 
+      lazy { init_icon_1243() }
+
+  public val icon_1244: DrawableResource by 
+      lazy { init_icon_1244() }
+
+  public val icon_1245: DrawableResource by 
+      lazy { init_icon_1245() }
+
+  public val icon_1246: DrawableResource by 
+      lazy { init_icon_1246() }
+
+  public val icon_1247: DrawableResource by 
+      lazy { init_icon_1247() }
+
+  public val icon_1248: DrawableResource by 
+      lazy { init_icon_1248() }
+
+  public val icon_1249: DrawableResource by 
+      lazy { init_icon_1249() }
+
+  public val icon_125: DrawableResource by 
+      lazy { init_icon_125() }
+
+  public val icon_1250: DrawableResource by 
+      lazy { init_icon_1250() }
+
+  public val icon_1251: DrawableResource by 
+      lazy { init_icon_1251() }
+
+  public val icon_1252: DrawableResource by 
+      lazy { init_icon_1252() }
+
+  public val icon_1253: DrawableResource by 
+      lazy { init_icon_1253() }
+
+  public val icon_1254: DrawableResource by 
+      lazy { init_icon_1254() }
+
+  public val icon_1255: DrawableResource by 
+      lazy { init_icon_1255() }
+
+  public val icon_1256: DrawableResource by 
+      lazy { init_icon_1256() }
+
+  public val icon_1257: DrawableResource by 
+      lazy { init_icon_1257() }
+
+  public val icon_1258: DrawableResource by 
+      lazy { init_icon_1258() }
+
+  public val icon_1259: DrawableResource by 
+      lazy { init_icon_1259() }
+
+  public val icon_126: DrawableResource by 
+      lazy { init_icon_126() }
+
+  public val icon_1260: DrawableResource by 
+      lazy { init_icon_1260() }
+
+  public val icon_1261: DrawableResource by 
+      lazy { init_icon_1261() }
+
+  public val icon_1262: DrawableResource by 
+      lazy { init_icon_1262() }
+
+  public val icon_1263: DrawableResource by 
+      lazy { init_icon_1263() }
+
+  public val icon_1264: DrawableResource by 
+      lazy { init_icon_1264() }
+
+  public val icon_1265: DrawableResource by 
+      lazy { init_icon_1265() }
+
+  public val icon_1266: DrawableResource by 
+      lazy { init_icon_1266() }
+
+  public val icon_1267: DrawableResource by 
+      lazy { init_icon_1267() }
+
+  public val icon_1268: DrawableResource by 
+      lazy { init_icon_1268() }
+
+  public val icon_1269: DrawableResource by 
+      lazy { init_icon_1269() }
+
+  public val icon_127: DrawableResource by 
+      lazy { init_icon_127() }
+
+  public val icon_1270: DrawableResource by 
+      lazy { init_icon_1270() }
+
+  public val icon_1271: DrawableResource by 
+      lazy { init_icon_1271() }
+
+  public val icon_1272: DrawableResource by 
+      lazy { init_icon_1272() }
+
+  public val icon_1273: DrawableResource by 
+      lazy { init_icon_1273() }
+
+  public val icon_1274: DrawableResource by 
+      lazy { init_icon_1274() }
+
+  public val icon_1275: DrawableResource by 
+      lazy { init_icon_1275() }
+
+  public val icon_1276: DrawableResource by 
+      lazy { init_icon_1276() }
+
+  public val icon_1277: DrawableResource by 
+      lazy { init_icon_1277() }
+
+  public val icon_1278: DrawableResource by 
+      lazy { init_icon_1278() }
+
+  public val icon_1279: DrawableResource by 
+      lazy { init_icon_1279() }
+
+  public val icon_128: DrawableResource by 
+      lazy { init_icon_128() }
+
+  public val icon_1280: DrawableResource by 
+      lazy { init_icon_1280() }
+
+  public val icon_1281: DrawableResource by 
+      lazy { init_icon_1281() }
+
+  public val icon_1282: DrawableResource by 
+      lazy { init_icon_1282() }
+
+  public val icon_1283: DrawableResource by 
+      lazy { init_icon_1283() }
+
+  public val icon_1284: DrawableResource by 
+      lazy { init_icon_1284() }
+
+  public val icon_1285: DrawableResource by 
+      lazy { init_icon_1285() }
+
+  public val icon_1286: DrawableResource by 
+      lazy { init_icon_1286() }
+
+  public val icon_1287: DrawableResource by 
+      lazy { init_icon_1287() }
+
+  public val icon_1288: DrawableResource by 
+      lazy { init_icon_1288() }
+
+  public val icon_1289: DrawableResource by 
+      lazy { init_icon_1289() }
+
+  public val icon_129: DrawableResource by 
+      lazy { init_icon_129() }
+
+  public val icon_1290: DrawableResource by 
+      lazy { init_icon_1290() }
+
+  public val icon_1291: DrawableResource by 
+      lazy { init_icon_1291() }
+
+  public val icon_1292: DrawableResource by 
+      lazy { init_icon_1292() }
+
+  public val icon_1293: DrawableResource by 
+      lazy { init_icon_1293() }
+
+  public val icon_1294: DrawableResource by 
+      lazy { init_icon_1294() }
+
+  public val icon_1295: DrawableResource by 
+      lazy { init_icon_1295() }
+
+  public val icon_1296: DrawableResource by 
+      lazy { init_icon_1296() }
+
+  public val icon_1297: DrawableResource by 
+      lazy { init_icon_1297() }
+
+  public val icon_1298: DrawableResource by 
+      lazy { init_icon_1298() }
+
+  public val icon_1299: DrawableResource by 
+      lazy { init_icon_1299() }
+
+  public val icon_13: DrawableResource by 
+      lazy { init_icon_13() }
+
+  public val icon_130: DrawableResource by 
+      lazy { init_icon_130() }
+
+  public val icon_1300: DrawableResource by 
+      lazy { init_icon_1300() }
+
+  public val icon_1301: DrawableResource by 
+      lazy { init_icon_1301() }
+
+  public val icon_1302: DrawableResource by 
+      lazy { init_icon_1302() }
+
+  public val icon_1303: DrawableResource by 
+      lazy { init_icon_1303() }
+
+  public val icon_1304: DrawableResource by 
+      lazy { init_icon_1304() }
+
+  public val icon_1305: DrawableResource by 
+      lazy { init_icon_1305() }
+
+  public val icon_1306: DrawableResource by 
+      lazy { init_icon_1306() }
+
+  public val icon_1307: DrawableResource by 
+      lazy { init_icon_1307() }
+
+  public val icon_1308: DrawableResource by 
+      lazy { init_icon_1308() }
+
+  public val icon_1309: DrawableResource by 
+      lazy { init_icon_1309() }
+
+  public val icon_131: DrawableResource by 
+      lazy { init_icon_131() }
+
+  public val icon_1310: DrawableResource by 
+      lazy { init_icon_1310() }
+
+  public val icon_1311: DrawableResource by 
+      lazy { init_icon_1311() }
+
+  public val icon_1312: DrawableResource by 
+      lazy { init_icon_1312() }
+
+  public val icon_1313: DrawableResource by 
+      lazy { init_icon_1313() }
+
+  public val icon_1314: DrawableResource by 
+      lazy { init_icon_1314() }
+
+  public val icon_1315: DrawableResource by 
+      lazy { init_icon_1315() }
+
+  public val icon_1316: DrawableResource by 
+      lazy { init_icon_1316() }
+
+  public val icon_1317: DrawableResource by 
+      lazy { init_icon_1317() }
+
+  public val icon_1318: DrawableResource by 
+      lazy { init_icon_1318() }
+
+  public val icon_1319: DrawableResource by 
+      lazy { init_icon_1319() }
+
+  public val icon_132: DrawableResource by 
+      lazy { init_icon_132() }
+
+  public val icon_1320: DrawableResource by 
+      lazy { init_icon_1320() }
+
+  public val icon_1321: DrawableResource by 
+      lazy { init_icon_1321() }
+
+  public val icon_1322: DrawableResource by 
+      lazy { init_icon_1322() }
+
+  public val icon_1323: DrawableResource by 
+      lazy { init_icon_1323() }
+
+  public val icon_1324: DrawableResource by 
+      lazy { init_icon_1324() }
+
+  public val icon_1325: DrawableResource by 
+      lazy { init_icon_1325() }
+
+  public val icon_1326: DrawableResource by 
+      lazy { init_icon_1326() }
+
+  public val icon_1327: DrawableResource by 
+      lazy { init_icon_1327() }
+
+  public val icon_1328: DrawableResource by 
+      lazy { init_icon_1328() }
+
+  public val icon_1329: DrawableResource by 
+      lazy { init_icon_1329() }
+
+  public val icon_133: DrawableResource by 
+      lazy { init_icon_133() }
+
+  public val icon_1330: DrawableResource by 
+      lazy { init_icon_1330() }
+
+  public val icon_1331: DrawableResource by 
+      lazy { init_icon_1331() }
+
+  public val icon_1332: DrawableResource by 
+      lazy { init_icon_1332() }
+
+  public val icon_1333: DrawableResource by 
+      lazy { init_icon_1333() }
+
+  public val icon_1334: DrawableResource by 
+      lazy { init_icon_1334() }
+
+  public val icon_1335: DrawableResource by 
+      lazy { init_icon_1335() }
+
+  public val icon_1336: DrawableResource by 
+      lazy { init_icon_1336() }
+
+  public val icon_1337: DrawableResource by 
+      lazy { init_icon_1337() }
+
+  public val icon_1338: DrawableResource by 
+      lazy { init_icon_1338() }
+
+  public val icon_1339: DrawableResource by 
+      lazy { init_icon_1339() }
+
+  public val icon_134: DrawableResource by 
+      lazy { init_icon_134() }
+
+  public val icon_1340: DrawableResource by 
+      lazy { init_icon_1340() }
+
+  public val icon_1341: DrawableResource by 
+      lazy { init_icon_1341() }
+
+  public val icon_1342: DrawableResource by 
+      lazy { init_icon_1342() }
+
+  public val icon_1343: DrawableResource by 
+      lazy { init_icon_1343() }
+
+  public val icon_1344: DrawableResource by 
+      lazy { init_icon_1344() }
+
+  public val icon_1345: DrawableResource by 
+      lazy { init_icon_1345() }
+
+  public val icon_1346: DrawableResource by 
+      lazy { init_icon_1346() }
+
+  public val icon_1347: DrawableResource by 
+      lazy { init_icon_1347() }
+
+  public val icon_1348: DrawableResource by 
+      lazy { init_icon_1348() }
+
+  public val icon_1349: DrawableResource by 
+      lazy { init_icon_1349() }
+
+  public val icon_135: DrawableResource by 
+      lazy { init_icon_135() }
+
+  public val icon_1350: DrawableResource by 
+      lazy { init_icon_1350() }
+
+  public val icon_1351: DrawableResource by 
+      lazy { init_icon_1351() }
+
+  public val icon_1352: DrawableResource by 
+      lazy { init_icon_1352() }
+
+  public val icon_1353: DrawableResource by 
+      lazy { init_icon_1353() }
+
+  public val icon_1354: DrawableResource by 
+      lazy { init_icon_1354() }
+
+  public val icon_1355: DrawableResource by 
+      lazy { init_icon_1355() }
+
+  public val icon_1356: DrawableResource by 
+      lazy { init_icon_1356() }
+
+  public val icon_1357: DrawableResource by 
+      lazy { init_icon_1357() }
+
+  public val icon_1358: DrawableResource by 
+      lazy { init_icon_1358() }
+
+  public val icon_1359: DrawableResource by 
+      lazy { init_icon_1359() }
+
+  public val icon_136: DrawableResource by 
+      lazy { init_icon_136() }
+
+  public val icon_1360: DrawableResource by 
+      lazy { init_icon_1360() }
+
+  public val icon_1361: DrawableResource by 
+      lazy { init_icon_1361() }
+
+  public val icon_1362: DrawableResource by 
+      lazy { init_icon_1362() }
+
+  public val icon_1363: DrawableResource by 
+      lazy { init_icon_1363() }
+
+  public val icon_1364: DrawableResource by 
+      lazy { init_icon_1364() }
+
+  public val icon_1365: DrawableResource by 
+      lazy { init_icon_1365() }
+
+  public val icon_1366: DrawableResource by 
+      lazy { init_icon_1366() }
+
+  public val icon_1367: DrawableResource by 
+      lazy { init_icon_1367() }
+
+  public val icon_1368: DrawableResource by 
+      lazy { init_icon_1368() }
+
+  public val icon_1369: DrawableResource by 
+      lazy { init_icon_1369() }
+
+  public val icon_137: DrawableResource by 
+      lazy { init_icon_137() }
+
+  public val icon_1370: DrawableResource by 
+      lazy { init_icon_1370() }
+
+  public val icon_1371: DrawableResource by 
+      lazy { init_icon_1371() }
+
+  public val icon_1372: DrawableResource by 
+      lazy { init_icon_1372() }
+
+  public val icon_1373: DrawableResource by 
+      lazy { init_icon_1373() }
+
+  public val icon_1374: DrawableResource by 
+      lazy { init_icon_1374() }
+
+  public val icon_1375: DrawableResource by 
+      lazy { init_icon_1375() }
+
+  public val icon_1376: DrawableResource by 
+      lazy { init_icon_1376() }
+
+  public val icon_1377: DrawableResource by 
+      lazy { init_icon_1377() }
+
+  public val icon_1378: DrawableResource by 
+      lazy { init_icon_1378() }
+
+  public val icon_1379: DrawableResource by 
+      lazy { init_icon_1379() }
+
+  public val icon_138: DrawableResource by 
+      lazy { init_icon_138() }
+
+  public val icon_1380: DrawableResource by 
+      lazy { init_icon_1380() }
+
+  public val icon_1381: DrawableResource by 
+      lazy { init_icon_1381() }
+
+  public val icon_1382: DrawableResource by 
+      lazy { init_icon_1382() }
+
+  public val icon_1383: DrawableResource by 
+      lazy { init_icon_1383() }
+
+  public val icon_1384: DrawableResource by 
+      lazy { init_icon_1384() }
+
+  public val icon_1385: DrawableResource by 
+      lazy { init_icon_1385() }
+
+  public val icon_1386: DrawableResource by 
+      lazy { init_icon_1386() }
+
+  public val icon_1387: DrawableResource by 
+      lazy { init_icon_1387() }
+
+  public val icon_1388: DrawableResource by 
+      lazy { init_icon_1388() }
+
+  public val icon_1389: DrawableResource by 
+      lazy { init_icon_1389() }
+
+  public val icon_139: DrawableResource by 
+      lazy { init_icon_139() }
+
+  public val icon_1390: DrawableResource by 
+      lazy { init_icon_1390() }
+
+  public val icon_1391: DrawableResource by 
+      lazy { init_icon_1391() }
+
+  public val icon_1392: DrawableResource by 
+      lazy { init_icon_1392() }
+
+  public val icon_1393: DrawableResource by 
+      lazy { init_icon_1393() }
+
+  public val icon_1394: DrawableResource by 
+      lazy { init_icon_1394() }
+
+  public val icon_1395: DrawableResource by 
+      lazy { init_icon_1395() }
+
+  public val icon_1396: DrawableResource by 
+      lazy { init_icon_1396() }
+
+  public val icon_1397: DrawableResource by 
+      lazy { init_icon_1397() }
+
+  public val icon_1398: DrawableResource by 
+      lazy { init_icon_1398() }
+
+  public val icon_1399: DrawableResource by 
+      lazy { init_icon_1399() }
+
+  public val icon_14: DrawableResource by 
+      lazy { init_icon_14() }
+
+  public val icon_140: DrawableResource by 
+      lazy { init_icon_140() }
+
+  public val icon_1400: DrawableResource by 
+      lazy { init_icon_1400() }
+
+  public val icon_1401: DrawableResource by 
+      lazy { init_icon_1401() }
+
+  public val icon_1402: DrawableResource by 
+      lazy { init_icon_1402() }
+
+  public val icon_1403: DrawableResource by 
+      lazy { init_icon_1403() }
+
+  public val icon_1404: DrawableResource by 
+      lazy { init_icon_1404() }
+
+  public val icon_1405: DrawableResource by 
+      lazy { init_icon_1405() }
+
+  public val icon_1406: DrawableResource by 
+      lazy { init_icon_1406() }
+
+  public val icon_1407: DrawableResource by 
+      lazy { init_icon_1407() }
+
+  public val icon_1408: DrawableResource by 
+      lazy { init_icon_1408() }
+
+  public val icon_1409: DrawableResource by 
+      lazy { init_icon_1409() }
+
+  public val icon_141: DrawableResource by 
+      lazy { init_icon_141() }
+
+  public val icon_1410: DrawableResource by 
+      lazy { init_icon_1410() }
+
+  public val icon_1411: DrawableResource by 
+      lazy { init_icon_1411() }
+
+  public val icon_1412: DrawableResource by 
+      lazy { init_icon_1412() }
+
+  public val icon_1413: DrawableResource by 
+      lazy { init_icon_1413() }
+
+  public val icon_1414: DrawableResource by 
+      lazy { init_icon_1414() }
+
+  public val icon_1415: DrawableResource by 
+      lazy { init_icon_1415() }
+
+  public val icon_1416: DrawableResource by 
+      lazy { init_icon_1416() }
+
+  public val icon_1417: DrawableResource by 
+      lazy { init_icon_1417() }
+
+  public val icon_1418: DrawableResource by 
+      lazy { init_icon_1418() }
+
+  public val icon_1419: DrawableResource by 
+      lazy { init_icon_1419() }
+
+  public val icon_142: DrawableResource by 
+      lazy { init_icon_142() }
+
+  public val icon_1420: DrawableResource by 
+      lazy { init_icon_1420() }
+
+  public val icon_1421: DrawableResource by 
+      lazy { init_icon_1421() }
+
+  public val icon_1422: DrawableResource by 
+      lazy { init_icon_1422() }
+
+  public val icon_1423: DrawableResource by 
+      lazy { init_icon_1423() }
+
+  public val icon_1424: DrawableResource by 
+      lazy { init_icon_1424() }
+
+  public val icon_1425: DrawableResource by 
+      lazy { init_icon_1425() }
+
+  public val icon_1426: DrawableResource by 
+      lazy { init_icon_1426() }
+
+  public val icon_1427: DrawableResource by 
+      lazy { init_icon_1427() }
+
+  public val icon_1428: DrawableResource by 
+      lazy { init_icon_1428() }
+
+  public val icon_1429: DrawableResource by 
+      lazy { init_icon_1429() }
+
+  public val icon_143: DrawableResource by 
+      lazy { init_icon_143() }
+
+  public val icon_1430: DrawableResource by 
+      lazy { init_icon_1430() }
+
+  public val icon_1431: DrawableResource by 
+      lazy { init_icon_1431() }
+
+  public val icon_1432: DrawableResource by 
+      lazy { init_icon_1432() }
+
+  public val icon_1433: DrawableResource by 
+      lazy { init_icon_1433() }
+
+  public val icon_1434: DrawableResource by 
+      lazy { init_icon_1434() }
+
+  public val icon_1435: DrawableResource by 
+      lazy { init_icon_1435() }
+
+  public val icon_1436: DrawableResource by 
+      lazy { init_icon_1436() }
+
+  public val icon_1437: DrawableResource by 
+      lazy { init_icon_1437() }
+
+  public val icon_1438: DrawableResource by 
+      lazy { init_icon_1438() }
+
+  public val icon_1439: DrawableResource by 
+      lazy { init_icon_1439() }
+
+  public val icon_144: DrawableResource by 
+      lazy { init_icon_144() }
+
+  public val icon_1440: DrawableResource by 
+      lazy { init_icon_1440() }
+
+  public val icon_1441: DrawableResource by 
+      lazy { init_icon_1441() }
+
+  public val icon_1442: DrawableResource by 
+      lazy { init_icon_1442() }
+
+  public val icon_1443: DrawableResource by 
+      lazy { init_icon_1443() }
+
+  public val icon_1444: DrawableResource by 
+      lazy { init_icon_1444() }
+
+  public val icon_1445: DrawableResource by 
+      lazy { init_icon_1445() }
+
+  public val icon_1446: DrawableResource by 
+      lazy { init_icon_1446() }
+
+  public val icon_1447: DrawableResource by 
+      lazy { init_icon_1447() }
 }
 
 @ExperimentalResourceApi
@@ -3514,1997 +1514,5997 @@ internal val Res.drawable.icon_0: DrawableResource
   get() = Drawable0.icon_0
 
 @ExperimentalResourceApi
+private fun init_icon_0(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_0",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_0.xml"),
+    )
+)
+
+@ExperimentalResourceApi
 internal val Res.drawable.icon_1: DrawableResource
   get() = Drawable0.icon_1
+
+@ExperimentalResourceApi
+private fun init_icon_1(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_10: DrawableResource
   get() = Drawable0.icon_10
 
 @ExperimentalResourceApi
+private fun init_icon_10(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_10",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_10.xml"),
+    )
+)
+
+@ExperimentalResourceApi
 internal val Res.drawable.icon_100: DrawableResource
   get() = Drawable0.icon_100
+
+@ExperimentalResourceApi
+private fun init_icon_100(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_100",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_100.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1000: DrawableResource
   get() = Drawable0.icon_1000
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10000: DrawableResource
-  get() = Drawable0.icon_10000
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10001: DrawableResource
-  get() = Drawable0.icon_10001
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10002: DrawableResource
-  get() = Drawable0.icon_10002
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10003: DrawableResource
-  get() = Drawable0.icon_10003
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10004: DrawableResource
-  get() = Drawable0.icon_10004
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10005: DrawableResource
-  get() = Drawable0.icon_10005
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10006: DrawableResource
-  get() = Drawable0.icon_10006
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10007: DrawableResource
-  get() = Drawable0.icon_10007
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10008: DrawableResource
-  get() = Drawable0.icon_10008
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10009: DrawableResource
-  get() = Drawable0.icon_10009
+private fun init_icon_1000(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1000",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1000.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1001: DrawableResource
   get() = Drawable0.icon_1001
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10010: DrawableResource
-  get() = Drawable0.icon_10010
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10011: DrawableResource
-  get() = Drawable0.icon_10011
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10012: DrawableResource
-  get() = Drawable0.icon_10012
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10013: DrawableResource
-  get() = Drawable0.icon_10013
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10014: DrawableResource
-  get() = Drawable0.icon_10014
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10015: DrawableResource
-  get() = Drawable0.icon_10015
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10016: DrawableResource
-  get() = Drawable0.icon_10016
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10017: DrawableResource
-  get() = Drawable0.icon_10017
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10018: DrawableResource
-  get() = Drawable0.icon_10018
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10019: DrawableResource
-  get() = Drawable0.icon_10019
+private fun init_icon_1001(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1001",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1001.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1002: DrawableResource
   get() = Drawable0.icon_1002
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10020: DrawableResource
-  get() = Drawable0.icon_10020
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10021: DrawableResource
-  get() = Drawable0.icon_10021
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10022: DrawableResource
-  get() = Drawable0.icon_10022
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10023: DrawableResource
-  get() = Drawable0.icon_10023
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10024: DrawableResource
-  get() = Drawable0.icon_10024
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10025: DrawableResource
-  get() = Drawable0.icon_10025
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10026: DrawableResource
-  get() = Drawable0.icon_10026
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10027: DrawableResource
-  get() = Drawable0.icon_10027
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10028: DrawableResource
-  get() = Drawable0.icon_10028
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10029: DrawableResource
-  get() = Drawable0.icon_10029
+private fun init_icon_1002(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1002",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1002.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1003: DrawableResource
   get() = Drawable0.icon_1003
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10030: DrawableResource
-  get() = Drawable0.icon_10030
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10031: DrawableResource
-  get() = Drawable0.icon_10031
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10032: DrawableResource
-  get() = Drawable0.icon_10032
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10033: DrawableResource
-  get() = Drawable0.icon_10033
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10034: DrawableResource
-  get() = Drawable0.icon_10034
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10035: DrawableResource
-  get() = Drawable0.icon_10035
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10036: DrawableResource
-  get() = Drawable0.icon_10036
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10037: DrawableResource
-  get() = Drawable0.icon_10037
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10038: DrawableResource
-  get() = Drawable0.icon_10038
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10039: DrawableResource
-  get() = Drawable0.icon_10039
+private fun init_icon_1003(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1003",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1003.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1004: DrawableResource
   get() = Drawable0.icon_1004
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10040: DrawableResource
-  get() = Drawable0.icon_10040
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10041: DrawableResource
-  get() = Drawable0.icon_10041
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10042: DrawableResource
-  get() = Drawable0.icon_10042
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10043: DrawableResource
-  get() = Drawable0.icon_10043
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10044: DrawableResource
-  get() = Drawable0.icon_10044
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10045: DrawableResource
-  get() = Drawable0.icon_10045
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10046: DrawableResource
-  get() = Drawable0.icon_10046
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10047: DrawableResource
-  get() = Drawable0.icon_10047
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10048: DrawableResource
-  get() = Drawable0.icon_10048
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10049: DrawableResource
-  get() = Drawable0.icon_10049
+private fun init_icon_1004(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1004",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1004.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1005: DrawableResource
   get() = Drawable0.icon_1005
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10050: DrawableResource
-  get() = Drawable0.icon_10050
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10051: DrawableResource
-  get() = Drawable0.icon_10051
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10052: DrawableResource
-  get() = Drawable0.icon_10052
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10053: DrawableResource
-  get() = Drawable0.icon_10053
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10054: DrawableResource
-  get() = Drawable0.icon_10054
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10055: DrawableResource
-  get() = Drawable0.icon_10055
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10056: DrawableResource
-  get() = Drawable0.icon_10056
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10057: DrawableResource
-  get() = Drawable0.icon_10057
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10058: DrawableResource
-  get() = Drawable0.icon_10058
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10059: DrawableResource
-  get() = Drawable0.icon_10059
+private fun init_icon_1005(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1005",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1005.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1006: DrawableResource
   get() = Drawable0.icon_1006
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10060: DrawableResource
-  get() = Drawable0.icon_10060
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10061: DrawableResource
-  get() = Drawable0.icon_10061
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10062: DrawableResource
-  get() = Drawable0.icon_10062
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10063: DrawableResource
-  get() = Drawable0.icon_10063
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10064: DrawableResource
-  get() = Drawable0.icon_10064
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10065: DrawableResource
-  get() = Drawable0.icon_10065
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10066: DrawableResource
-  get() = Drawable0.icon_10066
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10067: DrawableResource
-  get() = Drawable0.icon_10067
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10068: DrawableResource
-  get() = Drawable0.icon_10068
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10069: DrawableResource
-  get() = Drawable0.icon_10069
+private fun init_icon_1006(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1006",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1006.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1007: DrawableResource
   get() = Drawable0.icon_1007
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10070: DrawableResource
-  get() = Drawable0.icon_10070
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10071: DrawableResource
-  get() = Drawable0.icon_10071
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10072: DrawableResource
-  get() = Drawable0.icon_10072
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10073: DrawableResource
-  get() = Drawable0.icon_10073
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10074: DrawableResource
-  get() = Drawable0.icon_10074
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10075: DrawableResource
-  get() = Drawable0.icon_10075
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10076: DrawableResource
-  get() = Drawable0.icon_10076
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10077: DrawableResource
-  get() = Drawable0.icon_10077
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10078: DrawableResource
-  get() = Drawable0.icon_10078
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10079: DrawableResource
-  get() = Drawable0.icon_10079
+private fun init_icon_1007(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1007",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1007.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1008: DrawableResource
   get() = Drawable0.icon_1008
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10080: DrawableResource
-  get() = Drawable0.icon_10080
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10081: DrawableResource
-  get() = Drawable0.icon_10081
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10082: DrawableResource
-  get() = Drawable0.icon_10082
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10083: DrawableResource
-  get() = Drawable0.icon_10083
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10084: DrawableResource
-  get() = Drawable0.icon_10084
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10085: DrawableResource
-  get() = Drawable0.icon_10085
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10086: DrawableResource
-  get() = Drawable0.icon_10086
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10087: DrawableResource
-  get() = Drawable0.icon_10087
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10088: DrawableResource
-  get() = Drawable0.icon_10088
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10089: DrawableResource
-  get() = Drawable0.icon_10089
+private fun init_icon_1008(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1008",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1008.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1009: DrawableResource
   get() = Drawable0.icon_1009
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10090: DrawableResource
-  get() = Drawable0.icon_10090
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10091: DrawableResource
-  get() = Drawable0.icon_10091
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10092: DrawableResource
-  get() = Drawable0.icon_10092
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10093: DrawableResource
-  get() = Drawable0.icon_10093
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10094: DrawableResource
-  get() = Drawable0.icon_10094
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10095: DrawableResource
-  get() = Drawable0.icon_10095
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10096: DrawableResource
-  get() = Drawable0.icon_10096
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10097: DrawableResource
-  get() = Drawable0.icon_10097
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10098: DrawableResource
-  get() = Drawable0.icon_10098
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10099: DrawableResource
-  get() = Drawable0.icon_10099
+private fun init_icon_1009(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1009",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1009.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_101: DrawableResource
   get() = Drawable0.icon_101
 
 @ExperimentalResourceApi
+private fun init_icon_101(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_101",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_101.xml"),
+    )
+)
+
+@ExperimentalResourceApi
 internal val Res.drawable.icon_1010: DrawableResource
   get() = Drawable0.icon_1010
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10100: DrawableResource
-  get() = Drawable0.icon_10100
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10101: DrawableResource
-  get() = Drawable0.icon_10101
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10102: DrawableResource
-  get() = Drawable0.icon_10102
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10103: DrawableResource
-  get() = Drawable0.icon_10103
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10104: DrawableResource
-  get() = Drawable0.icon_10104
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10105: DrawableResource
-  get() = Drawable0.icon_10105
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10106: DrawableResource
-  get() = Drawable0.icon_10106
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10107: DrawableResource
-  get() = Drawable0.icon_10107
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10108: DrawableResource
-  get() = Drawable0.icon_10108
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10109: DrawableResource
-  get() = Drawable0.icon_10109
+private fun init_icon_1010(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1010",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1010.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1011: DrawableResource
   get() = Drawable0.icon_1011
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10110: DrawableResource
-  get() = Drawable0.icon_10110
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10111: DrawableResource
-  get() = Drawable0.icon_10111
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10112: DrawableResource
-  get() = Drawable0.icon_10112
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10113: DrawableResource
-  get() = Drawable0.icon_10113
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10114: DrawableResource
-  get() = Drawable0.icon_10114
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10115: DrawableResource
-  get() = Drawable0.icon_10115
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10116: DrawableResource
-  get() = Drawable0.icon_10116
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10117: DrawableResource
-  get() = Drawable0.icon_10117
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10118: DrawableResource
-  get() = Drawable0.icon_10118
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10119: DrawableResource
-  get() = Drawable0.icon_10119
+private fun init_icon_1011(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1011",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1011.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1012: DrawableResource
   get() = Drawable0.icon_1012
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10120: DrawableResource
-  get() = Drawable0.icon_10120
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10121: DrawableResource
-  get() = Drawable0.icon_10121
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10122: DrawableResource
-  get() = Drawable0.icon_10122
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10123: DrawableResource
-  get() = Drawable0.icon_10123
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10124: DrawableResource
-  get() = Drawable0.icon_10124
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10125: DrawableResource
-  get() = Drawable0.icon_10125
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10126: DrawableResource
-  get() = Drawable0.icon_10126
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10127: DrawableResource
-  get() = Drawable0.icon_10127
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10128: DrawableResource
-  get() = Drawable0.icon_10128
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10129: DrawableResource
-  get() = Drawable0.icon_10129
+private fun init_icon_1012(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1012",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1012.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1013: DrawableResource
   get() = Drawable0.icon_1013
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10130: DrawableResource
-  get() = Drawable0.icon_10130
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10131: DrawableResource
-  get() = Drawable0.icon_10131
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10132: DrawableResource
-  get() = Drawable0.icon_10132
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10133: DrawableResource
-  get() = Drawable0.icon_10133
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10134: DrawableResource
-  get() = Drawable0.icon_10134
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10135: DrawableResource
-  get() = Drawable0.icon_10135
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10136: DrawableResource
-  get() = Drawable0.icon_10136
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10137: DrawableResource
-  get() = Drawable0.icon_10137
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10138: DrawableResource
-  get() = Drawable0.icon_10138
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10139: DrawableResource
-  get() = Drawable0.icon_10139
+private fun init_icon_1013(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1013",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1013.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1014: DrawableResource
   get() = Drawable0.icon_1014
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10140: DrawableResource
-  get() = Drawable0.icon_10140
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10141: DrawableResource
-  get() = Drawable0.icon_10141
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10142: DrawableResource
-  get() = Drawable0.icon_10142
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10143: DrawableResource
-  get() = Drawable0.icon_10143
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10144: DrawableResource
-  get() = Drawable0.icon_10144
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10145: DrawableResource
-  get() = Drawable0.icon_10145
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10146: DrawableResource
-  get() = Drawable0.icon_10146
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10147: DrawableResource
-  get() = Drawable0.icon_10147
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10148: DrawableResource
-  get() = Drawable0.icon_10148
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10149: DrawableResource
-  get() = Drawable0.icon_10149
+private fun init_icon_1014(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1014",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1014.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1015: DrawableResource
   get() = Drawable0.icon_1015
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10150: DrawableResource
-  get() = Drawable0.icon_10150
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10151: DrawableResource
-  get() = Drawable0.icon_10151
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10152: DrawableResource
-  get() = Drawable0.icon_10152
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10153: DrawableResource
-  get() = Drawable0.icon_10153
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10154: DrawableResource
-  get() = Drawable0.icon_10154
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10155: DrawableResource
-  get() = Drawable0.icon_10155
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10156: DrawableResource
-  get() = Drawable0.icon_10156
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10157: DrawableResource
-  get() = Drawable0.icon_10157
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10158: DrawableResource
-  get() = Drawable0.icon_10158
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10159: DrawableResource
-  get() = Drawable0.icon_10159
+private fun init_icon_1015(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1015",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1015.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1016: DrawableResource
   get() = Drawable0.icon_1016
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10160: DrawableResource
-  get() = Drawable0.icon_10160
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10161: DrawableResource
-  get() = Drawable0.icon_10161
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10162: DrawableResource
-  get() = Drawable0.icon_10162
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10163: DrawableResource
-  get() = Drawable0.icon_10163
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10164: DrawableResource
-  get() = Drawable0.icon_10164
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10165: DrawableResource
-  get() = Drawable0.icon_10165
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10166: DrawableResource
-  get() = Drawable0.icon_10166
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10167: DrawableResource
-  get() = Drawable0.icon_10167
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10168: DrawableResource
-  get() = Drawable0.icon_10168
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10169: DrawableResource
-  get() = Drawable0.icon_10169
+private fun init_icon_1016(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1016",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1016.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1017: DrawableResource
   get() = Drawable0.icon_1017
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10170: DrawableResource
-  get() = Drawable0.icon_10170
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10171: DrawableResource
-  get() = Drawable0.icon_10171
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10172: DrawableResource
-  get() = Drawable0.icon_10172
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10173: DrawableResource
-  get() = Drawable0.icon_10173
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10174: DrawableResource
-  get() = Drawable0.icon_10174
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10175: DrawableResource
-  get() = Drawable0.icon_10175
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10176: DrawableResource
-  get() = Drawable0.icon_10176
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10177: DrawableResource
-  get() = Drawable0.icon_10177
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10178: DrawableResource
-  get() = Drawable0.icon_10178
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10179: DrawableResource
-  get() = Drawable0.icon_10179
+private fun init_icon_1017(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1017",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1017.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1018: DrawableResource
   get() = Drawable0.icon_1018
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10180: DrawableResource
-  get() = Drawable0.icon_10180
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10181: DrawableResource
-  get() = Drawable0.icon_10181
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10182: DrawableResource
-  get() = Drawable0.icon_10182
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10183: DrawableResource
-  get() = Drawable0.icon_10183
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10184: DrawableResource
-  get() = Drawable0.icon_10184
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10185: DrawableResource
-  get() = Drawable0.icon_10185
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10186: DrawableResource
-  get() = Drawable0.icon_10186
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10187: DrawableResource
-  get() = Drawable0.icon_10187
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10188: DrawableResource
-  get() = Drawable0.icon_10188
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10189: DrawableResource
-  get() = Drawable0.icon_10189
+private fun init_icon_1018(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1018",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1018.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1019: DrawableResource
   get() = Drawable0.icon_1019
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10190: DrawableResource
-  get() = Drawable0.icon_10190
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10191: DrawableResource
-  get() = Drawable0.icon_10191
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10192: DrawableResource
-  get() = Drawable0.icon_10192
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10193: DrawableResource
-  get() = Drawable0.icon_10193
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10194: DrawableResource
-  get() = Drawable0.icon_10194
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10195: DrawableResource
-  get() = Drawable0.icon_10195
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10196: DrawableResource
-  get() = Drawable0.icon_10196
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10197: DrawableResource
-  get() = Drawable0.icon_10197
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10198: DrawableResource
-  get() = Drawable0.icon_10198
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10199: DrawableResource
-  get() = Drawable0.icon_10199
+private fun init_icon_1019(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1019",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1019.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_102: DrawableResource
   get() = Drawable0.icon_102
 
 @ExperimentalResourceApi
+private fun init_icon_102(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_102",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_102.xml"),
+    )
+)
+
+@ExperimentalResourceApi
 internal val Res.drawable.icon_1020: DrawableResource
   get() = Drawable0.icon_1020
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10200: DrawableResource
-  get() = Drawable0.icon_10200
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10201: DrawableResource
-  get() = Drawable0.icon_10201
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10202: DrawableResource
-  get() = Drawable0.icon_10202
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10203: DrawableResource
-  get() = Drawable0.icon_10203
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10204: DrawableResource
-  get() = Drawable0.icon_10204
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10205: DrawableResource
-  get() = Drawable0.icon_10205
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10206: DrawableResource
-  get() = Drawable0.icon_10206
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10207: DrawableResource
-  get() = Drawable0.icon_10207
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10208: DrawableResource
-  get() = Drawable0.icon_10208
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10209: DrawableResource
-  get() = Drawable0.icon_10209
+private fun init_icon_1020(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1020",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1020.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1021: DrawableResource
   get() = Drawable0.icon_1021
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10210: DrawableResource
-  get() = Drawable0.icon_10210
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10211: DrawableResource
-  get() = Drawable0.icon_10211
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10212: DrawableResource
-  get() = Drawable0.icon_10212
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10213: DrawableResource
-  get() = Drawable0.icon_10213
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10214: DrawableResource
-  get() = Drawable0.icon_10214
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10215: DrawableResource
-  get() = Drawable0.icon_10215
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10216: DrawableResource
-  get() = Drawable0.icon_10216
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10217: DrawableResource
-  get() = Drawable0.icon_10217
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10218: DrawableResource
-  get() = Drawable0.icon_10218
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10219: DrawableResource
-  get() = Drawable0.icon_10219
+private fun init_icon_1021(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1021",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1021.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1022: DrawableResource
   get() = Drawable0.icon_1022
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10220: DrawableResource
-  get() = Drawable0.icon_10220
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10221: DrawableResource
-  get() = Drawable0.icon_10221
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10222: DrawableResource
-  get() = Drawable0.icon_10222
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10223: DrawableResource
-  get() = Drawable0.icon_10223
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10224: DrawableResource
-  get() = Drawable0.icon_10224
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10225: DrawableResource
-  get() = Drawable0.icon_10225
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10226: DrawableResource
-  get() = Drawable0.icon_10226
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10227: DrawableResource
-  get() = Drawable0.icon_10227
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10228: DrawableResource
-  get() = Drawable0.icon_10228
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10229: DrawableResource
-  get() = Drawable0.icon_10229
+private fun init_icon_1022(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1022",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1022.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1023: DrawableResource
   get() = Drawable0.icon_1023
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10230: DrawableResource
-  get() = Drawable0.icon_10230
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10231: DrawableResource
-  get() = Drawable0.icon_10231
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10232: DrawableResource
-  get() = Drawable0.icon_10232
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10233: DrawableResource
-  get() = Drawable0.icon_10233
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10234: DrawableResource
-  get() = Drawable0.icon_10234
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10235: DrawableResource
-  get() = Drawable0.icon_10235
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10236: DrawableResource
-  get() = Drawable0.icon_10236
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10237: DrawableResource
-  get() = Drawable0.icon_10237
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10238: DrawableResource
-  get() = Drawable0.icon_10238
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10239: DrawableResource
-  get() = Drawable0.icon_10239
+private fun init_icon_1023(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1023",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1023.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1024: DrawableResource
   get() = Drawable0.icon_1024
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10240: DrawableResource
-  get() = Drawable0.icon_10240
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10241: DrawableResource
-  get() = Drawable0.icon_10241
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10242: DrawableResource
-  get() = Drawable0.icon_10242
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10243: DrawableResource
-  get() = Drawable0.icon_10243
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10244: DrawableResource
-  get() = Drawable0.icon_10244
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10245: DrawableResource
-  get() = Drawable0.icon_10245
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10246: DrawableResource
-  get() = Drawable0.icon_10246
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10247: DrawableResource
-  get() = Drawable0.icon_10247
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10248: DrawableResource
-  get() = Drawable0.icon_10248
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10249: DrawableResource
-  get() = Drawable0.icon_10249
+private fun init_icon_1024(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1024",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1024.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1025: DrawableResource
   get() = Drawable0.icon_1025
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10250: DrawableResource
-  get() = Drawable0.icon_10250
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10251: DrawableResource
-  get() = Drawable0.icon_10251
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10252: DrawableResource
-  get() = Drawable0.icon_10252
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10253: DrawableResource
-  get() = Drawable0.icon_10253
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10254: DrawableResource
-  get() = Drawable0.icon_10254
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10255: DrawableResource
-  get() = Drawable0.icon_10255
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10256: DrawableResource
-  get() = Drawable0.icon_10256
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10257: DrawableResource
-  get() = Drawable0.icon_10257
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10258: DrawableResource
-  get() = Drawable0.icon_10258
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10259: DrawableResource
-  get() = Drawable0.icon_10259
+private fun init_icon_1025(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1025",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1025.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1026: DrawableResource
   get() = Drawable0.icon_1026
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10260: DrawableResource
-  get() = Drawable0.icon_10260
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10261: DrawableResource
-  get() = Drawable0.icon_10261
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10262: DrawableResource
-  get() = Drawable0.icon_10262
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10263: DrawableResource
-  get() = Drawable0.icon_10263
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10264: DrawableResource
-  get() = Drawable0.icon_10264
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10265: DrawableResource
-  get() = Drawable0.icon_10265
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10266: DrawableResource
-  get() = Drawable0.icon_10266
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10267: DrawableResource
-  get() = Drawable0.icon_10267
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10268: DrawableResource
-  get() = Drawable0.icon_10268
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10269: DrawableResource
-  get() = Drawable0.icon_10269
+private fun init_icon_1026(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1026",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1026.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1027: DrawableResource
   get() = Drawable0.icon_1027
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10270: DrawableResource
-  get() = Drawable0.icon_10270
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10271: DrawableResource
-  get() = Drawable0.icon_10271
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10272: DrawableResource
-  get() = Drawable0.icon_10272
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10273: DrawableResource
-  get() = Drawable0.icon_10273
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10274: DrawableResource
-  get() = Drawable0.icon_10274
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10275: DrawableResource
-  get() = Drawable0.icon_10275
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10276: DrawableResource
-  get() = Drawable0.icon_10276
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10277: DrawableResource
-  get() = Drawable0.icon_10277
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10278: DrawableResource
-  get() = Drawable0.icon_10278
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10279: DrawableResource
-  get() = Drawable0.icon_10279
+private fun init_icon_1027(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1027",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1027.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1028: DrawableResource
   get() = Drawable0.icon_1028
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10280: DrawableResource
-  get() = Drawable0.icon_10280
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10281: DrawableResource
-  get() = Drawable0.icon_10281
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10282: DrawableResource
-  get() = Drawable0.icon_10282
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10283: DrawableResource
-  get() = Drawable0.icon_10283
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10284: DrawableResource
-  get() = Drawable0.icon_10284
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10285: DrawableResource
-  get() = Drawable0.icon_10285
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10286: DrawableResource
-  get() = Drawable0.icon_10286
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10287: DrawableResource
-  get() = Drawable0.icon_10287
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10288: DrawableResource
-  get() = Drawable0.icon_10288
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10289: DrawableResource
-  get() = Drawable0.icon_10289
+private fun init_icon_1028(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1028",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1028.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1029: DrawableResource
   get() = Drawable0.icon_1029
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10290: DrawableResource
-  get() = Drawable0.icon_10290
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10291: DrawableResource
-  get() = Drawable0.icon_10291
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10292: DrawableResource
-  get() = Drawable0.icon_10292
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10293: DrawableResource
-  get() = Drawable0.icon_10293
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10294: DrawableResource
-  get() = Drawable0.icon_10294
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10295: DrawableResource
-  get() = Drawable0.icon_10295
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10296: DrawableResource
-  get() = Drawable0.icon_10296
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10297: DrawableResource
-  get() = Drawable0.icon_10297
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10298: DrawableResource
-  get() = Drawable0.icon_10298
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10299: DrawableResource
-  get() = Drawable0.icon_10299
+private fun init_icon_1029(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1029",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1029.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_103: DrawableResource
   get() = Drawable0.icon_103
 
 @ExperimentalResourceApi
+private fun init_icon_103(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_103",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_103.xml"),
+    )
+)
+
+@ExperimentalResourceApi
 internal val Res.drawable.icon_1030: DrawableResource
   get() = Drawable0.icon_1030
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10300: DrawableResource
-  get() = Drawable0.icon_10300
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10301: DrawableResource
-  get() = Drawable0.icon_10301
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10302: DrawableResource
-  get() = Drawable0.icon_10302
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10303: DrawableResource
-  get() = Drawable0.icon_10303
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10304: DrawableResource
-  get() = Drawable0.icon_10304
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10305: DrawableResource
-  get() = Drawable0.icon_10305
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10306: DrawableResource
-  get() = Drawable0.icon_10306
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10307: DrawableResource
-  get() = Drawable0.icon_10307
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10308: DrawableResource
-  get() = Drawable0.icon_10308
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10309: DrawableResource
-  get() = Drawable0.icon_10309
+private fun init_icon_1030(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1030",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1030.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1031: DrawableResource
   get() = Drawable0.icon_1031
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10310: DrawableResource
-  get() = Drawable0.icon_10310
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10311: DrawableResource
-  get() = Drawable0.icon_10311
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10312: DrawableResource
-  get() = Drawable0.icon_10312
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10313: DrawableResource
-  get() = Drawable0.icon_10313
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10314: DrawableResource
-  get() = Drawable0.icon_10314
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10315: DrawableResource
-  get() = Drawable0.icon_10315
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10316: DrawableResource
-  get() = Drawable0.icon_10316
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10317: DrawableResource
-  get() = Drawable0.icon_10317
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10318: DrawableResource
-  get() = Drawable0.icon_10318
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10319: DrawableResource
-  get() = Drawable0.icon_10319
+private fun init_icon_1031(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1031",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1031.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1032: DrawableResource
   get() = Drawable0.icon_1032
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10320: DrawableResource
-  get() = Drawable0.icon_10320
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10321: DrawableResource
-  get() = Drawable0.icon_10321
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10322: DrawableResource
-  get() = Drawable0.icon_10322
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10323: DrawableResource
-  get() = Drawable0.icon_10323
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10324: DrawableResource
-  get() = Drawable0.icon_10324
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10325: DrawableResource
-  get() = Drawable0.icon_10325
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10326: DrawableResource
-  get() = Drawable0.icon_10326
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10327: DrawableResource
-  get() = Drawable0.icon_10327
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10328: DrawableResource
-  get() = Drawable0.icon_10328
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10329: DrawableResource
-  get() = Drawable0.icon_10329
+private fun init_icon_1032(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1032",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1032.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1033: DrawableResource
   get() = Drawable0.icon_1033
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10330: DrawableResource
-  get() = Drawable0.icon_10330
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10331: DrawableResource
-  get() = Drawable0.icon_10331
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10332: DrawableResource
-  get() = Drawable0.icon_10332
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10333: DrawableResource
-  get() = Drawable0.icon_10333
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10334: DrawableResource
-  get() = Drawable0.icon_10334
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10335: DrawableResource
-  get() = Drawable0.icon_10335
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10336: DrawableResource
-  get() = Drawable0.icon_10336
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10337: DrawableResource
-  get() = Drawable0.icon_10337
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10338: DrawableResource
-  get() = Drawable0.icon_10338
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10339: DrawableResource
-  get() = Drawable0.icon_10339
+private fun init_icon_1033(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1033",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1033.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1034: DrawableResource
   get() = Drawable0.icon_1034
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10340: DrawableResource
-  get() = Drawable0.icon_10340
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10341: DrawableResource
-  get() = Drawable0.icon_10341
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10342: DrawableResource
-  get() = Drawable0.icon_10342
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10343: DrawableResource
-  get() = Drawable0.icon_10343
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10344: DrawableResource
-  get() = Drawable0.icon_10344
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10345: DrawableResource
-  get() = Drawable0.icon_10345
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10346: DrawableResource
-  get() = Drawable0.icon_10346
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10347: DrawableResource
-  get() = Drawable0.icon_10347
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10348: DrawableResource
-  get() = Drawable0.icon_10348
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10349: DrawableResource
-  get() = Drawable0.icon_10349
+private fun init_icon_1034(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1034",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1034.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1035: DrawableResource
   get() = Drawable0.icon_1035
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10350: DrawableResource
-  get() = Drawable0.icon_10350
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10351: DrawableResource
-  get() = Drawable0.icon_10351
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10352: DrawableResource
-  get() = Drawable0.icon_10352
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10353: DrawableResource
-  get() = Drawable0.icon_10353
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10354: DrawableResource
-  get() = Drawable0.icon_10354
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10355: DrawableResource
-  get() = Drawable0.icon_10355
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10356: DrawableResource
-  get() = Drawable0.icon_10356
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10357: DrawableResource
-  get() = Drawable0.icon_10357
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10358: DrawableResource
-  get() = Drawable0.icon_10358
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10359: DrawableResource
-  get() = Drawable0.icon_10359
+private fun init_icon_1035(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1035",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1035.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1036: DrawableResource
   get() = Drawable0.icon_1036
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10360: DrawableResource
-  get() = Drawable0.icon_10360
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10361: DrawableResource
-  get() = Drawable0.icon_10361
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10362: DrawableResource
-  get() = Drawable0.icon_10362
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10363: DrawableResource
-  get() = Drawable0.icon_10363
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10364: DrawableResource
-  get() = Drawable0.icon_10364
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10365: DrawableResource
-  get() = Drawable0.icon_10365
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10366: DrawableResource
-  get() = Drawable0.icon_10366
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10367: DrawableResource
-  get() = Drawable0.icon_10367
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10368: DrawableResource
-  get() = Drawable0.icon_10368
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10369: DrawableResource
-  get() = Drawable0.icon_10369
+private fun init_icon_1036(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1036",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1036.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1037: DrawableResource
   get() = Drawable0.icon_1037
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10370: DrawableResource
-  get() = Drawable0.icon_10370
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10371: DrawableResource
-  get() = Drawable0.icon_10371
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10372: DrawableResource
-  get() = Drawable0.icon_10372
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10373: DrawableResource
-  get() = Drawable0.icon_10373
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10374: DrawableResource
-  get() = Drawable0.icon_10374
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10375: DrawableResource
-  get() = Drawable0.icon_10375
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10376: DrawableResource
-  get() = Drawable0.icon_10376
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10377: DrawableResource
-  get() = Drawable0.icon_10377
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10378: DrawableResource
-  get() = Drawable0.icon_10378
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10379: DrawableResource
-  get() = Drawable0.icon_10379
+private fun init_icon_1037(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1037",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1037.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1038: DrawableResource
   get() = Drawable0.icon_1038
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10380: DrawableResource
-  get() = Drawable0.icon_10380
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10381: DrawableResource
-  get() = Drawable0.icon_10381
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10382: DrawableResource
-  get() = Drawable0.icon_10382
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10383: DrawableResource
-  get() = Drawable0.icon_10383
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10384: DrawableResource
-  get() = Drawable0.icon_10384
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10385: DrawableResource
-  get() = Drawable0.icon_10385
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10386: DrawableResource
-  get() = Drawable0.icon_10386
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10387: DrawableResource
-  get() = Drawable0.icon_10387
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10388: DrawableResource
-  get() = Drawable0.icon_10388
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10389: DrawableResource
-  get() = Drawable0.icon_10389
+private fun init_icon_1038(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1038",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1038.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1039: DrawableResource
   get() = Drawable0.icon_1039
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10390: DrawableResource
-  get() = Drawable0.icon_10390
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10391: DrawableResource
-  get() = Drawable0.icon_10391
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10392: DrawableResource
-  get() = Drawable0.icon_10392
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10393: DrawableResource
-  get() = Drawable0.icon_10393
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10394: DrawableResource
-  get() = Drawable0.icon_10394
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10395: DrawableResource
-  get() = Drawable0.icon_10395
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10396: DrawableResource
-  get() = Drawable0.icon_10396
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10397: DrawableResource
-  get() = Drawable0.icon_10397
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10398: DrawableResource
-  get() = Drawable0.icon_10398
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10399: DrawableResource
-  get() = Drawable0.icon_10399
+private fun init_icon_1039(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1039",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1039.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_104: DrawableResource
   get() = Drawable0.icon_104
 
 @ExperimentalResourceApi
+private fun init_icon_104(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_104",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_104.xml"),
+    )
+)
+
+@ExperimentalResourceApi
 internal val Res.drawable.icon_1040: DrawableResource
   get() = Drawable0.icon_1040
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10400: DrawableResource
-  get() = Drawable0.icon_10400
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10401: DrawableResource
-  get() = Drawable0.icon_10401
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10402: DrawableResource
-  get() = Drawable0.icon_10402
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10403: DrawableResource
-  get() = Drawable0.icon_10403
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10404: DrawableResource
-  get() = Drawable0.icon_10404
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10405: DrawableResource
-  get() = Drawable0.icon_10405
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10406: DrawableResource
-  get() = Drawable0.icon_10406
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10407: DrawableResource
-  get() = Drawable0.icon_10407
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10408: DrawableResource
-  get() = Drawable0.icon_10408
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10409: DrawableResource
-  get() = Drawable0.icon_10409
+private fun init_icon_1040(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1040",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1040.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1041: DrawableResource
   get() = Drawable0.icon_1041
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10410: DrawableResource
-  get() = Drawable0.icon_10410
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10411: DrawableResource
-  get() = Drawable0.icon_10411
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10412: DrawableResource
-  get() = Drawable0.icon_10412
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10413: DrawableResource
-  get() = Drawable0.icon_10413
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10414: DrawableResource
-  get() = Drawable0.icon_10414
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10415: DrawableResource
-  get() = Drawable0.icon_10415
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10416: DrawableResource
-  get() = Drawable0.icon_10416
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10417: DrawableResource
-  get() = Drawable0.icon_10417
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10418: DrawableResource
-  get() = Drawable0.icon_10418
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10419: DrawableResource
-  get() = Drawable0.icon_10419
+private fun init_icon_1041(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1041",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1041.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1042: DrawableResource
   get() = Drawable0.icon_1042
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10420: DrawableResource
-  get() = Drawable0.icon_10420
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10421: DrawableResource
-  get() = Drawable0.icon_10421
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10422: DrawableResource
-  get() = Drawable0.icon_10422
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10423: DrawableResource
-  get() = Drawable0.icon_10423
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10424: DrawableResource
-  get() = Drawable0.icon_10424
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10425: DrawableResource
-  get() = Drawable0.icon_10425
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10426: DrawableResource
-  get() = Drawable0.icon_10426
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10427: DrawableResource
-  get() = Drawable0.icon_10427
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10428: DrawableResource
-  get() = Drawable0.icon_10428
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10429: DrawableResource
-  get() = Drawable0.icon_10429
+private fun init_icon_1042(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1042",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1042.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1043: DrawableResource
   get() = Drawable0.icon_1043
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10430: DrawableResource
-  get() = Drawable0.icon_10430
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10431: DrawableResource
-  get() = Drawable0.icon_10431
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10432: DrawableResource
-  get() = Drawable0.icon_10432
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10433: DrawableResource
-  get() = Drawable0.icon_10433
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10434: DrawableResource
-  get() = Drawable0.icon_10434
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10435: DrawableResource
-  get() = Drawable0.icon_10435
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10436: DrawableResource
-  get() = Drawable0.icon_10436
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10437: DrawableResource
-  get() = Drawable0.icon_10437
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10438: DrawableResource
-  get() = Drawable0.icon_10438
-
-@ExperimentalResourceApi
-internal val Res.drawable.icon_10439: DrawableResource
-  get() = Drawable0.icon_10439
+private fun init_icon_1043(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1043",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1043.xml"),
+    )
+)
 
 @ExperimentalResourceApi
 internal val Res.drawable.icon_1044: DrawableResource
   get() = Drawable0.icon_1044
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10440: DrawableResource
-  get() = Drawable0.icon_10440
+private fun init_icon_1044(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1044",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1044.xml"),
+    )
+)
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10441: DrawableResource
-  get() = Drawable0.icon_10441
+internal val Res.drawable.icon_1045: DrawableResource
+  get() = Drawable0.icon_1045
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10442: DrawableResource
-  get() = Drawable0.icon_10442
+private fun init_icon_1045(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1045",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1045.xml"),
+    )
+)
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10443: DrawableResource
-  get() = Drawable0.icon_10443
+internal val Res.drawable.icon_1046: DrawableResource
+  get() = Drawable0.icon_1046
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10444: DrawableResource
-  get() = Drawable0.icon_10444
+private fun init_icon_1046(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1046",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1046.xml"),
+    )
+)
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10445: DrawableResource
-  get() = Drawable0.icon_10445
+internal val Res.drawable.icon_1047: DrawableResource
+  get() = Drawable0.icon_1047
 
 @ExperimentalResourceApi
-internal val Res.drawable.icon_10446: DrawableResource
-  get() = Drawable0.icon_10446
+private fun init_icon_1047(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1047",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1047.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1048: DrawableResource
+  get() = Drawable0.icon_1048
+
+@ExperimentalResourceApi
+private fun init_icon_1048(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1048",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1048.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1049: DrawableResource
+  get() = Drawable0.icon_1049
+
+@ExperimentalResourceApi
+private fun init_icon_1049(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1049",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1049.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_105: DrawableResource
+  get() = Drawable0.icon_105
+
+@ExperimentalResourceApi
+private fun init_icon_105(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_105",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_105.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1050: DrawableResource
+  get() = Drawable0.icon_1050
+
+@ExperimentalResourceApi
+private fun init_icon_1050(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1050",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1050.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1051: DrawableResource
+  get() = Drawable0.icon_1051
+
+@ExperimentalResourceApi
+private fun init_icon_1051(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1051",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1051.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1052: DrawableResource
+  get() = Drawable0.icon_1052
+
+@ExperimentalResourceApi
+private fun init_icon_1052(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1052",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1052.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1053: DrawableResource
+  get() = Drawable0.icon_1053
+
+@ExperimentalResourceApi
+private fun init_icon_1053(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1053",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1053.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1054: DrawableResource
+  get() = Drawable0.icon_1054
+
+@ExperimentalResourceApi
+private fun init_icon_1054(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1054",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1054.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1055: DrawableResource
+  get() = Drawable0.icon_1055
+
+@ExperimentalResourceApi
+private fun init_icon_1055(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1055",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1055.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1056: DrawableResource
+  get() = Drawable0.icon_1056
+
+@ExperimentalResourceApi
+private fun init_icon_1056(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1056",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1056.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1057: DrawableResource
+  get() = Drawable0.icon_1057
+
+@ExperimentalResourceApi
+private fun init_icon_1057(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1057",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1057.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1058: DrawableResource
+  get() = Drawable0.icon_1058
+
+@ExperimentalResourceApi
+private fun init_icon_1058(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1058",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1058.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1059: DrawableResource
+  get() = Drawable0.icon_1059
+
+@ExperimentalResourceApi
+private fun init_icon_1059(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1059",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1059.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_106: DrawableResource
+  get() = Drawable0.icon_106
+
+@ExperimentalResourceApi
+private fun init_icon_106(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_106",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_106.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1060: DrawableResource
+  get() = Drawable0.icon_1060
+
+@ExperimentalResourceApi
+private fun init_icon_1060(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1060",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1060.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1061: DrawableResource
+  get() = Drawable0.icon_1061
+
+@ExperimentalResourceApi
+private fun init_icon_1061(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1061",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1061.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1062: DrawableResource
+  get() = Drawable0.icon_1062
+
+@ExperimentalResourceApi
+private fun init_icon_1062(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1062",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1062.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1063: DrawableResource
+  get() = Drawable0.icon_1063
+
+@ExperimentalResourceApi
+private fun init_icon_1063(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1063",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1063.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1064: DrawableResource
+  get() = Drawable0.icon_1064
+
+@ExperimentalResourceApi
+private fun init_icon_1064(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1064",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1064.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1065: DrawableResource
+  get() = Drawable0.icon_1065
+
+@ExperimentalResourceApi
+private fun init_icon_1065(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1065",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1065.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1066: DrawableResource
+  get() = Drawable0.icon_1066
+
+@ExperimentalResourceApi
+private fun init_icon_1066(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1066",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1066.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1067: DrawableResource
+  get() = Drawable0.icon_1067
+
+@ExperimentalResourceApi
+private fun init_icon_1067(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1067",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1067.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1068: DrawableResource
+  get() = Drawable0.icon_1068
+
+@ExperimentalResourceApi
+private fun init_icon_1068(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1068",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1068.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1069: DrawableResource
+  get() = Drawable0.icon_1069
+
+@ExperimentalResourceApi
+private fun init_icon_1069(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1069",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1069.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_107: DrawableResource
+  get() = Drawable0.icon_107
+
+@ExperimentalResourceApi
+private fun init_icon_107(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_107",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_107.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1070: DrawableResource
+  get() = Drawable0.icon_1070
+
+@ExperimentalResourceApi
+private fun init_icon_1070(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1070",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1070.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1071: DrawableResource
+  get() = Drawable0.icon_1071
+
+@ExperimentalResourceApi
+private fun init_icon_1071(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1071",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1071.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1072: DrawableResource
+  get() = Drawable0.icon_1072
+
+@ExperimentalResourceApi
+private fun init_icon_1072(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1072",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1072.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1073: DrawableResource
+  get() = Drawable0.icon_1073
+
+@ExperimentalResourceApi
+private fun init_icon_1073(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1073",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1073.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1074: DrawableResource
+  get() = Drawable0.icon_1074
+
+@ExperimentalResourceApi
+private fun init_icon_1074(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1074",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1074.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1075: DrawableResource
+  get() = Drawable0.icon_1075
+
+@ExperimentalResourceApi
+private fun init_icon_1075(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1075",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1075.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1076: DrawableResource
+  get() = Drawable0.icon_1076
+
+@ExperimentalResourceApi
+private fun init_icon_1076(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1076",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1076.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1077: DrawableResource
+  get() = Drawable0.icon_1077
+
+@ExperimentalResourceApi
+private fun init_icon_1077(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1077",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1077.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1078: DrawableResource
+  get() = Drawable0.icon_1078
+
+@ExperimentalResourceApi
+private fun init_icon_1078(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1078",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1078.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1079: DrawableResource
+  get() = Drawable0.icon_1079
+
+@ExperimentalResourceApi
+private fun init_icon_1079(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1079",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1079.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_108: DrawableResource
+  get() = Drawable0.icon_108
+
+@ExperimentalResourceApi
+private fun init_icon_108(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_108",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_108.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1080: DrawableResource
+  get() = Drawable0.icon_1080
+
+@ExperimentalResourceApi
+private fun init_icon_1080(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1080",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1080.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1081: DrawableResource
+  get() = Drawable0.icon_1081
+
+@ExperimentalResourceApi
+private fun init_icon_1081(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1081",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1081.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1082: DrawableResource
+  get() = Drawable0.icon_1082
+
+@ExperimentalResourceApi
+private fun init_icon_1082(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1082",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1082.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1083: DrawableResource
+  get() = Drawable0.icon_1083
+
+@ExperimentalResourceApi
+private fun init_icon_1083(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1083",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1083.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1084: DrawableResource
+  get() = Drawable0.icon_1084
+
+@ExperimentalResourceApi
+private fun init_icon_1084(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1084",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1084.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1085: DrawableResource
+  get() = Drawable0.icon_1085
+
+@ExperimentalResourceApi
+private fun init_icon_1085(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1085",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1085.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1086: DrawableResource
+  get() = Drawable0.icon_1086
+
+@ExperimentalResourceApi
+private fun init_icon_1086(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1086",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1086.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1087: DrawableResource
+  get() = Drawable0.icon_1087
+
+@ExperimentalResourceApi
+private fun init_icon_1087(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1087",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1087.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1088: DrawableResource
+  get() = Drawable0.icon_1088
+
+@ExperimentalResourceApi
+private fun init_icon_1088(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1088",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1088.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1089: DrawableResource
+  get() = Drawable0.icon_1089
+
+@ExperimentalResourceApi
+private fun init_icon_1089(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1089",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1089.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_109: DrawableResource
+  get() = Drawable0.icon_109
+
+@ExperimentalResourceApi
+private fun init_icon_109(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_109",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_109.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1090: DrawableResource
+  get() = Drawable0.icon_1090
+
+@ExperimentalResourceApi
+private fun init_icon_1090(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1090",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1090.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1091: DrawableResource
+  get() = Drawable0.icon_1091
+
+@ExperimentalResourceApi
+private fun init_icon_1091(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1091",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1091.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1092: DrawableResource
+  get() = Drawable0.icon_1092
+
+@ExperimentalResourceApi
+private fun init_icon_1092(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1092",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1092.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1093: DrawableResource
+  get() = Drawable0.icon_1093
+
+@ExperimentalResourceApi
+private fun init_icon_1093(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1093",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1093.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1094: DrawableResource
+  get() = Drawable0.icon_1094
+
+@ExperimentalResourceApi
+private fun init_icon_1094(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1094",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1094.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1095: DrawableResource
+  get() = Drawable0.icon_1095
+
+@ExperimentalResourceApi
+private fun init_icon_1095(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1095",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1095.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1096: DrawableResource
+  get() = Drawable0.icon_1096
+
+@ExperimentalResourceApi
+private fun init_icon_1096(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1096",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1096.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1097: DrawableResource
+  get() = Drawable0.icon_1097
+
+@ExperimentalResourceApi
+private fun init_icon_1097(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1097",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1097.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1098: DrawableResource
+  get() = Drawable0.icon_1098
+
+@ExperimentalResourceApi
+private fun init_icon_1098(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1098",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1098.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1099: DrawableResource
+  get() = Drawable0.icon_1099
+
+@ExperimentalResourceApi
+private fun init_icon_1099(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1099",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1099.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_11: DrawableResource
+  get() = Drawable0.icon_11
+
+@ExperimentalResourceApi
+private fun init_icon_11(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_11",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_11.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_110: DrawableResource
+  get() = Drawable0.icon_110
+
+@ExperimentalResourceApi
+private fun init_icon_110(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_110",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_110.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1100: DrawableResource
+  get() = Drawable0.icon_1100
+
+@ExperimentalResourceApi
+private fun init_icon_1100(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1100",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1100.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1101: DrawableResource
+  get() = Drawable0.icon_1101
+
+@ExperimentalResourceApi
+private fun init_icon_1101(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1101",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1101.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1102: DrawableResource
+  get() = Drawable0.icon_1102
+
+@ExperimentalResourceApi
+private fun init_icon_1102(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1102",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1102.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1103: DrawableResource
+  get() = Drawable0.icon_1103
+
+@ExperimentalResourceApi
+private fun init_icon_1103(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1103",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1103.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1104: DrawableResource
+  get() = Drawable0.icon_1104
+
+@ExperimentalResourceApi
+private fun init_icon_1104(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1104",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1104.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1105: DrawableResource
+  get() = Drawable0.icon_1105
+
+@ExperimentalResourceApi
+private fun init_icon_1105(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1105",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1105.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1106: DrawableResource
+  get() = Drawable0.icon_1106
+
+@ExperimentalResourceApi
+private fun init_icon_1106(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1106",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1106.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1107: DrawableResource
+  get() = Drawable0.icon_1107
+
+@ExperimentalResourceApi
+private fun init_icon_1107(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1107",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1107.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1108: DrawableResource
+  get() = Drawable0.icon_1108
+
+@ExperimentalResourceApi
+private fun init_icon_1108(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1108",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1108.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1109: DrawableResource
+  get() = Drawable0.icon_1109
+
+@ExperimentalResourceApi
+private fun init_icon_1109(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1109",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1109.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_111: DrawableResource
+  get() = Drawable0.icon_111
+
+@ExperimentalResourceApi
+private fun init_icon_111(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_111",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_111.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1110: DrawableResource
+  get() = Drawable0.icon_1110
+
+@ExperimentalResourceApi
+private fun init_icon_1110(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1110",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1110.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1111: DrawableResource
+  get() = Drawable0.icon_1111
+
+@ExperimentalResourceApi
+private fun init_icon_1111(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1111",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1111.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1112: DrawableResource
+  get() = Drawable0.icon_1112
+
+@ExperimentalResourceApi
+private fun init_icon_1112(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1112",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1112.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1113: DrawableResource
+  get() = Drawable0.icon_1113
+
+@ExperimentalResourceApi
+private fun init_icon_1113(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1113",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1113.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1114: DrawableResource
+  get() = Drawable0.icon_1114
+
+@ExperimentalResourceApi
+private fun init_icon_1114(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1114",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1114.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1115: DrawableResource
+  get() = Drawable0.icon_1115
+
+@ExperimentalResourceApi
+private fun init_icon_1115(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1115",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1115.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1116: DrawableResource
+  get() = Drawable0.icon_1116
+
+@ExperimentalResourceApi
+private fun init_icon_1116(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1116",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1116.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1117: DrawableResource
+  get() = Drawable0.icon_1117
+
+@ExperimentalResourceApi
+private fun init_icon_1117(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1117",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1117.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1118: DrawableResource
+  get() = Drawable0.icon_1118
+
+@ExperimentalResourceApi
+private fun init_icon_1118(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1118",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1118.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1119: DrawableResource
+  get() = Drawable0.icon_1119
+
+@ExperimentalResourceApi
+private fun init_icon_1119(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1119",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1119.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_112: DrawableResource
+  get() = Drawable0.icon_112
+
+@ExperimentalResourceApi
+private fun init_icon_112(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_112",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_112.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1120: DrawableResource
+  get() = Drawable0.icon_1120
+
+@ExperimentalResourceApi
+private fun init_icon_1120(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1120",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1120.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1121: DrawableResource
+  get() = Drawable0.icon_1121
+
+@ExperimentalResourceApi
+private fun init_icon_1121(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1121",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1121.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1122: DrawableResource
+  get() = Drawable0.icon_1122
+
+@ExperimentalResourceApi
+private fun init_icon_1122(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1122",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1122.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1123: DrawableResource
+  get() = Drawable0.icon_1123
+
+@ExperimentalResourceApi
+private fun init_icon_1123(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1123",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1123.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1124: DrawableResource
+  get() = Drawable0.icon_1124
+
+@ExperimentalResourceApi
+private fun init_icon_1124(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1124",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1124.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1125: DrawableResource
+  get() = Drawable0.icon_1125
+
+@ExperimentalResourceApi
+private fun init_icon_1125(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1125",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1125.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1126: DrawableResource
+  get() = Drawable0.icon_1126
+
+@ExperimentalResourceApi
+private fun init_icon_1126(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1126",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1126.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1127: DrawableResource
+  get() = Drawable0.icon_1127
+
+@ExperimentalResourceApi
+private fun init_icon_1127(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1127",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1127.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1128: DrawableResource
+  get() = Drawable0.icon_1128
+
+@ExperimentalResourceApi
+private fun init_icon_1128(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1128",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1128.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1129: DrawableResource
+  get() = Drawable0.icon_1129
+
+@ExperimentalResourceApi
+private fun init_icon_1129(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1129",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1129.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_113: DrawableResource
+  get() = Drawable0.icon_113
+
+@ExperimentalResourceApi
+private fun init_icon_113(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_113",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_113.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1130: DrawableResource
+  get() = Drawable0.icon_1130
+
+@ExperimentalResourceApi
+private fun init_icon_1130(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1130",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1130.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1131: DrawableResource
+  get() = Drawable0.icon_1131
+
+@ExperimentalResourceApi
+private fun init_icon_1131(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1131",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1131.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1132: DrawableResource
+  get() = Drawable0.icon_1132
+
+@ExperimentalResourceApi
+private fun init_icon_1132(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1132",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1132.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1133: DrawableResource
+  get() = Drawable0.icon_1133
+
+@ExperimentalResourceApi
+private fun init_icon_1133(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1133",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1133.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1134: DrawableResource
+  get() = Drawable0.icon_1134
+
+@ExperimentalResourceApi
+private fun init_icon_1134(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1134",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1134.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1135: DrawableResource
+  get() = Drawable0.icon_1135
+
+@ExperimentalResourceApi
+private fun init_icon_1135(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1135",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1135.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1136: DrawableResource
+  get() = Drawable0.icon_1136
+
+@ExperimentalResourceApi
+private fun init_icon_1136(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1136",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1136.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1137: DrawableResource
+  get() = Drawable0.icon_1137
+
+@ExperimentalResourceApi
+private fun init_icon_1137(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1137",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1137.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1138: DrawableResource
+  get() = Drawable0.icon_1138
+
+@ExperimentalResourceApi
+private fun init_icon_1138(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1138",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1138.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1139: DrawableResource
+  get() = Drawable0.icon_1139
+
+@ExperimentalResourceApi
+private fun init_icon_1139(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1139",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1139.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_114: DrawableResource
+  get() = Drawable0.icon_114
+
+@ExperimentalResourceApi
+private fun init_icon_114(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_114",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_114.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1140: DrawableResource
+  get() = Drawable0.icon_1140
+
+@ExperimentalResourceApi
+private fun init_icon_1140(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1140",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1140.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1141: DrawableResource
+  get() = Drawable0.icon_1141
+
+@ExperimentalResourceApi
+private fun init_icon_1141(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1141",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1141.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1142: DrawableResource
+  get() = Drawable0.icon_1142
+
+@ExperimentalResourceApi
+private fun init_icon_1142(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1142",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1142.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1143: DrawableResource
+  get() = Drawable0.icon_1143
+
+@ExperimentalResourceApi
+private fun init_icon_1143(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1143",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1143.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1144: DrawableResource
+  get() = Drawable0.icon_1144
+
+@ExperimentalResourceApi
+private fun init_icon_1144(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1144",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1144.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1145: DrawableResource
+  get() = Drawable0.icon_1145
+
+@ExperimentalResourceApi
+private fun init_icon_1145(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1145",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1145.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1146: DrawableResource
+  get() = Drawable0.icon_1146
+
+@ExperimentalResourceApi
+private fun init_icon_1146(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1146",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1146.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1147: DrawableResource
+  get() = Drawable0.icon_1147
+
+@ExperimentalResourceApi
+private fun init_icon_1147(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1147",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1147.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1148: DrawableResource
+  get() = Drawable0.icon_1148
+
+@ExperimentalResourceApi
+private fun init_icon_1148(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1148",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1148.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1149: DrawableResource
+  get() = Drawable0.icon_1149
+
+@ExperimentalResourceApi
+private fun init_icon_1149(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1149",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1149.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_115: DrawableResource
+  get() = Drawable0.icon_115
+
+@ExperimentalResourceApi
+private fun init_icon_115(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_115",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_115.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1150: DrawableResource
+  get() = Drawable0.icon_1150
+
+@ExperimentalResourceApi
+private fun init_icon_1150(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1150",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1150.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1151: DrawableResource
+  get() = Drawable0.icon_1151
+
+@ExperimentalResourceApi
+private fun init_icon_1151(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1151",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1151.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1152: DrawableResource
+  get() = Drawable0.icon_1152
+
+@ExperimentalResourceApi
+private fun init_icon_1152(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1152",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1152.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1153: DrawableResource
+  get() = Drawable0.icon_1153
+
+@ExperimentalResourceApi
+private fun init_icon_1153(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1153",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1153.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1154: DrawableResource
+  get() = Drawable0.icon_1154
+
+@ExperimentalResourceApi
+private fun init_icon_1154(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1154",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1154.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1155: DrawableResource
+  get() = Drawable0.icon_1155
+
+@ExperimentalResourceApi
+private fun init_icon_1155(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1155",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1155.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1156: DrawableResource
+  get() = Drawable0.icon_1156
+
+@ExperimentalResourceApi
+private fun init_icon_1156(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1156",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1156.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1157: DrawableResource
+  get() = Drawable0.icon_1157
+
+@ExperimentalResourceApi
+private fun init_icon_1157(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1157",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1157.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1158: DrawableResource
+  get() = Drawable0.icon_1158
+
+@ExperimentalResourceApi
+private fun init_icon_1158(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1158",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1158.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1159: DrawableResource
+  get() = Drawable0.icon_1159
+
+@ExperimentalResourceApi
+private fun init_icon_1159(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1159",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1159.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_116: DrawableResource
+  get() = Drawable0.icon_116
+
+@ExperimentalResourceApi
+private fun init_icon_116(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_116",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_116.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1160: DrawableResource
+  get() = Drawable0.icon_1160
+
+@ExperimentalResourceApi
+private fun init_icon_1160(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1160",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1160.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1161: DrawableResource
+  get() = Drawable0.icon_1161
+
+@ExperimentalResourceApi
+private fun init_icon_1161(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1161",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1161.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1162: DrawableResource
+  get() = Drawable0.icon_1162
+
+@ExperimentalResourceApi
+private fun init_icon_1162(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1162",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1162.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1163: DrawableResource
+  get() = Drawable0.icon_1163
+
+@ExperimentalResourceApi
+private fun init_icon_1163(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1163",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1163.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1164: DrawableResource
+  get() = Drawable0.icon_1164
+
+@ExperimentalResourceApi
+private fun init_icon_1164(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1164",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1164.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1165: DrawableResource
+  get() = Drawable0.icon_1165
+
+@ExperimentalResourceApi
+private fun init_icon_1165(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1165",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1165.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1166: DrawableResource
+  get() = Drawable0.icon_1166
+
+@ExperimentalResourceApi
+private fun init_icon_1166(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1166",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1166.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1167: DrawableResource
+  get() = Drawable0.icon_1167
+
+@ExperimentalResourceApi
+private fun init_icon_1167(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1167",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1167.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1168: DrawableResource
+  get() = Drawable0.icon_1168
+
+@ExperimentalResourceApi
+private fun init_icon_1168(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1168",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1168.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1169: DrawableResource
+  get() = Drawable0.icon_1169
+
+@ExperimentalResourceApi
+private fun init_icon_1169(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1169",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1169.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_117: DrawableResource
+  get() = Drawable0.icon_117
+
+@ExperimentalResourceApi
+private fun init_icon_117(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_117",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_117.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1170: DrawableResource
+  get() = Drawable0.icon_1170
+
+@ExperimentalResourceApi
+private fun init_icon_1170(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1170",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1170.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1171: DrawableResource
+  get() = Drawable0.icon_1171
+
+@ExperimentalResourceApi
+private fun init_icon_1171(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1171",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1171.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1172: DrawableResource
+  get() = Drawable0.icon_1172
+
+@ExperimentalResourceApi
+private fun init_icon_1172(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1172",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1172.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1173: DrawableResource
+  get() = Drawable0.icon_1173
+
+@ExperimentalResourceApi
+private fun init_icon_1173(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1173",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1173.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1174: DrawableResource
+  get() = Drawable0.icon_1174
+
+@ExperimentalResourceApi
+private fun init_icon_1174(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1174",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1174.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1175: DrawableResource
+  get() = Drawable0.icon_1175
+
+@ExperimentalResourceApi
+private fun init_icon_1175(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1175",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1175.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1176: DrawableResource
+  get() = Drawable0.icon_1176
+
+@ExperimentalResourceApi
+private fun init_icon_1176(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1176",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1176.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1177: DrawableResource
+  get() = Drawable0.icon_1177
+
+@ExperimentalResourceApi
+private fun init_icon_1177(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1177",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1177.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1178: DrawableResource
+  get() = Drawable0.icon_1178
+
+@ExperimentalResourceApi
+private fun init_icon_1178(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1178",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1178.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1179: DrawableResource
+  get() = Drawable0.icon_1179
+
+@ExperimentalResourceApi
+private fun init_icon_1179(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1179",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1179.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_118: DrawableResource
+  get() = Drawable0.icon_118
+
+@ExperimentalResourceApi
+private fun init_icon_118(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_118",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_118.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1180: DrawableResource
+  get() = Drawable0.icon_1180
+
+@ExperimentalResourceApi
+private fun init_icon_1180(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1180",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1180.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1181: DrawableResource
+  get() = Drawable0.icon_1181
+
+@ExperimentalResourceApi
+private fun init_icon_1181(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1181",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1181.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1182: DrawableResource
+  get() = Drawable0.icon_1182
+
+@ExperimentalResourceApi
+private fun init_icon_1182(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1182",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1182.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1183: DrawableResource
+  get() = Drawable0.icon_1183
+
+@ExperimentalResourceApi
+private fun init_icon_1183(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1183",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1183.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1184: DrawableResource
+  get() = Drawable0.icon_1184
+
+@ExperimentalResourceApi
+private fun init_icon_1184(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1184",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1184.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1185: DrawableResource
+  get() = Drawable0.icon_1185
+
+@ExperimentalResourceApi
+private fun init_icon_1185(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1185",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1185.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1186: DrawableResource
+  get() = Drawable0.icon_1186
+
+@ExperimentalResourceApi
+private fun init_icon_1186(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1186",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1186.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1187: DrawableResource
+  get() = Drawable0.icon_1187
+
+@ExperimentalResourceApi
+private fun init_icon_1187(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1187",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1187.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1188: DrawableResource
+  get() = Drawable0.icon_1188
+
+@ExperimentalResourceApi
+private fun init_icon_1188(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1188",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1188.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1189: DrawableResource
+  get() = Drawable0.icon_1189
+
+@ExperimentalResourceApi
+private fun init_icon_1189(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1189",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1189.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_119: DrawableResource
+  get() = Drawable0.icon_119
+
+@ExperimentalResourceApi
+private fun init_icon_119(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_119",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_119.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1190: DrawableResource
+  get() = Drawable0.icon_1190
+
+@ExperimentalResourceApi
+private fun init_icon_1190(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1190",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1190.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1191: DrawableResource
+  get() = Drawable0.icon_1191
+
+@ExperimentalResourceApi
+private fun init_icon_1191(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1191",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1191.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1192: DrawableResource
+  get() = Drawable0.icon_1192
+
+@ExperimentalResourceApi
+private fun init_icon_1192(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1192",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1192.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1193: DrawableResource
+  get() = Drawable0.icon_1193
+
+@ExperimentalResourceApi
+private fun init_icon_1193(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1193",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1193.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1194: DrawableResource
+  get() = Drawable0.icon_1194
+
+@ExperimentalResourceApi
+private fun init_icon_1194(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1194",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1194.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1195: DrawableResource
+  get() = Drawable0.icon_1195
+
+@ExperimentalResourceApi
+private fun init_icon_1195(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1195",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1195.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1196: DrawableResource
+  get() = Drawable0.icon_1196
+
+@ExperimentalResourceApi
+private fun init_icon_1196(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1196",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1196.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1197: DrawableResource
+  get() = Drawable0.icon_1197
+
+@ExperimentalResourceApi
+private fun init_icon_1197(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1197",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1197.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1198: DrawableResource
+  get() = Drawable0.icon_1198
+
+@ExperimentalResourceApi
+private fun init_icon_1198(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1198",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1198.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1199: DrawableResource
+  get() = Drawable0.icon_1199
+
+@ExperimentalResourceApi
+private fun init_icon_1199(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1199",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1199.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_12: DrawableResource
+  get() = Drawable0.icon_12
+
+@ExperimentalResourceApi
+private fun init_icon_12(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_12",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_12.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_120: DrawableResource
+  get() = Drawable0.icon_120
+
+@ExperimentalResourceApi
+private fun init_icon_120(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_120",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_120.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1200: DrawableResource
+  get() = Drawable0.icon_1200
+
+@ExperimentalResourceApi
+private fun init_icon_1200(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1200",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1200.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1201: DrawableResource
+  get() = Drawable0.icon_1201
+
+@ExperimentalResourceApi
+private fun init_icon_1201(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1201",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1201.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1202: DrawableResource
+  get() = Drawable0.icon_1202
+
+@ExperimentalResourceApi
+private fun init_icon_1202(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1202",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1202.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1203: DrawableResource
+  get() = Drawable0.icon_1203
+
+@ExperimentalResourceApi
+private fun init_icon_1203(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1203",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1203.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1204: DrawableResource
+  get() = Drawable0.icon_1204
+
+@ExperimentalResourceApi
+private fun init_icon_1204(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1204",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1204.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1205: DrawableResource
+  get() = Drawable0.icon_1205
+
+@ExperimentalResourceApi
+private fun init_icon_1205(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1205",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1205.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1206: DrawableResource
+  get() = Drawable0.icon_1206
+
+@ExperimentalResourceApi
+private fun init_icon_1206(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1206",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1206.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1207: DrawableResource
+  get() = Drawable0.icon_1207
+
+@ExperimentalResourceApi
+private fun init_icon_1207(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1207",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1207.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1208: DrawableResource
+  get() = Drawable0.icon_1208
+
+@ExperimentalResourceApi
+private fun init_icon_1208(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1208",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1208.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1209: DrawableResource
+  get() = Drawable0.icon_1209
+
+@ExperimentalResourceApi
+private fun init_icon_1209(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1209",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1209.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_121: DrawableResource
+  get() = Drawable0.icon_121
+
+@ExperimentalResourceApi
+private fun init_icon_121(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_121",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_121.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1210: DrawableResource
+  get() = Drawable0.icon_1210
+
+@ExperimentalResourceApi
+private fun init_icon_1210(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1210",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1210.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1211: DrawableResource
+  get() = Drawable0.icon_1211
+
+@ExperimentalResourceApi
+private fun init_icon_1211(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1211",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1211.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1212: DrawableResource
+  get() = Drawable0.icon_1212
+
+@ExperimentalResourceApi
+private fun init_icon_1212(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1212",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1212.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1213: DrawableResource
+  get() = Drawable0.icon_1213
+
+@ExperimentalResourceApi
+private fun init_icon_1213(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1213",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1213.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1214: DrawableResource
+  get() = Drawable0.icon_1214
+
+@ExperimentalResourceApi
+private fun init_icon_1214(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1214",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1214.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1215: DrawableResource
+  get() = Drawable0.icon_1215
+
+@ExperimentalResourceApi
+private fun init_icon_1215(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1215",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1215.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1216: DrawableResource
+  get() = Drawable0.icon_1216
+
+@ExperimentalResourceApi
+private fun init_icon_1216(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1216",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1216.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1217: DrawableResource
+  get() = Drawable0.icon_1217
+
+@ExperimentalResourceApi
+private fun init_icon_1217(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1217",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1217.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1218: DrawableResource
+  get() = Drawable0.icon_1218
+
+@ExperimentalResourceApi
+private fun init_icon_1218(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1218",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1218.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1219: DrawableResource
+  get() = Drawable0.icon_1219
+
+@ExperimentalResourceApi
+private fun init_icon_1219(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1219",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1219.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_122: DrawableResource
+  get() = Drawable0.icon_122
+
+@ExperimentalResourceApi
+private fun init_icon_122(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_122",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_122.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1220: DrawableResource
+  get() = Drawable0.icon_1220
+
+@ExperimentalResourceApi
+private fun init_icon_1220(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1220",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1220.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1221: DrawableResource
+  get() = Drawable0.icon_1221
+
+@ExperimentalResourceApi
+private fun init_icon_1221(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1221",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1221.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1222: DrawableResource
+  get() = Drawable0.icon_1222
+
+@ExperimentalResourceApi
+private fun init_icon_1222(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1222",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1222.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1223: DrawableResource
+  get() = Drawable0.icon_1223
+
+@ExperimentalResourceApi
+private fun init_icon_1223(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1223",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1223.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1224: DrawableResource
+  get() = Drawable0.icon_1224
+
+@ExperimentalResourceApi
+private fun init_icon_1224(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1224",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1224.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1225: DrawableResource
+  get() = Drawable0.icon_1225
+
+@ExperimentalResourceApi
+private fun init_icon_1225(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1225",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1225.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1226: DrawableResource
+  get() = Drawable0.icon_1226
+
+@ExperimentalResourceApi
+private fun init_icon_1226(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1226",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1226.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1227: DrawableResource
+  get() = Drawable0.icon_1227
+
+@ExperimentalResourceApi
+private fun init_icon_1227(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1227",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1227.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1228: DrawableResource
+  get() = Drawable0.icon_1228
+
+@ExperimentalResourceApi
+private fun init_icon_1228(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1228",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1228.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1229: DrawableResource
+  get() = Drawable0.icon_1229
+
+@ExperimentalResourceApi
+private fun init_icon_1229(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1229",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1229.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_123: DrawableResource
+  get() = Drawable0.icon_123
+
+@ExperimentalResourceApi
+private fun init_icon_123(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_123",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_123.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1230: DrawableResource
+  get() = Drawable0.icon_1230
+
+@ExperimentalResourceApi
+private fun init_icon_1230(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1230",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1230.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1231: DrawableResource
+  get() = Drawable0.icon_1231
+
+@ExperimentalResourceApi
+private fun init_icon_1231(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1231",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1231.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1232: DrawableResource
+  get() = Drawable0.icon_1232
+
+@ExperimentalResourceApi
+private fun init_icon_1232(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1232",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1232.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1233: DrawableResource
+  get() = Drawable0.icon_1233
+
+@ExperimentalResourceApi
+private fun init_icon_1233(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1233",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1233.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1234: DrawableResource
+  get() = Drawable0.icon_1234
+
+@ExperimentalResourceApi
+private fun init_icon_1234(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1234",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1234.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1235: DrawableResource
+  get() = Drawable0.icon_1235
+
+@ExperimentalResourceApi
+private fun init_icon_1235(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1235",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1235.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1236: DrawableResource
+  get() = Drawable0.icon_1236
+
+@ExperimentalResourceApi
+private fun init_icon_1236(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1236",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1236.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1237: DrawableResource
+  get() = Drawable0.icon_1237
+
+@ExperimentalResourceApi
+private fun init_icon_1237(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1237",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1237.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1238: DrawableResource
+  get() = Drawable0.icon_1238
+
+@ExperimentalResourceApi
+private fun init_icon_1238(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1238",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1238.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1239: DrawableResource
+  get() = Drawable0.icon_1239
+
+@ExperimentalResourceApi
+private fun init_icon_1239(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1239",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1239.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_124: DrawableResource
+  get() = Drawable0.icon_124
+
+@ExperimentalResourceApi
+private fun init_icon_124(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_124",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_124.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1240: DrawableResource
+  get() = Drawable0.icon_1240
+
+@ExperimentalResourceApi
+private fun init_icon_1240(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1240",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1240.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1241: DrawableResource
+  get() = Drawable0.icon_1241
+
+@ExperimentalResourceApi
+private fun init_icon_1241(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1241",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1241.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1242: DrawableResource
+  get() = Drawable0.icon_1242
+
+@ExperimentalResourceApi
+private fun init_icon_1242(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1242",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1242.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1243: DrawableResource
+  get() = Drawable0.icon_1243
+
+@ExperimentalResourceApi
+private fun init_icon_1243(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1243",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1243.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1244: DrawableResource
+  get() = Drawable0.icon_1244
+
+@ExperimentalResourceApi
+private fun init_icon_1244(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1244",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1244.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1245: DrawableResource
+  get() = Drawable0.icon_1245
+
+@ExperimentalResourceApi
+private fun init_icon_1245(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1245",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1245.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1246: DrawableResource
+  get() = Drawable0.icon_1246
+
+@ExperimentalResourceApi
+private fun init_icon_1246(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1246",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1246.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1247: DrawableResource
+  get() = Drawable0.icon_1247
+
+@ExperimentalResourceApi
+private fun init_icon_1247(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1247",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1247.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1248: DrawableResource
+  get() = Drawable0.icon_1248
+
+@ExperimentalResourceApi
+private fun init_icon_1248(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1248",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1248.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1249: DrawableResource
+  get() = Drawable0.icon_1249
+
+@ExperimentalResourceApi
+private fun init_icon_1249(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1249",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1249.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_125: DrawableResource
+  get() = Drawable0.icon_125
+
+@ExperimentalResourceApi
+private fun init_icon_125(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_125",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_125.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1250: DrawableResource
+  get() = Drawable0.icon_1250
+
+@ExperimentalResourceApi
+private fun init_icon_1250(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1250",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1250.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1251: DrawableResource
+  get() = Drawable0.icon_1251
+
+@ExperimentalResourceApi
+private fun init_icon_1251(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1251",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1251.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1252: DrawableResource
+  get() = Drawable0.icon_1252
+
+@ExperimentalResourceApi
+private fun init_icon_1252(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1252",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1252.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1253: DrawableResource
+  get() = Drawable0.icon_1253
+
+@ExperimentalResourceApi
+private fun init_icon_1253(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1253",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1253.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1254: DrawableResource
+  get() = Drawable0.icon_1254
+
+@ExperimentalResourceApi
+private fun init_icon_1254(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1254",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1254.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1255: DrawableResource
+  get() = Drawable0.icon_1255
+
+@ExperimentalResourceApi
+private fun init_icon_1255(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1255",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1255.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1256: DrawableResource
+  get() = Drawable0.icon_1256
+
+@ExperimentalResourceApi
+private fun init_icon_1256(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1256",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1256.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1257: DrawableResource
+  get() = Drawable0.icon_1257
+
+@ExperimentalResourceApi
+private fun init_icon_1257(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1257",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1257.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1258: DrawableResource
+  get() = Drawable0.icon_1258
+
+@ExperimentalResourceApi
+private fun init_icon_1258(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1258",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1258.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1259: DrawableResource
+  get() = Drawable0.icon_1259
+
+@ExperimentalResourceApi
+private fun init_icon_1259(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1259",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1259.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_126: DrawableResource
+  get() = Drawable0.icon_126
+
+@ExperimentalResourceApi
+private fun init_icon_126(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_126",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_126.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1260: DrawableResource
+  get() = Drawable0.icon_1260
+
+@ExperimentalResourceApi
+private fun init_icon_1260(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1260",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1260.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1261: DrawableResource
+  get() = Drawable0.icon_1261
+
+@ExperimentalResourceApi
+private fun init_icon_1261(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1261",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1261.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1262: DrawableResource
+  get() = Drawable0.icon_1262
+
+@ExperimentalResourceApi
+private fun init_icon_1262(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1262",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1262.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1263: DrawableResource
+  get() = Drawable0.icon_1263
+
+@ExperimentalResourceApi
+private fun init_icon_1263(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1263",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1263.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1264: DrawableResource
+  get() = Drawable0.icon_1264
+
+@ExperimentalResourceApi
+private fun init_icon_1264(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1264",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1264.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1265: DrawableResource
+  get() = Drawable0.icon_1265
+
+@ExperimentalResourceApi
+private fun init_icon_1265(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1265",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1265.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1266: DrawableResource
+  get() = Drawable0.icon_1266
+
+@ExperimentalResourceApi
+private fun init_icon_1266(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1266",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1266.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1267: DrawableResource
+  get() = Drawable0.icon_1267
+
+@ExperimentalResourceApi
+private fun init_icon_1267(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1267",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1267.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1268: DrawableResource
+  get() = Drawable0.icon_1268
+
+@ExperimentalResourceApi
+private fun init_icon_1268(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1268",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1268.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1269: DrawableResource
+  get() = Drawable0.icon_1269
+
+@ExperimentalResourceApi
+private fun init_icon_1269(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1269",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1269.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_127: DrawableResource
+  get() = Drawable0.icon_127
+
+@ExperimentalResourceApi
+private fun init_icon_127(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_127",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_127.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1270: DrawableResource
+  get() = Drawable0.icon_1270
+
+@ExperimentalResourceApi
+private fun init_icon_1270(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1270",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1270.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1271: DrawableResource
+  get() = Drawable0.icon_1271
+
+@ExperimentalResourceApi
+private fun init_icon_1271(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1271",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1271.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1272: DrawableResource
+  get() = Drawable0.icon_1272
+
+@ExperimentalResourceApi
+private fun init_icon_1272(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1272",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1272.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1273: DrawableResource
+  get() = Drawable0.icon_1273
+
+@ExperimentalResourceApi
+private fun init_icon_1273(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1273",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1273.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1274: DrawableResource
+  get() = Drawable0.icon_1274
+
+@ExperimentalResourceApi
+private fun init_icon_1274(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1274",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1274.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1275: DrawableResource
+  get() = Drawable0.icon_1275
+
+@ExperimentalResourceApi
+private fun init_icon_1275(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1275",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1275.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1276: DrawableResource
+  get() = Drawable0.icon_1276
+
+@ExperimentalResourceApi
+private fun init_icon_1276(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1276",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1276.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1277: DrawableResource
+  get() = Drawable0.icon_1277
+
+@ExperimentalResourceApi
+private fun init_icon_1277(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1277",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1277.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1278: DrawableResource
+  get() = Drawable0.icon_1278
+
+@ExperimentalResourceApi
+private fun init_icon_1278(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1278",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1278.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1279: DrawableResource
+  get() = Drawable0.icon_1279
+
+@ExperimentalResourceApi
+private fun init_icon_1279(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1279",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1279.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_128: DrawableResource
+  get() = Drawable0.icon_128
+
+@ExperimentalResourceApi
+private fun init_icon_128(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_128",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_128.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1280: DrawableResource
+  get() = Drawable0.icon_1280
+
+@ExperimentalResourceApi
+private fun init_icon_1280(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1280",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1280.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1281: DrawableResource
+  get() = Drawable0.icon_1281
+
+@ExperimentalResourceApi
+private fun init_icon_1281(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1281",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1281.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1282: DrawableResource
+  get() = Drawable0.icon_1282
+
+@ExperimentalResourceApi
+private fun init_icon_1282(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1282",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1282.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1283: DrawableResource
+  get() = Drawable0.icon_1283
+
+@ExperimentalResourceApi
+private fun init_icon_1283(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1283",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1283.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1284: DrawableResource
+  get() = Drawable0.icon_1284
+
+@ExperimentalResourceApi
+private fun init_icon_1284(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1284",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1284.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1285: DrawableResource
+  get() = Drawable0.icon_1285
+
+@ExperimentalResourceApi
+private fun init_icon_1285(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1285",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1285.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1286: DrawableResource
+  get() = Drawable0.icon_1286
+
+@ExperimentalResourceApi
+private fun init_icon_1286(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1286",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1286.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1287: DrawableResource
+  get() = Drawable0.icon_1287
+
+@ExperimentalResourceApi
+private fun init_icon_1287(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1287",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1287.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1288: DrawableResource
+  get() = Drawable0.icon_1288
+
+@ExperimentalResourceApi
+private fun init_icon_1288(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1288",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1288.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1289: DrawableResource
+  get() = Drawable0.icon_1289
+
+@ExperimentalResourceApi
+private fun init_icon_1289(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1289",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1289.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_129: DrawableResource
+  get() = Drawable0.icon_129
+
+@ExperimentalResourceApi
+private fun init_icon_129(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_129",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_129.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1290: DrawableResource
+  get() = Drawable0.icon_1290
+
+@ExperimentalResourceApi
+private fun init_icon_1290(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1290",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1290.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1291: DrawableResource
+  get() = Drawable0.icon_1291
+
+@ExperimentalResourceApi
+private fun init_icon_1291(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1291",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1291.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1292: DrawableResource
+  get() = Drawable0.icon_1292
+
+@ExperimentalResourceApi
+private fun init_icon_1292(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1292",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1292.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1293: DrawableResource
+  get() = Drawable0.icon_1293
+
+@ExperimentalResourceApi
+private fun init_icon_1293(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1293",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1293.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1294: DrawableResource
+  get() = Drawable0.icon_1294
+
+@ExperimentalResourceApi
+private fun init_icon_1294(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1294",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1294.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1295: DrawableResource
+  get() = Drawable0.icon_1295
+
+@ExperimentalResourceApi
+private fun init_icon_1295(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1295",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1295.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1296: DrawableResource
+  get() = Drawable0.icon_1296
+
+@ExperimentalResourceApi
+private fun init_icon_1296(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1296",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1296.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1297: DrawableResource
+  get() = Drawable0.icon_1297
+
+@ExperimentalResourceApi
+private fun init_icon_1297(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1297",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1297.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1298: DrawableResource
+  get() = Drawable0.icon_1298
+
+@ExperimentalResourceApi
+private fun init_icon_1298(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1298",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1298.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1299: DrawableResource
+  get() = Drawable0.icon_1299
+
+@ExperimentalResourceApi
+private fun init_icon_1299(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1299",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1299.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_13: DrawableResource
+  get() = Drawable0.icon_13
+
+@ExperimentalResourceApi
+private fun init_icon_13(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_13",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_13.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_130: DrawableResource
+  get() = Drawable0.icon_130
+
+@ExperimentalResourceApi
+private fun init_icon_130(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_130",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_130.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1300: DrawableResource
+  get() = Drawable0.icon_1300
+
+@ExperimentalResourceApi
+private fun init_icon_1300(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1300",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1300.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1301: DrawableResource
+  get() = Drawable0.icon_1301
+
+@ExperimentalResourceApi
+private fun init_icon_1301(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1301",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1301.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1302: DrawableResource
+  get() = Drawable0.icon_1302
+
+@ExperimentalResourceApi
+private fun init_icon_1302(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1302",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1302.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1303: DrawableResource
+  get() = Drawable0.icon_1303
+
+@ExperimentalResourceApi
+private fun init_icon_1303(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1303",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1303.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1304: DrawableResource
+  get() = Drawable0.icon_1304
+
+@ExperimentalResourceApi
+private fun init_icon_1304(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1304",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1304.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1305: DrawableResource
+  get() = Drawable0.icon_1305
+
+@ExperimentalResourceApi
+private fun init_icon_1305(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1305",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1305.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1306: DrawableResource
+  get() = Drawable0.icon_1306
+
+@ExperimentalResourceApi
+private fun init_icon_1306(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1306",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1306.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1307: DrawableResource
+  get() = Drawable0.icon_1307
+
+@ExperimentalResourceApi
+private fun init_icon_1307(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1307",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1307.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1308: DrawableResource
+  get() = Drawable0.icon_1308
+
+@ExperimentalResourceApi
+private fun init_icon_1308(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1308",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1308.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1309: DrawableResource
+  get() = Drawable0.icon_1309
+
+@ExperimentalResourceApi
+private fun init_icon_1309(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1309",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1309.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_131: DrawableResource
+  get() = Drawable0.icon_131
+
+@ExperimentalResourceApi
+private fun init_icon_131(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_131",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_131.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1310: DrawableResource
+  get() = Drawable0.icon_1310
+
+@ExperimentalResourceApi
+private fun init_icon_1310(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1310",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1310.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1311: DrawableResource
+  get() = Drawable0.icon_1311
+
+@ExperimentalResourceApi
+private fun init_icon_1311(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1311",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1311.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1312: DrawableResource
+  get() = Drawable0.icon_1312
+
+@ExperimentalResourceApi
+private fun init_icon_1312(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1312",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1312.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1313: DrawableResource
+  get() = Drawable0.icon_1313
+
+@ExperimentalResourceApi
+private fun init_icon_1313(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1313",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1313.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1314: DrawableResource
+  get() = Drawable0.icon_1314
+
+@ExperimentalResourceApi
+private fun init_icon_1314(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1314",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1314.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1315: DrawableResource
+  get() = Drawable0.icon_1315
+
+@ExperimentalResourceApi
+private fun init_icon_1315(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1315",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1315.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1316: DrawableResource
+  get() = Drawable0.icon_1316
+
+@ExperimentalResourceApi
+private fun init_icon_1316(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1316",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1316.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1317: DrawableResource
+  get() = Drawable0.icon_1317
+
+@ExperimentalResourceApi
+private fun init_icon_1317(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1317",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1317.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1318: DrawableResource
+  get() = Drawable0.icon_1318
+
+@ExperimentalResourceApi
+private fun init_icon_1318(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1318",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1318.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1319: DrawableResource
+  get() = Drawable0.icon_1319
+
+@ExperimentalResourceApi
+private fun init_icon_1319(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1319",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1319.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_132: DrawableResource
+  get() = Drawable0.icon_132
+
+@ExperimentalResourceApi
+private fun init_icon_132(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_132",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_132.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1320: DrawableResource
+  get() = Drawable0.icon_1320
+
+@ExperimentalResourceApi
+private fun init_icon_1320(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1320",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1320.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1321: DrawableResource
+  get() = Drawable0.icon_1321
+
+@ExperimentalResourceApi
+private fun init_icon_1321(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1321",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1321.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1322: DrawableResource
+  get() = Drawable0.icon_1322
+
+@ExperimentalResourceApi
+private fun init_icon_1322(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1322",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1322.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1323: DrawableResource
+  get() = Drawable0.icon_1323
+
+@ExperimentalResourceApi
+private fun init_icon_1323(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1323",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1323.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1324: DrawableResource
+  get() = Drawable0.icon_1324
+
+@ExperimentalResourceApi
+private fun init_icon_1324(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1324",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1324.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1325: DrawableResource
+  get() = Drawable0.icon_1325
+
+@ExperimentalResourceApi
+private fun init_icon_1325(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1325",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1325.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1326: DrawableResource
+  get() = Drawable0.icon_1326
+
+@ExperimentalResourceApi
+private fun init_icon_1326(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1326",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1326.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1327: DrawableResource
+  get() = Drawable0.icon_1327
+
+@ExperimentalResourceApi
+private fun init_icon_1327(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1327",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1327.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1328: DrawableResource
+  get() = Drawable0.icon_1328
+
+@ExperimentalResourceApi
+private fun init_icon_1328(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1328",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1328.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1329: DrawableResource
+  get() = Drawable0.icon_1329
+
+@ExperimentalResourceApi
+private fun init_icon_1329(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1329",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1329.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_133: DrawableResource
+  get() = Drawable0.icon_133
+
+@ExperimentalResourceApi
+private fun init_icon_133(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_133",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_133.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1330: DrawableResource
+  get() = Drawable0.icon_1330
+
+@ExperimentalResourceApi
+private fun init_icon_1330(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1330",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1330.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1331: DrawableResource
+  get() = Drawable0.icon_1331
+
+@ExperimentalResourceApi
+private fun init_icon_1331(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1331",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1331.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1332: DrawableResource
+  get() = Drawable0.icon_1332
+
+@ExperimentalResourceApi
+private fun init_icon_1332(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1332",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1332.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1333: DrawableResource
+  get() = Drawable0.icon_1333
+
+@ExperimentalResourceApi
+private fun init_icon_1333(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1333",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1333.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1334: DrawableResource
+  get() = Drawable0.icon_1334
+
+@ExperimentalResourceApi
+private fun init_icon_1334(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1334",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1334.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1335: DrawableResource
+  get() = Drawable0.icon_1335
+
+@ExperimentalResourceApi
+private fun init_icon_1335(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1335",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1335.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1336: DrawableResource
+  get() = Drawable0.icon_1336
+
+@ExperimentalResourceApi
+private fun init_icon_1336(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1336",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1336.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1337: DrawableResource
+  get() = Drawable0.icon_1337
+
+@ExperimentalResourceApi
+private fun init_icon_1337(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1337",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1337.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1338: DrawableResource
+  get() = Drawable0.icon_1338
+
+@ExperimentalResourceApi
+private fun init_icon_1338(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1338",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1338.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1339: DrawableResource
+  get() = Drawable0.icon_1339
+
+@ExperimentalResourceApi
+private fun init_icon_1339(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1339",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1339.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_134: DrawableResource
+  get() = Drawable0.icon_134
+
+@ExperimentalResourceApi
+private fun init_icon_134(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_134",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_134.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1340: DrawableResource
+  get() = Drawable0.icon_1340
+
+@ExperimentalResourceApi
+private fun init_icon_1340(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1340",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1340.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1341: DrawableResource
+  get() = Drawable0.icon_1341
+
+@ExperimentalResourceApi
+private fun init_icon_1341(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1341",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1341.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1342: DrawableResource
+  get() = Drawable0.icon_1342
+
+@ExperimentalResourceApi
+private fun init_icon_1342(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1342",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1342.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1343: DrawableResource
+  get() = Drawable0.icon_1343
+
+@ExperimentalResourceApi
+private fun init_icon_1343(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1343",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1343.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1344: DrawableResource
+  get() = Drawable0.icon_1344
+
+@ExperimentalResourceApi
+private fun init_icon_1344(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1344",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1344.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1345: DrawableResource
+  get() = Drawable0.icon_1345
+
+@ExperimentalResourceApi
+private fun init_icon_1345(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1345",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1345.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1346: DrawableResource
+  get() = Drawable0.icon_1346
+
+@ExperimentalResourceApi
+private fun init_icon_1346(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1346",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1346.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1347: DrawableResource
+  get() = Drawable0.icon_1347
+
+@ExperimentalResourceApi
+private fun init_icon_1347(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1347",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1347.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1348: DrawableResource
+  get() = Drawable0.icon_1348
+
+@ExperimentalResourceApi
+private fun init_icon_1348(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1348",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1348.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1349: DrawableResource
+  get() = Drawable0.icon_1349
+
+@ExperimentalResourceApi
+private fun init_icon_1349(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1349",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1349.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_135: DrawableResource
+  get() = Drawable0.icon_135
+
+@ExperimentalResourceApi
+private fun init_icon_135(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_135",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_135.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1350: DrawableResource
+  get() = Drawable0.icon_1350
+
+@ExperimentalResourceApi
+private fun init_icon_1350(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1350",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1350.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1351: DrawableResource
+  get() = Drawable0.icon_1351
+
+@ExperimentalResourceApi
+private fun init_icon_1351(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1351",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1351.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1352: DrawableResource
+  get() = Drawable0.icon_1352
+
+@ExperimentalResourceApi
+private fun init_icon_1352(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1352",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1352.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1353: DrawableResource
+  get() = Drawable0.icon_1353
+
+@ExperimentalResourceApi
+private fun init_icon_1353(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1353",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1353.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1354: DrawableResource
+  get() = Drawable0.icon_1354
+
+@ExperimentalResourceApi
+private fun init_icon_1354(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1354",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1354.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1355: DrawableResource
+  get() = Drawable0.icon_1355
+
+@ExperimentalResourceApi
+private fun init_icon_1355(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1355",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1355.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1356: DrawableResource
+  get() = Drawable0.icon_1356
+
+@ExperimentalResourceApi
+private fun init_icon_1356(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1356",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1356.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1357: DrawableResource
+  get() = Drawable0.icon_1357
+
+@ExperimentalResourceApi
+private fun init_icon_1357(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1357",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1357.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1358: DrawableResource
+  get() = Drawable0.icon_1358
+
+@ExperimentalResourceApi
+private fun init_icon_1358(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1358",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1358.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1359: DrawableResource
+  get() = Drawable0.icon_1359
+
+@ExperimentalResourceApi
+private fun init_icon_1359(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1359",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1359.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_136: DrawableResource
+  get() = Drawable0.icon_136
+
+@ExperimentalResourceApi
+private fun init_icon_136(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_136",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_136.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1360: DrawableResource
+  get() = Drawable0.icon_1360
+
+@ExperimentalResourceApi
+private fun init_icon_1360(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1360",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1360.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1361: DrawableResource
+  get() = Drawable0.icon_1361
+
+@ExperimentalResourceApi
+private fun init_icon_1361(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1361",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1361.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1362: DrawableResource
+  get() = Drawable0.icon_1362
+
+@ExperimentalResourceApi
+private fun init_icon_1362(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1362",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1362.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1363: DrawableResource
+  get() = Drawable0.icon_1363
+
+@ExperimentalResourceApi
+private fun init_icon_1363(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1363",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1363.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1364: DrawableResource
+  get() = Drawable0.icon_1364
+
+@ExperimentalResourceApi
+private fun init_icon_1364(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1364",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1364.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1365: DrawableResource
+  get() = Drawable0.icon_1365
+
+@ExperimentalResourceApi
+private fun init_icon_1365(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1365",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1365.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1366: DrawableResource
+  get() = Drawable0.icon_1366
+
+@ExperimentalResourceApi
+private fun init_icon_1366(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1366",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1366.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1367: DrawableResource
+  get() = Drawable0.icon_1367
+
+@ExperimentalResourceApi
+private fun init_icon_1367(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1367",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1367.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1368: DrawableResource
+  get() = Drawable0.icon_1368
+
+@ExperimentalResourceApi
+private fun init_icon_1368(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1368",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1368.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1369: DrawableResource
+  get() = Drawable0.icon_1369
+
+@ExperimentalResourceApi
+private fun init_icon_1369(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1369",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1369.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_137: DrawableResource
+  get() = Drawable0.icon_137
+
+@ExperimentalResourceApi
+private fun init_icon_137(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_137",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_137.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1370: DrawableResource
+  get() = Drawable0.icon_1370
+
+@ExperimentalResourceApi
+private fun init_icon_1370(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1370",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1370.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1371: DrawableResource
+  get() = Drawable0.icon_1371
+
+@ExperimentalResourceApi
+private fun init_icon_1371(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1371",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1371.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1372: DrawableResource
+  get() = Drawable0.icon_1372
+
+@ExperimentalResourceApi
+private fun init_icon_1372(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1372",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1372.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1373: DrawableResource
+  get() = Drawable0.icon_1373
+
+@ExperimentalResourceApi
+private fun init_icon_1373(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1373",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1373.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1374: DrawableResource
+  get() = Drawable0.icon_1374
+
+@ExperimentalResourceApi
+private fun init_icon_1374(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1374",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1374.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1375: DrawableResource
+  get() = Drawable0.icon_1375
+
+@ExperimentalResourceApi
+private fun init_icon_1375(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1375",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1375.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1376: DrawableResource
+  get() = Drawable0.icon_1376
+
+@ExperimentalResourceApi
+private fun init_icon_1376(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1376",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1376.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1377: DrawableResource
+  get() = Drawable0.icon_1377
+
+@ExperimentalResourceApi
+private fun init_icon_1377(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1377",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1377.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1378: DrawableResource
+  get() = Drawable0.icon_1378
+
+@ExperimentalResourceApi
+private fun init_icon_1378(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1378",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1378.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1379: DrawableResource
+  get() = Drawable0.icon_1379
+
+@ExperimentalResourceApi
+private fun init_icon_1379(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1379",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1379.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_138: DrawableResource
+  get() = Drawable0.icon_138
+
+@ExperimentalResourceApi
+private fun init_icon_138(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_138",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_138.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1380: DrawableResource
+  get() = Drawable0.icon_1380
+
+@ExperimentalResourceApi
+private fun init_icon_1380(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1380",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1380.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1381: DrawableResource
+  get() = Drawable0.icon_1381
+
+@ExperimentalResourceApi
+private fun init_icon_1381(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1381",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1381.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1382: DrawableResource
+  get() = Drawable0.icon_1382
+
+@ExperimentalResourceApi
+private fun init_icon_1382(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1382",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1382.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1383: DrawableResource
+  get() = Drawable0.icon_1383
+
+@ExperimentalResourceApi
+private fun init_icon_1383(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1383",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1383.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1384: DrawableResource
+  get() = Drawable0.icon_1384
+
+@ExperimentalResourceApi
+private fun init_icon_1384(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1384",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1384.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1385: DrawableResource
+  get() = Drawable0.icon_1385
+
+@ExperimentalResourceApi
+private fun init_icon_1385(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1385",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1385.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1386: DrawableResource
+  get() = Drawable0.icon_1386
+
+@ExperimentalResourceApi
+private fun init_icon_1386(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1386",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1386.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1387: DrawableResource
+  get() = Drawable0.icon_1387
+
+@ExperimentalResourceApi
+private fun init_icon_1387(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1387",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1387.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1388: DrawableResource
+  get() = Drawable0.icon_1388
+
+@ExperimentalResourceApi
+private fun init_icon_1388(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1388",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1388.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1389: DrawableResource
+  get() = Drawable0.icon_1389
+
+@ExperimentalResourceApi
+private fun init_icon_1389(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1389",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1389.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_139: DrawableResource
+  get() = Drawable0.icon_139
+
+@ExperimentalResourceApi
+private fun init_icon_139(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_139",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_139.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1390: DrawableResource
+  get() = Drawable0.icon_1390
+
+@ExperimentalResourceApi
+private fun init_icon_1390(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1390",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1390.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1391: DrawableResource
+  get() = Drawable0.icon_1391
+
+@ExperimentalResourceApi
+private fun init_icon_1391(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1391",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1391.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1392: DrawableResource
+  get() = Drawable0.icon_1392
+
+@ExperimentalResourceApi
+private fun init_icon_1392(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1392",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1392.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1393: DrawableResource
+  get() = Drawable0.icon_1393
+
+@ExperimentalResourceApi
+private fun init_icon_1393(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1393",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1393.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1394: DrawableResource
+  get() = Drawable0.icon_1394
+
+@ExperimentalResourceApi
+private fun init_icon_1394(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1394",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1394.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1395: DrawableResource
+  get() = Drawable0.icon_1395
+
+@ExperimentalResourceApi
+private fun init_icon_1395(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1395",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1395.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1396: DrawableResource
+  get() = Drawable0.icon_1396
+
+@ExperimentalResourceApi
+private fun init_icon_1396(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1396",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1396.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1397: DrawableResource
+  get() = Drawable0.icon_1397
+
+@ExperimentalResourceApi
+private fun init_icon_1397(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1397",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1397.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1398: DrawableResource
+  get() = Drawable0.icon_1398
+
+@ExperimentalResourceApi
+private fun init_icon_1398(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1398",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1398.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1399: DrawableResource
+  get() = Drawable0.icon_1399
+
+@ExperimentalResourceApi
+private fun init_icon_1399(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1399",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1399.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_14: DrawableResource
+  get() = Drawable0.icon_14
+
+@ExperimentalResourceApi
+private fun init_icon_14(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_14",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_14.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_140: DrawableResource
+  get() = Drawable0.icon_140
+
+@ExperimentalResourceApi
+private fun init_icon_140(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_140",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_140.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1400: DrawableResource
+  get() = Drawable0.icon_1400
+
+@ExperimentalResourceApi
+private fun init_icon_1400(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1400",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1400.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1401: DrawableResource
+  get() = Drawable0.icon_1401
+
+@ExperimentalResourceApi
+private fun init_icon_1401(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1401",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1401.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1402: DrawableResource
+  get() = Drawable0.icon_1402
+
+@ExperimentalResourceApi
+private fun init_icon_1402(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1402",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1402.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1403: DrawableResource
+  get() = Drawable0.icon_1403
+
+@ExperimentalResourceApi
+private fun init_icon_1403(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1403",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1403.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1404: DrawableResource
+  get() = Drawable0.icon_1404
+
+@ExperimentalResourceApi
+private fun init_icon_1404(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1404",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1404.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1405: DrawableResource
+  get() = Drawable0.icon_1405
+
+@ExperimentalResourceApi
+private fun init_icon_1405(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1405",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1405.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1406: DrawableResource
+  get() = Drawable0.icon_1406
+
+@ExperimentalResourceApi
+private fun init_icon_1406(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1406",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1406.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1407: DrawableResource
+  get() = Drawable0.icon_1407
+
+@ExperimentalResourceApi
+private fun init_icon_1407(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1407",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1407.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1408: DrawableResource
+  get() = Drawable0.icon_1408
+
+@ExperimentalResourceApi
+private fun init_icon_1408(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1408",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1408.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1409: DrawableResource
+  get() = Drawable0.icon_1409
+
+@ExperimentalResourceApi
+private fun init_icon_1409(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1409",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1409.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_141: DrawableResource
+  get() = Drawable0.icon_141
+
+@ExperimentalResourceApi
+private fun init_icon_141(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_141",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_141.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1410: DrawableResource
+  get() = Drawable0.icon_1410
+
+@ExperimentalResourceApi
+private fun init_icon_1410(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1410",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1410.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1411: DrawableResource
+  get() = Drawable0.icon_1411
+
+@ExperimentalResourceApi
+private fun init_icon_1411(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1411",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1411.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1412: DrawableResource
+  get() = Drawable0.icon_1412
+
+@ExperimentalResourceApi
+private fun init_icon_1412(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1412",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1412.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1413: DrawableResource
+  get() = Drawable0.icon_1413
+
+@ExperimentalResourceApi
+private fun init_icon_1413(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1413",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1413.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1414: DrawableResource
+  get() = Drawable0.icon_1414
+
+@ExperimentalResourceApi
+private fun init_icon_1414(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1414",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1414.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1415: DrawableResource
+  get() = Drawable0.icon_1415
+
+@ExperimentalResourceApi
+private fun init_icon_1415(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1415",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1415.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1416: DrawableResource
+  get() = Drawable0.icon_1416
+
+@ExperimentalResourceApi
+private fun init_icon_1416(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1416",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1416.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1417: DrawableResource
+  get() = Drawable0.icon_1417
+
+@ExperimentalResourceApi
+private fun init_icon_1417(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1417",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1417.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1418: DrawableResource
+  get() = Drawable0.icon_1418
+
+@ExperimentalResourceApi
+private fun init_icon_1418(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1418",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1418.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1419: DrawableResource
+  get() = Drawable0.icon_1419
+
+@ExperimentalResourceApi
+private fun init_icon_1419(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1419",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1419.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_142: DrawableResource
+  get() = Drawable0.icon_142
+
+@ExperimentalResourceApi
+private fun init_icon_142(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_142",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_142.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1420: DrawableResource
+  get() = Drawable0.icon_1420
+
+@ExperimentalResourceApi
+private fun init_icon_1420(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1420",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1420.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1421: DrawableResource
+  get() = Drawable0.icon_1421
+
+@ExperimentalResourceApi
+private fun init_icon_1421(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1421",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1421.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1422: DrawableResource
+  get() = Drawable0.icon_1422
+
+@ExperimentalResourceApi
+private fun init_icon_1422(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1422",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1422.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1423: DrawableResource
+  get() = Drawable0.icon_1423
+
+@ExperimentalResourceApi
+private fun init_icon_1423(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1423",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1423.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1424: DrawableResource
+  get() = Drawable0.icon_1424
+
+@ExperimentalResourceApi
+private fun init_icon_1424(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1424",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1424.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1425: DrawableResource
+  get() = Drawable0.icon_1425
+
+@ExperimentalResourceApi
+private fun init_icon_1425(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1425",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1425.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1426: DrawableResource
+  get() = Drawable0.icon_1426
+
+@ExperimentalResourceApi
+private fun init_icon_1426(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1426",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1426.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1427: DrawableResource
+  get() = Drawable0.icon_1427
+
+@ExperimentalResourceApi
+private fun init_icon_1427(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1427",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1427.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1428: DrawableResource
+  get() = Drawable0.icon_1428
+
+@ExperimentalResourceApi
+private fun init_icon_1428(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1428",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1428.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1429: DrawableResource
+  get() = Drawable0.icon_1429
+
+@ExperimentalResourceApi
+private fun init_icon_1429(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1429",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1429.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_143: DrawableResource
+  get() = Drawable0.icon_143
+
+@ExperimentalResourceApi
+private fun init_icon_143(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_143",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_143.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1430: DrawableResource
+  get() = Drawable0.icon_1430
+
+@ExperimentalResourceApi
+private fun init_icon_1430(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1430",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1430.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1431: DrawableResource
+  get() = Drawable0.icon_1431
+
+@ExperimentalResourceApi
+private fun init_icon_1431(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1431",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1431.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1432: DrawableResource
+  get() = Drawable0.icon_1432
+
+@ExperimentalResourceApi
+private fun init_icon_1432(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1432",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1432.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1433: DrawableResource
+  get() = Drawable0.icon_1433
+
+@ExperimentalResourceApi
+private fun init_icon_1433(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1433",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1433.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1434: DrawableResource
+  get() = Drawable0.icon_1434
+
+@ExperimentalResourceApi
+private fun init_icon_1434(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1434",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1434.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1435: DrawableResource
+  get() = Drawable0.icon_1435
+
+@ExperimentalResourceApi
+private fun init_icon_1435(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1435",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1435.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1436: DrawableResource
+  get() = Drawable0.icon_1436
+
+@ExperimentalResourceApi
+private fun init_icon_1436(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1436",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1436.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1437: DrawableResource
+  get() = Drawable0.icon_1437
+
+@ExperimentalResourceApi
+private fun init_icon_1437(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1437",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1437.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1438: DrawableResource
+  get() = Drawable0.icon_1438
+
+@ExperimentalResourceApi
+private fun init_icon_1438(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1438",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1438.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1439: DrawableResource
+  get() = Drawable0.icon_1439
+
+@ExperimentalResourceApi
+private fun init_icon_1439(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1439",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1439.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_144: DrawableResource
+  get() = Drawable0.icon_144
+
+@ExperimentalResourceApi
+private fun init_icon_144(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_144",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_144.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1440: DrawableResource
+  get() = Drawable0.icon_1440
+
+@ExperimentalResourceApi
+private fun init_icon_1440(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1440",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1440.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1441: DrawableResource
+  get() = Drawable0.icon_1441
+
+@ExperimentalResourceApi
+private fun init_icon_1441(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1441",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1441.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1442: DrawableResource
+  get() = Drawable0.icon_1442
+
+@ExperimentalResourceApi
+private fun init_icon_1442(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1442",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1442.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1443: DrawableResource
+  get() = Drawable0.icon_1443
+
+@ExperimentalResourceApi
+private fun init_icon_1443(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1443",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1443.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1444: DrawableResource
+  get() = Drawable0.icon_1444
+
+@ExperimentalResourceApi
+private fun init_icon_1444(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1444",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1444.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1445: DrawableResource
+  get() = Drawable0.icon_1445
+
+@ExperimentalResourceApi
+private fun init_icon_1445(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1445",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1445.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1446: DrawableResource
+  get() = Drawable0.icon_1446
+
+@ExperimentalResourceApi
+private fun init_icon_1446(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1446",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1446.xml"),
+    )
+)
+
+@ExperimentalResourceApi
+internal val Res.drawable.icon_1447: DrawableResource
+  get() = Drawable0.icon_1447
+
+@ExperimentalResourceApi
+private fun init_icon_1447(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:icon_1447",
+    setOf(
+      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/icon_1447.xml"),
+    )
+)

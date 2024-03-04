@@ -188,42 +188,50 @@ private fun getChunkFileSpec(
         val objectSpec = TypeSpec.objectBuilder(chunkClassName).also { typeObject ->
             typeObject.addModifiers(KModifier.PRIVATE)
             typeObject.addAnnotation(experimentalAnnotation)
-            val properties = idToResources.map { (resName, items) ->
+            val properties = idToResources.keys.map { resName ->
                 PropertySpec.builder(resName, type.getClassName())
-                    .initializer(
-                        CodeBlock.builder()
-                            .add("%T(\n", type.getClassName()).withIndent {
-                                add("\"${type}:${resName}\",")
-                                if (type == ResourceType.STRING) add(" \"$resName\",")
-                                withIndent {
-                                    add("\nsetOf(\n").withIndent {
-                                        items.forEach { item ->
-                                            add("%T(", resourceItemClass)
-                                            add("setOf(").addQualifiers(item).add("), ")
-                                            //file separator should be '/' on all platforms
-                                            add("\"${item.path.invariantSeparatorsPathString}\"") //todo: add module ID here
-                                            add("),\n")
-                                        }
-                                    }
-                                    add(")\n")
-                                }
-                            }
-                            .add(")")
-                            .build().toString()
-                    )
+                    .delegate("\nlazy·{ init_$resName() }")
                     .build()
             }
             typeObject.addProperties(properties)
         }.build()
         chunkFile.addType(objectSpec)
 
-        idToResources.keys.forEach { resName ->
+        idToResources.forEach { (resName, items) ->
             val accessor = PropertySpec.builder(resName, type.getClassName(), KModifier.INTERNAL)
                 .receiver(ClassName(packageName, "Res", type.typeName))
                 .addAnnotation(experimentalAnnotation)
                 .getter(FunSpec.getterBuilder().addStatement("return $chunkClassName.$resName").build())
                 .build()
             chunkFile.addProperty(accessor)
+
+            val initializer = FunSpec.builder("init_$resName")
+                .addModifiers(KModifier.PRIVATE)
+                .addAnnotation(experimentalAnnotation)
+                .returns(type.getClassName())
+                .addStatement(
+                    CodeBlock.builder()
+                        .add("return %T(\n", type.getClassName()).withIndent {
+                            add("\"${type}:${resName}\",")
+                            if (type == ResourceType.STRING) add(" \"$resName\",")
+                            withIndent {
+                                add("\nsetOf(\n").withIndent {
+                                    items.forEach { item ->
+                                        add("%T(", resourceItemClass)
+                                        add("setOf(").addQualifiers(item).add("), ")
+                                        //file separator should be '/' on all platforms
+                                        add("\"${item.path.invariantSeparatorsPathString}\"") //todo: add module ID here
+                                        add("),\n")
+                                    }
+                                }
+                                add(")\n")
+                            }
+                        }
+                        .add(")")
+                        .build().toString()
+                )
+                .build()
+            chunkFile.addFunction(initializer)
         }
     }.build()
 }
