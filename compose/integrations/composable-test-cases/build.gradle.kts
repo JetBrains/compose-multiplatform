@@ -14,6 +14,7 @@ allprojects {
         // mavenLocal()
     }
 
+    // Apply here for all subprojects. It applies the compiler plugin
     this.apply<InternalComposeSupportPlugin>()
 
     afterEvaluate {
