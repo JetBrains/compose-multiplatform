@@ -299,7 +299,7 @@ class ResourcesTest : GradlePluginTestBase() {
     //https://github.com/JetBrains/compose-multiplatform/issues/4194
     //https://github.com/JetBrains/compose-multiplatform/issues/4285
     //
-    // 25_000 icons + 25_000 strings!!!
+    // 1500 icons + 1500*20 strings!!!
     @Test
     fun testHugeNumberOfResources(): Unit = with(
         //disable cache for the test because the generateResourceFiles task doesn't support it
