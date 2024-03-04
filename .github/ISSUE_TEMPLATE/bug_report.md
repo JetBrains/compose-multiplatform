@@ -18,11 +18,11 @@ A clear and concise description of what the bug is.
 
 **Affected platforms**
 <!-- Select one or multiple affected platforms below: -->
-- [ ] Desktop (Windows, Linux, macOS)
-- [ ] iOS
-- [ ] Web (K/Wasm) - Canvas based API
-- [ ] Web (K/JS) - Canvas based API
-- [ ] Web (K/JS) - HTML library
+- Desktop (Windows, Linux, macOS)
+- iOS
+- Web (K/Wasm) - Canvas based API
+- Web (K/JS) - Canvas based API
+- Web (K/JS) - HTML library
 
 **Versions**
 - Kotlin version*: 
