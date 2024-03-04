@@ -93,10 +93,13 @@ val jar = tasks.named<Jar>("jar") {
     this.duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
-val supportedGradleVersions = project.property("compose.tests.gradle.versions")
-    .toString().split(",")
-    .map { it.trim() }
-    .map { GradleVersion.version(it) }
+val supportedGradleVersions = project.propertyList("compose.tests.gradle.versions")
+val supportedAgpVersions = project.propertyList("compose.tests.agp.versions")
+
+fun Project.propertyList(name: String) =
+    project.property(name).toString()
+        .split(",")
+        .map { it.trim() }
 
 val gradleTestsPattern = "org.jetbrains.compose.test.tests.integration.*"
 
@@ -151,17 +154,30 @@ for (jdkVersion in jdkVersionsForTests) {
 }
 
 for (gradleVersion in supportedGradleVersions) {
-    tasks.registerVerificationTask<Test>("testGradle-${gradleVersion.version}") {
-        classpath = tasks.test.get().classpath
+    for (agpVersion in supportedAgpVersions) {
+        tasks.registerVerificationTask<Test>("test-Gradle(${gradleVersion})-Agp($agpVersion)") {
+            classpath = tasks.test.get().classpath
+            filter { includeTestsMatching(gradleTestsPattern) }
+            dependsOn(downloadJdksForTests)
 
-        dependsOn(downloadJdksForTests)
-        systemProperty("compose.tests.gradle.test.jdks.root", jdkForTestsRoot.absolutePath)
-        if (gradleVersion >= GradleVersion.version("7.6")) {
-            systemProperty("compose.tests.gradle.configuration.cache", "true")
-        }
-        systemProperty("compose.tests.gradle.version", gradleVersion.version)
-        filter {
-            includeTestsMatching(gradleTestsPattern)
+            /*
+             * Fixes this kind of error:
+             * What went wrong:
+             * An exception occurred applying plugin request [id: 'com.android.application', version: '8.2.2']
+             * > Failed to apply plugin 'com.android.internal.version-check'.
+             * > Minimum supported Gradle version is 8.2. Current version is 7.4.
+             */
+            val agpMajor = agpVersion.split('.').first().toInt()
+            val gradleMajor = gradleVersion.split('.').first().toInt()
+            onlyIf { agpMajor <= gradleMajor }
+
+            systemProperty("compose.tests.gradle.test.jdks.root", jdkForTestsRoot.absolutePath)
+            systemProperty("compose.tests.gradle.version", gradleVersion)
+            systemProperty("compose.tests.agp.version", agpVersion)
+            systemProperty(
+                "compose.tests.gradle.configuration.cache",
+                GradleVersion.version(gradleVersion) >= GradleVersion.version("8.0")
+            )
         }
     }
 }
