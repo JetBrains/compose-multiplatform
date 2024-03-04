@@ -64,6 +64,7 @@ inline fun <reified T : Task> TaskContainer.registerVerificationTask(
     crossinline fn: T.() -> Unit
 ): TaskProvider<T> =
     register(name, T::class) {
+        group = "verification"
         fn()
     }.apply {
         named("check").dependsOn(this)

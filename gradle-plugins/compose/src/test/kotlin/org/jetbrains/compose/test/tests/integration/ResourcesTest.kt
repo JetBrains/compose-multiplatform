@@ -212,14 +212,14 @@ class ResourcesTest : GradlePluginTestBase() {
             commonResourcesFiles.forEach { res ->
                 if (res == "font/emptyFont.otf") {
                     //android fonts should be only in assets
-                    assertNull(zip.getEntry(res))
+                    assertNull(zip.getEntry(res), "file = '$res'")
                 } else {
-                    assertNotNull(zip.getEntry(res))
+                    assertNotNull(zip.getEntry(res), "file = '$res'")
                 }
             }
-            assertNotNull(zip.getEntry("assets/font/emptyFont.otf"))
+            assertNotNull(zip.getEntry("assets/font/emptyFont.otf"), "file = 'assets/font/emptyFont.otf'")
             val platformTxt = zip.getEntry("files/platform.txt")
-            assertNotNull(platformTxt)
+            assertNotNull(platformTxt, "file = 'files/platform.txt'")
             val text = zip.getInputStream(platformTxt).readBytes().decodeToString()
             assertEquals("android $flavor-$type", text)
         }

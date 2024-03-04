@@ -29,6 +29,7 @@ kotlin {
 }
 
 android {
+    namespace = "org.jetbrains.compose.testapp"
     compileSdk = 31
 
     defaultConfig {

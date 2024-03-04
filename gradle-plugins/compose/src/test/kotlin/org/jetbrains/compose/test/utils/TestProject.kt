@@ -9,13 +9,16 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
+import org.junit.jupiter.params.provider.Arguments
 import java.io.File
 import java.util.Properties
+import java.util.stream.Stream
 
 data class TestEnvironment(
     val workingDir: File,
-    val kotlinVersion: String = TestKotlinVersions.Default,
-    val agpVersion: String = "7.3.1",
+    val kotlinVersion: String = TestProperties.composeCompilerCompatibleKotlinVersion,
+    val gradleVersion: String = TestProperties.gradleVersion,
+    val agpVersion: String = TestProperties.agpVersion,
     val composeGradlePluginVersion: String = TestProperties.composeGradlePluginVersion,
     val mokoResourcesPluginVersion: String = "0.23.0",
     val composeCompilerPlugin: String? = null,
@@ -42,6 +45,8 @@ data class TestEnvironment(
         }
         file.writeText(content)
     }
+
+    val parsedGradleVersion: GradleVersion = GradleVersion.version(gradleVersion)
 }
 
 private val testJdks = TestProperties
@@ -57,7 +62,7 @@ class TestProject(
         "--stacktrace",
         "--init-script", testProjectsRootDir.resolve("init.gradle").absolutePath,
         "-P${ComposeProperties.VERBOSE}=${testEnvironment.composeVerbose}",
-        if (GradleVersion.version(TestProperties.gradleVersionForTests).baseVersion < GradleVersion.version("8.0")) {
+        if (testEnvironment.parsedGradleVersion < GradleVersion.version("8.0")) {
             null
         } else {
             "-Porg.gradle.java.installations.paths=${testJdks.joinToString(",")}"
@@ -89,7 +94,7 @@ class TestProject(
 
     private inline fun withGradleRunner(args: Array<out String>, runnerFn: GradleRunner.() -> BuildResult): BuildResult {
         if (testEnvironment.useGradleConfigurationCache) {
-            if (TestProperties.gradleBaseVersionForTests < GradleVersion.version("8.0")) {
+            if (testEnvironment.parsedGradleVersion < GradleVersion.version("8.0")) {
                 // Gradle 7.* does not use the configuration cache in the same build.
                 // In other words, if cache misses, Gradle performs configuration,
                 // but does not, use the serialized task graph.
@@ -123,7 +128,7 @@ class TestProject(
         }
 
         return GradleRunner.create().apply {
-            withGradleVersion(TestProperties.gradleVersionForTests)
+            withGradleVersion(testEnvironment.gradleVersion)
             withProjectDir(testEnvironment.workingDir)
             withArguments(allArgs)
             if (testEnvironment.additionalEnvVars.isNotEmpty()) {

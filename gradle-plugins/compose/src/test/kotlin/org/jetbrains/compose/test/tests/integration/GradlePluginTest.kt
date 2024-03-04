@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 
 class GradlePluginTest : GradlePluginTestBase() {
@@ -64,22 +66,15 @@ class GradlePluginTest : GradlePluginTestBase() {
         )
     }
 
-    // We rely on this property to use gradle configuration cache in some tests.
-    // Enabling configuration cache unconditionally breaks out tests with gradle 7.3.3.
-    // Old comment: 'for some reason configuration cache + test kit + custom vars does not work'
-    private val GradleVersion.isAtLeastGradle8
-        get() = this >= GradleVersion.version("8.0")
-
     @Test
     fun iosResources() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
         val iosTestEnv = iosTestEnv()
         val testEnv = defaultTestEnvironment.copy(
-            useGradleConfigurationCache = TestProperties.gradleBaseVersionForTests.isAtLeastGradle8,
             additionalEnvVars = iosTestEnv.envVars
         )
 
-        with(testProject(TestProjects.iosResources, testEnv)) {
+        with(TestProject(TestProjects.iosResources, testEnv)) {
             gradle(":embedAndSignAppleFrameworkForXcode", "--dry-run").checks {
                 // This test is not intended to actually run embedAndSignAppleFrameworkForXcode.
                 // Instead, it should check that embedAndSign depends on syncComposeResources using dry run
@@ -96,11 +91,7 @@ class GradlePluginTest : GradlePluginTestBase() {
     @Test
     fun iosTestResources() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
-        val testEnv = defaultTestEnvironment.copy(
-            useGradleConfigurationCache = TestProperties.gradleBaseVersionForTests.isAtLeastGradle8
-        )
-
-        with(testProject(TestProjects.iosResources, testEnv)) {
+        with(testProject(TestProjects.iosResources)) {
             gradle(":linkDebugTestIosX64", "--dry-run").checks {
                 check.taskSkipped(":copyTestComposeResourcesForIosX64")
                 check.taskSkipped(":linkDebugTestIosX64")
@@ -117,7 +108,6 @@ class GradlePluginTest : GradlePluginTestBase() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
         val iosTestEnv = iosTestEnv()
         val testEnv = defaultTestEnvironment.copy(
-            useGradleConfigurationCache = TestProperties.gradleBaseVersionForTests.isAtLeastGradle8,
             additionalEnvVars = iosTestEnv.envVars
         )
         with(testProject(TestProjects.iosMokoResources, testEnv)) {
@@ -138,11 +128,6 @@ class GradlePluginTest : GradlePluginTestBase() {
     @Test
     fun nativeCacheKind() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
-        fun nativeCacheKindProject(kotlinVersion: String) = testProject(
-            TestProjects.nativeCacheKind,
-            defaultTestEnvironment.copy(kotlinVersion = kotlinVersion, useGradleConfigurationCache = false)
-        )
-
         val task = if (currentArch == Arch.X64) {
             ":subproject:linkDebugFrameworkIosX64"
         } else {
@@ -153,11 +138,14 @@ class GradlePluginTest : GradlePluginTestBase() {
         // the compiler crashed (older k/native doesn't support libs built using newer k/native):
         // e: kotlin.NotImplementedError: Generation of stubs for class org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterPublicSymbolImpl is not supported yet
 
-        val defaultKotlinVersion = kotlinVersionNumbers(TestKotlinVersions.Default)
-        if (defaultKotlinVersion >= KotlinVersion(1, 9, 20)) {
+        if (kotlinVersionNumbers(defaultTestEnvironment.kotlinVersion) >= KotlinVersion(1, 9, 20)) {
             testWorkDir.deleteRecursively()
             testWorkDir.mkdirs()
-            with(nativeCacheKindProject(TestKotlinVersions.Default) ) {
+            val project = TestProject(
+                TestProjects.nativeCacheKind,
+                defaultTestEnvironment.copy(useGradleConfigurationCache = false)
+            )
+            with(project) {
                 gradle(task, "--info").checks {
                     check.taskSuccessful(task)
                     check.logContains("-Xauto-cache-from=")
@@ -220,7 +208,7 @@ class GradlePluginTest : GradlePluginTestBase() {
             }
         }
 
-        testKotlinVersion(TestKotlinVersions.v1_9_21)
+        testKotlinVersion("1.9.21")
     }
 
     @Test
@@ -251,7 +239,7 @@ class GradlePluginTest : GradlePluginTestBase() {
 
     @Test
     fun newAndroidTarget() {
-        Assumptions.assumeTrue(TestProperties.gradleBaseVersionForTests >= GradleVersion.version("8.0.0"))
+        Assumptions.assumeTrue(defaultTestEnvironment.parsedGradleVersion >= GradleVersion.version("8.0.0"))
         with(testProject(TestProjects.newAndroidTarget)) {
             gradle("build", "--dry-run").checks {
             }

@@ -6,10 +6,22 @@
 package org.jetbrains.compose.test.utils
 
 import org.junit.jupiter.api.DisplayNameGenerator
+import java.lang.reflect.Method
 
 class GradleTestNameGenerator : DisplayNameGenerator.Standard() {
-    private val gradleVersion = TestProperties.gradleVersionForTests?.let { "[Gradle '$it']" } ?: ""
 
-    override fun generateDisplayNameForClass(testClass: Class<*>?): String =
-        super.generateDisplayNameForClass(testClass) + gradleVersion
+    override fun generateDisplayNameForMethod(testClass: Class<*>, testMethod: Method) =
+        testMethod.name + with(TestProperties) {
+            mutableListOf<String>().apply {
+                muteException { add("kotlin=$composeCompilerCompatibleKotlinVersion") }
+                muteException { add("gradle=$gradleVersion") }
+                muteException { add("agp=$agpVersion") }
+            }.joinToString(prefix = "(", separator = ", ", postfix = ")")
+        }
+
+    private fun muteException(fn: () -> Unit) = try {
+        fn()
+    } catch (_: Exception) {
+        //do nothing
+    }
 }
