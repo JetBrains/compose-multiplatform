@@ -1,4 +1,4 @@
-rootProject.name = "resources_test"
+rootProject.name = "Resources-Test"
 pluginManagement {
     repositories {
         mavenLocal()
