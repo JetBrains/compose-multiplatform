@@ -1,6 +1,7 @@
+import internal.composeRuntimeDependency
+
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose")
 }
 
 group = "com.example"
@@ -12,7 +13,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(compose.runtime)
+                api(project.composeRuntimeDependency)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             }
         }

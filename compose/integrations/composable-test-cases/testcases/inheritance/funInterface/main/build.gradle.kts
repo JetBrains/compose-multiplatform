@@ -1,6 +1,5 @@
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose")
 }
 
 kotlin {
@@ -9,7 +8,6 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(compose.runtime)
                 implementation(getCommonLib())
                 implementation(getLibDependencyForMain())
             }

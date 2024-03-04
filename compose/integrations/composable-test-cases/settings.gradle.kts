@@ -7,10 +7,6 @@ pluginManagement {
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
         mavenLocal()
     }
-
-    plugins {
-        id("org.jetbrains.compose").version(extra["compose.version"] as String)
-    }
 }
 
 rootProject.name = "composable-test-cases"
