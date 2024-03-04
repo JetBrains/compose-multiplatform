@@ -179,7 +179,7 @@ class ResourcesTest : GradlePluginTestBase() {
             checkAndroidApk("full", "debug", commonResourcesFiles)
             checkAndroidApk("full", "release", commonResourcesFiles)
 
-            val desktopJar = file("build/libs/resources_test-desktop.jar")
+            val desktopJar = file("build/libs/Resources-Test-desktop.jar")
             assertTrue(desktopJar.exists())
             ZipFile(desktopJar).use { zip ->
                 commonResourcesFiles.forEach { res ->
@@ -206,7 +206,7 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     private fun TestProject.checkAndroidApk(flavor: String, type: String, commonResourcesFiles: Sequence<String>) {
-        val apk = file("build/outputs/apk/$flavor/$type/resources_test-$flavor-$type.apk")
+        val apk = file("build/outputs/apk/$flavor/$type/Resources-Test-$flavor-$type.apk")
         assertTrue(apk.exists())
         ZipFile(apk).use { zip ->
             commonResourcesFiles.forEach { res ->
