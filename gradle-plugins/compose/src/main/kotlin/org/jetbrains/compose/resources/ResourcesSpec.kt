@@ -116,7 +116,8 @@ private const val ITEMS_PER_FILE_LIMIT = 500
 internal fun getResFileSpecs(
     //type -> id -> items
     resources: Map<ResourceType, Map<String, List<ResourceItem>>>,
-    packageName: String
+    packageName: String,
+    moduleDir: String
 ): List<FileSpec> {
     val files = mutableListOf<FileSpec>()
     val resClass = FileSpec.builder(packageName, "Res").also { file ->
@@ -147,7 +148,7 @@ internal fun getResFileSpecs(
                     .addParameter("path", String::class)
                     .addModifiers(KModifier.SUSPEND)
                     .returns(ByteArray::class)
-                    .addStatement("return %M(path)", readResourceBytes) //todo: add module ID here
+                    .addStatement("""return %M("$moduleDir" + path)""", readResourceBytes)
                     .build()
             )
             ResourceType.values().forEach { type ->
@@ -163,7 +164,13 @@ internal fun getResFileSpecs(
 
         chunks.forEachIndexed { index, ids ->
             files.add(
-                getChunkFileSpec(type, index, packageName, idToResources.subMap(ids.first(), true, ids.last(), true))
+                getChunkFileSpec(
+                    type,
+                    index,
+                    packageName,
+                    moduleDir,
+                    idToResources.subMap(ids.first(), true, ids.last(), true)
+                )
             )
         }
     }
@@ -175,6 +182,7 @@ private fun getChunkFileSpec(
     type: ResourceType,
     index: Int,
     packageName: String,
+    moduleDir: String,
     idToResources: Map<String, List<ResourceItem>>
 ): FileSpec {
     val chunkClassName = type.typeName.uppercaseFirstChar() + index
@@ -220,7 +228,7 @@ private fun getChunkFileSpec(
                                         add("%T(", resourceItemClass)
                                         add("setOf(").addQualifiers(item).add("), ")
                                         //file separator should be '/' on all platforms
-                                        add("\"${item.path.invariantSeparatorsPathString}\"") //todo: add module ID here
+                                        add("\"$moduleDir${item.path.invariantSeparatorsPathString}\"")
                                         add("),\n")
                                     }
                                 }
