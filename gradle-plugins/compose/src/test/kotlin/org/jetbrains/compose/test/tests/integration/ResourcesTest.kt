@@ -133,6 +133,83 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun testComposeResourcesPublication(): Unit = with(
+        testProject(
+            "misc/kmpResourcePublication",
+            defaultTestEnvironment.copy(
+                kotlinVersion = "2.0.0-titan-98",
+                composeCompilerPlugin = "2.0.0-Beta4"
+            )
+        )
+    ) {
+        gradle(":cmplib:publishAllPublicationsToMavenRepository").checks {
+            val resDir = file("cmplib/src/commonMain/composeResources")
+            val resourcesFiles = resDir.walkTopDown()
+                .filter { !it.isDirectory && !it.isHidden }
+                .map { it.relativeTo(resDir).invariantSeparatorsPath }
+            val subdir = "me.sample.library.cmplib"
+
+            fun libpath(target: String, ext: String) =
+                "my-mvn/me/sample/library/cmplib-$target/1.0/cmplib-$target-1.0$ext"
+
+            val aar = file(libpath("android", ".aar"))
+            val innerClassesJar = aar.parentFile.resolve("aar-inner-classes.jar")
+            assertTrue(aar.exists(), "File not found: " + aar.path)
+            ZipFile(aar).use { zip ->
+                resourcesFiles
+                    .filter { it.startsWith("font") }
+                    .forEach { fontRes ->
+                        assertNotNull(
+                            zip.getEntry("assets/composeResources/$subdir/$fontRes"),
+                            "Resource not found: '$fontRes' in aar '${aar.path}'"
+                        )
+                    }
+
+                innerClassesJar.writeBytes(
+                    zip.getInputStream(zip.getEntry("classes.jar")).readBytes()
+                )
+            }
+            ZipFile(innerClassesJar).use { zip ->
+                resourcesFiles
+                    .filterNot { it.startsWith("font") }
+                    .forEach { res ->
+                        assertNotNull(
+                            zip.getEntry("composeResources/$subdir/$res"),
+                            "Resource not found: '$res' in aar/classes.jar '${aar.path}'"
+                        )
+                    }
+            }
+
+            val jar = file(libpath("jvm", ".jar"))
+            checkResourcesZip(jar, resourcesFiles, subdir)
+
+            val iosx64ResZip = file(libpath("iosx64", "-kotlin_resources.kotlin_resources.zip"))
+            checkResourcesZip(iosx64ResZip, resourcesFiles, subdir)
+            val iosarm64ResZip = file(libpath("iosarm64", "-kotlin_resources.kotlin_resources.zip"))
+            checkResourcesZip(iosarm64ResZip, resourcesFiles, subdir)
+            val iossimulatorarm64ResZip = file(libpath("iossimulatorarm64", "-kotlin_resources.kotlin_resources.zip"))
+            checkResourcesZip(iossimulatorarm64ResZip, resourcesFiles, subdir)
+            //todo
+//            val jsResZip = file(libpath("js", "-kotlin_resources.kotlin_resources.zip"))
+//            checkResourcesZip(jsResZip, resourcesFiles, subdir)
+//            val wasmjsResZip = file(libpath("wasmjs", "-kotlin_resources.kotlin_resources.zip"))
+//            checkResourcesZip(wasmjsResZip, resourcesFiles, subdir)
+        }
+    }
+
+    private fun checkResourcesZip(zipFile: File, resourcesFiles: Sequence<String>, subdir: String) {
+        assertTrue(zipFile.exists(), "File not found: " + zipFile.path)
+        ZipFile(zipFile).use { zip ->
+            resourcesFiles.forEach { res ->
+                assertNotNull(
+                    zip.getEntry("composeResources/$subdir/$res"),
+                    "Resource not found: '$res' in zip '${zipFile.path}'"
+                )
+            }
+        }
+    }
+
+    @Test
     fun testFinalArtefacts(): Unit = with(testProject("misc/commonResources")) {
         //https://developer.android.com/build/build-variants?utm_source=android-studio#product-flavors
         file("build.gradle.kts").appendText("""
