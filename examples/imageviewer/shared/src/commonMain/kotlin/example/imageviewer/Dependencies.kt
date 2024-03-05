@@ -6,12 +6,10 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.filter.PlatformContext
 import example.imageviewer.model.PictureData
+import imageviewer.shared.generated.resources.Res
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.readResourceBytes
 
-@OptIn(ExperimentalResourceApi::class)
 abstract class Dependencies {
     abstract val notification: Notification
     abstract val imageStorage: ImageStorage
@@ -22,7 +20,7 @@ abstract class Dependencies {
     val imageProvider: ImageProvider = object : ImageProvider {
         override suspend fun getImage(picture: PictureData): ImageBitmap = when (picture) {
             is PictureData.Resource -> {
-                readResourceBytes(picture.resource).toImageBitmap()
+                Res.readBytes(picture.resource).toImageBitmap()
             }
 
             is PictureData.Camera -> {
@@ -32,7 +30,7 @@ abstract class Dependencies {
 
         override suspend fun getThumbnail(picture: PictureData): ImageBitmap = when (picture) {
             is PictureData.Resource -> {
-                readResourceBytes(picture.thumbnailResource).toImageBitmap()
+                Res.readBytes(picture.thumbnailResource).toImageBitmap()
             }
 
             is PictureData.Camera -> {

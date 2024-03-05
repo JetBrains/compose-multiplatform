@@ -6,15 +6,11 @@ plugins {
 }
 
 kotlin {
-    jvm {
-        withJava()
-    }
+    jvm()
     sourceSets {
-        val jvmMain by getting {
-            dependencies {
-                implementation(compose.desktop.currentOs)
-                implementation(project(":shared"))
-            }
+        jvmMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation(project(":shared"))
         }
     }
 }
@@ -28,7 +24,7 @@ compose.desktop {
             packageName = "ImageViewer"
             packageVersion = "1.0.0"
 
-            val iconsRoot = project.file("../shared/src/commonMain/resources")
+            val iconsRoot = project.file("desktop-icons")
             macOS {
                 iconFile.set(iconsRoot.resolve("icon-mac.icns"))
             }

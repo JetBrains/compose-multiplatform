@@ -2,35 +2,34 @@ package example.imageviewer.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import example.imageviewer.*
 import example.imageviewer.icon.IconPhotoCamera
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.imageResource
+import imageviewer.shared.generated.resources.Res
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 actual fun CameraView(
     modifier: Modifier,
     onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
 ) {
     val randomPicture = remember { resourcePictures.random() }
-    val imageBitmap = imageResource(randomPicture.resource)
+    var imageBitmap by remember { mutableStateOf(ImageBitmap(1, 1)) }
+    LaunchedEffect(randomPicture) {
+        imageBitmap = Res.readBytes(randomPicture.resource).toImageBitmap()
+    }
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         Image(
-            bitmap = imageResource(randomPicture.resource),
+            bitmap = imageBitmap,
             contentDescription = "Camera stub",
             Modifier.fillMaxSize()
         )
