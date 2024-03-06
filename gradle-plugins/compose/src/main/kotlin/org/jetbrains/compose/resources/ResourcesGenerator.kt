@@ -11,18 +11,19 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.jetbrains.compose.ComposePlugin
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
+import org.jetbrains.compose.experimental.uikit.internal.utils.isIosTarget
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
+import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
+import org.jetbrains.compose.resources.ios.getSyncResourcesTaskName
 import org.jetbrains.kotlin.gradle.ComposeKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
-import org.jetbrains.kotlin.gradle.plugin.extraProperties
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmAndroidCompilation
+import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.plugin.mpp.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.resources.KotlinTargetResourcesPublication
 import org.jetbrains.kotlin.gradle.plugin.sources.android.androidSourceSetInfoOrNull
 import org.jetbrains.kotlin.gradle.utils.ObservableSet
@@ -75,7 +76,7 @@ private fun Project.configureComposeResources(
     commonSourceSetName: String,
     projectId: Provider<String>
 ) {
-    logger.lifecycle("Configure compose resources")
+    logger.info("Configure compose resources")
     kotlinExtension.sourceSets.all { sourceSet ->
         val sourceSetName = sourceSet.name
         val composeResourcesPath = project.projectDir.resolve("src/$sourceSetName/$COMPOSE_RESOURCES_DIR")
@@ -99,10 +100,13 @@ private fun Project.configureKmpResources(
     kotlinExtension as KotlinMultiplatformExtension
     kmpResources as KotlinTargetResourcesPublication
 
-    logger.lifecycle("Configure KMP resources")
+    logger.info("Configure KMP resources")
+
+    //configure KMP resources publishing for each supported target
     kotlinExtension.targets
         .matching { target -> kmpResources.canPublishResources(target) }
         .all { target ->
+            logger.info("Configure resources publication for '${target.targetName}' target")
             kmpResources.publishResourcesAsKotlinComponent(
                 target,
                 { sourceSet ->
@@ -118,6 +122,7 @@ private fun Project.configureKmpResources(
 
             if (target is KotlinAndroidTarget) {
                 //for android target publish fonts in assets
+                logger.info("Configure fonts relocation for '${target.targetName}' target")
                 kmpResources.publishInAndroidAssets(
                     target,
                     { sourceSet ->
@@ -131,11 +136,53 @@ private fun Project.configureKmpResources(
                 )
             }
         }
+
+    //generate accessors for common resources
     kotlinExtension.sourceSets.all { sourceSet ->
         val sourceSetName = sourceSet.name
         if (sourceSetName == KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME) {
             val composeResourcesPath = project.projectDir.resolve("src/$sourceSetName/$COMPOSE_RESOURCES_DIR")
             configureResourceGenerator(composeResourcesPath, sourceSet, projectId, true)
+        }
+    }
+
+    //add all resolved resources for browser and native compilations
+    val platformsForSetupCompilation = listOf(KotlinPlatformType.native, KotlinPlatformType.js, KotlinPlatformType.wasm)
+    kotlinExtension.targets
+        .matching { target -> target.platformType in platformsForSetupCompilation }
+        .all { target: KotlinTarget ->
+            val allResources = kmpResources.resolveResources(target)
+            target.compilations.all { compilation ->
+                if (compilation.name == KotlinCompilation.MAIN_COMPILATION_NAME) {
+                    configureResourcesForCompilation(compilation, allResources)
+                }
+            }
+        }
+}
+
+/**
+ * Add resolved resources to a kotlin compilation to include it into a resulting platform artefact
+ * It is required for JS and Native targets.
+ * For JVM and Android it works automatically via jar files
+ */
+private fun Project.configureResourcesForCompilation(
+    compilation: KotlinCompilation<*>,
+    directoryWithAllResourcesForCompilation: Provider<File>
+) {
+    logger.info("Add all resolved resources to '${compilation.target.targetName}' target '${compilation.name}' compilation")
+    compilation.defaultSourceSet.resources.srcDir(directoryWithAllResourcesForCompilation)
+    if (compilation is KotlinJsCompilation) {
+        tasks.named(compilation.processResourcesTaskName).configure { processResourcesTask ->
+            processResourcesTask.dependsOn(directoryWithAllResourcesForCompilation)
+        }
+    }
+    if (compilation is KotlinNativeCompilation) {
+        compilation.target.binaries.withType(Framework::class.java).all { framework ->
+            tasks.configureEach { task ->
+                if (task.name == framework.getSyncResourcesTaskName()) {
+                    task.dependsOn(directoryWithAllResourcesForCompilation)
+                }
+            }
         }
     }
 }
@@ -189,6 +236,8 @@ private fun Project.configureResourceGenerator(
     generateModulePath: Boolean
 ) {
     val packageName = projectId.map { "$it.generated.resources" }
+
+    logger.info("Configure accessors for '${commonSourceSet.name}'")
 
     fun buildDir(path: String) = layout.dir(layout.buildDirectory.map { File(it.asFile, path) })
 

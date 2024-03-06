@@ -161,7 +161,7 @@ private fun SyncIosResourcesContext.configureSyncResourcesTasks() {
     val lazyTasksDependencies = LazyTasksDependencyConfigurator(project.tasks)
     configureEachIosFramework { framework ->
         val frameworkClassifier = framework.namePrefix.uppercaseFirstChar()
-        val syncResourcesTaskName = "sync${frameworkClassifier}ComposeResourcesForIos"
+        val syncResourcesTaskName = framework.getSyncResourcesTaskName()
         val checkSyncResourcesTaskName = "checkCanSync${frameworkClassifier}ComposeResourcesForIos"
         val checkNoSandboxTask = framework.project.tasks.registerOrConfigure<CheckCanAccessComposeResourcesDirectory>(checkSyncResourcesTaskName) {}
         val syncTask = framework.project.tasks.registerOrConfigure<SyncComposeResourcesForIosTask>(syncResourcesTaskName) {
@@ -190,6 +190,9 @@ private fun SyncIosResourcesContext.configureSyncResourcesTasks() {
         bin.linkTask.dependsOn(task)
     }
 }
+
+internal fun Framework.getSyncResourcesTaskName() =
+    "sync${namePrefix.uppercaseFirstChar()}ComposeResourcesForIos"
 
 private val Framework.isCocoapodsFramework: Boolean
     get() = name.startsWith("pod")
