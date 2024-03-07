@@ -12,8 +12,8 @@ RUN apt-get update -y && \
     apt-get install openjdk-17-jdk --no-install-recommends -y
 
 ENV ANDROID_HOME=/android/sdk
-ARG ANDROID_PLATFORM=android-33
-ARG CMD_TOOLS_VERSION=9123335
+ARG ANDROID_PLATFORM=android-34
+ARG CMD_TOOLS_VERSION=11076708
 ARG CMD_TOOLS_ROOT=$ANDROID_HOME/cmdline-tools/$CMD_TOOLS_VERSION
 ARG SDK_MANAGER=$CMD_TOOLS_ROOT/bin/sdkmanager
 
