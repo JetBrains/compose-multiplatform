@@ -87,6 +87,23 @@ abstract class ComposePlugin : Plugin<Project> {
 
             disableSignatureClashCheck(project)
         }
+
+
+        // TODO: this is needed for now to run the gradle plugin tests when using compose 1.6.0
+        //  which depends on coroutines 1.7.3
+        project.configurations.all {
+            val isWeb = it.name.startsWith("wasmJs") || it.name.startsWith("js")
+            if (isWeb) {
+                it.resolutionStrategy.eachDependency {
+                    if (it.requested.group.startsWith("org.jetbrains.kotlinx") &&
+                        it.requested.name.startsWith("kotlinx-coroutines-")) {
+                        if (it.requested.version?.startsWith("1.7") == true) {
+                            it.useVersion("1.8.0-RC2")
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun disableSignatureClashCheck(project: Project) {

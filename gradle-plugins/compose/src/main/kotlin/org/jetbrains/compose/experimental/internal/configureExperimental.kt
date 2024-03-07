@@ -9,16 +9,12 @@ import org.gradle.api.Project
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
 import org.jetbrains.compose.experimental.web.internal.configureExperimentalWebApplication
-import org.jetbrains.compose.web.WebExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 internal fun Project.configureExperimental(
     composeExt: ComposeExtension,
     experimentalExt: ExperimentalExtension
 ) {
     if (experimentalExt.web._isApplicationInitialized) {
-        val webExt = composeExt.extensions.getByType(WebExtension::class.java)
-        webExt.targetsToConfigure(project)
-            .configureExperimentalWebApplication(project, experimentalExt.web.application)
+        configureExperimentalWebApplication(project, experimentalExt.web.application)
     }
 }
