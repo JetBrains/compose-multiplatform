@@ -118,6 +118,15 @@ tasks.test {
     }
 }
 
+if (properties.getOrDefault("dev.junit.parallel", "false") == "true") {
+    logger.lifecycle("Test task will run in parallel")
+    tasks.withType(Test::class.java) {
+        //https://junit.org/junit5/docs/current/user-guide/#writing-tests-parallel-execution-config-properties
+        systemProperties["junit.jupiter.execution.parallel.enabled"] = true
+        systemProperties["junit.jupiter.execution.parallel.mode.default"] = "concurrent"
+    }
+}
+
 /**
  * Gradle 8.0 removed auto downloading of requested toolchains unless a toolchain repository is configured.
  * For now, the only option to enable auto downloading out-of-the-box is to use Foojay Disco resolver,
