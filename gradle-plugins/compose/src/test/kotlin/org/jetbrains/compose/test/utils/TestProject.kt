@@ -59,6 +59,7 @@ class TestProject(
     private val testProjectsRootDir = File("src/test/test-projects")
 
     private val additionalArgs = listOfNotNull(
+        "--info",
         "--stacktrace",
         "-P${ComposeProperties.VERBOSE}=${testEnvironment.composeVerbose}",
         if (testEnvironment.parsedGradleVersion < GradleVersion.version("8.0")) {
