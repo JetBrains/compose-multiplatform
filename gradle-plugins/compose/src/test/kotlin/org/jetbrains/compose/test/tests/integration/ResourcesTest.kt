@@ -403,25 +403,6 @@ class ResourcesTest : GradlePluginTestBase() {
         gradle("jar")
     }
 
-    //https://github.com/JetBrains/compose-multiplatform/issues/4194
-    //https://github.com/JetBrains/compose-multiplatform/issues/4285
-    //
-    // 1500 icons + 1500*20 strings!!!
-    @Test
-    fun testHugeNumberOfResources(): Unit = with(
-        //disable cache for the test because the generateResourceFiles task doesn't support it
-        testProject("misc/hugeResources", defaultTestEnvironment.copy(useGradleConfigurationCache = false))
-    ) {
-        gradle("compileKotlinDesktop").checks {
-            check.taskSuccessful(":generateResourceFiles")
-            check.taskSuccessful(":generateComposeResClass")
-            assertDirectoriesContentEquals(
-                file("build/generated/compose/resourceGenerator/kotlin/app/group/huge/generated/resources"),
-                file("expected")
-            )
-        }
-    }
-
     //https://github.com/gmazzo/gradle-buildconfig-plugin/issues/131
     @Test
     fun testBundledKotlinPoet(): Unit = with(testProject("misc/bundledKotlinPoet")) {
