@@ -1,5 +1,6 @@
 package org.jetbrains.compose.test.tests.integration
 
+import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.compose.test.utils.*
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -133,11 +134,11 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testComposeResourcesPublication(): Unit = with(
+    fun testMultiModuleResources(): Unit = with(
         testProject(
             "misc/kmpResourcePublication",
             defaultTestEnvironment.copy(
-                kotlinVersion = "2.0.0-titan-98",
+                kotlinVersion = "2.0.0-titan-105",
                 composeCompilerPlugin = "2.0.0-Beta4"
             )
         )
@@ -189,11 +190,38 @@ class ResourcesTest : GradlePluginTestBase() {
             checkResourcesZip(iosarm64ResZip, resourcesFiles, subdir)
             val iossimulatorarm64ResZip = file(libpath("iossimulatorarm64", "-kotlin_resources.kotlin_resources.zip"))
             checkResourcesZip(iossimulatorarm64ResZip, resourcesFiles, subdir)
-            //todo
-//            val jsResZip = file(libpath("js", "-kotlin_resources.kotlin_resources.zip"))
-//            checkResourcesZip(jsResZip, resourcesFiles, subdir)
-//            val wasmjsResZip = file(libpath("wasmjs", "-kotlin_resources.kotlin_resources.zip"))
-//            checkResourcesZip(wasmjsResZip, resourcesFiles, subdir)
+            val jsResZip = file(libpath("js", "-kotlin_resources.kotlin_resources.zip"))
+            checkResourcesZip(jsResZip, resourcesFiles, subdir)
+            val wasmjsResZip = file(libpath("wasm-js", "-kotlin_resources.kotlin_resources.zip"))
+            checkResourcesZip(wasmjsResZip, resourcesFiles, subdir)
+        }
+
+        file("settings.gradle.kts").modify { content ->
+            content.replace("//include(\":appModule\")", "include(\":appModule\")")
+        }
+
+        gradle(":appModule:jvmTest", "-i")
+        gradle(":appModule:pixel5Check")
+
+        if (currentOS == OS.MacOS) {
+            val iosTask = if (currentArch == Arch.X64) {
+                ":appModule:iosX64Test"
+            } else {
+                ":appModule:iosSimulatorArm64Test"
+            }
+            gradle(iosTask)
+        }
+
+        file("featureModule/src/commonMain/kotlin/me/sample/app/Feature.kt").modify { content ->
+            content.replace(
+                "Text(txt + stringResource(Res.string.str_1), modifier)",
+                "Text(stringResource(Res.string.str_1), modifier)"
+            )
+        }
+
+        gradleFailure(":appModule:jvmTest").checks {
+            check.logContains("java.lang.AssertionError: Failed to assert the following: (Text + EditableText = [test text: Feature text str_1])")
+            check.logContains("Text = '[Feature text str_1]'")
         }
     }
 
@@ -212,7 +240,8 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun testFinalArtefacts(): Unit = with(testProject("misc/commonResources")) {
         //https://developer.android.com/build/build-variants?utm_source=android-studio#product-flavors
-        file("build.gradle.kts").appendText("""
+        file("build.gradle.kts").appendText(
+            """
             
             kotlin {
                 js {
@@ -232,7 +261,8 @@ class ResourcesTest : GradlePluginTestBase() {
                     create("full")
                 }
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         file("src/androidDemoDebug/composeResources/files/platform.txt").writeNewFile("android demo-debug")
         file("src/androidDemoRelease/composeResources/files/platform.txt").writeNewFile("android demo-release")
         file("src/androidFullDebug/composeResources/files/platform.txt").writeNewFile("android full-debug")

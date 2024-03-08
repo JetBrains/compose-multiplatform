@@ -12,9 +12,9 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun MyLibraryText(txt: String) {
+fun MyLibraryText(modifier: Modifier = Modifier, txt: String) {
     Column {
-        Text(text = txt + stringResource(Res.string.str_1))
+        Text(text = txt + stringResource(Res.string.str_1), modifier)
         Text(
             text = "\uF055\uF056\uF057\uF058\uF059\uF05A",
             fontFamily = FontFamily(Font(Res.font.font_awesome))

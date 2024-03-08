@@ -1,22 +1,11 @@
 plugins {
     id("org.jetbrains.compose")
     kotlin("multiplatform")
-    id("maven-publish")
     id("com.android.library")
 }
 
-group = "me.sample.library"
-version = "1.0"
-publishing {
-    repositories {
-        maven {
-            url = uri(rootProject.projectDir.resolve("my-mvn"))
-        }
-    }
-}
-
 kotlin {
-    androidTarget { publishLibraryVariants("release") }
+    androidTarget()
     jvm()
     iosX64()
     iosArm64()
@@ -39,8 +28,9 @@ kotlin {
 }
 
 android {
-    namespace = "me.sample.library"
+    namespace = "me.sample.feature"
     compileSdk = 34
+
     defaultConfig {
         minSdk = 24
     }
