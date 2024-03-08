@@ -9,12 +9,11 @@ import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.gradle.util.GradleVersion
 import org.jetbrains.compose.ComposePlugin
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.experimental.uikit.internal.utils.isIosTarget
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
-import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.compose.resources.ios.getSyncResourcesTaskName
@@ -33,6 +32,7 @@ import javax.inject.Inject
 private const val COMPOSE_RESOURCES_DIR = "composeResources"
 private const val RES_GEN_DIR = "generated/compose/resourceGenerator"
 private const val KMP_RES_EXT = "multiplatformResourcesPublication"
+private const val MIN_GRADLE_VERSION_FOR_KMP_RESOURCES = "7.6"
 private val androidPluginIds = listOf(
     "com.android.application",
     "com.android.library"
@@ -50,9 +50,28 @@ internal fun Project.configureComposeResources() {
         val kotlinExtension = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
 
         val hasKmpResources = extraProperties.has(KMP_RES_EXT)
-        if (hasKmpResources) {
+        val currentGradleVersion = GradleVersion.current()
+        val minGradleVersion = GradleVersion.version(MIN_GRADLE_VERSION_FOR_KMP_RESOURCES)
+        if (hasKmpResources && currentGradleVersion >= minGradleVersion) {
             configureKmpResources(kotlinExtension, extraProperties.get(KMP_RES_EXT)!!, projectId)
         } else {
+            if (!hasKmpResources) {
+                logger.info(
+                    """
+                        Compose resources publication requires Kotlin Gradle Plugin >= 2.0
+                        Current Kotlin Gradle Plugin is ${KotlinVersion.CURRENT}
+                    """.trimIndent()
+                )
+            }
+            if (currentGradleVersion < minGradleVersion) {
+                logger.info(
+                    """
+                        Compose resources publication requires Gradle >= $MIN_GRADLE_VERSION_FOR_KMP_RESOURCES
+                        Current Gradle is ${currentGradleVersion.version}
+                    """.trimIndent()
+                )
+            }
+
             //current KGP doesn't have KPM resources
             configureComposeResources(kotlinExtension, KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME, projectId)
 

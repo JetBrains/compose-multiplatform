@@ -1,5 +1,6 @@
 package org.jetbrains.compose.test.tests.integration
 
+import org.gradle.util.GradleVersion
 import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.compose.test.utils.*
 import org.junit.jupiter.api.Test
@@ -134,94 +135,102 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testMultiModuleResources(): Unit = with(
-        testProject(
-            "misc/kmpResourcePublication",
-            defaultTestEnvironment.copy(
-                kotlinVersion = "2.0.0-titan-105",
-                composeCompilerPlugin = "2.0.0-Beta4"
-            )
+    fun testMultiModuleResources() {
+        val environment = defaultTestEnvironment.copy(
+            kotlinVersion = "2.0.0-titan-105",
+            composeCompilerPlugin = "2.0.0-Beta4"
         )
-    ) {
-        gradle(":cmplib:publishAllPublicationsToMavenRepository").checks {
-            val resDir = file("cmplib/src/commonMain/composeResources")
-            val resourcesFiles = resDir.walkTopDown()
-                .filter { !it.isDirectory && !it.isHidden }
-                .map { it.relativeTo(resDir).invariantSeparatorsPath }
-            val subdir = "me.sample.library.cmplib"
+        with(
+            testProject("misc/kmpResourcePublication", environment)
+        ) {
+            if (environment.parsedGradleVersion < GradleVersion.version("7.6")) {
+                val output = gradle(":tasks").output
+                output.contains("Compose resources publication requires Gradle >= 7.6")
+                output.contains("Current Kotlin Gradle Plugin is ${environment.gradleVersion}")
+                return@with
+            }
 
-            fun libpath(target: String, ext: String) =
-                "my-mvn/me/sample/library/cmplib-$target/1.0/cmplib-$target-1.0$ext"
+            gradle(":cmplib:publishAllPublicationsToMavenRepository").checks {
+                val resDir = file("cmplib/src/commonMain/composeResources")
+                val resourcesFiles = resDir.walkTopDown()
+                    .filter { !it.isDirectory && !it.isHidden }
+                    .map { it.relativeTo(resDir).invariantSeparatorsPath }
+                val subdir = "me.sample.library.cmplib"
 
-            val aar = file(libpath("android", ".aar"))
-            val innerClassesJar = aar.parentFile.resolve("aar-inner-classes.jar")
-            assertTrue(aar.exists(), "File not found: " + aar.path)
-            ZipFile(aar).use { zip ->
-                resourcesFiles
-                    .filter { it.startsWith("font") }
-                    .forEach { fontRes ->
-                        assertNotNull(
-                            zip.getEntry("assets/composeResources/$subdir/$fontRes"),
-                            "Resource not found: '$fontRes' in aar '${aar.path}'"
-                        )
-                    }
+                fun libpath(target: String, ext: String) =
+                    "my-mvn/me/sample/library/cmplib-$target/1.0/cmplib-$target-1.0$ext"
 
-                innerClassesJar.writeBytes(
-                    zip.getInputStream(zip.getEntry("classes.jar")).readBytes()
+                val aar = file(libpath("android", ".aar"))
+                val innerClassesJar = aar.parentFile.resolve("aar-inner-classes.jar")
+                assertTrue(aar.exists(), "File not found: " + aar.path)
+                ZipFile(aar).use { zip ->
+                    resourcesFiles
+                        .filter { it.startsWith("font") }
+                        .forEach { fontRes ->
+                            assertNotNull(
+                                zip.getEntry("assets/composeResources/$subdir/$fontRes"),
+                                "Resource not found: '$fontRes' in aar '${aar.path}'"
+                            )
+                        }
+
+                    innerClassesJar.writeBytes(
+                        zip.getInputStream(zip.getEntry("classes.jar")).readBytes()
+                    )
+                }
+                ZipFile(innerClassesJar).use { zip ->
+                    resourcesFiles
+                        .filterNot { it.startsWith("font") }
+                        .forEach { res ->
+                            assertNotNull(
+                                zip.getEntry("composeResources/$subdir/$res"),
+                                "Resource not found: '$res' in aar/classes.jar '${aar.path}'"
+                            )
+                        }
+                }
+
+                val jar = file(libpath("jvm", ".jar"))
+                checkResourcesZip(jar, resourcesFiles, subdir)
+
+                val iosx64ResZip = file(libpath("iosx64", "-kotlin_resources.kotlin_resources.zip"))
+                checkResourcesZip(iosx64ResZip, resourcesFiles, subdir)
+                val iosarm64ResZip = file(libpath("iosarm64", "-kotlin_resources.kotlin_resources.zip"))
+                checkResourcesZip(iosarm64ResZip, resourcesFiles, subdir)
+                val iossimulatorarm64ResZip =
+                    file(libpath("iossimulatorarm64", "-kotlin_resources.kotlin_resources.zip"))
+                checkResourcesZip(iossimulatorarm64ResZip, resourcesFiles, subdir)
+                val jsResZip = file(libpath("js", "-kotlin_resources.kotlin_resources.zip"))
+                checkResourcesZip(jsResZip, resourcesFiles, subdir)
+                val wasmjsResZip = file(libpath("wasm-js", "-kotlin_resources.kotlin_resources.zip"))
+                checkResourcesZip(wasmjsResZip, resourcesFiles, subdir)
+            }
+
+            file("settings.gradle.kts").modify { content ->
+                content.replace("//include(\":appModule\")", "include(\":appModule\")")
+            }
+
+            gradle(":appModule:jvmTest", "-i")
+            gradle(":appModule:pixel5Check")
+
+            if (currentOS == OS.MacOS) {
+                val iosTask = if (currentArch == Arch.X64) {
+                    ":appModule:iosX64Test"
+                } else {
+                    ":appModule:iosSimulatorArm64Test"
+                }
+                gradle(iosTask)
+            }
+
+            file("featureModule/src/commonMain/kotlin/me/sample/app/Feature.kt").modify { content ->
+                content.replace(
+                    "Text(txt + stringResource(Res.string.str_1), modifier)",
+                    "Text(stringResource(Res.string.str_1), modifier)"
                 )
             }
-            ZipFile(innerClassesJar).use { zip ->
-                resourcesFiles
-                    .filterNot { it.startsWith("font") }
-                    .forEach { res ->
-                        assertNotNull(
-                            zip.getEntry("composeResources/$subdir/$res"),
-                            "Resource not found: '$res' in aar/classes.jar '${aar.path}'"
-                        )
-                    }
+
+            gradleFailure(":appModule:jvmTest").checks {
+                check.logContains("java.lang.AssertionError: Failed to assert the following: (Text + EditableText = [test text: Feature text str_1])")
+                check.logContains("Text = '[Feature text str_1]'")
             }
-
-            val jar = file(libpath("jvm", ".jar"))
-            checkResourcesZip(jar, resourcesFiles, subdir)
-
-            val iosx64ResZip = file(libpath("iosx64", "-kotlin_resources.kotlin_resources.zip"))
-            checkResourcesZip(iosx64ResZip, resourcesFiles, subdir)
-            val iosarm64ResZip = file(libpath("iosarm64", "-kotlin_resources.kotlin_resources.zip"))
-            checkResourcesZip(iosarm64ResZip, resourcesFiles, subdir)
-            val iossimulatorarm64ResZip = file(libpath("iossimulatorarm64", "-kotlin_resources.kotlin_resources.zip"))
-            checkResourcesZip(iossimulatorarm64ResZip, resourcesFiles, subdir)
-            val jsResZip = file(libpath("js", "-kotlin_resources.kotlin_resources.zip"))
-            checkResourcesZip(jsResZip, resourcesFiles, subdir)
-            val wasmjsResZip = file(libpath("wasm-js", "-kotlin_resources.kotlin_resources.zip"))
-            checkResourcesZip(wasmjsResZip, resourcesFiles, subdir)
-        }
-
-        file("settings.gradle.kts").modify { content ->
-            content.replace("//include(\":appModule\")", "include(\":appModule\")")
-        }
-
-        gradle(":appModule:jvmTest", "-i")
-        gradle(":appModule:pixel5Check")
-
-        if (currentOS == OS.MacOS) {
-            val iosTask = if (currentArch == Arch.X64) {
-                ":appModule:iosX64Test"
-            } else {
-                ":appModule:iosSimulatorArm64Test"
-            }
-            gradle(iosTask)
-        }
-
-        file("featureModule/src/commonMain/kotlin/me/sample/app/Feature.kt").modify { content ->
-            content.replace(
-                "Text(txt + stringResource(Res.string.str_1), modifier)",
-                "Text(stringResource(Res.string.str_1), modifier)"
-            )
-        }
-
-        gradleFailure(":appModule:jvmTest").checks {
-            check.logContains("java.lang.AssertionError: Failed to assert the following: (Text + EditableText = [test text: Feature text str_1])")
-            check.logContains("Text = '[Feature text str_1]'")
         }
     }
 
