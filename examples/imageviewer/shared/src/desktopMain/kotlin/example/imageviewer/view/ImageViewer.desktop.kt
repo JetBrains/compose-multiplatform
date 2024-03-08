@@ -4,26 +4,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.*
+import androidx.compose.ui.window.ApplicationScope
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowPosition
+import androidx.compose.ui.window.WindowState
 import example.imageviewer.*
-import example.imageviewer.Notification
 import example.imageviewer.filter.PlatformContext
-import example.imageviewer.model.*
+import example.imageviewer.model.PictureData
 import example.imageviewer.style.ImageViewerTheme
+import imageviewer.shared.generated.resources.Res
+import imageviewer.shared.generated.resources.ic_imageviewer_round
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import org.jetbrains.compose.resources.painterResource
 import java.awt.Dimension
 import java.awt.Toolkit
 
@@ -40,7 +43,6 @@ class ExternalNavigationEventBus {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ApplicationScope.ImageViewerDesktop() {
     val ioScope = rememberCoroutineScope { ioDispatcher }
@@ -57,7 +59,7 @@ fun ApplicationScope.ImageViewerDesktop() {
             position = WindowPosition.Aligned(Alignment.Center),
             size = getPreferredWindowSize(720, 857)
         ),
-        icon = painterResource("ic_imageviewer_round.png"),
+        icon = painterResource(Res.drawable.ic_imageviewer_round),
         // https://github.com/JetBrains/compose-jb/issues/2741
         onKeyEvent = {
             if (it.type == KeyEventType.KeyUp) {

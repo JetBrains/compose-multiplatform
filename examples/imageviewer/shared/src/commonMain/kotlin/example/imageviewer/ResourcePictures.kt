@@ -5,8 +5,8 @@ import example.imageviewer.model.PictureData
 
 val resourcePictures = arrayOf(
     PictureData.Resource(
-        resource = "1.jpg",
-        thumbnailResource = "1-thumbnail.jpg",
+        resource = "files/1.jpg",
+        thumbnailResource = "files/1-thumbnail.jpg",
         name = "Mountain K2",
         description = """
             K2, at 8,611 meters above sea level, is the second-highest mountain on Earth, after Mount Everest.
@@ -17,8 +17,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(35.8825, 76.513333)
     ),
     PictureData.Resource(
-        resource = "2.jpg",
-        thumbnailResource = "2-thumbnail.jpg",
+        resource = "files/2.jpg",
+        thumbnailResource = "files/2-thumbnail.jpg",
         name = "Kina The Calico",
         description = """
             This cute kitty 🐱 loves one thing above all: soups and sauces!
@@ -29,8 +29,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(48.138018, 11.5737048)
     ),
     PictureData.Resource(
-        resource = "3.jpg",
-        thumbnailResource = "3-thumbnail.jpg",
+        resource = "files/3.jpg",
+        thumbnailResource = "files/3-thumbnail.jpg",
         name = "Blue City",
         description = """
             Is a city in northwest Morocco.
@@ -41,8 +41,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(35.171389, -5.269722)
     ),
     PictureData.Resource(
-        resource = "4.jpg",
-        thumbnailResource = "4-thumbnail.jpg",
+        resource = "files/4.jpg",
+        thumbnailResource = "files/4-thumbnail.jpg",
         name = "Tokyo Skytree",
         description = """
             Tokyo Skytree is a broadcasting and observation tower in Sumida, Tokyo.
@@ -52,8 +52,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(35.7101, 139.8107)
     ),
     PictureData.Resource(
-        resource = "5.jpg",
-        thumbnailResource = "5-thumbnail.jpg",
+        resource = "files/5.jpg",
+        thumbnailResource = "files/5-thumbnail.jpg",
         name = "Taranaki",
         description = """
             Mount Taranaki is a dormant stratovolcano in the Taranaki region on the west coast of New Zealand's North Island.
@@ -64,8 +64,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(-39.296389, 174.064722)
     ),
     PictureData.Resource(
-        resource = "6.jpg",
-        thumbnailResource = "6-thumbnail.jpg",
+        resource = "files/6.jpg",
+        thumbnailResource = "files/6-thumbnail.jpg",
         name = "Auckland SkyCity",
         description = """
             SkyCity Casino History
@@ -76,8 +76,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(-36.846589, 174.760871)
     ),
     PictureData.Resource(
-        resource = "7.jpg",
-        thumbnailResource = "7-thumbnail.jpg",
+        resource = "files/7.jpg",
+        thumbnailResource = "files/7-thumbnail.jpg",
         name = "Berliner Fernsehturm",
         description = """
             At 368 meters, the Berlin television tower is the tallest building in Germany and the fifth tallest television tower in Europe.
@@ -88,8 +88,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(52.520833, 13.409444)
     ),
     PictureData.Resource(
-        resource = "8.jpg",
-        thumbnailResource = "8-thumbnail.jpg",
+        resource = "files/8.jpg",
+        thumbnailResource = "files/8-thumbnail.jpg",
         name = "Hoggar Mountains",
         description = """
             The Hoggar Mountains are a highland region in the central Sahara in southern Algeria, along the Tropic of Cancer.
@@ -99,8 +99,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(22.133333, 6.166667)
     ),
     PictureData.Resource(
-        resource = "9.jpg",
-        thumbnailResource = "9-thumbnail.jpg",
+        resource = "files/9.jpg",
+        thumbnailResource = "files/9-thumbnail.jpg",
         name = "Nakhal Fort",
         description = """
             Nakhal Fort is a large fortification in Al Batinah Region of Oman.
@@ -111,8 +111,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(23.395, 57.829)
     ),
     PictureData.Resource(
-        resource = "10.jpg",
-        thumbnailResource = "10-thumbnail.jpg",
+        resource = "files/10.jpg",
+        thumbnailResource = "files/10-thumbnail.jpg",
         name = "Mountain Ararat",
         description = """
             Mount Ararat is a snow-capped and dormant compound volcano in the extreme east of Turkey.
@@ -123,8 +123,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(40.169339, 44.488434)
     ),
     PictureData.Resource(
-        resource = "11.jpg",
-        thumbnailResource = "11-thumbnail.jpg",
+        resource = "files/11.jpg",
+        thumbnailResource = "files/11-thumbnail.jpg",
         name = "Cabo da Roca",
         description = """
             The view on Cabo da Roca.
@@ -134,8 +134,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(38.789283172, -9.4909725957)
     ),
     PictureData.Resource(
-        resource = "12.jpg",
-        thumbnailResource = "12-thumbnail.jpg",
+        resource = "files/12.jpg",
+        thumbnailResource = "files/12-thumbnail.jpg",
         name = "Surprised Whiskers 🐱",
         description = """
             Surprised Whiskers: A Furry Tale.
@@ -146,8 +146,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(52.3560485, 4.9085645)
     ),
     PictureData.Resource(
-        resource = "13.jpg",
-        thumbnailResource = "13-thumbnail.jpg",
+        resource = "files/13.jpg",
+        thumbnailResource = "files/13-thumbnail.jpg",
         name = "Software Engineering Donut",
         description = """
             Munich
@@ -159,8 +159,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(48.1764708, 11.4580367)
     ),
     PictureData.Resource(
-        resource = "14.jpg",
-        thumbnailResource = "14-thumbnail.jpg",
+        resource = "files/14.jpg",
+        thumbnailResource = "files/14-thumbnail.jpg",
         name = "Seligman Police Car.",
         description = """
             Seligman, USA
@@ -172,8 +172,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(35.3259364, -112.8553165)
     ),
     PictureData.Resource(
-        resource = "15.jpg",
-        thumbnailResource = "15-thumbnail.jpg",
+        resource = "files/15.jpg",
+        thumbnailResource = "files/15-thumbnail.jpg",
         name = "Good Luck Charms",
         description = """
             Munich
@@ -186,8 +186,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(48.1458602, 11.5053059)
     ),
     PictureData.Resource(
-        resource = "16.jpg",
-        thumbnailResource = "16-thumbnail.jpg",
+        resource = "files/16.jpg",
+        thumbnailResource = "files/16-thumbnail.jpg",
         name = "Pong Restaurant",
         description = """
             Stockholm, Sweden
@@ -199,8 +199,8 @@ val resourcePictures = arrayOf(
         gps = GpsPosition(59.3364318, 18.0587228)
     ),
     PictureData.Resource(
-        resource = "17.jpg",
-        thumbnailResource = "17-thumbnail.jpg",
+        resource = "files/17.jpg",
+        thumbnailResource = "files/17-thumbnail.jpg",
         name = "Loki",
         description = """
             Meet Loki, my black cat - a furry feline with big, beautiful eyes and an arrogant attitude.

@@ -34,12 +34,10 @@ import example.imageviewer.icon.IconPhotoCamera
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
+import imageviewer.shared.generated.resources.Res
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.readResourceBytes
 import java.nio.ByteBuffer
-import java.util.*
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -69,7 +67,6 @@ actual fun CameraView(
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @SuppressLint("MissingPermission")
 @Composable
 private fun CameraWithGrantedPermission(
@@ -176,7 +173,7 @@ private fun CameraWithGrantedPermission(
                 delay(5000)
                 if (capturePhotoStarted) {
                     addLocationInfoAndReturnResult(
-                        readResourceBytes("android-emulator-photo.jpg").toImageBitmap()
+                        Res.readBytes("files/android-emulator-photo.jpg").toImageBitmap()
                     )
                 }
             }

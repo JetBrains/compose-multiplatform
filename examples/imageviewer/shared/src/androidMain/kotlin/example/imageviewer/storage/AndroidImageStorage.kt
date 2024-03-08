@@ -13,15 +13,13 @@ import example.imageviewer.ImageStorage
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.PictureData
 import example.imageviewer.toImageBitmap
+import imageviewer.shared.generated.resources.Res
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.readResourceBytes
 import java.io.File
 
 private const val maxStorableImageSizePx = 2000
@@ -102,7 +100,6 @@ class AndroidImageStorage(
             picture.jpgFile.readBytes().toImageBitmap()
         }
 
-    @OptIn(ExperimentalResourceApi::class)
     suspend fun getUri(context: Context, picture: PictureData): Uri = withContext(Dispatchers.IO) {
         if (!sharedImagesDir.exists()) {
             sharedImagesDir.mkdirs()
@@ -117,7 +114,7 @@ class AndroidImageStorage(
                 if (!tempFileToShare.exists()) {
                     tempFileToShare.createNewFile()
                 }
-                tempFileToShare.writeBytes(readResourceBytes(picture.resource))
+                tempFileToShare.writeBytes(Res.readBytes(picture.resource))
             }
         }
         FileProvider.getUriForFile(
