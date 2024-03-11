@@ -6,7 +6,21 @@ pluginManagement {
     repositories {
         mavenLocal()
         gradlePluginPortal()
-        maven { url "https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev" }
+        mavenCentral()
+        google()
+        maven {
+            url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
+        }
+    }
+}
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        google()
+        maven {
+            url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
+        }
     }
 }
 rootProject.name = "nativeCacheKind"

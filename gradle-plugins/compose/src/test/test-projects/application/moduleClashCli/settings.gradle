@@ -6,6 +6,21 @@ pluginManagement {
     repositories {
         mavenLocal()
         gradlePluginPortal()
+        mavenCentral()
+        google()
+        maven {
+            url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
+        }
+    }
+}
+dependencyResolutionManagement {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        google()
+        maven {
+            url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
+        }
     }
 }
 include ':lib1:utils', ':lib2:utils', ':app'

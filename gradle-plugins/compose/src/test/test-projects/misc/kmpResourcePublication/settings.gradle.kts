@@ -4,6 +4,7 @@ include(":featureModule")
 //include(":appModule")
 pluginManagement {
     repositories {
+        mavenLocal()
         gradlePluginPortal()
         mavenCentral()
         google()
@@ -11,7 +12,6 @@ pluginManagement {
         maven("https://packages.jetbrains.team/files/p/mpp/kgp-for-compose2")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
-        mavenLocal()
     }
     plugins {
         id("org.jetbrains.kotlin.multiplatform").version("KOTLIN_VERSION_PLACEHOLDER")
