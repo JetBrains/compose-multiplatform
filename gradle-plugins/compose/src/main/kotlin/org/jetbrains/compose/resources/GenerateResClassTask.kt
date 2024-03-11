@@ -63,7 +63,7 @@ internal abstract class GenerateResClassTask : DefaultTask() {
                 getResFileSpecs(
                     resources,
                     packageName.get(),
-                    moduleDir.getOrNull()?.let { it.path + "/" } ?: ""
+                    moduleDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
                 ).forEach { it.writeTo(kotlinDir) }
             } else {
                 logger.info("Generation Res class is disabled")
