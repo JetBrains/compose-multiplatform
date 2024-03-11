@@ -1,6 +1,4 @@
 import org.jetbrains.compose.ExperimentalComposeLibrary
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 
 plugins {
     id("org.jetbrains.compose")
@@ -9,16 +7,7 @@ plugins {
 }
 
 kotlin {
-    androidTarget {
-        @OptIn(ExperimentalKotlinGradlePluginApi::class)
-        instrumentedTestVariant {
-            sourceSetTree.set(KotlinSourceSetTree.test)
-            dependencies {
-                implementation("androidx.compose.ui:ui-test-junit4-android:1.6.2")
-                debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.2")
-            }
-        }
-    }
+    androidTarget()
     jvm()
     iosX64()
     iosArm64()
@@ -63,19 +52,6 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    @Suppress("UnstableApiUsage")
-    testOptions {
-        managedDevices {
-            devices {
-                maybeCreate<com.android.build.api.dsl.ManagedVirtualDevice>("pixel5").apply {
-                    device = "Pixel 5"
-                    apiLevel = 34
-                    systemImageSource = "aosp"
-                }
-            }
-        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

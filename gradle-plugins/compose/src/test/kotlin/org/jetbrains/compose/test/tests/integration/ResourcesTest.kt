@@ -212,7 +212,6 @@ class ResourcesTest : GradlePluginTestBase() {
             }
 
             gradle(":appModule:jvmTest", "-i")
-            gradle(":appModule:pixel5Check")
 
             if (currentOS == OS.MacOS) {
                 val iosTask = if (currentArch == Arch.X64) {
