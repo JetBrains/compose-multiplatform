@@ -191,13 +191,16 @@ class ResourcesTest : GradlePluginTestBase() {
                 val jar = file(libpath("jvm", ".jar"))
                 checkResourcesZip(jar, resourcesFiles, subdir)
 
-                val iosx64ResZip = file(libpath("iosx64", "-kotlin_resources.kotlin_resources.zip"))
-                checkResourcesZip(iosx64ResZip, resourcesFiles, subdir)
-                val iosarm64ResZip = file(libpath("iosarm64", "-kotlin_resources.kotlin_resources.zip"))
-                checkResourcesZip(iosarm64ResZip, resourcesFiles, subdir)
-                val iossimulatorarm64ResZip =
-                    file(libpath("iossimulatorarm64", "-kotlin_resources.kotlin_resources.zip"))
-                checkResourcesZip(iossimulatorarm64ResZip, resourcesFiles, subdir)
+                if (currentOS == OS.MacOS) {
+                    val iosx64ResZip = file(libpath("iosx64", "-kotlin_resources.kotlin_resources.zip"))
+                    checkResourcesZip(iosx64ResZip, resourcesFiles, subdir)
+                    val iosarm64ResZip = file(libpath("iosarm64", "-kotlin_resources.kotlin_resources.zip"))
+                    checkResourcesZip(iosarm64ResZip, resourcesFiles, subdir)
+                    val iossimulatorarm64ResZip = file(
+                        libpath("iossimulatorarm64", "-kotlin_resources.kotlin_resources.zip")
+                    )
+                    checkResourcesZip(iossimulatorarm64ResZip, resourcesFiles, subdir)
+                }
                 val jsResZip = file(libpath("js", "-kotlin_resources.kotlin_resources.zip"))
                 checkResourcesZip(jsResZip, resourcesFiles, subdir)
                 val wasmjsResZip = file(libpath("wasm-js", "-kotlin_resources.kotlin_resources.zip"))
