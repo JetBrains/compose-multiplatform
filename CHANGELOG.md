@@ -22,7 +22,7 @@ An overview of highlights for this release is also available in the Compose Mult
 #### iOS
 - Native-like caret behaviour by long/single taps in textfields([1](https://github.com/JetBrains/compose-multiplatform-core/pull/913), [2](https://github.com/JetBrains/compose-multiplatform-core/pull/858))
 - [Basic accessibility support](https://github.com/JetBrains/compose-multiplatform-core/pull/1025)
-- [Popups/Dialogs can now be displayed outside a ViewController over native components](https://github.com/JetBrains/compose-multiplatform-core/pull/1031)
+- [`Popup`s/`Dialog`s can now be displayed outside a `ViewController` over native components](https://github.com/JetBrains/compose-multiplatform-core/pull/1031)
 - [Allow selecting `Text` in `SelectionContainer` by double and triple tap](https://github.com/JetBrains/compose-multiplatform-core/pull/984)
 
 #### Web
@@ -30,7 +30,7 @@ An overview of highlights for this release is also available in the Compose Mult
 
 #### Desktop
 - [Proper clipping of `SwingPanel` interop](https://github.com/JetBrains/compose-multiplatform-core/pull/915) <sub>_(under an experimental flag, see the link)_</sub>
-- [Popups/Dialogs can now be displayed outside the main window or panel and over native components](https://github.com/JetBrains/compose-multiplatform-core/pull/992) <sub>_(under an experimental flag, see the link)_</sub>
+- [`Popup`s/`Dialog`s can now be displayed outside the main window or panel and over native components](https://github.com/JetBrains/compose-multiplatform-core/pull/992) <sub>_(under an experimental flag, see the link)_</sub>
 
 ## Breaking changes
 
@@ -52,6 +52,10 @@ An overview of highlights for this release is also available in the Compose Mult
 #### iOS/Desktop/Web
 - [Deprecate `public ComposeScene` in favour of `@InternalComposeUiApi MultiLayerComposeScene`](https://github.com/JetBrains/compose-multiplatform-core/pull/908)
 - [Hide deprecated DropdownMenu overloads](https://github.com/JetBrains/compose-multiplatform-core/pull/1003)
+
+#### iOS
+
+- Separate platform views for `Popup`s/`Dialog`s that are enabled by default, unable to draw anything out of their own bounds (for example, a shadow of the topmost container). It will be fixed in a future version, but if you're relying on this behavior, you can switch back to the old behavior by setting the `platformLayers` parameter to `false`.
 
 #### Desktop
 - [Remove deprecated APIs in `TooltipArea` and `PointerEvent`](https://github.com/JetBrains/compose-multiplatform-core/pull/1029)
