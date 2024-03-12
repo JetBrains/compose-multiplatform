@@ -208,7 +208,12 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             if (distributionDir == null || !distributionDir.exists()) {
                 error("Invalid distribution path: $distributionDir")
             }
-            val appDir = distributionDir.resolve("TestPackage/app")
+            val appDirSubPath = when (currentOS) {
+                OS.Linux -> "TestPackage/lib/app"
+                OS.Windows -> "TestPackage/app"
+                OS.MacOS -> "TestPackage.app/Contents/app"
+            }
+            val appDir = distributionDir.resolve(appDirSubPath)
             val jarsCount = appDir.listFiles()?.count { it.name.endsWith(".jar", ignoreCase = true) } ?: 0
             assert(jarsCount == 1)
         }
