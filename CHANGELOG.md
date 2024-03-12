@@ -55,7 +55,14 @@ An overview of highlights for this release is also available in the Compose Mult
 
 #### iOS
 
-- Separate platform views for `Popup`s/`Dialog`s that are enabled by default, unable to draw anything out of their own bounds (for example, a shadow of the topmost container). It will be fixed in a future version, but if you're relying on this behavior, you can switch back to the old behavior by setting the `platformLayers` parameter to `false`.
+- Separate platform views for `Popup`s/`Dialog`s that are enabled by default, unable to draw anything out of their own bounds (for example, a shadow of the topmost container). It will be fixed in a future version, but if you're relying on this behavior, you can switch back to the old behavior by setting the `platformLayers` parameter to `false`:
+  ```kt
+  ComposeUIViewController(configure = {
+      platformLayers = false
+  }) {
+      // ...
+  }
+  ```
 
 #### Desktop
 - [Remove deprecated APIs in `TooltipArea` and `PointerEvent`](https://github.com/JetBrains/compose-multiplatform-core/pull/1029)
