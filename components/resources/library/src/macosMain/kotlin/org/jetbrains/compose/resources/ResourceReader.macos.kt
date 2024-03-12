@@ -11,9 +11,10 @@ actual suspend fun readResourceBytes(path: String): ByteArray {
     val currentDirectoryPath = NSFileManager.defaultManager().currentDirectoryPath
     val contentsAtPath = NSFileManager.defaultManager().run {
         //todo in future bundle resources with app and use all sourceSets (skikoMain, nativeMain)
-        contentsAtPath("$currentDirectoryPath/src/macosMain/resources/$path")
-            ?: contentsAtPath("$currentDirectoryPath/src/commonMain/resources/$path")
-            ?: contentsAtPath("$currentDirectoryPath/src/commonTest/resources/$path")
+        contentsAtPath("$currentDirectoryPath/src/macosMain/composeResources/$path")
+            ?: contentsAtPath("$currentDirectoryPath/src/macosTest/composeResources/$path")
+            ?: contentsAtPath("$currentDirectoryPath/src/commonMain/composeResources/$path")
+            ?: contentsAtPath("$currentDirectoryPath/src/commonTest/composeResources/$path")
     } ?: throw MissingResourceException(path)
     return ByteArray(contentsAtPath.length.toInt()).apply {
         usePinned {
