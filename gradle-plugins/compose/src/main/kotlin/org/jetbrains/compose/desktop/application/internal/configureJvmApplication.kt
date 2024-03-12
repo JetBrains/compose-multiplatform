@@ -458,14 +458,14 @@ private fun JvmApplicationContext.configureFlattenJars(
 ) {
     if (runProguard != null) {
         flattenJars.dependsOn(runProguard)
-        flattenJars.inputFiles.from(project.fileTree(runProguard.flatMap { it.destinationDir }))
+        flattenJars.inputFiles.from(runProguard.flatMap { it.destinationDir })
     } else {
         flattenJars.useAppRuntimeFiles { (runtimeJars, _) ->
             inputFiles.from(runtimeJars)
         }
     }
 
-    flattenJars.destinationDir.set(appTmpDir.dir("flattenJars"))
+    flattenJars.flattenedJar.set(appTmpDir.file("flattenJars/flattened.jar"))
 }
 
 private fun JvmApplicationContext.configurePackageUberJarForCurrentOS(
@@ -473,7 +473,7 @@ private fun JvmApplicationContext.configurePackageUberJarForCurrentOS(
     flattenJars: Provider<AbstractJarsFlattenTask>
 ) {
     jar.dependsOn(flattenJars)
-    jar.from(flattenJars.flatMap { it.destinationDir })
+    jar.from(project.zipTree(flattenJars.flatMap { it.flattenedJar }))
 
     app.mainClass?.let { jar.manifest.attributes["Main-Class"] = it }
     jar.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
