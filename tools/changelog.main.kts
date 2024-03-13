@@ -31,6 +31,11 @@ import java.util.concurrent.TimeUnit
 
 val firstCommit = args.getOrNull(0) ?: error("Please call this way: kotlin changelog.main.kts <firstCommit> <lastCommit>")
 val lastCommit = args.getOrNull(1) ?: error("Please call this way: kotlin changelog.main.kts <firstCommit> <lastCommit>")
+val token = args.getOrNull(2)
+
+if (token == null) {
+    println("To increase the rate limit, specify token: kotlin changelog.main.kts <firstCommit> <lastCommit> TOKEN")
+}
 
 // commits that don't have a link to a PR (a link should be something like " (#454)")
 val commitToPRLinkMapping = File("commit-to-pr-mapping.txt").readLines().associate {
@@ -230,7 +235,12 @@ fun String.execCommand(workingDir: File = File(".")): String? {
 inline fun <reified T> request(
     url: String
 ): T = exponentialRetry {
-    URL(url).openStream().use {
+    val connection = URL(url).openConnection()
+    connection.setRequestProperty("User-Agent", "Compose-Multiplatform-Script")
+    if (token != null) {
+        connection.setRequestProperty("Authorization", "Bearer $token")
+    }
+    connection.getInputStream().use {
         Gson().fromJson(
             it.bufferedReader(),
             T::class.java
@@ -240,14 +250,15 @@ inline fun <reified T> request(
 
 fun <T> exponentialRetry(block: () -> T): T {
     val exception = IOException()
-    val retriesSeconds = listOf(60, 300, 1200)
-    for (retriesSecond in retriesSeconds) {
+    val retriesMinutes = listOf(1, 5, 15, 30, 60)
+    for (retriesMinute in retriesMinutes) {
         try {
             return block()
         } catch (e: IOException) {
             e.printStackTrace()
             exception.addSuppressed(e)
-            Thread.sleep(retriesSecond.toLong())
+            println("Retry in $retriesMinute minutes")
+            Thread.sleep(retriesMinute.toLong() * 60 * 1000)
         }
     }
     throw exception
