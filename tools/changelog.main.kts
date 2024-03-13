@@ -34,7 +34,7 @@ val lastCommit = args.getOrNull(1) ?: error("Please call this way: kotlin change
 val token = args.getOrNull(2)
 
 if (token == null) {
-    println("To increase the rate limit, specify token: kotlin changelog.main.kts <firstCommit> <lastCommit> TOKEN")
+    println("To increase the rate limit, specify token (https://github.com/settings/tokens): kotlin changelog.main.kts <firstCommit> <lastCommit> TOKEN")
 }
 
 // commits that don't have a link to a PR (a link should be something like " (#454)")
