@@ -1,3 +1,46 @@
+# 1.6.1 (March 2024)
+
+_Changes since 1.6.0_
+
+## Features
+#### Common
+- [Support Kotlin 1.9.23](https://github.com/JetBrains/compose-multiplatform/pull/4452)
+
+## Fixes
+#### iOS, Desktop, Web
+- [Consume less CPU for text field cursor blinking](https://github.com/JetBrains/compose-multiplatform-core/pull/1113)
+- [Fix Material3 slider getting stuck while dragging](https://github.com/JetBrains/compose-multiplatform-core/pull/1135)
+- [Fix `ExposedDropdownMenuBox` recomposing unnecessarily](https://github.com/JetBrains/compose-multiplatform-core/pull/1156)
+#### iOS
+- [Fix AppStore/TestFlight verification failure due to skiko/skia conflicting names with ICU library](https://github.com/JetBrains/compose-multiplatform-core/pull/1157)
+- [Fix `Pager` scroll with scrollable content on top](https://github.com/JetBrains/compose-multiplatform-core/pull/1098)
+- [Fix crash when selecting a character before the punctuation sign](https://github.com/JetBrains/compose-multiplatform-core/pull/1151)
+- [Fix unintended state reset](https://github.com/JetBrains/compose-multiplatform-core/pull/1152)
+- [Context menu isn't showing in empty textfield](https://github.com/JetBrains/compose-multiplatform-core/pull/1142)
+- [Fix a logical error causing Compose tree corruption and consequent crash](https://github.com/JetBrains/compose-multiplatform-core/pull/1163)
+- [Fix `TextField` crash when using speech-to-text](https://github.com/JetBrains/compose-multiplatform-core/pull/1183)
+#### Web
+- [Fix browser key events consumption](https://github.com/JetBrains/compose-multiplatform-core/pull/1124)
+- [Fix `Popup` on resize](https://github.com/JetBrains/compose-multiplatform-core/pull/1166)
+#### Desktop
+- [Fix additional windows creation with `COMPONENT` layer type](https://github.com/JetBrains/compose-multiplatform-core/pull/1131)
+- [Keep adding interop order consistent between platforms](https://github.com/JetBrains/compose-multiplatform-core/pull/1143)
+#### Resources
+- [Support three letters locales](https://github.com/JetBrains/compose-multiplatform/pull/4394)
+- [Init resource accessors lazily and in external function to avoid MethodTooLargeException](https://github.com/JetBrains/compose-multiplatform/pull/4404)
+- [Fix `Res` class generation if the library is declared as 'api'](https://github.com/JetBrains/compose-multiplatform/pull/4406)
+- [Fix `regionCode` crash on iOS before 17](https://github.com/JetBrains/compose-multiplatform/pull/4473)
+- [Fix package name of generated `Res` file when project is building for `JsTarget`](https://github.com/JetBrains/compose-multiplatform/pull/4300)
+
+## Dependencies
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+- [Compiler 1.5.10](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.10)
+- [Runtime 1.6.3](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.3)
+- [UI 1.6.3](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.3)
+- [Foundation 1.6.3](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.3)
+- [Material 1.6.3](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.3)
+- [Material3 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.1)
+
 # 1.6.0 (February 2024)
 
 _Changes since 1.5.12_
