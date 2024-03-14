@@ -13,7 +13,7 @@ _Changes since 1.6.0_
 - [Fix `ExposedDropdownMenuBox` recomposing unnecessarily](https://github.com/JetBrains/compose-multiplatform-core/pull/1156)
 #### iOS
 - [Fix AppStore/TestFlight verification failure due to skiko/skia conflicting names with ICU library](https://github.com/JetBrains/compose-multiplatform-core/pull/1157)
-- [Fix Pager scroll with scrollable content on top](https://github.com/JetBrains/compose-multiplatform-core/pull/1098)
+- [Fix `Pager` scroll with scrollable content on top](https://github.com/JetBrains/compose-multiplatform-core/pull/1098)
 - [Fix crash when selecting a character before the punctuation sign](https://github.com/JetBrains/compose-multiplatform-core/pull/1151)
 - [Fix unintended state reset](https://github.com/JetBrains/compose-multiplatform-core/pull/1152)
 - [Context menu isn't showing in empty textfield](https://github.com/JetBrains/compose-multiplatform-core/pull/1142)
