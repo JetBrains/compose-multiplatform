@@ -21,7 +21,7 @@ _Changes since 1.6.0_
 - [Fix `TextField` crash when using speech-to-text](https://github.com/JetBrains/compose-multiplatform-core/pull/1183)
 #### Web
 - [Fix browser key events consumption](https://github.com/JetBrains/compose-multiplatform-core/pull/1124)
-- [Send correct window size on resize - this fixes popup crashes that happened](https://github.com/JetBrains/compose-multiplatform-core/pull/1166)
+- [Fix `Popup` on resize](https://github.com/JetBrains/compose-multiplatform-core/pull/1166)
 #### Desktop
 - [Fix additional windows creation with `COMPONENT` layer type](https://github.com/JetBrains/compose-multiplatform-core/pull/1131)
 - [Keep adding interop order consistent between platforms](https://github.com/JetBrains/compose-multiplatform-core/pull/1143)
