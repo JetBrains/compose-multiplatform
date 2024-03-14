@@ -18,7 +18,7 @@ _Changes since 1.6.0_
 - [Fix unintended state reset](https://github.com/JetBrains/compose-multiplatform-core/pull/1152)
 - [Context menu isn't showing in empty textfield](https://github.com/JetBrains/compose-multiplatform-core/pull/1142)
 - [Fix a logical error causing Compose tree corruption and consequent crash](https://github.com/JetBrains/compose-multiplatform-core/pull/1163)
-- [Fix TextField crash when using speech-to-text](https://github.com/JetBrains/compose-multiplatform-core/pull/1183)
+- [Fix `TextField` crash when using speech-to-text](https://github.com/JetBrains/compose-multiplatform-core/pull/1183)
 #### Web
 - [Fix browser key events consumption](https://github.com/JetBrains/compose-multiplatform-core/pull/1124)
 - [Send correct window size on resize - this fixes popup crashes that happened](https://github.com/JetBrains/compose-multiplatform-core/pull/1166)
