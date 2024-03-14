@@ -30,7 +30,7 @@ _Changes since 1.6.0_
 - [Init resource accessors lazily and in external function to avoid MethodTooLargeException](https://github.com/JetBrains/compose-multiplatform/pull/4404)
 - [Fix `Res` class generation if the library is declared as 'api'](https://github.com/JetBrains/compose-multiplatform/pull/4406)
 - [Fix `regionCode` crash on iOS before 17](https://github.com/JetBrains/compose-multiplatform/pull/4473)
-- [Fix package name of generated Res file when project is building for JsTarget](https://github.com/JetBrains/compose-multiplatform/pull/4300)
+- [Fix package name of generated `Res` file when project is building for `JsTarget`](https://github.com/JetBrains/compose-multiplatform/pull/4300)
 
 ## Dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
