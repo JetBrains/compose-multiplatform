@@ -28,7 +28,7 @@ _Changes since 1.6.0_
 #### Resources
 - [Support three letters locales](https://github.com/JetBrains/compose-multiplatform/pull/4394)
 - [Init resource accessors lazily and in external function to avoid MethodTooLargeException](https://github.com/JetBrains/compose-multiplatform/pull/4404)
-- [Fix Res class generation if the library is declared as 'api'](https://github.com/JetBrains/compose-multiplatform/pull/4406)
+- [Fix `Res` class generation if the library is declared as 'api'](https://github.com/JetBrains/compose-multiplatform/pull/4406)
 - [Fix regionCode crash on iOS before 17](https://github.com/JetBrains/compose-multiplatform/pull/4473)
 - [Fix package name of generated Res file when project is building for JsTarget](https://github.com/JetBrains/compose-multiplatform/pull/4300)
 
