@@ -10,7 +10,7 @@ _Changes since 1.6.0_
 #### iOS, Desktop, Web
 - [Consume less CPU for text field cursor blinking](https://github.com/JetBrains/compose-multiplatform-core/pull/1113)
 - [Fix Material3 slider getting stuck while dragging](https://github.com/JetBrains/compose-multiplatform-core/pull/1135)
-- [Fix ExposedDropdownMenuBox recomposing unnecessarily](https://github.com/JetBrains/compose-multiplatform-core/pull/1156)
+- [Fix `ExposedDropdownMenuBox` recomposing unnecessarily](https://github.com/JetBrains/compose-multiplatform-core/pull/1156)
 #### iOS
 - [Fix AppStore/TestFlight verification failure due to skiko/skia conflicting names with ICU library](https://github.com/JetBrains/compose-multiplatform-core/pull/1157)
 - [Fix Pager scroll with scrollable content on top](https://github.com/JetBrains/compose-multiplatform-core/pull/1098)
