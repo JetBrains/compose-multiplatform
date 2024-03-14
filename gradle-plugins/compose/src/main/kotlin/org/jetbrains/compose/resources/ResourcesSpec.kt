@@ -117,8 +117,10 @@ internal fun getResFileSpecs(
     //type -> id -> items
     resources: Map<ResourceType, Map<String, List<ResourceItem>>>,
     packageName: String,
-    moduleDir: String
+    moduleDir: String,
+    isPublic: Boolean
 ): List<FileSpec> {
+    val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
     val files = mutableListOf<FileSpec>()
     val resClass = FileSpec.builder(packageName, "Res").also { file ->
         file.addAnnotation(
@@ -128,7 +130,7 @@ internal fun getResFileSpecs(
                 .build()
         )
         file.addType(TypeSpec.objectBuilder("Res").also { resObject ->
-            resObject.addModifiers(KModifier.INTERNAL)
+            resObject.addModifiers(resModifier)
             resObject.addAnnotation(experimentalAnnotation)
 
             //readFileBytes
@@ -169,6 +171,7 @@ internal fun getResFileSpecs(
                     index,
                     packageName,
                     moduleDir,
+                    resModifier,
                     idToResources.subMap(ids.first(), true, ids.last(), true)
                 )
             )
@@ -183,6 +186,7 @@ private fun getChunkFileSpec(
     index: Int,
     packageName: String,
     moduleDir: String,
+    resModifier: KModifier,
     idToResources: Map<String, List<ResourceItem>>
 ): FileSpec {
     val chunkClassName = type.typeName.uppercaseFirstChar() + index
@@ -206,7 +210,7 @@ private fun getChunkFileSpec(
         chunkFile.addType(objectSpec)
 
         idToResources.forEach { (resName, items) ->
-            val accessor = PropertySpec.builder(resName, type.getClassName(), KModifier.INTERNAL)
+            val accessor = PropertySpec.builder(resName, type.getClassName(), resModifier)
                 .receiver(ClassName(packageName, "Res", type.typeName))
                 .addAnnotation(experimentalAnnotation)
                 .getter(FunSpec.getterBuilder().addStatement("return $chunkClassName.$resName").build())

@@ -126,10 +126,20 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/drawable/vector_3.xml").renameTo(
             file("src/commonMain/composeResources/drawable/vector_2.xml")
         )
+
+        file("build.gradle.kts").modify { txt ->
+            txt + """
+                compose.resources {
+                    publicResClass = true
+                    resourceProjectId = "my.lib.res"
+                }
+            """.trimIndent()
+        }
+
         gradle("generateComposeResClass").checks {
             assertDirectoriesContentEquals(
-                file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources"),
-                file("expected")
+                file("build/generated/compose/resourceGenerator/kotlin/my/lib/res"),
+                file("expected-open-res")
             )
         }
     }
@@ -155,7 +165,7 @@ class ResourcesTest : GradlePluginTestBase() {
                 val resourcesFiles = resDir.walkTopDown()
                     .filter { !it.isDirectory && !it.isHidden }
                     .map { it.relativeTo(resDir).invariantSeparatorsPath }
-                val subdir = "me.sample.library.cmplib"
+                val subdir = "me.sample.library.resources"
 
                 fun libpath(target: String, ext: String) =
                     "my-mvn/me/sample/library/cmplib-$target/1.0/cmplib-$target-1.0$ext"

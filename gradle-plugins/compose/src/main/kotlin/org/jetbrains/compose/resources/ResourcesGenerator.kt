@@ -38,13 +38,19 @@ private val androidPluginIds = listOf(
     "com.android.library"
 )
 
-internal fun Project.configureComposeResources() {
+internal fun Project.configureComposeResources(config: ResourcesExtension) {
     val projectId = provider {
-        val groupName = project.group.toString().lowercase().asUnderscoredIdentifier()
-        val moduleName = project.name.lowercase().asUnderscoredIdentifier()
-        if (groupName.isNotEmpty()) "$groupName.$moduleName"
-        else moduleName
+        config.resourceProjectId.takeIf { it.isNotEmpty() } ?: run {
+            val groupName = project.group.toString().lowercase().asUnderscoredIdentifier()
+            val moduleName = project.name.lowercase().asUnderscoredIdentifier()
+            val id = if (groupName.isNotEmpty()) "$groupName.$moduleName" else moduleName
+            "$id.generated.resources"
+        }
     }
+
+    val publicResClass = provider { config.publicResClass }
+
+    val generateResClassMode = provider { config.generateResClass }
 
     plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
         val kotlinExtension = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
@@ -53,7 +59,13 @@ internal fun Project.configureComposeResources() {
         val currentGradleVersion = GradleVersion.current()
         val minGradleVersion = GradleVersion.version(MIN_GRADLE_VERSION_FOR_KMP_RESOURCES)
         if (hasKmpResources && currentGradleVersion >= minGradleVersion) {
-            configureKmpResources(kotlinExtension, extraProperties.get(KMP_RES_EXT)!!, projectId)
+            configureKmpResources(
+                kotlinExtension,
+                extraProperties.get(KMP_RES_EXT)!!,
+                projectId,
+                publicResClass,
+                generateResClassMode
+            )
         } else {
             if (!hasKmpResources) {
                 logger.info(
@@ -73,7 +85,13 @@ internal fun Project.configureComposeResources() {
             }
 
             //current KGP doesn't have KPM resources
-            configureComposeResources(kotlinExtension, KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME, projectId)
+            configureComposeResources(
+                kotlinExtension,
+                KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME,
+                projectId,
+                publicResClass,
+                generateResClassMode
+            )
 
             //when applied AGP then configure android resources
             androidPluginIds.forEach { pluginId ->
@@ -86,14 +104,22 @@ internal fun Project.configureComposeResources() {
     }
     plugins.withId(KOTLIN_JVM_PLUGIN_ID) {
         val kotlinExtension = project.extensions.getByType(KotlinProjectExtension::class.java)
-        configureComposeResources(kotlinExtension, SourceSet.MAIN_SOURCE_SET_NAME, projectId)
+        configureComposeResources(
+            kotlinExtension,
+            SourceSet.MAIN_SOURCE_SET_NAME,
+            projectId,
+            publicResClass,
+            generateResClassMode
+        )
     }
 }
 
 private fun Project.configureComposeResources(
     kotlinExtension: KotlinProjectExtension,
     commonSourceSetName: String,
-    projectId: Provider<String>
+    projectId: Provider<String>,
+    publicResClass: Provider<Boolean>,
+    generateResClassMode: Provider<ResourcesExtension.ResourceClassGeneration>
 ) {
     logger.info("Configure compose resources")
     kotlinExtension.sourceSets.all { sourceSet ->
@@ -105,7 +131,14 @@ private fun Project.configureComposeResources(
         sourceSet.resources.srcDirs(composeResourcesPath)
 
         if (sourceSetName == commonSourceSetName) {
-            configureResourceGenerator(composeResourcesPath, sourceSet, projectId, false)
+            configureResourceGenerator(
+                composeResourcesPath,
+                sourceSet,
+                projectId,
+                publicResClass,
+                generateResClassMode,
+                false
+            )
         }
     }
 }
@@ -114,7 +147,9 @@ private fun Project.configureComposeResources(
 private fun Project.configureKmpResources(
     kotlinExtension: KotlinProjectExtension,
     kmpResources: Any,
-    projectId: Provider<String>
+    projectId: Provider<String>,
+    publicResClass: Provider<Boolean>,
+    generateResClassMode: Provider<ResourcesExtension.ResourceClassGeneration>
 ) {
     kotlinExtension as KotlinMultiplatformExtension
     kmpResources as KotlinTargetResourcesPublication
@@ -161,7 +196,14 @@ private fun Project.configureKmpResources(
         val sourceSetName = sourceSet.name
         if (sourceSetName == KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME) {
             val composeResourcesPath = project.projectDir.resolve("src/$sourceSetName/$COMPOSE_RESOURCES_DIR")
-            configureResourceGenerator(composeResourcesPath, sourceSet, projectId, true)
+            configureResourceGenerator(
+                composeResourcesPath,
+                sourceSet,
+                projectId,
+                publicResClass,
+                generateResClassMode,
+                true
+            )
         }
     }
 
@@ -252,26 +294,34 @@ private fun Project.configureResourceGenerator(
     commonComposeResourcesDir: File,
     commonSourceSet: KotlinSourceSet,
     projectId: Provider<String>,
+    publicResClass: Provider<Boolean>,
+    generateResClassMode: Provider<ResourcesExtension.ResourceClassGeneration>,
     generateModulePath: Boolean
 ) {
-    val packageName = projectId.map { "$it.generated.resources" }
-
     logger.info("Configure accessors for '${commonSourceSet.name}'")
 
     fun buildDir(path: String) = layout.dir(layout.buildDirectory.map { File(it.asFile, path) })
 
     //lazy check a dependency on the Resources library
-    val shouldGenerateResClass: Provider<Boolean> = provider {
-        if (ComposeProperties.alwaysGenerateResourceAccessors(project).get()) {
-            true
-        } else {
-            configurations.run {
-                //because the implementation configuration doesn't extend the api in the KGP ¯\_(ツ)_/¯
-                getByName(commonSourceSet.implementationConfigurationName).allDependencies +
-                        getByName(commonSourceSet.apiConfigurationName).allDependencies
-            }.any { dep ->
-                val depStringNotation = dep.let { "${it.group}:${it.name}:${it.version}" }
-                depStringNotation == ComposePlugin.CommonComponentsDependencies.resources
+    val shouldGenerateResClass = generateResClassMode.map { mode ->
+        when (mode) {
+            ResourcesExtension.ResourceClassGeneration.Auto -> {
+                //todo remove the gradle property when the gradle plugin will be published
+                if (ComposeProperties.alwaysGenerateResourceAccessors(project).get()) {
+                    true
+                } else {
+                    configurations.run {
+                        //because the implementation configuration doesn't extend the api in the KGP ¯\_(ツ)_/¯
+                        getByName(commonSourceSet.implementationConfigurationName).allDependencies +
+                                getByName(commonSourceSet.apiConfigurationName).allDependencies
+                    }.any { dep ->
+                        val depStringNotation = dep.let { "${it.group}:${it.name}:${it.version}" }
+                        depStringNotation == ComposePlugin.CommonComponentsDependencies.resources
+                    }
+                }
+            }
+            ResourcesExtension.ResourceClassGeneration.Always -> {
+                true
             }
         }
     }
@@ -280,8 +330,9 @@ private fun Project.configureResourceGenerator(
         "generateComposeResClass",
         GenerateResClassTask::class.java
     ) { task ->
-        task.packageName.set(packageName)
+        task.packageName.set(projectId)
         task.shouldGenerateResClass.set(shouldGenerateResClass)
+        task.makeResClassPublic.set(publicResClass)
         task.resDir.set(commonComposeResourcesDir)
         task.codeDir.set(buildDir("$RES_GEN_DIR/kotlin"))
 

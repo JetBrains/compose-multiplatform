@@ -28,6 +28,7 @@ import org.jetbrains.compose.internal.mppExtOrNull
 import org.jetbrains.compose.internal.service.ConfigurationProblemReporterService
 import org.jetbrains.compose.internal.service.GradlePropertySnapshotService
 import org.jetbrains.compose.internal.utils.currentTarget
+import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.compose.resources.configureComposeResources
 import org.jetbrains.compose.resources.ios.configureSyncTask
 import org.jetbrains.compose.web.WebExtension
@@ -52,6 +53,7 @@ abstract class ComposePlugin : Plugin<Project> {
         val desktopExtension = composeExtension.extensions.create("desktop", DesktopExtension::class.java)
         val androidExtension = composeExtension.extensions.create("android", AndroidExtension::class.java)
         val experimentalExtension = composeExtension.extensions.create("experimental", ExperimentalExtension::class.java)
+        val resourcesExtension = composeExtension.extensions.create("resources", ResourcesExtension::class.java)
 
         project.dependencies.extensions.add("compose", Dependencies(project))
 
@@ -65,7 +67,7 @@ abstract class ComposePlugin : Plugin<Project> {
         project.plugins.apply(ComposeCompilerKotlinSupportPlugin::class.java)
         project.configureNativeCompilerCaching()
 
-        project.configureComposeResources()
+        project.configureComposeResources(resourcesExtension)
 
         project.afterEvaluate {
             configureDesktop(project, desktopExtension)
