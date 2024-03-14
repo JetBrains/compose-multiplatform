@@ -17,6 +17,10 @@ internal abstract class GenerateResClassTask : DefaultTask() {
     abstract val packageName: Property<String>
 
     @get:Input
+    @get:Optional
+    abstract val moduleDir: Property<File>
+
+    @get:Input
     abstract val shouldGenerateResClass: Property<Boolean>
 
     @get:InputFiles
@@ -56,7 +60,11 @@ internal abstract class GenerateResClassTask : DefaultTask() {
                     }
                     .groupBy { it.type }
                     .mapValues { (_, items) -> items.groupBy { it.name } }
-                getResFileSpecs(resources, packageName.get()).forEach { it.writeTo(kotlinDir) }
+                getResFileSpecs(
+                    resources,
+                    packageName.get(),
+                    moduleDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
+                ).forEach { it.writeTo(kotlinDir) }
             } else {
                 logger.info("Generation Res class is disabled")
             }

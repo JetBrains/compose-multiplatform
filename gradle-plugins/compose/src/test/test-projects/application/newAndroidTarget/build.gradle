@@ -6,11 +6,6 @@ plugins {
     id "org.jetbrains.compose"
 }
 
-repositories {
-    jetbrainsCompose()
-    google()
-}
-
 kotlin {
     targetHierarchy.default()
 

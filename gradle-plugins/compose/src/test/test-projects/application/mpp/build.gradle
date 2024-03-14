@@ -6,11 +6,6 @@ plugins {
     id "org.jetbrains.compose"
 }
 
-repositories {
-    jetbrainsCompose()
-    google()
-}
-
 kotlin {
     // empty stub (no actual android app) to detect configuration conflicts
     // like https://github.com/JetBrains/compose-jb/issues/2345
