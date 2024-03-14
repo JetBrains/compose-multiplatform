@@ -144,11 +144,12 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
  */
 fun repoNumberForCommit(commit: GitHubCompareResponse.CommitEntry): Int? {
     val commitTitle = commit.commit.message.substringBefore("\n")
-    // check title similar to `Fix import android flavors with compose resources (#4319)`
-    return if (commitTitle.contains(" (#")) {
-        commitTitle.substringAfter(" (#").substringBefore(")").toIntOrNull()
-    } else {
-        commitToPRLinkMapping[commit.sha]?.substringAfterLast("/")?.toIntOrNull()
+    val prLink = commitToPRLinkMapping[commit.sha]
+    return when {
+        prLink != null -> prLink.substringAfterLast("/").toIntOrNull()
+        // check title similar to `Fix import android flavors with compose resources (#4319)`
+        commitTitle.contains(" (#") -> commitTitle.substringAfter(" (#").substringBefore(")").toIntOrNull()
+        else -> null
     }
 }
 
