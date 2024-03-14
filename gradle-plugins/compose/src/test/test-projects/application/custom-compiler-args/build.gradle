@@ -6,11 +6,6 @@ plugins {
     id "org.jetbrains.compose"
 }
 
-repositories {
-    google()
-    jetbrainsCompose()
-}
-
 kotlin {
     jvm("desktop")
     js(IR) {

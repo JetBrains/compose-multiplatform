@@ -3,11 +3,6 @@ plugins {
     id "org.jetbrains.compose"
 }
 
-repositories {
-    google()
-    jetbrainsCompose()
-}
-
 kotlin {
     def platforms = project.property("platforms").split(",")
     if (platforms.contains("jvm")) {

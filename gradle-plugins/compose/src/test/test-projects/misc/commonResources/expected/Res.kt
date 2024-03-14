@@ -21,7 +21,7 @@ internal object Res {
    * @param path The path of the file to read in the compose resource's directory.
    * @return The content of the file as a byte array.
    */
-  public suspend fun readBytes(path: String): ByteArray = readResourceBytes(path)
+  public suspend fun readBytes(path: String): ByteArray = readResourceBytes("" + path)
 
   public object drawable
 

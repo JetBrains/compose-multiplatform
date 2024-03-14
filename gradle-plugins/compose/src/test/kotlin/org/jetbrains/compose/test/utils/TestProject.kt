@@ -59,8 +59,8 @@ class TestProject(
     private val testProjectsRootDir = File("src/test/test-projects")
 
     private val additionalArgs = listOfNotNull(
+        "--info",
         "--stacktrace",
-        "--init-script", testProjectsRootDir.resolve("init.gradle").absolutePath,
         "-P${ComposeProperties.VERBOSE}=${testEnvironment.composeVerbose}",
         if (testEnvironment.parsedGradleVersion < GradleVersion.version("8.0")) {
             null

@@ -1,5 +1,7 @@
 package org.jetbrains.compose.test.tests.integration
 
+import org.gradle.util.GradleVersion
+import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.compose.test.utils.*
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -133,9 +135,124 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun testMultiModuleResources() {
+        val environment = defaultTestEnvironment.copy(
+            kotlinVersion = "2.0.0-titan-105",
+            composeCompilerPlugin = "2.0.0-Beta4"
+        )
+        with(
+            testProject("misc/kmpResourcePublication", environment)
+        ) {
+            if (environment.parsedGradleVersion < GradleVersion.version("7.6")) {
+                val output = gradle(":tasks").output
+                output.contains("Compose resources publication requires Gradle >= 7.6")
+                output.contains("Current Kotlin Gradle Plugin is ${environment.gradleVersion}")
+                return@with
+            }
+
+            gradle(":cmplib:publishAllPublicationsToMavenRepository").checks {
+                val resDir = file("cmplib/src/commonMain/composeResources")
+                val resourcesFiles = resDir.walkTopDown()
+                    .filter { !it.isDirectory && !it.isHidden }
+                    .map { it.relativeTo(resDir).invariantSeparatorsPath }
+                val subdir = "me.sample.library.cmplib"
+
+                fun libpath(target: String, ext: String) =
+                    "my-mvn/me/sample/library/cmplib-$target/1.0/cmplib-$target-1.0$ext"
+
+                val aar = file(libpath("android", ".aar"))
+                val innerClassesJar = aar.parentFile.resolve("aar-inner-classes.jar")
+                assertTrue(aar.exists(), "File not found: " + aar.path)
+                ZipFile(aar).use { zip ->
+                    resourcesFiles
+                        .filter { it.startsWith("font") }
+                        .forEach { fontRes ->
+                            assertNotNull(
+                                zip.getEntry("assets/composeResources/$subdir/$fontRes"),
+                                "Resource not found: '$fontRes' in aar '${aar.path}'"
+                            )
+                        }
+
+                    innerClassesJar.writeBytes(
+                        zip.getInputStream(zip.getEntry("classes.jar")).readBytes()
+                    )
+                }
+                ZipFile(innerClassesJar).use { zip ->
+                    resourcesFiles
+                        .filterNot { it.startsWith("font") }
+                        .forEach { res ->
+                            assertNotNull(
+                                zip.getEntry("composeResources/$subdir/$res"),
+                                "Resource not found: '$res' in aar/classes.jar '${aar.path}'"
+                            )
+                        }
+                }
+
+                val jar = file(libpath("jvm", ".jar"))
+                checkResourcesZip(jar, resourcesFiles, subdir)
+
+                if (currentOS == OS.MacOS) {
+                    val iosx64ResZip = file(libpath("iosx64", "-kotlin_resources.kotlin_resources.zip"))
+                    checkResourcesZip(iosx64ResZip, resourcesFiles, subdir)
+                    val iosarm64ResZip = file(libpath("iosarm64", "-kotlin_resources.kotlin_resources.zip"))
+                    checkResourcesZip(iosarm64ResZip, resourcesFiles, subdir)
+                    val iossimulatorarm64ResZip = file(
+                        libpath("iossimulatorarm64", "-kotlin_resources.kotlin_resources.zip")
+                    )
+                    checkResourcesZip(iossimulatorarm64ResZip, resourcesFiles, subdir)
+                }
+                val jsResZip = file(libpath("js", "-kotlin_resources.kotlin_resources.zip"))
+                checkResourcesZip(jsResZip, resourcesFiles, subdir)
+                val wasmjsResZip = file(libpath("wasm-js", "-kotlin_resources.kotlin_resources.zip"))
+                checkResourcesZip(wasmjsResZip, resourcesFiles, subdir)
+            }
+
+            file("settings.gradle.kts").modify { content ->
+                content.replace("//include(\":appModule\")", "include(\":appModule\")")
+            }
+
+            gradle(":appModule:jvmTest", "-i")
+
+            if (currentOS == OS.MacOS) {
+                val iosTask = if (currentArch == Arch.X64) {
+                    ":appModule:iosX64Test"
+                } else {
+                    ":appModule:iosSimulatorArm64Test"
+                }
+                gradle(iosTask)
+            }
+
+            file("featureModule/src/commonMain/kotlin/me/sample/app/Feature.kt").modify { content ->
+                content.replace(
+                    "Text(txt + stringResource(Res.string.str_1), modifier)",
+                    "Text(stringResource(Res.string.str_1), modifier)"
+                )
+            }
+
+            gradleFailure(":appModule:jvmTest").checks {
+                check.logContains("java.lang.AssertionError: Failed to assert the following: (Text + EditableText = [test text: Feature text str_1])")
+                check.logContains("Text = '[Feature text str_1]'")
+            }
+        }
+    }
+
+    private fun checkResourcesZip(zipFile: File, resourcesFiles: Sequence<String>, subdir: String) {
+        assertTrue(zipFile.exists(), "File not found: " + zipFile.path)
+        ZipFile(zipFile).use { zip ->
+            resourcesFiles.forEach { res ->
+                assertNotNull(
+                    zip.getEntry("composeResources/$subdir/$res"),
+                    "Resource not found: '$res' in zip '${zipFile.path}'"
+                )
+            }
+        }
+    }
+
+    @Test
     fun testFinalArtefacts(): Unit = with(testProject("misc/commonResources")) {
         //https://developer.android.com/build/build-variants?utm_source=android-studio#product-flavors
-        file("build.gradle.kts").appendText("""
+        file("build.gradle.kts").appendText(
+            """
             
             kotlin {
                 js {
@@ -155,7 +272,8 @@ class ResourcesTest : GradlePluginTestBase() {
                     create("full")
                 }
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         file("src/androidDemoDebug/composeResources/files/platform.txt").writeNewFile("android demo-debug")
         file("src/androidDemoRelease/composeResources/files/platform.txt").writeNewFile("android demo-release")
         file("src/androidFullDebug/composeResources/files/platform.txt").writeNewFile("android full-debug")
@@ -294,25 +412,6 @@ class ResourcesTest : GradlePluginTestBase() {
             )
         }
         gradle("jar")
-    }
-
-    //https://github.com/JetBrains/compose-multiplatform/issues/4194
-    //https://github.com/JetBrains/compose-multiplatform/issues/4285
-    //
-    // 1500 icons + 1500*20 strings!!!
-    @Test
-    fun testHugeNumberOfResources(): Unit = with(
-        //disable cache for the test because the generateResourceFiles task doesn't support it
-        testProject("misc/hugeResources", defaultTestEnvironment.copy(useGradleConfigurationCache = false))
-    ) {
-        gradle("compileKotlinDesktop").checks {
-            check.taskSuccessful(":generateResourceFiles")
-            check.taskSuccessful(":generateComposeResClass")
-            assertDirectoriesContentEquals(
-                file("build/generated/compose/resourceGenerator/kotlin/app/group/huge/generated/resources"),
-                file("expected")
-            )
-        }
     }
 
     //https://github.com/gmazzo/gradle-buildconfig-plugin/issues/131

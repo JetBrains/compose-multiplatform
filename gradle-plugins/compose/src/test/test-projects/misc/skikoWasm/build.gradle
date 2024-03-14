@@ -5,10 +5,6 @@ plugins {
     id "org.jetbrains.compose"
 }
 
-repositories {
-    jetbrainsCompose()
-}
-
 kotlin {
     js(IR) {
         browser()

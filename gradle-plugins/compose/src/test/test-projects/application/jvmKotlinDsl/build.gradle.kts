@@ -6,10 +6,6 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-repositories {
-    jetbrainsCompose()
-}
-
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(compose.desktop.currentOs)
