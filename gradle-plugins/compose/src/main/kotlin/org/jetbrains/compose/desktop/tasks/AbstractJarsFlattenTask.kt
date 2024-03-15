@@ -34,7 +34,7 @@ import java.util.zip.ZipOutputStream
  * instead of a list of real jars after Proguard task execution.
  *
  * Also, we use output to the single jar instead of flattening to the directory in the filesystem because:
- * - Windows filesystem is case-sensitive and not every jar can be unzipped without losing files
+ * - Windows filesystem is case-insensitive and not every jar can be unzipped without losing files
  * - it's just faster
  */
 abstract class AbstractJarsFlattenTask : AbstractComposeDesktopTask() {
@@ -46,11 +46,11 @@ abstract class AbstractJarsFlattenTask : AbstractComposeDesktopTask() {
     val flattenedJar: RegularFileProperty = objects.fileProperty()
 
     @get:Internal
-    val entries = hashSetOf<String>()
+    val seenEntryNames = hashSetOf<String>()
 
     @TaskAction
     fun execute() {
-        entries.clear()
+        seenEntryNames.clear()
         fileOperations.delete(flattenedJar)
 
         ZipOutputStream(FileOutputStream(flattenedJar.ioFile).buffered()).use { outputStream ->
@@ -78,9 +78,9 @@ abstract class AbstractJarsFlattenTask : AbstractComposeDesktopTask() {
         }
 
     private fun ZipOutputStream.writeEntryIfNotSeen(entry: ZipEntry, inputStream: InputStream) {
-        if (entry.name !in entries) {
+        if (entry.name !in seenEntryNames) {
             copyZipEntry(entry, inputStream, this)
-            entries += entry.name
+            seenEntryNames += entry.name
         }
     }
 }
