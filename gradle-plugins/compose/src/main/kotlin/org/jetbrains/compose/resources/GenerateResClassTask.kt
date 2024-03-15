@@ -96,10 +96,14 @@ internal abstract class GenerateResClassTask : DefaultTask() {
             return null
         }
 
-        if (typeString == "values" && file.name.equals("strings.xml", true)) {
-            val stringIds = getStringIds(file)
-            return stringIds.map { strId ->
-                ResourceItem(ResourceType.STRING, qualifiers, strId.asUnderscoredIdentifier(), path)
+        if (typeString == "values") {
+            if (file.name.equals("strings.xml", true)) {
+                val stringIds = getStringIds(file)
+                return stringIds.map { strId ->
+                    ResourceItem(ResourceType.STRING, qualifiers, strId.asUnderscoredIdentifier(), path)
+                }
+            } else {
+                error("Forbidden file name '${file.name}'! Only a file for string resources named 'strings.xml' is valid in the 'values' folder.")
             }
         }
 
