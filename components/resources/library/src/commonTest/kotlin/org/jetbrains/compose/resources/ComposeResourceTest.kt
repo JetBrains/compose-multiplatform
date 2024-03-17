@@ -294,11 +294,8 @@ class ComposeResourceTest {
         val bytes = readResourceBytes("strings.xml")
         val source = mutableListOf<Byte>()
         getResourceAsFlow("strings.xml").collect { chunk ->
-            println("p")
             source.addAll(chunk.asList())
-            println("q")
         }
-        println("r")
         assertContentEquals(bytes, source.toByteArray())
     }
 }
