@@ -1,5 +1,6 @@
 [versions]
 kotlinx-coroutines = "1.7.3"
+kotlinx-io = "0.3.1"
 androidx-appcompat = "1.6.1"
 androidx-activity-compose = "1.8.2"
 androidx-test = "1.5.0"
@@ -8,6 +9,7 @@ androidx-compose = "1.6.0"
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+kotlinx-io-core = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test" }
