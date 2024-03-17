@@ -107,7 +107,6 @@ private fun ReadableStream.getBYOBReader(): ReadableStreamBYOBReader {
  */
 private external interface ReadableStreamBYOBReader : JsAny {
     fun read(view: ArrayBufferView): Promise<ReadableStreamBYOBReaderReadResult>
-    fun releaseLock()
 }
 
 private external interface ReadableStreamBYOBReaderReadResult : JsAny {
