@@ -5,7 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runComposeUiTest
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 
@@ -184,10 +184,7 @@ class ComposeResourceTest {
     @Test
     fun testGetFileResourceAsSource() = runTest {
         val bytes = readResourceBytes("strings.xml")
-        val source = mutableListOf<Byte>()
-        getResourceAsFlow("strings.xml").collect { chunk ->
-            source.addAll(chunk.asList())
-        }
+        val source = getResourceAsFlow("strings.xml").toList().flatMap { it.asList() }
         assertContentEquals(bytes, source.toByteArray())
     }
 }
