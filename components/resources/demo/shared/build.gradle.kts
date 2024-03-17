@@ -59,6 +59,7 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.material3)
+            implementation(libs.kotlinx.io.core)
             implementation(project(":resources:library"))
         }
         val desktopMain by getting
