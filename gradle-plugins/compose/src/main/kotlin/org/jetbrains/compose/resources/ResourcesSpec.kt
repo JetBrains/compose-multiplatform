@@ -160,15 +160,15 @@ internal fun getResFileSpecs(
                         """
                     Returns a flow which emits the content of the resource file as byte array chunks. The length of each
                     chunk is not empty and has the length of [byteCount] or smaller. The flow will throw
-                    [MissingResourceException] when the resource file is missing or [ResourceIOException] if any IO
-                    error occurs. You can catch those with the [catch][kotlinx.coroutines.flow.catch] operator. This
-                    function is useful when the resource is too big to be contained in a single [ByteArray].
+                    [MissingResourceException][org.jetbrains.compose.resources.MissingResourceException] when the
+                    resource file is missing or [ResourceIOException][org.jetbrains.compose.resources.ResourceIOException]
+                    if any IO error occurs. You can catch those with the [catch][kotlinx.coroutines.flow.catch] operator.
+                    This function is useful when the resource is too big to be contained in a single [ByteArray].
                     
                     Example: `val bytes = Res.getAsFlow("files/key.bin").collectToList().flatten()`
                     
                     @param path The path of the file to read in the resource's directory.
-                    @param byteCount The maximum length of the emitted byte arrays. The flow can emit an array smaller
-                                     than this length.
+                    @param byteCount The maximum length of the emitted byte arrays. The flow can emit an array smaller than this length.
                     
                     @return A flow that emits the content of the file as byte sub-arrays.
                     
