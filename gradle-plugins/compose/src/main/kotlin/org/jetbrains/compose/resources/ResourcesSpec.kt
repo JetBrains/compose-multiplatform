@@ -176,7 +176,11 @@ internal fun getResFileSpecs(
                 """.trimIndent()
                     )
                     .addParameter("path", String::class)
-                    .addParameter("byteCount", Int::class)
+                    .addParameter(
+                        ParameterSpec.builder("byteCount", Int::class)
+                            .defaultValue("%L", 8192)
+                            .build()
+                    )
                     .returns(
                         ClassName("kotlinx.coroutines.flow", "Flow")
                             .plusParameter(ByteArray::class.asTypeName())
