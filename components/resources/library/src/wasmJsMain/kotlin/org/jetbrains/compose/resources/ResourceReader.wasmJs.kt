@@ -81,7 +81,8 @@ internal external fun jsExportInt8ArrayToWasm(src: Int8Array, size: Int, dstAddr
 internal fun jsInt8ArrayToKotlinByteArray(x: Int8Array): ByteArray {
     val size = x.length
 
-    @OptIn(UnsafeWasmMemoryApi::class) return withScopedMemoryAllocator { allocator ->
+    @OptIn(UnsafeWasmMemoryApi::class)
+    return withScopedMemoryAllocator { allocator ->
         val memBuffer = allocator.allocate(size)
         val dstAddress = memBuffer.address.toInt()
         jsExportInt8ArrayToWasm(x, size, dstAddress)
