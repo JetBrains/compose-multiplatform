@@ -51,7 +51,7 @@ fun FileRes(paddingValues: PaddingValues) {
         )
         Text(
             modifier = Modifier.padding(16.dp),
-            text = "File: 'files/icon.xml'",
+            text = "File: 'files/platform-text.txt'",
             style = MaterialTheme.typography.titleLarge
         )
         OutlinedCard(
