@@ -172,7 +172,7 @@ internal fun getResFileSpecs(
                     if any IO error occurs. You can catch those with the [catch][kotlinx.coroutines.flow.catch] operator.
                     This function is useful when the resource is too big to be contained in a single [ByteArray].
                     
-                    Example: `val bytes = Res.getAsFlow("files/key.bin").collectToList().flatten()`
+                    Example: `val bytes = Res.getAsFlow("files/key.bin").toList().flatMap { it.asList() }`
                     
                     @param path The path of the file to read in the resource's directory.
                     @param byteCount The maximum length of the emitted byte arrays. The flow can emit an array smaller than this length.
