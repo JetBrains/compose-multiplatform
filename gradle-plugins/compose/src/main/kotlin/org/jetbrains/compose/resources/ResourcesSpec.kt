@@ -157,6 +157,9 @@ internal fun getResFileSpecs(
                     .build()
             )
 
+            val defaultResourceChunkSize = MemberName(
+                "org.jetbrains.compose.resources", "DEFAULT_RESOURCE_CHUNK_SIZE"
+            )
             val getResourceAsFlow = MemberName("org.jetbrains.compose.resources", "getResourceAsFlow")
             resObject.addFunction(
                 FunSpec.builder("getAsFlow")
@@ -176,13 +179,13 @@ internal fun getResFileSpecs(
                     
                     @return A flow that emits the content of the file as byte sub-arrays.
                     
-                    @throws IllegalArgumentException - when [byteCount] is not positive.
+                    @throws IllegalArgumentException When [byteCount] is not positive.
                 """.trimIndent()
                     )
                     .addParameter("path", String::class)
                     .addParameter(
                         ParameterSpec.builder("byteCount", Int::class)
-                            .defaultValue("%L", 8192)
+                            .defaultValue("%M", defaultResourceChunkSize)
                             .build()
                     )
                     .returns(

@@ -33,10 +33,16 @@ expect suspend fun readResourceBytes(path: String): ByteArray
  *
  * @return A flow that emits the content of the file as byte sub-arrays.
  *
- * @throws IllegalArgumentException - when [byteCount] is not positive.
+ * @throws IllegalArgumentException When [byteCount] is not positive.
  */
 @InternalResourceApi
-expect fun getResourceAsFlow(path: String, byteCount: Int = 8192): Flow<ByteArray>
+expect fun getResourceAsFlow(path: String, byteCount: Int = DEFAULT_RESOURCE_CHUNK_SIZE): Flow<ByteArray>
+
+/**
+ * The default size of byte array chunks emitted by flows built with [getResourceAsFlow].
+ */
+@InternalResourceApi
+const val DEFAULT_RESOURCE_CHUNK_SIZE: Int = 8192
 
 internal interface ResourceReader {
     suspend fun read(path: String): ByteArray
