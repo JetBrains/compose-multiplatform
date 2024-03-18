@@ -6,7 +6,9 @@ import platform.UIKit.UIUserInterfaceStyle
 
 @OptIn(InternalResourceApi::class)
 internal actual fun getSystemEnvironment(): ResourceEnvironment {
-    val locale = NSLocale.currentLocale()
+    val locale = NSLocale.preferredLanguages.firstOrNull()
+        ?.let { NSLocale(it as String) }
+        ?: NSLocale.currentLocale
 
     val languageCode = locale.languageCode
     val regionCode = locale.objectForKey(NSLocaleCountryCode) as? String
