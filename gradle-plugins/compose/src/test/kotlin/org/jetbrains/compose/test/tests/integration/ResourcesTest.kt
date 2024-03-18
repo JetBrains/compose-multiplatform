@@ -337,6 +337,36 @@ class ResourcesTest : GradlePluginTestBase() {
         }
     }
 
+    @Test
+    fun testAndroidFonts(): Unit = with(testProject("misc/commonResources")) {
+        val commonResourcesDir = file("src/commonMain/composeResources")
+        val commonResourcesFiles = commonResourcesDir.walkTopDown()
+            .filter { !it.isDirectory && !it.isHidden }
+            .map { it.relativeTo(commonResourcesDir).invariantSeparatorsPath }
+
+        gradle("assembleDebug").checks {
+            check.taskSuccessful(":copyDebugFontsToAndroidAssets")
+
+            getAndroidApk("", "debug", "Resources-Test").let { apk ->
+                checkResourcesInZip(apk, commonResourcesFiles, true)
+            }
+        }
+
+        file("src/commonMain/composeResources/font-en").renameTo(
+            file("src/commonMain/composeResources/font-mdpi")
+        )
+        val newCommonResourcesFiles = commonResourcesDir.walkTopDown()
+            .filter { !it.isDirectory && !it.isHidden }
+            .map { it.relativeTo(commonResourcesDir).invariantSeparatorsPath }
+        gradle("assembleDebug").checks {
+            check.taskSuccessful(":copyDebugFontsToAndroidAssets")
+
+            getAndroidApk("", "debug", "Resources-Test").let { apk ->
+                checkResourcesInZip(apk, newCommonResourcesFiles, true)
+            }
+        }
+    }
+
     private fun File.writeNewFile(text: String) {
         parentFile.mkdirs()
         createNewFile()
