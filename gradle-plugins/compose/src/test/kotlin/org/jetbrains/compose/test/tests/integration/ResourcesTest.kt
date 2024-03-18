@@ -292,21 +292,41 @@ class ResourcesTest : GradlePluginTestBase() {
             check.taskSuccessful(":copyFullDebugFontsToAndroidAssets")
             check.taskSuccessful(":copyFullReleaseFontsToAndroidAssets")
 
-            checkAndroidApk("demo", "debug", commonResourcesFiles)
-            checkAndroidApk("demo", "release", commonResourcesFiles)
-            checkAndroidApk("full", "debug", commonResourcesFiles)
-            checkAndroidApk("full", "release", commonResourcesFiles)
+            getAndroidApk("demo", "debug", "Resources-Test").let { apk ->
+                checkResourcesInZip(apk, commonResourcesFiles, true)
+                assertEquals(
+                    "android demo-debug",
+                    readFileInZip(apk, "files/platform.txt").decodeToString()
+                )
+            }
+            getAndroidApk("demo", "release", "Resources-Test").let { apk ->
+                checkResourcesInZip(apk, commonResourcesFiles, true)
+                assertEquals(
+                    "android demo-release",
+                    readFileInZip(apk, "files/platform.txt").decodeToString()
+                )
+            }
+            getAndroidApk("full", "debug", "Resources-Test").let { apk ->
+                checkResourcesInZip(apk, commonResourcesFiles, true)
+                assertEquals(
+                    "android full-debug",
+                    readFileInZip(apk, "files/platform.txt").decodeToString()
+                )
+            }
+            getAndroidApk("full", "release", "Resources-Test").let { apk ->
+                checkResourcesInZip(apk, commonResourcesFiles, true)
+                assertEquals(
+                    "android full-release",
+                    readFileInZip(apk, "files/platform.txt").decodeToString()
+                )
+            }
 
-            val desktopJar = file("build/libs/Resources-Test-desktop.jar")
-            assertTrue(desktopJar.exists())
-            ZipFile(desktopJar).use { zip ->
-                commonResourcesFiles.forEach { res ->
-                    assertNotNull(zip.getEntry(res))
-                }
-                val platformTxt = zip.getEntry("files/platform.txt")
-                assertNotNull(platformTxt)
-                val text = zip.getInputStream(platformTxt).readBytes().decodeToString()
-                assertEquals("desktop", text)
+            file("build/libs/Resources-Test-desktop.jar").let { jar ->
+                checkResourcesInZip(jar, commonResourcesFiles, false)
+                assertEquals(
+                    "desktop",
+                    readFileInZip(jar, "files/platform.txt").decodeToString()
+                )
             }
 
             val jsBuildDir = file("build/dist/js/productionExecutable")
@@ -323,24 +343,35 @@ class ResourcesTest : GradlePluginTestBase() {
         writeText(text)
     }
 
-    private fun TestProject.checkAndroidApk(flavor: String, type: String, commonResourcesFiles: Sequence<String>) {
-        val apk = file("build/outputs/apk/$flavor/$type/Resources-Test-$flavor-$type.apk")
-        assertTrue(apk.exists())
-        ZipFile(apk).use { zip ->
+    private fun TestProject.getAndroidApk(flavor: String, type: String, name: String): File {
+        return if (flavor.isNotEmpty()) {
+            file("build/outputs/apk/$flavor/$type/$name-$flavor-$type.apk")
+        } else {
+            file("build/outputs/apk/$type/$name-$type.apk")
+        }
+    }
+
+    private fun checkResourcesInZip(file: File, commonResourcesFiles: Sequence<String>, isAndroid: Boolean) {
+        println("check ZIP: '${file.path}'")
+        assertTrue(file.exists())
+        ZipFile(file).use { zip ->
             commonResourcesFiles.forEach { res ->
-                if (res == "font/emptyFont.otf") {
+                println("check '$res' file")
+                if (isAndroid && res.startsWith("font")) {
                     //android fonts should be only in assets
                     assertNull(zip.getEntry(res), "file = '$res'")
+                    assertNotNull(zip.getEntry("assets/$res"), "file = 'assets/$res'")
                 } else {
                     assertNotNull(zip.getEntry(res), "file = '$res'")
                 }
             }
-            assertNotNull(zip.getEntry("assets/font/emptyFont.otf"), "file = 'assets/font/emptyFont.otf'")
-            val platformTxt = zip.getEntry("files/platform.txt")
-            assertNotNull(platformTxt, "file = 'files/platform.txt'")
-            val text = zip.getInputStream(platformTxt).readBytes().decodeToString()
-            assertEquals("android $flavor-$type", text)
         }
+    }
+
+    private fun readFileInZip(file: File, path: String): ByteArray = ZipFile(file).use { zip ->
+        val platformTxt = zip.getEntry(path)
+        assertNotNull(platformTxt, "file = '$path'")
+        zip.getInputStream(platformTxt).readBytes()
     }
 
     @Test
