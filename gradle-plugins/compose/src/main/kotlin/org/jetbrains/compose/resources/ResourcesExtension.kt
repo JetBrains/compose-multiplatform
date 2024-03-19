@@ -15,7 +15,7 @@ abstract class ResourcesExtension {
      * If it is empty then `{group name}.{module name}.generated.resources` will be used.
      *
      */
-    var resourceProjectId: String = ""
+    var packageOfResClass: String = ""
 
     enum class ResourceClassGeneration { Auto, Always }
 

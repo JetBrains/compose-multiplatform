@@ -57,5 +57,5 @@ compose {
 
 compose.resources {
     publicResClass = true
-    resourceProjectId = "me.sample.library.resources"
+    packageOfResClass = "me.sample.library.resources"
 }

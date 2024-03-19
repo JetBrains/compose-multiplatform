@@ -39,8 +39,8 @@ private val androidPluginIds = listOf(
 )
 
 internal fun Project.configureComposeResources(config: ResourcesExtension) {
-    val projectId = provider {
-        config.resourceProjectId.takeIf { it.isNotEmpty() } ?: run {
+    val resourcePackage = provider {
+        config.packageOfResClass.takeIf { it.isNotEmpty() } ?: run {
             val groupName = project.group.toString().lowercase().asUnderscoredIdentifier()
             val moduleName = project.name.lowercase().asUnderscoredIdentifier()
             val id = if (groupName.isNotEmpty()) "$groupName.$moduleName" else moduleName
@@ -62,7 +62,7 @@ internal fun Project.configureComposeResources(config: ResourcesExtension) {
             configureKmpResources(
                 kotlinExtension,
                 extraProperties.get(KMP_RES_EXT)!!,
-                projectId,
+                resourcePackage,
                 publicResClass,
                 generateResClassMode
             )
@@ -88,7 +88,7 @@ internal fun Project.configureComposeResources(config: ResourcesExtension) {
             configureComposeResources(
                 kotlinExtension,
                 KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME,
-                projectId,
+                resourcePackage,
                 publicResClass,
                 generateResClassMode
             )
@@ -107,7 +107,7 @@ internal fun Project.configureComposeResources(config: ResourcesExtension) {
         configureComposeResources(
             kotlinExtension,
             SourceSet.MAIN_SOURCE_SET_NAME,
-            projectId,
+            resourcePackage,
             publicResClass,
             generateResClassMode
         )
@@ -117,7 +117,7 @@ internal fun Project.configureComposeResources(config: ResourcesExtension) {
 private fun Project.configureComposeResources(
     kotlinExtension: KotlinProjectExtension,
     commonSourceSetName: String,
-    projectId: Provider<String>,
+    resourcePackage: Provider<String>,
     publicResClass: Provider<Boolean>,
     generateResClassMode: Provider<ResourcesExtension.ResourceClassGeneration>
 ) {
@@ -134,7 +134,7 @@ private fun Project.configureComposeResources(
             configureResourceGenerator(
                 composeResourcesPath,
                 sourceSet,
-                projectId,
+                resourcePackage,
                 publicResClass,
                 generateResClassMode,
                 false
@@ -147,7 +147,7 @@ private fun Project.configureComposeResources(
 private fun Project.configureKmpResources(
     kotlinExtension: KotlinProjectExtension,
     kmpResources: Any,
-    projectId: Provider<String>,
+    resourcePackage: Provider<String>,
     publicResClass: Provider<Boolean>,
     generateResClassMode: Provider<ResourcesExtension.ResourceClassGeneration>
 ) {
@@ -171,7 +171,7 @@ private fun Project.configureKmpResources(
                         if (target is KotlinAndroidTarget) listOf("**/font*/*") else emptyList()
                     )
                 },
-                projectId.asModuleDir()
+                resourcePackage.asModuleDir()
             )
 
             if (target is KotlinAndroidTarget) {
@@ -186,7 +186,7 @@ private fun Project.configureKmpResources(
                             emptyList()
                         )
                     },
-                    projectId.asModuleDir()
+                    resourcePackage.asModuleDir()
                 )
             }
         }
@@ -199,7 +199,7 @@ private fun Project.configureKmpResources(
             configureResourceGenerator(
                 composeResourcesPath,
                 sourceSet,
-                projectId,
+                resourcePackage,
                 publicResClass,
                 generateResClassMode,
                 true
@@ -293,7 +293,7 @@ private fun Project.configureAndroidComposeResources(
 private fun Project.configureResourceGenerator(
     commonComposeResourcesDir: File,
     commonSourceSet: KotlinSourceSet,
-    projectId: Provider<String>,
+    resourcePackage: Provider<String>,
     publicResClass: Provider<Boolean>,
     generateResClassMode: Provider<ResourcesExtension.ResourceClassGeneration>,
     generateModulePath: Boolean
@@ -330,14 +330,14 @@ private fun Project.configureResourceGenerator(
         "generateComposeResClass",
         GenerateResClassTask::class.java
     ) { task ->
-        task.packageName.set(projectId)
+        task.packageName.set(resourcePackage)
         task.shouldGenerateResClass.set(shouldGenerateResClass)
         task.makeResClassPublic.set(publicResClass)
         task.resDir.set(commonComposeResourcesDir)
         task.codeDir.set(buildDir("$RES_GEN_DIR/kotlin"))
 
         if (generateModulePath) {
-            task.moduleDir.set(projectId.asModuleDir())
+            task.moduleDir.set(resourcePackage.asModuleDir())
         }
     }
 

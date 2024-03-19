@@ -131,7 +131,7 @@ class ResourcesTest : GradlePluginTestBase() {
             txt + """
                 compose.resources {
                     publicResClass = true
-                    resourceProjectId = "my.lib.res"
+                    packageOfResClass = "my.lib.res"
                 }
             """.trimIndent()
         }
