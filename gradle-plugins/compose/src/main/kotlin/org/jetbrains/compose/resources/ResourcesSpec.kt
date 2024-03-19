@@ -131,7 +131,6 @@ internal fun getResFileSpecs(
             resObject.addModifiers(KModifier.INTERNAL)
             resObject.addAnnotation(experimentalAnnotation)
 
-            //readFileBytes
             val readResourceBytes = MemberName("org.jetbrains.compose.resources", "readResourceBytes")
             resObject.addFunction(
                 FunSpec.builder("readBytes")
@@ -149,6 +148,26 @@ internal fun getResFileSpecs(
                     .addModifiers(KModifier.SUSPEND)
                     .returns(ByteArray::class)
                     .addStatement("""return %M("$moduleDir" + path)""", readResourceBytes)
+                    .build()
+            )
+
+            val convertPathToUri = MemberName("org.jetbrains.compose.resources", "convertPathToUri")
+            resObject.addFunction(
+                FunSpec.builder("getAsUri")
+                    .addKdoc(
+                        """
+                    Converts a given file path to a platform dependent URI string.
+                    
+                    Example: `val uri = Res.getAsUri("files/key.bin")`
+                    
+                    @param path The file path to be converted to a URI.
+                    @return The URI representation of the given file path.
+                """.trimIndent()
+                    )
+                    .addParameter("path", String::class)
+                    .addModifiers(KModifier.SUSPEND)
+                    .returns(String::class)
+                    .addStatement("""return %M("$moduleDir" + path)""", convertPathToUri)
                     .build()
             )
             ResourceType.values().forEach { type ->
