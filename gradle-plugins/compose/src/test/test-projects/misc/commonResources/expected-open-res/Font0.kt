@@ -19,7 +19,10 @@ public val Res.font.emptyFont: FontResource
 @ExperimentalResourceApi
 private fun init_emptyFont(): FontResource = org.jetbrains.compose.resources.FontResource(
   "font:emptyFont",
-    setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(), "font/emptyFont.otf"),
-    )
+  setOf(
+
+    org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.LanguageQualifier("en"),
+    ), "font-en/emptyFont.otf"),
+    org.jetbrains.compose.resources.ResourceItem(setOf(), "font/emptyFont.otf"),
+  )
 )
