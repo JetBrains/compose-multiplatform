@@ -11,6 +11,8 @@ import me.sample.app.MyFeatureText
 import me.sample.library.MyLibraryText
 import org.jetbrains.compose.resources.stringResource
 import kmpresourcepublication.appmodule.generated.resources.*
+import me.sample.library.resources.Res as LibRes
+import me.sample.library.resources.*
 import kotlin.test.Test
 
 @OptIn(ExperimentalTestApi::class)
@@ -28,11 +30,18 @@ class ComposeAppTest {
                 )
                 MyFeatureText(Modifier.testTag("feature-text"), txt)
                 MyLibraryText(Modifier.testTag("library-text"), txt)
+
+                //direct read a resource from library
+                Text(
+                    modifier = Modifier.testTag("library-resource-text"),
+                    text = stringResource(LibRes.string.str_1)
+                )
             }
         }
 
         onNodeWithTag("app-text").assertTextEquals("test text: App text str_1")
         onNodeWithTag("feature-text").assertTextEquals("test text: Feature text str_1")
         onNodeWithTag("library-text").assertTextEquals("test text: Library text str_1")
+        onNodeWithTag("library-resource-text").assertTextEquals("Library text str_1")
     }
 }
