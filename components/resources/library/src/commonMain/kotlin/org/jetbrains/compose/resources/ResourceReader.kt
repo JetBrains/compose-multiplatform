@@ -14,6 +14,15 @@ class MissingResourceException(path: String) : Exception("Missing resource with 
 @InternalResourceApi
 expect suspend fun readResourceBytes(path: String): ByteArray
 
+/**
+ * Converts a given file path to a platform dependent URI string.
+ *
+ * @param path The file path to be converted to a URI.
+ * @return The URI representation of the given file path.
+ */
+@InternalResourceApi
+expect suspend fun convertPathToUri(path: String): String
+
 internal interface ResourceReader {
     suspend fun read(path: String): ByteArray
 }
