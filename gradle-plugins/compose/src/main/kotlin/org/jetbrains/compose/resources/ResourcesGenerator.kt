@@ -359,7 +359,8 @@ internal abstract class CopyAndroidFontsToAssetsTask : DefaultTask() {
     @get:Inject
     abstract val fileSystem: FileSystemOperations
 
-    @get:InputDirectory
+    @get:InputFiles
+    @get:IgnoreEmptyDirectories
     abstract val from: Property<File>
 
     @get:OutputDirectory
