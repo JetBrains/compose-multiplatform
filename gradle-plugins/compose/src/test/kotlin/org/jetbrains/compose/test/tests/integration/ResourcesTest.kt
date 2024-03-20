@@ -119,7 +119,21 @@ class ResourcesTest : GradlePluginTestBase() {
             )
         }
 
+        file("src/commonMain/composeResources/values/strings.xml").renameTo(
+            file("src/commonMain/composeResources/values/colors.xml")
+        )
+        gradle("generateComposeResClass").checks {
+            check.logContains(
+                """
+                Forbidden file name 'colors.xml'! Only a file for string resources named 'strings.xml' is valid in the 'values' folder.
+            """.trimIndent()
+            )
+        }
+
         //restore defaults
+        file("src/commonMain/composeResources/values/colors.xml").renameTo(
+            file("src/commonMain/composeResources/values/strings.xml")
+        )
         file("src/commonMain/composeResources/string-us").renameTo(
             file("src/commonMain/composeResources/drawable-en")
         )
