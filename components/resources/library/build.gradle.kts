@@ -1,5 +1,5 @@
 import org.jetbrains.compose.ExperimentalComposeLibrary
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
@@ -65,12 +65,27 @@ kotlin {
         //  │    ┌───┴───┐      │   ┌───┴───┐
         // web   ios    macos   desktop    android
 
+        // For plurals support
+        val generatePluralRuleListsTask = tasks.register<GeneratePluralRuleListsTask>("generatePluralRuleLists") {
+            pluralsFile = project.layout.projectDirectory.file(
+                "src/commonMain/kotlin/org/jetbrains/compose/resources/intl/plurals.xml"
+            )
+            outputDir = project.layout.buildDirectory.dir(
+                "generated/intl/kotlin"
+            )
+        }
+
+        tasks.withType<KotlinCompile<*>> {
+            dependsOn(generatePluralRuleListsTask)
+        }
+
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(libs.kotlinx.coroutines.core)
             }
+            kotlin.srcDir(generatePluralRuleListsTask.flatMap { it.outputDir })
         }
         val commonTest by getting {
             dependencies {
