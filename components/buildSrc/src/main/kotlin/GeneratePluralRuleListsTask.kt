@@ -21,46 +21,32 @@ abstract class GeneratePluralRuleListsTask : DefaultTask() {
     abstract val pluralsFile: RegularFileProperty
 
     @get:OutputDirectory
-    abstract val outputDir: DirectoryProperty
+    abstract val mainDir: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val testDir: DirectoryProperty
 
     @TaskAction
     fun generatePluralRuleLists() {
-        val outputDir = outputDir.get().asFile
-        if (outputDir.exists()) {
-            outputDir.deleteRecursively()
-        }
-        outputDir.mkdirs()
+        generateDirectories()
 
         val pluralRuleLists = parsePluralRuleLists()
-        val pluralRuleListIndexByLocale = pluralRuleLists.flatMapIndexed { idx, pluralRuleList ->
-            pluralRuleList.locales.map { locale ->
-                locale to idx
-            }
-        }
 
-        val fileContent = """
-            package org.jetbrains.compose.resources.intl
-            
-            internal val cldrPluralRuleListIndexByLocale = mapOf(
-                ${pluralRuleListIndexByLocale.joinToString { (locale, idx) -> "\"$locale\" to $idx" }}
-            )
-            
-            internal val cldrPluralRuleLists = arrayOf(
-                ${
-            pluralRuleLists.joinToString { pluralRuleList ->
-                """
-                        arrayOf(${
-                    pluralRuleList.rules.joinToString { rule ->
-                        "PluralCategory.${rule.count.uppercase()} to \"${rule.rule}\""
-                    }
-                })
-                    """.trimIndent()
-            }
-        }
-            )
-        """.trimIndent()
+        val mainContent = generateMainContent(pluralRuleLists)
+        mainDir.get().asFile.resolve("cldr.kt").writeText(mainContent)
 
-        outputDir.resolve("generated.kt").writeText(fileContent)
+        val testContent = generateTestContent(pluralRuleLists)
+        testDir.get().asFile.resolve("cldr.test.kt").writeText(testContent)
+    }
+
+    private fun generateDirectories() {
+        for (directoryProperty in arrayOf(mainDir, testDir)) {
+            val directory = directoryProperty.get().asFile
+            if (directory.exists()) {
+                directory.deleteRecursively()
+            }
+            directory.mkdirs()
+        }
     }
 
     private fun parsePluralRuleLists(): List<PluralRuleList> {
@@ -76,14 +62,69 @@ abstract class GeneratePluralRuleListsTask : DefaultTask() {
             PluralRuleList(
                 locales,
                 pluralRules.children().filterIsInstance<Node>().map { pluralRule ->
+                    val rule = pluralRule.text().split('@')
                     PluralRule(
                         pluralRule.attribute("count").toString(),
                         // trim samples as not needed
-                        pluralRule.text().split('@')[0].trim(),
+                        rule[0].trim(),
+                        rule.firstOrNull { it.startsWith("integer") }?.substringAfter("integer")?.trim() ?: "",
+                        rule.firstOrNull { it.startsWith("decimal") }?.substringAfter("decimal")?.trim() ?: "",
                     )
                 }
             )
         }
+    }
+
+    private fun generateMainContent(pluralRuleLists: List<PluralRuleList>): String {
+        val pluralRuleListIndexByLocale = pluralRuleLists.flatMapIndexed { idx, pluralRuleList ->
+            pluralRuleList.locales.map { locale ->
+                locale to idx
+            }
+        }
+
+        return """
+            package org.jetbrains.compose.resources.intl
+            
+            internal val cldrPluralRuleListIndexByLocale = mapOf(
+                ${pluralRuleListIndexByLocale.joinToString { (locale, idx) -> "\"$locale\" to $idx" }}
+            )
+            
+            internal val cldrPluralRuleLists = arrayOf(${
+                pluralRuleLists.joinToString { pluralRuleList ->
+                    """
+                        arrayOf(${
+                            pluralRuleList.rules.joinToString { rule ->
+                                "PluralCategory.${rule.count.uppercase()} to \"${rule.rule}\""
+                            }
+                        })
+                    """.trimIndent()
+                }
+            })
+        """.trimIndent()
+    }
+
+    private fun generateTestContent(pluralRuleLists: List<PluralRuleList>): String {
+        val pluralRuleIntegerSamplesByLocale = pluralRuleLists.flatMap { pluralRuleList ->
+            pluralRuleList.locales.map { locale ->
+                locale to pluralRuleList.rules.map { it.count to it.integerSample }
+            }
+        }
+
+        return """
+            package org.jetbrains.compose.resources
+            
+            import org.jetbrains.compose.resources.intl.PluralCategory
+            
+            internal val cldrPluralRuleIntegerSamples = arrayOf(${
+                pluralRuleIntegerSamplesByLocale.joinToString { (locale, samples) ->
+                    """"$locale" to arrayOf(${
+                        samples.joinToString { (count, sample) ->
+                            "PluralCategory.${count.uppercase()} to \"$sample\""
+                        }
+                    } )""".trimIndent()
+                }
+            })
+        """.trimIndent()
     }
 }
 
@@ -95,4 +136,6 @@ private data class PluralRuleList(
 private data class PluralRule(
     val count: String,
     val rule: String,
+    val integerSample: String,
+    val decimalSample: String,
 )

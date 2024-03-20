@@ -70,9 +70,8 @@ kotlin {
             pluralsFile = project.layout.projectDirectory.file(
                 "src/commonMain/kotlin/org/jetbrains/compose/resources/intl/plurals.xml"
             )
-            outputDir = project.layout.buildDirectory.dir(
-                "generated/intl/kotlin"
-            )
+            mainDir = project.layout.buildDirectory.dir("generated/intl/commonMain/kotlin")
+            testDir = project.layout.buildDirectory.dir("generated/intl/commonTest/kotlin")
         }
 
         tasks.withType<KotlinCompile<*>> {
@@ -85,7 +84,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(libs.kotlinx.coroutines.core)
             }
-            kotlin.srcDir(generatePluralRuleListsTask.flatMap { it.outputDir })
+            kotlin.srcDir(generatePluralRuleListsTask.flatMap { it.mainDir })
         }
         val commonTest by getting {
             dependencies {
@@ -95,6 +94,7 @@ kotlin {
                 @OptIn(ExperimentalComposeLibrary::class)
                 implementation(compose.uiTest)
             }
+            kotlin.srcDir(generatePluralRuleListsTask.flatMap { it.testDir })
         }
         val blockingMain by creating {
             dependsOn(commonMain)
