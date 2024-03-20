@@ -102,8 +102,11 @@ internal abstract class GenerateResClassTask : DefaultTask() {
 
         if (typeString == "values" && file.name.equals("strings.xml", true)) {
             val stringIds = getStringIds(file)
+            val quantityStringIds = getQuantityStringIds(file)
             return stringIds.map { strId ->
                 ResourceItem(ResourceType.STRING, qualifiers, strId.asUnderscoredIdentifier(), path)
+            } + quantityStringIds.map { quantityStrId ->
+                ResourceItem(ResourceType.QUANTITY_STRING, qualifiers, quantityStrId.asUnderscoredIdentifier(), path)
             }
         }
 
@@ -117,6 +120,15 @@ internal abstract class GenerateResClassTask : DefaultTask() {
         val items = doc.getElementsByTagName("resources").item(0).childNodes
         val ids = List(items.length) { items.item(it) }
             .filter { it.nodeName in stringTypeNames }
+            .map { it.attributes.getNamedItem("name").nodeValue }
+        return ids.toSet()
+    }
+
+    private fun getQuantityStringIds(stringsXml: File): Set<String> {
+        val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(stringsXml)
+        val items = doc.getElementsByTagName("resources").item(0).childNodes
+        val ids = List(items.length) { items.item(it) }
+            .filter { it.nodeName == "plurals" }
             .map { it.attributes.getNamedItem("name").nodeValue }
         return ids.toSet()
     }
