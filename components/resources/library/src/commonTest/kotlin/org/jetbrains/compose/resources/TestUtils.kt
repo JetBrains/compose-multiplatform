@@ -13,3 +13,21 @@ internal fun TestQuantityStringResource(key: String) = QuantityStringResource(
     key,
     setOf(ResourceItem(emptySet(), "strings.xml"))
 )
+
+fun parsePluralSamples(samples: String): List<Int> {
+    return samples.split(',').flatMap {
+        val range = it.trim()
+        when {
+            range.isEmpty() -> emptyList()
+            range in arrayOf("…", "...") -> emptyList()
+            // ignore numbers in compact exponent format
+            range.contains('c') || range.contains('e') -> emptyList()
+            range.contains('~') -> {
+                val (start, endInclusive) = range.split('~')
+                return@flatMap (start.toInt()..endInclusive.toInt()).toList()
+            }
+
+            else -> listOf(range.toInt())
+        }
+    }
+}
