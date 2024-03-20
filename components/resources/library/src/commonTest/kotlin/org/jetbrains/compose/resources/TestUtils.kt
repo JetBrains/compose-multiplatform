@@ -1,5 +1,9 @@
 package org.jetbrains.compose.resources
 
+import org.jetbrains.compose.resources.intl.PluralCategory
+import org.jetbrains.compose.resources.intl.PluralRule
+import org.jetbrains.compose.resources.intl.PluralRuleList
+
 @OptIn(InternalResourceApi::class, ExperimentalResourceApi::class)
 internal fun TestStringResource(key: String) = StringResource(
     "STRING:$key",
@@ -14,7 +18,7 @@ internal fun TestQuantityStringResource(key: String) = QuantityStringResource(
     setOf(ResourceItem(emptySet(), "strings.xml"))
 )
 
-fun parsePluralSamples(samples: String): List<Int> {
+internal fun parsePluralSamples(samples: String): List<Int> {
     return samples.split(',').flatMap {
         val range = it.trim()
         when {
@@ -30,4 +34,9 @@ fun parsePluralSamples(samples: String): List<Int> {
             else -> listOf(range.toInt())
         }
     }
+}
+
+internal fun pluralRuleListOf(vararg rules: Pair<PluralCategory, String>): PluralRuleList {
+    val pluralRules = rules.map { PluralRule(it.first, it.second) } + PluralRule(PluralCategory.OTHER, "")
+    return PluralRuleList(pluralRules.toTypedArray())
 }
