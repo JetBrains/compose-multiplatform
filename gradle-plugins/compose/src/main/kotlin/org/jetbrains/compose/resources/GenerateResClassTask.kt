@@ -102,11 +102,11 @@ internal abstract class GenerateResClassTask : DefaultTask() {
 
         if (typeString == "values" && file.name.equals("strings.xml", true)) {
             val stringIds = getStringIds(file)
-            val quantityStringIds = getQuantityStringIds(file)
+            val pluralStringIds = getPluralStringIds(file)
             return stringIds.map { strId ->
                 ResourceItem(ResourceType.STRING, qualifiers, strId.asUnderscoredIdentifier(), path)
-            } + quantityStringIds.map { quantityStrId ->
-                ResourceItem(ResourceType.QUANTITY_STRING, qualifiers, quantityStrId.asUnderscoredIdentifier(), path)
+            } + pluralStringIds.map { pluralStrId ->
+                ResourceItem(ResourceType.PLURAL_STRING, qualifiers, pluralStrId.asUnderscoredIdentifier(), path)
             }
         }
 
@@ -124,7 +124,7 @@ internal abstract class GenerateResClassTask : DefaultTask() {
         return ids.toSet()
     }
 
-    private fun getQuantityStringIds(stringsXml: File): Set<String> {
+    private fun getPluralStringIds(stringsXml: File): Set<String> {
         val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(stringsXml)
         val items = doc.getElementsByTagName("resources").item(0).childNodes
         val ids = List(items.length) { items.item(it) }

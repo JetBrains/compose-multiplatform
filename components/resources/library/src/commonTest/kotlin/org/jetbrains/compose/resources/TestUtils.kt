@@ -12,7 +12,7 @@ internal fun TestStringResource(key: String) = StringResource(
 )
 
 @OptIn(InternalResourceApi::class, ExperimentalResourceApi::class)
-internal fun TestQuantityStringResource(key: String) = QuantityStringResource(
+internal fun TestPluralStringResource(key: String) = PluralStringResource(
     "PLURALS:$key",
     key,
     setOf(ResourceItem(emptySet(), "strings.xml"))
