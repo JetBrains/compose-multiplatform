@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.resources
 
+import kotlinx.coroutines.test.runTest
 import org.jetbrains.compose.resources.intl.PluralCategory
 import org.jetbrains.compose.resources.intl.PluralRuleList
 import kotlin.test.*
@@ -17,9 +18,9 @@ class PluralRulesTest {
      * Tests the actual language pluralization rules with the integer samples given by Unicode.
      */
     @Test
-    fun testIntegerSamples() {
+    fun testIntegerSamples() = runTest {
         for ((locale, samplesByCategory) in cldrPluralRuleIntegerSamples) {
-            val pluralRuleList = PluralRuleList.createInstance(locale)
+            val pluralRuleList = PluralRuleList.getInstance(locale)
             for ((category, samples) in samplesByCategory) {
                 for (sample in parsePluralSamples(samples)) {
                     assertEquals(category, pluralRuleList.getCategory(sample))

@@ -22,7 +22,7 @@ internal class PluralRuleList(private val rules: Array<PluralRule>) {
 
     companion object {
         private val cacheMutex = Mutex()
-        private val cache = mutableMapOf<String, Deferred<PluralRuleList>>()
+        private val cache = Array<Deferred<PluralRuleList>?>(cldrPluralRuleLists.size) { null }
         private val emptyList = PluralRuleList(emptyArray())
 
         @OptIn(InternalResourceApi::class)
@@ -31,13 +31,19 @@ internal class PluralRuleList(private val rules: Array<PluralRule>) {
             regionQualifier: RegionQualifier,
         ): PluralRuleList {
             val cldrLocaleName = buildCldrLocaleName(languageQualifier, regionQualifier) ?: return emptyList
+            return getInstance(cldrLocaleName)
+        }
+
+        suspend fun getInstance(cldrLocaleName: String): PluralRuleList {
+            val listIndex = cldrPluralRuleListIndexByLocale[cldrLocaleName]!!
             return coroutineScope {
                 val deferred = cacheMutex.withLock {
-                    cache.getOrPut(cldrLocaleName) {
-                        async(start = CoroutineStart.LAZY) {
-                            createInstance(cldrLocaleName)
+                    if (cache[listIndex] == null) {
+                        cache[listIndex] = async(start = CoroutineStart.LAZY) {
+                            createInstance(listIndex)
                         }
                     }
+                    cache[listIndex]!!
                 }
                 deferred.await()
             }
@@ -58,8 +64,7 @@ internal class PluralRuleList(private val rules: Array<PluralRule>) {
             return null
         }
 
-        internal fun createInstance(cldrLocaleName: String): PluralRuleList {
-            val cldrPluralRuleListIndex = cldrPluralRuleListIndexByLocale[cldrLocaleName]!!
+        private fun createInstance(cldrPluralRuleListIndex: Int): PluralRuleList {
             val cldrPluralRuleList = cldrPluralRuleLists[cldrPluralRuleListIndex]
             val pluralRules = cldrPluralRuleList.map { PluralRule(it.first, it.second) }
             return PluralRuleList(pluralRules.toTypedArray())
