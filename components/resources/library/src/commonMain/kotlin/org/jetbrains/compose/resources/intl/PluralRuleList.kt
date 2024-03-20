@@ -58,7 +58,7 @@ internal class PluralRuleList private constructor(private val rules: Array<Plura
             return null
         }
 
-        private fun createInstance(cldrLocaleName: String): PluralRuleList {
+        internal fun createInstance(cldrLocaleName: String): PluralRuleList {
             val cldrPluralRuleListIndex = cldrPluralRuleListIndexByLocale[cldrLocaleName]!!
             val cldrPluralRuleList = cldrPluralRuleLists[cldrPluralRuleListIndex]
             val pluralRules = cldrPluralRuleList.map {
