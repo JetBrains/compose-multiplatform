@@ -38,7 +38,7 @@ class StringResource
 @OptIn(InternalResourceApi::class)
 @ExperimentalResourceApi
 @Immutable
-class QuantityStringResource
+class PluralStringResource
 @InternalResourceApi constructor(id: String, val key: String, items: Set<ResourceItem>) : Resource(id, items)
 
 private sealed interface StringItem {
@@ -197,10 +197,10 @@ private suspend fun loadString(
  */
 @ExperimentalResourceApi
 @Composable
-fun pluralStringResource(resource: QuantityStringResource, quantity: Int): String {
+fun pluralStringResource(resource: PluralStringResource, quantity: Int): String {
     val resourceReader = LocalResourceReader.current
     val pluralStr by rememberResourceState(resource, quantity, { "" }) { env ->
-        loadQuantityString(resource, quantity, resourceReader, env)
+        loadPluralString(resource, quantity, resourceReader, env)
     }
     return pluralStr
 }
@@ -215,12 +215,12 @@ fun pluralStringResource(resource: QuantityStringResource, quantity: Int): Strin
  * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
  */
 @ExperimentalResourceApi
-suspend fun getQuantityString(resource: QuantityStringResource, quantity: Int): String =
-    loadQuantityString(resource, quantity, DefaultResourceReader, getResourceEnvironment())
+suspend fun getPluralString(resource: PluralStringResource, quantity: Int): String =
+    loadPluralString(resource, quantity, DefaultResourceReader, getResourceEnvironment())
 
 @OptIn(InternalResourceApi::class, ExperimentalResourceApi::class)
-private suspend fun loadQuantityString(
-    resource: QuantityStringResource,
+private suspend fun loadPluralString(
+    resource: PluralStringResource,
     quantity: Int,
     resourceReader: ResourceReader,
     environment: ResourceEnvironment
@@ -251,13 +251,13 @@ private suspend fun loadQuantityString(
  */
 @ExperimentalResourceApi
 @Composable
-fun pluralStringResource(resource: QuantityStringResource, quantity: Int, vararg formatArgs: Any): String {
+fun pluralStringResource(resource: PluralStringResource, quantity: Int, vararg formatArgs: Any): String {
     val resourceReader = LocalResourceReader.current
     val args = formatArgs.map { it.toString() }
-    val quantityStr by rememberResourceState(resource, quantity, args, { "" }) { env ->
-        loadQuantityString(resource, quantity, args, resourceReader, env)
+    val pluralStr by rememberResourceState(resource, quantity, args, { "" }) { env ->
+        loadPluralString(resource, quantity, args, resourceReader, env)
     }
-    return quantityStr
+    return pluralStr
 }
 
 /**
@@ -271,8 +271,8 @@ fun pluralStringResource(resource: QuantityStringResource, quantity: Int, vararg
  * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
  */
 @ExperimentalResourceApi
-suspend fun getQuantityString(resource: QuantityStringResource, quantity: Int, vararg formatArgs: Any): String =
-    loadQuantityString(
+suspend fun getPluralString(resource: PluralStringResource, quantity: Int, vararg formatArgs: Any): String =
+    loadPluralString(
         resource, quantity,
         formatArgs.map { it.toString() },
         DefaultResourceReader,
@@ -280,14 +280,14 @@ suspend fun getQuantityString(resource: QuantityStringResource, quantity: Int, v
     )
 
 @OptIn(ExperimentalResourceApi::class)
-private suspend fun loadQuantityString(
-    resource: QuantityStringResource,
+private suspend fun loadPluralString(
+    resource: PluralStringResource,
     quantity: Int,
     args: List<String>,
     resourceReader: ResourceReader,
     environment: ResourceEnvironment
 ): String {
-    val str = loadQuantityString(resource, quantity, resourceReader, environment)
+    val str = loadPluralString(resource, quantity, resourceReader, environment)
     return str.replaceWithArgs(args)
 }
 

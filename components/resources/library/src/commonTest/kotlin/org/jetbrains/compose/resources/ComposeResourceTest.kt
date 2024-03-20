@@ -145,9 +145,9 @@ class ComposeResourceTest {
     }
 
     @Test
-    fun testQuantityStringResourceCache() = runComposeUiTest {
+    fun testPluralStringResourceCache() = runComposeUiTest {
         val testResourceReader = TestResourceReader()
-        var res by mutableStateOf(TestQuantityStringResource("plurals"))
+        var res by mutableStateOf(TestPluralStringResource("plurals"))
         var quantity by mutableStateOf(0)
         var str = ""
         setContent {
@@ -177,7 +177,7 @@ class ComposeResourceTest {
         assertEquals("other", str)
         assertEquals(3, quantity)
 
-        res = TestQuantityStringResource("another_plurals")
+        res = TestPluralStringResource("another_plurals")
         quantity = 0
         waitForIdle()
         assertEquals("another other", str)
@@ -188,13 +188,13 @@ class ComposeResourceTest {
     }
 
     @Test
-    fun testReadQuantityStringResource() = runComposeUiTest {
+    fun testReadPluralStringResource() = runComposeUiTest {
         var plurals = ""
         var another_plurals = ""
         setContent {
             CompositionLocalProvider(LocalComposeEnvironment provides TestComposeEnvironment) {
-                plurals = pluralStringResource(TestQuantityStringResource("plurals"), 1)
-                another_plurals = pluralStringResource(TestQuantityStringResource("another_plurals"), 1)
+                plurals = pluralStringResource(TestPluralStringResource("plurals"), 1)
+                another_plurals = pluralStringResource(TestPluralStringResource("another_plurals"), 1)
             }
         }
         waitForIdle()
@@ -213,8 +213,8 @@ class ComposeResourceTest {
         var str2 = ""
         setContent {
             CompositionLocalProvider(LocalComposeEnvironment provides TestComposeEnvironment) {
-                str1 = pluralStringResource(TestQuantityStringResource("messages"), quantity, 3, arg)
-                str2 = pluralStringResource(TestQuantityStringResource("messages"), quantity, 5, arg)
+                str1 = pluralStringResource(TestPluralStringResource("messages"), quantity, 3, arg)
+                str2 = pluralStringResource(TestPluralStringResource("messages"), quantity, 5, arg)
             }
         }
         waitForIdle()
@@ -233,11 +233,11 @@ class ComposeResourceTest {
     }
 
     @Test
-    fun testLoadQuantityStringResource() = runTest {
-        assertEquals("one", getQuantityString(TestQuantityStringResource("plurals"), 1))
-        assertEquals("other", getQuantityString(TestQuantityStringResource("plurals"), 5))
-        assertEquals("another one", getQuantityString(TestQuantityStringResource("another_plurals"), 1))
-        assertEquals("another other", getQuantityString(TestQuantityStringResource("another_plurals"), 5))
+    fun testLoadPluralStringResource() = runTest {
+        assertEquals("one", getPluralString(TestPluralStringResource("plurals"), 1))
+        assertEquals("other", getPluralString(TestPluralStringResource("plurals"), 5))
+        assertEquals("another one", getPluralString(TestPluralStringResource("another_plurals"), 1))
+        assertEquals("another other", getPluralString(TestPluralStringResource("another_plurals"), 5))
     }
 
     @Test
