@@ -15,7 +15,7 @@ import org.jetbrains.compose.resources.InternalResourceApi
 import org.jetbrains.compose.resources.LanguageQualifier
 import org.jetbrains.compose.resources.RegionQualifier
 
-internal class PluralRuleList private constructor(private val rules: Array<PluralRule>) {
+internal class PluralRuleList(private val rules: Array<PluralRule>) {
     fun getCategory(quantity: Int): PluralCategory {
         return rules.first { rule -> rule.appliesTo(quantity) }.category
     }
@@ -61,12 +61,7 @@ internal class PluralRuleList private constructor(private val rules: Array<Plura
         internal fun createInstance(cldrLocaleName: String): PluralRuleList {
             val cldrPluralRuleListIndex = cldrPluralRuleListIndexByLocale[cldrLocaleName]!!
             val cldrPluralRuleList = cldrPluralRuleLists[cldrPluralRuleListIndex]
-            val pluralRules = cldrPluralRuleList.map {
-                PluralRule(
-                    it.first,
-                    PluralCondition.parse(it.second),
-                )
-            }
+            val pluralRules = cldrPluralRuleList.map { PluralRule(it.first, it.second) }
             return PluralRuleList(pluralRules.toTypedArray())
         }
     }
