@@ -9,4 +9,8 @@ Donec eget turpis ac sem ultricies consequat.</string>
         <item>item \u2318</item>
         <item>item \u00BD</item>
     </string-array>
+    <plurals name="new_message">
+        <item quantity="one">%1$d new message</item>
+        <item quantity="other">%1$d new messages</item>
+    </plurals>
 </resources>

@@ -4,14 +4,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import components.resources.demo.shared.generated.resources.Res
 import components.resources.demo.shared.generated.resources.*
-import org.jetbrains.compose.resources.stringArrayResource
-import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.*
 
 @Composable
 fun StringRes(paddingValues: PaddingValues) {
@@ -92,6 +92,26 @@ fun StringRes(paddingValues: PaddingValues) {
             value = stringArrayResource(Res.string.str_arr).toString(),
             onValueChange = {},
             label = { Text("Text(stringArrayResource(Res.string.str_arr).toString())") },
+            enabled = false,
+            colors = TextFieldDefaults.colors(
+                disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                disabledContainerColor = MaterialTheme.colorScheme.surface,
+                disabledLabelColor = MaterialTheme.colorScheme.onSurface,
+            )
+        )
+        var numMessages by remember { mutableStateOf(0) }
+        OutlinedTextField(
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            value = pluralStringResource(Res.plurals.new_message, numMessages, numMessages),
+            onValueChange = {},
+            label = { Text("Text(pluralStringResource(Res.plurals.new_message, $numMessages, $numMessages))") },
+            leadingIcon = {
+                Row {
+                    IconButton({ numMessages += 1 }) {
+                        Icon(Icons.Default.Add, contentDescription = "Add Message")
+                    }
+                }
+            },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
