@@ -38,4 +38,9 @@ internal enum class PluralOperand {
      * The visible fraction digits in the source number, *without* trailing zeros, expressed as an integer.
      */
     T,
+
+    /**
+     * Compact decimal exponent value: exponent of the power of 10 used in compact decimal formatting.
+     */
+    C,
 }

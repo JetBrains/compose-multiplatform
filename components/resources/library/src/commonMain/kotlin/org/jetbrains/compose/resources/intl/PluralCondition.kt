@@ -120,6 +120,7 @@ internal sealed class PluralCondition {
                     't' -> PluralOperand.T
                     'v' -> PluralOperand.V
                     'w' -> PluralOperand.W
+                    'c', 'e' -> PluralOperand.C
                     else -> throw PluralConditionParseException(description)
                 }
             }
@@ -165,14 +166,18 @@ internal sealed class PluralCondition {
                     return start..start
                 }
                 consumeNext()
-                if (peekNext() != '.') throw PluralConditionParseException(description)
+                if (consumeNext() != '.') throw PluralConditionParseException(description)
                 val endInclusive = consumeNextInt()
                 return start..endInclusive
             }
 
             fun nextCommaOrNull(): Char? {
                 return when (peekNextOrNull()) {
-                    ',' -> ','
+                    ',' -> {
+                        consumeNext()
+                        ','
+                    }
+
                     null -> null
                     else -> throw PluralConditionParseException(description)
                 }
