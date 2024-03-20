@@ -18,12 +18,8 @@ internal class PluralRule private constructor(val category: PluralCategory, priv
         return condition.isFulfilled(n)
     }
 
-    // add appliesTo(n: Double) or appliesTo(n: Decimal) as needed
-
     private sealed class Condition {
         abstract fun isFulfilled(n: Int): Boolean
-
-        // add isFulfilled(n: Double) or isFulfilled(n: Decimal) as needed
 
         /**
          * Plural operands defined in the [Unicode Locale Data Markup Language](https://unicode.org/reports/tr35/tr35-numbers.html#Plural_Operand_Meanings).
