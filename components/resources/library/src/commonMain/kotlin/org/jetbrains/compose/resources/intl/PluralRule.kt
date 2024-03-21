@@ -21,6 +21,10 @@ internal class PluralRule private constructor(val category: PluralCategory, priv
     private sealed class Condition {
         abstract fun isFulfilled(n: Int): Boolean
 
+        abstract fun simplifyForInteger(): Condition
+
+        abstract fun equivalentForInteger(other: Condition): Boolean
+
         /**
          * Plural operands defined in the [Unicode Locale Data Markup Language](https://unicode.org/reports/tr35/tr35-numbers.html#Plural_Operand_Meanings).
          */
@@ -65,7 +69,29 @@ internal class PluralRule private constructor(val category: PluralCategory, priv
             private val left: Condition,
             private val right: Condition,
         ) : Condition() {
-            override fun isFulfilled(n: Int): Boolean = left.isFulfilled(n) and right.isFulfilled(n)
+            override fun isFulfilled(n: Int): Boolean = left.isFulfilled(n) && right.isFulfilled(n)
+
+            override fun simplifyForInteger(): Condition {
+                val leftSimplified = left.simplifyForInteger()
+                if (leftSimplified == False) return False
+
+                val rightSimplified = right.simplifyForInteger()
+                when {
+                    leftSimplified == True -> return rightSimplified
+                    rightSimplified == False -> return False
+                    rightSimplified == True -> return leftSimplified
+                }
+
+                if (leftSimplified.equivalentForInteger(rightSimplified)) return leftSimplified
+                return And(leftSimplified, rightSimplified)
+            }
+
+            override fun equivalentForInteger(other: Condition): Boolean {
+                if (this === other) return true
+                if (other !is And) return false
+                return left.equivalentForInteger(other.left) && right.equivalentForInteger(other.right)
+            }
+
             override fun toString(): String = "$left and $right"
         }
 
@@ -73,7 +99,29 @@ internal class PluralRule private constructor(val category: PluralCategory, priv
             private val left: Condition,
             private val right: Condition,
         ) : Condition() {
-            override fun isFulfilled(n: Int): Boolean = left.isFulfilled(n) or right.isFulfilled(n)
+            override fun isFulfilled(n: Int): Boolean = left.isFulfilled(n) || right.isFulfilled(n)
+
+            override fun simplifyForInteger(): Condition {
+                val leftSimplified = left.simplifyForInteger()
+                if (leftSimplified == True) return True
+
+                val rightSimplified = right.simplifyForInteger()
+                when {
+                    leftSimplified == False -> return rightSimplified
+                    rightSimplified == True -> return True
+                    rightSimplified == False -> return leftSimplified
+                }
+
+                if (leftSimplified.equivalentForInteger(rightSimplified)) return leftSimplified
+                return Or(leftSimplified, rightSimplified)
+            }
+
+            override fun equivalentForInteger(other: Condition): Boolean {
+                if (this === other) return true
+                if (other !is Or) return false
+                return left.equivalentForInteger(other.left) && right.equivalentForInteger(other.right)
+            }
+
             override fun toString(): String = "$left or $right"
         }
 
@@ -96,12 +144,35 @@ internal class PluralRule private constructor(val category: PluralCategory, priv
                 return ranges.any { moduloAppliedValue in it } != comparisonIsNegated
             }
 
+            override fun simplifyForInteger(): Condition {
+                return when (operand) {
+                    Operand.N, Operand.I -> Relation(
+                        Operand.N,
+                        operandDivisor,
+                        comparisonIsNegated,
+                        ranges,
+                    )
+
+                    else -> if (ranges.any { 0 in it } != comparisonIsNegated) True else False
+                }
+            }
+
+            override fun equivalentForInteger(other: Condition): Boolean {
+                if (this === other) return true
+                if (other !is Relation) return false
+                if ((operand == Operand.N || operand == Operand.I) != (other.operand == Operand.N || other.operand == Operand.I)) return false
+                if (operandDivisor != other.operandDivisor) return false
+                if (comparisonIsNegated != other.comparisonIsNegated) return false
+                if (!ranges.contentEquals(other.ranges)) return false
+                return true
+            }
+
             override fun toString(): String {
                 return StringBuilder().run {
                     append(operand.name.lowercase())
                     if (operandDivisor != null) {
                         append(" % ")
-                        append(operand)
+                        append(operandDivisor)
                     }
                     append(' ')
                     if (comparisonIsNegated) {
@@ -125,9 +196,18 @@ internal class PluralRule private constructor(val category: PluralCategory, priv
             }
         }
 
-        private object NoCondition : Condition() {
-            override fun isFulfilled(n: Int): Boolean = true
+        private object True : Condition() {
+            override fun isFulfilled(n: Int) = true
+            override fun simplifyForInteger() = this
+            override fun equivalentForInteger(other: Condition) = this == other
             override fun toString(): String = ""
+        }
+
+        private object False : Condition() {
+            override fun isFulfilled(n: Int) = false
+            override fun simplifyForInteger() = this
+            override fun equivalentForInteger(other: Condition) = this == other
+            override fun toString(): String = "(false)"
         }
 
         private class Parser(private val description: String) {
@@ -174,7 +254,7 @@ internal class PluralRule private constructor(val category: PluralCategory, priv
 
             fun parse(): Condition {
                 consumeWhitespaces()
-                if (eof()) return NoCondition
+                if (eof()) return True
                 val condition = nextCondition()
                 consumeWhitespaces()
                 assert(eof())
@@ -320,7 +400,7 @@ internal class PluralRule private constructor(val category: PluralCategory, priv
              * digit           = [0-9]
              * ```
              */
-            fun parse(description: String): Condition = Parser(description).parse()
+            fun parse(description: String): Condition = Parser(description).parse().simplifyForInteger()
         }
     }
 }
