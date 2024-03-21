@@ -52,4 +52,30 @@
             <action class="org.jetbrains.compose.desktop.ide.preview.RefreshOrRunPreviewAction"/>
         </group>
     </actions>
+
+
+    <extensions defaultExtensionNs="com.intellij">
+
+        <defaultLiveTemplates file="templates/ComposeMultiplatformTemplates.xml"/>
+
+        <intentionAction>
+            <className>org.jetbrains.compose.intentions.WrapWithComposableIntentionGroup
+            </className>
+            <category>Compose Multiplatform</category>
+        </intentionAction>
+
+        <intentionAction>
+            <className>org.jetbrains.compose.intentions.RemoveComposableIntention
+            </className>
+            <category>Compose Multiplatform</category>
+        </intentionAction>
+
+        <intentionAction>
+            <className>org.jetbrains.compose.intentions.RemoveParentComposableIntention
+            </className>
+            <category>Compose Multiplatform</category>
+        </intentionAction>
+
+    </extensions>
+
 </idea-plugin>
