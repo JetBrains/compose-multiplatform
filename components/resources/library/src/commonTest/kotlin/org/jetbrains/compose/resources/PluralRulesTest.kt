@@ -6,8 +6,9 @@
 package org.jetbrains.compose.resources
 
 import kotlinx.coroutines.test.runTest
-import org.jetbrains.compose.resources.intl.PluralCategory
-import org.jetbrains.compose.resources.intl.PluralRuleList
+import org.jetbrains.compose.resources.plural.*
+import org.jetbrains.compose.resources.plural.PluralCategory
+import org.jetbrains.compose.resources.plural.PluralRuleList
 import kotlin.test.*
 
 /**

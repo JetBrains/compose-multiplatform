@@ -4,8 +4,8 @@ import androidx.compose.runtime.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import org.jetbrains.compose.resources.intl.PluralCategory
-import org.jetbrains.compose.resources.intl.PluralRuleList
+import org.jetbrains.compose.resources.plural.PluralCategory
+import org.jetbrains.compose.resources.plural.PluralRuleList
 import org.jetbrains.compose.resources.vector.xmldom.Element
 import org.jetbrains.compose.resources.vector.xmldom.NodeList
 
@@ -228,7 +228,7 @@ private suspend fun loadPluralString(
     val path = resource.getPathByEnvironment(environment)
     val keyToValue = getParsedStrings(path, resourceReader)
     val item = keyToValue[resource.key] as? StringItem.Plurals
-        ?: error("String ID=`${resource.key}` is not found!")
+        ?: error("Quantity string ID=`${resource.key}` is not found!")
     val pluralRuleList = PluralRuleList.getInstance(
         environment.language,
         environment.region,

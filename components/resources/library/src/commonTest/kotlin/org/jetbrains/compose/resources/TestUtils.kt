@@ -1,8 +1,8 @@
 package org.jetbrains.compose.resources
 
-import org.jetbrains.compose.resources.intl.PluralCategory
-import org.jetbrains.compose.resources.intl.PluralRule
-import org.jetbrains.compose.resources.intl.PluralRuleList
+import org.jetbrains.compose.resources.plural.PluralCategory
+import org.jetbrains.compose.resources.plural.PluralRule
+import org.jetbrains.compose.resources.plural.PluralRuleList
 
 @OptIn(InternalResourceApi::class, ExperimentalResourceApi::class)
 internal fun TestStringResource(key: String) = StringResource(

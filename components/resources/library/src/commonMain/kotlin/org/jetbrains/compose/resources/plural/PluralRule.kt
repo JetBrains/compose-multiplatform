@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.resources.intl
+package org.jetbrains.compose.resources.plural
 
 import kotlin.math.absoluteValue
 
