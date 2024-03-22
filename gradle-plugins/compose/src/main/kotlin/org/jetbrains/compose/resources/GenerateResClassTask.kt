@@ -101,12 +101,13 @@ internal abstract class GenerateResClassTask : DefaultTask() {
         }
 
         if (typeString == "values" && file.name.equals("strings.xml", true)) {
-            val stringIds = getStringIds(file)
-            val pluralStringIds = getPluralStringIds(file)
-            return stringIds.map { strId ->
-                ResourceItem(ResourceType.STRING, qualifiers, strId.asUnderscoredIdentifier(), path)
-            } + pluralStringIds.map { pluralStrId ->
-                ResourceItem(ResourceType.PLURAL_STRING, qualifiers, pluralStrId.asUnderscoredIdentifier(), path)
+            return getStringResources(file).mapNotNull { (typeName, strId) ->
+                val type = when(typeName) {
+                    "string", "string-array" -> ResourceType.STRING
+                    "plurals" -> ResourceType.PLURAL_STRING
+                    else -> return@mapNotNull null
+                }
+                ResourceItem(type, qualifiers, strId.asUnderscoredIdentifier(), path)
             }
         }
 
@@ -114,23 +115,14 @@ internal abstract class GenerateResClassTask : DefaultTask() {
         return listOf(ResourceItem(type, qualifiers, file.nameWithoutExtension.asUnderscoredIdentifier(), path))
     }
 
-    private val stringTypeNames = listOf("string", "string-array")
-    private fun getStringIds(stringsXml: File): Set<String> {
+    //type -> id
+    private val stringTypeNames = listOf("string", "string-array", "plurals")
+    private fun getStringResources(stringsXml: File): List<Pair<String, String>> {
         val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(stringsXml)
         val items = doc.getElementsByTagName("resources").item(0).childNodes
-        val ids = List(items.length) { items.item(it) }
+        return List(items.length) { items.item(it) }
             .filter { it.nodeName in stringTypeNames }
-            .map { it.attributes.getNamedItem("name").nodeValue }
-        return ids.toSet()
-    }
-
-    private fun getPluralStringIds(stringsXml: File): Set<String> {
-        val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(stringsXml)
-        val items = doc.getElementsByTagName("resources").item(0).childNodes
-        val ids = List(items.length) { items.item(it) }
-            .filter { it.nodeName == "plurals" }
-            .map { it.attributes.getNamedItem("name").nodeValue }
-        return ids.toSet()
+            .map { it.nodeName to it.attributes.getNamedItem("name").nodeValue }
     }
 
     private fun File.listNotHiddenFiles(): List<File> =
