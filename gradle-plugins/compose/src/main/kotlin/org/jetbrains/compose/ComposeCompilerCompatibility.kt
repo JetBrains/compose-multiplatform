@@ -26,7 +26,7 @@ internal object ComposeCompilerCompatibility {
         "1.9.23" to "1.5.10.1",
         "2.0.0-Beta1" to "1.5.4-dev1-kt2.0.0-Beta1",
         "2.0.0-Beta4" to "1.5.9-kt-2.0.0-Beta4",
-        "2.0.0-Beta4" to "1.5.11-kt-2.0.0-Beta5",
+        "2.0.0-Beta5" to "1.5.11-kt-2.0.0-Beta5",
     )
 
     fun compilerVersionFor(kotlinVersion: String): String {
