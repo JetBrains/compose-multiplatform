@@ -511,4 +511,20 @@ class ResourcesTest : GradlePluginTestBase() {
             .map { it.toPath().relativeTo(actualPath) }.sorted().joinToString("\n")
         assertEquals(expectedFilesCount, actualFilesCount)
     }
+
+    @Test
+    fun testResourcesTaskDisabled() = with(testProject("misc/commonResources")) {
+        file("build.gradle.kts").appendText(
+            """
+                compose {
+                    resources {
+                        generateResClass = never
+                    }
+                }
+            """.trimIndent()
+        )
+        gradle("generateComposeResClass").checks {
+            check.logContains("Generation Res class is disabled")
+        }
+    }
 }

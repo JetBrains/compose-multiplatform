@@ -323,6 +323,9 @@ private fun Project.configureResourceGenerator(
             ResourcesExtension.ResourceClassGeneration.Always -> {
                 true
             }
+            ResourcesExtension.ResourceClassGeneration.Never -> {
+                false
+            }
         }
     }
 
