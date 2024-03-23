@@ -6,7 +6,6 @@
 import groovy.util.Node
 import groovy.xml.XmlParser
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.tasks.*
 
@@ -21,20 +20,20 @@ abstract class GeneratePluralRuleListsTask : DefaultTask() {
     abstract val pluralsFile: RegularFileProperty
 
     @get:OutputFile
-    abstract val mainDir: RegularFileProperty
+    abstract val outputFile: RegularFileProperty
 
     @get:OutputFile
-    abstract val testDir: RegularFileProperty
+    abstract val samplesOutputFile: RegularFileProperty
 
     @TaskAction
     fun generatePluralRuleLists() {
         val pluralRuleLists = parsePluralRuleLists()
 
         val mainContent = generateMainContent(pluralRuleLists)
-        mainDir.get().asFile.writeText(mainContent)
+        outputFile.get().asFile.writeText(mainContent)
 
         val testContent = generateTestContent(pluralRuleLists)
-        testDir.get().asFile.writeText(testContent)
+        samplesOutputFile.get().asFile.writeText(testContent)
     }
 
     private fun parsePluralRuleLists(): List<PluralRuleList> {
