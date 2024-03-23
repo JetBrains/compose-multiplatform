@@ -235,7 +235,8 @@ private suspend fun loadPluralString(
     )
     val pluralCategory = pluralRuleList.getCategory(quantity)
     val str = item.items[pluralCategory]
-        ?: error("String ID=`${resource.key}` does not have the pluralization $pluralCategory for quantity $quantity!")
+        ?: item.items[PluralCategory.OTHER]
+        ?: error("Quantity string ID=`${resource.key}` does not have the pluralization $pluralCategory for quantity $quantity!")
     return str
 }
 
