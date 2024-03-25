@@ -27,7 +27,5 @@ public object Res {
 
   public object string
 
-  public object plurals
-
   public object font
 }
