@@ -9,6 +9,7 @@ import kotlin.io.path.invariantSeparatorsPathString
 internal enum class ResourceType(val typeName: String) {
     DRAWABLE("drawable"),
     STRING("string"),
+    PLURAL_STRING("plurals"),
     FONT("font");
 
     override fun toString(): String = typeName
@@ -31,6 +32,7 @@ internal data class ResourceItem(
 private fun ResourceType.getClassName(): ClassName = when (this) {
     ResourceType.DRAWABLE -> ClassName("org.jetbrains.compose.resources", "DrawableResource")
     ResourceType.STRING -> ClassName("org.jetbrains.compose.resources", "StringResource")
+    ResourceType.PLURAL_STRING -> ClassName("org.jetbrains.compose.resources", "PluralStringResource")
     ResourceType.FONT -> ClassName("org.jetbrains.compose.resources", "FontResource")
 }
 
@@ -225,7 +227,7 @@ private fun getChunkFileSpec(
                     CodeBlock.builder()
                         .add("return %T(\n", type.getClassName()).withIndent {
                             add("\"${type}:${resName}\",")
-                            if (type == ResourceType.STRING) add(" \"$resName\",")
+                            if (type == ResourceType.STRING || type == ResourceType.PLURAL_STRING) add(" \"$resName\",")
                             withIndent {
                                 add("\nsetOf(\n").withIndent {
                                     items.forEach { item ->

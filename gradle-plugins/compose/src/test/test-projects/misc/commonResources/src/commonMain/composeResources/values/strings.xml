@@ -13,4 +13,14 @@
     <string name="PascalCase">PascalCase</string>
     <string name="1-kebab-case">1-kebab-case</string>
     <string name="camelCase">camelCase</string>
+
+    <plurals name="numberOfSongsAvailable">
+        <item quantity="zero">%d zero</item>
+        <item quantity="one">%d one</item>
+        <item quantity="two">%d two</item>
+        <item quantity="few">%d few</item>
+        <item quantity="many">%d many</item>
+        <item quantity="other">%d other</item>
+    </plurals>
+
 </resources>
