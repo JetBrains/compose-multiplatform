@@ -58,8 +58,3 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 }
-
-compose {
-    kotlinCompilerPlugin.set(dependencies.compiler.forKotlin("COMPOSE_COMPILER_PLUGIN_PLACEHOLDER"))
-    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=KOTLIN_VERSION_PLACEHOLDER")
-}
