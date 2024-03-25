@@ -1,5 +1,4 @@
 import org.jetbrains.compose.ExperimentalComposeLibrary
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
@@ -196,6 +195,14 @@ configureMavenPublication(
 // adding it here to make sure skiko is unpacked and available in web tests
 compose.experimental {
     web.application {}
+}
+
+//utility task to generate CLDRPluralRuleLists.kt file by 'CLDRPluralRules/plurals.xml'
+tasks.register<GeneratePluralRuleListsTask>("generatePluralRuleLists") {
+    val projectDir = project.layout.projectDirectory
+    pluralsFile = projectDir.file("CLDRPluralRules/plurals.xml")
+    outputFile = projectDir.file("src/commonMain/kotlin/org/jetbrains/compose/resources/plural/CLDRPluralRuleLists.kt")
+    samplesOutputFile = projectDir.file("src/commonTest/kotlin/org/jetbrains/compose/resources/CLDRPluralRuleLists.test.kt")
 }
 
 afterEvaluate {

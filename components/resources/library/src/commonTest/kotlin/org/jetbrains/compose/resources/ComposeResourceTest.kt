@@ -145,6 +145,102 @@ class ComposeResourceTest {
     }
 
     @Test
+    fun testPluralStringResourceCache() = runComposeUiTest {
+        val testResourceReader = TestResourceReader()
+        var res by mutableStateOf(TestPluralStringResource("plurals"))
+        var quantity by mutableStateOf(0)
+        var str = ""
+        setContent {
+            CompositionLocalProvider(
+                LocalResourceReader provides testResourceReader,
+                LocalComposeEnvironment provides TestComposeEnvironment
+            ) {
+                str = pluralStringResource(res, quantity)
+            }
+        }
+
+        waitForIdle()
+        assertEquals("other", str)
+
+        quantity = 1
+        waitForIdle()
+        assertEquals("one", str)
+        assertEquals(1, quantity)
+
+        quantity = 2
+        waitForIdle()
+        assertEquals("other", str)
+        assertEquals(2, quantity)
+
+        quantity = 3
+        waitForIdle()
+        assertEquals("other", str)
+        assertEquals(3, quantity)
+
+        res = TestPluralStringResource("another_plurals")
+        quantity = 0
+        waitForIdle()
+        assertEquals("another other", str)
+
+        quantity = 1
+        waitForIdle()
+        assertEquals("another one", str)
+    }
+
+    @Test
+    fun testReadPluralStringResource() = runComposeUiTest {
+        var plurals = ""
+        var another_plurals = ""
+        setContent {
+            CompositionLocalProvider(LocalComposeEnvironment provides TestComposeEnvironment) {
+                plurals = pluralStringResource(TestPluralStringResource("plurals"), 1)
+                another_plurals = pluralStringResource(TestPluralStringResource("another_plurals"), 1)
+            }
+        }
+        waitForIdle()
+
+        assertEquals("one", plurals)
+        assertEquals("another one", another_plurals)
+    }
+
+    @Test
+    fun testReadQualityStringFromDifferentArgs() = runComposeUiTest {
+        // we're putting different integers to arguments and the quantity
+        var quantity by mutableStateOf(0)
+
+        var arg by mutableStateOf("me")
+        var str1 = ""
+        var str2 = ""
+        setContent {
+            CompositionLocalProvider(LocalComposeEnvironment provides TestComposeEnvironment) {
+                str1 = pluralStringResource(TestPluralStringResource("messages"), quantity, 3, arg)
+                str2 = pluralStringResource(TestPluralStringResource("messages"), quantity, 5, arg)
+            }
+        }
+        waitForIdle()
+        assertEquals("3 messages for me", str1)
+        assertEquals("5 messages for me", str2)
+
+        arg = "you"
+        waitForIdle()
+        assertEquals("3 messages for you", str1)
+        assertEquals("5 messages for you", str2)
+
+        quantity = 1
+        waitForIdle()
+        assertEquals("3 message for you", str1)
+        assertEquals("5 message for you", str2)
+    }
+
+    @Test
+    fun testLoadPluralStringResource() = runTest {
+        assertEquals("one", getPluralString(TestPluralStringResource("plurals"), 1))
+        assertEquals("other", getPluralString(TestPluralStringResource("plurals"), 5))
+        assertEquals("another one", getPluralString(TestPluralStringResource("another_plurals"), 1))
+        assertEquals("another other", getPluralString(TestPluralStringResource("another_plurals"), 5))
+    }
+
+    @Test
     fun testMissingResource() = runTest {
         assertFailsWith<MissingResourceException> {
             readResourceBytes("missing.png")
@@ -170,6 +266,18 @@ class ComposeResourceTest {
                         <item>item 2</item>
                         <item>item 3</item>
                     </string-array>
+                    <plurals name="plurals">
+                        <item quantity="one">one</item>
+                        <item quantity="other">other</item>
+                    </plurals>
+                    <plurals name="another_plurals">
+                        <item quantity="one">another one</item>
+                        <item quantity="other">another other</item>
+                    </plurals>
+                    <plurals name="messages">
+                        <item quantity="one">%1${'$'}d message for %2${'$'}s</item>
+                        <item quantity="other">%1${'$'}d messages for %2${'$'}s</item>
+                    </plurals>
                 </resources>
                 
             """.trimIndent(),

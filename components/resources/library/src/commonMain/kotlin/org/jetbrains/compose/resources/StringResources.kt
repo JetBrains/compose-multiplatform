@@ -4,10 +4,16 @@ import androidx.compose.runtime.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import org.jetbrains.compose.resources.plural.PluralCategory
+import org.jetbrains.compose.resources.plural.PluralRuleList
 import org.jetbrains.compose.resources.vector.xmldom.Element
 import org.jetbrains.compose.resources.vector.xmldom.NodeList
 
 private val SimpleStringFormatRegex = Regex("""%(\d)\$[ds]""")
+
+private fun String.replaceWithArgs(args: List<String>) = SimpleStringFormatRegex.replace(this) { matchResult ->
+    args[matchResult.groupValues[1].toInt() - 1]
+}
 
 /**
  * Represents a string resource in the application.
@@ -22,8 +28,22 @@ private val SimpleStringFormatRegex = Regex("""%(\d)\$[ds]""")
 class StringResource
 @InternalResourceApi constructor(id: String, val key: String, items: Set<ResourceItem>) : Resource(id, items)
 
+/**
+ * Represents a quantity string resource in the application.
+ *
+ * @param id The unique identifier of the resource.
+ * @param key The key used to retrieve the string resource.
+ * @param items The set of resource items associated with the string resource.
+ */
+@OptIn(InternalResourceApi::class)
+@ExperimentalResourceApi
+@Immutable
+class PluralStringResource
+@InternalResourceApi constructor(id: String, val key: String, items: Set<ResourceItem>) : Resource(id, items)
+
 private sealed interface StringItem {
     data class Value(val text: String) : StringItem
+    data class Plurals(val items: Map<PluralCategory, String>) : StringItem
     data class Array(val items: List<String>) : StringItem
 }
 
@@ -56,6 +76,15 @@ private suspend fun parseStringXml(path: String, resourceReader: ResourceReader)
         val rawString = element.textContent.orEmpty()
         element.getAttribute("name") to StringItem.Value(handleSpecialCharacters(rawString))
     }
+    val plurals = nodes.getElementsWithName("plurals").associate { pluralElement ->
+        val items = pluralElement.childNodes.getElementsWithName("item").mapNotNull { element ->
+            val pluralCategory = PluralCategory.fromString(
+                element.getAttribute("quantity"),
+            ) ?: return@mapNotNull null
+            pluralCategory to element.textContent.orEmpty()
+        }
+        pluralElement.getAttribute("name") to StringItem.Plurals(items.toMap())
+    }
     val arrays = nodes.getElementsWithName("string-array").associate { arrayElement ->
         val items = arrayElement.childNodes.getElementsWithName("item").map { element ->
             val rawString = element.textContent.orEmpty()
@@ -63,7 +92,7 @@ private suspend fun parseStringXml(path: String, resourceReader: ResourceReader)
         }
         arrayElement.getAttribute("name") to StringItem.Array(items)
     }
-    return strings + arrays
+    return strings + plurals + arrays
 }
 
 /**
@@ -154,9 +183,113 @@ private suspend fun loadString(
     environment: ResourceEnvironment
 ): String {
     val str = loadString(resource, resourceReader, environment)
-    return SimpleStringFormatRegex.replace(str) { matchResult ->
-        args[matchResult.groupValues[1].toInt() - 1]
+    return str.replaceWithArgs(args)
+}
+
+/**
+ * Retrieves the string for the pluralization for the given quantity using the specified quantity string resource.
+ *
+ * @param resource The quantity string resource to be used.
+ * @param quantity The quantity of the pluralization to use.
+ * @return The retrieved string resource.
+ *
+ * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
+ */
+@ExperimentalResourceApi
+@Composable
+fun pluralStringResource(resource: PluralStringResource, quantity: Int): String {
+    val resourceReader = LocalResourceReader.current
+    val pluralStr by rememberResourceState(resource, quantity, { "" }) { env ->
+        loadPluralString(resource, quantity, resourceReader, env)
     }
+    return pluralStr
+}
+
+/**
+ * Loads a string using the specified string resource.
+ *
+ * @param resource The string resource to be used.
+ * @param quantity The quantity of the pluralization to use.
+ * @return The loaded string resource.
+ *
+ * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
+ */
+@ExperimentalResourceApi
+suspend fun getPluralString(resource: PluralStringResource, quantity: Int): String =
+    loadPluralString(resource, quantity, DefaultResourceReader, getResourceEnvironment())
+
+@OptIn(InternalResourceApi::class, ExperimentalResourceApi::class)
+private suspend fun loadPluralString(
+    resource: PluralStringResource,
+    quantity: Int,
+    resourceReader: ResourceReader,
+    environment: ResourceEnvironment
+): String {
+    val path = resource.getPathByEnvironment(environment)
+    val keyToValue = getParsedStrings(path, resourceReader)
+    val item = keyToValue[resource.key] as? StringItem.Plurals
+        ?: error("Quantity string ID=`${resource.key}` is not found!")
+    val pluralRuleList = PluralRuleList.getInstance(
+        environment.language,
+        environment.region,
+    )
+    val pluralCategory = pluralRuleList.getCategory(quantity)
+    val str = item.items[pluralCategory]
+        ?: item.items[PluralCategory.OTHER]
+        ?: error("Quantity string ID=`${resource.key}` does not have the pluralization $pluralCategory for quantity $quantity!")
+    return str
+}
+
+/**
+ * Retrieves the string for the pluralization for the given quantity using the specified quantity string resource.
+ *
+ * @param resource The quantity string resource to be used.
+ * @param quantity The quantity of the pluralization to use.
+ * @param formatArgs The arguments to be inserted into the formatted string.
+ * @return The retrieved string resource.
+ *
+ * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
+ */
+@ExperimentalResourceApi
+@Composable
+fun pluralStringResource(resource: PluralStringResource, quantity: Int, vararg formatArgs: Any): String {
+    val resourceReader = LocalResourceReader.current
+    val args = formatArgs.map { it.toString() }
+    val pluralStr by rememberResourceState(resource, quantity, args, { "" }) { env ->
+        loadPluralString(resource, quantity, args, resourceReader, env)
+    }
+    return pluralStr
+}
+
+/**
+ * Loads a string using the specified string resource.
+ *
+ * @param resource The string resource to be used.
+ * @param quantity The quantity of the pluralization to use.
+ * @param formatArgs The arguments to be inserted into the formatted string.
+ * @return The loaded string resource.
+ *
+ * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
+ */
+@ExperimentalResourceApi
+suspend fun getPluralString(resource: PluralStringResource, quantity: Int, vararg formatArgs: Any): String =
+    loadPluralString(
+        resource, quantity,
+        formatArgs.map { it.toString() },
+        DefaultResourceReader,
+        getResourceEnvironment(),
+    )
+
+@OptIn(ExperimentalResourceApi::class)
+private suspend fun loadPluralString(
+    resource: PluralStringResource,
+    quantity: Int,
+    args: List<String>,
+    resourceReader: ResourceReader,
+    environment: ResourceEnvironment
+): String {
+    val str = loadPluralString(resource, quantity, resourceReader, environment)
+    return str.replaceWithArgs(args)
 }
 
 /**

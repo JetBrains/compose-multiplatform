@@ -8,4 +8,16 @@
         <item>item 2</item>
         <item>item 3</item>
     </string-array>
+    <plurals name="plurals">
+        <item quantity="one">one</item>
+        <item quantity="other">other</item>
+    </plurals>
+    <plurals name="another_plurals">
+        <item quantity="one">another one</item>
+        <item quantity="other">another other</item>
+    </plurals>
+    <plurals name="messages">
+        <item quantity="one">%1$d message for %2$s</item>
+        <item quantity="other">%1$d messages for %2$s</item>
+    </plurals>
 </resources>
