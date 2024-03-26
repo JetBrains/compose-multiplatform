@@ -15,10 +15,9 @@ import org.jetbrains.compose.experimental.dsl.ExperimentalWebApplication
 import org.jetbrains.compose.experimental.web.tasks.ExperimentalUnpackSkikoWasmRuntimeTask
 import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.compose.internal.utils.registerTask
-import org.jetbrains.compose.internal.utils.uppercaseFirstChar
-import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
+import org.jetbrains.kotlin.gradle.tasks.IncrementalSyncTask
 
-internal fun Collection<KotlinJsIrTarget>.configureExperimentalWebApplication(
+internal fun configureExperimentalWebApplication(
     project: Project,
     app: ExperimentalWebApplication
 ) {
@@ -29,24 +28,17 @@ internal fun Collection<KotlinJsIrTarget>.configureExperimentalWebApplication(
     skikoJsWasmRuntimeConfiguration.defaultDependencies {
         it.addLater(skikoJsWasmRuntimeDependency)
     }
-    forEach {
-        val mainCompilation = it.compilations.getByName("main")
-        val testCompilation = it.compilations.getByName("test")
-        val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-wasm/${it.targetName}")
-        val taskName = "unpackSkikoWasmRuntime${it.targetName.uppercaseFirstChar()}"
-        mainCompilation.defaultSourceSet.resources.srcDir(unpackedRuntimeDir)
-        testCompilation.defaultSourceSet.resources.srcDir(unpackedRuntimeDir)
+    val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-wasm/")
+    val taskName = "unpackSkikoWasmRuntime"
 
-        val unpackRuntime = project.registerTask<ExperimentalUnpackSkikoWasmRuntimeTask>(taskName) {
-            skikoRuntimeFiles = skikoJsWasmRuntimeConfiguration
-            outputDir.set(unpackedRuntimeDir)
-        }
-        project.tasks.named(mainCompilation.processResourcesTaskName).configure { processResourcesTask ->
-            processResourcesTask.dependsOn(unpackRuntime)
-        }
-        project.tasks.named(testCompilation.processResourcesTaskName).configure { processResourcesTask ->
-            processResourcesTask.dependsOn(unpackRuntime)
-        }
+    val unpackRuntime = project.registerTask<ExperimentalUnpackSkikoWasmRuntimeTask>(taskName) {
+        skikoRuntimeFiles = skikoJsWasmRuntimeConfiguration
+        outputDir.set(unpackedRuntimeDir)
+    }
+    // According to https://youtrack.jetbrains.com/issue/COMPOSE-1114
+    project.tasks.withType(IncrementalSyncTask::class.java) {
+        it.dependsOn(unpackRuntime)
+        it.from.from(unpackedRuntimeDir)
     }
 }
 
