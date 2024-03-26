@@ -34,6 +34,7 @@ private fun registerConfigurePreviewTask(
     ) { previewTask ->
         runtimeFiles.configureUsageBy(previewTask) { (runtimeJars, _) ->
             previewClasspath = runtimeJars
+            skikoRuntime = tryGetSkikoRuntimeIfNeeded()
         }
     }
 }

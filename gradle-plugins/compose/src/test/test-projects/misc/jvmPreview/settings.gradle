@@ -25,4 +25,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = 'jvmPreview'
-include(':jvm', ':mpp')
+include(':common', ':jvm', ':mpp')
