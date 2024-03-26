@@ -18,3 +18,6 @@ actual suspend fun readResourceBytes(path: String): ByteArray {
     }
     return response.arrayBuffer().await().toByteArray()
 }
+
+internal actual fun getWindowLocation(): WindowLocation =
+    window.location.let { WindowLocation(it.origin, it.pathname) }

@@ -9,6 +9,7 @@ import kotlin.ByteArray
 import kotlin.OptIn
 import kotlin.String
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.convertPathToUri
 import org.jetbrains.compose.resources.readResourceBytes
 
 @ExperimentalResourceApi
@@ -22,6 +23,16 @@ internal object Res {
      * @return The content of the file as a byte array.
      */
     public suspend fun readBytes(path: String): ByteArray = readResourceBytes("" + path)
+
+    /**
+     * Converts a given file path to a platform dependent URI string.
+     *
+     * Example: `val uri = Res.getAsUri("files/key.bin")`
+     *
+     * @param path The file path to be converted to a URI.
+     * @return The URI representation of the given file path.
+     */
+    public suspend fun getAsUri(path: String): String = convertPathToUri("" + path)
 
     public object drawable
 

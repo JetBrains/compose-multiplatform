@@ -50,3 +50,6 @@ internal fun jsInt8ArrayToKotlinByteArray(x: Int8Array): ByteArray {
         ByteArray(size) { i -> (memBuffer + i).loadByte() }
     }
 }
+
+internal actual fun getWindowLocation(): WindowLocation =
+    window.location.let { WindowLocation(it.origin, it.pathname) }
