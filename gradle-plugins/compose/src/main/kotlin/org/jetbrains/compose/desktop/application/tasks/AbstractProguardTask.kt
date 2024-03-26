@@ -42,6 +42,10 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
     @get:Input
     val dontoptimize: Property<Boolean?> = objects.nullableProperty()
 
+    @get:Optional
+    @get:Input
+    val joinOutputJars: Property<Boolean?> = objects.nullableProperty()
+
     // todo: DSL for excluding default rules
     // also consider pulling coroutines rules from coroutines artifact
     // https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/resources/META-INF/proguard/coroutines.pro
@@ -98,10 +102,14 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
         }
 
         jarsConfigurationFile.ioFile.bufferedWriter().use { writer ->
+            val toSingleOutputJar = joinOutputJars.orNull == true
             for ((input, output) in inputToOutputJars.entries) {
                 writer.writeLn("-injars '${input.normalizedPath()}'")
-                writer.writeLn("-outjars '${output.normalizedPath()}'")
+                if (!toSingleOutputJar)
+                    writer.writeLn("-outjars '${output.normalizedPath()}'")
             }
+            if (toSingleOutputJar)
+                writer.writeLn("-outjars '${mainJarInDestinationDir.ioFile.normalizedPath()}'")
 
             for (jmod in jmods) {
                 writer.writeLn("-libraryjars '${jmod.normalizedPath()}'(!**.jar;!module-info.class)")

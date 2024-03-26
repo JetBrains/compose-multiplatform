@@ -65,6 +65,12 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Input
     val mangleJarFilesNames: Property<Boolean> = objects.notNullProperty(true)
 
+    /**
+     * Indicates that task will get the uber JAR as input.
+     */
+    @get:Input
+    val packageFromUberJar: Property<Boolean> = objects.notNullProperty(false)
+
     @get:InputDirectory
     @get:Optional
     /** @see internal/wixToolset.kt */
@@ -323,7 +329,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
             javaOption("-D$APP_RESOURCES_DIR=${appDir(packagedResourcesDir.ioFile.name)}")
 
-            val mappedJar = libsMapping[launcherMainJar.ioFile]?.singleOrNull()
+            val mappedJar = libsMapping[launcherMainJar.ioFile]?.singleOrNull { it.isJarFile }
                 ?: error("Main jar was not processed correctly: ${launcherMainJar.ioFile}")
             val mainJarPath = mappedJar.normalizedPath(base = libsDir.ioFile)
             cliArg("--main-jar", mainJarPath)
@@ -468,11 +474,14 @@ abstract class AbstractJPackageTask @Inject constructor(
             return targetFile
         }
 
+        // skiko can be bundled to the main uber jar by proguard
+        fun File.isMainUberJar() = packageFromUberJar.get() && name == launcherMainJar.ioFile.name
+
         val outdatedLibs = invalidateMappedLibs(inputChanges)
         for (sourceFile in outdatedLibs) {
             assert(sourceFile.exists()) { "Lib file does not exist: $sourceFile" }
 
-            libsMapping[sourceFile] = if (isSkikoForCurrentOS(sourceFile)) {
+            libsMapping[sourceFile] = if (isSkikoForCurrentOS(sourceFile) || sourceFile.isMainUberJar()) {
                 val unpackedFiles = unpackSkikoForCurrentOS(sourceFile, skikoDir.ioFile, fileOperations)
                 unpackedFiles.map { copyFileToLibsDir(it) }
             } else {

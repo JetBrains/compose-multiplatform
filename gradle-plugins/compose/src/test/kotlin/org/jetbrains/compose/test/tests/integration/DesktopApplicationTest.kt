@@ -32,9 +32,15 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                     tasks.getByName("run").doFirst {
                         throw new StopExecutionException("Skip run task")
                     }
+                    tasks.getByName("runRelease").doFirst {
+                        throw new StopExecutionException("Skip runRelease task")
+                    }
                     
                     tasks.getByName("runDistributable").doFirst {
                         throw new StopExecutionException("Skip runDistributable task")
+                    }
+                    tasks.getByName("runReleaseDistributable").doFirst {
+                        throw new StopExecutionException("Skip runReleaseDistributable task")
                     }
                 }
             """.trimIndent()
@@ -42,9 +48,16 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         gradle("run").checks {
             check.taskSuccessful(":run")
         }
+        gradle("runRelease").checks {
+            check.taskSuccessful(":runRelease")
+        }
         gradle("runDistributable").checks {
             check.taskSuccessful(":createDistributable")
             check.taskSuccessful(":runDistributable")
+        }
+        gradle("runReleaseDistributable").checks {
+            check.taskSuccessful(":createReleaseDistributable")
+            check.taskSuccessful(":runReleaseDistributable")
         }
     }
 
@@ -55,9 +68,18 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             check.taskSuccessful(":run")
             check.logContains(logLine)
         }
+        gradle("runRelease").checks {
+            check.taskSuccessful(":runRelease")
+            check.logContains(logLine)
+        }
         gradle("runDistributable").checks {
             check.taskSuccessful(":createDistributable")
             check.taskSuccessful(":runDistributable")
+            check.logContains(logLine)
+        }
+        gradle("runReleaseDistributable").checks {
+            check.taskSuccessful(":createReleaseDistributable")
+            check.taskSuccessful(":runReleaseDistributable")
             check.logContains(logLine)
         }
     }
@@ -166,6 +188,38 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun joinOutputJarsJvm() = with(testProject(TestProjects.jvm)) {
+        joinOutputJars()
+    }
+
+    @Test
+    fun joinOutputJarsMpp() = with(testProject(TestProjects.mpp)) {
+        joinOutputJars()
+    }
+
+    private fun TestProject.joinOutputJars() {
+        enableJoinOutputJars()
+        gradle(":createReleaseDistributable").checks {
+            check.taskSuccessful(":createReleaseDistributable")
+
+            val distributionPathPattern = "The distribution is written to (.*)".toRegex()
+            val m = distributionPathPattern.find(check.log)
+            val distributionDir = m?.groupValues?.get(1)?.let(::File)
+            if (distributionDir == null || !distributionDir.exists()) {
+                error("Invalid distribution path: $distributionDir")
+            }
+            val appDirSubPath = when (currentOS) {
+                OS.Linux -> "TestPackage/lib/app"
+                OS.Windows -> "TestPackage/app"
+                OS.MacOS -> "TestPackage.app/Contents/app"
+            }
+            val appDir = distributionDir.resolve(appDirSubPath)
+            val jarsCount = appDir.listFiles()?.count { it.name.endsWith(".jar", ignoreCase = true) } ?: 0
+            assert(jarsCount == 1)
+        }
+    }
+
+    @Test
     fun gradleBuildCache() = with(testProject(TestProjects.jvm)) {
         modifyGradleProperties {
             setProperty("org.gradle.caching", "true")
@@ -265,19 +319,39 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun packageUberJarForCurrentOSJvm() = with(testProject(TestProjects.jvm)) {
-        testPackageUberJarForCurrentOS()
+        testPackageUberJarForCurrentOS(false)
     }
 
     @Test
     fun packageUberJarForCurrentOSMpp() = with(testProject(TestProjects.mpp)) {
-        testPackageUberJarForCurrentOS()
+        testPackageUberJarForCurrentOS(false)
     }
 
-    private fun TestProject.testPackageUberJarForCurrentOS() {
-        gradle(":packageUberJarForCurrentOS").checks {
-            check.taskSuccessful(":packageUberJarForCurrentOS")
+    @Test
+    fun packageReleaseUberJarForCurrentOSJvm() = with(testProject(TestProjects.jvm)) {
+        testPackageUberJarForCurrentOS(true)
+    }
 
-            val resultJarFile = file("build/compose/jars/TestPackage-${currentTarget.id}-1.0.0.jar")
+    @Test
+    fun packageReleaseUberJarForCurrentOSMpp() = with(testProject(TestProjects.mpp)) {
+        testPackageUberJarForCurrentOS(true)
+    }
+
+    private fun TestProject.testPackageUberJarForCurrentOS(release: Boolean) {
+        val task = when {
+            release -> ":packageReleaseUberJarForCurrentOS"
+            else -> ":packageUberJarForCurrentOS"
+        }
+
+        val jarFileName = when {
+            release -> "build/compose/jars/TestPackage-${currentTarget.id}-1.0.0-release.jar"
+            else -> "build/compose/jars/TestPackage-${currentTarget.id}-1.0.0.jar"
+        }
+
+        gradle(task).checks {
+            check.taskSuccessful(task)
+
+            val resultJarFile = file(jarFileName)
             resultJarFile.checkExists()
 
             JarFile(resultJarFile).use { jar ->
@@ -470,25 +544,33 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testUnpackSkiko() {
-        with(testProject(TestProjects.unpackSkiko)) {
-            gradle(":runDistributable").checks {
-                check.taskSuccessful(":runDistributable")
+    fun testUnpackSkiko() = with(testProject(TestProjects.unpackSkiko)) {
+        testUnpackSkiko(":runDistributable")
+    }
 
-                val libraryPathPattern = "Read skiko library path: '(.*)'".toRegex()
-                val m = libraryPathPattern.find(check.log)
-                val skikoDir = m?.groupValues?.get(1)?.let(::File)
-                if (skikoDir == null || !skikoDir.exists()) {
-                    error("Invalid skiko path: $skikoDir")
-                }
-                val filesToFind = when (currentOS) {
-                    OS.Linux -> listOf("libskiko-linux-${currentArch.id}.so")
-                    OS.Windows -> listOf("skiko-windows-${currentArch.id}.dll", "icudtl.dat")
-                    OS.MacOS -> listOf("libskiko-macos-${currentArch.id}.dylib")
-                }
-                for (fileName in filesToFind) {
-                    skikoDir.resolve(fileName).checkExists()
-                }
+    @Test
+    fun testUnpackSkikoFromUberJar() = with(testProject(TestProjects.unpackSkiko)) {
+        enableJoinOutputJars()
+        testUnpackSkiko(":runReleaseDistributable")
+    }
+
+    private fun TestProject.testUnpackSkiko(runDistributableTask: String) {
+        gradle(runDistributableTask).checks {
+            check.taskSuccessful(runDistributableTask)
+
+            val libraryPathPattern = "Read skiko library path: '(.*)'".toRegex()
+            val m = libraryPathPattern.find(check.log)
+            val skikoDir = m?.groupValues?.get(1)?.let(::File)
+            if (skikoDir == null || !skikoDir.exists()) {
+                error("Invalid skiko path: $skikoDir")
+            }
+            val filesToFind = when (currentOS) {
+                OS.Linux -> listOf("libskiko-linux-${currentArch.id}.so")
+                OS.Windows -> listOf("skiko-windows-${currentArch.id}.dll", "icudtl.dat")
+                OS.MacOS -> listOf("libskiko-macos-${currentArch.id}.dylib")
+            }
+            for (fileName in filesToFind) {
+                skikoDir.resolve(fileName).checkExists()
             }
         }
     }
@@ -517,5 +599,18 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 file("wix311").checkNotExists()
             }
         }
+    }
+
+    private fun TestProject.enableJoinOutputJars() {
+        val enableJoinOutputJars = """
+                    compose.desktop {
+                        application {
+                            buildTypes.release.proguard {
+                                joinOutputJars.set(true)
+                            }
+                        }
+                    }
+                """.trimIndent()
+        file("build.gradle").modify { "$it\n$enableJoinOutputJars" }
     }
 }
