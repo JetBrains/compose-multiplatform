@@ -81,7 +81,7 @@ private suspend fun parseStringXml(path: String, resourceReader: ResourceReader)
             val pluralCategory = PluralCategory.fromString(
                 element.getAttribute("quantity"),
             ) ?: return@mapNotNull null
-            pluralCategory to element.textContent.orEmpty()
+            pluralCategory to handleSpecialCharacters(element.textContent.orEmpty())
         }
         pluralElement.getAttribute("name") to StringItem.Plurals(items.toMap())
     }
