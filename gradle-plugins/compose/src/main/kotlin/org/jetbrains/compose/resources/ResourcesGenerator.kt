@@ -300,7 +300,7 @@ private fun Project.configureResourceGenerator(
 ) {
     logger.info("Configure accessors for '${commonSourceSet.name}'")
 
-    fun buildDir(path: String) = layout.dir(layout.buildDirectory.map { File(it.asFile, path) })
+    fun buildDir(path: String) = layout.buildDirectory.asFile.map { it.resolve(path) }
 
     //lazy check a dependency on the Resources library
     val shouldGenerateResClass = generateResClassMode.map { mode ->
@@ -329,6 +329,14 @@ private fun Project.configureResourceGenerator(
         }
     }
 
+    val xmlValuesConverterTask = tasks.register(
+        "convertXmlValues",
+        XmlValuesConverterTask::class.java
+    ) { task ->
+        task.originalResourcesDir.set(commonComposeResourcesDir)
+        task.outputDir.set(buildDir("$RES_GEN_DIR/convertedXmlValues"))
+    }
+
     val genTask = tasks.register(
         "generateComposeResClass",
         GenerateResClassTask::class.java
@@ -338,6 +346,7 @@ private fun Project.configureResourceGenerator(
         task.makeResClassPublic.set(publicResClass)
         task.resDir.set(commonComposeResourcesDir)
         task.codeDir.set(buildDir("$RES_GEN_DIR/kotlin"))
+        task.convertedXmlValuesDir.set(xmlValuesConverterTask.flatMap { it.outputDir })
 
         if (generateModulePath) {
             task.moduleDir.set(resourcePackage.asModuleDir())

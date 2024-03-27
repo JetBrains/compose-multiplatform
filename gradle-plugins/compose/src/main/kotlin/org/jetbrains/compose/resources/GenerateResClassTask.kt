@@ -1,12 +1,11 @@
 package org.jetbrains.compose.resources
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import java.io.File
+import java.io.RandomAccessFile
 import java.nio.file.Path
-import javax.xml.parsers.DocumentBuilderFactory
 import kotlin.io.path.relativeTo
 
 /**
@@ -30,13 +29,17 @@ internal abstract class GenerateResClassTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val resDir: Property<File>
 
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val convertedXmlValuesDir: Property<File>
+
     @get:OutputDirectory
-    abstract val codeDir: DirectoryProperty
+    abstract val codeDir: Property<File>
 
     @TaskAction
     fun generate() {
         try {
-            val kotlinDir = codeDir.get().asFile
+            val kotlinDir = codeDir.get()
             logger.info("Clean directory $kotlinDir")
             kotlinDir.deleteRecursively()
             kotlinDir.mkdirs()
@@ -100,34 +103,46 @@ internal abstract class GenerateResClassTask : DefaultTask() {
             return null
         }
 
-        if (typeString == "values" && file.name.equals("strings.xml", true)) {
-            return getStringResources(file).mapNotNull { (typeName, strId) ->
-                val type = when(typeName) {
-                    "string", "string-array" -> ResourceType.STRING
-                    "plurals" -> ResourceType.PLURAL_STRING
-                    else -> return@mapNotNull null
-                }
-                ResourceItem(type, qualifiers, strId.asUnderscoredIdentifier(), path)
-            }
+        if (typeString == "values" && file.extension.equals("xml", true)) {
+            val converted = convertedXmlValuesDir.get()
+                .resolve(file.parentFile.name)
+                .resolve(file.nameWithoutExtension + ".${XmlValuesConverterTask.CONVERTED_RESOURCE_EXT}")
+            return getValueResourceItems(converted, qualifiers, path.parent.resolve(converted.name))
         }
 
-        val type = ResourceType.fromString(typeString)
+        val type = ResourceType.fromString(typeString) ?: error("Unknown resource type: '$typeString'.")
         return listOf(ResourceItem(type, qualifiers, file.nameWithoutExtension.asUnderscoredIdentifier(), path))
     }
 
-    //type -> id
-    private val stringTypeNames = listOf("string", "string-array", "plurals")
-    private fun getStringResources(stringsXml: File): List<Pair<String, String>> {
-        val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(stringsXml)
-        val items = doc.getElementsByTagName("resources").item(0).childNodes
-        return List(items.length) { items.item(it) }
-            .filter { it.nodeName in stringTypeNames }
-            .map { it.nodeName to it.attributes.getNamedItem("name").nodeValue }
+    private fun getValueResourceItems(dataFile: File, qualifiers: List<String>, path: Path) : List<ResourceItem> {
+        val result = mutableListOf<ResourceItem>()
+        RandomAccessFile(dataFile, "r").use { f ->
+            var offset: Long = 0
+            var line: String? = f.readLine()
+            while (line != null) {
+                val size = line.encodeToByteArray().size.toLong()
+                result.add(getValueResourceItem(line, offset, size, qualifiers, path))
+                offset += size + 1 // "+1" for newline character
+                line = f.readLine()
+            }
+        }
+        return result
     }
 
-    private fun File.listNotHiddenFiles(): List<File> =
-        listFiles()?.filter { !it.isHidden }.orEmpty()
+    private fun getValueResourceItem(
+        recordString: String,
+        offset: Long,
+        size: Long,
+        qualifiers: List<String>,
+        path: Path
+    ) : ResourceItem {
+        val record = ValueResourceRecord.createFromString(recordString)
+        return ResourceItem(record.type, qualifiers, record.key.asUnderscoredIdentifier(), path.resolve("$offset-$size"))
+    }
 }
+
+internal fun File.listNotHiddenFiles(): List<File> =
+    listFiles()?.filter { !it.isHidden }.orEmpty()
 
 internal fun String.asUnderscoredIdentifier(): String =
     replace('-', '_')

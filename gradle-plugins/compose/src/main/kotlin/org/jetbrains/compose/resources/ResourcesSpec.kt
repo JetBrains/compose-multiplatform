@@ -6,12 +6,12 @@ import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.invariantSeparatorsPathString
 
-internal enum class ResourceType(val typeName: String) {
-    DRAWABLE("drawable"),
-    STRING("string"),
-    STRING_ARRAY("string-array"),
-    PLURAL_STRING("plurals"),
-    FONT("font");
+internal enum class ResourceType(val typeName: String, val accessorName: String) {
+    DRAWABLE("drawable", "drawable"),
+    STRING("string", "string"),
+    STRING_ARRAY("string-array", "array"),
+    PLURAL_STRING("plurals", "plurals"),
+    FONT("font", "font");
 
     override fun toString(): String = typeName
 
@@ -159,7 +159,7 @@ internal fun getResFileSpecs(
                     .build()
             )
             ResourceType.values().forEach { type ->
-                resObject.addType(TypeSpec.objectBuilder(type.typeName).build())
+                resObject.addType(TypeSpec.objectBuilder(type.accessorName).build())
             }
         }.build())
     }.build()
@@ -194,7 +194,7 @@ private fun getChunkFileSpec(
     resModifier: KModifier,
     idToResources: Map<String, List<ResourceItem>>
 ): FileSpec {
-    val chunkClassName = type.typeName.uppercaseFirstChar() + index
+    val chunkClassName = type.accessorName.uppercaseFirstChar() + index
     return FileSpec.builder(packageName, chunkClassName).also { chunkFile ->
         chunkFile.addAnnotation(
             AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
@@ -216,7 +216,7 @@ private fun getChunkFileSpec(
 
         idToResources.forEach { (resName, items) ->
             val accessor = PropertySpec.builder(resName, type.getClassName(), resModifier)
-                .receiver(ClassName(packageName, "Res", type.typeName))
+                .receiver(ClassName(packageName, "Res", type.accessorName))
                 .addAnnotation(experimentalAnnotation)
                 .getter(FunSpec.getterBuilder().addStatement("return $chunkClassName.$resName").build())
                 .build()
