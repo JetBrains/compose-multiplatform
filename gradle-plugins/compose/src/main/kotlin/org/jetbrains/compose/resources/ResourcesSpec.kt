@@ -9,16 +9,15 @@ import kotlin.io.path.invariantSeparatorsPathString
 internal enum class ResourceType(val typeName: String) {
     DRAWABLE("drawable"),
     STRING("string"),
+    STRING_ARRAY("string-array"),
     PLURAL_STRING("plurals"),
     FONT("font");
 
     override fun toString(): String = typeName
 
     companion object {
-        fun fromString(str: String): ResourceType =
-            ResourceType.values()
-                .firstOrNull { it.typeName.equals(str, true) }
-                ?: error("Unknown resource type: '$str'.")
+        fun fromString(str: String): ResourceType? =
+            ResourceType.values().firstOrNull { it.typeName.equals(str, true) }
     }
 }
 
@@ -32,9 +31,13 @@ internal data class ResourceItem(
 private fun ResourceType.getClassName(): ClassName = when (this) {
     ResourceType.DRAWABLE -> ClassName("org.jetbrains.compose.resources", "DrawableResource")
     ResourceType.STRING -> ClassName("org.jetbrains.compose.resources", "StringResource")
+    ResourceType.STRING_ARRAY -> ClassName("org.jetbrains.compose.resources", "StringArrayResource")
     ResourceType.PLURAL_STRING -> ClassName("org.jetbrains.compose.resources", "PluralStringResource")
     ResourceType.FONT -> ClassName("org.jetbrains.compose.resources", "FontResource")
 }
+
+private fun ResourceType.requiresKeyName() =
+    this in setOf(ResourceType.STRING, ResourceType.STRING_ARRAY, ResourceType.PLURAL_STRING)
 
 private val resourceItemClass = ClassName("org.jetbrains.compose.resources", "ResourceItem")
 private val experimentalAnnotation = AnnotationSpec.builder(
@@ -227,7 +230,7 @@ private fun getChunkFileSpec(
                     CodeBlock.builder()
                         .add("return %T(\n", type.getClassName()).withIndent {
                             add("\"${type}:${resName}\",")
-                            if (type == ResourceType.STRING || type == ResourceType.PLURAL_STRING) add(" \"$resName\",")
+                            if (type.requiresKeyName()) add(" \"$resName\",")
                             withIndent {
                                 add("\nsetOf(\n").withIndent {
                                     items.forEach { item ->
