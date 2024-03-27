@@ -57,9 +57,7 @@ private suspend fun loadPluralString(
     environment: ResourceEnvironment
 ): String {
     val path = resource.getPathByEnvironment(environment)
-    val keyToValue = getParsedStrings(path, resourceReader)
-    val item = keyToValue[resource.key] as? StringItem.Plurals
-        ?: error("Quantity string ID=`${resource.key}` is not found!")
+    val item = getStringItem(path, resourceReader) as StringItem.Plurals
     val pluralRuleList = PluralRuleList.getInstance(
         environment.language,
         environment.region,

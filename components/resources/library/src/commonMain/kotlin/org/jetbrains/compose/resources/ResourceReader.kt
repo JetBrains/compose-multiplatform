@@ -16,11 +16,16 @@ expect suspend fun readResourceBytes(path: String): ByteArray
 
 internal interface ResourceReader {
     suspend fun read(path: String): ByteArray
+    suspend fun readPart(path: String, offset: Long, size: Long): ByteArray
 }
 
 internal val DefaultResourceReader: ResourceReader = object : ResourceReader {
     @OptIn(InternalResourceApi::class)
     override suspend fun read(path: String): ByteArray = readResourceBytes(path)
+
+    override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
+        TODO("Not yet implemented")
+    }
 }
 
 //ResourceReader provider will be overridden for tests

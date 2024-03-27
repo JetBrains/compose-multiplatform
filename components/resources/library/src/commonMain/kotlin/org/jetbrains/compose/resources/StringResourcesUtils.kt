@@ -6,9 +6,10 @@ import kotlinx.coroutines.sync.withLock
 import org.jetbrains.compose.resources.plural.PluralCategory
 import org.jetbrains.compose.resources.vector.xmldom.Element
 import org.jetbrains.compose.resources.vector.xmldom.NodeList
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 private val SimpleStringFormatRegex = Regex("""%(\d)\$[ds]""")
-
 internal fun String.replaceWithArgs(args: List<String>) = SimpleStringFormatRegex.replace(this) { matchResult ->
     args[matchResult.groupValues[1].toInt() - 1]
 }
@@ -20,84 +21,55 @@ internal sealed interface StringItem {
 }
 
 private val stringsCacheMutex = Mutex()
-private val parsedStringsCache = mutableMapOf<String, Deferred<Map<String, StringItem>>>()
-
+private val stringItemsCache = mutableMapOf<String, Deferred<StringItem>>()
 //@TestOnly
-internal fun dropStringsCache() {
-    parsedStringsCache.clear()
+internal fun dropStringItemsCache() {
+    stringItemsCache.clear()
 }
 
-internal suspend fun getParsedStrings(
+internal suspend fun getStringItem(
     path: String,
     resourceReader: ResourceReader
-): Map<String, StringItem> = coroutineScope {
+): StringItem = coroutineScope {
     val deferred = stringsCacheMutex.withLock {
-        parsedStringsCache.getOrPut(path) {
+        stringItemsCache.getOrPut(path) {
             //LAZY - to free the mutex lock as fast as possible
             async(start = CoroutineStart.LAZY) {
-                parseStringXml(path, resourceReader)
+                val filePath = path.substringBeforeLast('/')
+                val recordPath = path.substringAfterLast('/')
+                val (offset, size) = recordPath.split('-').map { it.toLong() }
+                val record = resourceReader.readPart(filePath, offset, size).decodeToString()
+                val recordItems = record.split('#')
+                val recordType = recordItems.first()
+                val recordData = recordItems.last()
+                when (recordType) {
+                    "plurals" -> recordData.decodeAsPlural()
+                    "string-array" -> recordData.decodeAsArray()
+                    else -> recordData.decodeAsString()
+                }
             }
         }
     }
     deferred.await()
 }
 
-private suspend fun parseStringXml(path: String, resourceReader: ResourceReader): Map<String, StringItem> {
-    val nodes = resourceReader.read(path).toXmlElement().childNodes
-    val strings = nodes.getElementsWithName("string").associate { element ->
-        val rawString = element.textContent.orEmpty()
-        element.getAttribute("name") to StringItem.Value(handleSpecialCharacters(rawString))
-    }
-    val plurals = nodes.getElementsWithName("plurals").associate { pluralElement ->
-        val items = pluralElement.childNodes.getElementsWithName("item").mapNotNull { element ->
-            val pluralCategory = PluralCategory.fromString(
-                element.getAttribute("quantity"),
-            ) ?: return@mapNotNull null
-            pluralCategory to handleSpecialCharacters(element.textContent.orEmpty())
-        }
-        pluralElement.getAttribute("name") to StringItem.Plurals(items.toMap())
-    }
-    val arrays = nodes.getElementsWithName("string-array").associate { arrayElement ->
-        val items = arrayElement.childNodes.getElementsWithName("item").map { element ->
-            val rawString = element.textContent.orEmpty()
-            handleSpecialCharacters(rawString)
-        }
-        arrayElement.getAttribute("name") to StringItem.Array(items)
-    }
-    return strings + plurals + arrays
-}
+@OptIn(ExperimentalEncodingApi::class)
+private fun String.decodeAsString(): StringItem.Value = StringItem.Value(
+    Base64.decode(this).decodeToString()
+)
 
-private fun NodeList.getElementsWithName(name: String): List<Element> =
-    List(length) { item(it) }
-        .filterIsInstance<Element>()
-        .filter { it.localName == name }
+@OptIn(ExperimentalEncodingApi::class)
+private fun String.decodeAsArray(): StringItem.Array = StringItem.Array(
+    split(",").map { item ->
+        Base64.decode(item).decodeToString()
+    }
+)
 
-//https://developer.android.com/guide/topics/resources/string-resource#escaping_quotes
-/**
- * Replaces
- *
- * '\n' -> new line
- *
- * '\t' -> tab
- *
- * '\uXXXX' -> unicode symbol
- *
- * '\\' -> '\'
- *
- * @param string The input string to handle.
- * @return The string with special characters replaced according to the logic.
- */
-internal fun handleSpecialCharacters(string: String): String {
-    val unicodeNewLineTabRegex = Regex("""\\u[a-fA-F\d]{4}|\\n|\\t""")
-    val doubleSlashRegex = Regex("""\\\\""")
-    val doubleSlashIndexes = doubleSlashRegex.findAll(string).map { it.range.first }
-    val handledString = unicodeNewLineTabRegex.replace(string) { matchResult ->
-        if (doubleSlashIndexes.contains(matchResult.range.first - 1)) matchResult.value
-        else when (matchResult.value) {
-            "\\n" -> "\n"
-            "\\t" -> "\t"
-            else -> matchResult.value.substring(2).toInt(16).toChar().toString()
-        }
-    }.replace("""\\""", """\""")
-    return handledString
-}
+@OptIn(ExperimentalEncodingApi::class)
+private fun String.decodeAsPlural(): StringItem.Plurals = StringItem.Plurals(
+    split(",").associate { item ->
+        val category = item.substringBefore(':')
+        val valueBase64 = item.substringAfter(':')
+        PluralCategory.fromString(category)!! to Base64.decode(valueBase64).decodeToString()
+    }
+)

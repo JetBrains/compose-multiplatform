@@ -59,8 +59,6 @@ private suspend fun loadStringArray(
     environment: ResourceEnvironment
 ): List<String> {
     val path = resource.getPathByEnvironment(environment)
-    val keyToValue = getParsedStrings(path, resourceReader)
-    val item = keyToValue[resource.key] as? StringItem.Array
-        ?: error("String array ID=`${resource.key}` is not found!")
+    val item = getStringItem(path, resourceReader) as StringItem.Array
     return item.items
 }

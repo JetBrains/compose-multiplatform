@@ -52,9 +52,7 @@ private suspend fun loadString(
     environment: ResourceEnvironment
 ): String {
     val path = resource.getPathByEnvironment(environment)
-    val keyToValue = getParsedStrings(path, resourceReader)
-    val item = keyToValue[resource.key] as? StringItem.Value
-        ?: error("String ID=`${resource.key}` is not found!")
+    val item = getStringItem(path, resourceReader) as StringItem.Value
     return item.text
 }
 
