@@ -1,18 +1,33 @@
 package org.jetbrains.compose.resources
 
 import java.io.File
+import java.io.InputStream
 
-private object AndroidResourceReader
+internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
+    override suspend fun read(path: String): ByteArray {
+        val resource = getResourceAsStream(path)
+        return resource.readBytes()
+    }
 
-@OptIn(ExperimentalResourceApi::class)
-@InternalResourceApi
-actual suspend fun readResourceBytes(path: String): ByteArray {
-    val classLoader = Thread.currentThread().contextClassLoader ?: AndroidResourceReader.javaClass.classLoader
-    val resource = classLoader.getResourceAsStream(path) ?: run {
-        //try to find a font in the android assets
-        if (File(path).parentFile?.name.orEmpty().startsWith("font")) {
-            classLoader.getResourceAsStream("assets/$path")
-        } else null
-    } ?: throw MissingResourceException(path)
-    return resource.readBytes()
+    override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
+        val resource = getResourceAsStream(path)
+        val result = ByteArray(size.toInt())
+        resource.use { input ->
+            input.skip(offset)
+            input.read(result, 0, size.toInt())
+        }
+        return result
+    }
+
+    @OptIn(ExperimentalResourceApi::class)
+    private fun getResourceAsStream(path: String): InputStream {
+        val classLoader = Thread.currentThread().contextClassLoader ?: this.javaClass.classLoader
+        val resource = classLoader.getResourceAsStream(path) ?: run {
+            //try to find a font in the android assets
+            if (File(path).parentFile?.name.orEmpty().startsWith("font")) {
+                classLoader.getResourceAsStream("assets/$path")
+            } else null
+        } ?: throw MissingResourceException(path)
+        return resource
+    }
 }

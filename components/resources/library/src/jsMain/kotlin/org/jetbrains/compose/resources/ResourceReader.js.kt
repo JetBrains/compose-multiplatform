@@ -5,16 +5,27 @@ import kotlinx.coroutines.await
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 
-private fun ArrayBuffer.toByteArray(): ByteArray =
-    Int8Array(this, 0, byteLength).unsafeCast<ByteArray>()
-
 @OptIn(ExperimentalResourceApi::class)
-@InternalResourceApi
-actual suspend fun readResourceBytes(path: String): ByteArray {
-    val resPath = WebResourcesConfiguration.getResourcePath(path)
-    val response = window.fetch(resPath).await()
-    if (!response.ok) {
-        throw MissingResourceException(resPath)
+internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
+    override suspend fun read(path: String): ByteArray {
+        return readAsArrayBuffer(path).let { buffer ->
+            buffer.toByteArray(0, buffer.byteLength)
+        }
     }
-    return response.arrayBuffer().await().toByteArray()
+
+    override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
+        return readAsArrayBuffer(path).toByteArray(offset.toInt(), size.toInt())
+    }
+
+    private suspend fun readAsArrayBuffer(path: String): ArrayBuffer {
+        val resPath = WebResourcesConfiguration.getResourcePath(path)
+        val response = window.fetch(resPath).await()
+        if (!response.ok) {
+            throw MissingResourceException(resPath)
+        }
+        return response.arrayBuffer().await()
+    }
+
+    private fun ArrayBuffer.toByteArray(offset: Int, size: Int): ByteArray =
+        Int8Array(this, offset, size).unsafeCast<ByteArray>()
 }

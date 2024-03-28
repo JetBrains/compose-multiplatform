@@ -8,28 +8,6 @@ import org.w3c.fetch.Response
 import kotlin.wasm.unsafe.UnsafeWasmMemoryApi
 import kotlin.wasm.unsafe.withScopedMemoryAllocator
 
-/**
- * Reads the content of the resource file at the specified path and returns it as a byte array.
- *
- * @param path The path of the file to read in the resource's directory.
- * @return The content of the file as a byte array.
- */
-@OptIn(ExperimentalResourceApi::class)
-@InternalResourceApi
-actual suspend fun readResourceBytes(path: String): ByteArray {
-    val resPath = WebResourcesConfiguration.getResourcePath(path)
-    val response = window.fetch(resPath).await<Response>()
-    if (!response.ok) {
-        throw MissingResourceException(resPath)
-    }
-    return response.arrayBuffer().await<ArrayBuffer>().toByteArray()
-}
-
-private fun ArrayBuffer.toByteArray(): ByteArray  {
-    val source = Int8Array(this, 0, byteLength)
-    return jsInt8ArrayToKotlinByteArray(source)
-}
-
 @JsFun(
     """ (src, size, dstAddr) => {
         const mem8 = new Int8Array(wasmExports.memory.buffer, dstAddr, size);
@@ -48,5 +26,32 @@ internal fun jsInt8ArrayToKotlinByteArray(x: Int8Array): ByteArray {
         val dstAddress = memBuffer.address.toInt()
         jsExportInt8ArrayToWasm(x, size, dstAddress)
         ByteArray(size) { i -> (memBuffer + i).loadByte() }
+    }
+}
+
+@OptIn(ExperimentalResourceApi::class)
+internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
+    override suspend fun read(path: String): ByteArray {
+        return readAsArrayBuffer(path).let { buffer ->
+            buffer.toByteArray(0, buffer.byteLength)
+        }
+    }
+
+    override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
+        return readAsArrayBuffer(path).toByteArray(offset.toInt(), size.toInt())
+    }
+
+    private suspend fun readAsArrayBuffer(path: String): ArrayBuffer {
+        val resPath = WebResourcesConfiguration.getResourcePath(path)
+        val response = window.fetch(resPath).await<Response>()
+        if (!response.ok) {
+            throw MissingResourceException(resPath)
+        }
+        return response.arrayBuffer().await()
+    }
+
+    private fun ArrayBuffer.toByteArray(offset: Int, size: Int): ByteArray  {
+        val source = Int8Array(this, offset, size)
+        return jsInt8ArrayToKotlinByteArray(source)
     }
 }
