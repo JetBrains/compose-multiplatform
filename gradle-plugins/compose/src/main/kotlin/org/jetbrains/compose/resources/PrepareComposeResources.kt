@@ -1,12 +1,94 @@
 package org.jetbrains.compose.resources
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.Project
+import org.gradle.api.file.*
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.w3c.dom.Node
 import java.io.File
 import java.util.*
+import javax.inject.Inject
 import javax.xml.parsers.DocumentBuilderFactory
+
+internal fun Project.registerPrepareComposeResourcesTask(
+    userComposeResourcesDir: File,
+    preparedComposeResourcesDir: Provider<Directory>
+): TaskProvider<PrepareComposeResourcesTask> {
+    val convertXmlValueResources = tasks.register(
+        "convertXmlValueResources",
+        XmlValuesConverterTask::class.java
+    ) { task ->
+        task.originalResourcesDir.set(userComposeResourcesDir)
+        task.outputDir.set(preparedComposeResourcesDir)
+    }
+
+    val copyNonXmlValueResources = tasks.register(
+        "copyNonXmlValueResources",
+        CopyNonXmlValueResourcesTask::class.java
+    ) { task ->
+        task.originalResourcesDir.set(userComposeResourcesDir)
+        task.outputDir.set(preparedComposeResourcesDir)
+    }
+
+    val prepareComposeResourcesTask = tasks.register(
+        "prepareComposeResourcesTask",
+        PrepareComposeResourcesTask::class.java
+    ) { task ->
+        task.convertedXmls.set(convertXmlValueResources.map { it.realOutputFiles.get() })
+        task.copiedNonXmls.set(copyNonXmlValueResources.map { it.realOutputFiles.get() })
+        task.outputDir.set(preparedComposeResourcesDir.map { it.asFile })
+    }
+
+    return prepareComposeResourcesTask
+}
+
+internal abstract class CopyNonXmlValueResourcesTask : DefaultTask() {
+    @get:Inject
+    abstract val fileSystem: FileSystemOperations
+
+    @get:Internal
+    abstract val originalResourcesDir: DirectoryProperty
+
+    @get:InputFiles
+    val realInputFiles = originalResourcesDir.map { dir ->
+        dir.asFileTree.matching { it.exclude("values*/*.xml") }
+    }
+
+    @get:Internal
+    abstract val outputDir: DirectoryProperty
+
+    @get:OutputFiles
+    val realOutputFiles = outputDir.map { dir ->
+        dir.asFileTree.matching { it.exclude("values*/*.${XmlValuesConverterTask.CONVERTED_RESOURCE_EXT}") }
+    }
+
+    @TaskAction
+    fun run() {
+        fileSystem.copy {  copy ->
+            copy.includeEmptyDirs = false
+            copy.from(originalResourcesDir) {
+                it.exclude("values*/*.xml")
+            }
+            copy.into(outputDir)
+        }
+    }
+}
+
+internal abstract class PrepareComposeResourcesTask : DefaultTask() {
+    @get:InputFiles
+    abstract val convertedXmls: Property<FileTree>
+
+    @get:InputFiles
+    abstract val copiedNonXmls: Property<FileTree>
+
+    @get:OutputDirectory
+    abstract val outputDir: Property<File>
+
+    @TaskAction
+    fun run() {}
+}
 
 internal data class ValueResourceRecord(
     val type: ResourceType,
@@ -34,23 +116,33 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
         const val CONVERTED_RESOURCE_EXT = "cvr" //Compose Value Resource
     }
 
-    @get:InputFiles
-    abstract val originalResourcesDir: Property<File>
+    @get:Internal
+    abstract val originalResourcesDir: DirectoryProperty
 
-    @get:OutputDirectory
-    abstract val outputDir: Property<File>
+    @get:InputFiles
+    val realInputFiles = originalResourcesDir.map { dir ->
+        dir.asFileTree.matching { it.include("values*/*.xml") }
+    }
+
+    @get:Internal
+    abstract val outputDir: DirectoryProperty
+
+    @get:OutputFiles
+    val realOutputFiles = outputDir.map { dir ->
+        dir.asFileTree.matching { it.include("values*/*.$CONVERTED_RESOURCE_EXT") }
+    }
 
     @TaskAction
     fun run() {
-        val dir = outputDir.get()
-        dir.deleteRecursively()
-        originalResourcesDir.get().listNotHiddenFiles().forEach { dir ->
-            if (dir.isDirectory && dir.name.startsWith("values")) {
-                dir.listNotHiddenFiles().forEach { f ->
+        val outDir = outputDir.get().asFile
+        originalResourcesDir.get().asFile.listNotHiddenFiles().forEach { valuesDir ->
+            if (valuesDir.isDirectory && valuesDir.name.startsWith("values")) {
+                valuesDir.listNotHiddenFiles().forEach { f ->
                     if (f.extension.equals("xml", true)) {
-                        val output = dir
+                        val output = outDir
                             .resolve(f.parentFile.name)
                             .resolve(f.nameWithoutExtension + ".$CONVERTED_RESOURCE_EXT")
+                        output.delete()
                         output.parentFile.mkdirs()
                         convert(f, output)
                     }

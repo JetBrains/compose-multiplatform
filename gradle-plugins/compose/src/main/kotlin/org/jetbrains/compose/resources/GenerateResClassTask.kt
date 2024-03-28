@@ -29,10 +29,6 @@ internal abstract class GenerateResClassTask : DefaultTask() {
     @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val resDir: Property<File>
 
-    @get:InputFiles
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val convertedXmlValuesDir: Property<File>
-
     @get:OutputDirectory
     abstract val codeDir: Property<File>
 
@@ -103,11 +99,8 @@ internal abstract class GenerateResClassTask : DefaultTask() {
             return null
         }
 
-        if (typeString == "values" && file.extension.equals("xml", true)) {
-            val converted = convertedXmlValuesDir.get()
-                .resolve(file.parentFile.name)
-                .resolve(file.nameWithoutExtension + ".${XmlValuesConverterTask.CONVERTED_RESOURCE_EXT}")
-            return getValueResourceItems(converted, qualifiers, path.parent.resolve(converted.name))
+        if (typeString == "values" && file.extension.equals(XmlValuesConverterTask.CONVERTED_RESOURCE_EXT, true)) {
+            return getValueResourceItems(file, qualifiers, path)
         }
 
         val type = ResourceType.fromString(typeString) ?: error("Unknown resource type: '$typeString'.")
