@@ -110,11 +110,16 @@ internal abstract class GenerateResClassTask : DefaultTask() {
     private fun getValueResourceItems(dataFile: File, qualifiers: List<String>, path: Path) : List<ResourceItem> {
         val result = mutableListOf<ResourceItem>()
         RandomAccessFile(dataFile, "r").use { f ->
-            var offset: Long = 0
+            var offset = 0L
             var line: String? = f.readLine()
             while (line != null) {
-                val size = line.encodeToByteArray().size.toLong()
-                result.add(getValueResourceItem(line, offset, size, qualifiers, path))
+                val size = line.encodeToByteArray().size
+
+                //first line is meta info
+                if (offset > 0) {
+                    result.add(getValueResourceItem(line, offset, size.toLong(), qualifiers, path))
+                }
+
                 offset += size + 1 // "+1" for newline character
                 line = f.readLine()
             }
@@ -130,7 +135,7 @@ internal abstract class GenerateResClassTask : DefaultTask() {
         path: Path
     ) : ResourceItem {
         val record = ValueResourceRecord.createFromString(recordString)
-        return ResourceItem(record.type, qualifiers, record.key.asUnderscoredIdentifier(), path.resolve("$offset-$size"))
+        return ResourceItem(record.type, qualifiers, record.key.asUnderscoredIdentifier(), path, offset, size)
     }
 }
 

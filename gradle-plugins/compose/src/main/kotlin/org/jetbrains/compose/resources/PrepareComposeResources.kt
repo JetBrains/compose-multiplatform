@@ -97,12 +97,13 @@ internal data class ValueResourceRecord(
     val content: String
 ) {
     fun getAsString(): String {
-        return listOf(type.typeName, key, content).joinToString("#")
+        return listOf(type.typeName, key, content).joinToString(SEPARATOR)
     }
 
     companion object {
+        private const val SEPARATOR = "|"
         fun createFromString(string: String): ValueResourceRecord {
-            val parts = string.split("#")
+            val parts = string.split(SEPARATOR)
             return ValueResourceRecord(
                 ResourceType.fromString(parts[0])!!,
                 parts[1],
@@ -115,6 +116,7 @@ internal data class ValueResourceRecord(
 internal abstract class XmlValuesConverterTask : DefaultTask() {
     companion object {
         const val CONVERTED_RESOURCE_EXT = "cvr" //Compose Value Resource
+        private const val FORMAT_VERSION = 0
     }
 
     @get:Internal
@@ -156,7 +158,11 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
         val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(original)
         val items = doc.getElementsByTagName("resources").item(0).childNodes
         val records = List(items.length) { items.item(it) }.mapNotNull { getItemRecord(it)?.getAsString() }
-        converted.writeText(records.sorted().joinToString("\n"))
+        val fileContent = buildString {
+            appendLine("version:$FORMAT_VERSION")
+            records.sorted().forEach { appendLine(it) }
+        }
+        converted.writeText(fileContent)
     }
 
     private fun getItemRecord(node: Node): ValueResourceRecord? {

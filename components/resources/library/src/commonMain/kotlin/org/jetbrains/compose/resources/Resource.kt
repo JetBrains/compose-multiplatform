@@ -40,10 +40,14 @@ sealed class Resource
  *
  * @property qualifiers The qualifiers of the resource item.
  * @property path The path of the resource item.
+ * @property offset The offset in bytes of the resource in the file. '-1' means the resource is whole file
+ * @property size The size in bytes of the resource in the file. '-1' means the resource is whole file
  */
 @InternalResourceApi
 @Immutable
 data class ResourceItem(
     internal val qualifiers: Set<Qualifier>,
-    internal val path: String
+    internal val path: String,
+    internal val offset: Long,
+    internal val size: Long,
 )

@@ -5,7 +5,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.intl.Locale
 
-@OptIn(InternalResourceApi::class)
 internal data class ResourceEnvironment(
     val language: LanguageQualifier,
     val region: RegionQualifier,
@@ -18,7 +17,6 @@ internal interface ComposeEnvironment {
     fun rememberEnvironment(): ResourceEnvironment
 }
 
-@OptIn(InternalResourceApi::class)
 internal val DefaultComposeEnvironment = object : ComposeEnvironment {
     @Composable
     override fun rememberEnvironment(): ResourceEnvironment {
@@ -51,17 +49,17 @@ internal expect fun getSystemEnvironment(): ResourceEnvironment
 internal var getResourceEnvironment = ::getSystemEnvironment
 
 @OptIn(InternalResourceApi::class, ExperimentalResourceApi::class)
-internal fun Resource.getPathByEnvironment(environment: ResourceEnvironment): String {
+internal fun Resource.getResourceItemByEnvironment(environment: ResourceEnvironment): ResourceItem {
     //Priority of environments: https://developer.android.com/guide/topics/resources/providing-resources#table2
     items.toList()
         .filterBy(environment.language)
-        .also { if (it.size == 1) return it.first().path }
+        .also { if (it.size == 1) return it.first() }
         .filterBy(environment.region)
-        .also { if (it.size == 1) return it.first().path }
+        .also { if (it.size == 1) return it.first() }
         .filterBy(environment.theme)
-        .also { if (it.size == 1) return it.first().path }
+        .also { if (it.size == 1) return it.first() }
         .filterBy(environment.density)
-        .also { if (it.size == 1) return it.first().path }
+        .also { if (it.size == 1) return it.first() }
         .let { items ->
             if (items.isEmpty()) {
                 error("Resource with ID='$id' not found")
@@ -71,7 +69,6 @@ internal fun Resource.getPathByEnvironment(environment: ResourceEnvironment): St
         }
 }
 
-@OptIn(InternalResourceApi::class)
 private fun List<ResourceItem>.filterBy(qualifier: Qualifier): List<ResourceItem> {
     //Android has a slightly different algorithm,
     //but it provides the same result: https://developer.android.com/guide/topics/resources/providing-resources#BestMatch

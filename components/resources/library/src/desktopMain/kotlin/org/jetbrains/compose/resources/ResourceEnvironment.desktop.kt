@@ -5,7 +5,6 @@ import org.jetbrains.skiko.currentSystemTheme
 import java.awt.Toolkit
 import java.util.*
 
-@OptIn(InternalResourceApi::class)
 internal actual fun getSystemEnvironment(): ResourceEnvironment {
     val locale = Locale.getDefault()
     //FIXME: don't use skiko internals

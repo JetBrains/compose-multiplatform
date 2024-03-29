@@ -9,7 +9,6 @@ import androidx.compose.runtime.*
  * @param key The key used to retrieve the string resource.
  * @param items The set of resource items associated with the string resource.
  */
-@OptIn(InternalResourceApi::class)
 @ExperimentalResourceApi
 @Immutable
 class StringResource
@@ -45,14 +44,14 @@ fun stringResource(resource: StringResource): String {
 suspend fun getString(resource: StringResource): String =
     loadString(resource, DefaultResourceReader, getResourceEnvironment())
 
-@OptIn(ExperimentalResourceApi::class)
+@OptIn(ExperimentalResourceApi::class, InternalResourceApi::class)
 private suspend fun loadString(
     resource: StringResource,
     resourceReader: ResourceReader,
     environment: ResourceEnvironment
 ): String {
-    val path = resource.getPathByEnvironment(environment)
-    val item = getStringItem(path, resourceReader) as StringItem.Value
+    val resourceItem = resource.getResourceItemByEnvironment(environment)
+    val item = getStringItem(resourceItem, resourceReader) as StringItem.Value
     return item.text
 }
 

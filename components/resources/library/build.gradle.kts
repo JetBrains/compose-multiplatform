@@ -52,6 +52,7 @@ kotlin {
                 optIn("kotlin.RequiresOptIn")
                 optIn("kotlinx.cinterop.ExperimentalForeignApi")
                 optIn("kotlin.experimental.ExperimentalNativeApi")
+                optIn("org.jetbrains.compose.resources.InternalResourceApi")
             }
         }
 

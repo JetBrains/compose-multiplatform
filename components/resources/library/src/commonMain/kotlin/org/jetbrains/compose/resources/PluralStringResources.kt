@@ -11,7 +11,6 @@ import org.jetbrains.compose.resources.plural.PluralRuleList
  * @param key The key used to retrieve the string resource.
  * @param items The set of resource items associated with the string resource.
  */
-@OptIn(InternalResourceApi::class)
 @ExperimentalResourceApi
 @Immutable
 class PluralStringResource
@@ -56,8 +55,8 @@ private suspend fun loadPluralString(
     resourceReader: ResourceReader,
     environment: ResourceEnvironment
 ): String {
-    val path = resource.getPathByEnvironment(environment)
-    val item = getStringItem(path, resourceReader) as StringItem.Plurals
+    val resourceItem = resource.getResourceItemByEnvironment(environment)
+    val item = getStringItem(resourceItem, resourceReader) as StringItem.Plurals
     val pluralRuleList = PluralRuleList.getInstance(
         environment.language,
         environment.region,

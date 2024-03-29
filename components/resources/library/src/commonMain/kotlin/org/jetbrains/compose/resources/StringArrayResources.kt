@@ -16,7 +16,6 @@ import org.jetbrains.compose.resources.vector.xmldom.NodeList
  * @param key The key used to retrieve the string array resource.
  * @param items The set of resource items associated with the string array resource.
  */
-@OptIn(InternalResourceApi::class)
 @ExperimentalResourceApi
 @Immutable
 class StringArrayResource
@@ -52,13 +51,13 @@ fun stringArrayResource(resource: StringArrayResource): List<String> {
 suspend fun getStringArray(resource: StringArrayResource): List<String> =
     loadStringArray(resource, DefaultResourceReader, getResourceEnvironment())
 
-@OptIn(ExperimentalResourceApi::class)
+@OptIn(ExperimentalResourceApi::class, InternalResourceApi::class)
 private suspend fun loadStringArray(
     resource: StringArrayResource,
     resourceReader: ResourceReader,
     environment: ResourceEnvironment
 ): List<String> {
-    val path = resource.getPathByEnvironment(environment)
-    val item = getStringItem(path, resourceReader) as StringItem.Array
+    val resourceItem = resource.getResourceItemByEnvironment(environment)
+    val item = getStringItem(resourceItem, resourceReader) as StringItem.Array
     return item.items
 }

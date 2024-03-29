@@ -28,18 +28,19 @@ internal fun dropStringItemsCache() {
 }
 
 internal suspend fun getStringItem(
-    path: String,
+    resourceItem: ResourceItem,
     resourceReader: ResourceReader
 ): StringItem = coroutineScope {
     val deferred = stringsCacheMutex.withLock {
-        stringItemsCache.getOrPut(path) {
+        stringItemsCache.getOrPut("${resourceItem.path}/${resourceItem.offset}-${resourceItem.size}") {
             //LAZY - to free the mutex lock as fast as possible
             async(start = CoroutineStart.LAZY) {
-                val filePath = path.substringBeforeLast('/')
-                val recordPath = path.substringAfterLast('/')
-                val (offset, size) = recordPath.split('-').map { it.toLong() }
-                val record = resourceReader.readPart(filePath, offset, size).decodeToString()
-                val recordItems = record.split('#')
+                val record = resourceReader.readPart(
+                    resourceItem.path,
+                    resourceItem.offset,
+                    resourceItem.size
+                ).decodeToString()
+                val recordItems = record.split('|')
                 val recordType = recordItems.first()
                 val recordData = recordItems.last()
                 when (recordType) {

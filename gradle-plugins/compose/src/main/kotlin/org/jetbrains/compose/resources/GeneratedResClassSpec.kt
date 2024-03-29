@@ -25,15 +25,17 @@ internal data class ResourceItem(
     val type: ResourceType,
     val qualifiers: List<String>,
     val name: String,
-    val path: Path
+    val path: Path,
+    val offset: Long = -1,
+    val size: Long = -1,
 )
 
 private fun ResourceType.getClassName(): ClassName = when (this) {
     ResourceType.DRAWABLE -> ClassName("org.jetbrains.compose.resources", "DrawableResource")
+    ResourceType.FONT -> ClassName("org.jetbrains.compose.resources", "FontResource")
     ResourceType.STRING -> ClassName("org.jetbrains.compose.resources", "StringResource")
     ResourceType.STRING_ARRAY -> ClassName("org.jetbrains.compose.resources", "StringArrayResource")
     ResourceType.PLURAL_STRING -> ClassName("org.jetbrains.compose.resources", "PluralStringResource")
-    ResourceType.FONT -> ClassName("org.jetbrains.compose.resources", "FontResource")
 }
 
 private fun ResourceType.requiresKeyName() =
@@ -237,7 +239,8 @@ private fun getChunkFileSpec(
                                         add("%T(", resourceItemClass)
                                         add("setOf(").addQualifiers(item).add("), ")
                                         //file separator should be '/' on all platforms
-                                        add("\"$moduleDir${item.path.invariantSeparatorsPathString}\"")
+                                        add("\"$moduleDir${item.path.invariantSeparatorsPathString}\", ")
+                                        add("${item.offset}, ${item.size}")
                                         add("),\n")
                                     }
                                 }

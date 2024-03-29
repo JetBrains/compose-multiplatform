@@ -4,7 +4,6 @@ import platform.Foundation.*
 import platform.UIKit.UIScreen
 import platform.UIKit.UIUserInterfaceStyle
 
-@OptIn(InternalResourceApi::class)
 internal actual fun getSystemEnvironment(): ResourceEnvironment {
     val locale = NSLocale.preferredLanguages.firstOrNull()
         ?.let { NSLocale(it as String) }

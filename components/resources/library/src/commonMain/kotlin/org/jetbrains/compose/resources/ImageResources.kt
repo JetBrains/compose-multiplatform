@@ -20,7 +20,6 @@ import org.jetbrains.compose.resources.vector.xmldom.Element
  * @param id The unique identifier of the drawable resource.
  * @param items The set of resource items associated with the image resource.
  */
-@OptIn(InternalResourceApi::class)
 @ExperimentalResourceApi
 @Immutable
 class DrawableResource
@@ -32,11 +31,10 @@ class DrawableResource
  * @param path The path of the drawable resource.
  * @return An [DrawableResource] object.
  */
-@OptIn(InternalResourceApi::class)
 @ExperimentalResourceApi
 fun DrawableResource(path: String): DrawableResource = DrawableResource(
     id = "DrawableResource:$path",
-    items = setOf(ResourceItem(emptySet(), path))
+    items = setOf(ResourceItem(emptySet(), path, -1, -1))
 )
 
 /**
@@ -50,7 +48,7 @@ fun DrawableResource(path: String): DrawableResource = DrawableResource(
 @Composable
 fun painterResource(resource: DrawableResource): Painter {
     val environment = LocalComposeEnvironment.current.rememberEnvironment()
-    val filePath = remember(resource, environment) { resource.getPathByEnvironment(environment) }
+    val filePath = remember(resource, environment) { resource.getResourceItemByEnvironment(environment).path }
     val isXml = filePath.endsWith(".xml", true)
     if (isXml) {
         return rememberVectorPainter(vectorResource(resource))
@@ -72,7 +70,7 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 fun imageResource(resource: DrawableResource): ImageBitmap {
     val resourceReader = LocalResourceReader.current
     val imageBitmap by rememberResourceState(resource, { emptyImageBitmap }) { env ->
-        val path = resource.getPathByEnvironment(env)
+        val path = resource.getResourceItemByEnvironment(env).path
         val cached = loadImage(path, resourceReader) {
             ImageCache.Bitmap(it.toImageBitmap())
         } as ImageCache.Bitmap
@@ -97,7 +95,7 @@ fun vectorResource(resource: DrawableResource): ImageVector {
     val resourceReader = LocalResourceReader.current
     val density = LocalDensity.current
     val imageVector by rememberResourceState(resource, { emptyImageVector }) { env ->
-        val path = resource.getPathByEnvironment(env)
+        val path = resource.getResourceItemByEnvironment(env).path
         val cached = loadImage(path, resourceReader) {
             ImageCache.Vector(it.toXmlElement().toImageVector(density))
         } as ImageCache.Vector
