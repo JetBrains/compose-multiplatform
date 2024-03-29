@@ -70,7 +70,7 @@ fun StringRes(paddingValues: PaddingValues) {
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
             value = stringArrayResource(Res.array.str_arr).toString(),
             onValueChange = {},
-            label = { Text("Text(stringArrayResource(Res.string.str_arr).toString())") },
+            label = { Text("Text(stringArrayResource(Res.array.str_arr).toString())") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,
