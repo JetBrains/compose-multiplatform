@@ -9,7 +9,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 @ExperimentalResourceApi
 private object Drawable0 {
     public val vector: DrawableResource by
-        lazy { init_vector() }
+    lazy { init_vector() }
 }
 
 @ExperimentalResourceApi
@@ -20,6 +20,6 @@ internal val Res.drawable.vector: DrawableResource
 private fun init_vector(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
     "drawable:vector",
     setOf(
-        org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/vector.xml"),
+        org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/vector.xml", -1, -1),
     )
 )

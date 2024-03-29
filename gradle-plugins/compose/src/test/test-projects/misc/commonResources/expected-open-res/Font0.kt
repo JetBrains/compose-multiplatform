@@ -8,8 +8,8 @@ import org.jetbrains.compose.resources.FontResource
 
 @ExperimentalResourceApi
 private object Font0 {
-  public val emptyFont: FontResource by 
-      lazy { init_emptyFont() }
+  public val emptyFont: FontResource by
+  lazy { init_emptyFont() }
 }
 
 @ExperimentalResourceApi
@@ -22,7 +22,7 @@ private fun init_emptyFont(): FontResource = org.jetbrains.compose.resources.Fon
   setOf(
 
     org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.LanguageQualifier("en"),
-    ), "font-en/emptyFont.otf"),
-    org.jetbrains.compose.resources.ResourceItem(setOf(), "font/emptyFont.otf"),
+    ), "font-en/emptyFont.otf", -1, -1),
+    org.jetbrains.compose.resources.ResourceItem(setOf(), "font/emptyFont.otf", -1, -1),
   )
 )

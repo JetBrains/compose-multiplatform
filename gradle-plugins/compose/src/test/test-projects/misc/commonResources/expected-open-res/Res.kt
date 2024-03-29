@@ -27,6 +27,8 @@ public object Res {
 
   public object string
 
+  public object array
+
   public object plurals
 
   public object font

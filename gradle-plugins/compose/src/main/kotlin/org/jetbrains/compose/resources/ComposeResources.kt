@@ -4,6 +4,7 @@ import com.android.build.gradle.BaseExtension
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.util.GradleVersion
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
@@ -67,6 +68,8 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>) {
             }
         }
     }
+
+    configureSyncIosComposeResources(kotlinExtension)
 }
 
 private fun Project.onKotlinJvmApplied(config: Provider<ResourcesExtension>) {

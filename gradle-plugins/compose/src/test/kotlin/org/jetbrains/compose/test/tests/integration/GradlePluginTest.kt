@@ -104,28 +104,6 @@ class GradlePluginTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun iosMokoResources() {
-        Assumptions.assumeTrue(currentOS == OS.MacOS)
-        val iosTestEnv = iosTestEnv()
-        val testEnv = defaultTestEnvironment.copy(
-            additionalEnvVars = iosTestEnv.envVars
-        )
-        with(testProject(TestProjects.iosMokoResources, testEnv)) {
-            gradle(
-                ":embedAndSignAppleFrameworkForXcode",
-                ":copyFrameworkResourcesToApp",
-                "--dry-run",
-                "--info"
-            ).checks {
-                // This test is not intended to actually run embedAndSignAppleFrameworkForXcode.
-                // Instead, it should check that the sync disables itself.
-                check.logContains("Compose Multiplatform resource management for iOS is disabled")
-                check.logDoesntContain(":syncComposeResourcesForIos")
-            }
-        }
-    }
-
-    @Test
     fun nativeCacheKind() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
         val task = if (currentArch == Arch.X64) {

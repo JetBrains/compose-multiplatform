@@ -1,19 +1,15 @@
-/*
- * Copyright 2020-2023 JetBrains s.r.o. and respective authors and developers.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
- */
+package org.jetbrains.compose.resources
 
-package org.jetbrains.compose.resources.ios
-
+import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
-import org.gradle.api.provider.MapProperty
-import org.gradle.api.provider.Provider
+import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.*
 import org.gradle.api.tasks.*
-import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
 import org.jetbrains.kotlin.konan.target.KonanTarget
+import javax.inject.Inject
 
-internal abstract class SyncComposeResourcesForIosTask : AbstractComposeIosTask() {
+internal abstract class SyncComposeResourcesForIosTask : DefaultTask() {
 
     private fun Provider<String>.orElseThrowMissingAttributeError(attribute: String): Provider<String> {
         val noProvidedValue = "__NO_PROVIDED_VALUE__"
@@ -27,6 +23,12 @@ internal abstract class SyncComposeResourcesForIosTask : AbstractComposeIosTask(
             it
         }
     }
+
+    @get:Inject
+    protected abstract val providers: ProviderFactory
+
+    @get:Inject
+    protected abstract val objects: ObjectFactory
 
     @get:Input
     val xcodeTargetPlatform: Provider<String> =
@@ -50,7 +52,7 @@ internal abstract class SyncComposeResourcesForIosTask : AbstractComposeIosTask(
     val resourceFiles: Provider<FileCollection> =
         xcodeTargetPlatform.zip(xcodeTargetArchs, ::Pair).map { (xcodeTargetPlatform, xcodeTargetArchs) ->
             val allResources = getRequestedKonanTargetsByXcode(xcodeTargetPlatform, xcodeTargetArchs)
-                .mapNotNull { konanTarget -> targetResources.getting(konanTarget.name).get().files }
+                .mapNotNull { konanTarget -> targetResources.getting(konanTarget.name).get() }
             objects.fileCollection().from(*allResources.toTypedArray())
         }
 
@@ -77,7 +79,7 @@ internal abstract class SyncComposeResourcesForIosTask : AbstractComposeIosTask(
                     }
                 }
             } else {
-                logger.warn("File '${dir.path}' is not a dir or doesn't exist")
+                logger.info("File '${dir.path}' is not a dir or doesn't exist")
             }
         }
     }
@@ -113,4 +115,34 @@ private fun getRequestedKonanTargetsByXcode(platform: String, archs: List<String
     }
 
     return targets.toList()
+}
+
+/**
+ * Since Xcode 15, there is a new default setting: `ENABLE_USER_SCRIPT_SANDBOXING = YES`
+ * It's set in project.pbxproj
+ *
+ * SyncComposeResourcesForIosTask fails to work with it right now.
+ *
+ * Gradle attempts to create an output folder for SyncComposeResourcesForIosTask on our behalf,
+ * so we can't handle an exception when it occurs. Therefore, we make SyncComposeResourcesForIosTask
+ * depend on CheckCanAccessComposeResourcesDirectory, where we check ENABLE_USER_SCRIPT_SANDBOXING.
+ */
+internal abstract class CheckCanAccessComposeResourcesDirectory : DefaultTask() {
+    @get:Input
+    val enabled = project.providers.environmentVariable("ENABLE_USER_SCRIPT_SANDBOXING")
+        .orElse("NOT_DEFINED")
+        .map { it == "YES" }
+
+    @TaskAction
+    fun run() {
+        if (enabled.get()) {
+            logger.error("""
+                Failed to sync compose resources!
+                Please make sure ENABLE_USER_SCRIPT_SANDBOXING is set to 'NO' in 'project.pbxproj'
+            """.trimIndent())
+            throw IllegalStateException(
+                "Sandbox environment detected (ENABLE_USER_SCRIPT_SANDBOXING = YES). It's not supported so far."
+            )
+        }
+    }
 }

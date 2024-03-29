@@ -2,7 +2,6 @@ package org.jetbrains.compose.resources
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.jetbrains.compose.resources.ios.getSyncResourcesTaskName
 import org.jetbrains.kotlin.gradle.ComposeKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
@@ -114,18 +113,11 @@ private fun Project.configureResourcesForCompilation(
 ) {
     logger.info("Add all resolved resources to '${compilation.target.targetName}' target '${compilation.name}' compilation")
     compilation.defaultSourceSet.resources.srcDir(directoryWithAllResourcesForCompilation)
+
+    //JS packaging requires explicit dependency
     if (compilation is KotlinJsCompilation) {
         tasks.named(compilation.processResourcesTaskName).configure { processResourcesTask ->
             processResourcesTask.dependsOn(directoryWithAllResourcesForCompilation)
-        }
-    }
-    if (compilation is KotlinNativeCompilation) {
-        compilation.target.binaries.withType(Framework::class.java).all { framework ->
-            tasks.configureEach { task ->
-                if (task.name == framework.getSyncResourcesTaskName()) {
-                    task.dependsOn(directoryWithAllResourcesForCompilation)
-                }
-            }
         }
     }
 }
