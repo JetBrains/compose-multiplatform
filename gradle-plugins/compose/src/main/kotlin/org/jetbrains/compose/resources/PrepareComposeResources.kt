@@ -202,34 +202,34 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
 
     private fun String.asBase64() =
         Base64.getEncoder().encode(this.encodeToByteArray()).decodeToString()
+}
 
-    //https://developer.android.com/guide/topics/resources/string-resource#escaping_quotes
-    /**
-     * Replaces
-     *
-     * '\n' -> new line
-     *
-     * '\t' -> tab
-     *
-     * '\uXXXX' -> unicode symbol
-     *
-     * '\\' -> '\'
-     *
-     * @param string The input string to handle.
-     * @return The string with special characters replaced according to the logic.
-     */
-    private fun handleSpecialCharacters(string: String): String {
-        val unicodeNewLineTabRegex = Regex("""\\u[a-fA-F\d]{4}|\\n|\\t""")
-        val doubleSlashRegex = Regex("""\\\\""")
-        val doubleSlashIndexes = doubleSlashRegex.findAll(string).map { it.range.first }
-        val handledString = unicodeNewLineTabRegex.replace(string) { matchResult ->
-            if (doubleSlashIndexes.contains(matchResult.range.first - 1)) matchResult.value
-            else when (matchResult.value) {
-                "\\n" -> "\n"
-                "\\t" -> "\t"
-                else -> matchResult.value.substring(2).toInt(16).toChar().toString()
-            }
-        }.replace("""\\""", """\""")
-        return handledString
-    }
+//https://developer.android.com/guide/topics/resources/string-resource#escaping_quotes
+/**
+ * Replaces
+ *
+ * '\n' -> new line
+ *
+ * '\t' -> tab
+ *
+ * '\uXXXX' -> unicode symbol
+ *
+ * '\\' -> '\'
+ *
+ * @param string The input string to handle.
+ * @return The string with special characters replaced according to the logic.
+ */
+internal fun handleSpecialCharacters(string: String): String {
+    val unicodeNewLineTabRegex = Regex("""\\u[a-fA-F\d]{4}|\\n|\\t""")
+    val doubleSlashRegex = Regex("""\\\\""")
+    val doubleSlashIndexes = doubleSlashRegex.findAll(string).map { it.range.first }
+    val handledString = unicodeNewLineTabRegex.replace(string) { matchResult ->
+        if (doubleSlashIndexes.contains(matchResult.range.first - 1)) matchResult.value
+        else when (matchResult.value) {
+            "\\n" -> "\n"
+            "\\t" -> "\t"
+            else -> matchResult.value.substring(2).toInt(16).toChar().toString()
+        }
+    }.replace("""\\""", """\""")
+    return handledString
 }
