@@ -5,16 +5,12 @@ import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.SourceSet
 import org.gradle.util.GradleVersion
-import org.jetbrains.compose.experimental.uikit.internal.utils.isIosTarget
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
-import org.jetbrains.compose.resources.ios.getSyncResourcesTaskName
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.extraProperties
-import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import java.io.File
 
 
@@ -70,20 +66,6 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>) {
                 configureAndroidComposeResources(kotlinExtension, androidExtension, preparedCommonResources)
             }
         }
-
-        //configure ios resources
-        kotlinExtension.targets
-            .matching { target -> target is KotlinNativeTarget && target.isIosTarget() }
-            .all { iosTarget ->
-                iosTarget as KotlinNativeTarget
-                iosTarget.binaries.withType(Framework::class.java).all { framework ->
-                    tasks.configureEach { task ->
-                        if (task.name == framework.getSyncResourcesTaskName()) {
-                            task.dependsOn(preparedCommonResources)
-                        }
-                    }
-                }
-            }
     }
 }
 

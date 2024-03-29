@@ -8,19 +8,11 @@ package org.jetbrains.compose.resources.ios
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.TaskContainer
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.experimental.uikit.internal.utils.asIosNativeTargetOrNull
-import org.jetbrains.compose.experimental.uikit.internal.utils.cocoapodsExt
-import org.jetbrains.compose.experimental.uikit.internal.utils.withCocoapodsPlugin
+import org.jetbrains.compose.experimental.uikit.internal.utils.*
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
-import org.jetbrains.compose.internal.utils.joinLowerCamelCase
-import org.jetbrains.compose.internal.utils.new
-import org.jetbrains.compose.internal.utils.registerOrConfigure
-import org.jetbrains.compose.internal.utils.uppercaseFirstChar
+import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.*
 import java.io.File
@@ -105,11 +97,13 @@ private fun SyncIosResourcesContext.configureCocoapodsResourcesAttribute() {
             val specAttributes = cocoapodsExt.extraSpecAttributes
             val resourcesSpec = specAttributes[RESOURCES_SPEC_ATTR]
             if (!resourcesSpec.isNullOrBlank()) {
-                error("""
+                error(
+                    """
                     |Kotlin.cocoapods.extraSpecAttributes["resources"] is not compatible with Compose Multiplatform's resources management for iOS.
                     |  * Recommended action: remove extraSpecAttributes["resources"] from '${project.buildFile}' and run '${project.path}:podInstall' once;
                     |  * Alternative action: turn off Compose Multiplatform's resources management for iOS by adding '${ComposeProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties;
-                """.trimMargin())
+                """.trimMargin()
+                )
             }
             cocoapodsExt.framework {
                 val syncDir = syncDirFor(this).get().asFile
@@ -163,13 +157,21 @@ private fun SyncIosResourcesContext.configureSyncResourcesTasks() {
         val frameworkClassifier = framework.namePrefix.uppercaseFirstChar()
         val syncResourcesTaskName = framework.getSyncResourcesTaskName()
         val checkSyncResourcesTaskName = "checkCanSync${frameworkClassifier}ComposeResourcesForIos"
-        val checkNoSandboxTask = framework.project.tasks.registerOrConfigure<CheckCanAccessComposeResourcesDirectory>(checkSyncResourcesTaskName) {}
-        val syncTask = framework.project.tasks.registerOrConfigure<SyncComposeResourcesForIosTask>(syncResourcesTaskName) {
-            dependsOn(checkNoSandboxTask)
-            outputDir.set(syncDirFor(framework))
-            iosTargets.add(iosTargetResourcesProvider(framework))
+        val checkNoSandboxTask = framework.project.tasks.registerOrConfigure<CheckCanAccessComposeResourcesDirectory>(
+            checkSyncResourcesTaskName
+        ) {}
+
+        val frameworkResources = framework.project.files()
+        framework.compilation.allKotlinSourceSets.forAll { ss ->
+            frameworkResources.from(ss.resources.srcDirs)
         }
-        with (lazyTasksDependencies) {
+        val syncTask = framework.project.tasks
+            .registerOrConfigure<SyncComposeResourcesForIosTask>(syncResourcesTaskName) {
+                dependsOn(checkNoSandboxTask)
+                outputDir.set(syncDirFor(framework))
+                targetResources.put(framework.target.konanTarget.name, frameworkResources)
+            }
+        with(lazyTasksDependencies) {
             if (framework.isCocoapodsFramework) {
                 "syncFramework".lazyDependsOn(syncTask.name)
             } else {
@@ -181,7 +183,7 @@ private fun SyncIosResourcesContext.configureSyncResourcesTasks() {
         val copyTestResourcesTask = "copyTestComposeResourcesFor${bin.target.targetName.uppercaseFirstChar()}"
         val task = project.tasks.registerOrConfigure<Copy>(copyTestResourcesTask) {
             from({
-                (bin.compilation.associateWith + bin.compilation).flatMap { compilation ->
+                (bin.compilation.associatedCompilations + bin.compilation).flatMap { compilation ->
                     compilation.allKotlinSourceSets.map { it.resources }
                 }
             })
@@ -204,28 +206,16 @@ private val Framework.namePrefix: String
         outputKind.taskNameClassifier
     )
 
-private fun extractPrefixFromBinaryName(name: String, buildType: NativeBuildType, outputKindClassifier: String): String {
+private fun extractPrefixFromBinaryName(
+    name: String,
+    buildType: NativeBuildType,
+    outputKindClassifier: String
+): String {
     val suffix = joinLowerCamelCase(buildType.getName(), outputKindClassifier)
     return if (name == suffix)
         ""
     else
         name.substringBeforeLast(suffix.uppercaseFirstChar())
-}
-
-private fun iosTargetResourcesProvider(bin: NativeBinary): Provider<IosTargetResources> {
-    val kotlinTarget = bin.target
-    val project = bin.project
-    return project.provider {
-        val resourceDirs = bin.compilation.allKotlinSourceSets
-            .flatMap { sourceSet ->
-                sourceSet.resources.srcDirs.map { it.canonicalPath }
-            }
-        project.objects.new<IosTargetResources>().apply {
-            name.set(kotlinTarget.name)
-            konanTarget.set(kotlinTarget.konanTarget.name)
-            dirs.set(resourceDirs)
-        }
-    }
 }
 
 /**
