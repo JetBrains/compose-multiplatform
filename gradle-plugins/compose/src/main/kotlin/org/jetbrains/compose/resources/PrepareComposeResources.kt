@@ -66,6 +66,7 @@ internal abstract class CopyNonXmlValueResourcesTask : DefaultTask() {
 
     @TaskAction
     fun run() {
+        realOutputFiles.get().forEach { f -> f.delete() }
         fileSystem.copy {  copy ->
             copy.includeEmptyDirs = false
             copy.from(originalResourcesDir) {
@@ -135,6 +136,7 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
     @TaskAction
     fun run() {
         val outDir = outputDir.get().asFile
+        realOutputFiles.get().forEach { f -> f.delete() }
         originalResourcesDir.get().asFile.listNotHiddenFiles().forEach { valuesDir ->
             if (valuesDir.isDirectory && valuesDir.name.startsWith("values")) {
                 valuesDir.listNotHiddenFiles().forEach { f ->
@@ -142,7 +144,6 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
                         val output = outDir
                             .resolve(f.parentFile.name)
                             .resolve(f.nameWithoutExtension + ".$CONVERTED_RESOURCE_EXT")
-                        output.delete()
                         output.parentFile.mkdirs()
                         convert(f, output)
                     }
