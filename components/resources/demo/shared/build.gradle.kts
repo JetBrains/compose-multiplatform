@@ -83,3 +83,8 @@ android {
 compose.experimental {
     web.application {}
 }
+
+//because the dependency on the compose library is a project dependency
+compose.resources {
+    generateResClass = always
+}

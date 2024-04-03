@@ -18,27 +18,6 @@ fun StringRes(paddingValues: PaddingValues) {
     Column(
         modifier = Modifier.padding(paddingValues).verticalScroll(rememberScrollState())
     ) {
-        Text(
-            modifier = Modifier.padding(16.dp),
-            text = "values/strings.xml",
-            style = MaterialTheme.typography.titleLarge
-        )
-        OutlinedCard(
-            modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth(),
-            shape = RoundedCornerShape(4.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-        ) {
-            var bytes by remember { mutableStateOf(ByteArray(0)) }
-            LaunchedEffect(Unit) {
-                bytes = Res.readBytes("values/strings.xml")
-            }
-            Text(
-                modifier = Modifier.padding(8.dp),
-                text = bytes.decodeToString(),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                softWrap = false
-            )
-        }
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
             value = stringResource(Res.string.app_name),
@@ -89,9 +68,9 @@ fun StringRes(paddingValues: PaddingValues) {
         )
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = stringArrayResource(Res.string.str_arr).toString(),
+            value = stringArrayResource(Res.array.str_arr).toString(),
             onValueChange = {},
-            label = { Text("Text(stringArrayResource(Res.string.str_arr).toString())") },
+            label = { Text("Text(stringArrayResource(Res.array.str_arr).toString())") },
             enabled = false,
             colors = TextFieldDefaults.colors(
                 disabledTextColor = MaterialTheme.colorScheme.onSurface,

@@ -1,11 +1,26 @@
 package org.jetbrains.compose.resources
 
-private object JvmResourceReader
+import java.io.InputStream
 
-@OptIn(ExperimentalResourceApi::class)
-@InternalResourceApi
-actual suspend fun readResourceBytes(path: String): ByteArray {
-    val classLoader = Thread.currentThread().contextClassLoader ?: JvmResourceReader.javaClass.classLoader
-    val resource = classLoader.getResourceAsStream(path) ?: throw MissingResourceException(path)
-    return resource.readBytes()
+internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
+    override suspend fun read(path: String): ByteArray {
+        val resource = getResourceAsStream(path)
+        return resource.readBytes()
+    }
+
+    override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
+        val resource = getResourceAsStream(path)
+        val result = ByteArray(size.toInt())
+        resource.use { input ->
+            input.skip(offset)
+            input.read(result, 0, size.toInt())
+        }
+        return result
+    }
+
+    @OptIn(ExperimentalResourceApi::class)
+    private fun getResourceAsStream(path: String): InputStream {
+        val classLoader = Thread.currentThread().contextClassLoader ?: this.javaClass.classLoader
+        return classLoader.getResourceAsStream(path) ?: throw MissingResourceException(path)
+    }
 }

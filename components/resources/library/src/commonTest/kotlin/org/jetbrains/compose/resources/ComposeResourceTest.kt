@@ -12,7 +12,7 @@ import kotlin.test.*
 class ComposeResourceTest {
 
     init {
-        dropStringsCache()
+        dropStringItemsCache()
         dropImageCache()
         getResourceEnvironment = ::getTestEnvironment
     }
@@ -71,7 +71,7 @@ class ComposeResourceTest {
             ) {
                 str = stringResource(res)
                 Text(str)
-                Text(stringArrayResource(TestStringResource("str_arr")).joinToString())
+                Text(stringArrayResource(TestStringArrayResource("str_arr")).joinToString())
             }
         }
         waitForIdle()
@@ -82,9 +82,25 @@ class ComposeResourceTest {
         res = TestStringResource("app_name")
         waitForIdle()
         assertEquals(str, "Compose Resources App")
+        res = TestStringResource("hello")
+        waitForIdle()
+        assertEquals(str, "\uD83D\uDE0A Hello world!")
+        res = TestStringResource("app_name")
+        waitForIdle()
+        assertEquals(str, "Compose Resources App")
+        res = TestStringResource("hello")
+        waitForIdle()
+        assertEquals(str, "\uD83D\uDE0A Hello world!")
+        res = TestStringResource("app_name")
+        waitForIdle()
+        assertEquals(str, "Compose Resources App")
 
         assertEquals(
-            expected = listOf("strings.xml"), //just one string.xml read
+            expected = listOf(
+                "strings.cvr/314-44",
+                "strings.cvr/211-47",
+                "strings.cvr/359-37"
+            ), //only three different
             actual = testResourceReader.readPaths
         )
     }
@@ -100,7 +116,7 @@ class ComposeResourceTest {
                 app_name = stringResource(TestStringResource("app_name"))
                 accentuated_characters = stringResource(TestStringResource("accentuated_characters"))
                 str_template = stringResource(TestStringResource("str_template"), "test-name", 42)
-                str_arr = stringArrayResource(TestStringResource("str_arr"))
+                str_arr = stringArrayResource(TestStringArrayResource("str_arr"))
             }
         }
         waitForIdle()
@@ -141,7 +157,7 @@ class ComposeResourceTest {
             "Hello, test-name! You have 42 new messages.",
             getString(TestStringResource("str_template"), "test-name", 42)
         )
-        assertEquals(listOf("item 1", "item 2", "item 3"), getStringArray(TestStringResource("str_arr")))
+        assertEquals(listOf("item 1", "item 2", "item 3"), getStringArray(TestStringArrayResource("str_arr")))
     }
 
     @Test
@@ -253,32 +269,18 @@ class ComposeResourceTest {
 
     @Test
     fun testReadFileResource() = runTest {
-        val bytes = readResourceBytes("strings.xml")
+        val bytes = readResourceBytes("strings.cvr")
         assertEquals(
             """
-                <resources>
-                    <string name="app_name">Compose Resources App</string>
-                    <string name="hello">😊 Hello world!</string>
-                    <string name="accentuated_characters">Créer une table</string>
-                    <string name="str_template">Hello, %1${'$'}s! You have %2${'$'}d new messages.</string>
-                    <string-array name="str_arr">
-                        <item>item 1</item>
-                        <item>item 2</item>
-                        <item>item 3</item>
-                    </string-array>
-                    <plurals name="plurals">
-                        <item quantity="one">one</item>
-                        <item quantity="other">other</item>
-                    </plurals>
-                    <plurals name="another_plurals">
-                        <item quantity="one">another one</item>
-                        <item quantity="other">another other</item>
-                    </plurals>
-                    <plurals name="messages">
-                        <item quantity="one">%1${'$'}d message for %2${'$'}s</item>
-                        <item quantity="other">%1${'$'}d messages for %2${'$'}s</item>
-                    </plurals>
-                </resources>
+                version:0
+                plurals|another_plurals|ONE:YW5vdGhlciBvbmU=,OTHER:YW5vdGhlciBvdGhlcg==
+                plurals|messages|ONE:JTEkZCBtZXNzYWdlIGZvciAlMiRz,OTHER:JTEkZCBtZXNzYWdlcyBmb3IgJTIkcw==
+                plurals|plurals|ONE:b25l,OTHER:b3RoZXI=
+                string-array|str_arr|aXRlbSAx,aXRlbSAy,aXRlbSAz
+                string|accentuated_characters|Q3LDqWVyIHVuZSB0YWJsZQ==
+                string|app_name|Q29tcG9zZSBSZXNvdXJjZXMgQXBw
+                string|hello|8J+YiiBIZWxsbyB3b3JsZCE=
+                string|str_template|SGVsbG8sICUxJHMhIFlvdSBoYXZlICUyJGQgbmV3IG1lc3NhZ2VzLg==
                 
             """.trimIndent(),
             bytes.decodeToString()

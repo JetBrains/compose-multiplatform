@@ -4,18 +4,38 @@ import org.jetbrains.compose.resources.plural.PluralCategory
 import org.jetbrains.compose.resources.plural.PluralRule
 import org.jetbrains.compose.resources.plural.PluralRuleList
 
-@OptIn(InternalResourceApi::class, ExperimentalResourceApi::class)
+private val cvrMap: Map<String, ResourceItem> = mapOf(
+    "accentuated_characters" to ResourceItem(setOf(), "strings.cvr", 259, 54),
+    "app_name" to ResourceItem(setOf(), "strings.cvr", 314, 44),
+    "hello" to ResourceItem(setOf(), "strings.cvr", 359, 37),
+    "str_template" to ResourceItem(setOf(), "strings.cvr", 397, 76),
+
+    "another_plurals" to ResourceItem(setOf(), "strings.cvr", 10, 71),
+    "messages" to ResourceItem(setOf(), "strings.cvr", 82, 88),
+    "plurals" to ResourceItem(setOf(), "strings.cvr", 171, 39),
+
+    "str_arr" to ResourceItem(setOf(), "strings.cvr", 211, 47),
+)
+
+@OptIn(ExperimentalResourceApi::class)
 internal fun TestStringResource(key: String) = StringResource(
     "STRING:$key",
     key,
-    setOf(ResourceItem(emptySet(), "strings.xml"))
+    setOf(cvrMap[key] ?: error("String ID=`$key` is not found!"))
 )
 
-@OptIn(InternalResourceApi::class, ExperimentalResourceApi::class)
+@OptIn(ExperimentalResourceApi::class)
+internal fun TestStringArrayResource(key: String) = StringArrayResource(
+    "STRING:$key",
+    key,
+    setOf(cvrMap[key] ?: error("String ID=`$key` is not found!"))
+)
+
+@OptIn(ExperimentalResourceApi::class)
 internal fun TestPluralStringResource(key: String) = PluralStringResource(
     "PLURALS:$key",
     key,
-    setOf(ResourceItem(emptySet(), "strings.xml"))
+    setOf(cvrMap[key] ?: error("String ID=`$key` is not found!"))
 )
 
 internal fun parsePluralSamples(samples: String): List<Int> {

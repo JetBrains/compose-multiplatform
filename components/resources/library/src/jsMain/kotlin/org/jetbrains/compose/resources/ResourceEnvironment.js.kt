@@ -9,7 +9,6 @@ private external class Intl {
     }
 }
 
-@OptIn(InternalResourceApi::class)
 internal actual fun getSystemEnvironment(): ResourceEnvironment {
     val locale = Intl.Locale(window.navigator.language)
     val isDarkTheme = window.matchMedia("(prefers-color-scheme: dark)").matches

@@ -5,11 +5,6 @@
         consectetur adipiscing elit.
         Donec eget turpis ac sem ultricies consequat.</string>
     <string name="str_template">Hello, %1$s! You have %2$d new messages.</string>
-    <string-array name="str_arr">
-        <item>item 1</item>
-        <item>item 2</item>
-        <item>item 3</item>
-    </string-array>
     <string name="PascalCase">PascalCase</string>
     <string name="1-kebab-case">1-kebab-case</string>
     <string name="camelCase">camelCase</string>

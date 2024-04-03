@@ -1,5 +1,9 @@
 package org.jetbrains.compose.resources
 
+import org.gradle.api.Project
+import org.gradle.api.provider.Provider
+import java.io.File
+
 abstract class ResourcesExtension {
     /**
      * Whether the generated resources accessors class should be public or not.
@@ -33,3 +37,15 @@ abstract class ResourcesExtension {
      */
     var generateResClass: ResourceClassGeneration = auto
 }
+
+internal fun Provider<ResourcesExtension>.getResourcePackage(project: Project) = map { config ->
+    config.packageOfResClass.takeIf { it.isNotEmpty() } ?: run {
+        val groupName = project.group.toString().lowercase().asUnderscoredIdentifier()
+        val moduleName = project.name.lowercase().asUnderscoredIdentifier()
+        val id = if (groupName.isNotEmpty()) "$groupName.$moduleName" else moduleName
+        "$id.generated.resources"
+    }
+}
+//the dir where resources must be placed in the final artefact
+internal fun Provider<ResourcesExtension>.getModuleResourcesDir(project: Project) =
+    getResourcePackage(project).map { packageName -> File("$COMPOSE_RESOURCES_DIR/$packageName") }

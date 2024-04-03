@@ -12,16 +12,16 @@ class MissingResourceException(path: String) : Exception("Missing resource with 
  * @return The content of the file as a byte array.
  */
 @InternalResourceApi
-expect suspend fun readResourceBytes(path: String): ByteArray
+suspend fun readResourceBytes(path: String): ByteArray = DefaultResourceReader.read(path)
 
 internal interface ResourceReader {
     suspend fun read(path: String): ByteArray
+    suspend fun readPart(path: String, offset: Long, size: Long): ByteArray
 }
 
-internal val DefaultResourceReader: ResourceReader = object : ResourceReader {
-    @OptIn(InternalResourceApi::class)
-    override suspend fun read(path: String): ByteArray = readResourceBytes(path)
-}
+internal expect fun getPlatformResourceReader(): ResourceReader
+
+internal val DefaultResourceReader = getPlatformResourceReader()
 
 //ResourceReader provider will be overridden for tests
 internal val LocalResourceReader = staticCompositionLocalOf { DefaultResourceReader }

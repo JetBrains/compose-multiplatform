@@ -56,10 +56,7 @@ internal object ComposeProperties {
         providers.valueOrNull(CHECK_JDK_VENDOR).toBooleanProvider(true)
 
     //providers.valueOrNull works only with root gradle.properties
-    fun alwaysGenerateResourceAccessors(project: Project): Provider<Boolean> = project.provider {
-        project.findProperty(ALWAYS_GENERATE_RESOURCE_ACCESSORS)?.toString().equals("true", true)
+    fun dontSyncResources(project: Project): Provider<Boolean> = project.provider {
+        project.findProperty(SYNC_RESOURCES_PROPERTY)?.toString().equals("false", true)
     }
-
-    fun syncResources(providers: ProviderFactory): Provider<Boolean> =
-        providers.valueOrNull(SYNC_RESOURCES_PROPERTY).toBooleanProvider(true)
 }

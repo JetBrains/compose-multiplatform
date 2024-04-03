@@ -2,6 +2,7 @@ package org.jetbrains.compose.test.tests.integration
 
 import org.gradle.util.GradleVersion
 import org.jetbrains.compose.internal.utils.*
+import org.jetbrains.compose.resources.XmlValuesConverterTask
 import org.jetbrains.compose.test.utils.*
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -163,7 +164,7 @@ class ResourcesTest : GradlePluginTestBase() {
                 val resDir = file("cmplib/src/commonMain/composeResources")
                 val resourcesFiles = resDir.walkTopDown()
                     .filter { !it.isDirectory && !it.isHidden }
-                    .map { it.relativeTo(resDir).invariantSeparatorsPath }
+                    .getConvertedResources(resDir)
                 val subdir = "me.sample.library.resources"
 
                 fun libpath(target: String, ext: String) =
@@ -293,7 +294,7 @@ class ResourcesTest : GradlePluginTestBase() {
         val commonResourcesDir = file("src/commonMain/composeResources")
         val commonResourcesFiles = commonResourcesDir.walkTopDown()
             .filter { !it.isDirectory && !it.isHidden }
-            .map { it.relativeTo(commonResourcesDir).invariantSeparatorsPath }
+            .getConvertedResources(commonResourcesDir)
 
         gradle("build").checks {
             check.taskSuccessful(":copyDemoDebugFontsToAndroidAssets")
@@ -351,7 +352,7 @@ class ResourcesTest : GradlePluginTestBase() {
         val commonResourcesDir = file("src/commonMain/composeResources")
         val commonResourcesFiles = commonResourcesDir.walkTopDown()
             .filter { !it.isDirectory && !it.isHidden }
-            .map { it.relativeTo(commonResourcesDir).invariantSeparatorsPath }
+            .getConvertedResources(commonResourcesDir)
 
         gradle("assembleDebug").checks {
             check.taskSuccessful(":copyDebugFontsToAndroidAssets")
@@ -366,7 +367,7 @@ class ResourcesTest : GradlePluginTestBase() {
         )
         val newCommonResourcesFiles = commonResourcesDir.walkTopDown()
             .filter { !it.isDirectory && !it.isHidden }
-            .map { it.relativeTo(commonResourcesDir).invariantSeparatorsPath }
+            .getConvertedResources(commonResourcesDir)
         gradle("assembleDebug").checks {
             check.taskSuccessful(":copyDebugFontsToAndroidAssets")
 
@@ -375,6 +376,19 @@ class ResourcesTest : GradlePluginTestBase() {
             }
         }
     }
+
+    private fun Sequence<File>.getConvertedResources(baseDir: File) = map { file ->
+        val newFile = if (
+            file.parentFile.name.startsWith("value") &&
+            file.extension.equals("xml", true)
+        ) {
+            file.parentFile.resolve(file.nameWithoutExtension + "." + XmlValuesConverterTask.CONVERTED_RESOURCE_EXT)
+        } else {
+            file
+        }
+        newFile.relativeTo(baseDir).invariantSeparatorsPath
+    }
+
 
     private fun File.writeNewFile(text: String) {
         parentFile.mkdirs()
@@ -434,22 +448,12 @@ class ResourcesTest : GradlePluginTestBase() {
             assertFalse(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
         }
 
-        gradle("prepareKotlinIdeaImport", "-Pcompose.resources.always.generate.accessors=true").checks {
-            check.taskSuccessful(":generateComposeResClass")
-            assertTrue(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
-        }
-
         modifyText("build.gradle.kts") { str ->
             str.replace(
                 "//api(compose.components.resources)",
                 "api(compose.components.resources)"
             )
         }
-        gradle("prepareKotlinIdeaImport").checks {
-            check.taskUpToDate(":generateComposeResClass")
-            assertTrue(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
-        }
-
         modifyText("build.gradle.kts") { str ->
             str.replace(
                 "group = \"app.group\"",

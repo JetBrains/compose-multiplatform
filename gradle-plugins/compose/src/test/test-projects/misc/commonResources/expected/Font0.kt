@@ -22,7 +22,7 @@ private fun init_emptyFont(): FontResource = org.jetbrains.compose.resources.Fon
   setOf(
 
     org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.LanguageQualifier("en"),
-    ), "font-en/emptyFont.otf"),
-    org.jetbrains.compose.resources.ResourceItem(setOf(), "font/emptyFont.otf"),
+    ), "font-en/emptyFont.otf", -1, -1),
+    org.jetbrains.compose.resources.ResourceItem(setOf(), "font/emptyFont.otf", -1, -1),
   )
 )

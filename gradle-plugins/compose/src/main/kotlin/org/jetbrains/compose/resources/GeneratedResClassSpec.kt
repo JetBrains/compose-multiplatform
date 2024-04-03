@@ -6,19 +6,18 @@ import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.invariantSeparatorsPathString
 
-internal enum class ResourceType(val typeName: String) {
-    DRAWABLE("drawable"),
-    STRING("string"),
-    PLURAL_STRING("plurals"),
-    FONT("font");
+internal enum class ResourceType(val typeName: String, val accessorName: String) {
+    DRAWABLE("drawable", "drawable"),
+    STRING("string", "string"),
+    STRING_ARRAY("string-array", "array"),
+    PLURAL_STRING("plurals", "plurals"),
+    FONT("font", "font");
 
     override fun toString(): String = typeName
 
     companion object {
-        fun fromString(str: String): ResourceType =
-            ResourceType.values()
-                .firstOrNull { it.typeName.equals(str, true) }
-                ?: error("Unknown resource type: '$str'.")
+        fun fromString(str: String): ResourceType? =
+            ResourceType.values().firstOrNull { it.typeName.equals(str, true) }
     }
 }
 
@@ -26,15 +25,21 @@ internal data class ResourceItem(
     val type: ResourceType,
     val qualifiers: List<String>,
     val name: String,
-    val path: Path
+    val path: Path,
+    val offset: Long = -1,
+    val size: Long = -1,
 )
 
 private fun ResourceType.getClassName(): ClassName = when (this) {
     ResourceType.DRAWABLE -> ClassName("org.jetbrains.compose.resources", "DrawableResource")
-    ResourceType.STRING -> ClassName("org.jetbrains.compose.resources", "StringResource")
-    ResourceType.PLURAL_STRING -> ClassName("org.jetbrains.compose.resources", "PluralStringResource")
     ResourceType.FONT -> ClassName("org.jetbrains.compose.resources", "FontResource")
+    ResourceType.STRING -> ClassName("org.jetbrains.compose.resources", "StringResource")
+    ResourceType.STRING_ARRAY -> ClassName("org.jetbrains.compose.resources", "StringArrayResource")
+    ResourceType.PLURAL_STRING -> ClassName("org.jetbrains.compose.resources", "PluralStringResource")
 }
+
+private fun ResourceType.requiresKeyName() =
+    this in setOf(ResourceType.STRING, ResourceType.STRING_ARRAY, ResourceType.PLURAL_STRING)
 
 private val resourceItemClass = ClassName("org.jetbrains.compose.resources", "ResourceItem")
 private val experimentalAnnotation = AnnotationSpec.builder(
@@ -156,7 +161,7 @@ internal fun getResFileSpecs(
                     .build()
             )
             ResourceType.values().forEach { type ->
-                resObject.addType(TypeSpec.objectBuilder(type.typeName).build())
+                resObject.addType(TypeSpec.objectBuilder(type.accessorName).build())
             }
         }.build())
     }.build()
@@ -191,7 +196,7 @@ private fun getChunkFileSpec(
     resModifier: KModifier,
     idToResources: Map<String, List<ResourceItem>>
 ): FileSpec {
-    val chunkClassName = type.typeName.uppercaseFirstChar() + index
+    val chunkClassName = type.accessorName.uppercaseFirstChar() + index
     return FileSpec.builder(packageName, chunkClassName).also { chunkFile ->
         chunkFile.addAnnotation(
             AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
@@ -213,7 +218,7 @@ private fun getChunkFileSpec(
 
         idToResources.forEach { (resName, items) ->
             val accessor = PropertySpec.builder(resName, type.getClassName(), resModifier)
-                .receiver(ClassName(packageName, "Res", type.typeName))
+                .receiver(ClassName(packageName, "Res", type.accessorName))
                 .addAnnotation(experimentalAnnotation)
                 .getter(FunSpec.getterBuilder().addStatement("return $chunkClassName.$resName").build())
                 .build()
@@ -227,14 +232,15 @@ private fun getChunkFileSpec(
                     CodeBlock.builder()
                         .add("return %T(\n", type.getClassName()).withIndent {
                             add("\"${type}:${resName}\",")
-                            if (type == ResourceType.STRING || type == ResourceType.PLURAL_STRING) add(" \"$resName\",")
+                            if (type.requiresKeyName()) add(" \"$resName\",")
                             withIndent {
                                 add("\nsetOf(\n").withIndent {
                                     items.forEach { item ->
                                         add("%T(", resourceItemClass)
                                         add("setOf(").addQualifiers(item).add("), ")
                                         //file separator should be '/' on all platforms
-                                        add("\"$moduleDir${item.path.invariantSeparatorsPathString}\"")
+                                        add("\"$moduleDir${item.path.invariantSeparatorsPathString}\", ")
+                                        add("${item.offset}, ${item.size}")
                                         add("),\n")
                                     }
                                 }

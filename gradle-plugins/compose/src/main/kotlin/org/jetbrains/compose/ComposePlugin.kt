@@ -19,24 +19,17 @@ import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.internal.configureDesktop
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
-import org.jetbrains.compose.experimental.internal.configureExperimental
-import org.jetbrains.compose.experimental.internal.configureExperimentalTargetsFlagsCheck
-import org.jetbrains.compose.experimental.internal.configureNativeCompilerCaching
-import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
-import org.jetbrains.compose.internal.mppExt
-import org.jetbrains.compose.internal.mppExtOrNull
+import org.jetbrains.compose.experimental.internal.*
+import org.jetbrains.compose.internal.*
 import org.jetbrains.compose.internal.service.ConfigurationProblemReporterService
 import org.jetbrains.compose.internal.service.GradlePropertySnapshotService
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.compose.resources.configureComposeResources
-import org.jetbrains.compose.resources.ios.configureSyncTask
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
-import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
+import org.jetbrains.kotlin.gradle.plugin.*
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
@@ -75,7 +68,6 @@ abstract class ComposePlugin : Plugin<Project> {
             project.plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
                 val mppExt = project.mppExt
                 project.configureExperimentalTargetsFlagsCheck(mppExt)
-                project.configureSyncTask(mppExt)
             }
 
             project.tasks.withType(KotlinCompile::class.java).configureEach {
