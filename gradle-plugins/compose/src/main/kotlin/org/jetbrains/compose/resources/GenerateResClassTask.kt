@@ -109,7 +109,7 @@ internal abstract class GenerateResClassTask : DefaultTask() {
 
     private fun getValueResourceItems(dataFile: File, qualifiers: List<String>, path: Path) : List<ResourceItem> {
         val result = mutableListOf<ResourceItem>()
-        RandomAccessFile(dataFile, "r").use { f ->
+        dataFile.bufferedReader().use { f ->
             var offset = 0L
             var line: String? = f.readLine()
             while (line != null) {
