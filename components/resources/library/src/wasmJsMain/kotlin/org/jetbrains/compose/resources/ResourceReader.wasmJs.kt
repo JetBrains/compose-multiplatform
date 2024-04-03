@@ -5,6 +5,8 @@ import kotlinx.coroutines.await
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 import org.w3c.fetch.Response
+import org.w3c.files.Blob
+import kotlin.js.Promise
 import kotlin.wasm.unsafe.UnsafeWasmMemoryApi
 import kotlin.wasm.unsafe.withScopedMemoryAllocator
 
@@ -15,43 +17,46 @@ import kotlin.wasm.unsafe.withScopedMemoryAllocator
     }
 """
 )
-internal external fun jsExportInt8ArrayToWasm(src: Int8Array, size: Int, dstAddr: Int)
+private external fun jsExportInt8ArrayToWasm(src: Int8Array, size: Int, dstAddr: Int)
 
-internal fun jsInt8ArrayToKotlinByteArray(x: Int8Array): ByteArray {
-    val size = x.length
-
-    @OptIn(UnsafeWasmMemoryApi::class)
-    return withScopedMemoryAllocator { allocator ->
-        val memBuffer = allocator.allocate(size)
-        val dstAddress = memBuffer.address.toInt()
-        jsExportInt8ArrayToWasm(x, size, dstAddress)
-        ByteArray(size) { i -> (memBuffer + i).loadByte() }
-    }
-}
+@JsFun("(blob) => blob.arrayBuffer()")
+private external fun jsExportBlobAsArrayBuffer(blob: Blob): Promise<ArrayBuffer>
 
 @OptIn(ExperimentalResourceApi::class)
 internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
     override suspend fun read(path: String): ByteArray {
-        return readAsArrayBuffer(path).let { buffer ->
-            buffer.toByteArray(0, buffer.byteLength)
-        }
+        return readAsBlob(path).asByteArray()
     }
 
     override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
-        return readAsArrayBuffer(path).toByteArray(offset.toInt(), size.toInt())
+        val part = readAsBlob(path).slice(offset.toInt(), (offset + size).toInt())
+        return part.asByteArray()
     }
 
-    private suspend fun readAsArrayBuffer(path: String): ArrayBuffer {
+    private suspend fun readAsBlob(path: String): Blob {
         val resPath = WebResourcesConfiguration.getResourcePath(path)
         val response = window.fetch(resPath).await<Response>()
         if (!response.ok) {
             throw MissingResourceException(resPath)
         }
-        return response.arrayBuffer().await()
+        return response.blob().await()
     }
 
-    private fun ArrayBuffer.toByteArray(offset: Int, size: Int): ByteArray  {
-        val source = Int8Array(this, offset, size)
-        return jsInt8ArrayToKotlinByteArray(source)
+    private suspend fun Blob.asByteArray(): ByteArray {
+        val buffer: ArrayBuffer = jsExportBlobAsArrayBuffer(this).await()
+        return Int8Array(buffer).asByteArray()
+    }
+
+    private fun Int8Array.asByteArray(): ByteArray {
+        val array = this
+        val size = array.length
+
+        @OptIn(UnsafeWasmMemoryApi::class)
+        return withScopedMemoryAllocator { allocator ->
+            val memBuffer = allocator.allocate(size)
+            val dstAddress = memBuffer.address.toInt()
+            jsExportInt8ArrayToWasm(array, size, dstAddress)
+            ByteArray(size) { i -> (memBuffer + i).loadByte() }
+        }
     }
 }

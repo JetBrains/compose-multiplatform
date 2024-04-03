@@ -4,28 +4,32 @@ import kotlinx.browser.window
 import kotlinx.coroutines.await
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
+import org.w3c.files.Blob
+import kotlin.js.Promise
 
 @OptIn(ExperimentalResourceApi::class)
 internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
     override suspend fun read(path: String): ByteArray {
-        return readAsArrayBuffer(path).let { buffer ->
-            buffer.toByteArray(0, buffer.byteLength)
-        }
+        return readAsBlob(path).asByteArray()
     }
 
     override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
-        return readAsArrayBuffer(path).toByteArray(offset.toInt(), size.toInt())
+        val part = readAsBlob(path).slice(offset.toInt(), (offset + size).toInt())
+        return part.asByteArray()
     }
 
-    private suspend fun readAsArrayBuffer(path: String): ArrayBuffer {
+    private suspend fun readAsBlob(path: String): Blob {
         val resPath = WebResourcesConfiguration.getResourcePath(path)
         val response = window.fetch(resPath).await()
         if (!response.ok) {
             throw MissingResourceException(resPath)
         }
-        return response.arrayBuffer().await()
+        return response.blob().await()
     }
 
-    private fun ArrayBuffer.toByteArray(offset: Int, size: Int): ByteArray =
-        Int8Array(this, offset, size).unsafeCast<ByteArray>()
+    private suspend fun Blob.asByteArray(): ByteArray {
+        //https://developer.mozilla.org/en-US/docs/Web/API/Blob/arrayBuffer
+        val buffer = asDynamic().arrayBuffer() as Promise<ArrayBuffer>
+        return Int8Array(buffer.await()).unsafeCast<ByteArray>()
+    }
 }
