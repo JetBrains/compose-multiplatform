@@ -13,4 +13,8 @@ internal class TestResourceReader : ResourceReader {
         readPathsList.add("$path/$offset-$size")
         return DefaultResourceReader.readPart(path, offset, size)
     }
+
+    override fun getUri(path: String): String {
+        return DefaultResourceReader.getUri(path)
+    }
 }
