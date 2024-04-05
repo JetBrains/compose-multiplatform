@@ -111,25 +111,14 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
     return this
 }
 
-// We need to divide accessors by different files because
-//
-// if all accessors are generated in a single object
-// then a build may fail with: org.jetbrains.org.objectweb.asm.MethodTooLargeException: Method too large: Res$drawable.<clinit> ()V
-// e.g. https://github.com/JetBrains/compose-multiplatform/issues/4285
-//
-// if accessor initializers are extracted from the single object but located in the same file
-// then a build may fail with: org.jetbrains.org.objectweb.asm.ClassTooLargeException: Class too large: Res$drawable
-private const val ITEMS_PER_FILE_LIMIT = 500
-internal fun getResFileSpecs(
-    //type -> id -> items
-    resources: Map<ResourceType, Map<String, List<ResourceItem>>>,
+internal fun getResFileSpec(
     packageName: String,
+    fileName: String,
     moduleDir: String,
     isPublic: Boolean
-): List<FileSpec> {
+): FileSpec {
     val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
-    val files = mutableListOf<FileSpec>()
-    val resClass = FileSpec.builder(packageName, "Res").also { file ->
+    return FileSpec.builder(packageName, fileName).also { file ->
         file.addAnnotation(
             AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
                 .addMember("org.jetbrains.compose.resources.InternalResourceApi::class")
@@ -186,7 +175,27 @@ internal fun getResFileSpecs(
             }
         }.build())
     }.build()
-    files.add(resClass)
+}
+
+// We need to divide accessors by different files because
+//
+// if all accessors are generated in a single object
+// then a build may fail with: org.jetbrains.org.objectweb.asm.MethodTooLargeException: Method too large: Res$drawable.<clinit> ()V
+// e.g. https://github.com/JetBrains/compose-multiplatform/issues/4285
+//
+// if accessor initializers are extracted from the single object but located in the same file
+// then a build may fail with: org.jetbrains.org.objectweb.asm.ClassTooLargeException: Class too large: Res$drawable
+private const val ITEMS_PER_FILE_LIMIT = 500
+internal fun getAccessorsSpecs(
+    //type -> id -> items
+    resources: Map<ResourceType, Map<String, List<ResourceItem>>>,
+    packageName: String,
+    fileSuffixName: String,
+    moduleDir: String,
+    isPublic: Boolean
+): List<FileSpec> {
+    val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
+    val files = mutableListOf<FileSpec>()
 
     //we need to sort it to generate the same code on different platforms
     sortResources(resources).forEach { (type, idToResources) ->
@@ -196,7 +205,8 @@ internal fun getResFileSpecs(
             files.add(
                 getChunkFileSpec(
                     type,
-                    index,
+                    fileSuffixName,
+                    type.accessorName.uppercaseFirstChar() + index,
                     packageName,
                     moduleDir,
                     resModifier,
@@ -211,14 +221,14 @@ internal fun getResFileSpecs(
 
 private fun getChunkFileSpec(
     type: ResourceType,
-    index: Int,
+    fileSuffixName: String,
+    chunkClassName: String,
     packageName: String,
     moduleDir: String,
     resModifier: KModifier,
     idToResources: Map<String, List<ResourceItem>>
 ): FileSpec {
-    val chunkClassName = type.accessorName.uppercaseFirstChar() + index
-    return FileSpec.builder(packageName, chunkClassName).also { chunkFile ->
+    return FileSpec.builder(packageName, chunkClassName + fileSuffixName).also { chunkFile ->
         chunkFile.addAnnotation(
             AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
                 .addMember("org.jetbrains.compose.resources.InternalResourceApi::class")

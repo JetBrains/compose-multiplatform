@@ -6,6 +6,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.util.GradleVersion
+import org.jetbrains.compose.ComposePlugin
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -33,17 +34,13 @@ internal fun Project.configureComposeResources(extension: ResourcesExtension) {
 private fun Project.onKgpApplied(config: Provider<ResourcesExtension>) {
     val kotlinExtension = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
 
-    //common resources must be converted (XML -> CVR)
-    val commonMain = KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME
-    val preparedCommonResources = prepareCommonResources(commonMain)
-
     val hasKmpResources = extraProperties.has(KMP_RES_EXT)
     val currentGradleVersion = GradleVersion.current()
     val minGradleVersion = GradleVersion.version(MIN_GRADLE_VERSION_FOR_KMP_RESOURCES)
     val kmpResourcesAreAvailable = hasKmpResources && currentGradleVersion >= minGradleVersion
 
     if (kmpResourcesAreAvailable) {
-        configureKmpResources(kotlinExtension, extraProperties.get(KMP_RES_EXT)!!, preparedCommonResources, config)
+        configureKmpResources(kotlinExtension, extraProperties.get(KMP_RES_EXT)!!, config)
     } else {
         if (!hasKmpResources) logger.info(
             """
@@ -58,13 +55,14 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>) {
             """.trimIndent()
         )
 
-        configureComposeResources(kotlinExtension, commonMain, preparedCommonResources, config)
+        val commonMain = KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME
+        configureComposeResources(kotlinExtension, commonMain, config)
 
         //when applied AGP then configure android resources
         androidPluginIds.forEach { pluginId ->
             plugins.withId(pluginId) {
                 val androidExtension = project.extensions.getByType(BaseExtension::class.java)
-                configureAndroidComposeResources(kotlinExtension, androidExtension, preparedCommonResources)
+                configureAndroidComposeResources(kotlinExtension, androidExtension)
             }
         }
     }
@@ -75,36 +73,20 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>) {
 private fun Project.onKotlinJvmApplied(config: Provider<ResourcesExtension>) {
     val kotlinExtension = project.extensions.getByType(KotlinProjectExtension::class.java)
     val main = SourceSet.MAIN_SOURCE_SET_NAME
-    val preparedCommonResources = prepareCommonResources(main)
-    configureComposeResources(kotlinExtension, main, preparedCommonResources, config)
-}
-
-//common resources must be converted (XML -> CVR)
-private fun Project.prepareCommonResources(commonSourceSetName: String): Provider<File> {
-    val preparedResourcesTask = registerPrepareComposeResourcesTask(
-        project.projectDir.resolve("src/$commonSourceSetName/$COMPOSE_RESOURCES_DIR"),
-        layout.buildDirectory.dir("$RES_GEN_DIR/preparedResources/$commonSourceSetName/$COMPOSE_RESOURCES_DIR")
-    )
-    return preparedResourcesTask.flatMap { it.outputDir }
+    configureComposeResources(kotlinExtension, main, config)
 }
 
 // sourceSet.resources.srcDirs doesn't work for Android targets.
 // Android resources should be configured separately
 private fun Project.configureComposeResources(
     kotlinExtension: KotlinProjectExtension,
-    commonSourceSetName: String,
-    preparedCommonResources: Provider<File>,
+    resClassSourceSetName: String,
     config: Provider<ResourcesExtension>
 ) {
     logger.info("Configure compose resources")
+    configureComposeResourcesGeneration(kotlinExtension, resClassSourceSetName, config)
+
     kotlinExtension.sourceSets.all { sourceSet ->
-        val sourceSetName = sourceSet.name
-        val resourcesDir = project.projectDir.resolve("src/$sourceSetName/$COMPOSE_RESOURCES_DIR")
-        if (sourceSetName == commonSourceSetName) {
-            sourceSet.resources.srcDirs(preparedCommonResources)
-            configureGenerationComposeResClass(preparedCommonResources, sourceSet, config, false)
-        } else {
-            sourceSet.resources.srcDirs(resourcesDir)
-        }
+        sourceSet.resources.srcDirs(sourceSet.getPreparedComposeResourcesDir())
     }
 }

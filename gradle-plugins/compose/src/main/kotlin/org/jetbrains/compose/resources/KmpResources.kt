@@ -15,13 +15,15 @@ import java.io.File
 internal fun Project.configureKmpResources(
     kotlinExtension: KotlinProjectExtension,
     kmpResources: Any,
-    preparedCommonResources: Provider<File>,
     config: Provider<ResourcesExtension>
 ) {
     kotlinExtension as KotlinMultiplatformExtension
     kmpResources as KotlinTargetResourcesPublication
 
     logger.info("Configure KMP resources")
+
+    val commonMain = KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME
+    configureComposeResourcesGeneration(kotlinExtension, commonMain, config)
 
     //configure KMP resources publishing for each supported target
     kotlinExtension.targets
@@ -33,16 +35,8 @@ internal fun Project.configureKmpResources(
             kmpResources.publishResourcesAsKotlinComponent(
                 target,
                 { sourceSet ->
-                    val sourceSetName = sourceSet.name
-                    val composeResDir: Provider<File>
-                    if (sourceSetName == KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME) {
-                        composeResDir = preparedCommonResources
-                    } else {
-                        composeResDir = provider { project.file("src/$sourceSetName/$COMPOSE_RESOURCES_DIR") }
-                    }
-
                     KotlinTargetResourcesPublication.ResourceRoot(
-                        composeResDir,
+                        sourceSet.getPreparedComposeResourcesDir(),
                         emptyList(),
                         //for android target exclude fonts
                         if (target is KotlinAndroidTarget) listOf("**/font*/*") else emptyList()
@@ -57,15 +51,8 @@ internal fun Project.configureKmpResources(
                 kmpResources.publishInAndroidAssets(
                     target,
                     { sourceSet ->
-                        val sourceSetName = sourceSet.name
-                        val composeResDir: Provider<File>
-                        if (sourceSetName == KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME) {
-                            composeResDir = preparedCommonResources
-                        } else {
-                            composeResDir = provider { project.file("src/$sourceSetName/$COMPOSE_RESOURCES_DIR") }
-                        }
                         KotlinTargetResourcesPublication.ResourceRoot(
-                            composeResDir,
+                            sourceSet.getPreparedComposeResourcesDir(),
                             listOf("**/font*/*"),
                             emptyList()
                         )
@@ -74,19 +61,6 @@ internal fun Project.configureKmpResources(
                 )
             }
         }
-
-    //generate accessors for common resources
-    kotlinExtension.sourceSets.all { sourceSet ->
-        val sourceSetName = sourceSet.name
-        if (sourceSetName == KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME) {
-            configureGenerationComposeResClass(
-                preparedCommonResources,
-                sourceSet,
-                config,
-                true
-            )
-        }
-    }
 
     //add all resolved resources for browser and native compilations
     val platformsForSetupCompilation = listOf(KotlinPlatformType.native, KotlinPlatformType.js, KotlinPlatformType.wasm)
