@@ -30,6 +30,7 @@ class ResourceTest {
                 ResourceItem(setOf(), "default", -1, -1),
                 ResourceItem(setOf(LanguageQualifier("en")), "en", -1, -1),
                 ResourceItem(setOf(LanguageQualifier("en"), RegionQualifier("US"), XHDPI), "en-rUS-xhdpi", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("de"), RegionQualifier("US")), "de-rUS", -1, -1),
                 ResourceItem(setOf(LanguageQualifier("fr"), LIGHT), "fr-light", -1, -1),
                 ResourceItem(setOf(DARK), "dark", -1, -1),
             )
@@ -47,6 +48,18 @@ class ResourceTest {
         assertEquals(
             "en",
             resource.getResourceItemByEnvironment(env("en", "IN", LIGHT, LDPI)).path
+        )
+        assertEquals(
+            "de-rUS",
+            resource.getResourceItemByEnvironment(env("de", "US", LIGHT, LDPI)).path
+        )
+        assertEquals(
+            "default",
+            resource.getResourceItemByEnvironment(env("de", "", LIGHT, LDPI)).path
+        )
+        assertEquals(
+            "default",
+            resource.getResourceItemByEnvironment(env("de", "IN", LIGHT, LDPI)).path
         )
         assertEquals(
             "default",
