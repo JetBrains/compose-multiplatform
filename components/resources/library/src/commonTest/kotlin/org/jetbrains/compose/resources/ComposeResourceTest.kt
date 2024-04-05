@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runComposeUiTest
 import kotlinx.coroutines.test.runTest
+import org.jetbrains.skiko.URIManager
 import kotlin.test.*
 
 @OptIn(ExperimentalTestApi::class, ExperimentalResourceApi::class, InternalResourceApi::class)
@@ -285,5 +286,22 @@ class ComposeResourceTest {
             """.trimIndent(),
             bytes.decodeToString()
         )
+    }
+
+    @Test
+    fun testGetResourceUri() = runComposeUiTest {
+        var uri1 = ""
+        var uri2 = ""
+        setContent {
+            CompositionLocalProvider(LocalComposeEnvironment provides TestComposeEnvironment) {
+                val resourceReader = LocalResourceReader.current
+                uri1 = resourceReader.getUri("1.png")
+                uri2 = resourceReader.getUri("2.png")
+            }
+        }
+        waitForIdle()
+
+        assertTrue(uri1.endsWith("/1.png"))
+        assertTrue(uri2.endsWith("/2.png"))
     }
 }
