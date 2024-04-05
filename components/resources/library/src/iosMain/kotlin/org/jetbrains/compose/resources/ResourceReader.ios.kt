@@ -21,6 +21,10 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         }
     }
 
+    override fun getUri(path: String): String {
+        return NSURL.fileURLWithPath(getPathInBundle(path)).toString()
+    }
+
     private fun readData(path: String): NSData {
         return NSFileManager.defaultManager().contentsAtPath(path) ?: throw MissingResourceException(path)
     }

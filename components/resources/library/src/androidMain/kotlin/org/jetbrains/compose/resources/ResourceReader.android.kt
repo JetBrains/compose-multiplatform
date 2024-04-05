@@ -20,14 +20,34 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
     }
 
     @OptIn(ExperimentalResourceApi::class)
+    override fun getUri(path: String): String {
+        val classLoader = getClassLoader()
+        val resource = classLoader.getResource(path) ?: run {
+            //try to find a font in the android assets
+            if (File(path).isFontResource()) {
+                classLoader.getResource("assets/$path")
+            } else null
+        } ?: throw MissingResourceException(path)
+        return resource.toURI().toString()
+    }
+
+    @OptIn(ExperimentalResourceApi::class)
     private fun getResourceAsStream(path: String): InputStream {
-        val classLoader = Thread.currentThread().contextClassLoader ?: this.javaClass.classLoader
+        val classLoader = getClassLoader()
         val resource = classLoader.getResourceAsStream(path) ?: run {
             //try to find a font in the android assets
-            if (File(path).parentFile?.name.orEmpty().startsWith("font")) {
+            if (File(path).isFontResource()) {
                 classLoader.getResourceAsStream("assets/$path")
             } else null
         } ?: throw MissingResourceException(path)
         return resource
+    }
+
+    private fun File.isFontResource(): Boolean {
+        return this.parentFile?.name.orEmpty().startsWith("font")
+    }
+
+    private fun getClassLoader(): ClassLoader {
+        return Thread.currentThread().contextClassLoader ?: this.javaClass.classLoader!!
     }
 }

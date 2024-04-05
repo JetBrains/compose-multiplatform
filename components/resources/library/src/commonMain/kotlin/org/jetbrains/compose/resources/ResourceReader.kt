@@ -14,9 +14,19 @@ class MissingResourceException(path: String) : Exception("Missing resource with 
 @InternalResourceApi
 suspend fun readResourceBytes(path: String): ByteArray = DefaultResourceReader.read(path)
 
+/**
+ * Provides the platform dependent URI for a given resource path.
+ *
+ * @param path The path to the file in the resource's directory.
+ * @return The URI string of the specified resource.
+ */
+@InternalResourceApi
+fun getResourceUri(path: String): String = DefaultResourceReader.getUri(path)
+
 internal interface ResourceReader {
     suspend fun read(path: String): ByteArray
     suspend fun readPart(path: String, offset: Long, size: Long): ByteArray
+    fun getUri(path: String): String
 }
 
 internal expect fun getPlatformResourceReader(): ResourceReader

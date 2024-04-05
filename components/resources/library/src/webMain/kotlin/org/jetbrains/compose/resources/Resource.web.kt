@@ -45,3 +45,13 @@ object WebResourcesConfiguration {
 fun configureWebResources(configure: WebResourcesConfiguration.() -> Unit) {
     WebResourcesConfiguration.configure()
 }
+
+@OptIn(ExperimentalResourceApi::class)
+internal fun getResourceUrl(windowOrigin: String, windowPathname: String, resourcePath: String): String {
+    val path = WebResourcesConfiguration.getResourcePath(resourcePath)
+    return when {
+        path.startsWith("/") -> windowOrigin + path
+        path.startsWith("http://") || path.startsWith("https://") -> path
+        else -> windowOrigin + windowPathname + path
+    }
+}

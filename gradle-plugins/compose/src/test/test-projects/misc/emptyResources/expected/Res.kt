@@ -3,12 +3,13 @@
     org.jetbrains.compose.resources.ExperimentalResourceApi::class,
 )
 
-package app.group.empty_res.generated.resources
+package app.group.resources_test.generated.resources
 
 import kotlin.ByteArray
 import kotlin.OptIn
 import kotlin.String
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.getResourceUri
 import org.jetbrains.compose.resources.readResourceBytes
 
 @ExperimentalResourceApi
@@ -22,6 +23,16 @@ internal object Res {
      * @return The content of the file as a byte array.
      */
     public suspend fun readBytes(path: String): ByteArray = readResourceBytes("" + path)
+
+    /**
+     * Returns the URI string of the resource file at the specified path.
+     *
+     * Example: `val uri = Res.getUri("files/key.bin")`
+     *
+     * @param path The path of the file in the compose resource's directory.
+     * @return The URI string of the file.
+     */
+    public fun getUri(path: String): String = getResourceUri("" + path)
 
     public object drawable
 
