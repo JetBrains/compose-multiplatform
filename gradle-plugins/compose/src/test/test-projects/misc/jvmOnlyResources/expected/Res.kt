@@ -3,7 +3,7 @@
     org.jetbrains.compose.resources.ExperimentalResourceApi::class,
 )
 
-package app.group.resources_test.generated.resources
+package me.app.jvmonlyresources.generated.resources
 
 import kotlin.ByteArray
 import kotlin.OptIn
