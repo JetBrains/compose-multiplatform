@@ -176,13 +176,18 @@ android {
             }
         }
     }
+    testNamespace = "org.jetbrains.compose.components.resources.test"
     sourceSets {
         val commonTestResources = "src/commonTest/resources"
         named("androidTest") {
             resources.srcDir(commonTestResources)
             assets.srcDir("src/androidInstrumentedTest/assets")
+            res.srcDir("src/androidInstrumentedTest/res")
         }
-        named("test") { resources.srcDir(commonTestResources) }
+        named("test") {
+            resources.srcDir(commonTestResources)
+            res.srcDir("src/androidInstrumentedTest/res")
+        }
     }
 }
 

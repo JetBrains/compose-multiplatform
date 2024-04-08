@@ -99,25 +99,5 @@ fun StringRes(paddingValues: PaddingValues) {
                 disabledLabelColor = MaterialTheme.colorScheme.onSurface,
             )
         )
-        var numMessages by remember { mutableStateOf(0) }
-        OutlinedTextField(
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
-            value = pluralStringResource(Res.plurals.new_message, numMessages, numMessages),
-            onValueChange = {},
-            label = { Text("Text(pluralStringResource(Res.plurals.new_message, $numMessages, $numMessages))") },
-            leadingIcon = {
-                Row {
-                    IconButton({ numMessages += 1 }) {
-                        Icon(Icons.Default.Add, contentDescription = "Add Message")
-                    }
-                }
-            },
-            enabled = false,
-            colors = TextFieldDefaults.colors(
-                disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                disabledContainerColor = MaterialTheme.colorScheme.surface,
-                disabledLabelColor = MaterialTheme.colorScheme.onSurface,
-            )
-        )
     }
 }

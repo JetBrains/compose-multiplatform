@@ -356,16 +356,31 @@ private fun NodeList.getElementsWithName(name: String): List<Element> =
  * @return The string with special characters replaced according to the logic.
  */
 internal fun handleSpecialCharacters(string: String): String {
-    val unicodeNewLineTabRegex = Regex("""\\u[a-fA-F\d]{4}|\\n|\\t""")
-    val doubleSlashRegex = Regex("""\\\\""")
-    val doubleSlashIndexes = doubleSlashRegex.findAll(string).map { it.range.first }
-    val handledString = unicodeNewLineTabRegex.replace(string) { matchResult ->
-        if (doubleSlashIndexes.contains(matchResult.range.first - 1)) matchResult.value
-        else when (matchResult.value) {
-            "\\n" -> "\n"
-            "\\t" -> "\t"
-            else -> matchResult.value.substring(2).toInt(16).toChar().toString()
+    val specialCharactersRegex = Regex("""\\@|\\\?|\\'""")
+    val specialCharactersString = specialCharactersRegex.replace(string) { matchResult ->
+        when(matchResult.value) {
+            "\\@" -> "@"
+            "\\?" -> "?"
+            "\\'" -> "'"
+            else -> matchResult.value
         }
-    }.replace("""\\""", """\""")
-    return handledString
+    }.trim()
+    if (specialCharactersString.startsWith('"') && specialCharactersString.endsWith('"')) {
+        return specialCharactersString.substring(1, specialCharactersString.length - 1)
+    } else {
+        val collapseWhitespaceRegex = Regex("""\s+""")
+        val unicodeNewLineTabRegex = Regex("""\\u[a-fA-F\d]{4}|\\n|\\t""")
+        val doubleSlashRegex = Regex("""\\\\""")
+        val whitespaceCollapsedString = collapseWhitespaceRegex.replace(specialCharactersString, " ")
+        val doubleSlashIndexes =
+            doubleSlashRegex.findAll(whitespaceCollapsedString).map { it.range.first }
+        return unicodeNewLineTabRegex.replace(whitespaceCollapsedString) { matchResult ->
+            if (doubleSlashIndexes.contains(matchResult.range.first - 1)) matchResult.value
+            else when (matchResult.value) {
+                "\\n" -> "\n"
+                "\\t" -> "\t"
+                else -> matchResult.value.substring(2).toInt(16).toChar().toString()
+            }
+        }.replace("""\\""", """\""")
+    }
 }

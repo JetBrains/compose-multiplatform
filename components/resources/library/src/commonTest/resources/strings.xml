@@ -1,8 +1,27 @@
 <resources>
     <string name="app_name">Compose Resources App</string>
-    <string name="hello">😊 Hello world!</string>
+    <string name="hello">😊 Hello
+        \@ \?
+        world!w</string>
     <string name="accentuated_characters">Créer une table</string>
     <string name="str_template">Hello, %1$s! You have %2$d new messages.</string>
+
+    <string name="test_question_mark">test question mark \?</string>
+    <string name="test_at_mark">test at mark \@</string>
+    <string name="test_whitespace">test
+        whitespace    is
+        😊</string>
+    <string name="test_apostrophe">test
+        apostrophe
+        it\'s</string>
+
+    <string name="test_double_quotation_marks">"😊 Hello\'s
+        \@ \?
+        world!"</string>
+    <string name="meld_test">😊 Hello\'s
+        \@ \?
+        world!</string>
+
     <string-array name="str_arr">
         <item>item 1</item>
         <item>item 2</item>

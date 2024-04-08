@@ -78,7 +78,7 @@ class ComposeResourceTest {
         assertEquals(str, "Compose Resources App")
         res = TestStringResource("hello")
         waitForIdle()
-        assertEquals(str, "\uD83D\uDE0A Hello world!")
+        assertEquals(str, "\uD83D\uDE0A Hello @ ? world!w")
         res = TestStringResource("app_name")
         waitForIdle()
         assertEquals(str, "Compose Resources App")
@@ -258,7 +258,9 @@ class ComposeResourceTest {
             """
                 <resources>
                     <string name="app_name">Compose Resources App</string>
-                    <string name="hello">😊 Hello world!</string>
+                    <string name="hello">😊 Hello
+                        \@ \?
+                        world!w</string>
                     <string name="accentuated_characters">Créer une table</string>
                     <string name="str_template">Hello, %1${'$'}s! You have %2${'$'}d new messages.</string>
                     <string-array name="str_arr">
