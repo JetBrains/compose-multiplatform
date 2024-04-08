@@ -1,4 +1,5 @@
 import org.jetbrains.compose.ExperimentalComposeLibrary
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
@@ -64,12 +65,26 @@ kotlin {
         //  │    ┌───┴───┐      │   ┌───┴───┐
         // web   ios    macos   desktop    android
 
+        // For plurals support
+        val generatePluralRuleListsTask = tasks.register<GeneratePluralRuleListsTask>("generatePluralRuleLists") {
+            pluralsFile = project.layout.projectDirectory.file(
+                "src/commonMain/kotlin/org/jetbrains/compose/resources/intl/plurals.xml"
+            )
+            mainDir = project.layout.buildDirectory.dir("generated/intl/commonMain/kotlin")
+            testDir = project.layout.buildDirectory.dir("generated/intl/commonTest/kotlin")
+        }
+
+        tasks.withType<KotlinCompile<*>> {
+            dependsOn(generatePluralRuleListsTask)
+        }
+
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(libs.kotlinx.coroutines.core)
             }
+            kotlin.srcDir(generatePluralRuleListsTask.flatMap { it.mainDir })
         }
         val commonTest by getting {
             dependencies {
@@ -79,6 +94,7 @@ kotlin {
                 @OptIn(ExperimentalComposeLibrary::class)
                 implementation(compose.uiTest)
             }
+            kotlin.srcDir(generatePluralRuleListsTask.flatMap { it.testDir })
         }
         val blockingMain by creating {
             dependsOn(commonMain)
@@ -200,14 +216,6 @@ configureMavenPublication(
 // adding it here to make sure skiko is unpacked and available in web tests
 compose.experimental {
     web.application {}
-}
-
-//utility task to generate CLDRPluralRuleLists.kt file by 'CLDRPluralRules/plurals.xml'
-tasks.register<GeneratePluralRuleListsTask>("generatePluralRuleLists") {
-    val projectDir = project.layout.projectDirectory
-    pluralsFile = projectDir.file("CLDRPluralRules/plurals.xml")
-    outputFile = projectDir.file("src/commonMain/kotlin/org/jetbrains/compose/resources/plural/CLDRPluralRuleLists.kt")
-    samplesOutputFile = projectDir.file("src/commonTest/kotlin/org/jetbrains/compose/resources/CLDRPluralRuleLists.test.kt")
 }
 
 afterEvaluate {

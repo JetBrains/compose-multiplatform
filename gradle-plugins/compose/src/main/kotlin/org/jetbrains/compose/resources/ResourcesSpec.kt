@@ -1,6 +1,7 @@
 package org.jetbrains.compose.resources
 
 import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.plusParameter
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import java.nio.file.Path
 import java.util.*
@@ -155,6 +156,46 @@ internal fun getResFileSpecs(
                     .addStatement("""return %M("$moduleDir" + path)""", readResourceBytes)
                     .build()
             )
+
+            val defaultResourceChunkSize = MemberName(
+                "org.jetbrains.compose.resources", "DEFAULT_RESOURCE_CHUNK_SIZE"
+            )
+            val getResourceAsFlow = MemberName("org.jetbrains.compose.resources", "getResourceAsFlow")
+            resObject.addFunction(
+                FunSpec.builder("getAsFlow")
+                    .addKdoc(
+                        """
+                    Returns a flow which emits the content of the resource file as byte array chunks. The length of each
+                    chunk is not empty and has the length of [byteCount] or smaller. The flow will throw
+                    [MissingResourceException][org.jetbrains.compose.resources.MissingResourceException] when the
+                    resource file is missing or [ResourceIOException][org.jetbrains.compose.resources.ResourceIOException]
+                    if any IO error occurs. You can catch those with the [catch][kotlinx.coroutines.flow.catch] operator.
+                    This function is useful when the resource is too big to be contained in a single [ByteArray].
+                    
+                    Example: `val bytes = Res.getAsFlow("files/key.bin").toList().flatMap { it.asList() }`
+                    
+                    @param path The path of the file to read in the resource's directory.
+                    @param byteCount The maximum length of the emitted byte arrays. The flow can emit an array smaller than this length.
+                    
+                    @return A flow that emits the content of the file as byte sub-arrays.
+                    
+                    @throws IllegalArgumentException When [byteCount] is not positive.
+                """.trimIndent()
+                    )
+                    .addParameter("path", String::class)
+                    .addParameter(
+                        ParameterSpec.builder("byteCount", Int::class)
+                            .defaultValue("%M", defaultResourceChunkSize)
+                            .build()
+                    )
+                    .returns(
+                        ClassName("kotlinx.coroutines.flow", "Flow")
+                            .plusParameter(ByteArray::class.asTypeName())
+                    )
+                    .addStatement("""return %M("$moduleDir" + path, byteCount)""", getResourceAsFlow)
+                    .build()
+            )
+
             ResourceType.values().forEach { type ->
                 resObject.addType(TypeSpec.objectBuilder(type.typeName).build())
             }

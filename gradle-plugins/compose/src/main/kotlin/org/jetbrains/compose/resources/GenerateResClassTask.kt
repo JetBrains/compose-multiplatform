@@ -101,6 +101,7 @@ internal abstract class GenerateResClassTask : DefaultTask() {
         }
 
         if (typeString == "values" && file.name.equals("strings.xml", true)) {
+<<<<<<< HEAD
             return getStringResources(file).mapNotNull { (typeName, strId) ->
                 val type = when(typeName) {
                     "string", "string-array" -> ResourceType.STRING
@@ -108,6 +109,14 @@ internal abstract class GenerateResClassTask : DefaultTask() {
                     else -> return@mapNotNull null
                 }
                 ResourceItem(type, qualifiers, strId.asUnderscoredIdentifier(), path)
+=======
+            val stringIds = getStringIds(file)
+            val pluralStringIds = getPluralStringIds(file)
+            return stringIds.map { strId ->
+                ResourceItem(ResourceType.STRING, qualifiers, strId.asUnderscoredIdentifier(), path)
+            } + pluralStringIds.map { pluralStrId ->
+                ResourceItem(ResourceType.PLURAL_STRING, qualifiers, pluralStrId.asUnderscoredIdentifier(), path)
+>>>>>>> origin/clebrain
             }
         }
 
@@ -123,6 +132,15 @@ internal abstract class GenerateResClassTask : DefaultTask() {
         return List(items.length) { items.item(it) }
             .filter { it.nodeName in stringTypeNames }
             .map { it.nodeName to it.attributes.getNamedItem("name").nodeValue }
+    }
+
+    private fun getPluralStringIds(stringsXml: File): Set<String> {
+        val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(stringsXml)
+        val items = doc.getElementsByTagName("resources").item(0).childNodes
+        val ids = List(items.length) { items.item(it) }
+            .filter { it.nodeName == "plurals" }
+            .map { it.attributes.getNamedItem("name").nodeValue }
+        return ids.toSet()
     }
 
     private fun File.listNotHiddenFiles(): List<File> =

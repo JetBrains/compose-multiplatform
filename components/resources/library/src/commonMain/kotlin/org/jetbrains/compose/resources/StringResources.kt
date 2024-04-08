@@ -4,8 +4,8 @@ import androidx.compose.runtime.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import org.jetbrains.compose.resources.plural.PluralCategory
-import org.jetbrains.compose.resources.plural.PluralRuleList
+import org.jetbrains.compose.resources.intl.PluralCategory
+import org.jetbrains.compose.resources.intl.PluralRuleList
 import org.jetbrains.compose.resources.vector.xmldom.Element
 import org.jetbrains.compose.resources.vector.xmldom.NodeList
 
@@ -81,7 +81,7 @@ private suspend fun parseStringXml(path: String, resourceReader: ResourceReader)
             val pluralCategory = PluralCategory.fromString(
                 element.getAttribute("quantity"),
             ) ?: return@mapNotNull null
-            pluralCategory to handleSpecialCharacters(element.textContent.orEmpty())
+            pluralCategory to element.textContent.orEmpty()
         }
         pluralElement.getAttribute("name") to StringItem.Plurals(items.toMap())
     }
@@ -228,15 +228,14 @@ private suspend fun loadPluralString(
     val path = resource.getPathByEnvironment(environment)
     val keyToValue = getParsedStrings(path, resourceReader)
     val item = keyToValue[resource.key] as? StringItem.Plurals
-        ?: error("Quantity string ID=`${resource.key}` is not found!")
+        ?: error("String ID=`${resource.key}` is not found!")
     val pluralRuleList = PluralRuleList.getInstance(
         environment.language,
         environment.region,
     )
     val pluralCategory = pluralRuleList.getCategory(quantity)
     val str = item.items[pluralCategory]
-        ?: item.items[PluralCategory.OTHER]
-        ?: error("Quantity string ID=`${resource.key}` does not have the pluralization $pluralCategory for quantity $quantity!")
+        ?: error("String ID=`${resource.key}` does not have the pluralization $pluralCategory for quantity $quantity!")
     return str
 }
 

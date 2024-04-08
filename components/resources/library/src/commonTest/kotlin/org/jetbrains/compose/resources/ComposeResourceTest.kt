@@ -5,6 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runComposeUiTest
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 
@@ -245,6 +246,9 @@ class ComposeResourceTest {
         assertFailsWith<MissingResourceException> {
             readResourceBytes("missing.png")
         }
+        assertFailsWith<MissingResourceException> {
+            getResourceAsFlow("missing.png").collect()
+        }
         val error = assertFailsWith<IllegalStateException> {
             getString(TestStringResource("unknown_id"))
         }
@@ -285,5 +289,12 @@ class ComposeResourceTest {
             """.trimIndent(),
             bytes.decodeToString()
         )
+    }
+
+    @Test
+    fun testGetFileResourceAsSource() = runTest {
+        val bytes = readResourceBytes("strings.xml")
+        val source = getResourceAsFlow("strings.xml").toList().flatMap { it.asList() }
+        assertContentEquals(bytes, source.toByteArray())
     }
 }
