@@ -117,7 +117,7 @@ private fun Project.configureResourceAccessorsGeneration(
         GenerateResourceAccessorsTask::class.java
     ) { task ->
         task.packageName.set(packageName)
-        task.fileSuffixName.set("." + sourceSet.name)
+        task.sourceSetName.set(sourceSet.name)
         task.shouldGenerateCode.set(shouldGenerateCode)
         task.makeAccessorsPublic.set(makeAccessorsPublic)
         task.resDir.set(resourcesDir)

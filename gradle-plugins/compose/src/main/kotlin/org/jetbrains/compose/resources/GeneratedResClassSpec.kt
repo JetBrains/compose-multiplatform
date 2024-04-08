@@ -190,7 +190,7 @@ internal fun getAccessorsSpecs(
     //type -> id -> items
     resources: Map<ResourceType, Map<String, List<ResourceItem>>>,
     packageName: String,
-    fileSuffixName: String,
+    sourceSetName: String,
     moduleDir: String,
     isPublic: Boolean
 ): List<FileSpec> {
@@ -205,8 +205,8 @@ internal fun getAccessorsSpecs(
             files.add(
                 getChunkFileSpec(
                     type,
-                    fileSuffixName,
-                    type.accessorName.uppercaseFirstChar() + index,
+                    "${type.accessorName.uppercaseFirstChar()}$index.$sourceSetName",
+                    sourceSetName.uppercaseFirstChar() + type.accessorName.uppercaseFirstChar() + index,
                     packageName,
                     moduleDir,
                     resModifier,
@@ -221,14 +221,14 @@ internal fun getAccessorsSpecs(
 
 private fun getChunkFileSpec(
     type: ResourceType,
-    fileSuffixName: String,
+    fileName: String,
     chunkClassName: String,
     packageName: String,
     moduleDir: String,
     resModifier: KModifier,
     idToResources: Map<String, List<ResourceItem>>
 ): FileSpec {
-    return FileSpec.builder(packageName, chunkClassName + fileSuffixName).also { chunkFile ->
+    return FileSpec.builder(packageName, fileName).also { chunkFile ->
         chunkFile.addAnnotation(
             AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
                 .addMember("org.jetbrains.compose.resources.InternalResourceApi::class")

@@ -19,7 +19,7 @@ internal abstract class GenerateResourceAccessorsTask : CodeGenerationTask() {
     abstract val packageName: Property<String>
 
     @get:Input
-    abstract val fileSuffixName: Property<String>
+    abstract val sourceSetName: Property<String>
 
     @get:Input
     @get:Optional
@@ -44,7 +44,7 @@ internal abstract class GenerateResourceAccessorsTask : CodeGenerationTask() {
         try {
             val kotlinDir = codeDir.get().asFile
             val rootResDir = resDir.get()
-            val suffix = fileSuffixName.get()
+            val sourceSet = sourceSetName.get()
 
             logger.info("Clean directory $kotlinDir")
             kotlinDir.deleteRecursively()
@@ -76,7 +76,7 @@ internal abstract class GenerateResourceAccessorsTask : CodeGenerationTask() {
                 val moduleDirectory = packagingDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
                 val isPublic = makeAccessorsPublic.get()
                 getAccessorsSpecs(
-                    resources, pkgName, suffix, moduleDirectory, isPublic
+                    resources, pkgName, sourceSet, moduleDirectory, isPublic
                 ).forEach { it.writeTo(kotlinDir) }
             } else {
                 logger.info("Generation accessors for $rootResDir is disabled")
