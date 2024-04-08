@@ -7,14 +7,14 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.PluralStringResource
 
 @ExperimentalResourceApi
-private object Plurals0 {
+private object CommonMainPlurals0 {
     public val numberOfSongsAvailable: PluralStringResource by
     lazy { init_numberOfSongsAvailable() }
 }
 
 @ExperimentalResourceApi
 internal val Res.plurals.numberOfSongsAvailable: PluralStringResource
-    get() = Plurals0.numberOfSongsAvailable
+    get() = CommonMainPlurals0.numberOfSongsAvailable
 
 @ExperimentalResourceApi
 private fun init_numberOfSongsAvailable(): PluralStringResource =

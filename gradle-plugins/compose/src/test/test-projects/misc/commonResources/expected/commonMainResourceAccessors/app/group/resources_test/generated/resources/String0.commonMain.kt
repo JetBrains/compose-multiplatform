@@ -7,7 +7,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.StringResource
 
 @ExperimentalResourceApi
-private object String0 {
+private object CommonMainString0 {
     public val PascalCase: StringResource by
     lazy { init_PascalCase() }
 
@@ -32,7 +32,7 @@ private object String0 {
 
 @ExperimentalResourceApi
 internal val Res.string.PascalCase: StringResource
-    get() = String0.PascalCase
+    get() = CommonMainString0.PascalCase
 
 @ExperimentalResourceApi
 private fun init_PascalCase(): StringResource = org.jetbrains.compose.resources.StringResource(
@@ -44,7 +44,7 @@ private fun init_PascalCase(): StringResource = org.jetbrains.compose.resources.
 
 @ExperimentalResourceApi
 internal val Res.string._1_kebab_case: StringResource
-    get() = String0._1_kebab_case
+    get() = CommonMainString0._1_kebab_case
 
 @ExperimentalResourceApi
 private fun init__1_kebab_case(): StringResource = org.jetbrains.compose.resources.StringResource(
@@ -56,7 +56,7 @@ private fun init__1_kebab_case(): StringResource = org.jetbrains.compose.resourc
 
 @ExperimentalResourceApi
 internal val Res.string.app_name: StringResource
-    get() = String0.app_name
+    get() = CommonMainString0.app_name
 
 @ExperimentalResourceApi
 private fun init_app_name(): StringResource = org.jetbrains.compose.resources.StringResource(
@@ -68,7 +68,7 @@ private fun init_app_name(): StringResource = org.jetbrains.compose.resources.St
 
 @ExperimentalResourceApi
 internal val Res.string.camelCase: StringResource
-    get() = String0.camelCase
+    get() = CommonMainString0.camelCase
 
 @ExperimentalResourceApi
 private fun init_camelCase(): StringResource = org.jetbrains.compose.resources.StringResource(
@@ -80,7 +80,7 @@ private fun init_camelCase(): StringResource = org.jetbrains.compose.resources.S
 
 @ExperimentalResourceApi
 internal val Res.string.hello: StringResource
-    get() = String0.hello
+    get() = CommonMainString0.hello
 
 @ExperimentalResourceApi
 private fun init_hello(): StringResource = org.jetbrains.compose.resources.StringResource(
@@ -92,7 +92,7 @@ private fun init_hello(): StringResource = org.jetbrains.compose.resources.Strin
 
 @ExperimentalResourceApi
 internal val Res.string.multi_line: StringResource
-    get() = String0.multi_line
+    get() = CommonMainString0.multi_line
 
 @ExperimentalResourceApi
 private fun init_multi_line(): StringResource = org.jetbrains.compose.resources.StringResource(
@@ -104,7 +104,7 @@ private fun init_multi_line(): StringResource = org.jetbrains.compose.resources.
 
 @ExperimentalResourceApi
 internal val Res.string.str_template: StringResource
-    get() = String0.str_template
+    get() = CommonMainString0.str_template
 
 @ExperimentalResourceApi
 private fun init_str_template(): StringResource = org.jetbrains.compose.resources.StringResource(

@@ -7,14 +7,14 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @ExperimentalResourceApi
-private object Drawable0 {
+private object MainDrawable0 {
     public val vector: DrawableResource by
     lazy { init_vector() }
 }
 
 @ExperimentalResourceApi
 internal val Res.drawable.vector: DrawableResource
-    get() = Drawable0.vector
+    get() = MainDrawable0.vector
 
 @ExperimentalResourceApi
 private fun init_vector(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(

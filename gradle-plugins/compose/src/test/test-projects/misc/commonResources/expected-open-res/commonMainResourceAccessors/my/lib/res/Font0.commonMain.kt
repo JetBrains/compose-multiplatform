@@ -7,14 +7,14 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.FontResource
 
 @ExperimentalResourceApi
-private object Font0 {
+private object CommonMainFont0 {
   public val emptyFont: FontResource by
   lazy { init_emptyFont() }
 }
 
 @ExperimentalResourceApi
 public val Res.font.emptyFont: FontResource
-  get() = Font0.emptyFont
+  get() = CommonMainFont0.emptyFont
 
 @ExperimentalResourceApi
 private fun init_emptyFont(): FontResource = org.jetbrains.compose.resources.FontResource(

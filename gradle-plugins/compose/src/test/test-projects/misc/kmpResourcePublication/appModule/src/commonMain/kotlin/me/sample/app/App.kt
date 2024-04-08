@@ -19,3 +19,6 @@ fun App() {
         MyLibraryIcon(Modifier)
     }
 }
+
+@Composable
+expect fun getPlatformSpecificString(): String

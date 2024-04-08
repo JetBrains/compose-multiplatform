@@ -7,7 +7,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @ExperimentalResourceApi
-private object Drawable0 {
+private object CommonMainDrawable0 {
   public val _3_strange_name: DrawableResource by
   lazy { init__3_strange_name() }
 
@@ -23,7 +23,7 @@ private object Drawable0 {
 
 @ExperimentalResourceApi
 internal val Res.drawable._3_strange_name: DrawableResource
-  get() = Drawable0._3_strange_name
+  get() = CommonMainDrawable0._3_strange_name
 
 @ExperimentalResourceApi
 private fun init__3_strange_name(): DrawableResource =
@@ -36,7 +36,7 @@ private fun init__3_strange_name(): DrawableResource =
 
 @ExperimentalResourceApi
 internal val Res.drawable.camelCaseName: DrawableResource
-  get() = Drawable0.camelCaseName
+  get() = CommonMainDrawable0.camelCaseName
 
 @ExperimentalResourceApi
 private fun init_camelCaseName(): DrawableResource =
@@ -49,7 +49,7 @@ private fun init_camelCaseName(): DrawableResource =
 
 @ExperimentalResourceApi
 internal val Res.drawable.vector: DrawableResource
-  get() = Drawable0.vector
+  get() = CommonMainDrawable0.vector
 
 @ExperimentalResourceApi
 private fun init_vector(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
@@ -74,7 +74,7 @@ private fun init_vector(): DrawableResource = org.jetbrains.compose.resources.Dr
 
 @ExperimentalResourceApi
 internal val Res.drawable.vector_2: DrawableResource
-  get() = Drawable0.vector_2
+  get() = CommonMainDrawable0.vector_2
 
 @ExperimentalResourceApi
 private fun init_vector_2(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
