@@ -1,6 +1,8 @@
 package org.jetbrains.compose.resources
 
 import com.android.build.gradle.BaseExtension
+import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
+import com.android.build.gradle.internal.lint.LintModelWriterTask
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.SourceSet
@@ -63,6 +65,23 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>) {
             plugins.withId(pluginId) {
                 val androidExtension = project.extensions.getByType(BaseExtension::class.java)
                 configureAndroidComposeResources(kotlinExtension, androidExtension)
+
+
+                /*
+                  There is a dirty fix for the problem:
+
+                  Reason: Task ':generateDemoDebugUnitTestLintModel' uses this output of task ':generateResourceAccessorsForAndroidUnitTest' without declaring an explicit or implicit dependency. This can lead to incorrect results being produced, depending on what order the tasks are executed.
+
+                  Possible solutions:
+                    1. Declare task ':generateResourceAccessorsForAndroidUnitTest' as an input of ':generateDemoDebugUnitTestLintModel'.
+                    2. Declare an explicit dependency on ':generateResourceAccessorsForAndroidUnitTest' from ':generateDemoDebugUnitTestLintModel' using Task#dependsOn.
+                    3. Declare an explicit dependency on ':generateResourceAccessorsForAndroidUnitTest' from ':generateDemoDebugUnitTestLintModel' using Task#mustRunAfter.
+                 */
+                tasks.matching {
+                    it is AndroidLintAnalysisTask || it is LintModelWriterTask
+                }.configureEach {
+                    it.mustRunAfter(tasks.withType(GenerateResourceAccessorsTask::class.java))
+                }
             }
         }
     }
