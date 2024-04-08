@@ -11,7 +11,8 @@ import java.io.File
 internal fun Project.configureComposeResourcesGeneration(
     kotlinExtension: KotlinProjectExtension,
     resClassSourceSetName: String,
-    config: Provider<ResourcesExtension>
+    config: Provider<ResourcesExtension>,
+    generateModulePath: Boolean
 ) {
     logger.info("Configure compose resources generation")
 
@@ -46,7 +47,7 @@ internal fun Project.configureComposeResourcesGeneration(
                 packageName,
                 makeAccessorsPublic,
                 packagingDir,
-                false
+                generateModulePath
             )
         }
 
@@ -60,7 +61,7 @@ internal fun Project.configureComposeResourcesGeneration(
             packageName,
             makeAccessorsPublic,
             packagingDir,
-            false
+            generateModulePath
         )
     }
 

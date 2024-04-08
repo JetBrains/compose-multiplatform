@@ -103,7 +103,7 @@ private fun Project.configureComposeResources(
     config: Provider<ResourcesExtension>
 ) {
     logger.info("Configure compose resources")
-    configureComposeResourcesGeneration(kotlinExtension, resClassSourceSetName, config)
+    configureComposeResourcesGeneration(kotlinExtension, resClassSourceSetName, config, false)
 
     kotlinExtension.sourceSets.all { sourceSet ->
         sourceSet.resources.srcDirs(sourceSet.getPreparedComposeResourcesDir())
