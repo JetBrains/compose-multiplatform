@@ -382,7 +382,8 @@ class ResourcesTest : GradlePluginTestBase() {
             file.parentFile.name.startsWith("value") &&
             file.extension.equals("xml", true)
         ) {
-            file.parentFile.resolve(file.nameWithoutExtension + "." + XmlValuesConverterTask.CONVERTED_RESOURCE_EXT)
+            val cvrSuffix = file.parentFile.parentFile.parentFile.name
+            file.parentFile.resolve("${file.nameWithoutExtension}.$cvrSuffix.${XmlValuesConverterTask.CONVERTED_RESOURCE_EXT}")
         } else {
             file
         }

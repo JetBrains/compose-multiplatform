@@ -20,6 +20,7 @@ internal val Res.string.desktop_str: StringResource
 private fun init_desktop_str(): StringResource = org.jetbrains.compose.resources.StringResource(
     "string:desktop_str", "desktop_str",
     setOf(
-        org.jetbrains.compose.resources.ResourceItem(setOf(), "values/desktop_strings.cvr", 10, 39),
+        org.jetbrains.compose.resources.ResourceItem(setOf(),
+            "values/desktop_strings.desktopMain.cvr", 10, 39),
     )
 )

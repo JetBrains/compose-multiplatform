@@ -20,6 +20,7 @@ public val Res.string.android_str: StringResource
 private fun init_android_str(): StringResource = org.jetbrains.compose.resources.StringResource(
     "string:android_str", "android_str",
     setOf(
-        org.jetbrains.compose.resources.ResourceItem(setOf(), "values/android_strings.cvr", 10, 39),
+        org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.androidMain.cvr", 10,
+            39),
     )
 )

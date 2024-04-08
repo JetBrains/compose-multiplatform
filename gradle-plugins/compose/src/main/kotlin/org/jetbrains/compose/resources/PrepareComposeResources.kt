@@ -25,6 +25,7 @@ internal fun Project.registerPrepareComposeResourcesTask(
         "convertXmlValueResourcesFor${sourceSet.name.uppercaseFirstChar()}",
         XmlValuesConverterTask::class.java
     ) { task ->
+        task.fileSuffix.set(sourceSet.name)
         task.originalResourcesDir.set(userComposeResourcesDir)
         task.outputDir.set(preparedComposeResourcesDir)
     }
@@ -137,6 +138,9 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
         private const val FORMAT_VERSION = 0
     }
 
+    @get:Input
+    abstract val fileSuffix: Property<String>
+
     @get:Internal
     abstract val originalResourcesDir: DirectoryProperty
 
@@ -151,12 +155,14 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
 
     @get:OutputFiles
     val realOutputFiles = outputDir.map { dir ->
-        dir.asFileTree.matching { it.include("values*/*.$CONVERTED_RESOURCE_EXT") }
+        val suffix = fileSuffix.get()
+        dir.asFileTree.matching { it.include("values*/*.$suffix.$CONVERTED_RESOURCE_EXT") }
     }
 
     @TaskAction
     fun run() {
         val outDir = outputDir.get().asFile
+        val suffix = fileSuffix.get()
         realOutputFiles.get().forEach { f -> f.delete() }
         originalResourcesDir.get().asFile.listNotHiddenFiles().forEach { valuesDir ->
             if (valuesDir.isDirectory && valuesDir.name.startsWith("values")) {
@@ -164,7 +170,7 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
                     if (f.extension.equals("xml", true)) {
                         val output = outDir
                             .resolve(f.parentFile.name)
-                            .resolve(f.nameWithoutExtension + ".$CONVERTED_RESOURCE_EXT")
+                            .resolve(f.nameWithoutExtension + ".$suffix.$CONVERTED_RESOURCE_EXT")
                         output.parentFile.mkdirs()
                         convert(f, output)
                     }

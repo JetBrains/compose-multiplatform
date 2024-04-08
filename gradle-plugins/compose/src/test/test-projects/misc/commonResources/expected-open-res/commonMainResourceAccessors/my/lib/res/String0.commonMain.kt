@@ -38,7 +38,8 @@ public val Res.string.PascalCase: StringResource
 private fun init_PascalCase(): StringResource = org.jetbrains.compose.resources.StringResource(
   "string:PascalCase", "PascalCase",
   setOf(
-    org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.cvr", 172, 34),
+    org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.commonMain.cvr", 172,
+      34),
   )
 )
 
@@ -50,7 +51,8 @@ public val Res.string._1_kebab_case: StringResource
 private fun init__1_kebab_case(): StringResource = org.jetbrains.compose.resources.StringResource(
   "string:_1_kebab_case", "_1_kebab_case",
   setOf(
-    org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.cvr", 135, 36),
+    org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.commonMain.cvr", 135,
+      36),
   )
 )
 
@@ -62,7 +64,8 @@ public val Res.string.app_name: StringResource
 private fun init_app_name(): StringResource = org.jetbrains.compose.resources.StringResource(
   "string:app_name", "app_name",
   setOf(
-    org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.cvr", 207, 44),
+    org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.commonMain.cvr", 207,
+      44),
   )
 )
 
@@ -74,7 +77,8 @@ public val Res.string.camelCase: StringResource
 private fun init_camelCase(): StringResource = org.jetbrains.compose.resources.StringResource(
   "string:camelCase", "camelCase",
   setOf(
-    org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.cvr", 252, 29),
+    org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.commonMain.cvr", 252,
+      29),
   )
 )
 
@@ -86,7 +90,8 @@ public val Res.string.hello: StringResource
 private fun init_hello(): StringResource = org.jetbrains.compose.resources.StringResource(
   "string:hello", "hello",
   setOf(
-    org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.cvr", 282, 37),
+    org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.commonMain.cvr", 282,
+      37),
   )
 )
 
@@ -98,7 +103,8 @@ public val Res.string.multi_line: StringResource
 private fun init_multi_line(): StringResource = org.jetbrains.compose.resources.StringResource(
   "string:multi_line", "multi_line",
   setOf(
-    org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.cvr", 320, 178),
+    org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.commonMain.cvr", 320,
+      178),
   )
 )
 
@@ -110,6 +116,7 @@ public val Res.string.str_template: StringResource
 private fun init_str_template(): StringResource = org.jetbrains.compose.resources.StringResource(
   "string:str_template", "str_template",
   setOf(
-    org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.cvr", 499, 76),
+    org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.commonMain.cvr", 499,
+      76),
   )
 )
