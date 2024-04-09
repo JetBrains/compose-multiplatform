@@ -17,7 +17,6 @@ internal fun determineIosKonanTargetsFromEnv(platform: String, archs: List<Strin
             targets.addAll(archs.map { arch ->
                 when (arch) {
                     "arm64", "arm64e" -> KonanTarget.IOS_ARM64
-                    "armv7", "armv7s" -> KonanTarget.IOS_ARM32
                     else -> error("Unknown iOS device arch: '$arch'")
                 }
             })

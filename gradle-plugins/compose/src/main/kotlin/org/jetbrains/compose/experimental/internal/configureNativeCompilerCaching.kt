@@ -23,7 +23,6 @@ private const val NONE_VALUE = "none"
 // https://github.com/JetBrains/compose-multiplatform-core/blob/jb-main/compose/runtime/runtime/build.gradle#L75
 private val SUPPORTED_NATIVE_TARGETS = setOf(
     // ios
-    KonanTarget.IOS_ARM32,
     KonanTarget.IOS_X64,
     KonanTarget.IOS_ARM64,
     KonanTarget.IOS_SIMULATOR_ARM64,
@@ -38,7 +37,6 @@ private val SUPPORTED_NATIVE_TARGETS = setOf(
     KonanTarget.WATCHOS_ARM64,
     KonanTarget.WATCHOS_ARM32,
     KonanTarget.WATCHOS_X64,
-    KonanTarget.WATCHOS_X86, // it's going to be deprecated, see comments in KonanTarget
     KonanTarget.WATCHOS_SIMULATOR_ARM64,
     // mingw
     KonanTarget.MINGW_X64,
