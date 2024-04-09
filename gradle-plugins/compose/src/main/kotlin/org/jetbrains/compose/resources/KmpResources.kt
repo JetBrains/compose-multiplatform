@@ -36,7 +36,7 @@ internal fun Project.configureKmpResources(
                 target,
                 { sourceSet ->
                     KotlinTargetResourcesPublication.ResourceRoot(
-                        sourceSet.getPreparedComposeResourcesDir(),
+                        getPreparedComposeResourcesDir(sourceSet),
                         emptyList(),
                         //for android target exclude fonts
                         if (target is KotlinAndroidTarget) listOf("**/font*/*") else emptyList()
@@ -52,7 +52,7 @@ internal fun Project.configureKmpResources(
                     target,
                     { sourceSet ->
                         KotlinTargetResourcesPublication.ResourceRoot(
-                            sourceSet.getPreparedComposeResourcesDir(),
+                            getPreparedComposeResourcesDir(sourceSet),
                             listOf("**/font*/*"),
                             emptyList()
                         )

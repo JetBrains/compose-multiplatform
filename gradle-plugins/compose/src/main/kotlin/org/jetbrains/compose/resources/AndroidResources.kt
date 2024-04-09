@@ -7,7 +7,6 @@ import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileSystemOperations
-import org.gradle.api.file.FileTree
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.jetbrains.compose.internal.utils.registerTask
@@ -19,7 +18,6 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmAndroidCompilation
 import org.jetbrains.kotlin.gradle.plugin.sources.android.androidSourceSetInfoOrNull
 import org.jetbrains.kotlin.gradle.utils.ObservableSet
-import java.io.File
 import javax.inject.Inject
 
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -38,7 +36,7 @@ internal fun Project.configureAndroidComposeResources(
                     .matching { it.name == kotlinAndroidSourceSet.androidSourceSetName }
                     .all { androidSourceSet ->
                         (compilation.allKotlinSourceSets as? ObservableSet<KotlinSourceSet>)?.forAll { kotlinSourceSet ->
-                            val preparedComposeResources = kotlinSourceSet.getPreparedComposeResourcesDir()
+                            val preparedComposeResources = getPreparedComposeResourcesDir(kotlinSourceSet)
                             androidSourceSet.resources.srcDirs(preparedComposeResources)
 
                             //fix for AGP < 8.0
@@ -62,7 +60,7 @@ internal fun Project.configureAndroidComposeResources(
                 if (compilation.androidVariant.name == variant.name) {
                     project.logger.info("Configure fonts for variant ${variant.name}")
                     (compilation.allKotlinSourceSets as? ObservableSet<KotlinSourceSet>)?.forAll { kotlinSourceSet ->
-                        val preparedComposeResources = kotlinSourceSet.getPreparedComposeResourcesDir()
+                        val preparedComposeResources = getPreparedComposeResourcesDir(kotlinSourceSet)
                         variantResources.from(preparedComposeResources)
                     }
                 }

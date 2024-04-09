@@ -47,7 +47,7 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>) {
         if (!hasKmpResources) logger.info(
             """
                 Compose resources publication requires Kotlin Gradle Plugin >= 2.0
-                Current Kotlin Gradle Plugin is ${KotlinVersion.CURRENT}
+                Current Kotlin Gradle Plugin is ${kotlinExtension.coreLibrariesVersion}
             """.trimIndent()
         )
         if (currentGradleVersion < minGradleVersion) logger.info(
@@ -106,6 +106,6 @@ private fun Project.configureComposeResources(
     configureComposeResourcesGeneration(kotlinExtension, resClassSourceSetName, config, false)
 
     kotlinExtension.sourceSets.all { sourceSet ->
-        sourceSet.resources.srcDirs(sourceSet.getPreparedComposeResourcesDir())
+        sourceSet.resources.srcDirs(getPreparedComposeResourcesDir(sourceSet))
     }
 }

@@ -50,9 +50,9 @@ internal fun Project.registerPrepareComposeResourcesTask(
     return prepareComposeResourcesTask
 }
 
-internal fun KotlinSourceSet.getPreparedComposeResourcesDir(): Provider<File> = project.tasks
+internal fun Project.getPreparedComposeResourcesDir(sourceSet: KotlinSourceSet): Provider<File> = tasks
         .named(
-            getPrepareComposeResourcesTaskName(this),
+            getPrepareComposeResourcesTaskName(sourceSet),
             PrepareComposeResourcesTask::class.java
         )
         .flatMap { it.outputDir.asFile }
