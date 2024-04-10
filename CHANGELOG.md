@@ -9,7 +9,7 @@ _Changes since 1.6.1_
 ## Fixes
 #### iOS, Desktop, Web
 - [Propagate composition locals to layers in the (re)composition phase](https://github.com/JetBrains/compose-multiplatform-core/pull/1233)
-- [Add transactions to FocusOwnerImpl takeFocus and releaseFocus to prevent crash when a window is re-shown](https://github.com/JetBrains/compose-multiplatform-core/pull/1231)
+- [Add transactions to `FocusOwnerImpl` `takeFocus` and `releaseFocus` to prevent crash when a window is re-shown](https://github.com/JetBrains/compose-multiplatform-core/pull/1231)
 - [Don't crash, and allow selection in SelectionContainer to start when drag starts below the bounds of the visible text](https://github.com/JetBrains/compose-multiplatform-core/pull/1230)
 
 #### iOS
