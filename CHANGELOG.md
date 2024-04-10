@@ -4,7 +4,7 @@ _Changes since 1.6.1_
 
 ## Features
 #### Common
-- [Support Kotlin 2.0.0-RC1](https://github.com/JetBrains/compose-multiplatform/pull/4596)
+- [Support Kotlin `2.0.0-RC1`](https://github.com/JetBrains/compose-multiplatform/pull/4596)
 
 ## Fixes
 #### iOS, Desktop, Web
