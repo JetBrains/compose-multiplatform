@@ -1,3 +1,29 @@
+# 1.6.2 (April 2024)
+
+_Changes since 1.6.1_
+
+## Features
+#### Common
+- [Support Kotlin 2.0.0-RC1](https://github.com/JetBrains/compose-multiplatform/pull/4596)
+
+## Fixes
+#### iOS, Desktop, Web
+- [Propagate composition locals to layers in the (re)composition phase](https://github.com/JetBrains/compose-multiplatform-core/pull/1233)
+- [Add transactions to FocusOwnerImpl takeFocus and releaseFocus to prevent crash when a window is re-shown](https://github.com/JetBrains/compose-multiplatform-core/pull/1231)
+- [Don't crash, and allow selection in SelectionContainer to start when drag starts below the bounds of the visible text](https://github.com/JetBrains/compose-multiplatform-core/pull/1230)
+
+#### iOS
+- [Fixed crash in Cupertino Textfield when a last symbol is a carriage return symbol](https://github.com/JetBrains/compose-multiplatform-core/pull/1229)
+
+## Dependencies
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+- [Compiler 1.5.11](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.11)
+- [Runtime 1.6.4](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.4)
+- [UI 1.6.4](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.4)
+- [Foundation 1.6.4](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.4)
+- [Material 1.6.4](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.4)
+- [Material3 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.1)
+
 # 1.6.1 (March 2024)
 
 _Changes since 1.6.0_
