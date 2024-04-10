@@ -13,7 +13,7 @@ _Changes since 1.6.1_
 - [Fix crash and allow selection in `SelectionContainer` to start when drag starts below the bounds of the visible text](https://github.com/JetBrains/compose-multiplatform-core/pull/1230)
 
 #### iOS
-- [Fixed crash in Cupertino Textfield when a last symbol is a carriage return symbol](https://github.com/JetBrains/compose-multiplatform-core/pull/1229)
+- [Fixed crash in `TextField` when a last symbol is a carriage return symbol](https://github.com/JetBrains/compose-multiplatform-core/pull/1229)
 
 ## Dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
