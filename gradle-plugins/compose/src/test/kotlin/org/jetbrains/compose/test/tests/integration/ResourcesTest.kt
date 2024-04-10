@@ -14,9 +14,9 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun testGeneratedAccessors(): Unit = with(testProject("misc/commonResources")) {
         //check generated resource's accessors
-        gradle("generateComposeResClass").checks {
+        gradle("prepareKotlinIdeaImport").checks {
             assertDirectoriesContentEquals(
-                file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources"),
+                file("build/generated/compose/resourceGenerator/kotlin"),
                 file("expected")
             )
         }
@@ -25,17 +25,17 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/drawable/vector_2.xml").renameTo(
             file("src/commonMain/composeResources/drawable/vector_3.xml")
         )
-        gradle("generateComposeResClass").checks {
+        gradle("prepareKotlinIdeaImport").checks {
             assertNotEqualTextFiles(
-                file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Drawable0.kt"),
-                file("expected/Drawable0.kt")
+                file("build/generated/compose/resourceGenerator/kotlin/commonMainResourceAccessors/app/group/resources_test/generated/resources/Drawable0.commonMain.kt"),
+                file("expected/commonMainResourceAccessors/app/group/resources_test/generated/resources/Drawable0.commonMain.kt")
             )
         }
 
         file("src/commonMain/composeResources/drawable-en").renameTo(
             file("src/commonMain/composeResources/drawable-rent")
         )
-        gradle("generateComposeResClass").checks {
+        gradle("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 contains unknown qualifier: 'rent'.
@@ -46,7 +46,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/drawable-rent").renameTo(
             file("src/commonMain/composeResources/drawable-rUS-en")
         )
-        gradle("generateComposeResClass").checks {
+        gradle("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 Region qualifier must be declared after language: 'en-rUS'.
@@ -57,7 +57,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/drawable-rUS-en").renameTo(
             file("src/commonMain/composeResources/drawable-rUS")
         )
-        gradle("generateComposeResClass").checks {
+        gradle("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 Region qualifier must be used only with language.
@@ -68,7 +68,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/drawable-rUS").renameTo(
             file("src/commonMain/composeResources/drawable-en-fr")
         )
-        gradle("generateComposeResClass").checks {
+        gradle("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 contains repetitive qualifiers: 'en' and 'fr'.
@@ -79,7 +79,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/drawable-en-fr").renameTo(
             file("src/commonMain/composeResources/image")
         )
-        gradle("generateComposeResClass").checks {
+        gradle("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 Unknown resource type: 'image'
@@ -90,7 +90,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/image").renameTo(
             file("src/commonMain/composeResources/files-de")
         )
-        gradle("generateComposeResClass").checks {
+        gradle("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 The 'files' directory doesn't support qualifiers: 'files-de'.
@@ -101,7 +101,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/files-de").renameTo(
             file("src/commonMain/composeResources/strings")
         )
-        gradle("generateComposeResClass").checks {
+        gradle("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 Unknown resource type: 'strings'.
@@ -112,7 +112,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/strings").renameTo(
             file("src/commonMain/composeResources/string-us")
         )
-        gradle("generateComposeResClass").checks {
+        gradle("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 Forbidden directory name 'string-us'! String resources should be declared in 'values/strings.xml'.
@@ -137,9 +137,9 @@ class ResourcesTest : GradlePluginTestBase() {
             """.trimIndent()
         }
 
-        gradle("generateComposeResClass").checks {
+        gradle("prepareKotlinIdeaImport").checks {
             assertDirectoriesContentEquals(
-                file("build/generated/compose/resourceGenerator/kotlin/my/lib/res"),
+                file("build/generated/compose/resourceGenerator/kotlin"),
                 file("expected-open-res")
             )
         }
@@ -382,7 +382,8 @@ class ResourcesTest : GradlePluginTestBase() {
             file.parentFile.name.startsWith("value") &&
             file.extension.equals("xml", true)
         ) {
-            file.parentFile.resolve(file.nameWithoutExtension + "." + XmlValuesConverterTask.CONVERTED_RESOURCE_EXT)
+            val cvrSuffix = file.parentFile.parentFile.parentFile.name
+            file.parentFile.resolve("${file.nameWithoutExtension}.$cvrSuffix.${XmlValuesConverterTask.CONVERTED_RESOURCE_EXT}")
         } else {
             file
         }
@@ -431,7 +432,7 @@ class ResourcesTest : GradlePluginTestBase() {
     fun testUpToDateChecks(): Unit = with(testProject("misc/commonResources")) {
         gradle("prepareKotlinIdeaImport").checks {
             check.taskSuccessful(":generateComposeResClass")
-            assertTrue(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
+            assertTrue(file("build/generated/compose/resourceGenerator/kotlin/commonResClass/app/group/resources_test/generated/resources/Res.kt").exists())
         }
         gradle("prepareKotlinIdeaImport").checks {
             check.taskUpToDate(":generateComposeResClass")
@@ -445,7 +446,7 @@ class ResourcesTest : GradlePluginTestBase() {
         }
         gradle("prepareKotlinIdeaImport").checks {
             check.taskSuccessful(":generateComposeResClass")
-            assertFalse(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
+            assertFalse(file("build/generated/compose/resourceGenerator/kotlin/commonResClass/app/group/resources_test/generated/resources/Res.kt").exists())
         }
 
         modifyText("build.gradle.kts") { str ->
@@ -462,8 +463,8 @@ class ResourcesTest : GradlePluginTestBase() {
         }
         gradle("prepareKotlinIdeaImport").checks {
             check.taskSuccessful(":generateComposeResClass")
-            assertFalse(file("build/generated/compose/resourceGenerator/kotlin/app/group/resources_test/generated/resources/Res.kt").exists())
-            assertTrue(file("build/generated/compose/resourceGenerator/kotlin/io/company/resources_test/generated/resources/Res.kt").exists())
+            assertFalse(file("build/generated/compose/resourceGenerator/kotlin/commonResClass/app/group/resources_test/generated/resources/Res.kt").exists())
+            assertTrue(file("build/generated/compose/resourceGenerator/kotlin/commonResClass/io/company/resources_test/generated/resources/Res.kt").exists())
         }
     }
 
@@ -471,7 +472,7 @@ class ResourcesTest : GradlePluginTestBase() {
     fun testEmptyResClass(): Unit = with(testProject("misc/emptyResources")) {
         gradle("generateComposeResClass").checks {
             assertDirectoriesContentEquals(
-                file("build/generated/compose/resourceGenerator/kotlin/app/group/empty_res/generated/resources"),
+                file("build/generated/compose/resourceGenerator/kotlin/commonResClass/app/group/empty_res/generated/resources"),
                 file("expected")
             )
         }
@@ -479,13 +480,12 @@ class ResourcesTest : GradlePluginTestBase() {
 
     @Test
     fun testJvmOnlyProject(): Unit = with(testProject("misc/jvmOnlyResources")) {
-        gradle("generateComposeResClass").checks {
+        gradle("jar").checks {
             assertDirectoriesContentEquals(
-                file("build/generated/compose/resourceGenerator/kotlin/me/app/jvmonlyresources/generated/resources"),
+                file("build/generated/compose/resourceGenerator/kotlin"),
                 file("expected")
             )
         }
-        gradle("jar")
     }
 
     //https://github.com/gmazzo/gradle-buildconfig-plugin/issues/131
@@ -509,8 +509,10 @@ class ResourcesTest : GradlePluginTestBase() {
         }
 
         val expectedFilesCount = expected.walkTopDown()
+            .filter { !it.isDirectory }
             .map { it.toPath().relativeTo(expectedPath) }.sorted().joinToString("\n")
         val actualFilesCount = actual.walkTopDown()
+            .filter { !it.isDirectory }
             .map { it.toPath().relativeTo(actualPath) }.sorted().joinToString("\n")
         assertEquals(expectedFilesCount, actualFilesCount)
     }

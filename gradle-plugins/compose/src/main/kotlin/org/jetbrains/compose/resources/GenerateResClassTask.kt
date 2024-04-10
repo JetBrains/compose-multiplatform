@@ -1,147 +1,59 @@
 package org.jetbrains.compose.resources
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import java.io.File
-import java.io.RandomAccessFile
-import java.nio.file.Path
-import kotlin.io.path.relativeTo
 
 /**
  * This task should be FAST and SAFE! Because it is being run during IDE import.
  */
-internal abstract class GenerateResClassTask : DefaultTask() {
+internal abstract class CodeGenerationTask : DefaultTask()
+
+internal abstract class GenerateResClassTask : CodeGenerationTask() {
+    companion object {
+        private const val RES_FILE_NAME = "Res"
+    }
+
     @get:Input
     abstract val packageName: Property<String>
 
     @get:Input
     @get:Optional
-    abstract val moduleDir: Property<File>
+    abstract val packagingDir: Property<File>
 
     @get:Input
-    abstract val shouldGenerateResClass: Property<Boolean>
+    abstract val shouldGenerateCode: Property<Boolean>
 
     @get:Input
-    abstract val makeResClassPublic: Property<Boolean>
-
-    @get:InputFiles
-    @get:PathSensitive(PathSensitivity.RELATIVE)
-    abstract val resDir: Property<File>
+    abstract val makeAccessorsPublic: Property<Boolean>
 
     @get:OutputDirectory
-    abstract val codeDir: Property<File>
+    abstract val codeDir: DirectoryProperty
 
     @TaskAction
     fun generate() {
         try {
-            val kotlinDir = codeDir.get()
-            logger.info("Clean directory $kotlinDir")
-            kotlinDir.deleteRecursively()
-            kotlinDir.mkdirs()
+            val dir = codeDir.get().asFile
+            dir.deleteRecursively()
+            dir.mkdirs()
 
-            if (shouldGenerateResClass.get()) {
-                val rootResDir = resDir.get()
-                logger.info("Generate resources for $rootResDir")
+            if (shouldGenerateCode.get()) {
+                logger.info("Generate $RES_FILE_NAME.kt")
 
-                //get first level dirs
-                val dirs = rootResDir.listNotHiddenFiles()
-
-                dirs.forEach { f ->
-                    if (!f.isDirectory) {
-                        error("${f.name} is not directory! Raw files should be placed in '${rootResDir.name}/files' directory.")
-                    }
-                }
-
-                //type -> id -> resource item
-                val resources: Map<ResourceType, Map<String, List<ResourceItem>>> = dirs
-                    .flatMap { dir ->
-                        dir.listNotHiddenFiles()
-                            .mapNotNull { it.fileToResourceItems(rootResDir.toPath()) }
-                            .flatten()
-                    }
-                    .groupBy { it.type }
-                    .mapValues { (_, items) -> items.groupBy { it.name } }
-                getResFileSpecs(
-                    resources,
-                    packageName.get(),
-                    moduleDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: "",
-                    makeResClassPublic.get()
-                ).forEach { it.writeTo(kotlinDir) }
+                val pkgName = packageName.get()
+                val moduleDirectory = packagingDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
+                val isPublic = makeAccessorsPublic.get()
+                getResFileSpec(pkgName, RES_FILE_NAME, moduleDirectory, isPublic).writeTo(dir)
             } else {
                 logger.info("Generation Res class is disabled")
             }
         } catch (e: Exception) {
             //message must contain two ':' symbols to be parsed by IDE UI!
-            logger.error("e: GenerateResClassTask was failed:", e)
+            logger.error("e: $name task was failed:", e)
         }
-    }
-
-    private fun File.fileToResourceItems(
-        relativeTo: Path
-    ): List<ResourceItem>? {
-        val file = this
-        val dirName = file.parentFile.name ?: return null
-        val typeAndQualifiers = dirName.split("-")
-        if (typeAndQualifiers.isEmpty()) return null
-
-        val typeString = typeAndQualifiers.first().lowercase()
-        val qualifiers = typeAndQualifiers.takeLast(typeAndQualifiers.size - 1)
-        val path = file.toPath().relativeTo(relativeTo)
-
-
-        if (typeString == "string") {
-            error("Forbidden directory name '$dirName'! String resources should be declared in 'values/strings.xml'.")
-        }
-
-        if (typeString == "files") {
-            if (qualifiers.isNotEmpty()) error("The 'files' directory doesn't support qualifiers: '$dirName'.")
-            return null
-        }
-
-        if (typeString == "values" && file.extension.equals(XmlValuesConverterTask.CONVERTED_RESOURCE_EXT, true)) {
-            return getValueResourceItems(file, qualifiers, path)
-        }
-
-        val type = ResourceType.fromString(typeString) ?: error("Unknown resource type: '$typeString'.")
-        return listOf(ResourceItem(type, qualifiers, file.nameWithoutExtension.asUnderscoredIdentifier(), path))
-    }
-
-    private fun getValueResourceItems(dataFile: File, qualifiers: List<String>, path: Path) : List<ResourceItem> {
-        val result = mutableListOf<ResourceItem>()
-        dataFile.bufferedReader().use { f ->
-            var offset = 0L
-            var line: String? = f.readLine()
-            while (line != null) {
-                val size = line.encodeToByteArray().size
-
-                //first line is meta info
-                if (offset > 0) {
-                    result.add(getValueResourceItem(line, offset, size.toLong(), qualifiers, path))
-                }
-
-                offset += size + 1 // "+1" for newline character
-                line = f.readLine()
-            }
-        }
-        return result
-    }
-
-    private fun getValueResourceItem(
-        recordString: String,
-        offset: Long,
-        size: Long,
-        qualifiers: List<String>,
-        path: Path
-    ) : ResourceItem {
-        val record = ValueResourceRecord.createFromString(recordString)
-        return ResourceItem(record.type, qualifiers, record.key.asUnderscoredIdentifier(), path, offset, size)
     }
 }
-
-internal fun File.listNotHiddenFiles(): List<File> =
-    listFiles()?.filter { !it.isHidden }.orEmpty()
-
-internal fun String.asUnderscoredIdentifier(): String =
-    replace('-', '_')
-        .let { if (it.isNotEmpty() && it.first().isDigit()) "_$it" else it }

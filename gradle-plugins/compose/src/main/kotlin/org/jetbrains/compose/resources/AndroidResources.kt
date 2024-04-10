@@ -5,9 +5,9 @@ import com.android.build.gradle.BaseExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
@@ -18,40 +18,31 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmAndroidCompilation
 import org.jetbrains.kotlin.gradle.plugin.sources.android.androidSourceSetInfoOrNull
 import org.jetbrains.kotlin.gradle.utils.ObservableSet
-import java.io.File
 import javax.inject.Inject
 
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 internal fun Project.configureAndroidComposeResources(
     kotlinExtension: KotlinMultiplatformExtension,
-    androidExtension: BaseExtension,
-    preparedCommonResources: Provider<File>
+    androidExtension: BaseExtension
 ) {
-    val commonMain = KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME
-    val commonResourcesDir = projectDir.resolve("src/$commonMain/$COMPOSE_RESOURCES_DIR")
-
     // 1) get the Kotlin Android Target Compilation -> [A]
     // 2) get default source set name for the 'A'
     // 3) find the associated Android SourceSet in the AndroidExtension -> [B]
     // 4) get all source sets in the 'A' and add its resources to the 'B'
     kotlinExtension.targets.withType(KotlinAndroidTarget::class.java).all { androidTarget ->
         androidTarget.compilations.all { compilation: KotlinJvmAndroidCompilation ->
-
-            //fix for AGP < 8.0
-            //usually 'androidSourceSet.resources.srcDir(preparedCommonResources)' should be enough
-            compilation.androidVariant.processJavaResourcesProvider.configure { it.dependsOn(preparedCommonResources) }
-
             compilation.defaultSourceSet.androidSourceSetInfoOrNull?.let { kotlinAndroidSourceSet ->
                 androidExtension.sourceSets
                     .matching { it.name == kotlinAndroidSourceSet.androidSourceSetName }
                     .all { androidSourceSet ->
                         (compilation.allKotlinSourceSets as? ObservableSet<KotlinSourceSet>)?.forAll { kotlinSourceSet ->
-                            if (kotlinSourceSet.name == commonMain) {
-                                androidSourceSet.resources.srcDir(preparedCommonResources)
-                            } else {
-                                androidSourceSet.resources.srcDir(
-                                    projectDir.resolve("src/${kotlinSourceSet.name}/$COMPOSE_RESOURCES_DIR")
-                                )
+                            val preparedComposeResources = getPreparedComposeResourcesDir(kotlinSourceSet)
+                            androidSourceSet.resources.srcDirs(preparedComposeResources)
+
+                            //fix for AGP < 8.0
+                            //usually 'androidSourceSet.resources.srcDir(preparedCommonResources)' should be enough
+                            compilation.androidVariant.processJavaResourcesProvider.configure {
+                                it.dependsOn(preparedComposeResources)
                             }
                         }
                     }
@@ -62,10 +53,24 @@ internal fun Project.configureAndroidComposeResources(
     //copy fonts from the compose resources dir to android assets
     val androidComponents = project.extensions.findByType(AndroidComponentsExtension::class.java) ?: return
     androidComponents.onVariants { variant ->
+        val variantResources = project.files()
+
+        kotlinExtension.targets.withType(KotlinAndroidTarget::class.java).all { androidTarget ->
+            androidTarget.compilations.all { compilation: KotlinJvmAndroidCompilation ->
+                if (compilation.androidVariant.name == variant.name) {
+                    project.logger.info("Configure fonts for variant ${variant.name}")
+                    (compilation.allKotlinSourceSets as? ObservableSet<KotlinSourceSet>)?.forAll { kotlinSourceSet ->
+                        val preparedComposeResources = getPreparedComposeResourcesDir(kotlinSourceSet)
+                        variantResources.from(preparedComposeResources)
+                    }
+                }
+            }
+        }
+
         val copyFonts = registerTask<CopyAndroidFontsToAssetsTask>(
             "copy${variant.name.uppercaseFirstChar()}FontsToAndroidAssets"
         ) {
-            from.set(commonResourcesDir)
+            from.set(variantResources)
         }
         variant.sources?.assets?.addGeneratedSourceDirectory(
             taskProvider = copyFonts,
@@ -83,7 +88,7 @@ internal abstract class CopyAndroidFontsToAssetsTask : DefaultTask() {
 
     @get:InputFiles
     @get:IgnoreEmptyDirectories
-    abstract val from: Property<File>
+    abstract val from: Property<FileCollection>
 
     @get:OutputDirectory
     abstract val outputDirectory: DirectoryProperty

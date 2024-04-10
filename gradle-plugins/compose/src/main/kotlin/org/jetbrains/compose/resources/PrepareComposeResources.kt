@@ -6,6 +6,8 @@ import org.gradle.api.file.*
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.jetbrains.compose.internal.utils.uppercaseFirstChar
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.w3c.dom.Node
 import java.io.File
 import java.util.*
@@ -13,19 +15,23 @@ import javax.inject.Inject
 import javax.xml.parsers.DocumentBuilderFactory
 
 internal fun Project.registerPrepareComposeResourcesTask(
-    userComposeResourcesDir: File,
-    preparedComposeResourcesDir: Provider<Directory>
+    sourceSet: KotlinSourceSet
 ): TaskProvider<PrepareComposeResourcesTask> {
+    val resDir = "${sourceSet.name}/$COMPOSE_RESOURCES_DIR"
+    val userComposeResourcesDir = project.projectDir.resolve("src/$resDir")
+    val preparedComposeResourcesDir = layout.buildDirectory.dir("$RES_GEN_DIR/preparedResources/$resDir")
+
     val convertXmlValueResources = tasks.register(
-        "convertXmlValueResources",
+        "convertXmlValueResourcesFor${sourceSet.name.uppercaseFirstChar()}",
         XmlValuesConverterTask::class.java
     ) { task ->
+        task.fileSuffix.set(sourceSet.name)
         task.originalResourcesDir.set(userComposeResourcesDir)
         task.outputDir.set(preparedComposeResourcesDir)
     }
 
     val copyNonXmlValueResources = tasks.register(
-        "copyNonXmlValueResources",
+        "copyNonXmlValueResourcesFor${sourceSet.name.uppercaseFirstChar()}",
         CopyNonXmlValueResourcesTask::class.java
     ) { task ->
         task.originalResourcesDir.set(userComposeResourcesDir)
@@ -33,16 +39,26 @@ internal fun Project.registerPrepareComposeResourcesTask(
     }
 
     val prepareComposeResourcesTask = tasks.register(
-        "prepareComposeResourcesTask",
+        getPrepareComposeResourcesTaskName(sourceSet),
         PrepareComposeResourcesTask::class.java
     ) { task ->
         task.convertedXmls.set(convertXmlValueResources.map { it.realOutputFiles.get() })
         task.copiedNonXmls.set(copyNonXmlValueResources.map { it.realOutputFiles.get() })
-        task.outputDir.set(preparedComposeResourcesDir.map { it.asFile })
+        task.outputDir.set(preparedComposeResourcesDir)
     }
 
     return prepareComposeResourcesTask
 }
+
+internal fun Project.getPreparedComposeResourcesDir(sourceSet: KotlinSourceSet): Provider<File> = tasks
+        .named(
+            getPrepareComposeResourcesTaskName(sourceSet),
+            PrepareComposeResourcesTask::class.java
+        )
+        .flatMap { it.outputDir.asFile }
+
+private fun getPrepareComposeResourcesTaskName(sourceSet: KotlinSourceSet) =
+    "prepareComposeResourcesTaskFor${sourceSet.name.uppercaseFirstChar()}"
 
 internal abstract class CopyNonXmlValueResourcesTask : DefaultTask() {
     @get:Inject
@@ -52,6 +68,7 @@ internal abstract class CopyNonXmlValueResourcesTask : DefaultTask() {
     abstract val originalResourcesDir: DirectoryProperty
 
     @get:InputFiles
+    @get:SkipWhenEmpty
     val realInputFiles = originalResourcesDir.map { dir ->
         dir.asFileTree.matching { it.exclude("values*/*.xml") }
     }
@@ -67,7 +84,7 @@ internal abstract class CopyNonXmlValueResourcesTask : DefaultTask() {
     @TaskAction
     fun run() {
         realOutputFiles.get().forEach { f -> f.delete() }
-        fileSystem.copy {  copy ->
+        fileSystem.copy { copy ->
             copy.includeEmptyDirs = false
             copy.from(originalResourcesDir) {
                 it.exclude("values*/*.xml")
@@ -79,16 +96,18 @@ internal abstract class CopyNonXmlValueResourcesTask : DefaultTask() {
 
 internal abstract class PrepareComposeResourcesTask : DefaultTask() {
     @get:InputFiles
+    @get:SkipWhenEmpty
     abstract val convertedXmls: Property<FileTree>
 
     @get:InputFiles
+    @get:SkipWhenEmpty
     abstract val copiedNonXmls: Property<FileTree>
 
     @get:OutputDirectory
-    abstract val outputDir: Property<File>
+    abstract val outputDir: DirectoryProperty
 
     @TaskAction
-    fun run() {}
+    fun run() = Unit
 }
 
 internal data class ValueResourceRecord(
@@ -119,10 +138,14 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
         private const val FORMAT_VERSION = 0
     }
 
+    @get:Input
+    abstract val fileSuffix: Property<String>
+
     @get:Internal
     abstract val originalResourcesDir: DirectoryProperty
 
     @get:InputFiles
+    @get:SkipWhenEmpty
     val realInputFiles = originalResourcesDir.map { dir ->
         dir.asFileTree.matching { it.include("values*/*.xml") }
     }
@@ -132,12 +155,14 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
 
     @get:OutputFiles
     val realOutputFiles = outputDir.map { dir ->
-        dir.asFileTree.matching { it.include("values*/*.$CONVERTED_RESOURCE_EXT") }
+        val suffix = fileSuffix.get()
+        dir.asFileTree.matching { it.include("values*/*.$suffix.$CONVERTED_RESOURCE_EXT") }
     }
 
     @TaskAction
     fun run() {
         val outDir = outputDir.get().asFile
+        val suffix = fileSuffix.get()
         realOutputFiles.get().forEach { f -> f.delete() }
         originalResourcesDir.get().asFile.listNotHiddenFiles().forEach { valuesDir ->
             if (valuesDir.isDirectory && valuesDir.name.startsWith("values")) {
@@ -145,7 +170,7 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
                     if (f.extension.equals("xml", true)) {
                         val output = outDir
                             .resolve(f.parentFile.name)
-                            .resolve(f.nameWithoutExtension + ".$CONVERTED_RESOURCE_EXT")
+                            .resolve(f.nameWithoutExtension + ".$suffix.$CONVERTED_RESOURCE_EXT")
                         output.parentFile.mkdirs()
                         convert(f, output)
                     }
@@ -195,6 +220,7 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
                         quantity.uppercase() + ":" + content.asBase64()
                     }
             }
+
             else -> error("Unknown string resource type: '$type'")
         }
         return ValueResourceRecord(type, key, value)
