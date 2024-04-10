@@ -32,7 +32,8 @@ fun main() = singleWindowApplication {
 
 ## Loading images from device storage or network asynchronously
 
-To load an image stored in the device memory (or from network) you can use `loadImageBitmap`, `loadSvgPainter` or `loadXmlImageVector`. The example below shows how to use them to load an image asynchronously.
+To load an image stored in the device memory (or from network) you can use `loadImageBitmap`, `loadSvgPainter` or `loadXmlImageVector`.
+The example below shows how to load images from `composableResources/files` and use them to load an image asynchronously.
 
 ```kotlin
 import androidx.compose.foundation.Image
@@ -41,62 +42,70 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.loadSvgPainter
 import androidx.compose.ui.res.loadXmlImageVector
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
+import easnx.composeapp.generated.resources.Res
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.skia.Image
 import org.xml.sax.InputSource
-import java.io.File
 import java.io.IOException
 import java.net.URL
 
+@OptIn(ExperimentalResourceApi::class)
 fun main() = singleWindowApplication {
     val density = LocalDensity.current
+    val bitmapPainter by produceState<BitmapPainter?>(initialValue = null) {
+        val bytes = Res.readBytes("files/sample.png")
+        value = BitmapPainter(loadImageBitmap(bytes))
+    }
+    val imageVector by produceState<ImageVector?>(initialValue = null) {
+        val bytes = Res.readBytes("files/compose-logo.xml")
+        value = loadXmlImageVector(bytes, density)
+    }
     Column {
-        AsyncImage(
-            load = { loadImageBitmap(File("sample.png")) },
-            painterFor = { remember { BitmapPainter(it) } },
-            contentDescription = "Sample",
-            modifier = Modifier.width(200.dp)
-        )
-        AsyncImage(
-            load = { loadSvgPainter("https://github.com/JetBrains/compose-multiplatform/raw/master/artwork/idea-logo.svg", density) },
-            painterFor = { it },
-            contentDescription = "Idea logo",
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier.width(200.dp)
-        )
-        AsyncImage(
-            load = { loadXmlImageVector(File("compose-logo.xml"), density) },
-            painterFor = { rememberVectorPainter(it) },
-            contentDescription = "Compose logo",
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier.width(200.dp)
-        )
+        bitmapPainter?.let {
+            Image(painter = it,
+                  contentDescription = "Sample",
+                  contentScale = ContentScale.Fit,
+                  modifier = Modifier.width(200.dp))
+        }
+
+        AsyncImage(load = { loadSvgPainter("https://github.com/JetBrains/compose-multiplatform/raw/master/artwork/idea-logo.svg", density) },
+                   painterFor = { it },
+                   contentDescription = "Idea logo",
+                   contentScale = ContentScale.FillWidth,
+                   modifier = Modifier.width(200.dp))
+
+        imageVector?.let {
+            Image(painter = rememberVectorPainter(it),
+                  contentDescription = "Compose logo",
+                  contentScale = ContentScale.FillWidth,
+                  modifier = Modifier.width(200.dp))
+        }
     }
 }
 
 @Composable
-fun <T> AsyncImage(
-    load: suspend () -> T,
-    painterFor: @Composable (T) -> Painter,
-    contentDescription: String,
-    modifier: Modifier = Modifier,
-    contentScale: ContentScale = ContentScale.Fit,
-) {
+fun <T> AsyncImage(load: suspend () -> T,
+                   painterFor: @Composable (T) -> Painter,
+                   contentDescription: String,
+                   modifier: Modifier = Modifier,
+                   contentScale: ContentScale = ContentScale.Fit) {
+
     val image: T? by produceState<T?>(null) {
         value = withContext(Dispatchers.IO) {
             try {
@@ -110,31 +119,28 @@ fun <T> AsyncImage(
         }
     }
 
-    if (image != null) {
-        Image(
-            painter = painterFor(image!!),
-            contentDescription = contentDescription,
-            contentScale = contentScale,
-            modifier = modifier
-        )
-    }
+    if (image != null)
+        Image(painter = painterFor(image!!),
+              contentDescription = contentDescription,
+              contentScale = contentScale,
+              modifier = modifier)
 }
 
 /* Loading from file with java.io API */
 
-fun loadImageBitmap(file: File): ImageBitmap =
-    file.inputStream().buffered().use(::loadImageBitmap)
+fun loadImageBitmap(bytes: ByteArray): ImageBitmap =
+    Image.makeFromEncoded(bytes).toComposeImageBitmap()
 
-fun loadSvgPainter(file: File, density: Density): Painter =
-    file.inputStream().buffered().use { loadSvgPainter(it, density) }
+fun loadSvgPainter(bytes: ByteArray, density: Density): Painter =
+    bytes.inputStream().buffered().use { loadSvgPainter(it, density) }
 
-fun loadXmlImageVector(file: File, density: Density): ImageVector =
-    file.inputStream().buffered().use { loadXmlImageVector(InputSource(it), density) }
+fun loadXmlImageVector(bytes: ByteArray, density: Density): ImageVector =
+    bytes.inputStream().buffered().use { loadXmlImageVector(InputSource(it), density) }
 
 /* Loading from network with java.net API */
 
 fun loadImageBitmap(url: String): ImageBitmap =
-    URL(url).openStream().buffered().use(::loadImageBitmap)
+    URL(url).openStream().buffered().use { loadImageBitmap(it.readAllBytes()) }
 
 fun loadSvgPainter(url: String, density: Density): Painter =
     URL(url).openStream().buffered().use { loadSvgPainter(it, density) }
