@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import components.resources.demo.shared.generated.resources.Res
 import components.resources.demo.shared.generated.resources.*
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.vectorResource
 import org.jetbrains.compose.resources.painterResource
@@ -22,6 +23,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
     Column(
         modifier = Modifier.padding(contentPadding).verticalScroll(rememberScrollState()),
     ) {
+        SvgShowcase()
         OutlinedCard(modifier = Modifier.padding(8.dp)) {
             Column(
                 modifier = Modifier.padding(16.dp).fillMaxWidth().fillMaxWidth(),
@@ -176,3 +178,6 @@ fun ImagesRes(contentPadding: PaddingValues) {
         }
     }
 }
+
+@Composable
+expect fun SvgShowcase()

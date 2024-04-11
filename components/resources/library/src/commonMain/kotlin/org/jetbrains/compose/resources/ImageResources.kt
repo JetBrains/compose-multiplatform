@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -49,9 +50,10 @@ fun DrawableResource(path: String): DrawableResource = DrawableResource(
 fun painterResource(resource: DrawableResource): Painter {
     val environment = LocalComposeEnvironment.current.rememberEnvironment()
     val filePath = remember(resource, environment) { resource.getResourceItemByEnvironment(environment).path }
-    val isXml = filePath.endsWith(".xml", true)
-    if (isXml) {
+    if (filePath.endsWith(".xml", true)) {
         return rememberVectorPainter(vectorResource(resource))
+    } else if (filePath.endsWith(".svg", true)) {
+        return svgPainter(resource)
     } else {
         return BitmapPainter(imageResource(resource))
     }
@@ -104,12 +106,34 @@ fun vectorResource(resource: DrawableResource): ImageVector {
     return imageVector
 }
 
+internal expect class SvgElement
+internal expect fun SvgElement.toSvgPainter(density: Density): Painter
+
+private val emptySvgPainter: Painter by lazy { BitmapPainter(emptyImageBitmap) }
+
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+private fun svgPainter(resource: DrawableResource): Painter {
+    val resourceReader = LocalResourceReader.current
+    val density = LocalDensity.current
+    val svgPainter by rememberResourceState(resource, { emptySvgPainter }) { env ->
+        val path = resource.getResourceItemByEnvironment(env).path
+        val cached = loadImage(path, resourceReader) {
+            ImageCache.Svg(it.toSvgElement().toSvgPainter(density))
+        } as ImageCache.Svg
+        cached.painter
+    }
+    return svgPainter
+}
+
 internal expect fun ByteArray.toImageBitmap(): ImageBitmap
 internal expect fun ByteArray.toXmlElement(): Element
+internal expect fun ByteArray.toSvgElement(): SvgElement
 
 private sealed interface ImageCache {
     class Bitmap(val bitmap: ImageBitmap) : ImageCache
     class Vector(val vector: ImageVector) : ImageCache
+    class Svg(val painter: Painter) : ImageCache
 }
 
 private val imageCacheMutex = Mutex()
