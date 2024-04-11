@@ -34,8 +34,8 @@ internal fun Project.configureComposeCompilerPlugin() {
     }
 }
 
-private const val newCompilerIsAvailableVersion = "2.0.0-RC1"
-private const val newComposeCompilerKotlinSupportPluginId = "org.jetbrains.kotlin.plugin.compose"
+internal const val newCompilerIsAvailableVersion = "2.0.0-RC1"
+internal const val newComposeCompilerKotlinSupportPluginId = "org.jetbrains.kotlin.plugin.compose"
 internal const val newComposeCompilerError = "Since Kotlin $newCompilerIsAvailableVersion " +
         "to use Compose Multiplatform you must apply \"$newComposeCompilerKotlinSupportPluginId\" plugin."
 

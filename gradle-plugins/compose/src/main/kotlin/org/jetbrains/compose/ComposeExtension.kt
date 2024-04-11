@@ -31,6 +31,7 @@ abstract class ComposeExtension @Inject constructor(
      * ```
      * (see available versions here: https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility)
      */
+    @Deprecated("Since Kotlin $newCompilerIsAvailableVersion Compose Compiler configuration is moved to the \"$newComposeCompilerKotlinSupportPluginId\" plugin")
     val kotlinCompilerPlugin: Property<String?> = objects.nullableProperty()
 
     /**
@@ -41,6 +42,7 @@ abstract class ComposeExtension @Inject constructor(
      * See all available arguments here:
      * https://github.com/androidx/androidx/blob/androidx-main/compose/compiler/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/ComposePlugin.kt
      */
+    @Deprecated("Since Kotlin $newCompilerIsAvailableVersion Compose Compiler configuration is moved to the \"$newComposeCompilerKotlinSupportPluginId\" plugin")
     val kotlinCompilerPluginArgs: ListProperty<String> = objects.listProperty(String::class.java)
 
     /**
@@ -51,6 +53,7 @@ abstract class ComposeExtension @Inject constructor(
      * platformTypes.set(platformTypes.get() - KotlinPlatformType.native)
      * ```
      */
+    @Deprecated("Since Kotlin $newCompilerIsAvailableVersion Compose Compiler configuration is moved to the \"$newComposeCompilerKotlinSupportPluginId\" plugin")
     val platformTypes: SetProperty<KotlinPlatformType> = objects.setProperty(KotlinPlatformType::class.java).apply {
         set(KotlinPlatformType.values().toMutableSet())
     }
