@@ -8,11 +8,53 @@ package org.jetbrains.compose
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.internal.ComposeCompilerArtifactProvider
+import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
+import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
+import org.jetbrains.compose.internal.Version
 import org.jetbrains.compose.internal.mppExtOrNull
 import org.jetbrains.compose.internal.service.ConfigurationProblemReporterService
 import org.jetbrains.compose.internal.webExt
-import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
+import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+internal fun Project.configureComposeCompilerPlugin() {
+    plugins.withId(KOTLIN_MPP_PLUGIN_ID) { plugin ->
+        configureComposeCompilerPlugin(plugin as KotlinBasePlugin)
+    }
+    plugins.withId(KOTLIN_JVM_PLUGIN_ID) { plugin ->
+        configureComposeCompilerPlugin(plugin as KotlinBasePlugin)
+    }
+}
+
+private const val newCompilerIsAvailableVersion = "2.0.0-RC1"
+private const val newComposeCompilerKotlinSupportPluginId = "org.jetbrains.kotlin.plugin.compose"
+internal const val newComposeCompilerError = "Since Kotlin $newCompilerIsAvailableVersion " +
+        "to use Compose Multiplatform you must apply \"$newComposeCompilerKotlinSupportPluginId\" plugin."
+
+private fun Project.configureComposeCompilerPlugin(kgp: KotlinBasePlugin) {
+    val kgpVersion = kgp.pluginVersion
+
+    if (Version.fromString(kgpVersion) < Version.fromString(newCompilerIsAvailableVersion)) {
+        logger.info("Apply ComposeCompilerKotlinSupportPlugin (KGP version = $kgpVersion)")
+        project.plugins.apply(ComposeCompilerKotlinSupportPlugin::class.java)
+    } else {
+        //There is no other way to check that the plugin WASN'T applied!
+        afterEvaluate {
+            logger.info("Check that new '$newComposeCompilerKotlinSupportPluginId' was applied")
+            if (!project.plugins.hasPlugin(newComposeCompilerKotlinSupportPluginId)) {
+                error("e: Configuration problem: $newComposeCompilerError")
+            }
+        }
+    }
+}
 
 class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
     private lateinit var composeCompilerArtifactProvider: ComposeCompilerArtifactProvider
