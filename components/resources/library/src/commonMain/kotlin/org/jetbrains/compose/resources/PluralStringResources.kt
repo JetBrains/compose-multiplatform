@@ -11,7 +11,6 @@ import org.jetbrains.compose.resources.plural.PluralRuleList
  * @param key The key used to retrieve the string resource.
  * @param items The set of resource items associated with the string resource.
  */
-@ExperimentalResourceApi
 @Immutable
 class PluralStringResource
 @InternalResourceApi constructor(id: String, val key: String, items: Set<ResourceItem>) : Resource(id, items)
@@ -25,7 +24,6 @@ class PluralStringResource
  *
  * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
  */
-@ExperimentalResourceApi
 @Composable
 fun pluralStringResource(resource: PluralStringResource, quantity: Int): String {
     val resourceReader = LocalResourceReader.current
@@ -44,11 +42,9 @@ fun pluralStringResource(resource: PluralStringResource, quantity: Int): String 
  *
  * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
  */
-@ExperimentalResourceApi
 suspend fun getPluralString(resource: PluralStringResource, quantity: Int): String =
     loadPluralString(resource, quantity, DefaultResourceReader, getResourceEnvironment())
 
-@OptIn(InternalResourceApi::class, ExperimentalResourceApi::class)
 private suspend fun loadPluralString(
     resource: PluralStringResource,
     quantity: Int,
@@ -78,7 +74,6 @@ private suspend fun loadPluralString(
  *
  * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
  */
-@ExperimentalResourceApi
 @Composable
 fun pluralStringResource(resource: PluralStringResource, quantity: Int, vararg formatArgs: Any): String {
     val resourceReader = LocalResourceReader.current
@@ -99,7 +94,6 @@ fun pluralStringResource(resource: PluralStringResource, quantity: Int, vararg f
  *
  * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
  */
-@ExperimentalResourceApi
 suspend fun getPluralString(resource: PluralStringResource, quantity: Int, vararg formatArgs: Any): String =
     loadPluralString(
         resource, quantity,
@@ -108,7 +102,6 @@ suspend fun getPluralString(resource: PluralStringResource, quantity: Int, varar
         getResourceEnvironment(),
     )
 
-@OptIn(ExperimentalResourceApi::class)
 private suspend fun loadPluralString(
     resource: PluralStringResource,
     quantity: Int,

@@ -19,7 +19,6 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         return result
     }
 
-    @OptIn(ExperimentalResourceApi::class)
     override fun getUri(path: String): String {
         val classLoader = getClassLoader()
         val resource = classLoader.getResource(path) ?: run {
@@ -31,7 +30,6 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         return resource.toURI().toString()
     }
 
-    @OptIn(ExperimentalResourceApi::class)
     private fun getResourceAsStream(path: String): InputStream {
         val classLoader = getClassLoader()
         val resource = classLoader.getResourceAsStream(path) ?: run {

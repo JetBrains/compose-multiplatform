@@ -17,25 +17,27 @@ private val cvrMap: Map<String, ResourceItem> = mapOf(
     "str_arr" to ResourceItem(setOf(), "strings.cvr", 211, 47),
 )
 
-@OptIn(ExperimentalResourceApi::class)
 internal fun TestStringResource(key: String) = StringResource(
     "STRING:$key",
     key,
     setOf(cvrMap[key] ?: error("String ID=`$key` is not found!"))
 )
 
-@OptIn(ExperimentalResourceApi::class)
 internal fun TestStringArrayResource(key: String) = StringArrayResource(
     "STRING:$key",
     key,
     setOf(cvrMap[key] ?: error("String ID=`$key` is not found!"))
 )
 
-@OptIn(ExperimentalResourceApi::class)
 internal fun TestPluralStringResource(key: String) = PluralStringResource(
     "PLURALS:$key",
     key,
     setOf(cvrMap[key] ?: error("String ID=`$key` is not found!"))
+)
+
+internal fun TestDrawableResource(path: String) = DrawableResource(
+    path,
+    setOf(ResourceItem(emptySet(), path, -1, -1))
 )
 
 internal fun parsePluralSamples(samples: String): List<Int> {

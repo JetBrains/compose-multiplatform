@@ -16,7 +16,6 @@ import org.jetbrains.compose.resources.vector.xmldom.NodeList
  * @param key The key used to retrieve the string array resource.
  * @param items The set of resource items associated with the string array resource.
  */
-@ExperimentalResourceApi
 @Immutable
 class StringArrayResource
 @InternalResourceApi constructor(id: String, val key: String, items: Set<ResourceItem>) : Resource(id, items)
@@ -29,7 +28,6 @@ class StringArrayResource
  *
  * @throws IllegalStateException if the string array with the given ID is not found.
  */
-@ExperimentalResourceApi
 @Composable
 fun stringArrayResource(resource: StringArrayResource): List<String> {
     val resourceReader = LocalResourceReader.current
@@ -47,11 +45,9 @@ fun stringArrayResource(resource: StringArrayResource): List<String> {
  *
  * @throws IllegalStateException if the string array with the given ID is not found.
  */
-@ExperimentalResourceApi
 suspend fun getStringArray(resource: StringArrayResource): List<String> =
     loadStringArray(resource, DefaultResourceReader, getResourceEnvironment())
 
-@OptIn(ExperimentalResourceApi::class, InternalResourceApi::class)
 private suspend fun loadStringArray(
     resource: StringArrayResource,
     resourceReader: ResourceReader,

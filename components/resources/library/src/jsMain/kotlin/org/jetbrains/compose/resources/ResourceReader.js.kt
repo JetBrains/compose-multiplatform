@@ -7,7 +7,6 @@ import org.khronos.webgl.Int8Array
 import org.w3c.files.Blob
 import kotlin.js.Promise
 
-@OptIn(ExperimentalResourceApi::class)
 internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         return readAsBlob(path).asByteArray()

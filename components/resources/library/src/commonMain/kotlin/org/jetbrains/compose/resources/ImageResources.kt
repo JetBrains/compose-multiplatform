@@ -21,22 +21,9 @@ import org.jetbrains.compose.resources.vector.xmldom.Element
  * @param id The unique identifier of the drawable resource.
  * @param items The set of resource items associated with the image resource.
  */
-@ExperimentalResourceApi
 @Immutable
 class DrawableResource
 @InternalResourceApi constructor(id: String, items: Set<ResourceItem>) : Resource(id, items)
-
-/**
- * Creates an [DrawableResource] object with the specified path.
- *
- * @param path The path of the drawable resource.
- * @return An [DrawableResource] object.
- */
-@ExperimentalResourceApi
-fun DrawableResource(path: String): DrawableResource = DrawableResource(
-    id = "DrawableResource:$path",
-    items = setOf(ResourceItem(emptySet(), path, -1, -1))
-)
 
 /**
  * Retrieves a [Painter] using the specified drawable resource.
@@ -45,7 +32,6 @@ fun DrawableResource(path: String): DrawableResource = DrawableResource(
  * @param resource The drawable resource to be used.
  * @return The [Painter] loaded from the resource.
  */
-@ExperimentalResourceApi
 @Composable
 fun painterResource(resource: DrawableResource): Painter {
     val environment = LocalComposeEnvironment.current.rememberEnvironment()
@@ -67,7 +53,6 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
  * @param resource The drawable resource to be used.
  * @return The ImageBitmap loaded from the resource.
  */
-@ExperimentalResourceApi
 @Composable
 fun imageResource(resource: DrawableResource): ImageBitmap {
     val resourceReader = LocalResourceReader.current
@@ -91,7 +76,6 @@ private val emptyImageVector: ImageVector by lazy {
  * @param resource The drawable resource to be used.
  * @return The ImageVector loaded from the resource.
  */
-@ExperimentalResourceApi
 @Composable
 fun vectorResource(resource: DrawableResource): ImageVector {
     val resourceReader = LocalResourceReader.current
