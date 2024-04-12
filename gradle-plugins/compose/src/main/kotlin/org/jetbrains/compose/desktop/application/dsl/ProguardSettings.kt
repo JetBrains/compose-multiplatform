@@ -23,4 +23,5 @@ abstract class ProguardSettings @Inject constructor(
     val isEnabled: Property<Boolean> = objects.notNullProperty(false)
     val obfuscate: Property<Boolean> = objects.notNullProperty(false)
     val optimize: Property<Boolean> = objects.notNullProperty(true)
+    val joinOutputJars: Property<Boolean> = objects.notNullProperty(false)
 }

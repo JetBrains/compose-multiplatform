@@ -6,6 +6,7 @@
 package org.jetbrains.compose.desktop.tasks
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.model.ObjectFactory
@@ -32,6 +33,9 @@ abstract class AbstractComposeDesktopTask : DefaultTask() {
 
     @get:Inject
     protected abstract val fileOperations: FileSystemOperations
+
+    @get:Inject
+    protected abstract val archiveOperations: ArchiveOperations
 
     @get:LocalState
     protected val logsDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/logs/$name")

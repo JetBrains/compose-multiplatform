@@ -7,7 +7,6 @@ package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.Sync
@@ -16,6 +15,7 @@ import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.validation.validatePackageVersions
 import org.jetbrains.compose.desktop.application.tasks.*
+import org.jetbrains.compose.desktop.tasks.AbstractJarsFlattenTask
 import org.jetbrains.compose.desktop.tasks.AbstractUnpackDefaultComposeApplicationResourcesTask
 import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.compose.internal.utils.OS
@@ -26,7 +26,6 @@ import org.jetbrains.compose.internal.utils.ioFile
 import org.jetbrains.compose.internal.utils.ioFileOrNull
 import org.jetbrains.compose.internal.utils.javaExecutable
 import org.jetbrains.compose.internal.utils.provider
-import java.io.File
 
 private val defaultJvmArgs = listOf("-D$CONFIGURE_SWING_GLOBALS=true")
 internal const val composeDesktopTaskGroup = "compose desktop"
@@ -220,11 +219,18 @@ private fun JvmApplicationContext.configurePackagingTasks(
         }
     }
 
+    val flattenJars = tasks.register<AbstractJarsFlattenTask>(
+        taskNameAction = "flatten",
+        taskNameObject = "Jars"
+    ) {
+        configureFlattenJars(this, runProguard)
+    }
+
     val packageUberJarForCurrentOS = tasks.register<Jar>(
         taskNameAction = "package",
         taskNameObject = "uberJarForCurrentOS"
     ) {
-        configurePackageUberJarForCurrentOS(this)
+        configurePackageUberJarForCurrentOS(this, flattenJars)
     }
 
     val runDistributable = tasks.register<AbstractRunDistributableTask>(
@@ -234,7 +240,7 @@ private fun JvmApplicationContext.configurePackagingTasks(
     )
 
     val run = tasks.register<JavaExec>(taskNameAction = "run") {
-        configureRunTask(this, commonTasks.prepareAppResources)
+        configureRunTask(this, commonTasks.prepareAppResources, runProguard)
     }
 }
 
@@ -259,6 +265,8 @@ private fun JvmApplicationContext.configureProguardTask(
     // when our DSL does the opposite.
     dontobfuscate.set(settings.obfuscate.map { !it })
     dontoptimize.set(settings.optimize.map { !it })
+
+    joinOutputJars.set(settings.joinOutputJars)
 
     dependsOn(unpackDefaultResources)
     defaultComposeRulesFile.set(unpackDefaultResources.flatMap { it.resources.defaultComposeProguardRules })
@@ -326,6 +334,7 @@ private fun JvmApplicationContext.configurePackageTask(
         packageTask.files.from(project.fileTree(runProguard.flatMap { it.destinationDir }))
         packageTask.launcherMainJar.set(runProguard.flatMap { it.mainJarInDestinationDir })
         packageTask.mangleJarFilesNames.set(false)
+        packageTask.packageFromUberJar.set(runProguard.flatMap { it.joinOutputJars })
     } else {
         packageTask.useAppRuntimeFiles { (runtimeJars, mainJar) ->
             files.from(runtimeJars)
@@ -412,7 +421,8 @@ internal fun JvmApplicationContext.configurePlatformSettings(
 
 private fun JvmApplicationContext.configureRunTask(
     exec: JavaExec,
-    prepareAppResources: TaskProvider<Sync>
+    prepareAppResources: TaskProvider<Sync>,
+    runProguard: Provider<AbstractProguardTask>?
 ) {
     exec.dependsOn(prepareAppResources)
 
@@ -431,34 +441,49 @@ private fun JvmApplicationContext.configureRunTask(
         add("-D$APP_RESOURCES_DIR=${appResourcesDir.absolutePath}")
     }
     exec.args = app.args
-    exec.useAppRuntimeFiles { (runtimeJars, _) ->
-        classpath = runtimeJars
+
+    if (runProguard != null) {
+        exec.dependsOn(runProguard)
+        exec.classpath = project.fileTree(runProguard.flatMap { it.destinationDir })
+    } else {
+        exec.useAppRuntimeFiles { (runtimeJars, _) ->
+            classpath = runtimeJars
+        }
     }
 }
 
-private fun JvmApplicationContext.configurePackageUberJarForCurrentOS(jar: Jar) {
-    fun flattenJars(files: FileCollection): FileCollection =
-        jar.project.files({
-            files.map { if (it.isZipOrJar()) jar.project.zipTree(it) else it }
-        })
-
-
-    jar.useAppRuntimeFiles { (runtimeJars, _) ->
-        from(flattenJars(runtimeJars))
+private fun JvmApplicationContext.configureFlattenJars(
+    flattenJars: AbstractJarsFlattenTask,
+    runProguard: Provider<AbstractProguardTask>?
+) {
+    if (runProguard != null) {
+        flattenJars.dependsOn(runProguard)
+        flattenJars.inputFiles.from(runProguard.flatMap { it.destinationDir })
+    } else {
+        flattenJars.useAppRuntimeFiles { (runtimeJars, _) ->
+            inputFiles.from(runtimeJars)
+        }
     }
+
+    flattenJars.flattenedJar.set(appTmpDir.file("flattenJars/flattened.jar"))
+}
+
+private fun JvmApplicationContext.configurePackageUberJarForCurrentOS(
+    jar: Jar,
+    flattenJars: Provider<AbstractJarsFlattenTask>
+) {
+    jar.dependsOn(flattenJars)
+    jar.from(project.zipTree(flattenJars.flatMap { it.flattenedJar }))
 
     app.mainClass?.let { jar.manifest.attributes["Main-Class"] = it }
     jar.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     jar.archiveAppendix.set(currentTarget.id)
     jar.archiveBaseName.set(packageNameProvider)
     jar.archiveVersion.set(packageVersionFor(TargetFormat.AppImage))
+    jar.archiveClassifier.set(buildType.classifier)
     jar.destinationDirectory.set(jar.project.layout.buildDirectory.dir("compose/jars"))
 
     jar.doLast {
         jar.logger.lifecycle("The jar is written to ${jar.archiveFile.ioFile.canonicalPath}")
     }
 }
-
-private fun File.isZipOrJar() =
-    name.endsWith(".jar", ignoreCase = true)
-        || name.endsWith(".zip", ignoreCase = true)
