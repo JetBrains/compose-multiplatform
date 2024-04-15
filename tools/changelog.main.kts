@@ -134,9 +134,10 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
         }
     }
 
-    return request<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$firstCommit...$lastCommit")
-        .commits
-        .map { changelogEntryFor(it, prForCommit(it)) }
+    return fetchPagedUntilEmpty { page ->
+        request<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$firstCommit...$lastCommit?per_page=1000&page=$page")
+            .commits
+    }.map { changelogEntryFor(it, prForCommit(it)) }
 }
 
 /**
@@ -263,6 +264,16 @@ fun <T> exponentialRetry(block: () -> T): T {
         }
     }
     throw exception
+}
+
+inline fun <T> fetchPagedUntilEmpty(fetch: (page: Int) -> List<T>): MutableList<T> {
+    val all = mutableListOf<T>()
+    var page = 1
+    do {
+        val result = fetch(page++)
+        all.addAll(result)
+    } while (result.isEmpty())
+    return all
 }
 
 //endregion
