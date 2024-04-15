@@ -33,6 +33,11 @@ val firstCommit = args.getOrNull(0) ?: error("Please call this way: kotlin chang
 val lastCommit = args.getOrNull(1) ?: error("Please call this way: kotlin changelog.main.kts <firstCommit> <lastCommit>")
 val token = args.getOrNull(2)
 
+// TODO automate or pass as arguments
+// Exclude cherry-picked commits to the previous versions
+val excludeFirstCommit = "v1.6.0-rc01"
+val excludeLastCommit = "v1.6.2"
+
 if (token == null) {
     println("To increase the rate limit, specify token (https://github.com/settings/tokens): kotlin changelog.main.kts <firstCommit> <lastCommit> TOKEN")
 }
@@ -137,9 +142,18 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
     val commits = fetchPagedUntilEmpty { page ->
         request<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$firstCommit...$lastCommit?per_page=1000&page=$page")
             .commits
-    }
+    }.toSet()
 
-    return commits
+    val excludedCommitMessages = fetchPagedUntilEmpty { page ->
+        request<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$excludeFirstCommit...$excludeLastCommit?per_page=1000&page=$page")
+            .commits
+            .map { it.commit.message }
+    }.toSet()
+
+    // Exclude cherry-picks with the same message (they have a different SHA, we can compare by it)
+    val nonCherrypickedCommits = commits.filter { it.commit.message !in excludedCommitMessages }
+
+    return nonCherrypickedCommits
         .map { changelogEntryFor(it, prForCommit(it)) }
 }
 
