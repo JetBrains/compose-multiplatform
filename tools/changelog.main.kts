@@ -276,7 +276,7 @@ inline fun <T> fetchPagedUntilEmpty(fetch: (page: Int) -> List<T>): MutableList<
     do {
         val result = fetch(page++)
         all.addAll(result)
-    } while (result.isEmpty())
+    } while (result.isNotEmpty())
     return all
 }
 
