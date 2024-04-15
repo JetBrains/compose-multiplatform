@@ -89,13 +89,13 @@ fun commitToVersion(commit: String) =
 
 fun ChangelogEntry.format() = buildString {
     append("- ")
-    if (type == Type.Highlighted) append("**")
+//    if (type == Type.Highlighted) append("**")
     if (type == Type.PrereleaseFix) append("_(prerelease fix)_ ")
     append("[$title]($link)")
-    if (type == Type.Highlighted) append("**")
-    platforms.forEach {
-        append(" <sub>$it</sub>")
-    }
+//    if (type == Type.Highlighted) append("**")
+//    platforms.forEach {
+//        append(" <sub>$it</sub>")
+//    }
 }
 
 /**
