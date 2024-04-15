@@ -12,7 +12,6 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.getResourceUri
 import org.jetbrains.compose.resources.readResourceBytes
 
-@ExperimentalResourceApi
 public object Res {
   /**
    * Reads the content of the resource file at the specified path and returns it as a byte array.
@@ -22,6 +21,7 @@ public object Res {
    * @param path The path of the file to read in the compose resource's directory.
    * @return The content of the file as a byte array.
    */
+  @ExperimentalResourceApi
   public suspend fun readBytes(path: String): ByteArray = readResourceBytes("" + path)
 
   /**
@@ -32,6 +32,7 @@ public object Res {
    * @param path The path of the file in the compose resource's directory.
    * @return The URI string of the file.
    */
+  @ExperimentalResourceApi
   public fun getUri(path: String): String = getResourceUri("" + path)
 
   public object drawable

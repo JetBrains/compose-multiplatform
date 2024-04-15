@@ -3,20 +3,16 @@
 package app.group.resources_test.generated.resources
 
 import kotlin.OptIn
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.PluralStringResource
 
-@ExperimentalResourceApi
 private object CommonMainPlurals0 {
     public val numberOfSongsAvailable: PluralStringResource by
     lazy { init_numberOfSongsAvailable() }
 }
 
-@ExperimentalResourceApi
 internal val Res.plurals.numberOfSongsAvailable: PluralStringResource
     get() = CommonMainPlurals0.numberOfSongsAvailable
 
-@ExperimentalResourceApi
 private fun init_numberOfSongsAvailable(): PluralStringResource =
     org.jetbrains.compose.resources.PluralStringResource(
         "plurals:numberOfSongsAvailable", "numberOfSongsAvailable",

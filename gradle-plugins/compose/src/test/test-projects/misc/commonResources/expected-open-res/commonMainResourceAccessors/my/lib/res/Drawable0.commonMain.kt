@@ -4,9 +4,7 @@ package my.lib.res
 
 import kotlin.OptIn
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 
-@ExperimentalResourceApi
 private object CommonMainDrawable0 {
   public val _3_strange_name: DrawableResource by
   lazy { init__3_strange_name() }
@@ -21,11 +19,9 @@ private object CommonMainDrawable0 {
   lazy { init_vector_2() }
 }
 
-@ExperimentalResourceApi
 public val Res.drawable._3_strange_name: DrawableResource
   get() = CommonMainDrawable0._3_strange_name
 
-@ExperimentalResourceApi
 private fun init__3_strange_name(): DrawableResource =
   org.jetbrains.compose.resources.DrawableResource(
     "drawable:_3_strange_name",
@@ -34,11 +30,9 @@ private fun init__3_strange_name(): DrawableResource =
     )
   )
 
-@ExperimentalResourceApi
 public val Res.drawable.camelCaseName: DrawableResource
   get() = CommonMainDrawable0.camelCaseName
 
-@ExperimentalResourceApi
 private fun init_camelCaseName(): DrawableResource =
   org.jetbrains.compose.resources.DrawableResource(
     "drawable:camelCaseName",
@@ -47,11 +41,9 @@ private fun init_camelCaseName(): DrawableResource =
     )
   )
 
-@ExperimentalResourceApi
 public val Res.drawable.vector: DrawableResource
   get() = CommonMainDrawable0.vector
 
-@ExperimentalResourceApi
 private fun init_vector(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
   "drawable:vector",
   setOf(
@@ -72,11 +64,9 @@ private fun init_vector(): DrawableResource = org.jetbrains.compose.resources.Dr
   )
 )
 
-@ExperimentalResourceApi
 public val Res.drawable.vector_2: DrawableResource
   get() = CommonMainDrawable0.vector_2
 
-@ExperimentalResourceApi
 private fun init_vector_2(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
   "drawable:vector_2",
   setOf(

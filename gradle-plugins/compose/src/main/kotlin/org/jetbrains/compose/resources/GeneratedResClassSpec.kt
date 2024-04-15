@@ -127,7 +127,6 @@ internal fun getResFileSpec(
         )
         file.addType(TypeSpec.objectBuilder("Res").also { resObject ->
             resObject.addModifiers(resModifier)
-            resObject.addAnnotation(experimentalAnnotation)
 
             //readFileBytes
             val readResourceBytes = MemberName("org.jetbrains.compose.resources", "readResourceBytes")
@@ -143,6 +142,7 @@ internal fun getResFileSpec(
                     @return The content of the file as a byte array.
                 """.trimIndent()
                     )
+                    .addAnnotation(experimentalAnnotation)
                     .addParameter("path", String::class)
                     .addModifiers(KModifier.SUSPEND)
                     .returns(ByteArray::class)
@@ -164,6 +164,7 @@ internal fun getResFileSpec(
                     @return The URI string of the file.
                 """.trimIndent()
                     )
+                    .addAnnotation(experimentalAnnotation)
                     .addParameter("path", String::class)
                     .returns(String::class)
                     .addStatement("""return %M("$moduleDir" + path)""", getResourceUri)
@@ -237,7 +238,6 @@ private fun getChunkFileSpec(
 
         val objectSpec = TypeSpec.objectBuilder(chunkClassName).also { typeObject ->
             typeObject.addModifiers(KModifier.PRIVATE)
-            typeObject.addAnnotation(experimentalAnnotation)
             val properties = idToResources.keys.map { resName ->
                 PropertySpec.builder(resName, type.getClassName())
                     .delegate("\nlazy·{ init_$resName() }")
@@ -250,14 +250,12 @@ private fun getChunkFileSpec(
         idToResources.forEach { (resName, items) ->
             val accessor = PropertySpec.builder(resName, type.getClassName(), resModifier)
                 .receiver(ClassName(packageName, "Res", type.accessorName))
-                .addAnnotation(experimentalAnnotation)
                 .getter(FunSpec.getterBuilder().addStatement("return $chunkClassName.$resName").build())
                 .build()
             chunkFile.addProperty(accessor)
 
             val initializer = FunSpec.builder("init_$resName")
                 .addModifiers(KModifier.PRIVATE)
-                .addAnnotation(experimentalAnnotation)
                 .returns(type.getClassName())
                 .addStatement(
                     CodeBlock.builder()
