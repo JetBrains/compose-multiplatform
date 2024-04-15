@@ -71,7 +71,7 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 @Composable
 fun imageResource(resource: DrawableResource): ImageBitmap {
     val resourceReader = LocalResourceReader.current
-    val imageBitmap by rememberResourceState(resource, { emptyImageBitmap }) { env ->
+    val imageBitmap by rememberResourceState(resource, resourceReader, { emptyImageBitmap }) { env ->
         val path = resource.getResourceItemByEnvironment(env).path
         val cached = loadImage(path, resourceReader) {
             ImageCache.Bitmap(it.toImageBitmap())
@@ -96,7 +96,7 @@ private val emptyImageVector: ImageVector by lazy {
 fun vectorResource(resource: DrawableResource): ImageVector {
     val resourceReader = LocalResourceReader.current
     val density = LocalDensity.current
-    val imageVector by rememberResourceState(resource, { emptyImageVector }) { env ->
+    val imageVector by rememberResourceState(resource, resourceReader, density, { emptyImageVector }) { env ->
         val path = resource.getResourceItemByEnvironment(env).path
         val cached = loadImage(path, resourceReader) {
             ImageCache.Vector(it.toXmlElement().toImageVector(density))
@@ -116,7 +116,7 @@ private val emptySvgPainter: Painter by lazy { BitmapPainter(emptyImageBitmap) }
 private fun svgPainter(resource: DrawableResource): Painter {
     val resourceReader = LocalResourceReader.current
     val density = LocalDensity.current
-    val svgPainter by rememberResourceState(resource, { emptySvgPainter }) { env ->
+    val svgPainter by rememberResourceState(resource, resourceReader, density, { emptySvgPainter }) { env ->
         val path = resource.getResourceItemByEnvironment(env).path
         val cached = loadImage(path, resourceReader) {
             ImageCache.Svg(it.toSvgElement().toSvgPainter(density))
