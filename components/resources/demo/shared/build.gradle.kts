@@ -50,20 +50,31 @@ kotlin {
         }
     }
 
+    applyDefaultHierarchyTemplate()
     sourceSets {
         all {
             languageSettings {
                 optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
             }
         }
+        val desktopMain by getting
+        val wasmJsMain by getting
+
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.material3)
             implementation(project(":resources:library"))
         }
-        val desktopMain by getting
         desktopMain.dependencies {
             implementation(compose.desktop.common)
+        }
+
+        val nonAndroidMain by creating {
+            dependsOn(commonMain.get())
+            wasmJsMain.dependsOn(this)
+            desktopMain.dependsOn(this)
+            nativeMain.get().dependsOn(this)
+            jsMain.get().dependsOn(this)
         }
     }
 }
