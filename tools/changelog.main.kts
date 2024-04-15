@@ -157,9 +157,9 @@ fun repoNumberForCommit(commit: GitHubCompareResponse.CommitEntry): Int? {
 fun typeOf(pullRequest: GitHubPullEntry): Type {
     val labels = pullRequest.labels.mapTo(mutableSetOf()) { it.name.lowercase() }
     return when {
-        labels.contains("changelog: highlight") -> Type.Highlighted
-        labels.contains("changelog: normal") -> Type.Normal
-        labels.contains("changelog: prerelease fix") -> Type.PrereleaseFix
+//        labels.contains("changelog: highlight") -> Type.Highlighted
+//        labels.contains("changelog: normal") -> Type.Normal
+//        labels.contains("changelog: prerelease fix") -> Type.PrereleaseFix
         else -> Type.Unknown
     }
 }
