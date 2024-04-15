@@ -164,7 +164,7 @@ fun typeOf(pullRequest: GitHubPullEntry): Type {
 //        labels.contains("changelog: highlight") -> Type.Highlighted
 //        labels.contains("changelog: normal") -> Type.Normal
 //        labels.contains("changelog: prerelease fix") -> Type.PrereleaseFix
-        else -> Type.Unknown
+        else -> Type.Normal
     }
 }
 
