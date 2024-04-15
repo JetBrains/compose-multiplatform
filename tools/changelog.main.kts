@@ -134,10 +134,14 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
         }
     }
 
-    return fetchPagedUntilEmpty { page ->
+    val commits = fetchPagedUntilEmpty { page ->
         request<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$firstCommit...$lastCommit?per_page=1000&page=$page")
             .commits
-    }.map { changelogEntryFor(it, prForCommit(it)) }
+    }
+
+    return commits
+        .map { changelogEntryFor(it, prForCommit(it)) }
+        .sortedBy { it.link }
 }
 
 /**
