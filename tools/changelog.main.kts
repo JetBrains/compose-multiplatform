@@ -141,7 +141,6 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
 
     return commits
         .map { changelogEntryFor(it, prForCommit(it)) }
-        .sortedBy { it.link }
 }
 
 /**
