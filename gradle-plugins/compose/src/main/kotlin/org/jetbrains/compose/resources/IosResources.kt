@@ -2,6 +2,7 @@ package org.jetbrains.compose.resources
 
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
+import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
@@ -54,7 +55,11 @@ internal fun Project.configureSyncIosComposeResources(
                     "embedAndSign${frameworkClassifier}AppleFrameworkForXcode"
                 }
 
-                project.tasks.named(externalTaskName).dependsOn(syncComposeResourcesTask)
+                project.tasks.configureEach { task ->
+                    if (task.name == externalTaskName) {
+                        task.dependsOn(syncComposeResourcesTask)
+                    }
+                }
             }
 
             nativeTarget.binaries.withType(TestExecutable::class.java).all { testExec ->
@@ -74,7 +79,7 @@ internal fun Project.configureSyncIosComposeResources(
     }
 
     plugins.withId(COCOAPODS_PLUGIN_ID) {
-        project.extensions.getByType(CocoapodsExtension::class.java).apply {
+        (kotlinExtension as ExtensionAware).extensions.getByType(CocoapodsExtension::class.java).apply {
             framework { podFramework ->
                 val syncDir = podFramework.getFinalResourcesDir().get().asFile.relativeTo(projectDir)
                 val specAttr = "['${syncDir.path}']"
