@@ -4,6 +4,7 @@ import com.example.common.TextLeafNode
 import com.example.common.composeText
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import kotlin.reflect.KClass
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -45,7 +46,7 @@ class CollectionOfComposablesTests {
     @Test
     fun testDefaultArgsForOverridden() = runTest {
         class Impl : DefaultComposableContent
-        
+
         val root = composeText {
             Impl().ComposableContent()
         }
@@ -101,7 +102,8 @@ class CollectionOfComposablesTests {
             val f: List<@Composable () -> Unit>,
         )
 
-        val composables: List<@Composable () -> Unit> = listOf(@Composable { TextLeafNode("a") }, @Composable { TextLeafNode("b") })
+        val composables: List<@Composable () -> Unit> =
+            listOf(@Composable { TextLeafNode("a") }, @Composable { TextLeafNode("b") })
         val single = SingleNested(composables)
 
         val singleRoot = composeText {
@@ -124,6 +126,45 @@ class CollectionOfComposablesTests {
         )
         assertEquals(singleRoot.dump(), doubleRoot.dump())
     }
+
+    interface ViewModel {
+        @Composable
+        fun content()
+    }
+
+    class ViewModelA : ViewModel {
+        @Composable
+        override fun content() {
+            TextLeafNode("a")
+        }
+    }
+
+    fun <T : ViewModel> get(klass: KClass<T>, viewModelBlock: () -> T): T {
+        if (klass.toString().contains("asdf")) {
+            throw Exception("AsdfASDFASDF")
+        }
+        return viewModelBlock()
+    }
+
+    @Composable
+    inline fun <reified T : ViewModel> getReified(
+        noinline viewModelBlock: () -> T
+    ): T = get(T::class, viewModelBlock)
+
+    /** Composable functions with `reified` generic types without proper symbol remapping for
+     * `IrTypeParameterSymbol` (inside 'T::class' / `IrClassReference`)
+     * https://github.com/JetBrains/compose-multiplatform/issues/3147
+     */
+    @Test
+    fun testReifiedGenericComposable() = runTest {
+        val root = composeText {
+            val vm = getReified { ViewModelA() }
+            vm.content()
+        }
+
+        assertEquals(
+            expected = "root:{a}",
+            actual = root.dump()
+        )
+    }
 }
-
-
