@@ -120,7 +120,7 @@ _Changes since 1.6.2_
 
 ## Dependencies
 
-- Gradle Plugin `org.jetbrains.compose`, version `1.6.0`. Based on Jetpack Compose libraries:
+- Gradle Plugin `org.jetbrains.compose`, version `1.6.10-beta01`. Based on Jetpack Compose libraries:
   - [Compiler 1.5.11](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.11)
   - [Runtime 1.6.4](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.4)
   - [UI 1.6.4](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.4)
