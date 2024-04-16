@@ -61,6 +61,8 @@ val normal = entries.ofType(Type.Normal)
 val prereleaseFixes = entries.ofType(Type.PrereleaseFix)
 val unknown = entries.ofType(Type.Unknown)
 
+println("\n# CHANGELOG")
+
 println(
     buildString {
         append("_Changes since ${commitToVersion(firstCommit)}_\n")
@@ -144,14 +146,16 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
             .commits
     }.toSet()
 
-    val excludedCommitMessages = fetchPagedUntilEmpty { page ->
+    fun GitHubCompareResponse.CommitEntry.commitId() = repoNumberForCommit(this)?.toString() ?: sha
+
+    val excludedCommitIds = fetchPagedUntilEmpty { page ->
         request<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$excludeFirstCommit...$excludeLastCommit?per_page=1000&page=$page")
             .commits
-            .map { it.commit.message }
+            .map { it.commitId() }
     }.toSet()
 
     // Exclude cherry-picks with the same message (they have a different SHA, we can compare by it)
-    val nonCherrypickedCommits = commits.filter { it.commit.message !in excludedCommitMessages }
+    val nonCherrypickedCommits = commits.filter { it.commitId() !in excludedCommitIds }
 
     return nonCherrypickedCommits
         .map { changelogEntryFor(it, prForCommit(it)) }
@@ -254,6 +258,7 @@ fun String.execCommand(workingDir: File = File(".")): String? {
 inline fun <reified T> request(
     url: String
 ): T = exponentialRetry {
+    println("Request $url")
     val connection = URL(url).openConnection()
     connection.setRequestProperty("User-Agent", "Compose-Multiplatform-Script")
     if (token != null) {
