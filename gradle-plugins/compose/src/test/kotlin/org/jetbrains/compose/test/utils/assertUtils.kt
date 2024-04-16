@@ -72,6 +72,10 @@ internal class BuildResultChecks(private val result: BuildResult) {
         }
     }
 
+    fun taskNoSource(task: String) {
+        taskOutcome(task, TaskOutcome.NO_SOURCE)
+    }
+
     private fun taskOutcome(task: String, expectedOutcome: TaskOutcome) {
         val actualOutcome = result.task(task)?.outcome
         if (actualOutcome != expectedOutcome) {
