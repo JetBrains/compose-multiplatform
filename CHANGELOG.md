@@ -53,6 +53,7 @@ _Changes since 1.6.2_
 - [XML resource optimizations](https://github.com/JetBrains/compose-multiplatform/pull/4559)
 - [Get resource files as URI](https://github.com/JetBrains/compose-multiplatform/pull/4576)
 - [Support source set's hierarchy for compose resources](https://github.com/JetBrains/compose-multiplatform/pull/4589)
+- [Support SVG drawables for non android platforms](https://github.com/JetBrains/compose-multiplatform/pull/4605)
 
 ### Gradle Plugin
 
@@ -78,6 +79,9 @@ _Changes since 1.6.2_
 - [Fix nested scroll when `Pager` involved in scrolling process](https://github.com/JetBrains/compose-multiplatform-core/pull/1154)
 - [Fix a11y wrong bounds calculation](https://github.com/JetBrains/compose-multiplatform-core/pull/1165)
 - [Delay tap indication inside scroll](https://github.com/JetBrains/compose-multiplatform-core/pull/1173)
+- [Fix keyboard opening when scrolling begins within a `TextField`](https://github.com/JetBrains/compose-multiplatform-core/pull/1176)
+- [Fix IME window insets and view offset when keyboard appears](https://github.com/JetBrains/compose-multiplatform-core/pull/1199)
+- [Fix animation frozen after app went background](https://github.com/JetBrains/compose-multiplatform-core/pull/1263)
 
 ### Desktop
 
@@ -89,11 +93,12 @@ _Changes since 1.6.2_
 - [Locale-aware date formatting for desktop](https://github.com/JetBrains/compose-multiplatform-core/pull/1159)
 - [Pass the id of the node whose layout changed to accessibility controllers](https://github.com/JetBrains/compose-multiplatform-core/pull/1162)
 - `WINDOW` layer fixes: [#1181](https://github.com/JetBrains/compose-multiplatform-core/pull/1181), [#1185](https://github.com/JetBrains/compose-multiplatform-core/pull/1185), [#1187](https://github.com/JetBrains/compose-multiplatform-core/pull/1187), [#1189](https://github.com/JetBrains/compose-multiplatform-core/pull/1189)
-- [Fix crash when we resize ComposePanel after re-adding it to the hierarchy](https://github.com/JetBrains/compose-multiplatform-core/pull/1195)
+- [Fix crash when we resize `ComposePanel` after re-adding it to the hierarchy](https://github.com/JetBrains/compose-multiplatform-core/pull/1195)
 - [Fix propagation of `LocalLocalization`](https://github.com/JetBrains/compose-multiplatform-core/pull/1202)
 - [Re-show the tooltip on mouse-move following a click in TooltipArea](https://github.com/JetBrains/compose-multiplatform-core/pull/1209)
 - [Fix the direction of scrolling when pressing on the scrollbar track with `reverseLayout=true`](https://github.com/JetBrains/compose-multiplatform-core/pull/1221)
-- [Don't crash, and allow selection in `SelectionContainer` to start when drag starts below the bounds of the visible text](https://github.com/JetBrains/compose-multiplatform-core/pull/1230)
+- [Fix crash and allow selection in `SelectionContainer` to start when drag starts below the bounds of the visible text](https://github.com/JetBrains/compose-multiplatform-core/pull/1230)
+- [Fix a crash on Windows without `dcomp.dll`](https://github.com/JetBrains/skiko/pull/909)
 
 ### Web
 
@@ -104,6 +109,7 @@ _Changes since 1.6.2_
 - [Dispose all listened events alongside with the application being disposed](https://github.com/JetBrains/compose-multiplatform-core/pull/1239)
 - [Modify `buttonFlags` only on `Press` and `Release`](https://github.com/JetBrains/compose-multiplatform-core/pull/1243)
 - [Fix keyboard mappings](https://github.com/JetBrains/compose-multiplatform-core/pull/1249)
+- [Correct density rounding in `ComposeWindow::resize`](https://github.com/JetBrains/compose-multiplatform-core/pull/1268)
 
 ### Resources
 
