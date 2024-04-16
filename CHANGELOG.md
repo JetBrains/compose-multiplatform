@@ -112,7 +112,6 @@ _Changes since 1.6.2_
 - [Init resource accessors lazily and in external function to avoid `MethodTooLargeException`](https://github.com/JetBrains/compose-multiplatform/pull/4404)
 - [Fix `Res` class generation if the library is declared as 'api'](https://github.com/JetBrains/compose-multiplatform/pull/4406)
 - [Fix resource packaging in APK when 'build' task is used with AGP 8.2+](https://github.com/JetBrains/compose-multiplatform/pull/4408)
-- [Fix `regionCode` crash on iOS before 17](https://github.com/JetBrains/compose-multiplatform/pull/4473)
 - [Use first of preferred locales instead of a current on iOS](https://github.com/JetBrains/compose-multiplatform/pull/4507)
 - [Fix `readResourceBytes` function on Android if font is located under qualified directory](https://github.com/JetBrains/compose-multiplatform/pull/4512)
 - [Fix android fonts in APKs](https://github.com/JetBrains/compose-multiplatform/pull/4509)
