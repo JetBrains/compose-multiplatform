@@ -10,8 +10,9 @@ _Changes since 1.6.2_
 
 ## Known issues
 
-- `inline fun <reified VM> viewModel(...)` is not available from common due to [compiler bug](https://github.com/JetBrains/compose-multiplatform/issues/3147). Please use `fun <VM> viewModel(KClass, ...)` overload instead.
-- Compose Multiplatform doesn't provide default `ViewModelStoreOwner` yet. For using `ViewModel`s outside of `NavHost` you need to provide custom store owner via `LocalViewModelStoreOwner`. Due to dependencies stability, it's expected to be fixed only in `1.7.0`.
+- [Crash on pre-iOS 17 devices due to loading `UITextLoupeSession` by K/N](https://github.com/JetBrains/compose-multiplatform/issues/4644)
+- `inline fun <reified VM> viewModel(...)` is not available from common due to [compiler bug](https://github.com/JetBrains/compose-multiplatform/issues/3147). Please use `fun <VM> viewModel(KClass, ...)` overload instead
+- Compose Multiplatform doesn't provide default `ViewModelStoreOwner` yet. For using `ViewModel`s outside of `NavHost` you need to provide custom store owner via `LocalViewModelStoreOwner`
 
 ## Features
 
@@ -36,7 +37,7 @@ _Changes since 1.6.2_
 ### Desktop
 
 - [Add an `alwaysOnTop` flag to `DialogWindow`](https://github.com/JetBrains/compose-multiplatform-core/pull/1120)
-- Basic support of `BasicTextField2`: [#1227](https://github.com/JetBrains/compose-multiplatform-core/pull/1227), [#1264](https://github.com/JetBrains/compose-multiplatform-core/pull/1264)
+- Basic support of `BasicTextField2`: [#1227](https://github.com/JetBrains/compose-multiplatform-core/pull/1227), [#1264](https://github.com/JetBrains/compose-multiplatform-core/pull/1264) <sub>_full support and support for other platforms is planned for 1.7.0_</sub>
 
 ### Web
 
