@@ -4,6 +4,7 @@ import org.gradle.util.GradleVersion
 import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.compose.resources.XmlValuesConverterTask
 import org.jetbrains.compose.test.utils.*
+import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.zip.ZipFile
@@ -530,6 +531,102 @@ class ResourcesTest : GradlePluginTestBase() {
         )
         gradle("generateComposeResClass").checks {
             check.logContains("Generation Res class is disabled")
+        }
+    }
+
+    @Test
+    fun iosResources() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        val iosEnv = mapOf(
+            "PLATFORM_NAME" to "iphonesimulator",
+            "ARCHS" to "arm64",
+            "CONFIGURATION" to "Debug",
+        )
+        val testEnv = defaultTestEnvironment.copy(
+            additionalEnvVars = iosEnv
+        )
+
+        with(TestProject("misc/iosResources", testEnv)) {
+            gradle(
+                ":syncFramework",
+                "-Pkotlin.native.cocoapods.platform=${iosEnv["PLATFORM_NAME"]}",
+                "-Pkotlin.native.cocoapods.archs=${iosEnv["ARCHS"]}",
+                "-Pkotlin.native.cocoapods.configuration=${iosEnv["CONFIGURATION"]}",
+                "--dry-run"
+            ).checks {
+                check.taskSkipped(":generateComposeResClass")
+
+                check.taskSkipped(":convertXmlValueResourcesForCommonMain")
+                check.taskSkipped(":copyNonXmlValueResourcesForCommonMain")
+                check.taskSkipped(":prepareComposeResourcesTaskForCommonMain")
+                check.taskSkipped(":generateResourceAccessorsForCommonMain")
+
+                check.taskSkipped(":convertXmlValueResourcesForNativeMain")
+                check.taskSkipped(":copyNonXmlValueResourcesForNativeMain")
+                check.taskSkipped(":prepareComposeResourcesTaskForNativeMain")
+                check.taskSkipped(":generateResourceAccessorsForNativeMain")
+
+                check.taskSkipped(":convertXmlValueResourcesForAppleMain")
+                check.taskSkipped(":copyNonXmlValueResourcesForAppleMain")
+                check.taskSkipped(":prepareComposeResourcesTaskForAppleMain")
+                check.taskSkipped(":generateResourceAccessorsForAppleMain")
+
+                check.taskSkipped(":convertXmlValueResourcesForIosMain")
+                check.taskSkipped(":copyNonXmlValueResourcesForIosMain")
+                check.taskSkipped(":prepareComposeResourcesTaskForIosMain")
+                check.taskSkipped(":generateResourceAccessorsForIosMain")
+
+                check.taskSkipped(":convertXmlValueResourcesForIosX64Main")
+                check.taskSkipped(":copyNonXmlValueResourcesForIosX64Main")
+                check.taskSkipped(":prepareComposeResourcesTaskForIosX64Main")
+                check.taskSkipped(":generateResourceAccessorsForIosX64Main")
+
+                check.taskSkipped(":syncPodComposeResourcesForIos")
+            }
+            gradle(":syncPodComposeResourcesForIos").checks {
+                check.taskSuccessful(":convertXmlValueResourcesForCommonMain")
+                check.taskSuccessful(":copyNonXmlValueResourcesForCommonMain")
+                check.taskSuccessful(":prepareComposeResourcesTaskForCommonMain")
+                check.taskSkipped(":generateResourceAccessorsForCommonMain")
+
+                check.taskNoSource(":convertXmlValueResourcesForNativeMain")
+                check.taskNoSource(":copyNonXmlValueResourcesForNativeMain")
+                check.taskNoSource(":prepareComposeResourcesTaskForNativeMain")
+                check.taskSkipped(":generateResourceAccessorsForNativeMain")
+
+                check.taskNoSource(":convertXmlValueResourcesForAppleMain")
+                check.taskNoSource(":copyNonXmlValueResourcesForAppleMain")
+                check.taskNoSource(":prepareComposeResourcesTaskForAppleMain")
+                check.taskSkipped(":generateResourceAccessorsForAppleMain")
+
+                check.taskSuccessful(":convertXmlValueResourcesForIosMain")
+                check.taskSuccessful(":copyNonXmlValueResourcesForIosMain")
+                check.taskSuccessful(":prepareComposeResourcesTaskForIosMain")
+                check.taskSkipped(":generateResourceAccessorsForIosMain")
+
+                check.taskNoSource(":convertXmlValueResourcesForIosX64Main")
+                check.taskNoSource(":copyNonXmlValueResourcesForIosX64Main")
+                check.taskNoSource(":prepareComposeResourcesTaskForIosX64Main")
+                check.taskSkipped(":generateResourceAccessorsForIosX64Main")
+
+                file("build/compose/ios/shared/compose-resources/drawable/compose-multiplatform.xml").checkExists()
+                file("build/compose/ios/shared/compose-resources/drawable/icon.xml").checkExists()
+            }
+        }
+    }
+
+    @Test
+    fun iosTestResources() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        with(testProject("misc/iosResources")) {
+            gradle(":linkDebugTestIosX64", "--dry-run").checks {
+                check.taskSkipped(":copyTestComposeResourcesForIosX64")
+                check.taskSkipped(":linkDebugTestIosX64")
+            }
+            gradle(":copyTestComposeResourcesForIosX64").checks {
+                file("build/bin/iosX64/debugTest/compose-resources/drawable/compose-multiplatform.xml").checkExists()
+                file("build/bin/iosX64/debugTest/compose-resources/drawable/icon.xml").checkExists()
+            }
         }
     }
 }
