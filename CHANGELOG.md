@@ -134,7 +134,7 @@ _Changes since 1.6.2_
   - [Material 1.6.4](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.4)
   - [Material3 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.1)
 
-- Lifecycle libraries `androidx.lifecycle:lifecycle-*:2.8.0-alpha01`. Based on:
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.0-alpha01`. Based on:
   - [Lifecycle 2.8.0-alpha04](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.0-alpha04)
   - [Lifecycle Runtime Compose 2.8.0-alpha02](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.0-alpha02) <sub>_(due to Compose `1.6.*` compatibility)_</sub>
 
