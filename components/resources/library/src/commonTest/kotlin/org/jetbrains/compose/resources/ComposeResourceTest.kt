@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.runTest
 import org.jetbrains.skiko.URIManager
 import kotlin.test.*
 
-@OptIn(ExperimentalTestApi::class, ExperimentalResourceApi::class, InternalResourceApi::class)
+@OptIn(ExperimentalTestApi::class, InternalResourceApi::class)
 class ComposeResourceTest {
 
     init {
@@ -20,7 +20,7 @@ class ComposeResourceTest {
 
     @Test
     fun testCountRecompositions() = runComposeUiTest {
-        var res by mutableStateOf(DrawableResource("1.png"))
+        var res by mutableStateOf(TestDrawableResource("1.png"))
         val recompositionsCounter = RecompositionsCounter()
         setContent {
             CompositionLocalProvider(LocalComposeEnvironment provides TestComposeEnvironment) {
@@ -31,7 +31,7 @@ class ComposeResourceTest {
             }
         }
         waitForIdle()
-        res = DrawableResource("2.png")
+        res = TestDrawableResource("2.png")
         waitForIdle()
         assertEquals(2, recompositionsCounter.count)
     }
@@ -39,7 +39,7 @@ class ComposeResourceTest {
     @Test
     fun testImageResourceCache() = runComposeUiTest {
         val testResourceReader = TestResourceReader()
-        var res by mutableStateOf(DrawableResource("1.png"))
+        var res by mutableStateOf(TestDrawableResource("1.png"))
         setContent {
             CompositionLocalProvider(
                 LocalResourceReader provides testResourceReader,
@@ -49,9 +49,9 @@ class ComposeResourceTest {
             }
         }
         waitForIdle()
-        res = DrawableResource("2.png")
+        res = TestDrawableResource("2.png")
         waitForIdle()
-        res = DrawableResource("1.png")
+        res = TestDrawableResource("1.png")
         waitForIdle()
 
         assertEquals(

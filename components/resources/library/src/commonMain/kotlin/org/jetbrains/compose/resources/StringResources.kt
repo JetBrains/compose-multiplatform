@@ -9,7 +9,6 @@ import androidx.compose.runtime.*
  * @param key The key used to retrieve the string resource.
  * @param items The set of resource items associated with the string resource.
  */
-@ExperimentalResourceApi
 @Immutable
 class StringResource
 @InternalResourceApi constructor(id: String, val key: String, items: Set<ResourceItem>) : Resource(id, items)
@@ -22,7 +21,6 @@ class StringResource
  *
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
-@ExperimentalResourceApi
 @Composable
 fun stringResource(resource: StringResource): String {
     val resourceReader = LocalResourceReader.current
@@ -40,11 +38,9 @@ fun stringResource(resource: StringResource): String {
  *
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
-@ExperimentalResourceApi
 suspend fun getString(resource: StringResource): String =
     loadString(resource, DefaultResourceReader, getResourceEnvironment())
 
-@OptIn(ExperimentalResourceApi::class, InternalResourceApi::class)
 private suspend fun loadString(
     resource: StringResource,
     resourceReader: ResourceReader,
@@ -64,7 +60,6 @@ private suspend fun loadString(
  *
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
-@ExperimentalResourceApi
 @Composable
 fun stringResource(resource: StringResource, vararg formatArgs: Any): String {
     val resourceReader = LocalResourceReader.current
@@ -84,7 +79,6 @@ fun stringResource(resource: StringResource, vararg formatArgs: Any): String {
  *
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
-@ExperimentalResourceApi
 suspend fun getString(resource: StringResource, vararg formatArgs: Any): String = loadString(
     resource,
     formatArgs.map { it.toString() },
@@ -92,7 +86,6 @@ suspend fun getString(resource: StringResource, vararg formatArgs: Any): String 
     getResourceEnvironment()
 )
 
-@OptIn(ExperimentalResourceApi::class)
 private suspend fun loadString(
     resource: StringResource,
     args: List<String>,

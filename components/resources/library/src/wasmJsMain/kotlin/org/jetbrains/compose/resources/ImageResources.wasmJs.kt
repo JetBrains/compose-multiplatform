@@ -5,7 +5,6 @@ import org.jetbrains.compose.resources.vector.xmldom.ElementImpl
 import org.jetbrains.compose.resources.vector.xmldom.MalformedXMLException
 import org.w3c.dom.parsing.DOMParser
 
-@OptIn(ExperimentalResourceApi::class)
 internal actual fun ByteArray.toXmlElement(): Element {
     val xmlString = decodeToString()
     val xmlDom = DOMParser().parseFromString(xmlString, "application/xml".toJsString())

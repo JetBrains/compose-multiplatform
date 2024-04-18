@@ -4,7 +4,6 @@
  */
 package org.jetbrains.compose.resources.vector.xmldom
 
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import platform.Foundation.NSError
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
@@ -58,7 +57,6 @@ private class ElementImpl(
     override fun lookupPrefix(namespaceURI: String): String = prefixMap[namespaceURI] ?: ""
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Suppress("CONFLICTING_OVERLOADS", "PARAMETER_NAME_CHANGED_ON_OVERRIDE")
 private class DomXmlParser : NSObject(), NSXMLParserDelegateProtocol {
 

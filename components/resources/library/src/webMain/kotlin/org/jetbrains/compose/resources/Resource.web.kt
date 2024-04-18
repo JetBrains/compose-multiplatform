@@ -6,7 +6,6 @@ package org.jetbrains.compose.resources
  * @see configureWebResources - for overriding the default configuration.
  */
 @Suppress("unused")
-@ExperimentalResourceApi
 object WebResourcesConfiguration {
     internal var getResourcePath: (path: String) -> String = { "./$it" }
 
@@ -16,7 +15,6 @@ object WebResourcesConfiguration {
      *
      * @param map the mapping function that takes a path String and returns a modified path String
      */
-    @ExperimentalResourceApi
     fun resourcePathMapping(map: (path: String) -> String) {
         getResourcePath = map
     }
@@ -41,12 +39,10 @@ object WebResourcesConfiguration {
  * ```
  */
 @Suppress("unused")
-@ExperimentalResourceApi
 fun configureWebResources(configure: WebResourcesConfiguration.() -> Unit) {
     WebResourcesConfiguration.configure()
 }
 
-@OptIn(ExperimentalResourceApi::class)
 internal fun getResourceUrl(windowOrigin: String, windowPathname: String, resourcePath: String): String {
     val path = WebResourcesConfiguration.getResourcePath(resourcePath)
     return when {

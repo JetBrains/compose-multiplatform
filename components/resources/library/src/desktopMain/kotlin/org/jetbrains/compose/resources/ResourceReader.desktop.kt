@@ -18,14 +18,12 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         return result
     }
 
-    @OptIn(ExperimentalResourceApi::class)
     override fun getUri(path: String): String {
         val classLoader = getClassLoader()
         val resource = classLoader.getResource(path) ?: throw MissingResourceException(path)
         return resource.toURI().toString()
     }
 
-    @OptIn(ExperimentalResourceApi::class)
     private fun getResourceAsStream(path: String): InputStream {
         val classLoader = getClassLoader()
         return classLoader.getResourceAsStream(path) ?: throw MissingResourceException(path)

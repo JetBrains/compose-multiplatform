@@ -5,7 +5,6 @@ import kotlinx.cinterop.usePinned
 import platform.Foundation.*
 import platform.posix.memcpy
 
-@OptIn(ExperimentalResourceApi::class)
 internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         val data = readData(getPathOnDisk(path))

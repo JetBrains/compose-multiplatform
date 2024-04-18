@@ -3,7 +3,6 @@ package org.jetbrains.compose.resources
 import org.jetbrains.compose.resources.vector.xmldom.*
 import org.w3c.dom.parsing.DOMParser
 
-@OptIn(ExperimentalResourceApi::class)
 internal actual fun ByteArray.toXmlElement(): Element {
     val xmlString = decodeToString()
     val xmlDom = DOMParser().parseFromString(xmlString, "application/xml")
