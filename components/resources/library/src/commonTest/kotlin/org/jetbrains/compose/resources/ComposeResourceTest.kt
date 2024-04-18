@@ -304,4 +304,20 @@ class ComposeResourceTest {
         assertTrue(uri1.endsWith("/1.png"))
         assertTrue(uri2.endsWith("/2.png"))
     }
+
+    @OptIn(ExperimentalResourceApi::class)
+    @Test
+    fun testGetResourceBytes() = runComposeUiTest {
+        var imageBytes = ByteArray(0)
+        var fontBytes = ByteArray(0)
+        setContent {
+            CompositionLocalProvider(LocalComposeEnvironment provides TestComposeEnvironment) {
+                imageBytes = getDrawableResourceBytes(TestDrawableResource("1.png"))
+                fontBytes = getFontResourceBytes(TestFontResource("font_awesome.otf"))
+            }
+        }
+        waitForIdle()
+        assertEquals(946, imageBytes.size)
+        assertEquals(134808, fontBytes.size)
+    }
 }

@@ -40,6 +40,11 @@ internal fun TestDrawableResource(path: String) = DrawableResource(
     setOf(ResourceItem(emptySet(), path, -1, -1))
 )
 
+internal fun TestFontResource(path: String) = FontResource(
+    path,
+    setOf(ResourceItem(emptySet(), path, -1, -1))
+)
+
 internal fun parsePluralSamples(samples: String): List<Int> {
     return samples.split(',').flatMap {
         val range = it.trim()

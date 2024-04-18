@@ -2,6 +2,7 @@ package org.jetbrains.compose.resources
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.font.*
 
 /**
@@ -33,3 +34,20 @@ expect fun Font(
     weight: FontWeight = FontWeight.Normal,
     style: FontStyle = FontStyle.Normal
 ): Font
+
+/**
+ * Retrieves an ByteArray using the specified font resource.
+ *
+ * @param resource The font resource to be used.
+ * @return The ByteArray loaded from the resource.
+ */
+@ExperimentalResourceApi
+@Composable
+fun getFontResourceBytes(resource: FontResource): ByteArray {
+    val resourceReader = LocalResourceReader.current
+    val bytes by rememberResourceState(resource, resourceReader, { ByteArray(0) }) { env ->
+        val item = resource.getResourceItemByEnvironment(env)
+        resourceReader.read(item.path)
+    }
+    return bytes
+}
