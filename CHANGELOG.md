@@ -11,6 +11,7 @@ _Changes since 1.6.2_
 ## Known issues
 
 - [**⚠️ Crash at startup on pre-iOS 17 devices due to loading `UITextLoupeSession`**](https://github.com/JetBrains/compose-multiplatform/issues/4644)
+- `lifecycle-runtime` breaks Compose UI compatibility with Java 11 on desktop, it requires Java 17 or above now.
 - `inline fun <reified VM> viewModel(...)` is not available from common due to [compiler bug](https://github.com/JetBrains/compose-multiplatform/issues/3147). Please use `fun <VM> viewModel(KClass, ...)` overload instead
 - Compose Multiplatform doesn't provide default `ViewModelStoreOwner` yet. For using `ViewModel`s outside of `NavHost` you need to provide custom store owner via `LocalViewModelStoreOwner`
 
