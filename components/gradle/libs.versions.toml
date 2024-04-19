@@ -1,5 +1,5 @@
 [versions]
-kotlinx-coroutines = "1.7.3"
+kotlinx-coroutines = "1.8.0"
 androidx-appcompat = "1.6.1"
 androidx-activity-compose = "1.8.2"
 androidx-test = "1.5.0"
