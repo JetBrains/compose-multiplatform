@@ -584,7 +584,7 @@ class ResourcesTest : GradlePluginTestBase() {
                 check.taskSkipped(":syncPodComposeResourcesForIos")
             }
             gradle(":syncPodComposeResourcesForIos").checks {
-                check.taskSuccessful(":convertXmlValueResourcesForCommonMain")
+                check.taskNoSource(":convertXmlValueResourcesForCommonMain")
                 check.taskSuccessful(":copyNonXmlValueResourcesForCommonMain")
                 check.taskSuccessful(":prepareComposeResourcesTaskForCommonMain")
                 check.taskSkipped(":generateResourceAccessorsForCommonMain")
@@ -599,7 +599,7 @@ class ResourcesTest : GradlePluginTestBase() {
                 check.taskNoSource(":prepareComposeResourcesTaskForAppleMain")
                 check.taskSkipped(":generateResourceAccessorsForAppleMain")
 
-                check.taskSuccessful(":convertXmlValueResourcesForIosMain")
+                check.taskNoSource(":convertXmlValueResourcesForIosMain")
                 check.taskSuccessful(":copyNonXmlValueResourcesForIosMain")
                 check.taskSuccessful(":prepareComposeResourcesTaskForIosMain")
                 check.taskSkipped(":generateResourceAccessorsForIosMain")

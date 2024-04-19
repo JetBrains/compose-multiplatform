@@ -69,6 +69,7 @@ internal abstract class CopyNonXmlValueResourcesTask : DefaultTask() {
 
     @get:InputFiles
     @get:SkipWhenEmpty
+    @get:IgnoreEmptyDirectories
     val realInputFiles = originalResourcesDir.map { dir ->
         dir.asFileTree.matching { it.exclude("values*/*.xml") }
     }
@@ -97,10 +98,12 @@ internal abstract class CopyNonXmlValueResourcesTask : DefaultTask() {
 internal abstract class PrepareComposeResourcesTask : DefaultTask() {
     @get:InputFiles
     @get:SkipWhenEmpty
+    @get:IgnoreEmptyDirectories
     abstract val convertedXmls: Property<FileTree>
 
     @get:InputFiles
     @get:SkipWhenEmpty
+    @get:IgnoreEmptyDirectories
     abstract val copiedNonXmls: Property<FileTree>
 
     @get:OutputDirectory
@@ -146,6 +149,7 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
 
     @get:InputFiles
     @get:SkipWhenEmpty
+    @get:IgnoreEmptyDirectories
     val realInputFiles = originalResourcesDir.map { dir ->
         dir.asFileTree.matching { it.include("values*/*.xml") }
     }
