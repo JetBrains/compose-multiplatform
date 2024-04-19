@@ -36,18 +36,17 @@ expect fun Font(
 ): Font
 
 /**
- * Retrieves an ByteArray using the specified font resource.
+ * Retrieves the byte array of the font resource.
  *
- * @param resource The font resource to be used.
- * @return The ByteArray loaded from the resource.
+ * @param environment The optional resource environment.
+ * @param resource The font resource.
+ * @return The byte array representing the font resource.
  */
 @ExperimentalResourceApi
-@Composable
-fun getFontResourceBytes(resource: FontResource): ByteArray {
-    val resourceReader = LocalResourceReader.current
-    val bytes by rememberResourceState(resource, resourceReader, { ByteArray(0) }) { env ->
-        val item = resource.getResourceItemByEnvironment(env)
-        resourceReader.read(item.path)
-    }
-    return bytes
+suspend fun getFontResourceBytes(
+    environment: ResourceEnvironment = getResourceEnvironment(),
+    resource: FontResource
+): ByteArray {
+    val resourceItem = resource.getResourceItemByEnvironment(environment)
+    return DefaultResourceReader.read(resourceItem.path)
 }

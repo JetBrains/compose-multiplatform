@@ -6,7 +6,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runComposeUiTest
 import kotlinx.coroutines.test.runTest
-import org.jetbrains.skiko.URIManager
 import kotlin.test.*
 
 @OptIn(ExperimentalTestApi::class, InternalResourceApi::class)
@@ -307,17 +306,23 @@ class ComposeResourceTest {
 
     @OptIn(ExperimentalResourceApi::class)
     @Test
-    fun testGetResourceBytes() = runComposeUiTest {
-        var imageBytes = ByteArray(0)
-        var fontBytes = ByteArray(0)
+    fun testGetResourceBytes() = runTest {
+        val imageBytes = getDrawableResourceBytes(resource = TestDrawableResource("1.png"))
+        assertEquals(946, imageBytes.size)
+        val fontBytes = getFontResourceBytes(resource = TestFontResource("font_awesome.otf"))
+        assertEquals(134808, fontBytes.size)
+    }
+
+    @OptIn(ExperimentalResourceApi::class)
+    @Test
+    fun testGetResourceEnvironment() = runComposeUiTest {
+        var environment: ResourceEnvironment? = null
         setContent {
-            CompositionLocalProvider(LocalComposeEnvironment provides TestComposeEnvironment) {
-                imageBytes = getDrawableResourceBytes(TestDrawableResource("1.png"))
-                fontBytes = getFontResourceBytes(TestFontResource("font_awesome.otf"))
-            }
+            environment = rememberResourceEnvironment()
         }
         waitForIdle()
-        assertEquals(946, imageBytes.size)
-        assertEquals(134808, fontBytes.size)
+
+        val systemEnvironment = getSystemEnvironment()
+        assertEquals(systemEnvironment, environment)
     }
 }

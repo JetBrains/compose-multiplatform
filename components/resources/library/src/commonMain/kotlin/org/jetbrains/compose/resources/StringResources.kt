@@ -41,6 +41,18 @@ fun stringResource(resource: StringResource): String {
 suspend fun getString(resource: StringResource): String =
     loadString(resource, DefaultResourceReader, getResourceEnvironment())
 
+/**
+ * Loads a string using the specified string resource.
+ *
+ * @param environment The resource environment.
+ * @param resource The string resource to be used.
+ * @return The loaded string resource.
+ *
+ * @throws IllegalArgumentException If the provided ID is not found in the resource file.
+ */
+suspend fun getString(environment: ResourceEnvironment, resource: StringResource): String =
+    loadString(resource, DefaultResourceReader, environment)
+
 private suspend fun loadString(
     resource: StringResource,
     resourceReader: ResourceReader,
@@ -84,6 +96,27 @@ suspend fun getString(resource: StringResource, vararg formatArgs: Any): String 
     formatArgs.map { it.toString() },
     DefaultResourceReader,
     getResourceEnvironment()
+)
+
+/**
+ * Loads a formatted string using the specified string resource and arguments.
+ *
+ * @param environment The resource environment.
+ * @param resource The string resource to be used.
+ * @param formatArgs The arguments to be inserted into the formatted string.
+ * @return The formatted string resource.
+ *
+ * @throws IllegalArgumentException If the provided ID is not found in the resource file.
+ */
+suspend fun getString(
+    environment: ResourceEnvironment,
+    resource: StringResource,
+    vararg formatArgs: Any
+): String = loadString(
+    resource,
+    formatArgs.map { it.toString() },
+    DefaultResourceReader,
+    environment
 )
 
 private suspend fun loadString(

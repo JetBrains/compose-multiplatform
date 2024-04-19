@@ -5,11 +5,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.intl.Locale
 
-internal data class ResourceEnvironment(
-    val language: LanguageQualifier,
-    val region: RegionQualifier,
-    val theme: ThemeQualifier,
-    val density: DensityQualifier
+data class ResourceEnvironment internal constructor(
+    internal val language: LanguageQualifier,
+    internal val region: RegionQualifier,
+    internal val theme: ThemeQualifier,
+    internal val density: DensityQualifier
 )
 
 internal interface ComposeEnvironment {
@@ -38,6 +38,20 @@ internal val DefaultComposeEnvironment = object : ComposeEnvironment {
 
 //ComposeEnvironment provider will be overridden for tests
 internal val LocalComposeEnvironment = staticCompositionLocalOf { DefaultComposeEnvironment }
+
+/**
+ * Returns an instance of [ResourceEnvironment].
+ *
+ * The [ResourceEnvironment] class represents the environment for resources.
+ *
+ * @return An instance of [ResourceEnvironment] representing the current environment.
+ */
+@ExperimentalResourceApi
+@Composable
+fun rememberResourceEnvironment(): ResourceEnvironment {
+    val composeEnvironment = LocalComposeEnvironment.current
+    return composeEnvironment.rememberEnvironment()
+}
 
 internal expect fun getSystemEnvironment(): ResourceEnvironment
 

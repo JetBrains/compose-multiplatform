@@ -110,20 +110,19 @@ private fun svgPainter(resource: DrawableResource): Painter {
 }
 
 /**
- * Retrieves an ByteArray using the specified drawable resource.
+ * Retrieves the byte array of the drawable resource.
  *
- * @param resource The drawable resource to be used.
- * @return The ByteArray loaded from the resource.
+ * @param environment The optional resource environment.
+ * @param resource The drawable resource.
+ * @return The byte array representing the drawable resource.
  */
 @ExperimentalResourceApi
-@Composable
-fun getDrawableResourceBytes(resource: DrawableResource): ByteArray {
-    val resourceReader = LocalResourceReader.current
-    val bytes by rememberResourceState(resource, resourceReader, { ByteArray(0) }) { env ->
-        val item = resource.getResourceItemByEnvironment(env)
-        resourceReader.read(item.path)
-    }
-    return bytes
+suspend fun getDrawableResourceBytes(
+    environment: ResourceEnvironment = getResourceEnvironment(),
+    resource: DrawableResource
+): ByteArray {
+    val resourceItem = resource.getResourceItemByEnvironment(environment)
+    return DefaultResourceReader.read(resourceItem.path)
 }
 
 internal expect fun ByteArray.toImageBitmap(): ImageBitmap
