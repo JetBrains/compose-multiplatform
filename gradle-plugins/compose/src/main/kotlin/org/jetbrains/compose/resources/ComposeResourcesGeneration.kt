@@ -68,7 +68,7 @@ internal fun Project.configureComposeResourcesGeneration(
     //setup task execution during IDE import
     tasks.configureEach { importTask ->
         if (importTask.name == "prepareKotlinIdeaImport") {
-            importTask.dependsOn(tasks.withType(CodeGenerationTask::class.java))
+            importTask.dependsOn(tasks.withType(IdeaImportTask::class.java))
         }
     }
 }

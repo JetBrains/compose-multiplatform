@@ -14,7 +14,7 @@ import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.relativeTo
 
-internal abstract class GenerateResourceAccessorsTask : CodeGenerationTask() {
+internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     @get:Input
     abstract val packageName: Property<String>
 
@@ -39,51 +39,45 @@ internal abstract class GenerateResourceAccessorsTask : CodeGenerationTask() {
     @get:OutputDirectory
     abstract val codeDir: DirectoryProperty
 
-    @TaskAction
-    fun generate() {
-        try {
-            val kotlinDir = codeDir.get().asFile
-            val rootResDir = resDir.get()
-            val sourceSet = sourceSetName.get()
+    override fun safeAction() {
+        val kotlinDir = codeDir.get().asFile
+        val rootResDir = resDir.get()
+        val sourceSet = sourceSetName.get()
 
-            logger.info("Clean directory $kotlinDir")
-            kotlinDir.deleteRecursively()
-            kotlinDir.mkdirs()
+        logger.info("Clean directory $kotlinDir")
+        kotlinDir.deleteRecursively()
+        kotlinDir.mkdirs()
 
-            if (shouldGenerateCode.get()) {
-                logger.info("Generate accessors for $rootResDir")
+        if (shouldGenerateCode.get()) {
+            logger.info("Generate accessors for $rootResDir")
 
-                //get first level dirs
-                val dirs = rootResDir.listNotHiddenFiles()
+            //get first level dirs
+            val dirs = rootResDir.listNotHiddenFiles()
 
-                dirs.forEach { f ->
-                    if (!f.isDirectory) {
-                        error("${f.name} is not directory! Raw files should be placed in '${rootResDir.name}/files' directory.")
-                    }
+            dirs.forEach { f ->
+                if (!f.isDirectory) {
+                    error("${f.name} is not directory! Raw files should be placed in '${rootResDir.name}/files' directory.")
                 }
-
-                //type -> id -> resource item
-                val resources: Map<ResourceType, Map<String, List<ResourceItem>>> = dirs
-                    .flatMap { dir ->
-                        dir.listNotHiddenFiles()
-                            .mapNotNull { it.fileToResourceItems(rootResDir.toPath()) }
-                            .flatten()
-                    }
-                    .groupBy { it.type }
-                    .mapValues { (_, items) -> items.groupBy { it.name } }
-
-                val pkgName = packageName.get()
-                val moduleDirectory = packagingDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
-                val isPublic = makeAccessorsPublic.get()
-                getAccessorsSpecs(
-                    resources, pkgName, sourceSet, moduleDirectory, isPublic
-                ).forEach { it.writeTo(kotlinDir) }
-            } else {
-                logger.info("Generation accessors for $rootResDir is disabled")
             }
-        } catch (e: Exception) {
-            //message must contain two ':' symbols to be parsed by IDE UI!
-            logger.error("e: $name task was failed:", e)
+
+            //type -> id -> resource item
+            val resources: Map<ResourceType, Map<String, List<ResourceItem>>> = dirs
+                .flatMap { dir ->
+                    dir.listNotHiddenFiles()
+                        .mapNotNull { it.fileToResourceItems(rootResDir.toPath()) }
+                        .flatten()
+                }
+                .groupBy { it.type }
+                .mapValues { (_, items) -> items.groupBy { it.name } }
+
+            val pkgName = packageName.get()
+            val moduleDirectory = packagingDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
+            val isPublic = makeAccessorsPublic.get()
+            getAccessorsSpecs(
+                resources, pkgName, sourceSet, moduleDirectory, isPublic
+            ).forEach { it.writeTo(kotlinDir) }
+        } else {
+            logger.info("Generation accessors for $rootResDir is disabled")
         }
     }
 
