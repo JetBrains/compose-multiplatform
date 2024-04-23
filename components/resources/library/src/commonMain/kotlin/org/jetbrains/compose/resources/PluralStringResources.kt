@@ -42,7 +42,6 @@ fun pluralStringResource(resource: PluralStringResource, quantity: Int): String 
  *
  * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
  */
-@OptIn(ExperimentalResourceApi::class)
 suspend fun getPluralString(resource: PluralStringResource, quantity: Int): String =
     loadPluralString(resource, quantity, DefaultResourceReader, getSystemResourceEnvironment())
 
@@ -111,7 +110,6 @@ fun pluralStringResource(resource: PluralStringResource, quantity: Int, vararg f
  *
  * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
  */
-@OptIn(ExperimentalResourceApi::class)
 suspend fun getPluralString(resource: PluralStringResource, quantity: Int, vararg formatArgs: Any): String =
     loadPluralString(
         resource, quantity,

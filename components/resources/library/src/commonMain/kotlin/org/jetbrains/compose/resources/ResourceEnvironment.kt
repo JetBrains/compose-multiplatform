@@ -5,6 +5,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.intl.Locale
 
+@ExperimentalResourceApi
 data class ResourceEnvironment internal constructor(
     internal val language: LanguageQualifier,
     internal val region: RegionQualifier,

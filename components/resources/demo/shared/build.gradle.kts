@@ -52,11 +52,6 @@ kotlin {
 
     applyDefaultHierarchyTemplate()
     sourceSets {
-        all {
-            languageSettings {
-                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
-            }
-        }
         val desktopMain by getting
         val wasmJsMain by getting
 
