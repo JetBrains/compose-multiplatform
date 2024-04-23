@@ -112,7 +112,7 @@ private fun svgPainter(resource: DrawableResource): Painter {
 /**
  * Retrieves the byte array of the drawable resource.
  *
- * @param environment The resource environment.
+ * @param environment The resource environment, which can be obtained from [rememberResourceEnvironment] or [getSystemResourceEnvironment].
  * @param resource The drawable resource.
  * @return The byte array representing the drawable resource.
  */

@@ -38,7 +38,7 @@ expect fun Font(
 /**
  * Retrieves the byte array of the font resource.
  *
- * @param environment The resource environment.
+ * @param environment The resource environment, which can be obtained from [rememberResourceEnvironment] or [getSystemResourceEnvironment].
  * @param resource The font resource.
  * @return The byte array representing the font resource.
  */
