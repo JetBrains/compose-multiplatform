@@ -13,10 +13,6 @@ in Android Studio or in AppCode with [installed CocoaPods](https://kotlinlang.or
 ### Run JS in browser with WebAssembly Skia via Gradle:
 `./gradlew :resources:demo:shared:jsBrowserDevelopmentRun`
 
-### Run MacOS via Gradle:
- - on Intel CPU: `./gradlew :resources:demo:shared:runDebugExecutableMacosX64`
- - on Apple Silicon: `./gradlew :resources:demo:shared:runDebugExecutableMacosArm64`
-
 # Tests
 Run script: 
 ```bash

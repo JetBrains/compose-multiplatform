@@ -39,24 +39,8 @@ kotlin {
         binaries.executable()
     }
 
-    listOf(
-        macosX64(),
-        macosArm64()
-    ).forEach { macosTarget ->
-        macosTarget.binaries {
-            executable {
-                entryPoint = "main"
-            }
-        }
-    }
-
     applyDefaultHierarchyTemplate()
     sourceSets {
-        all {
-            languageSettings {
-                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
-            }
-        }
         val desktopMain by getting
         val wasmJsMain by getting
 

@@ -95,7 +95,6 @@ internal expect fun SvgElement.toSvgPainter(density: Density): Painter
 
 private val emptySvgPainter: Painter by lazy { BitmapPainter(emptyImageBitmap) }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun svgPainter(resource: DrawableResource): Painter {
     val resourceReader = LocalResourceReader.current
@@ -108,6 +107,22 @@ private fun svgPainter(resource: DrawableResource): Painter {
         cached.painter
     }
     return svgPainter
+}
+
+/**
+ * Retrieves the byte array of the drawable resource.
+ *
+ * @param environment The resource environment, which can be obtained from [rememberResourceEnvironment] or [getSystemResourceEnvironment].
+ * @param resource The drawable resource.
+ * @return The byte array representing the drawable resource.
+ */
+@ExperimentalResourceApi
+suspend fun getDrawableResourceBytes(
+    environment: ResourceEnvironment,
+    resource: DrawableResource
+): ByteArray {
+    val resourceItem = resource.getResourceItemByEnvironment(environment)
+    return DefaultResourceReader.read(resourceItem.path)
 }
 
 internal expect fun ByteArray.toImageBitmap(): ImageBitmap

@@ -43,7 +43,24 @@ fun pluralStringResource(resource: PluralStringResource, quantity: Int): String 
  * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
  */
 suspend fun getPluralString(resource: PluralStringResource, quantity: Int): String =
-    loadPluralString(resource, quantity, DefaultResourceReader, getResourceEnvironment())
+    loadPluralString(resource, quantity, DefaultResourceReader, getSystemResourceEnvironment())
+
+/**
+ * Loads a string using the specified string resource.
+ *
+ * @param environment The resource environment.
+ * @param resource The string resource to be used.
+ * @param quantity The quantity of the pluralization to use.
+ * @return The loaded string resource.
+ *
+ * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
+ */
+@ExperimentalResourceApi
+suspend fun getPluralString(
+    environment: ResourceEnvironment,
+    resource: PluralStringResource,
+    quantity: Int
+): String = loadPluralString(resource, quantity, DefaultResourceReader, environment)
 
 private suspend fun loadPluralString(
     resource: PluralStringResource,
@@ -99,8 +116,32 @@ suspend fun getPluralString(resource: PluralStringResource, quantity: Int, varar
         resource, quantity,
         formatArgs.map { it.toString() },
         DefaultResourceReader,
-        getResourceEnvironment(),
+        getSystemResourceEnvironment(),
     )
+
+/**
+ * Loads a string using the specified string resource.
+ *
+ * @param environment The resource environment.
+ * @param resource The string resource to be used.
+ * @param quantity The quantity of the pluralization to use.
+ * @param formatArgs The arguments to be inserted into the formatted string.
+ * @return The loaded string resource.
+ *
+ * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
+ */
+@ExperimentalResourceApi
+suspend fun getPluralString(
+    environment: ResourceEnvironment,
+    resource: PluralStringResource,
+    quantity: Int,
+    vararg formatArgs: Any
+): String = loadPluralString(
+    resource, quantity,
+    formatArgs.map { it.toString() },
+    DefaultResourceReader,
+    environment
+)
 
 private suspend fun loadPluralString(
     resource: PluralStringResource,

@@ -6,7 +6,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runComposeUiTest
 import kotlinx.coroutines.test.runTest
-import org.jetbrains.skiko.URIManager
 import kotlin.test.*
 
 @OptIn(ExperimentalTestApi::class, InternalResourceApi::class)
@@ -303,5 +302,28 @@ class ComposeResourceTest {
 
         assertTrue(uri1.endsWith("/1.png"))
         assertTrue(uri2.endsWith("/2.png"))
+    }
+
+    @OptIn(ExperimentalResourceApi::class)
+    @Test
+    fun testGetResourceBytes() = runTest {
+        val env = getSystemEnvironment()
+        val imageBytes = getDrawableResourceBytes(env, TestDrawableResource("1.png"))
+        assertEquals(946, imageBytes.size)
+        val fontBytes = getFontResourceBytes(env, TestFontResource("font_awesome.otf"))
+        assertEquals(134808, fontBytes.size)
+    }
+
+    @OptIn(ExperimentalResourceApi::class)
+    @Test
+    fun testGetResourceEnvironment() = runComposeUiTest {
+        var environment: ResourceEnvironment? = null
+        setContent {
+            environment = rememberResourceEnvironment()
+        }
+        waitForIdle()
+
+        val systemEnvironment = getSystemEnvironment()
+        assertEquals(systemEnvironment, environment)
     }
 }

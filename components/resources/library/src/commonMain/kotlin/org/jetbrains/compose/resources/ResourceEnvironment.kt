@@ -5,12 +5,35 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.intl.Locale
 
-internal data class ResourceEnvironment(
-    val language: LanguageQualifier,
-    val region: RegionQualifier,
-    val theme: ThemeQualifier,
-    val density: DensityQualifier
-)
+@ExperimentalResourceApi
+class ResourceEnvironment internal constructor(
+    internal val language: LanguageQualifier,
+    internal val region: RegionQualifier,
+    internal val theme: ThemeQualifier,
+    internal val density: DensityQualifier
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as ResourceEnvironment
+
+        if (language != other.language) return false
+        if (region != other.region) return false
+        if (theme != other.theme) return false
+        if (density != other.density) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = language.hashCode()
+        result = 31 * result + region.hashCode()
+        result = 31 * result + theme.hashCode()
+        result = 31 * result + density.hashCode()
+        return result
+    }
+}
 
 internal interface ComposeEnvironment {
     @Composable
@@ -39,14 +62,32 @@ internal val DefaultComposeEnvironment = object : ComposeEnvironment {
 //ComposeEnvironment provider will be overridden for tests
 internal val LocalComposeEnvironment = staticCompositionLocalOf { DefaultComposeEnvironment }
 
+/**
+ * Returns an instance of [ResourceEnvironment].
+ *
+ * The [ResourceEnvironment] class represents the environment for resources.
+ *
+ * @return An instance of [ResourceEnvironment] representing the current environment.
+ */
+@ExperimentalResourceApi
+@Composable
+fun rememberResourceEnvironment(): ResourceEnvironment {
+    val composeEnvironment = LocalComposeEnvironment.current
+    return composeEnvironment.rememberEnvironment()
+}
+
 internal expect fun getSystemEnvironment(): ResourceEnvironment
 
 //the function reference will be overridden for tests
+//@TestOnly
+internal var getResourceEnvironment = ::getSystemEnvironment
+
 /**
- * Provides the resource environment for non-composable access to string resources.
+ * Provides the resource environment for non-composable access to resources.
  * It is an expensive operation! Don't use it in composable functions with no cache!
  */
-internal var getResourceEnvironment = ::getSystemEnvironment
+@ExperimentalResourceApi
+fun getSystemResourceEnvironment(): ResourceEnvironment = getResourceEnvironment()
 
 @OptIn(InternalResourceApi::class)
 internal fun Resource.getResourceItemByEnvironment(environment: ResourceEnvironment): ResourceItem {
