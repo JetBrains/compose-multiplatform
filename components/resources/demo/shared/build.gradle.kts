@@ -39,17 +39,6 @@ kotlin {
         binaries.executable()
     }
 
-    listOf(
-        macosX64(),
-        macosArm64()
-    ).forEach { macosTarget ->
-        macosTarget.binaries {
-            executable {
-                entryPoint = "main"
-            }
-        }
-    }
-
     applyDefaultHierarchyTemplate()
     sourceSets {
         val desktopMain by getting
