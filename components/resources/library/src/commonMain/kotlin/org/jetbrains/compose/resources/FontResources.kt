@@ -38,13 +38,13 @@ expect fun Font(
 /**
  * Retrieves the byte array of the font resource.
  *
- * @param environment The optional resource environment.
+ * @param environment The resource environment.
  * @param resource The font resource.
  * @return The byte array representing the font resource.
  */
 @ExperimentalResourceApi
 suspend fun getFontResourceBytes(
-    environment: ResourceEnvironment = getSystemResourceEnvironment(),
+    environment: ResourceEnvironment,
     resource: FontResource
 ): ByteArray {
     val resourceItem = resource.getResourceItemByEnvironment(environment)

@@ -112,13 +112,13 @@ private fun svgPainter(resource: DrawableResource): Painter {
 /**
  * Retrieves the byte array of the drawable resource.
  *
- * @param environment The optional resource environment.
+ * @param environment The resource environment.
  * @param resource The drawable resource.
  * @return The byte array representing the drawable resource.
  */
 @ExperimentalResourceApi
 suspend fun getDrawableResourceBytes(
-    environment: ResourceEnvironment = getSystemResourceEnvironment(),
+    environment: ResourceEnvironment,
     resource: DrawableResource
 ): ByteArray {
     val resourceItem = resource.getResourceItemByEnvironment(environment)

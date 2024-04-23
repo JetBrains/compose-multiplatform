@@ -307,9 +307,10 @@ class ComposeResourceTest {
     @OptIn(ExperimentalResourceApi::class)
     @Test
     fun testGetResourceBytes() = runTest {
-        val imageBytes = getDrawableResourceBytes(resource = TestDrawableResource("1.png"))
+        val env = getSystemEnvironment()
+        val imageBytes = getDrawableResourceBytes(env, TestDrawableResource("1.png"))
         assertEquals(946, imageBytes.size)
-        val fontBytes = getFontResourceBytes(resource = TestFontResource("font_awesome.otf"))
+        val fontBytes = getFontResourceBytes(env, TestFontResource("font_awesome.otf"))
         assertEquals(134808, fontBytes.size)
     }
 
