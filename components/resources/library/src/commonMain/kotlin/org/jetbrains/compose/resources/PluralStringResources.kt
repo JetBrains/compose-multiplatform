@@ -55,6 +55,7 @@ suspend fun getPluralString(resource: PluralStringResource, quantity: Int): Stri
  *
  * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
  */
+@ExperimentalResourceApi
 suspend fun getPluralString(
     environment: ResourceEnvironment,
     resource: PluralStringResource,
@@ -129,6 +130,7 @@ suspend fun getPluralString(resource: PluralStringResource, quantity: Int, varar
  *
  * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
  */
+@ExperimentalResourceApi
 suspend fun getPluralString(
     environment: ResourceEnvironment,
     resource: PluralStringResource,
