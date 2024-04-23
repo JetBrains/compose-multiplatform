@@ -15,7 +15,7 @@ import java.io.File
  */
 internal abstract class IdeaImportTask : DefaultTask() {
     @get:Input
-    val isIdeaSync: Provider<Boolean> = project.provider {
+    val ideaIsInSync: Provider<Boolean> = project.provider {
         System.getProperty("idea.sync.active", "false").toBoolean()
     }
 
@@ -26,7 +26,7 @@ internal abstract class IdeaImportTask : DefaultTask() {
         } catch (e: Exception) {
             //message must contain two ':' symbols to be parsed by IDE UI!
             logger.error("e: $name task was failed:", e)
-            if (!isIdeaSync.get()) throw e
+            if (!ideaIsInSync.get()) throw e
         }
     }
 
