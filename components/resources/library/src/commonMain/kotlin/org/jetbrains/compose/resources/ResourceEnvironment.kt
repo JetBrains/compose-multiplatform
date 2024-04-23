@@ -6,12 +6,34 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.intl.Locale
 
 @ExperimentalResourceApi
-data class ResourceEnvironment internal constructor(
+class ResourceEnvironment internal constructor(
     internal val language: LanguageQualifier,
     internal val region: RegionQualifier,
     internal val theme: ThemeQualifier,
     internal val density: DensityQualifier
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as ResourceEnvironment
+
+        if (language != other.language) return false
+        if (region != other.region) return false
+        if (theme != other.theme) return false
+        if (density != other.density) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = language.hashCode()
+        result = 31 * result + region.hashCode()
+        result = 31 * result + theme.hashCode()
+        result = 31 * result + density.hashCode()
+        return result
+    }
+}
 
 internal interface ComposeEnvironment {
     @Composable
