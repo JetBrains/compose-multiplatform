@@ -45,8 +45,9 @@ fun stringArrayResource(resource: StringArrayResource): List<String> {
  *
  * @throws IllegalStateException if the string array with the given ID is not found.
  */
+@OptIn(ExperimentalResourceApi::class)
 suspend fun getStringArray(resource: StringArrayResource): List<String> =
-    loadStringArray(resource, DefaultResourceReader, getResourceEnvironment())
+    loadStringArray(resource, DefaultResourceReader, getSystemResourceEnvironment())
 
 /**
  * Loads a list of strings using the specified string array resource.

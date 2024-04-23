@@ -56,11 +56,15 @@ fun rememberResourceEnvironment(): ResourceEnvironment {
 internal expect fun getSystemEnvironment(): ResourceEnvironment
 
 //the function reference will be overridden for tests
+//@TestOnly
+internal var getResourceEnvironment = ::getSystemEnvironment
+
 /**
- * Provides the resource environment for non-composable access to string resources.
+ * Provides the resource environment for non-composable access to resources.
  * It is an expensive operation! Don't use it in composable functions with no cache!
  */
-internal var getResourceEnvironment = ::getSystemEnvironment
+@ExperimentalResourceApi
+fun getSystemResourceEnvironment(): ResourceEnvironment = getResourceEnvironment()
 
 @OptIn(InternalResourceApi::class)
 internal fun Resource.getResourceItemByEnvironment(environment: ResourceEnvironment): ResourceItem {

@@ -44,7 +44,7 @@ expect fun Font(
  */
 @ExperimentalResourceApi
 suspend fun getFontResourceBytes(
-    environment: ResourceEnvironment = getResourceEnvironment(),
+    environment: ResourceEnvironment = getSystemResourceEnvironment(),
     resource: FontResource
 ): ByteArray {
     val resourceItem = resource.getResourceItemByEnvironment(environment)

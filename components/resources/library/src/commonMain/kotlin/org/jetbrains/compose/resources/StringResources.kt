@@ -38,8 +38,9 @@ fun stringResource(resource: StringResource): String {
  *
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
+@OptIn(ExperimentalResourceApi::class)
 suspend fun getString(resource: StringResource): String =
-    loadString(resource, DefaultResourceReader, getResourceEnvironment())
+    loadString(resource, DefaultResourceReader, getSystemResourceEnvironment())
 
 /**
  * Loads a string using the specified string resource.
@@ -91,11 +92,12 @@ fun stringResource(resource: StringResource, vararg formatArgs: Any): String {
  *
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
+@OptIn(ExperimentalResourceApi::class)
 suspend fun getString(resource: StringResource, vararg formatArgs: Any): String = loadString(
     resource,
     formatArgs.map { it.toString() },
     DefaultResourceReader,
-    getResourceEnvironment()
+    getSystemResourceEnvironment()
 )
 
 /**
