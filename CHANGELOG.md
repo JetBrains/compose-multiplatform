@@ -31,7 +31,7 @@ _Changes since 1.6.10-beta01_
 
 - [Fix Kotlin/Native can't use `T::class` in inline function of `@Composable`](https://github.com/JetBrains/compose-multiplatform/issues/3147)
 - [Fix missing recomposition after showing `Dialog`](https://github.com/JetBrains/compose-multiplatform-core/pull/1272)
-- _(prerelease fix)_ [Revert "Do not measure clipped graphics"](https://github.com/JetBrains/compose-multiplatform-core/pull/1285)
+- _(prerelease fix)_ [Fix shadow behind dialogs in platform-layer mode](https://github.com/JetBrains/compose-multiplatform-core/pull/1285)
 
 ### iOS
 
