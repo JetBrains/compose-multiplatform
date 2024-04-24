@@ -49,9 +49,9 @@ _Changes since 1.6.10-beta01_
 
 ### Web
 
-- _(prerelease fix)_ [Correct `Key.isTypedEvent` behavior](https://github.com/JetBrains/compose-multiplatform-core/pull/1281)
 - [Fix `MouseEvent` to `PointerButton` mapping](https://github.com/JetBrains/compose-multiplatform-core/pull/1274)
 - [Correct virtual keyboard mode resolution](https://github.com/JetBrains/compose-multiplatform-core/pull/1295)
+- _(prerelease fix)_ [Correct `Key.isTypedEvent` behavior](https://github.com/JetBrains/compose-multiplatform-core/pull/1281)
 
 ### Navigation
 
