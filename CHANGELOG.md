@@ -1,3 +1,78 @@
+
+# 1.6.10-beta02 (April 2024)
+
+_Changes since 1.6.10-beta01_
+
+## Known issues
+
+- [`lifecycle-runtime` breaks Compose UI compatibility with Java 11 on desktop, it requires Java 17 or above now. Expected to be fixed in `1.6.10-rc01`](http://r.android.com/3047339)
+- [`navigation-compose:2.8.0-*` on Android brings Compose `1.7.*` dependency and might cause compatibility issues with `1.6.*`](https://github.com/JetBrains/compose-multiplatform/issues/4677)
+
+## Features
+
+### Lifecycle
+
+- [Publish additional targets for non-compose modules](https://github.com/JetBrains/compose-multiplatform-core/pull/1282)
+- [Commonize `inline fun <reified VM> viewModel(..)`](https://github.com/JetBrains/compose-multiplatform-core/pull/1290)
+- [Provide `ViewModelStoreOwner` by Compose view](https://github.com/JetBrains/compose-multiplatform-core/pull/1291)
+
+### Resources
+
+- [Delete the experimental mark from the stable resources library API](https://github.com/JetBrains/compose-multiplatform/pull/4623)
+- [Add functions to retrieve bytes from drawable or font resources](https://github.com/JetBrains/compose-multiplatform/pull/4651)
+
+### Navigation
+
+- Support parsing navigation arguments ([#1277](https://github.com/JetBrains/compose-multiplatform-core/pull/1277), [#1289](https://github.com/JetBrains/compose-multiplatform-core/pull/1289))
+
+## Fixes
+
+### Multiple Platforms
+
+- [Fix Kotlin/Native can't use `T::class` in inline function of `@Composable`](https://github.com/JetBrains/compose-multiplatform/issues/3147)
+- [Fix missing recomposition after showing `Dialog`](https://github.com/JetBrains/compose-multiplatform-core/pull/1272)
+- _(prerelease fix)_ [Revert "Do not measure clipped graphics"](https://github.com/JetBrains/compose-multiplatform-core/pull/1285)
+
+### iOS
+
+- Fixed appearing of text editing menu ([#1269](https://github.com/JetBrains/compose-multiplatform-core/pull/1269), [#1293](https://github.com/JetBrains/compose-multiplatform-core/pull/1293))
+- [Fix content rect calculation in `SelectionManager`](https://github.com/JetBrains/compose-multiplatform-core/pull/1270)
+- _(prerelease fix)_ [Fix crash on loading `UITextLoupeSession` on old iOS versions](https://github.com/JetBrains/compose-multiplatform-core/pull/1278)
+- _(prerelease fix)_ Fix memory leaks ([#1292](https://github.com/JetBrains/compose-multiplatform-core/pull/1292), [#1302](https://github.com/JetBrains/compose-multiplatform-core/pull/1302))
+
+### Desktop
+
+- [Sync all AccessibilityControllers when an a11y query is received](https://github.com/JetBrains/compose-multiplatform-core/pull/1283)
+- [Fix crash when modifying Compose state from a non-UI thread](https://github.com/JetBrains/compose-multiplatform-core/pull/1288)
+- [Close `Popup`/`Dialog` by clicking any mouse button outside](https://github.com/JetBrains/compose-multiplatform-core/pull/1280)
+- _(prerelease fix)_ [Fix `KeyEvent` binary compatibility](https://github.com/JetBrains/compose-multiplatform-core/pull/1310)
+
+### Web
+
+- _(prerelease fix)_ [Correct `Key.isTypedEvent` behavior](https://github.com/JetBrains/compose-multiplatform-core/pull/1281)
+- [Fix `MouseEvent` to `PointerButton` mapping](https://github.com/JetBrains/compose-multiplatform-core/pull/1274)
+- [Correct virtual keyboard mode resolution](https://github.com/JetBrains/compose-multiplatform-core/pull/1295)
+
+### Navigation
+
+- _(prerelease fix)_ [Fix overriding dependency visibility](https://github.com/JetBrains/compose-multiplatform-core/pull/1275)
+- _(prerelease fix)_ [Fix finding graph without route](https://github.com/JetBrains/compose-multiplatform-core/pull/1311)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.6.10-beta02`. Based on Jetpack Compose libraries:
+  - [Compiler 1.5.11](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.11)
+  - [Runtime 1.6.6](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.6)
+  - [UI 1.6.6](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.6)
+  - [Foundation 1.6.6](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.6)
+  - [Material 1.6.6](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.6)
+  - [Material3 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.1)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.0-beta01`. Based on [Jetpack Lifecycle 2.8.0-beta01](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.0-beta01)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.8.0-alpha02`. Based on [Jetpack Navigation 2.8.0-alpha05](https://developer.android.com/jetpack/androidx/releases/navigation#2.8.0-alpha05)
+
+___
+
 # 1.6.10-beta01 (April 2024)
 
 _Changes since 1.6.2_
