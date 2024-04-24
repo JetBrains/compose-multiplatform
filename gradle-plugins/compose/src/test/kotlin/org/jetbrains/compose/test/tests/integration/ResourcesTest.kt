@@ -13,6 +13,24 @@ import kotlin.test.*
 
 class ResourcesTest : GradlePluginTestBase() {
     @Test
+    fun testSafeImport() {
+        with(testProject("misc/commonResources")) {
+            file("src/commonMain/composeResources/drawable-en").renameTo(
+                file("src/commonMain/composeResources/drawable-rent")
+            )
+            gradleFailure("prepareKotlinIdeaImport").checks {
+                check.logContains("e: generateResourceAccessorsForCommonMain task was failed:")
+                check.logContains("contains unknown qualifier: 'rent'.")
+            }
+
+            gradle("prepareKotlinIdeaImport", "-Didea.sync.active=true").checks {
+                check.logContains("e: generateResourceAccessorsForCommonMain task was failed:")
+                check.logContains("contains unknown qualifier: 'rent'.")
+            }
+        }
+    }
+
+    @Test
     fun testGeneratedAccessors(): Unit = with(testProject("misc/commonResources")) {
         //check generated resource's accessors
         gradle("prepareKotlinIdeaImport").checks {
@@ -36,7 +54,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/drawable-en").renameTo(
             file("src/commonMain/composeResources/drawable-rent")
         )
-        gradle("prepareKotlinIdeaImport").checks {
+        gradleFailure("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 contains unknown qualifier: 'rent'.
@@ -47,7 +65,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/drawable-rent").renameTo(
             file("src/commonMain/composeResources/drawable-rUS-en")
         )
-        gradle("prepareKotlinIdeaImport").checks {
+        gradleFailure("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 Region qualifier must be declared after language: 'en-rUS'.
@@ -58,7 +76,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/drawable-rUS-en").renameTo(
             file("src/commonMain/composeResources/drawable-rUS")
         )
-        gradle("prepareKotlinIdeaImport").checks {
+        gradleFailure("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 Region qualifier must be used only with language.
@@ -69,7 +87,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/drawable-rUS").renameTo(
             file("src/commonMain/composeResources/drawable-en-fr")
         )
-        gradle("prepareKotlinIdeaImport").checks {
+        gradleFailure("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 contains repetitive qualifiers: 'en' and 'fr'.
@@ -80,7 +98,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/drawable-en-fr").renameTo(
             file("src/commonMain/composeResources/image")
         )
-        gradle("prepareKotlinIdeaImport").checks {
+        gradleFailure("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 Unknown resource type: 'image'
@@ -91,7 +109,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/image").renameTo(
             file("src/commonMain/composeResources/files-de")
         )
-        gradle("prepareKotlinIdeaImport").checks {
+        gradleFailure("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 The 'files' directory doesn't support qualifiers: 'files-de'.
@@ -102,7 +120,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/files-de").renameTo(
             file("src/commonMain/composeResources/strings")
         )
-        gradle("prepareKotlinIdeaImport").checks {
+        gradleFailure("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 Unknown resource type: 'strings'.
@@ -113,7 +131,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/strings").renameTo(
             file("src/commonMain/composeResources/string-us")
         )
-        gradle("prepareKotlinIdeaImport").checks {
+        gradleFailure("prepareKotlinIdeaImport").checks {
             check.logContains(
                 """
                 Forbidden directory name 'string-us'! String resources should be declared in 'values/strings.xml'.
@@ -128,6 +146,58 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/commonMain/composeResources/drawable/vector_3.xml").renameTo(
             file("src/commonMain/composeResources/drawable/vector_2.xml")
         )
+
+        val testXml = file("src/commonMain/composeResources/values/test.xml")
+        testXml.writeText("")
+        gradleFailure("prepareKotlinIdeaImport").checks {
+            check.logContains("${testXml.name} is not valid. Check the file content.")
+        }
+
+        testXml.writeText("invalid")
+        gradleFailure("prepareKotlinIdeaImport").checks {
+            check.logContains("${testXml.name} is not valid. Check the file content.")
+        }
+
+        testXml.writeText("""
+            <resources>
+                <aaa name="v">aaa</aaa>
+            </resources>
+        """.trimIndent())
+        gradleFailure("prepareKotlinIdeaImport").checks {
+            check.logContains("${testXml.name} is not valid. Unknown resource type: 'aaa'.")
+        }
+
+        testXml.writeText("""
+            <resources>
+                <drawable name="v">aaa</drawable>
+            </resources>
+        """.trimIndent())
+        gradleFailure("prepareKotlinIdeaImport").checks {
+            check.logContains("${testXml.name} is not valid. Unknown string resource type: 'drawable'.")
+        }
+
+        testXml.writeText("""
+            <resources>
+                <string name="v1">aaa</string>
+                <string name="v2">aaa</string>
+                <string name="v3">aaa</string>
+                <string name="v1">aaa</string>
+            </resources>
+        """.trimIndent())
+        gradleFailure("prepareKotlinIdeaImport").checks {
+            check.logContains("${testXml.name} is not valid. Duplicated key 'v1'.")
+        }
+
+        testXml.writeText("""
+            <resources>
+                <string name="v1">aaa</string>
+                <string foo="v2">aaa</string>
+            </resources>
+        """.trimIndent())
+        gradleFailure("prepareKotlinIdeaImport").checks {
+            check.logContains("${testXml.name} is not valid. Attribute 'name' not found.")
+        }
+        testXml.delete()
 
         file("build.gradle.kts").modify { txt ->
             txt + """

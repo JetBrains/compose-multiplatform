@@ -1,14 +1,23 @@
 package org.jetbrains.compose.resources
 
-import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.api.file.*
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileSystemOperations
+import org.gradle.api.file.FileTree
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.IgnoreEmptyDirectories
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.SkipWhenEmpty
+import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.w3c.dom.Node
+import org.xml.sax.SAXParseException
 import java.io.File
 import java.util.*
 import javax.inject.Inject
@@ -60,7 +69,7 @@ internal fun Project.getPreparedComposeResourcesDir(sourceSet: KotlinSourceSet):
 private fun getPrepareComposeResourcesTaskName(sourceSet: KotlinSourceSet) =
     "prepareComposeResourcesTaskFor${sourceSet.name.uppercaseFirstChar()}"
 
-internal abstract class CopyNonXmlValueResourcesTask : DefaultTask() {
+internal abstract class CopyNonXmlValueResourcesTask : IdeaImportTask() {
     @get:Inject
     abstract val fileSystem: FileSystemOperations
 
@@ -82,8 +91,7 @@ internal abstract class CopyNonXmlValueResourcesTask : DefaultTask() {
         dir.asFileTree.matching { it.exclude("values*/*.${XmlValuesConverterTask.CONVERTED_RESOURCE_EXT}") }
     }
 
-    @TaskAction
-    fun run() {
+    override fun safeAction() {
         realOutputFiles.get().forEach { f -> f.delete() }
         fileSystem.copy { copy ->
             copy.includeEmptyDirs = false
@@ -95,7 +103,7 @@ internal abstract class CopyNonXmlValueResourcesTask : DefaultTask() {
     }
 }
 
-internal abstract class PrepareComposeResourcesTask : DefaultTask() {
+internal abstract class PrepareComposeResourcesTask : IdeaImportTask() {
     @get:InputFiles
     @get:SkipWhenEmpty
     @get:IgnoreEmptyDirectories
@@ -109,8 +117,7 @@ internal abstract class PrepareComposeResourcesTask : DefaultTask() {
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
 
-    @TaskAction
-    fun run() = Unit
+    override fun safeAction() = Unit
 }
 
 internal data class ValueResourceRecord(
@@ -135,7 +142,7 @@ internal data class ValueResourceRecord(
     }
 }
 
-internal abstract class XmlValuesConverterTask : DefaultTask() {
+internal abstract class XmlValuesConverterTask : IdeaImportTask() {
     companion object {
         const val CONVERTED_RESOURCE_EXT = "cvr" //Compose Value Resource
         private const val FORMAT_VERSION = 0
@@ -163,8 +170,7 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
         dir.asFileTree.matching { it.include("values*/*.$suffix.$CONVERTED_RESOURCE_EXT") }
     }
 
-    @TaskAction
-    fun run() {
+    override fun safeAction() {
         val outDir = outputDir.get().asFile
         val suffix = fileSuffix.get()
         realOutputFiles.get().forEach { f -> f.delete() }
@@ -176,7 +182,13 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
                             .resolve(f.parentFile.name)
                             .resolve(f.nameWithoutExtension + ".$suffix.$CONVERTED_RESOURCE_EXT")
                         output.parentFile.mkdirs()
-                        convert(f, output)
+                        try {
+                            convert(f, output)
+                        } catch (e: SAXParseException) {
+                            error("XML file ${f.absolutePath} is not valid. Check the file content.")
+                        } catch (e: Exception) {
+                            error("XML file ${f.absolutePath} is not valid. ${e.message}")
+                        }
                     }
                 }
             }
@@ -186,17 +198,28 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
     private fun convert(original: File, converted: File) {
         val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(original)
         val items = doc.getElementsByTagName("resources").item(0).childNodes
-        val records = List(items.length) { items.item(it) }.mapNotNull { getItemRecord(it)?.getAsString() }
+        val records = List(items.length) { items.item(it) }
+            .filter { it.hasAttributes() }
+            .map { getItemRecord(it) }
+
+        //check there are no duplicates type + key
+        records.groupBy { it.key }
+            .filter { it.value.size > 1 }
+            .forEach { (key, records) ->
+                val allTypes = records.map { it.type }
+                require(allTypes.size == allTypes.toSet().size) { "Duplicated key '$key'." }
+            }
+
         val fileContent = buildString {
             appendLine("version:$FORMAT_VERSION")
-            records.sorted().forEach { appendLine(it) }
+            records.map { it.getAsString() }.sorted().forEach { appendLine(it) }
         }
         converted.writeText(fileContent)
     }
 
-    private fun getItemRecord(node: Node): ValueResourceRecord? {
-        val type = ResourceType.fromString(node.nodeName) ?: return null
-        val key = node.attributes.getNamedItem("name").nodeValue
+    private fun getItemRecord(node: Node): ValueResourceRecord {
+        val type = ResourceType.fromString(node.nodeName) ?: error("Unknown resource type: '${node.nodeName}'.")
+        val key = node.attributes.getNamedItem("name")?.nodeValue ?: error("Attribute 'name' not found.")
         val value: String
         when (type) {
             ResourceType.STRING -> {
@@ -225,7 +248,7 @@ internal abstract class XmlValuesConverterTask : DefaultTask() {
                     }
             }
 
-            else -> error("Unknown string resource type: '$type'")
+            else -> error("Unknown string resource type: '$type'.")
         }
         return ValueResourceRecord(type, key, value)
     }
