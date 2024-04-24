@@ -11,6 +11,7 @@ import org.jetbrains.compose.internal.ComposeCompilerArtifactProvider
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.Version
+import org.jetbrains.compose.internal.ideaIsInSyncProvider
 import org.jetbrains.compose.internal.mppExtOrNull
 import org.jetbrains.compose.internal.service.ConfigurationProblemReporterService
 import org.jetbrains.compose.internal.webExt
@@ -34,10 +35,12 @@ internal fun Project.configureComposeCompilerPlugin() {
     }
 }
 
-internal const val newCompilerIsAvailableVersion = "2.0.0-RC1"
+internal const val newCompilerIsAvailableVersion = "2.0.0-RC2"
 internal const val newComposeCompilerKotlinSupportPluginId = "org.jetbrains.kotlin.plugin.compose"
-internal const val newComposeCompilerError = "Since Kotlin $newCompilerIsAvailableVersion " +
-        "to use Compose Multiplatform you must apply \"$newComposeCompilerKotlinSupportPluginId\" plugin."
+internal const val newComposeCompilerError =
+    "Since Kotlin $newCompilerIsAvailableVersion to use Compose Multiplatform " +
+            "you must apply \"$newComposeCompilerKotlinSupportPluginId\" plugin."
+            //"More info: URL" TODO add documentation link
 
 private fun Project.configureComposeCompilerPlugin(kgp: KotlinBasePlugin) {
     val kgpVersion = kgp.pluginVersion
@@ -50,7 +53,9 @@ private fun Project.configureComposeCompilerPlugin(kgp: KotlinBasePlugin) {
         afterEvaluate {
             logger.info("Check that new '$newComposeCompilerKotlinSupportPluginId' was applied")
             if (!project.plugins.hasPlugin(newComposeCompilerKotlinSupportPluginId)) {
-                error("e: Configuration problem: $newComposeCompilerError")
+                val ideaIsInSync = project.ideaIsInSyncProvider().get()
+                if (ideaIsInSync) logger.error("e: Configuration problem: $newComposeCompilerError")
+                else error("e: Configuration problem: $newComposeCompilerError")
             }
         }
     }

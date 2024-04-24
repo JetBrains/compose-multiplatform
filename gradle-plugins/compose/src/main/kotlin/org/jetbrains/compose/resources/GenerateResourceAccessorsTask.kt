@@ -10,6 +10,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.compose.internal.IdeaImportTask
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.relativeTo

@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.test.tests.integration
 
+import org.jetbrains.compose.newCompilerIsAvailableVersion
 import org.jetbrains.compose.newComposeCompilerError
 import org.jetbrains.compose.test.utils.GradlePluginTestBase
 import org.jetbrains.compose.test.utils.TestProjects
@@ -52,7 +53,7 @@ class KotlinCompatibilityTest : GradlePluginTestBase() {
     fun testNewCompilerPluginError() {
         val testProject = testProject(
             TestProjects.mpp,
-            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = "2.0.0-RC1")
+            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = newCompilerIsAvailableVersion)
         )
         testProject.gradleFailure("tasks").checks {
             check.logContains(newComposeCompilerError)
