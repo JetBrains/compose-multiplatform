@@ -307,7 +307,7 @@ class ComposeResourceTest {
     @OptIn(ExperimentalResourceApi::class)
     @Test
     fun testGetResourceBytes() = runTest {
-        val env = getSystemEnvironment()
+        val env = getSystemResourceEnvironment()
         val imageBytes = getDrawableResourceBytes(env, TestDrawableResource("1.png"))
         assertEquals(946, imageBytes.size)
         val fontBytes = getFontResourceBytes(env, TestFontResource("font_awesome.otf"))
@@ -319,11 +319,13 @@ class ComposeResourceTest {
     fun testGetResourceEnvironment() = runComposeUiTest {
         var environment: ResourceEnvironment? = null
         setContent {
-            environment = rememberResourceEnvironment()
+            CompositionLocalProvider(LocalComposeEnvironment provides TestComposeEnvironment) {
+                environment = rememberResourceEnvironment()
+            }
         }
         waitForIdle()
 
-        val systemEnvironment = getSystemEnvironment()
+        val systemEnvironment = getSystemResourceEnvironment()
         assertEquals(systemEnvironment, environment)
     }
 }
