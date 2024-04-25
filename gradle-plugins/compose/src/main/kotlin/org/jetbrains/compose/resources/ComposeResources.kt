@@ -13,6 +13,8 @@ import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.extraProperties
 import java.io.File
@@ -29,11 +31,11 @@ private val androidPluginIds = listOf(
 
 internal fun Project.configureComposeResources(extension: ResourcesExtension) {
     val config = provider { extension }
-    plugins.withId(KOTLIN_MPP_PLUGIN_ID) { onKgpApplied(config) }
+    plugins.withId(KOTLIN_MPP_PLUGIN_ID) { onKgpApplied(config, it as KotlinBasePlugin) }
     plugins.withId(KOTLIN_JVM_PLUGIN_ID) { onKotlinJvmApplied(config) }
 }
 
-private fun Project.onKgpApplied(config: Provider<ResourcesExtension>) {
+private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: KotlinBasePlugin) {
     val kotlinExtension = project.extensions.getByType(KotlinMultiplatformExtension::class.java)
 
     val hasKmpResources = extraProperties.has(KMP_RES_EXT)
@@ -47,7 +49,7 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>) {
         if (!hasKmpResources) logger.info(
             """
                 Compose resources publication requires Kotlin Gradle Plugin >= 2.0
-                Current Kotlin Gradle Plugin is ${kotlinExtension.coreLibrariesVersion}
+                Current Kotlin Gradle Plugin is ${kgp.pluginVersion}
             """.trimIndent()
         )
         if (currentGradleVersion < minGradleVersion) logger.info(

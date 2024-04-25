@@ -27,6 +27,7 @@ import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.compose.resources.configureComposeResources
 import org.jetbrains.compose.web.WebExtension
+import org.jetbrains.kotlin.com.github.gundy.semver4j.SemVer
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.plugin.*
@@ -57,7 +58,7 @@ abstract class ComposePlugin : Plugin<Project> {
         project.initializePreview(desktopExtension)
         composeExtension.extensions.create("web", WebExtension::class.java)
 
-        project.plugins.apply(ComposeCompilerKotlinSupportPlugin::class.java)
+        project.configureComposeCompilerPlugin()
         project.configureNativeCompilerCaching()
 
         project.configureComposeResources(resourcesExtension)

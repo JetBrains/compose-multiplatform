@@ -1,37 +1,12 @@
 package org.jetbrains.compose.resources
 
-import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
+import org.jetbrains.compose.internal.IdeaImportTask
 import java.io.File
-
-/**
- * This task should be FAST and SAFE! Because it is being run during IDE import.
- */
-internal abstract class IdeaImportTask : DefaultTask() {
-    @get:Input
-    val ideaIsInSync: Provider<Boolean> = project.provider {
-        System.getProperty("idea.sync.active", "false").toBoolean()
-    }
-
-    @TaskAction
-    fun run() {
-        try {
-            safeAction()
-        } catch (e: Exception) {
-            //message must contain two ':' symbols to be parsed by IDE UI!
-            logger.error("e: $name task was failed:", e)
-            if (!ideaIsInSync.get()) throw e
-        }
-    }
-
-    abstract fun safeAction()
-}
 
 internal abstract class GenerateResClassTask : IdeaImportTask() {
     companion object {

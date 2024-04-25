@@ -14,6 +14,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFiles
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.api.tasks.TaskProvider
+import org.jetbrains.compose.internal.IdeaImportTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.w3c.dom.Node
