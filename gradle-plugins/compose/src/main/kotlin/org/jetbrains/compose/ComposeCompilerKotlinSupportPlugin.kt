@@ -39,8 +39,8 @@ internal const val newCompilerIsAvailableVersion = "2.0.0-RC2"
 internal const val newComposeCompilerKotlinSupportPluginId = "org.jetbrains.kotlin.plugin.compose"
 internal const val newComposeCompilerError =
     "Since Kotlin $newCompilerIsAvailableVersion to use Compose Multiplatform " +
-            "you must apply \"$newComposeCompilerKotlinSupportPluginId\" plugin."
-            //"More info: URL" TODO add documentation link
+            "you must apply \"$newComposeCompilerKotlinSupportPluginId\" plugin." +
+            "\nSee the migration guide https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compiler/compose-compiler.html#migrating-a-compose-multiplatform-project"
 
 private fun Project.configureComposeCompilerPlugin(kgp: KotlinBasePlugin) {
     val kgpVersion = kgp.pluginVersion
