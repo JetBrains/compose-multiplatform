@@ -49,6 +49,7 @@ class KotlinCompatibilityTest : GradlePluginTestBase() {
         }
     }
 
+    /* TODO uncomment the test when Kotlin RC2 will be published
     @Test
     fun testNewCompilerPluginError() {
         val testProject = testProject(
@@ -58,5 +59,5 @@ class KotlinCompatibilityTest : GradlePluginTestBase() {
         testProject.gradleFailure("tasks").checks {
             check.logContains(newComposeCompilerError)
         }
-    }
+    }*/
 }
