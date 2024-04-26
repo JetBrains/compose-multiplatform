@@ -73,7 +73,7 @@ internal fun Project.configureSyncIosComposeResources(
                     })
                     into(testExec.outputDirectory.resolve(IOS_COMPOSE_RESOURCES_ROOT_DIR))
                 }
-                testExec.linkTask.dependsOn(copyTestResourcesTask)
+                testExec.linkTaskProvider.dependsOn(copyTestResourcesTask)
             }
         }
     }
