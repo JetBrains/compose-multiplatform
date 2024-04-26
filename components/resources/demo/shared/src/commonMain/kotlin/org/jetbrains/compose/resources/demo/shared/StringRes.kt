@@ -9,10 +9,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import components.resources.demo.shared.generated.resources.*
 import org.jetbrains.compose.resources.*
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun StringRes(paddingValues: PaddingValues) {
     Column(
@@ -42,6 +44,41 @@ fun StringRes(paddingValues: PaddingValues) {
                 disabledLabelColor = MaterialTheme.colorScheme.onSurface,
             )
         )
+        OutlinedCard(
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            shape = RoundedCornerShape(4.dp)
+        ) {
+            CompositionLocalProvider(
+                LocalResourceLocale provides Locale("np")
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                    value = stringResource(Res.string.hello),
+                    onValueChange = {},
+                    label = {
+                        Text("Text(stringResource(Res.string.hello))")
+                    },
+                    enabled = false,
+                    colors = TextFieldDefaults.colors(
+                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                        disabledContainerColor = MaterialTheme.colorScheme.surface,
+                        disabledLabelColor = MaterialTheme.colorScheme.onSurface,
+                    )
+                )
+                Text(
+                    modifier = Modifier.padding(16.dp),
+                    text = """
+                        CompositionLocalProvider(
+                            LocalResourceLocale provides Locale("np")
+                        ) {
+                            Text(stringResource(Res.string.hello))
+                        }
+                    """.trimIndent(),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    softWrap = false
+                )
+            }
+        }
         OutlinedTextField(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
             value = stringResource(Res.string.multi_line),

@@ -43,7 +43,7 @@ internal interface ComposeEnvironment {
 internal val DefaultComposeEnvironment = object : ComposeEnvironment {
     @Composable
     override fun rememberEnvironment(): ResourceEnvironment {
-        val composeLocale = Locale.current
+        val composeLocale = LocalResourceLocale.current
         val composeTheme = isSystemInDarkTheme()
         val composeDensity = LocalDensity.current
 
@@ -154,3 +154,7 @@ private fun List<ResourceItem>.filterByLocale(language: LanguageQualifier, regio
         item.qualifiers.none { it is LanguageQualifier || it is RegionQualifier }
     }
 }
+
+// Locale used for Resource that can be override by user
+@ExperimentalResourceApi
+val LocalResourceLocale = compositionLocalOf { Locale.current }

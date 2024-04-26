@@ -5,6 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runComposeUiTest
+import androidx.compose.ui.text.intl.Locale
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 
@@ -327,5 +328,38 @@ class ComposeResourceTest {
 
         val systemEnvironment = getSystemResourceEnvironment()
         assertEquals(systemEnvironment, environment)
+    }
+
+    @Test
+    fun testDefaultResourceLocaleOnResourceEnvironment() = runComposeUiTest {
+        var resourceEnvironment: ResourceEnvironment? = null
+        var expectedLocale: Locale? = null
+
+        setContent {
+            expectedLocale = Locale.current
+            resourceEnvironment = rememberResourceEnvironment()
+        }
+
+        waitForIdle()
+
+        assertEquals(resourceEnvironment?.language?.language, expectedLocale?.language)
+        assertEquals(resourceEnvironment?.region?.region, expectedLocale?.region)
+    }
+
+    @Test
+    fun testProvidedResourceLocaleOnResourceEnvironment() = runComposeUiTest {
+        var resourceEnvironment: ResourceEnvironment? = null
+        val expectedLocale = Locale("np")
+
+        setContent {
+            CompositionLocalProvider(LocalResourceLocale provides expectedLocale) {
+                resourceEnvironment = rememberResourceEnvironment()
+            }
+        }
+
+        waitForIdle()
+
+        assertEquals(resourceEnvironment?.language?.language, expectedLocale.language)
+        assertEquals(resourceEnvironment?.region?.region, expectedLocale.region)
     }
 }
