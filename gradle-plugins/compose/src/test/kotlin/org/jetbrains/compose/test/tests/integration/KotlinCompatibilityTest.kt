@@ -49,9 +49,10 @@ class KotlinCompatibilityTest : GradlePluginTestBase() {
         }
     }
 
-    /* TODO uncomment the test when Kotlin RC2 will be published
     @Test
     fun testNewCompilerPluginError() {
+        // TODO replace by this after Kotlin 2.0 release
+        // testEnvironment = defaultTestEnvironment.copy(kotlinVersion = "2.0")
         val testProject = testProject(
             TestProjects.mpp,
             testEnvironment = defaultTestEnvironment.copy(kotlinVersion = newCompilerIsAvailableVersion)
@@ -59,5 +60,5 @@ class KotlinCompatibilityTest : GradlePluginTestBase() {
         testProject.gradleFailure("tasks").checks {
             check.logContains(newComposeCompilerError)
         }
-    }*/
+    }
 }
