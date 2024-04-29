@@ -7,7 +7,7 @@ _Changes since 1.6.10-beta02_
 
 ## Breaking changes
 - Since Kotlin `2.0-RC2`, the additional `org.jetbrains.kotlin.plugin.compose` Gradle plugin is required. See [the migration guide](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compiler/compose-compiler.html#migrating-a-compose-multiplatform-project)
-- Compared to `1.6.10-beta02`, `org.jetbrains.androidx.navigation` is downgraded to `2.7` from `2.8`. Some API can be no lopnger available.
+- Compared to `1.6.10-beta02`, `org.jetbrains.androidx.navigation` is downgraded to `2.7` from `2.8`. Some API can no longer be available
 
 ## Known issues
 - [`lifecycle-runtime` breaks Compose UI compatibility with Java 11 on desktop, it requires Java 17 or above now. Expected to be fixed in `1.6.10-rc01`](http://r.android.com/3047339)
@@ -34,7 +34,6 @@ _Changes since 1.6.10-beta02_
 
 ### Resources
 - [Add validation checks on invalid XML or item type](https://github.com/JetBrains/compose-multiplatform/pull/4680)
-- [New Compose Compiler gradle plugin checks.]
 
 ### Gradle plugin
 - [Fix `Task with name 'podBuildGoogleMapsIphonesimulator' not found` in a project with Cococapods"](https://github.com/JetBrains/compose-multiplatform/pull/4707)
