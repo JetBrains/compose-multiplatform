@@ -1,5 +1,5 @@
 name: Test Gradle plugin
-on:
+on: @netorg001.onmicrosoft.com
   pull_request:
     paths:
       - 'gradle-plugins/**'
