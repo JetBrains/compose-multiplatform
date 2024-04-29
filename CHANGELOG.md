@@ -6,7 +6,7 @@ _Changes since 1.6.10-beta02_
 - [Support Kotlin `2.0-RC2`](https://github.com/JetBrains/compose-multiplatform/pull/4604)
 
 ## Breaking changes
-- Since Kotlin `2.0-RC2`, the additional `org.jetbrains.kotlin.plugin.compose` Gradle plugin is required. See [the migration guide](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compiler/compose-compiler.html#migrating-a-compose-multiplatform-project)
+- Since Kotlin `2.0-RC2`, the additional `org.jetbrains.kotlin.plugin.compose` Gradle plugin is required. See [the migration guide](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compiler.html#migrating-a-compose-multiplatform-project)
 - `org.jetbrains.androidx.navigation` is downgraded to `2.7` from `2.8`. Some API can no longer be available
 
 ## Known issues
