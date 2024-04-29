@@ -1,3 +1,55 @@
+# 1.6.10-beta03 (April 2024)
+
+_Changes since 1.6.10-beta02_
+
+## Highlights
+- [Support Kotlin `2.0-RC2`](https://github.com/JetBrains/compose-multiplatform/pull/4604)
+
+## Breaking changes
+- Since Kotlin `2.0-RC2`, the additional `org.jetbrains.kotlin.plugin.compose` Gradle plugin is required. See [the migration guide](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compiler/compose-compiler.html#migrating-a-compose-multiplatform-project)
+- Compared to `1.6.10-beta02`, `org.jetbrains.androidx.navigation` is downgraded to `2.7` from `2.8`. Some API can be no lopnger available.
+
+## Known issues
+- [`lifecycle-runtime` breaks Compose UI compatibility with Java 11 on desktop, it requires Java 17 or above now. Expected to be fixed in `1.6.10-rc01`](http://r.android.com/3047339)
+- [A project with Android flavors cannot be imported into any IDE if it has Compose Multiplatform resources 1.6.10 + Kotlin 2.0.0](https://github.com/JetBrains/compose-multiplatform/issues/4704)
+
+## Features
+
+### Multiple Platforms
+- _(prerelease fix)_ [Publish additional targets for `lifecycle-runtime-compose`](https://github.com/JetBrains/compose-multiplatform-core/pull/1322)
+
+### Lifecycle
+- _(prerelease fix)_ [Update Lifecycle handling on iOS based on feedback](https://github.com/JetBrains/compose-multiplatform-core/pull/1319)
+
+### Web
+- [Basic IME keyboard support](https://github.com/JetBrains/compose-multiplatform-core/pull/1297)
+
+## Fixes
+### Multiple Platforms
+- _(prerelease fix)_ [Fix frozen composition with pager and text field](https://github.com/JetBrains/compose-multiplatform-core/pull/1316)
+
+### Desktop
+- [Fix crash when creating SwingRedrawer on DirectX](https://github.com/JetBrains/skiko/pull/917)
+- [Option to not throw `RenderException` when use OpenGL on macOS](https://github.com/JetBrains/skiko/pull/915)
+
+### Resources
+- [Add validation checks on invalid XML or item type](https://github.com/JetBrains/compose-multiplatform/pull/4680)
+- [New Compose Compiler gradle plugin checks.]
+
+### Gradle plugin
+- [Fix `Task with name 'podBuildGoogleMapsIphonesimulator' not found` in a project with Cococapods"](https://github.com/JetBrains/compose-multiplatform/pull/4707)
+
+## Dependencies
+- Gradle Plugin `org.jetbrains.compose`, version `1.6.10-beta03`. Based on Jetpack Compose libraries:
+  - [Compiler 1.5.11](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.11)
+  - [Runtime 1.6.6](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.6)
+  - [UI 1.6.6](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.6)
+  - [Foundation 1.6.6](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.6)
+  - [Material 1.6.6](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.6)
+  - [Material3 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.1)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.0-beta02`. Based on [Jetpack Lifecycle 2.8.0-beta01](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.0-beta01)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.7.0-alpha03`. Based on [Jetpack Navigation 2.7.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.7.7)
 
 # 1.6.10-beta02 (April 2024)
 
