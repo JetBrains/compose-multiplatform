@@ -11,7 +11,7 @@ _Changes since 1.6.10-beta02_
 
 ## Known issues
 - [`lifecycle-runtime` breaks Compose UI compatibility with Java 11 on desktop, it requires Java 17 or above now. Expected to be fixed in `1.6.10-rc01`](http://r.android.com/3047339)
-- [A project with Android flavors cannot be imported into any IDE if it has Compose Multiplatform resources 1.6.10 + Kotlin 2.0.0](https://github.com/JetBrains/compose-multiplatform/issues/4704)
+- [A project with Android flavors cannot be imported into any IDE if it has Compose Multiplatform resources 1.6.10 + Kotlin 2.0.0](https://github.com/JetBrains/compose-multiplatform/issues/4700)
 
 ## Features
 
