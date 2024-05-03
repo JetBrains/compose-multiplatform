@@ -27,6 +27,10 @@ Choose a run configuration for an appropriate target in IDE and run it.
 # outputs are written to desktopApp/build/compose/binaries
 ```
 
+## Run on Web via Gradle
+
+`./gradlew :web:wasmJsRun`
+
 ### Running Android application
 
 - Get a [Google Maps API key](https://developers.google.com/maps/documentation/android-sdk/get-api-key)

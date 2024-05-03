@@ -29,5 +29,6 @@ rootProject.name = "imageviewer"
 
 include(":androidApp")
 include(":shared")
+include(":webApp")
 include(":desktopApp")
 include(":mapview-desktop")
