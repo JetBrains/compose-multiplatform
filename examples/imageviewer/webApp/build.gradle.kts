@@ -11,9 +11,9 @@ val copyJsResources = tasks.create("copyJsResourcesWorkaround", Copy::class.java
     into("build/processedResources/js/main")
 }
 
-//tasks.withType<DefaultIncrementalSyncTask> {
-//    dependsOn(copyJsResources)
-//}
+tasks.withType<DefaultIncrementalSyncTask> {
+    dependsOn(copyJsResources)
+}
 
 val copyWasmResources = tasks.create("copyWasmResourcesWorkaround", Copy::class.java) {
     from(project(":shared").file("src/commonMain/composeResources"))
@@ -21,10 +21,10 @@ val copyWasmResources = tasks.create("copyWasmResourcesWorkaround", Copy::class.
 }
 
 afterEvaluate {
-//    project.tasks.getByName("jsProcessResources").finalizedBy(copyJsResources)
-//    project.tasks.getByName("wasmJsProcessResources").finalizedBy(copyWasmResources)
-//    project.tasks.getByName("wasmJsDevelopmentExecutableCompileSync").dependsOn(copyWasmResources)
-//    project.tasks.getByName("wasmJsProductionExecutableCompileSync").dependsOn(copyWasmResources)
+    project.tasks.getByName("jsProcessResources").finalizedBy(copyJsResources)
+    project.tasks.getByName("wasmJsProcessResources").finalizedBy(copyWasmResources)
+    project.tasks.getByName("wasmJsDevelopmentExecutableCompileSync").dependsOn(copyWasmResources)
+    project.tasks.getByName("wasmJsProductionExecutableCompileSync").dependsOn(copyWasmResources)
 }
 
 val rootDirPath = project.rootDir.path
