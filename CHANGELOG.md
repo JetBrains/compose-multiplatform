@@ -5,6 +5,7 @@ _Changes since 1.6.10-beta03_
 ## Known issues
 
 - [A project with Android flavors cannot be imported into any IDE if it has Compose Multiplatform resources 1.6.10 + Kotlin 2.0.0](https://youtrack.jetbrains.com/issue/KT-67806)
+- If you experience the `org.jetbrains.compose.resources.MissingResourceException: Missing resource with path: ...` error after switching your Kotlin version from 1.9 to 2.0 (or the other way around), this might be resolved by manually cleaning the `build` directories in your project - this includes the `build` folders located in the root and module folders of your project.
 
 ## Fixes
 
