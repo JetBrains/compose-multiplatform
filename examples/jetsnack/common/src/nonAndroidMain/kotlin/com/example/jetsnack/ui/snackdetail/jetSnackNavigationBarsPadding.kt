@@ -1,11 +1,21 @@
 package com.example.jetsnack.ui.snackdetail
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
-actual fun Modifier.jetSnackNavigationBarsPadding(): Modifier = this
-//  .navigationBarsPadding()
+@Composable
+actual fun Modifier.jetSnackNavigationBarsPadding(): Modifier =
+    this.windowInsetsPadding(WindowInsets.navigationBars)
 
-actual fun Modifier.jetSnackStatusBarsPadding(): Modifier = this
-// statusBarsPadding()
-actual fun Modifier.jetSnackSystemBarsPadding(): Modifier = this
-// Modifier.systemBarsPadding()
+@Composable
+actual fun Modifier.jetSnackStatusBarsPadding(): Modifier =
+    this.windowInsetsPadding(WindowInsets.statusBars)
+
+@Composable
+actual fun Modifier.jetSnackSystemBarsPadding(): Modifier =
+    this.windowInsetsPadding(WindowInsets.systemBars)

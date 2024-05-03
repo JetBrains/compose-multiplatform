@@ -27,3 +27,4 @@ runGradle notepad packageDistributionForCurrentOS
 runGradle todoapp-lite packageDistributionForCurrentOS
 runGradle graphics-2d packageDistributionForCurrentOS
 runGradle widgets-gallery packageDistributionForCurrentOS
+runGradle jetsnack packageDistributionForCurrentOS
