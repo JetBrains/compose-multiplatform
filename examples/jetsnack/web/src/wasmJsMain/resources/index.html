@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <title>JetSnack with Kotlin/Wasm</title>
+    <script type="application/javascript" src="skiko.js"></script>
+    <script type="application/javascript" src="jetsnackwasmapp.js"></script>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: white;
+            overflow: hidden;
+        }
+
+        #warning {
+            position: absolute;
+            top: 100px;
+            left: 100px;
+            max-width: 830px;
+            z-index: 100;
+            background-color: white;
+            font-size: initial;
+            display: none;
+        }
+        #warning li {
+            padding-bottom: 15px;
+        }
+
+        #warning span.code {
+            font-family: monospace;
+        }
+
+        ul {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        #footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: white;
+            font-size: initial;
+        }
+
+        #close {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<canvas id="jetsnackCanvas"></canvas>
+
+<div id="warning">
+    ⚠️ Please make sure that your runtime environment supports the latest version of Wasm GC and Exception-Handling proposals.
+    For more information, see <a href="https://kotl.in/wasm-help">https://kotl.in/wasm-help</a>.
+<br/>
+<br/>
+    <ul>
+        <li>For <b>Chrome</b> and <b>Chromium-based</b> browsers (Edge, Brave etc.), it <b>should just work</b> since version 119.</li>
+        <li>For <b>Firefox</b> 120 it <b>should just work</b>.</li>
+        <li>For <b>Firefox</b> 119:
+            <ol>
+                <li>Open <span class="code">about:config</span> in the browser.</li>
+                <li>Enable <strong>javascript.options.wasm_gc</strong>.</li>
+                <li>Refresh this page.</li>
+            </ol>
+        </li>
+    </ul>
+</div>
+<div id="footer">
+    <div style="float: left; width: 50%; padding-right: 5px">
+        <span style="padding-left: 20px">Don't hesitate to share your feedback and ask questions:</span>
+        <ul style="">
+            <li>In the Kotlin Slack <code><a href="https://slack-chats.kotlinlang.org/c/webassembly">#webassembly</a></code> channel (if you’re not a member, apply at <a href="https://kotl.in/slack">https://kotl.in/slack</a>).</li>
+        </ul>
+    </div>
+    <div style="float: left; width: 45%;">
+        <span style="padding-left: 20px;">For future news</span>
+        <ul>
+            <li>Join <code><a href="https://slack-chats.kotlinlang.org/c/webassembly">#webassembly</a></code> channel in Kotlin Slack (if you’re not a member, apply at <a href="https://kotl.in/slack">https://kotl.in/slack</a>).</li>
+            <li>Follow <a href="https://twitter.com/bashorov/">@bashorov</a> on Twitter</li>
+        </ul>
+    </div>
+    <div id="close" onclick="document.getElementById('footer').style.display='none'">ⓧ</div>
+</div>
+</body>
+
+<script type="application/javascript" >
+    const unhandledError = (event, error) => {
+        if (error instanceof WebAssembly.CompileError) {
+            document.getElementById("warning").style.display="initial";
+
+            // Hide a Scary Webpack Overlay which is less informative in this case.  
+            const webpackOverlay = document.getElementById("webpack-dev-server-client-overlay");
+            if (webpackOverlay != null) webpackOverlay.style.display="none";
+        }
+    }
+    addEventListener("error", (event) => unhandledError(event, event.error));
+    addEventListener("unhandledrejection", (event) => unhandledError(event, event.reason));
+</script>
+
+</html>
