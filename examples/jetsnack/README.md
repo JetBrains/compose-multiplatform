@@ -6,7 +6,7 @@ Check it out:
 
 [![Static Badge](https://img.shields.io/badge/online%20demo%20%F0%9F%9A%80-6b57ff?style=for-the-badge)](https://zal.im/wasm/jetsnack).
 
-![](screenshots/jetsnack.png)
+![](screenshots/jetsnack_mpp.png)
 
 > **Note:**
 > To learn more about the Jetsnack application, visit the [Jetsnack README.md](https://github.com/android/compose-samples/tree/main/Jetsnack).
