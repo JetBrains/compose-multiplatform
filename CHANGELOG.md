@@ -1,44 +1,91 @@
+# 1.6.10-rc01 (May 2024)
+
+_Changes since 1.6.10-beta03_
+
+## Known issues
+
+- [A project with Android flavors cannot be imported into any IDE if it has Compose Multiplatform resources 1.6.10 + Kotlin 2.0.0](https://youtrack.jetbrains.com/issue/KT-67806)
+- If you experience the `org.jetbrains.compose.resources.MissingResourceException: Missing resource with path: ...` error after switching your Kotlin version from 1.9 to 2.0 (or the other way around), this might be resolved by manually cleaning the `build` directories in your project - this includes the `build` folders located in the root and module folders of your project.
+
+## Fixes
+
+### Desktop
+
+- _(prerelease fix)_ [Fix inconsistency in closing `Dialog` by mouse clicking on scrim that was introduced by `1.6.10-beta02`](https://github.com/JetBrains/compose-multiplatform-core/pull/1336)
+
+### Web
+
+- [Fix browser clipboard events handling on Windows](https://github.com/JetBrains/compose-multiplatform-core/pull/1329)
+- [Rename `viewportContainer` to `viewportContainerId` parameter in `ComposeViewport`](https://github.com/JetBrains/compose-multiplatform-core/pull/1334)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.6.10-rc01`. Based on Jetpack Compose libraries:
+  - [Compiler 1.5.11](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.11)
+  - [Runtime 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.7)
+  - [UI 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.7)
+  - [Foundation 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.7)
+  - [Material 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.7)
+  - [Material3 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.1)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.0-rc01`. Based on [Jetpack Lifecycle 2.8.0-rc01](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.0-rc01)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.7.0-alpha04`. Based on [Jetpack Navigation 2.7.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.7.7)
+
+___
+
 # 1.6.10-beta03 (April 2024)
 
 _Changes since 1.6.10-beta02_
 
 ## Highlights
+
 - [Support Kotlin `2.0-RC2`](https://github.com/JetBrains/compose-multiplatform/pull/4604)
 
 ## Breaking changes
+
 - Since Kotlin `2.0-RC2`, the additional `org.jetbrains.kotlin.plugin.compose` Gradle plugin is required. See [the migration guide](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compiler.html#migrating-a-compose-multiplatform-project)
 - `org.jetbrains.androidx.navigation` is downgraded to `2.7` from `2.8`. Some API can no longer be available
 
 ## Known issues
+
 - [`lifecycle-runtime` breaks Compose UI compatibility with Java 11 on desktop, it requires Java 17 or above now. Expected to be fixed in `1.6.10-rc01`](http://r.android.com/3047339)
 - [A project with Android flavors cannot be imported into any IDE if it has Compose Multiplatform resources 1.6.10 + Kotlin 2.0.0](https://youtrack.jetbrains.com/issue/KT-67806)
 
 ## Features
 
 ### Multiple Platforms
+
 - _(prerelease fix)_ [Publish additional targets for `lifecycle-runtime-compose`](https://github.com/JetBrains/compose-multiplatform-core/pull/1322)
 
 ### Lifecycle
+
 - _(prerelease fix)_ [Update Lifecycle handling on iOS based on feedback](https://github.com/JetBrains/compose-multiplatform-core/pull/1319)
 
 ### Web
+
 - [Basic IME keyboard support](https://github.com/JetBrains/compose-multiplatform-core/pull/1297)
 
 ## Fixes
+
 ### Multiple Platforms
+
 - _(prerelease fix)_ [Fix frozen composition with pager and text field](https://github.com/JetBrains/compose-multiplatform-core/pull/1316)
 
 ### Desktop
+
 - [Fix crash when creating SwingRedrawer on DirectX](https://github.com/JetBrains/skiko/pull/917)
 - [Option to not throw `RenderException` when use OpenGL on macOS](https://github.com/JetBrains/skiko/pull/915)
 
 ### Resources
+
 - [Add validation checks on invalid XML or item type](https://github.com/JetBrains/compose-multiplatform/pull/4680)
 
 ### Gradle plugin
+
 - [Fix `Task with name 'podBuildGoogleMapsIphonesimulator' not found` in a project with Cococapods"](https://github.com/JetBrains/compose-multiplatform/pull/4707)
 
 ## Dependencies
+
 - Gradle Plugin `org.jetbrains.compose`, version `1.6.10-beta03`. Based on Jetpack Compose libraries:
   - [Compiler 1.5.11](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.11)
   - [Runtime 1.6.6](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.6)
@@ -49,6 +96,8 @@ _Changes since 1.6.10-beta02_
 
 - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.0-beta02`. Based on [Jetpack Lifecycle 2.8.0-beta01](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.0-beta01)
 - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.7.0-alpha03`. Based on [Jetpack Navigation 2.7.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.7.7)
+
+___
 
 # 1.6.10-beta02 (April 2024)
 
