@@ -24,6 +24,7 @@ afterEvaluate {
     project.tasks.getByName("jsProcessResources").finalizedBy(copyJsResources)
     project.tasks.getByName("wasmJsProcessResources").finalizedBy(copyWasmResources)
     project.tasks.getByName("wasmJsDevelopmentExecutableCompileSync").dependsOn(copyWasmResources)
+    project.tasks.getByName("wasmJsProductionExecutableCompileSync").dependsOn(copyWasmResources)
 }
 
 val rootDirPath = project.rootDir.path
