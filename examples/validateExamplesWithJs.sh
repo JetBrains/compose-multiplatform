@@ -22,3 +22,4 @@ runGradle() {
 runGradle html/compose-bird build
 runGradle html/landing build
 runGradle html/with-react build
+runGradle jetsnack :web:wasmJsBrowserDistribution
