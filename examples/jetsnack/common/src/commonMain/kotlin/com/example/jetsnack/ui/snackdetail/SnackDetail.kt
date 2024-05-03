@@ -389,8 +389,11 @@ private fun CartBottomBar(modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
 expect fun Modifier.jetSnackNavigationBarsPadding(): Modifier
+@Composable
 expect fun Modifier.jetSnackStatusBarsPadding(): Modifier
+@Composable
 expect fun Modifier.jetSnackSystemBarsPadding(): Modifier
 
 //@Preview

@@ -26,6 +26,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 //import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -48,6 +49,7 @@ import com.example.jetsnack.ui.components.FilterBar
 import com.example.jetsnack.ui.components.JetsnackDivider
 import com.example.jetsnack.ui.components.JetsnackSurface
 import com.example.jetsnack.ui.components.SnackCollection
+import com.example.jetsnack.ui.snackdetail.jetSnackStatusBarsPadding
 import com.example.jetsnack.ui.theme.JetsnackTheme
 
 @Composable
@@ -74,9 +76,9 @@ private fun Feed(
 ) {
 
     JetsnackSurface(modifier = modifier.fillMaxSize()) {
-        Box {
+        Column {
+            DestinationBar(modifier = Modifier.jetSnackStatusBarsPadding())
             SnackCollectionList(snackCollections, filters, onSnackClick)
-            DestinationBar()
         }
     }
 }
@@ -94,9 +96,6 @@ private fun SnackCollectionList(
         LazyColumn {
 
             item {
-                Spacer(
-                    Modifier.windowInsetsTopHeight(snackCollectionListItemWindowInsets())
-                )
                 FilterBar(filters, onShowFilters = { filtersVisible = true })
             }
             itemsIndexed(snackCollections) { index, snackCollection ->
