@@ -28,6 +28,8 @@ kotlin {
         }
     }
 
+    applyDefaultHierarchyTemplate()
+
     sourceSets {
         all {
             languageSettings {
