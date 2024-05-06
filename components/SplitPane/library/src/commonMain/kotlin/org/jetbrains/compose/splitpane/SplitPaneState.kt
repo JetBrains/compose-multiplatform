@@ -15,14 +15,7 @@ class SplitPaneState(
     private var _positionPercentage by mutableStateOf(initialPositionPercentage)
     var positionPercentage: Float
         get() = _positionPercentage
-        set(value) {
-            if (maxPosition == Float.POSITIVE_INFINITY) {
-                _positionPercentage = value
-            } else {
-                val movableArea = maxPosition - minPosition
-                _positionPercentage = (movableArea * value).coerceIn(0f, movableArea) / movableArea
-            }
-        }
+        set(value) { _positionPercentage = value.coerceIn(0f, 1f) }
 
     internal var minPosition: Float = 0f
 
