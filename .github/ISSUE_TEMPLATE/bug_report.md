@@ -22,19 +22,28 @@ A clear and concise description of what the bug is.
 - iOS
 - Web (K/Wasm) - Canvas based API
 - Web (K/JS) - Canvas based API
-- Web (K/JS) - HTML library
+- Web (K/JS) - HTML library <!-- Note that Compose HTML is not a multiplatform library. It can be used ONLY with Kotlin/JS. -->
 
 **Versions**
-- Kotlin version*: 
-- Compose Multiplatform version*: 
-- OS version(s)* (required for Desktop and iOS issues): 
+- Libraries:
+  - Compose Multiplatform version:
+  - Navigation Multiplatform version (for related issues):
+  - ...
+- Kotlin version: 
+- OS version(s) (required for Desktop and iOS issues): 
 - OS architecture (x86 or arm64):
 - Device (model or simulator for iOS issues): 
 - JDK (for desktop issues): 
 
 **To Reproduce**
-Steps and/or the code snippet to reproduce the behavior:
-1. Go to '...'
+Steps to reproduce the behavior:
+1. Run this code snippet:
+   ```kt
+   @Composable
+   fun BugReproduction() {
+       // ...
+   }
+   ```
 2. Click on '...'
 3. Scroll down to '...'
 4. See error
