@@ -9,6 +9,7 @@ import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.util.GradleVersion
 import org.jetbrains.compose.ComposePlugin
+import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -41,23 +42,33 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: Kotl
     val hasKmpResources = extraProperties.has(KMP_RES_EXT)
     val currentGradleVersion = GradleVersion.current()
     val minGradleVersion = GradleVersion.version(MIN_GRADLE_VERSION_FOR_KMP_RESOURCES)
-    val kmpResourcesAreAvailable = hasKmpResources && currentGradleVersion >= minGradleVersion
+    val enableMultimoduleResources = ComposeProperties.enableMultimoduleResources(providers).get()
+    val kmpResourcesAreAvailable = enableMultimoduleResources && hasKmpResources && currentGradleVersion >= minGradleVersion
 
     if (kmpResourcesAreAvailable) {
         configureKmpResources(kotlinExtension, extraProperties.get(KMP_RES_EXT)!!, config)
     } else {
-        if (!hasKmpResources) logger.info(
-            """
-                Compose resources publication requires Kotlin Gradle Plugin >= 2.0
-                Current Kotlin Gradle Plugin is ${kgp.pluginVersion}
-            """.trimIndent()
-        )
-        if (currentGradleVersion < minGradleVersion) logger.info(
-            """
-                Compose resources publication requires Gradle >= $MIN_GRADLE_VERSION_FOR_KMP_RESOURCES
-                Current Gradle is ${currentGradleVersion.version}
-            """.trimIndent()
-        )
+        if (!enableMultimoduleResources) {
+            logger.info(
+                """
+                    Multimodule Compose Resources are disabled by default.
+                    To enable it add 'compose.resources.multimodule.enable=true' int the root gradle.properties file.
+                """.trimIndent()
+            )
+        } else {
+            if (!hasKmpResources) logger.info(
+                """
+                    Compose resources publication requires Kotlin Gradle Plugin >= 2.0
+                    Current Kotlin Gradle Plugin is ${kgp.pluginVersion}
+                """.trimIndent()
+            )
+            if (currentGradleVersion < minGradleVersion) logger.info(
+                """
+                    Compose resources publication requires Gradle >= $MIN_GRADLE_VERSION_FOR_KMP_RESOURCES
+                    Current Gradle is ${currentGradleVersion.version}
+                """.trimIndent()
+            )
+        }
 
         val commonMain = KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME
         configureComposeResources(kotlinExtension, commonMain, config)
