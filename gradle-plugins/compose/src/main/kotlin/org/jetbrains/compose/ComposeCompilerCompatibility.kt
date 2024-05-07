@@ -24,7 +24,7 @@ internal object ComposeCompilerCompatibility {
         "1.9.21" to "1.5.4",
         "1.9.22" to "1.5.8.1",
         "1.9.23" to "1.5.13",
-        "1.9.24" to "1.5.13",
+        "1.9.24" to "1.5.13.1",
         "2.0.0-Beta1" to "1.5.4-dev1-kt2.0.0-Beta1",
         "2.0.0-Beta4" to "1.5.9-kt-2.0.0-Beta4",
         "2.0.0-Beta5" to "1.5.11-kt-2.0.0-Beta5",
