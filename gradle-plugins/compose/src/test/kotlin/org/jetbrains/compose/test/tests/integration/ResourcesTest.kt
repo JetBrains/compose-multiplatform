@@ -1,6 +1,7 @@
 package org.jetbrains.compose.test.tests.integration
 
 import org.gradle.util.GradleVersion
+import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.compose.resources.XmlValuesConverterTask
 import org.jetbrains.compose.test.utils.*
@@ -158,42 +159,50 @@ class ResourcesTest : GradlePluginTestBase() {
             check.logContains("${testXml.name} is not valid. Check the file content.")
         }
 
-        testXml.writeText("""
+        testXml.writeText(
+            """
             <resources>
                 <aaa name="v">aaa</aaa>
             </resources>
-        """.trimIndent())
+        """.trimIndent()
+        )
         gradleFailure("prepareKotlinIdeaImport").checks {
             check.logContains("${testXml.name} is not valid. Unknown resource type: 'aaa'.")
         }
 
-        testXml.writeText("""
+        testXml.writeText(
+            """
             <resources>
                 <drawable name="v">aaa</drawable>
             </resources>
-        """.trimIndent())
+        """.trimIndent()
+        )
         gradleFailure("prepareKotlinIdeaImport").checks {
             check.logContains("${testXml.name} is not valid. Unknown string resource type: 'drawable'.")
         }
 
-        testXml.writeText("""
+        testXml.writeText(
+            """
             <resources>
                 <string name="v1">aaa</string>
                 <string name="v2">aaa</string>
                 <string name="v3">aaa</string>
                 <string name="v1">aaa</string>
             </resources>
-        """.trimIndent())
+        """.trimIndent()
+        )
         gradleFailure("prepareKotlinIdeaImport").checks {
             check.logContains("${testXml.name} is not valid. Duplicated key 'v1'.")
         }
 
-        testXml.writeText("""
+        testXml.writeText(
+            """
             <resources>
                 <string name="v1">aaa</string>
                 <string foo="v2">aaa</string>
             </resources>
-        """.trimIndent())
+        """.trimIndent()
+        )
         gradleFailure("prepareKotlinIdeaImport").checks {
             check.logContains("${testXml.name} is not valid. Attribute 'name' not found.")
         }
@@ -219,7 +228,7 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun testMultiModuleResources() {
         val environment = defaultTestEnvironment.copy(
-            kotlinVersion = "2.0.0-Beta5"
+            kotlinVersion = "2.0.0-RC2"
         )
         with(
             testProject("misc/kmpResourcePublication", environment)
@@ -232,6 +241,8 @@ class ResourcesTest : GradlePluginTestBase() {
             }
 
             gradle(":cmplib:publishAllPublicationsToMavenRepository").checks {
+                check.logContains("Configure KMP resources")
+
                 val resDir = file("cmplib/src/commonMain/composeResources")
                 val resourcesFiles = resDir.walkTopDown()
                     .filter { !it.isDirectory && !it.isHidden }
@@ -313,6 +324,22 @@ class ResourcesTest : GradlePluginTestBase() {
             gradleFailure(":appModule:jvmTest").checks {
                 check.logContains("java.lang.AssertionError: Failed to assert the following: (Text + EditableText = [test text: Feature text str_1])")
                 check.logContains("Text = '[Feature text str_1]'")
+            }
+        }
+    }
+
+    @Test
+    fun testDisableMultimoduleResourcesWithNewKotlin() {
+        val environment = defaultTestEnvironment.copy(
+            kotlinVersion = "2.0.0-RC2"
+        )
+
+        with(testProject("misc/kmpResourcePublication", environment)) {
+            file("gradle.properties").modify { content ->
+                content + "\n" + ComposeProperties.DISABLE_MULTIMODULE_RESOURCES + "=true"
+            }
+            gradle(":cmplib:build").checks {
+                check.logContains("Configure compose resources")
             }
         }
     }
