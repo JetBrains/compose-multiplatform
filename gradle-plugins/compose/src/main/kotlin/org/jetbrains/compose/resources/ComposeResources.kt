@@ -52,7 +52,7 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: Kotl
             logger.info(
                 """
                     Multimodule Compose Resources are disabled by default.
-                    To enable it add 'compose.resources.multimodule.enable=true' int the root gradle.properties file.
+                    To enable it, add 'org.jetbrains.compose.resources.multimodule.enable=true' to the root gradle.properties file.
                 """.trimIndent()
             )
         } else {

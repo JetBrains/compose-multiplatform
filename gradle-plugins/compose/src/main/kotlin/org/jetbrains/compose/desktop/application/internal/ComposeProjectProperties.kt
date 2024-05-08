@@ -22,7 +22,7 @@ internal object ComposeProperties {
     internal const val MAC_NOTARIZATION_PASSWORD = "compose.desktop.mac.notarization.password"
     internal const val MAC_NOTARIZATION_TEAM_ID_PROVIDER = "compose.desktop.mac.notarization.teamID"
     internal const val CHECK_JDK_VENDOR = "compose.desktop.packaging.checkJdkVendor"
-    internal const val ENABLE_MULTIMODULE_RESOURCES = "compose.resources.multimodule.enable"
+    internal const val ENABLE_MULTIMODULE_RESOURCES = "org.jetbrains.compose.resources.multimodule.enable"
     internal const val SYNC_RESOURCES_PROPERTY = "compose.ios.resources.sync"
 
     fun isVerbose(providers: ProviderFactory): Provider<Boolean> =

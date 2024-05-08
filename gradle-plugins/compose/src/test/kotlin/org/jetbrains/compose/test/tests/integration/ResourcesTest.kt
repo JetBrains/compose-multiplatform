@@ -334,12 +334,12 @@ class ResourcesTest : GradlePluginTestBase() {
             testProject("misc/kmpResourcePublication", environment)
         ) {
             file("gradle.properties").modify { content ->
-                content.replace("compose.resources.multimodule.enable=true", "")
+                content.replace("org.jetbrains.compose.resources.multimodule.enable=true", "")
             }
 
             gradle(":cmplib:build").checks {
                 check.logContains("Multimodule Compose Resources are disabled by default.")
-                check.logContains("To enable it add 'compose.resources.multimodule.enable=true' int the root gradle.properties file.")
+                check.logContains("To enable it, add 'org.jetbrains.compose.resources.multimodule.enable=true' to the root gradle.properties file.")
             }
         }
     }
