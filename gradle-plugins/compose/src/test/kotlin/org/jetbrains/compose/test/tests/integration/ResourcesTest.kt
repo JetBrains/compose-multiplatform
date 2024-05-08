@@ -1,6 +1,7 @@
 package org.jetbrains.compose.test.tests.integration
 
 import org.gradle.util.GradleVersion
+import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.compose.resources.XmlValuesConverterTask
 import org.jetbrains.compose.test.utils.*
@@ -240,6 +241,8 @@ class ResourcesTest : GradlePluginTestBase() {
             }
 
             gradle(":cmplib:publishAllPublicationsToMavenRepository").checks {
+                check.logContains("Configure KMP resources")
+
                 val resDir = file("cmplib/src/commonMain/composeResources")
                 val resourcesFiles = resDir.walkTopDown()
                     .filter { !it.isDirectory && !it.isHidden }
@@ -326,20 +329,17 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testOldResourcesWithNewKotlin() {
+    fun testDisableMultimoduleResourcesWithNewKotlin() {
         val environment = defaultTestEnvironment.copy(
             kotlinVersion = "2.0.0-RC2"
         )
-        with(
-            testProject("misc/kmpResourcePublication", environment)
-        ) {
-            file("gradle.properties").modify { content ->
-                content.replace("org.jetbrains.compose.resources.multimodule.enable=true", "")
-            }
 
+        with(testProject("misc/kmpResourcePublication", environment)) {
+            file("gradle.properties").modify { content ->
+                content + "\n" + ComposeProperties.DISABLE_MULTIMODULE_RESOURCES + "=true"
+            }
             gradle(":cmplib:build").checks {
-                check.logContains("Multimodule Compose Resources are disabled by default.")
-                check.logContains("To enable it, add 'org.jetbrains.compose.resources.multimodule.enable=true' to the root gradle.properties file.")
+                check.logContains("Configure compose resources")
             }
         }
     }

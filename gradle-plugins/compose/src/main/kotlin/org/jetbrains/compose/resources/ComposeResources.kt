@@ -42,20 +42,13 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: Kotl
     val hasKmpResources = extraProperties.has(KMP_RES_EXT)
     val currentGradleVersion = GradleVersion.current()
     val minGradleVersion = GradleVersion.version(MIN_GRADLE_VERSION_FOR_KMP_RESOURCES)
-    val enableMultimoduleResources = ComposeProperties.enableMultimoduleResources(providers).get()
-    val kmpResourcesAreAvailable = enableMultimoduleResources && hasKmpResources && currentGradleVersion >= minGradleVersion
+    val disableMultimoduleResources = ComposeProperties.disableMultimoduleResources(providers).get()
+    val kmpResourcesAreAvailable = !disableMultimoduleResources && hasKmpResources && currentGradleVersion >= minGradleVersion
 
     if (kmpResourcesAreAvailable) {
         configureKmpResources(kotlinExtension, extraProperties.get(KMP_RES_EXT)!!, config)
     } else {
-        if (!enableMultimoduleResources) {
-            logger.info(
-                """
-                    Multimodule Compose Resources are disabled by default.
-                    To enable it, add 'org.jetbrains.compose.resources.multimodule.enable=true' to the root gradle.properties file.
-                """.trimIndent()
-            )
-        } else {
+        if (!disableMultimoduleResources) {
             if (!hasKmpResources) logger.info(
                 """
                     Compose resources publication requires Kotlin Gradle Plugin >= 2.0
