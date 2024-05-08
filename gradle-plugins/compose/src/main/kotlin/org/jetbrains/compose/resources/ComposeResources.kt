@@ -20,7 +20,6 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.extraProperties
 import java.io.File
 
-
 internal const val COMPOSE_RESOURCES_DIR = "composeResources"
 internal const val RES_GEN_DIR = "generated/compose/resourceGenerator"
 private const val KMP_RES_EXT = "multiplatformResourcesPublication"
@@ -47,6 +46,7 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: Kotl
 
     if (kmpResourcesAreAvailable) {
         configureKmpResources(kotlinExtension, extraProperties.get(KMP_RES_EXT)!!, config)
+        onAgpApplied { fixAndroidLintTaskDependencies() }
     } else {
         if (!disableMultimoduleResources) {
             if (!hasKmpResources) logger.info(
@@ -66,33 +66,22 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: Kotl
         val commonMain = KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME
         configureComposeResources(kotlinExtension, commonMain, config)
 
-        //when applied AGP then configure android resources
-        androidPluginIds.forEach { pluginId ->
-            plugins.withId(pluginId) {
-                val androidExtension = project.extensions.getByType(BaseExtension::class.java)
-                configureAndroidComposeResources(kotlinExtension, androidExtension)
-
-
-                /*
-                  There is a dirty fix for the problem:
-
-                  Reason: Task ':generateDemoDebugUnitTestLintModel' uses this output of task ':generateResourceAccessorsForAndroidUnitTest' without declaring an explicit or implicit dependency. This can lead to incorrect results being produced, depending on what order the tasks are executed.
-
-                  Possible solutions:
-                    1. Declare task ':generateResourceAccessorsForAndroidUnitTest' as an input of ':generateDemoDebugUnitTestLintModel'.
-                    2. Declare an explicit dependency on ':generateResourceAccessorsForAndroidUnitTest' from ':generateDemoDebugUnitTestLintModel' using Task#dependsOn.
-                    3. Declare an explicit dependency on ':generateResourceAccessorsForAndroidUnitTest' from ':generateDemoDebugUnitTestLintModel' using Task#mustRunAfter.
-                 */
-                tasks.matching {
-                    it is AndroidLintAnalysisTask || it is LintModelWriterTask
-                }.configureEach {
-                    it.mustRunAfter(tasks.withType(GenerateResourceAccessorsTask::class.java))
-                }
-            }
+        onAgpApplied { androidExtension ->
+            configureAndroidComposeResources(kotlinExtension, androidExtension)
+            fixAndroidLintTaskDependencies()
         }
     }
 
     configureSyncIosComposeResources(kotlinExtension)
+}
+
+private fun Project.onAgpApplied(block: (androidExtension: BaseExtension) -> Unit) {
+    androidPluginIds.forEach { pluginId ->
+        plugins.withId(pluginId) {
+            val androidExtension = project.extensions.getByType(BaseExtension::class.java)
+            block(androidExtension)
+        }
+    }
 }
 
 private fun Project.onKotlinJvmApplied(config: Provider<ResourcesExtension>) {
