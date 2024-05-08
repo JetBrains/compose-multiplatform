@@ -3,6 +3,7 @@ import org.jetbrains.compose.ExperimentalComposeLibrary
 plugins {
     id("org.jetbrains.compose")
     kotlin("multiplatform")
+    kotlin("plugin.compose")
     id("com.android.application")
 }
 
