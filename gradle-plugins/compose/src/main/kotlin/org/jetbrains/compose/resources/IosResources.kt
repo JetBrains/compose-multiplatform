@@ -81,19 +81,24 @@ internal fun Project.configureSyncIosComposeResources(
     plugins.withId(COCOAPODS_PLUGIN_ID) {
         (kotlinExtension as ExtensionAware).extensions.getByType(CocoapodsExtension::class.java).apply {
             framework { podFramework ->
-                val syncDir = podFramework.getFinalResourcesDir().get().asFile.relativeTo(projectDir)
-                val specAttr = "['${syncDir.path}']"
-                extraSpecAttributes["resources"] = specAttr
-                project.tasks.named("podInstall").configure {
-                    it.doFirst {
-                        if (extraSpecAttributes["resources"] != specAttr) {
-                            error("""
+                // DIRTY HACK: we don't have an API to configure PodspecTask.
+                // We need to use the cocoapods DSL only but to provide a correct resources path we need lazy read a framework baseName.
+                // Which may be configured be the same DSL
+                podFramework.project.afterEvaluate {
+                    val syncDir = podFramework.getFinalResourcesDir().get().asFile.relativeTo(projectDir)
+                    val specAttr = "['${syncDir.path}']"
+                    extraSpecAttributes["resources"] = specAttr
+                    project.tasks.named("podInstall").configure {
+                        it.doFirst {
+                            if (extraSpecAttributes["resources"] != specAttr) {
+                                error("""
                             |Kotlin.cocoapods.extraSpecAttributes["resources"] is not compatible with Compose Multiplatform's resources management for iOS.
                             |  * Recommended action: remove extraSpecAttributes["resources"] from '${project.buildFile}' and run '${project.path}:podInstall' once;
                             |  * Alternative action: turn off Compose Multiplatform's resources management for iOS by adding '${ComposeProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties;
                         """.trimMargin())
+                            }
+                            syncDir.mkdirs()
                         }
-                        syncDir.mkdirs()
                     }
                 }
             }
@@ -113,7 +118,10 @@ private fun Framework.isCocoapodsFramework() = name.startsWith("pod")
 private fun Framework.getFinalResourcesDir(): Provider<Directory> {
     val providers = project.providers
     return if (isCocoapodsFramework()) {
-        project.layout.buildDirectory.dir("compose/ios/$baseName/$IOS_COMPOSE_RESOURCES_ROOT_DIR/")
+        val frameworkBaseNameProvider = project.provider { baseName }
+        frameworkBaseNameProvider.flatMap { name ->
+            project.layout.buildDirectory.dir("compose/ios/$name/$IOS_COMPOSE_RESOURCES_ROOT_DIR/")
+        }
     } else {
         providers.environmentVariable("BUILT_PRODUCTS_DIR")
             .zip(
