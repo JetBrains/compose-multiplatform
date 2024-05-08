@@ -709,6 +709,13 @@ class ResourcesTest : GradlePluginTestBase() {
                 file("build/compose/ios/shared/compose-resources/drawable/compose-multiplatform.xml").checkExists()
                 file("build/compose/ios/shared/compose-resources/drawable/icon.xml").checkExists()
             }
+
+            gradle(":podspec", "-Pkotlin.native.cocoapods.generate.wrapper=true").checks {
+                assertEqualTextFiles(
+                    file("iosResources.podspec"),
+                    file("expected/iosResources.podspec")
+                )
+            }
         }
     }
 
