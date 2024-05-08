@@ -86,13 +86,13 @@ internal fun Project.configureSyncIosComposeResources(
                 extraSpecAttributes["resources"] = specAttr
                 project.tasks.named("podInstall").configure {
                     it.doFirst {
-                        if (extraSpecAttributes["resources"] != specAttr) {
-                            error("""
-                            |Kotlin.cocoapods.extraSpecAttributes["resources"] is not compatible with Compose Multiplatform's resources management for iOS.
-                            |  * Recommended action: remove extraSpecAttributes["resources"] from '${project.buildFile}' and run '${project.path}:podInstall' once;
-                            |  * Alternative action: turn off Compose Multiplatform's resources management for iOS by adding '${ComposeProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties;
-                        """.trimMargin())
-                        }
+                        if (extraSpecAttributes["resources"] != specAttr) error(
+                            """
+                                |Kotlin.cocoapods.extraSpecAttributes["resources"] is not compatible with Compose Multiplatform's resources management for iOS.
+                                |  * Recommended action: remove extraSpecAttributes["resources"] from '${project.buildFile}' and run '${project.path}:podInstall' once;
+                                |  * Alternative action: turn off Compose Multiplatform's resources management for iOS by adding '${ComposeProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties;
+                            """.trimMargin()
+                        )
                         syncDir.mkdirs()
                     }
                 }
@@ -113,7 +113,7 @@ private fun Framework.isCocoapodsFramework() = name.startsWith("pod")
 private fun Framework.getFinalResourcesDir(): Provider<Directory> {
     val providers = project.providers
     return if (isCocoapodsFramework()) {
-        project.layout.buildDirectory.dir("compose/ios/$baseName/$IOS_COMPOSE_RESOURCES_ROOT_DIR/")
+        project.layout.buildDirectory.dir("compose/cocoapods/$IOS_COMPOSE_RESOURCES_ROOT_DIR/")
     } else {
         providers.environmentVariable("BUILT_PRODUCTS_DIR")
             .zip(
