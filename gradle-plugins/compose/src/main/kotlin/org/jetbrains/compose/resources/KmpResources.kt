@@ -20,7 +20,7 @@ internal fun Project.configureKmpResources(
     kotlinExtension as KotlinMultiplatformExtension
     kmpResources as KotlinTargetResourcesPublication
 
-        logger.info("Configure KMP resources")
+    logger.info("Configure KMP resources")
 
     val commonMain = KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME
     configureComposeResourcesGeneration(kotlinExtension, commonMain, config, true)
