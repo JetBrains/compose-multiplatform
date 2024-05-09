@@ -6,7 +6,7 @@ plugins {
 }
 
 kotlin {
-    js(IR) {
+    wasmJs {
         browser()
         binaries.executable()
     }
@@ -29,6 +29,6 @@ compose.experimental {
 // test for https://github.com/JetBrains/compose-multiplatform/issues/3169
 afterEvaluate {
     afterEvaluate {
-        dependencies.add(kotlin.targets.js.compilations.main.compileDependencyConfigurationName, "org.jetbrains.kotlin:kotlin-stdlib")
+        dependencies.add(kotlin.targets.wasmJs.compilations.main.compileDependencyConfigurationName, "org.jetbrains.kotlin:kotlin-stdlib")
     }
 }

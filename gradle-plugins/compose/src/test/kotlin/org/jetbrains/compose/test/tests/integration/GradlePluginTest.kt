@@ -24,8 +24,6 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
 import java.io.File
 
 class GradlePluginTest : GradlePluginTestBase() {
@@ -125,20 +123,20 @@ class GradlePluginTest : GradlePluginTestBase() {
             testEnvironment = defaultTestEnvironment.copy(useGradleConfigurationCache = false)
         )
     ) {
-        fun jsCanvasEnabled(value: Boolean) {
-            modifyGradleProperties { put("org.jetbrains.compose.experimental.jscanvas.enabled", value.toString()) }
+        fun wasmCanvasEnabled(value: Boolean) {
+            modifyGradleProperties { put("org.jetbrains.compose.experimental.wasm.enabled", value.toString()) }
 
         }
 
-        jsCanvasEnabled(false)
+        wasmCanvasEnabled(false)
         gradleFailure(":build").checks {
-            check.logContains("ERROR: Compose targets '[jscanvas]' are experimental and may have bugs!")
+            check.logContains("ERROR: Compose targets '[wasm]' are experimental and may have bugs!")
         }
 
-        jsCanvasEnabled(true)
+        wasmCanvasEnabled(true)
         gradle(":build").checks {
-            check.taskSuccessful(":unpackSkikoWasmRuntimeJs")
-            check.taskSuccessful(":compileKotlinJs")
+            check.taskSuccessful(":unpackSkikoWasmRuntime")
+            check.taskSuccessful(":compileKotlinWasmJs")
         }
     }
 
