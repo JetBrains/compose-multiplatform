@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.experimental.web.internal
+package org.jetbrains.compose.web.internal
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -11,16 +11,25 @@ import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.artifacts.UnresolvedDependency
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.ComposeBuildConfig
-import org.jetbrains.compose.experimental.dsl.ExperimentalWebApplication
-import org.jetbrains.compose.experimental.web.tasks.ExperimentalUnpackSkikoWasmRuntimeTask
+import org.jetbrains.compose.ComposeExtension
+import org.jetbrains.compose.web.tasks.UnpackSkikoWasmRuntimeTask
 import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
+import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
-internal fun Collection<KotlinJsIrTarget>.configureExperimentalWebApplication(
-    project: Project,
-    app: ExperimentalWebApplication
+internal fun Project.configureWeb(
+    composeExt: ComposeExtension,
+) {
+    val webExt = composeExt.extensions.getByType(WebExtension::class.java)
+    // configure only if there is k/wasm or k/js target:
+    webExt.targetsToConfigure(project)
+        .configureWebApplication(project)
+}
+
+internal fun Collection<KotlinJsIrTarget>.configureWebApplication(
+    project: Project
 ) {
     val skikoJsWasmRuntimeConfiguration = project.configurations.create("COMPOSE_SKIKO_JS_WASM_RUNTIME")
     val skikoJsWasmRuntimeDependency = skikoVersionProvider(project).map { skikoVersion ->
@@ -37,7 +46,7 @@ internal fun Collection<KotlinJsIrTarget>.configureExperimentalWebApplication(
         mainCompilation.defaultSourceSet.resources.srcDir(unpackedRuntimeDir)
         testCompilation.defaultSourceSet.resources.srcDir(unpackedRuntimeDir)
 
-        val unpackRuntime = project.registerTask<ExperimentalUnpackSkikoWasmRuntimeTask>(taskName) {
+        val unpackRuntime = project.registerTask<UnpackSkikoWasmRuntimeTask>(taskName) {
             skikoRuntimeFiles = skikoJsWasmRuntimeConfiguration
             outputDir.set(unpackedRuntimeDir)
         }
