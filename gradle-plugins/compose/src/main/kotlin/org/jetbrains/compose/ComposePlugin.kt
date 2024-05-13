@@ -27,6 +27,7 @@ import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.compose.resources.configureComposeResources
 import org.jetbrains.compose.web.WebExtension
+import org.jetbrains.compose.web.internal.configureWeb
 import org.jetbrains.kotlin.com.github.gundy.semver4j.SemVer
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
@@ -65,7 +66,7 @@ abstract class ComposePlugin : Plugin<Project> {
 
         project.afterEvaluate {
             configureDesktop(project, desktopExtension)
-            project.configureExperimental(composeExtension, experimentalExtension)
+            project.configureWeb(composeExtension)
             project.plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
                 val mppExt = project.mppExt
                 project.configureExperimentalTargetsFlagsCheck(mppExt)
