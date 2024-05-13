@@ -1,7 +1,7 @@
 package org.jetbrains.compose
 
 private const val KOTLIN_COMPATIBILITY_LINK =
-    "https://github.com/JetBrains/compose-jb/blob/master/VERSIONING.md#kotlin-compatibility"
+    "https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compatibility-and-versioning.html"
 
 internal object ComposeCompilerCompatibility {
     private val kotlinToCompiler = sortedMapOf(
