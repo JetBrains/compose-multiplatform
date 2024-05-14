@@ -2,6 +2,10 @@
 
 _Changes since 1.6.10-rc01_
 
+## Known issues
+
+- iOS compilation might fail on some projects with [`org.jetbrains.kotlin.backend.konan.llvm.NativeCodeGeneratorException: Exception during generating code for following declaration: private fun $init_global()`](https://github.com/JetBrains/compose-multiplatform/issues/4809)
+
 ## Features
 
 ### Web
