@@ -2,9 +2,11 @@
 
 _Changes since 1.6.10-rc01_
 
-## Highlights
+## Features
 
-- Compose for Web goes to Alpha! [Some experimental Compose Multiplatform Gradle plugin APIs for web app configuration were deprecated. Their usage is not required anymore.](https://github.com/JetBrains/compose-multiplatform/pull/4796)
+### Web
+
+- [Some experimental Compose Multiplatform Gradle plugin APIs for web app configuration were deprecated. Their usage is not required anymore.](https://github.com/JetBrains/compose-multiplatform/pull/4796)
 
 ## Fixes
 
