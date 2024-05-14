@@ -1,3 +1,38 @@
+# 1.6.10-rc02 (May 2024)
+
+_Changes since 1.6.10-rc01_
+
+## Highlights
+
+- Compose for Web goes to Alpha! [Some experimental Compose Multiplatform Gradle plugin APIs for web app configuration were deprecated. Their usage is not required anymore.](https://github.com/JetBrains/compose-multiplatform/pull/4796)
+
+## Fixes
+
+### iOS
+
+- _(prerelease fix)_ [Fixes a crash when `UIKitView` or `UIKitViewController` is inside a tree with `SemanticsModifierNode` having `shouldMergeDescendantSemantics = true` and Accessibility sync is on](https://github.com/JetBrains/compose-multiplatform-core/pull/1347)
+
+### Resources
+
+- [To disable the Compose Resources publication and the multimodule support in cases of problems add `org.jetbrains.compose.resources.multimodule.disable=true` to the root `gradle.properties`](https://github.com/JetBrains/compose-multiplatform/pull/4771)
+- _(prerelease fix)_ [Fix resources with cocoapods integration](https://github.com/JetBrains/compose-multiplatform/pull/4783)
+- _(prerelease fix)_ [Fix AGP lint tasks dependency issues](https://github.com/JetBrains/compose-multiplatform/pull/4784)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.6.10-rc01`. Based on Jetpack Compose libraries:
+  - [Compiler 1.5.13](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.13)
+  - [Runtime 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.7)
+  - [UI 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.7)
+  - [Foundation 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.7)
+  - [Material 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.7)
+  - [Material3 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.1)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.0-rc02`. Based on [Jetpack Lifecycle 2.8.0-rc01](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.0-rc01)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.7.0-alpha05`. Based on [Jetpack Navigation 2.7.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.7.7)
+
+___
+
 # 1.6.10-rc01 (May 2024)
 
 _Changes since 1.6.10-beta03_
