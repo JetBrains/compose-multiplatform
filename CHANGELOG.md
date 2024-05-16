@@ -18,7 +18,7 @@ _Changes since 1.6.10-rc02_
   - [Material 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.7)
   - [Material3 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.1)
 
-- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.0-rc03`. Based on [Jetpack Lifecycle 2.8.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.0-rc01)
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.0-rc03`. Based on [Jetpack Lifecycle 2.8.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.0)
 - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.7.0-alpha06`. Based on [Jetpack Navigation 2.7.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.7.7)
 
 ___
