@@ -1,6 +1,9 @@
 package org.jetbrains.compose.resources
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -9,9 +12,6 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import org.jetbrains.compose.resources.vector.toImageVector
 import org.jetbrains.compose.resources.vector.xmldom.Element
 
@@ -91,6 +91,7 @@ fun vectorResource(resource: DrawableResource): ImageVector {
 }
 
 internal expect class SvgElement
+
 internal expect fun SvgElement.toSvgPainter(density: Density): Painter
 
 private val emptySvgPainter: Painter by lazy { BitmapPainter(emptyImageBitmap) }
@@ -135,8 +136,7 @@ private sealed interface ImageCache {
     class Svg(val painter: Painter) : ImageCache
 }
 
-private val imageCacheMutex = Mutex()
-private val imageCache = mutableMapOf<String, Deferred<ImageCache>>()
+private val imageCache = AsyncCache<String, ImageCache>()
 
 //@TestOnly
 internal fun dropImageCache() {
@@ -147,14 +147,4 @@ private suspend fun loadImage(
     path: String,
     resourceReader: ResourceReader,
     decode: (ByteArray) -> ImageCache
-): ImageCache = coroutineScope {
-    val deferred = imageCacheMutex.withLock {
-        imageCache.getOrPut(path) {
-            //LAZY - to free the mutex lock as fast as possible
-            async(start = CoroutineStart.LAZY) {
-                decode(resourceReader.read(path))
-            }
-        }
-    }
-    deferred.await()
-}
+): ImageCache = imageCache.getOrLoad(path) { decode(resourceReader.read(path)) }
