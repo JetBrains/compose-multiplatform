@@ -6,7 +6,7 @@ _Changes since 1.6.10-rc02_
 
 ### iOS
 
-- [Fix `org.jetbrains.kotlin.backend.konan.llvm.NativeCodeGeneratorException: Exception during generating code for following declaration: private fun $init_global()`](https://github.com/JetBrains/compose-multiplatform/issues/4809)
+- _(prerelease fix)_ [Fix `org.jetbrains.kotlin.backend.konan.llvm.NativeCodeGeneratorException: Exception during generating code for following declaration: private fun $init_global()`](https://github.com/JetBrains/compose-multiplatform/issues/4809)
 
 ## Dependencies
 
