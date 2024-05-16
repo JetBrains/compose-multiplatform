@@ -5,12 +5,7 @@
 
 package org.jetbrains.compose.resources.plural
 
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import org.jetbrains.compose.resources.AsyncCache
 import org.jetbrains.compose.resources.InternalResourceApi
 import org.jetbrains.compose.resources.LanguageQualifier
 import org.jetbrains.compose.resources.RegionQualifier
@@ -21,8 +16,7 @@ internal class PluralRuleList(private val rules: Array<PluralRule>) {
     }
 
     companion object {
-        private val cacheMutex = Mutex()
-        private val cache = Array<Deferred<PluralRuleList>?>(cldrPluralRuleLists.size) { null }
+        private val cache = AsyncCache<Int, PluralRuleList>()
         private val emptyList = PluralRuleList(emptyArray())
 
         @OptIn(InternalResourceApi::class)
@@ -36,17 +30,7 @@ internal class PluralRuleList(private val rules: Array<PluralRule>) {
 
         suspend fun getInstance(cldrLocaleName: String): PluralRuleList {
             val listIndex = cldrPluralRuleListIndexByLocale[cldrLocaleName]!!
-            return coroutineScope {
-                val deferred = cacheMutex.withLock {
-                    if (cache[listIndex] == null) {
-                        cache[listIndex] = async(start = CoroutineStart.LAZY) {
-                            createInstance(listIndex)
-                        }
-                    }
-                    cache[listIndex]!!
-                }
-                deferred.await()
-            }
+            return cache.getOrLoad(listIndex) { createInstance(listIndex) }
         }
 
         @OptIn(InternalResourceApi::class)
