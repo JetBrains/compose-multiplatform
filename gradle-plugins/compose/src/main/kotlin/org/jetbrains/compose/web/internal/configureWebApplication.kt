@@ -31,6 +31,7 @@ internal fun Project.configureWeb(
 internal fun Collection<KotlinJsIrTarget>.configureWebApplication(
     project: Project
 ) {
+    if (project.properties["org.jetbrains.compose.web.skipUnpackSkiko"] == "true") return
     val skikoJsWasmRuntimeConfiguration = project.configurations.create("COMPOSE_SKIKO_JS_WASM_RUNTIME")
     val skikoJsWasmRuntimeDependency = skikoVersionProvider(project).map { skikoVersion ->
         project.dependencies.create("org.jetbrains.skiko:skiko-js-wasm-runtime:$skikoVersion")
