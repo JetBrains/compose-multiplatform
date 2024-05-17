@@ -35,7 +35,7 @@ internal fun Project.configureWeb(
             configuration.isCanBeResolved && isWasmOrJs
         }.all { configuration ->
             val match = configuration.incoming.artifacts.resolvedArtifacts.get().any { artifact ->
-                artifact.id.componentIdentifier.toString().contains("org.jetbrains.compose.ui")
+                artifact.id.componentIdentifier.toString().contains("org.jetbrains.compose.ui:ui:")
             }
 
             dependsOnComposeUi = dependsOnComposeUi || match
