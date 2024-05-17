@@ -1,3 +1,165 @@
+# 1.6.10 (May 2024)
+
+_Changes since 1.6.2_
+
+## Highlights
+
+- Experimental multiplatform support of `Lifecycle` and `ViewModel`. See [documentation](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-lifecycle.html) for details
+- Experimental multiplatform support of Jetpack Navigation. See [documentation](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-navigation-routing.html) for details or check out the [nav_cupcake project](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/nav_cupcake/) which was converted from the [Navigate between screens with Compose](https://developer.android.com/codelabs/basic-android-kotlin-compose-navigation) Android codelab
+- [Support multi-module projects and libraries publication with Compose resources](https://github.com/JetBrains/compose-multiplatform/pull/4454) <sub>_(Kotlin `2.0.0-Beta05` or higher is required)_</sub>
+
+## Breaking changes
+
+- Since Kotlin `2.0-RC2`, the additional `org.jetbrains.kotlin.plugin.compose` Gradle plugin is required. See [the migration guide](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compiler.html#migrating-a-compose-multiplatform-project)
+
+## Features
+
+### Multiple Platforms
+
+- [Add font rasterization settings in paragraph style](https://github.com/JetBrains/compose-multiplatform-core/pull/1102)
+- [Localize internal strings in `ui`, `material` and `material3`](https://github.com/JetBrains/compose-multiplatform-core/pull/1158)
+
+### iOS
+
+- [Magnifier for iOS 17+](https://github.com/JetBrains/compose-multiplatform-core/pull/1000)
+- [Support software keyboard inset in `Dialog`](https://github.com/JetBrains/compose-multiplatform-core/pull/1067)
+- [iOS a11y dialogues and popups integration](https://github.com/JetBrains/compose-multiplatform-core/pull/1091)
+- [OS logging integrated with `trace`](https://github.com/JetBrains/compose-multiplatform-core/pull/1140)
+- [Support accessibility scroll](https://github.com/JetBrains/compose-multiplatform-core/pull/1169)
+- [Improve iOS a11y sync behavior](https://github.com/JetBrains/compose-multiplatform-core/pull/1170)
+- [Add throttle for text context menu updates](https://github.com/JetBrains/compose-multiplatform-core/pull/1182)
+- [Support a11y for interop views](https://github.com/JetBrains/compose-multiplatform-core/pull/1241)
+- [Support `HapticFeedback` on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1255)
+- [iOS support `LiveRegion` semantics in a11y](https://github.com/JetBrains/compose-multiplatform-core/pull/1258)
+
+### Desktop
+
+- [Add an `alwaysOnTop` flag to `DialogWindow`](https://github.com/JetBrains/compose-multiplatform-core/pull/1120)
+- Basic support of `BasicTextField2`: [#1227](https://github.com/JetBrains/compose-multiplatform-core/pull/1227), [#1264](https://github.com/JetBrains/compose-multiplatform-core/pull/1264) <sub>_full support and support for other platforms is planned for 1.7.0_</sub>
+
+### Web
+
+- [Listen to browser clipboard events and bind them with Compose TextFieldSelectionManager and SelectionManager](https://github.com/JetBrains/compose-multiplatform-core/pull/1206)
+- [Introduce ComposeViewport function that renders content in parent container](https://github.com/JetBrains/compose-multiplatform-core/pull/1211)
+- [Introduce minimal virtual keyboard support](https://github.com/JetBrains/compose-multiplatform-core/pull/1259)
+- [Basic IME keyboard support](https://github.com/JetBrains/compose-multiplatform-core/pull/1297)
+- [Some experimental Compose Multiplatform Gradle plugin APIs for web app configuration were deprecated. Their usage is not required anymore.](https://github.com/JetBrains/compose-multiplatform/pull/4796)
+
+### Resources
+
+- [Support three letters locales](https://github.com/JetBrains/compose-multiplatform/pull/4394)
+- [Add DSL to configure compose resources](https://github.com/JetBrains/compose-multiplatform/pull/4482)
+- [Support plural string resource](https://github.com/JetBrains/compose-multiplatform/pull/4519)
+- [Add option to disable compose resources generation](https://github.com/JetBrains/compose-multiplatform/pull/4526)
+- [XML resource optimizations](https://github.com/JetBrains/compose-multiplatform/pull/4559)
+- [Get resource files as URI](https://github.com/JetBrains/compose-multiplatform/pull/4576)
+- [Support source set's hierarchy for compose resources](https://github.com/JetBrains/compose-multiplatform/pull/4589)
+- [Support SVG drawables for non android platforms](https://github.com/JetBrains/compose-multiplatform/pull/4605)
+- [Delete the experimental mark from the stable resources library API](https://github.com/JetBrains/compose-multiplatform/pull/4623)
+- [Add functions to retrieve bytes from drawable or font resources](https://github.com/JetBrains/compose-multiplatform/pull/4651)
+- [To disable the Compose Resources publication and the multimodule support in cases of problems add `org.jetbrains.compose.resources.multimodule.disable=true` to the root `gradle.properties`](https://github.com/JetBrains/compose-multiplatform/pull/4771)
+
+### Gradle Plugin
+
+- [Add possibility to modify the macOS minimum version](https://github.com/JetBrains/compose-multiplatform/pull/4271)
+- [Make desktop preview task fully configuration cache compliant](https://github.com/JetBrains/compose-multiplatform/pull/4410)
+- [Option to pack jars as uber JAR, support Proguard for uber JAR](https://github.com/JetBrains/compose-multiplatform/pull/4136)
+
+## Fixes
+
+### Multiple Platforms
+
+- [Fix `NaN` font metrics by initializing typeface for `TextStyle`](https://github.com/JetBrains/compose-multiplatform-core/pull/1087)
+- [Fix render order of interop views](https://github.com/JetBrains/compose-multiplatform-core/pull/1145)
+- [Reimplement SortedSet for JS/Native to improve performance](https://github.com/JetBrains/compose-multiplatform-core/pull/1167)
+- [Allow drawing outside of platform layers](https://github.com/JetBrains/compose-multiplatform-core/pull/1190)
+- [Prevent a few unnecessary re-compositions in `Popup` and `DesktopMenu`](https://github.com/JetBrains/compose-multiplatform-core/pull/1225)
+- [Propagate composition locals to layers in the (re)composition phase](https://github.com/JetBrains/compose-multiplatform-core/pull/1233)
+- [Move the effects and synthetic events dispatching to after the draw phase in the render loop](https://github.com/JetBrains/compose-multiplatform-core/pull/1260)
+- [Fix Kotlin/Native can't use `T::class` in inline function of `@Composable`](https://github.com/JetBrains/compose-multiplatform/issues/3147)
+- [Fix missing recomposition after showing `Dialog`](https://github.com/JetBrains/compose-multiplatform-core/pull/1272)
+
+### iOS
+
+- [Fix keyboard disappear on IME action](https://github.com/JetBrains/compose-multiplatform-core/pull/1118)
+- [Fix nested scroll when `Pager` involved in scrolling process](https://github.com/JetBrains/compose-multiplatform-core/pull/1154)
+- [Fix a11y wrong bounds calculation](https://github.com/JetBrains/compose-multiplatform-core/pull/1165)
+- [Delay tap indication inside scroll](https://github.com/JetBrains/compose-multiplatform-core/pull/1173)
+- [Fix keyboard opening when scrolling begins within a `TextField`](https://github.com/JetBrains/compose-multiplatform-core/pull/1176)
+- [Fix IME window insets and view offset when keyboard appears](https://github.com/JetBrains/compose-multiplatform-core/pull/1199)
+- [Fix animation frozen after app went background](https://github.com/JetBrains/compose-multiplatform-core/pull/1263)
+- Fixed appearing of text editing menu ([#1269](https://github.com/JetBrains/compose-multiplatform-core/pull/1269), [#1293](https://github.com/JetBrains/compose-multiplatform-core/pull/1293))
+- [Fix content rect calculation in `SelectionManager`](https://github.com/JetBrains/compose-multiplatform-core/pull/1270)
+
+### Desktop
+
+- [Fix nested scrolling on mouse wheel](https://github.com/JetBrains/compose-multiplatform-core/pull/1055)
+- [Trigger fling callbacks on mouse wheel scroll (fixes `Pager` and lazy column/row spanning)](https://github.com/JetBrains/compose-multiplatform-core/pull/1100)
+- [Fix `Pager` direction detection for mouse wheel](https://github.com/JetBrains/compose-multiplatform-core/pull/1103)
+- [Fix missing clicks inside `SelectionContainer`](https://github.com/JetBrains/compose-multiplatform-core/pull/1106)
+- [Fix clipping bounds of `SwingPanel`](https://github.com/JetBrains/compose-multiplatform-core/pull/1147)
+- [Locale-aware date formatting for desktop](https://github.com/JetBrains/compose-multiplatform-core/pull/1159)
+- [Pass the id of the node whose layout changed to accessibility controllers](https://github.com/JetBrains/compose-multiplatform-core/pull/1162)
+- `WINDOW` layer fixes: [#1181](https://github.com/JetBrains/compose-multiplatform-core/pull/1181), [#1185](https://github.com/JetBrains/compose-multiplatform-core/pull/1185), [#1187](https://github.com/JetBrains/compose-multiplatform-core/pull/1187), [#1189](https://github.com/JetBrains/compose-multiplatform-core/pull/1189)
+- [Fix crash when we resize `ComposePanel` after re-adding it to the hierarchy](https://github.com/JetBrains/compose-multiplatform-core/pull/1195)
+- [Fix propagation of `LocalLocalization`](https://github.com/JetBrains/compose-multiplatform-core/pull/1202)
+- [Re-show the tooltip on mouse-move following a click in TooltipArea](https://github.com/JetBrains/compose-multiplatform-core/pull/1209)
+- [Fix the direction of scrolling when pressing on the scrollbar track with `reverseLayout=true`](https://github.com/JetBrains/compose-multiplatform-core/pull/1221)
+- [Fix crash and allow selection in `SelectionContainer` to start when drag starts below the bounds of the visible text](https://github.com/JetBrains/compose-multiplatform-core/pull/1230)
+- [Fix a crash on Windows without `dcomp.dll`](https://github.com/JetBrains/skiko/pull/909)
+- [Fix crash when creating SwingRedrawer on DirectX](https://github.com/JetBrains/skiko/pull/917)
+- [Option to not throw `RenderException` when use OpenGL on macOS](https://github.com/JetBrains/skiko/pull/915)
+- [Sync all AccessibilityControllers when an a11y query is received](https://github.com/JetBrains/compose-multiplatform-core/pull/1283)
+- [Fix crash when modifying Compose state from a non-UI thread](https://github.com/JetBrains/compose-multiplatform-core/pull/1288)
+- [Close `Popup`/`Dialog` by clicking any mouse button outside](https://github.com/JetBrains/compose-multiplatform-core/pull/1280)
+
+### Web
+
+- [Implement actual `fun isCopyKeyEvent`](https://github.com/JetBrains/compose-multiplatform-core/pull/1101)
+- [Fix metadata compilation](https://github.com/JetBrains/compose-multiplatform-core/pull/1123)
+- [Support `sendKey` test utility function on wasm target](https://github.com/JetBrains/compose-multiplatform-core/pull/1150)
+- [Send correct window sized on resize](https://github.com/JetBrains/compose-multiplatform-core/pull/1166)
+- [Dispose all listened events alongside with the application being disposed](https://github.com/JetBrains/compose-multiplatform-core/pull/1239)
+- [Modify `buttonFlags` only on `Press` and `Release`](https://github.com/JetBrains/compose-multiplatform-core/pull/1243)
+- [Fix keyboard mappings](https://github.com/JetBrains/compose-multiplatform-core/pull/1249)
+- [Correct density rounding in `ComposeWindow::resize`](https://github.com/JetBrains/compose-multiplatform-core/pull/1268)
+- [Fix `MouseEvent` to `PointerButton` mapping](https://github.com/JetBrains/compose-multiplatform-core/pull/1274)
+- [Correct virtual keyboard mode resolution](https://github.com/JetBrains/compose-multiplatform-core/pull/1295)
+- [Fix browser clipboard events handling on Windows](https://github.com/JetBrains/compose-multiplatform-core/pull/1329)
+- [Rename `viewportContainer` to `viewportContainerId` parameter in `ComposeViewport`](https://github.com/JetBrains/compose-multiplatform-core/pull/1334)
+
+### Resources
+
+- [Fix resource accessors compilation when there are huge number of resource files](https://github.com/JetBrains/compose-multiplatform/pull/4294)
+- [Init resource accessors lazily and in external function to avoid `MethodTooLargeException`](https://github.com/JetBrains/compose-multiplatform/pull/4404)
+- [Fix `Res` class generation if the library is declared as 'api'](https://github.com/JetBrains/compose-multiplatform/pull/4406)
+- [Fix resource packaging in APK when 'build' task is used with AGP 8.2+](https://github.com/JetBrains/compose-multiplatform/pull/4408)
+- [Use first of preferred locales instead of a current on iOS](https://github.com/JetBrains/compose-multiplatform/pull/4507)
+- [Fix `readResourceBytes` function on Android if font is located under qualified directory](https://github.com/JetBrains/compose-multiplatform/pull/4512)
+- [Fix android fonts in APKs](https://github.com/JetBrains/compose-multiplatform/pull/4509)
+- [Handle special characters for quantity strings](https://github.com/JetBrains/compose-multiplatform/pull/4543)
+- [Select default resource if there are no exact language+region or default language match](https://github.com/JetBrains/compose-multiplatform/pull/4577)
+- [Add validation checks on invalid XML or item type](https://github.com/JetBrains/compose-multiplatform/pull/4680)
+
+### Gradle plugin
+
+- [Fix `Task with name 'podBuildGoogleMapsIphonesimulator' not found` in a project with Cococapods"](https://github.com/JetBrains/compose-multiplatform/pull/4707)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.6.10`. Based on Jetpack Compose libraries:
+  - [Compiler 1.5.14](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.14)
+  - [Runtime 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.7)
+  - [UI 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.7)
+  - [Foundation 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.7)
+  - [Material 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.7)
+  - [Material3 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.1)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.0`. Based on [Jetpack Lifecycle 2.8.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.0)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.7.0-alpha07`. Based on [Jetpack Navigation 2.7.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.7.7)
+
+___
+
 # 1.6.10-rc03 (May 2024)
 
 _Changes since 1.6.10-rc02_
