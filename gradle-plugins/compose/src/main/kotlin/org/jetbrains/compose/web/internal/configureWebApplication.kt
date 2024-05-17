@@ -28,14 +28,14 @@ internal fun Project.configureWeb(
     // If there is compose.ui, then skiko is required!
     val shouldRunUnpackSkiko = project.provider {
         var dependsOnComposeUi = false
-        project.configurations.matching {
-            val isWasmOrJs = it.name.contains("js", true) ||
-                    it.name.contains("wasm", true)
+        project.configurations.matching { configuration ->
+            val isWasmOrJs = configuration.name.contains("js", true) ||
+                    configuration.name.contains("wasm", true)
 
-            it.isCanBeResolved && isWasmOrJs
-        }.all {
-            val match = it.incoming.artifacts.resolvedArtifacts.get().any {
-                it.id.componentIdentifier.toString().contains("org.jetbrains.compose.ui")
+            configuration.isCanBeResolved && isWasmOrJs
+        }.all { configuration ->
+            val match = configuration.incoming.artifacts.resolvedArtifacts.get().any { artifact ->
+                artifact.id.componentIdentifier.toString().contains("org.jetbrains.compose.ui")
             }
 
             dependsOnComposeUi = dependsOnComposeUi || match
