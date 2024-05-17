@@ -9,6 +9,7 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.artifacts.UnresolvedDependency
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.ComposeBuildConfig
 import org.jetbrains.compose.ComposeExtension
@@ -27,20 +28,23 @@ internal fun Project.configureWeb(
     // here we check all dependencies (including transitive)
     // If there is compose.ui, then skiko is required!
     val shouldRunUnpackSkiko = project.provider {
-        var dependsOnComposeUi = false
-        project.configurations.matching { configuration ->
-            val isWasmOrJs = configuration.name.contains("js", true) ||
-                    configuration.name.contains("wasm", true)
+        webExt.targetsToConfigure(project).any { target ->
+            val compilation = target.compilations.getByName("main")
+            val compileConfiguration = compilation.compileDependencyConfigurationName
+            val runtimeConfiguration = compilation.runtimeDependencyConfigurationName
 
-            configuration.isCanBeResolved && isWasmOrJs
-        }.all { configuration ->
-            val match = configuration.incoming.artifacts.resolvedArtifacts.get().any { artifact ->
-                artifact.id.componentIdentifier.toString().contains("org.jetbrains.compose.ui:ui:")
+            listOf(compileConfiguration, runtimeConfiguration).mapNotNull {  name ->
+                project.configurations.findByName(name)
+            }.flatMap { configuration ->
+                configuration.incoming.resolutionResult.allComponents.map { it.id }
+            }.any { identifier ->
+                if (identifier is ModuleComponentIdentifier) {
+                    identifier.group == "org.jetbrains.compose.ui" && identifier.module == "ui"
+                } else {
+                    false
+                }
             }
-
-            dependsOnComposeUi = dependsOnComposeUi || match
         }
-        dependsOnComposeUi
     }
 
     // configure only if there is k/wasm or k/js target:
