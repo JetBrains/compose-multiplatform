@@ -23,13 +23,34 @@ internal fun Project.configureWeb(
     composeExt: ComposeExtension,
 ) {
     val webExt = composeExt.extensions.getByType(WebExtension::class.java)
+
+    // here we check all dependencies (including transitive)
+    // If there is compose.ui, then skiko is required!
+    val shouldRunUnpackSkiko = project.provider {
+        var dependsOnComposeUi = false
+        project.configurations.matching { configuration ->
+            val isWasmOrJs = configuration.name.contains("js", true) ||
+                    configuration.name.contains("wasm", true)
+
+            configuration.isCanBeResolved && isWasmOrJs
+        }.all { configuration ->
+            val match = configuration.incoming.artifacts.resolvedArtifacts.get().any { artifact ->
+                artifact.id.componentIdentifier.toString().contains("org.jetbrains.compose.ui:ui:")
+            }
+
+            dependsOnComposeUi = dependsOnComposeUi || match
+        }
+        dependsOnComposeUi
+    }
+
     // configure only if there is k/wasm or k/js target:
     webExt.targetsToConfigure(project)
-        .configureWebApplication(project)
+        .configureWebApplication(project, shouldRunUnpackSkiko)
 }
 
 internal fun Collection<KotlinJsIrTarget>.configureWebApplication(
-    project: Project
+    project: Project,
+    shouldRunUnpackSkiko: Provider<Boolean>
 ) {
     val skikoJsWasmRuntimeConfiguration = project.configurations.create("COMPOSE_SKIKO_JS_WASM_RUNTIME")
     val skikoJsWasmRuntimeDependency = skikoVersionProvider(project).map { skikoVersion ->
@@ -47,6 +68,10 @@ internal fun Collection<KotlinJsIrTarget>.configureWebApplication(
         testCompilation.defaultSourceSet.resources.srcDir(unpackedRuntimeDir)
 
         val unpackRuntime = project.registerTask<UnpackSkikoWasmRuntimeTask>(taskName) {
+            onlyIf {
+                shouldRunUnpackSkiko.get()
+            }
+
             skikoRuntimeFiles = skikoJsWasmRuntimeConfiguration
             outputDir.set(unpackedRuntimeDir)
         }
