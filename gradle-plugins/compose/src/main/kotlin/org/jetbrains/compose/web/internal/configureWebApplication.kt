@@ -23,15 +23,35 @@ internal fun Project.configureWeb(
     composeExt: ComposeExtension,
 ) {
     val webExt = composeExt.extensions.getByType(WebExtension::class.java)
+
+    // here we check all dependencies (including transitive)
+    // If there is compose.ui, then skiko is required!
+    val shouldRunUnpackSkiko = project.provider {
+        var dependsOnComposeUi = false
+        project.configurations.matching {
+            val isWasmOrJs = it.name.contains("js", true) ||
+                    it.name.contains("wasm", true)
+
+            it.isCanBeResolved && isWasmOrJs
+        }.all {
+            val match = it.incoming.artifacts.resolvedArtifacts.get().any {
+                it.id.componentIdentifier.toString().contains("org.jetbrains.compose.ui")
+            }
+
+            dependsOnComposeUi = dependsOnComposeUi || match
+        }
+        dependsOnComposeUi
+    }
+
     // configure only if there is k/wasm or k/js target:
     webExt.targetsToConfigure(project)
-        .configureWebApplication(project)
+        .configureWebApplication(project, shouldRunUnpackSkiko)
 }
 
 internal fun Collection<KotlinJsIrTarget>.configureWebApplication(
-    project: Project
+    project: Project,
+    shouldRunUnpackSkiko: Provider<Boolean>
 ) {
-    if (project.properties["org.jetbrains.compose.web.skipUnpackSkiko"] == "true") return
     val skikoJsWasmRuntimeConfiguration = project.configurations.create("COMPOSE_SKIKO_JS_WASM_RUNTIME")
     val skikoJsWasmRuntimeDependency = skikoVersionProvider(project).map { skikoVersion ->
         project.dependencies.create("org.jetbrains.skiko:skiko-js-wasm-runtime:$skikoVersion")
@@ -48,6 +68,10 @@ internal fun Collection<KotlinJsIrTarget>.configureWebApplication(
         testCompilation.defaultSourceSet.resources.srcDir(unpackedRuntimeDir)
 
         val unpackRuntime = project.registerTask<UnpackSkikoWasmRuntimeTask>(taskName) {
+            onlyIf {
+                shouldRunUnpackSkiko.get()
+            }
+
             skikoRuntimeFiles = skikoJsWasmRuntimeConfiguration
             outputDir.set(unpackedRuntimeDir)
         }
