@@ -18,7 +18,7 @@ jobs:
       matrix:
         os: [ubuntu-20.04, macos-14, windows-2022]
         gradle: [7.4, 8.7]
-        agp: [8.1.0, 8.3.1]
+        agp: [8.1.0, 8.4.0]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
