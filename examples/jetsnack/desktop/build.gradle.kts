@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.compose")
     id("org.jetbrains.compose")
 }
 

@@ -7,9 +7,9 @@ androidx-activity = "1.8.2"
 androidx-lifecycle = "2.8.0-rc03"
 androidx-navigation = "2.7.0-alpha06"
 compose-android = "1.6.7"
-compose-multiplatform = "1.6.10-rc03"
+compose-multiplatform = "1.6.10"
 junit = "4.13.2"
-kotlin = "2.0.0-RC3"
+kotlin = "2.0.0"
 kotlinx-datetime = "0.6.0"
 
 [libraries]

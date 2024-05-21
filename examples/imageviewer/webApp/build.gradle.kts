@@ -1,8 +1,10 @@
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.ir.DefaultIncrementalSyncTask
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.compose")
     id("org.jetbrains.compose")
 }
 
@@ -41,6 +43,7 @@ kotlin {
         useEsModules()
     }
 
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "imageviewer"
         browser {
@@ -77,8 +80,4 @@ kotlin {
             dependsOn(jsWasmMain)
         }
     }
-}
-
-compose.experimental {
-    web.application {}
 }
