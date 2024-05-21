@@ -1,14 +1,15 @@
 plugins {
     id("org.jetbrains.compose")
     id("com.android.application")
-    kotlin("android")
+    kotlin("multiplatform")
+    kotlin("plugin.compose")
 }
 
 group "com.example"
 version "1.0-SNAPSHOT"
 
-repositories {
-    jcenter()
+kotlin {
+    androidTarget()
 }
 
 dependencies {

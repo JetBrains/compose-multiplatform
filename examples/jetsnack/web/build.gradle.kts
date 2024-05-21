@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
+    kotlin("plugin.compose")
 }
 
 group = "com.example"
@@ -44,8 +45,4 @@ kotlin {
             }
         }
     }
-}
-
-compose.experimental {
-    web.application {}
 }
