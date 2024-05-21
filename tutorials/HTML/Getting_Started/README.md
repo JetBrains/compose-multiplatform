@@ -36,8 +36,8 @@ pluginManagement {
 ``` kotlin
 // Add compose gradle plugin
 plugins {
-    kotlin("multiplatform") version "1.9.23"
-    id("org.jetbrains.compose") version "1.6.2"
+    kotlin("multiplatform") version "1.9.24"
+    id("org.jetbrains.compose") version "1.6.10"
 }
 
 // Add maven repositories
