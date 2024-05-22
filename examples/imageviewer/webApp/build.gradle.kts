@@ -8,27 +8,6 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-val copyJsResources = tasks.create("copyJsResourcesWorkaround", Copy::class.java) {
-    from(project(":shared").file("src/commonMain/composeResources"))
-    into("build/processedResources/js/main")
-}
-
-tasks.withType<DefaultIncrementalSyncTask> {
-    dependsOn(copyJsResources)
-}
-
-val copyWasmResources = tasks.create("copyWasmResourcesWorkaround", Copy::class.java) {
-    from(project(":shared").file("src/commonMain/composeResources"))
-    into("build/processedResources/wasmJs/main")
-}
-
-afterEvaluate {
-    project.tasks.getByName("jsProcessResources").finalizedBy(copyJsResources)
-    project.tasks.getByName("wasmJsProcessResources").finalizedBy(copyWasmResources)
-    project.tasks.getByName("wasmJsDevelopmentExecutableCompileSync").dependsOn(copyWasmResources)
-    project.tasks.getByName("wasmJsProductionExecutableCompileSync").dependsOn(copyWasmResources)
-}
-
 val rootDirPath = project.rootDir.path
 
 kotlin {

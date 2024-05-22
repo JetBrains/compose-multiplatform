@@ -6,7 +6,7 @@
 
     const outDir = __dirname + "/kotlin/"
     const projecName = path.basename(__dirname);
-    const mapFile = outDir + projecName + ".map"
+    const mapFile = outDir + projecName + ".wasm.map"
 
     const sourcemap = JSON.parse(fs.readFileSync(mapFile))
     const sources = sourcemap["sources"]

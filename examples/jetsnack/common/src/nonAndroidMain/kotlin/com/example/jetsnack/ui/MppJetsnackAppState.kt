@@ -8,6 +8,8 @@ import com.example.jetsnack.ui.home.HomeSections
 import kotlinx.coroutines.CoroutineScope
 
 @Stable
+@OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
+@HiddenFromObjC // Remove after the bug is fixed: https://github.com/JetBrains/compose-multiplatform/issues/4848
 actual class MppJetsnackAppState(
     actual val scaffoldState: ScaffoldState,
     actual val snackbarManager: SnackbarManager,
