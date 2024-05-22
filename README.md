@@ -14,7 +14,7 @@ You can choose the platforms across which to share your UIs using Compose Multip
 * [iOS](https://jb.gg/start-cmp) (Alpha)
 * [Android](https://jb.gg/start-cmp) 
 * [Desktop](https://jb.gg/start-cmp) (Windows, MacOS, Linux)
-* [Web](https://kotl.in/wasm-compose-example) (Experimental)
+* [Web](https://kotl.in/wasm-compose-example) (Alpha)
 
 For example, you can share UIs between iOS and Android or Windows and MacOS.
 
@@ -55,7 +55,7 @@ It has desktop extensions for menus, keyboard shortcuts, window manipulation, an
 
 ## Web
 
-> Web support is Experimental and may be changed at any time. Use it only for evaluation purposes. 
+> Web support is in Alpha. It may change incompatibly and require manual migration in the future. 
 > We would appreciate your feedback on it in the public Slack channel [#compose-web](https://kotlinlang.slack.com/archives/C01F2HV7868/p1678887590205449). 
 > If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
 
