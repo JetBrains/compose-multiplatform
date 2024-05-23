@@ -1,9 +1,11 @@
-import androidx.compose.ui.window.Window
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.window.CanvasBasedWindow
 import org.jetbrains.skiko.wasm.onWasmReady
 
+@OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     onWasmReady {
-        Window("Graphics2D") {
+        CanvasBasedWindow(title = "Graphics2D") {
             MainView()
         }
     }
