@@ -1,6 +1,7 @@
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
+    kotlin("plugin.compose")
     id("org.jetbrains.compose")
     id("com.apollographql.apollo").version("2.3.0")
 }

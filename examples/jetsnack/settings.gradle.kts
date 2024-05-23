@@ -12,6 +12,7 @@ pluginManagement {
         val composeVersion = extra["compose.version"] as String
 
         kotlin("multiplatform").version(kotlinVersion)
+        kotlin("plugin.compose").version(kotlinVersion)
         kotlin("android").version(kotlinVersion)
         id("com.android.application").version(agpVersion)
         id("com.android.library").version(agpVersion)

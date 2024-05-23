@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.compose")
     id("org.jetbrains.compose")
 }
 
@@ -17,9 +18,5 @@ kotlin {
             }
         }
     }
-}
-
-compose.experimental {
-    web.application {}
 }
 
