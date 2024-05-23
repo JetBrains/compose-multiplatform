@@ -14,7 +14,7 @@ You can choose the platforms across which to share your UIs using Compose Multip
 * [iOS](https://jb.gg/start-cmp) (Beta)
 * [Android](https://jb.gg/start-cmp) 
 * [Desktop](https://jb.gg/start-cmp) (Windows, MacOS, Linux)
-* [Web](https://kotl.in/wasm-compose-example) (Alpha)
+* [Web](https://jb.gg/start-cmp) (Alpha)
 
 For example, you can share UIs between iOS and Android or Windows and MacOS.
 
@@ -63,7 +63,7 @@ You can experiment with sharing your mobile or desktop UIs with the web. Compose
 the newest target for Kotlin Multiplatform projects. It allows Kotlin developers to run their code in the browser with 
 all the benefits that WebAssembly has to offer, such as good and predictable performance for your applications.
 
-**[Get started with Compose for Web](https://kotl.in/wasm-compose-example)**
+**[Get started with Compose for Web](https://jb.gg/start-cmp)**
 
 ## Libraries
 
