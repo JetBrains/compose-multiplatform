@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import com.example.jetsnack.model.SnackbarManager
 import com.example.jetsnack.ui.home.HomeSections
 import kotlinx.coroutines.CoroutineScope
+import kotlin.native.HiddenFromObjC
 
 @Stable
 @OptIn(kotlin.experimental.ExperimentalObjCRefinement::class)
