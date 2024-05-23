@@ -11,10 +11,10 @@ It is based on [Jetpack Compose](https://developer.android.com/jetpack/compose) 
 
 You can choose the platforms across which to share your UIs using Compose Multiplatform:
 
-* [iOS](https://jb.gg/start-cmp) (Alpha)
+* [iOS](https://jb.gg/start-cmp) (Beta)
 * [Android](https://jb.gg/start-cmp) 
 * [Desktop](https://jb.gg/start-cmp) (Windows, MacOS, Linux)
-* [Web](https://kotl.in/wasm-compose-example) (Experimental)
+* [Web](https://kotl.in/wasm-compose-example) (Alpha)
 
 For example, you can share UIs between iOS and Android or Windows and MacOS.
 
@@ -22,7 +22,7 @@ For example, you can share UIs between iOS and Android or Windows and MacOS.
 
 ## iOS
 
-> iOS support is in Alpha. It may change incompatibly and require manual migration in the future. 
+> iOS support is in Beta. It is feature complete, and migration issues should be minimal. You may still encounter bugs, performance and developer experience issues, but not as much as in the Alpha stage.
 > We would appreciate your feedback on it in the public Slack channel [#compose-ios](https://kotlinlang.slack.com/archives/C0346LWVBJ4/p1678888063176359). 
 > If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
 
@@ -55,7 +55,7 @@ It has desktop extensions for menus, keyboard shortcuts, window manipulation, an
 
 ## Web
 
-> Web support is Experimental and may be changed at any time. Use it only for evaluation purposes. 
+> Web support is in Alpha. It may change incompatibly and require manual migration in the future.
 > We would appreciate your feedback on it in the public Slack channel [#compose-web](https://kotlinlang.slack.com/archives/C01F2HV7868/p1678887590205449). 
 > If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
 
