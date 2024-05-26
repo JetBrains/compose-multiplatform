@@ -191,7 +191,7 @@ compose.desktop {
 Versions must follow the rules:
   * For `dmg` and `pkg`: 
     * The format is `MAJOR[.MINOR][.PATCH]`, where:
-      * `MAJOR` is an integer > 0;
+      * `MAJOR` is a non-negative integer;
       * `MINOR` is an optional non-negative integer;
       * `PATCH` is an optional non-negative integer;
   * For `msi` and `exe`: 
