@@ -33,33 +33,33 @@ val firstCommit = args.getOrNull(0) ?: error("Please call this way: kotlin chang
 val lastCommit = args.getOrNull(1) ?: error("Please call this way: kotlin changelog.main.kts <firstCommit> <lastCommit>")
 val token = args.getOrNull(2)
 
-// TODO automate or pass as arguments
-// Exclude cherry-picked commits to the previous versions
-val excludeFirstCommit = "v1.6.0-rc01"
-val excludeLastCommit = "v1.6.2"
+val sectionOrder = listOf(
+    "Highlights",
+    "Known issues",
+    "Breaking changes",
+    "Features",
+    "Fixes",
+    null
+)
+
+val subsectionOrder = listOf(
+    "Multiple Platforms",
+    "iOS",
+    "Desktop",
+    "Web",
+    "Resources",
+    "Gradle Plugin",
+    "Lifecycle",
+    "Navigation",
+    null
+)
 
 if (token == null) {
     println("To increase the rate limit, specify token (https://github.com/settings/tokens): kotlin changelog.main.kts <firstCommit> <lastCommit> TOKEN")
 }
 
-// commits that don't have a link to a PR (a link should be something like " (#454)")
-val commitToPRLinkMapping = File("commit-to-pr-mapping.txt").readLines().associate {
-    val splits = it.split(" ")
-    val commit = splits[0]
-    val prLink = splits[1]
-    commit to prLink
-}
-
 val entries = entriesForRepo("JetBrains/compose-multiplatform-core") +
         entriesForRepo("JetBrains/compose-multiplatform")
-
-fun List<ChangelogEntry>.ofType(type: Type) =
-    filter { it.type == type }.sortedByDescending { it.platforms.sumOf { it.sorting } }
-
-val highlighted = entries.ofType(Type.Highlighted)
-val normal = entries.ofType(Type.Normal)
-val prereleaseFixes = entries.ofType(Type.PrereleaseFix)
-val unknown = entries.ofType(Type.Unknown)
 
 println("\n# CHANGELOG")
 
@@ -68,19 +68,23 @@ println(
         append("_Changes since ${commitToVersion(firstCommit)}_\n")
         append("\n")
 
-        if (highlighted.isNotEmpty())
-            append(highlighted.joinToString("\n") { it.format() }).append("\n")
+        entries
+            .sortedBy { it.sectionOrder() }
+            .groupBy { it.sectionName() }
+            .forEach { (section, sectionEntries) ->
+                appendLine("## $section")
 
-        if (normal.isNotEmpty())
-            append(normal.joinToString("\n") { it.format() }).append("\n")
-
-        if (prereleaseFixes.isNotEmpty())
-            append(prereleaseFixes.joinToString("\n") { it.format() }).append("\n")
-
-        if (unknown.isNotEmpty()) {
-            append("\nUnknown changes for review:\n")
-            append(unknown.joinToString("\n") { it.format() }).append("\n")
-        }
+                sectionEntries
+                    .sortedBy { it.subsectionOrder() }
+                    .groupBy { it.subsectionName() }
+                    .forEach { (subsection, subsectionEntries) ->
+                        appendLine("### $subsection")
+                        subsectionEntries.forEach {
+                            appendLine(it.format())
+                        }
+                        appendLine()
+                    }
+            }
     }
 )
 
@@ -94,15 +98,50 @@ fun commitToVersion(commit: String) =
         commit
     }
 
-fun ChangelogEntry.format() = buildString {
-    append("- ")
-//    if (type == Type.Highlighted) append("**")
-    if (type == Type.PrereleaseFix) append("_(prerelease fix)_ ")
-    append("[$title]($link)")
-//    if (type == Type.Highlighted) append("**")
-//    platforms.forEach {
-//        append(" <sub>$it</sub>")
-//    }
+fun ChangelogEntry.format() = if (link != null) "$message ([link]($link))" else message
+
+/**
+ * Extract by format https://github.com/JetBrains/compose-multiplatform/blob/b32350459acceb9cca6b9e4422b7aaa051d9ae7d/.github/PULL_REQUEST_TEMPLATE.md?plain=1
+ */
+fun GitHubPullEntry.extractReleaseNotes(link: String): List<ChangelogEntry> {
+    // extract body inside "## Release Notes"
+    val relNoteBody = run {
+        val after = body?.substringAfter("## Release Notes", "")?.ifBlank { null } ?:
+            body?.substringAfter("## Release notes", "")?.ifBlank { null } ?:
+            body?.substringAfter("## RelNote", "")?.ifBlank { null }
+
+        val before = after?.substringBefore("\n## ", "")?.ifBlank { null } ?:
+            after?.substringBefore("\n# ", "")?.ifBlank { null } ?:
+            after
+
+        before?.trim()
+    }
+
+    val list = mutableListOf<ChangelogEntry>()
+    var section: String? = null
+    var subsection: String? = null
+
+    for (line in relNoteBody.orEmpty().split("\n")) {
+        // parse "### Section - Subsection"
+        if (line.startsWith("### ")) {
+            val s = line.removePrefix("### ")
+            section = s.substringBefore("-", "").trim().ifEmpty { null }
+            subsection = s.substringAfter("-", "").trim().ifEmpty { null }
+        } else if (section != null && line.isNotBlank()) {
+            val isTopLevel = line.startsWith("-")
+            val trimmedLine = line.removeSuffix(".")
+            list.add(
+                ChangelogEntry(
+                    trimmedLine,
+                    section,
+                    subsection,
+                    link.takeIf { isTopLevel }
+                )
+            )
+        }
+    }
+
+    return list
 }
 
 /**
@@ -121,23 +160,20 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
         return pullNumberToPull[repoNumber]
     }
 
-    fun changelogEntryFor(
+    fun changelogEntriesFor(
         commit: GitHubCompareResponse.CommitEntry,
         pullRequest: GitHubPullEntry?
-    ): ChangelogEntry {
+    ): List<ChangelogEntry> {
         return if (pullRequest != null) {
             val prTitle = pullRequest.title
             val prNumber = pullRequest.number
-            ChangelogEntry(
-                prTitle,
-                "https://github.com/$repo/pull/$prNumber",
-                typeOf(pullRequest),
-                platformsOf(pullRequest)
-            )
+            val prLink = "https://github.com/$repo/pull/$prNumber"
+            val prList = pullRequest.extractReleaseNotes(prLink)
+            prList.ifEmpty {
+                listOf(ChangelogEntry(prTitle, null, null, prLink))
+            }
         } else {
-            val commitSha = commit.sha
-            val commitTitle = commit.commit.message.substringBefore("\n")
-            ChangelogEntry(commitTitle, "https://github.com/$repo/commit/$commitSha", Type.Unknown, emptyList())
+            listOf()
         }
     }
 
@@ -148,17 +184,7 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
 
     fun GitHubCompareResponse.CommitEntry.commitId() = repoNumberForCommit(this)?.toString() ?: sha
 
-    val excludedCommitIds = fetchPagedUntilEmpty { page ->
-        request<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$excludeFirstCommit...$excludeLastCommit?per_page=1000&page=$page")
-            .commits
-            .map { it.commitId() }
-    }.toSet()
-
-    // Exclude cherry-picks with the same message (they have a different SHA, we can compare by it)
-    val nonCherrypickedCommits = commits.filter { it.commitId() !in excludedCommitIds }
-
-    return nonCherrypickedCommits
-        .map { changelogEntryFor(it, prForCommit(it)) }
+    return commits.flatMap { changelogEntriesFor(it, prForCommit(it)) }
 }
 
 /**
@@ -166,54 +192,25 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
  */
 fun repoNumberForCommit(commit: GitHubCompareResponse.CommitEntry): Int? {
     val commitTitle = commit.commit.message.substringBefore("\n")
-    val prLink = commitToPRLinkMapping[commit.sha]
-    return when {
-        prLink != null -> prLink.substringAfterLast("/").toIntOrNull()
-        // check title similar to `Fix import android flavors with compose resources (#4319)`
-        commitTitle.contains(" (#") -> commitTitle.substringAfter(" (#").substringBefore(")").toIntOrNull()
-        else -> null
-    }
-}
-
-fun typeOf(pullRequest: GitHubPullEntry): Type {
-    val labels = pullRequest.labels.mapTo(mutableSetOf()) { it.name.lowercase() }
-    return when {
-//        labels.contains("changelog: highlight") -> Type.Highlighted
-//        labels.contains("changelog: normal") -> Type.Normal
-//        labels.contains("changelog: prerelease fix") -> Type.PrereleaseFix
-        else -> Type.Normal
-    }
-}
-
-fun platformsOf(pullRequest: GitHubPullEntry) = pullRequest.labels.mapNotNull {
-    when (it.name.lowercase()) {
-        "ios" -> Platform.IOS
-        "android" -> Platform.Android
-        "desktop" -> Platform.Desktop
-        "web" -> Platform.Web
-        "common" -> Platform.Common
-        else -> null
+    // check title similar to `Fix import android flavors with compose resources (#4319)`
+    return if (commitTitle.contains(" (#")) {
+        commitTitle.substringAfter(" (#").substringBefore(")").toIntOrNull()
+    } else {
+        null
     }
 }
 
 data class ChangelogEntry(
-    val title: String,
-    val link: String,
-    val type: Type,
-    val platforms: List<Platform>,
+    val message: String,
+    val section: String?,
+    val subsection: String?,
+    val link: String?,
 )
 
-enum class Type { Highlighted, Normal, PrereleaseFix, Unknown }
-
-enum class Platform(val title: String, val sorting: Int) {
-    Common("Common", 0x11111),
-    IOS("iOS", 0x01000),
-    Android("Android", 0x00100),
-    Desktop("Desktop", 0x00010),
-    Web("Web", 0x00001);
-
-    override fun toString() = title
-}
+fun ChangelogEntry.sectionOrder(): Int = sectionOrder.indexOf(section)
+fun ChangelogEntry.subsectionOrder(): Int = subsectionOrder.indexOf(subsection)
+fun ChangelogEntry.sectionName(): String = section ?: "Unknown"
+fun ChangelogEntry.subsectionName(): String = subsection ?: "Unknown"
 
 // example https://api.github.com/repos/JetBrains/compose-multiplatform-core/compare/v1.6.0-rc02...release/1.6.0
 data class GitHubCompareResponse(val commits: List<CommitEntry>) {
@@ -222,7 +219,7 @@ data class GitHubCompareResponse(val commits: List<CommitEntry>) {
 }
 
 // example https://api.github.com/repos/JetBrains/compose-multiplatform-core/pulls?state=closed
-data class GitHubPullEntry(val number: Int, val title: String, val body: String, val labels: List<Label>) {
+data class GitHubPullEntry(val number: Int, val title: String, val body: String?, val labels: List<Label>) {
     class Label(val name: String)
 }
 
