@@ -51,11 +51,9 @@ class KotlinCompatibilityTest : GradlePluginTestBase() {
 
     @Test
     fun testNewCompilerPluginError() {
-        // TODO replace by this after Kotlin 2.0 release
-        // testEnvironment = defaultTestEnvironment.copy(kotlinVersion = "2.0")
         val testProject = testProject(
             TestProjects.mpp,
-            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = newCompilerIsAvailableVersion)
+            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = "2.0.0")
         )
         testProject.gradleFailure("tasks").checks {
             check.logContains(newComposeCompilerError)
