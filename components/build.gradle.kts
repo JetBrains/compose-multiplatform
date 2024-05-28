@@ -1,6 +1,7 @@
 plugins {
     kotlin("multiplatform") apply false
     id("com.android.library") apply false
+    id("org.jetbrains.kotlinx.binary-compatibility-validator") apply false
 }
 
 subprojects {
