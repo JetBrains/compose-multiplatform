@@ -1,3 +1,4 @@
+import kotlinx.validation.ExperimentalBCVApi
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
@@ -6,6 +7,7 @@ plugins {
     id("org.jetbrains.compose")
     id("maven-publish")
     id("com.android.library")
+    id("org.jetbrains.kotlinx.binary-compatibility-validator")
 }
 
 val composeVersion = extra["compose.version"] as String
@@ -193,6 +195,12 @@ configureMavenPublication(
     artifactId = "components-resources",
     name = "Resources for Compose JB"
 )
+
+apiValidation {
+    @OptIn(ExperimentalBCVApi::class)
+    klib { enabled = true }
+    nonPublicMarkers.add("org.jetbrains.compose.resources.InternalResourceApi")
+}
 
 // adding it here to make sure skiko is unpacked and available in web tests
 compose.experimental {
