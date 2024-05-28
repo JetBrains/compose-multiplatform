@@ -30,7 +30,7 @@ COMPOSE_VERSION=1.6.1
 # https://repo1.maven.org/maven2/org/jetbrains/compose/ui/ui-desktop/1.6.1/ui-desktop-1.6.1.pom
 # (replace 1.6.1) with the version of compose used.
 SKIKO_VERSION=0.7.97
-KOTLIN_VERSION=1.9.23
+KOTLIN_VERSION=1.9.24
 COROUTINES_VERSION=1.8.0
 ANDROIDX_COLLECTION_VERSION=1.4.0
 GOOGLE_REPO="https://maven.google.com/"
