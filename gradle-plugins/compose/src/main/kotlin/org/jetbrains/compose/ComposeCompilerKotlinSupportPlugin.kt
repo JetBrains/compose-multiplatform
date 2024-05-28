@@ -8,6 +8,8 @@ package org.jetbrains.compose
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.internal.ComposeCompilerArtifactProvider
+import org.jetbrains.compose.internal.KOTLIN_ANDROID_PLUGIN_ID
+import org.jetbrains.compose.internal.KOTLIN_JS_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.Version
@@ -27,11 +29,16 @@ import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 internal fun Project.configureComposeCompilerPlugin() {
-    plugins.withId(KOTLIN_MPP_PLUGIN_ID) { plugin ->
-        configureComposeCompilerPlugin(plugin as KotlinBasePlugin)
-    }
-    plugins.withId(KOTLIN_JVM_PLUGIN_ID) { plugin ->
-        configureComposeCompilerPlugin(plugin as KotlinBasePlugin)
+    //only one of them can be applied to the project
+    listOf(
+        KOTLIN_MPP_PLUGIN_ID,
+        KOTLIN_JVM_PLUGIN_ID,
+        KOTLIN_ANDROID_PLUGIN_ID,
+        KOTLIN_JS_PLUGIN_ID
+    ).forEach { pluginId ->
+        plugins.withId(pluginId) { plugin ->
+            configureComposeCompilerPlugin(plugin as KotlinBasePlugin)
+        }
     }
 }
 
