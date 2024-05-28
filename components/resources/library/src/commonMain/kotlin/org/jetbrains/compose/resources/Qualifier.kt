@@ -1,14 +1,18 @@
 package org.jetbrains.compose.resources
 
+import kotlin.jvm.JvmInline
+
 interface Qualifier
 
+@JvmInline
 @InternalResourceApi
-data class LanguageQualifier(
+value class LanguageQualifier(
     val language: String
 ) : Qualifier
 
+@JvmInline
 @InternalResourceApi
-data class RegionQualifier(
+value class RegionQualifier(
     val region: String
 ) : Qualifier
 
