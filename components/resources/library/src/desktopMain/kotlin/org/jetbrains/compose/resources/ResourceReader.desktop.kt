@@ -30,6 +30,6 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
     }
 
     private fun getClassLoader(): ClassLoader {
-        return Thread.currentThread().contextClassLoader ?: this.javaClass.classLoader!!
+        return this.javaClass.classLoader ?: error("Cannot find class loader")
     }
 }
