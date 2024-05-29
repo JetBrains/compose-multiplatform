@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.platform.Font
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -29,12 +31,27 @@ private val emptyFontBase64 =
 @OptIn(ExperimentalEncodingApi::class)
 private val defaultEmptyFont by lazy { Font("org.jetbrains.compose.emptyFont", Base64.decode(emptyFontBase64)) }
 
+private val cacheMutex = Mutex()
+private val fontsCachedBySkiko = mutableSetOf<String>()
+
 @Composable
 actual fun Font(resource: FontResource, weight: FontWeight, style: FontStyle): Font {
     val resourceReader = LocalResourceReader.current
     val fontFile by rememberResourceState(resource, weight, style, { defaultEmptyFont }) { env ->
         val path = resource.getResourceItemByEnvironment(env).path
-        val fontBytes = resourceReader.read(path)
+
+        // Skiko has own internal font's cache,
+        // so we can provide an empty byte array since the font was cached already
+        val fontBytes = cacheMutex.withLock {
+            if (fontsCachedBySkiko.contains(path)) {
+                ByteArray(0)
+            } else {
+                val bytes = resourceReader.read(path)
+                fontsCachedBySkiko.add(path)
+                bytes
+            }
+        }
+
         Font(path, fontBytes, weight, style)
     }
     return fontFile
