@@ -1,20 +1,50 @@
 package org.jetbrains.compose.resources
 
-import kotlin.jvm.JvmInline
-
 interface Qualifier
 
-@JvmInline
 @InternalResourceApi
-value class LanguageQualifier(
+class LanguageQualifier(
     val language: String
-) : Qualifier
+) : Qualifier {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
 
-@JvmInline
+        other as LanguageQualifier
+
+        return language == other.language
+    }
+
+    override fun hashCode(): Int {
+        return language.hashCode()
+    }
+
+    override fun toString(): String {
+        return "LanguageQualifier(language='$language')"
+    }
+}
+
 @InternalResourceApi
-value class RegionQualifier(
+class RegionQualifier(
     val region: String
-) : Qualifier
+) : Qualifier {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as RegionQualifier
+
+        return region == other.region
+    }
+
+    override fun hashCode(): Int {
+        return region.hashCode()
+    }
+
+    override fun toString(): String {
+        return "RegionQualifier(region='$region')"
+    }
+}
 
 @InternalResourceApi
 enum class ThemeQualifier : Qualifier {
