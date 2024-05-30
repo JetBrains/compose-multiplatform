@@ -84,7 +84,7 @@ internal fun Project.configureSyncIosComposeResources(
                 val syncDir = podFramework.getFinalResourcesDir().get().asFile.relativeTo(projectDir)
                 val specAttr = "['${syncDir.path}']"
                 extraSpecAttributes["resources"] = specAttr
-                project.tasks.named("podInstall").configure {
+                project.tasks.named("podspec").configure {
                     it.doFirst {
                         if (extraSpecAttributes["resources"] != specAttr) error(
                             """
