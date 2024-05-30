@@ -240,7 +240,7 @@ private fun getChunkFileSpec(
             typeObject.addModifiers(KModifier.PRIVATE)
             val properties = idToResources.keys.map { resName ->
                 PropertySpec.builder(resName, type.getClassName())
-                    .delegate("\nlazy·{ init_$resName() }")
+                    .delegate("\nlazy·{ %N() }", "init_$resName")
                     .build()
             }
             typeObject.addProperties(properties)
@@ -250,7 +250,7 @@ private fun getChunkFileSpec(
         idToResources.forEach { (resName, items) ->
             val accessor = PropertySpec.builder(resName, type.getClassName(), resModifier)
                 .receiver(ClassName(packageName, "Res", type.accessorName))
-                .getter(FunSpec.getterBuilder().addStatement("return $chunkClassName.$resName").build())
+                .getter(FunSpec.getterBuilder().addStatement("return $chunkClassName.%N", resName).build())
                 .build()
             chunkFile.addProperty(accessor)
 
@@ -260,8 +260,8 @@ private fun getChunkFileSpec(
                 .addStatement(
                     CodeBlock.builder()
                         .add("return %T(\n", type.getClassName()).withIndent {
-                            add("\"${type}:${resName}\",")
-                            if (type.requiresKeyName()) add(" \"$resName\",")
+                            add("%S,", "$type:$resName")
+                            if (type.requiresKeyName()) add(" %S,", resName)
                             withIndent {
                                 add("\nsetOf(\n").withIndent {
                                     items.forEach { item ->

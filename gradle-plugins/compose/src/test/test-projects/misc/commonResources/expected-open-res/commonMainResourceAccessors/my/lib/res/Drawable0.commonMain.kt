@@ -12,6 +12,9 @@ private object CommonMainDrawable0 {
   public val camelCaseName: DrawableResource by
   lazy { init_camelCaseName() }
 
+  public val `is`: DrawableResource by
+  lazy { init_is() }
+
   public val vector: DrawableResource by
   lazy { init_vector() }
 
@@ -40,6 +43,16 @@ private fun init_camelCaseName(): DrawableResource =
       org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/camelCaseName.xml", -1, -1),
     )
   )
+
+public val Res.drawable.`is`: DrawableResource
+  get() = CommonMainDrawable0.`is`
+
+private fun init_is(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
+  "drawable:is",
+  setOf(
+    org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/is.xml", -1, -1),
+  )
+)
 
 public val Res.drawable.vector: DrawableResource
   get() = CommonMainDrawable0.vector
