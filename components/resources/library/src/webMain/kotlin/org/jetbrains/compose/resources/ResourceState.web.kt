@@ -1,10 +1,12 @@
 package org.jetbrains.compose.resources
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
 
 @Composable
 internal actual fun <T> rememberResourceState(
@@ -13,11 +15,14 @@ internal actual fun <T> rememberResourceState(
     block: suspend (ResourceEnvironment) -> T
 ): State<T> {
     val environment = LocalComposeEnvironment.current.rememberEnvironment()
-    val state = remember(key1) { mutableStateOf(getDefault()) }
-    LaunchedEffect(key1) {
-        state.value = block(environment)
+    val scope = rememberCoroutineScope()
+    return remember(key1) {
+        val mutableState = mutableStateOf(getDefault())
+        scope.launch(start = CoroutineStart.UNDISPATCHED) {
+            mutableState.value = block(environment)
+        }
+        mutableState
     }
-    return state
 }
 
 @Composable
@@ -28,11 +33,14 @@ internal actual fun <T> rememberResourceState(
     block: suspend (ResourceEnvironment) -> T
 ): State<T> {
     val environment = LocalComposeEnvironment.current.rememberEnvironment()
-    val state = remember(key1, key2) { mutableStateOf(getDefault()) }
-    LaunchedEffect(key1, key2) {
-        state.value = block(environment)
+    val scope = rememberCoroutineScope()
+    return remember(key1, key2) {
+        val mutableState = mutableStateOf(getDefault())
+        scope.launch(start = CoroutineStart.UNDISPATCHED) {
+            mutableState.value = block(environment)
+        }
+        mutableState
     }
-    return state
 }
 
 @Composable
@@ -44,9 +52,12 @@ internal actual fun <T> rememberResourceState(
     block: suspend (ResourceEnvironment) -> T
 ): State<T> {
     val environment = LocalComposeEnvironment.current.rememberEnvironment()
-    val state = remember(key1, key2, key3) { mutableStateOf(getDefault()) }
-    LaunchedEffect(key1, key2, key3) {
-        state.value = block(environment)
+    val scope = rememberCoroutineScope()
+    return remember(key1, key2, key3) {
+        val mutableState = mutableStateOf(getDefault())
+        scope.launch(start = CoroutineStart.UNDISPATCHED) {
+            mutableState.value = block(environment)
+        }
+        mutableState
     }
-    return state
 }
