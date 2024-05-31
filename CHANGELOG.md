@@ -6,29 +6,29 @@ _Changes since 1.6.10_
 
 ### Multiple Platforms
 
-- Fix endless re-layout when layout is invalidated by measure, which includes measuring `TextField(singleLine=true)` with `IntrinsicSize` ([link](https://github.com/JetBrains/compose-multiplatform-core/pull/1355))
-- Fix container size for `Dialog` centering inside `ImageComposeScene` ([link](https://github.com/JetBrains/compose-multiplatform-core/pull/1375))
+- [Fix endless re-layout when layout is invalidated by measure, which includes measuring `TextField(singleLine=true)` with `IntrinsicSize`](https://github.com/JetBrains/compose-multiplatform-core/pull/1355)
+- [Fix container size for `Dialog` centering inside `ImageComposeScene`](https://github.com/JetBrains/compose-multiplatform-core/pull/1375)
 
 ### iOS
 
-- Fix crash on iOS 12 caused by usage unavailable `UIMenuController` API ([link](https://github.com/JetBrains/compose-multiplatform-core/pull/1361))
+- [Fix crash on iOS 12 caused by usage unavailable `UIMenuController` API](https://github.com/JetBrains/compose-multiplatform-core/pull/1361)
 
 ### Desktop
 
-- Fix `DropdownMenu`/`Popup` positioning when a window is moved to a screen with a different density ([link](https://github.com/JetBrains/compose-multiplatform-core/pull/1333))
-- Fix possible scrolling without animation on some mouse models ([link](https://github.com/JetBrains/compose-multiplatform-core/pull/1326))
+- [Fix `DropdownMenu`/`Popup` positioning when a window is moved to a screen with a different density](https://github.com/JetBrains/compose-multiplatform-core/pull/1333)
+- [Fix possible scrolling without animation on some mouse models](https://github.com/JetBrains/compose-multiplatform-core/pull/1326)
 
 ### Web
 
-- Fixed crash when `DatePicker` text field receives illegal input ([link](https://github.com/JetBrains/compose-multiplatform-core/pull/1368))
+- [Fixed crash when `DatePicker` text field receives illegal input](https://github.com/JetBrains/compose-multiplatform-core/pull/1368)
 
 ### Resources
 
-- Fix a cached font if the resource acessor was changed ([link](https://github.com/JetBrains/compose-multiplatform/pull/4864))
+- [Fix a cached font if the resource acessor was changed](https://github.com/JetBrains/compose-multiplatform/pull/4864)
 
 ### Gradle Plugin
 
-- Fix Compose Compiler configuration for Kotlin < 2.0 when kotlin-android or kotlin-js gradle plugins are applied ([link](https://github.com/JetBrains/compose-multiplatform/pull/4879))
+- [Fix Compose Compiler configuration for Kotlin < 2.0 when kotlin-android or kotlin-js gradle plugins are applied](https://github.com/JetBrains/compose-multiplatform/pull/4879)
 
 ## Dependencies
 
