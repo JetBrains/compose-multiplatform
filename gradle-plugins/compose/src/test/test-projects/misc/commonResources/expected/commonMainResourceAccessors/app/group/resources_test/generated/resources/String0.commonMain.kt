@@ -21,6 +21,9 @@ private object CommonMainString0 {
     public val hello: StringResource by
     lazy { init_hello() }
 
+    public val `info_using_release_$x`: StringResource by
+    lazy { `init_info_using_release_$x`() }
+
     public val multi_line: StringResource by
     lazy { init_multi_line() }
 
@@ -83,13 +86,25 @@ private fun init_hello(): StringResource = org.jetbrains.compose.resources.Strin
     )
 )
 
+internal val Res.string.`info_using_release_$x`: StringResource
+    get() = CommonMainString0.`info_using_release_$x`
+
+private fun `init_info_using_release_$x`(): StringResource =
+    org.jetbrains.compose.resources.StringResource(
+        "string:info_using_release_${'$'}x", "info_using_release_${'$'}x",
+        setOf(
+            org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.commonMain.cvr", 320,
+                57),
+        )
+    )
+
 internal val Res.string.multi_line: StringResource
     get() = CommonMainString0.multi_line
 
 private fun init_multi_line(): StringResource = org.jetbrains.compose.resources.StringResource(
     "string:multi_line", "multi_line",
     setOf(
-        org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.commonMain.cvr", 320,
+        org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.commonMain.cvr", 378,
             178),
     )
 )
@@ -100,7 +115,7 @@ internal val Res.string.str_template: StringResource
 private fun init_str_template(): StringResource = org.jetbrains.compose.resources.StringResource(
     "string:str_template", "str_template",
     setOf(
-        org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.commonMain.cvr", 499,
+        org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.commonMain.cvr", 557,
             76),
     )
 )

@@ -227,9 +227,7 @@ class ResourcesTest : GradlePluginTestBase() {
 
     @Test
     fun testMultiModuleResources() {
-        val environment = defaultTestEnvironment.copy(
-            kotlinVersion = "2.0.0-RC2"
-        )
+        val environment = defaultTestEnvironment.copy(kotlinVersion = "2.0.0")
         with(
             testProject("misc/kmpResourcePublication", environment)
         ) {
