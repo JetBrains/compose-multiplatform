@@ -1,10 +1,13 @@
 package org.jetbrains.compose.resources
 
+import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.TaskAction
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -83,13 +86,16 @@ internal fun Project.configureSyncIosComposeResources(
             framework { podFramework ->
                 val syncDir = podFramework.getFinalResourcesDir().get().asFile.relativeTo(projectDir)
                 val specAttr = "['${syncDir.path}']"
-                extraSpecAttributes["resources"] = specAttr
-                project.tasks.named("podInstall").configure {
+                val specAttributes = extraSpecAttributes
+                val buildFile = project.buildFile
+                val projectPath = project.path
+                specAttributes["resources"] = specAttr
+                project.tasks.named("podspec").configure {
                     it.doFirst {
-                        if (extraSpecAttributes["resources"] != specAttr) error(
+                        if (specAttributes["resources"] != specAttr) error(
                             """
                                 |Kotlin.cocoapods.extraSpecAttributes["resources"] is not compatible with Compose Multiplatform's resources management for iOS.
-                                |  * Recommended action: remove extraSpecAttributes["resources"] from '${project.buildFile}' and run '${project.path}:podInstall' once;
+                                |  * Recommended action: remove extraSpecAttributes["resources"] from '$buildFile' and run '$projectPath:podInstall' once;
                                 |  * Alternative action: turn off Compose Multiplatform's resources management for iOS by adding '${ComposeProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties;
                             """.trimMargin()
                         )
