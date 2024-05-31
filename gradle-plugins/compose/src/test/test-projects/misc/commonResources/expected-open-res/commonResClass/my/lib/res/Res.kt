@@ -8,7 +8,9 @@ package my.lib.res
 import kotlin.ByteArray
 import kotlin.OptIn
 import kotlin.String
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.FontResource
 import org.jetbrains.compose.resources.getResourceUri
 import org.jetbrains.compose.resources.readResourceBytes
 
@@ -35,7 +37,22 @@ public object Res {
   @ExperimentalResourceApi
   public fun getUri(path: String): String = getResourceUri("" + path)
 
-  public object drawable
+  public object drawable {
+    /**
+     * Returns the resource accessor by the specified path.
+     *
+     * NOTE: if the file does not match the resource type, there will be a crash in runtime!
+     *
+     * @param path The path of the file in the compose resource's directory.
+     * @return The accessor to the specified file.
+     */
+    @ExperimentalResourceApi
+    public fun byPath(path: String): DrawableResource =
+      org.jetbrains.compose.resources.DrawableResource(
+        "drawable:" + path,
+        setOf(org.jetbrains.compose.resources.ResourceItem(setOf(), "" + path, -1, -1))
+      )
+  }
 
   public object string
 
@@ -43,5 +60,19 @@ public object Res {
 
   public object plurals
 
-  public object font
+  public object font {
+    /**
+     * Returns the resource accessor by the specified path.
+     *
+     * NOTE: if the file does not match the resource type, there will be a crash in runtime!
+     *
+     * @param path The path of the file in the compose resource's directory.
+     * @return The accessor to the specified file.
+     */
+    @ExperimentalResourceApi
+    public fun byPath(path: String): FontResource = org.jetbrains.compose.resources.FontResource(
+      "font:" + path,
+      setOf(org.jetbrains.compose.resources.ResourceItem(setOf(), "" + path, -1, -1))
+    )
+  }
 }

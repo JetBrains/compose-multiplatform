@@ -134,13 +134,13 @@ internal fun getResFileSpec(
                 FunSpec.builder("readBytes")
                     .addKdoc(
                         """
-                    Reads the content of the resource file at the specified path and returns it as a byte array.
-                    
-                    Example: `val bytes = Res.readBytes("files/key.bin")`
-                    
-                    @param path The path of the file to read in the compose resource's directory.
-                    @return The content of the file as a byte array.
-                """.trimIndent()
+                            Reads the content of the resource file at the specified path and returns it as a byte array.
+                            
+                            Example: `val bytes = Res.readBytes("files/key.bin")`
+                            
+                            @param path The path of the file to read in the compose resource's directory.
+                            @return The content of the file as a byte array.
+                        """.trimIndent()
                     )
                     .addAnnotation(experimentalAnnotation)
                     .addParameter("path", String::class)
@@ -156,13 +156,13 @@ internal fun getResFileSpec(
                 FunSpec.builder("getUri")
                     .addKdoc(
                         """
-                    Returns the URI string of the resource file at the specified path.
-                    
-                    Example: `val uri = Res.getUri("files/key.bin")`
-                    
-                    @param path The path of the file in the compose resource's directory.
-                    @return The URI string of the file.
-                """.trimIndent()
+                            Returns the URI string of the resource file at the specified path.
+                            
+                            Example: `val uri = Res.getUri("files/key.bin")`
+                            
+                            @param path The path of the file in the compose resource's directory.
+                            @return The URI string of the file.
+                        """.trimIndent()
                     )
                     .addAnnotation(experimentalAnnotation)
                     .addParameter("path", String::class)
@@ -172,10 +172,45 @@ internal fun getResFileSpec(
             )
 
             ResourceType.values().forEach { type ->
-                resObject.addType(TypeSpec.objectBuilder(type.accessorName).build())
+                val resTypeBuilder = TypeSpec.objectBuilder(type.accessorName)
+
+                if (type == ResourceType.DRAWABLE || type == ResourceType.FONT) {
+                    resTypeBuilder.addFunction(getByPathFunction(type, moduleDir))
+                }
+
+                resObject.addType(resTypeBuilder.build())
             }
         }.build())
     }.build()
+}
+
+private fun getByPathFunction(type: ResourceType, moduleDir: String): FunSpec {
+    return FunSpec.builder("byPath")
+        .addKdoc(
+            """
+                Returns the resource accessor by the specified path.
+                
+                NOTE: if the file does not match the resource type, there will be a crash in runtime!
+                
+                @param path The path of the file in the compose resource's directory.
+                @return The accessor to the specified file.
+            """.trimIndent()
+        )
+        .addAnnotation(experimentalAnnotation)
+        .addParameter("path", String::class)
+        .returns(type.getClassName())
+        .addStatement(
+            CodeBlock.builder()
+                .add("return %T(\n", type.getClassName()).withIndent {
+                    add("%S + path,", "$type:$moduleDir")
+                    withIndent {
+                        add("\nsetOf(%T(setOf(), \"$moduleDir\" + path, -1, -1))\n", resourceItemClass)
+                    }
+                }
+                .add(")")
+                .build().toString()
+        )
+        .build()
 }
 
 // We need to divide accessors by different files because
