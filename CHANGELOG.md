@@ -1,3 +1,50 @@
+# 1.6.11 (June 2024)
+
+_Changes since 1.6.10_
+
+## Fixes
+
+### Multiple Platforms
+
+- Fix endless re-layout when layout is invalidated by measure, which includes measuring `TextField(singleLine=true)` with `IntrinsicSize` ([link](https://github.com/JetBrains/compose-multiplatform-core/pull/1355))
+- Fix container size for `Dialog` centering inside `ImageComposeScene` ([link](https://github.com/JetBrains/compose-multiplatform-core/pull/1375))
+
+### iOS
+
+- Fix crash on iOS 12 caused by usage unavailable `UIMenuController` API ([link](https://github.com/JetBrains/compose-multiplatform-core/pull/1361))
+
+### Desktop
+
+- Fix `DropdownMenu`/`Popup` positioning when a window is moved to a screen with a different density ([link](https://github.com/JetBrains/compose-multiplatform-core/pull/1333))
+- Fix possible scrolling without animation on some mouse models ([link](https://github.com/JetBrains/compose-multiplatform-core/pull/1326))
+
+### Web
+
+- Fixed crash when `DatePicker` text field receives illegal input ([link](https://github.com/JetBrains/compose-multiplatform-core/pull/1368))
+
+### Resources
+
+- Fix a cached font if the resource acessor was changed ([link](https://github.com/JetBrains/compose-multiplatform/pull/4864))
+
+### Gradle Plugin
+
+- Fix Compose Compiler configuration for Kotlin < 2.0 when kotlin-android or kotlin-js gradle plugins are applied ([link](https://github.com/JetBrains/compose-multiplatform/pull/4879))
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.6.11`. Based on Jetpack Compose libraries:
+  - [Compiler 1.5.14](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.14)
+  - [Runtime 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.6.7)
+  - [UI 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.6.7)
+  - [Foundation 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.6.7)
+  - [Material 1.6.7](https://developer.android.com/jetpack/androidx/releases/compose-material#1.6.7)
+  - [Material3 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.2.1)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.0`. Based on [Jetpack Lifecycle 2.8.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.0)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.7.0-alpha07`. Based on [Jetpack Navigation 2.7.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.7.7)
+
+___
+
 # 1.6.10 (May 2024)
 
 _Changes since 1.6.2_
