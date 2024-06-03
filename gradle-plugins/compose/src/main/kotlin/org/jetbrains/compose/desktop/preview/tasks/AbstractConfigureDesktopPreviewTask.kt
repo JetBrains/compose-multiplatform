@@ -19,7 +19,7 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
     internal lateinit var previewClasspath: FileCollection
 
     @get:InputFiles
-    internal lateinit var skikoRuntime: Provider<FileCollection>
+    internal abstract val skikoRuntime: Property<FileCollection>
 
     @get:Internal
     internal val javaHome: Property<String> = objects.notNullProperty<String>().apply {
