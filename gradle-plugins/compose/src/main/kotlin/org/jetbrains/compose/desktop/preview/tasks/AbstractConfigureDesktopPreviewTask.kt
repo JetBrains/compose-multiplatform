@@ -19,7 +19,7 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
     internal lateinit var previewClasspath: FileCollection
 
     @get:InputFiles
-    internal lateinit var skikoRuntime: FileCollection
+    internal lateinit var skikoRuntime: Provider<FileCollection>
 
     @get:Internal
     internal val javaHome: Property<String> = objects.notNullProperty<String>().apply {
@@ -58,10 +58,12 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
                 javaExecutable = javaExecutable(javaHome.get()),
                 hostClasspath = hostClasspath.files.asSequence().pathString()
             )
+
+        val skikoRuntimeFiles = skikoRuntime.get()
         val previewClasspathString =
             (previewClasspath.files.asSequence() +
                     uiTooling.files.asSequence() +
-                    skikoRuntime.files.asSequence()
+                    skikoRuntimeFiles.files.asSequence()
             ).pathString()
 
         val gradleLogger = logger
