@@ -286,6 +286,9 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Internal
     val appResourcesDir: DirectoryProperty = objects.directoryProperty()
 
+    @get:Internal
+    val jpackageResourcesDir: DirectoryProperty = objects.directoryProperty()
+
     /**
      * Gradle runtime verification fails,
      * if InputDirectory is not null, but a directory does not exist.
@@ -523,6 +526,8 @@ abstract class AbstractJPackageTask @Inject constructor(
                     .writeToFile(jpackageResources.ioFile.resolve("product-def.plist"))
             }
         }
+
+        jpackageResourcesDir.ioFileOrNull?.copyRecursively(jpackageResources.ioFile, overwrite = true)
     }
 
     override fun jvmToolEnvironment(): MutableMap<String, String> =
