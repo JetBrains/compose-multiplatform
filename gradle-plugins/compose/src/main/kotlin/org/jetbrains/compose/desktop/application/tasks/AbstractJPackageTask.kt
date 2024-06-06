@@ -9,14 +9,17 @@ import org.gradle.api.file.*
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
 import org.gradle.process.ExecResult
 import org.gradle.work.ChangeType
 import org.gradle.work.InputChanges
+import org.jetbrains.compose.desktop.application.dsl.FileAssociation
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
+import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.*
 import org.jetbrains.compose.desktop.application.internal.files.*
 import org.jetbrains.compose.desktop.application.internal.files.MacJarSignFileCopyingProcessor
 import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
@@ -244,6 +247,10 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     val javaRuntimePropertiesFile: RegularFileProperty = objects.fileProperty()
 
+    @get:Input
+    @get:Optional
+    val fileAssociations: SetProperty<FileAssociation> = objects.setProperty(FileAssociation::class.java)
+
     private lateinit var jvmRuntimeInfo: JvmRuntimeProperties
 
     @get:Optional
@@ -272,6 +279,9 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:LocalState
     protected val skikoDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/skiko")
+
+    @get:LocalState
+    protected val propertyFilesDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/propertyFiles")
 
     @get:Internal
     private val libsDir: Provider<Directory> = workingDir.map {
@@ -334,6 +344,30 @@ abstract class AbstractJPackageTask @Inject constructor(
             val mainJarPath = mappedJar.normalizedPath(base = libsDir.ioFile)
             cliArg("--main-jar", mainJarPath)
             cliArg("--main-class", launcherMainClass)
+
+            val propertyFilesDirJava = propertyFilesDir.ioFile
+            fileOperations.clearDirs(propertyFilesDir)
+
+            val fileAssociationFiles = fileAssociations.orNull.orEmpty()
+                .groupBy { it.extension }
+                .mapValues { (extension, associations) ->
+                    associations.mapIndexed { index, association ->
+                        propertyFilesDirJava.resolve("FA${extension}${if (index > 0) index.toString() else ""}.properties")
+                            .apply {
+                                writeText(
+                                    """
+                                        mime-type=${association.mimeType}
+                                        extension=${association.extension}
+                                        description=${association.description}
+                                    """.trimIndent()
+                                )
+                            }
+                    }
+                }.values.flatten()
+
+            for (fileAssociationFile in fileAssociationFiles) {
+                cliArg("--file-associations", fileAssociationFile)
+            }
 
             if (currentOS == OS.Windows) {
                 cliArg("--win-console", winConsole)
@@ -620,6 +654,22 @@ abstract class AbstractJPackageTask @Inject constructor(
             ?: "Copyright (C) $year"
         plist[PlistKeys.NSSupportsAutomaticGraphicsSwitching] = "true"
         plist[PlistKeys.NSHighResolutionCapable] = "true"
+        val fileAssociationMutableSet = fileAssociations.orNull
+        if (!fileAssociationMutableSet.isNullOrEmpty()) {
+            plist[PlistKeys.CFBundleDocumentTypes] = fileAssociationMutableSet
+                .groupBy { it.mimeType to it.description }
+                .map { (key, extensions) ->
+                    val (mimeType, description) = key
+                    InfoPlistMapValue(
+                        PlistKeys.CFBundleTypeRole to InfoPlistStringValue("Editor"),
+                        PlistKeys.CFBundleTypeExtensions to InfoPlistListValue(extensions.map { InfoPlistStringValue(it.extension) }),
+                        PlistKeys.CFBundleTypeIconFile to InfoPlistStringValue("$packageName.icns"),
+                        PlistKeys.CFBundleTypeMIMETypes to InfoPlistStringValue(mimeType),
+                        PlistKeys.CFBundleTypeName to InfoPlistStringValue(description),
+                        PlistKeys.CFBundleTypeOSTypes to InfoPlistListValue(InfoPlistStringValue("****")),
+                    )
+                }
+        }
     }
 }
 

@@ -32,4 +32,9 @@ abstract class JvmApplicationDistributions : AbstractDistributions() {
     fun windows(fn: Action<WindowsPlatformSettings>) {
         fn.execute(windows)
     }
+    
+    internal val fileAssociations: MutableSet<FileAssociation> = mutableSetOf()
+    fun fileAssociation(mimeType: String, extension: String, description: String) {
+        fileAssociations.add(FileAssociation(mimeType, extension, description))
+    }
 }
