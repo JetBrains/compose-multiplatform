@@ -13,10 +13,30 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         val resource = getResourceAsStream(path)
         val result = ByteArray(size.toInt())
         resource.use { input ->
-            input.skip(offset)
-            input.read(result, 0, size.toInt())
+            input.skipBytes(offset)
+            input.readBytes(result, 0, size.toInt())
         }
         return result
+    }
+
+    //skipNBytes requires API 34
+    private fun InputStream.skipBytes(offset: Long) {
+        var skippedBytes = 0L
+        while (skippedBytes < offset) {
+            val count = skip(offset - skippedBytes)
+            if (count == 0L) break
+            skippedBytes += count
+        }
+    }
+
+    //readNBytes requires API 34
+    private fun InputStream.readBytes(byteArray: ByteArray, offset: Int, size: Int) {
+        var readBytes = 0
+        while (readBytes < size) {
+            val count = read(byteArray,  offset + readBytes, size - readBytes)
+            if (count <= 0) break
+            readBytes += count
+        }
     }
 
     override fun getUri(path: String): String {

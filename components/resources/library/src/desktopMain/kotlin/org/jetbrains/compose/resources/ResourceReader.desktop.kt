@@ -12,8 +12,8 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         val resource = getResourceAsStream(path)
         val result = ByteArray(size.toInt())
         resource.use { input ->
-            input.skip(offset)
-            input.read(result, 0, size.toInt())
+            input.skipNBytes(offset)
+            input.readNBytes(result, 0, size.toInt())
         }
         return result
     }
