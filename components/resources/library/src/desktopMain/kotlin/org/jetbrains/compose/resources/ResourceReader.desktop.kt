@@ -10,12 +10,10 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
 
     override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
         val resource = getResourceAsStream(path)
-        val result = ByteArray(size.toInt())
-        resource.use { input ->
-            input.skip(offset)
-            input.read(result, 0, size.toInt())
+        return resource.use { input ->
+            input.skipNBytes(offset)
+            input.readNBytes(size.toInt())
         }
-        return result
     }
 
     override fun getUri(path: String): String {
