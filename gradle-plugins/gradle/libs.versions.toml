@@ -5,6 +5,9 @@ kotlin-poet = "1.16.0"
 plugin-android = "7.3.0"
 shadow-jar = "8.1.1"
 publish-plugin = "1.2.1"
+# The default version of Proguard that will be used in Compose Desktop Gradle plugin
+# to shrink and minimize the application in the Release build, the version can be overriden.
+default-proguard = "7.2.2"
 
 [libraries]
 download-task = { module = "de.undercouch:gradle-download-task", version.ref = "gradle-download-plugin" }
