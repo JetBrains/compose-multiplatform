@@ -267,6 +267,7 @@ private fun JvmApplicationContext.configureProguardTask(
     dontoptimize.set(settings.optimize.map { !it })
 
     joinOutputJars.set(settings.joinOutputJars)
+    minimizeKotlinStandardLibrary.set(settings.minimizeKotlinStandardLibrary)
 
     dependsOn(unpackDefaultResources)
     defaultComposeRulesFile.set(unpackDefaultResources.flatMap { it.resources.defaultComposeProguardRules })
