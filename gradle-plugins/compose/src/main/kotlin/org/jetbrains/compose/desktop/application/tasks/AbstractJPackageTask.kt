@@ -345,30 +345,6 @@ abstract class AbstractJPackageTask @Inject constructor(
             cliArg("--main-jar", mainJarPath)
             cliArg("--main-class", launcherMainClass)
 
-            val propertyFilesDirJava = propertyFilesDir.ioFile
-            fileOperations.clearDirs(propertyFilesDir)
-
-            val fileAssociationFiles = fileAssociations.orNull.orEmpty()
-                .groupBy { it.extension }
-                .mapValues { (extension, associations) ->
-                    associations.mapIndexed { index, association ->
-                        propertyFilesDirJava.resolve("FA${extension}${if (index > 0) index.toString() else ""}.properties")
-                            .apply {
-                                writeText(
-                                    """
-                                        mime-type=${association.mimeType}
-                                        extension=${association.extension}
-                                        description=${association.description}
-                                    """.trimIndent()
-                                )
-                            }
-                    }
-                }.values.flatten()
-
-            for (fileAssociationFile in fileAssociationFiles) {
-                cliArg("--file-associations", fileAssociationFile)
-            }
-
             if (currentOS == OS.Windows) {
                 cliArg("--win-console", winConsole)
             }
@@ -401,6 +377,31 @@ abstract class AbstractJPackageTask @Inject constructor(
             cliArg("--install-dir", installationPath)
             cliArg("--license-file", licenseFile)
             cliArg("--resource-dir", jpackageResources)
+
+            val propertyFilesDirJava = propertyFilesDir.ioFile
+            fileOperations.clearDirs(propertyFilesDir)
+
+            val fileAssociationFiles = fileAssociations.orNull.orEmpty()
+                .groupBy { it.extension }
+                .mapValues { (extension, associations) ->
+                    associations.mapIndexed { index, association ->
+                        propertyFilesDirJava.resolve("FA${extension}${if (index > 0) index.toString() else ""}.properties")
+                            .apply {
+                                writeText(
+                                    """
+                                        mime-type=${association.mimeType}
+                                        extension=${association.extension}
+                                        description=${association.description}
+                                    """.trimIndent()
+                                )
+                            }
+                    }
+                }.values.flatten()
+
+            for (fileAssociationFile in fileAssociationFiles) {
+                cliArg("--file-associations", fileAssociationFile)
+            }
+
 
             when (currentOS) {
                 OS.Linux -> {
