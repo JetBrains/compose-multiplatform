@@ -91,7 +91,7 @@ fun JetsnackButton(
                         minWidth = ButtonDefaults.MinWidth,
                         minHeight = ButtonDefaults.MinHeight
                     )
-                    .indication(interactionSource, rememberRipple())
+                    //.indication(interactionSource, rememberRipple()) TODO fails compilation on 1.7. Fix properly
                     .padding(contentPadding),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
