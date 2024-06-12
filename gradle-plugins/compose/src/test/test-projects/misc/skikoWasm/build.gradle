@@ -10,6 +10,10 @@ kotlin {
         browser()
         binaries.executable()
     }
+    wasm {
+        browser()
+        binaries.executable()
+    }
     sourceSets {
         commonMain {
             dependencies {
@@ -20,10 +24,6 @@ kotlin {
             }
         }
     }
-}
-
-compose.experimental {
-    web.application {}
 }
 
 // test for https://github.com/JetBrains/compose-multiplatform/issues/3169
