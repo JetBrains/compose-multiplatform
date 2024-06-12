@@ -21,7 +21,6 @@ import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
 import org.jetbrains.compose.experimental.internal.*
 import org.jetbrains.compose.internal.*
-import org.jetbrains.compose.internal.service.ConfigurationProblemReporterService
 import org.jetbrains.compose.internal.service.GradlePropertySnapshotService
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.resources.ResourcesExtension
@@ -36,7 +35,6 @@ import org.jetbrains.kotlin.gradle.plugin.*
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
 private fun initBuildServices(project: Project) {
-    ConfigurationProblemReporterService.init(project)
     GradlePropertySnapshotService.init(project)
 }
 
