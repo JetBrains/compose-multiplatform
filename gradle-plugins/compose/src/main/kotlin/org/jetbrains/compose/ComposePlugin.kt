@@ -21,7 +21,6 @@ import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
 import org.jetbrains.compose.experimental.internal.*
 import org.jetbrains.compose.internal.*
-import org.jetbrains.compose.internal.service.GradlePropertySnapshotService
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.compose.resources.configureComposeResources
@@ -34,14 +33,8 @@ import org.jetbrains.kotlin.gradle.plugin.*
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
-private fun initBuildServices(project: Project) {
-    GradlePropertySnapshotService.init(project)
-}
-
 abstract class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        initBuildServices(project)
-
         val composeExtension = project.extensions.create("compose", ComposeExtension::class.java, project)
         val desktopExtension = composeExtension.extensions.create("desktop", DesktopExtension::class.java)
         val androidExtension = composeExtension.extensions.create("android", AndroidExtension::class.java)
@@ -58,7 +51,6 @@ abstract class ComposePlugin : Plugin<Project> {
         composeExtension.extensions.create("web", WebExtension::class.java)
 
         project.configureComposeCompilerPlugin()
-        project.configureNativeCompilerCaching()
 
         project.configureComposeResources(resourcesExtension)
 

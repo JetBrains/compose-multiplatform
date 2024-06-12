@@ -9,121 +9,23 @@ import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewLogger
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.RemoteConnection
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.receiveConfigFromGradle
-import org.jetbrains.compose.experimental.internal.kotlinVersionNumbers
-import org.jetbrains.compose.internal.utils.Arch
-import org.jetbrains.compose.internal.utils.OS
-import org.jetbrains.compose.internal.utils.currentArch
-import org.jetbrains.compose.internal.utils.currentOS
-import org.jetbrains.compose.test.utils.*
+import org.jetbrains.compose.test.utils.GradlePluginTestBase
+import org.jetbrains.compose.test.utils.TestProjects
+import org.jetbrains.compose.test.utils.TestProperties
+import org.jetbrains.compose.test.utils.checks
 import org.junit.jupiter.api.Assumptions
-
+import org.junit.jupiter.api.Test
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketTimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
-import java.io.File
 
 class GradlePluginTest : GradlePluginTestBase() {
-
-    @Test
-    fun nativeCacheKind() {
-        Assumptions.assumeTrue(currentOS == OS.MacOS)
-        val task = if (currentArch == Arch.X64) {
-            ":subproject:linkDebugFrameworkIosX64"
-        } else {
-            ":subproject:linkDebugFrameworkIosArm64"
-        }
-        // Note: we used to test with kotlin version 1.9.0 and 1.9.10 too,
-        // but since we now use Compose core libs (1.6.0-dev-1340 and newer) built using kotlin 1.9.21,
-        // the compiler crashed (older k/native doesn't support libs built using newer k/native):
-        // e: kotlin.NotImplementedError: Generation of stubs for class org.jetbrains.kotlin.ir.symbols.impl.IrTypeParameterPublicSymbolImpl is not supported yet
-
-        if (kotlinVersionNumbers(defaultTestEnvironment.kotlinVersion) >= KotlinVersion(1, 9, 20)) {
-            testWorkDir.deleteRecursively()
-            testWorkDir.mkdirs()
-            val project = TestProject(
-                TestProjects.nativeCacheKind,
-                defaultTestEnvironment.copy(useGradleConfigurationCache = false)
-            )
-            with(project) {
-                gradle(task, "--info").checks {
-                    check.taskSuccessful(task)
-                    check.logContains("-Xauto-cache-from=")
-                }
-            }
-        }
-    }
-
-    @Test
-    fun nativeCacheKindError() {
-        Assumptions.assumeTrue(currentOS == OS.MacOS)
-        fun withNativeCacheKindErrorProject(kotlinVersion: String, fn: TestProject.() -> Unit) {
-            with(testProject(
-                TestProjects.nativeCacheKindError,
-                defaultTestEnvironment.copy(kotlinVersion = kotlinVersion)
-            )) {
-                fn()
-                testWorkDir.deleteRecursively()
-                testWorkDir.mkdirs()
-            }
-        }
-
-        fun testKotlinVersion(kotlinVersion: String) {
-            val args = arrayOf("help")
-            val commonPartOfWarning = "Compose Multiplatform Gradle plugin manages this property automatically"
-            withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
-                gradle(*args).checks {
-                    check.logDoesntContain("Error: 'kotlin.native.cacheKind")
-                    check.logDoesntContain(commonPartOfWarning)
-                }
-            }
-            withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
-                gradleFailure(*args, "-Pkotlin.native.cacheKind=none").checks {
-                    check.logContains("Error: 'kotlin.native.cacheKind' is explicitly set to 'none'")
-                    check.logContains(commonPartOfWarning)
-                }
-
-                gradleFailure(*args, "-Pkotlin.native.cacheKind=none").checks {
-                    check.logContains("Error: 'kotlin.native.cacheKind' is explicitly set to 'none'")
-                    check.logContains(commonPartOfWarning)
-                }
-            }
-            withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
-                gradleFailure(*args, "-Pkotlin.native.cacheKind=static").checks {
-                    check.logContains("Error: 'kotlin.native.cacheKind' is explicitly set to 'static'")
-                    check.logContains(commonPartOfWarning)
-                }
-            }
-            withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
-                gradleFailure(*args, "-Pkotlin.native.cacheKind.iosX64=none").checks {
-                    check.logContains("Error: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'none'")
-                    check.logContains(commonPartOfWarning)
-                }
-            }
-            withNativeCacheKindErrorProject(kotlinVersion = kotlinVersion) {
-                gradleFailure(*args, "-Pkotlin.native.cacheKind.iosX64=static").checks {
-                    check.logContains("Error: 'kotlin.native.cacheKind.iosX64' is explicitly set to 'static'")
-                    check.logContains(commonPartOfWarning)
-                }
-            }
-        }
-
-        testKotlinVersion("1.9.21")
-    }
-
     @Test
     fun skikoWasm() = with(
-        testProject(
-            TestProjects.skikoWasm,
-            // configuration cache is disabled as a temporary workaround for KT-58057
-            // todo: enable once KT-58057 is fixed
-            testEnvironment = defaultTestEnvironment.copy(useGradleConfigurationCache = false)
-        )
+        testProject(TestProjects.skikoWasm)
     ) {
         fun jsCanvasEnabled(value: Boolean) {
             modifyGradleProperties { put("org.jetbrains.compose.experimental.jscanvas.enabled", value.toString()) }
