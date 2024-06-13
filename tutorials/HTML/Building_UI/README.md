@@ -1,4 +1,4 @@
-# Building the UI with with the Compose HTML library
+# Building the UI with the Compose HTML library
 
 In this tutorial we will look at several examples that use the Composable HTML/CSS DSL to describe the user interface for your web application.
 
