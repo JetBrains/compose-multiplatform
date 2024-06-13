@@ -104,7 +104,7 @@ private fun getDependencies(
                 toastState.value = ToastState.Shown(text)
             }
         }
-        override val imageStorage: DesktopImageStorage = DesktopImageStorage(pictures, ioScope)
+        override val imageStorage: DesktopImageStorage = DesktopImageStorage(ioScope)
         override val sharePicture: SharePicture = object : SharePicture {
             override fun share(context: PlatformContext, picture: PictureData) {
                 // On Desktop share feature not supported
