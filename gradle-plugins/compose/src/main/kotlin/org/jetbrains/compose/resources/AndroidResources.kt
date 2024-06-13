@@ -39,8 +39,6 @@ internal fun Project.configureAndroidComposeResources(
                     .all { androidSourceSet ->
                         (compilation.allKotlinSourceSets as? ObservableSet<KotlinSourceSet>)?.forAll { kotlinSourceSet ->
                             val preparedComposeResources = getPreparedComposeResourcesDir(kotlinSourceSet)
-                            androidSourceSet.resources.srcDirs(preparedComposeResources)
-
                             //fix for AGP < 8.0
                             //usually 'androidSourceSet.resources.srcDir(preparedCommonResources)' should be enough
                             compilation.androidVariant.processJavaResourcesProvider.configure {
@@ -69,22 +67,20 @@ internal fun Project.configureAndroidComposeResources(
             }
         }
 
-        val copyFonts = registerTask<CopyAndroidFontsToAssetsTask>(
-            "copy${variant.name.uppercaseFirstChar()}FontsToAndroidAssets"
+        val copyResources = registerTask<CopyResourcesToAndroidAssetsTask>(
+            "copy${variant.name.uppercaseFirstChar()}ResourcesToAndroidAssets"
         ) {
             from.set(variantResources)
         }
         variant.sources?.assets?.addGeneratedSourceDirectory(
-            taskProvider = copyFonts,
-            wiredWith = CopyAndroidFontsToAssetsTask::outputDirectory
+            taskProvider = copyResources,
+            wiredWith = CopyResourcesToAndroidAssetsTask::outputDirectory
         )
-        //exclude a duplication of fonts in apks
-        variant.packaging.resources.excludes.add("**/font*/*")
     }
 }
 
 //Copy task doesn't work with 'variant.sources?.assets?.addGeneratedSourceDirectory' API
-internal abstract class CopyAndroidFontsToAssetsTask : DefaultTask() {
+internal abstract class CopyResourcesToAndroidAssetsTask : DefaultTask() {
     @get:Inject
     abstract val fileSystem: FileSystemOperations
 
@@ -100,7 +96,6 @@ internal abstract class CopyAndroidFontsToAssetsTask : DefaultTask() {
         fileSystem.copy {
             it.includeEmptyDirs = false
             it.from(from)
-            it.include("**/font*/*")
             it.into(outputDirectory)
         }
     }

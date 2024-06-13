@@ -32,28 +32,26 @@ internal fun Project.configureKmpResources(
             logger.info("Configure resources publication for '${target.targetName}' target")
             val packedResourceDir = config.getModuleResourcesDir(project)
 
-            kmpResources.publishResourcesAsKotlinComponent(
-                target,
-                { sourceSet ->
-                    KotlinTargetResourcesPublication.ResourceRoot(
-                        getPreparedComposeResourcesDir(sourceSet),
-                        emptyList(),
-                        //for android target exclude fonts
-                        if (target is KotlinAndroidTarget) listOf("**/font*/*") else emptyList()
-                    )
-                },
-                packedResourceDir
-            )
-
-            if (target is KotlinAndroidTarget) {
-                //for android target publish fonts in assets
-                logger.info("Configure fonts relocation for '${target.targetName}' target")
+            if (target !is KotlinAndroidTarget) {
+                kmpResources.publishResourcesAsKotlinComponent(
+                    target,
+                    { sourceSet ->
+                        KotlinTargetResourcesPublication.ResourceRoot(
+                            getPreparedComposeResourcesDir(sourceSet),
+                            emptyList(),
+                            emptyList()
+                        )
+                    },
+                    packedResourceDir
+                )
+            } else {
+                //for android target publish resources in assets
                 kmpResources.publishInAndroidAssets(
                     target,
                     { sourceSet ->
                         KotlinTargetResourcesPublication.ResourceRoot(
                             getPreparedComposeResourcesDir(sourceSet),
-                            listOf("**/font*/*"),
+                            emptyList(),
                             emptyList()
                         )
                     },
