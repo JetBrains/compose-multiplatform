@@ -187,6 +187,7 @@ android {
             assets.srcDir("src/androidInstrumentedTest/assets")
         }
         named("test") { resources.srcDir(commonTestResources) }
+        named("main") { manifest.srcFile("src/androidMain/AndroidManifest.xml") }
     }
 }
 

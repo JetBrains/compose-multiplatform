@@ -9,5 +9,5 @@ import androidx.compose.ui.text.font.*
 actual fun Font(resource: FontResource, weight: FontWeight, style: FontStyle): Font {
     val environment = LocalComposeEnvironment.current.rememberEnvironment()
     val path = remember(environment, resource) { resource.getResourceItemByEnvironment(environment).path }
-    return Font(path, LocalContext.current.assets, weight, style)
+    return Font(path, androidContext.assets, weight, style)
 }
