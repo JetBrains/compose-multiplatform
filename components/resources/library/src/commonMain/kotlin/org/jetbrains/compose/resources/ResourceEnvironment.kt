@@ -97,7 +97,7 @@ internal fun Resource.getResourceItemByEnvironment(environment: ResourceEnvironm
         .also { if (it.size == 1) return it.first() }
         .filterBy(environment.theme)
         .also { if (it.size == 1) return it.first() }
-        .filterBy(environment.density)
+        .filterByDensity(environment.density)
         .also { if (it.size == 1) return it.first() }
         .let { items ->
             if (items.isEmpty()) {
@@ -125,12 +125,59 @@ private fun List<ResourceItem>.filterBy(qualifier: Qualifier): List<ResourceItem
     }
 }
 
+// https://developer.android.com/guide/topics/resources/providing-resources#BestMatch
+// In general, Android prefers scaling down a larger original image to scaling up a smaller original image.
+private fun List<ResourceItem>.filterByDensity(density: DensityQualifier): List<ResourceItem> {
+    val items = this
+    var withQualifier = emptyList<ResourceItem>()
+
+    // filter with the same or better density
+    val exactAndHigherQualifiers = DensityQualifier.entries
+        .filter { it.dpi >= density.dpi }
+        .sortedBy { it.dpi }
+
+    for (qualifier in exactAndHigherQualifiers) {
+        withQualifier = items.filter { item -> item.qualifiers.any { it == qualifier } }
+        if (withQualifier.isNotEmpty()) break
+    }
+    if (withQualifier.isNotEmpty()) return withQualifier
+
+    // filter with low density
+    val lowQualifiers = DensityQualifier.entries
+        .minus(DensityQualifier.LDPI)
+        .filter { it.dpi < density.dpi }
+        .sortedByDescending { it.dpi }
+    for (qualifier in lowQualifiers) {
+        withQualifier = items.filter { item -> item.qualifiers.any { it == qualifier } }
+        if (withQualifier.isNotEmpty()) break
+    }
+    if (withQualifier.isNotEmpty()) return withQualifier
+
+    //items with no DensityQualifier (default)
+    // The system assumes that default resources (those from a directory without configuration qualifiers)
+    // are designed for the baseline pixel density (mdpi) and resizes those bitmaps
+    // to the appropriate size for the current pixel density.
+    // https://developer.android.com/training/multiscreen/screendensities#DensityConsiderations
+    val withNoDensity = items.filter { item ->
+        item.qualifiers.none { it is DensityQualifier }
+    }
+    if (withNoDensity.isNotEmpty()) return withNoDensity
+
+    //items with LDPI density
+    return items.filter { item ->
+        item.qualifiers.any { it == DensityQualifier.LDPI }
+    }
+}
+
 // we need to filter by language and region together because there is slightly different logic:
 // 1) if there is the exact match language+region then use it
 // 2) if there is the language WITHOUT region match then use it
 // 3) in other cases use items WITHOUT language and region qualifiers at all
 // issue: https://github.com/JetBrains/compose-multiplatform/issues/4571
-private fun List<ResourceItem>.filterByLocale(language: LanguageQualifier, region: RegionQualifier): List<ResourceItem> {
+private fun List<ResourceItem>.filterByLocale(
+    language: LanguageQualifier,
+    region: RegionQualifier
+): List<ResourceItem> {
     val withLanguage = filter { item ->
         item.qualifiers.any { it == language }
     }
