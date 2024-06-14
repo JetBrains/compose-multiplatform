@@ -119,6 +119,21 @@ class IosImageStorage(
             }
         }.readData()
     }
+
+    suspend fun getNSURLToShare(picture: PictureData): NSURL = withContext(Dispatchers.IO) {
+        when (picture) {
+            is PictureData.Camera -> {
+                picture.jpgFile
+            }
+
+            is PictureData.Resource -> {
+                NSURL(
+                    fileURLWithPath = NSBundle.mainBundle.resourcePath + "/" + picture.resource,
+                    isDirectory = false
+                )
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalForeignApi::class)
