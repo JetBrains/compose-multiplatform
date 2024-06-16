@@ -6,6 +6,7 @@
 package org.jetbrains.compose.desktop.ide.preview
 
 import com.intellij.execution.executors.DefaultRunExecutor
+import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -27,6 +28,14 @@ class RunPreviewAction(
 ) : AnAction({ "Show non-interactive preview" }, PreviewIcons.RUN_PREVIEW) {
     override fun actionPerformed(e: AnActionEvent) {
         val project = e.project ?: return
+        buildPreviewViaGradle(project, previewLocation)
+    }
+}
+
+class RefreshShownPreviewAction : AnAction({ "Refresh last preview" }, AllIcons.Actions.Refresh) {
+    override fun actionPerformed(e: AnActionEvent) {
+        val project = e.project ?: return
+        val previewLocation = project.service<PreviewStateService>().lastPreviewLocation ?: return
         buildPreviewViaGradle(project, previewLocation)
     }
 }
@@ -79,10 +88,10 @@ private fun buildPreviewViaGradle(project: Project, previewLocation: PreviewLoca
         GradleConstants.SYSTEM_ID,
         object : TaskCallback {
             override fun onSuccess() {
-                previewService.buildFinished(success = true)
+                previewService.buildFinished(previewLocation, success = true)
             }
             override fun onFailure() {
-                previewService.buildFinished(success = false)
+                previewService.buildFinished(previewLocation, success = false)
             }
         },
         ProgressExecutionMode.IN_BACKGROUND_ASYNC,
