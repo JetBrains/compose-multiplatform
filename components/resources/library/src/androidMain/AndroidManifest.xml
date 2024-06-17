@@ -3,7 +3,7 @@
 
     <application>
         <provider
-                android:authorities="org.jetbrains.compose.resources.AndroidContextProvider"
+                android:authorities="${applicationId}.resources.AndroidContextProvider"
                 android:name="org.jetbrains.compose.resources.AndroidContextProvider"
                 android:exported="false"
                 android:enabled="true">
