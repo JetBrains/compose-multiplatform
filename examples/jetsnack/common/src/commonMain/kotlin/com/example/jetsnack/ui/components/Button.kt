@@ -86,11 +86,14 @@ fun JetsnackButton(
             value = MaterialTheme.typography.button
         ) {
             Row(
+                @Suppress("DEPRECATION_ERROR")
                 Modifier
                     .defaultMinSize(
                         minWidth = ButtonDefaults.MinWidth,
                         minHeight = ButtonDefaults.MinHeight
                     )
+                    // TODO This should be replaced by non-deprecated alternative after the original example migrates to Jetpack Compose 1.7:
+                    // https://github.com/android/compose-samples/blob/3bc6b7d7c74571ea74776ec5b15518b40de4d31b/Jetsnack/app/src/main/java/com/example/jetsnack/ui/components/Button.kt#L95
                     .indication(interactionSource, rememberRipple())
                     .padding(contentPadding),
                 horizontalArrangement = Arrangement.Center,
