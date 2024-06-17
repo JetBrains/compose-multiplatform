@@ -5,7 +5,7 @@ plugins {
 }
 
 subprojects {
-    version = findProperty("deploy.version") ?: property("compose.version")!!
+    version = findProperty("deploy.version")!!
 
     plugins.withId("java") {
         configureIfExists<JavaPluginExtension> {
