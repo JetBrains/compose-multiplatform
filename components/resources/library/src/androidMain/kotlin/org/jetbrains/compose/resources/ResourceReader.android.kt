@@ -2,7 +2,7 @@ package org.jetbrains.compose.resources
 
 import android.content.res.AssetManager
 import android.net.Uri
-import java.io.IOException
+import java.io.FileNotFoundException
 import java.io.InputStream
 
 internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
@@ -57,7 +57,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
     private fun getResourceAsStream(path: String): InputStream {
         return try {
             assets.open(path)
-        } catch (e: IOException) {
+        } catch (e: FileNotFoundException) {
             val classLoader = getClassLoader()
             classLoader.getResourceAsStream(path) ?: throw MissingResourceException(path)
         }
@@ -72,7 +72,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         val result = try {
             inputStream = open(path)
             true
-        } catch (e: IOException) {
+        } catch (e: FileNotFoundException) {
             false
         } finally {
             inputStream?.close()
