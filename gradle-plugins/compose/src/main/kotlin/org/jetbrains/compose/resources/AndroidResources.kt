@@ -13,7 +13,6 @@ import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import org.jetbrains.compose.internal.ideaIsInSyncProvider
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -38,12 +37,6 @@ internal fun Project.configureAndroidComposeResources(
                     (compilation.allKotlinSourceSets as? ObservableSet<KotlinSourceSet>)?.forAll { kotlinSourceSet ->
                         val preparedComposeResources = getPreparedComposeResourcesDir(kotlinSourceSet)
                         variantResources.from(preparedComposeResources)
-
-                        // variant.sources?.assets?.addGeneratedSourceDirectory DOESN'T WORK for the AS Compose preview
-                        // But we know that resources will be prepared during IDE sync, and we can use addStaticSourceDirectory here
-                        if (ideaIsInSyncProvider().get()) {
-                            variant.sources?.assets?.addStaticSourceDirectory(preparedComposeResources.get().path)
-                        }
                     }
                 }
             }
@@ -54,10 +47,22 @@ internal fun Project.configureAndroidComposeResources(
         ) {
             from.set(variantResources)
         }
-        variant.sources?.assets?.addGeneratedSourceDirectory(
-            taskProvider = copyResources,
-            wiredWith = CopyResourcesToAndroidAssetsTask::outputDirectory
-        )
+        variant.sources.assets?.apply {
+            addGeneratedSourceDirectory(
+                taskProvider = copyResources,
+                wiredWith = CopyResourcesToAndroidAssetsTask::outputDirectory
+            )
+
+            // addGeneratedSourceDirectory doesn't mark the output directory as assets hence AS Compose Preview doesn't work
+            addStaticSourceDirectory(copyResources.flatMap { it.outputDirectory.asFile }.get().path)
+
+            // addGeneratedSourceDirectory doesn't run the copyResources task during AS Compose Preview build
+            tasks.configureEach { task ->
+                if (task.name == "compile${variant.name.uppercaseFirstChar()}Sources") {
+                    task.dependsOn(copyResources)
+                }
+            }
+        }
     }
 }
 
@@ -98,5 +103,30 @@ internal fun Project.fixAndroidLintTaskDependencies() {
         it is AndroidLintAnalysisTask || it is LintModelWriterTask
     }.configureEach {
         it.mustRunAfter(tasks.withType(GenerateResourceAccessorsTask::class.java))
+    }
+}
+
+internal fun Project.configureAndroidAssetsForPreview() {
+    val androidComponents = project.extensions.findByType(AndroidComponentsExtension::class.java) ?: return
+    androidComponents.onVariants { variant ->
+        variant.sources.assets?.apply {
+            val kgpCopyAssetsTaskName = "${variant.name}AssetsCopyForAGP"
+
+            // addGeneratedSourceDirectory doesn't mark the output directory as assets hence AS Compose Preview doesn't work
+            tasks.all { task ->
+                if (task.name == kgpCopyAssetsTaskName) {
+                    task.outputs.files.forEach { file ->
+                        addStaticSourceDirectory(file.path)
+                    }
+                }
+            }
+
+            // addGeneratedSourceDirectory doesn't run the copyResources task during AS Compose Preview build
+            tasks.configureEach { task ->
+                if (task.name == "compile${variant.name.uppercaseFirstChar()}Sources") {
+                    task.dependsOn(kgpCopyAssetsTaskName)
+                }
+            }
+        }
     }
 }

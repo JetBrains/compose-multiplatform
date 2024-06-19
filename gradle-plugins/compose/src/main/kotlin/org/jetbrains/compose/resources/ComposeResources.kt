@@ -39,7 +39,10 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: Kotl
 
     if (kmpResourcesAreAvailable) {
         configureKmpResources(kotlinExtension, extraProperties.get(KMP_RES_EXT)!!, config)
-        onAgpApplied { fixAndroidLintTaskDependencies() }
+        onAgpApplied {
+            configureAndroidAssetsForPreview()
+            fixAndroidLintTaskDependencies()
+        }
     } else {
         if (!disableMultimoduleResources) {
             if (!hasKmpResources) logger.info(
