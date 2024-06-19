@@ -13,6 +13,7 @@ import org.gradle.api.tasks.IgnoreEmptyDirectories
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.compose.internal.ideaIsInSyncProvider
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -37,6 +38,12 @@ internal fun Project.configureAndroidComposeResources(
                     (compilation.allKotlinSourceSets as? ObservableSet<KotlinSourceSet>)?.forAll { kotlinSourceSet ->
                         val preparedComposeResources = getPreparedComposeResourcesDir(kotlinSourceSet)
                         variantResources.from(preparedComposeResources)
+
+                        // variant.sources?.assets?.addGeneratedSourceDirectory DOESN'T WORK for the AS Compose preview
+                        // But we know that resources will be prepared during IDE sync, and we can use addStaticSourceDirectory here
+                        if (ideaIsInSyncProvider().get()) {
+                            variant.sources?.assets?.addStaticSourceDirectory(preparedComposeResources.get().path)
+                        }
                     }
                 }
             }
