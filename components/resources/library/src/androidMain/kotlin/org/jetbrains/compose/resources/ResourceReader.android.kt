@@ -2,11 +2,19 @@ package org.jetbrains.compose.resources
 
 import android.content.res.AssetManager
 import android.net.Uri
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ProvidableCompositionLocal
 import java.io.FileNotFoundException
 import java.io.InputStream
 
 internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
-    private val assets: AssetManager = androidContext.assets
+    private val assets: AssetManager by lazy {
+        val context = androidContext ?: error(
+            "Android context is not initialized. " +
+                    "If it happens in the Preview mode then call PreviewContextConfigurationEffect() function."
+        )
+        context.assets
+    }
 
     override suspend fun read(path: String): ByteArray {
         val resource = getResourceAsStream(path)
@@ -37,7 +45,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
     private fun InputStream.readBytes(byteArray: ByteArray, offset: Int, size: Int) {
         var readBytes = 0
         while (readBytes < size) {
-            val count = read(byteArray,  offset + readBytes, size - readBytes)
+            val count = read(byteArray, offset + readBytes, size - readBytes)
             if (count <= 0) break
             readBytes += count
         }
@@ -80,3 +88,9 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         return result
     }
 }
+
+internal actual val ProvidableCompositionLocal<ResourceReader>.currentOrPreview: ResourceReader
+    @Composable get() {
+        PreviewContextConfigurationEffect()
+        return current
+    }

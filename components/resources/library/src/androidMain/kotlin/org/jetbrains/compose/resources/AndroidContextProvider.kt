@@ -6,19 +6,45 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.net.Uri
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 
 internal val androidContext get() = AndroidContextProvider.ANDROID_CONTEXT
+
+/**
+ * The function configures the android context
+ * to be used for non-composable resource read functions
+ *
+ * e.g. `Res.readBytes(...)`
+ *
+ * Example usage:
+ * ```
+ * @Preview
+ * @Composable
+ * fun MyPreviewComponent() {
+ *     PreviewContextConfigurationEffect()
+ *     //...
+ * }
+ * ```
+ */
+@ExperimentalResourceApi
+@Composable
+fun PreviewContextConfigurationEffect() {
+    if (LocalInspectionMode.current) {
+        AndroidContextProvider.ANDROID_CONTEXT = LocalContext.current
+    }
+}
 
 //https://andretietz.com/2017/09/06/autoinitialise-android-library/
 internal class AndroidContextProvider : ContentProvider() {
     companion object {
         @SuppressLint("StaticFieldLeak")
-        lateinit var ANDROID_CONTEXT: Context
-            private set
+        var ANDROID_CONTEXT: Context? = null
     }
 
     override fun onCreate(): Boolean {
-        ANDROID_CONTEXT = context ?: error("AndroidContextProvider context is null")
+        ANDROID_CONTEXT = context
         return true
     }
 

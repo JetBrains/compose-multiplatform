@@ -293,7 +293,7 @@ class ComposeResourceTest {
         var uri2 = ""
         setContent {
             CompositionLocalProvider(LocalComposeEnvironment provides TestComposeEnvironment) {
-                val resourceReader = LocalResourceReader.current
+                val resourceReader = LocalResourceReader.currentOrPreview
                 uri1 = resourceReader.getUri("1.png")
                 uri2 = resourceReader.getUri("2.png")
             }
