@@ -103,6 +103,7 @@ internal fun Project.fixAndroidLintTaskDependencies() {
         it is AndroidLintAnalysisTask || it is LintModelWriterTask
     }.configureEach {
         it.mustRunAfter(tasks.withType(GenerateResourceAccessorsTask::class.java))
+        it.mustRunAfter(tasks.withType(CopyResourcesToAndroidAssetsTask::class.java))
     }
 }
 
