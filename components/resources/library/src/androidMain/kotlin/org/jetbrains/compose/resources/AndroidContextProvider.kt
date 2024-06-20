@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.Context
+import android.content.pm.ProviderInfo
 import android.database.Cursor
 import android.net.Uri
 import androidx.compose.runtime.Composable
@@ -46,6 +47,19 @@ internal class AndroidContextProvider : ContentProvider() {
     override fun onCreate(): Boolean {
         ANDROID_CONTEXT = context
         return true
+    }
+
+    override fun attachInfo(context: Context, info: ProviderInfo?) {
+        if (info == null) {
+            throw NullPointerException("AndroidContextProvider ProviderInfo cannot be null.")
+        }
+        // So if the authorities equal the library internal ones, the developer forgot to set his applicationId
+        if ("org.jetbrains.compose.components.resources.resources.AndroidContextProvider" == info.authority) {
+            throw IllegalStateException("Incorrect provider authority in manifest. Most likely due to a "
+                    + "missing applicationId variable your application\'s build.gradle.")
+        }
+
+        super.attachInfo(context, info)
     }
 
     override fun query(
