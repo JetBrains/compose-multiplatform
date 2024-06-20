@@ -54,7 +54,10 @@ internal fun Project.configureAndroidComposeResources(
             )
 
             // addGeneratedSourceDirectory doesn't mark the output directory as assets hence AS Compose Preview doesn't work
-            addStaticSourceDirectory(copyResources.flatMap { it.outputDirectory.asFile }.get().path)
+            val outDir = copyResources.flatMap { it.outputDirectory.asFile }.get()
+            if (outDir.isDirectory) {
+                addStaticSourceDirectory(outDir.path)
+            }
 
             // addGeneratedSourceDirectory doesn't run the copyResources task during AS Compose Preview build
             tasks.configureEach { task ->
@@ -117,7 +120,9 @@ internal fun Project.configureAndroidAssetsForPreview() {
             tasks.all { task ->
                 if (task.name == kgpCopyAssetsTaskName) {
                     task.outputs.files.forEach { file ->
-                        addStaticSourceDirectory(file.path)
+                        if (file.isDirectory) {
+                            addStaticSourceDirectory(file.path)
+                        }
                     }
                 }
             }
