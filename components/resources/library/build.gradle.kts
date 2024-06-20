@@ -10,8 +10,6 @@ plugins {
     id("org.jetbrains.kotlinx.binary-compatibility-validator")
 }
 
-val composeVersion = extra["compose.version"] as String
-
 kotlin {
     jvm("desktop")
     androidTarget {
@@ -187,6 +185,7 @@ android {
             assets.srcDir("src/androidInstrumentedTest/assets")
         }
         named("test") { resources.srcDir(commonTestResources) }
+        named("main") { manifest.srcFile("src/androidMain/AndroidManifest.xml") }
     }
 }
 
@@ -200,11 +199,6 @@ apiValidation {
     @OptIn(ExperimentalBCVApi::class)
     klib { enabled = true }
     nonPublicMarkers.add("org.jetbrains.compose.resources.InternalResourceApi")
-}
-
-// adding it here to make sure skiko is unpacked and available in web tests
-compose.experimental {
-    web.application {}
 }
 
 //utility task to generate CLDRPluralRuleLists.kt file by 'CLDRPluralRules/plurals.xml'

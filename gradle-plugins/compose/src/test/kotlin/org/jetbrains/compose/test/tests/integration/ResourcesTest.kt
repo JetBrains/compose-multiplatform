@@ -251,32 +251,13 @@ class ResourcesTest : GradlePluginTestBase() {
                     "my-mvn/me/sample/library/cmplib-$target/1.0/cmplib-$target-1.0$ext"
 
                 val aar = file(libpath("android", ".aar"))
-                val innerClassesJar = aar.parentFile.resolve("aar-inner-classes.jar")
                 assertTrue(aar.exists(), "File not found: " + aar.path)
-                ZipFile(aar).use { zip ->
-                    resourcesFiles
-                        .filter { it.startsWith("font") }
-                        .forEach { fontRes ->
+                ZipFile(aar).use { zip -> resourcesFiles.forEach { fontRes ->
                             assertNotNull(
                                 zip.getEntry("assets/composeResources/$subdir/$fontRes"),
                                 "Resource not found: '$fontRes' in aar '${aar.path}'"
                             )
-                        }
-
-                    innerClassesJar.writeBytes(
-                        zip.getInputStream(zip.getEntry("classes.jar")).readBytes()
-                    )
-                }
-                ZipFile(innerClassesJar).use { zip ->
-                    resourcesFiles
-                        .filterNot { it.startsWith("font") }
-                        .forEach { res ->
-                            assertNotNull(
-                                zip.getEntry("composeResources/$subdir/$res"),
-                                "Resource not found: '$res' in aar/classes.jar '${aar.path}'"
-                            )
-                        }
-                }
+                        } }
 
                 val jar = file(libpath("jvm", ".jar"))
                 checkResourcesZip(jar, resourcesFiles, subdir)
@@ -393,37 +374,37 @@ class ResourcesTest : GradlePluginTestBase() {
             .getConvertedResources(commonResourcesDir)
 
         gradle("build").checks {
-            check.taskSuccessful(":copyDemoDebugFontsToAndroidAssets")
-            check.taskSuccessful(":copyDemoReleaseFontsToAndroidAssets")
-            check.taskSuccessful(":copyFullDebugFontsToAndroidAssets")
-            check.taskSuccessful(":copyFullReleaseFontsToAndroidAssets")
+            check.taskSuccessful(":copyDemoDebugResourcesToAndroidAssets")
+            check.taskSuccessful(":copyDemoReleaseResourcesToAndroidAssets")
+            check.taskSuccessful(":copyFullDebugResourcesToAndroidAssets")
+            check.taskSuccessful(":copyFullReleaseResourcesToAndroidAssets")
 
             getAndroidApk("demo", "debug", "Resources-Test").let { apk ->
                 checkResourcesInZip(apk, commonResourcesFiles, true)
                 assertEquals(
                     "android demo-debug",
-                    readFileInZip(apk, "files/platform.txt").decodeToString()
+                    readFileInZip(apk, "assets/files/platform.txt").decodeToString()
                 )
             }
             getAndroidApk("demo", "release", "Resources-Test").let { apk ->
                 checkResourcesInZip(apk, commonResourcesFiles, true)
                 assertEquals(
                     "android demo-release",
-                    readFileInZip(apk, "files/platform.txt").decodeToString()
+                    readFileInZip(apk, "assets/files/platform.txt").decodeToString()
                 )
             }
             getAndroidApk("full", "debug", "Resources-Test").let { apk ->
                 checkResourcesInZip(apk, commonResourcesFiles, true)
                 assertEquals(
                     "android full-debug",
-                    readFileInZip(apk, "files/platform.txt").decodeToString()
+                    readFileInZip(apk, "assets/files/platform.txt").decodeToString()
                 )
             }
             getAndroidApk("full", "release", "Resources-Test").let { apk ->
                 checkResourcesInZip(apk, commonResourcesFiles, true)
                 assertEquals(
                     "android full-release",
-                    readFileInZip(apk, "files/platform.txt").decodeToString()
+                    readFileInZip(apk, "assets/files/platform.txt").decodeToString()
                 )
             }
 
@@ -443,36 +424,6 @@ class ResourcesTest : GradlePluginTestBase() {
         }
     }
 
-    @Test
-    fun testAndroidFonts(): Unit = with(testProject("misc/commonResources")) {
-        val commonResourcesDir = file("src/commonMain/composeResources")
-        val commonResourcesFiles = commonResourcesDir.walkTopDown()
-            .filter { !it.isDirectory && !it.isHidden }
-            .getConvertedResources(commonResourcesDir)
-
-        gradle("assembleDebug").checks {
-            check.taskSuccessful(":copyDebugFontsToAndroidAssets")
-
-            getAndroidApk("", "debug", "Resources-Test").let { apk ->
-                checkResourcesInZip(apk, commonResourcesFiles, true)
-            }
-        }
-
-        file("src/commonMain/composeResources/font-en").renameTo(
-            file("src/commonMain/composeResources/font-mdpi")
-        )
-        val newCommonResourcesFiles = commonResourcesDir.walkTopDown()
-            .filter { !it.isDirectory && !it.isHidden }
-            .getConvertedResources(commonResourcesDir)
-        gradle("assembleDebug").checks {
-            check.taskSuccessful(":copyDebugFontsToAndroidAssets")
-
-            getAndroidApk("", "debug", "Resources-Test").let { apk ->
-                checkResourcesInZip(apk, newCommonResourcesFiles, true)
-            }
-        }
-    }
-
     private fun Sequence<File>.getConvertedResources(baseDir: File) = map { file ->
         val newFile = if (
             file.parentFile.name.startsWith("value") &&
@@ -485,7 +436,6 @@ class ResourcesTest : GradlePluginTestBase() {
         }
         newFile.relativeTo(baseDir).invariantSeparatorsPath
     }
-
 
     private fun File.writeNewFile(text: String) {
         parentFile.mkdirs()
@@ -507,8 +457,8 @@ class ResourcesTest : GradlePluginTestBase() {
         ZipFile(file).use { zip ->
             commonResourcesFiles.forEach { res ->
                 println("check '$res' file")
-                if (isAndroid && res.startsWith("font")) {
-                    //android fonts should be only in assets
+                if (isAndroid) {
+                    //android resources should be only in assets
                     assertNull(zip.getEntry(res), "file = '$res'")
                     assertNotNull(zip.getEntry("assets/$res"), "file = 'assets/$res'")
                 } else {

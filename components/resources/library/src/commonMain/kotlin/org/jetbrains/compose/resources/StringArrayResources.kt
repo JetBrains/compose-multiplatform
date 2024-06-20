@@ -30,7 +30,7 @@ class StringArrayResource
  */
 @Composable
 fun stringArrayResource(resource: StringArrayResource): List<String> {
-    val resourceReader = LocalResourceReader.current
+    val resourceReader = LocalResourceReader.currentOrPreview
     val array by rememberResourceState(resource, { emptyList() }) { env ->
         loadStringArray(resource, resourceReader, env)
     }

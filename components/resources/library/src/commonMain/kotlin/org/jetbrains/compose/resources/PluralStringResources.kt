@@ -26,7 +26,7 @@ class PluralStringResource
  */
 @Composable
 fun pluralStringResource(resource: PluralStringResource, quantity: Int): String {
-    val resourceReader = LocalResourceReader.current
+    val resourceReader = LocalResourceReader.currentOrPreview
     val pluralStr by rememberResourceState(resource, quantity, { "" }) { env ->
         loadPluralString(resource, quantity, resourceReader, env)
     }
@@ -93,7 +93,7 @@ private suspend fun loadPluralString(
  */
 @Composable
 fun pluralStringResource(resource: PluralStringResource, quantity: Int, vararg formatArgs: Any): String {
-    val resourceReader = LocalResourceReader.current
+    val resourceReader = LocalResourceReader.currentOrPreview
     val args = formatArgs.map { it.toString() }
     val pluralStr by rememberResourceState(resource, quantity, args, { "" }) { env ->
         loadPluralString(resource, quantity, args, resourceReader, env)

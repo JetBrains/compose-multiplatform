@@ -52,6 +52,10 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.common)
         }
+        androidMain.dependencies {
+            implementation(libs.androidx.ui.tooling)
+            implementation(libs.androidx.ui.tooling.preview)
+        }
 
         val nonAndroidMain by creating {
             dependsOn(commonMain.get())
@@ -72,6 +76,12 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+    buildFeatures {
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.11"
     }
 }
 

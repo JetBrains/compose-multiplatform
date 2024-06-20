@@ -7,8 +7,6 @@ plugins {
     id("com.android.library")
 }
 
-val composeVersion = extra["compose.version"] as String
-
 kotlin {
     jvm("desktop")
     androidTarget {
