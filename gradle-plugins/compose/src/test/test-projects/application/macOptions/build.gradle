@@ -11,17 +11,17 @@ dependencies {
 }
 
 def extraInfoPlistKeys = """
-  <key>CFBundleURLTypes</key>
-  <array>
-    <dict>
-      <key>CFBundleURLName</key>
-      <string>Exameple URL</string>
-      <key>CFBundleURLSchemes</key>
-      <array>
-        <string>exampleUrl</string>
-      </array>
-    </dict>
-  </array>"""
+    <key>CFBundleURLTypes</key>
+    <array>
+      <dict>
+        <key>CFBundleURLName</key>
+        <string>Exameple URL</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>exampleUrl</string>
+        </array>
+      </dict>
+    </array>"""
 
 compose.desktop {
     application {
