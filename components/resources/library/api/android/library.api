@@ -1,3 +1,7 @@
+public final class org/jetbrains/compose/resources/AndroidContextProviderKt {
+	public static final fun PreviewContextConfigurationEffect (Landroidx/compose/runtime/Composer;I)V
+}
+
 public final class org/jetbrains/compose/resources/DensityQualifier$Companion {
 	public final fun selectByDensity (F)Lorg/jetbrains/compose/resources/DensityQualifier;
 	public final fun selectByValue (I)Lorg/jetbrains/compose/resources/DensityQualifier;
