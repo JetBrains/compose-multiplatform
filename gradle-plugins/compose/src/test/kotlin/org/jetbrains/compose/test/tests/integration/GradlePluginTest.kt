@@ -5,13 +5,13 @@
 
 package org.jetbrains.compose.test.tests.integration
 
+import org.gradle.internal.impldep.junit.framework.TestCase.assertEquals
+import org.gradle.internal.impldep.junit.framework.TestCase.assertTrue
 import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewLogger
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.RemoteConnection
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.receiveConfigFromGradle
-import org.jetbrains.compose.test.utils.GradlePluginTestBase
-import org.jetbrains.compose.test.utils.TestProjects
-import org.jetbrains.compose.test.utils.TestProperties
+import org.jetbrains.compose.test.utils.*
 import org.jetbrains.compose.test.utils.checks
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
@@ -21,11 +21,16 @@ import java.net.SocketTimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
+import kotlin.test.assertFalse
 
 class GradlePluginTest : GradlePluginTestBase() {
     @Test
     fun skikoWasm() = with(
-        testProject(TestProjects.skikoWasm)
+        testProject(
+            TestProjects.skikoWasm,
+            // TODO: enable the configuration cache after moving all test projects to kotlin 2.0 or newer
+            defaultTestEnvironment.copy(useGradleConfigurationCache = false)
+        )
     ) {
         fun jsCanvasEnabled(value: Boolean) {
             modifyGradleProperties { put("org.jetbrains.compose.experimental.jscanvas.enabled", value.toString()) }
@@ -39,8 +44,22 @@ class GradlePluginTest : GradlePluginTestBase() {
 
         jsCanvasEnabled(true)
         gradle(":build").checks {
-            check.taskSuccessful(":unpackSkikoWasmRuntimeJs")
+            check.taskSuccessful(":unpackSkikoWasmRuntime")
             check.taskSuccessful(":compileKotlinJs")
+            check.taskSuccessful(":compileKotlinWasmJs")
+            check.taskSuccessful(":wasmJsBrowserDistribution")
+
+            file("./build/dist/wasmJs/productionExecutable").apply {
+                checkExists()
+                assertTrue(isDirectory)
+                val distributionFiles = listFiles()!!.map { it.name }.toList()
+                assertFalse(
+                    distributionFiles.contains("skiko.wasm"),
+                    "skiko.wasm is probably a duplicate"
+                )
+                // one file is the app wasm file and another one is skiko wasm file with a mangled name
+                assertEquals(2, distributionFiles.filter { it.endsWith(".wasm") }.size)
+            }
         }
     }
 

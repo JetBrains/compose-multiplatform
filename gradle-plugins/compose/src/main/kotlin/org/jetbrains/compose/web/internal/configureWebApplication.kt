@@ -13,12 +13,11 @@ import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.ComposeBuildConfig
 import org.jetbrains.compose.ComposeExtension
-import org.jetbrains.compose.web.tasks.UnpackSkikoWasmRuntimeTask
-import org.jetbrains.compose.internal.utils.*
+import org.jetbrains.compose.internal.utils.detachedComposeDependency
 import org.jetbrains.compose.internal.utils.registerTask
-import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.compose.web.WebExtension
-import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
+import org.jetbrains.compose.web.tasks.UnpackSkikoWasmRuntimeTask
+import org.jetbrains.kotlin.gradle.tasks.IncrementalSyncTask
 
 internal fun Project.configureWeb(
     composeExt: ComposeExtension,
@@ -48,11 +47,12 @@ internal fun Project.configureWeb(
     }
 
     // configure only if there is k/wasm or k/js target:
-    webExt.targetsToConfigure(project)
-        .configureWebApplication(project, shouldRunUnpackSkiko)
+    if (webExt.targetsToConfigure(project).isNotEmpty()) {
+        configureWebApplication(project, shouldRunUnpackSkiko)
+    }
 }
 
-internal fun Collection<KotlinJsIrTarget>.configureWebApplication(
+internal fun configureWebApplication(
     project: Project,
     shouldRunUnpackSkiko: Provider<Boolean>
 ) {
@@ -63,28 +63,22 @@ internal fun Collection<KotlinJsIrTarget>.configureWebApplication(
     skikoJsWasmRuntimeConfiguration.defaultDependencies {
         it.addLater(skikoJsWasmRuntimeDependency)
     }
-    forEach {
-        val mainCompilation = it.compilations.getByName("main")
-        val testCompilation = it.compilations.getByName("test")
-        val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-wasm/${it.targetName}")
-        val taskName = "unpackSkikoWasmRuntime${it.targetName.uppercaseFirstChar()}"
-        mainCompilation.defaultSourceSet.resources.srcDir(unpackedRuntimeDir)
-        testCompilation.defaultSourceSet.resources.srcDir(unpackedRuntimeDir)
 
-        val unpackRuntime = project.registerTask<UnpackSkikoWasmRuntimeTask>(taskName) {
-            onlyIf {
-                shouldRunUnpackSkiko.get()
-            }
+    val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-wasm")
+    val taskName = "unpackSkikoWasmRuntime"
 
-            skikoRuntimeFiles = skikoJsWasmRuntimeConfiguration
-            outputDir.set(unpackedRuntimeDir)
+    val unpackRuntime = project.registerTask<UnpackSkikoWasmRuntimeTask>(taskName) {
+        onlyIf {
+            shouldRunUnpackSkiko.get()
         }
-        project.tasks.named(mainCompilation.processResourcesTaskName).configure { processResourcesTask ->
-            processResourcesTask.dependsOn(unpackRuntime)
-        }
-        project.tasks.named(testCompilation.processResourcesTaskName).configure { processResourcesTask ->
-            processResourcesTask.dependsOn(unpackRuntime)
-        }
+
+        skikoRuntimeFiles = skikoJsWasmRuntimeConfiguration
+        outputDir.set(unpackedRuntimeDir)
+    }
+
+    project.tasks.withType(IncrementalSyncTask::class.java) {
+        it.dependsOn(unpackRuntime)
+        it.from.from(unpackedRuntimeDir)
     }
 }
 
