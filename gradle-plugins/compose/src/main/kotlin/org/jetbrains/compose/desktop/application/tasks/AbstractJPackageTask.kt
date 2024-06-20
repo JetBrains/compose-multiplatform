@@ -25,6 +25,7 @@ import org.jetbrains.compose.desktop.application.internal.files.MacJarSignFileCo
 import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.validation.validate
 import org.jetbrains.compose.internal.utils.*
+import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import java.io.*
 import java.nio.file.LinkOption
 import java.util.*
@@ -250,6 +251,22 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Input
     @get:Optional
     val fileAssociations: SetProperty<FileAssociation> = objects.setProperty(FileAssociation::class.java)
+    
+    private val iconMapping by lazy {
+        val icons = fileAssociations.orNull.orEmpty().mapNotNull { it.iconFile }
+        if (icons.isEmpty()) return@lazy emptyMap()
+        val iconTempNames = generateSequence {
+            icons.mapTo(mutableSetOf()) { String(CharArray(10) { ('a'..'z').random() }) }
+        }.first { it.size == icons.size }
+        val appDir = destinationDir.ioFile.resolve("${packageName.get()}.app")
+        val iconsDir = appDir.resolve("Contents").resolve("Resources")
+        if (iconsDir.exists()) {
+            iconsDir.deleteRecursively()
+        }
+        icons.zip(iconTempNames) { icon, newName ->
+            icon to iconsDir.resolve(newName + icon.name.drop(icon.nameWithoutExtension.length))
+        }.toMap()
+    }
 
     private lateinit var jvmRuntimeInfo: JvmRuntimeProperties
 
@@ -387,12 +404,14 @@ abstract class AbstractJPackageTask @Inject constructor(
                     associations.mapIndexed { index, association ->
                         propertyFilesDirJava.resolve("FA${extension}${if (index > 0) index.toString() else ""}.properties")
                             .apply {
+                                val withoutIcon = """
+                                    mime-type=${association.mimeType}
+                                    extension=${association.extension}
+                                    description=${association.description}
+                                """.trimIndent()
                                 writeText(
-                                    """
-                                        mime-type=${association.mimeType}
-                                        extension=${association.extension}
-                                        description=${association.description}
-                                    """.trimIndent()
+                                    if (association.iconFile == null) withoutIcon
+                                    else "${withoutIcon}\nicon=${association.iconFile.normalizedPath()}"
                                 )
                             }
                     }
@@ -604,6 +623,15 @@ abstract class AbstractJPackageTask @Inject constructor(
 
         macSigner.sign(runtimeDir, runtimeEntitlementsFile, forceEntitlements = true)
         macSigner.sign(appDir, appEntitlementsFile, forceEntitlements = true)
+        
+        if (iconMapping.isNotEmpty()) {
+            for ((originalIcon, newIcon) in iconMapping) {
+                if (originalIcon.exists()) {
+                    newIcon.ensureParentDirsCreated()
+                    originalIcon.copyTo(newIcon)
+                }
+            }
+        }
     }
 
     override fun initState() {
@@ -661,10 +689,11 @@ abstract class AbstractJPackageTask @Inject constructor(
                 .groupBy { it.mimeType to it.description }
                 .map { (key, extensions) ->
                     val (mimeType, description) = key
+                    val iconPath = extensions.firstNotNullOfOrNull { it.iconFile }?.let { iconMapping[it]?.name }
                     InfoPlistMapValue(
                         PlistKeys.CFBundleTypeRole to InfoPlistStringValue("Editor"),
                         PlistKeys.CFBundleTypeExtensions to InfoPlistListValue(extensions.map { InfoPlistStringValue(it.extension) }),
-                        PlistKeys.CFBundleTypeIconFile to InfoPlistStringValue("$packageName.icns"),
+                        PlistKeys.CFBundleTypeIconFile to InfoPlistStringValue(iconPath ?: "$packageName.icns"),
                         PlistKeys.CFBundleTypeMIMETypes to InfoPlistStringValue(mimeType),
                         PlistKeys.CFBundleTypeName to InfoPlistStringValue(description),
                         PlistKeys.CFBundleTypeOSTypes to InfoPlistListValue(InfoPlistStringValue("****")),

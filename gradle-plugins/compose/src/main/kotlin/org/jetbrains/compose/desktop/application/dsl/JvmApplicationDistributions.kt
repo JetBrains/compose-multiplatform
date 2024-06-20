@@ -6,6 +6,7 @@
 package org.jetbrains.compose.desktop.application.dsl
 
 import org.gradle.api.Action
+import java.io.File
 
 internal val DEFAULT_RUNTIME_MODULES = arrayOf(
     "java.base", "java.desktop", "java.logging", "jdk.crypto.ec"
@@ -33,8 +34,12 @@ abstract class JvmApplicationDistributions : AbstractDistributions() {
         fn.execute(windows)
     }
     
-    internal val fileAssociations: MutableSet<FileAssociation> = mutableSetOf()
-    fun fileAssociation(mimeType: String, extension: String, description: String) {
-        fileAssociations.add(FileAssociation(mimeType, extension, description))
+    fun fileAssociation(
+        mimeType: String, extension: String, description: String,
+        linuxIcon: File? = null, windowsIcon: File? = null, macOSIcon: File? = null,
+    ) {
+        linux.fileAssociation(mimeType, extension, description, linuxIcon)
+        windows.fileAssociation(mimeType, extension, description, windowsIcon)
+        macOS.fileAssociation(mimeType, extension, description, macOSIcon)
     }
 }
