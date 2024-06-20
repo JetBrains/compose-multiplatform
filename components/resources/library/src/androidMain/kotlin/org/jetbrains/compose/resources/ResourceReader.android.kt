@@ -18,7 +18,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
 
     override suspend fun read(path: String): ByteArray {
         val resource = getResourceAsStream(path)
-        return resource.readBytes()
+        return resource.use { input -> input.readBytes() }
     }
 
     override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
