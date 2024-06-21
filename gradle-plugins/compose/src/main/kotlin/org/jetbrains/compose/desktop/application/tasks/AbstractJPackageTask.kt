@@ -250,7 +250,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    val fileAssociations: SetProperty<FileAssociation> = objects.setProperty(FileAssociation::class.java)
+    internal val fileAssociations: SetProperty<FileAssociation> = objects.setProperty(FileAssociation::class.java)
     
     private val iconMapping by lazy {
         val icons = fileAssociations.orNull.orEmpty().mapNotNull { it.iconFile }

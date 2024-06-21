@@ -14,42 +14,37 @@ private fun indentForLevel(level: Int) = indent.repeat(level)
 
 internal class InfoPlistBuilder(private val extraPlistKeysRawXml: String? = null) {
     internal sealed class InfoPlistValue {
-        abstract fun toString(nestingLevel: Int): String
-        override fun toString(): String = toString(0)
+        abstract fun asPlistEntry(nestingLevel: Int): String
         data class InfoPlistListValue(val elements: List<InfoPlistValue>) : InfoPlistValue() {
-            override fun toString(nestingLevel: Int): String =
+            override fun asPlistEntry(nestingLevel: Int): String =
                 if (elements.isEmpty()) "${indentForLevel(nestingLevel)}<array/>"
                 else elements.joinToString(
                     separator = "\n",
                     prefix = "${indentForLevel(nestingLevel)}<array>\n",
                     postfix = "\n${indentForLevel(nestingLevel)}</array>"
                 ) {
-                    it.toString(nestingLevel + 1)
+                    it.asPlistEntry(nestingLevel + 1)
                 }
-
-            override fun toString(): String = super.toString()
 
             constructor(vararg elements: InfoPlistValue) : this(elements.asList())
         }
 
         data class InfoPlistMapValue(val elements: Map<InfoPlistKey, InfoPlistValue>) : InfoPlistValue() {
-            override fun toString(nestingLevel: Int): String =
+            override fun asPlistEntry(nestingLevel: Int): String =
                 if (elements.isEmpty()) "${indentForLevel(nestingLevel)}<dict/>"
                 else elements.entries.joinToString(
                     separator = "\n",
                     prefix = "${indentForLevel(nestingLevel)}<dict>\n",
                     postfix = "\n${indentForLevel(nestingLevel)}</dict>",
                 ) { (key, value) ->
-                    "${indentForLevel(nestingLevel + 1)}<key>${key.name}</key>\n${value.toString(nestingLevel + 1)}"
+                    "${indentForLevel(nestingLevel + 1)}<key>${key.name}</key>\n${value.asPlistEntry(nestingLevel + 1)}"
                 }
-            override fun toString() = super.toString()
 
             constructor(vararg elements: Pair<InfoPlistKey, InfoPlistValue>) : this(elements.toMap())
         }
 
         data class InfoPlistStringValue(val value: String) : InfoPlistValue() {
-            override fun toString(nestingLevel: Int): String = if (value.isEmpty()) "${indentForLevel(nestingLevel)}<string/>" else "${indentForLevel(nestingLevel)}<string>$value</string>"
-            override fun toString() = super.toString()
+            override fun asPlistEntry(nestingLevel: Int): String = if (value.isEmpty()) "${indentForLevel(nestingLevel)}<string/>" else "${indentForLevel(nestingLevel)}<string>$value</string>"
         }
     }
 
@@ -78,7 +73,7 @@ internal class InfoPlistBuilder(private val extraPlistKeysRawXml: String? = null
                 appendLine("${indentForLevel(1)}<dict>")
                 for ((k, v) in values) {
                     appendLine("${indentForLevel(2)}<key>${k.name}</key>")
-                    appendLine(v.toString(2))
+                    appendLine(v.asPlistEntry(2))
                 }
                 extraPlistKeysRawXml?.let { appendLine(it) }
                 appendLine("${indentForLevel(1)}</dict>")
