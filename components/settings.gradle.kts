@@ -12,12 +12,15 @@ pluginManagement {
     plugins {
         kotlin("jvm").version(extra["kotlin.version"] as String)
         kotlin("multiplatform").version(extra["kotlin.version"] as String)
-        id("org.jetbrains.compose") //version is not required because the plugin is included to the build
+        id("org.jetbrains.compose").version(extra["compose.version"] as String)
         id("com.android.library").version(extra["agp.version"] as String)
         id("org.jetbrains.kotlinx.binary-compatibility-validator").version("0.15.0-Beta.2")
     }
 
-    includeBuild("../gradle-plugins")
+    val gradlePluginDir = rootDir.resolve("../gradle-plugins")
+    if (gradlePluginDir.exists()) {
+        includeBuild(gradlePluginDir)
+    }
 }
 
 dependencyResolutionManagement {
