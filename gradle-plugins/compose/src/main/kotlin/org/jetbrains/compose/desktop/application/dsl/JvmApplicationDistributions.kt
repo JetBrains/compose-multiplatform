@@ -34,12 +34,13 @@ abstract class JvmApplicationDistributions : AbstractDistributions() {
         fn.execute(windows)
     }
     
+    @JvmOverloads
     fun fileAssociation(
         mimeType: String, extension: String, description: String,
-        linuxIcon: File? = null, windowsIcon: File? = null, macOSIcon: File? = null,
+        linuxIconFile: File? = null, windowsIconFile: File? = null, macOSIconFile: File? = null,
     ) {
-        linux.fileAssociation(mimeType, extension, description, linuxIcon)
-        windows.fileAssociation(mimeType, extension, description, windowsIcon)
-        macOS.fileAssociation(mimeType, extension, description, macOSIcon)
+        linux.fileAssociation(mimeType, extension, description, linuxIconFile)
+        windows.fileAssociation(mimeType, extension, description, windowsIconFile)
+        macOS.fileAssociation(mimeType, extension, description, macOSIconFile)
     }
 }

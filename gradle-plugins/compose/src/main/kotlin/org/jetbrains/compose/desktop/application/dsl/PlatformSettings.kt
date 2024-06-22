@@ -20,6 +20,8 @@ abstract class AbstractPlatformSettings {
     var installationPath: String? = null
 
     internal val fileAssociations: MutableSet<FileAssociation> = mutableSetOf()
+
+    @JvmOverloads
     fun fileAssociation(mimeType: String, extension: String, description: String, iconFile: File? = null) {
         fileAssociations.add(FileAssociation(mimeType, extension, description, iconFile))
     }

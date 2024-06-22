@@ -253,19 +253,33 @@ abstract class AbstractJPackageTask @Inject constructor(
     internal val fileAssociations: SetProperty<FileAssociation> = objects.setProperty(FileAssociation::class.java)
     
     private val iconMapping by lazy {
-        val icons = fileAssociations.orNull.orEmpty().mapNotNull { it.iconFile }
+        val icons = fileAssociations.orNull.orEmpty().mapNotNull { it.iconFile }.distinct()
         if (icons.isEmpty()) return@lazy emptyMap()
-        val iconTempNames = generateSequence {
-            icons.mapTo(mutableSetOf()) { String(CharArray(10) { ('a'..'z').random() }) }
-        }.first { it.size == icons.size }
+        val iconTempNames: List<String> = mutableListOf<String>().apply {
+            val usedNames = mutableSetOf("${packageName.get()}.icns")
+            for (icon in icons) {
+                if (!icon.exists()) continue
+                if (usedNames.add(icon.name)) {
+                    add(icon.name)
+                    continue
+                }
+                val nameWithoutExtension = icon.nameWithoutExtension
+                val extension = icon.extension
+                for (n in 1UL..ULong.MAX_VALUE) {
+                    val newName = "$nameWithoutExtension ($n).$extension"
+                    if (usedNames.add(newName)) {
+                        add(newName)
+                        break
+                    }
+                }
+            }
+        }
         val appDir = destinationDir.ioFile.resolve("${packageName.get()}.app")
         val iconsDir = appDir.resolve("Contents").resolve("Resources")
         if (iconsDir.exists()) {
             iconsDir.deleteRecursively()
         }
-        icons.zip(iconTempNames) { icon, newName ->
-            icon to iconsDir.resolve(newName + icon.name.drop(icon.nameWithoutExtension.length))
-        }.toMap()
+        icons.zip(iconTempNames) { icon, newName -> icon to iconsDir.resolve(newName) }.toMap()
     }
 
     private lateinit var jvmRuntimeInfo: JvmRuntimeProperties
