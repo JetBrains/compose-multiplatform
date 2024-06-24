@@ -81,4 +81,3 @@ Now you can run the test by either clicking ![run](https://github.com/JetBrains/
 ```
 ./gradlew test
 ```
-
