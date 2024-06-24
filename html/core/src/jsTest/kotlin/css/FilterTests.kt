@@ -6,12 +6,31 @@
 package org.jetbrains.compose.web.core.tests.css
 
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
-import org.jetbrains.compose.web.testutils.*
-import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.testutils.assertEquals
+import org.jetbrains.compose.web.testutils.composition
+import org.jetbrains.compose.web.testutils.nextChild
+import org.jetbrains.compose.web.testutils.runTest
+import org.jetbrains.compose.web.css.Color
+import org.jetbrains.compose.web.css.blur
+import org.jetbrains.compose.web.css.brightness
+import org.jetbrains.compose.web.css.contrast
+import org.jetbrains.compose.web.css.deg
+import org.jetbrains.compose.web.css.dropShadow
+import org.jetbrains.compose.web.css.em
+import org.jetbrains.compose.web.css.filter
+import org.jetbrains.compose.web.css.grayscale
+import org.jetbrains.compose.web.css.hueRotate
+import org.jetbrains.compose.web.css.invert
+import org.jetbrains.compose.web.css.opacity
+import org.jetbrains.compose.web.css.percent
+import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.saturate
+import org.jetbrains.compose.web.css.sepia
+import org.jetbrains.compose.web.css.style
+import org.jetbrains.compose.web.css.turn
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Img
 import kotlin.test.Test
-import kotlin.test.assertEquals
 
 @ExperimentalComposeWebApi
 class FilterTests {
