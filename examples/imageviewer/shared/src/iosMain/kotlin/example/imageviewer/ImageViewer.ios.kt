@@ -52,22 +52,23 @@ fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState
         override val sharePicture: SharePicture = object : SharePicture {
             override fun share(context: PlatformContext, picture: PictureData) {
                 ioScope.launch {
-                    val data = imageStorage.getNSDataToShare(picture)
-                    withContext(Dispatchers.Main) {
-                        val window = UIApplication.sharedApplication.windows.last() as? UIWindow
-                        val currentViewController = window?.rootViewController
-                        val activityViewController = UIActivityViewController(
-                            activityItems = listOf(
-                                UIImage(data = data),
-                                picture.description
-                            ),
-                            applicationActivities = null
-                        )
-                        currentViewController?.presentViewController(
-                            viewControllerToPresent = activityViewController,
-                            animated = true,
-                            completion = null,
-                        )
+                    imageStorage.getNSURLToShare(picture).path?.let { imageUrl ->
+                        withContext(Dispatchers.Main) {
+                            val window = UIApplication.sharedApplication.windows.last() as? UIWindow
+                            val currentViewController = window?.rootViewController
+                            val activityViewController = UIActivityViewController(
+                                activityItems = listOf(
+                                    UIImage.imageWithContentsOfFile(imageUrl),
+                                    picture.description
+                                ),
+                                applicationActivities = null
+                            )
+                            currentViewController?.presentViewController(
+                                viewControllerToPresent = activityViewController,
+                                animated = true,
+                                completion = null,
+                            )
+                        }
                     }
                 }
             }
