@@ -1,6 +1,7 @@
 package org.jetbrains.compose.resources
 
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
 import java.io.File
 
@@ -36,6 +37,18 @@ abstract class ResourcesExtension {
      * - `never`: Never generate the Res class.
      */
     var generateResClass: ResourceClassGeneration = auto
+
+    internal val customResourceDirectories: MutableMap<String, Provider<Directory>> = mutableMapOf()
+
+    /**
+     * Associates a custom resource directory with a specific source set.
+     *
+     * @param sourceSetName the name of the source set to associate the custom resource directory with
+     * @param directoryProvider the provider that provides the custom directory
+     */
+    fun customDirectory(sourceSetName: String, directoryProvider: Provider<Directory>) {
+        customResourceDirectories[sourceSetName] = directoryProvider
+    }
 }
 
 internal fun Provider<ResourcesExtension>.getResourcePackage(project: Project) = map { config ->
