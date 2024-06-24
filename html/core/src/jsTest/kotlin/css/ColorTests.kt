@@ -5,14 +5,23 @@
 
 package org.jetbrains.compose.web.core.tests.css
 
-import org.jetbrains.compose.web.testutils.*
-import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.testutils.assertContains
+import org.jetbrains.compose.web.testutils.assertEquals
+import org.jetbrains.compose.web.testutils.composition
+import org.jetbrains.compose.web.testutils.nextChild
+import org.jetbrains.compose.web.testutils.root
+import org.jetbrains.compose.web.testutils.runTest
+import org.jetbrains.compose.web.css.Color
+import org.jetbrains.compose.web.css.color
+import org.jetbrains.compose.web.css.hsl
+import org.jetbrains.compose.web.css.hsla
+import org.jetbrains.compose.web.css.rgb
+import org.jetbrains.compose.web.css.rgba
+import org.jetbrains.compose.web.css.style
 import org.jetbrains.compose.web.dom.Div
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
 import kotlin.test.Test
-import kotlin.test.assertEquals
-
 
 class ColorTests {
     @Test
