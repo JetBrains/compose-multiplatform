@@ -19,17 +19,27 @@ import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.internal.configureDesktop
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
-import org.jetbrains.compose.experimental.internal.*
-import org.jetbrains.compose.internal.*
+import org.jetbrains.compose.experimental.internal.ComposeCompilerCompatibility
+import org.jetbrains.compose.experimental.internal.ExperimentalComposeLibrary
+import org.jetbrains.compose.internal.ComposeBuildConfig
+import org.jetbrains.compose.internal.Dependencies
+import org.jetbrains.compose.internal.ComposeExtension
+import org.jetbrains.compose.internal.configureComposeCompilerPlugin
+import org.jetbrains.compose.internal.configureExperimentalTargetsFlagsCheck
+import org.jetbrains.compose.internal.getKotlinPluginVersion
+import org.jetbrains.compose.internal.mppExt
+import org.jetbrains.compose.internal.mppExtOrNull
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.compose.resources.configureComposeResources
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.compose.web.internal.configureWeb
-import org.jetbrains.kotlin.com.github.gundy.semver4j.SemVer
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
-import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
+import org.jetbrains.kotlin.gradle.plugin.KOTLIN_MPP_PLUGIN_ID
+import org.jetbrains.kotlin.gradle.plugin.mppExt
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
