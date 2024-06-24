@@ -1,7 +1,21 @@
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.objcPtr
-import org.jetbrains.skia.*
-import platform.Metal.*
+import org.jetbrains.skia.BackendRenderTarget
+import org.jetbrains.skia.ColorSpace
+import org.jetbrains.skia.DirectContext
+import org.jetbrains.skia.GraphicsContext
+import org.jetbrains.skia.PixelGeometry
+import org.jetbrains.skia.Surface
+import org.jetbrains.skia.SurfaceColorFormat
+import org.jetbrains.skia.SurfaceOrigin
+import org.jetbrains.skia.SurfaceProps
+import platform.Metal.MTLCreateSystemDefaultDevice
+import platform.Metal.MTLPixelFormatBGRA8Unorm
+import platform.Metal.MTLTextureDescriptor
+import platform.Metal.MTLTextureType2D
+import platform.Metal.MTLTextureUsageRenderTarget
+import platform.Metal.MTLTextureUsageShaderRead
+import platform.Metal.MTLTextureUsageShaderWrite
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
