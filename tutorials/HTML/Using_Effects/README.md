@@ -103,12 +103,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.Composable
 import kotlinx.browser.document
-import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.dom.*
+import org.jetbrains.compose.web.css.Color
+import org.jetbrains.compose.web.css.backgroundColor
+import org.jetbrains.compose.web.css.minHeight
+import org.jetbrains.compose.web.css.padding
+import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.width
+import org.jetbrains.compose.web.dom.Button
+import org.jetbrains.compose.web.dom.CheckboxInput
+import org.jetbrains.compose.web.dom.DisposableRefEffect
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.DomSideEffect
+import org.jetbrains.compose.web.dom.Label
+import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.renderComposable
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLParagraphElement
-
 
 // Here we pretend that `RedBoldTextNotComposableRenderer`
 // wraps a UI logic provided by 3rd party library that doesn't use Compose
