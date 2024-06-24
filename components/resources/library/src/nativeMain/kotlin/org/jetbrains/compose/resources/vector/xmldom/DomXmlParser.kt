@@ -129,4 +129,3 @@ private class DomXmlParser : NSObject(), NSXMLParserDelegateProtocol {
         throw MalformedXMLException("parse error occurred")
     }
 }
-
