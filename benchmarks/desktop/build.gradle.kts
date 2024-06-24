@@ -1,6 +1,7 @@
 import org.jetbrains.compose.compose
-import kotlinx.benchmark.gradle.*
-import org.jetbrains.kotlin.allopen.gradle.*
+import kotlinx.benchmark.gradle.BenchmarkExtension
+import kotlinx.benchmark.gradle.JvmBenchmarkTarget
+import org.jetbrains.kotlin.allopen.gradle.AllOpenExtension
 
 plugins {
     kotlin("jvm") version "1.4.20"
