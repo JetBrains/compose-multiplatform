@@ -3,13 +3,26 @@ package org.jetbrains.compose.web.core.tests
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.css.Color
+import org.jetbrains.compose.web.css.color
+import org.jetbrains.compose.web.css.height
 import org.jetbrains.compose.web.css.keywords.auto
+import org.jetbrains.compose.web.css.opacity
+import org.jetbrains.compose.web.css.padding
+import org.jetbrains.compose.web.css.px
+import org.jetbrains.compose.web.css.style
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.testutils.assertEquals
+import org.jetbrains.compose.web.testutils.getAttribute
+import org.jetbrains.compose.web.testutils.getAttributeNames
+import org.jetbrains.compose.web.testutils.composition
+import org.jetbrains.compose.web.testutils.id
+import org.jetbrains.compose.web.testutils.nextChild
+import org.jetbrains.compose.web.testutils.root
+import org.jetbrains.compose.web.testutils.runTest
+import org.jetbrains.compose.web.testutils.waitForChanges
 import kotlin.test.Test
-import kotlin.test.assertEquals
-import org.jetbrains.compose.web.testutils.*
 
 class InlineStyleTests {
 
