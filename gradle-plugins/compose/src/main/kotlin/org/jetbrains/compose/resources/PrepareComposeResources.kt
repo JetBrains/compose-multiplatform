@@ -1,6 +1,7 @@
 package org.jetbrains.compose.resources
 
 import org.gradle.api.Project
+import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.FileTree
@@ -25,11 +26,19 @@ import javax.inject.Inject
 import javax.xml.parsers.DocumentBuilderFactory
 
 internal fun Project.registerPrepareComposeResourcesTask(
-    sourceSet: KotlinSourceSet
+    sourceSet: KotlinSourceSet,
+    config: Provider<ResourcesExtension>
 ): TaskProvider<PrepareComposeResourcesTask> {
-    val resDir = "${sourceSet.name}/$COMPOSE_RESOURCES_DIR"
-    val userComposeResourcesDir = project.projectDir.resolve("src/$resDir")
-    val preparedComposeResourcesDir = layout.buildDirectory.dir("$RES_GEN_DIR/preparedResources/$resDir")
+    val userComposeResourcesDir: Provider<Directory> = config.flatMap { ext ->
+        ext.customResourceDirectories[sourceSet.name] ?: provider {
+            //default path
+            layout.projectDirectory.dir("src/${sourceSet.name}/$COMPOSE_RESOURCES_DIR")
+        }
+    }
+
+    val preparedComposeResourcesDir = layout.buildDirectory.dir(
+        "$RES_GEN_DIR/preparedResources/${sourceSet.name}/$COMPOSE_RESOURCES_DIR"
+    )
 
     val convertXmlValueResources = tasks.register(
         "convertXmlValueResourcesFor${sourceSet.name.uppercaseFirstChar()}",
@@ -61,11 +70,11 @@ internal fun Project.registerPrepareComposeResourcesTask(
 }
 
 internal fun Project.getPreparedComposeResourcesDir(sourceSet: KotlinSourceSet): Provider<File> = tasks
-        .named(
-            getPrepareComposeResourcesTaskName(sourceSet),
-            PrepareComposeResourcesTask::class.java
-        )
-        .flatMap { it.outputDir.asFile }
+    .named(
+        getPrepareComposeResourcesTaskName(sourceSet),
+        PrepareComposeResourcesTask::class.java
+    )
+    .flatMap { it.outputDir.asFile }
 
 private fun getPrepareComposeResourcesTaskName(sourceSet: KotlinSourceSet) =
     "prepareComposeResourcesTaskFor${sourceSet.name.uppercaseFirstChar()}"

@@ -54,7 +54,7 @@ internal fun Project.configureComposeResourcesGeneration(
         }
 
         //common resources must be converted (XML -> CVR)
-        val preparedResourcesTask = registerPrepareComposeResourcesTask(sourceSet)
+        val preparedResourcesTask = registerPrepareComposeResourcesTask(sourceSet, config)
         val preparedResources = preparedResourcesTask.flatMap { it.outputDir.asFile }
         configureResourceAccessorsGeneration(
             sourceSet,

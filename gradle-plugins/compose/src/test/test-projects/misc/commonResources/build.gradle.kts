@@ -62,3 +62,31 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 }
+
+abstract class GenerateAndroidRes : DefaultTask() {
+    @get:Inject
+    abstract val layout: ProjectLayout
+
+    @get:OutputDirectory
+    val outputDir = layout.buildDirectory.dir("generatedAndroidResources")
+
+    @TaskAction
+    fun run() {
+        val dir = outputDir.get().asFile
+        dir.deleteRecursively()
+        File(dir, "values/strings.xml").apply {
+            parentFile.mkdirs()
+            writeText(
+                """
+                    <resources>
+                        <string name="android_str">Android string</string>
+                    </resources>
+                """.trimIndent()
+            )
+        }
+    }
+}
+compose.resources.customDirectory(
+    sourceSetName = "androidMain",
+    directoryProvider = tasks.register<GenerateAndroidRes>("generateAndroidRes").map { it.outputDir.get() }
+)
