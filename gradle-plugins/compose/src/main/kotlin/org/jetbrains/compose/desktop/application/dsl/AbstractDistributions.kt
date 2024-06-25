@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.desktop.application.dsl
 
+import org.gradle.api.Action
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.file.RegularFileProperty
@@ -35,5 +36,13 @@ abstract class AbstractDistributions {
     var targetFormats: Set<TargetFormat> = EnumSet.noneOf(TargetFormat::class.java)
     open fun targetFormats(vararg formats: TargetFormat) {
         targetFormats = EnumSet.copyOf(formats.toList())
+    }
+
+    internal val additionalLauncherSettings = objects.mapProperty(String::class.java, String::class.java)
+
+    fun additionalLauncher(name: String, fn: Action<AdditionalLauncherArguments>) {
+        val settings = AdditionalLauncherArguments()
+        fn.execute(settings)
+        additionalLauncherSettings.put(name, settings.getFileContent())
     }
 }

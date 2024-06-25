@@ -322,6 +322,7 @@ private fun JvmApplicationContext.configurePackageTask(
         packageTask.packageVendor.set(packageTask.provider { executables.vendor })
         packageTask.packageVersion.set(packageVersionFor(packageTask.targetFormat))
         packageTask.licenseFile.set(executables.licenseFile)
+        packageTask.additionalLaunchers.set(executables.additionalLauncherSettings)
     }
 
     packageTask.destinationDir.set(app.nativeDistributions.outputBaseDir.map {

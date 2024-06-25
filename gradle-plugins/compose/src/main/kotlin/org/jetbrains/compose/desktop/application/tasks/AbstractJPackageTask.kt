@@ -7,6 +7,7 @@ package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.*
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
@@ -22,6 +23,7 @@ import org.jetbrains.compose.desktop.application.internal.files.MacJarSignFileCo
 import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.validation.validate
 import org.jetbrains.compose.internal.utils.*
+import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import java.io.*
 import java.nio.file.LinkOption
 import java.util.*
@@ -123,6 +125,10 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Input
     @get:Optional
     val packageVersion: Property<String?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
+    val additionalLaunchers: MapProperty<String, String> = objects.mapProperty(String::class.java, String::class.java)
 
     @get:Input
     @get:Optional
@@ -273,6 +279,9 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:LocalState
     protected val skikoDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/skiko")
 
+    @get:LocalState
+    protected val additionalLaunchersDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/launchers")
+
     @get:Internal
     private val libsDir: Provider<Directory> = workingDir.map {
         it.dir("libs")
@@ -353,6 +362,12 @@ abstract class AbstractJPackageTask @Inject constructor(
                 macProvisioningProfile.orNull?.let { provisioningProfile ->
                     cliArg("--app-content", provisioningProfile)
                 }
+            }
+
+            additionalLaunchers.orNull?.forEach {
+                val fileName = "${name}_${it.key.replace(' ', '_')}.properties"
+                val file = additionalLaunchersDir.ioFile.resolve(fileName)
+                cliArg("--add-launcher", "${it.key}=${file.normalizedPath()}")
             }
         }
 
@@ -486,6 +501,15 @@ abstract class AbstractJPackageTask @Inject constructor(
                 unpackedFiles.map { copyFileToLibsDir(it) }
             } else {
                 listOf(copyFileToLibsDir(sourceFile))
+            }
+        }
+
+        fileOperations.clearDirs(additionalLaunchersDir)
+        additionalLaunchers.orNull?.forEach {
+            val fileName = "${name}_${it.key.replace(' ', '_')}.properties"
+            val file = additionalLaunchersDir.ioFile.resolve(fileName).apply {
+                ensureParentDirsCreated()
+                writeText(it.value)
             }
         }
 
