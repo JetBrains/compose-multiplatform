@@ -1,6 +1,10 @@
 package org.jetbrains.compose.resources
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.InternalResourceApi
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberResourceState
 
 /**
  * Represents a string resource in the application.
