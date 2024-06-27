@@ -10,7 +10,8 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.logging.Logger
 import org.jetbrains.compose.ComposeBuildConfig
-import java.util.*
+import java.io.File
+import java.util.Properties
 
 internal inline fun Logger.info(fn: () -> String) {
     if (isInfoEnabled) {
