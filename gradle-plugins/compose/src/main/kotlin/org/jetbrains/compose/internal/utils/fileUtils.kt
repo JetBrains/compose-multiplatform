@@ -12,7 +12,7 @@ import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 import java.io.File
-import java.util.*
+import java.util.Properties
 
 internal fun Provider<String>.toDir(project: Project): Provider<Directory> =
     project.layout.dir(map { File(it) })
