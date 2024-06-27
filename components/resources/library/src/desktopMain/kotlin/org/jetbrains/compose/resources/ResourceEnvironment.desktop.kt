@@ -3,7 +3,7 @@ package org.jetbrains.compose.resources
 import org.jetbrains.skiko.SystemTheme
 import org.jetbrains.skiko.currentSystemTheme
 import java.awt.Toolkit
-import java.util.*
+import java.util.Locale
 
 internal actual fun getSystemEnvironment(): ResourceEnvironment {
     val locale = Locale.getDefault()
