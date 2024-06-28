@@ -18,7 +18,8 @@ private fun init_emptyFont(): FontResource = org.jetbrains.compose.resources.Fon
   setOf(
 
     org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.LanguageQualifier("en"),
-    ), "font-en/emptyFont.otf", -1, -1),
-    org.jetbrains.compose.resources.ResourceItem(setOf(), "font/emptyFont.otf", -1, -1),
+    ), "composeResources/my.lib.res/font-en/emptyFont.otf", -1, -1),
+    org.jetbrains.compose.resources.ResourceItem(setOf(),
+      "composeResources/my.lib.res/font/emptyFont.otf", -1, -1),
   )
 )

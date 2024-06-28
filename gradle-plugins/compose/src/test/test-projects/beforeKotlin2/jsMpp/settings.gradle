@@ -15,13 +15,12 @@ pluginManagement {
 }
 dependencyResolutionManagement {
     repositories {
-        mavenCentral()
         mavenLocal()
+        mavenCentral()
         google()
         maven {
             url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
         }
     }
 }
-rootProject.name = "nativeCacheKind"
-include(":subproject")
+rootProject.name = "jsMpp"

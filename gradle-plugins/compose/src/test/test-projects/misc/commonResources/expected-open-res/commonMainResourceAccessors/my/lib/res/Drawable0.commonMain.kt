@@ -29,7 +29,8 @@ private fun init__3_strange_name(): DrawableResource =
   org.jetbrains.compose.resources.DrawableResource(
     "drawable:_3_strange_name",
     setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/3-strange-name.xml", -1, -1),
+      org.jetbrains.compose.resources.ResourceItem(setOf(),
+        "composeResources/my.lib.res/drawable/3-strange-name.xml", -1, -1),
     )
   )
 
@@ -40,7 +41,8 @@ private fun init_camelCaseName(): DrawableResource =
   org.jetbrains.compose.resources.DrawableResource(
     "drawable:camelCaseName",
     setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/camelCaseName.xml", -1, -1),
+      org.jetbrains.compose.resources.ResourceItem(setOf(),
+        "composeResources/my.lib.res/drawable/camelCaseName.xml", -1, -1),
     )
   )
 
@@ -50,7 +52,8 @@ public val Res.drawable.`is`: DrawableResource
 private fun init_is(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
   "drawable:is",
   setOf(
-    org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/is.xml", -1, -1),
+    org.jetbrains.compose.resources.ResourceItem(setOf(),
+      "composeResources/my.lib.res/drawable/is.xml", -1, -1),
   )
 )
 
@@ -62,18 +65,20 @@ private fun init_vector(): DrawableResource = org.jetbrains.compose.resources.Dr
   setOf(
 
     org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.LanguageQualifier("ast"),
-    ), "drawable-ast/vector.xml", -1, -1),
+    ), "composeResources/my.lib.res/drawable-ast/vector.xml", -1, -1),
 
     org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.LanguageQualifier("au"),
-      org.jetbrains.compose.resources.RegionQualifier("US"), ), "drawable-au-rUS/vector.xml", -1, -1),
+      org.jetbrains.compose.resources.RegionQualifier("US"), ),
+      "composeResources/my.lib.res/drawable-au-rUS/vector.xml", -1, -1),
 
     org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.ThemeQualifier.DARK,
       org.jetbrains.compose.resources.LanguageQualifier("ge"), ),
-      "drawable-dark-ge/vector.xml", -1, -1),
+      "composeResources/my.lib.res/drawable-dark-ge/vector.xml", -1, -1),
 
     org.jetbrains.compose.resources.ResourceItem(setOf(org.jetbrains.compose.resources.LanguageQualifier("en"),
-    ), "drawable-en/vector.xml", -1, -1),
-    org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/vector.xml", -1, -1),
+    ), "composeResources/my.lib.res/drawable-en/vector.xml", -1, -1),
+    org.jetbrains.compose.resources.ResourceItem(setOf(),
+      "composeResources/my.lib.res/drawable/vector.xml", -1, -1),
   )
 )
 
@@ -83,6 +88,7 @@ public val Res.drawable.vector_2: DrawableResource
 private fun init_vector_2(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
   "drawable:vector_2",
   setOf(
-    org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/vector_2.xml", -1, -1),
+    org.jetbrains.compose.resources.ResourceItem(setOf(),
+      "composeResources/my.lib.res/drawable/vector_2.xml", -1, -1),
   )
 )

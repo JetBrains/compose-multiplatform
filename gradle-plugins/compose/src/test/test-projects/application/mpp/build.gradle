@@ -3,6 +3,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 plugins {
     id "com.android.application"
     id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.kotlin.plugin.compose"
     id "org.jetbrains.compose"
 }
 
@@ -21,6 +22,9 @@ kotlin {
             }
         }
     }
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
 }
 
 android {
@@ -30,14 +34,6 @@ android {
     defaultConfig {
         minSdk = 21
         targetSdk = 31
-    }
-}
-
-kotlin {
-    jvm {
-        jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
-        }
     }
 }
 

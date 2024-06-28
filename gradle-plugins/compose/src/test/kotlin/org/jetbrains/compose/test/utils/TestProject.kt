@@ -9,14 +9,12 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.junit.jupiter.params.provider.Arguments
 import java.io.File
-import java.util.Properties
-import java.util.stream.Stream
+import java.util.*
 
 data class TestEnvironment(
     val workingDir: File,
-    val kotlinVersion: String = TestProperties.composeCompilerCompatibleKotlinVersion,
+    val kotlinVersion: String = TestProperties.kotlinVersion,
     val gradleVersion: String = TestProperties.gradleVersion,
     val agpVersion: String = TestProperties.agpVersion,
     val composeGradlePluginVersion: String = TestProperties.composeGradlePluginVersion,

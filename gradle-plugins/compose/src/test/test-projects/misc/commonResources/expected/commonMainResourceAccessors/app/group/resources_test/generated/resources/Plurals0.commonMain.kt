@@ -17,7 +17,8 @@ private fun init_numberOfSongsAvailable(): PluralStringResource =
     org.jetbrains.compose.resources.PluralStringResource(
         "plurals:numberOfSongsAvailable", "numberOfSongsAvailable",
         setOf(
-            org.jetbrains.compose.resources.ResourceItem(setOf(), "values/strings.commonMain.cvr", 10,
-                124),
+            org.jetbrains.compose.resources.ResourceItem(setOf(),
+                "composeResources/app.group.resources_test.generated.resources/values/strings.commonMain.cvr",
+                10, 124),
         )
     )
