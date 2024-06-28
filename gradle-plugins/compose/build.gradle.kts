@@ -43,12 +43,6 @@ val embeddedDependencies by configurations.creating {
     isTransitive = false
 }
 
-val kgpResourcesDevVersion = "2.0.0-dev-17632"
-//KMP resources API available since ^kgpResourcesDevVersion
-repositories {
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
-}
-
 dependencies {
     // By default, Gradle resolves plugins only via Gradle Plugin Portal.
     // To avoid declaring an additional repo, all dependencies must:
@@ -63,7 +57,7 @@ dependencies {
 
     compileOnly(gradleApi())
     compileOnly(localGroovy())
-    compileOnly(kotlin("gradle-plugin", kgpResourcesDevVersion))
+    compileOnly(kotlin("gradle-plugin"))
     compileOnly(kotlin("native-utils"))
     compileOnly(libs.plugin.android)
     compileOnly(libs.plugin.android.api)

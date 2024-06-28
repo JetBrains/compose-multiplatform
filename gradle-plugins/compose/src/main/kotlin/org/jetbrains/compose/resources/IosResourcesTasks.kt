@@ -4,8 +4,16 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.*
-import org.gradle.api.tasks.*
+import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.TaskAction
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import javax.inject.Inject
 
@@ -95,7 +103,6 @@ private fun getRequestedKonanTargetsByXcode(platform: String, archs: List<String
             targets.addAll(archs.map { arch ->
                 when (arch) {
                     "arm64", "arm64e" -> KonanTarget.IOS_ARM64
-                    "armv7", "armv7s" -> KonanTarget.IOS_ARM32
                     else -> error("Unknown iOS device arch: '$arch'")
                 }
             })
