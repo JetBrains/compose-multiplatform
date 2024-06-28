@@ -6,9 +6,14 @@ import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.LintModelWriterTask
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.api.file.*
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.IgnoreEmptyDirectories
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -130,6 +135,10 @@ internal fun Project.configureAndroidAssetsForPreview() {
             tasks.configureEach { task ->
                 if (task.name == "compile${variant.name.uppercaseFirstChar()}Sources") {
                     task.dependsOn(kgpCopyAssetsTaskName)
+                }
+                //fix https://github.com/JetBrains/compose-multiplatform/issues/5038
+                if (task is AndroidLintAnalysisTask || task is LintModelWriterTask) {
+                    task.mustRunAfter(kgpCopyAssetsTaskName)
                 }
             }
         }
