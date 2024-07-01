@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.compose")
     kotlin("native.cocoapods")
     id("org.jetbrains.compose")
 }

@@ -22,7 +22,8 @@ public object Res {
    * @return The content of the file as a byte array.
    */
   @ExperimentalResourceApi
-  public suspend fun readBytes(path: String): ByteArray = readResourceBytes("" + path)
+  public suspend fun readBytes(path: String): ByteArray =
+    readResourceBytes("composeResources/my.lib.res/" + path)
 
   /**
    * Returns the URI string of the resource file at the specified path.
@@ -33,7 +34,7 @@ public object Res {
    * @return The URI string of the file.
    */
   @ExperimentalResourceApi
-  public fun getUri(path: String): String = getResourceUri("" + path)
+  public fun getUri(path: String): String = getResourceUri("composeResources/my.lib.res/" + path)
 
   public object drawable
 

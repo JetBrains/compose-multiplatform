@@ -11,7 +11,8 @@ import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewLogger
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.RemoteConnection
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.receiveConfigFromGradle
-import org.jetbrains.compose.test.utils.*
+import org.jetbrains.compose.test.utils.GradlePluginTestBase
+import org.jetbrains.compose.test.utils.checkExists
 import org.jetbrains.compose.test.utils.checks
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
@@ -27,7 +28,7 @@ class GradlePluginTest : GradlePluginTestBase() {
     @Test
     fun skikoWasm() = with(
         testProject(
-            TestProjects.skikoWasm,
+            "misc/skikoWasm",
             // TODO: enable the configuration cache after moving all test projects to kotlin 2.0 or newer
             defaultTestEnvironment.copy(useGradleConfigurationCache = false)
         )
@@ -66,7 +67,7 @@ class GradlePluginTest : GradlePluginTestBase() {
     @Test
     fun newAndroidTarget() {
         Assumptions.assumeTrue(defaultTestEnvironment.parsedGradleVersion >= GradleVersion.version("8.0.0"))
-        with(testProject(TestProjects.newAndroidTarget)) {
+        with(testProject("application/newAndroidTarget")) {
             gradle("build", "--dry-run").checks {
             }
         }
@@ -75,12 +76,7 @@ class GradlePluginTest : GradlePluginTestBase() {
     @Test
     fun jsMppIsNotBroken() =
         with(
-            testProject(
-                TestProjects.jsMpp,
-                testEnvironment = defaultTestEnvironment.copy(
-                    kotlinVersion = TestProperties.composeJsCompilerCompatibleKotlinVersion
-                )
-            )
+            testProject("misc/jsMpp")
         ) {
             gradle(":compileKotlinJs").checks {
                 check.taskSuccessful(":compileKotlinJs")
@@ -145,7 +141,7 @@ class GradlePluginTest : GradlePluginTestBase() {
 
     private fun testConfigureDesktopPreviewImpl(port: Int) {
         check(port > 0) { "Invalid port: $port" }
-        with(testProject(TestProjects.jvmPreview)) {
+        with(testProject("misc/jvmPreview")) {
             val portProperty = "-Pcompose.desktop.preview.ide.port=$port"
             val previewTargetProperty = "-Pcompose.desktop.preview.target=PreviewKt.ExamplePreview"
             val jvmTask = ":jvm:configureDesktopPreview"

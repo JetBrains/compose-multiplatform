@@ -1,18 +1,20 @@
 package org.jetbrains.compose.resources
 
-import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.Directory
 import org.gradle.api.plugins.ExtensionAware
-import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.TaskAction
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.internal.utils.*
+import org.jetbrains.compose.internal.utils.dependsOn
+import org.jetbrains.compose.internal.utils.joinLowerCamelCase
+import org.jetbrains.compose.internal.utils.registerOrConfigure
+import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.cocoapods.CocoapodsExtension
-import org.jetbrains.kotlin.gradle.plugin.mpp.*
+import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.io.File
 
@@ -137,7 +139,7 @@ private fun KotlinNativeTarget.isIosSimulatorTarget(): Boolean =
     konanTarget === KonanTarget.IOS_X64 || konanTarget === KonanTarget.IOS_SIMULATOR_ARM64
 
 private fun KotlinNativeTarget.isIosDeviceTarget(): Boolean =
-    konanTarget === KonanTarget.IOS_ARM64 || konanTarget === KonanTarget.IOS_ARM32
+    konanTarget === KonanTarget.IOS_ARM64
 
 private fun KotlinNativeTarget.isIosTarget(): Boolean =
     isIosSimulatorTarget() || isIosDeviceTarget()
