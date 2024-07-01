@@ -54,6 +54,11 @@ val subsectionOrder = listOf(
     null
 )
 
+// TODO automate or pass as arguments
+// Exclude cherry-picked commits to the previous versions
+val excludeFirstCommit = "v1.6.10-rc01"
+val excludeLastCommit = "v1.6.11"
+
 if (token == null) {
     println("To increase the rate limit, specify token (https://github.com/settings/tokens): kotlin changelog.main.kts <firstCommit> <lastCommit> TOKEN")
 }
@@ -184,7 +189,16 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
 
     fun GitHubCompareResponse.CommitEntry.commitId() = repoNumberForCommit(this)?.toString() ?: sha
 
-    return commits.flatMap { changelogEntriesFor(it, prForCommit(it)) }
+    val excludedCommitIds = fetchPagedUntilEmpty { page ->
+        request<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$excludeFirstCommit...$excludeLastCommit?per_page=1000&page=$page")
+            .commits
+            .map { it.commitId() }
+    }.toSet()
+
+    // Exclude cherry-picks with the same message (they have a different SHA, we can compare by it)
+    val nonCherrypickedCommits = commits.filter { it.commitId() !in excludedCommitIds }
+
+    return nonCherrypickedCommits.flatMap { changelogEntriesFor(it, prForCommit(it)) }
 }
 
 /**
