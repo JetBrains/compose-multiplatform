@@ -60,10 +60,10 @@ fun main() = singleWindowApplication(
                 }
 
                 Button(onClick = { splitterState.firstVisible = !splitterState.firstVisible }) {
-                    Text(if (splitterState.firstVisible) "Hide V First" else "Show V First")
+                    Text(if (splitterState.firstVisible) "Hide Left Pane" else "Show Left Pane")
                 }
                 Button(onClick = { hSplitterState.firstVisible = !hSplitterState.firstVisible }) {
-                    Text(if (hSplitterState.firstVisible) "Hide H First" else "Show H First")
+                    Text(if (hSplitterState.firstVisible) "Hide Top Pane" else "Show Top Pane")
                 }
 
                 OutlinedTextField(value = delta, onValueChange = { delta = it }, label = { Text("Delta") })
