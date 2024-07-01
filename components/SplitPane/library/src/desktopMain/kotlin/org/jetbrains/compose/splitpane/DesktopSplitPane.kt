@@ -115,7 +115,7 @@ internal actual fun SplitPane(
 
                 val handlePlaceable = handleMeasurable.measure(splitterConstraints)
                 val handleSize = handlePlaceable.valueByDirection(isHorizontal)
-                // TODO support RTL
+
                 val handlePosition = when (splitter.alignment) {
                     SplitterHandleAlignment.BEFORE -> position + splitterSize - handleSize
                     SplitterHandleAlignment.ABOVE -> position + (splitterSize - handleSize) / 2

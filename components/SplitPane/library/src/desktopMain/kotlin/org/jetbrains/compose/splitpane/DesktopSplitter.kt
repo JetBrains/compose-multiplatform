@@ -3,7 +3,6 @@ package org.jetbrains.compose.splitpane
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -11,7 +10,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import java.awt.Cursor
 
-@OptIn(ExperimentalComposeUiApi::class)
 private fun Modifier.cursorForHorizontalResize(isHorizontal: Boolean): Modifier =
     pointerHoverIcon(PointerIcon(Cursor(if (isHorizontal) Cursor.E_RESIZE_CURSOR else Cursor.S_RESIZE_CURSOR)))
 
