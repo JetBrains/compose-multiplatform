@@ -252,7 +252,7 @@ abstract class AbstractJPackageTask @Inject constructor(
     internal val fileAssociations: SetProperty<FileAssociation> = objects.setProperty(FileAssociation::class.java)
     
     private val iconMapping by lazy {
-        val icons = fileAssociations.orNull.orEmpty().mapNotNull { it.iconFile }.distinct()
+        val icons = fileAssociations.get().mapNotNull { it.iconFile }.distinct()
         if (icons.isEmpty()) return@lazy emptyMap()
         val iconTempNames: List<String> = mutableListOf<String>().apply {
             val usedNames = mutableSetOf("${packageName.get()}.icns")
@@ -411,7 +411,7 @@ abstract class AbstractJPackageTask @Inject constructor(
             val propertyFilesDirJava = propertyFilesDir.ioFile
             fileOperations.clearDirs(propertyFilesDir)
 
-            val fileAssociationFiles = fileAssociations.orNull.orEmpty()
+            val fileAssociationFiles = fileAssociations.get()
                 .groupBy { it.extension }
                 .mapValues { (extension, associations) ->
                     associations.mapIndexed { index, association ->
@@ -696,8 +696,8 @@ abstract class AbstractJPackageTask @Inject constructor(
             ?: "Copyright (C) $year"
         plist[PlistKeys.NSSupportsAutomaticGraphicsSwitching] = "true"
         plist[PlistKeys.NSHighResolutionCapable] = "true"
-        val fileAssociationMutableSet = fileAssociations.orNull
-        if (!fileAssociationMutableSet.isNullOrEmpty()) {
+        val fileAssociationMutableSet = fileAssociations.get()
+        if (fileAssociationMutableSet.isNotEmpty()) {
             plist[PlistKeys.CFBundleDocumentTypes] = fileAssociationMutableSet
                 .groupBy { it.mimeType to it.description }
                 .map { (key, extensions) ->
