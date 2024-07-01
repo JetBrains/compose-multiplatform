@@ -183,11 +183,13 @@ internal class SplitPaneScopeImpl(
 @Composable
 fun rememberSplitPaneState(
     initialPositionPercentage: Float = 0f,
-    moveEnabled: Boolean = true
+    moveEnabled: Boolean = true,
+    firstVisible: Boolean = true
 ): SplitPaneState {
     return remember {
         SplitPaneState(
             moveEnabled = moveEnabled,
+            firstVisible = firstVisible,
             initialPositionPercentage = initialPositionPercentage
         )
     }
