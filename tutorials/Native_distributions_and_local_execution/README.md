@@ -532,6 +532,7 @@ compose.desktop {
             packageName = "file-associations-demo"
             packageVersion = "1.0.0"
 
+            // macOS-specific associations for .kott and .ko files.
             macOS {
                 fileAssociation(
                     mimeType = "text/kotlin",
