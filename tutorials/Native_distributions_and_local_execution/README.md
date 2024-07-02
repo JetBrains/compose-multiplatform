@@ -513,7 +513,7 @@ compose.desktop {
 
 ## File associations
 
-File associations can be added with `fileAssociation` function.
+File associations can be added using the `fileAssociation()` function.
 These associations can optionally include custom icons.
 Similar to the [app icon](#app-icon), these custom icons also must be provided in OS-specific formats: `.icns` for macOS, `.ico` for Windows and `.png` for Linux.
 
