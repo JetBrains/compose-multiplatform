@@ -511,6 +511,63 @@ compose.desktop {
 }
 ```
 
+## File associations
+
+File associations can be added using the `fileAssociation()` function.
+These associations can optionally include custom icons.
+Similar to the [app icon](#app-icon), these custom icons also must be provided in OS-specific formats: `.icns` for macOS, `.ico` for Windows and `.png` for Linux.
+
+It is possible to specify both OS-specific and OS-agnostic file associations.
+For OS-agnostic associations you can specify icon files for all three operating systems in-place,
+while for OS-specific there is a shorthand with a single `iconFile` parameter.
+
+```kotlin
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+
+            packageName = "file-associations-demo"
+            packageVersion = "1.0.0"
+
+            // macOS-specific associations for .kott and .ko files.
+            macOS {
+                fileAssociation(
+                    mimeType = "text/kotlin",
+                    extension = "kott",
+                    description = "Kotlin Source File",
+                    iconFile = project.file("Kotlin_icon_big.icns"),
+                )
+                fileAssociation(
+                    mimeType = "text/kotlin",
+                    extension = "ko",
+                    description = "Kotlin Source File",
+                )
+            }
+
+            // OS-agnostic file association for .kot files, with icons for all three operating systems.
+            fileAssociation(
+                mimeType = "text/kotlin",
+                extension = "kot",
+                description = "Kotlin Source File",
+                macOSIconFile = project.file("Kotlin_icon_big.icns"),
+                windowsIconFile = project.file("Kotlin_icon_big.ico"),
+                linuxIconFile = project.file("Kotlin_icon_big.png"),
+            )
+
+            // OS-agnostic file association for .kottt files, without icons.
+            fileAssociation(
+                mimeType = "text/kotlin",
+                extension = "kottt",
+                description = "Kotlin Source File",
+            )
+        }
+    }
+}
+```
+
 ## Customizing Info.plist on macOS
 
 We aim to support important platform-specific customization use-cases via declarative DSL.
