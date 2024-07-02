@@ -546,6 +546,7 @@ compose.desktop {
                 )
             }
 
+            // OS-agnostic file association for .kot files, with icons for all three operating systems.
             fileAssociation(
                 mimeType = "text/kotlin",
                 extension = "kot",
