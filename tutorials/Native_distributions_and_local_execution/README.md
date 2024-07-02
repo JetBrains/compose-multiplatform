@@ -519,7 +519,7 @@ Similar to [app icon](#app-icon), these custom icons also have OS-specific forma
 
 It is possible to specify both OS-specific and OS-agnostic file associations.
 For OS-agnostic you can specify icon files for all three OSes in-place,
-while for OS-specific there is a shorthand with a single icon file parameter.
+while for OS-specific there is a shorthand with a single `iconFile` parameter.
 
 ```kotlin
 compose.desktop {
