@@ -515,7 +515,7 @@ compose.desktop {
 
 File associations can be added with `fileAssociation` function.
 These associations can optionally include custom icons.
-Similar to [app icon](#app-icon), these custom icons also have OS-specific formats: `.icns` for macOS, `.ico` for Windows and `.png` for Linux.
+Similar to the [app icon](#app-icon), these custom icons also must be provided in OS-specific formats: `.icns` for macOS, `.ico` for Windows and `.png` for Linux.
 
 It is possible to specify both OS-specific and OS-agnostic file associations.
 For OS-agnostic associations you can specify icon files for all three operating systems in-place,
