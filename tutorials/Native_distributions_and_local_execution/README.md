@@ -555,6 +555,7 @@ compose.desktop {
                 linuxIconFile = project.file("Kotlin_icon_big.png"),
             )
 
+            // OS-agnostic file association for .kottt files, without icons.
             fileAssociation(
                 mimeType = "text/kotlin",
                 extension = "kottt",
