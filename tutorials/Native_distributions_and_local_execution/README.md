@@ -518,7 +518,7 @@ These associations can optionally include custom icons.
 Similar to [app icon](#app-icon), these custom icons also have OS-specific formats: `.icns` for macOS, `.ico` for Windows and `.png` for Linux.
 
 It is possible to specify both OS-specific and OS-agnostic file associations.
-For OS-agnostic you can specify icon files for all three OSes in-place,
+For OS-agnostic associations you can specify icon files for all three operating systems in-place,
 while for OS-specific there is a shorthand with a single `iconFile` parameter.
 
 ```kotlin
