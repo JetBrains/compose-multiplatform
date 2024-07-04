@@ -6,8 +6,14 @@ import org.jetbrains.compose.ComposePlugin
 import org.jetbrains.compose.internal.IDEA_IMPORT_TASK_NAME
 import org.jetbrains.compose.internal.IdeaImportTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinSingleTargetExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMetadataTarget
+import org.jetbrains.kotlin.tooling.core.withClosure
 import java.io.File
 
 internal fun Project.configureComposeResourcesGeneration(
@@ -67,6 +73,8 @@ internal fun Project.configureComposeResourcesGeneration(
         )
     }
 
+    configureResourceCollectorsGeneration(kotlinExtension, shouldGenerateCode, packageName, makeAccessorsPublic)
+
     //setup task execution during IDE import
     tasks.configureEach { importTask ->
         if (importTask.name == IDEA_IMPORT_TASK_NAME) {
@@ -115,7 +123,7 @@ private fun Project.configureResourceAccessorsGeneration(
     logger.info("Configure resource accessors generation for ${sourceSet.name}")
 
     val genTask = tasks.register(
-        "generateResourceAccessorsFor${sourceSet.name.uppercaseFirstChar()}",
+        sourceSet.getResourceAccessorsGenerationTaskName(),
         GenerateResourceAccessorsTask::class.java
     ) { task ->
         task.packageName.set(packageName)
@@ -128,6 +136,93 @@ private fun Project.configureResourceAccessorsGeneration(
         if (generateModulePath) {
             task.packagingDir.set(packagingDir)
         }
+    }
+
+    //register generated source set
+    sourceSet.kotlin.srcDir(genTask.map { it.codeDir })
+}
+
+private fun KotlinSourceSet.getResourceAccessorsGenerationTaskName(): String {
+    return "generateResourceAccessorsFor${this.name.uppercaseFirstChar()}"
+}
+
+//we have to generate actual resource collector functions for each leaf source set
+private fun Project.configureResourceCollectorsGeneration(
+    kotlinExtension: KotlinProjectExtension,
+    shouldGenerateCode: Provider<Boolean>,
+    packageName: Provider<String>,
+    makeAccessorsPublic: Provider<Boolean>
+) {
+    if (kotlinExtension is KotlinMultiplatformExtension) {
+        kotlinExtension.targets.all { target ->
+            if (target is KotlinAndroidTarget) {
+                kotlinExtension.sourceSets.matching { it.name == "androidMain" }.all { androidMain ->
+                    configureResourceCollectorsGeneration(
+                        androidMain,
+                        shouldGenerateCode,
+                        packageName,
+                        makeAccessorsPublic
+                    )
+                }
+            } else if (target !is KotlinMetadataTarget) {
+                target.compilations.matching { it.name == KotlinCompilation.MAIN_COMPILATION_NAME }.all { compilation ->
+                    configureResourceCollectorsGeneration(
+                        compilation.defaultSourceSet,
+                        shouldGenerateCode,
+                        packageName,
+                        makeAccessorsPublic
+                    )
+                }
+            }
+        }
+    } else if (kotlinExtension is KotlinSingleTargetExtension<*>) {
+        //JVM only projects
+        kotlinExtension.target.compilations
+            .findByName(KotlinCompilation.MAIN_COMPILATION_NAME)
+            ?.let { compilation ->
+                configureResourceCollectorsGeneration(
+                    compilation.defaultSourceSet,
+                    shouldGenerateCode,
+                    packageName,
+                    makeAccessorsPublic
+                )
+            }
+    }
+
+}
+
+private fun Project.configureResourceCollectorsGeneration(
+    sourceSet: KotlinSourceSet,
+    shouldGenerateCode: Provider<Boolean>,
+    packageName: Provider<String>,
+    makeAccessorsPublic: Provider<Boolean>
+) {
+    val taskName = "generateResourceCollectorsFor${sourceSet.name.uppercaseFirstChar()}"
+    if (tasks.names.contains(taskName)) {
+        logger.info("Resource collectors generation for ${sourceSet.name} is already configured")
+        return
+    }
+    logger.info("Configure resource collectors generation for ${sourceSet.name}")
+
+    val accessorDirs = project.files({
+        val allSourceSets = sourceSet.withClosure { it.dependsOn }
+        allSourceSets.mapNotNull { item ->
+            val taskName = item.getResourceAccessorsGenerationTaskName()
+            if (tasks.names.contains(taskName)) {
+                tasks.named(taskName, GenerateResourceAccessorsTask::class.java).map { it.codeDir }
+            } else null
+        }
+    })
+
+    val genTask = tasks.register(
+        taskName,
+        GenerateResourceCollectorsTask::class.java
+    ) { task ->
+        task.packageName.set(packageName)
+        task.shouldGenerateCode.set(shouldGenerateCode)
+        task.makeAccessorsPublic.set(makeAccessorsPublic)
+        task.resourceAccessorDirs.from(accessorDirs)
+        task.codeDir.set(layout.buildDirectory.dir("$RES_GEN_DIR/kotlin/${sourceSet.name}ResourceCollectors"))
     }
 
     //register generated source set

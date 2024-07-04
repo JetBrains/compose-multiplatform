@@ -1,6 +1,7 @@
 package org.jetbrains.compose.resources
 
 import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import java.nio.file.Path
 import java.util.*
@@ -44,6 +45,9 @@ private fun ResourceType.requiresKeyName() =
 private val resourceItemClass = ClassName("org.jetbrains.compose.resources", "ResourceItem")
 private val experimentalAnnotation = AnnotationSpec.builder(
     ClassName("org.jetbrains.compose.resources", "ExperimentalResourceApi")
+).build()
+private val internalAnnotation = AnnotationSpec.builder(
+    ClassName("org.jetbrains.compose.resources", "InternalResourceApi")
 ).build()
 
 private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlock.Builder {
@@ -175,6 +179,22 @@ internal fun getResFileSpec(
                 resObject.addType(TypeSpec.objectBuilder(type.accessorName).build())
             }
         }.build())
+
+        ResourceType.values().forEach { type ->
+            val typeClassName = type.getClassName()
+            file.addProperty(
+                PropertySpec
+                    .builder(
+                        "all${typeClassName.simpleName}s",
+                        MAP.parameterizedBy(String::class.asClassName(), typeClassName),
+                        KModifier.EXPECT,
+                        resModifier
+                    )
+                    .addAnnotation(experimentalAnnotation)
+                    .receiver(ClassName(packageName, "Res"))
+                    .build()
+            )
+        }
     }.build()
 }
 
@@ -247,6 +267,23 @@ private fun getChunkFileSpec(
         }.build()
         chunkFile.addType(objectSpec)
 
+        //__collect${chunkClassName}Resources function
+        chunkFile.addFunction(
+            FunSpec.builder("_collect${chunkClassName}Resources")
+                .addAnnotation(internalAnnotation)
+                .addModifiers(KModifier.INTERNAL)
+                .addParameter(
+                    "map",
+                    MUTABLE_MAP.parameterizedBy(String::class.asClassName(), type.getClassName())
+                )
+                .also { collectFun ->
+                    idToResources.keys.forEach { resName ->
+                        collectFun.addStatement("map.put(%S, $chunkClassName.%N)", resName, resName)
+                    }
+                }
+                .build()
+        )
+
         idToResources.forEach { (resName, items) ->
             val accessor = PropertySpec.builder(resName, type.getClassName(), resModifier)
                 .receiver(ClassName(packageName, "Res", type.accessorName))
@@ -284,6 +321,48 @@ private fun getChunkFileSpec(
         }
     }.build()
 }
+
+internal fun getResourceCollectorsFileSpec(
+    fileName: String,
+    packageName: String,
+    isPublic: Boolean,
+    typeToCollectorFunctions: Map<ResourceType, List<String>>
+): FileSpec = FileSpec.builder(packageName, fileName).also { file ->
+    val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
+
+    file.addAnnotation(
+        AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
+            .addMember("org.jetbrains.compose.resources.InternalResourceApi::class")
+            .build()
+    )
+
+    ResourceType.values().forEach { type ->
+        val typeClassName = type.getClassName()
+        val initBlock = CodeBlock.builder()
+            .addStatement("lazy {").withIndent {
+                addStatement("val map = mutableMapOf<String, %T>()", typeClassName)
+                typeToCollectorFunctions.get(type).orEmpty().forEach { item ->
+                    addStatement("%N(map)", item)
+                }
+                addStatement("return@lazy map")
+            }
+            .addStatement("}")
+            .build()
+
+        val property = PropertySpec
+            .builder(
+                "all${typeClassName.simpleName}s",
+                MAP.parameterizedBy(String::class.asClassName(), typeClassName),
+                KModifier.ACTUAL,
+                resModifier
+            )
+            .addAnnotation(experimentalAnnotation)
+            .receiver(ClassName(packageName, "Res"))
+            .delegate(initBlock)
+            .build()
+        file.addProperty(property)
+    }
+}.build()
 
 private fun sortResources(
     resources: Map<ResourceType, Map<String, List<ResourceItem>>>
