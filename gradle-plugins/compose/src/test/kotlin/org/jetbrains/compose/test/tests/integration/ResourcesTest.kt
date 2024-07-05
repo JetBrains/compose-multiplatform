@@ -513,9 +513,9 @@ class ResourcesTest : GradlePluginTestBase() {
 
     @Test
     fun testEmptyResClass(): Unit = with(testProject("misc/emptyResources")) {
-        gradle("generateComposeResClass").checks {
+        gradle("prepareKotlinIdeaImport").checks {
             assertDirectoriesContentEquals(
-                file("build/generated/compose/resourceGenerator/kotlin/commonResClass/app/group/empty_res/generated/resources"),
+                file("build/generated/compose/resourceGenerator/kotlin"),
                 file("expected")
             )
         }
