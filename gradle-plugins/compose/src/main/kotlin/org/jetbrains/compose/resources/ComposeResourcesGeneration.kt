@@ -98,17 +98,21 @@ private fun Project.configureResClassGeneration(
         GenerateResClassTask::class.java
     ) { task ->
         task.packageName.set(packageName)
-        task.shouldGenerateCode.set(shouldGenerateCode)
         task.makeAccessorsPublic.set(makeAccessorsPublic)
         task.codeDir.set(layout.buildDirectory.dir("$RES_GEN_DIR/kotlin/commonResClass"))
 
         if (generateModulePath) {
             task.packagingDir.set(packagingDir)
         }
+        task.onlyIf { shouldGenerateCode.get() }
     }
 
     //register generated source set
-    resClassSourceSet.kotlin.srcDir(genTask.map { it.codeDir })
+    resClassSourceSet.kotlin.srcDir(
+        genTask.zip(shouldGenerateCode) { task, flag ->
+            if (flag) listOf(task.codeDir) else emptyList()
+        }
+    )
 }
 
 private fun Project.configureResourceAccessorsGeneration(
@@ -128,7 +132,6 @@ private fun Project.configureResourceAccessorsGeneration(
     ) { task ->
         task.packageName.set(packageName)
         task.sourceSetName.set(sourceSet.name)
-        task.shouldGenerateCode.set(shouldGenerateCode)
         task.makeAccessorsPublic.set(makeAccessorsPublic)
         task.resDir.set(resourcesDir)
         task.codeDir.set(layout.buildDirectory.dir("$RES_GEN_DIR/kotlin/${sourceSet.name}ResourceAccessors"))
@@ -136,10 +139,15 @@ private fun Project.configureResourceAccessorsGeneration(
         if (generateModulePath) {
             task.packagingDir.set(packagingDir)
         }
+        task.onlyIf { shouldGenerateCode.get() }
     }
 
     //register generated source set
-    sourceSet.kotlin.srcDir(genTask.map { it.codeDir })
+    sourceSet.kotlin.srcDir(
+        genTask.zip(shouldGenerateCode) { task, flag ->
+            if (flag) listOf(task.codeDir) else emptyList()
+        }
+    )
 }
 
 private fun KotlinSourceSet.getResourceAccessorsGenerationTaskName(): String {
@@ -219,13 +227,17 @@ private fun Project.configureExpectResourceCollectorsGeneration(
         GenerateExpectResourceCollectorsTask::class.java
     ) { task ->
         task.packageName.set(packageName)
-        task.shouldGenerateCode.set(shouldGenerateCode)
         task.makeAccessorsPublic.set(makeAccessorsPublic)
         task.codeDir.set(layout.buildDirectory.dir("$RES_GEN_DIR/kotlin/${sourceSet.name}ResourceCollectors"))
+        task.onlyIf { shouldGenerateCode.get() }
     }
 
     //register generated source set
-    sourceSet.kotlin.srcDir(genTask.map { it.codeDir })
+    sourceSet.kotlin.srcDir(
+        genTask.zip(shouldGenerateCode) { task, flag ->
+            if (flag) listOf(task.codeDir) else emptyList()
+        }
+    )
 }
 
 private fun Project.configureActualResourceCollectorsGeneration(
@@ -257,13 +269,17 @@ private fun Project.configureActualResourceCollectorsGeneration(
         GenerateActualResourceCollectorsTask::class.java
     ) { task ->
         task.packageName.set(packageName)
-        task.shouldGenerateCode.set(shouldGenerateCode)
         task.makeAccessorsPublic.set(makeAccessorsPublic)
         task.useActualModifier.set(useActualModifier)
         task.resourceAccessorDirs.from(accessorDirs)
         task.codeDir.set(layout.buildDirectory.dir("$RES_GEN_DIR/kotlin/${sourceSet.name}ResourceCollectors"))
+        task.onlyIf { shouldGenerateCode.get() }
     }
 
     //register generated source set
-    sourceSet.kotlin.srcDir(genTask.map { it.codeDir })
+    sourceSet.kotlin.srcDir(
+        genTask.zip(shouldGenerateCode) { task, flag ->
+            if (flag) listOf(task.codeDir) else emptyList()
+        }
+    )
 }
