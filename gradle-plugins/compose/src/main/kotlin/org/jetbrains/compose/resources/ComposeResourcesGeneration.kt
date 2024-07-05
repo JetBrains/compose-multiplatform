@@ -154,23 +154,36 @@ private fun Project.configureResourceCollectorsGeneration(
     makeAccessorsPublic: Provider<Boolean>
 ) {
     if (kotlinExtension is KotlinMultiplatformExtension) {
+        kotlinExtension.sourceSets
+            .matching { it.name == KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME }
+            .all { commonMainSourceSet ->
+                configureExpectResourceCollectorsGeneration(
+                    commonMainSourceSet,
+                    shouldGenerateCode,
+                    packageName,
+                    makeAccessorsPublic
+                )
+            }
+
         kotlinExtension.targets.all { target ->
             if (target is KotlinAndroidTarget) {
                 kotlinExtension.sourceSets.matching { it.name == "androidMain" }.all { androidMain ->
-                    configureResourceCollectorsGeneration(
+                    configureActualResourceCollectorsGeneration(
                         androidMain,
                         shouldGenerateCode,
                         packageName,
-                        makeAccessorsPublic
+                        makeAccessorsPublic,
+                        true
                     )
                 }
             } else if (target !is KotlinMetadataTarget) {
                 target.compilations.matching { it.name == KotlinCompilation.MAIN_COMPILATION_NAME }.all { compilation ->
-                    configureResourceCollectorsGeneration(
+                    configureActualResourceCollectorsGeneration(
                         compilation.defaultSourceSet,
                         shouldGenerateCode,
                         packageName,
-                        makeAccessorsPublic
+                        makeAccessorsPublic,
+                        true
                     )
                 }
             }
@@ -180,47 +193,73 @@ private fun Project.configureResourceCollectorsGeneration(
         kotlinExtension.target.compilations
             .findByName(KotlinCompilation.MAIN_COMPILATION_NAME)
             ?.let { compilation ->
-                configureResourceCollectorsGeneration(
+                configureActualResourceCollectorsGeneration(
                     compilation.defaultSourceSet,
                     shouldGenerateCode,
                     packageName,
-                    makeAccessorsPublic
+                    makeAccessorsPublic,
+                    false
                 )
             }
     }
 
 }
 
-private fun Project.configureResourceCollectorsGeneration(
+private fun Project.configureExpectResourceCollectorsGeneration(
     sourceSet: KotlinSourceSet,
     shouldGenerateCode: Provider<Boolean>,
     packageName: Provider<String>,
     makeAccessorsPublic: Provider<Boolean>
 ) {
-    val taskName = "generateResourceCollectorsFor${sourceSet.name.uppercaseFirstChar()}"
+    logger.info("Configure expect resource collectors generation for ${sourceSet.name}")
+
+
+    val genTask = tasks.register(
+        "generateExpectResourceCollectorsFor${sourceSet.name.uppercaseFirstChar()}",
+        GenerateExpectResourceCollectorsTask::class.java
+    ) { task ->
+        task.packageName.set(packageName)
+        task.shouldGenerateCode.set(shouldGenerateCode)
+        task.makeAccessorsPublic.set(makeAccessorsPublic)
+        task.codeDir.set(layout.buildDirectory.dir("$RES_GEN_DIR/kotlin/${sourceSet.name}ResourceCollectors"))
+    }
+
+    //register generated source set
+    sourceSet.kotlin.srcDir(genTask.map { it.codeDir })
+}
+
+private fun Project.configureActualResourceCollectorsGeneration(
+    sourceSet: KotlinSourceSet,
+    shouldGenerateCode: Provider<Boolean>,
+    packageName: Provider<String>,
+    makeAccessorsPublic: Provider<Boolean>,
+    useActualModifier: Boolean
+) {
+    val taskName = "generateActualResourceCollectorsFor${sourceSet.name.uppercaseFirstChar()}"
     if (tasks.names.contains(taskName)) {
-        logger.info("Resource collectors generation for ${sourceSet.name} is already configured")
+        logger.info("Actual resource collectors generation for ${sourceSet.name} is already configured")
         return
     }
-    logger.info("Configure resource collectors generation for ${sourceSet.name}")
+    logger.info("Configure actual resource collectors generation for ${sourceSet.name}")
 
     val accessorDirs = project.files({
         val allSourceSets = sourceSet.withClosure { it.dependsOn }
         allSourceSets.mapNotNull { item ->
-            val taskName = item.getResourceAccessorsGenerationTaskName()
-            if (tasks.names.contains(taskName)) {
-                tasks.named(taskName, GenerateResourceAccessorsTask::class.java).map { it.codeDir }
+            val accessorsTaskName = item.getResourceAccessorsGenerationTaskName()
+            if (tasks.names.contains(accessorsTaskName)) {
+                tasks.named(accessorsTaskName, GenerateResourceAccessorsTask::class.java).map { it.codeDir }
             } else null
         }
     })
 
     val genTask = tasks.register(
         taskName,
-        GenerateResourceCollectorsTask::class.java
+        GenerateActualResourceCollectorsTask::class.java
     ) { task ->
         task.packageName.set(packageName)
         task.shouldGenerateCode.set(shouldGenerateCode)
         task.makeAccessorsPublic.set(makeAccessorsPublic)
+        task.useActualModifier.set(useActualModifier)
         task.resourceAccessorDirs.from(accessorDirs)
         task.codeDir.set(layout.buildDirectory.dir("$RES_GEN_DIR/kotlin/${sourceSet.name}ResourceCollectors"))
     }

@@ -1,7 +1,19 @@
 package org.jetbrains.compose.resources
 
-import com.squareup.kotlinpoet.*
+import com.squareup.kotlinpoet.AnnotationSpec
+import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
+import com.squareup.kotlinpoet.FileSpec
+import com.squareup.kotlinpoet.FunSpec
+import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.MAP
+import com.squareup.kotlinpoet.MUTABLE_MAP
+import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
+import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asClassName
+import com.squareup.kotlinpoet.withIndent
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import java.nio.file.Path
 import java.util.*
@@ -179,22 +191,6 @@ internal fun getResFileSpec(
                 resObject.addType(TypeSpec.objectBuilder(type.accessorName).build())
             }
         }.build())
-
-        ResourceType.values().forEach { type ->
-            val typeClassName = type.getClassName()
-            file.addProperty(
-                PropertySpec
-                    .builder(
-                        "all${typeClassName.simpleName}s",
-                        MAP.parameterizedBy(String::class.asClassName(), typeClassName),
-                        KModifier.EXPECT,
-                        resModifier
-                    )
-                    .addAnnotation(experimentalAnnotation)
-                    .receiver(ClassName(packageName, "Res"))
-                    .build()
-            )
-        }
     }.build()
 }
 
@@ -322,10 +318,36 @@ private fun getChunkFileSpec(
     }.build()
 }
 
-internal fun getResourceCollectorsFileSpec(
-    fileName: String,
+internal fun getExpectResourceCollectorsFileSpec(
     packageName: String,
+    fileName: String,
+    isPublic: Boolean
+): FileSpec {
+    val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
+    return FileSpec.builder(packageName, fileName).also { file ->
+        ResourceType.values().forEach { type ->
+            val typeClassName = type.getClassName()
+            file.addProperty(
+                PropertySpec
+                    .builder(
+                        "all${typeClassName.simpleName}s",
+                        MAP.parameterizedBy(String::class.asClassName(), typeClassName),
+                        KModifier.EXPECT,
+                        resModifier
+                    )
+                    .addAnnotation(experimentalAnnotation)
+                    .receiver(ClassName(packageName, "Res"))
+                    .build()
+            )
+        }
+    }.build()
+}
+
+internal fun getActualResourceCollectorsFileSpec(
+    packageName: String,
+    fileName: String,
     isPublic: Boolean,
+    useActualModifier: Boolean, //e.g. java only project doesn't need actual modifiers
     typeToCollectorFunctions: Map<ResourceType, List<String>>
 ): FileSpec = FileSpec.builder(packageName, fileName).also { file ->
     val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
@@ -349,12 +371,17 @@ internal fun getResourceCollectorsFileSpec(
             .addStatement("}")
             .build()
 
+        val mods = if (useActualModifier) {
+            listOf(KModifier.ACTUAL, resModifier)
+        } else {
+            listOf(resModifier)
+        }
+
         val property = PropertySpec
             .builder(
                 "all${typeClassName.simpleName}s",
                 MAP.parameterizedBy(String::class.asClassName(), typeClassName),
-                KModifier.ACTUAL,
-                resModifier
+                mods
             )
             .addAnnotation(experimentalAnnotation)
             .receiver(ClassName(packageName, "Res"))

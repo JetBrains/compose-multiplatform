@@ -8,11 +8,10 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
-import org.gradle.api.tasks.SkipWhenEmpty
 import org.jetbrains.compose.internal.IdeaImportTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 
-internal abstract class GenerateResourceCollectorsTask : IdeaImportTask() {
+internal abstract class GenerateExpectResourceCollectorsTask : IdeaImportTask() {
     @get:Input
     abstract val packageName: Property<String>
 
@@ -21,6 +20,40 @@ internal abstract class GenerateResourceCollectorsTask : IdeaImportTask() {
 
     @get:Input
     abstract val makeAccessorsPublic: Property<Boolean>
+
+    @get:OutputDirectory
+    abstract val codeDir: DirectoryProperty
+
+    override fun safeAction() {
+        val kotlinDir = codeDir.get().asFile
+
+        logger.info("Clean directory $kotlinDir")
+        kotlinDir.deleteRecursively()
+        kotlinDir.mkdirs()
+
+        if (shouldGenerateCode.get()) {
+            logger.info("Generate expect ResourceCollectors for $kotlinDir")
+
+            val pkgName = packageName.get()
+            val isPublic = makeAccessorsPublic.get()
+            val spec = getExpectResourceCollectorsFileSpec(pkgName, "ExpectResourceCollectors", isPublic)
+            spec.writeTo(kotlinDir)
+        }
+    }
+}
+
+internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() {
+    @get:Input
+    abstract val packageName: Property<String>
+
+    @get:Input
+    abstract val shouldGenerateCode: Property<Boolean>
+
+    @get:Input
+    abstract val makeAccessorsPublic: Property<Boolean>
+
+    @get:Input
+    abstract val useActualModifier: Property<Boolean>
 
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -42,7 +75,7 @@ internal abstract class GenerateResourceCollectorsTask : IdeaImportTask() {
         }
 
         if (shouldGenerateCode.get()) {
-            logger.info("Generate ResourceCollectors for $kotlinDir")
+            logger.info("Generate actual ResourceCollectors for $kotlinDir")
             val funNames = inputFiles.mapNotNull { inputFile ->
                 if (inputFile.nameWithoutExtension.contains('.')) {
                     val (fileName, suffix) = inputFile.nameWithoutExtension.split('.')
@@ -67,7 +100,14 @@ internal abstract class GenerateResourceCollectorsTask : IdeaImportTask() {
 
             val pkgName = packageName.get()
             val isPublic = makeAccessorsPublic.get()
-            val spec = getResourceCollectorsFileSpec("ResourceCollectors", pkgName, isPublic, funNames)
+            val useActual = useActualModifier.get()
+            val spec = getActualResourceCollectorsFileSpec(
+                pkgName,
+                "ActualResourceCollectors",
+                isPublic,
+                useActual,
+                funNames
+            )
             spec.writeTo(kotlinDir)
         } else {
             logger.info("Generation ResourceCollectors for $kotlinDir is disabled")
