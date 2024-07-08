@@ -122,7 +122,7 @@ internal fun Project.configureAndroidAssetsForPreview() {
 
             if (androidComponents.pluginVersion >= agp_8_1_0) {
                 // addGeneratedSourceDirectory doesn't mark the output directory as assets hence AS Compose Preview doesn't work
-                tasks.all { task ->
+                tasks.configureEach { task ->
                     if (task.name == kgpCopyAssetsTaskName) {
                         task.outputs.files.forEach { file ->
                             addStaticSourceDirectory(file.path)
