@@ -1,95 +1,71 @@
 package org.jetbrains.compose.resources
 
-import com.android.build.api.AndroidPluginVersion
 import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.Variant
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.LintModelWriterTask
-import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
-import org.gradle.api.file.FileSystemOperations
-import org.gradle.api.provider.Property
-import org.gradle.api.tasks.IgnoreEmptyDirectories
-import org.gradle.api.tasks.InputFiles
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
-import org.jetbrains.compose.internal.utils.registerTask
+import org.gradle.api.tasks.Copy
+import org.jetbrains.compose.internal.utils.dir
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJvmAndroidCompilation
-import org.jetbrains.kotlin.gradle.utils.ObservableSet
-import javax.inject.Inject
 
-private val agp_8_1_0 = AndroidPluginVersion(8, 1, 0)
+internal fun Project.getAndroidVariantComposeResources(
+    kotlinExtension: KotlinMultiplatformExtension,
+    variant: Variant
+): FileCollection = project.files({
+    kotlinExtension.targets.withType(KotlinAndroidTarget::class.java).flatMap { androidTarget ->
+        androidTarget.compilations.flatMap { compilation ->
+            if (compilation.androidVariant.name == variant.name) {
+                compilation.allKotlinSourceSets.map { kotlinSourceSet ->
+                    getPreparedComposeResourcesDir(kotlinSourceSet)
+                }
+            } else emptyList()
+        }
+    }
+})
+
+internal fun Project.getKgpAndroidVariantComposeResources(
+    variant: Variant
+): FileCollection = project.files({
+    val taskName = "${variant.name}AssetsCopyForAGP"
+    if (tasks.names.contains(taskName)) tasks.named(taskName).map { it.outputs.files }
+    else files()
+})
 
 internal fun Project.configureAndroidComposeResources(
-    kotlinExtension: KotlinMultiplatformExtension
+    getVariantComposeResources: (Variant) -> FileCollection
 ) {
     //copy all compose resources to android assets
     val androidComponents = project.extensions.findByType(AndroidComponentsExtension::class.java) ?: return
     androidComponents.onVariants { variant ->
-        val variantResources = project.files()
+        val variantAssets = getVariantComposeResources(variant)
+        val variantAssetsDir = layout.buildDirectory.dir(RES_GEN_DIR).dir(variant.name + "AndroidAssets")
 
-        kotlinExtension.targets.withType(KotlinAndroidTarget::class.java).all { androidTarget ->
-            androidTarget.compilations.all { compilation: KotlinJvmAndroidCompilation ->
-                if (compilation.androidVariant.name == variant.name) {
-                    project.logger.info("Configure resources for variant ${variant.name}")
-                    (compilation.allKotlinSourceSets as? ObservableSet<KotlinSourceSet>)?.forAll { kotlinSourceSet ->
-                        val preparedComposeResources = getPreparedComposeResourcesDir(kotlinSourceSet)
-                        variantResources.from(preparedComposeResources)
-                    }
-                }
-            }
+        val copyVariantAssets = tasks.register(
+            "copy${variant.name.uppercaseFirstChar()}ComposeResourcesToAndroidAssets",
+            Copy::class.java
+        ) { task ->
+            task.from(variantAssets)
+            task.into(variantAssetsDir)
         }
 
-        val copyResources = registerTask<CopyResourcesToAndroidAssetsTask>(
-            "copy${variant.name.uppercaseFirstChar()}ResourcesToAndroidAssets"
-        ) {
-            from.set(variantResources)
-        }
-        variant.sources.assets?.apply {
-            addGeneratedSourceDirectory(
-                taskProvider = copyResources,
-                wiredWith = CopyResourcesToAndroidAssetsTask::outputDirectory
-            )
-
-            // https://issuetracker.google.com/348208777
-            if (androidComponents.pluginVersion >= agp_8_1_0) {
-                // addGeneratedSourceDirectory doesn't mark the output directory as assets hence AS Compose Preview doesn't work
-                addStaticSourceDirectory(copyResources.flatMap { it.outputDirectory.asFile }.get().path)
+        //https://issuetracker.google.com/348208777
+        variant.sources.assets?.addStaticSourceDirectory(variantAssetsDir.get().asFile.path)
+        tasks.configureEach { task ->
+            if (task.name == "merge${variant.name.uppercaseFirstChar()}Assets") {
+                task.dependsOn(copyVariantAssets)
             }
-
-            // addGeneratedSourceDirectory doesn't run the copyResources task during AS Compose Preview build
-            tasks.configureEach { task ->
-                if (task.name == "compile${variant.name.uppercaseFirstChar()}Sources") {
-                    task.dependsOn(copyResources)
-                }
+            //fix task dependencies for AndroidStudio preview
+            if (task.name == "compile${variant.name.uppercaseFirstChar()}Sources") {
+                task.dependsOn(copyVariantAssets)
             }
-        }
-    }
-}
-
-//Copy task doesn't work with 'variant.sources?.assets?.addGeneratedSourceDirectory' API
-internal abstract class CopyResourcesToAndroidAssetsTask : DefaultTask() {
-    @get:Inject
-    abstract val fileSystem: FileSystemOperations
-
-    @get:InputFiles
-    @get:IgnoreEmptyDirectories
-    abstract val from: Property<FileCollection>
-
-    @get:OutputDirectory
-    abstract val outputDirectory: DirectoryProperty
-
-    @TaskAction
-    fun action() {
-        fileSystem.copy {
-            it.includeEmptyDirs = false
-            it.from(from)
-            it.into(outputDirectory)
+            //fix linter task dependencies for `build` task
+            if (task is AndroidLintAnalysisTask || task is LintModelWriterTask) {
+                task.mustRunAfter(copyVariantAssets)
+            }
         }
     }
 }
@@ -109,38 +85,5 @@ internal fun Project.fixAndroidLintTaskDependencies() {
         it is AndroidLintAnalysisTask || it is LintModelWriterTask
     }.configureEach {
         it.mustRunAfter(tasks.withType(GenerateResourceAccessorsTask::class.java))
-        it.mustRunAfter(tasks.withType(CopyResourcesToAndroidAssetsTask::class.java))
-    }
-}
-
-// https://issuetracker.google.com/348208777
-internal fun Project.configureAndroidAssetsForPreview() {
-    val androidComponents = project.extensions.findByType(AndroidComponentsExtension::class.java) ?: return
-    androidComponents.onVariants { variant ->
-        variant.sources.assets?.apply {
-            val kgpCopyAssetsTaskName = "${variant.name}AssetsCopyForAGP"
-
-            if (androidComponents.pluginVersion >= agp_8_1_0) {
-                // addGeneratedSourceDirectory doesn't mark the output directory as assets hence AS Compose Preview doesn't work
-                tasks.configureEach { task ->
-                    if (task.name == kgpCopyAssetsTaskName) {
-                        task.outputs.files.forEach { file ->
-                            addStaticSourceDirectory(file.path)
-                        }
-                    }
-                }
-            }
-
-            // addGeneratedSourceDirectory doesn't run the copyResources task during AS Compose Preview build
-            tasks.configureEach { task ->
-                if (task.name == "compile${variant.name.uppercaseFirstChar()}Sources") {
-                    task.dependsOn(kgpCopyAssetsTaskName)
-                }
-                //fix https://github.com/JetBrains/compose-multiplatform/issues/5038
-                if (task is AndroidLintAnalysisTask || task is LintModelWriterTask) {
-                    task.mustRunAfter(kgpCopyAssetsTaskName)
-                }
-            }
-        }
     }
 }
