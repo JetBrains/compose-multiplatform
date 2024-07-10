@@ -23,7 +23,7 @@ internal object Res {
    */
   @ExperimentalResourceApi
   public suspend fun readBytes(path: String): ByteArray =
-    readResourceBytes("composeResources/app.group.resources_test.generated.resources/" + path)
+      readResourceBytes("composeResources/app.group.resources_test.generated.resources/" + path)
 
   /**
    * Returns the URI string of the resource file at the specified path.
@@ -35,7 +35,7 @@ internal object Res {
    */
   @ExperimentalResourceApi
   public fun getUri(path: String): String =
-    getResourceUri("composeResources/app.group.resources_test.generated.resources/" + path)
+      getResourceUri("composeResources/app.group.resources_test.generated.resources/" + path)
 
   public object drawable
 

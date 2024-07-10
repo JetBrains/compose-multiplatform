@@ -23,7 +23,7 @@ public object Res {
    */
   @ExperimentalResourceApi
   public suspend fun readBytes(path: String): ByteArray =
-    readResourceBytes("composeResources/my.lib.res/" + path)
+      readResourceBytes("composeResources/my.lib.res/" + path)
 
   /**
    * Returns the URI string of the resource file at the specified path.
