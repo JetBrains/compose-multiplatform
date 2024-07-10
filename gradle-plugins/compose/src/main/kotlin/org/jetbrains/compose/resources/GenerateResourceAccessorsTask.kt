@@ -9,7 +9,6 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
-import org.gradle.api.tasks.TaskAction
 import org.jetbrains.compose.internal.IdeaImportTask
 import java.io.File
 import java.nio.file.Path
@@ -25,9 +24,6 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     @get:Input
     @get:Optional
     abstract val packagingDir: Property<File>
-
-    @get:Input
-    abstract val shouldGenerateCode: Property<Boolean>
 
     @get:Input
     abstract val makeAccessorsPublic: Property<Boolean>
@@ -49,37 +45,33 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
         kotlinDir.deleteRecursively()
         kotlinDir.mkdirs()
 
-        if (shouldGenerateCode.get()) {
-            logger.info("Generate accessors for $rootResDir")
+        logger.info("Generate accessors for $rootResDir")
 
-            //get first level dirs
-            val dirs = rootResDir.listNotHiddenFiles()
+        //get first level dirs
+        val dirs = rootResDir.listNotHiddenFiles()
 
-            dirs.forEach { f ->
-                if (!f.isDirectory) {
-                    error("${f.name} is not directory! Raw files should be placed in '${rootResDir.name}/files' directory.")
-                }
+        dirs.forEach { f ->
+            if (!f.isDirectory) {
+                error("${f.name} is not directory! Raw files should be placed in '${rootResDir.name}/files' directory.")
             }
-
-            //type -> id -> resource item
-            val resources: Map<ResourceType, Map<String, List<ResourceItem>>> = dirs
-                .flatMap { dir ->
-                    dir.listNotHiddenFiles()
-                        .mapNotNull { it.fileToResourceItems(rootResDir.toPath()) }
-                        .flatten()
-                }
-                .groupBy { it.type }
-                .mapValues { (_, items) -> items.groupBy { it.name } }
-
-            val pkgName = packageName.get()
-            val moduleDirectory = packagingDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
-            val isPublic = makeAccessorsPublic.get()
-            getAccessorsSpecs(
-                resources, pkgName, sourceSet, moduleDirectory, isPublic
-            ).forEach { it.writeTo(kotlinDir) }
-        } else {
-            logger.info("Generation accessors for $rootResDir is disabled")
         }
+
+        //type -> id -> resource item
+        val resources: Map<ResourceType, Map<String, List<ResourceItem>>> = dirs
+            .flatMap { dir ->
+                dir.listNotHiddenFiles()
+                    .mapNotNull { it.fileToResourceItems(rootResDir.toPath()) }
+                    .flatten()
+            }
+            .groupBy { it.type }
+            .mapValues { (_, items) -> items.groupBy { it.name } }
+
+        val pkgName = packageName.get()
+        val moduleDirectory = packagingDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
+        val isPublic = makeAccessorsPublic.get()
+        getAccessorsSpecs(
+            resources, pkgName, sourceSet, moduleDirectory, isPublic
+        ).forEach { it.writeTo(kotlinDir) }
     }
 
     private fun File.fileToResourceItems(

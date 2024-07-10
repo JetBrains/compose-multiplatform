@@ -16,9 +16,6 @@ internal abstract class GenerateExpectResourceCollectorsTask : IdeaImportTask() 
     abstract val packageName: Property<String>
 
     @get:Input
-    abstract val shouldGenerateCode: Property<Boolean>
-
-    @get:Input
     abstract val makeAccessorsPublic: Property<Boolean>
 
     @get:OutputDirectory
@@ -31,23 +28,18 @@ internal abstract class GenerateExpectResourceCollectorsTask : IdeaImportTask() 
         kotlinDir.deleteRecursively()
         kotlinDir.mkdirs()
 
-        if (shouldGenerateCode.get()) {
-            logger.info("Generate expect ResourceCollectors for $kotlinDir")
+        logger.info("Generate expect ResourceCollectors for $kotlinDir")
 
-            val pkgName = packageName.get()
-            val isPublic = makeAccessorsPublic.get()
-            val spec = getExpectResourceCollectorsFileSpec(pkgName, "ExpectResourceCollectors", isPublic)
-            spec.writeTo(kotlinDir)
-        }
+        val pkgName = packageName.get()
+        val isPublic = makeAccessorsPublic.get()
+        val spec = getExpectResourceCollectorsFileSpec(pkgName, "ExpectResourceCollectors", isPublic)
+        spec.writeTo(kotlinDir)
     }
 }
 
 internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() {
     @get:Input
     abstract val packageName: Property<String>
-
-    @get:Input
-    abstract val shouldGenerateCode: Property<Boolean>
 
     @get:Input
     abstract val makeAccessorsPublic: Property<Boolean>
@@ -73,44 +65,39 @@ internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() 
         val inputFiles = inputDirs.flatMap { dir ->
             dir.walkTopDown().filter { !it.isHidden && it.isFile && it.extension == "kt" }.toList()
         }
+        logger.info("Generate actual ResourceCollectors for $kotlinDir")
+        val funNames = inputFiles.mapNotNull { inputFile ->
+            if (inputFile.nameWithoutExtension.contains('.')) {
+                val (fileName, suffix) = inputFile.nameWithoutExtension.split('.')
+                val type = ResourceType.values().firstOrNull { fileName.startsWith(it.accessorName, true) }
+                val name = "_collect${suffix.uppercaseFirstChar()}${fileName}Resources"
 
-        if (shouldGenerateCode.get()) {
-            logger.info("Generate actual ResourceCollectors for $kotlinDir")
-            val funNames = inputFiles.mapNotNull { inputFile ->
-                if (inputFile.nameWithoutExtension.contains('.')) {
-                    val (fileName, suffix) = inputFile.nameWithoutExtension.split('.')
-                    val type = ResourceType.values().firstOrNull { fileName.startsWith(it.accessorName, true) }
-                    val name = "_collect${suffix.uppercaseFirstChar()}${fileName}Resources"
-
-                    if (type == null) {
-                        logger.warn("Unknown resources type: `$inputFile`")
-                        null
-                    } else if (!inputFile.readText().contains(name)) {
-                        logger.warn("A function '$name' is not found in the `$inputFile` file!")
-                        null
-                    } else {
-                        logger.info("Found collector function: `$name`")
-                        type to name
-                    }
-                } else {
-                    logger.warn("Unknown file name: `$inputFile`")
+                if (type == null) {
+                    logger.warn("Unknown resources type: `$inputFile`")
                     null
+                } else if (!inputFile.readText().contains(name)) {
+                    logger.warn("A function '$name' is not found in the `$inputFile` file!")
+                    null
+                } else {
+                    logger.info("Found collector function: `$name`")
+                    type to name
                 }
-            }.groupBy({ it.first }, { it.second })
+            } else {
+                logger.warn("Unknown file name: `$inputFile`")
+                null
+            }
+        }.groupBy({ it.first }, { it.second })
 
-            val pkgName = packageName.get()
-            val isPublic = makeAccessorsPublic.get()
-            val useActual = useActualModifier.get()
-            val spec = getActualResourceCollectorsFileSpec(
-                pkgName,
-                "ActualResourceCollectors",
-                isPublic,
-                useActual,
-                funNames
-            )
-            spec.writeTo(kotlinDir)
-        } else {
-            logger.info("Generation ResourceCollectors for $kotlinDir is disabled")
-        }
+        val pkgName = packageName.get()
+        val isPublic = makeAccessorsPublic.get()
+        val useActual = useActualModifier.get()
+        val spec = getActualResourceCollectorsFileSpec(
+            pkgName,
+            "ActualResourceCollectors",
+            isPublic,
+            useActual,
+            funNames
+        )
+        spec.writeTo(kotlinDir)
     }
 }

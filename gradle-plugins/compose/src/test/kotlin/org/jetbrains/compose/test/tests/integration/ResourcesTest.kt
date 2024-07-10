@@ -488,8 +488,7 @@ class ResourcesTest : GradlePluginTestBase() {
             )
         }
         gradle("prepareKotlinIdeaImport").checks {
-            check.taskSuccessful(":generateComposeResClass")
-            assertFalse(file("build/generated/compose/resourceGenerator/kotlin/commonResClass/app/group/resources_test/generated/resources/Res.kt").exists())
+            check.taskSkipped(":generateComposeResClass")
         }
 
         modifyText("build.gradle.kts") { str ->
@@ -571,8 +570,14 @@ class ResourcesTest : GradlePluginTestBase() {
                 }
             """.trimIndent()
         )
-        gradle("generateComposeResClass").checks {
-            check.logContains("Generation Res class is disabled")
+        gradle("prepareKotlinIdeaImport").checks {
+            check.taskSkipped(":generateComposeResClass")
+            check.taskSkipped(":generateResourceAccessorsForCommonMain")
+            check.taskSkipped(":generateResourceAccessorsForDesktopMain")
+            check.taskSkipped(":generateResourceAccessorsForAndroidMain")
+            check.taskSkipped(":generateExpectResourceCollectorsForCommonMain")
+            check.taskSkipped(":generateActualResourceCollectorsForDesktopMain")
+            check.taskSkipped(":generateActualResourceCollectorsForAndroidMain")
         }
     }
 

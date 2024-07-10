@@ -21,9 +21,6 @@ internal abstract class GenerateResClassTask : IdeaImportTask() {
     abstract val packagingDir: Property<File>
 
     @get:Input
-    abstract val shouldGenerateCode: Property<Boolean>
-
-    @get:Input
     abstract val makeAccessorsPublic: Property<Boolean>
 
     @get:OutputDirectory
@@ -34,15 +31,11 @@ internal abstract class GenerateResClassTask : IdeaImportTask() {
         dir.deleteRecursively()
         dir.mkdirs()
 
-        if (shouldGenerateCode.get()) {
-            logger.info("Generate $RES_FILE_NAME.kt")
+        logger.info("Generate $RES_FILE_NAME.kt")
 
-            val pkgName = packageName.get()
-            val moduleDirectory = packagingDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
-            val isPublic = makeAccessorsPublic.get()
-            getResFileSpec(pkgName, RES_FILE_NAME, moduleDirectory, isPublic).writeTo(dir)
-        } else {
-            logger.info("Generation Res class is disabled")
-        }
+        val pkgName = packageName.get()
+        val moduleDirectory = packagingDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
+        val isPublic = makeAccessorsPublic.get()
+        getResFileSpec(pkgName, RES_FILE_NAME, moduleDirectory, isPublic).writeTo(dir)
     }
 }
