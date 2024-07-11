@@ -10,6 +10,7 @@ pluginManagement {
     plugins {
         val kotlinVersion = extra["kotlin.version"] as String
         kotlin("multiplatform").version(kotlinVersion)
+        id("org.jetbrains.kotlin.plugin.compose").version(kotlinVersion)
         val composeVersion = extra["compose.version"] as String
         id("org.jetbrains.compose").version(composeVersion)
     }
