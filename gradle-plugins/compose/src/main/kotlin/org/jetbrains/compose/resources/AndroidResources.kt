@@ -53,7 +53,9 @@ internal fun Project.configureAndroidComposeResources(
         }
 
         //https://issuetracker.google.com/348208777
-        variant.sources.assets?.addStaticSourceDirectory(variantAssetsDir.get().asFile.path)
+        val staticDir = variantAssetsDir.get().asFile
+        staticDir.mkdirs()
+        variant.sources.assets?.addStaticSourceDirectory(staticDir.path)
         tasks.configureEach { task ->
             if (task.name == "merge${variant.name.uppercaseFirstChar()}Assets") {
                 task.dependsOn(copyVariantAssets)
