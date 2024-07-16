@@ -1,0 +1,1 @@
+Benchmark extracted from https://github.com/JetBrains/compose-multiplatform-core/blob/jb-main/compose/mpp/demo/src/commonMain/kotlin/androidx/compose/mpp/demo/TextDirection.kt
