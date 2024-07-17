@@ -84,7 +84,7 @@ To build and run the Jetsnack application with Compose Multiplatform for web and
 
 * **Web version:**
 
-  `./gradlew :web:wasmJsRun`
+  `./gradlew :composeApp:wasmJsRun`
   <br>&nbsp;<br>
 
   Once the application starts, open the following URL in your browser: 
