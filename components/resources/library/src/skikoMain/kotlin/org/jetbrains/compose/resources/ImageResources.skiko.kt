@@ -6,7 +6,6 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.unit.Density
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.Image
-import org.jetbrains.skia.ImageFilter
 import org.jetbrains.skia.Paint
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.SamplingMode
@@ -28,11 +27,8 @@ internal actual fun ByteArray.toImageBitmap(resourceDensity: Int, targetDensity:
         val dstRect = Rect.Companion.makeWH(targetW, targetH)
 
         targetImage = Surface.makeRasterN32Premul(targetW.toInt(), targetH.toInt()).run {
-            val paint = Paint().apply {
-                isAntiAlias = true
-                imageFilter = ImageFilter.makeImage(image, srcRect, dstRect, SamplingMode.MITCHELL)
-            }
-            canvas.drawImageRect(image, srcRect, dstRect, paint)
+            val paint = Paint().apply { isAntiAlias = true }
+            canvas.drawImageRect(image, srcRect, dstRect, SamplingMode.LINEAR, paint, true)
             makeImageSnapshot()
         }
     } else {
