@@ -4,7 +4,13 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.unit.Density
-import org.jetbrains.skia.*
+import org.jetbrains.skia.Data
+import org.jetbrains.skia.Image
+import org.jetbrains.skia.ImageFilter
+import org.jetbrains.skia.Paint
+import org.jetbrains.skia.Rect
+import org.jetbrains.skia.SamplingMode
+import org.jetbrains.skia.Surface
 import org.jetbrains.skia.svg.SVGDOM
 
 internal actual fun ByteArray.toImageBitmap(resourceDensity: Int, targetDensity: Int): ImageBitmap {
@@ -22,7 +28,10 @@ internal actual fun ByteArray.toImageBitmap(resourceDensity: Int, targetDensity:
         val dstRect = Rect.Companion.makeWH(targetW, targetH)
 
         targetImage = Surface.makeRasterN32Premul(targetW.toInt(), targetH.toInt()).run {
-            val paint = Paint().apply { isAntiAlias = true }
+            val paint = Paint().apply {
+                isAntiAlias = true
+                imageFilter = ImageFilter.makeImage(image, srcRect, dstRect, SamplingMode.MITCHELL)
+            }
             canvas.drawImageRect(image, srcRect, dstRect, paint)
             makeImageSnapshot()
         }
