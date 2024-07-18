@@ -2,7 +2,11 @@ package example.imageviewer.view
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
@@ -15,8 +19,15 @@ import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
-import example.imageviewer.*
+import example.imageviewer.Dependencies
+import example.imageviewer.DesktopImageStorage
+import example.imageviewer.ExternalImageViewerEvent
+import example.imageviewer.ImageViewerCommon
+import example.imageviewer.Notification
+import example.imageviewer.PopupNotification
+import example.imageviewer.SharePicture
 import example.imageviewer.filter.PlatformContext
+import example.imageviewer.ioDispatcher
 import example.imageviewer.model.PictureData
 import example.imageviewer.style.ImageViewerTheme
 import imageviewer.shared.generated.resources.Res
@@ -99,7 +110,7 @@ private fun getDependencies(
     events: SharedFlow<ExternalImageViewerEvent>
 ) =
     object : Dependencies() {
-        override val notification: Notification = object : PopupNotification(localization) {
+        override val notification: Notification = object : PopupNotification() {
             override fun showPopUpMessage(text: String) {
                 toastState.value = ToastState.Shown(text)
             }

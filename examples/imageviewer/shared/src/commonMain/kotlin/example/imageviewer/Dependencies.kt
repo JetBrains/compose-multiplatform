@@ -7,8 +7,10 @@ import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.filter.PlatformContext
 import example.imageviewer.model.PictureData
 import imageviewer.shared.generated.resources.Res
+import imageviewer.shared.generated.resources.picture
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import org.jetbrains.compose.resources.getString
 
 abstract class Dependencies {
     abstract val notification: Notification
@@ -16,7 +18,6 @@ abstract class Dependencies {
     abstract val sharePicture: SharePicture
     val pictures: SnapshotStateList<PictureData> = mutableStateListOf(*resourcePictures)
     open val externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
-    val localization: Localization = getCurrentLocalization()
     val imageProvider: ImageProvider = object : ImageProvider {
         override suspend fun getImage(picture: PictureData): ImageBitmap = when (picture) {
             is PictureData.Resource -> {
@@ -76,26 +77,15 @@ abstract class Dependencies {
 }
 
 interface Notification {
-    fun notifyImageData(picture: PictureData)
+    suspend fun notifyImageData(picture: PictureData)
 }
 
-abstract class PopupNotification(private val localization: Localization) : Notification {
+abstract class PopupNotification : Notification {
+
     abstract fun showPopUpMessage(text: String)
-    override fun notifyImageData(picture: PictureData) = showPopUpMessage(
-        "${localization.picture} ${picture.name}"
+    override suspend fun notifyImageData(picture: PictureData) = showPopUpMessage(
+        getString(Res.string.picture, picture.name)
     )
-}
-
-interface Localization {
-    val appName: String
-    val back: String
-    val picture: String
-    val takePhoto: String
-    val addPhoto: String
-    val kotlinConfName: String
-    val kotlinConfDescription: String
-    val newPhotoName: String
-    val newPhotoDescription: String
 }
 
 interface ImageProvider {
@@ -116,10 +106,6 @@ interface ImageStorage {
 
 interface SharePicture {
     fun share(context: PlatformContext, picture: PictureData)
-}
-
-internal val LocalLocalization = staticCompositionLocalOf<Localization> {
-    noLocalProvidedFor("LocalLocalization")
 }
 
 internal val LocalNotification = staticCompositionLocalOf<Notification> {

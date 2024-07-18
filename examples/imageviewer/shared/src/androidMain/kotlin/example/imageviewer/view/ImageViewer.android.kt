@@ -42,7 +42,7 @@ private fun getDependencies(
     ioScope: CoroutineScope,
     externalEvents: Flow<ExternalImageViewerEvent>
 ) = object : Dependencies() {
-    override val notification: Notification = object : PopupNotification(localization) {
+    override val notification: Notification = object : PopupNotification() {
         override fun showPopUpMessage(text: String) {
             Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
         }

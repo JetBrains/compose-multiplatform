@@ -13,9 +13,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import example.imageviewer.LocalLocalization
 import example.imageviewer.icon.IconCustomArrowBack
 import example.imageviewer.style.ImageviewerColors
+import imageviewer.shared.generated.resources.Res
+import imageviewer.shared.generated.resources.back
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun CircularButton(
@@ -59,7 +61,7 @@ fun CircularButton(
 
 @Composable
 fun BackButton(onClick: () -> Unit) {
-    Tooltip(LocalLocalization.current.back) {
+    Tooltip(stringResource(Res.string.back)) {
         CircularButton(
             imageVector = IconCustomArrowBack,
             onClick = onClick

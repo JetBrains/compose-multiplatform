@@ -1,28 +1,40 @@
 package example.imageviewer.view
 
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.dp
 import example.imageviewer.LocalImageProvider
-import example.imageviewer.Localization
-import example.imageviewer.LocalLocalization
 import example.imageviewer.filter.FilterType
 import example.imageviewer.filter.getFilter
 import example.imageviewer.filter.getPlatformContext
-import example.imageviewer.model.*
-import example.imageviewer.style.*
+import example.imageviewer.model.PictureData
+import example.imageviewer.model.ScalableState
+import example.imageviewer.style.ImageviewerColors
+import imageviewer.shared.generated.resources.Res
+import imageviewer.shared.generated.resources.back
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun FullscreenImageScreen(
@@ -30,7 +42,6 @@ fun FullscreenImageScreen(
     back: () -> Unit,
 ) {
     val imageProvider = LocalImageProvider.current
-    val localization: Localization = LocalLocalization.current
     val availableFilters = FilterType.values().toList()
     var selectedFilters by remember { mutableStateOf(emptySet<FilterType>()) }
 
@@ -88,7 +99,7 @@ fun FullscreenImageScreen(
 
         TopLayout(
             alignLeftContent = {
-                Tooltip(localization.back) {
+                Tooltip(stringResource(Res.string.back)) {
                     BackButton(back)
                 }
             },

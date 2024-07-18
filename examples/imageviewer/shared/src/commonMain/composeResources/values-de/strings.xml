@@ -1,0 +1,11 @@
+<resources>
+    <string name="appName">Meine Erinnerungen</string>
+    <string name="picture">Bild:</string>
+    <string name="back">Zurück</string>
+    <string name="takePhoto">Mach ein Foto 📸</string>
+    <string name="addPhoto">Füge ein Foto hinzu</string>
+    <string name="kotlinConfName">KotlinConf 2023 🎉</string>
+    <string name="kotlinConfDescription">KotlinConf -- eine großartige Zeit, auch auf %1$d!</string>
+    <string name="newPhotoName">New Memory</string>
+    <string name="newPhotoDescription">Viel Erfolg mit Compose Multiplatform! 🙂</string>
+</resources>

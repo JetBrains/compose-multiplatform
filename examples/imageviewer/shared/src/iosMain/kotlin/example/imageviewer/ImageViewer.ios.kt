@@ -2,7 +2,11 @@ package example.imageviewer
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import example.imageviewer.filter.PlatformContext
 import example.imageviewer.model.PictureData
@@ -41,7 +45,7 @@ internal fun ImageViewerIos() {
 
 fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) =
     object : Dependencies() {
-        override val notification: Notification = object : PopupNotification(localization) {
+        override val notification: Notification = object : PopupNotification() {
             override fun showPopUpMessage(text: String) {
                 toastState.value = ToastState.Shown(text)
             }
