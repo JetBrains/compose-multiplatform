@@ -19,7 +19,7 @@ class ImageViewerTest {
     val rule = createComposeRule()
 
     private val dependencies = object : Dependencies() {
-        override val notification: Notification = object : PopupNotification(localization) {
+        override val notification: Notification = object : PopupNotification() {
             override fun showPopUpMessage(text: String) {
             }
         }
