@@ -1,10 +1,10 @@
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.compose")
-    id("com.android.library")
-    id("org.jetbrains.compose")
-    kotlin("plugin.serialization")
-    id("kotlin-parcelize")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.kotlinParcelize)
 }
 
 version = "1.0-SNAPSHOT"
@@ -43,22 +43,22 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material)
             implementation(compose.components.resources)
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.kotlinx.coroutines.core)
         }
 
         androidMain.dependencies {
-            api("androidx.activity:activity-compose:1.8.2")
-            api("androidx.appcompat:appcompat:1.6.1")
-            api("androidx.core:core-ktx:1.12.0")
-            implementation("androidx.camera:camera-camera2:1.3.1")
-            implementation("androidx.camera:camera-lifecycle:1.3.1")
-            implementation("androidx.camera:camera-view:1.3.1")
-            implementation("com.google.accompanist:accompanist-permissions:0.29.2-rc")
-            implementation("com.google.android.gms:play-services-maps:18.2.0")
-            implementation("com.google.android.gms:play-services-location:21.1.0")
-            implementation("com.google.maps.android:maps-compose:2.11.2")
+            api(libs.androidx.activity.compose)
+            api(libs.androidx.appcompat)
+            api(libs.androidx.core.ktx)
+            implementation(libs.androidx.camera.camera2)
+            implementation(libs.androidx.camera.lifecycle)
+            implementation(libs.androidx.camera.view)
+            implementation(libs.accompanist.permissions)
+            implementation(libs.play.services.maps)
+            implementation(libs.play.services.location)
+            implementation(libs.maps.compose)
         }
 
         val jsWasmMain by creating {
@@ -79,6 +79,7 @@ kotlin {
         val desktopMain by getting
         desktopMain.dependencies {
             implementation(compose.desktop.common)
+            implementation(libs.kotlinx.coroutines.swing)
             implementation(project(":mapview-desktop"))
         }
         val desktopTest by getting

@@ -1,8 +1,8 @@
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.compose")
-    id("org.jetbrains.compose")
-    kotlin("plugin.serialization")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 version = "1.0-SNAPSHOT"
@@ -19,7 +19,7 @@ kotlin {
         }
         val desktopMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-cio:2.2.1")
+                implementation(libs.ktor.client.cio)
                 implementation(compose.desktop.common)
             }
         }

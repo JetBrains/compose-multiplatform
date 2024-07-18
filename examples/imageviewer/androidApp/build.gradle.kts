@@ -1,9 +1,9 @@
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.compose")
-    id("com.android.application")
-    id("org.jetbrains.compose")
-    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version "2.0.1"
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.secrets)
 }
 
 kotlin {
