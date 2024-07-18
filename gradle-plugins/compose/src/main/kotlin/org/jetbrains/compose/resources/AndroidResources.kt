@@ -41,11 +41,12 @@ internal fun Project.configureAndroidComposeResources(
     //copy all compose resources to android assets
     val androidComponents = project.extensions.findByType(AndroidComponentsExtension::class.java) ?: return
     androidComponents.onVariants { variant ->
+        val camelVariantName = variant.name.uppercaseFirstChar()
         val variantAssets = getVariantComposeResources(variant)
         val variantAssetsDir = layout.buildDirectory.dir(RES_GEN_DIR).dir(variant.name + "AndroidAssets")
 
         val copyVariantAssets = tasks.register(
-            "copy${variant.name.uppercaseFirstChar()}ComposeResourcesToAndroidAssets",
+            "copy${camelVariantName}ComposeResourcesToAndroidAssets",
             Copy::class.java
         ) { task ->
             task.from(variantAssets)
@@ -56,12 +57,16 @@ internal fun Project.configureAndroidComposeResources(
         val staticDir = variantAssetsDir.get().asFile
         staticDir.mkdirs()
         variant.sources.assets?.addStaticSourceDirectory(staticDir.path)
+
+        val agpTaskNames = listOf(
+            //fix agp task dependencies for build and allTests tasks
+            "merge${camelVariantName}Assets",
+            "package${camelVariantName}Assets",
+            //fix agp task dependencies for AndroidStudio preview
+            "compile${camelVariantName}Sources",
+        )
         tasks.configureEach { task ->
-            if (task.name == "merge${variant.name.uppercaseFirstChar()}Assets") {
-                task.dependsOn(copyVariantAssets)
-            }
-            //fix task dependencies for AndroidStudio preview
-            if (task.name == "compile${variant.name.uppercaseFirstChar()}Sources") {
+            if (task.name in agpTaskNames) {
                 task.dependsOn(copyVariantAssets)
             }
             //fix linter task dependencies for `build` task
