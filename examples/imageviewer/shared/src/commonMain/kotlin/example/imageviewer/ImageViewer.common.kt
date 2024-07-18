@@ -1,13 +1,25 @@
 package example.imageviewer
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import example.imageviewer.model.*
-import example.imageviewer.view.*
+import androidx.compose.ui.Modifier
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import example.imageviewer.model.MemoryPage
+import example.imageviewer.model.PictureData
+import example.imageviewer.view.CameraScreen
+import example.imageviewer.view.FullscreenImageScreen
+import example.imageviewer.view.GalleryScreen
+import example.imageviewer.view.MemoryScreen
+import kotlinx.coroutines.delay
 
 enum class ExternalImageViewerEvent {
     Next,
@@ -17,7 +29,7 @@ enum class ExternalImageViewerEvent {
 
 @Composable
 fun ImageViewerCommon(
-    dependencies: Dependencies
+    dependencies: Dependencies,
 ) {
     CompositionLocalProvider(
         LocalLocalization provides dependencies.localization,
@@ -33,94 +45,86 @@ fun ImageViewerCommon(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ImageViewerWithProvidedDependencies(
-    pictures: SnapshotStateList<PictureData>
+    pictures: SnapshotStateList<PictureData>,
 ) {
     // rememberSaveable is required to properly handle Android configuration changes (such as device rotation)
     val selectedPictureIndex = rememberSaveable { mutableStateOf(0) }
-    val navigationStack = rememberSaveable(
-        saver = listSaver<NavigationStack<Page>, Page>(
-            restore = { NavigationStack(*it.toTypedArray()) },
-            save = { it.stack },
-        )
-    ) {
-        NavigationStack(GalleryPage())
-    }
 
     val externalEvents = LocalInternalEvents.current
+    val navController = rememberNavController()
+
     LaunchedEffect(Unit) {
         externalEvents.collect {
             if (it == ExternalImageViewerEvent.ReturnBack) {
-                navigationStack.back()
+                navController.navigateUp()
             }
         }
     }
 
-    AnimatedContent(targetState = navigationStack.lastWithIndex(), transitionSpec = {
-        val previousIdx = initialState.index
-        val currentIdx = targetState.index
-        val multiplier = if (previousIdx < currentIdx) 1 else -1
-        if (initialState.value is GalleryPage && targetState.value is MemoryPage) {
-            fadeIn() with fadeOut(tween(durationMillis = 500, 500))
-        } else if (initialState.value is MemoryPage && targetState.value is GalleryPage) {
-            fadeIn() with fadeOut(tween(delayMillis = 150))
-        } else {
-            slideInHorizontally { w -> multiplier * w } with
-                    slideOutHorizontally { w -> multiplier * -1 * w }
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(1000)
+            println(navController.currentBackStack.value.toList().map {
+                it.destination.route
+            })
         }
-    }) { (_, page) ->
-        when (page) {
-            is GalleryPage -> {
-                GalleryScreen(
-                    pictures = pictures,
-                    selectedPictureIndex = selectedPictureIndex,
-                    onClickPreviewPicture = { previewPictureIndex ->
-                        navigationStack.push(MemoryPage(previewPictureIndex))
-                    }
-                ) {
-                    navigationStack.push(CameraPage())
+    }
+
+    NavHost(
+        navController = navController,
+        startDestination = Gallery,
+        modifier = Modifier.fillMaxSize(),
+        enterTransition = enterT,
+        exitTransition = exitT,
+        popExitTransition = popExitT,
+        popEnterTransition = popEnterT
+    ) {
+        composable<Gallery> {
+            GalleryScreen(
+                pictures = pictures,
+                selectedPictureIndex = selectedPictureIndex,
+                onClickPreviewPicture = { previewPictureIndex ->
+                    navController.navigate(Memory(previewPictureIndex))
+                },
+                onMakeNewMemory = {
+                    navController.navigate(Camera)
                 }
-            }
-
-            is FullScreenPage -> {
-                FullscreenImageScreen(
-                    picture = pictures[page.pictureIndex],
-                    back = {
-                        navigationStack.back()
-                    }
-                )
-            }
-
-            is MemoryPage -> {
-                MemoryScreen(
-                    pictures = pictures,
-                    memoryPage = page,
-                    onSelectRelatedMemory = { pictureIndex ->
-                        navigationStack.push(MemoryPage(pictureIndex))
-                    },
-                    onBack = { resetNavigation ->
-                        if (resetNavigation) {
-                            selectedPictureIndex.value = 0
-                            navigationStack.reset()
-                        } else {
-                            navigationStack.back()
-                        }
-                    },
-                    onHeaderClick = { pictureIndex ->
-                        navigationStack.push(FullScreenPage(pictureIndex))
-                    },
-                )
-            }
-
-            is CameraPage -> {
-                CameraScreen(
-                    onBack = { resetSelectedPicture ->
-                        if (resetSelectedPicture) {
-                            selectedPictureIndex.value = 0
-                        }
-                        navigationStack.back()
-                    },
-                )
-            }
+            )
+        }
+        composable<Memory> {
+            val memoryRoute = it.toRoute<Memory>()
+            MemoryScreen(
+                pictures = pictures,
+                memoryPage = MemoryPage(memoryRoute.imageIndex),
+                onSelectRelatedMemory = { pictureIndex ->
+                    navController.navigate(Memory(pictureIndex))
+                },
+                onBack = { resetNavigation ->
+                    // TODO: There's an annoying problem here where navigating too quickly
+                    // somehow breaks navigation. Unclear at the moment why.
+                    val didNav = navController.navigateUp()
+                    println("navigating up! $didNav")
+                },
+                onHeaderClick = { pictureIndex ->
+                    navController.navigate(FullScreen(pictureIndex))
+                },
+            )
+        }
+        composable<FullScreen> {
+            val fullScreenRoute = it.toRoute<FullScreen>()
+            FullscreenImageScreen(
+                picture = pictures[fullScreenRoute.imageIndex],
+                back = {
+                    navController.navigateUp()
+                }
+            )
+        }
+        composable<Camera> {
+            CameraScreen(
+                onBack = { resetSelectedPicture ->
+                    navController.navigateUp()
+                },
+            )
         }
     }
 }

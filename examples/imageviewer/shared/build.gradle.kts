@@ -46,6 +46,8 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.androidx.lifecycle.viewmodel.compose)
+            implementation(libs.androidx.navigation.compose)
         }
 
         androidMain.dependencies {
@@ -59,6 +61,8 @@ kotlin {
             implementation(libs.play.services.maps)
             implementation(libs.play.services.location)
             implementation(libs.maps.compose)
+            // TODO remove once we've upgraded to a version that is no longer affected by https://issuetracker.google.com/issues/346608857?pli=1
+            implementation("androidx.navigation:navigation-compose:2.8.0-beta05")
         }
 
         val jsWasmMain by creating {
