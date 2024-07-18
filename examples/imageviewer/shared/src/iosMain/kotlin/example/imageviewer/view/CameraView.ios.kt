@@ -28,10 +28,10 @@ import example.imageviewer.createNewPhotoNameAndDescription
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
+import example.imageviewer.utils.toGps
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCAction
-import kotlinx.cinterop.useContents
 import platform.AVFoundation.AVAuthorizationStatusAuthorized
 import platform.AVFoundation.AVAuthorizationStatusDenied
 import platform.AVFoundation.AVAuthorizationStatusNotDetermined
@@ -65,7 +65,6 @@ import platform.AVFoundation.fileDataRepresentation
 import platform.AVFoundation.position
 import platform.AVFoundation.requestAccessForMediaType
 import platform.CoreGraphics.CGRect
-import platform.CoreLocation.CLLocation
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.kCLLocationAccuracyBest
 import platform.Foundation.NSError
@@ -314,9 +313,3 @@ private fun BoxScope.RealDeviceCamera(
     }
 }
 
-@OptIn(ExperimentalForeignApi::class)
-fun CLLocation.toGps() =
-    GpsPosition(
-        latitude = coordinate.useContents { latitude },
-        longitude = coordinate.useContents { longitude }
-    )
