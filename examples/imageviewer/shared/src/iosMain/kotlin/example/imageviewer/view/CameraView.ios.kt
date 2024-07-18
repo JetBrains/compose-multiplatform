@@ -1,10 +1,22 @@
 package example.imageviewer.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -13,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import example.imageviewer.IosStorableImage
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.createNewPhotoNameAndDescription
-import example.imageviewer.icon.IconPhotoCamera
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
@@ -21,9 +32,38 @@ import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
-import platform.AVFoundation.*
+import platform.AVFoundation.AVAuthorizationStatusAuthorized
+import platform.AVFoundation.AVAuthorizationStatusDenied
+import platform.AVFoundation.AVAuthorizationStatusNotDetermined
+import platform.AVFoundation.AVAuthorizationStatusRestricted
+import platform.AVFoundation.AVCaptureDevice
 import platform.AVFoundation.AVCaptureDeviceDiscoverySession.Companion.discoverySessionWithDeviceTypes
+import platform.AVFoundation.AVCaptureDeviceInput
 import platform.AVFoundation.AVCaptureDeviceInput.Companion.deviceInputWithDevice
+import platform.AVFoundation.AVCaptureDevicePositionFront
+import platform.AVFoundation.AVCaptureDeviceTypeBuiltInDualCamera
+import platform.AVFoundation.AVCaptureDeviceTypeBuiltInDualWideCamera
+import platform.AVFoundation.AVCaptureDeviceTypeBuiltInDuoCamera
+import platform.AVFoundation.AVCaptureDeviceTypeBuiltInUltraWideCamera
+import platform.AVFoundation.AVCaptureDeviceTypeBuiltInWideAngleCamera
+import platform.AVFoundation.AVCapturePhoto
+import platform.AVFoundation.AVCapturePhotoCaptureDelegateProtocol
+import platform.AVFoundation.AVCapturePhotoOutput
+import platform.AVFoundation.AVCapturePhotoSettings
+import platform.AVFoundation.AVCaptureSession
+import platform.AVFoundation.AVCaptureSessionPresetPhoto
+import platform.AVFoundation.AVCaptureVideoOrientationLandscapeLeft
+import platform.AVFoundation.AVCaptureVideoOrientationLandscapeRight
+import platform.AVFoundation.AVCaptureVideoOrientationPortrait
+import platform.AVFoundation.AVCaptureVideoPreviewLayer
+import platform.AVFoundation.AVLayerVideoGravityResizeAspectFill
+import platform.AVFoundation.AVMediaTypeVideo
+import platform.AVFoundation.AVVideoCodecKey
+import platform.AVFoundation.AVVideoCodecTypeJPEG
+import platform.AVFoundation.authorizationStatusForMediaType
+import platform.AVFoundation.fileDataRepresentation
+import platform.AVFoundation.position
+import platform.AVFoundation.requestAccessForMediaType
 import platform.CoreGraphics.CGRect
 import platform.CoreLocation.CLLocation
 import platform.CoreLocation.CLLocationManager
@@ -246,7 +286,7 @@ private fun BoxScope.RealDeviceCamera(
         },
     )
     CircularButton(
-        imageVector = IconPhotoCamera,
+        imageVector = Icons.Filled.PhotoCamera,
         modifier = Modifier.align(Alignment.BottomCenter).padding(36.dp),
         enabled = !capturePhotoStarted,
     ) {

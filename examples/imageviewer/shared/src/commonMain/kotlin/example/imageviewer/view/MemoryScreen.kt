@@ -3,17 +3,43 @@ package example.imageviewer.view
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
+import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,9 +58,9 @@ import androidx.compose.ui.unit.sp
 import example.imageviewer.LocalImageProvider
 import example.imageviewer.LocalSharePicture
 import example.imageviewer.filter.getPlatformContext
-import example.imageviewer.icon.IconAutoFixHigh
 import example.imageviewer.isShareFeatureSupported
-import example.imageviewer.model.*
+import example.imageviewer.model.MemoryPage
+import example.imageviewer.model.PictureData
 import example.imageviewer.shareIcon
 import example.imageviewer.style.ImageviewerColors
 
@@ -123,11 +149,11 @@ fun MemoryScreen(
                     )
                     Spacer(Modifier.height(50.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        IconWithText(Icons.Default.Delete, "Delete") {
+                        IconWithText(Icons.Filled.Delete, "Delete") {
                             imageProvider.delete(picture)
                             onBack(true)
                         }
-                        IconWithText(Icons.Default.Edit, "Edit") {
+                        IconWithText(Icons.Filled.Edit, "Edit") {
                             edit = true
                         }
                         if (isShareFeatureSupported) {
@@ -205,7 +231,7 @@ fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
         modifier = Modifier.align(Alignment.BottomEnd).padding(12.dp)
     ) {
         CircularButton(
-            imageVector = IconAutoFixHigh,
+            imageVector = Icons.Filled.AutoFixHigh,
             onClick = onClick,
         )
     }

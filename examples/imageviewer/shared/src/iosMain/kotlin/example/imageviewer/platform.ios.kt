@@ -1,7 +1,8 @@
 package example.imageviewer
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.IosShare
 import androidx.compose.ui.graphics.vector.ImageVector
-import example.imageviewer.icon.IconIosShare
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -24,4 +25,4 @@ actual val ioDispatcher = Dispatchers.IO
 
 actual val isShareFeatureSupported: Boolean = true
 
-actual val shareIcon: ImageVector = IconIosShare
+actual val shareIcon: ImageVector = Icons.Filled.IosShare

@@ -32,6 +32,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -55,8 +57,6 @@ import example.imageviewer.ExternalImageViewerEvent
 import example.imageviewer.LocalImageProvider
 import example.imageviewer.LocalInternalEvents
 import example.imageviewer.LocalNotification
-import example.imageviewer.icon.IconMenu
-import example.imageviewer.icon.IconVisibility
 import example.imageviewer.model.PictureData
 import example.imageviewer.style.ImageviewerColors
 import kotlinx.coroutines.launch
@@ -166,7 +166,7 @@ fun GalleryScreen(
                 alignLeftContent = {},
                 alignRightContent = {
                     CircularButton(
-                        imageVector = IconMenu,
+                        imageVector = Icons.Filled.Menu,
                         modifier = Modifier.testTag("toggleGalleryStyleButton")
                     ) {
                         galleryStyle = when (galleryStyle) {
@@ -267,7 +267,7 @@ fun SquareThumbnail(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = IconVisibility,
+                        imageVector = Icons.Filled.Visibility,
                         contentDescription = null,
                         modifier = Modifier.size(17.dp),
                         tint = Color.White,
