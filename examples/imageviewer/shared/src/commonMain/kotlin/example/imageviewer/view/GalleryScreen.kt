@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -67,7 +66,6 @@ enum class GalleryStyle {
     LIST
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GalleryScreen(
     pictures: SnapshotStateList<PictureData>,
@@ -198,15 +196,6 @@ fun GalleryScreen(
         }
     }
 }
-
-@Composable
-expect fun GalleryLazyVerticalGrid(
-    columns: GridCells,
-    modifier: Modifier,
-    verticalArrangement: Arrangement.Vertical,
-    horizontalArrangement: Arrangement.Horizontal,
-    content: LazyGridScope.() -> Unit
-)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

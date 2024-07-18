@@ -27,7 +27,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
-import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -44,10 +43,8 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -226,7 +223,7 @@ private fun MemoryHeader(bitmap: ImageBitmap, picture: PictureData, onClick: () 
 }
 
 @Composable
-fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
+private fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
     Column(
         modifier = Modifier.align(Alignment.BottomEnd).padding(12.dp)
     ) {
@@ -237,44 +234,9 @@ fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
     }
 }
 
-@Composable
-fun BoxScope.MemoryTextOverlay(picture: PictureData) {
-    val shadowTextStyle = LocalTextStyle.current.copy(
-        shadow = Shadow(
-            color = Color.Black.copy(0.75f),
-            offset = Offset(0f, 0f),
-            blurRadius = 4f
-        )
-    )
-    Column(
-        modifier = Modifier.align(Alignment.BottomStart).padding(start = 12.dp, bottom = 16.dp)
-    ) {
-        Text(
-            text = picture.dateString,
-            textAlign = TextAlign.Left,
-            color = Color.White,
-            fontSize = 20.sp,
-            lineHeight = 22.sp,
-            modifier = Modifier.fillMaxWidth(),
-            fontWeight = FontWeight.SemiBold,
-            style = shadowTextStyle
-        )
-        Spacer(Modifier.height(1.dp))
-        Text(
-            text = picture.name,
-            textAlign = TextAlign.Left,
-            color = Color.White,
-            fontSize = 14.sp,
-            lineHeight = 16.sp,
-            fontWeight = FontWeight.Normal,
-            style = shadowTextStyle
-        )
-    }
-}
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Collapsible(s: String, onEdit: () -> Unit) {
+private fun Collapsible(s: String, onEdit: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     var isCollapsed by remember { mutableStateOf(true) }
     val text = if (isCollapsed) s.lines().first() + "... (see more)" else s
@@ -305,7 +267,7 @@ fun Collapsible(s: String, onEdit: () -> Unit) {
 }
 
 @Composable
-fun Headliner(s: String) {
+private fun Headliner(s: String) {
     Text(
         text = s,
         fontWeight = FontWeight.SemiBold,
