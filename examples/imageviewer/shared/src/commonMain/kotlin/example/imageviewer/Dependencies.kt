@@ -6,6 +6,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.filter.PlatformContext
 import example.imageviewer.model.PictureData
+import example.imageviewer.storage.ImageStorage
 import imageviewer.shared.generated.resources.Res
 import imageviewer.shared.generated.resources.picture
 import kotlinx.coroutines.flow.Flow
@@ -94,14 +95,6 @@ interface ImageProvider {
     fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage)
     fun delete(picture: PictureData)
     fun edit(picture: PictureData, name: String, description: String): PictureData
-}
-
-interface ImageStorage {
-    fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage)
-    fun delete(picture: PictureData.Camera)
-    fun rewrite(picture: PictureData.Camera)
-    suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap
-    suspend fun getImage(picture: PictureData.Camera): ImageBitmap
 }
 
 interface SharePicture {

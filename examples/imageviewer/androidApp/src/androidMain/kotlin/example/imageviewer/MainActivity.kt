@@ -25,5 +25,4 @@ class MainActivity : AppCompatActivity() {
             externalEvents.tryEmit(ExternalImageViewerEvent.ReturnBack)
         }
     }
-
 }

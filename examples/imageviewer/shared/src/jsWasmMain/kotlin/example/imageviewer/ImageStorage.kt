@@ -2,6 +2,7 @@ package example.imageviewer
 
 import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.model.PictureData
+import example.imageviewer.storage.ImageStorage
 
 // TODO: Rework it with some web service to store the images
 class WebImageStorage : ImageStorage {

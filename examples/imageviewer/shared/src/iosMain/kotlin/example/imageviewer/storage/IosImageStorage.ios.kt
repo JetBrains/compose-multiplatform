@@ -2,7 +2,6 @@ package example.imageviewer.storage
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.ImageBitmap
-import example.imageviewer.ImageStorage
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.PictureData
 import example.imageviewer.toImageBitmap

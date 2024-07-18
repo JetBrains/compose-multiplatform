@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import example.imageviewer.filter.scaleBitmapAspectRatio
 import example.imageviewer.model.PictureData
+import example.imageviewer.storage.ImageStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

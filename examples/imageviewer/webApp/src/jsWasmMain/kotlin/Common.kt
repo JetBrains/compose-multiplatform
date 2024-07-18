@@ -7,12 +7,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import example.imageviewer.Dependencies
-import example.imageviewer.ImageStorage
 import example.imageviewer.ImageViewerCommon
 import example.imageviewer.WebImageStorage
 import example.imageviewer.WebPopupNotification
 import example.imageviewer.WebSharePicture
 import example.imageviewer.ioDispatcher
+import example.imageviewer.storage.ImageStorage
 import example.imageviewer.style.ImageViewerTheme
 import example.imageviewer.view.Toast
 import example.imageviewer.view.ToastState
