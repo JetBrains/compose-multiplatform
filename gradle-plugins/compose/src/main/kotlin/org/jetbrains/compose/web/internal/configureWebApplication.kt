@@ -10,7 +10,9 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.artifacts.UnresolvedDependency
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.provider.Provider
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.compose.ComposeBuildConfig
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.internal.utils.detachedComposeDependency
@@ -77,8 +79,16 @@ internal fun configureWebApplication(
     }
 
     project.tasks.withType(IncrementalSyncTask::class.java) {
+        if (it.name.contains("wasmJs", ignoreCase = true)) {
+            it.dependsOn(unpackRuntime)
+            it.from.from(unpackedRuntimeDir)
+        }
+    }
+
+    project.tasks.named("jsProcessResources", ProcessResources::class.java) {
+        it.from(unpackedRuntimeDir)
         it.dependsOn(unpackRuntime)
-        it.from.from(unpackedRuntimeDir)
+        it.exclude("META-INF")
     }
 }
 

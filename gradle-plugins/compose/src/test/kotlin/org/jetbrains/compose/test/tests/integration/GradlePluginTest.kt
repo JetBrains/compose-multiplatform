@@ -49,6 +49,7 @@ class GradlePluginTest : GradlePluginTestBase() {
             check.taskSuccessful(":compileKotlinJs")
             check.taskSuccessful(":compileKotlinWasmJs")
             check.taskSuccessful(":wasmJsBrowserDistribution")
+            check.taskSuccessful(":jsBrowserDistribution")
 
             file("./build/dist/wasmJs/productionExecutable").apply {
                 checkExists()
@@ -60,6 +61,14 @@ class GradlePluginTest : GradlePluginTestBase() {
                 )
                 // one file is the app wasm file and another one is skiko wasm file with a mangled name
                 assertEquals(2, distributionFiles.filter { it.endsWith(".wasm") }.size)
+            }
+
+            file("./build/dist/js/productionExecutable").apply {
+                checkExists()
+                assertTrue(isDirectory)
+                val distributionFiles = listFiles()!!.map { it.name }.toList()
+                assertTrue(distributionFiles.contains("skiko.wasm"))
+                assertTrue(distributionFiles.contains("skiko.js"))
             }
         }
     }
