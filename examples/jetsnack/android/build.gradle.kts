@@ -19,9 +19,9 @@ dependencies {
 
 android {
     compileSdk = 34
-    namespace = "com.example.android"
+    namespace = "example.jetsnack"
     defaultConfig {
-        applicationId = "com.example.android"
+        applicationId = "org.jetbrains.Jetsnack"
         minSdk = 24
         targetSdk = 33
         versionCode = 1
