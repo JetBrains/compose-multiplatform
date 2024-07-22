@@ -1,0 +1,33 @@
+pluginManagement {
+    plugins {
+        id 'org.jetbrains.kotlin.multiplatform' version 'KOTLIN_VERSION_PLACEHOLDER'
+        id 'org.jetbrains.compose' version 'COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER'
+        id 'com.android.application' version 'AGP_VERSION_PLACEHOLDER'
+    }
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+        mavenCentral()
+        google()
+        maven {
+            url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
+        }
+        maven {
+            url 'https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/'
+        }
+    }
+}
+dependencyResolutionManagement {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        google()
+        maven {
+            url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
+        }
+        maven {
+            url 'https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/'
+        }
+    }
+}
+rootProject.name = "mpp"

@@ -2,15 +2,30 @@ package org.jetbrains.compose.test.tests.integration
 
 import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.internal.utils.*
+import org.jetbrains.compose.internal.utils.Arch
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentArch
+import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.resources.XmlValuesConverterTask
-import org.jetbrains.compose.test.utils.*
+import org.jetbrains.compose.test.utils.GradlePluginTestBase
+import org.jetbrains.compose.test.utils.TestProject
+import org.jetbrains.compose.test.utils.assertEqualTextFiles
+import org.jetbrains.compose.test.utils.assertNotEqualTextFiles
+import org.jetbrains.compose.test.utils.checkExists
+import org.jetbrains.compose.test.utils.checks
+import org.jetbrains.compose.test.utils.modify
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.zip.ZipFile
+import kotlin.io.path.Path
+import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.relativeTo
-import kotlin.test.*
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class ResourcesTest : GradlePluginTestBase() {
     @Test
@@ -227,9 +242,7 @@ class ResourcesTest : GradlePluginTestBase() {
 
     @Test
     fun testMultiModuleResources() {
-        val environment = defaultTestEnvironment.copy(
-            kotlinVersion = "2.0.0-RC2"
-        )
+        val environment = defaultTestEnvironment.copy(kotlinVersion = "2.0.0")
         with(
             testProject("misc/kmpResourcePublication", environment)
         ) {
@@ -246,57 +259,31 @@ class ResourcesTest : GradlePluginTestBase() {
                 val resDir = file("cmplib/src/commonMain/composeResources")
                 val resourcesFiles = resDir.walkTopDown()
                     .filter { !it.isDirectory && !it.isHidden }
-                    .getConvertedResources(resDir)
-                val subdir = "me.sample.library.resources"
+                    .getConvertedResources(resDir, "composeResources/me.sample.library.resources")
 
                 fun libpath(target: String, ext: String) =
                     "my-mvn/me/sample/library/cmplib-$target/1.0/cmplib-$target-1.0$ext"
 
                 val aar = file(libpath("android", ".aar"))
-                val innerClassesJar = aar.parentFile.resolve("aar-inner-classes.jar")
-                assertTrue(aar.exists(), "File not found: " + aar.path)
-                ZipFile(aar).use { zip ->
-                    resourcesFiles
-                        .filter { it.startsWith("font") }
-                        .forEach { fontRes ->
-                            assertNotNull(
-                                zip.getEntry("assets/composeResources/$subdir/$fontRes"),
-                                "Resource not found: '$fontRes' in aar '${aar.path}'"
-                            )
-                        }
-
-                    innerClassesJar.writeBytes(
-                        zip.getInputStream(zip.getEntry("classes.jar")).readBytes()
-                    )
-                }
-                ZipFile(innerClassesJar).use { zip ->
-                    resourcesFiles
-                        .filterNot { it.startsWith("font") }
-                        .forEach { res ->
-                            assertNotNull(
-                                zip.getEntry("composeResources/$subdir/$res"),
-                                "Resource not found: '$res' in aar/classes.jar '${aar.path}'"
-                            )
-                        }
-                }
+                checkResourcesZip(aar, resourcesFiles, true)
 
                 val jar = file(libpath("jvm", ".jar"))
-                checkResourcesZip(jar, resourcesFiles, subdir)
+                checkResourcesZip(jar, resourcesFiles, false)
 
                 if (currentOS == OS.MacOS) {
                     val iosx64ResZip = file(libpath("iosx64", "-kotlin_resources.kotlin_resources.zip"))
-                    checkResourcesZip(iosx64ResZip, resourcesFiles, subdir)
+                    checkResourcesZip(iosx64ResZip, resourcesFiles, false)
                     val iosarm64ResZip = file(libpath("iosarm64", "-kotlin_resources.kotlin_resources.zip"))
-                    checkResourcesZip(iosarm64ResZip, resourcesFiles, subdir)
+                    checkResourcesZip(iosarm64ResZip, resourcesFiles, false)
                     val iossimulatorarm64ResZip = file(
                         libpath("iossimulatorarm64", "-kotlin_resources.kotlin_resources.zip")
                     )
-                    checkResourcesZip(iossimulatorarm64ResZip, resourcesFiles, subdir)
+                    checkResourcesZip(iossimulatorarm64ResZip, resourcesFiles, false)
                 }
                 val jsResZip = file(libpath("js", "-kotlin_resources.kotlin_resources.zip"))
-                checkResourcesZip(jsResZip, resourcesFiles, subdir)
+                checkResourcesZip(jsResZip, resourcesFiles, false)
                 val wasmjsResZip = file(libpath("wasm-js", "-kotlin_resources.kotlin_resources.zip"))
-                checkResourcesZip(wasmjsResZip, resourcesFiles, subdir)
+                checkResourcesZip(wasmjsResZip, resourcesFiles, false)
             }
 
             file("settings.gradle.kts").modify { content ->
@@ -344,14 +331,19 @@ class ResourcesTest : GradlePluginTestBase() {
         }
     }
 
-    private fun checkResourcesZip(zipFile: File, resourcesFiles: Sequence<String>, subdir: String) {
+    private fun checkResourcesZip(zipFile: File, resourcesFiles: Sequence<String>, isAndroid: Boolean) {
+        println("check ZIP: '${zipFile.path}'")
         assertTrue(zipFile.exists(), "File not found: " + zipFile.path)
         ZipFile(zipFile).use { zip ->
             resourcesFiles.forEach { res ->
-                assertNotNull(
-                    zip.getEntry("composeResources/$subdir/$res"),
-                    "Resource not found: '$res' in zip '${zipFile.path}'"
-                )
+                println("check '$res' file")
+                if (isAndroid) {
+                    //android resources should be only in assets
+                    assertNull(zip.getEntry(res), "file = '$res'")
+                    assertNotNull(zip.getEntry("assets/$res"), "file = 'assets/$res'")
+                } else {
+                    assertNotNull(zip.getEntry(res), "file = '$res'")
+                }
             }
         }
     }
@@ -390,50 +382,51 @@ class ResourcesTest : GradlePluginTestBase() {
         file("src/jsMain/composeResources/files/platform.txt").writeNewFile("js")
 
         val commonResourcesDir = file("src/commonMain/composeResources")
+        val repackDir = "composeResources/app.group.resources_test.generated.resources"
         val commonResourcesFiles = commonResourcesDir.walkTopDown()
             .filter { !it.isDirectory && !it.isHidden }
-            .getConvertedResources(commonResourcesDir)
+            .getConvertedResources(commonResourcesDir, repackDir)
 
         gradle("build").checks {
-            check.taskSuccessful(":copyDemoDebugFontsToAndroidAssets")
-            check.taskSuccessful(":copyDemoReleaseFontsToAndroidAssets")
-            check.taskSuccessful(":copyFullDebugFontsToAndroidAssets")
-            check.taskSuccessful(":copyFullReleaseFontsToAndroidAssets")
+            check.taskSuccessful(":demoDebugAssetsCopyForAGP")
+            check.taskSuccessful(":demoReleaseAssetsCopyForAGP")
+            check.taskSuccessful(":fullDebugAssetsCopyForAGP")
+            check.taskSuccessful(":fullReleaseAssetsCopyForAGP")
 
             getAndroidApk("demo", "debug", "Resources-Test").let { apk ->
-                checkResourcesInZip(apk, commonResourcesFiles, true)
+                checkResourcesZip(apk, commonResourcesFiles, true)
                 assertEquals(
                     "android demo-debug",
-                    readFileInZip(apk, "files/platform.txt").decodeToString()
+                    readFileInZip(apk, "assets/$repackDir/files/platform.txt").decodeToString()
                 )
             }
             getAndroidApk("demo", "release", "Resources-Test").let { apk ->
-                checkResourcesInZip(apk, commonResourcesFiles, true)
+                checkResourcesZip(apk, commonResourcesFiles, true)
                 assertEquals(
                     "android demo-release",
-                    readFileInZip(apk, "files/platform.txt").decodeToString()
+                    readFileInZip(apk, "assets/$repackDir/files/platform.txt").decodeToString()
                 )
             }
             getAndroidApk("full", "debug", "Resources-Test").let { apk ->
-                checkResourcesInZip(apk, commonResourcesFiles, true)
+                checkResourcesZip(apk, commonResourcesFiles, true)
                 assertEquals(
                     "android full-debug",
-                    readFileInZip(apk, "files/platform.txt").decodeToString()
+                    readFileInZip(apk, "assets/$repackDir/files/platform.txt").decodeToString()
                 )
             }
             getAndroidApk("full", "release", "Resources-Test").let { apk ->
-                checkResourcesInZip(apk, commonResourcesFiles, true)
+                checkResourcesZip(apk, commonResourcesFiles, true)
                 assertEquals(
                     "android full-release",
-                    readFileInZip(apk, "files/platform.txt").decodeToString()
+                    readFileInZip(apk, "assets/$repackDir/files/platform.txt").decodeToString()
                 )
             }
 
             file("build/libs/Resources-Test-desktop.jar").let { jar ->
-                checkResourcesInZip(jar, commonResourcesFiles, false)
+                checkResourcesZip(jar, commonResourcesFiles, false)
                 assertEquals(
                     "desktop",
-                    readFileInZip(jar, "files/platform.txt").decodeToString()
+                    readFileInZip(jar, "$repackDir/files/platform.txt").decodeToString()
                 )
             }
 
@@ -441,41 +434,11 @@ class ResourcesTest : GradlePluginTestBase() {
             commonResourcesFiles.forEach { res ->
                 assertTrue(jsBuildDir.resolve(res).exists())
             }
-            assertEquals("js", jsBuildDir.resolve("files/platform.txt").readText())
+            assertEquals("js", jsBuildDir.resolve("$repackDir/files/platform.txt").readText())
         }
     }
 
-    @Test
-    fun testAndroidFonts(): Unit = with(testProject("misc/commonResources")) {
-        val commonResourcesDir = file("src/commonMain/composeResources")
-        val commonResourcesFiles = commonResourcesDir.walkTopDown()
-            .filter { !it.isDirectory && !it.isHidden }
-            .getConvertedResources(commonResourcesDir)
-
-        gradle("assembleDebug").checks {
-            check.taskSuccessful(":copyDebugFontsToAndroidAssets")
-
-            getAndroidApk("", "debug", "Resources-Test").let { apk ->
-                checkResourcesInZip(apk, commonResourcesFiles, true)
-            }
-        }
-
-        file("src/commonMain/composeResources/font-en").renameTo(
-            file("src/commonMain/composeResources/font-mdpi")
-        )
-        val newCommonResourcesFiles = commonResourcesDir.walkTopDown()
-            .filter { !it.isDirectory && !it.isHidden }
-            .getConvertedResources(commonResourcesDir)
-        gradle("assembleDebug").checks {
-            check.taskSuccessful(":copyDebugFontsToAndroidAssets")
-
-            getAndroidApk("", "debug", "Resources-Test").let { apk ->
-                checkResourcesInZip(apk, newCommonResourcesFiles, true)
-            }
-        }
-    }
-
-    private fun Sequence<File>.getConvertedResources(baseDir: File) = map { file ->
+    private fun Sequence<File>.getConvertedResources(baseDir: File, repackDir: String) = map { file ->
         val newFile = if (
             file.parentFile.name.startsWith("value") &&
             file.extension.equals("xml", true)
@@ -485,9 +448,8 @@ class ResourcesTest : GradlePluginTestBase() {
         } else {
             file
         }
-        newFile.relativeTo(baseDir).invariantSeparatorsPath
+        Path(repackDir, newFile.relativeTo(baseDir).path).invariantSeparatorsPathString
     }
-
 
     private fun File.writeNewFile(text: String) {
         parentFile.mkdirs()
@@ -500,23 +462,6 @@ class ResourcesTest : GradlePluginTestBase() {
             file("build/outputs/apk/$flavor/$type/$name-$flavor-$type.apk")
         } else {
             file("build/outputs/apk/$type/$name-$type.apk")
-        }
-    }
-
-    private fun checkResourcesInZip(file: File, commonResourcesFiles: Sequence<String>, isAndroid: Boolean) {
-        println("check ZIP: '${file.path}'")
-        assertTrue(file.exists())
-        ZipFile(file).use { zip ->
-            commonResourcesFiles.forEach { res ->
-                println("check '$res' file")
-                if (isAndroid && res.startsWith("font")) {
-                    //android fonts should be only in assets
-                    assertNull(zip.getEntry(res), "file = '$res'")
-                    assertNotNull(zip.getEntry("assets/$res"), "file = 'assets/$res'")
-                } else {
-                    assertNotNull(zip.getEntry(res), "file = '$res'")
-                }
-            }
         }
     }
 
@@ -543,8 +488,7 @@ class ResourcesTest : GradlePluginTestBase() {
             )
         }
         gradle("prepareKotlinIdeaImport").checks {
-            check.taskSuccessful(":generateComposeResClass")
-            assertFalse(file("build/generated/compose/resourceGenerator/kotlin/commonResClass/app/group/resources_test/generated/resources/Res.kt").exists())
+            check.taskSkipped(":generateComposeResClass")
         }
 
         modifyText("build.gradle.kts") { str ->
@@ -568,9 +512,9 @@ class ResourcesTest : GradlePluginTestBase() {
 
     @Test
     fun testEmptyResClass(): Unit = with(testProject("misc/emptyResources")) {
-        gradle("generateComposeResClass").checks {
+        gradle("prepareKotlinIdeaImport").checks {
             assertDirectoriesContentEquals(
-                file("build/generated/compose/resourceGenerator/kotlin/commonResClass/app/group/empty_res/generated/resources"),
+                file("build/generated/compose/resourceGenerator/kotlin"),
                 file("expected")
             )
         }
@@ -626,8 +570,14 @@ class ResourcesTest : GradlePluginTestBase() {
                 }
             """.trimIndent()
         )
-        gradle("generateComposeResClass").checks {
-            check.logContains("Generation Res class is disabled")
+        gradle("prepareKotlinIdeaImport").checks {
+            check.taskSkipped(":generateComposeResClass")
+            check.taskSkipped(":generateResourceAccessorsForCommonMain")
+            check.taskSkipped(":generateResourceAccessorsForDesktopMain")
+            check.taskSkipped(":generateResourceAccessorsForAndroidMain")
+            check.taskSkipped(":generateExpectResourceCollectorsForCommonMain")
+            check.taskSkipped(":generateActualResourceCollectorsForDesktopMain")
+            check.taskSkipped(":generateActualResourceCollectorsForAndroidMain")
         }
     }
 
@@ -706,8 +656,8 @@ class ResourcesTest : GradlePluginTestBase() {
                 check.taskNoSource(":prepareComposeResourcesTaskForIosX64Main")
                 check.taskSkipped(":generateResourceAccessorsForIosX64Main")
 
-                file("build/compose/cocoapods/compose-resources/drawable/compose-multiplatform.xml").checkExists()
-                file("build/compose/cocoapods/compose-resources/drawable/icon.xml").checkExists()
+                file("build/compose/cocoapods/compose-resources/composeResources/iosresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
+                file("build/compose/cocoapods/compose-resources/composeResources/iosresources.generated.resources/drawable/icon.xml").checkExists()
             }
 
             gradle(":podspec", "-Pkotlin.native.cocoapods.generate.wrapper=true").checks {
@@ -728,8 +678,8 @@ class ResourcesTest : GradlePluginTestBase() {
                 check.taskSkipped(":linkDebugTestIosX64")
             }
             gradle(":copyTestComposeResourcesForIosX64").checks {
-                file("build/bin/iosX64/debugTest/compose-resources/drawable/compose-multiplatform.xml").checkExists()
-                file("build/bin/iosX64/debugTest/compose-resources/drawable/icon.xml").checkExists()
+                file("build/bin/iosX64/debugTest/compose-resources/composeResources/iosresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
+                file("build/bin/iosX64/debugTest/compose-resources/composeResources/iosresources.generated.resources/drawable/icon.xml").checkExists()
             }
         }
     }

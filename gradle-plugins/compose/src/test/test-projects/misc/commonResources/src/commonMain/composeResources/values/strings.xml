@@ -8,6 +8,7 @@
     <string name="PascalCase">PascalCase</string>
     <string name="1-kebab-case">1-kebab-case</string>
     <string name="camelCase">camelCase</string>
+    <string name="info_using_release_$x">info_using_release_$x</string>
 
     <plurals name="numberOfSongsAvailable">
         <item quantity="zero">%d zero</item>

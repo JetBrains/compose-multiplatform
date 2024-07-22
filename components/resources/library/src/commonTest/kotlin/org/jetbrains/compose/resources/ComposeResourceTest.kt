@@ -60,6 +60,44 @@ class ComposeResourceTest {
     }
 
     @Test
+    fun testImageResourceDensity() = runComposeUiTest {
+        val testResourceReader = TestResourceReader()
+        val imgRes = DrawableResource(
+            "test_id", setOf(
+                ResourceItem(setOf(DensityQualifier.XXXHDPI), "2.png", -1, -1),
+                ResourceItem(setOf(DensityQualifier.MDPI), "1.png", -1, -1),
+            )
+        )
+        val mdpiEnvironment = object : ComposeEnvironment {
+            @Composable
+            override fun rememberEnvironment() = ResourceEnvironment(
+                language = LanguageQualifier("en"),
+                region = RegionQualifier("US"),
+                theme = ThemeQualifier.LIGHT,
+                density = DensityQualifier.MDPI
+            )
+        }
+
+        var environment by mutableStateOf(TestComposeEnvironment)
+        setContent {
+            CompositionLocalProvider(
+                LocalResourceReader provides testResourceReader,
+                LocalComposeEnvironment provides environment
+            ) {
+                Image(painterResource(imgRes), null)
+            }
+        }
+        waitForIdle()
+        environment = mdpiEnvironment
+        waitForIdle()
+
+        assertEquals(
+            expected = listOf("2.png", "1.png"), //XXXHDPI - fist, MDPI - next
+            actual = testResourceReader.readPaths
+        )
+    }
+
+    @Test
     fun testStringResourceCache() = runComposeUiTest {
         val testResourceReader = TestResourceReader()
         var res by mutableStateOf(TestStringResource("app_name"))
@@ -293,7 +331,7 @@ class ComposeResourceTest {
         var uri2 = ""
         setContent {
             CompositionLocalProvider(LocalComposeEnvironment provides TestComposeEnvironment) {
-                val resourceReader = LocalResourceReader.current
+                val resourceReader = LocalResourceReader.currentOrPreview
                 uri1 = resourceReader.getUri("1.png")
                 uri2 = resourceReader.getUri("2.png")
             }

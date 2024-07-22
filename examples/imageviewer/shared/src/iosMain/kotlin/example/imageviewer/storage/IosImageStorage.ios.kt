@@ -14,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import platform.CoreGraphics.CGRectMake
@@ -36,7 +35,7 @@ private const val storableThumbnailSizePx = 180
 private const val jpegCompressionQuality = 60
 
 class IosImageStorage(
-    private val pictures: SnapshotStateList<PictureData>,
+    pictures: SnapshotStateList<PictureData>,
     private val ioScope: CoroutineScope
 ) : ImageStorage {
 
@@ -77,7 +76,6 @@ class IosImageStorage(
                 picture.jpgFile.writeJpeg(fitInto(maxStorableImageSizePx))
                 picture.thumbnailJpgFile.writeJpeg(fitInto(storableThumbnailSizePx))
             }
-            pictures.add(0, picture)
             picture.jsonFile.writeText(picture.toJson())
         }
     }
@@ -120,6 +118,21 @@ class IosImageStorage(
                 )
             }
         }.readData()
+    }
+
+    suspend fun getNSURLToShare(picture: PictureData): NSURL = withContext(Dispatchers.IO) {
+        when (picture) {
+            is PictureData.Camera -> {
+                picture.jpgFile
+            }
+
+            is PictureData.Resource -> {
+                NSURL(
+                    fileURLWithPath = NSBundle.mainBundle.resourcePath + "/" + picture.resource,
+                    isDirectory = false
+                )
+            }
+        }
     }
 }
 

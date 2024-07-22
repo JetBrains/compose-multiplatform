@@ -39,6 +39,7 @@ abstract class Dependencies {
         }
 
         override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
+            pictures.add(0, picture)
             imageStorage.saveImage(picture, image)
         }
 

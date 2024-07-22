@@ -7,11 +7,9 @@ package org.jetbrains.compose.test.tests.unit
 
 import org.jetbrains.compose.internal.ComposeCompilerArtifactProvider
 import org.jetbrains.compose.internal.copy
-import org.jetbrains.compose.test.utils.TestProperties
 import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 
 internal class ComposeCompilerArtifactProviderTest {
     @Test
@@ -69,11 +67,8 @@ internal class ComposeCompilerArtifactProviderTest {
             get() = SubpluginArtifact(
                 groupId = "org.jetbrains.compose.compiler",
                 artifactId = "compiler",
-                version = TestProperties.composeCompilerVersion
+                version = "1.9.20"
             )
-
-        val jbCompilerHosted: SubpluginArtifact
-            get() = jbCompiler.copy(artifactId = "compiler-hosted")
 
         val googleCompiler: SubpluginArtifact
             get() = jbCompiler.copy(groupId = "androidx.compose.compiler")

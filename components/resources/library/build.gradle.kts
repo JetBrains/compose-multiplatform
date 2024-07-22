@@ -1,3 +1,4 @@
+import kotlinx.validation.ExperimentalBCVApi
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
@@ -6,9 +7,8 @@ plugins {
     id("org.jetbrains.compose")
     id("maven-publish")
     id("com.android.library")
+    id("org.jetbrains.kotlinx.binary-compatibility-validator")
 }
-
-val composeVersion = extra["compose.version"] as String
 
 kotlin {
     jvm("desktop")
@@ -185,6 +185,7 @@ android {
             assets.srcDir("src/androidInstrumentedTest/assets")
         }
         named("test") { resources.srcDir(commonTestResources) }
+        named("main") { manifest.srcFile("src/androidMain/AndroidManifest.xml") }
     }
 }
 
@@ -194,9 +195,10 @@ configureMavenPublication(
     name = "Resources for Compose JB"
 )
 
-// adding it here to make sure skiko is unpacked and available in web tests
-compose.experimental {
-    web.application {}
+apiValidation {
+    @OptIn(ExperimentalBCVApi::class)
+    klib { enabled = true }
+    nonPublicMarkers.add("org.jetbrains.compose.resources.InternalResourceApi")
 }
 
 //utility task to generate CLDRPluralRuleLists.kt file by 'CLDRPluralRules/plurals.xml'

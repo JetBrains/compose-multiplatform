@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.compose")
     id("com.android.application")
     id("org.jetbrains.compose")
 }
@@ -9,8 +10,10 @@ group = "app.group"
 kotlin {
     androidTarget {
         compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
+            compileTaskProvider {
+                compilerOptions {
+                    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+                }
             }
         }
     }
@@ -62,3 +65,31 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 }
+
+abstract class GenerateAndroidRes : DefaultTask() {
+    @get:Inject
+    abstract val layout: ProjectLayout
+
+    @get:OutputDirectory
+    val outputDir = layout.buildDirectory.dir("generatedAndroidResources")
+
+    @TaskAction
+    fun run() {
+        val dir = outputDir.get().asFile
+        dir.deleteRecursively()
+        File(dir, "values/strings.xml").apply {
+            parentFile.mkdirs()
+            writeText(
+                """
+                    <resources>
+                        <string name="android_str">Android string</string>
+                    </resources>
+                """.trimIndent()
+            )
+        }
+    }
+}
+compose.resources.customDirectory(
+    sourceSetName = "androidMain",
+    directoryProvider = tasks.register<GenerateAndroidRes>("generateAndroidRes").map { it.outputDir.get() }
+)

@@ -6,10 +6,15 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.internal.utils.*
+import org.jetbrains.compose.internal.utils.dependsOn
+import org.jetbrains.compose.internal.utils.joinLowerCamelCase
+import org.jetbrains.compose.internal.utils.registerOrConfigure
+import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.cocoapods.CocoapodsExtension
-import org.jetbrains.kotlin.gradle.plugin.mpp.*
+import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.io.File
 
@@ -83,13 +88,16 @@ internal fun Project.configureSyncIosComposeResources(
             framework { podFramework ->
                 val syncDir = podFramework.getFinalResourcesDir().get().asFile.relativeTo(projectDir)
                 val specAttr = "['${syncDir.path}']"
-                extraSpecAttributes["resources"] = specAttr
-                project.tasks.named("podInstall").configure {
+                val specAttributes = extraSpecAttributes
+                val buildFile = project.buildFile
+                val projectPath = project.path
+                specAttributes["resources"] = specAttr
+                project.tasks.named("podspec").configure {
                     it.doFirst {
-                        if (extraSpecAttributes["resources"] != specAttr) error(
+                        if (specAttributes["resources"] != specAttr) error(
                             """
                                 |Kotlin.cocoapods.extraSpecAttributes["resources"] is not compatible with Compose Multiplatform's resources management for iOS.
-                                |  * Recommended action: remove extraSpecAttributes["resources"] from '${project.buildFile}' and run '${project.path}:podInstall' once;
+                                |  * Recommended action: remove extraSpecAttributes["resources"] from '$buildFile' and run '$projectPath:podInstall' once;
                                 |  * Alternative action: turn off Compose Multiplatform's resources management for iOS by adding '${ComposeProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties;
                             """.trimMargin()
                         )
@@ -131,7 +139,7 @@ private fun KotlinNativeTarget.isIosSimulatorTarget(): Boolean =
     konanTarget === KonanTarget.IOS_X64 || konanTarget === KonanTarget.IOS_SIMULATOR_ARM64
 
 private fun KotlinNativeTarget.isIosDeviceTarget(): Boolean =
-    konanTarget === KonanTarget.IOS_ARM64 || konanTarget === KonanTarget.IOS_ARM32
+    konanTarget === KonanTarget.IOS_ARM64
 
 private fun KotlinNativeTarget.isIosTarget(): Boolean =
     isIosSimulatorTarget() || isIosDeviceTarget()

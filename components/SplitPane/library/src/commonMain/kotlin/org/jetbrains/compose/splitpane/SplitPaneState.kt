@@ -11,10 +11,11 @@ class SplitPaneState(
 ) {
 
     var moveEnabled by mutableStateOf(moveEnabled)
-        internal set
 
-    var positionPercentage by mutableStateOf(initialPositionPercentage)
-        internal set
+    private var _positionPercentage by mutableStateOf(initialPositionPercentage)
+    var positionPercentage: Float
+        get() = _positionPercentage
+        set(value) { _positionPercentage = value.coerceIn(0f, 1f) }
 
     internal var minPosition: Float = 0f
 

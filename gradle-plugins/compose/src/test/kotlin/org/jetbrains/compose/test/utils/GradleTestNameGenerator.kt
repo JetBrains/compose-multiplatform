@@ -13,7 +13,7 @@ class GradleTestNameGenerator : DisplayNameGenerator.Standard() {
     override fun generateDisplayNameForMethod(testClass: Class<*>, testMethod: Method) =
         testMethod.name + with(TestProperties) {
             mutableListOf<String>().apply {
-                muteException { add("kotlin=$composeCompilerCompatibleKotlinVersion") }
+                muteException { add("kotlin=$kotlinVersion") }
                 muteException { add("gradle=$gradleVersion") }
                 muteException { add("agp=$agpVersion") }
             }.joinToString(prefix = "(", separator = ", ", postfix = ")")

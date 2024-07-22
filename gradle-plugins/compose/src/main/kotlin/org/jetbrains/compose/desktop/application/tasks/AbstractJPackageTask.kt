@@ -9,19 +9,23 @@ import org.gradle.api.file.*
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
 import org.gradle.process.ExecResult
 import org.gradle.work.ChangeType
 import org.gradle.work.InputChanges
+import org.jetbrains.compose.desktop.application.dsl.FileAssociation
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
+import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.*
 import org.jetbrains.compose.desktop.application.internal.files.*
 import org.jetbrains.compose.desktop.application.internal.files.MacJarSignFileCopyingProcessor
 import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.validation.validate
 import org.jetbrains.compose.internal.utils.*
+import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import java.io.*
 import java.nio.file.LinkOption
 import java.util.*
@@ -244,6 +248,39 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     val javaRuntimePropertiesFile: RegularFileProperty = objects.fileProperty()
 
+    @get:Input
+    internal val fileAssociations: SetProperty<FileAssociation> = objects.setProperty(FileAssociation::class.java)
+    
+    private val iconMapping by lazy {
+        val icons = fileAssociations.get().mapNotNull { it.iconFile }.distinct()
+        if (icons.isEmpty()) return@lazy emptyMap()
+        val iconTempNames: List<String> = mutableListOf<String>().apply {
+            val usedNames = mutableSetOf("${packageName.get()}.icns")
+            for (icon in icons) {
+                if (!icon.exists()) continue
+                if (usedNames.add(icon.name)) {
+                    add(icon.name)
+                    continue
+                }
+                val nameWithoutExtension = icon.nameWithoutExtension
+                val extension = icon.extension
+                for (n in 1UL..ULong.MAX_VALUE) {
+                    val newName = "$nameWithoutExtension ($n).$extension"
+                    if (usedNames.add(newName)) {
+                        add(newName)
+                        break
+                    }
+                }
+            }
+        }
+        val appDir = destinationDir.ioFile.resolve("${packageName.get()}.app")
+        val iconsDir = appDir.resolve("Contents").resolve("Resources")
+        if (iconsDir.exists()) {
+            iconsDir.deleteRecursively()
+        }
+        icons.zip(iconTempNames) { icon, newName -> icon to iconsDir.resolve(newName) }.toMap()
+    }
+
     private lateinit var jvmRuntimeInfo: JvmRuntimeProperties
 
     @get:Optional
@@ -272,6 +309,9 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:LocalState
     protected val skikoDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/skiko")
+
+    @get:LocalState
+    protected val propertyFilesDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/propertyFiles")
 
     @get:Internal
     private val libsDir: Provider<Directory> = workingDir.map {
@@ -367,6 +407,33 @@ abstract class AbstractJPackageTask @Inject constructor(
             cliArg("--install-dir", installationPath)
             cliArg("--license-file", licenseFile)
             cliArg("--resource-dir", jpackageResources)
+
+            val propertyFilesDirJava = propertyFilesDir.ioFile
+            fileOperations.clearDirs(propertyFilesDir)
+
+            val fileAssociationFiles = fileAssociations.get()
+                .groupBy { it.extension }
+                .mapValues { (extension, associations) ->
+                    associations.mapIndexed { index, association ->
+                        propertyFilesDirJava.resolve("FA${extension}${if (index > 0) index.toString() else ""}.properties")
+                            .apply {
+                                val withoutIcon = """
+                                    mime-type=${association.mimeType}
+                                    extension=${association.extension}
+                                    description=${association.description}
+                                """.trimIndent()
+                                writeText(
+                                    if (association.iconFile == null) withoutIcon
+                                    else "${withoutIcon}\nicon=${association.iconFile.normalizedPath()}"
+                                )
+                            }
+                    }
+                }.values.flatten()
+
+            for (fileAssociationFile in fileAssociationFiles) {
+                cliArg("--file-associations", fileAssociationFile)
+            }
+
 
             when (currentOS) {
                 OS.Linux -> {
@@ -569,6 +636,15 @@ abstract class AbstractJPackageTask @Inject constructor(
 
         macSigner.sign(runtimeDir, runtimeEntitlementsFile, forceEntitlements = true)
         macSigner.sign(appDir, appEntitlementsFile, forceEntitlements = true)
+        
+        if (iconMapping.isNotEmpty()) {
+            for ((originalIcon, newIcon) in iconMapping) {
+                if (originalIcon.exists()) {
+                    newIcon.ensureParentDirsCreated()
+                    originalIcon.copyTo(newIcon)
+                }
+            }
+        }
     }
 
     override fun initState() {
@@ -620,6 +696,23 @@ abstract class AbstractJPackageTask @Inject constructor(
             ?: "Copyright (C) $year"
         plist[PlistKeys.NSSupportsAutomaticGraphicsSwitching] = "true"
         plist[PlistKeys.NSHighResolutionCapable] = "true"
+        val fileAssociationMutableSet = fileAssociations.get()
+        if (fileAssociationMutableSet.isNotEmpty()) {
+            plist[PlistKeys.CFBundleDocumentTypes] = fileAssociationMutableSet
+                .groupBy { it.mimeType to it.description }
+                .map { (key, extensions) ->
+                    val (mimeType, description) = key
+                    val iconPath = extensions.firstNotNullOfOrNull { it.iconFile }?.let { iconMapping[it]?.name }
+                    InfoPlistMapValue(
+                        PlistKeys.CFBundleTypeRole to InfoPlistStringValue("Editor"),
+                        PlistKeys.CFBundleTypeExtensions to InfoPlistListValue(extensions.map { InfoPlistStringValue(it.extension) }),
+                        PlistKeys.CFBundleTypeIconFile to InfoPlistStringValue(iconPath ?: "$packageName.icns"),
+                        PlistKeys.CFBundleTypeMIMETypes to InfoPlistStringValue(mimeType),
+                        PlistKeys.CFBundleTypeName to InfoPlistStringValue(description),
+                        PlistKeys.CFBundleTypeOSTypes to InfoPlistListValue(InfoPlistStringValue("****")),
+                    )
+                }
+        }
     }
 }
 

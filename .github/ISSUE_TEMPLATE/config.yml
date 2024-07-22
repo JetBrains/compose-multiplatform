@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Create
+    url: https://youtrack.jetbrains.com/newIssue?project=CMP
+    about: Please report new issues to the JetBrains YouTrack
