@@ -62,15 +62,16 @@ actual fun CameraView(
         CircularButton(
             imageVector = Icons.Filled.PhotoCamera,
             modifier = Modifier.align(Alignment.BottomCenter).padding(36.dp),
-        ) {
-            onCapture(
-                createCameraPictureData(
-                    name = nameAndDescription.name,
-                    description = nameAndDescription.description,
-                    gps = randomPicture.gps
-                ),
-                DesktopStorableImage(imageBitmap)
-            )
-        }
+            onClick = {
+                onCapture(
+                    createCameraPictureData(
+                        name = nameAndDescription.name,
+                        description = nameAndDescription.description,
+                        gps = randomPicture.gps
+                    ),
+                    DesktopStorableImage(imageBitmap)
+                )
+            },
+        )
     }
 }

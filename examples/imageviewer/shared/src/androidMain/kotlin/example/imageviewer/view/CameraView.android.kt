@@ -143,52 +143,53 @@ private fun CameraWithGrantedPermission(
             imageVector = Icons.Filled.PhotoCamera,
             modifier = Modifier.align(Alignment.BottomCenter).padding(36.dp),
             enabled = !capturePhotoStarted,
-        ) {
-            fun addLocationInfoAndReturnResult(imageBitmap: ImageBitmap) {
-                fun sendToStorage(gpsPosition: GpsPosition) {
-                    onCapture(
-                        createCameraPictureData(
-                            name = nameAndDescription.name,
-                            description = nameAndDescription.description,
-                            gps = gpsPosition
-                        ),
-                        AndroidStorableImage(imageBitmap)
-                    )
-                    capturePhotoStarted = false
-                }
-                LocationServices.getFusedLocationProviderClient(context)
-                    .getCurrentLocation(CurrentLocationRequest.Builder().build(), null)
-                    .apply {
-                        addOnSuccessListener {
-                            sendToStorage(GpsPosition(it.latitude, it.longitude))
-                        }
-                        addOnFailureListener {
-                            sendToStorage(GpsPosition(0.0, 0.0))
-                        }
+            onClick = {
+                fun addLocationInfoAndReturnResult(imageBitmap: ImageBitmap) {
+                    fun sendToStorage(gpsPosition: GpsPosition) {
+                        onCapture(
+                            createCameraPictureData(
+                                name = nameAndDescription.name,
+                                description = nameAndDescription.description,
+                                gps = gpsPosition
+                            ),
+                            AndroidStorableImage(imageBitmap)
+                        )
+                        capturePhotoStarted = false
                     }
-            }
+                    LocationServices.getFusedLocationProviderClient(context)
+                        .getCurrentLocation(CurrentLocationRequest.Builder().build(), null)
+                        .apply {
+                            addOnSuccessListener {
+                                sendToStorage(GpsPosition(it.latitude, it.longitude))
+                            }
+                            addOnFailureListener {
+                                sendToStorage(GpsPosition(0.0, 0.0))
+                            }
+                        }
+                }
 
-            capturePhotoStarted = true
-            imageCapture.takePicture(executor, object : OnImageCapturedCallback() {
-                override fun onCaptureSuccess(image: ImageProxy) {
-                    val byteArray: ByteArray = image.planes[0].buffer.toByteArray()
-                    val imageBitmap = byteArray.toImageBitmap()
-                    image.close()
-                    addLocationInfoAndReturnResult(imageBitmap)
+                capturePhotoStarted = true
+                imageCapture.takePicture(executor, object : OnImageCapturedCallback() {
+                    override fun onCaptureSuccess(image: ImageProxy) {
+                        val byteArray: ByteArray = image.planes[0].buffer.toByteArray()
+                        val imageBitmap = byteArray.toImageBitmap()
+                        image.close()
+                        addLocationInfoAndReturnResult(imageBitmap)
+                    }
+                })
+                viewScope.launch {
+                    // TODO: There is a known issue with Android emulator
+                    //  https://partnerissuetracker.corp.google.com/issues/161034252
+                    //  After 5 seconds delay, let's assume that the bug appears and publish a prepared photo
+                    delay(5000)
+                    if (capturePhotoStarted) {
+                        addLocationInfoAndReturnResult(
+                            Res.readBytes("files/android-emulator-photo.jpg").toImageBitmap()
+                        )
+                    }
                 }
-            })
-            viewScope.launch {
-                // TODO: There is a known issue with Android emulator
-                //  https://partnerissuetracker.corp.google.com/issues/161034252
-                //  After 5 seconds delay, let's assume that the bug appears and publish a prepared photo
-                delay(5000)
-                if (capturePhotoStarted) {
-                    addLocationInfoAndReturnResult(
-                        Res.readBytes("files/android-emulator-photo.jpg").toImageBitmap()
-                    )
-                }
-            }
-        }
+            },
+        )
         if (capturePhotoStarted) {
             CircularProgressIndicator(
                 modifier = Modifier.size(80.dp).align(Alignment.Center),

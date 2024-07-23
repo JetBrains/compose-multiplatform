@@ -288,22 +288,23 @@ private fun BoxScope.RealDeviceCamera(
         imageVector = Icons.Filled.PhotoCamera,
         modifier = Modifier.align(Alignment.BottomCenter).padding(36.dp),
         enabled = !capturePhotoStarted,
-    ) {
-        capturePhotoStarted = true
-        val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(
-            format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
-        )
-        if (camera.position == AVCaptureDevicePositionFront) {
-            capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
-                ?.automaticallyAdjustsVideoMirroring = false
-            capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
-                ?.videoMirrored = true
-        }
-        capturePhotoOutput.capturePhotoWithSettings(
-            settings = photoSettings,
-            delegate = photoCaptureDelegate
-        )
-    }
+        onClick = {
+            capturePhotoStarted = true
+            val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(
+                format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
+            )
+            if (camera.position == AVCaptureDevicePositionFront) {
+                capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
+                    ?.automaticallyAdjustsVideoMirroring = false
+                capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
+                    ?.videoMirrored = true
+            }
+            capturePhotoOutput.capturePhotoWithSettings(
+                settings = photoSettings,
+                delegate = photoCaptureDelegate
+            )
+        },
+    )
     if (capturePhotoStarted) {
         CircularProgressIndicator(
             modifier = Modifier.size(80.dp).align(Alignment.Center),
