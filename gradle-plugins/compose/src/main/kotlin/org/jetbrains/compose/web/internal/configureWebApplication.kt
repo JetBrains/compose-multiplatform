@@ -85,6 +85,7 @@ internal fun configureWebApplication(
 
     targets.forEach { target ->
         target.compilations.all { compilation ->
+            // `wasmTargetType` is available starting with kotlin 1.9.2x
             if (target.wasmTargetType != null) {
                 // Kotlin/Wasm uses ES module system to depend on skiko through skiko.mjs.
                 // Further bundler could process all files by its own (both skiko.mjs and skiko.wasm) and then emits its own version.

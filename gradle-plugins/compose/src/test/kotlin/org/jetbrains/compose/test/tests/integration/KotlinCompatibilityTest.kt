@@ -16,7 +16,7 @@ class KotlinCompatibilityTest : GradlePluginTestBase() {
     fun testKotlinMpp_1_9_10() = testMpp("1.9.10")
 
     @Test
-    fun testKotlinJsMpp_1_9_10() = testJsMpp("1.9.10")
+    fun testKotlinJsMpp_1_9_24() = testJsMpp("1.9.24")
 
     @Test
     fun testKotlinMpp_1_9_20() = testMpp("1.9.20")
