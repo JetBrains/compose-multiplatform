@@ -179,7 +179,7 @@ private fun CameraWithGrantedPermission(
                 })
                 viewScope.launch {
                     // TODO: There is a known issue with Android emulator
-                    //  https://partnerissuetracker.corp.google.com/issues/161034252
+                    //  https://issuetracker.google.com/issues/161034252
                     //  After 5 seconds delay, let's assume that the bug appears and publish a prepared photo
                     delay(5000)
                     if (capturePhotoStarted) {
