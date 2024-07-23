@@ -2,13 +2,13 @@ package example.imageviewer
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -55,20 +55,19 @@ fun ImageViewerWithProvidedDependencies(
     LaunchedEffect(Unit) {
         externalEvents.collect {
             if (it == ExternalImageViewerEvent.ReturnBack) {
-                navController.navigateUp()
+                if (navController.currentBackStack.value.size > 2) {
+                    navController.popBackStack()
+                }
             }
         }
     }
 
-    LaunchedEffect(Unit) {
-        while (true) {
-            delay(1000)
-            println(navController.currentBackStack.value.toList().map {
-                it.destination.route
-            })
-        }
+    val cbs by navController.currentBackStack.collectAsState()
+    LaunchedEffect(cbs) {
+        println(cbs.map { it.destination.route })
     }
 
+    // TODO: The current version of compose-navigation has a bug that messes up the behavior of the animations. https://issuetracker.google.com/issues/355006319
     NavHost(
         navController = navController,
         startDestination = Gallery,
@@ -83,10 +82,14 @@ fun ImageViewerWithProvidedDependencies(
                 pictures = pictures,
                 selectedPictureIndex = selectedPictureIndex,
                 onClickPreviewPicture = { previewPictureIndex ->
-                    navController.navigate(Memory(previewPictureIndex))
+                    if (navController.allowsNavigation(it)) {
+                        navController.navigate(Memory(previewPictureIndex))
+                    }
                 },
                 onMakeNewMemory = {
-                    navController.navigate(Camera)
+                    if (navController.allowsNavigation(it)) {
+                        navController.navigate(Camera)
+                    }
                 }
             )
         }
@@ -96,16 +99,19 @@ fun ImageViewerWithProvidedDependencies(
                 pictures = pictures,
                 memoryPage = MemoryPage(memoryRoute.imageIndex),
                 onSelectRelatedMemory = { pictureIndex ->
-                    navController.navigate(Memory(pictureIndex))
+                    if (navController.allowsNavigation(it)) {
+                        navController.navigate(Memory(pictureIndex))
+                    }
                 },
                 onBack = { resetNavigation ->
-                    // TODO: There's an annoying problem here where navigating too quickly
-                    // somehow breaks navigation. Unclear at the moment why.
-                    val didNav = navController.navigateUp()
-                    println("navigating up! $didNav")
+                    if (navController.allowsNavigation(it)) {
+                        navController.navigateUp()
+                    }
                 },
                 onHeaderClick = { pictureIndex ->
-                    navController.navigate(FullScreen(pictureIndex))
+                    if (navController.allowsNavigation(it)) {
+                        navController.navigate(FullScreen(pictureIndex))
+                    }
                 },
             )
         }
@@ -114,16 +120,29 @@ fun ImageViewerWithProvidedDependencies(
             FullscreenImageScreen(
                 picture = pictures[fullScreenRoute.imageIndex],
                 back = {
-                    navController.navigateUp()
+                    if (navController.allowsNavigation(it)) {
+                        navController.navigateUp()
+                    }
                 }
             )
         }
         composable<Camera> {
             CameraScreen(
                 onBack = { resetSelectedPicture ->
-                    navController.navigateUp()
+                    if (navController.allowsNavigation(it)) {
+                        navController.navigateUp()
+                    }
                 },
             )
         }
+    }
+}
+
+fun NavController.allowsNavigation(backStackEntry: NavBackStackEntry): Boolean {
+    if (this.currentBackStackEntry == backStackEntry) {
+        return true
+    } else {
+        println("Away navigation not allowed for non-top back stack entry $backStackEntry")
+        return false
     }
 }

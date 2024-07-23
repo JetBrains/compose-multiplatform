@@ -6,11 +6,11 @@ android-minSdk = "24"
 android-targetSdk = "34"
 androidx-activity = "1.9.0"
 androidx-lifecycle = "2.8.0"
-androidx-navigation = "2.8.0-alpha08"
+androidx-navigation = "2.8.0-dev1739"
 appcompat = "1.7.0"
 cameraCamera2 = "1.3.4"
 compose-android = "1.6.8"
-compose-multiplatform = "1.7.0-dev1731"
+compose-multiplatform = "1.7.0-dev1739"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 kotlin = "2.0.0"
@@ -56,4 +56,4 @@ composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-mu
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlinParcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
-secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secrets"}
+secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secrets" }
