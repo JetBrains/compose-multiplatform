@@ -10,13 +10,17 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.artifacts.UnresolvedDependency
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.provider.Provider
+import org.gradle.language.jvm.tasks.ProcessResources
 import org.jetbrains.compose.ComposeBuildConfig
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.internal.utils.detachedComposeDependency
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.compose.web.tasks.UnpackSkikoWasmRuntimeTask
+import org.jetbrains.kotlin.gradle.targets.js.KotlinWasmTargetType
+import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.tasks.IncrementalSyncTask
 
 internal fun Project.configureWeb(
@@ -46,13 +50,16 @@ internal fun Project.configureWeb(
         }
     }
 
+    val targets = webExt.targetsToConfigure(project)
+
     // configure only if there is k/wasm or k/js target:
-    if (webExt.targetsToConfigure(project).isNotEmpty()) {
-        configureWebApplication(project, shouldRunUnpackSkiko)
+    if (targets.isNotEmpty()) {
+        configureWebApplication(targets, project, shouldRunUnpackSkiko)
     }
 }
 
 internal fun configureWebApplication(
+    targets: Collection<KotlinJsIrTarget>,
     project: Project,
     shouldRunUnpackSkiko: Provider<Boolean>
 ) {
@@ -76,9 +83,29 @@ internal fun configureWebApplication(
         outputDir.set(unpackedRuntimeDir)
     }
 
-    project.tasks.withType(IncrementalSyncTask::class.java) {
-        it.dependsOn(unpackRuntime)
-        it.from.from(unpackedRuntimeDir)
+    targets.forEach { target ->
+        target.compilations.all { compilation ->
+            // `wasmTargetType` is available starting with kotlin 1.9.2x
+            if (target.wasmTargetType != null) {
+                // Kotlin/Wasm uses ES module system to depend on skiko through skiko.mjs.
+                // Further bundler could process all files by its own (both skiko.mjs and skiko.wasm) and then emits its own version.
+                // So that’s why we need to provide skiko.mjs and skiko.wasm only for webpack, but not in the final dist.
+                compilation.binaries.all {
+                    it.linkSyncTask.configure {
+                        it.dependsOn(unpackRuntime)
+                        it.from.from(unpackedRuntimeDir)
+                    }
+                }
+            } else {
+                // Kotlin/JS depends on Skiko through global space.
+                // Bundler cannot know anything about global externals, so that’s why we need to copy it to final dist
+                project.tasks.named(compilation.processResourcesTaskName, ProcessResources::class.java) {
+                    it.from(unpackedRuntimeDir)
+                    it.dependsOn(unpackRuntime)
+                    it.exclude("META-INF")
+                }
+            }
+        }
     }
 }
 
