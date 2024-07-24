@@ -24,7 +24,7 @@ For example, you can share UIs between iOS and Android or Windows and MacOS.
 
 > iOS support is in Beta. It is feature complete, and migration issues should be minimal. You may still encounter bugs, performance and developer experience issues, but not as much as in the Alpha stage.
 > We would appreciate your feedback on it in the public Slack channel [#compose-ios](https://kotlinlang.slack.com/archives/C0346LWVBJ4/p1678888063176359). 
-> If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
+> If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
 
 Compose Multiplatform shares most of its API with Jetpack Compose, the Android UI framework developed by Google. 
 You can use the same APIs to build user interfaces for both Android and iOS.
@@ -57,7 +57,7 @@ It has desktop extensions for menus, keyboard shortcuts, window manipulation, an
 
 > Web support is in Alpha. It may change incompatibly and require manual migration in the future.
 > We would appreciate your feedback on it in the public Slack channel [#compose-web](https://kotlinlang.slack.com/archives/C01F2HV7868/p1678887590205449). 
-> If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
+> If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
 
 You can experiment with sharing your mobile or desktop UIs with the web. Compose for Web is based on [Kotlin/Wasm](https://kotl.in/wasm), 
 the newest target for Kotlin Multiplatform projects. It allows Kotlin developers to run their code in the browser with 
