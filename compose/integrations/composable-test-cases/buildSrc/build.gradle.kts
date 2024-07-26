@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
-
 repositories {
     mavenCentral()
     gradlePluginPortal()
@@ -18,12 +16,4 @@ java {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin")
-}
-
-
-tasks.withType<KotlinCompile<*>>().configureEach {
-    kotlinOptions {
-        languageVersion = "1.9"
-        apiVersion = "1.9"
-    }
 }

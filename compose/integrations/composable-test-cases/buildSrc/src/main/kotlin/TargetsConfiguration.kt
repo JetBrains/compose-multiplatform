@@ -11,25 +11,15 @@ val Project.coroutinesVersion: String
         return extraProperties.properties["kotlinx.coroutines.version"] as String
     }
 
-val Project.isInIdea: Boolean
-    get() {
-        return System.getProperty("idea.active")?.toBoolean() == true
-    }
-
-val Project.isFailingJsCase: Boolean
-    get() = this.name.contains("-failingJs-")
-
-val Project.isMingwX64Enabled: Boolean
-    get() = false //this.isInIdea
-
 @OptIn(ExperimentalWasmDsl::class)
 fun KotlinMultiplatformExtension.configureTargets() {
     jvm("desktop")
+    applyDefaultHierarchyTemplate()
     configureJsTargets()
     wasmJs {
         d8 {}
     }
-    ios()
+
     iosArm64()
     iosSimulatorArm64()
     iosX64()
@@ -64,3 +54,12 @@ fun KotlinSourceSet.configureCommonTestDependencies() {
         }
     }
 }
+
+val Project.composeVersion: String
+    get() = properties["compose.version"] as? String
+        ?: error("'compose.version' is not defined")
+
+val Project.composeRuntimeDependency: String
+    get() = properties["compose.runtime.artifactId"] as? String
+        ?: properties["compose.runtime.groupId"]?.let { "$it:runtime:$composeVersion" }
+        ?: "org.jetbrains.compose.runtime:runtime:${composeVersion}"

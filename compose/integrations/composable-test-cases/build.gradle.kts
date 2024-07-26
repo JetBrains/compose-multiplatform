@@ -1,4 +1,3 @@
-import internal.InternalComposeSupportPlugin
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 
@@ -14,26 +13,7 @@ allprojects {
         // mavenLocal()
     }
 
-    // Apply here for all subprojects instead of applying in each build.gradle.kts separately.
-    // It applies the compiler plugin
-    this.apply<InternalComposeSupportPlugin>()
-
     afterEvaluate {
-        val pluginOptionPrefix = "plugin:androidx.compose.compiler.plugins.kotlin:"
-        val project = this
-        val kotlinVersion = project.properties["kotlin.version"] as? String
-
-        project.tasks.withType(KotlinCompile::class.java).configureEach {
-            kotlinOptions.apply {
-                freeCompilerArgs +=
-                    listOf(
-                        "-P",
-                        "${pluginOptionPrefix}suppressKotlinVersionCompatibilityCheck=$kotlinVersion"
-                    )
-
-            }
-        }
-
         tasks.withType<KotlinJsCompile>().configureEach {
             kotlinOptions.freeCompilerArgs += listOf(
                 "-Xklib-enable-signature-clash-checks=false",
@@ -49,6 +29,7 @@ allprojects {
 
 plugins {
     kotlin("multiplatform") apply false
+    alias(libs.plugins.composeCompiler).apply(false)
 }
 
 fun Project.disableYarnLockMismatchReport() {
