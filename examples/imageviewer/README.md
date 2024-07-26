@@ -29,7 +29,7 @@ Choose a run configuration for an appropriate target in IDE and run it.
 
 ## Run on Web via Gradle
 
-`./gradlew :web:wasmJsRun`
+`./gradlew :webApp:wasmJsRun`
 
 ### Running Android application
 
