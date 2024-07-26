@@ -1,10 +1,6 @@
 # 1.7.0-alpha02 (July 2024)
+
 _Changes since 1.7.0-alpha01_
-
-## Breaking Changes
-
-### Multiple Platforms
-- [ComposeScene `fun hitTestInteropView(position: Offset): Boolean` changed to `fun hitTestInteropView(position: Offset): InteropView?`](https://github.com/JetBrains/compose-multiplatform-core/pull/1426)
 
 ## Features
 
@@ -50,7 +46,7 @@ _Changes since 1.7.0-alpha01_
 
 ## Dependencies
 - Gradle Plugin `org.jetbrains.compose`, version `1.7.0-alpha02`. Based on Jetpack Compose libraries:
-  - Compiler 1.5.14.1-beta02
+- - [Compiler 1.5.14](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.5.14)
   - [Runtime 1.7.0-beta05](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.7.0-beta05)
   - [UI 1.7.0-beta05](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.7.0-beta05)
   - [Foundation 1.7.0-beta05](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.7.0-beta05)
