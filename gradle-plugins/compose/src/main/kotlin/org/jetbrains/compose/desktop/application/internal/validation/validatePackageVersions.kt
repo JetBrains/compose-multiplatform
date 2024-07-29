@@ -169,7 +169,7 @@ private object WindowsVersionChecker : VersionChecker {
 
 private object MacVersionChecker : VersionChecker {
     override val correctFormat = """|'MAJOR[.MINOR][.PATCH]', where:
-        |    * MAJOR is an integer > 0;
+        |    * MAJOR is a non-negative integer;
         |    * MINOR is an optional non-negative integer;
         |    * PATCH is an optional non-negative integer;
     """.trimMargin()
@@ -180,6 +180,5 @@ private object MacVersionChecker : VersionChecker {
         return parts.isNotEmpty()
                 && parts.size <= 3
                 && parts.all { it != null && it >= 0 }
-                && (parts.first() ?: 0) > 0
     }
 }
