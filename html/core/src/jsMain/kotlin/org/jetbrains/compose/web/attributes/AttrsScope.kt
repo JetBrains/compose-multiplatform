@@ -141,7 +141,26 @@ open class AttrsScopeBuilder<TElement : Element>(
     internal val attributesMap = mutableMapOf<String, String>()
     internal val styleScope: StyleScopeBuilder = StyleScopeBuilder()
     internal val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
-    internal var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
+    private val refEffects: MutableList<DisposableEffectScope.(TElement) -> DisposableEffectResult> = mutableListOf()
+    internal val refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)?
+        get() = if (refEffects.isEmpty()) {
+            null
+        } else {
+            { element ->
+                val onDisposes = mutableListOf<DisposableEffectResult>()
+                refEffects.forEach {
+                    onDisposes.add(it(element))
+                }
+
+                onDispose {
+                    onDisposes.forEach {
+                        runCatching {
+                            it()
+                        }
+                    }
+                }
+            }
+        }
     internal val classes: MutableList<String> = mutableListOf()
 
     /**
@@ -188,7 +207,7 @@ open class AttrsScopeBuilder<TElement : Element>(
      * Under the hood, `ref` uses [DisposableEffect](https://developer.android.com/jetpack/compose/side-effects#disposableeffect)
      */
     override fun ref(effect: DisposableEffectScope.(TElement) -> DisposableEffectResult) {
-        this.refEffect = effect
+        refEffects.add(effect)
     }
 
     /**
