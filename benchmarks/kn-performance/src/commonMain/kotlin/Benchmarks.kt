@@ -127,9 +127,10 @@ fun runBenchmark(
     targetFps: Int,
     frameCount: Int,
     graphicsContext: GraphicsContext?,
+    warmupCount: Int = 100,
     content: @Composable () -> Unit
 ): BenchmarkStats {
-    val stats = measureComposable(frameCount, width, height, targetFps, graphicsContext, content).generateStats()
+    val stats = measureComposable(warmupCount, frameCount, width, height, targetFps, graphicsContext, content).generateStats()
 
     println(name)
     stats.prettyPrint()
