@@ -663,3 +663,16 @@ compose.desktop {
     }
 }
 ```
+
+Minimizing the Kotlin library is disabled by default.
+To minimize it, 
+set the following property via Gradle DSL:
+```
+compose.desktop {
+    application {
+        buildTypes.release.proguard {
+            minimizeKotlinStandardLibrary.set(true)
+        }
+    }
+}
+```
