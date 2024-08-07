@@ -13,7 +13,6 @@ import org.jetbrains.compose.web.sample.tests.testCase
 
 class RadioGroupTestCases {
 
-    @OptIn(ExperimentalComposeWebApi::class)
     val radioGroupItemsCanBeChecked by testCase {
         var checked by remember { mutableStateOf("None") }
 
@@ -34,7 +33,6 @@ class RadioGroupTestCases {
         }
     }
 
-    @OptIn(ExperimentalComposeWebApi::class)
     val twoRadioGroupsChangedIndependently by testCase {
         var checked1 by remember { mutableStateOf("None") }
         var checked2 by remember { mutableStateOf("None") }
