@@ -110,6 +110,7 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         modules.set(provider { app.nativeDistributions.modules })
         includeAllModules.set(provider { app.nativeDistributions.includeAllModules })
         javaRuntimePropertiesFile.set(checkRuntime.flatMap { it.javaRuntimePropertiesFile })
+        cds.set(provider { app.nativeDistributions.cds })
         destinationDir.set(appTmpDir.dir("runtime"))
     }
 

@@ -280,6 +280,21 @@ compose.desktop {
 }
 ```
 
+## Enabling Class data sharing (CDS)
+
+This option requires JDK 18. Class data sharing (CDS) can be enabled which helps reduce the startup
+time and memory footprint.
+
+``` kotlin
+compose.desktop {
+    application {
+        nativeDistributions {
+            cds = true
+        }
+    }
+}
+```
+
 ## Packaging resources
 
 There are multiple ways to package and load resources with Compose for Desktop.
