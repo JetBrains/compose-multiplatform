@@ -74,6 +74,8 @@ for creating web user interfaces with HTML and CSS.
 
 > Note that Compose HTML is not a multiplatform library. It can be used only with Kotlin/JS.
 
+**[Get started with Compose HTML](tutorials/HTML/Getting_Started)**
+
 ## Learn more
 
 * [FAQ](https://jb.gg/cmp-faq)
