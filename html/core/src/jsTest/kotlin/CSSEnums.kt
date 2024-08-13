@@ -114,3 +114,14 @@ fun Position.Companion.values() = listOf(
     Position.Sticky,
     Position.Fixed
 )
+
+fun VisibilityStyle.Companion.values() = listOf(
+    VisibilityStyle.Visible,
+    VisibilityStyle.Hidden,
+    VisibilityStyle.Collapse,
+    VisibilityStyle.Inherit,
+    VisibilityStyle.Initial,
+    VisibilityStyle.Revert,
+    VisibilityStyle.RevertLayer,
+    VisibilityStyle.Unset
+)
