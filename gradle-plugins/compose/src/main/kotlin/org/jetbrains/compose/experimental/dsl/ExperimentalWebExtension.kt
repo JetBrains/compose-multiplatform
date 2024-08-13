@@ -10,15 +10,24 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import javax.inject.Inject
 
+@Deprecated(
+    message = "Starting from 1.6.10, Compose for Web goes to Alpha. Experimental configuration is not needed anymore.",
+)
 abstract class ExperimentalWebExtension @Inject constructor(private val objectFactory: ObjectFactory) : ExtensionAware {
     internal var _isApplicationInitialized = false
         private set
 
+    @Deprecated(
+        message = "Starting from 1.6.10, Compose for Web goes to Alpha. Experimental configuration is not needed anymore.",
+    )
     val application: ExperimentalWebApplication by lazy {
         _isApplicationInitialized = true
         objectFactory.newInstance(ExperimentalWebApplication::class.java, "main")
     }
 
+    @Deprecated(
+        message = "Starting from 1.6.10, Compose for Web goes to Alpha. Experimental configuration is not needed anymore.",
+    )
     fun application(fn: Action<ExperimentalWebApplication>) {
         fn.execute(application)
     }

@@ -15,22 +15,22 @@ for distribution on macOS.
 * [Xcode](https://developer.apple.com/xcode/). The tutorial was checked with Xcode 12.3.
 * JDK 15+. The tutorial was checked with OpenJDK 15.0.1.
 
-## Preparing a Developer ID certificate
+## Preparing a certificate
 
-You will need a Developer ID certificate for signing your app.
+You will need a certificate for signing your app.
 
-#### Checking existing Developer ID certificates
+#### Checking existing certificates
 
 Open https://developer.apple.com/account/resources/certificates
 
-#### Creating a new Developer ID certificate
-1. [Create a certificate signing request](https://help.apple.com/developer-account/#/devbfa00fef7):
+#### Creating a new certificate
+1. [Create a certificate signing request](https://developer.apple.com/help/account/create-certificates/create-a-certificate-signing-request):
     * Open `Keychain Access`.
     * Open the menu dialog
         ```
         Keychain Access > Certificate Assistant > Request a Certificate from a Certificate Authority
         ```
-    * Enter your Developer ID email and common name.
+    * Enter your certificate email and common name.
     * Check `Save to disk` option.
 2. Create and install a new certificate using your [Apple Developer account](https://developer.apple.com/account/):
     * Open https://developer.apple.com/account/resources/certificates/add
@@ -104,7 +104,7 @@ Note that you need to create two of these profiles, one for your app and another
 ## Creating an app-specific password
 
 To be able to upload an app for notarization,
-you will need an app-specific password associated with your Apple ID.
+you will need an app-specific password associated with your Apple ID. Notarization is only required for apps outside the App Store.
 
 Follow these steps to generate a new password:
 1. Sign in to your [Apple ID](https://appleid.apple.com/account/home) account page.
@@ -221,35 +221,57 @@ The following Gradle properties can be used instead of DSL properties:
 
 Those properties could be stored in `$HOME/.gradle/gradle.properties` to use across multiple applications.
 
-### Configuring notarization settings
+### Notarization
 
-``` kotlin
-macOS {
-    notarization { 
-         appleID.set("john.doe@example.com")
-         password.set("@keychain:NOTARIZATION_PASSWORD")
-         
-         // optional
-         ascProvider.set("<TEAM_ID>")
+Distributing your macOS application outside the App Store 
+requires notarization.
+Notarization involves submitting your application to Apple for verification. 
+If your software passes the verification, 
+it's signed by Apple, stating that it has been notarized.
+
+To notarize your app, you can use `notarize<PACKAGING_FORMAT>` task:
+```
+./gradlew notarizeDmg \
+          -Pcompose.desktop.mac.notarization.appleID=<APPLE_ID> \
+          -Pcompose.desktop.mac.notarization.password=<PASSWORD> \
+          -Pcompose.desktop.mac.notarization.teamID=<TEAM_ID>
+```
+where:
+* `<APPLE_ID>` — your Apple ID;
+* `<PASSWORD>` — the app-specific password created previously;
+* `<TEAM_ID>` — your Team. To get a table of team IDs associated with a given username and password, run:
+```
+xcrun altool --list-providers -u <Apple ID> -p <Notarization password>"
+```
+
+<img alt="Team ID" src="notarization-team-id.png" />
+
+
+The following tasks can be used for notarization:
+* `notarizeDmg` — build, sign and notarize `.dmg` installer;
+* `notarizeReleaseDmg` — same as `notarizeDmg`, but with [ProGuard](tutorials/Native_distributions_and_local_execution/README.md).
+* `notarizePkg` — build, sign and notarize `.pkg` installer;
+* `notarizeReleasePkg` — same as `notarizePkg`, but with [ProGuard](tutorials/Native_distributions_and_local_execution/README.md).
+
+The notarization settings can also be set using the DSL.
+For example, it is possible to pass credentials using environment variables:
+```
+compose.desktop.application {
+    nativeDistributions {
+        macOS {
+            notarization {
+                val providers = project.providers
+                appleID.set(providers.environmentVariable("NOTARIZATION_APPLE_ID"))
+                password.set(providers.environmentVariable("NOTARIZATION_PASSWORD"))
+                teamId.set(providers.environmentVariable("NOTARIZATION_TEAM_ID"))
+            }
+        }
     }
 }
 ```
 
-* Set `appleID` to your Apple ID.
-  * Alternatively, the `compose.desktop.mac.notarization.appleID` Gradle property can be used.
-* Set `password` to the app-specific password created previously.
-    * Alternatively, the `compose.desktop.mac.notarization.password` Gradle property can be used.
-    * Don't write raw password directly into a build script.
-    * If the password was added to the keychain, as described previously, it can be referenced as
-     ```
-     @keychain:NOTARIZATION_PASSWORD
-     ```
-* Set `ascProvider` to your Team ID, if your account is associated with multiple teams.
-    * Alternatively, the `compose.desktop.mac.notarization.ascProvider` Gradle property can be used.
-    * To get a table of team IDs associated with a given username and password, run:
-```
-xcrun altool --list-providers -u <Apple ID> -p <Notarization password>"
-```
+According to Apple, for 98 percent of software notarization completes within 15 minutes.
+To learn more on how to avoid long response times, check [the official documentation](https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution/customizing_the_notarization_workflow#3561440).
 
 ### Configuring provisioning profile
 
@@ -369,17 +391,7 @@ Apple, and they may be able to give you a more detailed error message.
 ## Using Gradle
 
 The following tasks are available:
-* Use `createDistributable` or `packageDmg` to get a signed application
+* Use `createDistributable`, `packageDmg`, or `packagePkg` to get a signed application
   (no separate step is required).
-* Use `notarize<PACKAGING_FORMAT>` (e.g. `notarizeDmg`) to upload an application for notarization.
-  Once the upload finishes, a `RequestUUID` will be printed. 
-  The notarization process takes some time.
-  Once the notarization process finishes, an email will be sent to you.
-  Uploaded file is saved to `<BUILD_DIR>/compose/notarization/main/<UPLOAD_DATE>-<PACKAGING_FORMAT>`
-* Use `checkNotarizationStatus` to check a status of 
-  last notarization requests. You can also use a command-line command to check any notarization request:
-```
-xcrun altool --notarization-info <RequestUUID> 
-             --username <Apple_ID>
-             --password "@keychain:NOTARIZATION_PASSWORD"
-```
+* Use `notarize<PACKAGING_FORMAT>` (e.g. `notarizeDmg`) to upload an application for notarization. 
+  Notarization is only required for apps outside the App Store.

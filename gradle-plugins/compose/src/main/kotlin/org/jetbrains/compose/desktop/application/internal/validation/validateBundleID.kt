@@ -19,7 +19,7 @@ private const val BUNDLE_ID_FORMAT =
     "bundleID may only contain alphanumeric characters (A-Z, a-z, 0-9), hyphen (-) and period (.) characters"
 private val ERR_BUNDLE_ID_IS_EMPTY =
     """|$ERR_PREFIX bundleID is empty or null. To specify:
-       |  * Use 'nativeExecutables.macOS.bundleID' DSL property;
+       |  * Use 'nativeDistributions.macOS.bundleID' DSL property;
        |  * $BUNDLE_ID_FORMAT;
        |  * Use reverse DNS notation (e.g. "com.mycompany.myapp");
        |""".trimMargin()

@@ -5,12 +5,14 @@
 
 package org.jetbrains.compose.desktop.application.internal
 
+import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
+import org.jetbrains.compose.internal.utils.toBooleanProvider
+import org.jetbrains.compose.internal.utils.valueOrNull
 
 internal object ComposeProperties {
     internal const val VERBOSE = "compose.desktop.verbose"
-    internal const val OVERRIDE_KOTLIN_JVM_TARGET = "compose.desktop.override.default.kotlin.jvm.target"
     internal const val PRESERVE_WD = "compose.preserve.working.dir"
     internal const val MAC_SIGN = "compose.desktop.mac.sign"
     internal const val MAC_SIGN_ID = "compose.desktop.mac.signing.identity"
@@ -18,53 +20,46 @@ internal object ComposeProperties {
     internal const val MAC_SIGN_PREFIX = "compose.desktop.mac.signing.prefix"
     internal const val MAC_NOTARIZATION_APPLE_ID = "compose.desktop.mac.notarization.appleID"
     internal const val MAC_NOTARIZATION_PASSWORD = "compose.desktop.mac.notarization.password"
-    internal const val MAC_NOTARIZATION_ASC_PROVIDER = "compose.desktop.mac.notarization.ascProvider"
+    internal const val MAC_NOTARIZATION_TEAM_ID_PROVIDER = "compose.desktop.mac.notarization.teamID"
+    internal const val CHECK_JDK_VENDOR = "compose.desktop.packaging.checkJdkVendor"
+    internal const val DISABLE_MULTIMODULE_RESOURCES = "org.jetbrains.compose.resources.multimodule.disable"
+    internal const val SYNC_RESOURCES_PROPERTY = "compose.ios.resources.sync"
 
     fun isVerbose(providers: ProviderFactory): Provider<Boolean> =
-        providers.findProperty(VERBOSE).toBoolean()
-
-    fun overrideKotlinJvmTarget(providers: ProviderFactory): Provider<Boolean> =
-        providers.provider {
-            providers.findProperty(OVERRIDE_KOTLIN_JVM_TARGET)?.toString() != "false"
-        }
+        providers.valueOrNull(VERBOSE).toBooleanProvider(false)
 
     fun preserveWorkingDir(providers: ProviderFactory): Provider<Boolean> =
-        providers.findProperty(PRESERVE_WD).toBoolean()
+        providers.valueOrNull(PRESERVE_WD).toBooleanProvider(false)
 
     fun macSign(providers: ProviderFactory): Provider<Boolean> =
-        providers.findProperty(MAC_SIGN).toBoolean()
+        providers.valueOrNull(MAC_SIGN).toBooleanProvider(false)
 
     fun macSignIdentity(providers: ProviderFactory): Provider<String?> =
-        providers.findProperty(MAC_SIGN_ID)
+        providers.valueOrNull(MAC_SIGN_ID)
 
     fun macSignKeychain(providers: ProviderFactory): Provider<String?> =
-        providers.findProperty(MAC_SIGN_KEYCHAIN)
+        providers.valueOrNull(MAC_SIGN_KEYCHAIN)
 
     fun macSignPrefix(providers: ProviderFactory): Provider<String?> =
-        providers.findProperty(MAC_SIGN_PREFIX)
+        providers.valueOrNull(MAC_SIGN_PREFIX)
 
     fun macNotarizationAppleID(providers: ProviderFactory): Provider<String?> =
-        providers.findProperty(MAC_NOTARIZATION_APPLE_ID)
+        providers.valueOrNull(MAC_NOTARIZATION_APPLE_ID)
 
     fun macNotarizationPassword(providers: ProviderFactory): Provider<String?> =
-        providers.findProperty(MAC_NOTARIZATION_PASSWORD)
+        providers.valueOrNull(MAC_NOTARIZATION_PASSWORD)
 
-    fun macNotarizationAscProvider(providers: ProviderFactory): Provider<String?> =
-        providers.findProperty(MAC_NOTARIZATION_ASC_PROVIDER)
+    fun macNotarizationTeamID(providers: ProviderFactory): Provider<String?> =
+        providers.valueOrNull(MAC_NOTARIZATION_TEAM_ID_PROVIDER)
 
-    private fun ProviderFactory.findProperty(prop: String): Provider<String?> =
-        provider {
-            gradleProperty(prop).forUseAtConfigurationTimeSafe().orNull
-        }
+    fun checkJdkVendor(providers: ProviderFactory): Provider<Boolean> =
+        providers.valueOrNull(CHECK_JDK_VENDOR).toBooleanProvider(true)
 
-    private fun Provider<String?>.forUseAtConfigurationTimeSafe(): Provider<String?> =
-        try {
-            forUseAtConfigurationTime()
-        } catch (e: NoSuchMethodError) {
-            // todo: remove once we drop support for Gradle 6.4
-            this
-        }
+    fun disableMultimoduleResources(providers: ProviderFactory): Provider<Boolean> =
+        providers.valueOrNull(DISABLE_MULTIMODULE_RESOURCES).toBooleanProvider(false)
 
-    private fun Provider<String?>.toBoolean(): Provider<Boolean> =
-        orElse("false").map { "true" == it }
+    //providers.valueOrNull works only with root gradle.properties
+    fun dontSyncResources(project: Project): Provider<Boolean> = project.provider {
+        project.findProperty(SYNC_RESOURCES_PROPERTY)?.toString().equals("false", true)
+    }
 }

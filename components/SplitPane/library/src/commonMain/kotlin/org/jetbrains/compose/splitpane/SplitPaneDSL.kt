@@ -4,9 +4,11 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.consumeAllChanges
+import androidx.compose.ui.composed
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
 /** Receiver scope which is used by [HorizontalSplitPane] and [VerticalSplitPane] */
@@ -15,7 +17,7 @@ interface SplitPaneScope {
 
     /**
      * Set up first composable item if SplitPane, for [HorizontalSplitPane] it will be
-     * Right part, for [VerticalSplitPane] it will be Top part
+     * Left part, for [VerticalSplitPane] it will be Top part
      * @param minSize a minimal size of composable item.
      * For [HorizontalSplitPane] it will be minimal width, for [VerticalSplitPane] it wil be minimal Heights.
      * In this context minimal mean that this composable item could not be smaller than specified value.
@@ -28,7 +30,7 @@ interface SplitPaneScope {
 
     /**
      * Set up second composable item if SplitPane.
-     * For [HorizontalSplitPane] it will be Left part, for [VerticalSplitPane] it will be Bottom part
+     * For [HorizontalSplitPane] it will be Right part, for [VerticalSplitPane] it will be Bottom part
      * @param minSize a minimal size of composable item.
      * For [HorizontalSplitPane] it will be minimal width, for [VerticalSplitPane] it wil be minimal Heights.
      * In this context minimal mean that this composable item could not be smaller than specified value.
@@ -84,12 +86,17 @@ interface SplitterScope {
 internal class HandleScopeImpl(
     private val containerScope: SplitPaneScopeImpl
 ) : HandleScope {
-    override fun Modifier.markAsHandle(): Modifier = this.pointerInput(containerScope.splitPaneState) {
-        detectDragGestures { change, _ ->
-            change.consumeAllChanges()
-            containerScope.splitPaneState.dispatchRawMovement(
-                if (containerScope.isHorizontal) change.position.x else change.position.y
-            )
+    override fun Modifier.markAsHandle(): Modifier = composed {
+        val layoutDirection = LocalLayoutDirection.current
+        pointerInput(containerScope.splitPaneState) {
+            detectDragGestures { change, _ ->
+                change.consume()
+                containerScope.splitPaneState.dispatchRawMovement(
+                    if (containerScope.isHorizontal)
+                        if (layoutDirection == LayoutDirection.Ltr) change.position.x else -change.position.x
+                    else change.position.y
+                )
+            }
         }
     }
 }
@@ -171,7 +178,6 @@ internal class SplitPaneScopeImpl(
  *
  * @param initialPositionPercentage the initial value for [SplitPaneState.positionPercentage]
  * @param moveEnabled the initial value for [SplitPaneState.moveEnabled]
- * @param interactionState the initial value for [SplitPaneState.interactionState]
  * */
 @ExperimentalSplitPaneApi
 @Composable

@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Compose Resources App</string>
+    <string name="hello">😊 Hello world!</string>
+    <string name="multi_line">Lorem ipsum dolor sit amet,
+        consectetur adipiscing elit.
+        Donec eget turpis ac sem ultricies consequat.</string>
+    <string name="str_template">Hello, %1$s! You have %2$d new messages.</string>
+    <string name="PascalCase">PascalCase</string>
+    <string name="1-kebab-case">1-kebab-case</string>
+    <string name="camelCase">camelCase</string>
+    <string name="info_using_release_$x">info_using_release_$x</string>
+
+    <plurals name="numberOfSongsAvailable">
+        <item quantity="zero">%d zero</item>
+        <item quantity="one">%d one</item>
+        <item quantity="two">%d two</item>
+        <item quantity="few">%d few</item>
+        <item quantity="many">%d many</item>
+        <item quantity="other">%d other</item>
+    </plurals>
+
+</resources>

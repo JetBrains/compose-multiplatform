@@ -4,6 +4,7 @@
  */
 package org.jetbrains.compose.desktop.ide.preview
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -18,7 +19,9 @@ class PreviewToolWindow : ToolWindowFactory, DumbAware {
         isPreviewCompatible(project)
 
     override fun init(toolWindow: ToolWindow) {
-        toolWindow.setIcon(PreviewIcons.COMPOSE)
+        ApplicationManager.getApplication().invokeLater {
+            toolWindow.setIcon(PreviewIcons.COMPOSE)
+        }
     }
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {

@@ -7,13 +7,11 @@ package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.FileSystemLocation
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
-import org.jetbrains.compose.desktop.application.internal.ioFile
-import org.jetbrains.compose.desktop.application.internal.notNullProperty
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
+import org.jetbrains.compose.internal.utils.*
 import java.io.File
 
 abstract class AbstractNativeMacApplicationPackageTask : AbstractComposeDesktopTask() {
@@ -35,7 +33,7 @@ abstract class AbstractNativeMacApplicationPackageTask : AbstractComposeDesktopT
 
     @TaskAction
     fun run() {
-        cleanDirs(destinationDir, workingDir)
+        fileOperations.clearDirs(destinationDir, workingDir)
 
         createPackage(
             destinationDir = destinationDir.ioFile,

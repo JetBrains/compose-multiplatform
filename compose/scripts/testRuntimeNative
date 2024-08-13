@@ -1,8 +1,0 @@
-#!/bin/bash
-
-cd "$(dirname "$0")"
-. ./prepare
-
-pushd ..
-./gradlew testRuntimeNative $COMPOSE_DEFAULT_GRADLE_ARGS "$@" || exit 1
-popd

@@ -8,6 +8,7 @@ package org.jetbrains.compose.desktop.application.dsl
 import org.gradle.api.Action
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
+import java.io.File
 import javax.inject.Inject
 
 abstract class AbstractPlatformSettings {
@@ -17,6 +18,13 @@ abstract class AbstractPlatformSettings {
     val iconFile: RegularFileProperty = objects.fileProperty()
     var packageVersion: String? = null
     var installationPath: String? = null
+
+    internal val fileAssociations: MutableSet<FileAssociation> = mutableSetOf()
+
+    @JvmOverloads
+    fun fileAssociation(mimeType: String, extension: String, description: String, iconFile: File? = null) {
+        fileAssociations.add(FileAssociation(mimeType, extension, description, iconFile))
+    }
 }
 
 abstract class AbstractMacOSPlatformSettings : AbstractPlatformSettings() {
@@ -26,6 +34,7 @@ abstract class AbstractMacOSPlatformSettings : AbstractPlatformSettings() {
     var dmgPackageVersion: String? = null
     var dmgPackageBuildVersion: String? = null
     var appCategory: String? = null
+    var minimumSystemVersion: String? = null
 
 
     /**

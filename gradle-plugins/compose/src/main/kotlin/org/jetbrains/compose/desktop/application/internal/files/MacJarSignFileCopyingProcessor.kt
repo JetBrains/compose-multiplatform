@@ -6,7 +6,6 @@
 package org.jetbrains.compose.desktop.application.internal.files
 
 import org.jetbrains.compose.desktop.application.internal.MacSigner
-import org.jetbrains.compose.desktop.application.internal.isJarFile
 import java.io.File
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -55,30 +54,22 @@ internal class MacJarSignFileCopyingProcessor(
     private fun signNativeLibsInJar(source: File, target: File) {
         if (target.exists()) target.delete()
 
-        transformJar(source, target) { zin, zout, entry ->
+        transformJar(source, target) { entry, zin, zout ->
             if (entry.name.isDylibPath) {
-                signDylibEntry(zin, zout, entry)
+                signDylibEntry(entry, zin, zout)
             } else {
-                zout.withNewEntry(ZipEntry(entry)) {
-                    zin.copyTo(zout)
-                }
+                copyZipEntry(entry, zin, zout)
             }
         }
     }
 
-    private fun signDylibEntry(zin: ZipInputStream, zout: ZipOutputStream, sourceEntry: ZipEntry) {
+    private fun signDylibEntry(sourceEntry: ZipEntry, zin: ZipInputStream, zout: ZipOutputStream) {
         val unpackedDylibFile = tempDir.resolve(sourceEntry.name.substringAfterLast("/"))
         try {
             zin.copyTo(unpackedDylibFile)
             signer.sign(unpackedDylibFile)
-            val targetEntry = ZipEntry(sourceEntry.name).apply {
-                comment = sourceEntry.comment
-                extra = sourceEntry.extra
-                method = sourceEntry.method
-                size = unpackedDylibFile.length()
-            }
-            zout.withNewEntry(ZipEntry(targetEntry)) {
-                unpackedDylibFile.copyTo(zout)
+            unpackedDylibFile.inputStream().buffered().use {
+                copyZipEntry(sourceEntry, from = it, to = zout)
             }
         } finally {
             unpackedDylibFile.delete()

@@ -13,3 +13,4 @@ build/
 /captures
 .externalNativeBuild
 .cxx
+kotlin-js-store

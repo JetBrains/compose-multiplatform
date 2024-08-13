@@ -18,21 +18,31 @@ function mavenDep {
   fi
 }
 
-PLATFORM=macos-x64
-# to know which Skiko version corresponds to Compose version, search "skiko" in https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/compose/ui/ui-graphics-desktop/1.1.0-alpha04/ui-graphics-desktop-1.1.0-alpha04.pom (replace 1.0.0-alpha04 by needed version)
-SKIKO_VERSION=0.2.33
-KOTLIN_VERSION=1.5.0
-COMPOSE_VERSION=0.4.0-build209
-COROUTINES_VERSION=1.3.6
-COLLECTIONS_VERSION=0.3
-SPACE_REPO="https://public.jetbrains.space/p/compose/packages/maven/"
+# Define which platform the code is running on. This is required to load the correct native code.
+PLATFORM=macos-arm64
+# The Compose compiler must be compatible with the selected version of Kotlin.
+# See https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compatibility-and-versioning.html#use-a-developer-version-of-compose-multiplatform-compiler
+# for which version of the compiler to use.
+COMPOSE_COMPILER_VERSION=1.5.10.1
+# See https://github.com/JetBrains/compose-multiplatform/releases for available versions of Compose
+COMPOSE_VERSION=1.6.1
+# To know which Skiko version corresponds to the used Compose version, search after "skiko" in
+# https://repo1.maven.org/maven2/org/jetbrains/compose/ui/ui-desktop/1.6.1/ui-desktop-1.6.1.pom
+# (replace 1.6.1) with the version of compose used.
+SKIKO_VERSION=0.7.97
+KOTLIN_VERSION=1.9.23
+COROUTINES_VERSION=1.8.0
+ANDROIDX_COLLECTION_VERSION=1.4.0
+GOOGLE_REPO="https://maven.google.com/"
 MAVEN_CENTRAL="https://repo1.maven.org/maven2"
 
-mavenDep "$SPACE_REPO" "org/jetbrains/skiko" "skiko-jvm-runtime-$PLATFORM" "$SKIKO_VERSION"
-mavenDep "$SPACE_REPO" "org/jetbrains/compose" "compose-full" "$COMPOSE_VERSION"
-mavenDep "$SPACE_REPO" "org/jetbrains/compose" "compose-compiler-hosted" "$COMPOSE_VERSION"
-mavenDep "$MAVEN_CENTRAL" "org/jetbrains/kotlinx" "kotlinx-collections-immutable-jvm" "$COLLECTIONS_VERSION"
-mavenDep "$MAVEN_CENTRAL" "org/jetbrains/kotlinx" "kotlinx-coroutines-core" "$COROUTINES_VERSION"
+mavenDep "$MAVEN_CENTRAL" "org/jetbrains/skiko" "skiko-awt" "$SKIKO_VERSION"
+mavenDep "$MAVEN_CENTRAL" "org/jetbrains/skiko" "skiko-awt-runtime-$PLATFORM" "$SKIKO_VERSION"
+mavenDep "$MAVEN_CENTRAL" "org/jetbrains/compose/compiler" "compiler-hosted" "$COMPOSE_COMPILER_VERSION"
+mavenDep "$MAVEN_CENTRAL" "org/jetbrains/compose" "compose-full" "$COMPOSE_VERSION"
+mavenDep "$MAVEN_CENTRAL" "org/jetbrains/kotlinx" "kotlinx-coroutines-core-jvm" "$COROUTINES_VERSION"
+mavenDep "$GOOGLE_REPO" "androidx/collection" "collection-jvm" "$ANDROIDX_COLLECTION_VERSION"
+
 mavenDep "$MAVEN_CENTRAL" "org/jetbrains/kotlin" "kotlin-stdlib" "$KOTLIN_VERSION"
 if [ ! -f "deps/kotlin-compiler-$KOTLIN_VERSION.zip" ]; then
   wget -P deps/ "https://github.com/JetBrains/kotlin/releases/download/v$KOTLIN_VERSION/kotlin-compiler-$KOTLIN_VERSION.zip"
@@ -46,16 +56,14 @@ if [ -d "$OUT_DIR" ]; then
   rm -rf $OUT_DIR
 fi
 
-COMPILE_CLASSPATH="deps/compose-full-$COMPOSE_VERSION.jar:deps/skiko-jvm-runtime-$PLATFORM-$SKIKO_VERSION.jar:deps/kotlinx-coroutines-core-$COROUTINES_VERSION.jar"
-RUNTIME_CLASSPATH="deps/kotlinx-collections-immutable-jvm-$COLLECTIONS_VERSION.jar:deps/kotlin-stdlib-$KOTLIN_VERSION.jar:$COMPILE_CLASSPATH"
+COMPILE_CLASSPATH="deps/compose-full-$COMPOSE_VERSION.jar"
+RUNTIME_CLASSPATH="deps/collection-jvm-$ANDROIDX_COLLECTION_VERSION.jar:deps/skiko-awt-$SKIKO_VERSION.jar:deps/skiko-awt-runtime-$PLATFORM-$SKIKO_VERSION.jar:deps/kotlin-stdlib-$KOTLIN_VERSION.jar:deps/kotlinx-coroutines-core-jvm-$COROUTINES_VERSION.jar:$COMPILE_CLASSPATH"
 SOURCES=$(find src/main -name "*.kt"|paste -sd " " -)
 JAVA_OPTS=-Xmx1G deps/kotlinc/bin/kotlinc-jvm \
--jvm-target 1.8 \
--Xuse-ir \
+-language-version 1.9 \
 -Xmulti-platform \
--Xplugin="deps/compose-compiler-hosted-$COMPOSE_VERSION.jar" \
+-Xplugin="deps/compiler-hosted-$COMPOSE_COMPILER_VERSION.jar" \
 -cp "$COMPILE_CLASSPATH" \
 -d $OUT_DIR $SOURCES
 
-#jar cf result.jar -C "$OUT_DIR" . -C "src/main/resources" .
 java -cp "out/:result.jar:$RUNTIME_CLASSPATH" MainKt

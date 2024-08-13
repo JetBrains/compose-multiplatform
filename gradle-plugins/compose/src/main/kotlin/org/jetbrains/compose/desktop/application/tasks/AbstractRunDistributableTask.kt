@@ -11,10 +11,10 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
-import org.jetbrains.compose.desktop.application.internal.OS
-import org.jetbrains.compose.desktop.application.internal.currentOS
-import org.jetbrains.compose.desktop.application.internal.executableName
-import org.jetbrains.compose.desktop.application.internal.ioFile
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentOS
+import org.jetbrains.compose.internal.utils.executableName
+import org.jetbrains.compose.internal.utils.ioFile
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import javax.inject.Inject
 

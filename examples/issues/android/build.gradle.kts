@@ -1,26 +1,30 @@
 plugins {
     id("com.android.application")
     kotlin("android")
+    kotlin("plugin.compose")
     id("org.jetbrains.compose")
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 34
+    namespace = "com.example.myapplication"
 
     defaultConfig {
         minSdk = 26
-        targetSdk = 31
+        targetSdk = 34
+        applicationId = "org.jetbrains.Issues"
         versionCode = 1
         versionName = "1.0"
     }
-
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    kotlin {
+        jvmToolchain(17)
     }
 }
 
 dependencies {
     implementation(project(":common"))
-    implementation("androidx.activity:activity-compose:1.3.1")
 }

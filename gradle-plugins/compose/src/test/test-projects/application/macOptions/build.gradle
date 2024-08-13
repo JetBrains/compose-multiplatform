@@ -1,7 +1,6 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-
 plugins {
     id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.plugin.compose"
     id "org.jetbrains.compose"
 }
 
@@ -11,28 +10,53 @@ dependencies {
 }
 
 def extraInfoPlistKeys = """
-  <key>CFBundleURLTypes</key>
-  <array>
-    <dict>
-      <key>CFBundleURLName</key>
-      <string>Exameple URL</string>
-      <key>CFBundleURLSchemes</key>
-      <array>
-        <string>exampleUrl</string>
-      </array>
-    </dict>
-  </array>"""
+    <key>CFBundleURLTypes</key>
+    <array>
+      <dict>
+        <key>CFBundleURLName</key>
+        <string>Example URL</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>exampleUrl</string>
+        </array>
+      </dict>
+    </array>"""
 
 compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
             packageName = "TestPackage"
+            fileAssociation(
+                    "text/kotlin",
+                    "kot",
+                    "Kotlin Source File0",
+                    project.file("Kotlin_icon_big.png"),
+                    project.file("Kotlin_icon_big.ico"),
+                    project.file("Kotlin_icon_big.icns"),
+            )
+            fileAssociation(
+                    "text/kotlin",
+                    "kot1",
+                    "Kotlin Source File1",
+            )
             macOS {
                 dockName = "CustomDockName"
+                minimumSystemVersion = "12.0"
                 infoPlist {
                     extraKeysRawXml = extraInfoPlistKeys
                 }
+                fileAssociation(
+                    "text/kotlin",
+                    "kott",
+                    "Kotlin Source File2",
+                    project.file("subdir/Kotlin_icon_big.icns"),
+                )
+                fileAssociation(
+                    "text/kotlin",
+                    "kott1",
+                    "Kotlin Source File3",
+                )
             }
         }
     }

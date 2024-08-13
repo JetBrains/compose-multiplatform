@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,6 +33,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.ui.examples.jetissues.data.*
 import androidx.ui.examples.jetissues.query.IssueQuery
 import androidx.ui.examples.jetissues.query.IssuesQuery
@@ -83,10 +86,12 @@ fun SingleColumnLayout(currentIssue: MutableState<IssuesQuery.Node?>) {
                             )
                         },
                         navigationIcon = {
-                            Button(onClick = {
-                                currentIssue.value = null
-                            }) {
-                                Text(text = "Back")
+                            IconButton(
+                                onClick = {
+                                    currentIssue.value = null
+                                }
+                            ) {
+                                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                             }
                         }
                     )

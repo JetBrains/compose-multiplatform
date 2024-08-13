@@ -9,8 +9,8 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
-import org.jetbrains.compose.desktop.application.internal.ioFile
-import org.jetbrains.compose.desktop.application.internal.notNullProperty
+import org.jetbrains.compose.internal.utils.ioFile
+import org.jetbrains.compose.internal.utils.notNullProperty
 import java.io.File
 
 abstract class AbstractNativeMacApplicationPackageDmgTask : AbstractNativeMacApplicationPackageTask() {

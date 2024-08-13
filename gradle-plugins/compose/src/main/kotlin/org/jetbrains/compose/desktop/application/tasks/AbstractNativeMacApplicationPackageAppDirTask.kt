@@ -9,13 +9,12 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
-import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder
 import org.jetbrains.compose.desktop.application.internal.PlistKeys
-import org.jetbrains.compose.desktop.application.internal.ioFile
-import org.jetbrains.compose.desktop.application.internal.notNullProperty
+import org.jetbrains.compose.internal.utils.ioFile
+import org.jetbrains.compose.internal.utils.notNullProperty
+import org.jetbrains.compose.internal.utils.nullableProperty
 import java.io.File
-import java.util.*
 
 private const val KOTLIN_NATIVE_MIN_SUPPORTED_MAC_OS = "10.13"
 
@@ -40,6 +39,10 @@ abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMac
     @get:Optional
     val copyright: Property<String?> = objects.nullableProperty()
 
+    @get:Input
+    @get:Optional
+    val minimumSystemVersion: Property<String?> = objects.nullableProperty()
+
     override fun createPackage(destinationDir: File, workingDir: File) {
         val packageName = packageName.get()
         val appDir = destinationDir.resolve("$packageName.app").apply { mkdirs() }
@@ -61,7 +64,7 @@ abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMac
     }
 
     private fun InfoPlistBuilder.setupInfoPlist(executableName: String) {
-        this[PlistKeys.LSMinimumSystemVersion] = KOTLIN_NATIVE_MIN_SUPPORTED_MAC_OS
+        this[PlistKeys.LSMinimumSystemVersion] = minimumSystemVersion.getOrElse(KOTLIN_NATIVE_MIN_SUPPORTED_MAC_OS)
         this[PlistKeys.CFBundleDevelopmentRegion] = "English"
         this[PlistKeys.CFBundleAllowMixedLocalizations] = "true"
         this[PlistKeys.CFBundleExecutable] = executableName

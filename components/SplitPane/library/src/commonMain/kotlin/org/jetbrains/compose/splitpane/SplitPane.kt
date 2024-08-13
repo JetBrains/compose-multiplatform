@@ -28,20 +28,15 @@ fun VerticalSplitPane(
     content: SplitPaneScope.() -> Unit
 ) {
     with(SplitPaneScopeImpl(isHorizontal = false, splitPaneState).apply(content)) {
-        if (firstPlaceableContent != null && secondPlaceableContent != null) {
-            SplitPane(
-                modifier = modifier,
-                isHorizontal = false,
-                splitPaneState = splitPaneState,
-                minimalSizesConfiguration = minimalSizes,
-                first = firstPlaceableContent!!,
-                second = secondPlaceableContent!!,
-                splitter = splitter
-            )
-        } else {
-            firstPlaceableContent?.invoke()
-            secondPlaceableContent?.invoke()
-        }
+        SplitPane(
+            modifier = modifier,
+            isHorizontal = false,
+            splitPaneState = splitPaneState,
+            minimalSizesConfiguration = minimalSizes,
+            first = firstPlaceableContent,
+            second = secondPlaceableContent,
+            splitter = splitter
+        )
     }
 }
 
@@ -63,20 +58,15 @@ fun HorizontalSplitPane(
     content: SplitPaneScope.() -> Unit
 ) {
     with(SplitPaneScopeImpl(isHorizontal = true, splitPaneState).apply(content)) {
-        if (firstPlaceableContent != null && secondPlaceableContent != null) {
-            SplitPane(
-                modifier = modifier,
-                isHorizontal = true,
-                splitPaneState = splitPaneState,
-                minimalSizesConfiguration = minimalSizes,
-                first = firstPlaceableContent!!,
-                second = secondPlaceableContent!!,
-                splitter = splitter
-            )
-        } else {
-            firstPlaceableContent?.invoke()
-            secondPlaceableContent?.invoke()
-        }
+        SplitPane(
+            modifier = modifier,
+            isHorizontal = true,
+            splitPaneState = splitPaneState,
+            minimalSizesConfiguration = minimalSizes,
+            first = firstPlaceableContent!!,
+            second = secondPlaceableContent!!,
+            splitter = splitter
+        )
     }
 
 }
@@ -105,12 +95,13 @@ internal expect fun defaultSplitter(
  * @param splitter separator composable, by default [Splitter] is used
  * */
 @Composable
+@OptIn(ExperimentalSplitPaneApi::class)
 internal expect fun SplitPane(
     modifier: Modifier = Modifier,
     isHorizontal: Boolean = true,
     splitPaneState: SplitPaneState,
     minimalSizesConfiguration: MinimalSizes = MinimalSizes(0.dp, 0.dp),
-    first: @Composable () -> Unit,
-    second: @Composable () -> Unit,
+    first: (@Composable () -> Unit)?,
+    second: (@Composable () -> Unit)?,
     splitter: Splitter
 )

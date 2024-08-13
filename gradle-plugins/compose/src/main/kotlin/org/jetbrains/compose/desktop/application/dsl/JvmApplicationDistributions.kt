@@ -6,6 +6,7 @@
 package org.jetbrains.compose.desktop.application.dsl
 
 import org.gradle.api.Action
+import java.io.File
 
 internal val DEFAULT_RUNTIME_MODULES = arrayOf(
     "java.base", "java.desktop", "java.logging", "jdk.crypto.ec"
@@ -31,5 +32,15 @@ abstract class JvmApplicationDistributions : AbstractDistributions() {
     val windows: WindowsPlatformSettings = objects.newInstance(WindowsPlatformSettings::class.java)
     fun windows(fn: Action<WindowsPlatformSettings>) {
         fn.execute(windows)
+    }
+    
+    @JvmOverloads
+    fun fileAssociation(
+        mimeType: String, extension: String, description: String,
+        linuxIconFile: File? = null, windowsIconFile: File? = null, macOSIconFile: File? = null,
+    ) {
+        linux.fileAssociation(mimeType, extension, description, linuxIconFile)
+        windows.fileAssociation(mimeType, extension, description, windowsIconFile)
+        macOS.fileAssociation(mimeType, extension, description, macOSIconFile)
     }
 }

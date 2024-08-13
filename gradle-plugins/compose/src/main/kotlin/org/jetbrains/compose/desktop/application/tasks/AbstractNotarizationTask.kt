@@ -5,24 +5,67 @@
 
 package org.jetbrains.compose.desktop.application.tasks
 
-import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.Nested
-import org.gradle.api.tasks.Optional
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.tasks.*
 import org.jetbrains.compose.desktop.application.dsl.MacOSNotarizationSettings
-import org.jetbrains.compose.desktop.application.internal.nullableProperty
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.desktop.application.internal.files.checkExistingFile
+import org.jetbrains.compose.desktop.application.internal.files.findOutputFileOrDir
+import org.jetbrains.compose.desktop.application.internal.validation.ValidatedMacOSNotarizationSettings
 import org.jetbrains.compose.desktop.application.internal.validation.validate
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
+import org.jetbrains.compose.internal.utils.MacUtils
+import org.jetbrains.compose.internal.utils.ioFile
+import java.io.File
+import javax.inject.Inject
 
-abstract class AbstractNotarizationTask : AbstractComposeDesktopTask() {
+abstract class AbstractNotarizationTask @Inject constructor(
     @get:Input
-    @get:Optional
-    internal val nonValidatedBundleID: Property<String?> = objects.nullableProperty()
+    val targetFormat: TargetFormat
+) : AbstractComposeDesktopTask() {
 
     @get:Nested
     @get:Optional
     internal var nonValidatedNotarizationSettings: MacOSNotarizationSettings? = null
 
-    internal fun validateNotarization() =
-        nonValidatedNotarizationSettings.validate(nonValidatedBundleID)
+    @get:InputDirectory
+    val inputDir: DirectoryProperty = objects.directoryProperty()
+
+    init {
+        check(targetFormat != TargetFormat.AppImage) { "${TargetFormat.AppImage} cannot be notarized!" }
+    }
+
+    @TaskAction
+    fun run() {
+        val notarization = nonValidatedNotarizationSettings.validate()
+        val packageFile = findOutputFileOrDir(inputDir.ioFile, targetFormat).checkExistingFile()
+
+        notarize(notarization, packageFile)
+        staple(packageFile)
+    }
+
+    private fun notarize(
+        notarization: ValidatedMacOSNotarizationSettings,
+        packageFile: File
+    ) {
+        logger.info("Uploading '${packageFile.name}' for notarization")
+        val args = listOfNotNull(
+            "notarytool",
+            "submit",
+            "--wait",
+            "--apple-id",
+            notarization.appleID,
+            "--team-id",
+            notarization.teamID,
+            packageFile.absolutePath
+        )
+        runExternalTool(tool = MacUtils.xcrun, args = args, stdinStr = notarization.password)
+    }
+
+    private fun staple(packageFile: File) {
+        runExternalTool(
+            tool = MacUtils.xcrun,
+            args = listOf("stapler", "staple", packageFile.absolutePath)
+        )
+    }
 }

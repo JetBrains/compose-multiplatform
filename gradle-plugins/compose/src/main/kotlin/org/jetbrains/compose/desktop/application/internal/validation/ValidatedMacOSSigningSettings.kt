@@ -9,8 +9,8 @@ import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.desktop.application.internal.OS
-import org.jetbrains.compose.desktop.application.internal.currentOS
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentOS
 import java.io.File
 
 internal data class ValidatedMacOSSigningSettings(
@@ -72,10 +72,10 @@ private val ERR_UNKNOWN_PREFIX =
     """|$ERR_PREFIX Could not infer signing prefix. To specify:
        |  * Set bundleID to reverse DNS notation (e.g. "com.mycompany.myapp");
        |  * Use '${ComposeProperties.MAC_SIGN_PREFIX}' Gradle property;
-       |  * Use 'nativeExecutables.macOS.signing.prefix' DSL property;
+       |  * Use 'nativeDistributions.macOS.signing.prefix' DSL property;
     """.trimMargin()
 private val ERR_UNKNOWN_SIGN_ID =
     """|$ERR_PREFIX signing identity is null or empty. To specify:
        |  * Use '${ComposeProperties.MAC_SIGN_ID}' Gradle property;
-       |  * Use 'nativeExecutables.macOS.signing.identity' DSL property;
+       |  * Use 'nativeDistributions.macOS.signing.identity' DSL property;
     """.trimMargin()

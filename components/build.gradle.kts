@@ -1,15 +1,11 @@
 plugins {
     kotlin("multiplatform") apply false
+    id("com.android.library") apply false
+    id("org.jetbrains.kotlinx.binary-compatibility-validator") apply false
 }
 
 subprojects {
-    version = findProperty("deploy.version") ?: property("compose.version")!!
-
-    repositories {
-        google()
-        mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    }
+    version = findProperty("deploy.version")!!
 
     plugins.withId("java") {
         configureIfExists<JavaPluginExtension> {

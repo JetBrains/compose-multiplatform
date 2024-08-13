@@ -6,10 +6,13 @@
 package org.jetbrains.compose.desktop.ide.preview
 
 import com.intellij.ide.lightEdit.LightEdit
+import com.intellij.openapi.application.NonBlockingReadAction
+import com.intellij.openapi.application.ReadAction
 import com.intellij.openapi.externalSystem.model.Key
 import com.intellij.openapi.externalSystem.model.project.AbstractNamedData
 import com.intellij.openapi.project.Project
 import java.lang.reflect.Modifier
+import java.util.concurrent.Callable
 
 // todo: filter only Compose projects
 internal fun isPreviewCompatible(project: Project): Boolean =
@@ -34,3 +37,9 @@ internal val kotlinTargetDataKey: Key<out AbstractNamedData> = run {
     @Suppress("UNCHECKED_CAST")
     getKeyMethod.invoke(companionInstance) as Key<out AbstractNamedData>
 }
+
+internal inline fun runNonBlocking(crossinline fn: () -> Unit): NonBlockingReadAction<Void?> =
+    ReadAction.nonBlocking(Callable<Void?> {
+        fn()
+        null
+    })

@@ -1,0 +1,9 @@
+version:0
+plurals|another_plurals|ONE:YW5vdGhlciBvbmU=,OTHER:YW5vdGhlciBvdGhlcg==
+plurals|messages|ONE:JTEkZCBtZXNzYWdlIGZvciAlMiRz,OTHER:JTEkZCBtZXNzYWdlcyBmb3IgJTIkcw==
+plurals|plurals|ONE:b25l,OTHER:b3RoZXI=
+string-array|str_arr|aXRlbSAx,aXRlbSAy,aXRlbSAz
+string|accentuated_characters|Q3LDqWVyIHVuZSB0YWJsZQ==
+string|app_name|Q29tcG9zZSBSZXNvdXJjZXMgQXBw
+string|hello|8J+YiiBIZWxsbyB3b3JsZCE=
+string|str_template|SGVsbG8sICUxJHMhIFlvdSBoYXZlICUyJGQgbmV3IG1lc3NhZ2VzLg==

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
+ * Copyright 2020-2022 JetBrains s.r.o. and respective authors and developers.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
@@ -10,6 +10,8 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.process.ExecOperations
 import org.gradle.process.ExecResult
+import org.jetbrains.compose.internal.utils.ioFile
+import java.io.ByteArrayInputStream
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -19,6 +21,12 @@ internal class ExternalToolRunner(
     private val logsDir: Provider<Directory>,
     private val execOperations: ExecOperations
 ) {
+    internal enum class LogToConsole {
+        Always,
+        Never,
+        OnlyWhenVerbose
+    }
+
     operator fun invoke(
         tool: File,
         args: Collection<String>,
@@ -26,13 +34,13 @@ internal class ExternalToolRunner(
         workingDir: File? = null,
         checkExitCodeIsNormal: Boolean = true,
         processStdout: Function1<String, Unit>? = null,
-        forceLogToFile: Boolean = false
+        logToConsole: LogToConsole = LogToConsole.OnlyWhenVerbose,
+        stdinStr: String? = null
     ): ExecResult {
         val logsDir = logsDir.ioFile
         logsDir.mkdirs()
 
         val toolName = tool.nameWithoutExtension
-        val logToConsole = verbose.get() && !forceLogToFile
         val outFile = logsDir.resolve("${toolName}-${currentTimeStamp()}-out.txt")
         val errFile = logsDir.resolve("${toolName}-${currentTimeStamp()}-err.txt")
 
@@ -46,6 +54,16 @@ internal class ExternalToolRunner(
                     // check exit value later
                     spec.isIgnoreExitValue = true
 
+                    if (stdinStr != null) {
+                        spec.standardInput = ByteArrayInputStream(stdinStr.toByteArray())
+                    }
+
+                    @Suppress("NAME_SHADOWING")
+                    val logToConsole = when (logToConsole) {
+                        LogToConsole.Always -> true
+                        LogToConsole.Never -> false
+                        LogToConsole.OnlyWhenVerbose -> verbose.get()
+                    }
                     if (logToConsole) {
                         spec.standardOutput = spec.standardOutput.alsoOutputTo(outFileStream)
                         spec.errorOutput = spec.errorOutput.alsoOutputTo(errFileStream)

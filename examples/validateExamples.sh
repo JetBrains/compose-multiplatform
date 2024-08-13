@@ -19,13 +19,12 @@ runGradle() {
     popd
 }
 
-runGradle codeviewer package
-runGradle imageviewer package
-runGradle issues package
-runGradle notepad package
-runGradle todoapp-lite package
-runGradle visual-effects package
-runGradle web-compose-bird build
-runGradle web-landing build
-runGradle web-with-react build
-runGradle widgets-gallery package
+runGradle chat packageDistributionForCurrentOS
+runGradle codeviewer packageDistributionForCurrentOS
+runGradle imageviewer packageDistributionForCurrentOS
+runGradle issues packageDistributionForCurrentOS
+runGradle notepad packageDistributionForCurrentOS
+runGradle todoapp-lite packageDistributionForCurrentOS
+runGradle graphics-2d packageDistributionForCurrentOS
+runGradle widgets-gallery packageDistributionForCurrentOS
+runGradle jetsnack packageDistributionForCurrentOS

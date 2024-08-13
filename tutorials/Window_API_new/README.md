@@ -94,7 +94,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
@@ -107,7 +107,7 @@ fun main() = application {
             onCloseRequest = { isAskingToClose = true }
         ) {
             if (isAskingToClose) {
-                Dialog(
+                DialogWindow(
                     onCloseRequest = { isAskingToClose = false },
                     title = "Close the document without saving?",
                 ) {
@@ -185,7 +185,7 @@ object TrayIcon : Painter() {
 
 ## Open and close multiple windows
 
-If an application has multiple windows, then it is better to put its state into a separate class and open/close window in response to `mutableStateListOf` changes (see [notepad example](https://github.com/JetBrains/compose-jb/tree/master/examples/notepad) for more complex use cases):
+If an application has multiple windows, then it is better to put its state into a separate class and open/close window in response to `mutableStateListOf` changes (see [notepad example](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/notepad) for more complex use cases):
 ```kotlin
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
@@ -432,8 +432,8 @@ private fun onWindowRelocate(position: WindowPosition) {
 ## Dialogs
 There are two types of window – modal and regular. Below are the functions for creating each:
 
-1. Window – regular window type.
-2. Dialog – modal window type. This type locks its parent window until the user is finished working with it and closes the modal window.
+1. `Window` – regular window type.
+2. `DialogWindow` – modal window type. This type locks its parent window until the user is finished working with it and closes the modal window.
 
 You can see an example of both types of window below.
 
@@ -445,7 +445,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogWindow
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
@@ -462,7 +462,7 @@ fun main() = application {
         }
 
         if (isDialogOpen) {
-            Dialog(
+            DialogWindow(
                 onCloseRequest = { isDialogOpen = false },
                 state = rememberDialogState(position = WindowPosition(Alignment.Center))
             ) {
@@ -584,7 +584,7 @@ fun main() = application {
     }
 }
 ```
-Note that `WindowDraggableArea` can be used only inside `singleWindowApplication`, `Window` and `Dialog`. If you need to use it in another Composable function, pass `WindowScope` as a receiver there:
+Note that `WindowDraggableArea` can be used only inside `singleWindowApplication`, `Window` and `DialogWindow`. If you need to use it in another Composable function, pass `WindowScope` as a receiver there:
 ```kotlin
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -653,4 +653,4 @@ fun main() = application {
 ```
 
 _**Important note:** Window transparency is implemented based on JDK implementation, that contains **known issue on Linux** in case of moving a Window between two monitors with different density. So when you move an App, the Window stops being transparent. And it seems nothing can be done with this situation on Compose side.
-[An issue about it](https://github.com/JetBrains/compose-jb/issues/1339)_
+[An issue about it](https://github.com/JetBrains/compose-multiplatform/issues/1339)_

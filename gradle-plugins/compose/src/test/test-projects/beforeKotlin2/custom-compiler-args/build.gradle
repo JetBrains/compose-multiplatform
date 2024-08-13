@@ -1,0 +1,50 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
+plugins {
+    id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.compose"
+}
+
+kotlin {
+    jvm("desktop")
+    js(IR) {
+        browser()
+        binaries.executable()
+    }
+    sourceSets {
+        desktopMain {
+            dependencies {
+                implementation "org.jetbrains.kotlin:kotlin-stdlib"
+                implementation compose.desktop.currentOs
+            }
+        }
+
+        jsMain {
+            dependencies {
+                implementation compose.runtime
+                implementation compose.web.core
+            }
+        }
+    }
+}
+
+compose {
+    kotlinCompilerPlugin.set(COMPOSE_COMPILER_PLUGIN_PLACEHOLDER)
+    kotlinCompilerPluginArgs.add(COMPOSE_COMPILER_PLUGIN_ARGS_PLACEHOLDER)
+
+    desktop {
+        application {
+            mainClass = "Main"
+            nativeDistributions {
+                targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            }
+
+            def projectPath = project.projectDir.absolutePath
+            if (DefaultNativePlatform.currentOperatingSystem.isWindows()) {
+                projectPath = projectPath.replace("\\", "\\\\")
+            }
+            args(projectPath)
+        }
+    }
+}

@@ -2,15 +2,8 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.plugin.compose"
     id "org.jetbrains.compose"
-}
-
-repositories {
-    google()
-    mavenCentral()
-    maven {
-        url "https://maven.pkg.jetbrains.space/public/p/compose/dev"
-    }
 }
 
 dependencies {

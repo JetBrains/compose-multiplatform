@@ -1,0 +1,3 @@
+This document has been moved to [https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compatibility-and-versioning.html](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compatibility-and-versioning.html).
+
+To edit the document, open [https://github.com/JetBrains/kotlin-multiplatform-dev-docs/blob/master/topics/compose/compose-compatibility-and-versioning.md](https://github.com/JetBrains/kotlin-multiplatform-dev-docs/blob/master/topics/compose/compose-compatibility-and-versioning.md).

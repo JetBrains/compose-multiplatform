@@ -1,6 +1,3 @@
-import org.jetbrains.compose.compose
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
@@ -11,19 +8,17 @@ kotlin {
     jvm("desktop")
 
     sourceSets {
-        named("commonMain") {
-            dependencies {
-                api(compose.runtime)
-                api(compose.foundation)
+        all {
+            languageSettings {
+                optIn("kotlin.RequiresOptIn")
             }
         }
-        named("desktopMain") {}
-    }
-}
 
-// TODO it seems that argument isn't applied to the common sourceSet. Figure out why
-tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        commonMain.dependencies {
+            api(compose.runtime)
+            api(compose.foundation)
+        }
+    }
 }
 
 configureMavenPublication(

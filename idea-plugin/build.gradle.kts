@@ -1,10 +1,10 @@
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     id("java")
-    id("org.jetbrains.kotlin.jvm") version "1.5.10"
-    id("org.jetbrains.intellij") version "1.3.0"
-    id("org.jetbrains.changelog") version "1.3.1"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.intellij.sdk)
+    alias(libs.plugins.intellij.changelog)
 }
 
 val projectProperties = ProjectProperties(project)
@@ -25,6 +25,7 @@ intellij {
     type.set(projectProperties.platformType)
     version.set(projectProperties.platformVersion)
     downloadSources.set(projectProperties.platformDownloadSources)
+    updateSinceUntilBuild.set(false)
 
     plugins.set(
         listOf(
@@ -43,21 +44,16 @@ tasks.buildSearchableOptions {
 tasks {
     // Set the compatibility versions to 1.8
     withType<JavaCompile> {
-        sourceCompatibility = "1.8"
-        targetCompatibility = "1.8"
+        sourceCompatibility = "11"
+        targetCompatibility = "11"
     }
     withType<KotlinJvmCompile> {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
 
     publishPlugin {
         token.set(System.getenv("IDE_PLUGIN_PUBLISH_TOKEN"))
         channels.set(projectProperties.pluginChannels)
-    }
-
-    patchPluginXml {
-        sinceBuild.set(projectProperties.pluginSinceBuild)
-        untilBuild.set(projectProperties.pluginUntilBuild)
     }
 
     runPluginVerifier {
@@ -71,8 +67,6 @@ class ProjectProperties(private val project: Project) {
     val platformVersion get() = stringProperty("platform.version")
     val platformDownloadSources get() = stringProperty("platform.download.sources").toBoolean()
     val pluginChannels get() = listProperty("plugin.channels")
-    val pluginSinceBuild get() = stringProperty("plugin.since.build")
-    val pluginUntilBuild get() = stringProperty("plugin.until.build")
     val pluginVerifierIdeVersions get() = listProperty("plugin.verifier.ide.versions")
 
     private fun stringProperty(key: String): String =

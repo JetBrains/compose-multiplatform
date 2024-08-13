@@ -6,17 +6,20 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
-import org.jetbrains.compose.ComposeBuildConfig
-import org.jetbrains.compose.desktop.application.internal.currentTarget
-import org.jetbrains.compose.desktop.application.internal.javaExecutable
-import org.jetbrains.compose.desktop.application.internal.notNullProperty
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.*
+import org.jetbrains.compose.internal.utils.*
+import org.jetbrains.compose.internal.utils.currentTarget
+import org.jetbrains.compose.internal.utils.javaExecutable
+import org.jetbrains.compose.internal.utils.notNullProperty
 import java.io.File
 
 abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask() {
     @get:InputFiles
     internal lateinit var previewClasspath: FileCollection
+
+    @get:InputFiles
+    internal abstract val skikoRuntime: Property<FileCollection>
 
     @get:Internal
     internal val javaHome: Property<String> = objects.notNullProperty<String>().apply {
@@ -28,23 +31,26 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
     @get:Optional
     internal val jvmArgs: ListProperty<String> = objects.listProperty(String::class.java)
 
+    @get:Optional
     @get:Input
     internal val previewTarget: Provider<String> =
         project.providers.gradleProperty("compose.desktop.preview.target")
 
+    @get:Optional
     @get:Input
     internal val idePort: Provider<String>  =
         project.providers.gradleProperty("compose.desktop.preview.ide.port")
 
     @get:InputFiles
-    internal val uiTooling = project.configurations.detachedConfiguration(
-        project.dependencies.create("org.jetbrains.compose.ui:ui-tooling-desktop:${ComposeBuildConfig.composeVersion}")
-    ).apply { isTransitive = false }
+    internal val uiTooling: FileCollection =
+        project.detachedComposeDependency(
+            groupId = "org.jetbrains.compose.ui",
+            artifactId = "ui-tooling-desktop",
+        ).excludeTransitiveDependencies()
 
     @get:InputFiles
-    internal val hostClasspath = project.configurations.detachedConfiguration(
-        project.dependencies.create("org.jetbrains.compose:preview-rpc:${ComposeBuildConfig.composeVersion}")
-    )
+    internal val hostClasspath: FileCollection =
+        project.detachedComposeGradleDependency(artifactId = "preview-rpc")
 
     @TaskAction
     fun run() {
@@ -52,10 +58,12 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
                 javaExecutable = javaExecutable(javaHome.get()),
                 hostClasspath = hostClasspath.files.asSequence().pathString()
             )
+
+        val skikoRuntimeFiles = skikoRuntime.get()
         val previewClasspathString =
             (previewClasspath.files.asSequence() +
                     uiTooling.files.asSequence() +
-                    tryGetSkikoRuntimeFilesIfNeeded().asSequence()
+                    skikoRuntimeFiles.files.asSequence()
             ).pathString()
 
         val gradleLogger = logger
@@ -75,7 +83,7 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
         }
     }
 
-    private fun tryGetSkikoRuntimeFilesIfNeeded(): Collection<File> {
+    internal fun tryGetSkikoRuntimeIfNeeded(): FileCollection {
         try {
             var hasSkikoJvm = false
             var hasSkikoJvmRuntime = false
@@ -93,19 +101,20 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
                     }
                 }
             }
-            if (hasSkikoJvmRuntime) return emptyList()
+            if (hasSkikoJvmRuntime) return project.files()
 
-            if (hasSkikoJvm && skikoVersion != null && skikoVersion.isNotBlank()) {
-                val skikoRuntimeConfig = project.configurations.detachedConfiguration(
-                    project.dependencies.create("org.jetbrains.skiko:skiko-awt-runtime-${currentTarget.id}:$skikoVersion")
-                ).apply { isTransitive = false }
-                return skikoRuntimeConfig.files
+            if (hasSkikoJvm && !skikoVersion.isNullOrBlank()) {
+                return project.detachedDependency(
+                    groupId = "org.jetbrains.skiko",
+                    artifactId = "skiko-awt-runtime-${currentTarget.id}",
+                    version = skikoVersion
+                ).excludeTransitiveDependencies()
             }
         } catch (e: Exception) {
             // OK
         }
 
-        return emptyList()
+        return project.files()
     }
 
     private fun Sequence<File>.pathString(): String =

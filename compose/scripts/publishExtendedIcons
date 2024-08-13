@@ -1,8 +1,0 @@
-#!/bin/bash
-
-cd "$(dirname "$0")"
-. ./prepare
-
-pushd ..
-./gradlew publishComposeJbExtendedIcons $COMPOSE_DEFAULT_GRADLE_ARGS --max-workers=1 "$@" || exit 1
-popd

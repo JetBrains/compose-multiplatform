@@ -12,6 +12,7 @@ pluginManagement {
 
         kotlin("jvm").version(kotlinVersion)
         kotlin("multiplatform").version(kotlinVersion)
+        kotlin("plugin.compose").version(kotlinVersion)
         kotlin("android").version(kotlinVersion)
         id("com.android.application").version(agpVersion)
         id("com.android.library").version(agpVersion)
@@ -19,4 +20,12 @@ pluginManagement {
     }
 }
 
-include(":common", ":android", ":desktop")
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version("0.4.0")
+}
+
+rootProject.name = "todoapp-lite"
+
+include(":androidApp")
+include(":shared")
+include(":desktopApp")

@@ -189,7 +189,7 @@ fun main() = application {
                         }
                     }
                     Separator()
-                    Item("About", icon = TrayIcon, onClick = { action = "Last action: About" })
+                    Item("About", icon = AboutIcon, onClick = { action = "Last action: About" })
                     Item("Exit", onClick = { isOpen = false }, shortcut = KeyShortcut(Key.Escape), mnemonic = 'E')
                 }
             }
@@ -204,7 +204,7 @@ fun main() = application {
     }
 }
 
-object TrayIcon : Painter() {
+object AboutIcon : Painter() {
     override val intrinsicSize = Size(256f, 256f)
 
     override fun DrawScope.onDraw() {

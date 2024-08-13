@@ -1,0 +1,13 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+
+if [[ -z "$COMPOSE_CUSTOM_VERSION" ]]; then
+    echo "Must provide COMPOSE_CUSTOM_VERSION in environment" 1>&2
+    exit 1
+fi
+
+pushd ../../components
+./gradlew publishToMavenLocal -Pcompose.version="$COMPOSE_CUSTOM_VERSION" -Pcompose.useMavenLocal=true || exit 1
+popd
+

@@ -1,0 +1,28 @@
+plugins {
+    id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.kotlin.plugin.compose"
+    id "com.android.kotlin.multiplatform.library"
+    id "org.jetbrains.compose"
+}
+
+kotlin {
+    targetHierarchy.default()
+
+    androidLibrary {
+        namespace = "com.google.samples.apps.diceroller.shared"
+        compileSdk = 34
+    }
+
+    jvm()
+
+    sourceSets {
+        getByName("commonMain") {
+            dependencies {
+                implementation(compose.ui)
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material3)
+            }
+        }
+    }
+}

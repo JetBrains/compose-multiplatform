@@ -5,11 +5,18 @@
 In this tutorial, we'll show you how to create native distributions (installers/packages) for all the supported systems.
 We will also demonstrate how to run an application locally with the same settings as for distributions.
 
+## Available tools
+
+There are two tools available for packaging Compose applications:
+
+1. The Compose Multiplatform Gradle plugin which provides tasks for basic packaging, obfuscation and (macOS only) signing.
+2. [Conveyor](https://www.hydraulic.software), which is a separate tool not made by JetBrains.
+
+This tutorial covers how to use the built-in tasks. Conveyor has [its own tutorial](https://conveyor.hydraulic.dev/latest/tutorial/hare/jvm). The choice of which to use boils down to features/ease of use vs price. Conveyor provides support for online updates, cross-building and [various other features](packaging-tools-comparison.md) but requires [a license](https://hydraulic.software/pricing.html) for non-open source projects. The packaging tasks come with the Compose Desktop Gradle plugin, but the resulting packages don't support online updates and will require a multi-platform CI setup to create packages for each OS.
+
 ## Gradle plugin
 
-`org.jetbrains.compose` Gradle plugin simplifies the packaging of applications into native distributions and running an application locally.
-
-Currently, the plugin uses [jpackage](https://openjdk.java.net/jeps/343) for packaging distributable applications. 
+`org.jetbrains.compose` Gradle plugin simplifies the packaging of applications into native distributions using `jpackage` and running an application locally.
 Distributable applications are self-contained, installable binaries which include all the Java runtime components they need, 
 without requiring an installed JDK on the target system.
 
@@ -55,7 +62,7 @@ The plugin creates the following tasks:
 Note, that there is no cross-compilation support available at the moment,
 so the formats can only be built using the specific OS (e.g. to build `.dmg` you have to use macOS).
 Tasks that are not compatible with the current OS are skipped by default.
-* `package` is a [lifecycle](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:lifecycle_tasks) task,
+* `packageDistributionForCurrentOS` is a [lifecycle](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:lifecycle_tasks) task,
 aggregating all package tasks for an application.
 * `packageUberJarForCurrentOS` is used to create a single jar file, containing all dependencies for current OS. 
 The task is available starting from the M2 release.
@@ -118,8 +125,7 @@ to run such applications will be faced with an error like this:
 
 <img alt="" src="attrs-error.png" height="462" />
 
-See [our tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) 
-on how to sign and notarize your application. 
+See [our tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) on how to sign and notarize your application. 
 
 ## Specifying package version
 
@@ -208,14 +214,14 @@ Versions must follow the rules:
 
 ## Customizing JDK version
 
-The plugin uses `jpackage`, for which you should be using at least [JDK 15](https://openjdk.java.net/projects/jdk/15/).
+The plugin uses `jpackage`, for which you should be using at least [JDK 17](https://openjdk.java.net/projects/jdk/17/).
 Make sure you meet at least one of the following requirements:
 * `JAVA_HOME` environment variable points to the compatible JDK version.
 * `javaHome` is set via DSL:
 ``` kotlin
 compose.desktop {
     application {
-        javaHome = System.getenv("JDK_15")
+        javaHome = System.getenv("JDK_17")
     }
 }
 ``` 
@@ -253,7 +259,7 @@ compose.desktop {
 
 The following properties are available in the `nativeDistributions` DSL block:
 * `packageName` — application's name (default value: Gradle project's [name](https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html#getName--));
-* `version` — application's version (default value: Gradle project's [version](https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html#getVersion--));
+* `packageVersion` — application's version (default value: Gradle project's [version](https://docs.gradle.org/current/javadoc/org/gradle/api/Project.html#getVersion--));
 * `description` — application's description (default value: none);
 * `copyright` — application's copyright (default value: none);
 * `vendor` — application's vendor (default value: none);
@@ -264,7 +270,7 @@ compose.desktop {
     application {
         nativeDistributions {
             packageName = "ExampleApp"
-            version = "0.1-SNAPSHOT"
+            packageVersion = "0.1-SNAPSHOT"
             description = "Compose Example App"
             copyright = "© 2020 My Name. All rights reserved."
             vendor = "Example vendor"
@@ -436,12 +442,14 @@ The following platform-specific options are available
     * `packageName` — a name of the application;
     * `dockName` — a name of the application displayed in the menu bar, the "About <App>" menu item, in the dock, etc. 
       Equals to `packageName` by default.
+    * `minimumSystemVersion` — a minimum macOS version required to run the application.
+      See [LSMinimumSystemVersion](https://developer.apple.com/documentation/bundleresources/information_property_list/lsminimumsystemversion) for details;
     * `signing`, `notarization`, `provisioningProfile`, and `runtimeProvisioningProfile` — see
       [the corresponding tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) 
       for details;
     * `appStore = true` — build and sign for the Apple App Store. Requires at least JDK 17;
     * `appCategory` — category of the app for the Apple App Store. 
-      Default value is `utilities` when building for the App Store, `Unknown` otherwise. 
+      Default value is `public.app-category.utilities` when building for the App Store, `Unknown` otherwise. 
       See [LSApplicationCategoryType](https://developer.apple.com/documentation/bundleresources/information_property_list/lsapplicationcategorytype) for a list of valid categories;
     * `entitlementsFile.set(File("PATH_TO_ENTITLEMENTS"))` — a path to file containing entitlements to use when signing.
       When a custom file is provided, make sure to add the entitlements that are required for Java apps.
@@ -545,7 +553,6 @@ val macExtraPlistKeys: String
         </dict>
       </array>
     """
-"""
 ```
 
 2. Use `java.awt.Desktop` to set up a URI handler:
@@ -581,55 +588,78 @@ fun main() {
 3. Run `./gradlew runDistributable`.
 4. Links like `compose://foo/bar` are now redirected from a browser to your application.
 
-## Obfuscation
-    
-To obfuscate Compose Multiplatform JVM applications the standard approach for JVM applications works.
-With the task `packageUberJarForCurrentOS` one could generate a JAR file which could be later obfuscated using ProGuard or R8.
+## Minification & obfuscation
 
-### ProGuard example
+Starting from 1.2 the Compose Gradle plugin supports [ProGuard](https://www.guardsquare.com/proguard) out-of-the-box.
+ProGuard is a well known [open source](https://github.com/Guardsquare/proguard) tool for minification and obfuscation,
+that is developed by [Guardsquare](https://www.guardsquare.com/).
 
-``` kotlin
-// build.gradle.kts
+The Gradle plugin provides a *release* task for each corresponding *default* packaging task:
 
-// Add ProGuard to buildscript classpath
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("com.guardsquare:proguard-gradle:7.2.0")
+ Default task (w/o ProGuard)       | Release task (w. ProGuard)               | Description
+-----------------------------------|------------------------------------------|--------------------------------------------------------------------------
+ `createDistributable`             | `createReleaseDistributable`             | Creates an application image with bundled JDK & resources
+ `runDistributable`                | `runReleaseDistributable`                | Runs an application image with bundled JDK & resources
+ `run`                             | `runRelease`                             | Runs a non-packaged application `jar` using Gradle JDK
+ `package<FORMAT_NAME>`            | `packageRelease<FORMAT_NAME>`            | Packages an application image into a `<FORMAT_NAME>` file
+ `packageDistributionForCurrentOS` | `packageReleaseDistributionForCurrentOS` | Packages an application image into a format compatible with current OS
+ `packageUberJarForCurrentOS`      | `packageReleaseUberJarForCurrentOS`      | Packages an application image into an uber (fat) JAR
+ `notarize<FORMAT_NAME>`           | `notarizeRelease<FORMAT_NAME>`           | Uploads a `<FORMAT_NAME>` application image for notarization (macOS only)
+ `checkNotarizationStatus`         | `checkReleaseNotarizationStatus`         | Checks if notarization succeeded (macOS only)
+
+The default configuration adds a few ProGuard rules:
+* an application image is minified, i.e. non-used classes are removed;
+* `compose.desktop.application.mainClass` is used as an entry point;
+* a few `keep` rules to avoid breaking Compose runtime.
+
+In many cases getting a minified Compose application will not require any additional configuration.
+However, sometimes ProGuard might be unable to track certain usages in bytecode
+(for example, this might happen if a class is used via reflection).
+If you encounter an issue, which happens only after ProGuard processing,
+you might want to add custom rules.
+To do so, specify a configuration file via DSL:
+```
+compose.desktop {
+    application {
+        buildTypes.release.proguard {
+            configurationFiles.from(project.file("compose-desktop.pro"))
+        }
     }
 }
+```
+See the Guardsquare's [comprehensive manual](https://www.guardsquare.com/manual/configuration/usage)
+on ProGuard's rules & configuration options.
 
-// ...
-
-// Define task to obfuscate the JAR and output to <name>.min.jar
-tasks.register<ProGuardTask>("obfuscate") {
-    val packageUberJarForCurrentOS by tasks.getting
-    dependsOn(packageUberJarForCurrentOS)
-    val files = packageUberJarForCurrentOS.outputs.files
-    injars(files)
-    outjars(files.map { file -> File(file.parentFile, "${file.nameWithoutExtension}.min.jar") })
-
-    val library = if (System.getProperty("java.version").startsWith("1.")) "lib/rt.jar" else "jmods"
-    libraryjars("${System.getProperty("java.home")}/$library")
-
-    configuration("proguard-rules.pro")
+Obfuscation is disabled by default. To enable it, set the following property via Gradle DSL:
+```
+compose.desktop {
+    application {
+        buildTypes.release.proguard {
+            obfuscate.set(true)
+        }
+    }
 }
 ```
 
-This ProGuard configuration should get you started:
-
+ProGuard's optimizations are enabled by default. To disable them, set the following property via Gradle DSL:
 ```
-# proguard-rules.pro
--dontoptimize
--dontobfuscate
-
--dontwarn kotlinx.**
-
--keepclasseswithmembers public class com.example.MainKt {
-    public static void main(java.lang.String[]);
+compose.desktop {
+    application {
+        buildTypes.release.proguard {
+            optimize.set(false)
+        }
+    }
 }
--keep class org.jetbrains.skia.** { *; }
--keep class org.jetbrains.skiko.** { *; }
+```
+
+Joining to the uber JAR is disabled by default - ProGuard produces the corresponding JAR for every input JAR.
+To enable it, set the following property via Gradle DSL:
+```
+compose.desktop {
+    application {
+        buildTypes.release.proguard {
+            joinOutputJars.set(true)
+        }
+    }
+}
 ```

@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Compose Resources App</string>
+    <string name="hello">😊 Hello world!</string>
+    <string name="multi_line">Lorem ipsum dolor sit amet,\nconsectetur adipiscing elit.
+Donec eget turpis ac sem ultricies consequat.</string>
+    <string name="str_template">Hello, %1$s!\nYou have %2$d new messages.</string>
+    <string-array name="str_arr">
+        <item>item \u2605</item>
+        <item>item \u2318</item>
+        <item>item \u00BD</item>
+    </string-array>
+    <plurals name="new_message">
+        <item quantity="one">%1$d new message</item>
+        <item quantity="other">%1$d new messages</item>
+    </plurals>
+</resources>

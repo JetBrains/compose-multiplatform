@@ -10,7 +10,7 @@ import org.jetbrains.skia.Codec
 import java.net.MalformedURLException
 import java.net.URL
 
-private const val DEFAULT_FRAME_DURATION = 50
+private const val DEFAULT_FRAME_DURATION = 100
 
 actual class AnimatedImage(val codec: Codec)
 
@@ -26,42 +26,50 @@ actual suspend fun loadResourceAnimatedImage(path: String): AnimatedImage {
 
 @Composable
 actual fun AnimatedImage.animate(): ImageBitmap {
-    val transition = rememberInfiniteTransition()
-    val frameIndex by transition.animateValue(
-        initialValue = 0,
-        targetValue = codec.frameCount - 1,
-        Int.VectorConverter,
-        animationSpec = infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = 0
-                for ((index, frame) in codec.framesInfo.withIndex()) {
-                    index at durationMillis
-                    val frameDuration = calcFrameDuration(frame)
-
-                    durationMillis += frameDuration
-                }
+    when (codec.frameCount) {
+        0 -> return ImageBitmap.Blank // No frames at all
+        1 -> {
+            // Just one frame, no animation
+            val bitmap = remember(codec) { Bitmap().apply { allocPixels(codec.imageInfo) } }
+            remember(bitmap) {
+                codec.readPixels(bitmap, 0)
             }
-        )
-    )
+            return bitmap.asComposeImageBitmap()
+        }
+        else -> {
+            val transition = rememberInfiniteTransition()
+            val frameIndex by transition.animateValue(
+                initialValue = 0,
+                targetValue = codec.frameCount - 1,
+                Int.VectorConverter,
+                animationSpec = infiniteRepeatable(
+                    animation = keyframes {
+                        durationMillis = 0
+                        for ((index, frame) in codec.framesInfo.withIndex()) {
+                            index at durationMillis
+                            val frameDuration = calcFrameDuration(frame)
 
-    val bitmap = remember(codec) { Bitmap().apply { allocPixels(codec.imageInfo) } }
+                            durationMillis += frameDuration
+                        }
+                    }
+                )
+            )
 
-    remember(bitmap, frameIndex) {
-        codec.readPixels(bitmap, frameIndex)
+            val bitmap = remember(codec) { Bitmap().apply { allocPixels(codec.imageInfo) } }
+
+            remember(bitmap, frameIndex) {
+                codec.readPixels(bitmap, frameIndex)
+            }
+
+            return bitmap.asComposeImageBitmap()
+        }
     }
-
-    return bitmap.asComposeImageBitmap()
 }
 
 private fun calcFrameDuration(frame: AnimationFrameInfo): Int {
-    var frameDuration = frame.duration
-
     // If the frame does not contain information about a duration, set a reasonable constant duration
-    if (frameDuration == 0) {
-        frameDuration = DEFAULT_FRAME_DURATION
-    }
-
-    return frameDuration
+    val frameDuration = frame.duration
+    return if (frameDuration == 0) DEFAULT_FRAME_DURATION else frameDuration
 }
 
 /**

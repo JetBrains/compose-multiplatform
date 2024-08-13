@@ -1,0 +1,112 @@
+public final class org/jetbrains/compose/resources/AndroidContextProviderKt {
+	public static final fun PreviewContextConfigurationEffect (Landroidx/compose/runtime/Composer;I)V
+}
+
+public final class org/jetbrains/compose/resources/DensityQualifier$Companion {
+	public final fun selectByDensity (F)Lorg/jetbrains/compose/resources/DensityQualifier;
+	public final fun selectByValue (I)Lorg/jetbrains/compose/resources/DensityQualifier;
+}
+
+public final class org/jetbrains/compose/resources/DrawableResource : org/jetbrains/compose/resources/Resource {
+	public static final field $stable I
+}
+
+public abstract interface annotation class org/jetbrains/compose/resources/ExperimentalResourceApi : java/lang/annotation/Annotation {
+}
+
+public final class org/jetbrains/compose/resources/FontResource : org/jetbrains/compose/resources/Resource {
+	public static final field $stable I
+}
+
+public final class org/jetbrains/compose/resources/FontResourcesKt {
+	public static final fun getFontResourceBytes (Lorg/jetbrains/compose/resources/ResourceEnvironment;Lorg/jetbrains/compose/resources/FontResource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class org/jetbrains/compose/resources/FontResources_androidKt {
+	public static final fun Font-DnXFreY (Lorg/jetbrains/compose/resources/FontResource;Landroidx/compose/ui/text/font/FontWeight;ILandroidx/compose/runtime/Composer;II)Landroidx/compose/ui/text/font/Font;
+}
+
+public final class org/jetbrains/compose/resources/ImageResourcesKt {
+	public static final fun getDrawableResourceBytes (Lorg/jetbrains/compose/resources/ResourceEnvironment;Lorg/jetbrains/compose/resources/DrawableResource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun imageResource (Lorg/jetbrains/compose/resources/DrawableResource;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/ImageBitmap;
+	public static final fun painterResource (Lorg/jetbrains/compose/resources/DrawableResource;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
+	public static final fun vectorResource (Lorg/jetbrains/compose/resources/DrawableResource;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/vector/ImageVector;
+}
+
+public abstract interface annotation class org/jetbrains/compose/resources/InternalResourceApi : java/lang/annotation/Annotation {
+}
+
+public final class org/jetbrains/compose/resources/MissingResourceException : java/lang/Exception {
+	public static final field $stable I
+	public fun <init> (Ljava/lang/String;)V
+}
+
+public final class org/jetbrains/compose/resources/PluralStringResource : org/jetbrains/compose/resources/Resource {
+	public static final field $stable I
+	public final fun getKey ()Ljava/lang/String;
+}
+
+public final class org/jetbrains/compose/resources/PluralStringResourcesKt {
+	public static final fun getPluralString (Lorg/jetbrains/compose/resources/PluralStringResource;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun getPluralString (Lorg/jetbrains/compose/resources/PluralStringResource;I[Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun getPluralString (Lorg/jetbrains/compose/resources/ResourceEnvironment;Lorg/jetbrains/compose/resources/PluralStringResource;ILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun getPluralString (Lorg/jetbrains/compose/resources/ResourceEnvironment;Lorg/jetbrains/compose/resources/PluralStringResource;I[Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun pluralStringResource (Lorg/jetbrains/compose/resources/PluralStringResource;ILandroidx/compose/runtime/Composer;I)Ljava/lang/String;
+	public static final fun pluralStringResource (Lorg/jetbrains/compose/resources/PluralStringResource;I[Ljava/lang/Object;Landroidx/compose/runtime/Composer;I)Ljava/lang/String;
+}
+
+public abstract interface class org/jetbrains/compose/resources/Qualifier {
+}
+
+public abstract class org/jetbrains/compose/resources/Resource {
+	public static final field $stable I
+	public synthetic fun <init> (Ljava/lang/String;Ljava/util/Set;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class org/jetbrains/compose/resources/ResourceEnvironment {
+	public static final field $stable I
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+}
+
+public final class org/jetbrains/compose/resources/ResourceEnvironmentKt {
+	public static final fun getSystemResourceEnvironment ()Lorg/jetbrains/compose/resources/ResourceEnvironment;
+	public static final fun rememberResourceEnvironment (Landroidx/compose/runtime/Composer;I)Lorg/jetbrains/compose/resources/ResourceEnvironment;
+}
+
+public final class org/jetbrains/compose/resources/StringArrayResource : org/jetbrains/compose/resources/Resource {
+	public static final field $stable I
+	public final fun getKey ()Ljava/lang/String;
+}
+
+public final class org/jetbrains/compose/resources/StringArrayResourcesKt {
+	public static final fun getStringArray (Lorg/jetbrains/compose/resources/ResourceEnvironment;Lorg/jetbrains/compose/resources/StringArrayResource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun getStringArray (Lorg/jetbrains/compose/resources/StringArrayResource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun stringArrayResource (Lorg/jetbrains/compose/resources/StringArrayResource;Landroidx/compose/runtime/Composer;I)Ljava/util/List;
+}
+
+public final class org/jetbrains/compose/resources/StringResource : org/jetbrains/compose/resources/Resource {
+	public static final field $stable I
+	public final fun getKey ()Ljava/lang/String;
+}
+
+public final class org/jetbrains/compose/resources/StringResourcesKt {
+	public static final fun getString (Lorg/jetbrains/compose/resources/ResourceEnvironment;Lorg/jetbrains/compose/resources/StringResource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun getString (Lorg/jetbrains/compose/resources/ResourceEnvironment;Lorg/jetbrains/compose/resources/StringResource;[Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun getString (Lorg/jetbrains/compose/resources/StringResource;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun getString (Lorg/jetbrains/compose/resources/StringResource;[Ljava/lang/Object;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun stringResource (Lorg/jetbrains/compose/resources/StringResource;Landroidx/compose/runtime/Composer;I)Ljava/lang/String;
+	public static final fun stringResource (Lorg/jetbrains/compose/resources/StringResource;[Ljava/lang/Object;Landroidx/compose/runtime/Composer;I)Ljava/lang/String;
+}
+
+public final class org/jetbrains/compose/resources/ThemeQualifier$Companion {
+	public final fun selectByValue (Z)Lorg/jetbrains/compose/resources/ThemeQualifier;
+}
+
+public final class org/jetbrains/compose/resources/vector/xmldom/MalformedXMLException : java/lang/Exception {
+	public static final field $stable I
+	public fun <init> (Ljava/lang/String;)V
+}
+

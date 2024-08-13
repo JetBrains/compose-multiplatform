@@ -12,13 +12,16 @@ import javax.inject.Inject
 abstract class ExperimentalExtension @Inject constructor(
     objects: ObjectFactory
 ) {
+
+    @Deprecated(
+        message = "Starting from 1.6.10, Compose for Web goes to Alpha. Experimental configuration is not needed anymore.",
+    )
     val web: ExperimentalWebExtension = objects.newInstance(ExperimentalWebExtension::class.java)
+
+    @Deprecated(
+        message = "Starting from 1.6.10, Compose for Web goes to Alpha. Experimental configuration is not needed anymore."
+    )
     fun web(action: Action<ExperimentalWebExtension>) {
         action.execute(web)
-    }
-
-    val uikit: ExperimentalUiKitExtension = objects.newInstance(ExperimentalUiKitExtension::class.java)
-    fun uikit(action: Action<ExperimentalUiKitExtension>) {
-        action.execute(uikit)
     }
 }

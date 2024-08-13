@@ -6,30 +6,35 @@
 package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.*
-import org.gradle.api.internal.file.FileOperations
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
 import org.gradle.process.ExecResult
 import org.gradle.work.ChangeType
 import org.gradle.work.InputChanges
+import org.jetbrains.compose.desktop.application.dsl.FileAssociation
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
+import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.*
 import org.jetbrains.compose.desktop.application.internal.files.*
 import org.jetbrains.compose.desktop.application.internal.files.MacJarSignFileCopyingProcessor
-import org.jetbrains.compose.desktop.application.internal.files.fileHash
-import org.jetbrains.compose.desktop.application.internal.files.transformJar
+import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.validation.validate
+import org.jetbrains.compose.internal.utils.*
+import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import java.io.*
+import java.nio.file.LinkOption
 import java.util.*
-import java.util.zip.ZipEntry
 import javax.inject.Inject
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 import kotlin.collections.ArrayList
+import kotlin.io.path.isExecutable
+import kotlin.io.path.isRegularFile
 
 abstract class AbstractJPackageTask @Inject constructor(
     @get:Input
@@ -37,6 +42,38 @@ abstract class AbstractJPackageTask @Inject constructor(
 ) : AbstractJvmToolOperationTask("jpackage") {
     @get:InputFiles
     val files: ConfigurableFileCollection = objects.fileCollection()
+
+    /**
+     * A hack to avoid conflicts between jar files in a flat dir.
+     * We receive input jar files as a list (FileCollection) of files.
+     * At that point we don't have access to jar files' coordinates.
+     *
+     * Some files can have the same simple names.
+     * For example, a project containing two modules:
+     *  1. :data:utils
+     *  2. :ui:utils
+     * produces:
+     *  1. <PROJECT>/data/utils/build/../utils.jar
+     *  2. <PROJECT>/ui/utils/build/../utils.jar
+     *
+     *  jpackage expects all files to be in one input directory (not sure),
+     *  so the natural workaround to avoid overwrites/conflicts is to add a content hash
+     *  to a file name. A better solution would be to preserve coordinates or relative paths,
+     *  but it is not straightforward at this point.
+     *
+     *  The flag is needed for two things:
+     *  1. Give users the ability to turn off the mangling, if they need to preserve names;
+     *  2. Proguard transformation already flattens jar files & mangles names, so we don't
+     *  need to mangle twice.
+     */
+    @get:Input
+    val mangleJarFilesNames: Property<Boolean> = objects.notNullProperty(true)
+
+    /**
+     * Indicates that task will get the uber JAR as input.
+     */
+    @get:Input
+    val packageFromUberJar: Property<Boolean> = objects.notNullProperty(false)
 
     @get:InputDirectory
     @get:Optional
@@ -135,6 +172,10 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     val macAppCategory: Property<String?> = objects.nullableProperty()
 
+    @get:Input
+    @get:Optional
+    val macMinimumSystemVersion: Property<String?> = objects.nullableProperty()
+
     @get:InputFile
     @get:Optional
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
@@ -207,16 +248,56 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     val javaRuntimePropertiesFile: RegularFileProperty = objects.fileProperty()
 
+    @get:Input
+    internal val fileAssociations: SetProperty<FileAssociation> = objects.setProperty(FileAssociation::class.java)
+    
+    private val iconMapping by lazy {
+        val icons = fileAssociations.get().mapNotNull { it.iconFile }.distinct()
+        if (icons.isEmpty()) return@lazy emptyMap()
+        val iconTempNames: List<String> = mutableListOf<String>().apply {
+            val usedNames = mutableSetOf("${packageName.get()}.icns")
+            for (icon in icons) {
+                if (!icon.exists()) continue
+                if (usedNames.add(icon.name)) {
+                    add(icon.name)
+                    continue
+                }
+                val nameWithoutExtension = icon.nameWithoutExtension
+                val extension = icon.extension
+                for (n in 1UL..ULong.MAX_VALUE) {
+                    val newName = "$nameWithoutExtension ($n).$extension"
+                    if (usedNames.add(newName)) {
+                        add(newName)
+                        break
+                    }
+                }
+            }
+        }
+        val appDir = destinationDir.ioFile.resolve("${packageName.get()}.app")
+        val iconsDir = appDir.resolve("Contents").resolve("Resources")
+        if (iconsDir.exists()) {
+            iconsDir.deleteRecursively()
+        }
+        icons.zip(iconTempNames) { icon, newName -> icon to iconsDir.resolve(newName) }.toMap()
+    }
+
+    private lateinit var jvmRuntimeInfo: JvmRuntimeProperties
+
     @get:Optional
     @get:Nested
     internal var nonValidatedMacSigningSettings: MacOSSigningSettings? = null
 
+    private val shouldSign: Boolean
+        get() = nonValidatedMacSigningSettings?.sign?.get() == true
+
     private val macSigner: MacSigner? by lazy {
         val nonValidatedSettings = nonValidatedMacSigningSettings
-        if (currentOS == OS.MacOS && nonValidatedSettings?.sign?.get() == true) {
-            val validatedSettings =
-                nonValidatedSettings.validate(nonValidatedMacBundleID, project, macAppStore)
-            MacSigner(validatedSettings, runExternalTool)
+        if (currentOS == OS.MacOS) {
+            if (shouldSign) {
+                val validatedSettings =
+                    nonValidatedSettings!!.validate(nonValidatedMacBundleID, project, macAppStore)
+                MacSignerImpl(validatedSettings, runExternalTool)
+            } else NoCertificateSigner(runExternalTool)
         } else null
     }
 
@@ -228,6 +309,9 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:LocalState
     protected val skikoDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/skiko")
+
+    @get:LocalState
+    protected val propertyFilesDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/propertyFiles")
 
     @get:Internal
     private val libsDir: Provider<Directory> = workingDir.map {
@@ -285,15 +369,14 @@ abstract class AbstractJPackageTask @Inject constructor(
 
             javaOption("-D$APP_RESOURCES_DIR=${appDir(packagedResourcesDir.ioFile.name)}")
 
-            val mappedJar = libsMapping[launcherMainJar.ioFile]?.singleOrNull()
+            val mappedJar = libsMapping[launcherMainJar.ioFile]?.singleOrNull { it.isJarFile }
                 ?: error("Main jar was not processed correctly: ${launcherMainJar.ioFile}")
-            cliArg("--main-jar", mappedJar)
+            val mainJarPath = mappedJar.normalizedPath(base = libsDir.ioFile)
+            cliArg("--main-jar", mainJarPath)
             cliArg("--main-class", launcherMainClass)
 
-            when (currentOS) {
-                OS.Windows -> {
-                    cliArg("--win-console", winConsole)
-                }
+            if (currentOS == OS.Windows) {
+                cliArg("--win-console", winConsole)
             }
             cliArg("--icon", iconFile)
             launcherArgs.orNull?.forEach {
@@ -315,7 +398,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
         if (targetFormat != TargetFormat.AppImage) {
             // Args, that can only be used, when creating an installer
-            if (currentOS == OS.MacOS && macAppStore.orNull == true) {
+            if (currentOS == OS.MacOS && jvmRuntimeInfo.majorVersion >= 18) {
                 // This is needed to prevent a directory does not exist error.
                 cliArg("--app-image", appImage.dir("${packageName.get()}.app"))
             } else {
@@ -324,6 +407,33 @@ abstract class AbstractJPackageTask @Inject constructor(
             cliArg("--install-dir", installationPath)
             cliArg("--license-file", licenseFile)
             cliArg("--resource-dir", jpackageResources)
+
+            val propertyFilesDirJava = propertyFilesDir.ioFile
+            fileOperations.clearDirs(propertyFilesDir)
+
+            val fileAssociationFiles = fileAssociations.get()
+                .groupBy { it.extension }
+                .mapValues { (extension, associations) ->
+                    associations.mapIndexed { index, association ->
+                        propertyFilesDirJava.resolve("FA${extension}${if (index > 0) index.toString() else ""}.properties")
+                            .apply {
+                                val withoutIcon = """
+                                    mime-type=${association.mimeType}
+                                    extension=${association.extension}
+                                    description=${association.description}
+                                """.trimIndent()
+                                writeText(
+                                    if (association.iconFile == null) withoutIcon
+                                    else "${withoutIcon}\nicon=${association.iconFile.normalizedPath()}"
+                                )
+                            }
+                    }
+                }.values.flatten()
+
+            for (fileAssociationFile in fileAssociationFiles) {
+                cliArg("--file-associations", fileAssociationFile)
+            }
+
 
             when (currentOS) {
                 OS.Linux -> {
@@ -343,6 +453,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--win-menu-group", winMenuGroup)
                     cliArg("--win-upgrade-uuid", winUpgradeUuid)
                 }
+                OS.MacOS -> {}
             }
         }
 
@@ -357,20 +468,18 @@ abstract class AbstractJPackageTask @Inject constructor(
         cliArg("--app-version", packageVersion)
         cliArg("--vendor", packageVendor)
 
-        when (currentOS) {
-            OS.MacOS -> {
-                cliArg("--mac-package-name", macPackageName)
-                cliArg("--mac-package-identifier", nonValidatedMacBundleID)
-                cliArg("--mac-app-store", macAppStore)
-                cliArg("--mac-app-category", macAppCategory)
-                cliArg("--mac-entitlements", macEntitlementsFile)
+        if (currentOS == OS.MacOS) {
+            cliArg("--mac-package-name", macPackageName)
+            cliArg("--mac-package-identifier", nonValidatedMacBundleID)
+            cliArg("--mac-app-store", macAppStore)
+            cliArg("--mac-app-category", macAppCategory)
+            cliArg("--mac-entitlements", macEntitlementsFile)
 
-                macSigner?.let { signer ->
-                    cliArg("--mac-sign", true)
-                    cliArg("--mac-signing-key-user-name", signer.settings.identity)
-                    cliArg("--mac-signing-keychain", signer.settings.keychain)
-                    cliArg("--mac-package-signing-prefix", signer.settings.prefix)
-                }
+            macSigner?.settings?.let { signingSettings ->
+                cliArg("--mac-sign", true)
+                cliArg("--mac-signing-key-user-name", signingSettings.identity)
+                cliArg("--mac-signing-keychain", signingSettings.keychain)
+                cliArg("--mac-package-signing-prefix", signingSettings.prefix)
             }
         }
     }
@@ -383,16 +492,13 @@ abstract class AbstractJPackageTask @Inject constructor(
 
         fun invalidateAllLibs() {
             outdatedLibs.addAll(files.files)
-            outdatedLibs.add(launcherMainJar.ioFile)
 
             logger.debug("Clearing all files in working dir: $libsDirFile")
-            fileOperations.delete(libsDirFile)
-            libsDirFile.mkdirs()
+            fileOperations.clearDirs(libsDirFile)
         }
 
         if (inputChanges.isIncremental) {
-            val allChanges = inputChanges.getFileChanges(files).asSequence() +
-                    inputChanges.getFileChanges(launcherMainJar)
+            val allChanges = inputChanges.getFileChanges(files).asSequence()
 
             try {
                 for (change in allChanges) {
@@ -414,35 +520,35 @@ abstract class AbstractJPackageTask @Inject constructor(
         return outdatedLibs
     }
 
+    private fun jarCopyingProcessor(): FileCopyingProcessor =
+        if (currentOS == OS.MacOS) {
+            val tmpDirForSign = signDir.ioFile
+            fileOperations.clearDirs(tmpDirForSign)
+            MacJarSignFileCopyingProcessor(macSigner!!, tmpDirForSign, jvmRuntimeInfo.majorVersion)
+        } else SimpleFileCopyingProcessor
+
     override fun prepareWorkingDir(inputChanges: InputChanges) {
         val libsDir = libsDir.ioFile
-        val fileProcessor =
-            macSigner?.let { signer ->
-                val tmpDirForSign = signDir.ioFile
-                fileOperations.delete(tmpDirForSign)
-                tmpDirForSign.mkdirs()
+        val fileProcessor = jarCopyingProcessor()
 
-                val jvmRuntimeInfo = JavaRuntimeProperties.readFromFile(javaRuntimePropertiesFile.ioFile)
-                MacJarSignFileCopyingProcessor(
-                    signer,
-                    tmpDirForSign,
-                    jvmRuntimeVersion = jvmRuntimeInfo.majorVersion
-                )
-            } ?: SimpleFileCopyingProcessor
+        val mangleJarFilesNames = mangleJarFilesNames.get()
         fun copyFileToLibsDir(sourceFile: File): File {
-            val targetFileName =
-                if (sourceFile.isJarFile) "${sourceFile.nameWithoutExtension}-${fileHash(sourceFile)}.jar"
+            val targetName =
+                if (mangleJarFilesNames && sourceFile.isJarFile) sourceFile.mangledName()
                 else sourceFile.name
-            val targetFile = libsDir.resolve(targetFileName)
+            val targetFile = libsDir.resolve(targetName)
             fileProcessor.copy(sourceFile, targetFile)
             return targetFile
         }
+
+        // skiko can be bundled to the main uber jar by proguard
+        fun File.isMainUberJar() = packageFromUberJar.get() && name == launcherMainJar.ioFile.name
 
         val outdatedLibs = invalidateMappedLibs(inputChanges)
         for (sourceFile in outdatedLibs) {
             assert(sourceFile.exists()) { "Lib file does not exist: $sourceFile" }
 
-            libsMapping[sourceFile] = if (isSkikoForCurrentOS(sourceFile)) {
+            libsMapping[sourceFile] = if (isSkikoForCurrentOS(sourceFile) || sourceFile.isMainUberJar()) {
                 val unpackedFiles = unpackSkikoForCurrentOS(sourceFile, skikoDir.ioFile, fileOperations)
                 unpackedFiles.map { copyFileToLibsDir(it) }
             } else {
@@ -451,7 +557,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
 
         // todo: incremental copy
-        cleanDirs(packagedResourcesDir)
+        fileOperations.clearDirs(packagedResourcesDir)
         val destResourcesDir = packagedResourcesDir.ioFile
         val appResourcesDir = appResourcesDir.ioFileOrNull
         if (appResourcesDir != null) {
@@ -459,25 +565,26 @@ abstract class AbstractJPackageTask @Inject constructor(
                 val relPath = file.relativeTo(appResourcesDir).path
                 val destFile = destResourcesDir.resolve(relPath)
                 if (file.isDirectory) {
-                    fileOperations.mkdir(destFile)
+                    fileOperations.mkdirs(destFile)
                 } else {
                     file.copyTo(destFile)
                 }
             }
         }
 
-        cleanDirs(jpackageResources)
+        fileOperations.clearDirs(jpackageResources)
         if (currentOS == OS.MacOS) {
             InfoPlistBuilder(macExtraPlistKeysRawXml.orNull)
                 .also { setInfoPlistValues(it) }
                 .writeToFile(jpackageResources.ioFile.resolve("Info.plist"))
 
             if (macAppStore.orNull == true) {
+                val systemVersion = macMinimumSystemVersion.orNull ?: "10.13"
                 val productDefPlistXml = """
-                    <key>os</key>
-                    <array>
-                        <string>10.13</string>
-                    </array>
+                <key>os</key>
+                <array>
+                <string>$systemVersion</string>
+                </array>
                 """.trimIndent()
                 InfoPlistBuilder(productDefPlistXml)
                     .writeToFile(jpackageResources.ioFile.resolve("product-def.plist"))
@@ -505,20 +612,44 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     private fun modifyRuntimeOnMacOsIfNeeded() {
         if (currentOS != OS.MacOS || targetFormat != TargetFormat.AppImage) return
-        macSigner?.let { macSigner ->
-            val macSigningHelper = MacSigningHelper(
-                macSigner = macSigner,
-                runtimeProvisioningProfile = macRuntimeProvisioningProfile.ioFileOrNull,
-                entitlementsFile = macEntitlementsFile.ioFileOrNull,
-                runtimeEntitlementsFile = macRuntimeEntitlementsFile.ioFileOrNull,
-                destinationDir = destinationDir.ioFile,
-                packageName = packageName.get()
-            )
-            macSigningHelper.modifyRuntimeIfNeeded()
+
+        val appDir = destinationDir.ioFile.resolve("${packageName.get()}.app")
+        val runtimeDir = appDir.resolve("Contents/runtime")
+
+        // Add the provisioning profile
+        macRuntimeProvisioningProfile.ioFileOrNull?.copyTo(
+            target = runtimeDir.resolve("Contents/embedded.provisionprofile"),
+            overwrite = true
+        )
+        val appEntitlementsFile = macEntitlementsFile.ioFileOrNull
+        val runtimeEntitlementsFile = macRuntimeEntitlementsFile.ioFileOrNull
+
+        val macSigner = macSigner!!
+        // Resign the runtime completely (and also the app dir only)
+        // Sign all libs and executables in runtime
+        runtimeDir.walk().forEach { file ->
+            val path = file.toPath()
+            if (path.isRegularFile(LinkOption.NOFOLLOW_LINKS) && (path.isExecutable() || file.name.isDylibPath)) {
+                macSigner.sign(file, runtimeEntitlementsFile)
+            }
+        }
+
+        macSigner.sign(runtimeDir, runtimeEntitlementsFile, forceEntitlements = true)
+        macSigner.sign(appDir, appEntitlementsFile, forceEntitlements = true)
+        
+        if (iconMapping.isNotEmpty()) {
+            for ((originalIcon, newIcon) in iconMapping) {
+                if (originalIcon.exists()) {
+                    newIcon.ensureParentDirsCreated()
+                    originalIcon.copyTo(newIcon)
+                }
+            }
         }
     }
 
     override fun initState() {
+        jvmRuntimeInfo = JvmRuntimeProperties.readFromFile(javaRuntimePropertiesFile.ioFile)
+
         val mappingFile = libsMappingFile.ioFile
         if (mappingFile.exists()) {
             try {
@@ -540,7 +671,8 @@ abstract class AbstractJPackageTask @Inject constructor(
     private fun setInfoPlistValues(plist: InfoPlistBuilder) {
         check(currentOS == OS.MacOS) { "Current OS is not macOS: $currentOS" }
 
-        plist[PlistKeys.LSMinimumSystemVersion] = "10.13"
+        val systemVersion = macMinimumSystemVersion.orNull ?: "10.13"
+        plist[PlistKeys.LSMinimumSystemVersion] = systemVersion
         plist[PlistKeys.CFBundleDevelopmentRegion] = "English"
         plist[PlistKeys.CFBundleAllowMixedLocalizations] = "true"
         val packageName = packageName.get()
@@ -555,8 +687,8 @@ abstract class AbstractJPackageTask @Inject constructor(
         val packageVersion = packageVersion.get()!!
         plist[PlistKeys.CFBundleShortVersionString] = packageVersion
         // If building for the App Store, use "utilities" as default just like jpackage.
-        val category = macAppCategory.orNull ?: (if (macAppStore.orNull == true) "utilities" else null)
-        plist[PlistKeys.LSApplicationCategoryType] = category?.let { "public.app-category.$it" } ?: "Unknown"
+        val category = macAppCategory.orNull ?: (if (macAppStore.orNull == true) "public.app-category.utilities" else null)
+        plist[PlistKeys.LSApplicationCategoryType] = category ?: "Unknown"
         val packageBuildVersion = packageBuildVersion.orNull ?: packageVersion
         plist[PlistKeys.CFBundleVersion] = packageBuildVersion
         val year = Calendar.getInstance().get(Calendar.YEAR)
@@ -564,6 +696,23 @@ abstract class AbstractJPackageTask @Inject constructor(
             ?: "Copyright (C) $year"
         plist[PlistKeys.NSSupportsAutomaticGraphicsSwitching] = "true"
         plist[PlistKeys.NSHighResolutionCapable] = "true"
+        val fileAssociationMutableSet = fileAssociations.get()
+        if (fileAssociationMutableSet.isNotEmpty()) {
+            plist[PlistKeys.CFBundleDocumentTypes] = fileAssociationMutableSet
+                .groupBy { it.mimeType to it.description }
+                .map { (key, extensions) ->
+                    val (mimeType, description) = key
+                    val iconPath = extensions.firstNotNullOfOrNull { it.iconFile }?.let { iconMapping[it]?.name }
+                    InfoPlistMapValue(
+                        PlistKeys.CFBundleTypeRole to InfoPlistStringValue("Editor"),
+                        PlistKeys.CFBundleTypeExtensions to InfoPlistListValue(extensions.map { InfoPlistStringValue(it.extension) }),
+                        PlistKeys.CFBundleTypeIconFile to InfoPlistStringValue(iconPath ?: "$packageName.icns"),
+                        PlistKeys.CFBundleTypeMIMETypes to InfoPlistStringValue(mimeType),
+                        PlistKeys.CFBundleTypeName to InfoPlistStringValue(description),
+                        PlistKeys.CFBundleTypeOSTypes to InfoPlistListValue(InfoPlistStringValue("****")),
+                    )
+                }
+        }
     }
 }
 
@@ -618,7 +767,7 @@ private fun isSkikoForCurrentOS(lib: File): Boolean =
     lib.name.startsWith("skiko-awt-runtime-${currentOS.id}-${currentArch.id}")
             && lib.name.endsWith(".jar")
 
-private fun unpackSkikoForCurrentOS(sourceJar: File, skikoDir: File, fileOperations: FileOperations): List<File> {
+private fun unpackSkikoForCurrentOS(sourceJar: File, skikoDir: File, fileOperations: FileSystemOperations): List<File> {
     val entriesToUnpack = when (currentOS) {
         OS.MacOS -> setOf("libskiko-macos-${currentArch.id}.dylib")
         OS.Windows -> setOf("skiko-windows-${currentArch.id}.dll", "icudtl.dat")
@@ -630,18 +779,15 @@ private fun unpackSkikoForCurrentOS(sourceJar: File, skikoDir: File, fileOperati
     val targetJar = skikoDir.resolve(sourceJar.name)
     outputFiles.add(targetJar)
 
-    fileOperations.delete(skikoDir)
-    fileOperations.mkdir(skikoDir)
-    transformJar(sourceJar, targetJar) { zin, zout, entry ->
+    fileOperations.clearDirs(skikoDir)
+    transformJar(sourceJar, targetJar) { entry, zin, zout ->
         // check both entry or entry.sha256
         if (entry.name.removeSuffix(".sha256") in entriesToUnpack) {
             val unpackedFile = skikoDir.resolve(entry.name.substringAfterLast("/"))
             zin.copyTo(unpackedFile)
             outputFiles.add(unpackedFile)
         } else {
-            zout.withNewEntry(ZipEntry(entry)) {
-                zin.copyTo(zout)
-            }
+            copyZipEntry(entry, zin, zout)
         }
     }
     return outputFiles
