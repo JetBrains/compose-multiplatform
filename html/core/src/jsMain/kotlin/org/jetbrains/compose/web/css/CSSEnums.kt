@@ -261,3 +261,21 @@ object GridAutoFlow : StylePropertyString  {
     inline val RowDense get() = "row dense".unsafeCast<GridAutoFlow>()
     inline val ColumnDense get() = "column dense".unsafeCast<GridAutoFlow>()
 }
+
+interface VisibilityStyle: StylePropertyEnum {
+    companion object {
+        inline val Visible get() = VisibilityStyle("visible")
+        inline val Hidden get() = VisibilityStyle("hidden")
+        inline val Collapse get() = VisibilityStyle("collapse")
+
+
+        inline val Inherit get() = VisibilityStyle("inherit")
+        inline val Initial get() = VisibilityStyle("initial")
+
+        inline val Revert get() = VisibilityStyle("revert")
+        inline val RevertLayer get() = VisibilityStyle("revert-layer")
+
+        inline val Unset get() = VisibilityStyle("unset")
+    }
+}
+inline fun VisibilityStyle(value: String) = value.unsafeCast<VisibilityStyle>()
