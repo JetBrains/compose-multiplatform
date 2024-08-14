@@ -153,9 +153,9 @@ open class AttrsScopeBuilder<TElement : Element>(
                 }
 
                 onDispose {
-                    onDisposes.forEach {
+                    onDisposes.forEach { disposableEffectResult ->
                         runCatching {
-                            it()
+                            disposableEffectResult.invoke()
                         }
                     }
                 }
