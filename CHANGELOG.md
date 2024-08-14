@@ -1,3 +1,47 @@
+# 1.7.0-alpha03 (August 2024)
+
+_Changes since release/1.7.0-alpha02_
+
+## Highlights
+### Multiple Platforms
+- [Skiko version was updated to 0.8.11 (It is based on skia m126 release)](https://github.com/JetBrains/compose-multiplatform-core/pull/1486)
+
+## Features
+### Multiple Platforms
+- [Commonized `material3-window-size-class` module](https://github.com/JetBrains/compose-multiplatform-core/pull/1466)
+- [Commonized `material3-common` module](https://github.com/JetBrains/compose-multiplatform-core/pull/1465)
+- [Commonized `:compose:material3:adaptive:adaptive`, `:compose:material3:adaptive:adaptive-layout`, `:compose:material3:adaptive:adaptive-navigation` and `:window:window-core` modules](https://github.com/JetBrains/compose-multiplatform-core/pull/1468)
+
+### iOS
+- [Opt-out of new touches strategy on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1460)
+
+### Resources
+- [Added utility functions to decode `Bitmap ByteArray as ImageVector` and `XML ByteArray as ImageVector` in the common code and `SVG ByteArray as Painter` in the non-android code](https://github.com/JetBrains/compose-multiplatform/pull/5098)
+
+## Fixes
+### Desktop
+- [[macOS] Fix crash when right-clicking an empty `SelectionContainer` or on the padding of a `Text` inside a `SelectionContainer`](https://github.com/JetBrains/compose-multiplatform-core/pull/1439)
+- [Fix input methods position on the screen and `NullPointerException: Cannot read field`](https://github.com/JetBrains/compose-multiplatform-core/pull/1491)
+
+### iOS
+- [_(prerelease fix)_  Fix the bug where only the changed touches were sent Compose, while all tracked touches were expected](https://github.com/JetBrains/compose-multiplatform-core/pull/1477)
+
+### Gradle Plugin
+- [_(prerelease fix)_ Fix broken configuration cache due Android Studio + AGP issues. Now Android Studio previews require latest AGP versions (8.5.2, 8.6.0-rc01, 8.7.0-alpha04): https://issuetracker.google.com/issues/348208777](https://github.com/JetBrains/compose-multiplatform/pull/5118)
+
+## Dependencies
+- Gradle Plugin `org.jetbrains.compose`, version `1.7.0-alpha02`. Based on Jetpack Compose libraries:
+  - [Runtime 1.7.0-beta06](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.7.0-beta06)
+  - [UI 1.7.0-beta06](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.7.0-beta06)
+  - [Foundation 1.7.0-beta05](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.7.0-beta06)
+  - [Material 1.7.0-beta05](https://developer.android.com/jetpack/androidx/releases/compose-material#1.7.0-beta06)
+  - [Material3 1.3.0-beta03](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.0-beta05)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.0`. Based on [Jetpack Lifecycle 2.8.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.0)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.8.0-alpha08`. Based on [Jetpack Navigation 2.8.0-beta05](https://developer.android.com/jetpack/androidx/releases/navigation#2.8.0-beta05)
+
+___
+
 # 1.7.0-alpha02 (July 2024)
 
 _Changes since 1.7.0-alpha01_
