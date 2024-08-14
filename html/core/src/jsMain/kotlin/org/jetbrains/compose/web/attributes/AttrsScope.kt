@@ -155,7 +155,7 @@ open class AttrsScopeBuilder<TElement : Element>(
                 onDispose {
                     onDisposes.forEach { disposableEffectResult ->
                         runCatching {
-                            disposableEffectResult.invoke()
+                            disposableEffectResult.dispose()
                         }
                     }
                 }
@@ -252,7 +252,7 @@ open class AttrsScopeBuilder<TElement : Element>(
 
     @ComposeWebInternalApi
     internal fun copyFrom(attrsScope: AttrsScopeBuilder<TElement>) {
-        refEffect = attrsScope.refEffect
+        refEffects.addAll(attrsScope.refEffects)
         styleScope.copyFrom(attrsScope.styleScope)
 
         attributesMap.putAll(attrsScope.attributesMap)
