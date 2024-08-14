@@ -40,13 +40,7 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: Kotl
     if (kmpResourcesAreAvailable) {
         configureKmpResources(kotlinExtension, extraProperties.get(KMP_RES_EXT)!!, config)
         onAgpApplied {
-            //workaround to fix AndroidStudio preview works with compose resources:
-            //it copies android assets and mark it as a static assets dir
-            //yes, the same resources will be registered in AGP twice: from KGP and here as static dirs
-            //but it works fine and there are no problems during merge android assets
-            configureAndroidComposeResources { variant ->
-                getKgpAndroidVariantComposeResources(variant)
-            }
+            fixKgpAndroidPreviewTaskDependencies()
             fixAndroidLintTaskDependencies()
         }
     } else {
@@ -69,9 +63,7 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: Kotl
         configureComposeResources(kotlinExtension, commonMain, config)
 
         onAgpApplied {
-            configureAndroidComposeResources { variant ->
-                getAndroidVariantComposeResources(kotlinExtension, variant)
-            }
+            configureAndroidComposeResources()
             fixAndroidLintTaskDependencies()
         }
     }
