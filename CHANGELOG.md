@@ -1,6 +1,6 @@
 # 1.7.0-alpha03 (August 2024)
 
-_Changes since release/1.7.0-alpha02_
+_Changes since 1.7.0-alpha02_
 
 ## Highlights
 ### Multiple Platforms
