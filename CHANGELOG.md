@@ -2,18 +2,11 @@
 
 _Changes since 1.7.0-alpha02_
 
-## Highlights
-### Multiple Platforms
-- [Skiko version was updated to 0.8.11 (It is based on skia m126 release)](https://github.com/JetBrains/compose-multiplatform-core/pull/1486)
-
 ## Features
 ### Multiple Platforms
-- [Commonized `material3-window-size-class` module](https://github.com/JetBrains/compose-multiplatform-core/pull/1466)
-- [Commonized `material3-common` module](https://github.com/JetBrains/compose-multiplatform-core/pull/1465)
-- [Commonized `:compose:material3:adaptive:adaptive`, `:compose:material3:adaptive:adaptive-layout`, `:compose:material3:adaptive:adaptive-navigation` and `:window:window-core` modules](https://github.com/JetBrains/compose-multiplatform-core/pull/1468)
-
-### iOS
-- [Opt-out of new touches strategy on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1460)
+- [Skia is updated to m126](https://github.com/JetBrains/compose-multiplatform-core/pull/1486)
+- [Commonized `org.jetbrains.compose.material3:material3-window-size-class` module](https://github.com/JetBrains/compose-multiplatform-core/pull/1466)
+- [Commonized `org.jetbrains.compose.material3.adaptive:adaptive-*` modules](https://github.com/JetBrains/compose-multiplatform-core/pull/1468)
 
 ### Resources
 - [Added utility functions to decode `Bitmap ByteArray as ImageVector` and `XML ByteArray as ImageVector` in the common code and `SVG ByteArray as Painter` in the non-android code](https://github.com/JetBrains/compose-multiplatform/pull/5098)
@@ -21,7 +14,7 @@ _Changes since 1.7.0-alpha02_
 ## Fixes
 ### Desktop
 - [[macOS] Fix crash when right-clicking an empty `SelectionContainer` or on the padding of a `Text` inside a `SelectionContainer`](https://github.com/JetBrains/compose-multiplatform-core/pull/1439)
-- [Fix input methods position on the screen and `NullPointerException: Cannot read field`](https://github.com/JetBrains/compose-multiplatform-core/pull/1491)
+- [_(prerelease fix)_ Fix input methods position on the screen and `NullPointerException: Cannot read field`](https://github.com/JetBrains/compose-multiplatform-core/pull/1491)
 
 ### iOS
 - [_(prerelease fix)_  Fix the bug where only the changed touches were sent Compose, while all tracked touches were expected](https://github.com/JetBrains/compose-multiplatform-core/pull/1477)
@@ -33,12 +26,13 @@ _Changes since 1.7.0-alpha02_
 - Gradle Plugin `org.jetbrains.compose`, version `1.7.0-alpha02`. Based on Jetpack Compose libraries:
   - [Runtime 1.7.0-beta06](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.7.0-beta06)
   - [UI 1.7.0-beta06](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.7.0-beta06)
-  - [Foundation 1.7.0-beta05](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.7.0-beta06)
-  - [Material 1.7.0-beta05](https://developer.android.com/jetpack/androidx/releases/compose-material#1.7.0-beta06)
-  - [Material3 1.3.0-beta03](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.0-beta05)
+  - [Foundation 1.7.0-beta06](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.7.0-beta06)
+  - [Material 1.7.0-beta06](https://developer.android.com/jetpack/androidx/releases/compose-material#1.7.0-beta06)
+  - [Material3 1.3.0-beta05](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.0-beta05)
 
 - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.0`. Based on [Jetpack Lifecycle 2.8.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.0)
-- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.8.0-alpha08`. Based on [Jetpack Navigation 2.8.0-beta05](https://developer.android.com/jetpack/androidx/releases/navigation#2.8.0-beta05)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.8.0-alpha09`. Based on [Jetpack Navigation 2.8.0-beta05](https://developer.android.com/jetpack/androidx/releases/navigation#2.8.0-beta05)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive-*:1.0.0-alpha01`. Based on [Jetpack Material3 Adaptive 1.0.0-beta04](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.0.0-beta04)
 
 ___
 
@@ -98,7 +92,7 @@ _Changes since 1.7.0-alpha01_
   - [Material3 1.3.0-beta03](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.0-beta03)
 
 - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.0`. Based on [Jetpack Lifecycle 2.8.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.0)
-- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.8.0-alpha08`. Based on [Jetpack Navigation 2.8.0-beta05](https://developer.android.com/jetpack/androidx/releases/navigation#2.8.0-beta05)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.8.0-alpha08`. Based on [Jetpack Navigation 2.8.0-beta03](https://developer.android.com/jetpack/androidx/releases/navigation#2.8.0-beta03)
 
 ___
 
