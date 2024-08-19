@@ -11,6 +11,7 @@ import org.gradle.api.tasks.Copy
 import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentOS
+import org.jetbrains.compose.internal.utils.findLocalOrGlobalProperty
 import org.jetbrains.compose.internal.utils.ioFile
 import java.io.File
 
@@ -32,7 +33,8 @@ internal fun JvmApplicationContext.configureWix() {
         return
     }
 
-    if (project.findProperty(DOWNLOAD_WIX_PROPERTY) == "false") return
+    val disableWixDownload = project.findLocalOrGlobalProperty(DOWNLOAD_WIX_PROPERTY).map { it == "false" }
+    if (disableWixDownload.get()) return
 
     val root = project.rootProject
     val wixDir = project.gradle.gradleUserHomeDir.resolve("compose-jb")

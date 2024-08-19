@@ -6,6 +6,7 @@
 package org.jetbrains.compose.experimental.internal
 
 import org.gradle.api.Project
+import org.jetbrains.compose.internal.utils.findLocalOrGlobalProperty
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 
@@ -74,7 +75,8 @@ private fun checkTarget(project: Project, target: KotlinTarget): CheckResult {
                 it.id.displayName.contains(SKIKO_ARTIFACT_PREFIX)
             }
             if (containsSkikoArtifact) {
-                if (project.findProperty(targetType.gradlePropertyName) != "true") {
+                val targetIsDisabled = project.findLocalOrGlobalProperty(targetType.gradlePropertyName).map { it != "true" }
+                if (targetIsDisabled.get()) {
                     return CheckResult.Fail(targetType)
                 }
             }
