@@ -37,9 +37,9 @@ _Changes since 1.7.0-alpha02_
 To use Material3 Adaptive add the dependencies for the artifacts you need in the `build.gradle` file for your app or module:
 ```Kotlin
 dependencies {
-  implementation("org.jetbrains.compose.material3.adaptive:adaptive:1.7.0-alpha03")
-  implementation("org.jetbrains.compose.material3.adaptive:adaptive-layout:1.7.0-alpha03")
-  implementation("org.jetbrains.compose.material3.adaptive:adaptive-navigation:1.7.0-alpha03")
+  implementation("org.jetbrains.compose.material3.adaptive:adaptive:1.0.0-alpha01")
+  implementation("org.jetbrains.compose.material3.adaptive:adaptive-layout:1.0.0-alpha01")
+  implementation("org.jetbrains.compose.material3.adaptive:adaptive-navigation:1.0.0-alpha01")
 }
 ```
 
