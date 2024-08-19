@@ -34,6 +34,15 @@ _Changes since 1.7.0-alpha02_
 - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.8.0-alpha09`. Based on [Jetpack Navigation 2.8.0-beta05](https://developer.android.com/jetpack/androidx/releases/navigation#2.8.0-beta05)
 - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive-*:1.0.0-alpha01`. Based on [Jetpack Material3 Adaptive 1.0.0-beta04](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.0.0-beta04)
 
+To use Material3 Adaptive add the dependencies for the artifacts you need in the `build.gradle` file for your app or module:
+```Kotlin
+dependencies {
+  implementation("org.jetbrains.compose.material3.adaptive:adaptive:1.7.0-alpha03")
+  implementation("org.jetbrains.compose.material3.adaptive:adaptive-layout:1.7.0-alpha03")
+  implementation("org.jetbrains.compose.material3.adaptive:adaptive-navigation:1.7.0-alpha03")
+}
+```
+
 ___
 
 # 1.7.0-alpha02 (July 2024)
