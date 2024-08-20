@@ -19,19 +19,23 @@ import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.internal.configureDesktop
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
-import org.jetbrains.compose.experimental.internal.*
-import org.jetbrains.compose.internal.*
+import org.jetbrains.compose.experimental.internal.configureExperimentalTargetsFlagsCheck
+import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
+import org.jetbrains.compose.internal.mppExt
+import org.jetbrains.compose.internal.mppExtOrNull
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.compose.resources.configureComposeResources
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.compose.web.internal.configureWeb
-import org.jetbrains.kotlin.com.github.gundy.semver4j.SemVer
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
-import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
+private const val material3AdaptiveVersion = "1.0.0-alpha01"
 
 abstract class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
@@ -99,6 +103,9 @@ abstract class ComposePlugin : Plugin<Project> {
         val foundation get() = composeDependency("org.jetbrains.compose.foundation:foundation")
         val material get() = composeDependency("org.jetbrains.compose.material:material")
         val material3 get() = composeDependency("org.jetbrains.compose.material3:material3")
+        val material3Adaptive get() = composeDependency("org.jetbrains.compose.material3.adaptive:adaptive", material3AdaptiveVersion)
+        val material3AdaptiveLayout get() = composeDependency("org.jetbrains.compose.material3.adaptive:adaptive-layout", material3AdaptiveVersion)
+        val material3AdaptiveNavigation get() = composeDependency("org.jetbrains.compose.material3.adaptive:adaptive-navigation", material3AdaptiveVersion)
         val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
         val runtimeSaveable get() = composeDependency("org.jetbrains.compose.runtime:runtime-saveable")
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
@@ -194,7 +201,7 @@ fun KotlinDependencyHandler.compose(groupWithArtifact: String) = composeDependen
 
 fun DependencyHandler.compose(groupWithArtifact: String) = composeDependency(groupWithArtifact)
 
-private fun composeDependency(groupWithArtifact: String) = "$groupWithArtifact:$composeVersion"
+private fun composeDependency(groupWithArtifact: String, version: String = composeVersion) = "$groupWithArtifact:$version"
 
 private fun setUpGroovyDslExtensions(project: Project) {
     project.plugins.withId("org.jetbrains.kotlin.multiplatform") {
