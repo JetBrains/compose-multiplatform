@@ -6,7 +6,7 @@ _Changes since 1.7.0-alpha02_
 ### Multiple Platforms
 - [Skia is updated to m126](https://github.com/JetBrains/compose-multiplatform-core/pull/1486)
 - [Commonized `org.jetbrains.compose.material3:material3-window-size-class` module](https://github.com/JetBrains/compose-multiplatform-core/pull/1466)
-- [Commonized `org.jetbrains.compose.material3.adaptive:adaptive-*` modules](https://github.com/JetBrains/compose-multiplatform-core/pull/1468)
+- [Commonized `org.jetbrains.compose.material3.adaptive:adaptive*` modules](https://github.com/JetBrains/compose-multiplatform-core/pull/1468)
 
 ### Resources
 - [Added utility functions to decode `Bitmap ByteArray as ImageVector` and `XML ByteArray as ImageVector` in the common code and `SVG ByteArray as Painter` in the non-android code](https://github.com/JetBrains/compose-multiplatform/pull/5098)
