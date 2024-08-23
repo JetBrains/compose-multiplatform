@@ -34,46 +34,57 @@ internal fun Project.configureMultimoduleResources(
     val platformsForSetupKmpResources = listOf(
         KotlinPlatformType.native, KotlinPlatformType.js, KotlinPlatformType.wasm
     )
+    val platformsForSkip = listOf(
+        KotlinPlatformType.common, KotlinPlatformType.androidJvm
+    )
     kotlinExtension.targets
-        .matching { target -> target.platformType != KotlinPlatformType.androidJvm }
+        .matching { target -> target.platformType !in platformsForSkip }
         .all { target ->
             target.compilations.all { compilation ->
-                if (compilation.name == KotlinCompilation.MAIN_COMPILATION_NAME) {
-                    logger.info("Configure resources publication for '${target.targetName}' target")
-                    val mainResources = files({
-                        compilation.allKotlinSourceSets.map { sourceSet -> getPreparedComposeResourcesDir(sourceSet) }
-                    })
-
-                    val assembleResTask = registerTask<AssembleTargetResourcesTask>(
-                        name = "assemble${target.targetName.uppercaseFirstChar()}MainResources"
-                    ) {
-                        resourceDirectories.setFrom(mainResources)
-                        relativeResourcePlacement.set(moduleIsolationDirectory)
-                        outputDirectory.set(layout.buildDirectory.dir("$RES_GEN_DIR/assembledResources/${target.targetName}Main"))
-                    }
-
-                    if (target.platformType in platformsForSetupKmpResources) {
-                        //configure NATIVE/JS/WASM resources
-                        //TODO temporary API misuse. will be changed on the KMP side
-                        //https://youtrack.jetbrains.com/issue/KT-70909
-                        val kmpResourceRoot = KotlinTargetResourcesPublication.ResourceRoot(
-                            assembleResTask.flatMap { it.outputDirectory.asFile },
-                            emptyList(),
-                            emptyList()
+                logger.info("Configure ${compilation.name} resources for '${target.targetName}' target")
+                val compilationResources = files({
+                    compilation.allKotlinSourceSets.map { sourceSet -> getPreparedComposeResourcesDir(sourceSet) }
+                })
+                val assembleResTask = registerTask<AssembleTargetResourcesTask>(
+                    name = "assemble${target.targetName.uppercaseFirstChar()}${compilation.name.uppercaseFirstChar()}Resources"
+                ) {
+                    resourceDirectories.setFrom(compilationResources)
+                    relativeResourcePlacement.set(moduleIsolationDirectory)
+                    outputDirectory.set(
+                        layout.buildDirectory.dir(
+                            "$RES_GEN_DIR/assembledResources/${target.targetName}${compilation.name.uppercaseFirstChar()}"
                         )
-                        val kmpEmptyPath = provider { File("") }
-                        kmpResources.publishResourcesAsKotlinComponent(
-                            target,
-                            { kmpResourceRoot },
-                            kmpEmptyPath
-                        )
+                    )
+                }
+                val allCompilationResources = assembleResTask.flatMap { it.outputDirectory.asFile }
 
-                        val allResources = kmpResources.resolveResources(target)
-                        configureResourcesForCompilation(compilation, allResources)
-                    } else if (target.platformType == KotlinPlatformType.jvm) {
-                        //configure JVM resources
-                        compilation.defaultSourceSet.resources.srcDirs(assembleResTask)
-                    }
+                //For Native/Js/Wasm main resources:
+                // 1) we have to configure new Kotlin component publication
+                // 2) we have to collect all transitive main resources
+                if (
+                    target.platformType in platformsForSetupKmpResources
+                    && compilation.name == KotlinCompilation.MAIN_COMPILATION_NAME
+                ) {
+                    //TODO temporary API misuse. will be changed on the KMP side
+                    //https://youtrack.jetbrains.com/issue/KT-70909
+                    val kmpResourceRoot = KotlinTargetResourcesPublication.ResourceRoot(
+                        allCompilationResources,
+                        emptyList(),
+                        emptyList()
+                    )
+                    val kmpEmptyPath = provider { File("") }
+                    logger.info("Configure KMP component publication for '${compilation.target.targetName}'")
+                    kmpResources.publishResourcesAsKotlinComponent(
+                        target,
+                        { kmpResourceRoot },
+                        kmpEmptyPath
+                    )
+
+                    val allResources = kmpResources.resolveResources(target)
+                    logger.info("Collect resolved ${compilation.name} resources for '${compilation.target.targetName}'")
+                    configureResourcesForCompilation(compilation, allResources)
+                } else {
+                    configureResourcesForCompilation(compilation, allCompilationResources)
                 }
             }
         }
@@ -85,16 +96,10 @@ internal fun Project.configureMultimoduleResources(
     }
 }
 
-/**
- * Add resolved resources to a kotlin compilation to include it into a resulting platform artefact
- * It is required for JS and Native targets.
- * For JVM and Android it works automatically via jar files
- */
 private fun Project.configureResourcesForCompilation(
     compilation: KotlinCompilation<*>,
     directoryWithAllResourcesForCompilation: Provider<File>
 ) {
-    logger.info("Add all resolved resources to '${compilation.target.targetName}' target '${compilation.name}' compilation")
     compilation.defaultSourceSet.resources.srcDir(directoryWithAllResourcesForCompilation)
 
     //JS packaging requires explicit dependency

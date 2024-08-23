@@ -1,7 +1,8 @@
 package org.jetbrains.compose.resources
 
 import com.android.build.api.variant.AndroidComponentsExtension
-import com.android.build.api.variant.Variant
+import com.android.build.api.variant.Component
+import com.android.build.api.variant.HasAndroidTest
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.LintModelWriterTask
 import org.gradle.api.DefaultTask
@@ -27,42 +28,56 @@ import javax.inject.Inject
 internal fun Project.configureAndroidComposeResources(moduleResourceDir: Provider<File>? = null) {
     //copy all compose resources to android assets
     val androidComponents = project.extensions.findByType(AndroidComponentsExtension::class.java) ?: return
-    val kotlinExtension = project.extensions.findByType(KotlinMultiplatformExtension::class.java) ?: return
     androidComponents.onVariants { variant ->
-        val camelVariantName = variant.name.uppercaseFirstChar()
-        val variantAssets = getAndroidVariantComposeResources(kotlinExtension, variant)
+        configureGeneratedAndroidComponentAssets(variant, moduleResourceDir)
 
-        val copyVariantAssets = registerTask<CopyResourcesToAndroidAssetsTask>(
-            "copy${camelVariantName}ComposeResourcesToAndroidAssets"
-        ) {
-            from.set(variantAssets)
-            moduleResourceDir?.let { relativeResourcePlacement.set(it) }
-        }
-
-        variant.sources.assets?.addGeneratedSourceDirectory(
-            copyVariantAssets,
-            CopyResourcesToAndroidAssetsTask::outputDirectory
-        )
-        tasks.configureEach { task ->
-            //fix agp task dependencies for AndroidStudio preview
-            if (task.name == "compile${camelVariantName}Sources") {
-                task.dependsOn(copyVariantAssets)
-            }
-            //fix linter task dependencies for `build` task
-            if (task is AndroidLintAnalysisTask || task is LintModelWriterTask) {
-                task.mustRunAfter(copyVariantAssets)
+        if (variant is HasAndroidTest) {
+            variant.androidTest?.let { androidTest ->
+                configureGeneratedAndroidComponentAssets(androidTest, moduleResourceDir)
             }
         }
     }
 }
 
-private fun Project.getAndroidVariantComposeResources(
+private fun Project.configureGeneratedAndroidComponentAssets(
+    component: Component,
+    moduleResourceDir: Provider<File>?
+) {
+    val kotlinExtension = project.extensions.findByType(KotlinMultiplatformExtension::class.java) ?: return
+    val camelComponentName = component.name.uppercaseFirstChar()
+    val componentAssets = getAndroidComponentComposeResources(kotlinExtension, component.name)
+    logger.info("Configure ${component.name} resources for 'android' target")
+
+    val copyComponentAssets = registerTask<CopyResourcesToAndroidAssetsTask>(
+        "copy${camelComponentName}ComposeResourcesToAndroidAssets"
+    ) {
+        from.set(componentAssets)
+        moduleResourceDir?.let { relativeResourcePlacement.set(it) }
+    }
+
+    component.sources.assets?.addGeneratedSourceDirectory(
+        copyComponentAssets,
+        CopyResourcesToAndroidAssetsTask::outputDirectory
+    )
+    tasks.configureEach { task ->
+        //fix agp task dependencies for AndroidStudio preview
+        if (task.name == "compile${camelComponentName}Sources") {
+            task.dependsOn(copyComponentAssets)
+        }
+        //fix linter task dependencies for `build` task
+        if (task is AndroidLintAnalysisTask || task is LintModelWriterTask) {
+            task.mustRunAfter(copyComponentAssets)
+        }
+    }
+}
+
+private fun Project.getAndroidComponentComposeResources(
     kotlinExtension: KotlinMultiplatformExtension,
-    variant: Variant
+    componentName: String
 ): FileCollection = project.files({
     kotlinExtension.targets.withType(KotlinAndroidTarget::class.java).flatMap { androidTarget ->
         androidTarget.compilations.flatMap { compilation ->
-            if (compilation.androidVariant.name == variant.name) {
+            if (compilation.androidVariant.name == componentName) {
                 compilation.allKotlinSourceSets.map { kotlinSourceSet ->
                     getPreparedComposeResourcesDir(kotlinSourceSet)
                 }
