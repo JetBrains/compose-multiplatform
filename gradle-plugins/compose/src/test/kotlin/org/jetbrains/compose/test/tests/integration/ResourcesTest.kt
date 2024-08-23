@@ -679,4 +679,22 @@ class ResourcesTest : GradlePluginTestBase() {
             }
         }
     }
+
+    @Test
+    fun checkTestResources() {
+        with(testProject("misc/testResources")) {
+            gradle("check").checks {
+                check.logContains("Configure main resources for 'desktop' target")
+                check.logContains("Configure test resources for 'desktop' target")
+                check.logContains("Configure main resources for 'iosX64' target")
+                check.logContains("Configure test resources for 'iosX64' target")
+                check.logContains("Configure main resources for 'iosArm64' target")
+                check.logContains("Configure test resources for 'iosArm64' target")
+                check.logContains("Configure main resources for 'iosSimulatorArm64' target")
+                check.logContains("Configure test resources for 'iosSimulatorArm64' target")
+
+                check.taskSuccessful(":desktopTest")
+            }
+        }
+    }
 }
