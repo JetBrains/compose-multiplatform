@@ -10,32 +10,21 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.IgnoreEmptyDirectories
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
+import java.io.File
 import javax.inject.Inject
 
-private fun Project.getAndroidVariantComposeResources(
-    kotlinExtension: KotlinMultiplatformExtension,
-    variant: Variant
-): FileCollection = project.files({
-    kotlinExtension.targets.withType(KotlinAndroidTarget::class.java).flatMap { androidTarget ->
-        androidTarget.compilations.flatMap { compilation ->
-            if (compilation.androidVariant.name == variant.name) {
-                compilation.allKotlinSourceSets.map { kotlinSourceSet ->
-                    getPreparedComposeResourcesDir(kotlinSourceSet)
-                }
-            } else emptyList()
-        }
-    }
-})
-
-internal fun Project.configureAndroidComposeResources() {
+internal fun Project.configureAndroidComposeResources(moduleResourceDir: Provider<File>? = null) {
     //copy all compose resources to android assets
     val androidComponents = project.extensions.findByType(AndroidComponentsExtension::class.java) ?: return
     val kotlinExtension = project.extensions.findByType(KotlinMultiplatformExtension::class.java) ?: return
@@ -47,6 +36,7 @@ internal fun Project.configureAndroidComposeResources() {
             "copy${camelVariantName}ComposeResourcesToAndroidAssets"
         ) {
             from.set(variantAssets)
+            moduleResourceDir?.let { relativeResourcePlacement.set(it) }
         }
 
         variant.sources.assets?.addGeneratedSourceDirectory(
@@ -66,6 +56,21 @@ internal fun Project.configureAndroidComposeResources() {
     }
 }
 
+private fun Project.getAndroidVariantComposeResources(
+    kotlinExtension: KotlinMultiplatformExtension,
+    variant: Variant
+): FileCollection = project.files({
+    kotlinExtension.targets.withType(KotlinAndroidTarget::class.java).flatMap { androidTarget ->
+        androidTarget.compilations.flatMap { compilation ->
+            if (compilation.androidVariant.name == variant.name) {
+                compilation.allKotlinSourceSets.map { kotlinSourceSet ->
+                    getPreparedComposeResourcesDir(kotlinSourceSet)
+                }
+            } else emptyList()
+        }
+    }
+})
+
 //Copy task doesn't work with 'variant.sources?.assets?.addGeneratedSourceDirectory' API
 internal abstract class CopyResourcesToAndroidAssetsTask : DefaultTask() {
     @get:Inject
@@ -75,6 +80,10 @@ internal abstract class CopyResourcesToAndroidAssetsTask : DefaultTask() {
     @get:IgnoreEmptyDirectories
     abstract val from: Property<FileCollection>
 
+    @get:Input
+    @get:Optional
+    abstract val relativeResourcePlacement: Property<File>
+
     @get:OutputDirectory
     abstract val outputDirectory: DirectoryProperty
 
@@ -83,7 +92,11 @@ internal abstract class CopyResourcesToAndroidAssetsTask : DefaultTask() {
         fileSystem.copy {
             it.includeEmptyDirs = false
             it.from(from)
-            it.into(outputDirectory)
+            if (relativeResourcePlacement.isPresent) {
+                it.into(outputDirectory.dir(relativeResourcePlacement.get().path))
+            } else {
+                it.into(outputDirectory)
+            }
         }
     }
 }
@@ -103,16 +116,5 @@ internal fun Project.fixAndroidLintTaskDependencies() {
         it is AndroidLintAnalysisTask || it is LintModelWriterTask
     }.configureEach {
         it.mustRunAfter(tasks.withType(GenerateResourceAccessorsTask::class.java))
-    }
-}
-
-internal fun Project.fixKgpAndroidPreviewTaskDependencies() {
-    val androidComponents = project.extensions.findByType(AndroidComponentsExtension::class.java) ?: return
-    androidComponents.onVariants { variant ->
-        tasks.configureEach { task ->
-            if (task.name == "compile${variant.name.uppercaseFirstChar()}Sources") {
-                task.dependsOn("${variant.name}AssetsCopyForAGP")
-            }
-        }
     }
 }

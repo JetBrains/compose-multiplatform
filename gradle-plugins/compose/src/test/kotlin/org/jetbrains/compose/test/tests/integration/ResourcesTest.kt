@@ -317,11 +317,7 @@ class ResourcesTest : GradlePluginTestBase() {
 
     @Test
     fun testDisableMultimoduleResourcesWithNewKotlin() {
-        val environment = defaultTestEnvironment.copy(
-            kotlinVersion = "2.0.0-RC2"
-        )
-
-        with(testProject("misc/kmpResourcePublication", environment)) {
+        with(testProject("misc/kmpResourcePublication")) {
             file("gradle.properties").modify { content ->
                 content + "\n" + ComposeProperties.DISABLE_MULTIMODULE_RESOURCES + "=true"
             }
@@ -388,10 +384,10 @@ class ResourcesTest : GradlePluginTestBase() {
             .getConvertedResources(commonResourcesDir, repackDir)
 
         gradle("build").checks {
-            check.taskSuccessful(":demoDebugAssetsCopyForAGP")
-            check.taskSuccessful(":demoReleaseAssetsCopyForAGP")
-            check.taskSuccessful(":fullDebugAssetsCopyForAGP")
-            check.taskSuccessful(":fullReleaseAssetsCopyForAGP")
+            check.taskSuccessful(":copyDemoDebugComposeResourcesToAndroidAssets")
+            check.taskSuccessful(":copyDemoReleaseComposeResourcesToAndroidAssets")
+            check.taskSuccessful(":copyFullDebugComposeResourcesToAndroidAssets")
+            check.taskSuccessful(":copyFullReleaseComposeResourcesToAndroidAssets")
 
             getAndroidApk("demo", "debug", "Resources-Test").let { apk ->
                 checkResourcesZip(apk, commonResourcesFiles, true)

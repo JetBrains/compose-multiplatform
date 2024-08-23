@@ -38,11 +38,7 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: Kotl
     val kmpResourcesAreAvailable = !disableMultimoduleResources && hasKmpResources && currentGradleVersion >= minGradleVersion
 
     if (kmpResourcesAreAvailable) {
-        configureKmpResources(kotlinExtension, extraProperties.get(KMP_RES_EXT)!!, config)
-        onAgpApplied {
-            fixKgpAndroidPreviewTaskDependencies()
-            fixAndroidLintTaskDependencies()
-        }
+        configureMultimoduleResources(kotlinExtension, extraProperties.get(KMP_RES_EXT)!!, config)
     } else {
         if (!disableMultimoduleResources) {
             if (!hasKmpResources) logger.info(
@@ -60,18 +56,13 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: Kotl
         }
 
         val commonMain = KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME
-        configureComposeResources(kotlinExtension, commonMain, config)
-
-        onAgpApplied {
-            configureAndroidComposeResources()
-            fixAndroidLintTaskDependencies()
-        }
+        configureSinglemoduleResources(kotlinExtension, commonMain, config)
     }
 
     configureSyncIosComposeResources(kotlinExtension)
 }
 
-private fun Project.onAgpApplied(block: () -> Unit) {
+internal fun Project.onAgpApplied(block: () -> Unit) {
     androidPluginIds.forEach { pluginId ->
         plugins.withId(pluginId) {
             block()
@@ -82,27 +73,5 @@ private fun Project.onAgpApplied(block: () -> Unit) {
 private fun Project.onKotlinJvmApplied(config: Provider<ResourcesExtension>) {
     val kotlinExtension = project.extensions.getByType(KotlinProjectExtension::class.java)
     val main = SourceSet.MAIN_SOURCE_SET_NAME
-    configureComposeResources(kotlinExtension, main, config)
-}
-
-private fun Project.configureComposeResources(
-    kotlinExtension: KotlinProjectExtension,
-    resClassSourceSetName: String,
-    config: Provider<ResourcesExtension>
-) {
-    logger.info("Configure compose resources")
-    configureComposeResourcesGeneration(kotlinExtension, resClassSourceSetName, config, false)
-
-    // mark prepared resources as sourceSet.resources
-    // 1) it automatically packs the resources to JVM jars
-    // 2) it configures the webpack to use the resources
-    // 3) for native targets we will use source set resources to pack them into the final app. see IosResources.kt
-    // 4) for the android it DOESN'T pack resources! we copy resources to assets in AndroidResources.kt
-    kotlinExtension.sourceSets.all { sourceSet ->
-        // the HACK is here because KGP copy androidMain java resources to Android target
-        // if the resources were registered in the androidMain source set before the target declaration
-        afterEvaluate {
-            sourceSet.resources.srcDirs(getPreparedComposeResourcesDir(sourceSet))
-        }
-    }
+    configureSinglemoduleResources(kotlinExtension, main, config)
 }
