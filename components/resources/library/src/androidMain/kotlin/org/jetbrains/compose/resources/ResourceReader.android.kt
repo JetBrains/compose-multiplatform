@@ -16,6 +16,8 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         context.assets
     }
 
+    private val instrumentedAssets: AssetManager? get() = androidInstrumentedContext?.assets
+
     override suspend fun read(path: String): ByteArray {
         val resource = getResourceAsStream(path)
         return resource.use { input -> input.readBytes() }
@@ -52,7 +54,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
     }
 
     override fun getUri(path: String): String {
-        val uri = if (assets.hasFile(path)) {
+        val uri = if (assets.hasFile(path) || instrumentedAssets.hasFile(path)) {
             Uri.parse("file:///android_asset/$path")
         } else {
             val classLoader = getClassLoader()
@@ -66,8 +68,12 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         return try {
             assets.open(path)
         } catch (e: FileNotFoundException) {
-            val classLoader = getClassLoader()
-            classLoader.getResourceAsStream(path) ?: throw MissingResourceException(path)
+            try {
+                instrumentedAssets.open(path)
+            } catch (e: FileNotFoundException) {
+                val classLoader = getClassLoader()
+                classLoader.getResourceAsStream(path) ?: throw MissingResourceException(path)
+            }
         }
     }
 
@@ -75,7 +81,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         return this.javaClass.classLoader ?: error("Cannot find class loader")
     }
 
-    private fun AssetManager.hasFile(path: String): Boolean {
+    private fun AssetManager?.hasFile(path: String): Boolean {
         var inputStream: InputStream? = null
         val result = try {
             inputStream = open(path)
@@ -87,6 +93,9 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         }
         return result
     }
+
+    private fun AssetManager?.open(path: String): InputStream =
+        this?.open(path) ?: throw FileNotFoundException("Current AssetManager is null.")
 }
 
 internal actual val ProvidableCompositionLocal<ResourceReader>.currentOrPreview: ResourceReader

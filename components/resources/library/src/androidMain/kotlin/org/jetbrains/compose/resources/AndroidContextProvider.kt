@@ -12,6 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 
 internal val androidContext get() = AndroidContextProvider.ANDROID_CONTEXT
+internal val androidInstrumentedContext get() = AndroidContextProvider.ANDROID_INSTRUMENTED_CONTEXT
 
 /**
  * The function configures the android context
@@ -37,11 +38,34 @@ fun PreviewContextConfigurationEffect() {
     }
 }
 
+/**
+ * Sets the Android instrumented context.
+ *
+ * @param context The Android context to be set as the instrumented context.
+ *                This context will be used by a ResourceReader to read test assets.
+ *
+ * Example usage:
+ * ```
+ * fun configureTestEnvironment() {
+ *     setAndroidInstrumentedContext{
+ *         InstrumentationRegistry.getInstrumentation().context
+ *     }
+ * }
+ * ```
+ */
+@ExperimentalResourceApi
+fun setAndroidInstrumentedContext(context: Context) {
+    AndroidContextProvider.ANDROID_INSTRUMENTED_CONTEXT = context
+}
+
 //https://andretietz.com/2017/09/06/autoinitialise-android-library/
 internal class AndroidContextProvider : ContentProvider() {
     companion object {
         @SuppressLint("StaticFieldLeak")
         var ANDROID_CONTEXT: Context? = null
+
+        @SuppressLint("StaticFieldLeak")
+        var ANDROID_INSTRUMENTED_CONTEXT: Context? = null
     }
 
     override fun onCreate(): Boolean {
