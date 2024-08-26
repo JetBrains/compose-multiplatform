@@ -2,20 +2,18 @@ package org.jetbrains.compose.resources
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.SourceSet
 import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.extraProperties
 
 internal const val COMPOSE_RESOURCES_DIR = "composeResources"
 internal const val RES_GEN_DIR = "generated/compose/resourceGenerator"
-private const val KMP_RES_EXT = "multiplatformResourcesPublication"
+internal const val KMP_RES_EXT = "multiplatformResourcesPublication"
 private const val MIN_GRADLE_VERSION_FOR_KMP_RESOURCES = "7.6"
 private val androidPluginIds = listOf(
     "com.android.application",
@@ -38,7 +36,7 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: Kotl
     val kmpResourcesAreAvailable = !disableMultimoduleResources && hasKmpResources && currentGradleVersion >= minGradleVersion
 
     if (kmpResourcesAreAvailable) {
-        configureMultimoduleResources(kotlinExtension, extraProperties.get(KMP_RES_EXT)!!, config)
+        configureMultimoduleResources(kotlinExtension, config)
     } else {
         if (!disableMultimoduleResources) {
             if (!hasKmpResources) logger.info(
@@ -55,11 +53,15 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: Kotl
             )
         }
 
-        val commonMain = KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME
-        configureSinglemoduleResources(kotlinExtension, commonMain, config)
+        configureSinglemoduleResources(kotlinExtension, config)
     }
 
     configureSyncIosComposeResources(kotlinExtension)
+}
+
+internal fun Project.onKotlinJvmApplied(config: Provider<ResourcesExtension>) {
+    val kotlinExtension = project.extensions.getByType(KotlinJvmProjectExtension::class.java)
+    configureJvmOnlyResources(kotlinExtension, config)
 }
 
 internal fun Project.onAgpApplied(block: () -> Unit) {
@@ -68,10 +70,4 @@ internal fun Project.onAgpApplied(block: () -> Unit) {
             block()
         }
     }
-}
-
-private fun Project.onKotlinJvmApplied(config: Provider<ResourcesExtension>) {
-    val kotlinExtension = project.extensions.getByType(KotlinProjectExtension::class.java)
-    val main = SourceSet.MAIN_SOURCE_SET_NAME
-    configureSinglemoduleResources(kotlinExtension, main, config)
 }

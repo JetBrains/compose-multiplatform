@@ -2,16 +2,17 @@ package org.jetbrains.compose.resources
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 
-//configure single module resources (no publishing, no module isolation)
+//configure single-module resources (no publishing, no module isolation)
 internal fun Project.configureSinglemoduleResources(
-    kotlinExtension: KotlinProjectExtension,
-    resClassSourceSetName: String,
+    kotlinExtension: KotlinMultiplatformExtension,
     config: Provider<ResourcesExtension>
 ) {
-    logger.info("Configure compose resources")
-    configureComposeResourcesGeneration(kotlinExtension, resClassSourceSetName, config, false)
+    logger.info("Configure single-module compose resources")
+    val commonMain = KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME
+    configureComposeResourcesGeneration(kotlinExtension, commonMain, config, false)
 
     // mark prepared resources as sourceSet.resources
     // 1) it automatically packs the resources to JVM jars

@@ -254,7 +254,7 @@ class ResourcesTest : GradlePluginTestBase() {
             }
 
             gradle(":cmplib:publishAllPublicationsToMavenRepository").checks {
-                check.logContains("Configure KMP resources")
+                check.logContains("Configure multi-module compose resources")
 
                 val resDir = file("cmplib/src/commonMain/composeResources")
                 val resourcesFiles = resDir.walkTopDown()
@@ -322,7 +322,7 @@ class ResourcesTest : GradlePluginTestBase() {
                 content + "\n" + ComposeProperties.DISABLE_MULTIMODULE_RESOURCES + "=true"
             }
             gradle(":cmplib:build").checks {
-                check.logContains("Configure compose resources")
+                check.logContains("Configure single-module compose resources")
             }
         }
     }
@@ -519,6 +519,7 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun testJvmOnlyProject(): Unit = with(testProject("misc/jvmOnlyResources")) {
         gradle("jar").checks {
+            check.logContains("Configure java-only compose resources")
             assertDirectoriesContentEquals(
                 file("build/generated/compose/resourceGenerator/kotlin"),
                 file("expected")

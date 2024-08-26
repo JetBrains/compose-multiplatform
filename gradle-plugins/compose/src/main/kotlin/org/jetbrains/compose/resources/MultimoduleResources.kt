@@ -2,98 +2,131 @@ package org.jetbrains.compose.resources
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.SourceSet
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.ComposeKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+import org.jetbrains.kotlin.gradle.plugin.extraProperties
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
 import org.jetbrains.kotlin.gradle.plugin.mpp.resources.KotlinTargetResourcesPublication
 import java.io.File
 
-//configure multimodule resources (with publishing and module isolation)
-@OptIn(ComposeKotlinGradlePluginApi::class)
+//configure multi-module resources (with publishing and module isolation)
 internal fun Project.configureMultimoduleResources(
-    kotlinExtension: KotlinProjectExtension,
-    kmpResources: Any,
+    kotlinExtension: KotlinMultiplatformExtension,
     config: Provider<ResourcesExtension>
 ) {
-    kotlinExtension as KotlinMultiplatformExtension
-    kmpResources as KotlinTargetResourcesPublication
-
-    logger.info("Configure KMP resources")
+    logger.info("Configure multi-module compose resources")
 
     val commonMain = KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME
     configureComposeResourcesGeneration(kotlinExtension, commonMain, config, true)
 
     val moduleIsolationDirectory = config.getModuleResourcesDir(project)
 
-    val platformsForSetupKmpResources = listOf(
-        KotlinPlatformType.native, KotlinPlatformType.js, KotlinPlatformType.wasm
-    )
     val platformsForSkip = listOf(
         KotlinPlatformType.common, KotlinPlatformType.androidJvm
     )
     kotlinExtension.targets
         .matching { target -> target.platformType !in platformsForSkip }
-        .all { target ->
-            target.compilations.all { compilation ->
-                logger.info("Configure ${compilation.name} resources for '${target.targetName}' target")
-                val compilationResources = files({
-                    compilation.allKotlinSourceSets.map { sourceSet -> getPreparedComposeResourcesDir(sourceSet) }
-                })
-                val assembleResTask = registerTask<AssembleTargetResourcesTask>(
-                    name = "assemble${target.targetName.uppercaseFirstChar()}${compilation.name.uppercaseFirstChar()}Resources"
-                ) {
-                    resourceDirectories.setFrom(compilationResources)
-                    relativeResourcePlacement.set(moduleIsolationDirectory)
-                    outputDirectory.set(
-                        layout.buildDirectory.dir(
-                            "$RES_GEN_DIR/assembledResources/${target.targetName}${compilation.name.uppercaseFirstChar()}"
-                        )
-                    )
-                }
-                val allCompilationResources = assembleResTask.flatMap { it.outputDirectory.asFile }
-
-                //For Native/Js/Wasm main resources:
-                // 1) we have to configure new Kotlin component publication
-                // 2) we have to collect all transitive main resources
-                if (
-                    target.platformType in platformsForSetupKmpResources
-                    && compilation.name == KotlinCompilation.MAIN_COMPILATION_NAME
-                ) {
-                    //TODO temporary API misuse. will be changed on the KMP side
-                    //https://youtrack.jetbrains.com/issue/KT-70909
-                    val kmpResourceRoot = KotlinTargetResourcesPublication.ResourceRoot(
-                        allCompilationResources,
-                        emptyList(),
-                        emptyList()
-                    )
-                    val kmpEmptyPath = provider { File("") }
-                    logger.info("Configure KMP component publication for '${compilation.target.targetName}'")
-                    kmpResources.publishResourcesAsKotlinComponent(
-                        target,
-                        { kmpResourceRoot },
-                        kmpEmptyPath
-                    )
-
-                    val allResources = kmpResources.resolveResources(target)
-                    logger.info("Collect resolved ${compilation.name} resources for '${compilation.target.targetName}'")
-                    configureResourcesForCompilation(compilation, allResources)
-                } else {
-                    configureResourcesForCompilation(compilation, allCompilationResources)
-                }
-            }
-        }
+        .all { target -> configureTargetResources(target, moduleIsolationDirectory) }
 
     //configure ANDROID resources
     onAgpApplied {
         configureAndroidComposeResources(moduleIsolationDirectory)
         fixAndroidLintTaskDependencies()
     }
+}
+
+//configure java multi-module resources (with module isolation)
+internal fun Project.configureJvmOnlyResources(
+    kotlinExtension: KotlinJvmProjectExtension,
+    config: Provider<ResourcesExtension>
+) {
+    logger.info("Configure java-only compose resources")
+
+    val main = SourceSet.MAIN_SOURCE_SET_NAME
+    configureComposeResourcesGeneration(kotlinExtension, main, config, true)
+
+    val moduleIsolationDirectory = config.getModuleResourcesDir(project)
+    val javaTarget = kotlinExtension.target
+
+    configureTargetResources(javaTarget, moduleIsolationDirectory)
+}
+
+private fun Project.configureTargetResources(
+    target: KotlinTarget,
+    moduleIsolationDirectory: Provider<File>
+) {
+    target.compilations.all { compilation ->
+        logger.info("Configure ${compilation.name} resources for '${target.targetName}' target")
+        val compilationResources = files({
+            compilation.allKotlinSourceSets.map { sourceSet -> getPreparedComposeResourcesDir(sourceSet) }
+        })
+        val assembleResTask = registerTask<AssembleTargetResourcesTask>(
+            name = "assemble${target.targetName.uppercaseFirstChar()}${compilation.name.uppercaseFirstChar()}Resources"
+        ) {
+            resourceDirectories.setFrom(compilationResources)
+            relativeResourcePlacement.set(moduleIsolationDirectory)
+            outputDirectory.set(
+                layout.buildDirectory.dir(
+                    "$RES_GEN_DIR/assembledResources/${target.targetName}${compilation.name.uppercaseFirstChar()}"
+                )
+            )
+        }
+        val allCompilationResources = assembleResTask.flatMap { it.outputDirectory.asFile }
+
+        if (
+            target.platformType in platformsForSetupKmpResources
+            && compilation.name == KotlinCompilation.MAIN_COMPILATION_NAME
+        ) {
+            configureKmpResources(compilation, allCompilationResources)
+        } else {
+            configureResourcesForCompilation(compilation, allCompilationResources)
+        }
+    }
+}
+
+private val platformsForSetupKmpResources = listOf(
+    KotlinPlatformType.native, KotlinPlatformType.js, KotlinPlatformType.wasm
+)
+
+@OptIn(ComposeKotlinGradlePluginApi::class)
+private fun Project.configureKmpResources(
+    compilation: KotlinCompilation<*>,
+    allCompilationResources: Provider<File>
+) {
+    require(compilation.platformType in platformsForSetupKmpResources)
+    val kmpResources = extraProperties.get(KMP_RES_EXT) as KotlinTargetResourcesPublication
+
+    //For Native/Js/Wasm main resources:
+    // 1) we have to configure new Kotlin component publication
+    // 2) we have to collect all transitive main resources
+
+    //TODO temporary API misuse. will be changed on the KMP side
+    //https://youtrack.jetbrains.com/issue/KT-70909
+    val target = compilation.target
+    val kmpResourceRoot = KotlinTargetResourcesPublication.ResourceRoot(
+        allCompilationResources,
+        emptyList(),
+        emptyList()
+    )
+    val kmpEmptyPath = provider { File("") }
+    logger.info("Configure KMP component publication for '${compilation.target.targetName}'")
+    kmpResources.publishResourcesAsKotlinComponent(
+        target,
+        { kmpResourceRoot },
+        kmpEmptyPath
+    )
+
+    val allResources = kmpResources.resolveResources(target)
+    logger.info("Collect resolved ${compilation.name} resources for '${compilation.target.targetName}'")
+    configureResourcesForCompilation(compilation, allResources)
 }
 
 private fun Project.configureResourcesForCompilation(
