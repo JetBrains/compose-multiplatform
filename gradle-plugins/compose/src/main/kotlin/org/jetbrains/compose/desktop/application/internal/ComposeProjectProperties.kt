@@ -8,8 +8,10 @@ package org.jetbrains.compose.desktop.application.internal
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
+import org.jetbrains.compose.internal.utils.findLocalOrGlobalProperty
 import org.jetbrains.compose.internal.utils.toBooleanProvider
 import org.jetbrains.compose.internal.utils.valueOrNull
+import org.jetbrains.kotlin.gradle.plugin.extraProperties
 
 internal object ComposeProperties {
     internal const val VERBOSE = "compose.desktop.verbose"
@@ -59,7 +61,6 @@ internal object ComposeProperties {
         providers.valueOrNull(DISABLE_MULTIMODULE_RESOURCES).toBooleanProvider(false)
 
     //providers.valueOrNull works only with root gradle.properties
-    fun dontSyncResources(project: Project): Provider<Boolean> = project.provider {
-        project.findProperty(SYNC_RESOURCES_PROPERTY)?.toString().equals("false", true)
-    }
+    fun dontSyncResources(project: Project): Provider<Boolean> =
+        project.findLocalOrGlobalProperty(SYNC_RESOURCES_PROPERTY).map { it == "false" }
 }
