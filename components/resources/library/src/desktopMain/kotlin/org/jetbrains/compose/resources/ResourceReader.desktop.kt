@@ -1,5 +1,7 @@
 package org.jetbrains.compose.resources
 
+import java.io.EOFException
+import java.io.IOException
 import java.io.InputStream
 
 internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
@@ -12,10 +14,20 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         val resource = getResourceAsStream(path)
         val result = ByteArray(size.toInt())
         resource.use { input ->
-            input.skipNBytes(offset)
+            input.skipBytes(offset)
             input.readNBytes(result, 0, size.toInt())
         }
         return result
+    }
+
+    //skipNBytes requires API 12
+    private fun InputStream.skipBytes(offset: Long) {
+        var skippedBytes = 0L
+        while (skippedBytes < offset) {
+            val count = skip(offset - skippedBytes)
+            if (count == 0L) break
+            skippedBytes += count
+        }
     }
 
     override fun getUri(path: String): String {
