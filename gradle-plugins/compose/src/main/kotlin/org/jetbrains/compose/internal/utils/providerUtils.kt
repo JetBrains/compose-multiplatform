@@ -50,5 +50,5 @@ internal fun Provider<String?>.toBooleanProvider(defaultValue: Boolean): Provide
 
 internal fun Project.findLocalOrGlobalProperty(name: String, default: String = ""): Provider<String> = provider {
     if (extraProperties.has(name)) extraProperties.get(name).toString()
-    else providers.gradleProperty(name).getOrElse(default)
+    else providers.gradleProperty(name).forUseAtConfigurationTimeSafe().getOrElse(default)
 }
