@@ -47,9 +47,9 @@ fun PreviewContextConfigurationEffect() {
  * Example usage:
  * ```
  * fun configureTestEnvironment() {
- *     setAndroidInstrumentedContext{
+ *     setAndroidInstrumentedContext(
  *         InstrumentationRegistry.getInstrumentation().context
- *     }
+ *     )
  * }
  * ```
  */
