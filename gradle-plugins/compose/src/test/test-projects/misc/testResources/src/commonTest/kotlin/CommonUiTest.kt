@@ -14,26 +14,21 @@ import kotlin.test.assertNotEquals
 class CommonUiTest {
 
     @Test
-    fun checkTestResources() {
-        runComposeUiTest {
-            setContent {
-                val mainStr = stringResource(Res.string.app_name)
-                val testStr = stringResource(Res.string.test_string)
-                assertEquals("Compose Resources App", mainStr)
-                assertEquals("Common test", testStr)
-                assertNotEquals("Compose Resources App", testStr)
-            }
+    fun checkTestResources() = runComposeUiTest {
+        setContent {
+            val mainStr = stringResource(Res.string.app_name)
+            val testStr = stringResource(Res.string.test_string)
+            assertEquals("Compose Resources App", mainStr)
+            assertEquals("Common test", testStr)
         }
     }
 
     @Test
-    fun checkTestFileResource() {
-        runTest {
-            val commonFile = Res.readBytes("files/common.txt").decodeToString()
-            assertEquals("common 777", commonFile)
-            val testFile = Res.readBytes("files/data.txt").decodeToString()
-            assertEquals("1234567890", testFile)
-        }
+    fun checkTestFileResource() = runTest {
+        val commonFile = Res.readBytes("files/common.txt").decodeToString()
+        assertEquals("common 777", commonFile)
+        val testFile = Res.readBytes("files/data.txt").decodeToString()
+        assertEquals("1234567890", testFile)
     }
 
 }

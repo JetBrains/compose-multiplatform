@@ -13,18 +13,16 @@ import kotlin.test.assertEquals
 class DesktopUiTest {
 
     @Test
-    fun checkTestResources() {
-        runComposeUiTest {
-            setContent {
-                val mainStr = stringResource(Res.string.app_name)
-                val testStr = stringResource(Res.string.test_string)
-                val desktopMainStr = stringResource(Res.string.desktop_str)
-                val desktopTestStr = stringResource(Res.string.desktop_test_str)
-                assertEquals("Compose Resources App", mainStr)
-                assertEquals("Common test", testStr)
-                assertEquals("Desktop string", desktopMainStr)
-                assertEquals("Desktop test string", desktopTestStr)
-            }
+    fun checkTestResources() = runComposeUiTest {
+        setContent {
+            val mainStr = stringResource(Res.string.app_name)
+            val testStr = stringResource(Res.string.test_string)
+            val desktopMainStr = stringResource(Res.string.desktop_str)
+            val desktopTestStr = stringResource(Res.string.desktop_test_str)
+            assertEquals("Compose Resources App", mainStr)
+            assertEquals("Common test", testStr)
+            assertEquals("Desktop string", desktopMainStr)
+            assertEquals("Desktop test string", desktopTestStr)
         }
     }
 
