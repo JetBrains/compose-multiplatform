@@ -2,6 +2,7 @@ package org.jetbrains.compose.resources
 
 import android.content.res.AssetManager
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import java.io.FileNotFoundException
@@ -16,7 +17,13 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         context.assets
     }
 
-    private val instrumentedAssets: AssetManager? get() = androidInstrumentedContext?.assets
+    private val instrumentedAssets: AssetManager?
+        get() = try {
+            androidInstrumentedContext.assets
+        } catch (e: NoClassDefFoundError) {
+            Log.d("ResourceReader", "Android Instrumentation context is not available.")
+            null
+        }
 
     override suspend fun read(path: String): ByteArray {
         val resource = getResourceAsStream(path)
