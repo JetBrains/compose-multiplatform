@@ -10,8 +10,10 @@ import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.test.platform.app.InstrumentationRegistry
 
 internal val androidContext get() = AndroidContextProvider.ANDROID_CONTEXT
+internal val androidInstrumentedContext get() = InstrumentationRegistry.getInstrumentation().context
 
 /**
  * The function configures the android context

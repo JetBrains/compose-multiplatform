@@ -254,7 +254,7 @@ class ResourcesTest : GradlePluginTestBase() {
             }
 
             gradle(":cmplib:publishAllPublicationsToMavenRepository").checks {
-                check.logContains("Configure KMP resources")
+                check.logContains("Configure multi-module compose resources")
 
                 val resDir = file("cmplib/src/commonMain/composeResources")
                 val resourcesFiles = resDir.walkTopDown()
@@ -317,16 +317,12 @@ class ResourcesTest : GradlePluginTestBase() {
 
     @Test
     fun testDisableMultimoduleResourcesWithNewKotlin() {
-        val environment = defaultTestEnvironment.copy(
-            kotlinVersion = "2.0.0-RC2"
-        )
-
-        with(testProject("misc/kmpResourcePublication", environment)) {
+        with(testProject("misc/kmpResourcePublication")) {
             file("gradle.properties").modify { content ->
                 content + "\n" + ComposeProperties.DISABLE_MULTIMODULE_RESOURCES + "=true"
             }
             gradle(":cmplib:build").checks {
-                check.logContains("Configure compose resources")
+                check.logContains("Configure single-module compose resources")
             }
         }
     }
@@ -388,10 +384,10 @@ class ResourcesTest : GradlePluginTestBase() {
             .getConvertedResources(commonResourcesDir, repackDir)
 
         gradle("build").checks {
-            check.taskSuccessful(":demoDebugAssetsCopyForAGP")
-            check.taskSuccessful(":demoReleaseAssetsCopyForAGP")
-            check.taskSuccessful(":fullDebugAssetsCopyForAGP")
-            check.taskSuccessful(":fullReleaseAssetsCopyForAGP")
+            check.taskSuccessful(":copyDemoDebugComposeResourcesToAndroidAssets")
+            check.taskSuccessful(":copyDemoReleaseComposeResourcesToAndroidAssets")
+            check.taskSuccessful(":copyFullDebugComposeResourcesToAndroidAssets")
+            check.taskSuccessful(":copyFullReleaseComposeResourcesToAndroidAssets")
 
             getAndroidApk("demo", "debug", "Resources-Test").let { apk ->
                 checkResourcesZip(apk, commonResourcesFiles, true)
@@ -523,6 +519,7 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun testJvmOnlyProject(): Unit = with(testProject("misc/jvmOnlyResources")) {
         gradle("jar").checks {
+            check.logContains("Configure java-only compose resources")
             assertDirectoriesContentEquals(
                 file("build/generated/compose/resourceGenerator/kotlin"),
                 file("expected")
@@ -680,6 +677,24 @@ class ResourcesTest : GradlePluginTestBase() {
             gradle(":copyTestComposeResourcesForIosX64").checks {
                 file("build/bin/iosX64/debugTest/compose-resources/composeResources/iosresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
                 file("build/bin/iosX64/debugTest/compose-resources/composeResources/iosresources.generated.resources/drawable/icon.xml").checkExists()
+            }
+        }
+    }
+
+    @Test
+    fun checkTestResources() {
+        with(testProject("misc/testResources")) {
+            gradle("check").checks {
+                check.logContains("Configure main resources for 'desktop' target")
+                check.logContains("Configure test resources for 'desktop' target")
+                check.logContains("Configure main resources for 'iosX64' target")
+                check.logContains("Configure test resources for 'iosX64' target")
+                check.logContains("Configure main resources for 'iosArm64' target")
+                check.logContains("Configure test resources for 'iosArm64' target")
+                check.logContains("Configure main resources for 'iosSimulatorArm64' target")
+                check.logContains("Configure test resources for 'iosSimulatorArm64' target")
+
+                check.taskSuccessful(":desktopTest")
             }
         }
     }

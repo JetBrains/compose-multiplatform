@@ -24,6 +24,7 @@ internal val Res.drawable.vector: DrawableResource
 private fun init_vector(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
   "drawable:vector",
     setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(), "drawable/vector.xml", -1, -1),
+      org.jetbrains.compose.resources.ResourceItem(setOf(),
+        "composeResources/me.app.jvmonlyresources.generated.resources/drawable/vector.xml", -1, -1),
     )
 )
