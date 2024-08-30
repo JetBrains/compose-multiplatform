@@ -111,16 +111,18 @@ private fun Project.configureKmpResources(
     //TODO temporary API misuse. will be changed on the KMP side
     //https://youtrack.jetbrains.com/issue/KT-70909
     val target = compilation.target
-    val kmpResourceRoot = KotlinTargetResourcesPublication.ResourceRoot(
-        allCompilationResources,
-        emptyList(),
-        emptyList()
-    )
     val kmpEmptyPath = provider { File("") }
+    val emptyDir = layout.buildDirectory.dir("$RES_GEN_DIR/emptyResourcesDir").map { it.asFile }
     logger.info("Configure KMP component publication for '${compilation.target.targetName}'")
     kmpResources.publishResourcesAsKotlinComponent(
         target,
-        { kmpResourceRoot },
+        { kotlinSourceSet ->
+            if (kotlinSourceSet == compilation.defaultSourceSet) {
+                KotlinTargetResourcesPublication.ResourceRoot(allCompilationResources, emptyList(), emptyList())
+            } else {
+                KotlinTargetResourcesPublication.ResourceRoot(emptyDir, emptyList(), emptyList())
+            }
+        },
         kmpEmptyPath
     )
 
