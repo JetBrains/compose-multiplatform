@@ -86,8 +86,8 @@ internal fun Project.configureSyncIosComposeResources(
     plugins.withId(COCOAPODS_PLUGIN_ID) {
         (kotlinExtension as ExtensionAware).extensions.getByType(CocoapodsExtension::class.java).apply {
             framework { podFramework ->
-                val syncDir = podFramework.getFinalResourcesDir().get().asFile.relativeTo(projectDir)
-                val specAttr = "['${syncDir.path}']"
+                val syncDir = podFramework.getFinalResourcesDir().get().asFile
+                val specAttr = "['${syncDir.relativeTo(projectDir).path}']"
                 val specAttributes = extraSpecAttributes
                 val buildFile = project.buildFile
                 val projectPath = project.path
@@ -97,7 +97,7 @@ internal fun Project.configureSyncIosComposeResources(
                         if (specAttributes["resources"] != specAttr) error(
                             """
                                 |Kotlin.cocoapods.extraSpecAttributes["resources"] is not compatible with Compose Multiplatform's resources management for iOS.
-                                |  * Recommended action: remove extraSpecAttributes["resources"] from '$buildFile' and run '$projectPath:podInstall' once;
+                                |  * Recommended action: remove extraSpecAttributes["resources"] from '$buildFile' and run '$projectPath:podspec' once;
                                 |  * Alternative action: turn off Compose Multiplatform's resources management for iOS by adding '${ComposeProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties;
                             """.trimMargin()
                         )
