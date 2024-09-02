@@ -591,6 +591,14 @@ class ResourcesTest : GradlePluginTestBase() {
         )
 
         with(TestProject("misc/iosResources", testEnv)) {
+            gradle(":podspec", "-Pkotlin.native.cocoapods.generate.wrapper=true").checks {
+                assertEqualTextFiles(
+                    file("iosResources.podspec"),
+                    file("expected/iosResources.podspec")
+                )
+                file("build/compose/cocoapods/compose-resources").checkExists()
+            }
+
             gradle(
                 ":syncFramework",
                 "-Pkotlin.native.cocoapods.platform=${iosEnv["PLATFORM_NAME"]}",
@@ -655,13 +663,6 @@ class ResourcesTest : GradlePluginTestBase() {
 
                 file("build/compose/cocoapods/compose-resources/composeResources/iosresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
                 file("build/compose/cocoapods/compose-resources/composeResources/iosresources.generated.resources/drawable/icon.xml").checkExists()
-            }
-
-            gradle(":podspec", "-Pkotlin.native.cocoapods.generate.wrapper=true").checks {
-                assertEqualTextFiles(
-                    file("iosResources.podspec"),
-                    file("expected/iosResources.podspec")
-                )
             }
         }
     }
