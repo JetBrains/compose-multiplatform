@@ -38,7 +38,7 @@ _Changes since release/1.7.0-alpha03_
 - [_(prerelease fix)_ Fix resource reading on Java 11](https://github.com/JetBrains/compose-multiplatform/pull/5125)
 
 ### Gradle Plugin
-- [Internal refactor to support project isolation](https://github.com/JetBrains/compose-multiplatform/pull/5120)
+- [Support project isolation](https://github.com/JetBrains/compose-multiplatform/pull/5120)
 
 ## Dependencies
 - Gradle Plugin `org.jetbrains.compose`, version `1.7.0-beta01`. Based on Jetpack Compose libraries:
