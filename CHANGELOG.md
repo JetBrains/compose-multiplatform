@@ -1,4 +1,4 @@
-# 1.7.0-beta01 (August 2024)
+# 1.7.0-beta01 (September 2024)
 
 _Changes since release/1.7.0-alpha03_
 
