@@ -50,7 +50,7 @@ _Changes since release/1.7.0-alpha03_
 
 - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.1`. Based on [Jetpack Lifecycle 2.8.4](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.4)
 - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.8.0-alpha09`. Based on [Jetpack Navigation 2.8.0-beta05](https://developer.android.com/jetpack/androidx/releases/navigation#2.8.0-beta05)
-- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.0.0-rc01`. Based on [Jetpack Material3 Adaptive 1.0.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.0.0-rc01)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.0.0-alpha02`. Based on [Jetpack Material3 Adaptive 1.0.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.0.0-rc01)
 
 ---
 
