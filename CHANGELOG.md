@@ -35,7 +35,7 @@ _Changes since release/1.7.0-alpha03_
 
 ### Resources
 - _(prerelease fix)_ [Fix a resource reading on iOS 12](https://github.com/JetBrains/compose-multiplatform/pull/5123)
-- [_(prerelease fix)_ Fix resource reading on Java 11](https://github.com/JetBrains/compose-multiplatform/pull/5125)
+- _(prerelease fix)_ [Fix resource reading on Java 11](https://github.com/JetBrains/compose-multiplatform/pull/5125)
 
 ### Gradle Plugin
 - [Support project isolation](https://github.com/JetBrains/compose-multiplatform/pull/5120)
