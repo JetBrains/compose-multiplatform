@@ -17,7 +17,7 @@ _Changes since release/1.7.0-alpha03_
 
 ### Desktop
 - [Added support for input methods (languages such as Chinese, Korean, Arabic) to BasicTextField(TextFieldState, ...)](https://github.com/JetBrains/compose-multiplatform-core/pull/1496)
-- [Add dynamic Drag&Drop target indication (🚫 icon under cursor if currently there is no valid drop target under it)](https://github.com/JetBrains/compose-multiplatform-core/pull/1510)
+- [Add dynamic Drag&Drop target indication](https://github.com/JetBrains/compose-multiplatform-core/pull/1510) (🚫 icon under cursor if currently there is no valid drop target under it)
 
 ### Resources
 - [Added support of test resources in Compose Multiplatform projects](https://github.com/JetBrains/compose-multiplatform/pull/5122)
