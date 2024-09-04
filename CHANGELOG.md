@@ -4,7 +4,7 @@ _Changes since release/1.7.0-alpha03_
 
 ## Breaking changes
 ### iOS
-- [`UIKitView` and `UIKitViewController` in `package androidx.compose.ui.interop` are deprecated. New API are mentioned in deprecation message. Deprecated invocations should work fine unless custom `onResize` is used, it is disallowed now and will print a warning.](https://github.com/JetBrains/compose-multiplatform-core/pull/1494)
+- [`UIKitView` and `UIKitViewController` in `package androidx.compose.ui.interop` are deprecated](https://github.com/JetBrains/compose-multiplatform-core/pull/1494). New API are mentioned in deprecation message. Deprecated invocations should work fine unless custom `onResize` is used, it is disallowed now and will print a warning.
 - [Actual of expected `InteropView` on iOS is `UIResponder` now instead of `UIView`. It's the first common ancestor for `UIViewController` and `UIView`, both of which can be integrated using iOS interop APIs](https://github.com/JetBrains/compose-multiplatform-core/pull/1489)
 - [The app will crash by default, if `CADisableMinimumFrameDurationOnPhone` is not set to true in `Info.plist`. Use newly added `ComposeUIViewControllerConfiguration.enforceStrictPlistSanityCheck` to opt-out of this behavior](https://github.com/JetBrains/compose-multiplatform-core/pull/1451)
 
