@@ -25,7 +25,7 @@ _Changes since release/1.7.0-alpha03_
 
 ## Fixes
 ### Multiple Platforms
-- [_(prerelease fix)_ Fix redirect on android artifacts for "window-core" module](https://github.com/JetBrains/compose-multiplatform-core/pull/1506)
+- _(prerelease fix)_ [Fix redirect on android artifacts for "window-core" module](https://github.com/JetBrains/compose-multiplatform-core/pull/1506)
 
 ### iOS
 - [Fix frame drops when dragging scrollable content on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1503)
