@@ -13,7 +13,7 @@ _Changes since release/1.7.0-alpha03_
 - [New multiplatform module "material-navigation"](https://github.com/JetBrains/compose-multiplatform-core/pull/1504)
 
 ### iOS
-- [New `UIKitView` and `UIKitViewController` API in `package androidx.compose.ui.viewinterop`. Support of `onReset` to reuse the interop composable emitted node and avoid excessive native views reallocations, fine-grain touches strategy control (cooperative with explicit time delay, non-cooperative where no touches are received by Compose, ignoring touches)](https://github.com/JetBrains/compose-multiplatform-core/pull/1494)
+- [New `UIKitView` and `UIKitViewController` API in `package androidx.compose.ui.viewinterop`](https://github.com/JetBrains/compose-multiplatform-core/pull/1494). Support of `onReset` to reuse the interop composable emitted node and avoid excessive native views reallocations, fine-grain touches strategy control (cooperative with explicit time delay, non-cooperative where no touches are received by Compose, ignoring touches)
 
 ### Desktop
 - [Added support for input methods (languages such as Chinese, Korean, Arabic) to BasicTextField(TextFieldState, ...)](https://github.com/JetBrains/compose-multiplatform-core/pull/1496)
