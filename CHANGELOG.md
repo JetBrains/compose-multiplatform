@@ -34,7 +34,7 @@ _Changes since release/1.7.0-alpha03_
 - _(prerelease fix)_ [Fixed drag-and-drop not working after a popup is displayed in the window](https://github.com/JetBrains/compose-multiplatform-core/pull/1493)
 
 ### Resources
-- [_(prerelease fix)_ Fix a resource reading on iOS 12](https://github.com/JetBrains/compose-multiplatform/pull/5123)
+- _(prerelease fix)_ [Fix a resource reading on iOS 12](https://github.com/JetBrains/compose-multiplatform/pull/5123)
 - [_(prerelease fix)_ Fix resource reading on Java 11](https://github.com/JetBrains/compose-multiplatform/pull/5125)
 
 ### Gradle Plugin
