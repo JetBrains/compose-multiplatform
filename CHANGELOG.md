@@ -1,3 +1,59 @@
+# 1.7.0-beta01 (September 2024)
+
+_Changes since release/1.7.0-alpha03_
+
+## Breaking changes
+### iOS
+- [`UIKitView` and `UIKitViewController` in `package androidx.compose.ui.interop` are deprecated](https://github.com/JetBrains/compose-multiplatform-core/pull/1494). New API are mentioned in deprecation message. Deprecated invocations should work fine unless custom `onResize` is used, it is disallowed now and will print a warning.
+- [Actual of expected `InteropView` on iOS is `UIResponder` now instead of `UIView`](https://github.com/JetBrains/compose-multiplatform-core/pull/1489). It's the first common ancestor for `UIViewController` and `UIView`, both of which can be integrated using iOS interop APIs
+- [The app will crash by default, if `CADisableMinimumFrameDurationOnPhone` is not set to true in `Info.plist`](https://github.com/JetBrains/compose-multiplatform-core/pull/1451). Use newly added `ComposeUIViewControllerConfiguration.enforceStrictPlistSanityCheck` to opt-out of this behavior
+
+## Features
+### Multiple Platforms
+- [New multiplatform module "material-navigation"](https://github.com/JetBrains/compose-multiplatform-core/pull/1504)
+
+### iOS
+- [New `UIKitView` and `UIKitViewController` API in `package androidx.compose.ui.viewinterop`](https://github.com/JetBrains/compose-multiplatform-core/pull/1494). Support of `onReset` to reuse the interop composable emitted node and avoid excessive native views reallocations, fine-grain touches strategy control (cooperative with explicit time delay, non-cooperative where no touches are received by Compose, ignoring touches)
+
+### Desktop
+- [Added support for input methods (languages such as Chinese, Korean, Arabic) to BasicTextField(TextFieldState, ...)](https://github.com/JetBrains/compose-multiplatform-core/pull/1496)
+- [Add dynamic Drag&Drop target indication](https://github.com/JetBrains/compose-multiplatform-core/pull/1510) (🚫 icon under cursor if currently there is no valid drop target under it)
+
+### Resources
+- [Added support of test resources in Compose Multiplatform projects](https://github.com/JetBrains/compose-multiplatform/pull/5122)
+- [Added support of multi-module resources in JVM-only projects](https://github.com/JetBrains/compose-multiplatform/pull/5122)
+
+## Fixes
+### Multiple Platforms
+- _(prerelease fix)_ [Fix redirect on android artifacts for "window-core" module](https://github.com/JetBrains/compose-multiplatform-core/pull/1506)
+
+### iOS
+- [Fix frame drops when dragging scrollable content on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1503)
+
+### Desktop
+- _(prerelease fix)_ [Fixed drag-and-drop not working after a popup is displayed in the window](https://github.com/JetBrains/compose-multiplatform-core/pull/1493)
+
+### Resources
+- _(prerelease fix)_ [Fix a resource reading on iOS 12](https://github.com/JetBrains/compose-multiplatform/pull/5123)
+- _(prerelease fix)_ [Fix resource reading on Java 11](https://github.com/JetBrains/compose-multiplatform/pull/5125)
+
+### Gradle Plugin
+- [Support project isolation](https://github.com/JetBrains/compose-multiplatform/pull/5120)
+
+## Dependencies
+- Gradle Plugin `org.jetbrains.compose`, version `1.7.0-beta01`. Based on Jetpack Compose libraries:
+  - [Runtime 1.7.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.7.0-rc01)
+  - [UI 1.7.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.7.0-rc01)
+  - [Foundation 1.7.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.7.0-rc01)
+  - [Material 1.7.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.7.0-rc01)
+  - [Material3 1.3.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.0-rc01)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.1`. Based on [Jetpack Lifecycle 2.8.4](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.4)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.8.0-alpha09`. Based on [Jetpack Navigation 2.8.0-beta05](https://developer.android.com/jetpack/androidx/releases/navigation#2.8.0-beta05)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.0.0-alpha02`. Based on [Jetpack Material3 Adaptive 1.0.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.0.0-rc01)
+
+---
+
 # 1.7.0-alpha03 (August 2024)
 
 _Changes since 1.7.0-alpha02_
@@ -23,7 +79,7 @@ _Changes since 1.7.0-alpha02_
 - [_(prerelease fix)_ Fix broken configuration cache due Android Studio + AGP issues. Now Android Studio previews require latest AGP versions (8.5.2, 8.6.0-rc01, 8.7.0-alpha04): https://issuetracker.google.com/issues/348208777](https://github.com/JetBrains/compose-multiplatform/pull/5118)
 
 ## Dependencies
-- Gradle Plugin `org.jetbrains.compose`, version `1.7.0-alpha02`. Based on Jetpack Compose libraries:
+- Gradle Plugin `org.jetbrains.compose`, version `1.7.0-alpha03`. Based on Jetpack Compose libraries:
   - [Runtime 1.7.0-beta06](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.7.0-beta06)
   - [UI 1.7.0-beta06](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.7.0-beta06)
   - [Foundation 1.7.0-beta06](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.7.0-beta06)
@@ -32,7 +88,7 @@ _Changes since 1.7.0-alpha02_
 
 - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.0`. Based on [Jetpack Lifecycle 2.8.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.0)
 - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.8.0-alpha09`. Based on [Jetpack Navigation 2.8.0-beta05](https://developer.android.com/jetpack/androidx/releases/navigation#2.8.0-beta05)
-- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive-*:1.0.0-alpha01`. Based on [Jetpack Material3 Adaptive 1.0.0-beta04](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.0.0-beta04)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.0.0-alpha01`. Based on [Jetpack Material3 Adaptive 1.0.0-beta04](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.0.0-beta04)
 
 To use Material3 Adaptive add the dependencies for the artifacts you need in the `build.gradle` file for your app or module:
 ```Kotlin
