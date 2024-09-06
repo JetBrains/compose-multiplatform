@@ -13,6 +13,8 @@ import com.example.jetsnack.ui.components.loadImage
 import com.example.jetsnack.ui.components.toByteArray
 import com.example.jetsnack.ui.theme.Karla
 import com.example.jetsnack.ui.theme.Montserrat
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.*
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalResourceApi::class)
@@ -31,9 +33,16 @@ fun main() {
         }
 
         LaunchedEffect(Unit) {
-            loadMontserratFont()
-            loadKarlaFont()
-            prepareImagesCache()
+            val j1 = launch {
+                loadMontserratFont()
+            }
+            val j2 = launch {
+                loadKarlaFont()
+            }
+            val j3 = launch {
+                prepareImagesCache()
+            }
+            joinAll(j1, j2, j3)
             loading = false
         }
     }

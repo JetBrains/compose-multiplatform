@@ -65,19 +65,19 @@ private val searchCategoryCollections = listOf(
         categories = listOf(
             SearchCategory(
                 name = "Chips & crackers",
-                imageUrl = "https://source.unsplash.com/UsSdMZ78Q3E"
+                imageUrl = "files/chips.jpg"
             ),
             SearchCategory(
                 name = "Fruit snacks",
-                imageUrl = "https://source.unsplash.com/SfP1PtM9Qa8"
+                imageUrl = "files/fruit.jpg"
             ),
             SearchCategory(
                 name = "Desserts",
-                imageUrl = "https://source.unsplash.com/_jk8KIyN_uA"
+                imageUrl = "files/desserts.jpg"
             ),
             SearchCategory(
                 name = "Nuts ",
-                imageUrl = "https://source.unsplash.com/UsSdMZ78Q3E"
+                imageUrl = "files/nuts.jpg"
             )
         )
     ),
@@ -87,27 +87,27 @@ private val searchCategoryCollections = listOf(
         categories = listOf(
             SearchCategory(
                 name = "Organic",
-                imageUrl = "https://source.unsplash.com/7meCnGCJ5Ms"
+                imageUrl = "files/organic.jpg"
             ),
             SearchCategory(
                 name = "Gluten Free",
-                imageUrl = "https://source.unsplash.com/m741tj4Cz7M"
+                imageUrl = "files/gluten_free.jpg"
             ),
             SearchCategory(
                 name = "Paleo",
-                imageUrl = "https://source.unsplash.com/dt5-8tThZKg"
+                imageUrl = "files/paleo.jpg"
             ),
             SearchCategory(
                 name = "Vegan",
-                imageUrl = "https://source.unsplash.com/ReXxkS1m1H0"
+                imageUrl = "files/vegan.jpg"
             ),
             SearchCategory(
                 name = "Vegitarian",
-                imageUrl = "https://source.unsplash.com/IGfIGP5ONV0"
+                imageUrl = "files/grapes.jpg"
             ),
             SearchCategory(
                 name = "Whole30",
-                imageUrl = "https://source.unsplash.com/9MzCd76xLGk"
+                imageUrl = "files/popcorn.jpg"
             )
         )
     )
