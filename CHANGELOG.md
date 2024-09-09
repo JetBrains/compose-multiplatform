@@ -38,9 +38,9 @@ _Changes since release/1.7.0-beta01_
 - [Fix a gradle project misconfiguration when KSP and Room are used](https://github.com/JetBrains/compose-multiplatform/pull/5129)
 
 ### Navigation
-- [_(prerelease fix)_ Fix saving state for nested `NavHostController`](https://github.com/JetBrains/compose-multiplatform-core/pull/1508)
-- [_(prerelease fix)_ Fix `IllegalArgumentException` on putting lists into `savedStateHandle`](https://github.com/JetBrains/compose-multiplatform-core/pull/1508)
-- [_(prerelease fix)_ Fixed missing commonization for type-safe version of `SavedStateHandle.toRoute`](https://github.com/JetBrains/compose-multiplatform-core/pull/1521)
+- _(prerelease fix)_ [Fix saving state for nested `NavHostController`](https://github.com/JetBrains/compose-multiplatform-core/pull/1508)
+- _(prerelease fix)_ [Fix IllegalArgumentException on putting lists into savedStateHandle](https://github.com/JetBrains/compose-multiplatform-core/pull/1546)
+- _(prerelease fix)_ [Fixed missing commonization for type-safe version of `SavedStateHandle.toRoute`](https://github.com/JetBrains/compose-multiplatform-core/pull/1521)
 
 ## Dependencies
 - Gradle Plugin `org.jetbrains.compose`, version `1.7.0-beta02`. Based on Jetpack Compose libraries:
