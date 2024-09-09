@@ -172,6 +172,38 @@ fun TextBox(text: String = "Item") {
 
 <img alt="Lazy component" src="lazy_scrollbar.gif" height="412" />
 
+## TextField with Scrollbar
+
+You can use scrollbars with TextField.
+
+> Tip: Please use `TextFieldVerticalScrollState`, passing it to the `scrollState` parameter of `TextField`/`BasicTextField`. This parameter is currently an experimental feature and requires adding `@OptIn(ExperimentalFoundationApi::class)` to the function.
+>
+> Do not use `ScrollState` and pass it to the `Modifier.verticalScroller`, otherwise it will affect the internal `TextFieldVerticalScrollState` of the `TextField`. As a result, when the cursor goes out of bounds, the `TextField` will not automatically update and scroll up, causing the content of the line where the cursor is located to not appear in the visible area.
+
+```kotlin
+@OptIn(ExperimentalFoundationApi::class)
+fun main() = singleWindowApplication {
+    Box(modifier = Modifier.fillMaxSize()) {
+        val scrollState = rememberTextFieldVerticalScrollState()
+        var text by remember { mutableStateOf("Text\n".repeat(100)) }
+        BasicTextField(
+            value = text,
+            onValueChange = { text = it },
+            modifier = Modifier.fillMaxSize(),
+            scrollState = scrollState
+        )
+
+        VerticalScrollbar(
+            adapter = rememberScrollbarAdapter(scrollState),
+            modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight()
+        )
+    }
+}
+```
+
+<img alt="TextFieldScrollbars" src="TextFieldScrollbar.gif" height="350" />
+
+
 ## Tooltips
 
 You can add tooltip to any components using `TooltipArea`. `TooltipArea` is similar to a `Box`, but with the ability to show a tooltip.
