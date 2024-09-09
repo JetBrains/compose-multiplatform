@@ -14,7 +14,7 @@ _Changes since release/1.7.0-beta01_
 - [`material3-adaptive-navigation-suite` is multiplatform now](https://github.com/JetBrains/compose-multiplatform-core/pull/1539)
 
 ### iOS
-- [Added support for input methods (languages such as Chinese, Korean, Arabic) to BasicTextField(TextFieldState, ...)](https://github.com/JetBrains/compose-multiplatform-core/pull/1540)
+- [Basic support for BasicTextField(TextFieldState, ...) on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1540)
 
 ### Desktop
 - [The thickness of border resizers in undecorated windows and dialogs can now be controlled by passing a new `decoration` argument](https://github.com/JetBrains/compose-multiplatform-core/pull/1505)
@@ -26,16 +26,21 @@ _Changes since release/1.7.0-beta01_
 
 ### iOS
 - [A new approach to implementation of `platformLayers`.](https://github.com/JetBrains/compose-multiplatform-core/pull/1515) Now extra layers (such as Dialogs and Popups) drawing is merged into a single screen size canvas. No jittering and crashes should happen with those anymore.
-- [Dialogs and popups now have their insets calculated correctly even when the frame of ComposeUIViewController spawning them doesn't intersect any safe areas](https://github.com/JetBrains/compose-multiplatform-core/pull/1515)
+- [`Dialog`s and `Popup`s now have their insets calculated correctly even when the frame of `ComposeUIViewController` spawning them doesn't intersect any safe areas](https://github.com/JetBrains/compose-multiplatform-core/pull/1515)
 
 ### Desktop
 - _(prerelease fix)_ [Fix "Moving after initiating a click cancels it"](https://github.com/JetBrains/compose-multiplatform-core/pull/1534)
 
 ### Resources
-- _(prerelease fix)_ [Fix cocoapods resources integration which leaded to a lack resources in ios apps](https://github.com/JetBrains/compose-multiplatform/pull/5128)
+- _(prerelease fix)_ [Fix Cocoapods resources integration which leaded to a lack resources in iOS apps](https://github.com/JetBrains/compose-multiplatform/pull/5128)
 
 ### Gradle Plugin
 - [Fix a gradle project misconfiguration when KSP and Room are used](https://github.com/JetBrains/compose-multiplatform/pull/5129)
+
+### Navigation
+- [_(prerelease fix)_ Fix saving state for nested `NavHostController`](https://github.com/JetBrains/compose-multiplatform-core/pull/1508)
+- [_(prerelease fix)_ Fix `IllegalArgumentException` on putting lists into `savedStateHandle`](https://github.com/JetBrains/compose-multiplatform-core/pull/1508)
+- [_(prerelease fix)_ Fixed missing commonization for type-safe version of `SavedStateHandle.toRoute`](https://github.com/JetBrains/compose-multiplatform-core/pull/1521)
 
 ## Dependencies
 - Gradle Plugin `org.jetbrains.compose`, version `1.7.0-beta02`. Based on Jetpack Compose libraries:
