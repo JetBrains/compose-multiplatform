@@ -46,6 +46,7 @@ class GradlePluginTest : GradlePluginTestBase() {
         jsCanvasEnabled(true)
         gradle(":build").checks {
             check.taskSuccessful(":unpackSkikoWasmRuntime")
+            check.taskSuccessful(":processSkikoRuntimeForKWasm")
             check.taskSuccessful(":compileKotlinJs")
             check.taskSuccessful(":compileKotlinWasmJs")
             check.taskSuccessful(":wasmJsBrowserDistribution")
@@ -69,6 +70,7 @@ class GradlePluginTest : GradlePluginTestBase() {
                 val distributionFiles = listFiles()!!.map { it.name }.toList()
                 assertTrue(distributionFiles.contains("skiko.wasm"))
                 assertTrue(distributionFiles.contains("skiko.js"))
+                assertFalse(this.resolve("skiko.js").readText().contains("skiko.js is redundant"))
             }
         }
     }
