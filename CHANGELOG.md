@@ -1,3 +1,63 @@
+# 1.7.0-beta02 (September 2024)
+
+_Changes since release/1.7.0-beta01_
+
+## Breaking changes
+### Desktop
+- [`Modifier.onExternalDrag` has been deprecated in favor of the new `Modifier.dragAndDropTarget`](https://github.com/JetBrains/compose-multiplatform-core/pull/1528)
+
+### Resources
+- [Deprecate resources in `compose.ui` in favour of the new resource library](https://github.com/JetBrains/compose-multiplatform-core/pull/1457)
+
+## Features
+### Multiple Platforms
+- [`material3-adaptive-navigation-suite` is multiplatform now](https://github.com/JetBrains/compose-multiplatform-core/pull/1539)
+
+### iOS
+- [Basic support for BasicTextField(TextFieldState, ...) on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1540)
+
+### Desktop
+- [The thickness of border resizers in undecorated windows and dialogs can now be controlled by passing a new `decoration` argument](https://github.com/JetBrains/compose-multiplatform-core/pull/1505)
+
+## Fixes
+### Multiple Platforms
+- _(prerelease fix)_ [Fix `GraphicsLayer` perspective matrix calculation and missing invalidations](https://github.com/JetBrains/compose-multiplatform-core/pull/1541)
+- _(prerelease fix)_ [Fix Wasm/Native ArrayIndexOutOfBoundsException exception in adaptive-layout module](https://github.com/JetBrains/compose-multiplatform-core/pull/1545)
+
+### iOS
+- [A new approach to implementation of `platformLayers`.](https://github.com/JetBrains/compose-multiplatform-core/pull/1515) Now extra layers (such as Dialogs and Popups) drawing is merged into a single screen size canvas. No jittering and crashes should happen with those anymore.
+- [`Dialog`s and `Popup`s now have their insets calculated correctly even when the frame of `ComposeUIViewController` spawning them doesn't intersect any safe areas](https://github.com/JetBrains/compose-multiplatform-core/pull/1515)
+
+### Desktop
+- _(prerelease fix)_ [Fix "Moving after initiating a click cancels it"](https://github.com/JetBrains/compose-multiplatform-core/pull/1534)
+
+### Resources
+- _(prerelease fix)_ [Fix Cocoapods resources integration which leaded to a lack resources in iOS apps](https://github.com/JetBrains/compose-multiplatform/pull/5128)
+
+### Gradle Plugin
+- [Fix a gradle project misconfiguration when KSP and Room are used](https://github.com/JetBrains/compose-multiplatform/pull/5129)
+
+### Lifecycle
+- Lifecycle 2.8.2 depends on Compose 1.6.11 (Lifecycle 2.8.1 accidentaly made dependent on Compose 1.7.0-beta01)
+
+### Navigation
+- _(prerelease fix)_ [Fix saving state for nested `NavHostController`](https://github.com/JetBrains/compose-multiplatform-core/pull/1508)
+- _(prerelease fix)_ [Fixed missing commonization for type-safe version of `SavedStateHandle.toRoute`](https://github.com/JetBrains/compose-multiplatform-core/pull/1521)
+
+## Dependencies
+- Gradle Plugin `org.jetbrains.compose`, version `1.7.0-beta02`. Based on Jetpack Compose libraries:
+  - [Runtime 1.7.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.7.0-rc01)
+  - [UI 1.7.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.7.0-rc01)
+  - [Foundation 1.7.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.7.0-rc01)
+  - [Material 1.7.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.7.0-rc01)
+  - [Material3 1.3.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.0-rc01)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.2`. Based on [Jetpack Lifecycle 2.8.4](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.4)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.8.0-alpha10`. Based on [Jetpack Navigation 2.8.0-rc01](https://developer.android.com/jetpack/androidx/releases/navigation#2.8.0-rc01)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.0.0-alpha03`. Based on [Jetpack Material3 Adaptive 1.0.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.0.0-rc01)
+
+---
+
 # 1.7.0-beta01 (September 2024)
 
 _Changes since release/1.7.0-alpha03_
