@@ -9,15 +9,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import com.example.common.generated.resources.Res
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 import java.net.URL
 import javax.imageio.ImageIO
 
 
 private val imagesCache = mutableMapOf<String, ImageBitmap>()
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalResourceApi::class)
 @Composable
 actual fun SnackAsyncImage(imageUrl: String, contentDescription: String?, modifier: Modifier) {
     var img: ImageBitmap? by remember(imageUrl) { mutableStateOf(null) }
@@ -39,7 +41,7 @@ actual fun SnackAsyncImage(imageUrl: String, contentDescription: String?, modifi
         } else {
             withContext(Dispatchers.IO) {
                 img = try {
-                    ImageIO.read(URL(imageUrl)).toComposeImageBitmap().also {
+                    org.jetbrains.skia.Image.makeFromEncoded(Res.readBytes(imageUrl)).toComposeImageBitmap().also {
                         imagesCache[imageUrl] = it
                         img = it
                     }

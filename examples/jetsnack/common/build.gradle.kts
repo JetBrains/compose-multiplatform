@@ -39,6 +39,7 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
+                implementation(compose.components.resources)
                 implementation(libs.kotlinx.coroutines)
             }
         }
