@@ -7,11 +7,9 @@ package org.jetbrains.compose.desktop.ide.preview
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.externalSystem.model.task.*
 import com.intellij.openapi.externalSystem.service.notification.ExternalSystemProgressNotificationManager
 import com.intellij.openapi.module.Module
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.ui.components.JBLoadingPanel
 import com.intellij.util.concurrency.annotations.RequiresReadLock
@@ -22,9 +20,8 @@ import javax.swing.JComponent
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
 
-@Service
-class PreviewStateService(private val myProject: Project) : Disposable {
-    private val idePreviewLogger = Logger.getInstance("org.jetbrains.compose.desktop.ide.preview")
+@Service(Service.Level.APP)
+class PreviewStateService() : Disposable {
     private val previewListener = CompositePreviewListener()
     private val previewManager: PreviewManager = PreviewManagerImpl(previewListener)
     val gradleCallbackPort: Int
@@ -35,7 +32,7 @@ class PreviewStateService(private val myProject: Project) : Disposable {
     init {
         val projectRefreshListener = ConfigurePreviewTaskNameCacheInvalidator(configurePreviewTaskNameCache)
         ExternalSystemProgressNotificationManager.getInstance()
-            .addNotificationListener(projectRefreshListener, myProject)
+            .addNotificationListener(projectRefreshListener, this)
     }
 
     @RequiresReadLock
@@ -80,7 +77,6 @@ private class PreviewResizeListener(private val previewManager: PreviewManager) 
 
     override fun ancestorAdded(event: AncestorEvent) {
         updateFrameSize(event.component)
-
     }
 
     override fun ancestorRemoved(event: AncestorEvent) {
