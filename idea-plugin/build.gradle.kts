@@ -32,13 +32,7 @@ dependencies {
 }
 
 intellijPlatform {
-    pluginConfiguration {
-        name = "Compose Multiplatform IDE Support"
-        ideaVersion {
-            sinceBuild = "231.*"
-            untilBuild = "243.*"
-        }
-    }
+    pluginConfiguration { name = "Compose Multiplatform IDE Support" }
     buildSearchableOptions = false
     autoReload = false
 
