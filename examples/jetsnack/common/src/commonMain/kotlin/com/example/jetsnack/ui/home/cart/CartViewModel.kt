@@ -16,14 +16,18 @@
 
 package com.example.jetsnack.ui.home.cart
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import com.example.jetsnack.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
+import com.example.common.generated.resources.Res
+import com.example.common.generated.resources.cart_decrease_error
+import com.example.common.generated.resources.cart_increase_error
 import com.example.jetsnack.model.OrderLine
 import com.example.jetsnack.model.SnackRepo
 import com.example.jetsnack.model.SnackbarManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlin.reflect.KClass
 
 /**
  * Holds the contents of the cart and allows changes to it.
@@ -33,7 +37,7 @@ import kotlinx.coroutines.flow.StateFlow
 class CartViewModel(
     private val snackbarManager: SnackbarManager,
     snackRepository: SnackRepo
-) : JetSnackCartViewModel() {
+) : ViewModel() {
 
     private val _orderLines: MutableStateFlow<List<OrderLine>> =
         MutableStateFlow(snackRepository.getCart())
@@ -48,7 +52,7 @@ class CartViewModel(
             val currentCount = _orderLines.value.first { it.snack.id == snackId }.count
             updateSnackCount(snackId, currentCount + 1)
         } else {
-            snackbarManager.showMessage(MppR.string.cart_increase_error)
+            snackbarManager.showMessage(Res.string.cart_increase_error)
         }
     }
 
@@ -63,7 +67,7 @@ class CartViewModel(
                 updateSnackCount(snackId, currentCount - 1)
             }
         } else {
-            snackbarManager.showMessage(MppR.string.cart_decrease_error)
+            snackbarManager.showMessage(Res.string.cart_decrease_error)
         }
     }
 
@@ -81,12 +85,18 @@ class CartViewModel(
         }
     }
 
-    companion object // necessary for android (see `provideFactory` method)
-}
-
-expect abstract class JetSnackCartViewModel() {
-
-    @Composable
-    fun collectOrderLinesAsState(flow: StateFlow<List<OrderLine>>): State<List<OrderLine>>
-
+    /**
+     * Factory for CartViewModel that takes SnackbarManager as a dependency
+     */
+    companion object {
+        fun provideFactory(
+            snackbarManager: SnackbarManager = SnackbarManager,
+            snackRepository: SnackRepo = SnackRepo
+        ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: KClass<T>, extras: CreationExtras): T {
+                return CartViewModel(snackbarManager, snackRepository) as T
+            }
+        }
+    }
 }

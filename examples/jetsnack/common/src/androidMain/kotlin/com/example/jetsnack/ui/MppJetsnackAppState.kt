@@ -1,8 +1,8 @@
 package com.example.jetsnack.ui
 
 import android.content.res.Resources
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.ScaffoldState
+import androidx.compose.material3.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalConfiguration

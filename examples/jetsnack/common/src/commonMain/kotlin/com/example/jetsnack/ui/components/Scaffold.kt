@@ -16,65 +16,89 @@
 
 package com.example.jetsnack.ui.components
 
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material.DrawerDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FabPosition
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.unit.Dp
+import com.example.jetsnack.model.SnackbarManager
 import com.example.jetsnack.ui.theme.JetsnackTheme
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 
 /**
- * Wrap Material [androidx.compose.material.Scaffold] and set [JetsnackTheme] colors.
+ * Wrap Material [androidx.compose.material3.Scaffold] and set [JetsnackTheme] colors.
  */
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun JetsnackScaffold(
     modifier: Modifier = Modifier,
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    snackBarHostState: SnackbarHostState = remember { SnackbarHostState() },
     topBar: @Composable (() -> Unit) = {},
     bottomBar: @Composable (() -> Unit) = {},
     snackbarHost: @Composable (SnackbarHostState) -> Unit = { SnackbarHost(it) },
     floatingActionButton: @Composable (() -> Unit) = {},
     floatingActionButtonPosition: FabPosition = FabPosition.End,
-    isFloatingActionButtonDocked: Boolean = false,
-    drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
-    drawerShape: Shape = MaterialTheme.shapes.large,
-    drawerElevation: Dp = DrawerDefaults.Elevation,
-    drawerBackgroundColor: Color = JetsnackTheme.colors.uiBackground,
-    drawerContentColor: Color = JetsnackTheme.colors.textSecondary,
-    drawerScrimColor: Color = JetsnackTheme.colors.uiBorder,
     backgroundColor: Color = JetsnackTheme.colors.uiBackground,
     contentColor: Color = JetsnackTheme.colors.textSecondary,
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
         modifier = modifier,
-        scaffoldState = scaffoldState,
         topBar = topBar,
         bottomBar = bottomBar,
-        snackbarHost = snackbarHost,
+        snackbarHost = {
+            snackbarHost(snackBarHostState)
+        },
         floatingActionButton = floatingActionButton,
         floatingActionButtonPosition = floatingActionButtonPosition,
-        isFloatingActionButtonDocked = isFloatingActionButtonDocked,
-        drawerContent = drawerContent,
-        drawerShape = drawerShape,
-        drawerElevation = drawerElevation,
-        drawerBackgroundColor = drawerBackgroundColor,
-        drawerContentColor = drawerContentColor,
-        drawerScrimColor = drawerScrimColor,
-        backgroundColor = backgroundColor,
+        containerColor = backgroundColor,
         contentColor = contentColor,
         content = content
     )
+}
+
+/**
+ * Remember and creates an instance of [JetsnackScaffoldState]
+ */
+@Composable
+fun rememberJetsnackScaffoldState(
+    snackBarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    snackbarManager: SnackbarManager = SnackbarManager,
+    coroutineScope: CoroutineScope = rememberCoroutineScope()
+): JetsnackScaffoldState = remember(snackBarHostState, snackbarManager, coroutineScope) {
+    JetsnackScaffoldState(snackBarHostState, snackbarManager, coroutineScope)
+}
+
+/**
+ * Responsible for holding [ScaffoldState], handles the logic of showing snackbar messages
+ */
+@Stable
+class JetsnackScaffoldState(
+    val snackBarHostState: SnackbarHostState,
+    private val snackbarManager: SnackbarManager,
+    coroutineScope: CoroutineScope
+) {
+    // Process snackbars coming from SnackbarManager
+    init {
+        coroutineScope.launch {
+            snackbarManager.messages.collect { currentMessages ->
+                if (currentMessages.isNotEmpty()) {
+                    val message = currentMessages[0]
+                    val text = currentMessages.toString()//stringResource(message.messageId)
+                    // Notify the SnackbarManager so it can remove the current message from the list
+                    snackbarManager.setMessageShown(message.id)
+                    // Display the snackbar on the screen. `showSnackbar` is a function
+                    // that suspends until the snackbar disappears from the screen
+                    snackBarHostState.showSnackbar(text.toString())
+                }
+            }
+        }
+    }
 }

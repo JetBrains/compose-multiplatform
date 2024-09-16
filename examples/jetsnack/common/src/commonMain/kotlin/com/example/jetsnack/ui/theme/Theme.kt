@@ -17,8 +17,7 @@
 package com.example.jetsnack.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.Colors
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -29,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-//import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val LightColorPalette = JetsnackColors(
     brand = Shadow5,
@@ -100,7 +98,7 @@ fun JetsnackTheme(
 
     ProvideJetsnackColors(colors) {
         MaterialTheme(
-            colors = debugColors(darkTheme),
+//            colors = debugColors(darkTheme),
             typography = Typography,
             shapes = Shapes,
             content = content
@@ -290,21 +288,21 @@ private val LocalJetsnackColors = staticCompositionLocalOf<JetsnackColors> {
  * A Material [Colors] implementation which sets all colors to [debugColor] to discourage usage of
  * [MaterialTheme.colors] in preference to [JetsnackTheme.colors].
  */
-fun debugColors(
-    darkTheme: Boolean,
-    debugColor: Color = Color.Magenta
-) = Colors(
-    primary = debugColor,
-    primaryVariant = debugColor,
-    secondary = debugColor,
-    secondaryVariant = debugColor,
-    background = debugColor,
-    surface = debugColor,
-    error = debugColor,
-    onPrimary = debugColor,
-    onSecondary = debugColor,
-    onBackground = debugColor,
-    onSurface = debugColor,
-    onError = debugColor,
-    isLight = !darkTheme
-)
+//fun debugColors(
+//    darkTheme: Boolean,
+//    debugColor: Color = Color.Magenta
+//) = Colors(
+//    primary = debugColor,
+//    primaryVariant = debugColor,
+//    secondary = debugColor,
+//    secondaryVariant = debugColor,
+//    background = debugColor,
+//    surface = debugColor,
+//    error = debugColor,
+//    onPrimary = debugColor,
+//    onSecondary = debugColor,
+//    onBackground = debugColor,
+//    onSurface = debugColor,
+//    onError = debugColor,
+//    isLight = !darkTheme
+//)

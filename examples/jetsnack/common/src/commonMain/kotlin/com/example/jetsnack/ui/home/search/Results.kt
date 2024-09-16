@@ -16,43 +16,41 @@
 
 package com.example.jetsnack.ui.home.search
 
-//import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.jetsnack.*
-import com.example.jetsnack.model.Filter
+import com.example.common.generated.resources.*
 import com.example.jetsnack.model.Snack
-import com.example.jetsnack.model.snacks
-import com.example.jetsnack.ui.components.FilterBar
-import com.example.jetsnack.ui.components.JetsnackSurface
+import com.example.jetsnack.ui.components.JetsnackButton
+import com.example.jetsnack.ui.components.JetsnackDivider
+import com.example.jetsnack.ui.components.SnackImage
 import com.example.jetsnack.ui.theme.JetsnackTheme
+import com.example.jetsnack.ui.utils.formatPrice
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SearchResults(
     searchResults: List<Snack>,
-    filters: List<Filter>,
-    onSnackClick: (Long) -> Unit
+    onSnackClick: (Long, String) -> Unit
 ) {
     Column {
-        FilterBar(filters, onShowFilters = {})
         Text(
-            text = stringResource(MppR.string.search_count, searchResults.size),
-            style = MaterialTheme.typography.h6,
+            text = stringResource(Res.string.search_count, searchResults.size),
+            style = MaterialTheme.typography.titleLarge,
             color = JetsnackTheme.colors.textPrimary,
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp)
         )
@@ -67,109 +65,72 @@ fun SearchResults(
 @Composable
 private fun SearchResult(
     snack: Snack,
-    onSnackClick: (Long) -> Unit,
+    onSnackClick: (Long, String) -> Unit,
     showDivider: Boolean,
     modifier: Modifier = Modifier
 ) {
-    // TODO: implement Search Result (we don't have ConstrainLayout in Compose MPP)
-//    ConstraintLayout(
-//        modifier = modifier
-//            .fillMaxWidth()
-//            .clickable { onSnackClick(snack.id) }
-//            .padding(horizontal = 24.dp)
-//    ) {
-//        val (divider, image, name, tag, priceSpacer, price, add) = createRefs()
-//        createVerticalChain(name, tag, priceSpacer, price, chainStyle = ChainStyle.Packed)
-//        if (showDivider) {
-//            JetsnackDivider(
-//                Modifier.constrainAs(divider) {
-//                    linkTo(start = parent.start, end = parent.end)
-//                    top.linkTo(parent.top)
-//                }
-//            )
-//        }
-//        SnackImage(
-//            imageUrl = snack.imageUrl,
-//            contentDescription = null,
-//            modifier = Modifier
-//                .size(100.dp)
-//                .constrainAs(image) {
-//                    linkTo(
-//                        top = parent.top,
-//                        topMargin = 16.dp,
-//                        bottom = parent.bottom,
-//                        bottomMargin = 16.dp
-//                    )
-//                    start.linkTo(parent.start)
-//                }
-//        )
-//        Text(
-//            text = snack.name,
-//            style = MaterialTheme.typography.subtitle1,
-//            color = JetsnackTheme.colors.textSecondary,
-//            modifier = Modifier.constrainAs(name) {
-//                linkTo(
-//                    start = image.end,
-//                    startMargin = 16.dp,
-//                    end = add.start,
-//                    endMargin = 16.dp,
-//                    bias = 0f
-//                )
-//            }
-//        )
-//        Text(
-//            text = snack.tagline,
-//            style = MaterialTheme.typography.body1,
-//            color = JetsnackTheme.colors.textHelp,
-//            modifier = Modifier.constrainAs(tag) {
-//                linkTo(
-//                    start = image.end,
-//                    startMargin = 16.dp,
-//                    end = add.start,
-//                    endMargin = 16.dp,
-//                    bias = 0f
-//                )
-//            }
-//        )
-//        Spacer(
-//            Modifier
-//                .height(8.dp)
-//                .constrainAs(priceSpacer) {
-//                    linkTo(top = tag.bottom, bottom = price.top)
-//                }
-//        )
-//        Text(
-//            text = formatPrice(snack.price),
-//            style = MaterialTheme.typography.subtitle1,
-//            color = JetsnackTheme.colors.textPrimary,
-//            modifier = Modifier.constrainAs(price) {
-//                linkTo(
-//                    start = image.end,
-//                    startMargin = 16.dp,
-//                    end = add.start,
-//                    endMargin = 16.dp,
-//                    bias = 0f
-//                )
-//            }
-//        )
-//        JetsnackButton(
-//            onClick = { /* todo */ },
-//            shape = CircleShape,
-//            contentPadding = PaddingValues(0.dp),
-//            modifier = Modifier
-//                .size(36.dp)
-//                .constrainAs(add) {
-//                    linkTo(top = parent.top, bottom = parent.bottom)
-//                    end.linkTo(parent.end)
-//                }
-//        ) {
-//            Icon(
-//                imageVector = Icons.Outlined.Add,
-//                contentDescription = stringResource(R.string.label_add)
-//            )
-//        }
-//    }
+    // Note the original example uses ConstraintLayout, but it's not available in ComposeMultiplatform
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onSnackClick(snack.id, "search") }
+            .padding(horizontal = 24.dp)
+    ) {
+        if (showDivider) {
+            JetsnackDivider()
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Snack Image
+            SnackImage(
+                image = snack.image,
+                contentDescription = null,
+                modifier = Modifier.size(100.dp)
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            // Text Content
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = snack.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = JetsnackTheme.colors.textSecondary
+                )
+                Text(
+                    text = snack.tagline,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = JetsnackTheme.colors.textHelp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = formatPrice(snack.price),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = JetsnackTheme.colors.textPrimary
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            // Add Button
+            JetsnackButton(
+                onClick = { /* TODO: Implement add action */ },
+                shape = CircleShape,
+                contentPadding = PaddingValues(0.dp),
+                modifier = Modifier.size(36.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Add,
+                    contentDescription = stringResource(Res.string.label_add)
+                )
+            }
+        }
+    }
 }
+
 
 @Composable
 fun NoResults(
@@ -184,36 +145,22 @@ fun NoResults(
             .padding(24.dp)
     ) {
         Image(
-            painterResource(MppR.drawable.empty_state_search),
+            painterResource(Res.drawable.empty_state_search),
             contentDescription = null
         )
         Spacer(Modifier.height(24.dp))
         Text(
-            text = stringResource(MppR.string.search_no_matches, query),
-            style = MaterialTheme.typography.subtitle1,
+            text = stringResource(Res.string.search_no_matches, query),
+            style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(16.dp))
         Text(
-            text = stringResource(MppR.string.search_no_matches_retry),
-            style = MaterialTheme.typography.body2,
+            text = stringResource(Res.string.search_no_matches_retry),
+            style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
-    }
-}
-
-//@Preview
-@Composable
-private fun SearchResultPreview() {
-    JetsnackTheme {
-        JetsnackSurface {
-            SearchResult(
-                snack = snacks[0],
-                onSnackClick = { },
-                showDivider = false
-            )
-        }
     }
 }

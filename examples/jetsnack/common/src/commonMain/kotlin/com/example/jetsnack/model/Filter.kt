@@ -16,13 +16,13 @@
 
 package com.example.jetsnack.model
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
+//import androidx.compose.material3.icons.Icons
+//import androidx.compose.material3.icons.filled.Star
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.jetsnack.Android
-import com.example.jetsnack.SortByAlpha
+//import com.example.jetsnack.Android
+//import com.example.jetsnack.SortByAlpha
 
 @Stable
 class Filter(
@@ -45,10 +45,10 @@ val priceFilters = listOf(
     Filter(name = "$$$"),
     Filter(name = "$$$$")
 )
-val sortFilters = listOf(
-    Filter(name = "Android's favorite (default)", icon = Icons.Filled.Android),
-    Filter(name = "Rating", icon = Icons.Filled.Star),
-    Filter(name = "Alphabetical", icon = Icons.Filled.SortByAlpha)
+val sortFilters = listOf<Filter>(
+    Filter(name = "Android's favorite (default)"),
+    Filter(name = "Rating",),
+    Filter(name = "Alphabetical",)
 )
 
 val categoryFilters = listOf(

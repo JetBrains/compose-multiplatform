@@ -16,108 +16,137 @@
 
 package com.example.jetsnack.ui.home
 
-import androidx.compose.animation.ExperimentalAnimationApi
-//import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Slider
-import androidx.compose.material.SliderDefaults
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.jetsnack.*
-import com.example.jetsnack.flowlayout.FlowMainAxisAlignment
-import com.example.jetsnack.flowlayout.FlowRow
+import com.example.common.generated.resources.*
+import com.example.common.generated.resources.Res
+import com.example.common.generated.resources.close
+import com.example.common.generated.resources.label_filters
+import com.example.common.generated.resources.reset
 import com.example.jetsnack.model.Filter
 import com.example.jetsnack.model.SnackRepo
+import com.example.jetsnack.ui.FilterSharedElementKey
 import com.example.jetsnack.ui.components.FilterChip
-import com.example.jetsnack.ui.components.JetsnackScaffold
 import com.example.jetsnack.ui.theme.JetsnackTheme
+import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun FilterScreen(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     onDismiss: () -> Unit
 ) {
     var sortState by remember { mutableStateOf(SnackRepo.getSortDefault()) }
-    var maxCalories by remember { mutableStateOf(0f) }
+    var maxCalories by remember { mutableFloatStateOf(0f) }
     val defaultFilter = SnackRepo.getSortDefault()
 
-    SnackDialog(onCloseRequest = onDismiss) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) {
+                // capture click
+            }
+    ) {
         val priceFilters = remember { SnackRepo.getPriceFilters() }
         val categoryFilters = remember { SnackRepo.getCategoryFilters() }
         val lifeStyleFilters = remember { SnackRepo.getLifeStyleFilters() }
-        JetsnackScaffold(
-            topBar = {
-                TopAppBar(
-                    navigationIcon = {
-                        IconButton(onClick = onDismiss) {
-                            Icon(
-                                imageVector = Icons.Filled.Close,
-                                contentDescription = stringResource(id = MppR.string.close)
-                            )
-                        }
-                    },
-                    title = {
-                        Text(
-                            text = stringResource(id = MppR.string.label_filters),
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.h6
-                        )
-                    },
-                    actions = {
-                        var resetEnabled = sortState != defaultFilter
-                        IconButton(
-                            onClick = { /* TODO: Open search */ },
-                            enabled = resetEnabled
-                        ) {
-                            val alpha = if (resetEnabled) {
-                                ContentAlpha.high
-                            } else {
-                                ContentAlpha.disabled
-                            }
-                            CompositionLocalProvider(LocalContentAlpha provides alpha) {
-                                Text(
-                                    text = stringResource(id = MppR.string.reset),
-                                    style = MaterialTheme.typography.body2
-                                )
-                            }
-                        }
-                    },
-                    backgroundColor = JetsnackTheme.colors.uiBackground
-                )
-            }
-        ) {
+        Spacer(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f))
+                .clickable(
+                    indication = null,
+                    interactionSource = remember { MutableInteractionSource() }
+                ) {
+                    onDismiss()
+                }
+        )
+        with(sharedTransitionScope) {
             Column(
                 Modifier
-                    .fillMaxSize()
+                    .padding(16.dp)
+                    .align(Alignment.Center)
+                    .clip(MaterialTheme.shapes.medium)
+                    .sharedBounds(
+                        rememberSharedContentState(FilterSharedElementKey),
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
+                        clipInOverlayDuringTransition = OverlayClip(MaterialTheme.shapes.medium)
+                    )
+                    .wrapContentSize()
+                    .heightIn(max = 450.dp)
                     .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) { }
+                    .background(JetsnackTheme.colors.uiFloated)
+                    .padding(horizontal = 24.dp, vertical = 16.dp)
+                    .skipToLookaheadSize(),
             ) {
+                Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = stringResource(Res.string.close)
+                        )
+                    }
+                    Text(
+                        text = stringResource(Res.string.label_filters),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight()
+                            .padding(top = 8.dp, end = 48.dp),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    val resetEnabled = sortState != defaultFilter
+
+                    IconButton(
+                        onClick = { /* TODO: Open search */ },
+                        enabled = resetEnabled
+                    ) {
+                        val fontWeight = if (resetEnabled) {
+                            FontWeight.Bold
+                        } else {
+                            FontWeight.Normal
+                        }
+
+                        Text(
+                            text = stringResource(Res.string.reset),
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = fontWeight,
+                            color = JetsnackTheme.colors.uiBackground
+                                .copy(alpha = if (!resetEnabled) 0.38f else 1f)
+                        )
+                    }
+                }
+
                 SortFiltersSection(
                     sortState = sortState,
                     onFilterChange = { filter ->
@@ -125,11 +154,11 @@ fun FilterScreen(
                     }
                 )
                 FilterChipSection(
-                    title = stringResource(id = MppR.string.price),
+                    title = stringResource(Res.string.price),
                     filters = priceFilters
                 )
                 FilterChipSection(
-                    title = stringResource(id = MppR.string.category),
+                    title = stringResource(Res.string.category),
                     filters = categoryFilters
                 )
 
@@ -140,7 +169,7 @@ fun FilterScreen(
                     }
                 )
                 FilterChipSection(
-                    title = stringResource(id = MppR.string.lifestyle),
+                    title = stringResource(Res.string.lifestyle),
                     filters = lifeStyleFilters
                 )
             }
@@ -148,15 +177,11 @@ fun FilterScreen(
     }
 }
 
-@Composable
-expect fun SnackDialog(onCloseRequest: () -> Unit, content: @Composable () -> Unit)
-
-
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FilterChipSection(title: String, filters: List<Filter>) {
     FilterTitle(text = title)
-    FlowRow(
-        mainAxisAlignment = FlowMainAxisAlignment.Center,
+    androidx.compose.foundation.layout.FlowRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 12.dp, bottom = 16.dp)
@@ -173,7 +198,7 @@ fun FilterChipSection(title: String, filters: List<Filter>) {
 
 @Composable
 fun SortFiltersSection(sortState: String, onFilterChange: (Filter) -> Unit) {
-    FilterTitle(text = stringResource(id = MppR.string.sort))
+    FilterTitle(text = stringResource(Res.string.sort))
     Column(Modifier.padding(bottom = 24.dp)) {
         SortFilters(
             sortState = sortState,
@@ -201,13 +226,14 @@ fun SortFilters(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MaxCalories(sliderPosition: Float, onValueChanged: (Float) -> Unit) {
-    FlowRow {
-        FilterTitle(text = stringResource(id = MppR.string.max_calories))
+    androidx.compose.foundation.layout.FlowRow {
+        FilterTitle(text = stringResource(Res.string.max_calories))
         Text(
-            text = stringResource(id = MppR.string.per_serving),
-            style = MaterialTheme.typography.body2,
+            text = stringResource(Res.string.per_serving),
+            style = MaterialTheme.typography.bodyMedium,
             color = JetsnackTheme.colors.brand,
             modifier = Modifier.padding(top = 5.dp, start = 10.dp)
         )
@@ -223,7 +249,8 @@ fun MaxCalories(sliderPosition: Float, onValueChanged: (Float) -> Unit) {
             .fillMaxWidth(),
         colors = SliderDefaults.colors(
             thumbColor = JetsnackTheme.colors.brand,
-            activeTrackColor = JetsnackTheme.colors.brand
+            activeTrackColor = JetsnackTheme.colors.brand,
+            inactiveTrackColor = JetsnackTheme.colors.iconInteractive
         )
     )
 }
@@ -232,11 +259,12 @@ fun MaxCalories(sliderPosition: Float, onValueChanged: (Float) -> Unit) {
 fun FilterTitle(text: String) {
     Text(
         text = text,
-        style = MaterialTheme.typography.h6,
+        style = MaterialTheme.typography.titleLarge,
         color = JetsnackTheme.colors.brand,
         modifier = Modifier.padding(bottom = 8.dp)
     )
 }
+
 @Composable
 fun SortOption(
     text: String,
@@ -254,7 +282,7 @@ fun SortOption(
         }
         Text(
             text = text,
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleMedium,
             modifier = Modifier
                 .padding(start = 10.dp)
                 .weight(1f)
@@ -267,9 +295,4 @@ fun SortOption(
             )
         }
     }
-}
-//@Preview
-@Composable
-fun FilterScreenPreview() {
-    FilterScreen(onDismiss = {})
 }

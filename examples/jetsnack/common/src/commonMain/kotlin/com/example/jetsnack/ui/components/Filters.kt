@@ -16,26 +16,24 @@
 
 package com.example.jetsnack.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.animateColorAsState
-//import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.FilterList
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -44,40 +42,54 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-import com.example.jetsnack.FilterList
-import com.example.jetsnack.MppR
-import com.example.jetsnack.label_filters
+import com.example.common.generated.resources.Res
+import com.example.common.generated.resources.label_filters
 import com.example.jetsnack.model.Filter
-import com.example.jetsnack.stringResource
+import com.example.jetsnack.ui.FilterSharedElementKey
 import com.example.jetsnack.ui.theme.JetsnackTheme
+import org.jetbrains.compose.resources.stringResource
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun FilterBar(
     filters: List<Filter>,
-    onShowFilters: () -> Unit
+    onShowFilters: () -> Unit,
+    filterScreenVisible: Boolean,
+    sharedTransitionScope: SharedTransitionScope
 ) {
-
-    LazyRow(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = PaddingValues(start = 12.dp, end = 8.dp),
-        modifier = Modifier.heightIn(min = 56.dp)
-    ) {
-        item {
-            IconButton(onClick = onShowFilters) {
-                Icon(
-                    imageVector = Icons.Rounded.FilterList,
-                    tint = JetsnackTheme.colors.brand,
-                    contentDescription = stringResource(MppR.string.label_filters),
-                    modifier = Modifier.diagonalGradientBorder(
-                        colors = JetsnackTheme.colors.interactiveSecondary,
-                        shape = CircleShape
-                    )
-                )
+    with(sharedTransitionScope) {
+        LazyRow(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(start = 12.dp, end = 8.dp),
+            modifier = Modifier.heightIn(min = 56.dp)
+        ) {
+            item {
+                AnimatedVisibility(visible = !filterScreenVisible) {
+                    IconButton(
+                        onClick = onShowFilters,
+                        modifier = Modifier
+                            .sharedBounds(
+                                rememberSharedContentState(FilterSharedElementKey),
+                                animatedVisibilityScope = this@AnimatedVisibility,
+                                resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds
+                            )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.FilterList,
+                            tint = JetsnackTheme.colors.brand,
+                            contentDescription = stringResource(Res.string.label_filters),
+                            modifier = Modifier.diagonalGradientBorder(
+                                colors = JetsnackTheme.colors.interactiveSecondary,
+                                shape = CircleShape
+                            )
+                        )
+                    }
+                }
             }
-        }
-        items(filters) { filter ->
-            FilterChip(filter = filter, shape = MaterialTheme.shapes.small)
+            items(filters) { filter ->
+                FilterChip(filter = filter, shape = MaterialTheme.shapes.small)
+            }
         }
     }
 }
@@ -90,7 +102,8 @@ fun FilterChip(
 ) {
     val (selected, setSelected) = filter.enabled
     val backgroundColor by animateColorAsState(
-        if (selected) JetsnackTheme.colors.brandSecondary else JetsnackTheme.colors.uiBackground
+        if (selected) JetsnackTheme.colors.brandSecondary else JetsnackTheme.colors.uiBackground,
+        label = "background color"
     )
     val border = Modifier.fadeInDiagonalGradientBorder(
         showBorder = !selected,
@@ -98,11 +111,12 @@ fun FilterChip(
         shape = shape
     )
     val textColor by animateColorAsState(
-        if (selected) Color.Black else JetsnackTheme.colors.textSecondary
+        if (selected) Color.Black else JetsnackTheme.colors.textSecondary,
+        label = "text color"
     )
 
     JetsnackSurface(
-        modifier = modifier.height(28.dp),
+        modifier = modifier,
         color = backgroundColor,
         contentColor = textColor,
         shape = shape,
@@ -134,7 +148,7 @@ fun FilterChip(
         ) {
             Text(
                 text = filter.name,
-                style = MaterialTheme.typography.caption,
+                style = MaterialTheme.typography.bodySmall,
                 maxLines = 1,
                 modifier = Modifier.padding(
                     horizontal = 20.dp,
@@ -142,21 +156,5 @@ fun FilterChip(
                 )
             )
         }
-    }
-}
-
-//@Preview
-@Composable
-private fun FilterDisabledPreview() {
-    JetsnackTheme {
-        FilterChip(Filter(name = "Demo", enabled = false), Modifier.padding(4.dp))
-    }
-}
-
-//@Preview
-@Composable
-private fun FilterEnabledPreview() {
-    JetsnackTheme {
-        FilterChip(Filter(name = "Demo", enabled = true))
     }
 }
