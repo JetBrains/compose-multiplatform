@@ -92,16 +92,3 @@ fun JetsnackGradientTintedIconButton(
         )
     }
 }
-
-//@Preview
-@Composable
-private fun GradientTintedIconButtonPreview() {
-    JetsnackTheme {
-//        JetsnackGradientTintedIconButton(
-//            imageVector = Icons.Default.Add,
-//            onClick = {},
-//            contentDescription = "Demo",
-//            modifier = Modifier.padding(4.dp)
-//        )
-    }
-}

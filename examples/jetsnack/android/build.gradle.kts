@@ -13,6 +13,7 @@ repositories {
 }
 
 dependencies {
+    implementation(compose.components.resources)
     implementation(project(":common"))
     implementation("androidx.activity:activity-compose:1.5.0")
 }
