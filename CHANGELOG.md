@@ -1,5 +1,5 @@
 # 1.7.0-rc01 (September 2024)
-_Changes since release/1.7.0-beta02_
+_Changes since 1.7.0-beta02_
 
 ## Highlights
 ### Web
