@@ -113,14 +113,15 @@ fun commitToVersion(commit: String) =
  */
 fun ChangelogEntry.format(): String {
     return if (link != null) {
-        val linkStartIndex = max(
+        val linkStartIndex = maxOf(
             message.indexOfFirst { !it.isWhitespace() && it != '-' }.ifNegative { 0 },
             message.endIndexOf("_(prerelease fix)_ ").ifNegative { 0 },
+            message.endIndexOf("(prerelease fix) ").ifNegative { 0 },
         )
         val linkLastIndex = message.indexOfAny(listOf(". ", " (")).ifNegative { message.length }
 
         val beforeLink = message.substring(0, linkStartIndex)
-        val inLink = message.substring(linkStartIndex, linkLastIndex)
+        val inLink = message.substring(linkStartIndex, linkLastIndex).removeLinks()
         val afterLink = message.substring(linkLastIndex, message.length)
 
         "$beforeLink[$inLink]($link)$afterLink"
@@ -138,6 +139,15 @@ fun String.endIndexOf(value: String): Int = indexOf(value).let {
         it
     }
 }
+
+/**
+ * Converts:
+ * Message (title)[some link], message
+ *
+ * to:
+ * Message title, message
+ */
+fun String.removeLinks(): String = replace(Regex("\\[([^)]*)\\]\\([^\\]]*\\)"), "$1")
 
 /**
  * Extract by format https://github.com/JetBrains/compose-multiplatform/blob/b32350459acceb9cca6b9e4422b7aaa051d9ae7d/.github/PULL_REQUEST_TEMPLATE.md?plain=1
