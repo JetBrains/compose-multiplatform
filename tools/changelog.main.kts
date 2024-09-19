@@ -28,6 +28,7 @@ import java.io.File
 import java.io.IOException
 import java.net.URL
 import java.util.concurrent.TimeUnit
+import kotlin.math.max
 
 val firstCommit = args.getOrNull(0) ?: error("Please call this way: kotlin changelog.main.kts <firstCommit> <lastCommit>")
 val lastCommit = args.getOrNull(1) ?: error("Please call this way: kotlin changelog.main.kts <firstCommit> <lastCommit>")
@@ -56,8 +57,8 @@ val subsectionOrder = listOf(
 
 // TODO automate or pass as arguments
 // Exclude cherry-picked commits to the previous versions
-val excludeFirstCommit = "v1.6.10-rc01"
-val excludeLastCommit = "v1.6.11"
+val excludeFirstCommit = "v1.6.11"
+val excludeLastCommit = "v1.7.0-beta02"
 
 if (token == null) {
     println("To increase the rate limit, specify token (https://github.com/settings/tokens): kotlin changelog.main.kts <firstCommit> <lastCommit> TOKEN")
@@ -103,7 +104,40 @@ fun commitToVersion(commit: String) =
         commit
     }
 
-fun ChangelogEntry.format() = if (link != null) "$message ([link]($link))" else message
+/**
+ * Formats:
+ * - A new approach to implementation of `platformLayers`. Now extra layers (such as Dialogs and Popups) drawing is merged into a single screen size canvas.
+ *
+ * to:
+ * - [A new approach to implementation of `platformLayers`](link). Now extra layers (such as Dialogs and Popups) drawing is merged into a single screen size canvas.
+ */
+fun ChangelogEntry.format(): String {
+    return if (link != null) {
+        val linkStartIndex = max(
+            message.indexOfFirst { !it.isWhitespace() && it != '-' }.ifNegative { 0 },
+            message.endIndexOf("_(prerelease fix)_ ").ifNegative { 0 },
+        )
+        val linkLastIndex = message.indexOfAny(listOf(". ", " (")).ifNegative { message.length }
+
+        val beforeLink = message.substring(0, linkStartIndex)
+        val inLink = message.substring(linkStartIndex, linkLastIndex)
+        val afterLink = message.substring(linkLastIndex, message.length)
+
+        "$beforeLink[$inLink]($link)$afterLink"
+    } else {
+        message
+    }
+}
+
+fun Int.ifNegative(value: () -> Int): Int = if (this < 0) value() else this
+
+fun String.endIndexOf(value: String): Int = indexOf(value).let {
+    if (it >= 0)  {
+        it + value.length
+    } else {
+        it
+    }
+}
 
 /**
  * Extract by format https://github.com/JetBrains/compose-multiplatform/blob/b32350459acceb9cca6b9e4422b7aaa051d9ae7d/.github/PULL_REQUEST_TEMPLATE.md?plain=1
@@ -134,7 +168,7 @@ fun GitHubPullEntry.extractReleaseNotes(link: String): List<ChangelogEntry> {
             subsection = s.substringAfter("-", "").trim().ifEmpty { null }
         } else if (section != null && line.isNotBlank()) {
             val isTopLevel = line.startsWith("-")
-            val trimmedLine = line.removeSuffix(".")
+            val trimmedLine = line.trimEnd().removeSuffix(".")
             list.add(
                 ChangelogEntry(
                     trimmedLine,
@@ -166,7 +200,6 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
     }
 
     fun changelogEntriesFor(
-        commit: GitHubCompareResponse.CommitEntry,
         pullRequest: GitHubPullEntry?
     ): List<ChangelogEntry> {
         return if (pullRequest != null) {
@@ -174,8 +207,9 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
             val prNumber = pullRequest.number
             val prLink = "https://github.com/$repo/pull/$prNumber"
             val prList = pullRequest.extractReleaseNotes(prLink)
+            val changelogMessage = "- $prTitle"
             prList.ifEmpty {
-                listOf(ChangelogEntry(prTitle, null, null, prLink))
+                listOf(ChangelogEntry(changelogMessage, null, null, prLink))
             }
         } else {
             listOf()
@@ -198,7 +232,7 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
     // Exclude cherry-picks with the same message (they have a different SHA, we can compare by it)
     val nonCherrypickedCommits = commits.filter { it.commitId() !in excludedCommitIds }
 
-    return nonCherrypickedCommits.flatMap { changelogEntriesFor(it, prForCommit(it)) }
+    return nonCherrypickedCommits.flatMap { changelogEntriesFor(prForCommit(it)) }
 }
 
 /**
