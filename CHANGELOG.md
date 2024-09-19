@@ -10,7 +10,7 @@ _Changes since 1.7.0-beta02_
 - [Support Kotlin 1.9.25](https://github.com/JetBrains/compose-multiplatform/pull/5141)
 
 ### Desktop
-- _(prerelease fix)_ [The `decoration` parameter added to `Window` and `DialogWindow`, and the APIs related to, it are now marked as experimental](https://github.com/JetBrains/compose-multiplatform-core/pull/1561)
+- _(prerelease fix)_ [The `decoration` parameter added to `Window` and `DialogWindow` and the APIs related to it are now marked as experimental](https://github.com/JetBrains/compose-multiplatform-core/pull/1561)
 
 ### Gradle Plugin
 - [New `compose.material3AdaptiveNavigationSuite` shortcut in the gradle plugin](https://github.com/JetBrains/compose-multiplatform/pull/5133)
@@ -25,7 +25,7 @@ _Changes since 1.7.0-beta02_
 
 ### iOS
 - _(prerelease fix)_ [Fix "ListDetailPaneScaffold from material3-adaptive throws ArrayIndexOutOfBoundsException"](https://github.com/JetBrains/compose-multiplatform-core/pull/1548)
-- _(prerelease fix)_ [Fix compose scene scale to match iOS natural screen scale](https://github.com/JetBrains/compose-multiplatform-core/pull/1547)
+- _(prerelease fix)_ [Fix "White bars on sides on some devices"](https://github.com/JetBrains/compose-multiplatform-core/pull/1547)
 - [Fix offset issues with keyboard and `TextField`](https://github.com/JetBrains/compose-multiplatform-core/pull/1523)
 - [Fix "Incorrect `imePadding` and high cpu usage when repeatedly opening and closing `Keyboard` on iOS"](https://github.com/JetBrains/compose-multiplatform-core/pull/1523)
 - [Fix "Selection handlers in wrong positions in a fullscreen TextField"](https://github.com/JetBrains/compose-multiplatform-core/pull/1523)
@@ -33,11 +33,11 @@ _Changes since 1.7.0-beta02_
 - _(prerelease fix)_ [Fix missing interop views with new `onReset` argument and placing inside more complex reusable layout inside `Lazy*` lists](https://github.com/JetBrains/compose-multiplatform-core/pull/1560)
 
 ### Desktop
-- [Fix bounds of ComposePanel in IntelliJ on macOs](https://github.com/JetBrains/compose-multiplatform-core/pull/1571)
-- [Fixed UI glitch when resizing a Compose window via its `WindowState`](https://github.com/JetBrains/compose-multiplatform-core/pull/1565)
+- [Fix bounds of `ComposePanel` in IntelliJ on macOs](https://github.com/JetBrains/compose-multiplatform-core/pull/1571)
+- [Fix UI glitch when resizing a Compose window via its `WindowState`](https://github.com/JetBrains/compose-multiplatform-core/pull/1565)
 
 ### Web
-- [Prevent a crash on mobile web when selecting some text in SelectionContainer](https://github.com/JetBrains/compose-multiplatform-core/pull/1551)
+- [Prevent a crash on mobile web when selecting some text in `SelectionContainer`](https://github.com/JetBrains/compose-multiplatform-core/pull/1551)
 
 ### Navigation
 - _(prerelease fix)_ [Fix `IllegalArgumentException` on putting lists into `savedStateHandle`](https://github.com/JetBrains/compose-multiplatform-core/pull/1546)
