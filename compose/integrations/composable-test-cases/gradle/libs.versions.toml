@@ -1,5 +1,5 @@
 [versions]
-kotlin="2.0.20-RC"
+kotlin="2.0.20"
 
 [plugins]
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
