@@ -20,29 +20,18 @@ _Changes since release/1.7.0-beta01_
 - [The thickness of border resizers in undecorated windows and dialogs can now be controlled by passing a new `decoration` argument](https://github.com/JetBrains/compose-multiplatform-core/pull/1505)
 
 ## Fixes
-### Multiple Platforms
-- _(prerelease fix)_ [Fix `GraphicsLayer` perspective matrix calculation and missing invalidations](https://github.com/JetBrains/compose-multiplatform-core/pull/1541)
-- _(prerelease fix)_ [Fix Wasm/Native ArrayIndexOutOfBoundsException exception in adaptive-layout module](https://github.com/JetBrains/compose-multiplatform-core/pull/1545)
-
-### iOS
-- [A new approach to implementation of `platformLayers`.](https://github.com/JetBrains/compose-multiplatform-core/pull/1515) Now extra layers (such as Dialogs and Popups) drawing is merged into a single screen size canvas. No jittering and crashes should happen with those anymore.
-- [`Dialog`s and `Popup`s now have their insets calculated correctly even when the frame of `ComposeUIViewController` spawning them doesn't intersect any safe areas](https://github.com/JetBrains/compose-multiplatform-core/pull/1515)
-
-### Desktop
-- _(prerelease fix)_ [Fix "Moving after initiating a click cancels it"](https://github.com/JetBrains/compose-multiplatform-core/pull/1534)
-
-### Resources
-- _(prerelease fix)_ [Fix Cocoapods resources integration which leaded to a lack resources in iOS apps](https://github.com/JetBrains/compose-multiplatform/pull/5128)
-
-### Gradle Plugin
-- [Fix a gradle project misconfiguration when KSP and Room are used](https://github.com/JetBrains/compose-multiplatform/pull/5129)
-
-### Lifecycle
-- Lifecycle 2.8.2 depends on Compose 1.6.11 (Lifecycle 2.8.1 accidentaly made dependent on Compose 1.7.0-beta01)
-
-### Navigation
-- _(prerelease fix)_ [Fix saving state for nested `NavHostController`](https://github.com/JetBrains/compose-multiplatform-core/pull/1508)
-- _(prerelease fix)_ [Fixed missing commonization for type-safe version of `SavedStateHandle.toRoute`](https://github.com/JetBrains/compose-multiplatform-core/pull/1521)
+- [CMP-5066](https://youtrack.jetbrains.com/issue/)
+- [CMP-5892](https://youtrack.jetbrains.com/issue/)
+- [CMP-5939](https://youtrack.jetbrains.com/issue/)
+- [CMP-6558](https://youtrack.jetbrains.com/issue/)
+- [CMP-6576](https://youtrack.jetbrains.com/issue/)
+- [CMP-1230](https://youtrack.jetbrains.com/issue/)
+- [CMP-1230](https://youtrack.jetbrains.com/issue/)
+- [CMP-5069](https://youtrack.jetbrains.com/issue/)
+- [CMP-4303](https://youtrack.jetbrains.com/issue/)
+- [CMP-5835](https://youtrack.jetbrains.com/issue/)
+- [CMP-1403](https://youtrack.jetbrains.com/issue/)
+- [CMP-4735](https://youtrack.jetbrains.com/issue/)
 
 ## Dependencies
 - Gradle Plugin `org.jetbrains.compose`, version `1.7.0-beta02`. Based on Jetpack Compose libraries:
