@@ -20,18 +20,18 @@ _Changes since release/1.7.0-beta01_
 - [The thickness of border resizers in undecorated windows and dialogs can now be controlled by passing a new `decoration` argument](https://github.com/JetBrains/compose-multiplatform-core/pull/1505)
 
 ## Fixes
-- [CMP-5066](https://youtrack.jetbrains.com/issue/)
-- [CMP-5892](https://youtrack.jetbrains.com/issue/)
-- [CMP-5939](https://youtrack.jetbrains.com/issue/)
-- [CMP-6558](https://youtrack.jetbrains.com/issue/)
-- [CMP-6576](https://youtrack.jetbrains.com/issue/)
-- [CMP-1230](https://youtrack.jetbrains.com/issue/)
-- [CMP-1230](https://youtrack.jetbrains.com/issue/)
-- [CMP-5069](https://youtrack.jetbrains.com/issue/)
-- [CMP-4303](https://youtrack.jetbrains.com/issue/)
-- [CMP-5835](https://youtrack.jetbrains.com/issue/)
-- [CMP-1403](https://youtrack.jetbrains.com/issue/)
-- [CMP-4735](https://youtrack.jetbrains.com/issue/)
+- [CMP-5066](https://youtrack.jetbrains.com/issue/CMP-5066) (PR)[https://github.com/JetBrains/compose-multiplatform-core/pull/1496]
+- [CMP-5892](https://youtrack.jetbrains.com/issue/CMP-5892) (PR)[https://github.com/JetBrains/compose-multiplatform-core/pull/1496]
+- [CMP-5939](https://youtrack.jetbrains.com/issue/CMP-5939) (PR)[https://github.com/JetBrains/compose-multiplatform-core/pull/1496]
+- [CMP-6558](https://youtrack.jetbrains.com/issue/CMP-6558) (PR)[https://github.com/JetBrains/compose-multiplatform-core/pull/1496]
+- [CMP-6576](https://youtrack.jetbrains.com/issue/CMP-6576) (PR)[https://github.com/JetBrains/compose-multiplatform-core/pull/1496]
+- [CMP-1230](https://youtrack.jetbrains.com/issue/CMP-1230) (PR)[https://github.com/JetBrains/compose-multiplatform-core/pull/1496]
+- [CMP-1230](https://youtrack.jetbrains.com/issue/CMP-1230) (PR)[https://github.com/JetBrains/compose-multiplatform-core/pull/1496]
+- [CMP-5069](https://youtrack.jetbrains.com/issue/CMP-5069) (PR)[https://github.com/JetBrains/compose-multiplatform-core/pull/1496]
+- [CMP-4303](https://youtrack.jetbrains.com/issue/CMP-4303) (PR)[https://github.com/JetBrains/compose-multiplatform-core/pull/1496]
+- [CMP-5835](https://youtrack.jetbrains.com/issue/CMP-5835) (PR)[https://github.com/JetBrains/compose-multiplatform-core/pull/1496]
+- [CMP-1403](https://youtrack.jetbrains.com/issue/CMP-1403) (PR)[https://github.com/JetBrains/compose-multiplatform-core/pull/1496]
+- [CMP-4735](https://youtrack.jetbrains.com/issue/CMP-4735) (PR)[https://github.com/JetBrains/compose-multiplatform-core/pull/1496]
 
 ## Dependencies
 - Gradle Plugin `org.jetbrains.compose`, version `1.7.0-beta02`. Based on Jetpack Compose libraries:
