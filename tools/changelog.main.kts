@@ -198,15 +198,17 @@ fun GitHubPullEntry.extractReleaseNotes(link: String): List<ChangelogEntry> {
  *        JetBrains/compose-multiplatform-core
  */
 fun entriesForRepo(repo: String): List<ChangelogEntry> {
-    val pullNumberToPull = (1..5)
+    val pulls = (1..5)
         .flatMap {
             request<Array<GitHubPullEntry>>("https://api.github.com/repos/$repo/pulls?state=closed&per_page=100&page=$it").toList()
         }
-        .associateBy { it.number }
+
+    val pullNumberToPull = pulls.associateBy { it.number }
+    val pullTitleToPull = pulls.associateBy { it.title }
 
     fun prForCommit(commit: GitHubCompareResponse.CommitEntry): GitHubPullEntry? {
-        val repoNumber = repoNumberForCommit(commit)
-        return pullNumberToPull[repoNumber]
+        val (repoTitle, repoNumber) = repoTitleAndNumberForCommit(commit)
+        return repoNumber?.let(pullNumberToPull::get) ?: pullTitleToPull[repoTitle]
     }
 
     fun changelogEntriesFor(
@@ -231,7 +233,7 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
             .commits
     }.toSet()
 
-    fun GitHubCompareResponse.CommitEntry.commitId() = repoNumberForCommit(this)?.toString() ?: sha
+    fun GitHubCompareResponse.CommitEntry.commitId() = prForCommit(this)?.number?.toString() ?: sha
 
     val excludedCommitIds = fetchPagedUntilEmpty { page ->
         request<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$excludeFirstCommit...$excludeLastCommit?per_page=1000&page=$page")
@@ -248,14 +250,12 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
 /**
  * Extract the PR number from the commit.
  */
-fun repoNumberForCommit(commit: GitHubCompareResponse.CommitEntry): Int? {
+fun repoTitleAndNumberForCommit(commit: GitHubCompareResponse.CommitEntry): Pair<String, Int?> {
     val commitTitle = commit.commit.message.substringBefore("\n")
     // check title similar to `Fix import android flavors with compose resources (#4319)`
-    return if (commitTitle.contains(" (#")) {
-        commitTitle.substringAfter(" (#").substringBefore(")").toIntOrNull()
-    } else {
-        null
-    }
+    val title = commitTitle.substringBeforeLast(" (#")
+    val number = commitTitle.substringAfterLast(" (#").substringBefore(")").toIntOrNull()
+    return title to number
 }
 
 data class ChangelogEntry(
