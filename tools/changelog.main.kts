@@ -94,9 +94,9 @@ fun getChangelog(firstCommit: String, lastCommit: String): String {
     val entries = entriesForRepo("JetBrains/compose-multiplatform-core", firstCommit, lastCommit) +
             entriesForRepo("JetBrains/compose-multiplatform", firstCommit, lastCommit)
 
-    println("\n# ${commitToVersion(lastCommit)} (${currentChangelogDate()})")
-
     return buildString {
+        appendLine("# ${commitToVersion(lastCommit)} (${currentChangelogDate()})")
+
         appendLine()
         appendLine("_Changes since ${commitToVersion(firstCommit)}_")
         appendLine()
@@ -139,6 +139,9 @@ fun getChangelog(firstCommit: String, lastCommit: String): String {
                 ___
             """.trimIndent()
         )
+
+        appendLine()
+        appendLine()
     }
 }
 
