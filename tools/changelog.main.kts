@@ -31,29 +31,30 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
-import javax.swing.text.html.HTML.Tag.HEAD
 
 //region ========================================== CONSTANTS =========================================
 
-val sectionOrder = listOf(
+// Sections from the template https://github.com/JetBrains/compose-multiplatform/blob/master/.github/PULL_REQUEST_TEMPLATE.md?plain=1
+// Changelog should contain only these categories
+
+val standardSections = listOf(
     "Highlights",
     "Known issues",
     "Breaking changes",
     "Features",
     "Fixes",
-    null
 )
 
-val subsectionOrder = listOf(
+val standardSubsections = listOf(
     "Multiple Platforms",
     "iOS",
     "Desktop",
     "Web",
+    "Android",
     "Resources",
     "Gradle Plugin",
     "Lifecycle",
     "Navigation",
-    null
 )
 
 val changelogFile = __FILE__.resolve("../../CHANGELOG.md")
@@ -86,9 +87,10 @@ println("Generating changelog between $previousVersion and $currentVersion")
 val newChangelog = getChangelog("v$previousVersion", versionCommit)
 
 changelogFile.writeText(
-    getChangelog("v$previousVersion", versionCommit) + previousChangelog
+    newChangelog + previousChangelog
 )
 
+println()
 println("CHANGELOG.md changed")
 
 
@@ -144,6 +146,19 @@ fun getChangelog(firstCommit: String, lastCommit: String): String {
 
         appendLine()
         appendLine()
+
+        val nonstandardSections = entries.mapNotNull { it.section }.toSet() - standardSections
+        val nonstandardSubsections = entries.mapNotNull { it.subsection }.toSet() - standardSubsections
+
+        if (nonstandardSections.isNotEmpty()) {
+            println()
+            println("WARNING! Changelog contains nonstandard sections. Please change them to the standard ones, or enhance the list in the PR template. List:\n${nonstandardSections.joinToString("\n")}")
+        }
+
+        if (nonstandardSubsections.isNotEmpty()) {
+            println()
+            println("WARNING! Changelog contains nonstandard subsections. Please change them to the standard ones, or enhance the list in the PR template. List:\n${nonstandardSubsections.joinToString("\n")}")
+        }
     }
 }
 
@@ -208,7 +223,7 @@ fun String.endIndexOf(value: String): Int = indexOf(value).let {
 fun String.removeLinks(): String = replace(Regex("\\[([^)]*)\\]\\([^\\]]*\\)"), "$1")
 
 /**
- * Extract by format https://github.com/JetBrains/compose-multiplatform/blob/b32350459acceb9cca6b9e4422b7aaa051d9ae7d/.github/PULL_REQUEST_TEMPLATE.md?plain=1
+ * Extract by format https://github.com/JetBrains/compose-multiplatform/blob/master/.github/PULL_REQUEST_TEMPLATE.md?plain=1
  */
 fun GitHubPullEntry.extractReleaseNotes(link: String): List<ChangelogEntry> {
     // extract body inside "## Release Notes"
@@ -325,8 +340,8 @@ data class ChangelogEntry(
     val link: String?,
 )
 
-fun ChangelogEntry.sectionOrder(): Int = sectionOrder.indexOf(section)
-fun ChangelogEntry.subsectionOrder(): Int = subsectionOrder.indexOf(subsection)
+fun ChangelogEntry.sectionOrder(): Int = section?.let(standardSections::indexOf) ?: standardSections.size
+fun ChangelogEntry.subsectionOrder(): Int = section?.let(standardSubsections::indexOf) ?: standardSubsections.size
 fun ChangelogEntry.sectionName(): String = section ?: "Unknown"
 fun ChangelogEntry.subsectionName(): String = subsection ?: "Unknown"
 
