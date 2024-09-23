@@ -33,9 +33,13 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
-val firstCommit = args.getOrNull(0) ?: error("Please call this way: kotlin changelog.main.kts <firstCommit> <lastCommit>")
-val lastCommit = args.getOrNull(1) ?: error("Please call this way: kotlin changelog.main.kts <firstCommit> <lastCommit>")
+val firstCommit =
+    args.getOrNull(0) ?: error("Please call this way: kotlin changelog.main.kts <firstCommit> <lastCommit>")
+val lastCommit =
+    args.getOrNull(1) ?: error("Please call this way: kotlin changelog.main.kts <firstCommit> <lastCommit>")
 val token = args.getOrNull(2)
+
+println(getChangelog(firstCommit, lastCommit))
 
 val sectionOrder = listOf(
     "Highlights",
@@ -58,31 +62,34 @@ val subsectionOrder = listOf(
     null
 )
 
-if (token == null) {
-    println("To increase the rate limit, specify token (https://github.com/settings/tokens): kotlin changelog.main.kts <firstCommit> <lastCommit> TOKEN")
-}
+fun getChangelog(firstCommit: String, lastCommit: String): String {
+    if (token == null) {
+        println("To increase the rate limit, specify token (https://github.com/settings/tokens): kotlin changelog.main.kts <firstCommit> <lastCommit> TOKEN")
+    }
 
-val entries = entriesForRepo("JetBrains/compose-multiplatform-core") +
-        entriesForRepo("JetBrains/compose-multiplatform")
+    val entries = entriesForRepo("JetBrains/compose-multiplatform-core", firstCommit, lastCommit) +
+            entriesForRepo("JetBrains/compose-multiplatform", firstCommit, lastCommit)
 
-println("\n# ${commitToVersion(lastCommit)} (${currentChangelogDate()})")
+    println("\n# ${commitToVersion(lastCommit)} (${currentChangelogDate()})")
 
-println(
-    buildString {
-        append("_Changes since ${commitToVersion(firstCommit)}_\n")
-        append("\n")
+    return buildString {
+        appendLine()
+        appendLine("_Changes since ${commitToVersion(firstCommit)}_")
+        appendLine()
 
         entries
             .sortedBy { it.sectionOrder() }
             .groupBy { it.sectionName() }
             .forEach { (section, sectionEntries) ->
                 appendLine("## $section")
+                appendLine()
 
                 sectionEntries
                     .sortedBy { it.subsectionOrder() }
                     .groupBy { it.subsectionName() }
                     .forEach { (subsection, subsectionEntries) ->
                         appendLine("### $subsection")
+                        appendLine()
                         subsectionEntries.forEach {
                             appendLine(it.format())
                         }
@@ -90,23 +97,26 @@ println(
                     }
             }
 
-        append("""
-            ## Dependencies
-            - Gradle Plugin `org.jetbrains.compose`, version `${commitToVersion(lastCommit)}`. Based on Jetpack Compose libraries:
-              - [Runtime REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-runtime#REDIRECT_PLACEHOLDER)
-              - [UI REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-ui#REDIRECT_PLACEHOLDER)
-              - [Foundation REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-foundation#REDIRECT_PLACEHOLDER)
-              - [Material REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-material#REDIRECT_PLACEHOLDER)
-              - [Material3 REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-material3#REDIRECT_PLACEHOLDER)
-
-            - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:RELEASE_PLACEHOLDER`. Based on [Jetpack Lifecycle REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/lifecycle#REDIRECT_PLACEHOLDER)
-            - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:RELEASE_PLACEHOLDER`. Based on [Jetpack Navigation REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/navigation#REDIRECT_PLACEHOLDER)
-            - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:RELEASE_PLACEHOLDER`. Based on [Jetpack Material3 Adaptive REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#REDIRECT_PLACEHOLDER)
-
-            ___
-        """.trimIndent())
+        append(
+            """
+                ## Dependencies
+        
+                - Gradle Plugin `org.jetbrains.compose`, version `${commitToVersion(lastCommit)}`. Based on Jetpack Compose libraries:
+                  - [Runtime REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-runtime#REDIRECT_PLACEHOLDER)
+                  - [UI REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-ui#REDIRECT_PLACEHOLDER)
+                  - [Foundation REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-foundation#REDIRECT_PLACEHOLDER)
+                  - [Material REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-material#REDIRECT_PLACEHOLDER)
+                  - [Material3 REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-material3#REDIRECT_PLACEHOLDER)
+        
+                - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:RELEASE_PLACEHOLDER`. Based on [Jetpack Lifecycle REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/lifecycle#REDIRECT_PLACEHOLDER)
+                - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:RELEASE_PLACEHOLDER`. Based on [Jetpack Navigation REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/navigation#REDIRECT_PLACEHOLDER)
+                - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:RELEASE_PLACEHOLDER`. Based on [Jetpack Material3 Adaptive REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#REDIRECT_PLACEHOLDER)
+        
+                ___
+            """.trimIndent()
+        )
     }
-)
+}
 
 /**
  * Transforms v1.6.0-beta01 to 1.6.0-beta01
@@ -152,7 +162,7 @@ fun ChangelogEntry.format(): String {
 fun Int.ifNegative(value: () -> Int): Int = if (this < 0) value() else this
 
 fun String.endIndexOf(value: String): Int = indexOf(value).let {
-    if (it >= 0)  {
+    if (it >= 0) {
         it + value.length
     } else {
         it
@@ -174,13 +184,14 @@ fun String.removeLinks(): String = replace(Regex("\\[([^)]*)\\]\\([^\\]]*\\)"), 
 fun GitHubPullEntry.extractReleaseNotes(link: String): List<ChangelogEntry> {
     // extract body inside "## Release Notes"
     val relNoteBody = run {
-        val after = body?.substringAfter("## Release Notes", "")?.ifBlank { null } ?:
-            body?.substringAfter("## Release notes", "")?.ifBlank { null } ?:
-            body?.substringAfter("## RelNote", "")?.ifBlank { null }
+        val after = body?.substringAfter("## Release Notes", "")?.ifBlank { null }
+            ?: body?.substringAfter("## Release notes", "")?.ifBlank { null } ?: body?.substringAfter(
+                "## RelNote",
+                ""
+            )?.ifBlank { null }
 
-        val before = after?.substringBefore("\n## ", "")?.ifBlank { null } ?:
-            after?.substringBefore("\n# ", "")?.ifBlank { null } ?:
-            after
+        val before = after?.substringBefore("\n## ", "")?.ifBlank { null } ?: after?.substringBefore("\n# ", "")
+            ?.ifBlank { null } ?: after
 
         before?.trim()
     }
@@ -216,7 +227,7 @@ fun GitHubPullEntry.extractReleaseNotes(link: String): List<ChangelogEntry> {
  * @param repo Example:
  *        JetBrains/compose-multiplatform-core
  */
-fun entriesForRepo(repo: String): List<ChangelogEntry> {
+fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<ChangelogEntry> {
     val pulls = (1..5)
         .flatMap {
             request<Array<GitHubPullEntry>>("https://api.github.com/repos/$repo/pulls?state=closed&per_page=100&page=$it").toList()
@@ -252,7 +263,8 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
     fun fetchCommits(firsCommitSha: String, lastCommitSha: String): CommitsResult {
         lateinit var mergeBaseCommit: String
         val commits = fetchPagedUntilEmpty { page ->
-            val result = request<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$firsCommitSha...$lastCommitSha?per_page=1000&page=$page")
+            val result =
+                request<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$firsCommitSha...$lastCommitSha?per_page=1000&page=$page")
             mergeBaseCommit = result.merge_base_commit.sha
             result.commits
         }
