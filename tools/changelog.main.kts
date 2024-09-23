@@ -27,6 +27,9 @@ import com.google.gson.Gson
 import java.io.File
 import java.io.IOException
 import java.net.URL
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
 
@@ -62,7 +65,7 @@ if (token == null) {
 val entries = entriesForRepo("JetBrains/compose-multiplatform-core") +
         entriesForRepo("JetBrains/compose-multiplatform")
 
-println("\n# CHANGELOG")
+println("\n# ${commitToVersion(lastCommit)} (${currentChangelogDate()})")
 
 println(
     buildString {
@@ -98,6 +101,11 @@ fun commitToVersion(commit: String) =
     } else {
         commit.removePrefix("release/")
     }
+
+/**
+ * September 2024
+ */
+fun currentChangelogDate() = LocalDate.now().format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.ENGLISH))
 
 /**
  * Formats:
