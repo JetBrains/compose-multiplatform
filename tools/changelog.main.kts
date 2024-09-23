@@ -55,11 +55,6 @@ val subsectionOrder = listOf(
     null
 )
 
-// TODO automate or pass as arguments
-// Exclude cherry-picked commits to the previous versions
-val excludeFirstCommit = "v1.6.11"
-val excludeLastCommit = "v1.7.0-beta02"
-
 if (token == null) {
     println("To increase the rate limit, specify token (https://github.com/settings/tokens): kotlin changelog.main.kts <firstCommit> <lastCommit> TOKEN")
 }
@@ -228,23 +223,23 @@ fun entriesForRepo(repo: String): List<ChangelogEntry> {
         }
     }
 
-    val commits = fetchPagedUntilEmpty { page ->
-        request<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$firstCommit...$lastCommit?per_page=1000&page=$page")
-            .commits
-    }.toSet()
+    class CommitsResult(val commits: List<GitHubCompareResponse.CommitEntry>, val mergeBaseSha: String)
 
-    fun GitHubCompareResponse.CommitEntry.commitId() = prForCommit(this)?.number?.toString() ?: sha
+    fun fetchCommits(firsCommitSha: String, lastCommitSha: String): CommitsResult {
+        lateinit var mergeBaseCommit: String
+        val commits = fetchPagedUntilEmpty { page ->
+            val result = request<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$firsCommitSha...$lastCommitSha?per_page=1000&page=$page")
+            mergeBaseCommit = result.merge_base_commit.sha
+            result.commits
+        }
+        return CommitsResult(commits, mergeBaseCommit)
+    }
 
-    val excludedCommitIds = fetchPagedUntilEmpty { page ->
-        request<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$excludeFirstCommit...$excludeLastCommit?per_page=1000&page=$page")
-            .commits
-            .map { it.commitId() }
-    }.toSet()
-
-    // Exclude cherry-picks with the same message (they have a different SHA, we can compare by it)
-    val nonCherrypickedCommits = commits.filter { it.commitId() !in excludedCommitIds }
-
-    return nonCherrypickedCommits.flatMap { changelogEntriesFor(prForCommit(it)) }
+    val main = fetchCommits(firstCommit, lastCommit)
+    val previous = fetchCommits(main.mergeBaseSha, firstCommit)
+    val pullRequests = main.commits.mapNotNull { prForCommit(it) }.toSet()
+    val previousVersionPullRequests = previous.commits.mapNotNull { prForCommit(it) }.toSet()
+    return (pullRequests - previousVersionPullRequests).flatMap { changelogEntriesFor(it) }
 }
 
 /**
@@ -271,7 +266,7 @@ fun ChangelogEntry.sectionName(): String = section ?: "Unknown"
 fun ChangelogEntry.subsectionName(): String = subsection ?: "Unknown"
 
 // example https://api.github.com/repos/JetBrains/compose-multiplatform-core/compare/v1.6.0-rc02...release/1.6.0
-data class GitHubCompareResponse(val commits: List<CommitEntry>) {
+data class GitHubCompareResponse(val commits: List<CommitEntry>, val merge_base_commit: CommitEntry) {
     data class CommitEntry(val sha: String, val commit: Commit)
     data class Commit(val message: String)
 }
