@@ -31,6 +31,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.swing.text.html.HTML.Tag.HEAD
 
 //region ========================================== CONSTANTS =========================================
 
@@ -59,9 +60,14 @@ val changelogFile = __FILE__.resolve("../../CHANGELOG.md")
 
 //endregion
 
-val versionCommit =
-    args.getOrNull(0) ?: error("Please call this way: kotlin changelog.main.kts <versionCommit>. The previous version will be read from the top of CHANGELOG.md")
-val token = args.getOrNull(1)
+val versionCommit = args.find { !it.contains("=") } ?: "HEAD"
+val token = args.find { it.startsWith("token=") }?.removePrefix("token=")
+
+println("Note. The script supports optional arguments: kotlin changelog.main.kts [versionCommit] [token=githubToken]")
+if (token == null) {
+    println("To increase the rate limit, specify token (https://github.com/settings/tokens)")
+}
+println()
 
 val currentChangelog = changelogFile.readText()
 val currentVersion = commitToVersion(versionCommit)
@@ -87,10 +93,6 @@ println("CHANGELOG.md changed")
 
 
 fun getChangelog(firstCommit: String, lastCommit: String): String {
-    if (token == null) {
-        println("To increase the rate limit, specify token (https://github.com/settings/tokens): kotlin changelog.main.kts <firstCommit> <lastCommit> TOKEN")
-    }
-
     val entries = entriesForRepo("JetBrains/compose-multiplatform-core", firstCommit, lastCommit) +
             entriesForRepo("JetBrains/compose-multiplatform", firstCommit, lastCommit)
 
