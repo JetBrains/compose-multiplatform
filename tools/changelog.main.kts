@@ -89,6 +89,22 @@ println(
                         appendLine()
                     }
             }
+
+        append("""
+            ## Dependencies
+            - Gradle Plugin `org.jetbrains.compose`, version `${commitToVersion(lastCommit)}`. Based on Jetpack Compose libraries:
+              - [Runtime REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-runtime#REDIRECT_PLACEHOLDER)
+              - [UI REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-ui#REDIRECT_PLACEHOLDER)
+              - [Foundation REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-foundation#REDIRECT_PLACEHOLDER)
+              - [Material REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-material#REDIRECT_PLACEHOLDER)
+              - [Material3 REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-material3#REDIRECT_PLACEHOLDER)
+
+            - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:RELEASE_PLACEHOLDER`. Based on [Jetpack Lifecycle REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/lifecycle#REDIRECT_PLACEHOLDER)
+            - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:RELEASE_PLACEHOLDER`. Based on [Jetpack Navigation REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/navigation#REDIRECT_PLACEHOLDER)
+            - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:RELEASE_PLACEHOLDER`. Based on [Jetpack Material3 Adaptive REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#REDIRECT_PLACEHOLDER)
+
+            ___
+        """.trimIndent())
     }
 )
 
