@@ -96,7 +96,7 @@ fun commitToVersion(commit: String) =
     if (commit.startsWith("v") && commit.contains(".")) {
         commit.removePrefix("v")
     } else {
-        commit
+        commit.removePrefix("release/")
     }
 
 /**
