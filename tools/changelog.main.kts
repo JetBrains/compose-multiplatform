@@ -31,15 +31,8 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.math.max
 
-val firstCommit =
-    args.getOrNull(0) ?: error("Please call this way: kotlin changelog.main.kts <firstCommit> <lastCommit>")
-val lastCommit =
-    args.getOrNull(1) ?: error("Please call this way: kotlin changelog.main.kts <firstCommit> <lastCommit>")
-val token = args.getOrNull(2)
-
-println(getChangelog(firstCommit, lastCommit))
+//region ========================================== CONSTANTS =========================================
 
 val sectionOrder = listOf(
     "Highlights",
@@ -61,6 +54,37 @@ val subsectionOrder = listOf(
     "Navigation",
     null
 )
+
+val changelogFile = __FILE__.resolve("../../CHANGELOG.md")
+
+//endregion
+
+val versionCommit =
+    args.getOrNull(0) ?: error("Please call this way: kotlin changelog.main.kts <versionCommit>. The previous version will be read from the top of CHANGELOG.md")
+val token = args.getOrNull(1)
+
+val currentChangelog = changelogFile.readText()
+val currentVersion = commitToVersion(versionCommit)
+val previousChangelog =
+    if (currentChangelog.startsWith("# $currentVersion ")) {
+        val nextChangelogIndex = currentChangelog.indexOf("\n# ")
+        currentChangelog.substring(nextChangelogIndex).removePrefix("\n")
+    } else {
+        currentChangelog
+    }
+
+val previousVersion = previousChangelog.substringAfter("# ").substringBefore(" (")
+
+println("Generating changelog between $previousVersion and $currentVersion")
+
+val newChangelog = getChangelog("v$previousVersion", versionCommit)
+
+changelogFile.writeText(
+    getChangelog("v$previousVersion", versionCommit) + previousChangelog
+)
+
+println("CHANGELOG.md changed")
+
 
 fun getChangelog(firstCommit: String, lastCommit: String): String {
     if (token == null) {
