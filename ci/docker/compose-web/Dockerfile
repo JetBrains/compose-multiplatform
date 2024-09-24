@@ -14,7 +14,7 @@ RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
     wget \
     xvfb
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update -yqq \
     && wget -qO- https://deb.nodesource.com/gpgkey/nodesource.gpg.key \
     && wget -qO- https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs
