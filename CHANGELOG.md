@@ -5,10 +5,6 @@ _Changes since 1.7.0-beta02_
 ### Web
 - [`skiko.js` is redundant in case of K/Wasm Compose for Web applications and it can be removed from index.html files to not load redundant files](https://github.com/JetBrains/compose-multiplatform/pull/5134). `skiko.js` will be removed from the k/wasm distribution in the future releases. `skiko.js` is still needed in case of K/JS Compose for Web apps
 
-## Known issues
-### iOS
-- `UriHandler.openUri` doesn't work on iOS 18. It will be fixed in 1.7.1. Call [UIApplication.openURL(url,options,completionHandler)](https://github.com/JetBrains/skiko/blob/85029c8d009edb6af67f45aa467e04a3c33cfb32/skiko/src/uikitMain/kotlin/org/jetbrains/skiko/Actuals.uikit.kt#L7) directly on iOS until 1.7.1 release
-
 ## Features
 ### Multiplatform
 - [Support Kotlin 1.9.25](https://github.com/JetBrains/compose-multiplatform/pull/5141)
