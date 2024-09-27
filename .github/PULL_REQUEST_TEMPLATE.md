@@ -19,19 +19,19 @@ Optional, if omitted - won't be included in the changelog
 
 Sections:
 - Highlights
-- Known issues
-- Breaking changes
+- Known Issues
+- Breaking Changes
 - Features
 - Fixes
 
 Subsections:
-- Multiple platforms
+- Multiple Platforms
 - iOS
 - Desktop
 - Web
 - Android
 - Resources
-- Gradle plugin
+- Gradle Plugin
 -->
 ### Section - Subsection
 - Describe a change for adding it to https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
