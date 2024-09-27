@@ -1,29 +1,35 @@
 # 1.7.0-rc01 (September 2024)
+
 _Changes since 1.7.0-beta02_
 
 ## Highlights
+
 ### Web
+
 - [`skiko.js` is redundant in case of K/Wasm Compose for Web applications and it can be removed from index.html files to not load redundant files](https://github.com/JetBrains/compose-multiplatform/pull/5134). `skiko.js` will be removed from the k/wasm distribution in the future releases. `skiko.js` is still needed in case of K/JS Compose for Web apps
 
 ## Features
-### Multiplatform
+
+### Multiple Platforms
+
 - [Support Kotlin 1.9.25](https://github.com/JetBrains/compose-multiplatform/pull/5141)
 
 ### Desktop
+
 - _(prerelease fix)_ [The `decoration` parameter added to `Window` and `DialogWindow` and the APIs related to it are now marked as experimental](https://github.com/JetBrains/compose-multiplatform-core/pull/1561)
 
 ### Gradle Plugin
+
 - [New `compose.material3AdaptiveNavigationSuite` shortcut in the gradle plugin](https://github.com/JetBrains/compose-multiplatform/pull/5133)
 
 ## Fixes
-### Android
-- _(prerelease fix)_ [Fix "Compose UI test error on android: No static method forceEnableAppTracing"](https://github.com/JetBrains/compose-multiplatform-core/pull/1564)
-- _(prerelease fix)_ [Fix "Android target depends on prerelease versions"](https://github.com/JetBrains/compose-multiplatform-core/pull/1564)
 
 ### Multiple Platforms
+
 - _(prerelease fix)_ [Fix possible infinity invalidation loop triggered by `GraphicsLayer.record`](https://github.com/JetBrains/compose-multiplatform-core/pull/1555)
 
 ### iOS
+
 - _(prerelease fix)_ [Fix "`ListDetailPaneScaffold` from material3-adaptive throws ArrayIndexOutOfBoundsException"](https://github.com/JetBrains/compose-multiplatform-core/pull/1548)
 - _(prerelease fix)_ [Fix "White bars on sides on some devices"](https://github.com/JetBrains/compose-multiplatform-core/pull/1547)
 - [Fix offset issues with keyboard and `TextField`](https://github.com/JetBrains/compose-multiplatform-core/pull/1523)
@@ -33,16 +39,25 @@ _Changes since 1.7.0-beta02_
 - _(prerelease fix)_ [Fix missing interop views with new `onReset` argument and placing inside more complex reusable layout inside `Lazy*` lists](https://github.com/JetBrains/compose-multiplatform-core/pull/1560)
 
 ### Desktop
+
 - [Fix bounds of `ComposePanel` in IntelliJ on macOs](https://github.com/JetBrains/compose-multiplatform-core/pull/1571)
 - [Fix UI glitch when resizing a Compose window via its `WindowState`](https://github.com/JetBrains/compose-multiplatform-core/pull/1565)
 
 ### Web
+
 - [Prevent a crash on mobile web when selecting some text in `SelectionContainer`](https://github.com/JetBrains/compose-multiplatform-core/pull/1551)
 
+### Android
+
+- _(prerelease fix)_ [Fix "Compose UI test error on android: No static method forceEnableAppTracing"](https://github.com/JetBrains/compose-multiplatform-core/pull/1564)
+- _(prerelease fix)_ [Fix "Android target depends on prerelease versions"](https://github.com/JetBrains/compose-multiplatform-core/pull/1564)
+
 ### Navigation
+
 - _(prerelease fix)_ [Fix `IllegalArgumentException` on putting lists into `savedStateHandle`](https://github.com/JetBrains/compose-multiplatform-core/pull/1546)
 
 ## Dependencies
+
 - Gradle Plugin `org.jetbrains.compose`, version `1.7.0-rc01`. Based on Jetpack Compose libraries:
   - [Runtime 1.7.0](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.7.0)
   - [UI 1.7.0](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.7.0)
