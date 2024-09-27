@@ -25,13 +25,13 @@ Sections:
 - Fixes
 
 Subsections:
-- Multiple Platforms
+- Multiple platforms
 - iOS
 - Desktop
 - Web
 - Android
 - Resources
-- Gradle Plugin
+- Gradle plugin
 -->
 ### Section - Subsection
 - Describe a change for adding it to https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
