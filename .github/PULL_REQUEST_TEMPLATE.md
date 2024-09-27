@@ -19,8 +19,8 @@ Optional, if omitted - won't be included in the changelog
 
 Sections:
 - Highlights
-- Known issues
-- Breaking changes
+- Known Issues
+- Breaking Changes
 - Features
 - Fixes
 
