@@ -6,7 +6,7 @@ _Changes since 1.7.0-beta02_
 
 ### Web
 
-- [`skiko.js` is redundant in case of K/Wasm Compose for Web applications and it can be removed from index.html files to not load redundant files](https://github.com/JetBrains/compose-multiplatform/pull/5134). `skiko.js` will be removed from the k/wasm distribution in the future releases. `skiko.js` is still needed in case of K/JS Compose for Web apps
+- [`skiko.js` is redundant in case of K/Wasm Compose Multiplatform for web applications and it can be removed from index.html files to not load redundant files](https://github.com/JetBrains/compose-multiplatform/pull/5134). `skiko.js` will be removed from the k/wasm distribution in the future releases. `skiko.js` is still needed in case of K/JS Compose Multiplatform for web apps
 
 ## Features
 
@@ -27,6 +27,7 @@ _Changes since 1.7.0-beta02_
 ### Multiple Platforms
 
 - _(prerelease fix)_ [Fix possible infinity invalidation loop triggered by `GraphicsLayer.record`](https://github.com/JetBrains/compose-multiplatform-core/pull/1555)
+- [Fix changing `FontRenderingSettings` is not reflected until composition restarts](https://github.com/JetBrains/compose-multiplatform-core/pull/1595)
 
 ### iOS
 
@@ -37,6 +38,9 @@ _Changes since 1.7.0-beta02_
 - [Fix "Selection handlers in wrong positions in a fullscreen TextField"](https://github.com/JetBrains/compose-multiplatform-core/pull/1523)
 - [Fix keyboard closing while scrolling content with Text Fields](https://github.com/JetBrains/compose-multiplatform-core/pull/1558)
 - _(prerelease fix)_ [Fix missing interop views with new `onReset` argument and placing inside more complex reusable layout inside `Lazy*` lists](https://github.com/JetBrains/compose-multiplatform-core/pull/1560)
+- _(prerelease fix)_ [Fix selection handlers height for `BasicTextField` on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1587)
+- _(prerelease fix)_ [To avoid `Symbol not found: _objc_release_x8` crash on iOS 15 simulators, skia has been re-built with downgraded Xcode](https://github.com/JetBrains/compose-multiplatform-core/pull/1595) (13.1)
+- [Fix "UriHandler.openUri no longer works on iOS 18"](https://github.com/JetBrains/compose-multiplatform-core/pull/1595)
 
 ### Desktop
 
