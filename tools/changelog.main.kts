@@ -1,23 +1,27 @@
 /**
- * Script for creating a changelog. Call
+ * Script for creating a changelog. Call:
  * ```
- * kotlin changelog.main.kts v1.6.0-rc02 release/1.6.0
+ * kotlin changelog.main.kts release/1.6.0 1.6.0-rc02
  * ```
- * where v1.6.0-rc02 - the first commit
- * where release/1.6.0 - the last commit
- */
-
-/**
- * Run from command line:
- * 1. Download https://github.com/JetBrains/kotlin/releases/tag/v1.9.22 and add `bin` to PATH
- * 2. Call `kotlin <fileName>`
+ * where:
+ * release/1.6.0 - the commit of the version
+ * 1.6.0-rc02 - the name of the version
  *
- * Run from IntelliJ:
+ * It modifies CHANGELOG.md and adds new changes between the last version in CHANGELOG.md and the specified version.
+ *
+ * Changelog entries are generated from reading Release Notes in GitHub PR's.
+ *
+ * ## How to run Kotlin scripts
+ * Option 1 - via Command line
+ * 1. Download https://github.com/JetBrains/kotlin/releases/tag/v1.9.22 and add `bin` to PATH
+ *
+ * Option 2 - via IntelliJ:
  * 1. Right click on the script
  * 2. More Run/Debug
  * 3. Modify Run Configuration...
- * 4. Clear all "Before launch" tasks (you can edit the system-wide template as well)
- * 5. OK
+ * 4. Add Program arguments
+ * 5. Clear all "Before launch" tasks (you can edit the system-wide template as well)
+ * 6. OK
  */
 
 @file:Repository("https://repo1.maven.org/maven2/")
@@ -39,8 +43,8 @@ import java.util.concurrent.TimeUnit
 
 val standardSections = listOf(
     "Highlights",
-    "Known issues",
-    "Breaking changes",
+    "Known Issues",
+    "Breaking Changes",
     "Features",
     "Fixes",
 )
@@ -61,19 +65,26 @@ val changelogFile = __FILE__.resolve("../../CHANGELOG.md")
 
 //endregion
 
-val versionCommit = args.find { !it.contains("=") } ?: "HEAD"
-val token = args.find { it.startsWith("token=") }?.removePrefix("token=")
+val argsKeyless = args
+    .filter { !it.contains("=") }
 
-println("Note. The script supports optional arguments: kotlin changelog.main.kts [versionCommit] [token=githubToken]")
+val argsKeyToValue = args
+    .filter { it.contains("=") }
+    .associate { it.substringBefore("=") to it.substringAfter("=") }
+
+val versionCommit = argsKeyless.getOrNull(0) ?: "HEAD"
+val versionName = argsKeyless.getOrNull(1) ?: versionCommit
+val token = argsKeyToValue["token"]
+
+println("Note. The script supports optional arguments: kotlin changelog.main.kts [versionCommit] [versionName] [token=githubToken]")
 if (token == null) {
     println("To increase the rate limit, specify token (https://github.com/settings/tokens)")
 }
 println()
 
 val currentChangelog = changelogFile.readText()
-val currentVersion = commitToVersion(versionCommit)
 val previousChangelog =
-    if (currentChangelog.startsWith("# $currentVersion ")) {
+    if (currentChangelog.startsWith("# $versionName ")) {
         val nextChangelogIndex = currentChangelog.indexOf("\n# ")
         currentChangelog.substring(nextChangelogIndex).removePrefix("\n")
     } else {
@@ -82,9 +93,9 @@ val previousChangelog =
 
 val previousVersion = previousChangelog.substringAfter("# ").substringBefore(" (")
 
-println("Generating changelog between $previousVersion and $currentVersion")
+println("Generating changelog between $previousVersion and $versionName")
 
-val newChangelog = getChangelog("v$previousVersion", versionCommit)
+val newChangelog = getChangelog("v$previousVersion", versionCommit, previousVersion, versionName)
 
 changelogFile.writeText(
     newChangelog + previousChangelog
@@ -94,15 +105,15 @@ println()
 println("CHANGELOG.md changed")
 
 
-fun getChangelog(firstCommit: String, lastCommit: String): String {
+fun getChangelog(firstCommit: String, lastCommit: String, firstVersion: String, lastVersion: String): String {
     val entries = entriesForRepo("JetBrains/compose-multiplatform-core", firstCommit, lastCommit) +
             entriesForRepo("JetBrains/compose-multiplatform", firstCommit, lastCommit)
 
     return buildString {
-        appendLine("# ${commitToVersion(lastCommit)} (${currentChangelogDate()})")
+        appendLine("# $lastVersion (${currentChangelogDate()})")
 
         appendLine()
-        appendLine("_Changes since ${commitToVersion(firstCommit)}_")
+        appendLine("_Changes since ${firstVersion}_")
         appendLine()
 
         entries
@@ -129,7 +140,7 @@ fun getChangelog(firstCommit: String, lastCommit: String): String {
             """
                 ## Dependencies
         
-                - Gradle Plugin `org.jetbrains.compose`, version `${commitToVersion(lastCommit)}`. Based on Jetpack Compose libraries:
+                - Gradle Plugin `org.jetbrains.compose`, version `$lastVersion`. Based on Jetpack Compose libraries:
                   - [Runtime REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-runtime#REDIRECT_PLACEHOLDER)
                   - [UI REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-ui#REDIRECT_PLACEHOLDER)
                   - [Foundation REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-foundation#REDIRECT_PLACEHOLDER)
@@ -140,7 +151,7 @@ fun getChangelog(firstCommit: String, lastCommit: String): String {
                 - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:RELEASE_PLACEHOLDER`. Based on [Jetpack Navigation REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/navigation#REDIRECT_PLACEHOLDER)
                 - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:RELEASE_PLACEHOLDER`. Based on [Jetpack Material3 Adaptive REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#REDIRECT_PLACEHOLDER)
         
-                ___
+                ---
             """.trimIndent()
         )
 
@@ -161,16 +172,6 @@ fun getChangelog(firstCommit: String, lastCommit: String): String {
         }
     }
 }
-
-/**
- * Transforms v1.6.0-beta01 to 1.6.0-beta01
- */
-fun commitToVersion(commit: String) =
-    if (commit.startsWith("v") && commit.contains(".")) {
-        commit.removePrefix("v")
-    } else {
-        commit.removePrefix("release/")
-    }
 
 /**
  * September 2024
@@ -248,8 +249,8 @@ fun GitHubPullEntry.extractReleaseNotes(link: String): List<ChangelogEntry> {
         // parse "### Section - Subsection"
         if (line.startsWith("### ")) {
             val s = line.removePrefix("### ")
-            section = s.substringBefore("-", "").trim().ifEmpty { null }
-            subsection = s.substringAfter("-", "").trim().ifEmpty { null }
+            section = s.substringBefore("-", "").trim().normalizeSectionName().ifEmpty { null }
+            subsection = s.substringAfter("-", "").trim().normalizeSubsectionName().ifEmpty { null }
         } else if (section != null && line.isNotBlank()) {
             val isTopLevel = line.startsWith("-")
             val trimmedLine = line.trimEnd().removeSuffix(".")
@@ -341,9 +342,11 @@ data class ChangelogEntry(
 )
 
 fun ChangelogEntry.sectionOrder(): Int = section?.let(standardSections::indexOf) ?: standardSections.size
-fun ChangelogEntry.subsectionOrder(): Int = section?.let(standardSubsections::indexOf) ?: standardSubsections.size
+fun ChangelogEntry.subsectionOrder(): Int = subsection?.let(standardSubsections::indexOf) ?: standardSubsections.size
 fun ChangelogEntry.sectionName(): String = section ?: "Unknown"
 fun ChangelogEntry.subsectionName(): String = subsection ?: "Unknown"
+fun String.normalizeSectionName() = standardSections.find { it.lowercase() == this.lowercase() } ?: this
+fun String.normalizeSubsectionName() = standardSubsections.find { it.lowercase() == this.lowercase() } ?: this
 
 // example https://api.github.com/repos/JetBrains/compose-multiplatform-core/compare/v1.6.0-rc02...release/1.6.0
 data class GitHubCompareResponse(val commits: List<CommitEntry>, val merge_base_commit: CommitEntry) {
