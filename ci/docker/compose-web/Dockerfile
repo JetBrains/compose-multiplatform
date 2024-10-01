@@ -10,6 +10,7 @@ RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
     openjdk-17-jdk \
     python3 \
     python-is-python3 \
+    sudo \
     unzip \
     wget \
     xvfb
