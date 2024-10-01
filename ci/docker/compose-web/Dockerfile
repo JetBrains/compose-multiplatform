@@ -14,6 +14,13 @@ RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
     wget \
     xvfb
 
+ARG USERNAME=web-test-user
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
+
 RUN apt-get update -yqq \
     && wget -qO- https://deb.nodesource.com/gpgkey/nodesource.gpg.key \
     && wget -qO- https://deb.nodesource.com/setup_22.x | bash - \
@@ -34,3 +41,5 @@ RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckod
 RUN export CHROME_DRIVER_VERSION=$(wget -qO- https://chromedriver.storage.googleapis.com/LATEST_RELEASE) \
     && wget https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip -P ~/tmp \
     && mkdir -p /root/.gradle/selenium/chrome &&  unzip -d /root/.gradle/selenium/chrome  ~/tmp/chromedriver_linux64.zip && rm ~/tmp/chromedriver_linux64.zip
+
+USER $USERNAME
