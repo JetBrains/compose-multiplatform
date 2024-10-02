@@ -29,7 +29,7 @@ class DomApplier(
 
     override fun onClear() {
         // or current.node.clear()?; in all examples it calls 'clear' on the root
-        root.node.clear()
+        root.clear()
     }
 }
 
@@ -41,19 +41,25 @@ interface NamedEventListener : EventListener {
 
 @ComposeWebInternalApi
 open class DomNodeWrapper(open val node: Node) {
+    private val knownNodes: MutableList<DomNodeWrapper> = mutableListOf<DomNodeWrapper>()
 
     fun insert(index: Int, nodeWrapper: DomNodeWrapper) {
-        val length = node.childNodes.length
+        val length = knownNodes.size
         if (index < length) {
-            node.insertBefore(nodeWrapper.node, node.childNodes[index]!!)
+            val nodeOnIndex = knownNodes[index]
+            knownNodes.add(index, nodeWrapper)
+            node.insertBefore(nodeWrapper.node, nodeOnIndex.node)
         } else {
+            knownNodes.add(nodeWrapper)
+
             node.appendChild(nodeWrapper.node)
         }
     }
 
     fun remove(index: Int, count: Int) {
         repeat(count) {
-            node.removeChild(node.childNodes[index]!!)
+            val nodeToRemove = knownNodes.removeAt(index)
+            node.removeChild(nodeToRemove.node)
         }
     }
 
@@ -67,8 +73,20 @@ open class DomNodeWrapper(open val node: Node) {
             val fromIndex = if (from > to) from + i else from
             val toIndex = if (from > to) to + i else to + count - 2
 
-            val child = node.removeChild(node.childNodes[fromIndex]!!)
-            node.insertBefore(child, node.childNodes[toIndex]!!)
+            val nodeOnIndex = knownNodes[toIndex]
+
+            val nodeToMove = knownNodes.removeAt(fromIndex)
+            node.removeChild(nodeToMove.node)
+
+            knownNodes.add(toIndex, nodeToMove)
+            node.insertBefore(nodeToMove.node, nodeOnIndex.node)
         }
+    }
+
+    internal fun clear() {
+        knownNodes.forEach {
+            node.removeChild(it.node)
+        }
+        knownNodes.clear()
     }
 }
