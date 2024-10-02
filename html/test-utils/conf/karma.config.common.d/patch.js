@@ -13,7 +13,7 @@ config.logLevel = config.LOG_DEBUG;
 
 config.customLaunchers = {
     ChromeForComposeTests: {
-        base: "Chrome",
+        base: "ChromeHeadless",
         flags: ["--no-sandbox", "--disable-search-engine-choice-screen"]
     }
 }
