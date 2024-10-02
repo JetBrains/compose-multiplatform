@@ -68,7 +68,7 @@ kotlin {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
     namespace = "org.jetbrains.Graphics2D"
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 

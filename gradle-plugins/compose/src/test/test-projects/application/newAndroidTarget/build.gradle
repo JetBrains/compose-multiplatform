@@ -10,7 +10,7 @@ kotlin {
 
     androidLibrary {
         namespace = "com.google.samples.apps.diceroller.shared"
-        compileSdk = 34
+        compileSdk = 35
     }
 
     jvm()

@@ -160,7 +160,7 @@ kotlin {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
     namespace = "org.jetbrains.compose.components.resources"
     defaultConfig {
         minSdk = 21
