@@ -1,6 +1,5 @@
-import com.example.jetsnack.ui.components.prepareImagesCache
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -8,7 +7,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.window.CanvasBasedWindow
-import com.example.jetsnack.JetSnackAppEntryPoint
+import com.example.jetsnack.ui.JetsnackApp
 import com.example.jetsnack.ui.components.loadImage
 import com.example.jetsnack.ui.components.toByteArray
 import com.example.jetsnack.ui.theme.Karla
@@ -29,7 +28,7 @@ fun main() {
         if (loading) {
             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         } else {
-            JetSnackAppEntryPoint()
+            JetsnackApp()
         }
 
         LaunchedEffect(Unit) {
@@ -39,10 +38,7 @@ fun main() {
             val j2 = launch {
                 loadKarlaFont()
             }
-            val j3 = launch {
-                prepareImagesCache()
-            }
-            joinAll(j1, j2, j3)
+            joinAll(j1, j2)
             loading = false
         }
     }

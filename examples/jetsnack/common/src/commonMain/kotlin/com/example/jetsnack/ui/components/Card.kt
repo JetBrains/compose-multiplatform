@@ -16,11 +16,8 @@
 
 package com.example.jetsnack.ui.components
 
-//import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -48,14 +45,4 @@ fun JetsnackCard(
         border = border,
         content = content
     )
-}
-
-//@Preview
-@Composable
-private fun CardPreview() {
-    JetsnackTheme {
-        JetsnackCard {
-            Text(text = "Demo", modifier = Modifier.padding(16.dp))
-        }
-    }
 }

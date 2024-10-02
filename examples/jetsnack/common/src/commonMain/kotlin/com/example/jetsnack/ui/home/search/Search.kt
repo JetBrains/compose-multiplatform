@@ -16,61 +16,37 @@
 
 package com.example.jetsnack.ui.home.search
 
-//import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.example.jetsnack.*
-import com.example.jetsnack.model.Filter
-import com.example.jetsnack.model.SearchCategoryCollection
-import com.example.jetsnack.model.SearchRepo
-import com.example.jetsnack.model.SearchSuggestionGroup
-import com.example.jetsnack.model.Snack
-import com.example.jetsnack.model.SnackRepo
+import com.example.common.generated.resources.Res
+import com.example.common.generated.resources.label_back
+import com.example.common.generated.resources.label_search
+import com.example.common.generated.resources.search_jetsnack
+import com.example.jetsnack.model.*
 import com.example.jetsnack.ui.components.JetsnackDivider
 import com.example.jetsnack.ui.components.JetsnackSurface
-import com.example.jetsnack.ui.snackdetail.jetSnackStatusBarsPadding
 import com.example.jetsnack.ui.theme.JetsnackTheme
-import com.example.jetsnack.ui.utils.mirroringBackIcon
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun Search(
-    onSnackClick: (Long) -> Unit,
+    onSnackClick: (Long, String) -> Unit,
     modifier: Modifier = Modifier,
     state: SearchState = rememberSearchState()
 ) {
     JetsnackSurface(modifier = modifier.fillMaxSize()) {
         Column {
-            Spacer(modifier = Modifier.jetSnackStatusBarsPadding())
+            Spacer(modifier = Modifier.statusBarsPadding())
             SearchBar(
                 query = state.query,
                 onQueryChange = { state.query = it },
@@ -90,13 +66,16 @@ fun Search(
                 SearchDisplay.Categories -> SearchCategories(state.categories)
                 SearchDisplay.Suggestions -> SearchSuggestions(
                     suggestions = state.suggestions,
-                    onSuggestionSelect = { suggestion -> state.query = TextFieldValue(suggestion) }
+                    onSuggestionSelect = { suggestion ->
+                        state.query = TextFieldValue(suggestion)
+                    }
                 )
+
                 SearchDisplay.Results -> SearchResults(
                     state.searchResults,
-                    state.filters,
                     onSnackClick
                 )
+
                 SearchDisplay.NoResults -> NoResults(state.query.text)
             }
         }
@@ -188,9 +167,9 @@ private fun SearchBar(
                 if (searchFocused) {
                     IconButton(onClick = onClearQuery) {
                         Icon(
-                            imageVector = mirroringBackIcon(),
+                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                             tint = JetsnackTheme.colors.iconPrimary,
-                            contentDescription = stringResource(MppR.string.label_back)
+                            contentDescription = stringResource(Res.string.label_back)
                         )
                     }
                 }
@@ -231,29 +210,12 @@ private fun SearchHint() {
         Icon(
             imageVector = Icons.Outlined.Search,
             tint = JetsnackTheme.colors.textHelp,
-            contentDescription = stringResource(MppR.string.label_search)
+            contentDescription = stringResource(Res.string.label_search)
         )
         Spacer(Modifier.width(8.dp))
         Text(
-            text = stringResource(MppR.string.search_jetsnack),
+            text = stringResource(Res.string.search_jetsnack),
             color = JetsnackTheme.colors.textHelp
         )
-    }
-}
-
-//@Preview
-@Composable
-private fun SearchBarPreview() {
-    JetsnackTheme {
-        JetsnackSurface {
-            SearchBar(
-                query = TextFieldValue(""),
-                onQueryChange = { },
-                searchFocused = false,
-                onSearchFocusChange = { },
-                onClearQuery = { },
-                searching = false
-            )
-        }
     }
 }

@@ -17,49 +17,53 @@
 package com.example.jetsnack.ui.components
 
 //import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.animation.*
+import androidx.compose.animation.core.animateDp
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.ArrowForward
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.jetsnack.model.CollectionType
 import com.example.jetsnack.model.Snack
 import com.example.jetsnack.model.SnackCollection
-import com.example.jetsnack.model.snacks
+import com.example.jetsnack.ui.LocalNavAnimatedVisibilityScope
+import com.example.jetsnack.ui.LocalSharedTransitionScope
+import com.example.jetsnack.ui.SnackSharedElementKey
+import com.example.jetsnack.ui.SnackSharedElementType
+import com.example.jetsnack.ui.snackdetail.nonSpatialExpressiveSpring
+import com.example.jetsnack.ui.snackdetail.snackDetailBoundsTransform
 import com.example.jetsnack.ui.theme.JetsnackTheme
-import com.example.jetsnack.ui.utils.mirroringIcon
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.imageResource
 
 private val HighlightCardWidth = 170.dp
 private val HighlightCardPadding = 16.dp
+private val Density.cardWidthWithPaddingPx
+    get() = (HighlightCardWidth + HighlightCardPadding).toPx()
 
 // The Cards show a gradient which spans 3 cards and scrolls with parallax.
 private val gradientWidth
@@ -71,7 +75,7 @@ private val gradientWidth
 @Composable
 fun SnackCollection(
     snackCollection: SnackCollection,
-    onSnackClick: (Long) -> Unit,
+    onSnackClick: (Long, String) -> Unit,
     modifier: Modifier = Modifier,
     index: Int = 0,
     highlight: Boolean = true
@@ -85,7 +89,7 @@ fun SnackCollection(
         ) {
             Text(
                 text = snackCollection.name,
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.titleLarge,
                 color = JetsnackTheme.colors.brand,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -98,52 +102,56 @@ fun SnackCollection(
                 modifier = Modifier.align(Alignment.CenterVertically)
             ) {
                 Icon(
-                    imageVector = mirroringIcon(
-                        ltrIcon = Icons.Outlined.ArrowForward,
-                        rtlIcon = Icons.Outlined.ArrowBack
-                    ),
+                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
                     tint = JetsnackTheme.colors.brand,
                     contentDescription = null
                 )
             }
         }
         if (highlight && snackCollection.type == CollectionType.Highlight) {
-            HighlightedSnacks(index, snackCollection.snacks, onSnackClick)
+            HighlightedSnacks(snackCollection.id, index, snackCollection.snacks, onSnackClick)
         } else {
-            Snacks(snackCollection.snacks, onSnackClick)
+            Snacks(snackCollection.id, snackCollection.snacks, onSnackClick)
         }
     }
 }
 
 @Composable
 private fun HighlightedSnacks(
+    snackCollectionId: Long,
     index: Int,
     snacks: List<Snack>,
-    onSnackClick: (Long) -> Unit,
+    onSnackClick: (Long, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val scroll = rememberScrollState(0)
+    val rowState = rememberLazyListState()
+    val cardWidthWithPaddingPx = with(LocalDensity.current) { cardWidthWithPaddingPx }
+
+    val scrollProvider = {
+        // Simple calculation of scroll distance for homogenous item types with the same width.
+        val offsetFromStart = cardWidthWithPaddingPx * rowState.firstVisibleItemIndex
+        offsetFromStart + rowState.firstVisibleItemScrollOffset
+    }
+
     val gradient = when ((index / 2) % 2) {
         0 -> JetsnackTheme.colors.gradient6_1
         else -> JetsnackTheme.colors.gradient6_2
     }
-    // The Cards show a gradient which spans 3 cards and scrolls with parallax.
-    val gradientWidth = with(LocalDensity.current) {
-        (6 * (HighlightCardWidth + HighlightCardPadding).toPx())
-    }
+
     LazyRow(
+        state = rowState,
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(start = 24.dp, end = 24.dp)
     ) {
         itemsIndexed(snacks) { index, snack ->
             HighlightSnackItem(
-                snack,
-                onSnackClick,
-                index,
-                gradient,
-                gradientWidth,
-                scroll.value
+                snackCollectionId = snackCollectionId,
+                snack = snack,
+                onSnackClick = onSnackClick,
+                index = index,
+                gradient = gradient,
+                scrollProvider = scrollProvider
             )
         }
     }
@@ -151,8 +159,9 @@ private fun HighlightedSnacks(
 
 @Composable
 private fun Snacks(
+    snackCollectionId: Long,
     snacks: List<Snack>,
-    onSnackClick: (Long) -> Unit,
+    onSnackClick: (Long, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyRow(
@@ -160,15 +169,17 @@ private fun Snacks(
         contentPadding = PaddingValues(start = 12.dp, end = 12.dp)
     ) {
         items(snacks) { snack ->
-            SnackItem(snack, onSnackClick)
+            SnackItem(snack, snackCollectionId, onSnackClick)
         }
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun SnackItem(
     snack: Snack,
-    onSnackClick: (Long) -> Unit,
+    snackCollectionId: Long,
+    onSnackClick: (Long, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     JetsnackSurface(
@@ -178,98 +189,253 @@ fun SnackItem(
             end = 4.dp,
             bottom = 8.dp
         )
+
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .clickable(onClick = { onSnackClick(snack.id) })
-                .padding(8.dp)
-        ) {
-            SnackImage(
-                imageUrl = snack.imageUrl,
-                elevation = 4.dp,
-                contentDescription = null,
-                modifier = Modifier.size(120.dp)
-            )
-            Text(
-                text = snack.name,
-                style = MaterialTheme.typography.subtitle1,
-                color = JetsnackTheme.colors.textSecondary,
-                modifier = Modifier.padding(top = 8.dp)
-            )
+        val sharedTransitionScope = LocalSharedTransitionScope.current
+            ?: throw IllegalStateException("No sharedTransitionScope found")
+        val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
+            ?: throw IllegalStateException("No animatedVisibilityScope found")
+
+        with(sharedTransitionScope) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .clickable(onClick = {
+                        onSnackClick(snack.id, snackCollectionId.toString())
+                    })
+                    .padding(8.dp)
+            ) {
+                SnackImage(
+                    image = snack.image,
+                    elevation = 1.dp,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(120.dp)
+                        .sharedBounds(
+                            rememberSharedContentState(
+                                key = SnackSharedElementKey(
+                                    snackId = snack.id,
+                                    origin = snackCollectionId.toString(),
+                                    type = SnackSharedElementType.Image
+                                )
+                            ),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            boundsTransform = snackDetailBoundsTransform
+                        )
+                )
+                Text(
+                    text = snack.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = JetsnackTheme.colors.textSecondary,
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .wrapContentWidth()
+                        .sharedBounds(
+                            rememberSharedContentState(
+                                key = SnackSharedElementKey(
+                                    snackId = snack.id,
+                                    origin = snackCollectionId.toString(),
+                                    type = SnackSharedElementType.Title
+                                )
+                            ),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            enter = fadeIn(nonSpatialExpressiveSpring()),
+                            exit = fadeOut(nonSpatialExpressiveSpring()),
+                            resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds(),
+                            boundsTransform = snackDetailBoundsTransform
+                        )
+                )
+            }
         }
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun HighlightSnackItem(
+    snackCollectionId: Long,
     snack: Snack,
-    onSnackClick: (Long) -> Unit,
+    onSnackClick: (Long, String) -> Unit,
     index: Int,
     gradient: List<Color>,
-    gradientWidth: Float,
-    scroll: Int,
+    scrollProvider: () -> Float,
     modifier: Modifier = Modifier
 ) {
-    val left = index * with(LocalDensity.current) {
-        (HighlightCardWidth + HighlightCardPadding).toPx()
-    }
-    JetsnackCard(
-        modifier = modifier
-            .size(
-                width = 170.dp,
-                height = 250.dp
-            )
-            .padding(bottom = 16.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .clickable(onClick = { onSnackClick(snack.id) })
-                .fillMaxSize()
+    val sharedTransitionScope = LocalSharedTransitionScope.current
+        ?: throw IllegalStateException("No Scope found")
+    val animatedVisibilityScope = LocalNavAnimatedVisibilityScope.current
+        ?: throw IllegalStateException("No Scope found")
+    with(sharedTransitionScope) {
+        val roundedCornerAnimation by animatedVisibilityScope.transition
+            .animateDp(label = "rounded corner") { enterExit: EnterExitState ->
+                when (enterExit) {
+                    EnterExitState.PreEnter -> 0.dp
+                    EnterExitState.Visible -> 20.dp
+                    EnterExitState.PostExit -> 20.dp
+                }
+            }
+        JetsnackCard(
+            elevation = 0.dp,
+            shape = RoundedCornerShape(roundedCornerAnimation),
+            modifier = modifier
+                .padding(bottom = 16.dp)
+                .sharedBounds(
+                    sharedContentState = rememberSharedContentState(
+                        key = SnackSharedElementKey(
+                            snackId = snack.id,
+                            origin = snackCollectionId.toString(),
+                            type = SnackSharedElementType.Bounds
+                        )
+                    ),
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    boundsTransform = snackDetailBoundsTransform,
+                    clipInOverlayDuringTransition = OverlayClip(
+                        RoundedCornerShape(
+                            roundedCornerAnimation
+                        )
+                    ),
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                )
+                .size(
+                    width = HighlightCardWidth,
+                    height = 250.dp
+                )
+                .border(
+                    1.dp,
+                    JetsnackTheme.colors.uiBorder.copy(alpha = 0.12f),
+                    RoundedCornerShape(roundedCornerAnimation)
+                )
+
         ) {
-            Box(
+            Column(
                 modifier = Modifier
-                    .height(160.dp)
-                    .fillMaxWidth()
+                    .clickable(onClick = {
+                        onSnackClick(
+                            snack.id,
+                            snackCollectionId.toString()
+                        )
+                    })
+                    .fillMaxSize()
+
             ) {
-                val gradientOffset = left - (scroll / 3f)
                 Box(
                     modifier = Modifier
-                        .height(100.dp)
+                        .height(160.dp)
                         .fillMaxWidth()
-                        .offsetGradientBackground(gradient, gradientWidth, gradientOffset)
-                )
-                SnackImage(
-                    imageUrl = snack.imageUrl,
-                    contentDescription = null,
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .sharedBounds(
+                                rememberSharedContentState(
+                                    key = SnackSharedElementKey(
+                                        snackId = snack.id,
+                                        origin = snackCollectionId.toString(),
+                                        type = SnackSharedElementType.Background
+                                    )
+                                ),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                boundsTransform = snackDetailBoundsTransform,
+                                enter = fadeIn(nonSpatialExpressiveSpring()),
+                                exit = fadeOut(nonSpatialExpressiveSpring()),
+                                resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds()
+                            )
+                            .height(100.dp)
+                            .fillMaxWidth()
+                            .offsetGradientBackground(
+                                colors = gradient,
+                                width = {
+                                    // The Cards show a gradient which spans 6 cards and
+                                    // scrolls with parallax.
+                                    6 * cardWidthWithPaddingPx
+                                },
+                                offset = {
+                                    val left = index * cardWidthWithPaddingPx
+                                    val gradientOffset = left - (scrollProvider() / 3f)
+                                    gradientOffset
+                                }
+                            )
+                    )
+
+                    SnackImage(
+                        image = snack.image,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .sharedBounds(
+                                rememberSharedContentState(
+                                    key = SnackSharedElementKey(
+                                        snackId = snack.id,
+                                        origin = snackCollectionId.toString(),
+                                        type = SnackSharedElementType.Image
+                                    )
+                                ),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                exit = fadeOut(nonSpatialExpressiveSpring()),
+                                enter = fadeIn(nonSpatialExpressiveSpring()),
+                                boundsTransform = snackDetailBoundsTransform
+                            )
+                            .align(Alignment.BottomCenter)
+                            .size(120.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = snack.name,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = JetsnackTheme.colors.textSecondary,
                     modifier = Modifier
-                        .size(120.dp)
-                        .align(Alignment.BottomCenter)
+                        .padding(horizontal = 16.dp)
+                        .sharedBounds(
+                            rememberSharedContentState(
+                                key = SnackSharedElementKey(
+                                    snackId = snack.id,
+                                    origin = snackCollectionId.toString(),
+                                    type = SnackSharedElementType.Title
+                                )
+                            ),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            enter = fadeIn(nonSpatialExpressiveSpring()),
+                            exit = fadeOut(nonSpatialExpressiveSpring()),
+                            boundsTransform = snackDetailBoundsTransform,
+                            resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds()
+                        )
+                        .wrapContentWidth()
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = snack.tagline,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = JetsnackTheme.colors.textHelp,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .sharedBounds(
+                            rememberSharedContentState(
+                                key = SnackSharedElementKey(
+                                    snackId = snack.id,
+                                    origin = snackCollectionId.toString(),
+                                    type = SnackSharedElementType.Tagline
+                                )
+                            ),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            enter = fadeIn(nonSpatialExpressiveSpring()),
+                            exit = fadeOut(nonSpatialExpressiveSpring()),
+                            boundsTransform = snackDetailBoundsTransform,
+                            resizeMode = SharedTransitionScope.ResizeMode.ScaleToBounds()
+                        )
+                        .wrapContentWidth()
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = snack.name,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.h6,
-                color = JetsnackTheme.colors.textSecondary,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = snack.tagline,
-                style = MaterialTheme.typography.body1,
-                color = JetsnackTheme.colors.textHelp,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
         }
     }
 }
 
 @Composable
 fun SnackImage(
-    imageUrl: String,
+    image: DrawableResource,
     contentDescription: String?,
     modifier: Modifier = Modifier,
     elevation: Dp = 0.dp
@@ -280,29 +446,11 @@ fun SnackImage(
         shape = CircleShape,
         modifier = modifier
     ) {
-        SnackAsyncImage(imageUrl, contentDescription, Modifier.fillMaxSize())
-    }
-}
-
-@Composable
-expect fun SnackAsyncImage(
-    imageUrl: String,
-    contentDescription: String?,
-    modifier: Modifier
-)
-
-//@Preview
-@Composable
-fun SnackCardPreview() {
-    JetsnackTheme {
-        val snack = snacks.first()
-        HighlightSnackItem(
-            snack = snack,
-            onSnackClick = { },
-            index = 0,
-            gradient = JetsnackTheme.colors.gradient6_1,
-            gradientWidth = gradientWidth,
-            scroll = 0
+        Image(
+            bitmap = imageResource(image),
+            contentDescription = contentDescription,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
         )
     }
 }

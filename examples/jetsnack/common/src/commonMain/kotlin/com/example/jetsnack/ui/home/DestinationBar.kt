@@ -16,67 +16,82 @@
 
 package com.example.jetsnack.ui.home
 
-//import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ExpandMore
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import com.example.jetsnack.ExpandMore
-import com.example.jetsnack.MppR
-import com.example.jetsnack.label_select_delivery
-import com.example.jetsnack.stringResource
+import com.example.common.generated.resources.Res
+import com.example.common.generated.resources.label_select_delivery
+import com.example.jetsnack.ui.LocalNavAnimatedVisibilityScope
+import com.example.jetsnack.ui.LocalSharedTransitionScope
 import com.example.jetsnack.ui.components.JetsnackDivider
-import com.example.jetsnack.ui.snackdetail.jetSnackStatusBarsPadding
+import com.example.jetsnack.ui.snackdetail.spatialExpressiveSpring
 import com.example.jetsnack.ui.theme.AlphaNearOpaque
 import com.example.jetsnack.ui.theme.JetsnackTheme
+import org.jetbrains.compose.resources.stringResource
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun DestinationBar(modifier: Modifier = Modifier) {
-    Column(modifier = modifier.jetSnackStatusBarsPadding()) {
-        TopAppBar(
-            backgroundColor = JetsnackTheme.colors.uiBackground.copy(alpha = AlphaNearOpaque),
-            contentColor = JetsnackTheme.colors.textSecondary,
-            elevation = 0.dp
-        ) {
-            Text(
-                text = "Huidekoperstraat 26-28, 1017 ZM Amsterdam | https://kotl.in/wasm-gio23",
-                style = MaterialTheme.typography.subtitle1,
-                color = JetsnackTheme.colors.textSecondary,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .weight(1f)
-                    .align(Alignment.CenterVertically)
-            )
-            IconButton(
-                onClick = { /* todo */ },
-                modifier = Modifier.align(Alignment.CenterVertically)
+    val sharedElementScope =
+        LocalSharedTransitionScope.current ?: throw IllegalStateException("No shared element scope")
+    val navAnimatedScope =
+        LocalNavAnimatedVisibilityScope.current ?: throw IllegalStateException("No nav scope")
+    with(sharedElementScope) {
+        with(navAnimatedScope) {
+            Column(
+                modifier = modifier
+                    .renderInSharedTransitionScopeOverlay()
+                    .animateEnterExit(
+                        enter = slideInVertically(spatialExpressiveSpring()) { -it * 2 },
+                        exit = slideOutVertically(spatialExpressiveSpring()) { -it * 2 }
+                    )
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.ExpandMore,
-                    tint = JetsnackTheme.colors.brand,
-                    contentDescription = stringResource(MppR.string.label_select_delivery)
+                TopAppBar(
+                    windowInsets = WindowInsets(0, 0, 0, 0),
+                    title = {
+                        Row {
+                            Text(
+                                text = "Huidekoperstraat 26-28, 1017 ZM Amsterdam | https://kotl.in/wasm-gio23",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = JetsnackTheme.colors.textSecondary,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .align(Alignment.CenterVertically)
+                            )
+                            IconButton(
+                                onClick = { /* todo */ },
+                                modifier = Modifier.align(Alignment.CenterVertically)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.ExpandMore,
+                                    tint = JetsnackTheme.colors.brand,
+                                    contentDescription = stringResource(Res.string.label_select_delivery)
+                                )
+                            }
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors().copy(
+                        containerColor = JetsnackTheme.colors.uiBackground
+                            .copy(alpha = AlphaNearOpaque),
+                        titleContentColor = JetsnackTheme.colors.textSecondary
+                    ),
                 )
+                JetsnackDivider()
             }
         }
-        JetsnackDivider()
-    }
-}
-
-//@Preview
-@Composable
-fun PreviewDestinationBar() {
-    JetsnackTheme {
-        DestinationBar()
     }
 }

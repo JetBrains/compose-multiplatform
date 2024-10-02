@@ -16,7 +16,6 @@
 
 package com.example.jetsnack.ui.components
 
-//import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,11 +28,10 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Text
-import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -41,13 +39,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
 import com.example.jetsnack.ui.theme.JetsnackTheme
 
 @Composable
-
 fun JetsnackButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -83,18 +79,15 @@ fun JetsnackButton(
             )
     ) {
         ProvideTextStyle(
-            value = MaterialTheme.typography.button
+            value = MaterialTheme.typography.labelLarge
         ) {
             Row(
-                @Suppress("DEPRECATION_ERROR")
                 Modifier
                     .defaultMinSize(
                         minWidth = ButtonDefaults.MinWidth,
                         minHeight = ButtonDefaults.MinHeight
                     )
-                    // TODO This should be replaced by non-deprecated alternative after the original example migrates to Jetpack Compose 1.7:
-                    // https://github.com/android/compose-samples/blob/3bc6b7d7c74571ea74776ec5b15518b40de4d31b/Jetsnack/app/src/main/java/com/example/jetsnack/ui/components/Button.kt#L95
-                    .indication(interactionSource, rememberRipple())
+                    .indication(interactionSource, ripple())
                     .padding(contentPadding),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically,
@@ -105,25 +98,3 @@ fun JetsnackButton(
 }
 
 private val ButtonShape = RoundedCornerShape(percent = 50)
-
-//@Preview
-@Composable
-private fun ButtonPreview() {
-    JetsnackTheme {
-        JetsnackButton(onClick = {}) {
-            Text(text = "Demo")
-        }
-    }
-}
-
-//@Preview
-@Composable
-private fun RectangleButtonPreview() {
-    JetsnackTheme {
-        JetsnackButton(
-            onClick = {}, shape = RectangleShape
-        ) {
-            Text(text = "Demo")
-        }
-    }
-}

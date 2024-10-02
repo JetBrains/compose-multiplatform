@@ -17,12 +17,12 @@
 package com.example.jetsnack.model
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Android
+import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.jetsnack.Android
-import com.example.jetsnack.SortByAlpha
 
 @Stable
 class Filter(
@@ -32,6 +32,7 @@ class Filter(
 ) {
     val enabled = mutableStateOf(enabled)
 }
+
 val filters = listOf(
     Filter(name = "Organic"),
     Filter(name = "Gluten-free"),

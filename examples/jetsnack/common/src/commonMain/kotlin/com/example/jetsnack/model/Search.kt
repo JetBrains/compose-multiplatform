@@ -17,9 +17,15 @@
 package com.example.jetsnack.model
 
 import androidx.compose.runtime.Immutable
+import com.example.common.generated.resources.*
+import com.example.common.generated.resources.Res
+import com.example.common.generated.resources.chips
+import com.example.common.generated.resources.desserts
+import com.example.common.generated.resources.fruit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.DrawableResource
 
 /**
  * A fake repo for searching.
@@ -44,7 +50,7 @@ data class SearchCategoryCollection(
 @Immutable
 data class SearchCategory(
     val name: String,
-    val imageUrl: String
+    val image: DrawableResource
 )
 
 @Immutable
@@ -58,26 +64,26 @@ data class SearchSuggestionGroup(
  * Static data
  */
 
-private val searchCategoryCollections = listOf(
+private val searchCategoryCollections = listOf<SearchCategoryCollection>(
     SearchCategoryCollection(
         id = 0L,
         name = "Categories",
         categories = listOf(
             SearchCategory(
                 name = "Chips & crackers",
-                imageUrl = "files/chips.jpg"
+                image = Res.drawable.chips
             ),
             SearchCategory(
                 name = "Fruit snacks",
-                imageUrl = "files/fruit.jpg"
+                image = Res.drawable.fruit
             ),
             SearchCategory(
                 name = "Desserts",
-                imageUrl = "files/desserts.jpg"
+                image = Res.drawable.desserts
             ),
             SearchCategory(
                 name = "Nuts ",
-                imageUrl = "files/nuts.jpg"
+                image = Res.drawable.nuts
             )
         )
     ),
@@ -87,27 +93,27 @@ private val searchCategoryCollections = listOf(
         categories = listOf(
             SearchCategory(
                 name = "Organic",
-                imageUrl = "files/organic.jpg"
+                image = Res.drawable.organic
             ),
             SearchCategory(
                 name = "Gluten Free",
-                imageUrl = "files/gluten_free.jpg"
+                image = Res.drawable.gluten_free
             ),
             SearchCategory(
                 name = "Paleo",
-                imageUrl = "files/paleo.jpg"
+                image = Res.drawable.paleo
             ),
             SearchCategory(
                 name = "Vegan",
-                imageUrl = "files/vegan.jpg"
+                image = Res.drawable.vegan
             ),
             SearchCategory(
                 name = "Vegitarian",
-                imageUrl = "files/grapes.jpg"
+                image = Res.drawable.organic
             ),
             SearchCategory(
                 name = "Whole30",
-                imageUrl = "files/popcorn.jpg"
+                image = Res.drawable.paleo
             )
         )
     )
