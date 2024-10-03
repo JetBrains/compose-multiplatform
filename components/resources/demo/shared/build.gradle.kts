@@ -68,7 +68,7 @@ kotlin {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
     namespace = "org.jetbrains.compose.resources.demo.shared"
     defaultConfig {
         minSdk = 21

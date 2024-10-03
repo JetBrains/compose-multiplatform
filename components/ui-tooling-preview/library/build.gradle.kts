@@ -34,7 +34,7 @@ kotlin {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
     namespace = "org.jetbrains.compose.ui.tooling.preview"
     defaultConfig {
         minSdk = 21
