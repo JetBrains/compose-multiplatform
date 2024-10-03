@@ -135,11 +135,7 @@ internal class PomDocument(file: File) {
     }
 
     private fun Node.children(): List<Node> {
-        val result = ArrayList<Node>(childNodes.length)
-        for (i in 0 until childNodes.length) {
-            result.add(childNodes.item(i))
-        }
-        return result
+        return (0 until childNodes.length).map { childNodes.item(it) }
     }
 
     private fun List<Node>.asMap(): Map<String, Node> =
