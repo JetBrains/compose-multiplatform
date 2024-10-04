@@ -15,6 +15,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.util.concurrency.annotations.RequiresReadLock
 import org.jetbrains.plugins.gradle.settings.GradleSettings
 import org.jetbrains.plugins.gradle.util.GradleConstants
+import java.util.Locale
 
 internal val DEFAULT_CONFIGURE_PREVIEW_TASK_NAME = "configureDesktopPreview"
 
@@ -38,8 +39,11 @@ internal class ConfigurePreviewTaskNameProviderImpl : ConfigurePreviewTaskNamePr
         return null
     }
 
-    private fun previewTaskName(targetName: String = "") =
-        "$DEFAULT_CONFIGURE_PREVIEW_TASK_NAME${targetName.capitalize()}"
+    private fun previewTaskName(targetName: String = ""): String {
+        val capitalizedTargetName =
+            targetName.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        return "$DEFAULT_CONFIGURE_PREVIEW_TASK_NAME$capitalizedTargetName"
+    }
 
     private fun moduleDataNodeOrNull(project: Project, modulePath: String): DataNode<ModuleData>? {
         val projectDataManager = ProjectDataManager.getInstance()
