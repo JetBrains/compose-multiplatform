@@ -44,6 +44,10 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
 
     @get:Optional
     @get:Input
+    val minimizeKotlinStandardLibrary: Property<Boolean?> = objects.nullableProperty()
+
+    @get:Optional
+    @get:Input
     val joinOutputJars: Property<Boolean?> = objects.nullableProperty()
 
     // todo: DSL for excluding default rules
@@ -123,6 +127,10 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
 
             if (dontoptimize.orNull == true) {
                 writer.writeLn("-dontoptimize")
+            }
+
+            if (minimizeKotlinStandardLibrary.orNull == false) {
+                writer.writeLn("-keep class kotlin.** { *; }")
             }
 
             writer.writeLn("""
