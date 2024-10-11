@@ -95,7 +95,6 @@ fun RadioGroup(
 @ExperimentalComposeWebApi
 class RadioGroupScope<T> internal constructor()
 
-@OptIn(ExperimentalComposeWebApi::class)
 private val radioGroupScopeImpl = RadioGroupScope<Any>()
 
 private var generatedRadioGroupNamesCounter = 0
