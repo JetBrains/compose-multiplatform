@@ -155,9 +155,6 @@ _Changes since 1.6.11_
 - [Support project isolation](https://github.com/JetBrains/compose-multiplatform/pull/5120)
 - [Fix a gradle project misconfiguration when KSP and Room are used](https://github.com/JetBrains/compose-multiplatform/pull/5129)
 
-### Lifecycle
-- Lifecycle 2.8.2 depends on Compose 1.6.11 (Lifecycle 2.8.1 accidentaly made dependent on Compose 1.7.0-beta01)
-
 ## Dependencies
 
 - Gradle Plugin `org.jetbrains.compose`, version `1.7.0`. Based on Jetpack Compose libraries:
