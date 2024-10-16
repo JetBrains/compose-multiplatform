@@ -45,7 +45,7 @@ _Changes since 1.6.11_
 - [Skia is updated to m126](https://github.com/JetBrains/compose-multiplatform-core/pull/1486)
 - [Commonized `org.jetbrains.compose.material3:material3-window-size-class` module](https://github.com/JetBrains/compose-multiplatform-core/pull/1466)
 - [Commonized `org.jetbrains.compose.material3.adaptive:adaptive*` modules](https://github.com/JetBrains/compose-multiplatform-core/pull/1468)
-- [New multiplatform module "material-navigation"](https://github.com/JetBrains/compose-multiplatform-core/pull/1504)
+- [New multiplatform module "material-navigation" (in beta status)](https://github.com/JetBrains/compose-multiplatform-core/pull/1504)
 - [`material3-adaptive-navigation-suite` is multiplatform now](https://github.com/JetBrains/compose-multiplatform-core/pull/1539)
 - [Support Kotlin 1.9.25](https://github.com/JetBrains/compose-multiplatform/pull/5141)
 
@@ -319,7 +319,7 @@ _Changes since 1.7.0-alpha03_
 
 ## Features
 ### Multiple Platforms
-- [New multiplatform module "material-navigation"](https://github.com/JetBrains/compose-multiplatform-core/pull/1504)
+- [New multiplatform module "material-navigation" (in beta status)](https://github.com/JetBrains/compose-multiplatform-core/pull/1504)
 
 ### iOS
 - [New `UIKitView` and `UIKitViewController` API in `package androidx.compose.ui.viewinterop`](https://github.com/JetBrains/compose-multiplatform-core/pull/1494). Support of `onReset` to reuse the interop composable emitted node and avoid excessive native views reallocations, fine-grain touches strategy control (cooperative with explicit time delay, non-cooperative where no touches are received by Compose, ignoring touches)
