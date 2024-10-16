@@ -61,7 +61,7 @@ val standardSubsections = listOf(
     "Navigation",
 )
 
-val changelogFile = __FILE__.resolve("../../CHANGELOG.md")
+val changelogFile = __FILE__.resolve("../../CHANGELOG.md").canonicalFile
 
 //endregion
 
