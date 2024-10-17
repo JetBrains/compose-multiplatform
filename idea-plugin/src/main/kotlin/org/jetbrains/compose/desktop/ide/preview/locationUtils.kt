@@ -32,6 +32,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.fqNameSafe
 import org.jetbrains.kotlin.resolve.lazy.BodyResolveMode
 
 internal const val DESKTOP_PREVIEW_ANNOTATION_FQN = "androidx.compose.desktop.ui.tooling.preview.Preview"
+internal const val COMMON_PREVIEW_ANNOTATION_FQN = "org.jetbrains.compose.ui.tooling.preview.Preview"
 internal const val COMPOSABLE_FQ_NAME = "androidx.compose.runtime.Composable"
 
 /**
@@ -120,7 +121,9 @@ internal fun KtNamedFunction.isValidComposablePreviewFunction(): Boolean {
         while (annotationIt.hasNext() && !(hasComposableAnnotation && hasPreviewAnnotation)) {
             val annotation = annotationIt.next()
             hasComposableAnnotation = hasComposableAnnotation || annotation.fqNameMatches(COMPOSABLE_FQ_NAME)
-            hasPreviewAnnotation = hasPreviewAnnotation || annotation.fqNameMatches(DESKTOP_PREVIEW_ANNOTATION_FQN)
+            hasPreviewAnnotation = hasPreviewAnnotation ||
+                    annotation.fqNameMatches(DESKTOP_PREVIEW_ANNOTATION_FQN) ||
+                    annotation.fqNameMatches(COMMON_PREVIEW_ANNOTATION_FQN)
         }
 
         return hasComposableAnnotation && hasPreviewAnnotation
