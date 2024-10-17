@@ -1,5 +1,5 @@
 [versions]
-agp = "8.2.0"
+agp = "8.5.0"
 android-compileSdk = "34"
 android-minSdk = "24"
 android-targetSdk = "34"
@@ -7,9 +7,9 @@ androidx-activity = "1.8.2"
 androidx-lifecycle = "2.8.0-rc03"
 androidx-navigation = "2.7.0-alpha06"
 compose-android = "1.6.7"
-compose-multiplatform = "1.6.10"
+compose-multiplatform = "1.7.0"
 junit = "4.13.2"
-kotlin = "2.0.0"
+kotlin = "2.0.20"
 kotlinx-datetime = "0.6.0"
 
 [libraries]
