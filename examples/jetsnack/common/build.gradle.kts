@@ -43,7 +43,6 @@ kotlin {
                 implementation(libs.androidx.navigation.compose)
                 implementation(libs.androidx.lifecycle.viewModelCompose)
                 implementation(libs.androidx.lifecycle.viewModel)
-                implementation(libs.compose.material.icons.core)
                 implementation(compose.materialIconsExtended)
                 implementation(compose.components.resources)
                 implementation(libs.kotlinx.coroutines)
