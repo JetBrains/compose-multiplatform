@@ -16,27 +16,26 @@
 
 package com.example.jetsnack.ui.home
 
-//import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.jetsnack.*
-import com.example.jetsnack.ui.theme.JetsnackTheme
+import com.example.common.generated.resources.Res
+import com.example.common.generated.resources.empty_state_search
+import com.example.common.generated.resources.grab_beverage
+import com.example.common.generated.resources.work_in_progress
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun Profile(modifier: Modifier = Modifier) {
+fun Profile(
+    modifier: Modifier = Modifier
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -45,30 +44,22 @@ fun Profile(modifier: Modifier = Modifier) {
             .padding(24.dp)
     ) {
         Image(
-            painterResource(MppR.drawable.empty_state_search),
+            painterResource(Res.drawable.empty_state_search),
             contentDescription = null
         )
         Spacer(Modifier.height(24.dp))
         Text(
-            text = stringResource(MppR.string.work_in_progress),
-            style = MaterialTheme.typography.subtitle1,
+            text = stringResource(Res.string.work_in_progress),
+            style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(16.dp))
         Text(
-            text = stringResource(MppR.string.grab_beverage),
-            style = MaterialTheme.typography.body2,
+            text = stringResource(Res.string.grab_beverage),
+            style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
-    }
-}
-
-//@Preview
-@Composable
-fun ProfilePreview() {
-    JetsnackTheme {
-        Profile()
     }
 }

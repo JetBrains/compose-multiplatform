@@ -38,13 +38,15 @@ kotlin {
             dependencies {
                 api(compose.runtime)
                 api(compose.foundation)
-                api(compose.material)
+                api(compose.ui)
+                api(compose.material3)
+                implementation(libs.androidx.navigation.compose)
+                implementation(libs.androidx.lifecycle.viewModelCompose)
+                implementation(libs.androidx.lifecycle.viewModel)
+                implementation(compose.materialIconsExtended)
                 implementation(compose.components.resources)
                 implementation(libs.kotlinx.coroutines)
             }
-        }
-        val nonAndroidMain by creating {
-            dependsOn(commonMain)
         }
         val commonTest by getting {
             dependencies {
@@ -73,22 +75,23 @@ kotlin {
             }
         }
         val desktopMain by getting {
-            dependsOn(nonAndroidMain)
+            dependsOn(commonMain)
             dependencies {
                 api(compose.preview)
+                implementation(libs.kotlinx.coroutines.swing)
             }
         }
         val desktopTest by getting
 
         val wasmJsMain by getting {
+            dependsOn(commonMain)
             dependencies {
                 implementation(kotlin("stdlib"))
             }
-            dependsOn(nonAndroidMain)
         }
 
         val iosMain by getting {
-            dependsOn(nonAndroidMain)
+            dependsOn(commonMain)
         }
     }
 }

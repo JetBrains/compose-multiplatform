@@ -17,27 +17,27 @@
 package com.example.jetsnack.ui.components
 
 import androidx.compose.animation.Crossfade
-//import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.jetsnack.*
+import com.example.common.generated.resources.Res
+import com.example.common.generated.resources.label_decrease
+import com.example.common.generated.resources.label_increase
+import com.example.common.generated.resources.quantity
 import com.example.jetsnack.ui.theme.JetsnackTheme
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun QuantitySelector(
@@ -47,20 +47,19 @@ fun QuantitySelector(
     modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier) {
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            Text(
-                text = stringResource(MppR.string.quantity),
-                style = MaterialTheme.typography.subtitle1,
-                color = JetsnackTheme.colors.textSecondary,
-                modifier = Modifier
-                    .padding(end = 18.dp)
-                    .align(Alignment.CenterVertically)
-            )
-        }
+        Text(
+            text = stringResource(Res.string.quantity),
+            style = MaterialTheme.typography.titleMedium,
+            color = JetsnackTheme.colors.textSecondary,
+            fontWeight = FontWeight.Normal,
+            modifier = Modifier
+                .padding(end = 18.dp)
+                .align(Alignment.CenterVertically)
+        )
         JetsnackGradientTintedIconButton(
             imageVector = Icons.Default.Remove,
             onClick = decreaseItemCount,
-            contentDescription = stringResource(MppR.string.label_decrease),
+            contentDescription = stringResource(Res.string.label_decrease),
             modifier = Modifier.align(Alignment.CenterVertically)
         )
         Crossfade(
@@ -70,7 +69,7 @@ fun QuantitySelector(
         ) {
             Text(
                 text = "$it",
-                style = MaterialTheme.typography.subtitle2,
+                style = MaterialTheme.typography.titleSmall,
                 fontSize = 18.sp,
                 color = JetsnackTheme.colors.textPrimary,
                 textAlign = TextAlign.Center,
@@ -80,30 +79,8 @@ fun QuantitySelector(
         JetsnackGradientTintedIconButton(
             imageVector = Icons.Default.Add,
             onClick = increaseItemCount,
-            contentDescription = stringResource(MppR.string.label_increase),
+            contentDescription = stringResource(Res.string.label_increase),
             modifier = Modifier.align(Alignment.CenterVertically)
         )
-    }
-}
-
-//@Preview
-@Composable
-fun QuantitySelectorPreview() {
-    JetsnackTheme {
-        JetsnackSurface {
-            QuantitySelector(1, {}, {})
-        }
-    }
-}
-
-//@Preview
-@Composable
-fun QuantitySelectorPreviewRtl() {
-    JetsnackTheme {
-        JetsnackSurface {
-            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                QuantitySelector(1, {}, {})
-            }
-        }
     }
 }

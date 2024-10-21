@@ -16,12 +16,8 @@
 
 package com.example.jetsnack.ui.components
 
-//import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
@@ -32,25 +28,13 @@ import com.example.jetsnack.ui.theme.JetsnackTheme
 fun JetsnackDivider(
     modifier: Modifier = Modifier,
     color: Color = JetsnackTheme.colors.uiBorder.copy(alpha = DividerAlpha),
-    thickness: Dp = 1.dp,
-    startIndent: Dp = 0.dp
+    thickness: Dp = 1.dp
 ) {
-    Divider(
+    HorizontalDivider(
         modifier = modifier,
         color = color,
-        thickness = thickness,
-        startIndent = startIndent
+        thickness = thickness
     )
 }
 
 private const val DividerAlpha = 0.12f
-
-//@Preview
-@Composable
-private fun DividerPreview() {
-    JetsnackTheme {
-        Box(Modifier.size(height = 10.dp, width = 100.dp)) {
-            JetsnackDivider(Modifier.align(Alignment.Center))
-        }
-    }
-}
