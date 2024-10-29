@@ -1,8 +1,10 @@
 package org.jetbrains.compose.resources
 
+import com.android.build.api.dsl.KotlinMultiplatformAndroidTarget
 import com.android.build.api.variant.AndroidComponentsExtension
-import com.android.build.api.variant.Component
 import com.android.build.api.variant.HasAndroidTest
+import com.android.build.api.variant.KotlinMultiplatformAndroidComponentsExtension
+import com.android.build.api.variant.Sources
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.LintModelWriterTask
 import org.gradle.api.DefaultTask
@@ -25,48 +27,50 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import java.io.File
 import javax.inject.Inject
 
-internal fun Project.configureAndroidComposeResources(moduleResourceDir: Provider<File>? = null) {
-    //copy all compose resources to android assets
-    val androidComponents = project.extensions.findByType(AndroidComponentsExtension::class.java) ?: return
-    androidComponents.onVariants { variant ->
-        configureGeneratedAndroidComponentAssets(variant, moduleResourceDir)
+//copy all compose resources to android assets
+internal fun Project.configureAndroidComposeResources(
+    agpPluginId: String,
+    moduleResourceDir: Provider<File>? = null
+) {
+    val kotlinExtension = extensions.findByType(KotlinMultiplatformExtension::class.java) ?: return
 
-        if (variant is HasAndroidTest) {
-            variant.androidTest?.let { androidTest ->
-                configureGeneratedAndroidComponentAssets(androidTest, moduleResourceDir)
-            }
+    if (agpPluginId != AGP_KMP_LIB_ID) {
+        extensions.findByType(AndroidComponentsExtension::class.java)?.let { androidComponents ->
+            configureAndroidComposeResources(kotlinExtension, androidComponents, moduleResourceDir)
+        }
+    } else {
+        @Suppress("UnstableApiUsage")
+        extensions.findByType(KotlinMultiplatformAndroidComponentsExtension::class.java)?.let { androidComponents ->
+            configureAndroidComposeResources(kotlinExtension, androidComponents, moduleResourceDir)
         }
     }
 }
 
-private fun Project.configureGeneratedAndroidComponentAssets(
-    component: Component,
+private fun Project.configureAndroidComposeResources(
+    kotlinExtension: KotlinMultiplatformExtension,
+    androidComponents: AndroidComponentsExtension<*, *, *>,
     moduleResourceDir: Provider<File>?
 ) {
-    val kotlinExtension = project.extensions.findByType(KotlinMultiplatformExtension::class.java) ?: return
-    val camelComponentName = component.name.uppercaseFirstChar()
-    val componentAssets = getAndroidComponentComposeResources(kotlinExtension, component.name)
-    logger.info("Configure ${component.name} resources for 'android' target")
+    logger.info("Configure compose resources with AndroidComponentsExtension")
+    androidComponents.onVariants { variant ->
+        val componentAssets = getAndroidComponentComposeResources(kotlinExtension, variant.name)
+        configureGeneratedAndroidComponentAssets(
+            variant.name,
+            variant.sources,
+            componentAssets,
+            moduleResourceDir
+        )
 
-    val copyComponentAssets = registerTask<CopyResourcesToAndroidAssetsTask>(
-        "copy${camelComponentName}ComposeResourcesToAndroidAssets"
-    ) {
-        from.set(componentAssets)
-        moduleResourceDir?.let { relativeResourcePlacement.set(it) }
-    }
-
-    component.sources.assets?.addGeneratedSourceDirectory(
-        copyComponentAssets,
-        CopyResourcesToAndroidAssetsTask::outputDirectory
-    )
-    tasks.configureEach { task ->
-        //fix agp task dependencies for AndroidStudio preview
-        if (task.name == "compile${camelComponentName}Sources") {
-            task.dependsOn(copyComponentAssets)
-        }
-        //fix linter task dependencies for `build` task
-        if (task is AndroidLintAnalysisTask || task is LintModelWriterTask) {
-            task.mustRunAfter(copyComponentAssets)
+        if (variant is HasAndroidTest) {
+            variant.androidTest?.let { androidTest ->
+                val androidTestAssets = getAndroidComponentComposeResources(kotlinExtension, androidTest.name)
+                configureGeneratedAndroidComponentAssets(
+                    androidTest.name,
+                    androidTest.sources,
+                    androidTestAssets,
+                    moduleResourceDir
+                )
+            }
         }
     }
 }
@@ -85,6 +89,82 @@ private fun Project.getAndroidComponentComposeResources(
         }
     }
 })
+
+@Suppress("UnstableApiUsage")
+private fun Project.configureAndroidComposeResources(
+    kotlinExtension: KotlinMultiplatformExtension,
+    androidComponents: KotlinMultiplatformAndroidComponentsExtension,
+    moduleResourceDir: Provider<File>?
+) {
+    logger.info("Configure compose resources with KotlinMultiplatformAndroidComponentsExtension")
+    androidComponents.onVariant { variant ->
+        val variantAssets = getAndroidKmpComponentComposeResources(kotlinExtension, variant.name)
+        configureGeneratedAndroidComponentAssets(
+            variant.name,
+            variant.sources,
+            variantAssets,
+            moduleResourceDir
+        )
+
+        variant.androidTest?.let { androidTest ->
+            val androidTestAssets = getAndroidKmpComponentComposeResources(kotlinExtension, androidTest.name)
+            configureGeneratedAndroidComponentAssets(
+                androidTest.name,
+                androidTest.sources,
+                androidTestAssets,
+                moduleResourceDir
+            )
+        }
+    }
+}
+
+@Suppress("UnstableApiUsage")
+private fun Project.getAndroidKmpComponentComposeResources(
+    kotlinExtension: KotlinMultiplatformExtension,
+    componentName: String
+): FileCollection = project.files({
+    kotlinExtension.targets.withType(KotlinMultiplatformAndroidTarget::class.java).flatMap { androidTarget ->
+        androidTarget.compilations.flatMap { compilation ->
+            if (compilation.componentName == componentName) {
+                compilation.allKotlinSourceSets.map { kotlinSourceSet ->
+                    getPreparedComposeResourcesDir(kotlinSourceSet)
+                }
+            } else emptyList()
+        }
+    }
+})
+
+private fun Project.configureGeneratedAndroidComponentAssets(
+    componentName: String,
+    componentSources: Sources,
+    componentAssets: FileCollection,
+    moduleResourceDir: Provider<File>?
+) {
+    logger.info("Configure $componentName resources for 'android' target")
+
+    val camelComponentName = componentName.uppercaseFirstChar()
+    val copyComponentAssets = registerTask<CopyResourcesToAndroidAssetsTask>(
+        "copy${camelComponentName}ComposeResourcesToAndroidAssets"
+    ) {
+        from.set(componentAssets)
+        moduleResourceDir?.let { relativeResourcePlacement.set(it) }
+    }
+
+    componentSources.assets?.addGeneratedSourceDirectory(
+        copyComponentAssets,
+        CopyResourcesToAndroidAssetsTask::outputDirectory
+    )
+    tasks.configureEach { task ->
+        //fix agp task dependencies for AndroidStudio preview
+        if (task.name == "compile${camelComponentName}Sources") {
+            task.dependsOn(copyComponentAssets)
+        }
+        //fix linter task dependencies for `build` task
+        if (task is AndroidLintAnalysisTask || task is LintModelWriterTask) {
+            task.mustRunAfter(copyComponentAssets)
+        }
+    }
+}
 
 //Copy task doesn't work with 'variant.sources?.assets?.addGeneratedSourceDirectory' API
 internal abstract class CopyResourcesToAndroidAssetsTask : DefaultTask() {

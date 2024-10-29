@@ -37,8 +37,8 @@ internal fun Project.configureMultimoduleResources(
         .all { target -> configureTargetResources(target, moduleIsolationDirectory) }
 
     //configure ANDROID resources
-    onAgpApplied {
-        configureAndroidComposeResources(moduleIsolationDirectory)
+    onAgpApplied { agpId ->
+        configureAndroidComposeResources(agpId, moduleIsolationDirectory)
         fixAndroidLintTaskDependencies()
     }
 }
