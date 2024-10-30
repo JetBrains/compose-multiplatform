@@ -15,10 +15,9 @@ internal const val COMPOSE_RESOURCES_DIR = "composeResources"
 internal const val RES_GEN_DIR = "generated/compose/resourceGenerator"
 internal const val KMP_RES_EXT = "multiplatformResourcesPublication"
 private const val MIN_GRADLE_VERSION_FOR_KMP_RESOURCES = "7.6"
-private val androidPluginIds = listOf(
-    "com.android.application",
-    "com.android.library"
-)
+private const val AGP_APP_ID = "com.android.application"
+private const val AGP_LIB_ID = "com.android.library"
+internal const val AGP_KMP_LIB_ID = "com.android.kotlin.multiplatform.library"
 
 internal fun Project.configureComposeResources(extension: ResourcesExtension) {
     val config = provider { extension }
@@ -64,10 +63,8 @@ internal fun Project.onKotlinJvmApplied(config: Provider<ResourcesExtension>) {
     configureJvmOnlyResources(kotlinExtension, config)
 }
 
-internal fun Project.onAgpApplied(block: () -> Unit) {
-    androidPluginIds.forEach { pluginId ->
-        plugins.withId(pluginId) {
-            block()
-        }
+internal fun Project.onAgpApplied(block: (pluginId: String) -> Unit) {
+    listOf(AGP_APP_ID, AGP_LIB_ID, AGP_KMP_LIB_ID).forEach { pluginId ->
+        plugins.withId(pluginId) { block(pluginId) }
     }
 }

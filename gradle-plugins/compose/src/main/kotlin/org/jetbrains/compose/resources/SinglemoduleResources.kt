@@ -27,8 +27,8 @@ internal fun Project.configureSinglemoduleResources(
         }
     }
 
-    onAgpApplied {
-        configureAndroidComposeResources()
+    onAgpApplied { agpId ->
+        configureAndroidComposeResources(agpId)
         fixAndroidLintTaskDependencies()
     }
 }

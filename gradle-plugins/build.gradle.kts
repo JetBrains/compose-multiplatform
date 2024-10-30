@@ -1,4 +1,5 @@
-import com.gradle.publish.PluginBundleExtension
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
@@ -20,8 +21,8 @@ subprojects {
 
     plugins.withId("java") {
         configureIfExists<JavaPluginExtension> {
-            sourceCompatibility = JavaVersion.VERSION_1_8
-            targetCompatibility = JavaVersion.VERSION_1_8
+            sourceCompatibility = JavaVersion.VERSION_11
+            targetCompatibility = JavaVersion.VERSION_11
 
             withJavadocJar()
             withSourcesJar()
@@ -30,11 +31,13 @@ subprojects {
 
     plugins.withId("org.jetbrains.kotlin.jvm") {
         tasks.withType(KotlinJvmCompile::class).configureEach {
-            // must be set to a language version of the kotlin compiler & runtime,
-            // which is bundled to the oldest supported Gradle
-            kotlinOptions.languageVersion = "1.5"
-            kotlinOptions.apiVersion = "1.5"
-            kotlinOptions.jvmTarget = "1.8"
+            compilerOptions {
+                // must be set to a language version of the kotlin compiler & runtime,
+                // which is bundled to the oldest supported Gradle
+                languageVersion.set(KotlinVersion.KOTLIN_1_5)
+                apiVersion.set(KotlinVersion.KOTLIN_1_5)
+                jvmTarget.set(JvmTarget.JVM_11)
+            }
         }
     }
 
