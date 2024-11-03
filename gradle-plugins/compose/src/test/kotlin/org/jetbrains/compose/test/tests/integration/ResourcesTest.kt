@@ -326,13 +326,11 @@ class ResourcesTest : GradlePluginTestBase() {
                 check.logContains("Configure compose resources with KotlinMultiplatformAndroidComponentsExtension")
 
                 val resourcesFiles = sequenceOf(
-                    "assets/composeResources/newagpresources.appmodule.generated.resources/values/strings.commonMain.cvr",
-                    "assets/composeResources/newagpresources.featuremodule.generated.resources/values/strings.commonMain.cvr"
+                    "composeResources/newagpresources.appmodule.generated.resources/values/strings.commonMain.cvr",
+                    "composeResources/newagpresources.featuremodule.generated.resources/values/strings.commonMain.cvr"
                 )
                 val apk = file("appModule/build/outputs/apk/debug/appModule-debug.apk")
-
-                //isAndroid = false, because the new AGP has an issue with duplicate resources for now
-                checkResourcesZip(apk, resourcesFiles, false)
+                checkResourcesZip(apk, resourcesFiles, true)
             }
         }
     }
