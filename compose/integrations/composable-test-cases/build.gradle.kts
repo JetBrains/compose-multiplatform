@@ -23,6 +23,18 @@ allprojects {
         tasks.withType<KotlinCompile<*>>().configureEach {
             kotlinOptions.freeCompilerArgs += "-Xpartial-linkage=disable"
         }
+        //non-depracated?
+//        tasks.withType<KotlinCompilationTask<KotlinJsCompilerOptions>>() {
+//            compilerOptions {
+//                freeCompilerArgs.add("-Xklib-enable-signature-clash-checks=false")
+//            }
+//        }
+//
+//        tasks.withType<KotlinCompilationTask<*>>() {
+//            compilerOptions {
+//                freeCompilerArgs.add("-Xpartial-linkage=disable")
+//            }
+//        }
     }
     disableYarnLockMismatchReport()
 }
