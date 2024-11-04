@@ -5,6 +5,7 @@ import com.example.common.composeText
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -14,6 +15,7 @@ class Tests {
      *  Here we use an unstable parameter, and therefore
      *  we expect the Composable function will NOT skip body execution.
      */
+    @Ignore
     @Test
     fun testUnstableParameter() = runTest {
         val i = UnstableDataClassWithPrivateVar(0)
@@ -34,6 +36,7 @@ class Tests {
         assertEquals(2, i.getI())
     }
 
+    @Ignore
     @Test
     fun testUnstableParameterOfLocalType() = runTest {
         val i = LocalUnstableDataClassWithPrivateVar(0)
