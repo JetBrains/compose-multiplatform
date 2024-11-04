@@ -1,20 +1,21 @@
 plugins {
     kotlin("multiplatform")
-    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
-    configureTargets()
-
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(getCommonLib())
-                implementation(getLibDependencyForMain())
+                implementation(project(":common"))
+                libDependencyForMain()
             }
         }
         val commonTest by getting {
-            configureCommonTestDependencies()
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(libs.kotlinx.coroutines.test)
+            }
         }
     }
 }

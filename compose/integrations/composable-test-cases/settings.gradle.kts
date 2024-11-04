@@ -9,6 +9,16 @@ pluginManagement {
     }
 }
 
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+        mavenLocal()
+    }
+}
+
 fun module(name: String, path: String) {
     include(name)
     val projectDir = rootDir.resolve(path).normalize().absoluteFile

@@ -5,15 +5,10 @@ repositories {
 }
 
 plugins {
-    kotlin("jvm")
-}
-
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    `kotlin-dsl`
+//    kotlin("jvm") version "2.1.0-RC"
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0-RC")
 }
