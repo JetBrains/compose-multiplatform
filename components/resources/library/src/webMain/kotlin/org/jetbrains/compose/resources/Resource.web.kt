@@ -1,5 +1,13 @@
 package org.jetbrains.compose.resources
 
+import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+
 /**
  * Represents the configuration object for web resources.
  *
@@ -50,4 +58,39 @@ internal fun getResourceUrl(windowOrigin: String, windowPathname: String, resour
         path.startsWith("http://") || path.startsWith("https://") -> path
         else -> windowOrigin + windowPathname + path
     }
+}
+
+@ExperimentalResourceApi
+@Composable
+fun preloadAndCacheFont(
+    resource: FontResource,
+    weight: FontWeight = FontWeight.Normal,
+    style: FontStyle = FontStyle.Normal
+): State<Font?> {
+    val fontState = remember(resource, weight, style) { mutableStateOf<Font?>(null) }.apply {
+        value = Font(resource, weight, style).takeIf { !it.isDefaultEmptyFont }
+    }
+    return fontState
+}
+
+@ExperimentalResourceApi
+@Composable
+fun preloadAndCacheImageResource(
+    resource: DrawableResource,
+): State<ImageBitmap?> {
+    val fontState = remember(resource) { mutableStateOf<ImageBitmap?>(null) }.apply {
+        value = imageResource(resource).takeIf { !it.isEmptyImageBitmapPlaceholder }
+    }
+    return fontState
+}
+
+@ExperimentalResourceApi
+@Composable
+fun preloadAndCacheVectorResource(
+    resource: DrawableResource,
+): State<ImageVector?> {
+    val fontState = remember(resource) { mutableStateOf<ImageVector?>(null) }.apply {
+        value = vectorResource(resource).takeIf { !it.isEmptyImageVectorPlaceholder }
+    }
+    return fontState
 }
