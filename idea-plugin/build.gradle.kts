@@ -51,12 +51,11 @@ intellijPlatform {
 }
 
 tasks {
-    // Set the compatibility versions to 1.8
     withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
+        sourceCompatibility = "21"
+        targetCompatibility = "21"
     }
-    withType<KotlinJvmCompile> { compilerOptions.jvmTarget.set(JvmTarget.JVM_11) }
+    withType<KotlinJvmCompile> { compilerOptions.jvmTarget.set(JvmTarget.JVM_21) }
 }
 
 class ProjectProperties(private val project: Project) {

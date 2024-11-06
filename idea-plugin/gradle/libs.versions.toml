@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.9.23"
-ideaPlugin = "2.0.1"
+ideaPlugin = "2.1.0"
 idea = "2024.2.1"
 changelog = "2.2.0"
 
