@@ -61,7 +61,7 @@ internal fun getResourceUrl(windowOrigin: String, windowPathname: String, resour
 
 @ExperimentalResourceApi
 @Composable
-fun preloadAndCacheFont(
+fun preloadFont(
     resource: FontResource,
     weight: FontWeight = FontWeight.Normal,
     style: FontStyle = FontStyle.Normal
@@ -74,7 +74,7 @@ fun preloadAndCacheFont(
 
 @ExperimentalResourceApi
 @Composable
-fun preloadAndCacheImageResource(
+fun preloadImageResource(
     resource: DrawableResource,
 ): State<ImageBitmap?> {
     val resState = remember(resource) { mutableStateOf<ImageBitmap?>(null) }.apply {
@@ -85,7 +85,7 @@ fun preloadAndCacheImageResource(
 
 @ExperimentalResourceApi
 @Composable
-fun preloadAndCacheVectorResource(
+fun preloadVectorResource(
     resource: DrawableResource,
 ): State<ImageVector?> {
     val resState = remember(resource) { mutableStateOf<ImageVector?>(null) }.apply {

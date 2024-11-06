@@ -16,7 +16,7 @@ internal actual fun <T> rememberResourceState(
 ): State<T> {
     val environment = LocalComposeEnvironment.current.rememberEnvironment()
     val scope = rememberCoroutineScope()
-    return remember(key1) {
+    return remember(key1, environment) {
         val mutableState = mutableStateOf(getDefault())
         scope.launch(start = CoroutineStart.UNDISPATCHED) {
             mutableState.value = block(environment)
@@ -34,7 +34,7 @@ internal actual fun <T> rememberResourceState(
 ): State<T> {
     val environment = LocalComposeEnvironment.current.rememberEnvironment()
     val scope = rememberCoroutineScope()
-    return remember(key1, key2) {
+    return remember(key1, key2, environment) {
         val mutableState = mutableStateOf(getDefault())
         scope.launch(start = CoroutineStart.UNDISPATCHED) {
             mutableState.value = block(environment)
@@ -53,7 +53,7 @@ internal actual fun <T> rememberResourceState(
 ): State<T> {
     val environment = LocalComposeEnvironment.current.rememberEnvironment()
     val scope = rememberCoroutineScope()
-    return remember(key1, key2, key3) {
+    return remember(key1, key2, key3, environment) {
         val mutableState = mutableStateOf(getDefault())
         scope.launch(start = CoroutineStart.UNDISPATCHED) {
             mutableState.value = block(environment)
