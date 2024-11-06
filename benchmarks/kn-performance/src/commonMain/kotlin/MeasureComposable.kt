@@ -1,7 +1,7 @@
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.graphics.asComposeCanvas
-import androidx.compose.ui.scene.MultiLayerComposeScene
+import androidx.compose.ui.scene.CanvasLayersComposeScene
 import androidx.compose.ui.unit.IntSize
 import org.jetbrains.skia.Surface
 import kotlin.time.Duration
@@ -44,7 +44,7 @@ fun measureComposable(
     graphicsContext: GraphicsContext?,
     content: @Composable () -> Unit
 ): BenchmarkResult = runBlocking {
-    val scene = MultiLayerComposeScene(size = IntSize(width, height))
+    val scene = CanvasLayersComposeScene(size = IntSize(width, height))
     try {
         val nanosPerFrame = (1.0 / targetFps.toDouble() * nanosPerSecond).toLong()
         scene.setContent(content)
