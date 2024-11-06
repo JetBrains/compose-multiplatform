@@ -107,7 +107,7 @@ fun preloadFont(
  * Preloads an image resource and provides a [State] containing the loaded [ImageBitmap] or `null` if not yet loaded.
  *
  * Internally, it reads the resource bytes, converts them to a [ImageBitmap] object, and caches the result,
- * speeding up future accesses to the same resource when using @Composable [imageResource] function.
+ * speeding up future accesses to the same resource when using @Composable [imageResource] or [painterResource] functions.
  *
  * **Usage Example:**
  * ```
@@ -145,7 +145,7 @@ fun preloadImageResource(
  * Preloads a vector image resource and provides a [State] containing the loaded [ImageVector] or `null` if not yet loaded.
  *
  * Internally, it reads the resource bytes, converts them to a [ImageVector] object, and caches the result,
- * speeding up future accesses to the same resource when using @Composable [vectorResource] function.
+ * speeding up future accesses to the same resource when using @Composable [vectorResource] or [painterResource] functions.
  *
  * **Usage Example:**
  * ```
