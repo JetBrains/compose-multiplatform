@@ -1,7 +1,7 @@
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.graphics.asComposeCanvas
-import androidx.compose.ui.scene.MultiLayerComposeScene
+import androidx.compose.ui.scene.CanvasLayersComposeScene
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import kotlin.time.Duration
@@ -18,7 +18,7 @@ fun measureComposable(
     frameCount: Int = 1000,
     content: @Composable () -> Unit
 ): Duration {
-    val scene = MultiLayerComposeScene(size = IntSize(width, height))
+    val scene = CanvasLayersComposeScene(size = IntSize(width, height))
     try {
         scene.setContent(content)
         val surface = org.jetbrains.skia.Surface.makeNull(width, height)
