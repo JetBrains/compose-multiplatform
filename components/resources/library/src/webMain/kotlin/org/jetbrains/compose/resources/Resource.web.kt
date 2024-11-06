@@ -72,15 +72,18 @@ internal fun getResourceUrl(windowOrigin: String, windowPathname: String, resour
  *     val fontState by preloadFont(Res.font.HeavyFont)
  *
  *     if (fontState != null) {
- *         Text(
- *             text = "Hello, World!",
- *             fontFamily = FontFamily(Font(Res.font.HeavyFont)) // the font is taken from the cache
- *         ) else {
- *              Box(modifier = Modifier.fillMaxSize()) {
- *                  CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
- *              }
- *         }
+ *          MyText()
+ *     } else {
+ *          Box(modifier = Modifier.fillMaxSize()) {
+ *              CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+ *          }
  *     }
+ * }
+ *
+ * @Composable
+ * fun MyText() {
+ *      // the font is taken from the cache
+ *      Text(text = "Hello, World!", fontFamily = FontFamily(Font(Res.font.HeavyFont)))
  * }
  * ```
  *
@@ -113,15 +116,21 @@ fun preloadFont(
  * ```
  * @Composable
  * fun MyApp() {
- *     val imageState by preloadImageResource(Res.drawable.heavy_drawable)
+ *     val imageState by preloadImageBitmap(Res.drawable.heavy_drawable)
  *
  *     if (imageState != null) {
- *         Image(painter = painterResource(Res.drawable.heavy_drawable), contentDescription = null)
+ *         MyImage()
  *     } else {
  *         Box(modifier = Modifier.fillMaxSize()) {
  *             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
  *         }
  *     }
+ * }
+ *
+ * @Composable
+ * fun MyImage() {
+ *      // the image is taken from the cache thanks to preloadImageBitmap
+ *      Image(painter = painterResource(Res.drawable.heavy_drawable), contentDescription = null)
  * }
  * ```
  *
@@ -131,7 +140,7 @@ fun preloadFont(
  */
 @ExperimentalResourceApi
 @Composable
-fun preloadImageResource(
+fun preloadImageBitmap(
     resource: DrawableResource,
 ): State<ImageBitmap?> {
     val resState = remember(resource) { mutableStateOf<ImageBitmap?>(null) }.apply {
@@ -151,15 +160,21 @@ fun preloadImageResource(
  * ```
  * @Composable
  * fun MyApp() {
- *     val iconState by preloadVectorResource(Res.drawable.heavy_vector_icon)
+ *     val iconState by preloadImageVector(Res.drawable.heavy_vector_icon)
  *
  *     if (iconState != null) {
- *         Image(painter = painterResource(Res.drawable.heavy_vector_icon), contentDescription = null)
+ *         MyIcon()
  *     } else {
  *         Box(modifier = Modifier.fillMaxSize()) {
-*              CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-*          }
+ *              CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+ *          }
  *     }
+ * }
+ *
+ * @Composable
+ * fun MyIcon() {
+ *     // the icon is taken from the cache thanks to preloadImageVector
+ *     Image(painter = painterResource(Res.drawable.heavy_vector_icon), contentDescription = null)
  * }
  * ```
  *
@@ -169,7 +184,7 @@ fun preloadImageResource(
  */
 @ExperimentalResourceApi
 @Composable
-fun preloadVectorResource(
+fun preloadImageVector(
     resource: DrawableResource,
 ): State<ImageVector?> {
     val resState = remember(resource) { mutableStateOf<ImageVector?>(null) }.apply {
