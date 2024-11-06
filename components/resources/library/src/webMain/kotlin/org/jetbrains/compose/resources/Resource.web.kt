@@ -154,7 +154,7 @@ fun preloadImageResource(
  *     val iconState by preloadVectorResource(Res.drawable.heavy_vector_icon)
  *
  *     if (iconState != null) {
- *         Image(patiner = painterResource(Res.drawable.heavy_vector_icon), contentDescription = null)
+ *         Image(painter = painterResource(Res.drawable.heavy_vector_icon), contentDescription = null)
  *     } else {
  *         Box(modifier = Modifier.fillMaxSize()) {
 *              CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
