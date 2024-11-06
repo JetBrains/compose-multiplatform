@@ -69,13 +69,17 @@ internal fun getResourceUrl(windowOrigin: String, windowPathname: String, resour
  * ```
  * @Composable
  * fun MyApp() {
- *     val fontState by preloadFont(Res.font.SomeNiceFont)
+ *     val fontState by preloadFont(Res.font.HeavyFont)
  *
  *     if (fontState != null) {
  *         Text(
  *             text = "Hello, World!",
- *             fontFamily = FontFamily(Font(Res.font.SomeNiceFont)) // the font is taken from the cache
- *         )
+ *             fontFamily = FontFamily(Font(Res.font.HeavyFont)) // the font is taken from the cache
+ *         ) else {
+ *              Box(modifier = Modifier.fillMaxSize()) {
+ *                  CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+ *              }
+ *         }
  *     }
  * }
  * ```
@@ -94,7 +98,7 @@ fun preloadFont(
     style: FontStyle = FontStyle.Normal
 ): State<Font?> {
     val resState = remember(resource, weight, style) { mutableStateOf<Font?>(null) }.apply {
-        value = Font(resource, weight, style).takeIf { !it.isDefaultEmptyFont }
+        value = Font(resource, weight, style).takeIf { !it.isEmptyPlaceholder }
     }
     return resState
 }
@@ -109,10 +113,14 @@ fun preloadFont(
  * ```
  * @Composable
  * fun MyApp() {
- *     val imageState by preloadImageResource(Res.drawable.niceDrawable)
+ *     val imageState by preloadImageResource(Res.drawable.heavy_drawable)
  *
  *     if (imageState != null) {
- *         Image(bitmap = imageResource(Res.drawable.niceDrawable))
+ *         Image(painter = painterResource(Res.drawable.heavy_drawable), contentDescription = null)
+ *     } else {
+ *         Box(modifier = Modifier.fillMaxSize()) {
+ *             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+ *         }
  *     }
  * }
  * ```
@@ -127,7 +135,7 @@ fun preloadImageResource(
     resource: DrawableResource,
 ): State<ImageBitmap?> {
     val resState = remember(resource) { mutableStateOf<ImageBitmap?>(null) }.apply {
-        value = imageResource(resource).takeIf { !it.isEmptyImageBitmapPlaceholder }
+        value = imageResource(resource).takeIf { !it.isEmptyPlaceholder }
     }
     return resState
 }
@@ -143,10 +151,14 @@ fun preloadImageResource(
  * ```
  * @Composable
  * fun MyApp() {
- *     val iconState by preloadVectorResource(Res.drawable.niceVectorIcon)
+ *     val iconState by preloadVectorResource(Res.drawable.heavy_vector_icon)
  *
  *     if (iconState != null) {
- *         Image(imageVector = vectorResource(Res.drawable.niceVectorIcon))
+ *         Image(patiner = painterResource(Res.drawable.heavy_vector_icon), contentDescription = null)
+ *     } else {
+ *         Box(modifier = Modifier.fillMaxSize()) {
+*              CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+*          }
  *     }
  * }
  * ```
@@ -161,7 +173,7 @@ fun preloadVectorResource(
     resource: DrawableResource,
 ): State<ImageVector?> {
     val resState = remember(resource) { mutableStateOf<ImageVector?>(null) }.apply {
-        value = vectorResource(resource).takeIf { !it.isEmptyImageVectorPlaceholder }
+        value = vectorResource(resource).takeIf { !it.isEmptyPlaceholder }
     }
     return resState
 }

@@ -51,7 +51,6 @@ class TestResourcePreloading {
                 font = preloadFont(TestFontResource("sometestfont")).value
 
                 if (condition) {
-                    println("Herere!! - $font")
                     font2 = Font(TestFontResource("sometestfont"))
                 }
             }
@@ -61,7 +60,7 @@ class TestResourcePreloading {
         assertEquals(null, font2)
 
         assertNotEquals(null, loadContinuation)
-        loadContinuation!!.resumeWith(Result.success(Base64.decode(emptyFontBase64)))
+        loadContinuation!!.resumeWith(Result.success(ByteArray(0)))
         loadContinuation = null
 
         waitForIdle()

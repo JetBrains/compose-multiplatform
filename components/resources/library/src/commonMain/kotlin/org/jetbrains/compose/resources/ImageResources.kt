@@ -47,7 +47,7 @@ fun painterResource(resource: DrawableResource): Painter {
 
 private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 
-internal val ImageBitmap.isEmptyImageBitmapPlaceholder: Boolean
+internal val ImageBitmap.isEmptyPlaceholder: Boolean
     get() = this == emptyImageBitmap
 
 /**
@@ -80,7 +80,7 @@ private val emptyImageVector: ImageVector by lazy {
     ImageVector.Builder("emptyImageVector", 1.dp, 1.dp, 1f, 1f).build()
 }
 
-internal val ImageVector.isEmptyImageVectorPlaceholder: Boolean
+internal val ImageVector.isEmptyPlaceholder: Boolean
     get() = this == emptyImageVector
 
 /**

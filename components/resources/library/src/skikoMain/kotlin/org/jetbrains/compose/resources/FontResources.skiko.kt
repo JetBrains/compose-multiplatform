@@ -7,7 +7,7 @@ import androidx.compose.ui.text.platform.Font
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-internal val emptyFontBase64 =
+private val emptyFontBase64 =
     "T1RUTwAJAIAAAwAQQ0ZGIML7MfIAAAQIAAAA2U9TLzJmMV8PAAABAAAAAGBjbWFwANUAVwAAA6QAAABEaGVhZCMuU7" +
             "IAAACcAAAANmhoZWECvgAmAAAA1AAAACRobXR4Az4AAAAABOQAAAAQbWF4cAAEUAAAAAD4AAAABm5hbWUpw3nbAAABYAAAAkNwb3N0AAMA" +
             "AAAAA+gAAAAgAAEAAAABAADs7nftXw889QADA+gAAAAA4WWJaQAAAADhZYlpAAAAAAFNAAAAAAADAAIAAAAAAAAAAQAAArz+1AAAAU0AAA" +
@@ -30,7 +30,7 @@ internal val emptyFontBase64 =
 private val defaultEmptyFont by lazy { Font("org.jetbrains.compose.emptyFont", Base64.decode(emptyFontBase64)) }
 
 private val fontCache = AsyncCache<String, Font>()
-internal val Font.isDefaultEmptyFont: Boolean
+internal val Font.isEmptyPlaceholder: Boolean
     get() = this == defaultEmptyFont
 
 @Composable
