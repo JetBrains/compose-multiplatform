@@ -26,6 +26,7 @@ dependencies {
     intellijPlatform {
         intellijIdeaCommunity(libs.versions.idea)
         instrumentationTools()
+        pluginVerifier()
 
         bundledPlugins("com.intellij.java", "org.jetbrains.kotlin", "com.intellij.gradle")
     }
@@ -41,7 +42,11 @@ intellijPlatform {
         channels = projectProperties.pluginChannels
     }
 
-    pluginVerification { ides { recommended() } }
+    pluginVerification {
+        ides {
+            recommended()
+        }
+    }
 }
 
 tasks {
