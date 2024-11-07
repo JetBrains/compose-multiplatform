@@ -290,7 +290,7 @@ class PreviewManagerImpl(
             }
         }
     }.also {
-        it.uncaughtExceptionHandler = Thread.UncaughtExceptionHandler { thread, e ->
+        it.uncaughtExceptionHandler = Thread.UncaughtExceptionHandler { _, e ->
             onError(e)
         }
         threads.add(it)

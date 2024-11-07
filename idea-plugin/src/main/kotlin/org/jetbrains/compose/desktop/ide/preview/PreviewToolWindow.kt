@@ -15,9 +15,6 @@ import java.awt.BorderLayout
 import org.jetbrains.compose.desktop.ide.preview.ui.PreviewPanel
 
 class PreviewToolWindow : ToolWindowFactory, DumbAware {
-    @Deprecated("Use isApplicableAsync")
-    override fun isApplicable(project: Project): Boolean = isPreviewCompatible(project)
-
     override suspend fun isApplicableAsync(project: Project): Boolean = isPreviewCompatible(project)
 
     override fun init(toolWindow: ToolWindow) {
