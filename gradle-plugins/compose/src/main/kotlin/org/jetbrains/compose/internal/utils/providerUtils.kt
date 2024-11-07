@@ -38,7 +38,10 @@ internal fun ProviderFactory.valueOrNull(prop: String): Provider<String?> =
     }
 
 private fun Provider<String?>.forUseAtConfigurationTimeSafe(): Provider<String?> =
-    try {
+    // https://docs.gradle.org/current/userguide/upgrading_version_7.html
+    if (org.gradle.util.GradleVersion.current() >= org.gradle.util.GradleVersion.version("8.0")) {
+        this
+    } else try {
         forUseAtConfigurationTime()
     } catch (e: NoSuchMethodError) {
         // todo: remove once we drop support for Gradle 6.4
