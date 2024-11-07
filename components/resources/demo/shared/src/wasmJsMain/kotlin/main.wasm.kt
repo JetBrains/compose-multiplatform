@@ -28,7 +28,6 @@ fun main() {
         resourcePathMapping { path -> "./$path" }
     }
     CanvasBasedWindow("Resources demo + K/Wasm") {
-        println("Theme = ${LocalSystemTheme.current}")
         val font1 by preloadFont(Res.font.Workbench_Regular)
         val font2 by preloadFont(Res.font.font_awesome, FontWeight.Normal, FontStyle.Normal)
         val emojiFont = preloadFont(Res.font.NotoColorEmoji).value
