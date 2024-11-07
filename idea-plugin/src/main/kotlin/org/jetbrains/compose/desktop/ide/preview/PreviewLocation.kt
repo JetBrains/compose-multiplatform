@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.desktop.ide.preview
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.externalSystem.util.ExternalSystemApiUtil
 import com.intellij.openapi.roots.ProjectFileIndex
 import com.intellij.util.concurrency.annotations.RequiresReadLock
@@ -20,7 +21,7 @@ internal fun KtNamedFunction.asPreviewFunctionOrNull(): PreviewLocation? {
     val module = ProjectFileIndex.getInstance(project).getModuleForFile(containingFile.virtualFile)
     if (module == null || module.isDisposed) return null
 
-    val service = project.getService(PreviewStateService::class.java)
+    val service = project.service<PreviewStateService>()
     val previewTaskName = service.configurePreviewTaskNameOrNull(module) ?: DEFAULT_CONFIGURE_PREVIEW_TASK_NAME
     val modulePath = ExternalSystemApiUtil.getExternalProjectPath(module) ?: return null
     return PreviewLocation(fqName = fqName, modulePath = modulePath, taskName = previewTaskName)
