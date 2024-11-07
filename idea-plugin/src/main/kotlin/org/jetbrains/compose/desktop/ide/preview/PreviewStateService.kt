@@ -20,8 +20,8 @@ import javax.swing.JComponent
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
 
-@Service(Service.Level.APP)
-class PreviewStateService() : Disposable {
+@Service(Service.Level.PROJECT)
+class PreviewStateService : Disposable {
     private val previewListener = CompositePreviewListener()
     private val previewManager: PreviewManager = PreviewManagerImpl(previewListener)
     val gradleCallbackPort: Int

@@ -30,7 +30,7 @@ class PreviewToolWindow : ToolWindowFactory, DumbAware {
             val loadingPanel = JBLoadingPanel(BorderLayout(), toolWindow.disposable)
             loadingPanel.add(panel, BorderLayout.CENTER)
             content.addContent(content.factory.createContent(loadingPanel, null, false))
-            service<PreviewStateService>().registerPreviewPanels(panel, loadingPanel)
+            project.service<PreviewStateService>().registerPreviewPanels(panel, loadingPanel)
         }
     }
 
