@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import height
 import width
+import kotlin.js.JsName
 
 import kotlin.math.*
 import kotlin.random.Random
@@ -36,6 +37,7 @@ data class SnowFlake(
 
 data class Star(val x: Dp, val y: Dp, val color: Color, val size: Dp)
 
+@JsName("val_random")
 val random = Random(123)
 
 fun random(): Float = random.nextFloat()
