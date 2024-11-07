@@ -30,6 +30,8 @@ private val emptyFontBase64 =
 private val defaultEmptyFont by lazy { Font("org.jetbrains.compose.emptyFont", Base64.decode(emptyFontBase64)) }
 
 private val fontCache = AsyncCache<String, Font>()
+internal val Font.isEmptyPlaceholder: Boolean
+    get() = this == defaultEmptyFont
 
 @Composable
 actual fun Font(resource: FontResource, weight: FontWeight, style: FontStyle): Font {
