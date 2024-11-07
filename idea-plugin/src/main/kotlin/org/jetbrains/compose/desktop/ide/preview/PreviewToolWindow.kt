@@ -11,23 +11,23 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import com.intellij.ui.components.JBLoadingPanel
-import org.jetbrains.compose.desktop.ide.preview.ui.PreviewPanel
 import java.awt.BorderLayout
+import org.jetbrains.compose.desktop.ide.preview.ui.PreviewPanel
 
 class PreviewToolWindow : ToolWindowFactory, DumbAware {
-    override fun isApplicable(project: Project): Boolean =
-        isPreviewCompatible(project)
+    @Deprecated("Use isApplicableAsync")
+    override fun isApplicable(project: Project): Boolean = isPreviewCompatible(project)
+
+    override suspend fun isApplicableAsync(project: Project): Boolean = isPreviewCompatible(project)
 
     override fun init(toolWindow: ToolWindow) {
-        ApplicationManager.getApplication().invokeLater {
-            toolWindow.setIcon(PreviewIcons.COMPOSE)
-        }
+        ApplicationManager.getApplication().invokeLater { toolWindow.setIcon(PreviewIcons.COMPOSE) }
     }
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         toolWindow.contentManager.let { content ->
             val panel = PreviewPanel(project)
-            val loadingPanel = JBLoadingPanel(BorderLayout(), project)
+            val loadingPanel = JBLoadingPanel(BorderLayout(), toolWindow.disposable)
             loadingPanel.add(panel, BorderLayout.CENTER)
             content.addContent(content.factory.createContent(loadingPanel, null, false))
             project.service<PreviewStateService>().registerPreviewPanels(panel, loadingPanel)
@@ -35,6 +35,5 @@ class PreviewToolWindow : ToolWindowFactory, DumbAware {
     }
 
     // don't show the toolwindow until a preview is requested
-    override fun shouldBeAvailable(project: Project): Boolean =
-        false
+    override fun shouldBeAvailable(project: Project): Boolean = false
 }
