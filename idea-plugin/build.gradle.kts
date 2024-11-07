@@ -50,6 +50,14 @@ tasks {
         targetCompatibility = "21"
     }
     withType<KotlinJvmCompile> { compilerOptions.jvmTarget.set(JvmTarget.JVM_21) }
+
+    runIde {
+        systemProperty("idea.is.internal", true)
+        systemProperty("idea.kotlin.plugin.use.k2", true)
+        jvmArgumentProviders += CommandLineArgumentProvider {
+            listOf("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005")
+        }
+    }
 }
 
 class ProjectProperties(private val project: Project) {
