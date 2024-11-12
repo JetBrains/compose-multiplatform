@@ -14,9 +14,10 @@ _Changes since 1.7.0_
 
 - [Fling animation works correctly for fast scrolling gestures](https://github.com/JetBrains/compose-multiplatform-core/pull/1616)
 - [Fix HorizontalPager snapping on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1661)
+- [Fix issue where `DateRangePicker` doesn't show confirmation button on iOS and Desktop](https://github.com/JetBrains/compose-multiplatform-core/pull/1666)
 - [Fixed double recomposition on the first screen](https://github.com/JetBrains/compose-multiplatform-core/pull/1668)
 - [Fix Accessibility Items availability inside dialogs](https://github.com/JetBrains/compose-multiplatform-core/pull/1678)
-- [Update DatePickerDialog to the latest AOSP version](https://github.com/JetBrains/compose-multiplatform-core/pull/1666)
+- [Memory leak due to Compose view controller never GCed](https://github.com/JetBrains/compose-multiplatform-core/pull/1660)
 
 ### Desktop
 
