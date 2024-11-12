@@ -163,18 +163,13 @@ fun getChangelog(firstCommit: String, lastCommit: String, firstVersion: String, 
                 it.section != null && it.subsection != null
                         && it.section !in standardSections && it.subsection !in standardSubsections
             }
-            .groupBy { "${it.section} - ${it.subsection}" }
 
         if (nonstandardSectionEntries.isNotEmpty()) {
             println()
             println("WARNING! Changelog contains nonstandard sections. Please change them to the standard ones, or enhance the list in the PR template.")
 
-            for ((section, entries) in nonstandardSectionEntries) {
-                println("[$section]")
-                for (entry in entries) {
-                    println("- ${entry.link}")
-                }
-                println()
+            for (entry in nonstandardSectionEntries) {
+                println("${entry.section} - ${entry.subsection} in ${entry.link}")
             }
         }
     }
