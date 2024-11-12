@@ -8,13 +8,13 @@ _Changes since 1.7.0_
 
 - [Fixed `Modifier.clickable` binary compatibility with 1.6 on non-JVM targets](https://github.com/JetBrains/compose-multiplatform-core/pull/1647)
 - [Fixed `Modifier.toggleable` and `Modifier.selectable` binary compatibility with 1.6 on non-JVM targets](https://github.com/JetBrains/compose-multiplatform-core/pull/1649)
+- [Fix issue where `DateRangePicker` doesn't show confirmation button on iOS and Desktop](https://github.com/JetBrains/compose-multiplatform-core/pull/1666)
 - [Fix Skia paragraph caching performance degradation](https://github.com/JetBrains/compose-multiplatform-core/pull/1676)
 
 ### iOS
 
 - [Fling animation works correctly for fast scrolling gestures](https://github.com/JetBrains/compose-multiplatform-core/pull/1616)
 - [Fix HorizontalPager snapping on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1661)
-- [Fix issue where `DateRangePicker` doesn't show confirmation button on iOS and Desktop](https://github.com/JetBrains/compose-multiplatform-core/pull/1666)
 - [Fixed double recomposition on the first screen](https://github.com/JetBrains/compose-multiplatform-core/pull/1668)
 - [Fix Accessibility Items availability inside dialogs](https://github.com/JetBrains/compose-multiplatform-core/pull/1678)
 - [Memory leak due to Compose view controller never GCed](https://github.com/JetBrains/compose-multiplatform-core/pull/1660)
