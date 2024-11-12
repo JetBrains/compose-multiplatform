@@ -158,17 +158,19 @@ fun getChangelog(firstCommit: String, lastCommit: String, firstVersion: String, 
         appendLine()
         appendLine()
 
-        val nonstandardSections = entries.mapNotNull { it.section }.toSet() - standardSections
-        val nonstandardSubsections = entries.mapNotNull { it.subsection }.toSet() - standardSubsections
+        val nonstandardSectionEntries = entries
+            .filter {
+                it.section != null && it.subsection != null
+                        && it.section !in standardSections && it.subsection !in standardSubsections
+            }
 
-        if (nonstandardSections.isNotEmpty()) {
+        if (nonstandardSectionEntries.isNotEmpty()) {
             println()
-            println("WARNING! Changelog contains nonstandard sections. Please change them to the standard ones, or enhance the list in the PR template. List:\n${nonstandardSections.joinToString("\n")}")
-        }
+            println("WARNING! Changelog contains nonstandard sections. Please change them to the standard ones, or enhance the list in the PR template.")
 
-        if (nonstandardSubsections.isNotEmpty()) {
-            println()
-            println("WARNING! Changelog contains nonstandard subsections. Please change them to the standard ones, or enhance the list in the PR template. List:\n${nonstandardSubsections.joinToString("\n")}")
+            for (entry in nonstandardSectionEntries) {
+                println("${entry.section} - ${entry.subsection} in ${entry.link}")
+            }
         }
     }
 }
