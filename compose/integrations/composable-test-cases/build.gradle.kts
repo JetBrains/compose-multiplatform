@@ -120,3 +120,5 @@ fun KotlinSourceSet.libDependencyForMain1() {
 //    if (project.name.endsWith("-main")) error("Unexpected main module name: ${project.name}")
 //    return project(":" + project.name.replace("-main", "-lib"))
 //}
+
+println("kotlin version: ${libs.versions.kotlin.get()}")

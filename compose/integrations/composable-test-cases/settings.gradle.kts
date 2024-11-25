@@ -17,6 +17,16 @@ dependencyResolutionManagement {
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
         mavenLocal()
     }
+
+    versionCatalogs {
+        register("libs").configure {
+            val kotlinVersion = providers.gradleProperty("kotlin_version").orNull
+            if (kotlinVersion != null) {
+                version("kotlin", kotlinVersion)
+//                println("kotlin version applied: $kotlinVersion")
+            }
+        }
+    }
 }
 
 fun module(name: String, path: String) {

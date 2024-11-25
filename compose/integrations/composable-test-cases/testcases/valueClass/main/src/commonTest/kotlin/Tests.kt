@@ -1,13 +1,10 @@
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.example.common.TextContainerNode
-import com.example.common.TextLeafNode
 import com.example.common.composeText
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.runTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -190,4 +187,8 @@ class Tests {
         job.cancel()
     }
 
+    @Test
+    fun testDataClassCopyAvailable() = runTest {
+        val a = DCCopyAvailable(10).copy()
+    }
 }
