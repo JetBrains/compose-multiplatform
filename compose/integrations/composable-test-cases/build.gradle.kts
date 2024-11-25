@@ -69,8 +69,8 @@ subprojects {
             jvm("desktop")
             applyDefaultHierarchyTemplate()
             js(IR) {
-                browser()
-                // nodejs() // Commented to save a bit of CI time. Testing in a browser should be enough.
+//                browser()
+                 nodejs() // Commented to save a bit of CI time. Testing in a browser should be enough.
             }
             wasmJs {
                 d8 {}

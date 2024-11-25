@@ -1,5 +1,5 @@
 [versions]
-kotlin="2.1.0-RC2-375"
+kotlin="2.1.0-RC2"
 kotlinx-coroutines = "1.8.0"
 compose = "1.7.0"
 
