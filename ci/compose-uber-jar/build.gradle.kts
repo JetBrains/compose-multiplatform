@@ -27,6 +27,12 @@ dependencies {
     implementation("org.jetbrains.compose.desktop:desktop-jvm-linux-x64:$composeVersion")
 }
 
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
 val shadowJar = tasks.named("shadowJar", ShadowJar::class) {
     dependencies {
         include { it.moduleGroup.startsWith("org.jetbrains.compose") }
