@@ -39,12 +39,13 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
     private fun getPathOnDisk(path: String): String {
         val fm = NSFileManager.defaultManager()
         val currentDirectoryPath = fm.currentDirectoryPath
+        val pathFix = path.removePrefix("composeResources/").substringAfter("/")
         return listOf(
             //todo in future bundle resources with app and use all sourceSets (skikoMain, nativeMain)
-            "$currentDirectoryPath/src/macosMain/composeResources/$path",
-            "$currentDirectoryPath/src/macosTest/composeResources/$path",
-            "$currentDirectoryPath/src/commonMain/composeResources/$path",
-            "$currentDirectoryPath/src/commonTest/composeResources/$path"
+            "$currentDirectoryPath/src/macosMain/composeResources/$pathFix",
+            "$currentDirectoryPath/src/macosTest/composeResources/$pathFix",
+            "$currentDirectoryPath/src/commonMain/composeResources/$pathFix",
+            "$currentDirectoryPath/src/commonTest/composeResources/$pathFix"
         ).firstOrNull { p -> fm.fileExistsAtPath(p) }  ?: throw MissingResourceException(path)
     }
 }
