@@ -33,7 +33,7 @@ internal fun Project.configureSyncIosComposeResources(
     }
 
     kotlinExtension.targets.withType(KotlinNativeTarget::class.java).all { nativeTarget ->
-        if (nativeTarget.isIosTarget()) {
+        if (nativeTarget.isIosOrMacTarget()) {
             nativeTarget.binaries.withType(Framework::class.java).all { iosFramework ->
                 val frameworkClassifier = iosFramework.getClassifier()
                 val checkNoSandboxTask = tasks.registerOrConfigure<CheckCanAccessComposeResourcesDirectory>(
@@ -127,7 +127,8 @@ private fun Framework.getFinalResourcesDir(): Provider<Directory> {
             .zip(
                 providers.environmentVariable("CONTENTS_FOLDER_PATH")
             ) { builtProductsDir, contentsFolderPath ->
-                File("$builtProductsDir/$contentsFolderPath/$IOS_COMPOSE_RESOURCES_ROOT_DIR").canonicalPath
+                val pathSuffix = if (target.isMacTarget()) "/Resources" else ""
+                File("$builtProductsDir/$contentsFolderPath$pathSuffix/$IOS_COMPOSE_RESOURCES_ROOT_DIR").canonicalPath
             }
             .flatMap {
                 project.objects.directoryProperty().apply { set(File(it)) }
@@ -141,5 +142,8 @@ private fun KotlinNativeTarget.isIosSimulatorTarget(): Boolean =
 private fun KotlinNativeTarget.isIosDeviceTarget(): Boolean =
     konanTarget === KonanTarget.IOS_ARM64
 
-private fun KotlinNativeTarget.isIosTarget(): Boolean =
-    isIosSimulatorTarget() || isIosDeviceTarget()
+private fun KotlinNativeTarget.isMacTarget(): Boolean =
+    konanTarget === KonanTarget.MACOS_X64 || konanTarget === KonanTarget.MACOS_ARM64
+
+private fun KotlinNativeTarget.isIosOrMacTarget(): Boolean =
+    isIosSimulatorTarget() || isIosDeviceTarget() || isMacTarget()

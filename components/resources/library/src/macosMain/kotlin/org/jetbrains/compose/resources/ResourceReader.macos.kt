@@ -41,6 +41,8 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         val currentDirectoryPath = fm.currentDirectoryPath
         val pathFix = path.removePrefix("composeResources/").substringAfter("/")
         return listOf(
+            // todo: support fallback path at bundle root?
+            NSBundle.mainBundle.resourcePath + "/compose-resources/" + path,
             //todo in future bundle resources with app and use all sourceSets (skikoMain, nativeMain)
             "$currentDirectoryPath/src/macosMain/composeResources/$pathFix",
             "$currentDirectoryPath/src/macosTest/composeResources/$pathFix",
