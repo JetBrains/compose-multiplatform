@@ -6,9 +6,10 @@ repositories {
 
 plugins {
     `kotlin-dsl`
-//    kotlin("jvm") version "2.1.0-RC"
+//    alias(libs.plugins.multiplatform)
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0-RC")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:${libs.versions.kotlin.get()}")
+//    implementation(libs.kotlin.gradle.plugin)
 }

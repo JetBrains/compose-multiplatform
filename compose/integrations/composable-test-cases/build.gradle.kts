@@ -1,4 +1,5 @@
 import org.gradle.accessors.dm.LibrariesForLibs
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
@@ -72,6 +73,7 @@ subprojects {
 //                browser()
                  nodejs() // Commented to save a bit of CI time. Testing in a browser should be enough.
             }
+            @OptIn(ExperimentalWasmDsl::class)
             wasmJs {
                 d8 {}
             }
@@ -120,5 +122,3 @@ fun KotlinSourceSet.libDependencyForMain1() {
 //    if (project.name.endsWith("-main")) error("Unexpected main module name: ${project.name}")
 //    return project(":" + project.name.replace("-main", "-lib"))
 //}
-
-println("kotlin version: ${libs.versions.kotlin.get()}")
