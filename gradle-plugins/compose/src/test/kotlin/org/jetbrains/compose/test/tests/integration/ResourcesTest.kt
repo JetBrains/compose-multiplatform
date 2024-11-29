@@ -756,9 +756,9 @@ class ResourcesTest : GradlePluginTestBase() {
                 check.taskSkipped(":prepareComposeResourcesTaskForMacosX64Main")
                 check.taskSkipped(":generateResourceAccessorsForMacosX64Main")
 
-                check.taskSkipped(":syncPodComposeResourcesForMacos")
+                check.taskSkipped(":syncPodComposeResourcesForIos")
             }
-            gradle(":syncPodComposeResourcesForMacos").checks {
+            gradle(":syncPodComposeResourcesForIos").checks {
                 check.taskNoSource(":convertXmlValueResourcesForCommonMain")
                 check.taskSuccessful(":copyNonXmlValueResourcesForCommonMain")
                 check.taskSuccessful(":prepareComposeResourcesTaskForCommonMain")
