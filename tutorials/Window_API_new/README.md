@@ -563,7 +563,7 @@ private fun FileDialog(
 ```
 
 ## Draggable window area
-If you window is undecorated and you want to add a custom draggable titlebar to it (or make the whole window draggable), you can use `DraggableWindowArea`:
+If you window is undecorated and you want to add a custom draggable titlebar to it (or make the whole window draggable), you can use `WindowDraggableArea`:
 ```kotlin
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
