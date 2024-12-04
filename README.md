@@ -1,7 +1,7 @@
 [![official project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
-[![stable](https://img.shields.io/github/v/release/JetBrains/compose-multiplatform?color=brightgreen&label=stable)](https://github.com/JetBrains/compose-multiplatform/releases/latest)
-[![prerelease](https://img.shields.io/github/v/release/JetBrains/compose-multiplatform?color=orange&include_prereleases&label=prerelease)](https://github.com/JetBrains/compose-multiplatform/releases)
-[![dev](https://img.shields.io/github/v/tag/JetBrains/compose-multiplatform?include_prereleases&sort=semver&filter=v*+dev*&label=dev)](https://github.com/JetBrains/compose-multiplatform/tags)
+[![stable](https://img.shields.io/github/v/release/JetBrains/compose-multiplatform?sort=semver&display_name=release&label=stable&color=brightgreen)](https://github.com/JetBrains/compose-multiplatform/releases/latest)
+[![prerelease](https://img.shields.io/github/v/release/JetBrains/compose-multiplatform?include_prereleases&sort=semver&filter=*-*&display_name=release&label=prerelease&color=blue)](https://github.com/JetBrains/compose-multiplatform/releases)
+[![dev](https://img.shields.io/github/v/tag/JetBrains/compose-multiplatform?include_prereleases&sort=semver&filter=v*+dev*&label=dev&color=orange)](https://github.com/JetBrains/compose-multiplatform/tags)
 
 # Compose Multiplatform
 
