@@ -1,6 +1,4 @@
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig.DevServer
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("multiplatform")
@@ -36,8 +34,7 @@ kotlin {
 
     wasmJs {
         binaries.executable()
-        browser {
-        }
+        browser ()
     }
 
     sourceSets {
