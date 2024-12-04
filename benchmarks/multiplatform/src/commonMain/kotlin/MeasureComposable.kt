@@ -8,7 +8,6 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.*
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.TimeSource.Monotonic.markNow
 import kotlin.time.measureTime
 
@@ -24,15 +23,17 @@ expect fun runGC()
 
 suspend inline fun preciseDelay(duration: Duration) {
     val liveDelay: Duration
-    if (duration.inWholeMilliseconds > 1) {
-        val delayMillis = duration.inWholeMilliseconds - 1
+    if (duration.inWholeMilliseconds > 2) {
+        //experiments have shown that for precise delay we should do live delay at least 2 ms
+        val delayMillis = duration.inWholeMilliseconds - 2
+        val delayStart = markNow()
         delay(delayMillis)
-        liveDelay = duration - delayMillis.milliseconds
+        liveDelay = duration - delayStart.elapsedNow()
     } else {
         liveDelay = duration
     }
-    val start = markNow()
-    while (start.elapsedNow() < liveDelay){}
+    val liveDelayStart = markNow()
+    while (liveDelayStart.elapsedNow() < liveDelay){}
 }
 
 @OptIn(ExperimentalTime::class, InternalComposeUiApi::class)
