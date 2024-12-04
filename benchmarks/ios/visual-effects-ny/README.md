@@ -1,1 +1,0 @@
-A benchmark app extracted from the NY sample of examples/visual-effects
