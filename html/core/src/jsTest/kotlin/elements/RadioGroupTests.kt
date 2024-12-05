@@ -12,7 +12,6 @@ import org.w3c.dom.HTMLInputElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@OptIn(ExperimentalComposeWebApi::class)
 class RadioGroupTests {
 
     @Test

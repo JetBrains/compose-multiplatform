@@ -113,7 +113,6 @@ class ElementsTests {
     }
 
     @Test
-    @OptIn(ExperimentalComposeWebApi::class)
     fun rawCreation() = runTest {
         @Composable
         fun CustomElement(
@@ -155,7 +154,6 @@ class ElementsTests {
     }
 
     @Test
-    @OptIn(ExperimentalComposeWebApi::class)
     fun rawCreationAndTagChanges() = runTest {
         @Composable
         fun CustomElement(
