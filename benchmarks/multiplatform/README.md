@@ -1,11 +1,11 @@
 # Compose Multiplatform benchmarks
 
 ## Run Desktop
-- `./gradlew :run`
+- `./gradlew :benchmarks:run`
 
 ## Run native on MacOS
- - `./gradlew runReleaseExecutableMacosArm64` (Works on Arm64 processors)
- - `./gradlew runReleaseExecutableMacosX64` (Works on Intel processors)
+ - `./gradlew :benchmarks:runReleaseExecutableMacosArm64` (Works on Arm64 processors)
+ - `./gradlew :benchmarks:runReleaseExecutableMacosX64` (Works on Intel processors)
 
 ## Run in web browser:
 
@@ -13,4 +13,4 @@ Please run your browser with manual GC enabled before running the benchmark, lik
 
 `open -a Google\ Chrome --args --js-flags="--expose-gc"`
 
-- `./gradlew wasmJsBrowserProductionRun` (you can see the results printed on the page itself)
+- `./gradlew :benchmarks:wasmJsBrowserProductionRun` (you can see the results printed on the page itself)

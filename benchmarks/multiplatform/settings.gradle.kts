@@ -17,3 +17,5 @@ pluginManagement {
 }
 
 rootProject.name = "compose-benchmarks"
+
+include(":benchmarks")
