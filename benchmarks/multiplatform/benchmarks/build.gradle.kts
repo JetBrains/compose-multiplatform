@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 plugins {
@@ -17,21 +18,30 @@ repositories {
 
 kotlin {
     jvm("desktop")
-    macosX64 {
-        binaries {
-            executable {
-                entryPoint = "main"
-            }
+
+    listOf(
+        iosX64(),
+        iosArm64(),
+        iosSimulatorArm64()
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
+            baseName = "benchmarks"
+            isStatic = true
         }
     }
-    macosArm64 {
-        binaries {
+
+    listOf(
+        macosX64(),
+        macosArm64()
+    ).forEach { macosTarget ->
+        macosTarget.binaries {
             executable {
                 entryPoint = "main"
             }
         }
     }
 
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         binaries.executable()
         browser ()
@@ -54,19 +64,6 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.1")
             }
-        }
-
-        val nativeMain by creating {
-            dependsOn(commonMain)
-        }
-        val macosMain by creating {
-            dependsOn(nativeMain)
-        }
-        val macosX64Main by getting {
-            dependsOn(macosMain)
-        }
-        val macosArm64Main by getting {
-            dependsOn(macosMain)
         }
     }
 }
