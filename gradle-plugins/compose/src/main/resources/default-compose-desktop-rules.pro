@@ -1,4 +1,3 @@
--keep class kotlin.** { *; }
 -keep class org.jetbrains.skia.** { *; }
 -keep class org.jetbrains.skiko.** { *; }
 
