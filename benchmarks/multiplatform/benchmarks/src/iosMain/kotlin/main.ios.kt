@@ -5,7 +5,7 @@
 
 import kotlinx.coroutines.runBlocking
 
-fun main() {
-//    Args.parseArgs(args) //TODO implement
+fun main(args : List<String>) {
+    Args.parseArgs(args.toTypedArray())
     runBlocking { runBenchmarks(graphicsContext = graphicsContext()) }
 }
