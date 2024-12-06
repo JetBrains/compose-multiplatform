@@ -1,3 +1,127 @@
+# 1.8.0-alpha01 (November 2024)
+
+_Changes since 1.7.1_
+
+## Highlights
+
+### iOS
+
+- [LocalUIViewController moved to the `androidx.compose.ui.uikit` module](https://github.com/JetBrains/compose-multiplatform-core/pull/1608)
+- [Update `AccessibilitySyncOptions` and remove `AccessibilityDebugLogger` from public API](https://github.com/JetBrains/compose-multiplatform-core/pull/1604)
+- [ComposeUIViewControllerDelegate marked as deprecated](https://github.com/JetBrains/compose-multiplatform-core/pull/1651). Use parent view controller to override the methods of the UIViewController class
+- [Remove experimental flag from `fun enableTraceOSLog()`](https://github.com/JetBrains/compose-multiplatform-core/pull/1652)
+- [Remove obsolete Canvas Layers mode on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1680)
+
+## Breaking Changes
+
+### Multiple Platforms
+
+- [Tests that relied on `waitForIdle`, `awaitIdle` or `runOnIdle`](https://github.com/JetBrains/compose-multiplatform-core/pull/1550) (whether explicit or implicit) executing `delay`-ed coroutines will no longer work correctly. To fix this advance the test time via `mainClock` manually, as needed
+    For example, tests that previously did something like:
+    ```
+    var updateText by mutableStateOf(false)
+    var text by mutableStateOf("0")
+    setContent {
+        LaunchedEffect(updateText) {
+            if (updateText) {
+                delay(1000)
+                text = "1"
+            }
+        }
+    }
+    updateText = true
+    waitForIdle()
+    assertEquals("1", text)
+    ```
+    will need to add `mainClock.advanceTimeBy(1000)` after `waitForIdle()`, because `waitForIdle` no longer waits for the `delay`-ed coroutine to complete
+- [Tests that advance the test clock](https://github.com/JetBrains/compose-multiplatform-core/pull/1550) (via `mainClock.advanceTimeBy`) may see different behavior with regards to the amount and timing of recomposition, layout, drawing and effects
+- [`runOnIdle` will now execute `action` on the UI thread](https://github.com/JetBrains/compose-multiplatform-core/pull/1601)
+- [`runOnIdle` will no longer call `waitForIdle` after executing the action](https://github.com/JetBrains/compose-multiplatform-core/pull/1601)
+- [Advancing `mainClock` such that it doesn't reach the next frame, will no longer cause a recomposition](https://github.com/JetBrains/compose-multiplatform-core/pull/1618)
+
+### Desktop
+
+- [Deprecated/experimental `Modifier.onExternalDrag` has been removed - common `Modifier.dragAndDropTarget` API should be used instead](https://github.com/JetBrains/compose-multiplatform-core/pull/1606)
+
+## Features
+
+### Multiple Platforms
+
+- [Support configurable vertical text centering via `LineHeightStyle.Alignment`](https://github.com/JetBrains/compose-multiplatform-core/pull/1569)
+- [Support Variable Fonts In All Platforms](https://github.com/JetBrains/compose-multiplatform-core/pull/1623)
+
+### iOS
+
+- [Add localised string for VoiceOver accessibility support](https://github.com/JetBrains/compose-multiplatform-core/pull/1441)
+- [Support state announcements for scrollable lists in VoiceOver](https://github.com/JetBrains/compose-multiplatform-core/pull/1644)
+- [Support for accessibility gestures for left-to-right languages](https://github.com/JetBrains/compose-multiplatform-core/pull/1663)
+
+### Desktop
+
+- [Compose plugin for IntelliJ IDEA now supports K2 mode](https://github.com/JetBrains/compose-multiplatform/pull/5138)
+
+### Resources
+
+- [Add new API to preload and cache font and image resources on web targets: `preloadFont`, `preloadImageBitmap`, `preloadImageVector`](https://github.com/JetBrains/compose-multiplatform/pull/5159)
+
+### Gradle Plugin
+
+- [Support compose resources in `androidLibrary` target](https://github.com/JetBrains/compose-multiplatform/pull/5157)
+
+### Navigation
+
+- [Basic support a navigation by deep links](https://github.com/JetBrains/compose-multiplatform-core/pull/1610)
+- [Commonize `navController.navigate(Uri)` method](https://github.com/JetBrains/compose-multiplatform-core/pull/1617)
+- [Implemented non-android `navController.handleDeepLink(NavDeepLinkRequest)` method](https://github.com/JetBrains/compose-multiplatform-core/pull/1617)
+- [New API to configure browser navigation buttons and the address line](https://github.com/JetBrains/compose-multiplatform-core/pull/1621)
+- [Navigation via a browser address field](https://github.com/JetBrains/compose-multiplatform-core/pull/1640)
+
+## Fixes
+
+### Multiple Platforms
+
+- [`waitForIdle`, `awaitIdle` and `runOnIdle` no longer consider Compose to be non-idle when coroutines launched in a composition scope call `delay`](https://github.com/JetBrains/compose-multiplatform-core/pull/1550). This prevents tests with an infinite loop with `delay` in a `LaunchedEffect` from hanging
+- [Tests that advance the test clock](https://github.com/JetBrains/compose-multiplatform-core/pull/1550) (via `mainClock.advanceTimeBy`) will now correctly (re)compose/layout/draw/effects each virtual frame as needed
+- [`runOnIdle` will now execute `action` on the UI thread, as Android behaves](https://github.com/JetBrains/compose-multiplatform-core/pull/1601)
+- [`runOnIdle` will no longer call `waitForIdle` after executing the action, as Android behaves](https://github.com/JetBrains/compose-multiplatform-core/pull/1601)
+- [The overhead for running an empty test has been significantly reduced](https://github.com/JetBrains/compose-multiplatform-core/pull/1615)
+
+### iOS
+
+- [Deprecate defaultUIKitMain()](https://github.com/JetBrains/compose-multiplatform-core/pull/1585)
+- [Fixed visibility of `androidx.compose.material3.internal.formatWithSkeleton` that was accidently marked as public](https://github.com/JetBrains/compose-multiplatform-core/pull/1609)
+- [Fix a bug where the accessibility tree did not reload when VoiceOver was enabled](https://github.com/JetBrains/compose-multiplatform-core/pull/1656)
+- [Fix Display Cutout Padding when rotating the device](https://github.com/JetBrains/compose-multiplatform-core/pull/1645)
+
+### Desktop
+
+- [Fix drag-and-drop when the list of supported actions doesn't include `Move`](https://github.com/JetBrains/compose-multiplatform-core/pull/1683)
+- [Fix accessibility focus when using `compose.swing.render.on.graphics=true`](https://github.com/JetBrains/compose-multiplatform-core/pull/1688)
+- [Fix "Context menu on desktop shows incorrect items after the second showing"](https://github.com/JetBrains/compose-multiplatform-core/pull/1693)
+
+### Resources
+
+- [Read `android:autoMirrored="true"` property and pass it to ImageVector builder](https://github.com/JetBrains/compose-multiplatform/pull/5140)
+
+### Navigation
+
+- [Fixed `No destination with ID 0 is on the NavController's back stack` crash on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1596)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.8.0-alpha01`. Based on Jetpack Compose libraries:
+  - [Runtime 1.8.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.8.0-alpha03)
+  - [UI 1.8.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.8.0-alpha03)
+  - [Foundation 1.8.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.8.0-alpha03)
+  - [Material 1.8.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material#1.8.0-alpha03)
+  - [Material3 1.4.0-alpha01](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-alpha01)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.0-alpha01`. Based on [Jetpack Lifecycle 2.9.0-alpha03](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.0-alpha03)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.8.0-alpha11`. Based on [Jetpack Navigation 2.8.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.8.0)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.1.0-alpha01`. Based on [Jetpack Material3 Adaptive 1.1.0-alpha04](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.1.0-alpha04)
+
+---
+
 # 1.7.1 (November 2024)
 
 _Changes since 1.7.0_
