@@ -8,6 +8,8 @@ import platform.Foundation.*
 
 internal actual fun getSystemEnvironment(): ResourceEnvironment {
     val locale = NSLocale.currentLocale()
+    val languageCode = locale.languageCode
+    val regionCode = locale.objectForKey(NSLocaleCountryCode) as? String
     val isDarkTheme = NSUserDefaults.standardUserDefaults.stringForKey("AppleInterfaceStyle") == "Dark"
 
     val dpi = NSScreen.mainScreen?.let { screen ->
@@ -24,8 +26,8 @@ internal actual fun getSystemEnvironment(): ResourceEnvironment {
     } ?: 0
 
     return ResourceEnvironment(
-        language = LanguageQualifier(locale.languageCode),
-        region = RegionQualifier(locale.regionCode.orEmpty()),
+        language = LanguageQualifier(languageCode),
+        region = RegionQualifier(regionCode.orEmpty()),
         theme = ThemeQualifier.selectByValue(isDarkTheme),
         density = DensityQualifier.selectByValue(dpi)
     )
