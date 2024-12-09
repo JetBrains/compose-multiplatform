@@ -5,9 +5,9 @@
 
 ## Desktop
 * [Image and icon manipulations](Image_And_Icons_Manipulations)
-* [Mouse events and hover](Mouse_Events)
-* [Scrolling and scrollbars](Desktop_Components#scrollbars)
-* [Tooltips](Desktop_Components#tooltips)
+* [Mouse events and hover](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-desktop-mouse-events.html)
+* [Scrolling and scrollbars](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-desktop-scrollbars.html)
+* [Tooltips](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-desktop-tooltips.html)
 * [Context Menu](Context_Menu/README.md)
 * [Top level windows management](Window_API_new)
 * [Menu, tray, notifications](Tray_Notifications_MenuBar_new)
