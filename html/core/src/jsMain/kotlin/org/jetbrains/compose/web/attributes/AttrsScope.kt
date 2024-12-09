@@ -246,3 +246,10 @@ open class AttrsScopeBuilder<TElement : Element>(
 private val setClassList: (HTMLElement, Array<out String>) -> Unit = { e, classList ->
     e.classList.add(*classList)
 }
+
+/**
+ * Adds a boolean attribute.
+ * @see AttrsScope.attr
+ */
+fun AttrsScope<*>.attr(attr: String, value: Boolean = true) =
+    attr(attr, value.toString())
