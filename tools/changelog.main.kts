@@ -188,13 +188,26 @@ fun currentChangelogDate() = LocalDate.now().format(DateTimeFormatter.ofPattern(
  * - [A new approach to implementation of `platformLayers`](link). Now extra layers (such as Dialogs and Popups) drawing is merged into a single screen size canvas.
  */
 fun ChangelogEntry.format(): String {
+    return try {
+        tryFormat()
+    } catch (e: Exception) {
+        throw RuntimeException("Formatting error of ChangelogEntry. Message:\n$message", e)
+    }
+}
+
+fun ChangelogEntry.tryFormat(): String {
     return if (link != null) {
+        val prefixRegex = "^[-\\s]*"   // "- "
+        val tagRegex1 = "\\(.*\\)\\s*" // "(something) "
+        val tagRegex2 = "\\[.*\\]\\s*" // "[something] "
+        val tagRegex3 = "_.*_\\s*"     // "_something_ "
         val linkStartIndex = maxOf(
-            message.indexOfFirst { !it.isWhitespace() && it != '-' }.ifNegative { 0 },
-            message.endIndexOf("_(prerelease fix)_ ").ifNegative { 0 },
-            message.endIndexOf("(prerelease fix) ").ifNegative { 0 },
+            message.endIndexOfFirstGroup(Regex("($prefixRegex).*"))?.plus(1) ?: 0,
+            message.endIndexOfFirstGroup(Regex("($prefixRegex$tagRegex1).*"))?.plus(1) ?: 0,
+            message.endIndexOfFirstGroup(Regex("($prefixRegex$tagRegex2).*"))?.plus(1) ?: 0,
+            message.endIndexOfFirstGroup(Regex("($prefixRegex$tagRegex3).*"))?.plus(1) ?: 0,
         )
-        val linkLastIndex = message.indexOfAny(listOf(". ", " (")).ifNegative { message.length }
+        val linkLastIndex = message.indexOfAny(listOf(". ", " ("), linkStartIndex).ifNegative { message.length }
 
         val beforeLink = message.substring(0, linkStartIndex)
         val inLink = message.substring(linkStartIndex, linkLastIndex).removeLinks()
@@ -208,13 +221,8 @@ fun ChangelogEntry.format(): String {
 
 fun Int.ifNegative(value: () -> Int): Int = if (this < 0) value() else this
 
-fun String.endIndexOf(value: String): Int = indexOf(value).let {
-    if (it >= 0) {
-        it + value.length
-    } else {
-        it
-    }
-}
+fun String.endIndexOfFirstGroup(regex: Regex): Int? =
+    regex.find(this)?.groups?.toList()?.getOrNull(1)?.range?.endInclusive
 
 /**
  * Converts:
