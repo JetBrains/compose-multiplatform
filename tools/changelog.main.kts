@@ -28,13 +28,15 @@
 @file:DependsOn("com.google.code.gson:gson:2.10.1")
 
 import com.google.gson.Gson
-import java.io.File
 import java.io.IOException
+import java.lang.ProcessBuilder.Redirect
 import java.net.URL
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
-import java.util.concurrent.TimeUnit
+import kotlin.text.substringAfterLast
 
 //region ========================================== CONSTANTS =========================================
 
@@ -73,7 +75,6 @@ val argsKeyToValue = args
     .associate { it.substringBefore("=") to it.substringAfter("=") }
 
 val versionCommit = argsKeyless.getOrNull(0) ?: "HEAD"
-val versionName = argsKeyless.getOrNull(1) ?: versionCommit
 val token = argsKeyToValue["token"]
 
 println("Note. The script supports optional arguments: kotlin changelog.main.kts [versionCommit] [versionName] [token=githubToken]")
@@ -81,6 +82,34 @@ if (token == null) {
     println("To increase the rate limit, specify token (https://github.com/settings/tokens)")
 }
 println()
+
+val androidxLibToVersion = androidxLibToVersion(versionCommit)
+val androidxLibToRedirectingVersion = androidxLibToRedirectingVersion(versionCommit)
+
+fun formatAndroidxLibVersion(libName: String) =
+    androidxLibToVersion[libName] ?: "PLACEHOLDER".also {
+        println("Can't find $libName version. Using PLACEHOLDER")
+    }
+
+fun formatAndroidxLibRedirectingVersion(libName: String) =
+    androidxLibToRedirectingVersion[libName] ?: "PLACEHOLDER".also {
+        println("Can't find $libName redirecting version. Using PLACEHOLDER")
+    }
+
+val versionCompose = formatAndroidxLibVersion("COMPOSE")
+val versionComposeMaterial3Adaptive = formatAndroidxLibVersion("COMPOSE_MATERIAL3_ADAPTIVE")
+val versionLifecycle = formatAndroidxLibVersion("LIFECYCLE")
+val versionNavigation = formatAndroidxLibVersion("NAVIGATION")
+
+val versionRedirectingCompose = formatAndroidxLibRedirectingVersion("compose")
+val versionRedirectingComposeFoundation = formatAndroidxLibRedirectingVersion("compose.foundation")
+val versionRedirectingComposeMaterial = formatAndroidxLibRedirectingVersion("compose.material")
+val versionRedirectingComposeMaterial3 = formatAndroidxLibRedirectingVersion("compose.material3")
+val versionRedirectingComposeMaterial3Adaptive = formatAndroidxLibRedirectingVersion("compose.material3.adaptive")
+val versionRedirectingLifecycle = formatAndroidxLibRedirectingVersion("lifecycle")
+val versionRedirectingNavigation = formatAndroidxLibRedirectingVersion("navigation")
+
+val versionName = versionCompose
 
 val currentChangelog = changelogFile.readText()
 val previousChangelog =
@@ -93,9 +122,10 @@ val previousChangelog =
 
 val previousVersion = previousChangelog.substringAfter("# ").substringBefore(" (")
 
+println()
 println("Generating changelog between $previousVersion and $versionName")
 
-val newChangelog = getChangelog("v$previousVersion", versionCommit, previousVersion, versionName)
+val newChangelog = getChangelog("v$previousVersion", versionCommit, previousVersion)
 
 changelogFile.writeText(
     newChangelog + previousChangelog
@@ -105,12 +135,12 @@ println()
 println("CHANGELOG.md changed")
 
 
-fun getChangelog(firstCommit: String, lastCommit: String, firstVersion: String, lastVersion: String): String {
+fun getChangelog(firstCommit: String, lastCommit: String, firstVersion: String): String {
     val entries = entriesForRepo("JetBrains/compose-multiplatform-core", firstCommit, lastCommit) +
             entriesForRepo("JetBrains/compose-multiplatform", firstCommit, lastCommit)
 
     return buildString {
-        appendLine("# $lastVersion (${currentChangelogDate()})")
+        appendLine("# $versionName (${currentChangelogDate()})")
 
         appendLine()
         appendLine("_Changes since ${firstVersion}_")
@@ -140,16 +170,16 @@ fun getChangelog(firstCommit: String, lastCommit: String, firstVersion: String, 
             """
                 ## Dependencies
         
-                - Gradle Plugin `org.jetbrains.compose`, version `$lastVersion`. Based on Jetpack Compose libraries:
-                  - [Runtime REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-runtime#REDIRECT_PLACEHOLDER)
-                  - [UI REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-ui#REDIRECT_PLACEHOLDER)
-                  - [Foundation REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-foundation#REDIRECT_PLACEHOLDER)
-                  - [Material REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-material#REDIRECT_PLACEHOLDER)
-                  - [Material3 REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-material3#REDIRECT_PLACEHOLDER)
-        
-                - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:RELEASE_PLACEHOLDER`. Based on [Jetpack Lifecycle REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/lifecycle#REDIRECT_PLACEHOLDER)
-                - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:RELEASE_PLACEHOLDER`. Based on [Jetpack Navigation REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/navigation#REDIRECT_PLACEHOLDER)
-                - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:RELEASE_PLACEHOLDER`. Based on [Jetpack Material3 Adaptive REDIRECT_PLACEHOLDER](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#REDIRECT_PLACEHOLDER)
+                - Gradle Plugin `org.jetbrains.compose`, version `$versionCompose`. Based on Jetpack Compose libraries:
+                  - [Runtime $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-runtime#$versionRedirectingCompose)
+                  - [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose)
+                  - [Foundation $versionRedirectingComposeFoundation](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingComposeFoundation)
+                  - [Material $versionRedirectingComposeMaterial](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingComposeMaterial)
+                  - [Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3)
+
+                - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:$versionLifecycle`. Based on [Jetpack Lifecycle $versionRedirectingLifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle#$versionRedirectingLifecycle)
+                - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:$versionNavigation`. Based on [Jetpack Navigation $versionRedirectingNavigation](https://developer.android.com/jetpack/androidx/releases/navigation#$versionRedirectingNavigation)
+                - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive`. Based on [Jetpack Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive)
         
                 ---
             """.trimIndent()
@@ -285,7 +315,7 @@ fun GitHubPullEntry.extractReleaseNotes(link: String): List<ChangelogEntry> {
 fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<ChangelogEntry> {
     val pulls = (1..5)
         .flatMap {
-            request<Array<GitHubPullEntry>>("https://api.github.com/repos/$repo/pulls?state=closed&per_page=100&page=$it").toList()
+            requestJson<Array<GitHubPullEntry>>("https://api.github.com/repos/$repo/pulls?state=closed&per_page=100&page=$it").toList()
         }
 
     val pullNumberToPull = pulls.associateBy { it.number }
@@ -318,8 +348,7 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
     fun fetchCommits(firsCommitSha: String, lastCommitSha: String): CommitsResult {
         lateinit var mergeBaseCommit: String
         val commits = fetchPagedUntilEmpty { page ->
-            val result =
-                request<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$firsCommitSha...$lastCommitSha?per_page=1000&page=$page")
+            val result = requestJson<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$firsCommitSha...$lastCommitSha?per_page=1000&page=$page")
             mergeBaseCommit = result.merge_base_commit.sha
             result.commits
         }
@@ -342,6 +371,55 @@ fun repoTitleAndNumberForCommit(commit: GitHubCompareResponse.CommitEntry): Pair
     val title = commitTitle.substringBeforeLast(" (#")
     val number = commitTitle.substringAfterLast(" (#").substringBefore(")").toIntOrNull()
     return title to number
+}
+
+/**
+ * Extract redirecting versions from core repo, file gradle.properties
+ *
+ * Example
+ * https://raw.githubusercontent.com/JetBrains/compose-multiplatform-core/v1.8.0%2Bdev1966/gradle.properties
+ * artifactRedirecting.androidx.graphics.version=1.0.1
+ */
+fun androidxLibToRedirectingVersion(commit: String): Map<String, String> {
+    val gradleProperties = githubContentOf("JetBrains/compose-multiplatform-core", "gradle.properties", commit)
+    val regex = Regex("artifactRedirecting\\.androidx\\.(.*)\\.version=(.*)")
+    return regex.findAll(gradleProperties).associate { result ->
+        result.groupValues[1].trim() to result.groupValues[2].trim()
+    }
+}
+
+/**
+ * Extract versions from CI config, file .teamcity/compose/Library.kt
+ *
+ * Example
+ * https://jetbrains.team/p/ui/repositories/compose-teamcity-config/files/8f8408ccd05a9188895969b1fa0243050716baad/.teamcity/compose/Library.kt?tab=source&line=37&lines-count=1
+ * Library.CORE_BUNDLE -> "1.1.0-alpha01"
+ */
+fun androidxLibToVersion(commit: String): Map<String, String> {
+    val repo = "ssh://git@git.jetbrains.team/ui/compose-teamcity-config.git"
+    val file = ".teamcity/compose/Library.kt"
+    val libraryKt = spaceContentOf(repo, file, commit)
+
+    return if (libraryKt.isBlank()) {
+        println("Can't clone $repo to know library versions. Please register your ssh key in https://jetbrains.team/m/me/authentication?tab=GitKeys")
+        emptyMap()
+    } else {
+        val regex = Regex("Library\\.(.*)\\s*->\\s*\"(.*)\"")
+        return regex.findAll(libraryKt).associate { result ->
+            result.groupValues[1].trim() to result.groupValues[2].trim()
+        }
+    }
+}
+
+fun githubContentOf(repo: String, path: String, commit: String): String {
+    val commitEncoded = URLEncoder.encode(commit, UTF_8)
+    return requestPlain("https://raw.githubusercontent.com/$repo/$commitEncoded/$path")
+}
+
+fun spaceContentOf(repoUrl: String, path: String, tagName: String): String {
+    return pipeProcess("git archive --remote=$repoUrl $tagName $path")
+        .pipeTo("tar -xO $path")
+        .readText()
 }
 
 data class ChangelogEntry(
@@ -370,37 +448,25 @@ data class GitHubPullEntry(val number: Int, val title: String, val body: String?
 }
 
 //region ========================================== UTILS =========================================
+fun pipeProcess(command: String) = ProcessBuilder(command.split(" "))
+    .redirectOutput(Redirect.PIPE)
+    .redirectError(Redirect.PIPE)
+    .start()!!
 
-// from https://stackoverflow.com/a/41495542
-fun String.runCommand(workingDir: File = File(".")) {
-    ProcessBuilder(*split(" ").toTypedArray())
-        .directory(workingDir)
-        .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-        .redirectError(ProcessBuilder.Redirect.INHERIT)
-        .start()
-        .waitFor(5, TimeUnit.MINUTES)
-}
-
-fun String.execCommand(workingDir: File = File(".")): String? {
-    try {
-        val parts = this.split("\\s".toRegex())
-        val proc = ProcessBuilder(*parts.toTypedArray())
-            .directory(workingDir)
-            .redirectOutput(ProcessBuilder.Redirect.PIPE)
-            .redirectError(ProcessBuilder.Redirect.PIPE)
-            .start()
-
-        proc.waitFor(60, TimeUnit.MINUTES)
-        return proc.inputStream.bufferedReader().readText()
-    } catch (e: IOException) {
-        e.printStackTrace()
-        return null
+fun Process.pipeTo(command: String): Process = pipeProcess(command).also {
+    inputStream.use { input ->
+        it.outputStream.use { out ->
+            input.copyTo(out)
+        }
     }
 }
 
-inline fun <reified T> request(
-    url: String
-): T = exponentialRetry {
+fun Process.readText(): String = inputStream.bufferedReader().use { it.readText() }
+
+inline fun <reified T> requestJson(url: String): T =
+    Gson().fromJson(requestPlain(url), T::class.java)
+
+fun requestPlain(url: String): String = exponentialRetry {
     println("Request $url")
     val connection = URL(url).openConnection()
     connection.setRequestProperty("User-Agent", "Compose-Multiplatform-Script")
@@ -408,10 +474,7 @@ inline fun <reified T> request(
         connection.setRequestProperty("Authorization", "Bearer $token")
     }
     connection.getInputStream().use {
-        Gson().fromJson(
-            it.bufferedReader(),
-            T::class.java
-        )
+        it.bufferedReader().readText()
     }
 }
 
