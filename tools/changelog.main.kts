@@ -281,6 +281,8 @@ fun GitHubPullEntry.extractReleaseNotes(link: String): List<ChangelogEntry> {
         before?.trim()
     }
 
+    if (relNoteBody?.trim()?.lowercase() == "n/a") return emptyList()
+
     val list = mutableListOf<ChangelogEntry>()
     var section: String? = null
     var subsection: String? = null
