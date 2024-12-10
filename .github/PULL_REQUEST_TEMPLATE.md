@@ -15,16 +15,18 @@ This should be tested by QA
 
 ## Release Notes
 <!--
-Optional, if omitted - won't be included in the changelog
+If we definitely shouldn't add Release Notes, add only N/A.
 
-Sections:
+Or enumerate sections, subsections and all changes.
+
+Possible sections:
 - Highlights
 - Known Issues
 - Breaking Changes
 - Features
 - Fixes
 
-Subsections:
+Possible subsections:
 - Multiple Platforms
 - iOS
 - Desktop
@@ -34,7 +36,6 @@ Subsections:
 - Gradle Plugin
 -->
 ### Section - Subsection
-<!-- Optional, in case we definitely shouldn't add Release Notes --> N/A
 - Describe a change for adding it to https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
 - _(prerelease fix)_ Fix some bug that introduced in a prerelease version (dev/beta). It will be included in a dev/beta changelog, but excluded from a stable changelog
 
