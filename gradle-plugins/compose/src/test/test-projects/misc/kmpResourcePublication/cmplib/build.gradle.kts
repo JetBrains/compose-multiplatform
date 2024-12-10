@@ -22,6 +22,8 @@ kotlin {
     iosX64()
     iosArm64()
     iosSimulatorArm64()
+    macosX64()
+    macosArm64()
     js { browser() }
     wasmJs { browser() }
 
@@ -41,7 +43,7 @@ kotlin {
 
 android {
     namespace = "me.sample.library"
-    compileSdk = 34
+    compileSdk = 35
     defaultConfig {
         minSdk = 24
     }

@@ -17,8 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-20.04, macos-14, windows-2022]
-        gradle: [7.4, 8.8]
-        agp: [8.1.0, 8.5.0]
+        gradle: [7.4, 8.10.2]
+        agp: [8.1.0, 8.5.0, 8.8.0-alpha08]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -33,7 +33,7 @@ jobs:
           ./gradlew assemble
           ./gradlew --continue :preview-rpc:test :compose:test ':compose:test-Gradle(${{ matrix.gradle }})-Agp(${{ matrix.agp }})'
       - name: Upload Reports
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: Test-Reports
           path: gradle-plugins/compose/build/reports

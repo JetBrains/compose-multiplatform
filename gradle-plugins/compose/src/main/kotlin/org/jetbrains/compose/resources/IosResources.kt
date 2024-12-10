@@ -33,7 +33,7 @@ internal fun Project.configureSyncIosComposeResources(
     }
 
     kotlinExtension.targets.withType(KotlinNativeTarget::class.java).all { nativeTarget ->
-        if (nativeTarget.isIosTarget()) {
+        if (nativeTarget.isIosOrMacTarget()) {
             nativeTarget.binaries.withType(Framework::class.java).all { iosFramework ->
                 val frameworkClassifier = iosFramework.getClassifier()
                 val checkNoSandboxTask = tasks.registerOrConfigure<CheckCanAccessComposeResourcesDirectory>(
@@ -86,8 +86,8 @@ internal fun Project.configureSyncIosComposeResources(
     plugins.withId(COCOAPODS_PLUGIN_ID) {
         (kotlinExtension as ExtensionAware).extensions.getByType(CocoapodsExtension::class.java).apply {
             framework { podFramework ->
-                val syncDir = podFramework.getFinalResourcesDir().get().asFile.relativeTo(projectDir)
-                val specAttr = "['${syncDir.path}']"
+                val syncDir = podFramework.getFinalResourcesDir().get().asFile
+                val specAttr = "['${syncDir.relativeTo(projectDir).path}']"
                 val specAttributes = extraSpecAttributes
                 val buildFile = project.buildFile
                 val projectPath = project.path
@@ -97,7 +97,7 @@ internal fun Project.configureSyncIosComposeResources(
                         if (specAttributes["resources"] != specAttr) error(
                             """
                                 |Kotlin.cocoapods.extraSpecAttributes["resources"] is not compatible with Compose Multiplatform's resources management for iOS.
-                                |  * Recommended action: remove extraSpecAttributes["resources"] from '$buildFile' and run '$projectPath:podInstall' once;
+                                |  * Recommended action: remove extraSpecAttributes["resources"] from '$buildFile' and run '$projectPath:podspec' once;
                                 |  * Alternative action: turn off Compose Multiplatform's resources management for iOS by adding '${ComposeProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties;
                             """.trimMargin()
                         )
@@ -116,6 +116,7 @@ private fun Framework.getClassifier(): String {
 }
 
 internal fun Framework.getSyncResourcesTaskName() = "sync${getClassifier()}ComposeResourcesForIos"
+
 private fun Framework.isCocoapodsFramework() = name.startsWith("pod")
 
 private fun Framework.getFinalResourcesDir(): Provider<Directory> {
@@ -125,9 +126,9 @@ private fun Framework.getFinalResourcesDir(): Provider<Directory> {
     } else {
         providers.environmentVariable("BUILT_PRODUCTS_DIR")
             .zip(
-                providers.environmentVariable("CONTENTS_FOLDER_PATH")
-            ) { builtProductsDir, contentsFolderPath ->
-                File("$builtProductsDir/$contentsFolderPath/$IOS_COMPOSE_RESOURCES_ROOT_DIR").canonicalPath
+                providers.environmentVariable("UNLOCALIZED_RESOURCES_FOLDER_PATH")
+            ) { builtProductsDir, unlocalizedResourcesFolderPath ->
+                File("$builtProductsDir/$unlocalizedResourcesFolderPath/$IOS_COMPOSE_RESOURCES_ROOT_DIR").canonicalPath
             }
             .flatMap {
                 project.objects.directoryProperty().apply { set(File(it)) }
@@ -143,3 +144,9 @@ private fun KotlinNativeTarget.isIosDeviceTarget(): Boolean =
 
 private fun KotlinNativeTarget.isIosTarget(): Boolean =
     isIosSimulatorTarget() || isIosDeviceTarget()
+
+private fun KotlinNativeTarget.isMacTarget(): Boolean =
+    konanTarget === KonanTarget.MACOS_X64 || konanTarget === KonanTarget.MACOS_ARM64
+
+private fun KotlinNativeTarget.isIosOrMacTarget(): Boolean =
+    isIosTarget() || isMacTarget()

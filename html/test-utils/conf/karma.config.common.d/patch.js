@@ -10,3 +10,12 @@ config.browserDisconnectTimeout = 10000;
 config.browserDisconnectTolerance = 3;
 config.browserConsoleLogOptions = {level: "debug", format: "%b %T: %m", terminal: true};
 config.logLevel = config.LOG_DEBUG;
+
+config.customLaunchers = {
+    ChromeForComposeTests: {
+        base: "ChromeHeadless",
+        flags: ["--no-sandbox", "--disable-search-engine-choice-screen"]
+    }
+}
+
+config.browsers = ["ChromeForComposeTests"]

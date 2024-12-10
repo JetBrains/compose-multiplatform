@@ -29,13 +29,20 @@ private val emptyFontBase64 =
 @OptIn(ExperimentalEncodingApi::class)
 private val defaultEmptyFont by lazy { Font("org.jetbrains.compose.emptyFont", Base64.decode(emptyFontBase64)) }
 
+private val fontCache = AsyncCache<String, Font>()
+internal val Font.isEmptyPlaceholder: Boolean
+    get() = this == defaultEmptyFont
+
 @Composable
 actual fun Font(resource: FontResource, weight: FontWeight, style: FontStyle): Font {
     val resourceReader = LocalResourceReader.currentOrPreview
     val fontFile by rememberResourceState(resource, weight, style, { defaultEmptyFont }) { env ->
         val path = resource.getResourceItemByEnvironment(env).path
-        val fontBytes = resourceReader.read(path)
-        Font(path, fontBytes, weight, style)
+        val key = "$path:$weight:$style"
+        fontCache.getOrLoad(key) {
+            val fontBytes = resourceReader.read(path)
+            Font(path, fontBytes, weight, style)
+        }
     }
     return fontFile
 }

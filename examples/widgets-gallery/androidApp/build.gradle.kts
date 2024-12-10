@@ -17,12 +17,12 @@ kotlin {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
     namespace = "org.jetbrains.compose.demo.widgets"
     defaultConfig {
         applicationId = "org.jetbrains.WidgetsGallery"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
     }

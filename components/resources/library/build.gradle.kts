@@ -113,6 +113,10 @@ kotlin {
         }
         val androidMain by getting {
             dependsOn(jvmAndAndroidMain)
+            dependencies {
+                //it will be called only in android instrumented tests where the library should be available
+                compileOnly(libs.androidx.test.monitor)
+            }
         }
         val androidInstrumentedTest by getting {
             dependsOn(jvmAndAndroidTest)
@@ -156,7 +160,7 @@ kotlin {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
     namespace = "org.jetbrains.compose.components.resources"
     defaultConfig {
         minSdk = 21

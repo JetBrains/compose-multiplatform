@@ -6,11 +6,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import com.example.common.generated.resources.Res
 import kotlinx.coroutines.*
 import com.example.jetsnack.model.snacks
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 val imagesCache = mutableMapOf<String, ImageBitmap>()
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 actual fun SnackAsyncImage(
     imageUrl: String,
@@ -28,21 +31,22 @@ actual fun SnackAsyncImage(
         if (imagesCache.contains(imageUrl)) {
             bitmap = imagesCache[imageUrl]!!
         } else {
-            val arrayBuffer = loadImage(imageUrl)
-            val skiaImg = org.jetbrains.skia.Image.makeFromEncoded(arrayBuffer.toByteArray())
-            imagesCache[imageUrl] = skiaImg.toComposeImageBitmap()
+            imagesCache[imageUrl] = org.jetbrains.skia.Image.makeFromEncoded(
+                Res.readBytes(imageUrl)
+            ).toComposeImageBitmap()
             bitmap = imagesCache[imageUrl]
         }
     }
 }
+@OptIn(ExperimentalResourceApi::class)
 suspend fun CoroutineScope.prepareImagesCache() {
     val jobs = mutableListOf<Job>()
     // We have not many images, so we can prepare and cache them upfront
     snacks.forEach {
         val j = launch {
-            val arrayBuffer = loadImage(it.imageUrl)
-            val skiaImg = org.jetbrains.skia.Image.makeFromEncoded(arrayBuffer.toByteArray())
-            imagesCache[it.imageUrl] = skiaImg.toComposeImageBitmap()
+            imagesCache[it.imageUrl] = org.jetbrains.skia.Image.makeFromEncoded(
+                Res.readBytes(it.imageUrl)
+            ).toComposeImageBitmap()
         }
         jobs.add(j)
     }

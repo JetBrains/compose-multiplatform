@@ -14,7 +14,9 @@ import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.Version
 import org.jetbrains.compose.internal.ideaIsInSyncProvider
+import org.jetbrains.compose.internal.mppExtOrNull
 import org.jetbrains.compose.internal.webExt
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
@@ -52,6 +54,32 @@ private fun Project.configureComposeCompilerPlugin(kgp: KotlinBasePlugin) {
     if (Version.fromString(kgpVersion) < Version.fromString(newCompilerIsAvailableVersion)) {
         logger.info("Apply ComposeCompilerKotlinSupportPlugin (KGP version = $kgpVersion)")
         project.plugins.apply(ComposeCompilerKotlinSupportPlugin::class.java)
+
+        //legacy logic applied for Kotlin < 2.0 only
+        project.afterEvaluate {
+            val composeExtension = project.extensions.getByType(ComposeExtension::class.java)
+            project.tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinCompile::class.java).configureEach {
+                it.kotlinOptions.apply {
+                    freeCompilerArgs = freeCompilerArgs +
+                            composeExtension.kotlinCompilerPluginArgs.get().flatMap { arg ->
+                                listOf("-P", "plugin:androidx.compose.compiler.plugins.kotlin:$arg")
+                            }
+                }
+            }
+
+            val hasAnyWebTarget = project.mppExtOrNull?.targets?.firstOrNull {
+                it.platformType == KotlinPlatformType.js ||
+                        it.platformType == KotlinPlatformType.wasm
+            } != null
+            if (hasAnyWebTarget) {
+                // currently k/wasm compile task is covered by KotlinJsCompile type
+                project.tasks.withType(KotlinJsCompile::class.java).configureEach {
+                    it.kotlinOptions.freeCompilerArgs += listOf(
+                        "-Xklib-enable-signature-clash-checks=false",
+                    )
+                }
+            }
+        }
     } else {
         //There is no other way to check that the plugin WASN'T applied!
         afterEvaluate {
@@ -76,8 +104,8 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
             val composeExt = target.extensions.getByType(ComposeExtension::class.java)
 
             composeCompilerArtifactProvider = ComposeCompilerArtifactProvider {
-                composeExt.kotlinCompilerPlugin.orNull ?:
-                    ComposeCompilerCompatibility.compilerVersionFor(target.getKotlinPluginVersion())
+                composeExt.kotlinCompilerPlugin.orNull
+                    ?: ComposeCompilerCompatibility.compilerVersionFor(target.getKotlinPluginVersion())
             }
 
             applicableForPlatformTypes = composeExt.platformTypes

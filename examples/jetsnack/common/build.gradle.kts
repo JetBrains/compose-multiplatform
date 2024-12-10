@@ -39,6 +39,7 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
+                implementation(compose.components.resources)
                 implementation(libs.kotlinx.coroutines)
             }
         }
@@ -94,12 +95,12 @@ kotlin {
 
 
 android {
-    compileSdk = 34
+    compileSdk = 35
     namespace = "com.example.jetsnack"
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = 24
-        targetSdk = 33
+        targetSdk = 35
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

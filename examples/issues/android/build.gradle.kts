@@ -6,12 +6,12 @@ plugins {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
     namespace = "com.example.myapplication"
 
     defaultConfig {
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         applicationId = "org.jetbrains.Issues"
         versionCode = 1
         versionName = "1.0"

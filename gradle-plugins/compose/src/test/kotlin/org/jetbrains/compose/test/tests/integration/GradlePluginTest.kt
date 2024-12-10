@@ -11,6 +11,7 @@ import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewLogger
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.RemoteConnection
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.receiveConfigFromGradle
+import org.jetbrains.compose.internal.Version
 import org.jetbrains.compose.test.utils.GradlePluginTestBase
 import org.jetbrains.compose.test.utils.checkExists
 import org.jetbrains.compose.test.utils.checks
@@ -46,9 +47,11 @@ class GradlePluginTest : GradlePluginTestBase() {
         jsCanvasEnabled(true)
         gradle(":build").checks {
             check.taskSuccessful(":unpackSkikoWasmRuntime")
+            check.taskSuccessful(":processSkikoRuntimeForKWasm")
             check.taskSuccessful(":compileKotlinJs")
             check.taskSuccessful(":compileKotlinWasmJs")
             check.taskSuccessful(":wasmJsBrowserDistribution")
+            check.taskSuccessful(":jsBrowserDistribution")
 
             file("./build/dist/wasmJs/productionExecutable").apply {
                 checkExists()
@@ -61,12 +64,22 @@ class GradlePluginTest : GradlePluginTestBase() {
                 // one file is the app wasm file and another one is skiko wasm file with a mangled name
                 assertEquals(2, distributionFiles.filter { it.endsWith(".wasm") }.size)
             }
+
+            file("./build/dist/js/productionExecutable").apply {
+                checkExists()
+                assertTrue(isDirectory)
+                val distributionFiles = listFiles()!!.map { it.name }.toList()
+                assertTrue(distributionFiles.contains("skiko.wasm"))
+                assertTrue(distributionFiles.contains("skiko.js"))
+                assertFalse(this.resolve("skiko.js").readText().contains("skiko.js is redundant"))
+            }
         }
     }
 
     @Test
     fun newAndroidTarget() {
-        Assumptions.assumeTrue(defaultTestEnvironment.parsedGradleVersion >= GradleVersion.version("8.0.0"))
+        Assumptions.assumeTrue(defaultTestEnvironment.parsedGradleVersion >= GradleVersion.version("8.10.2"))
+        Assumptions.assumeTrue(Version.fromString(defaultTestEnvironment.agpVersion) >= Version.fromString("8.8.0-alpha08"))
         with(testProject("application/newAndroidTarget")) {
             gradle("build", "--dry-run").checks {
             }

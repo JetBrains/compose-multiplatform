@@ -15,7 +15,7 @@ pluginManagement {
                 val useVersion = if (extra.has("compose.version")) {
                     extra["compose.version"].toString()
                 } else {
-                    "0.0.0-SNASPHOT"
+                    "0.0.0-SNAPSHOT"
                 }
                 println("COMPOSE_INTEGRATION_VERSION=[$useVersion]")
                 useVersion(useVersion)

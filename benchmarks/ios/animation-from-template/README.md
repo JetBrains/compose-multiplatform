@@ -1,1 +1,0 @@
-Infinite animation based on: https://github.com/JetBrains/compose-multiplatform-template

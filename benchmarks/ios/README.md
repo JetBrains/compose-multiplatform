@@ -1,1 +1,1 @@
-Collection of test compose multiplatfom applications used for evaluating performance of Compose for iOS.
+### Moved to [multiplatform](https://github.com/JetBrains/compose-multiplatform/tree/master/benchmarks/multiplatform)

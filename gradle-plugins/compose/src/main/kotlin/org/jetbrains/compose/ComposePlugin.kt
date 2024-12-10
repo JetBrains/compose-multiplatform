@@ -19,17 +19,16 @@ import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.internal.configureDesktop
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
-import org.jetbrains.compose.experimental.internal.*
-import org.jetbrains.compose.internal.*
+import org.jetbrains.compose.experimental.internal.configureExperimentalTargetsFlagsCheck
+import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
+import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.compose.resources.configureComposeResources
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.compose.web.internal.configureWeb
-import org.jetbrains.kotlin.com.github.gundy.semver4j.SemVer
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
-import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
-import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
@@ -61,32 +60,6 @@ abstract class ComposePlugin : Plugin<Project> {
                 val mppExt = project.mppExt
                 project.configureExperimentalTargetsFlagsCheck(mppExt)
             }
-
-            project.tasks.withType(KotlinCompile::class.java).configureEach {
-                it.kotlinOptions.apply {
-                    freeCompilerArgs = freeCompilerArgs +
-                            composeExtension.kotlinCompilerPluginArgs.get().flatMap { arg ->
-                                listOf("-P", "plugin:androidx.compose.compiler.plugins.kotlin:$arg")
-                            }
-                }
-            }
-
-            disableSignatureClashCheck(project)
-        }
-    }
-
-    private fun disableSignatureClashCheck(project: Project) {
-        val hasAnyWebTarget = project.mppExtOrNull?.targets?.firstOrNull {
-            it.platformType == KotlinPlatformType.js ||
-                    it.platformType == KotlinPlatformType.wasm
-        } != null
-        if (hasAnyWebTarget) {
-            // currently k/wasm compile task is covered by KotlinJsCompile type
-            project.tasks.withType(KotlinJsCompile::class.java).configureEach {
-                it.kotlinOptions.freeCompilerArgs += listOf(
-                    "-Xklib-enable-signature-clash-checks=false",
-                )
-            }
         }
     }
 
@@ -99,6 +72,7 @@ abstract class ComposePlugin : Plugin<Project> {
         val foundation get() = composeDependency("org.jetbrains.compose.foundation:foundation")
         val material get() = composeDependency("org.jetbrains.compose.material:material")
         val material3 get() = composeDependency("org.jetbrains.compose.material3:material3")
+        val material3AdaptiveNavigationSuite get() = composeDependency("org.jetbrains.compose.material3:material3-adaptive-navigation-suite")
         val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
         val runtimeSaveable get() = composeDependency("org.jetbrains.compose.runtime:runtime-saveable")
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
@@ -110,7 +84,7 @@ abstract class ComposePlugin : Plugin<Project> {
         val uiTooling get() = composeDependency("org.jetbrains.compose.ui:ui-tooling")
         val uiUtil get() = composeDependency("org.jetbrains.compose.ui:ui-util")
         val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
-        val materialIconsExtended get() = composeDependency("org.jetbrains.compose.material:material-icons-extended")
+        val materialIconsExtended get() = "org.jetbrains.compose.material:material-icons-extended:1.7.0-rc01"
         val components get() = CommonComponentsDependencies
         @Deprecated("Use compose.html", replaceWith = ReplaceWith("html"))
         val web: WebDependencies get() = WebDependencies

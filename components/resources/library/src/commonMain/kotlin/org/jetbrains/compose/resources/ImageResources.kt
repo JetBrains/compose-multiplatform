@@ -47,6 +47,9 @@ fun painterResource(resource: DrawableResource): Painter {
 
 private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 
+internal val ImageBitmap.isEmptyPlaceholder: Boolean
+    get() = this == emptyImageBitmap
+
 /**
  * Retrieves an ImageBitmap using the specified drawable resource.
  *
@@ -56,10 +59,17 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 @Composable
 fun imageResource(resource: DrawableResource): ImageBitmap {
     val resourceReader = LocalResourceReader.currentOrPreview
-    val imageBitmap by rememberResourceState(resource, resourceReader, { emptyImageBitmap }) { env ->
-        val path = resource.getResourceItemByEnvironment(env).path
-        val cached = loadImage(path, resourceReader) {
-            ImageCache.Bitmap(it.toImageBitmap())
+    val resourceEnvironment = rememberResourceEnvironment()
+    val imageBitmap by rememberResourceState(
+        resource, resourceReader, resourceEnvironment, { emptyImageBitmap }
+    ) { env ->
+        val item = resource.getResourceItemByEnvironment(env)
+        val resourceDensityQualifier = item.qualifiers.firstOrNull { it is DensityQualifier } as? DensityQualifier
+        val resourceDensity = resourceDensityQualifier?.dpi ?: DensityQualifier.MDPI.dpi
+        val screenDensity = resourceEnvironment.density.dpi
+        val path = item.path
+        val cached = loadImage(path, "$path-${screenDensity}dpi", resourceReader) {
+            ImageCache.Bitmap(it.toImageBitmap(resourceDensity, screenDensity))
         } as ImageCache.Bitmap
         cached.bitmap
     }
@@ -69,6 +79,9 @@ fun imageResource(resource: DrawableResource): ImageBitmap {
 private val emptyImageVector: ImageVector by lazy {
     ImageVector.Builder("emptyImageVector", 1.dp, 1.dp, 1f, 1f).build()
 }
+
+internal val ImageVector.isEmptyPlaceholder: Boolean
+    get() = this == emptyImageVector
 
 /**
  * Retrieves an ImageVector using the specified drawable resource.
@@ -82,7 +95,7 @@ fun vectorResource(resource: DrawableResource): ImageVector {
     val density = LocalDensity.current
     val imageVector by rememberResourceState(resource, resourceReader, density, { emptyImageVector }) { env ->
         val path = resource.getResourceItemByEnvironment(env).path
-        val cached = loadImage(path, resourceReader) {
+        val cached = loadImage(path, path, resourceReader) {
             ImageCache.Vector(it.toXmlElement().toImageVector(density))
         } as ImageCache.Vector
         cached.vector
@@ -102,7 +115,7 @@ private fun svgPainter(resource: DrawableResource): Painter {
     val density = LocalDensity.current
     val svgPainter by rememberResourceState(resource, resourceReader, density, { emptySvgPainter }) { env ->
         val path = resource.getResourceItemByEnvironment(env).path
-        val cached = loadImage(path, resourceReader) {
+        val cached = loadImage(path, path, resourceReader) {
             ImageCache.Svg(it.toSvgElement().toSvgPainter(density))
         } as ImageCache.Svg
         cached.painter
@@ -126,7 +139,7 @@ suspend fun getDrawableResourceBytes(
     return DefaultResourceReader.read(resourceItem.path)
 }
 
-internal expect fun ByteArray.toImageBitmap(): ImageBitmap
+internal expect fun ByteArray.toImageBitmap(resourceDensity: Int, targetDensity: Int): ImageBitmap
 internal expect fun ByteArray.toXmlElement(): Element
 internal expect fun ByteArray.toSvgElement(): SvgElement
 
@@ -145,6 +158,7 @@ internal fun dropImageCache() {
 
 private suspend fun loadImage(
     path: String,
+    cacheKey: String,
     resourceReader: ResourceReader,
     decode: (ByteArray) -> ImageCache
-): ImageCache = imageCache.getOrLoad(path) { decode(resourceReader.read(path)) }
+): ImageCache = imageCache.getOrLoad(cacheKey) { decode(resourceReader.read(path)) }

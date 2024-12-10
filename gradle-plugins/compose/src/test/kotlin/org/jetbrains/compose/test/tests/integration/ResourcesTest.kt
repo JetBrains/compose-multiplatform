@@ -2,6 +2,7 @@ package org.jetbrains.compose.test.tests.integration
 
 import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
+import org.jetbrains.compose.internal.Version
 import org.jetbrains.compose.internal.utils.Arch
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentArch
@@ -254,7 +255,7 @@ class ResourcesTest : GradlePluginTestBase() {
             }
 
             gradle(":cmplib:publishAllPublicationsToMavenRepository").checks {
-                check.logContains("Configure KMP resources")
+                check.logContains("Configure multi-module compose resources")
 
                 val resDir = file("cmplib/src/commonMain/composeResources")
                 val resourcesFiles = resDir.walkTopDown()
@@ -279,6 +280,13 @@ class ResourcesTest : GradlePluginTestBase() {
                         libpath("iossimulatorarm64", "-kotlin_resources.kotlin_resources.zip")
                     )
                     checkResourcesZip(iossimulatorarm64ResZip, resourcesFiles, false)
+
+                    val macosx64ResZip =
+                        file(libpath("macosx64", "-kotlin_resources.kotlin_resources.zip"))
+                    checkResourcesZip(macosx64ResZip, resourcesFiles, false)
+                    val macosarm64ResZip =
+                        file(libpath("macosarm64", "-kotlin_resources.kotlin_resources.zip"))
+                    checkResourcesZip(macosarm64ResZip, resourcesFiles, false)
                 }
                 val jsResZip = file(libpath("js", "-kotlin_resources.kotlin_resources.zip"))
                 checkResourcesZip(jsResZip, resourcesFiles, false)
@@ -299,6 +307,13 @@ class ResourcesTest : GradlePluginTestBase() {
                     ":appModule:iosSimulatorArm64Test"
                 }
                 gradle(iosTask)
+
+                val macosTask = if (currentArch == Arch.X64) {
+                    ":appModule:macosX64Test"
+                } else {
+                    ":appModule:macosArm64Test"
+                }
+                gradle(macosTask)
             }
 
             file("featureModule/src/commonMain/kotlin/me/sample/app/Feature.kt").modify { content ->
@@ -316,17 +331,32 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testDisableMultimoduleResourcesWithNewKotlin() {
-        val environment = defaultTestEnvironment.copy(
-            kotlinVersion = "2.0.0-RC2"
-        )
+    fun testNewAgpResources() {
+        Assumptions.assumeTrue(defaultTestEnvironment.parsedGradleVersion >= GradleVersion.version("8.10.2"))
+        Assumptions.assumeTrue(Version.fromString(defaultTestEnvironment.agpVersion) >= Version.fromString("8.8.0-alpha08"))
 
-        with(testProject("misc/kmpResourcePublication", environment)) {
+        with(testProject("misc/newAgpResources", defaultTestEnvironment)) {
+            gradle(":appModule:assembleDebug").checks {
+                check.logContains("Configure compose resources with KotlinMultiplatformAndroidComponentsExtension")
+
+                val resourcesFiles = sequenceOf(
+                    "composeResources/newagpresources.appmodule.generated.resources/values/strings.commonMain.cvr",
+                    "composeResources/newagpresources.featuremodule.generated.resources/values/strings.commonMain.cvr"
+                )
+                val apk = file("appModule/build/outputs/apk/debug/appModule-debug.apk")
+                checkResourcesZip(apk, resourcesFiles, true)
+            }
+        }
+    }
+
+    @Test
+    fun testDisableMultimoduleResourcesWithNewKotlin() {
+        with(testProject("misc/kmpResourcePublication")) {
             file("gradle.properties").modify { content ->
                 content + "\n" + ComposeProperties.DISABLE_MULTIMODULE_RESOURCES + "=true"
             }
             gradle(":cmplib:build").checks {
-                check.logContains("Configure compose resources")
+                check.logContains("Configure single-module compose resources")
             }
         }
     }
@@ -388,10 +418,10 @@ class ResourcesTest : GradlePluginTestBase() {
             .getConvertedResources(commonResourcesDir, repackDir)
 
         gradle("build").checks {
-            check.taskSuccessful(":demoDebugAssetsCopyForAGP")
-            check.taskSuccessful(":demoReleaseAssetsCopyForAGP")
-            check.taskSuccessful(":fullDebugAssetsCopyForAGP")
-            check.taskSuccessful(":fullReleaseAssetsCopyForAGP")
+            check.taskSuccessful(":copyDemoDebugComposeResourcesToAndroidAssets")
+            check.taskSuccessful(":copyDemoReleaseComposeResourcesToAndroidAssets")
+            check.taskSuccessful(":copyFullDebugComposeResourcesToAndroidAssets")
+            check.taskSuccessful(":copyFullReleaseComposeResourcesToAndroidAssets")
 
             getAndroidApk("demo", "debug", "Resources-Test").let { apk ->
                 checkResourcesZip(apk, commonResourcesFiles, true)
@@ -523,6 +553,7 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun testJvmOnlyProject(): Unit = with(testProject("misc/jvmOnlyResources")) {
         gradle("jar").checks {
+            check.logContains("Configure java-only compose resources")
             assertDirectoriesContentEquals(
                 file("build/generated/compose/resourceGenerator/kotlin"),
                 file("expected")
@@ -594,6 +625,14 @@ class ResourcesTest : GradlePluginTestBase() {
         )
 
         with(TestProject("misc/iosResources", testEnv)) {
+            gradle(":podspec", "-Pkotlin.native.cocoapods.generate.wrapper=true").checks {
+                assertEqualTextFiles(
+                    file("iosResources.podspec"),
+                    file("expected/iosResources.podspec")
+                )
+                file("build/compose/cocoapods/compose-resources").checkExists()
+            }
+
             gradle(
                 ":syncFramework",
                 "-Pkotlin.native.cocoapods.platform=${iosEnv["PLATFORM_NAME"]}",
@@ -659,12 +698,94 @@ class ResourcesTest : GradlePluginTestBase() {
                 file("build/compose/cocoapods/compose-resources/composeResources/iosresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
                 file("build/compose/cocoapods/compose-resources/composeResources/iosresources.generated.resources/drawable/icon.xml").checkExists()
             }
+        }
+    }
 
+    @Test
+    fun macosResources() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        val macosEnv = mapOf(
+            "PLATFORM_NAME" to "macosx",
+            "ARCHS" to "arm64",
+            "CONFIGURATION" to "Debug",
+        )
+        val testEnv = defaultTestEnvironment.copy(
+            additionalEnvVars = macosEnv
+        )
+
+        with(TestProject("misc/macosResources", testEnv)) {
             gradle(":podspec", "-Pkotlin.native.cocoapods.generate.wrapper=true").checks {
                 assertEqualTextFiles(
-                    file("iosResources.podspec"),
-                    file("expected/iosResources.podspec")
+                    file("macosResources.podspec"),
+                    file("expected/macosResources.podspec")
                 )
+                file("build/compose/cocoapods/compose-resources").checkExists()
+            }
+
+            gradle(
+                ":syncFramework",
+                "-Pkotlin.native.cocoapods.platform=${macosEnv["PLATFORM_NAME"]}",
+                "-Pkotlin.native.cocoapods.archs=${macosEnv["ARCHS"]}",
+                "-Pkotlin.native.cocoapods.configuration=${macosEnv["CONFIGURATION"]}",
+                "--dry-run"
+            ).checks {
+                check.taskSkipped(":generateComposeResClass")
+
+                check.taskSkipped(":convertXmlValueResourcesForCommonMain")
+                check.taskSkipped(":copyNonXmlValueResourcesForCommonMain")
+                check.taskSkipped(":prepareComposeResourcesTaskForCommonMain")
+                check.taskSkipped(":generateResourceAccessorsForCommonMain")
+
+                check.taskSkipped(":convertXmlValueResourcesForNativeMain")
+                check.taskSkipped(":copyNonXmlValueResourcesForNativeMain")
+                check.taskSkipped(":prepareComposeResourcesTaskForNativeMain")
+                check.taskSkipped(":generateResourceAccessorsForNativeMain")
+
+                check.taskSkipped(":convertXmlValueResourcesForAppleMain")
+                check.taskSkipped(":copyNonXmlValueResourcesForAppleMain")
+                check.taskSkipped(":prepareComposeResourcesTaskForAppleMain")
+                check.taskSkipped(":generateResourceAccessorsForAppleMain")
+
+                check.taskSkipped(":convertXmlValueResourcesForMacosMain")
+                check.taskSkipped(":copyNonXmlValueResourcesForMacosMain")
+                check.taskSkipped(":prepareComposeResourcesTaskForMacosMain")
+                check.taskSkipped(":generateResourceAccessorsForMacosMain")
+
+                check.taskSkipped(":convertXmlValueResourcesForMacosX64Main")
+                check.taskSkipped(":copyNonXmlValueResourcesForMacosX64Main")
+                check.taskSkipped(":prepareComposeResourcesTaskForMacosX64Main")
+                check.taskSkipped(":generateResourceAccessorsForMacosX64Main")
+
+                check.taskSkipped(":syncPodComposeResourcesForIos")
+            }
+            gradle(":syncPodComposeResourcesForIos").checks {
+                check.taskNoSource(":convertXmlValueResourcesForCommonMain")
+                check.taskSuccessful(":copyNonXmlValueResourcesForCommonMain")
+                check.taskSuccessful(":prepareComposeResourcesTaskForCommonMain")
+                check.taskSkipped(":generateResourceAccessorsForCommonMain")
+
+                check.taskNoSource(":convertXmlValueResourcesForNativeMain")
+                check.taskNoSource(":copyNonXmlValueResourcesForNativeMain")
+                check.taskNoSource(":prepareComposeResourcesTaskForNativeMain")
+                check.taskSkipped(":generateResourceAccessorsForNativeMain")
+
+                check.taskNoSource(":convertXmlValueResourcesForAppleMain")
+                check.taskNoSource(":copyNonXmlValueResourcesForAppleMain")
+                check.taskNoSource(":prepareComposeResourcesTaskForAppleMain")
+                check.taskSkipped(":generateResourceAccessorsForAppleMain")
+
+                check.taskNoSource(":convertXmlValueResourcesForMacosMain")
+                check.taskSuccessful(":copyNonXmlValueResourcesForMacosMain")
+                check.taskSuccessful(":prepareComposeResourcesTaskForMacosMain")
+                check.taskSkipped(":generateResourceAccessorsForMacosMain")
+
+                check.taskNoSource(":convertXmlValueResourcesForMacosX64Main")
+                check.taskNoSource(":copyNonXmlValueResourcesForMacosX64Main")
+                check.taskNoSource(":prepareComposeResourcesTaskForMacosX64Main")
+                check.taskSkipped(":generateResourceAccessorsForMacosX64Main")
+
+                file("build/compose/cocoapods/compose-resources/composeResources/macosresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
+                file("build/compose/cocoapods/compose-resources/composeResources/macosresources.generated.resources/drawable/icon.xml").checkExists()
             }
         }
     }
@@ -680,6 +801,43 @@ class ResourcesTest : GradlePluginTestBase() {
             gradle(":copyTestComposeResourcesForIosX64").checks {
                 file("build/bin/iosX64/debugTest/compose-resources/composeResources/iosresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
                 file("build/bin/iosX64/debugTest/compose-resources/composeResources/iosresources.generated.resources/drawable/icon.xml").checkExists()
+            }
+        }
+    }
+
+    @Test
+    fun macosTestResources() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        with(testProject("misc/macosResources")) {
+            gradle(":linkDebugTestMacosX64", "--dry-run").checks {
+                check.taskSkipped(":copyTestComposeResourcesForMacosX64")
+                check.taskSkipped(":linkDebugTestMacosX64")
+            }
+            gradle(":copyTestComposeResourcesForMacosX64").checks {
+                file("build/bin/macosX64/debugTest/compose-resources/composeResources/macosresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
+                file("build/bin/macosX64/debugTest/compose-resources/composeResources/macosresources.generated.resources/drawable/icon.xml").checkExists()
+            }
+        }
+    }
+
+    @Test
+    fun checkTestResources() {
+        with(testProject("misc/testResources")) {
+            gradle("check").checks {
+                check.logContains("Configure main resources for 'desktop' target")
+                check.logContains("Configure test resources for 'desktop' target")
+                check.logContains("Configure main resources for 'iosX64' target")
+                check.logContains("Configure test resources for 'iosX64' target")
+                check.logContains("Configure main resources for 'iosArm64' target")
+                check.logContains("Configure test resources for 'iosArm64' target")
+                check.logContains("Configure main resources for 'iosSimulatorArm64' target")
+                check.logContains("Configure test resources for 'iosSimulatorArm64' target")
+                check.logContains("Configure main resources for 'macosX64' target")
+                check.logContains("Configure test resources for 'macosX64' target")
+                check.logContains("Configure main resources for 'macosArm64' target")
+                check.logContains("Configure test resources for 'macosArm64' target")
+
+                check.taskSuccessful(":desktopTest")
             }
         }
     }

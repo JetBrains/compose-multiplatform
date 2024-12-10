@@ -366,4 +366,49 @@ class ComposeResourceTest {
         val systemEnvironment = getSystemResourceEnvironment()
         assertEquals(systemEnvironment, environment)
     }
+
+    @Test
+    fun rememberResourceStateAffectedByEnvironmentChanges() = runComposeUiTest {
+        val env2 = ResourceEnvironment(
+            language = LanguageQualifier("en"),
+            region = RegionQualifier("CA"),
+            theme = ThemeQualifier.DARK,
+            density = DensityQualifier.MDPI
+        )
+
+        val envState = mutableStateOf(TestComposeEnvironment)
+        var lastEnv1: ResourceEnvironment? = null
+        var lastEnv2: ResourceEnvironment? = null
+        var lastEnv3: ResourceEnvironment? = null
+
+        setContent {
+            CompositionLocalProvider(LocalComposeEnvironment provides envState.value) {
+                rememberResourceState(1, { "" }) {
+                    lastEnv1 = it
+                }
+                rememberResourceState(1, 2,  { "" }) {
+                    lastEnv2 = it
+                }
+                rememberResourceState(1, 2, 3,  { "" }) {
+                    lastEnv3 = it
+                }
+            }
+        }
+
+        assertNotEquals(null, lastEnv1)
+        assertNotEquals(env2, lastEnv1)
+        assertEquals(lastEnv1, lastEnv2)
+        assertEquals(lastEnv2, lastEnv3)
+
+        val testEnv2 = object : ComposeEnvironment {
+            @Composable
+            override fun rememberEnvironment() = env2
+        }
+        envState.value = testEnv2
+        waitForIdle()
+
+        assertEquals(env2, lastEnv1)
+        assertEquals(env2, lastEnv2)
+        assertEquals(env2, lastEnv3)
+    }
 }
