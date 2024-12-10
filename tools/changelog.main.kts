@@ -286,6 +286,8 @@ fun GitHubPullEntry.extractReleaseNotes(link: String): List<ChangelogEntry> {
     val list = mutableListOf<ChangelogEntry>()
     var section: String? = null
     var subsection: String? = null
+    var isFirstLine = true
+    var shouldPadLines = false
 
     for (line in relNoteBody.orEmpty().split("\n")) {
         // parse "### Section - Subsection"
@@ -293,17 +295,30 @@ fun GitHubPullEntry.extractReleaseNotes(link: String): List<ChangelogEntry> {
             val s = line.removePrefix("### ")
             section = s.substringBefore("-", "").trim().normalizeSectionName().ifEmpty { null }
             subsection = s.substringAfter("-", "").trim().normalizeSubsectionName().ifEmpty { null }
+            isFirstLine = true
+            shouldPadLines = false
         } else if (section != null && line.isNotBlank()) {
-            val isTopLevel = line.startsWith("-")
-            val trimmedLine = line.trimEnd().removeSuffix(".")
+            var lineFixed = line
+
+            if (isFirstLine && !lineFixed.startsWith("-")) {
+                lineFixed = "- $lineFixed"
+                shouldPadLines = true
+            }
+            if (!isFirstLine && shouldPadLines) {
+                lineFixed = "  $lineFixed"
+            }
+            lineFixed = lineFixed.trimEnd().removeSuffix(".")
+
+            val isTopLevel = lineFixed.startsWith("-")
             list.add(
                 ChangelogEntry(
-                    trimmedLine,
+                    lineFixed,
                     section,
                     subsection,
                     link.takeIf { isTopLevel }
                 )
             )
+            isFirstLine = false
         }
     }
 
