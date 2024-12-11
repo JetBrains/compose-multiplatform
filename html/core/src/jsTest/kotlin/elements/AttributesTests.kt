@@ -579,4 +579,16 @@ class AttributesTests {
             assertEquals("400", attrsMap["height"])
         }
     }
+
+    @Test
+    fun booleanAttributeTest() = runTest {
+        composition {
+            TextInput {
+                attr("required", true)
+            }
+        }
+        with(nextChild()) {
+            assertEquals("true", getAttribute("required"))
+        }
+    }
 }
