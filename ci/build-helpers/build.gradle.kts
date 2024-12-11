@@ -5,8 +5,6 @@ plugins {
 }
 
 val mavenCentral = MavenCentralProperties(project)
-val mavenCentralGroup = project.providers.gradleProperty("maven.central.group")
-val mavenCentralStage = project.providers.gradleProperty("maven.central.stage")
 if (mavenCentral.signArtifacts) {
     signing.useInMemoryPgpKeys(
         mavenCentral.signArtifactsKey.get(),
@@ -20,8 +18,7 @@ val preparedArtifactsRoot = publishingDir.map { it.dir("prepared") }
 val modulesFile = publishingDir.map { it.file("modules.txt") }
 
 val findComposeModules by tasks.registering(FindModulesInSpaceTask::class) {
-    requestedGroupId.set(mavenCentralGroup)
-    requestedVersion.set(mavenCentral.version)
+    requestedCoordinates.set(mavenCentral.coordinates)
     spaceInstanceUrl.set("https://public.jetbrains.space")
     spaceClientId.set(System.getenv("COMPOSE_REPO_USERNAME") ?: "")
     spaceClientSecret.set(System.getenv("COMPOSE_REPO_KEY") ?: "")
@@ -50,14 +47,14 @@ val fixModulesBeforePublishing by tasks.registering(FixModulesBeforePublishingTa
 val reuploadArtifactsToMavenCentral by tasks.registering(UploadToSonatypeTask::class) {
     dependsOn(fixModulesBeforePublishing)
 
-    version.set(mavenCentral.version)
     modulesToUpload.set(project.provider { readComposeModules(modulesFile, preparedArtifactsRoot) })
 
     sonatypeServer.set("https://oss.sonatype.org")
     user.set(mavenCentral.user)
     password.set(mavenCentral.password)
     autoCommitOnSuccess.set(mavenCentral.autoCommitOnSuccess)
-    stagingProfileName.set(mavenCentralStage)
+    stagingProfileName.set(mavenCentral.stage)
+    stagingDescription.set(mavenCentral.description)
 }
 
 fun readComposeModules(
