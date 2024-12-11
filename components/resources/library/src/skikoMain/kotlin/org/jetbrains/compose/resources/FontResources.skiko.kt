@@ -55,12 +55,12 @@ actual fun Font(
     variationSettings: FontVariation.Settings,
 ): Font {
     val resourceReader = LocalResourceReader.currentOrPreview
-    val fontFile by rememberResourceState(resource, weight, style, { defaultEmptyFont }) { env ->
+    val fontFile by rememberResourceState(resource, weight, style, variationSettings, { defaultEmptyFont }) { env ->
         val path = resource.getResourceItemByEnvironment(env).path
-        val key = "$path:$weight:$style"
+        val key = "$path:$weight:$style:${variationSettings.settings}"
         fontCache.getOrLoad(key) {
             val fontBytes = resourceReader.read(path)
-            Font(path, fontBytes, weight, style, variationSettings)
+            Font("$path${variationSettings.settings}", fontBytes, weight, style, variationSettings)
         }
     }
     return fontFile
