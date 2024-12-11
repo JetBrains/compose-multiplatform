@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.*
  */
 @Immutable
 class FontResource
-@InternalResourceApi constructor(id: String, items: Set<ResourceItem>): Resource(id, items)
+@InternalResourceApi constructor(id: String, items: Set<ResourceItem>) : Resource(id, items)
 
 /**
  * Creates a font using the specified font resource, weight, and style.
@@ -28,6 +28,10 @@ class FontResource
  *
  * @throws NotFoundException if the specified resource ID is not found.
  */
+@Deprecated(
+    message = "Use the updated Font() function with variationSettings instead.",
+    level = DeprecationLevel.HIDDEN
+)
 @Composable
 expect fun Font(
     resource: FontResource,
@@ -35,7 +39,18 @@ expect fun Font(
     style: FontStyle = FontStyle.Normal
 ): Font
 
-
+/**
+ * Creates a font using the specified font resource, weight, and style.
+ *
+ * @param resource The font resource to be used.
+ * @param weight The weight of the font. Default value is [FontWeight.Normal].
+ * @param style The style of the font. Default value is [FontStyle.Normal].
+ * @param variationSettings Custom variation settings for the font, with a default value derived from the specified [weight] and [style].
+ *
+ * @return The created [Font] object.
+ *
+ * @throws NotFoundException if the specified resource ID is not found.
+ */
 @Composable
 expect fun Font(
     resource: FontResource,
