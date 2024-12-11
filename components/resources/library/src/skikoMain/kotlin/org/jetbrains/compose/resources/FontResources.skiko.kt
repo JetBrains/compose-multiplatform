@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.font.*
 import androidx.compose.ui.text.platform.Font
+import androidx.compose.ui.unit.Density
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -33,6 +34,10 @@ private val fontCache = AsyncCache<String, Font>()
 internal val Font.isEmptyPlaceholder: Boolean
     get() = this == defaultEmptyFont
 
+@Deprecated(
+    message = "Use the new Font function with variationSettings instead.",
+    level = DeprecationLevel.HIDDEN
+)
 @Composable
 actual fun Font(resource: FontResource, weight: FontWeight, style: FontStyle): Font {
     val resourceReader = LocalResourceReader.currentOrPreview
@@ -45,4 +50,31 @@ actual fun Font(resource: FontResource, weight: FontWeight, style: FontStyle): F
         }
     }
     return fontFile
+}
+
+@Composable
+actual fun Font(
+    resource: FontResource,
+    weight: FontWeight,
+    style: FontStyle,
+    variationSettings: FontVariation.Settings,
+): Font {
+    val resourceReader = LocalResourceReader.currentOrPreview
+    val fontFile by rememberResourceState(resource, weight, style, variationSettings, { defaultEmptyFont }) { env ->
+        val path = resource.getResourceItemByEnvironment(env).path
+        val key = "$path:$weight:$style:${variationSettings.getCacheKey()}"
+        fontCache.getOrLoad(key) {
+            val fontBytes = resourceReader.read(path)
+            Font(key, fontBytes, weight, style, variationSettings)
+        }
+    }
+    return fontFile
+}
+
+internal fun FontVariation.Settings.getCacheKey(): String {
+    val defaultDensity = Density(1f)
+    return settings
+        .map { "${it::class.simpleName}(${it.axisName},${it.toVariationValue(defaultDensity)})" }
+        .sorted()
+        .joinToString(",")
 }
