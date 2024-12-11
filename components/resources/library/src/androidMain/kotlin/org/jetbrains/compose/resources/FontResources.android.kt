@@ -5,6 +5,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.*
 
+@Deprecated(
+    message = "Use the updated Font() function with variationSettings instead.",
+    level = DeprecationLevel.HIDDEN
+)
 @Composable
 actual fun Font(resource: FontResource, weight: FontWeight, style: FontStyle): Font {
     val environment = LocalComposeEnvironment.current.rememberEnvironment()

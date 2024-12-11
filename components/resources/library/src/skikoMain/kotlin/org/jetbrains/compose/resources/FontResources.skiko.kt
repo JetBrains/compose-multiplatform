@@ -33,6 +33,10 @@ private val fontCache = AsyncCache<String, Font>()
 internal val Font.isEmptyPlaceholder: Boolean
     get() = this == defaultEmptyFont
 
+@Deprecated(
+    message = "Use the updated Font() function with variationSettings instead.",
+    level = DeprecationLevel.HIDDEN
+)
 @Composable
 actual fun Font(resource: FontResource, weight: FontWeight, style: FontStyle): Font {
     val resourceReader = LocalResourceReader.currentOrPreview
