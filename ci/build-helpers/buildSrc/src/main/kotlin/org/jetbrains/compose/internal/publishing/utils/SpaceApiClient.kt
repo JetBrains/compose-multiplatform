@@ -21,7 +21,9 @@ internal class SpaceApiClient(
         val groupId: String,
         val artifactId: String,
         val version: String
-    )
+    ) {
+        override fun toString() = "$groupId:$artifactId:$version"
+    }
 
     fun forEachPackageWithVersion(
         projectId: ProjectIdentifier,

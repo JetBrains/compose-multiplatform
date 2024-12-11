@@ -28,10 +28,10 @@ abstract class UploadToSonatypeTask : DefaultTask() {
     abstract val stagingProfileName: Property<String>
 
     @get:Internal
-    abstract val autoCommitOnSuccess: Property<Boolean>
+    abstract val stagingDescription: Property<String>
 
     @get:Internal
-    abstract val version: Property<String>
+    abstract val autoCommitOnSuccess: Property<Boolean>
 
     @get:Internal
     abstract val modulesToUpload: ListProperty<ModuleToUpload>
@@ -59,7 +59,7 @@ abstract class UploadToSonatypeTask : DefaultTask() {
         validate(stagingProfile, modules)
 
         val stagingRepo = sonatype.createStagingRepo(
-            stagingProfile, "Staging repo for '${stagingProfile.name}' release '${version.get()}'"
+            stagingProfile, stagingDescription.get()
         )
         try {
             for (module in modules) {
@@ -76,7 +76,7 @@ abstract class UploadToSonatypeTask : DefaultTask() {
     private fun validate(stagingProfile: StagingProfile, modules: List<ModuleToUpload>) {
         val validationIssues = arrayListOf<Pair<ModuleToUpload, ModuleValidator.Status.Error>>()
         for (module in modules) {
-            val status = ModuleValidator(stagingProfile, module, version.get()).validate()
+            val status = ModuleValidator(stagingProfile, module).validate()
             if (status is ModuleValidator.Status.Error) {
                 validationIssues.add(module to status)
             }

@@ -12,7 +12,6 @@ import java.io.File
 internal class ModuleValidator(
     private val stagingProfile: StagingProfile,
     private val module: ModuleToUpload,
-    private val version: String
 ) {
     private val errors = arrayListOf<String>()
     private var status: Status? = null
@@ -35,10 +34,6 @@ internal class ModuleValidator(
     private fun validateImpl() {
         if (!module.groupId.startsWith(stagingProfile.name)) {
             errors.add("Module's group id '${module.groupId}' does not match staging repo '${stagingProfile.name}'")
-        }
-
-        if (module.version != version) {
-            errors.add("Unexpected version '${module.version}' (expected: '$version')")
         }
 
         val pomFile = artifactFile(extension = "pom")
