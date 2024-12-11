@@ -23,12 +23,19 @@ class FontResource
  * @param resource The font resource to be used.
  * @param weight The weight of the font. Default value is [FontWeight.Normal].
  * @param style The style of the font. Default value is [FontStyle.Normal].
- * @param variationSettings Custom variation settings for the font, with a default value derived from the specified [weight] and [style].
  *
  * @return The created [Font] object.
  *
  * @throws NotFoundException if the specified resource ID is not found.
  */
+@Composable
+expect fun Font(
+    resource: FontResource,
+    weight: FontWeight = FontWeight.Normal,
+    style: FontStyle = FontStyle.Normal
+): Font
+
+
 @Composable
 expect fun Font(
     resource: FontResource,
