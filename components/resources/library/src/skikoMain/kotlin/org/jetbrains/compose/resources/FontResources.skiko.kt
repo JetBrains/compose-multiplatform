@@ -33,6 +33,10 @@ private val fontCache = AsyncCache<String, Font>()
 internal val Font.isEmptyPlaceholder: Boolean
     get() = this == defaultEmptyFont
 
+@Deprecated(
+    message = "Use the new Font function with variationSettings instead.",
+    level = DeprecationLevel.HIDDEN
+)
 @Composable
 actual fun Font(resource: FontResource, weight: FontWeight, style: FontStyle): Font {
     val resourceReader = LocalResourceReader.currentOrPreview
@@ -42,6 +46,28 @@ actual fun Font(resource: FontResource, weight: FontWeight, style: FontStyle): F
         fontCache.getOrLoad(key) {
             val fontBytes = resourceReader.read(path)
             Font(path, fontBytes, weight, style)
+        }
+    }
+    return fontFile
+}
+
+@Composable
+actual fun Font(
+    resource: FontResource,
+    weight: FontWeight,
+    style: FontStyle,
+    variationSettings: FontVariation.Settings,
+): Font {
+    val resourceReader = LocalResourceReader.currentOrPreview
+    val fontFile by rememberResourceState(resource, weight, style, variationSettings, { defaultEmptyFont }) { env ->
+        val path = resource.getResourceItemByEnvironment(env).path
+        val settingsKey = variationSettings.settings
+            .sortedBy { it::class.simpleName }
+            .joinToString(",") { it::class.simpleName + "_" + it.hashCode() }
+        val key = "$path:$weight:$style:$settingsKey"
+        fontCache.getOrLoad(key) {
+            val fontBytes = resourceReader.read(path)
+            Font(key, fontBytes, weight, style, variationSettings)
         }
     }
     return fontFile
