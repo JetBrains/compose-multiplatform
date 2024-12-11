@@ -16,6 +16,7 @@ import org.jetbrains.compose.internal.publishing.utils.SpaceApiClient
 import org.jetbrains.compose.internal.publishing.utils.SpaceApiClient.PackageInfo
 import space.jetbrains.api.runtime.types.PackageRepositoryIdentifier
 import space.jetbrains.api.runtime.types.ProjectIdentifier
+import java.util.regex.Pattern
 
 abstract class FindModulesInSpaceTask : DefaultTask() {
     @get:Input
@@ -68,8 +69,7 @@ abstract class FindModulesInSpaceTask : DefaultTask() {
     }
 }
 
-private fun String.matchesWildcard(pattern: String): Boolean = Regex.escape(pattern)
-    .replace("\\*", ".*")
-    .replace("\\?", ".")
+private fun String.matchesWildcard(pattern: String): Boolean = "\\Q$pattern\\E"
+    .replace("*", "\\E.*\\Q")
     .toRegex()
     .matches(this)

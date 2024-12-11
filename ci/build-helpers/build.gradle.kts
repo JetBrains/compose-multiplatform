@@ -54,7 +54,7 @@ val reuploadArtifactsToMavenCentral by tasks.registering(UploadToSonatypeTask::c
     password.set(mavenCentral.password)
     autoCommitOnSuccess.set(mavenCentral.autoCommitOnSuccess)
     stagingProfileName.set(mavenCentral.stage)
-    stagingProfileName.set(mavenCentral.description)
+    stagingDescription.set(mavenCentral.description)
 }
 
 fun readComposeModules(
