@@ -11,8 +11,9 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
-import org.jetbrains.compose.desktop.application.internal.RuntimeCompressionLevel
+import org.gradle.process.ExecResult
 import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
+import org.jetbrains.compose.desktop.application.internal.RuntimeCompressionLevel
 import org.jetbrains.compose.desktop.application.internal.cliArg
 import org.jetbrains.compose.internal.utils.ioFile
 import org.jetbrains.compose.internal.utils.notNullProperty
@@ -30,6 +31,9 @@ abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
 
     @get:InputFile
     val javaRuntimePropertiesFile: RegularFileProperty = objects.fileProperty()
+
+    @get:Input
+    val cds: Property<Boolean> = objects.notNullProperty(false)
 
     @get:Input
     internal val stripDebug: Property<Boolean> = objects.notNullProperty(true)
@@ -56,12 +60,33 @@ abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
             cliArg("--add-modules", m)
         }
 
+        val cds = cds.get()
+
+        if (cds) {
+            cliArg("--generate-cds-archive", true)
+        }
         cliArg("--strip-debug", stripDebug)
         cliArg("--no-header-files", noHeaderFiles)
         cliArg("--no-man-pages", noManPages)
-        cliArg("--strip-native-commands", stripNativeCommands)
+        // Native commands cannot be stripped if CDS is enabled, because bin/java is used by the
+        // CDS option. The files will be stripped later.
+        if (!cds) {
+            cliArg("--strip-native-commands", stripNativeCommands)
+        }
         cliArg("--compress", compressionLevel.orNull?.id)
 
         cliArg("--output", destinationDir)
+    }
+
+    override fun checkResult(result: ExecResult) {
+        super.checkResult(result)
+        if (stripNativeCommands.get() && cds.get()) {
+            // Native files were not removed yet, so do it here.
+            destinationDir.get().dir("bin").asFile
+                .walkBottomUp()
+                // Windows JVM has its .ddl files in bin/
+                .filter { it.isFile && it.extension != "dll" }
+                .forEach { it.delete() }
+        }
     }
 }
