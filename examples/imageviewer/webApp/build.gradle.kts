@@ -12,7 +12,7 @@ val rootDirPath = project.rootDir.path
 
 kotlin {
     js {
-        moduleName = "imageviewer"
+        moduleName = "imageviewer-wa-js"
         browser {
             commonWebpackConfig {
                 outputFileName = "imageviewer.js"
@@ -24,7 +24,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "imageviewer"
+        moduleName = "imageviewer-wa-wasm"
         browser {
              // TODO: uncomment when https://youtrack.jetbrains.com/issue/KT-68614 is fixed (it doesn't work with configuration cache)
 //            commonWebpackConfig {
