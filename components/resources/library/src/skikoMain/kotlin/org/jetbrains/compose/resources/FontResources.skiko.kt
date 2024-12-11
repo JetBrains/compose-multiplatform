@@ -46,3 +46,22 @@ actual fun Font(resource: FontResource, weight: FontWeight, style: FontStyle): F
     }
     return fontFile
 }
+
+@Composable
+actual fun Font(
+    resource: FontResource,
+    weight: FontWeight,
+    style: FontStyle,
+    variationSettings: FontVariation.Settings,
+): Font {
+    val resourceReader = LocalResourceReader.currentOrPreview
+    val fontFile by rememberResourceState(resource, weight, style, { defaultEmptyFont }) { env ->
+        val path = resource.getResourceItemByEnvironment(env).path
+        val key = "$path:$weight:$style"
+        fontCache.getOrLoad(key) {
+            val fontBytes = resourceReader.read(path)
+            Font(path, fontBytes, weight, style, variationSettings)
+        }
+    }
+    return fontFile
+}

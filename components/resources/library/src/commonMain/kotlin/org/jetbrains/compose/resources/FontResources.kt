@@ -35,6 +35,15 @@ expect fun Font(
     style: FontStyle = FontStyle.Normal
 ): Font
 
+
+@Composable
+expect fun Font(
+    resource: FontResource,
+    weight: FontWeight = FontWeight.Normal,
+    style: FontStyle = FontStyle.Normal,
+    variationSettings: FontVariation.Settings = FontVariation.Settings(weight, style)
+): Font
+
 /**
  * Retrieves the byte array of the font resource.
  *
