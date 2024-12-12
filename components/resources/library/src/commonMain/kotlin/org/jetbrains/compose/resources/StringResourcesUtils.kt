@@ -4,7 +4,7 @@ import org.jetbrains.compose.resources.plural.PluralCategory
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-private val SimpleStringFormatRegex = Regex("""%(\d)\$[ds]""")
+private val SimpleStringFormatRegex = Regex("""%(\d+)\$[ds]""")
 internal fun String.replaceWithArgs(args: List<String>) = SimpleStringFormatRegex.replace(this) { matchResult ->
     args[matchResult.groupValues[1].toInt() - 1]
 }
