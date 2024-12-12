@@ -10,8 +10,14 @@ import org.gradle.api.provider.Provider
 
 @Suppress("unused") // public api
 class MavenCentralProperties(private val myProject: Project) {
-    val version: Provider<String> =
-        propertyProvider("maven.central.version")
+    val coordinates: Provider<String> =
+        propertyProvider("maven.central.coordinates")
+
+    val stage: Provider<String> =
+        propertyProvider("maven.central.stage")
+
+    val description: Provider<String> =
+        propertyProvider("maven.central.description")
 
     val user: Provider<String> =
         propertyProvider("maven.central.user", envVar = "MAVEN_CENTRAL_USER")

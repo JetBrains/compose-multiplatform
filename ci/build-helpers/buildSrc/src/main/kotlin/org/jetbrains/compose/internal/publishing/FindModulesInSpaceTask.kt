@@ -13,15 +13,14 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.compose.internal.publishing.utils.SpaceApiClient
+import org.jetbrains.compose.internal.publishing.utils.SpaceApiClient.PackageInfo
 import space.jetbrains.api.runtime.types.PackageRepositoryIdentifier
 import space.jetbrains.api.runtime.types.ProjectIdentifier
+import java.util.regex.Pattern
 
 abstract class FindModulesInSpaceTask : DefaultTask() {
     @get:Input
-    abstract val requestedGroupId: Property<String>
-
-    @get:Input
-    abstract val requestedVersion: Property<String>
+    abstract val requestedCoordinates: Property<String>
 
     @get:Input
     abstract val spaceInstanceUrl: Property<String>
@@ -52,11 +51,14 @@ abstract class FindModulesInSpaceTask : DefaultTask() {
         val projectId = ProjectIdentifier.Id(spaceProjectId.get())
         val repoId = PackageRepositoryIdentifier.Id(spaceRepoId.get())
         val modules = ArrayList<String>()
-        val requestedGroupId = requestedGroupId.get()
-        val requestedVersion = requestedVersion.get()
-        space.forEachPackageWithVersion(projectId, repoId, requestedVersion) { pkg ->
-            if (pkg.groupId.startsWith(requestedGroupId)) {
-                modules.add("${pkg.groupId}:${pkg.artifactId}:${pkg.version}")
+        val requestedCoordinates = requestedCoordinates.get().split(",")
+        requestedCoordinates.forEach { req ->
+            val version = req.substringAfterLast(":") // suppose we don't support wildcards in version
+            space.forEachPackageWithVersion(projectId, repoId, version) { pkg ->
+                val pkgStr = pkg.toString()
+                if (pkgStr.matchesWildcard(req)) {
+                    modules.add(pkgStr)
+                }
             }
         }
 
@@ -66,3 +68,8 @@ abstract class FindModulesInSpaceTask : DefaultTask() {
         }
     }
 }
+
+private fun String.matchesWildcard(pattern: String): Boolean = "\\Q$pattern\\E"
+    .replace("*", "\\E.*\\Q")
+    .toRegex()
+    .matches(this)
