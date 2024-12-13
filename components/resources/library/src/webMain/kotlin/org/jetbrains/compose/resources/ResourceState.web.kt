@@ -61,3 +61,23 @@ internal actual fun <T> rememberResourceState(
         mutableState
     }
 }
+
+@Composable
+internal actual fun <T> rememberResourceState(
+    key1: Any,
+    key2: Any,
+    key3: Any,
+    key4: Any,
+    getDefault: () -> T,
+    block: suspend (ResourceEnvironment) -> T
+): State<T> {
+    val environment = LocalComposeEnvironment.current.rememberEnvironment()
+    val scope = rememberCoroutineScope()
+    return remember(key1, key2, key3, key4, environment) {
+        val mutableState = mutableStateOf(getDefault())
+        scope.launch(start = CoroutineStart.UNDISPATCHED) {
+            mutableState.value = block(environment)
+        }
+        mutableState
+    }
+}
