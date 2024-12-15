@@ -47,3 +47,20 @@ internal actual fun <T> rememberResourceState(
         )
     }
 }
+
+@Composable
+internal actual fun <T> rememberResourceState(
+    key1: Any,
+    key2: Any,
+    key3: Any,
+    key4: Any,
+    getDefault: () -> T,
+    block: suspend (ResourceEnvironment) -> T
+): State<T> {
+    val environment = LocalComposeEnvironment.current.rememberEnvironment()
+    return remember(key1, key2, key3, key4, environment) {
+        mutableStateOf(
+            runBlocking { block(environment) }
+        )
+    }
+}

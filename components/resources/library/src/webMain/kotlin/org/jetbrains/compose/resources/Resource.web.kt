@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 
 /**
@@ -90,6 +91,7 @@ internal fun getResourceUrl(windowOrigin: String, windowPathname: String, resour
  * @param resource The font resource to be used.
  * @param weight The weight of the font. Default value is [FontWeight.Normal].
  * @param style The style of the font. Default value is [FontStyle.Normal].
+ * @param variationSettings Custom variation settings for the font, with a default value derived from the specified [weight] and [style].
  * @return A [State]<[Font]?> object that holds the loaded [Font] when available,
  * or `null` if the font is not yet ready.
  */
@@ -98,10 +100,11 @@ internal fun getResourceUrl(windowOrigin: String, windowPathname: String, resour
 fun preloadFont(
     resource: FontResource,
     weight: FontWeight = FontWeight.Normal,
-    style: FontStyle = FontStyle.Normal
+    style: FontStyle = FontStyle.Normal,
+    variationSettings: FontVariation.Settings = FontVariation.Settings(weight, style),
 ): State<Font?> {
-    val resState = remember(resource, weight, style) { mutableStateOf<Font?>(null) }.apply {
-        value = Font(resource, weight, style).takeIf { !it.isEmptyPlaceholder }
+    val resState = remember(resource, weight, style, variationSettings) { mutableStateOf<Font?>(null) }.apply {
+        value = Font(resource, weight, style, variationSettings).takeIf { !it.isEmptyPlaceholder }
     }
     return resState
 }

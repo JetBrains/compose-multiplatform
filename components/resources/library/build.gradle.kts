@@ -212,10 +212,3 @@ tasks.register<GeneratePluralRuleListsTask>("generatePluralRuleLists") {
     outputFile = projectDir.file("src/commonMain/kotlin/org/jetbrains/compose/resources/plural/CLDRPluralRuleLists.kt")
     samplesOutputFile = projectDir.file("src/commonTest/kotlin/org/jetbrains/compose/resources/CLDRPluralRuleLists.test.kt")
 }
-
-afterEvaluate {
-    // TODO(o.k.): remove this after we refactor jsAndWasmMain source set in skiko to get rid of broken "common" js-interop
-    tasks.configureEach {
-        if (name == "compileWebMainKotlinMetadata") enabled = false
-    }
-}
