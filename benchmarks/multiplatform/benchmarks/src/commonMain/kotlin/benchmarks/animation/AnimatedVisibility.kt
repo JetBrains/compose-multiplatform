@@ -13,8 +13,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import compose_benchmarks.generated.resources.Res
-import compose_benchmarks.generated.resources.compose_multiplatform
+import compose_benchmarks.benchmarks.generated.resources.Res
+import compose_benchmarks.benchmarks.generated.resources.compose_multiplatform
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
