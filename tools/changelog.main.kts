@@ -1,11 +1,15 @@
 /**
  * Script for creating a changelog. Call:
  * ```
- * kotlin changelog.main.kts release/1.6.0 1.6.0-rc02
+ * kotlin changelog.main.kts v1.7.0-dev555
+ * ```
+ * or:
+ * ```
+ * kotlin changelog.main.kts v1.7.0..v1.7.1-dev555
  * ```
  * where:
- * release/1.6.0 - the commit of the version
- * 1.6.0-rc02 - the name of the version
+ * v1.7.0-dev555 - the tag/branch of the version. The previous version will be read from CHANGELOG.md
+ * v1.7.0..1.7.1-dev555 - the range of tag/branches for the changelog
  *
  * It modifies CHANGELOG.md and adds new changes between the last version in CHANGELOG.md and the specified version.
  *
@@ -74,17 +78,36 @@ val argsKeyToValue = args
     .filter { it.contains("=") }
     .associate { it.substringBefore("=") to it.substringAfter("=") }
 
-val versionCommit = argsKeyless.getOrNull(0) ?: "HEAD"
+val commitsArg = argsKeyless.getOrNull(0) ?: "HEAD"
+
+var previousVersionCommitArg: String?
+var versionCommitArg: String
+if (commitsArg.contains("..")) {
+    previousVersionCommitArg = commitsArg.substringBefore("..")
+    versionCommitArg = commitsArg.substringAfter("..")
+} else {
+    previousVersionCommitArg = null
+    versionCommitArg = commitsArg
+}
+
+val versionCommit = versionCommitArg
+
 val token = argsKeyToValue["token"]
 
-println("Note. The script supports optional arguments: kotlin changelog.main.kts [versionCommit] [versionName] [token=githubToken]")
+println("Note. The script supports optional arguments: kotlin changelog.main.kts [previousVersionCommit..versionCommit] [token=githubToken]")
 if (token == null) {
     println("To increase the rate limit, specify token (https://github.com/settings/tokens)")
 }
 println()
 
+val androidxLibToPreviousVersion = previousVersionCommitArg?.let(::androidxLibToVersion)
 val androidxLibToVersion = androidxLibToVersion(versionCommit)
 val androidxLibToRedirectingVersion = androidxLibToRedirectingVersion(versionCommit)
+
+fun formatAndroidxLibPreviousVersion(libName: String) =
+    androidxLibToPreviousVersion?.get(libName) ?: "PLACEHOLDER".also {
+        println("Can't find $libName previous version. Using PLACEHOLDER")
+    }
 
 fun formatAndroidxLibVersion(libName: String) =
     androidxLibToVersion[libName] ?: "PLACEHOLDER".also {
@@ -120,12 +143,21 @@ val previousChangelog =
         currentChangelog
     }
 
-val previousVersion = previousChangelog.substringAfter("# ").substringBefore(" (")
+var previousVersionCommit: String
+var previousVersion: String
+if (previousVersionCommitArg != null) {
+    previousVersionCommit = previousVersionCommitArg!!
+    previousVersion = formatAndroidxLibPreviousVersion("COMPOSE")
+} else {
+    val previousVersionInChangelog = previousChangelog.substringAfter("# ").substringBefore(" (")
+    previousVersionCommit = "v$previousVersionInChangelog"
+    previousVersion = previousVersionInChangelog
+}
 
 println()
 println("Generating changelog between $previousVersion and $versionName")
 
-val newChangelog = getChangelog("v$previousVersion", versionCommit, previousVersion)
+val newChangelog = getChangelog(previousVersionCommit, versionCommit, previousVersion)
 
 changelogFile.writeText(
     newChangelog + previousChangelog
