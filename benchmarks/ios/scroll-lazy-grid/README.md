@@ -1,1 +1,0 @@
-A benchmark app extracted from https://github.com/androidx/androidx/blob/androidx-main/compose/integration-tests/macrobenchmark-target/src/main/java/androidx/compose/integration/macrobenchmark/target/LazyVerticalGridActivity.kt

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Benchmarks Compose + K/Wasm</title>
+    <script src="benchmarks.js"></script>
+    <script type="application/javascript">
+            const log = console.log.bind(console)
+            console.log = (...args) => {
+                const message = args.join(' ');
+                const p = document.createElement('p');
+                p.textContent = message;
+                document.body.appendChild(p);
+                log(...args);
+            }
+    </script>
+</head>
+<body>
+Wait for the benchmarks to complete...
+</body>
+</html>

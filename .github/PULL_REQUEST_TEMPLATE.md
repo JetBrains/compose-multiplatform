@@ -15,20 +15,23 @@ This should be tested by QA
 
 ## Release Notes
 <!--
-Optional, if omitted - won't be included in the changelog
+If we definitely shouldn't add Release Notes, add only N/A.
 
-Sections:
+Or enumerate sections, subsections and all changes.
+
+Possible sections:
 - Highlights
-- Known issues
-- Breaking changes
+- Known Issues
+- Breaking Changes
 - Features
 - Fixes
 
-Subsections:
+Possible subsections:
 - Multiple Platforms
 - iOS
 - Desktop
 - Web
+- Android
 - Resources
 - Gradle Plugin
 -->

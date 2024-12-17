@@ -2,6 +2,7 @@ package org.jetbrains.compose.test.tests.integration
 
 import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
+import org.jetbrains.compose.internal.Version
 import org.jetbrains.compose.internal.utils.Arch
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentArch
@@ -311,6 +312,25 @@ class ResourcesTest : GradlePluginTestBase() {
             gradleFailure(":appModule:jvmTest").checks {
                 check.logContains("java.lang.AssertionError: Failed to assert the following: (Text + EditableText = [test text: Feature text str_1])")
                 check.logContains("Text = '[Feature text str_1]'")
+            }
+        }
+    }
+
+    @Test
+    fun testNewAgpResources() {
+        Assumptions.assumeTrue(defaultTestEnvironment.parsedGradleVersion >= GradleVersion.version("8.10.2"))
+        Assumptions.assumeTrue(Version.fromString(defaultTestEnvironment.agpVersion) >= Version.fromString("8.8.0-alpha08"))
+
+        with(testProject("misc/newAgpResources", defaultTestEnvironment)) {
+            gradle(":appModule:assembleDebug").checks {
+                check.logContains("Configure compose resources with KotlinMultiplatformAndroidComponentsExtension")
+
+                val resourcesFiles = sequenceOf(
+                    "composeResources/newagpresources.appmodule.generated.resources/values/strings.commonMain.cvr",
+                    "composeResources/newagpresources.featuremodule.generated.resources/values/strings.commonMain.cvr"
+                )
+                val apk = file("appModule/build/outputs/apk/debug/appModule-debug.apk")
+                checkResourcesZip(apk, resourcesFiles, true)
             }
         }
     }

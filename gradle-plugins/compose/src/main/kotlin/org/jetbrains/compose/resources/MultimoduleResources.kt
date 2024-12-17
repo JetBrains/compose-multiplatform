@@ -1,5 +1,6 @@
 package org.jetbrains.compose.resources
 
+import com.android.build.api.dsl.KotlinMultiplatformAndroidTarget
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.SourceSet
@@ -13,7 +14,9 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.extraProperties
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMetadataTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.resources.KotlinTargetResourcesPublication
 import java.io.File
 
@@ -29,16 +32,14 @@ internal fun Project.configureMultimoduleResources(
 
     val moduleIsolationDirectory = config.getModuleResourcesDir(project)
 
-    val platformsForSkip = listOf(
-        KotlinPlatformType.common, KotlinPlatformType.androidJvm
-    )
     kotlinExtension.targets
-        .matching { target -> target.platformType !in platformsForSkip }
+        .matching { target -> !target.skipResourcesConfiguration() }
         .all { target -> configureTargetResources(target, moduleIsolationDirectory) }
 
+
     //configure ANDROID resources
-    onAgpApplied {
-        configureAndroidComposeResources(moduleIsolationDirectory)
+    onAgpApplied { agpId ->
+        configureAndroidComposeResources(agpId, moduleIsolationDirectory)
         fixAndroidLintTaskDependencies()
     }
 }
@@ -90,6 +91,25 @@ private fun Project.configureTargetResources(
             configureResourcesForCompilation(compilation, allCompilationResources)
         }
     }
+}
+
+private fun KotlinTarget.skipResourcesConfiguration(): Boolean = when {
+    this is KotlinMetadataTarget -> true
+
+    //android resources should be configured via AGP
+    this is KotlinAndroidTarget -> true
+
+    //new AGP library target
+    this.isMultiplatformAndroidTarget() -> true
+
+    else -> false
+}
+
+@Suppress("UnstableApiUsage")
+private fun KotlinTarget.isMultiplatformAndroidTarget(): Boolean = try {
+    this is KotlinMultiplatformAndroidTarget
+} catch (e: NoClassDefFoundError) {
+    false
 }
 
 private val platformsForSetupKmpResources = listOf(

@@ -1,76 +1,79 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     id("java")
     alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.intellij.sdk)
+    alias(libs.plugins.intellij.plugin)
     alias(libs.plugins.intellij.changelog)
 }
 
 val projectProperties = ProjectProperties(project)
 
 group = "org.jetbrains.compose.desktop.ide"
+
 version = projectProperties.deployVersion
 
 repositories {
     mavenCentral()
+
+    intellijPlatform { defaultRepositories() }
 }
 
 dependencies {
     implementation("org.jetbrains.compose:preview-rpc")
+
+    intellijPlatform {
+        intellijIdeaCommunity(libs.versions.idea)
+        instrumentationTools()
+        pluginVerifier()
+
+        bundledPlugins("com.intellij.java", "org.jetbrains.kotlin", "com.intellij.gradle")
+    }
 }
 
-intellij {
-    pluginName.set("Compose Multiplatform IDE Support")
-    type.set(projectProperties.platformType)
-    version.set(projectProperties.platformVersion)
-    downloadSources.set(projectProperties.platformDownloadSources)
-    updateSinceUntilBuild.set(false)
+intellijPlatform {
+    pluginConfiguration { name = "Compose Multiplatform IDE Support" }
+    buildSearchableOptions = false
+    autoReload = false
 
-    plugins.set(
-        listOf(
-            "java",
-            "com.intellij.gradle",
-            "org.jetbrains.kotlin"
-        )
-    )
-}
+    publishing {
+        token = System.getenv("IDE_PLUGIN_PUBLISH_TOKEN")
+        channels = projectProperties.pluginChannels
+    }
 
-tasks.buildSearchableOptions {
-    // temporary workaround
-    enabled = false
+    pluginVerification {
+        ides {
+            recommended()
+        }
+    }
 }
 
 tasks {
-    // Set the compatibility versions to 1.8
     withType<JavaCompile> {
-        sourceCompatibility = "11"
-        targetCompatibility = "11"
+        sourceCompatibility = "21"
+        targetCompatibility = "21"
     }
-    withType<KotlinJvmCompile> {
-        kotlinOptions.jvmTarget = "11"
-    }
+    withType<KotlinJvmCompile> { compilerOptions.jvmTarget.set(JvmTarget.JVM_21) }
 
-    publishPlugin {
-        token.set(System.getenv("IDE_PLUGIN_PUBLISH_TOKEN"))
-        channels.set(projectProperties.pluginChannels)
-    }
-
-    runPluginVerifier {
-        ideVersions.set(projectProperties.pluginVerifierIdeVersions)
+    runIde {
+        systemProperty("idea.is.internal", true)
+        systemProperty("idea.kotlin.plugin.use.k2", true)
+        jvmArgumentProviders += CommandLineArgumentProvider {
+            listOf("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005")
+        }
     }
 }
 
 class ProjectProperties(private val project: Project) {
-    val deployVersion get() = stringProperty("deploy.version")
-    val platformType get() = stringProperty("platform.type")
-    val platformVersion get() = stringProperty("platform.version")
-    val platformDownloadSources get() = stringProperty("platform.download.sources").toBoolean()
-    val pluginChannels get() = listProperty("plugin.channels")
-    val pluginVerifierIdeVersions get() = listProperty("plugin.verifier.ide.versions")
+    val deployVersion
+        get() = stringProperty("deploy.version")
 
-    private fun stringProperty(key: String): String =
-        project.findProperty(key)!!.toString()
+    val pluginChannels
+        get() = listProperty("plugin.channels")
+
+    private fun stringProperty(key: String): String = project.findProperty(key)!!.toString()
+
     private fun listProperty(key: String): List<String> =
         stringProperty(key).split(",").map { it.trim() }
 }

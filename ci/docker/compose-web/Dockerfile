@@ -14,6 +14,10 @@ RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
     wget \
     xvfb
 
+RUN apt-get update -yqq \
+    && wget -qO- https://deb.nodesource.com/gpgkey/nodesource.gpg.key \
+    && wget -qO- https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs
 
 ARG CHROME_VERSION="google-chrome-stable"
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
@@ -30,6 +34,3 @@ RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.29.1/geckod
 RUN export CHROME_DRIVER_VERSION=$(wget -qO- https://chromedriver.storage.googleapis.com/LATEST_RELEASE) \
     && wget https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip -P ~/tmp \
     && mkdir -p /root/.gradle/selenium/chrome &&  unzip -d /root/.gradle/selenium/chrome  ~/tmp/chromedriver_linux64.zip && rm ~/tmp/chromedriver_linux64.zip
-
-COPY chrome-no-sandbox /usr/bin/chrome-no-sandbox 
-RUN chmod u+x /usr/bin/chrome-no-sandbox

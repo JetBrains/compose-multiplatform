@@ -160,7 +160,7 @@ kotlin {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
     namespace = "org.jetbrains.compose.components.resources"
     defaultConfig {
         minSdk = 21
@@ -211,11 +211,4 @@ tasks.register<GeneratePluralRuleListsTask>("generatePluralRuleLists") {
     pluralsFile = projectDir.file("CLDRPluralRules/plurals.xml")
     outputFile = projectDir.file("src/commonMain/kotlin/org/jetbrains/compose/resources/plural/CLDRPluralRuleLists.kt")
     samplesOutputFile = projectDir.file("src/commonTest/kotlin/org/jetbrains/compose/resources/CLDRPluralRuleLists.test.kt")
-}
-
-afterEvaluate {
-    // TODO(o.k.): remove this after we refactor jsAndWasmMain source set in skiko to get rid of broken "common" js-interop
-    tasks.configureEach {
-        if (name == "compileWebMainKotlinMetadata") enabled = false
-    }
 }

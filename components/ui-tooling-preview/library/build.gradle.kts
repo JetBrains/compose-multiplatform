@@ -34,7 +34,7 @@ kotlin {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
     namespace = "org.jetbrains.compose.ui.tooling.preview"
     defaultConfig {
         minSdk = 21
@@ -52,10 +52,3 @@ configureMavenPublication(
     name = "Experimental Compose Multiplatform tooling library API. This library provides the API required to declare " +
             "@Preview composables in user apps."
 )
-
-afterEvaluate {
-    // TODO(o.k.): remove this after we refactor jsAndWasmMain source set in skiko to get rid of broken "common" js-interop
-    tasks.configureEach {
-        if (name == "compileWebMainKotlinMetadata") enabled = false
-    }
-}

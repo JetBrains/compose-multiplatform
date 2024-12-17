@@ -23,6 +23,10 @@
     <depends>com.intellij.gradle</depends>
     <depends>org.jetbrains.kotlin</depends>
 
+    <extensions defaultExtensionNs="org.jetbrains.kotlin">
+        <supportsKotlinPluginMode supportsK2="true" />
+    </extensions>
+
     <extensions defaultExtensionNs="com.intellij">
         <runLineMarkerContributor
                 language="kotlin"

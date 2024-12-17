@@ -75,7 +75,8 @@ internal fun Element.toImageVector(density: Density): ImageVector {
         defaultWidth = attributeOrNull(ANDROID_NS, "width").parseDp(density),
         defaultHeight = attributeOrNull(ANDROID_NS, "height").parseDp(density),
         viewportWidth = attributeOrNull(ANDROID_NS, "viewportWidth")?.toFloat() ?: 0f,
-        viewportHeight = attributeOrNull(ANDROID_NS, "viewportHeight")?.toFloat() ?: 0f
+        viewportHeight = attributeOrNull(ANDROID_NS, "viewportHeight")?.toFloat() ?: 0f,
+        autoMirror = attributeOrNull(ANDROID_NS, "autoMirrored") == "true"
     )
     parseVectorNodes(builder, context)
     return builder.build()

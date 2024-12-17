@@ -77,7 +77,7 @@ kotlin {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
     namespace = "org.jetbrains.compose.demo.widgets.platform"
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
