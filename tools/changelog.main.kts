@@ -1,15 +1,15 @@
 /**
  * Script for creating a changelog. Call:
  * ```
- * kotlin changelog.main.kts v1.7.0-dev555
+ * kotlin changelog.main.kts v1.7.0+dev555
  * ```
  * or:
  * ```
- * kotlin changelog.main.kts v1.7.0..v1.7.1-dev555
+ * kotlin changelog.main.kts v1.7.0..v1.7.1+dev555
  * ```
  * where:
- * v1.7.0-dev555 - the tag/branch of the version. The previous version will be read from CHANGELOG.md
- * v1.7.0..1.7.1-dev555 - the range of tag/branches for the changelog
+ * v1.7.0+dev555 - the tag/branch of the version. The previous version will be read from CHANGELOG.md
+ * v1.7.0..v1.7.1+dev555 - the range of tag/branches for the changelog
  *
  * It modifies CHANGELOG.md and adds new changes between the last version in CHANGELOG.md and the specified version.
  *
