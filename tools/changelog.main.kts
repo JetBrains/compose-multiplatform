@@ -104,6 +104,11 @@ val androidxLibToPreviousVersion = previousVersionCommitArg?.let(::androidxLibTo
 val androidxLibToVersion = androidxLibToVersion(versionCommit)
 val androidxLibToRedirectingVersion = androidxLibToRedirectingVersion(versionCommit)
 
+fun formatAndroidxLibPreviousVersion(libName: String) =
+    androidxLibToPreviousVersion?.get(libName) ?: "PLACEHOLDER".also {
+        println("Can't find $libName previous version. Using PLACEHOLDER")
+    }
+
 fun formatAndroidxLibVersion(libName: String) =
     androidxLibToVersion[libName] ?: "PLACEHOLDER".also {
         println("Can't find $libName version. Using PLACEHOLDER")
@@ -138,9 +143,16 @@ val previousChangelog =
         currentChangelog
     }
 
-val previousVersionInChangelog = previousChangelog.substringAfter("# ").substringBefore(" (")
-val previousVersionCommit = previousVersionCommitArg ?: "v$previousVersionInChangelog"
-val previousVersion = androidxLibToPreviousVersion?.get("COMPOSE") ?: previousVersionInChangelog
+var previousVersionCommit: String
+var previousVersion: String
+if (previousVersionCommitArg != null) {
+    previousVersionCommit = previousVersionCommitArg!!
+    previousVersion = formatAndroidxLibPreviousVersion("COMPOSE")
+} else {
+    val previousVersionInChangelog = previousChangelog.substringAfter("# ").substringBefore(" (")
+    previousVersionCommit = "v$previousVersionInChangelog"
+    previousVersion = previousVersionInChangelog
+}
 
 println()
 println("Generating changelog between $previousVersion and $versionName")
