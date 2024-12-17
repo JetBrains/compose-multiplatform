@@ -84,7 +84,7 @@ var previousVersionCommitArg: String?
 var versionCommitArg: String
 if (commitsArg.contains("..")) {
     previousVersionCommitArg = commitsArg.substringBefore("..")
-    versionCommitArg = commitsArg.substringAfter("..",)
+    versionCommitArg = commitsArg.substringAfter("..")
 } else {
     previousVersionCommitArg = null
     versionCommitArg = commitsArg
