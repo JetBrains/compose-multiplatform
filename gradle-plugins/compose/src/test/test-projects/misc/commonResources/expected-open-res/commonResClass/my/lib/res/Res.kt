@@ -2,12 +2,17 @@
   org.jetbrains.compose.resources.InternalResourceApi::class,
   org.jetbrains.compose.resources.ExperimentalResourceApi::class,
 )
+@file:Suppress(
+  "RedundantVisibilityModifier",
+  "REDUNDANT_VISIBILITY_MODIFIER",
+)
 
 package my.lib.res
 
 import kotlin.ByteArray
 import kotlin.OptIn
 import kotlin.String
+import kotlin.Suppress
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.getResourceUri
 import org.jetbrains.compose.resources.readResourceBytes
