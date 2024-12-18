@@ -141,6 +141,12 @@ internal fun getResFileSpec(
                 .addMember("org.jetbrains.compose.resources.ExperimentalResourceApi::class")
                 .build()
         )
+        file.addAnnotation(
+            AnnotationSpec.builder(ClassName("kotlin", "Suppress"))
+                .addMember("%S","RedundantVisibilityModifier")
+                .addMember("%S","REDUNDANT_VISIBILITY_MODIFIER")
+                .build()
+        )
         file.addType(TypeSpec.objectBuilder("Res").also { resObject ->
             resObject.addModifiers(resModifier)
 
