@@ -1,3 +1,35 @@
+# 1.7.2 (December 2024)
+
+_Changes since 1.7.1_
+
+## Features
+
+### Desktop
+
+- [Compose plugin for IntelliJ IDEA now supports K2 mode](https://github.com/JetBrains/compose-multiplatform/pull/5138)
+
+## Fixes
+
+### iOS
+
+- [Taps should be properly registered on interop views with `UIKitInteropInteractionMode.Cooperative` interaction mode](https://github.com/JetBrains/compose-multiplatform-core/pull/1731)
+- [Interactive pop](https://github.com/JetBrains/compose-multiplatform-core/pull/1731) (swipe to go back) on `UINavigationController` should recognize correctly
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.7.2`. Based on Jetpack Compose libraries:
+  - [Runtime 1.7.6](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.7.6)
+  - [UI 1.7.6](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.7.6)
+  - [Foundation 1.7.6](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.7.6)
+  - [Material 1.7.6](https://developer.android.com/jetpack/androidx/releases/compose-material#1.7.6)
+  - [Material3 1.3.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.1)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.8.4`. Based on [Jetpack Lifecycle 2.8.5](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.8.5)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.8.0-alpha10`. Based on [Jetpack Navigation 2.8.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.8.0)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.0.1`. Based on [Jetpack Material3 Adaptive 1.0.0](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.0.0)
+
+---
+
 # 1.8.0-alpha01 (November 2024)
 
 _Changes since 1.7.1_
