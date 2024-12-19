@@ -56,7 +56,10 @@ suspend fun measureComposable(
         // warmup
         repeat(warmupCount) {
             scene.render(canvas, it * nanosPerFrame)
+            surface.flushAndSubmit(false)
         }
+
+        graphicsContext?.awaitGPUCompletion()
 
         runGC()
 
@@ -65,8 +68,10 @@ suspend fun measureComposable(
             renderTime = measureTime {
                 repeat(frameCount) {
                     scene.render(canvas, it * nanosPerFrame)
+                    surface.flushAndSubmit(false)
                 }
             }
+            graphicsContext?.awaitGPUCompletion()
         }
 
         val frames = MutableList(frameCount) {
