@@ -17,7 +17,7 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import compose_benchmarks.benchmarks.generated.resources.Res
-import compose_benchmarks.benchmarks.generated.resources.compose_multiplatform
+import compose_benchmarks.benchmarks.generated.resources.img
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -25,7 +25,9 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun AnimatedVisibility() {
     MaterialTheme {
-        var showImage by remember { mutableStateOf(false) }
+        val res = painterResource(Res.drawable.img)
+        var showImage by remember { mutableStateOf(true) }
+
         var transition: Transition<EnterExitState>? = null
         LaunchedEffect(showImage) {
             do {
@@ -37,10 +39,7 @@ fun AnimatedVisibility() {
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             AnimatedVisibility(showImage) {
                 transition = this.transition
-                Image(
-                    painterResource(Res.drawable.compose_multiplatform),
-                    null
-                )
+                Image(res, null)
             }
         }
     }

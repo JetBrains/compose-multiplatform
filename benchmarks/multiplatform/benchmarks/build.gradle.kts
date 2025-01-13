@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.d8.D8Exec
+import org.jetbrains.kotlin.gradle.targets.js.d8.D8Plugin.Companion.kotlinD8RootExtension
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import kotlin.text.replace
 
@@ -16,6 +18,7 @@ repositories {
     google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    mavenLocal()
 }
 
 kotlin {
@@ -46,7 +49,13 @@ kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         binaries.executable()
-        browser ()
+        d8 {
+            runTask {
+                d8Args.add("--abort-on-uncaught-exception")
+//                d8Args.add("--print-all-exceptions")
+            }
+        }
+        browser()
     }
 
     sourceSets {
@@ -113,4 +122,32 @@ gradle.taskGraph.whenReady {
             open = "http://localhost:8080?$args"
         )
     }
+}
+
+
+configurations.all {
+    resolutionStrategy.eachDependency {
+        val groupPrefix = "org.jetbrains.skiko"
+        val group = requested.group
+
+        if (
+            group.startsWith(groupPrefix)) {
+            useVersion("25.2.5-SNAPSHOT")
+        }
+    }
+}
+
+tasks.withType<D8Exec>().configureEach {
+    doFirst {
+        val file = rootProject.layout.buildDirectory.file(
+            "js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin/compose-benchmarks-benchmarks-wasm-js.mjs"
+        ).get().asFile
+        file.appendText("\nawait import('./polyfills.mjs');\n")
+    }
+}
+
+tasks.register("buildD8Distribution", Zip::class.java) {
+    from(rootProject.layout.buildDirectory.file("js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin"))
+    archiveFileName.set("d8-distribution.zip")
+    destinationDirectory.set(rootProject.layout.buildDirectory.dir("distributions"))
 }

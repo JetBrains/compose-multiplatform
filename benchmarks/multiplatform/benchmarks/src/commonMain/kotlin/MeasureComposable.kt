@@ -40,6 +40,12 @@ suspend inline fun preciseDelay(duration: Duration) {
     while (liveDelayStart.elapsedNow() < liveDelay){}
 }
 
+internal interface EventLoop {
+    suspend fun runMicrotasks()
+}
+
+internal var eventLoop: EventLoop? = null
+
 @OptIn(ExperimentalTime::class, InternalComposeUiApi::class)
 suspend fun measureComposable(
     name: String,
@@ -76,6 +82,7 @@ suspend fun measureComposable(
                     gpuTotalTime += measureTime {
                         graphicsContext?.awaitGPUCompletion()
                     }
+                    eventLoop?.runMicrotasks()
                 }
             }
             cpuTotalTime -= gpuTotalTime
