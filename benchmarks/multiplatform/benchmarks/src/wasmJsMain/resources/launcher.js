@@ -1,0 +1,1 @@
+import('./compose-benchmarks-benchmarks-wasm-js.mjs')

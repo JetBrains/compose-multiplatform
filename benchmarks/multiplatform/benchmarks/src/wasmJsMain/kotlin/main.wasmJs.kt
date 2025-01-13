@@ -1,13 +1,25 @@
-import kotlinx.browser.window
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import org.w3c.dom.url.URLSearchParams
+import kotlinx.coroutines.*
+import kotlin.coroutines.suspendCoroutine
+import kotlin.js.Promise
 
-fun main() {
-    val urlParams = URLSearchParams(window.location.search.toJsString())
-    var i = 0
-    val args = generateSequence { urlParams.get("arg${i++}") }.toList().toTypedArray()
-    Args.parseArgs(args)
+fun main(args: Array<String>) {
+    println("Args = ${args.joinToString(separator = ", ")}")
+    // Args.parseArgs(args)
+    Args.enableModes(Mode.CPU)
+
+    val jsOne = 1.toJsNumber()
+
+    eventLoop = object : EventLoop {
+        override suspend fun runMicrotasks() {
+            suspendCoroutine { c ->
+                Promise.resolve(jsOne).then {
+                    c.resumeWith(Result.success(Unit))
+                    it
+                }
+            }
+        }
+    }
+
     MainScope().launch {
         runBenchmarks()
         println("Completed!")
