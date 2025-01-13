@@ -6,8 +6,10 @@ import androidx.compose.ui.unit.IntSize
 import org.jetbrains.skia.Surface
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.*
+import kotlin.coroutines.Continuation
 import kotlin.time.TimeSource.Monotonic.markNow
 import kotlin.time.measureTime
 
@@ -27,13 +29,21 @@ suspend inline fun preciseDelay(duration: Duration) {
         //experiments have shown that for precise delay we should do live delay at least 2 ms
         val delayMillis = duration.inWholeMilliseconds - 2
         val delayStart = markNow()
-        delay(delayMillis)
+        yield()
+//        delay(delayMillis)
         liveDelay = duration - delayStart.elapsedNow()
     } else {
         liveDelay = duration
     }
     val liveDelayStart = markNow()
     while (liveDelayStart.elapsedNow() < liveDelay){}
+}
+
+val delays = mutableMapOf<Long, Continuation<Unit>>()
+var currentTime = 0L
+
+fun scheduleAfterMyDelay(delay: Long, continuation: Continuation<Unit>): Unit {
+    delays.put(currentTime + delay * 1_000_000, continuation)
 }
 
 @OptIn(ExperimentalTime::class, InternalComposeUiApi::class)
@@ -67,8 +77,14 @@ suspend fun measureComposable(
         if (Args.isModeEnabled(Mode.CPU)) {
             renderTime = measureTime {
                 repeat(frameCount) {
-                    scene.render(canvas, it * nanosPerFrame)
+                    currentTime = it * nanosPerFrame
+                    scene.render(canvas, currentTime)
                     surface.flushAndSubmit(false)
+                    val keys = delays.keys.filter { it <= currentTime }
+                    keys.forEach { k ->
+                        delays[k]?.resumeWith(Result.success(Unit))
+                        delays.remove(k)
+                    }
                 }
             }
             graphicsContext?.awaitGPUCompletion()
@@ -78,7 +94,7 @@ suspend fun measureComposable(
             BenchmarkFrame(Duration.INFINITE, Duration.INFINITE)
         }
 
-        if (Args.isModeEnabled(Mode.FRAMES)) {
+        if (Args.isModeEnabled(Mode.FRAMES) && false) {
 
             var nextVSync = Duration.ZERO
             var missedFrames = 0;
@@ -120,6 +136,6 @@ suspend fun measureComposable(
             frames
         )
     } finally {
-        scene.close()
+       // scene.close()
     }
 }

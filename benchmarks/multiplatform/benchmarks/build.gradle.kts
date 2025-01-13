@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.d8.D8Exec
+import org.jetbrains.kotlin.gradle.targets.js.d8.D8Plugin.Companion.kotlinD8RootExtension
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 plugins {
@@ -44,7 +46,13 @@ kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         binaries.executable()
-        browser ()
+        d8 {
+            runTask {
+                d8Args.add("--abort-on-uncaught-exception")
+//                d8Args.add("--print-all-exceptions")
+            }
+        }
+        browser()
     }
 
     sourceSets {
@@ -56,13 +64,14 @@ kotlin {
                 implementation(compose.runtime)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
             }
         }
 
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.1")
+                runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.10.1")
             }
         }
     }
@@ -94,5 +103,28 @@ gradle.taskGraph.whenReady {
         devServerProperty = devServerProperty.get().copy(
             open = "http://localhost:8080?$args"
         )
+    }
+}
+
+
+configurations.all {
+    resolutionStrategy.eachDependency {
+        val groupPrefix = "org.jetbrains.skiko"
+        val group = requested.group
+
+        if (
+            group.startsWith(groupPrefix)) {
+            useVersion("25.1.6-SNAPSHOT")
+        }
+    }
+}
+
+tasks.withType<D8Exec>().configureEach {
+
+    doFirst {
+        val file = rootProject.layout.buildDirectory.file(
+            "js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin/compose-benchmarks-benchmarks-wasm-js.mjs"
+        ).get().asFile
+        file.appendText("\nawait import('./polyfills.mjs');\n")
     }
 }
