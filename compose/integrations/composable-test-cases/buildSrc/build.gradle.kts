@@ -5,7 +5,8 @@ repositories {
 }
 
 plugins {
-    `kotlin-dsl`
+//    `kotlin-dsl`
+    kotlin("jvm") version libs.versions.kotlin.get()
 //    alias(libs.plugins.multiplatform)
 }
 
