@@ -112,7 +112,7 @@ private val allAccessibilityTraits = mapOf(
  * within a UI hierarchy. This class captures various accessibility properties of UI components
  * and structures them into a tree.
  */
-data class AccessibilityTestNode(
+internal data class AccessibilityTestNode(
     var isAccessibilityElement: Boolean? = null,
     var identifier: String? = null,
     var label: String? = null,

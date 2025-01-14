@@ -190,14 +190,14 @@ internal class NSErrorWithKotlinException(val kotlinException: Throwable) : NSEr
  * XCTest equivalent of K/N TestSuite.
  */
 internal class XCTestSuiteWrapper(val testSuite: TestSuite) : XCTestSuite(testSuite.name) {
-//    private val ignoredSuite: Boolean
-//        get() = testSuite.ignored || testSuite.testCases.all { it.value.ignored }
+    private val ignoredSuite: Boolean
+        get() = testSuite.ignored || testSuite.testCases.all { it.value.ignored }
 
     override fun setUp() {
-        testSuite.doBeforeClass()
+        if (!ignoredSuite) testSuite.doBeforeClass()
     }
 
     override fun tearDown() {
-        testSuite.doAfterClass()
+        if (!ignoredSuite) testSuite.doAfterClass()
     }
 }

@@ -210,7 +210,7 @@ internal class UIKitInstrumentedTest {
 }
 
 @OptIn(ExperimentalForeignApi::class)
-class MockAppDelegate: NSObject(), UIApplicationDelegateProtocol {
+internal class MockAppDelegate: NSObject(), UIApplicationDelegateProtocol {
     private var _window: UIWindow? = null
     override fun window(): UIWindow? = _window
 

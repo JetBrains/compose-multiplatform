@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.test.utils.assertAccessibilityTree
+import androidx.compose.test.utils.available
 import androidx.compose.test.utils.findNode
 import androidx.compose.test.utils.runUIKitInstrumentedTest
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -31,13 +32,10 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.viewinterop.UIKitInteropProperties
 import androidx.compose.ui.viewinterop.UIKitView
-import org.jetbrains.skiko.OS
-import org.jetbrains.skiko.OSVersion
-import org.jetbrains.skiko.available
 import platform.UIKit.*
 import kotlin.test.*
 
-@Ignore // TODO: Uncomment when switching to 1.8.0-beta02
+@Ignore // TODO: Uncomment when switching to 1.8.0-alpha02
 class ComponentsAccessibilitySemanticTest {
     @OptIn(ExperimentalMaterialApi::class)
     @Test
@@ -125,7 +123,7 @@ class ComponentsAccessibilitySemanticTest {
             node {
                 isAccessibilityElement = true
                 traits(UIAccessibilityTraitButton)
-                if (available(OS.Ios to OSVersion(major = 17))) {
+                if (available(iosMajorVersion = 17)) {
                     traits(UIAccessibilityTraitToggleButton)
                 }
             }
@@ -372,7 +370,7 @@ class ComponentsAccessibilitySemanticTest {
             }
             node {
                 isAccessibilityElement = true
-                if (available(OS.Ios to OSVersion(major = 17))) {
+                if (available(iosMajorVersion = 17)) {
                     traits(
                         UIAccessibilityTraitButton,
                         UIAccessibilityTraitToggleButton,
