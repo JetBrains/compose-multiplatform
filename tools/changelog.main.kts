@@ -15,6 +15,14 @@
  *
  * Changelog entries are generated from reading Release Notes in GitHub PR's.
  *
+ * ## Checking PRs
+ * ```
+ * kotlin changelog.main.kts action=checkPr compose-multiplatform 5202
+ * ```
+ *
+ * compose-multiplatform - name of the GitHub repo
+ * 5202 - PR number
+ *
  * ## How to run Kotlin scripts
  * Option 1 - via Command line
  * 1. Download https://github.com/JetBrains/kotlin/releases/tag/v1.9.22 and add `bin` to PATH
@@ -40,6 +48,7 @@ import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.system.exitProcess
 import kotlin.text.substringAfterLast
 
 //region ========================================== CONSTANTS =========================================
@@ -78,161 +87,217 @@ val argsKeyToValue = args
     .filter { it.contains("=") }
     .associate { it.substringBefore("=") to it.substringAfter("=") }
 
-val commitsArg = argsKeyless.getOrNull(0) ?: "HEAD"
+val token = argsKeyToValue["token"] ?:
+    println("To increase the rate limit, specify token (https://github.com/settings/tokens), adding token=yourtoken in the end")
 
-var previousVersionCommitArg: String?
-var versionCommitArg: String
-if (commitsArg.contains("..")) {
-    previousVersionCommitArg = commitsArg.substringBefore("..")
-    versionCommitArg = commitsArg.substringAfter("..")
-} else {
-    previousVersionCommitArg = null
-    versionCommitArg = commitsArg
-}
-
-val versionCommit = versionCommitArg
-
-val token = argsKeyToValue["token"]
-
-println("Note. The script supports optional arguments: kotlin changelog.main.kts [previousVersionCommit..versionCommit] [token=githubToken]")
-if (token == null) {
-    println("To increase the rate limit, specify token (https://github.com/settings/tokens)")
-}
 println()
 
-val androidxLibToPreviousVersion = previousVersionCommitArg?.let(::androidxLibToVersion)
-val androidxLibToVersion = androidxLibToVersion(versionCommit)
-val androidxLibToRedirectingVersion = androidxLibToRedirectingVersion(versionCommit)
+when (argsKeyToValue["action"]) {
+    "checkPr" -> checkPr()
+    else -> generateChangelog()
+}
 
-fun formatAndroidxLibPreviousVersion(libName: String) =
-    androidxLibToPreviousVersion?.get(libName) ?: "PLACEHOLDER".also {
-        println("Can't find $libName previous version. Using PLACEHOLDER")
-    }
+fun generateChangelog() {
+    val commitsArg = argsKeyless.getOrNull(0) ?: "HEAD"
 
-fun formatAndroidxLibVersion(libName: String) =
-    androidxLibToVersion[libName] ?: "PLACEHOLDER".also {
-        println("Can't find $libName version. Using PLACEHOLDER")
-    }
-
-fun formatAndroidxLibRedirectingVersion(libName: String) =
-    androidxLibToRedirectingVersion[libName] ?: "PLACEHOLDER".also {
-        println("Can't find $libName redirecting version. Using PLACEHOLDER")
-    }
-
-val versionCompose = formatAndroidxLibVersion("COMPOSE")
-val versionComposeMaterial3Adaptive = formatAndroidxLibVersion("COMPOSE_MATERIAL3_ADAPTIVE")
-val versionLifecycle = formatAndroidxLibVersion("LIFECYCLE")
-val versionNavigation = formatAndroidxLibVersion("NAVIGATION")
-
-val versionRedirectingCompose = formatAndroidxLibRedirectingVersion("compose")
-val versionRedirectingComposeFoundation = formatAndroidxLibRedirectingVersion("compose.foundation")
-val versionRedirectingComposeMaterial = formatAndroidxLibRedirectingVersion("compose.material")
-val versionRedirectingComposeMaterial3 = formatAndroidxLibRedirectingVersion("compose.material3")
-val versionRedirectingComposeMaterial3Adaptive = formatAndroidxLibRedirectingVersion("compose.material3.adaptive")
-val versionRedirectingLifecycle = formatAndroidxLibRedirectingVersion("lifecycle")
-val versionRedirectingNavigation = formatAndroidxLibRedirectingVersion("navigation")
-
-val versionName = versionCompose
-
-val currentChangelog = changelogFile.readText()
-val previousChangelog =
-    if (currentChangelog.startsWith("# $versionName ")) {
-        val nextChangelogIndex = currentChangelog.indexOf("\n# ")
-        currentChangelog.substring(nextChangelogIndex).removePrefix("\n")
+    var previousVersionCommitArg: String?
+    var versionCommitArg: String
+    if (commitsArg.contains("..")) {
+        previousVersionCommitArg = commitsArg.substringBefore("..")
+        versionCommitArg = commitsArg.substringAfter("..")
     } else {
-        currentChangelog
+        previousVersionCommitArg = null
+        versionCommitArg = commitsArg
     }
 
-var previousVersionCommit: String
-var previousVersion: String
-if (previousVersionCommitArg != null) {
-    previousVersionCommit = previousVersionCommitArg!!
-    previousVersion = formatAndroidxLibPreviousVersion("COMPOSE")
-} else {
-    val previousVersionInChangelog = previousChangelog.substringAfter("# ").substringBefore(" (")
-    previousVersionCommit = "v$previousVersionInChangelog"
-    previousVersion = previousVersionInChangelog
+    val versionCommit = versionCommitArg
+
+    val androidxLibToPreviousVersion = previousVersionCommitArg?.let(::androidxLibToVersion)
+    val androidxLibToVersion = androidxLibToVersion(versionCommit)
+    val androidxLibToRedirectingVersion = androidxLibToRedirectingVersion(versionCommit)
+
+    fun formatAndroidxLibPreviousVersion(libName: String) =
+        androidxLibToPreviousVersion?.get(libName) ?: "PLACEHOLDER".also {
+            println("Can't find $libName previous version. Using PLACEHOLDER")
+        }
+
+    fun formatAndroidxLibVersion(libName: String) =
+        androidxLibToVersion[libName] ?: "PLACEHOLDER".also {
+            println("Can't find $libName version. Using PLACEHOLDER")
+        }
+
+    fun formatAndroidxLibRedirectingVersion(libName: String) =
+        androidxLibToRedirectingVersion[libName] ?: "PLACEHOLDER".also {
+            println("Can't find $libName redirecting version. Using PLACEHOLDER")
+        }
+
+    val versionCompose = formatAndroidxLibVersion("COMPOSE")
+    val versionComposeMaterial3Adaptive = formatAndroidxLibVersion("COMPOSE_MATERIAL3_ADAPTIVE")
+    val versionLifecycle = formatAndroidxLibVersion("LIFECYCLE")
+    val versionNavigation = formatAndroidxLibVersion("NAVIGATION")
+
+    val versionRedirectingCompose = formatAndroidxLibRedirectingVersion("compose")
+    val versionRedirectingComposeFoundation = formatAndroidxLibRedirectingVersion("compose.foundation")
+    val versionRedirectingComposeMaterial = formatAndroidxLibRedirectingVersion("compose.material")
+    val versionRedirectingComposeMaterial3 = formatAndroidxLibRedirectingVersion("compose.material3")
+    val versionRedirectingComposeMaterial3Adaptive = formatAndroidxLibRedirectingVersion("compose.material3.adaptive")
+    val versionRedirectingLifecycle = formatAndroidxLibRedirectingVersion("lifecycle")
+    val versionRedirectingNavigation = formatAndroidxLibRedirectingVersion("navigation")
+
+    val versionName = versionCompose
+
+    val currentChangelog = changelogFile.readText()
+    val previousChangelog =
+        if (currentChangelog.startsWith("# $versionName ")) {
+            val nextChangelogIndex = currentChangelog.indexOf("\n# ")
+            currentChangelog.substring(nextChangelogIndex).removePrefix("\n")
+        } else {
+            currentChangelog
+        }
+
+    var previousVersionCommit: String
+    var previousVersion: String
+    if (previousVersionCommitArg != null) {
+        previousVersionCommit = previousVersionCommitArg!!
+        previousVersion = formatAndroidxLibPreviousVersion("COMPOSE")
+    } else {
+        val previousVersionInChangelog = previousChangelog.substringAfter("# ").substringBefore(" (")
+        previousVersionCommit = "v$previousVersionInChangelog"
+        previousVersion = previousVersionInChangelog
+    }
+
+    fun getChangelog(firstCommit: String, lastCommit: String, firstVersion: String): String {
+        val entries = entriesForRepo("JetBrains/compose-multiplatform-core", firstCommit, lastCommit) +
+                entriesForRepo("JetBrains/compose-multiplatform", firstCommit, lastCommit)
+
+        return buildString {
+            appendLine("# $versionName (${currentChangelogDate()})")
+
+            appendLine()
+            appendLine("_Changes since ${firstVersion}_")
+            appendLine()
+
+            entries
+                .sortedBy { it.sectionOrder() }
+                .groupBy { it.sectionName() }
+                .forEach { (section, sectionEntries) ->
+                    appendLine("## $section")
+                    appendLine()
+
+                    sectionEntries
+                        .sortedBy { it.subsectionOrder() }
+                        .groupBy { it.subsectionName() }
+                        .forEach { (subsection, subsectionEntries) ->
+                            appendLine("### $subsection")
+                            appendLine()
+                            subsectionEntries.forEach {
+                                appendLine(it.format())
+                            }
+                            appendLine()
+                        }
+                }
+
+            append(
+                """
+                    ## Dependencies
+            
+                    - Gradle Plugin `org.jetbrains.compose`, version `$versionCompose`. Based on Jetpack Compose libraries:
+                      - [Runtime $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-runtime#$versionRedirectingCompose)
+                      - [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose)
+                      - [Foundation $versionRedirectingComposeFoundation](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingComposeFoundation)
+                      - [Material $versionRedirectingComposeMaterial](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingComposeMaterial)
+                      - [Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3)
+    
+                    - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:$versionLifecycle`. Based on [Jetpack Lifecycle $versionRedirectingLifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle#$versionRedirectingLifecycle)
+                    - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:$versionNavigation`. Based on [Jetpack Navigation $versionRedirectingNavigation](https://developer.android.com/jetpack/androidx/releases/navigation#$versionRedirectingNavigation)
+                    - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive`. Based on [Jetpack Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive)
+            
+                    ---
+                """.trimIndent()
+            )
+
+            appendLine()
+            appendLine()
+
+            val nonstandardSectionEntries = entries
+                .filter {
+                    it.section != null && it.subsection != null
+                            && it.section !in standardSections && it.subsection !in standardSubsections
+                }
+
+            if (nonstandardSectionEntries.isNotEmpty()) {
+                println()
+                println("WARNING! Changelog contains nonstandard sections. Please change them to the standard ones, or enhance the list in the PR template.")
+
+                for (entry in nonstandardSectionEntries) {
+                    println("${entry.section} - ${entry.subsection} in ${entry.link}")
+                }
+            }
+        }
+    }
+
+    println()
+    println("Generating changelog between $previousVersion and $versionName")
+
+    val newChangelog = getChangelog(previousVersionCommit, versionCommit, previousVersion)
+
+    changelogFile.writeText(
+        newChangelog + previousChangelog
+    )
+
+    println()
+    println("CHANGELOG.md changed")
 }
 
-println()
-println("Generating changelog between $previousVersion and $versionName")
+fun checkPr() {
+    val repo = argsKeyless.getOrNull(0) ?: error("Please specify PR number as the first argument")
+    val prNumber = argsKeyless.getOrNull(1) ?: error("Please specify PR number as the second argument")
+    val releaseNotes = pullRequest(repo, prNumber).extractReleaseNotes()
 
-val newChangelog = getChangelog(previousVersionCommit, versionCommit, previousVersion)
+    val commonDescription = """
+            Valid examples:
+            
+            ## Release Notes
+            ### Features - Desktop
+            - Added Drag&Drop support
+            - Fixed non-working Drag&Drop in dialogs
+            
+            ### Features - iOS
+            - Added Drag&Drop support
 
-changelogFile.writeText(
-    newChangelog + previousChangelog
-)
+            ## Release Notes
+            N/A
+            
+            Allowed sections: ${standardSections.joinToString(", ")}
+            Allowed subsections: ${standardSubsections.joinToString(", ")}
+    """.trimIndent()
 
-println()
-println("CHANGELOG.md changed")
+    val nonstandardSections = if (releaseNotes is ReleaseNotes.Specified) {
+        releaseNotes.entries
+            .filter { it.section !in standardSections || it.subsection !in standardSubsections }
+            .map { "${it.section} - ${it.subsection}" }
+            .toSet()
+    } else {
+        emptySet()
+    }
 
-
-fun getChangelog(firstCommit: String, lastCommit: String, firstVersion: String): String {
-    val entries = entriesForRepo("JetBrains/compose-multiplatform-core", firstCommit, lastCommit) +
-            entriesForRepo("JetBrains/compose-multiplatform", firstCommit, lastCommit)
-
-    return buildString {
-        appendLine("# $versionName (${currentChangelogDate()})")
-
-        appendLine()
-        appendLine("_Changes since ${firstVersion}_")
-        appendLine()
-
-        entries
-            .sortedBy { it.sectionOrder() }
-            .groupBy { it.sectionName() }
-            .forEach { (section, sectionEntries) ->
-                appendLine("## $section")
-                appendLine()
-
-                sectionEntries
-                    .sortedBy { it.subsectionOrder() }
-                    .groupBy { it.subsectionName() }
-                    .forEach { (subsection, subsectionEntries) ->
-                        appendLine("### $subsection")
-                        appendLine()
-                        subsectionEntries.forEach {
-                            appendLine(it.format())
-                        }
-                        appendLine()
-                    }
-            }
-
-        append(
-            """
-                ## Dependencies
-        
-                - Gradle Plugin `org.jetbrains.compose`, version `$versionCompose`. Based on Jetpack Compose libraries:
-                  - [Runtime $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-runtime#$versionRedirectingCompose)
-                  - [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose)
-                  - [Foundation $versionRedirectingComposeFoundation](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingComposeFoundation)
-                  - [Material $versionRedirectingComposeMaterial](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingComposeMaterial)
-                  - [Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3)
-
-                - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:$versionLifecycle`. Based on [Jetpack Lifecycle $versionRedirectingLifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle#$versionRedirectingLifecycle)
-                - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:$versionNavigation`. Based on [Jetpack Navigation $versionRedirectingNavigation](https://developer.android.com/jetpack/androidx/releases/navigation#$versionRedirectingNavigation)
-                - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive`. Based on [Jetpack Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive)
-        
-                ---
-            """.trimIndent()
-        )
-
-        appendLine()
-        appendLine()
-
-        val nonstandardSectionEntries = entries
-            .filter {
-                it.section != null && it.subsection != null
-                        && it.section !in standardSections && it.subsection !in standardSubsections
-            }
-
-        if (nonstandardSectionEntries.isNotEmpty()) {
-            println()
-            println("WARNING! Changelog contains nonstandard sections. Please change them to the standard ones, or enhance the list in the PR template.")
-
-            for (entry in nonstandardSectionEntries) {
-                println("${entry.section} - ${entry.subsection} in ${entry.link}")
-            }
+    when {
+        releaseNotes == null -> {
+            System.err.println("""
+                    "## Release Notes" section is missing in the PR description
+                    
+                    
+                """.trimIndent() + commonDescription)
+            exitProcess(1)
+        }
+        nonstandardSections.isNotEmpty() -> {
+            System.err.println("""
+                    "## Release Notes" contains nonstandard sections:
+                    ${nonstandardSections.joinToString(", ")}
+                    
+                    
+                """.trimIndent() + commonDescription)
+            exitProcess(1)
         }
     }
 }
@@ -298,7 +363,7 @@ fun String.removeLinks(): String = replace(Regex("\\[([^)]*)\\]\\([^\\]]*\\)"), 
 /**
  * Extract by format https://github.com/JetBrains/compose-multiplatform/blob/master/.github/PULL_REQUEST_TEMPLATE.md?plain=1
  */
-fun GitHubPullEntry.extractReleaseNotes(link: String): List<ChangelogEntry> {
+fun GitHubPullEntry.extractReleaseNotes(): ReleaseNotes? {
     // extract body inside "## Release Notes"
     val relNoteBody = run {
         val after = body?.substringAfter("## Release Notes", "")?.ifBlank { null }
@@ -313,7 +378,8 @@ fun GitHubPullEntry.extractReleaseNotes(link: String): List<ChangelogEntry> {
         before?.trim()
     }
 
-    if (relNoteBody?.trim()?.lowercase() == "n/a") return emptyList()
+    if (relNoteBody == null) return null
+    if (relNoteBody.trim().lowercase() == "n/a") return ReleaseNotes.NA
 
     val list = mutableListOf<ChangelogEntry>()
     var section: String? = null
@@ -321,7 +387,7 @@ fun GitHubPullEntry.extractReleaseNotes(link: String): List<ChangelogEntry> {
     var isFirstLine = true
     var shouldPadLines = false
 
-    for (line in relNoteBody.orEmpty().split("\n")) {
+    for (line in relNoteBody.split("\n")) {
         // parse "### Section - Subsection"
         if (line.startsWith("### ")) {
             val s = line.removePrefix("### ")
@@ -347,14 +413,14 @@ fun GitHubPullEntry.extractReleaseNotes(link: String): List<ChangelogEntry> {
                     lineFixed,
                     section,
                     subsection,
-                    link.takeIf { isTopLevel }
+                    html_url.takeIf { isTopLevel }
                 )
             )
             isFirstLine = false
         }
     }
 
-    return list
+    return ReleaseNotes.Specified(list)
 }
 
 /**
@@ -379,14 +445,8 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
         pullRequest: GitHubPullEntry?
     ): List<ChangelogEntry> {
         return if (pullRequest != null) {
-            val prTitle = pullRequest.title
-            val prNumber = pullRequest.number
-            val prLink = "https://github.com/$repo/pull/$prNumber"
-            val prList = pullRequest.extractReleaseNotes(prLink)
-            val changelogMessage = "- $prTitle"
-            prList.ifEmpty {
-                listOf(ChangelogEntry(changelogMessage, null, null, prLink))
-            }
+            pullRequest.extractReleaseNotes()?.entries ?:
+                listOf(ChangelogEntry("- ${pullRequest.title}", null, null, pullRequest.html_url))
         } else {
             listOf()
         }
@@ -409,6 +469,14 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
     val pullRequests = main.commits.mapNotNull { prForCommit(it) }.toSet()
     val previousVersionPullRequests = previous.commits.mapNotNull { prForCommit(it) }.toSet()
     return (pullRequests - previousVersionPullRequests).flatMap { changelogEntriesFor(it) }
+}
+
+/**
+ * @param repo Example:
+ *        JetBrains/compose-multiplatform-core
+ */
+fun pullRequest(repo: String, prNumber: String): GitHubPullEntry {
+    return requestJson<GitHubPullEntry>("https://api.github.com/repos/$repo/pulls/$prNumber")
 }
 
 /**
@@ -471,6 +539,24 @@ fun spaceContentOf(repoUrl: String, path: String, tagName: String): String {
         .readText()
 }
 
+sealed interface ReleaseNotes {
+    val entries: List<ChangelogEntry>
+
+    object NA: ReleaseNotes {
+        override val entries: List<ChangelogEntry> get() = emptyList()
+    }
+
+    class Specified(override val entries: List<ChangelogEntry>): ReleaseNotes
+
+    fun ifEmpty(action: () -> ReleaseNotes): ReleaseNotes {
+        return if (entries.isEmpty()) {
+            action()
+        } else {
+            this
+        }
+    }
+}
+
 data class ChangelogEntry(
     val message: String,
     val section: String?,
@@ -492,7 +578,7 @@ data class GitHubCompareResponse(val commits: List<CommitEntry>, val merge_base_
 }
 
 // example https://api.github.com/repos/JetBrains/compose-multiplatform-core/pulls?state=closed
-data class GitHubPullEntry(val number: Int, val title: String, val body: String?, val labels: List<Label>) {
+data class GitHubPullEntry(val html_url: String, val number: Int, val title: String, val body: String?, val labels: List<Label>) {
     class Label(val name: String)
 }
 
