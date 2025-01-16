@@ -17,8 +17,11 @@
  *
  * ## Checking PRs
  * ```
- * kotlin changelog.main.kts action=prcheck compose-multiplatform 5202
+ * kotlin changelog.main.kts action=checkPr compose-multiplatform 5202
  * ```
+ *
+ * compose-multiplatform - name of the GitHub repo
+ * 5202 - PR number
  *
  * ## How to run Kotlin scripts
  * Option 1 - via Command line
@@ -45,6 +48,7 @@ import java.nio.charset.StandardCharsets.UTF_8
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.system.exitProcess
 import kotlin.text.substringAfterLast
 
 //region ========================================== CONSTANTS =========================================
@@ -284,6 +288,7 @@ fun checkPr() {
                     
                     
                 """.trimIndent() + commonDescription)
+            exitProcess(1)
         }
         nonstandardSections.isNotEmpty() -> {
             System.err.println("""
@@ -292,6 +297,7 @@ fun checkPr() {
                     
                     
                 """.trimIndent() + commonDescription)
+            exitProcess(1)
         }
     }
 }
