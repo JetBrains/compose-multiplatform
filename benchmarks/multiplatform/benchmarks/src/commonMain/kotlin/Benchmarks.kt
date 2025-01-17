@@ -148,7 +148,7 @@ suspend fun runBenchmark(
 ) {
     if (Args.isBenchmarkEnabled(name)) {
         println("$name:")
-        val stats = measureComposable(warmupCount, frameCount, width, height, targetFps, graphicsContext, content).generateStats()
+        val stats = measureComposable(warmupCount, Args.getBenchmarkProblemSize(name, frameCount), width, height, targetFps, graphicsContext, content).generateStats()
         stats.prettyPrint()
     }
 }
