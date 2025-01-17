@@ -8,7 +8,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":common"))
-                libDependencyForMain()
+                //libDependencyForMain()
             }
         }
         val commonTest by getting {

@@ -52,7 +52,7 @@ allprojects {
 }
 
 plugins {
-    kotlin("multiplatform").apply(false)
+    kotlin("multiplatform").version(libs.versions.kotlin).apply(false)
 //    alias(libs.plugins.multiplatform).apply(false)
     alias(libs.plugins.compose.compiler).apply(false)
 }
@@ -86,7 +86,24 @@ subprojects {
             // We use linux agents on CI. So it doesn't run the tests, but it builds the klib anyway which is time consuming.
             // if (project.isMingwX64Enabled) mingwX64()
             linuxX64()
+
+            sourceSets {
+                val commonMain by getting {
+                    val projectName = project.name
+                    dependencies {
+                        if (projectName != "common") {
+                            implementation(project(":common"))
+                        }
+
+                        if (projectName.endsWith("-main")) {
+                                implementation(project(":" + projectName.replace("-main", "-lib")))
+                        }
+                    }
+                }
+            }
         }
+
+
 
 //
 //            sourceSets {
@@ -103,13 +120,6 @@ subprojects {
 //        }
     }
 }
-
-fun KotlinSourceSet.libDependencyForMain1() {
-        if (!project.name.endsWith("-main")) error("Unexpected main module name: ${project.name}")
-        dependencies {
-            implementation(project(":" + project.name.replace("-main", "-lib")))
-        }
-    }
 
 //subprojects {
 //    // This makes sure the function is accessible in subprojects
