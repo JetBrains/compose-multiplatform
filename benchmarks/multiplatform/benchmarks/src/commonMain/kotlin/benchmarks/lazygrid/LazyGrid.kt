@@ -26,32 +26,25 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlin.coroutines.suspendCoroutine
 
 @Composable
-fun LazyGrid() {
+fun LazyGrid(smoothScroll: Boolean = false, withLaunchedEffectInItem: Boolean = false) {
     val itemCount = 12000
     val entries = remember {List(itemCount) { Entry("$it") }}
     val state = rememberLazyGridState()
 
-    var smoothScroll by remember { mutableStateOf(false)}
+    var scrollIteration by remember { mutableStateOf(0) }
 
     MaterialTheme {
         Column {
-            Row {
-                Checkbox(
-                    checked = smoothScroll,
-                    onCheckedChange = { value -> smoothScroll = value}
-                )
-                Text (text = "Smooth scroll", modifier = Modifier.align(Alignment.CenterVertically))
-            }
-
             LazyVerticalGrid(
                 columns = GridCells.Fixed(4),
                 modifier = Modifier.fillMaxWidth().semantics { contentDescription = "IamLazy" },
                 state = state
             ) {
                 items(entries) {
-                    ListCell(it)
+                    ListCell(it, withLaunchedEffectInItem)
                 }
             }
         }
@@ -67,12 +60,12 @@ fun LazyGrid() {
                 curItem = state.firstVisibleItemIndex
                 if (curItem == 0) direct = true
                 if (curItem > itemCount - 100) direct = false
-                state.scrollBy(if (direct) 5f else -5f)
+                state.scrollBy(if (direct) 55f else -55f)
             }
         }
     } else {
-        LaunchedEffect(curItem) {
-            withFrameMillis { }
+        LaunchedEffect(scrollIteration) {
+            withFrameMillis {}
             curItem += if (direct) 50 else -50
             if (curItem >= itemCount) {
                 direct = false
@@ -82,15 +75,15 @@ fun LazyGrid() {
                 curItem = 0
             }
             state.scrollToItem(curItem)
+            scrollIteration += 1
         }
     }
-
 }
 
 data class Entry(val contents: String)
 
 @Composable
-private fun ListCell(entry: Entry) {
+private fun ListCell(entry: Entry, withLaunchedEffect: Boolean = false) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -102,5 +95,12 @@ private fun ListCell(entry: Entry) {
             style = MaterialTheme.typography.h5,
             modifier = Modifier.padding(16.dp)
         )
+
+        if (withLaunchedEffect) {
+            LaunchedEffect(Unit) {
+                // Never resumed to imitate some async task running in an item's scope
+                suspendCoroutine {  }
+            }
+        }
     }
 }

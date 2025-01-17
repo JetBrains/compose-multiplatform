@@ -144,11 +144,12 @@ suspend fun runBenchmark(
     frameCount: Int,
     graphicsContext: GraphicsContext?,
     warmupCount: Int = 100,
+    frameCountCpu: Int = frameCount,
     content: @Composable () -> Unit
 ) {
     if (Args.isBenchmarkEnabled(name)) {
         println("$name:")
-        val stats = measureComposable(warmupCount, frameCount, width, height, targetFps, graphicsContext, content).generateStats()
+        val stats = measureComposable(warmupCount, frameCount, frameCountCpu, width, height, targetFps, graphicsContext, content).generateStats()
         stats.prettyPrint()
     }
 }
@@ -162,8 +163,15 @@ suspend fun runBenchmarks(
     println()
     println("Running emulating $targetFps FPS")
     println()
-    runBenchmark("AnimatedVisibility9", width, height, targetFps, 10000, graphicsContext) { AnimatedVisibility() }
-//    runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext) { LazyGrid() }
-//    runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext) { NYContent(width, height) }
-//    runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel()}
+    runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext, frameCountCpu = 100_000) { AnimatedVisibility() }
+    runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext) { LazyGrid(smoothScroll = false) }
+    runBenchmark("LazyGrid_ItemLaunchedEffect", width, height, targetFps, 1000, graphicsContext) {
+        LazyGrid(smoothScroll = false, withLaunchedEffectInItem = true)
+    }
+    runBenchmark("LazyGrid-SmoothScroll", width, height, targetFps, 1000, graphicsContext) { LazyGrid(smoothScroll = true) }
+    runBenchmark("LazyGrid_SmoothScroll_ItemLaunchedEffect", width, height, targetFps, 1000, graphicsContext) {
+        LazyGrid(smoothScroll = true, withLaunchedEffectInItem = true)
+    }
+    runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext, frameCountCpu = 10_000) { NYContent(width, height) }
+    //runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel()}
 }

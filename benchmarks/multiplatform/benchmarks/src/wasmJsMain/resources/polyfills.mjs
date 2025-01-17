@@ -28,26 +28,22 @@ class BlobPolyfill {
     }
 }
 
+globalThis.asyncReadBuffer = async (s) => {
+    return readbuffer(s);
+}
 
-// if (globalThis.fetch === 'undefined') {
-//    throw new Error('fetch not implemented');
-// }
 globalThis.fetch = async (p) => {
     console.log('fetch', p);
     let data;
     try {
-        // data = readbuffer("drawable/compose-multiplatform.xml");
+        // data = await asyncReadBuffer("drawable/img.png");
         data = readbuffer("drawable/img.png");
         console.log('readbuffer', p);
     } catch (err) {
         console.log('error', err);
     }
 
-    console.log('return access1 - ', p);
     const uint8 = new Uint8Array(data);
-    // const uint8 = data;
-
-    console.log('return access2 - ', p);
 
     return {
         ok: true,

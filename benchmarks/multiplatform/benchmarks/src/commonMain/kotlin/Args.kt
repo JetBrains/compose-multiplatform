@@ -30,6 +30,8 @@ object Args {
         }
     }
 
+    fun enableModes(vararg modes: Mode) = this.modes.addAll(modes)
+
     fun isModeEnabled(mode: Mode): Boolean = modes.isEmpty() || modes.contains(mode)
 
     fun isBenchmarkEnabled(benchmark: String): Boolean = benchmarks.isEmpty() || benchmarks.contains(benchmark.uppercase())

@@ -26,7 +26,11 @@ import org.jetbrains.compose.resources.painterResource
 fun AnimatedVisibility() {
     MaterialTheme {
         val res = painterResource(Res.drawable.img)
-        var showImage by remember { mutableStateOf(false) }
+        var showImage by remember { mutableStateOf(true) }
+
+        remember(res.intrinsicSize) {
+            println("intrinsicSize: ${res.intrinsicSize}")
+        }
 
         var transition: Transition<EnterExitState>? = null
         LaunchedEffect(showImage) {
