@@ -6,7 +6,7 @@ _Changes since 1.8.0-alpha01_
 
 ### Resources
 
-- [Add FontVariation.Settings support to the resources library](https://github.com/JetBrains/compose-multiplatform/pull/5183)
+- [Add `FontVariation.Settings` support to the resources library](https://github.com/JetBrains/compose-multiplatform/pull/5183)
 
 ## Features
 
