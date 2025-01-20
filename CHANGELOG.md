@@ -1,3 +1,72 @@
+# 1.8.0-alpha02 (January 2025)
+
+_Changes since 1.8.0-alpha01_
+
+## Highlights
+
+### Resources
+
+- [Add `FontVariation.Settings` support to the resources library](https://github.com/JetBrains/compose-multiplatform/pull/5183)
+
+## Features
+
+### iOS
+
+- [Accessibility navigation uses safe area to calculate when focused rect is out of bounds](https://github.com/JetBrains/compose-multiplatform-core/pull/1745)
+- [Initial Drag&Drop support](https://github.com/JetBrains/compose-multiplatform-core/pull/1690)
+- [Align Compose components semantics with UIKit views accessibility](https://github.com/JetBrains/compose-multiplatform-core/pull/1719)
+
+### Web
+
+- [Adds experimental `PointerIcon.fromKeyword` function to change the browser cursor](https://github.com/JetBrains/compose-multiplatform-core/pull/1704)
+
+## Fixes
+
+### Multiple Platforms
+
+- [Fix missing implementation on non-Android platforms for `ModalDrawerSheet` overload with `DrawerState` argument](https://github.com/JetBrains/compose-multiplatform-core/pull/1763)
+
+### iOS
+
+- [Fixes an interruption while typing characters on a Chinese keyboard](https://github.com/JetBrains/compose-multiplatform-core/pull/1692)
+- [Accessibility reading of content when obscured by layers such as pop-ups and dialogs](https://github.com/JetBrains/compose-multiplatform-core/pull/1698)
+- [Taps should be properly registered on interop views with `UIKitInteropInteractionMode.Cooperative` interaction mode](https://github.com/JetBrains/compose-multiplatform-core/pull/1695)
+- [Interactive pop on `UINavigationController` should recognize correctly](https://github.com/JetBrains/compose-multiplatform-core/pull/1695)
+- [Enables Cupertino overscroll by default for scrollable components](https://github.com/JetBrains/compose-multiplatform-core/pull/1753)
+- [Experimental method`optOutOfCupertinoOverscroll()` removed](https://github.com/JetBrains/compose-multiplatform-core/pull/1753)
+- [Fix iOS Accessibility element tree construction within merged nodes](https://github.com/JetBrains/compose-multiplatform-core/pull/1750)
+
+### Desktop
+
+- [Fixed rare crash when using a scrollbar for lazy grid with animated enter/exit items](https://github.com/JetBrains/compose-multiplatform-core/pull/1707)
+- [Fix possible exception during `Dialog`/`Popup` creation in case of `compose.layers.type=COMPONENT` and pointing `windowContainer` to `ComposePanel` itself](https://github.com/JetBrains/compose-multiplatform-core/pull/1747)
+- [Fix interop initial z-order placement on Windows with `compose.interop.blending` flag](https://github.com/JetBrains/compose-multiplatform-core/pull/1774) (1.7.0 regression)
+- [Fixed the background of transparent windows/dialogs on Windows becoming opaque as the window is moved](https://github.com/JetBrains/compose-multiplatform-core/pull/1772)
+
+### Resources
+
+- [Fix string resource's regex for placeholders to correctly match multi-digit placeholders](https://github.com/JetBrains/compose-multiplatform/pull/5187)
+
+### Navigation
+
+- [Fix incorrect navigation up on the root screen for non-android targets](https://github.com/JetBrains/compose-multiplatform-core/pull/1736)
+- [Fixed browser navigation integration when route paths contain special symbols](https://github.com/JetBrains/compose-multiplatform-core/pull/1738)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.8.0-alpha02`. Based on Jetpack Compose libraries:
+  - [Runtime 1.8.0-alpha07](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.8.0-alpha07)
+  - [UI 1.8.0-alpha07](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.8.0-alpha07)
+  - [Foundation 1.8.0-alpha07](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.8.0-alpha07)
+  - [Material 1.8.0-alpha07](https://developer.android.com/jetpack/androidx/releases/compose-material#1.8.0-alpha07)
+  - [Material3 1.4.0-alpha04](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-alpha04)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.0-alpha02`. Based on [Jetpack Lifecycle 2.9.0-alpha03](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.0-alpha03)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.8.0-alpha12`. Based on [Jetpack Navigation 2.8.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.8.4)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.1.0-alpha02`. Based on [Jetpack Material3 Adaptive 1.1.0-alpha07](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.1.0-alpha07)
+
+---
+
 # 1.7.3 (December 2024)
 
 _Changes since 1.7.1_
