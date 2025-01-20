@@ -32,7 +32,7 @@ _Changes since 1.8.0-alpha01_
 - [Accessibility reading of content when obscured by layers such as pop-ups and dialogs](https://github.com/JetBrains/compose-multiplatform-core/pull/1698)
 - [Taps should be properly registered on interop views with `UIKitInteropInteractionMode.Cooperative` interaction mode](https://github.com/JetBrains/compose-multiplatform-core/pull/1695)
 - [Interactive pop on `UINavigationController` should recognize correctly](https://github.com/JetBrains/compose-multiplatform-core/pull/1695)
-- [Enables Cupertino Overscroll by default for scrollable components](https://github.com/JetBrains/compose-multiplatform-core/pull/1753)
+- [Enables Cupertino overscroll by default for scrollable components](https://github.com/JetBrains/compose-multiplatform-core/pull/1753)
 - [Experimental method`optOutOfCupertinoOverscroll()` removed](https://github.com/JetBrains/compose-multiplatform-core/pull/1753)
 - [Fix iOS Accessibility element tree construction within merged nodes](https://github.com/JetBrains/compose-multiplatform-core/pull/1750)
 
