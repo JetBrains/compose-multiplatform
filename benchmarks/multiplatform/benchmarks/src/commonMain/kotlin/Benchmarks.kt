@@ -1,6 +1,7 @@
 import androidx.compose.runtime.Composable
 import benchmarks.animation.AnimatedVisibility
 import benchmarks.complexlazylist.components.MainUiNoImageUseModel
+import benchmarks.example1.Example1
 import benchmarks.lazygrid.LazyGrid
 import benchmarks.visualeffects.NYContent
 import kotlin.math.roundToInt
@@ -166,4 +167,5 @@ suspend fun runBenchmarks(
     runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext) { LazyGrid() }
     runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext) { NYContent(width, height) }
     runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel()}
+    runBenchmark("Example1", width, height, targetFps, 1000, graphicsContext) { Example1() }
 }
