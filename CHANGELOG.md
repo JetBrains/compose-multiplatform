@@ -18,7 +18,7 @@ _Changes since 1.8.0-alpha01_
 
 ### Web
 
-- [Adds experimental PointerIcon.fromKeyword function to change the browser cursor](https://github.com/JetBrains/compose-multiplatform-core/pull/1704)
+- [Adds experimental `PointerIcon.fromKeyword` function to change the browser cursor](https://github.com/JetBrains/compose-multiplatform-core/pull/1704)
 
 ## Fixes
 
