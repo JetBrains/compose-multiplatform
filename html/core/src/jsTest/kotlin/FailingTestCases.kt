@@ -6,6 +6,7 @@
 package org.jetbrains.compose.web.core.tests
 
 import kotlin.test.Test
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class FailingTestCases {
@@ -20,7 +21,8 @@ class FailingTestCases {
         } catch (e: Throwable) {
             expectedErrorThrown = true
         }
-        assertTrue(expectedErrorThrown)
+        // No exception in Kotlin 2.1.0
+        assertFalse(expectedErrorThrown)
     }
 }
 

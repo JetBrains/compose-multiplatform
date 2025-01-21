@@ -87,7 +87,7 @@ class StringFormatTest {
     }
 
     @Test
-    fun `replaceWithArgs ensures %d and %s placeholders behave identically`() {
+    fun `replaceWithArgs ensures _d and _s placeholders behave identically`() {
         val template = "%1\$d, %1\$s, %2\$d, %2\$s"
         val args = listOf("42", "hello")
 
