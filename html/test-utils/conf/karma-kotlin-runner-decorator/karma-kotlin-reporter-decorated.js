@@ -9,7 +9,7 @@ const NewReporter = function(baseReporterDecorator, config, emitter) {
     const fs = require('fs');
     // const kotlinVersion = fs.readFileSync(path.resolve(__dirname, "../../../buildSrc/build/kotlin.version"), 'utf8');
 
-    const kotlinReporterModule = require(`../../../build/js/node_modules/kotlin-test-js-runner/karma-kotlin-reporter`);
+    const kotlinReporterModule = require(`../../../build/js/packages_imported/kotlin-test-js-runner/0.0.1/karma-kotlin-reporter`);
     const KotlinReporter = kotlinReporterModule['reporter:karma-kotlin-reporter'][1];
     this.$inject = KotlinReporter.$inject
 
