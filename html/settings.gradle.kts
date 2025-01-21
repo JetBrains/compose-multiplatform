@@ -20,6 +20,9 @@ pluginManagement {
 
     val repos = (localProperties?.getProperty("compose.web.repos"))?.split(File.pathSeparator)
 
+    val buildSrcProperties: java.util.Properties = properties(rootProject.projectDir.resolve("buildSrc/gradle.properties").absolutePath)!!
+    val kotlinVersion = buildSrcProperties["kotlin.version"] as String
+
     repositories {
         gradlePluginPortal()
         mavenCentral()
@@ -43,6 +46,9 @@ pluginManagement {
         eachPlugin {
             if (requested.id.id == "org.jetbrains.compose") {
                 useModule("org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:$COMPOSE_CORE_VERSION")
+            }
+            if (requested.id.id == "org.jetbrains.kotlin.plugin.compose") {
+                useVersion(kotlinVersion)
             }
         }
     }
