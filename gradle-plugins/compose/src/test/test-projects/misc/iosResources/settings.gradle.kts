@@ -15,10 +15,10 @@ pluginManagement {
 }
 dependencyResolutionManagement {
     repositories {
-        mavenLocal()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         mavenCentral()
         gradlePluginPortal()
         google()
+        mavenLocal()
     }
 }
