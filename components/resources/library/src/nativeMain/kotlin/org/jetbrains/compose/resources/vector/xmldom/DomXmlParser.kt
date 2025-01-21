@@ -4,6 +4,7 @@
  */
 package org.jetbrains.compose.resources.vector.xmldom
 
+import kotlinx.cinterop.ObjCSignatureOverride
 import platform.Foundation.NSError
 import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
@@ -91,6 +92,7 @@ private class DomXmlParser : NSObject(), NSXMLParserDelegateProtocol {
         nodeStack.add(node)
     }
 
+    @ObjCSignatureOverride
     override fun parser(parser: NSXMLParser, foundCharacters: String) {
         nodeStack.lastOrNull()?.let { node ->
             node.textContent = node.textContent.orEmpty() + foundCharacters
@@ -116,15 +118,18 @@ private class DomXmlParser : NSObject(), NSXMLParserDelegateProtocol {
         curPrefixMap = curPrefixMapInverted.entries.associateBy({ it.value }, { it.key })
     }
 
+    @ObjCSignatureOverride
     override fun parser(parser: NSXMLParser, didEndMappingPrefix: String) {
         curPrefixMapInverted.remove(didEndMappingPrefix)
         curPrefixMap = curPrefixMapInverted.entries.associateBy({ it.value }, { it.key })
     }
 
+    @ObjCSignatureOverride
     override fun parser(parser: NSXMLParser, validationErrorOccurred: NSError) {
         throw MalformedXMLException("validation error occurred")
     }
 
+    @ObjCSignatureOverride
     override fun parser(parser: NSXMLParser, parseErrorOccurred: NSError) {
         throw MalformedXMLException("parse error occurred")
     }
