@@ -12,21 +12,17 @@ import org.jetbrains.compose.test.utils.checks
 import org.junit.jupiter.api.Test
 
 class KotlinCompatibilityTest : GradlePluginTestBase() {
+
+    // Note: we can't test non-jvm targets with Kotlin older than 2.1.0, because of klib abi version bump in 2.1.0
     @Test
-    fun testKotlinMpp_1_9_10() = testMpp("1.9.10")
+    fun testKotlinMpp_2_1_0() = testMpp("2.1.0")
 
     @Test
-    fun testKotlinJsMpp_1_9_24() = testJsMpp("1.9.24")
-
-    @Test
-    fun testKotlinMpp_1_9_20() = testMpp("1.9.20")
-
-    @Test
-    fun testKotlinJsMpp_1_9_20() = testJsMpp("1.9.20")
+    fun testKotlinJsMpp_2_1_0() = testJsMpp("2.1.0")
 
     private fun testMpp(kotlinVersion: String) = with(
         testProject(
-            "beforeKotlin2/mpp",
+            "application/mpp",
             testEnvironment = defaultTestEnvironment.copy(kotlinVersion = kotlinVersion)
         )
     ) {
@@ -39,7 +35,7 @@ class KotlinCompatibilityTest : GradlePluginTestBase() {
 
     private fun testJsMpp(kotlinVersion: String) = with(
         testProject(
-            "beforeKotlin2/jsMpp",
+            "application/jsMpp",
             testEnvironment = defaultTestEnvironment.copy(kotlinVersion = kotlinVersion)
         )
     ) {
@@ -86,15 +82,6 @@ class KotlinCompatibilityTest : GradlePluginTestBase() {
             composeCompilerPlugin = "dependencies.compiler.auto",
         )
     ).checkCustomComposeCompiler()
-
-    @Test
-    fun testKotlinCheckDisabled() = testProject(
-        "beforeKotlin2/custom-compiler-args", defaultTestEnvironment.copy(
-            kotlinVersion = "1.9.21",
-            composeCompilerPlugin = "dependencies.compiler.forKotlin(\"1.9.20\")",
-            composeCompilerArgs = "\"suppressKotlinVersionCompatibilityCheck=1.9.21\""
-        )
-    ).checkCustomComposeCompiler(checkKJS = true)
 
     private fun TestProject.checkCustomComposeCompiler(checkKJS: Boolean = false) {
         gradle(":runDistributable").checks {
