@@ -124,5 +124,6 @@ suspend fun measureComposable(
         )
     } finally {
         scene.close()
+        runGC() // cleanup for next benchmarks
     }
 }
