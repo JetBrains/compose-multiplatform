@@ -42,11 +42,11 @@ internal fun UIKitInstrumentedTest.getAccessibilityTree(): AccessibilityTestNode
             if (count == NSIntegerMax) {
                 when (element) {
                     is UITableView -> {
-                        TODO("Unused in tests. Implement correct table view traversal.")
+                        println("warning: UITableView is currently unsupported")
                     }
 
                     is UICollectionView -> {
-                        TODO("Unused in tests. Implement correct collection view traversal.")
+                        println("warning: UICollectionView is currently unsupported")
                     }
 
                     is UIView -> {
@@ -244,9 +244,9 @@ internal fun UIKitInstrumentedTest.assertAccessibilityTree(
     assertAccessibilityTree(validator)
 }
 
-internal fun UIKitInstrumentedTest.findNode(identifier: String) = findNodeOrNull {
-    it.identifier == identifier
-} ?: fail("Unable to find node with identifier: $identifier")
+internal fun UIKitInstrumentedTest.findNodeWithTag(tag: String) = findNodeOrNull {
+    it.identifier == tag
+} ?: fail("Unable to find node with identifier: $tag")
 
 internal fun UIKitInstrumentedTest.findNodeWithLabel(label: String) = findNodeOrNull {
     it.label == label

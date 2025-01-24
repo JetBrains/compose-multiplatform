@@ -16,5 +16,5 @@ To execute XCTest cases on an iOS Simulator, use:
 
 ```shell
 cd launcher 
-xcrun xcodebuild test -scheme Launcher -destination "platform=iOS Simulator,name=iPhone 16 Pro"
+xcodebuild test -scheme Launcher -destination "platform=iOS Simulator,name=iPhone 16 Pro"
 ```

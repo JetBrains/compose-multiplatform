@@ -104,6 +104,11 @@ internal class UIKitInstrumentedTest {
         }
     }
 
+    fun delay(timeoutMillis: Long) {
+        val runLoop = NSRunLoop.currentRunLoop()
+        runLoop.runUntilDate(NSDate.dateWithTimeIntervalSinceNow(timeoutMillis.toDouble() / 1000.0))
+    }
+
     fun waitUntil(
         conditionDescription: String? = null,
         timeoutMillis: Long = 5_000,
