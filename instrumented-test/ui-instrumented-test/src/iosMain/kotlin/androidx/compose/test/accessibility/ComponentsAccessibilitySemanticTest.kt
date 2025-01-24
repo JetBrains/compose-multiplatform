@@ -17,7 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.test.utils.assertAccessibilityTree
 import androidx.compose.test.utils.available
-import androidx.compose.test.utils.findNode
+import androidx.compose.test.utils.findNodeWithTag
 import androidx.compose.test.utils.runUIKitInstrumentedTest
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -35,7 +35,6 @@ import androidx.compose.ui.viewinterop.UIKitView
 import platform.UIKit.*
 import kotlin.test.*
 
-@Ignore // TODO: Uncomment when switching to 1.8.0-alpha02
 class ComponentsAccessibilitySemanticTest {
     @OptIn(ExperimentalMaterialApi::class)
     @Test
@@ -97,7 +96,7 @@ class ComponentsAccessibilitySemanticTest {
         }
 
         var oldValue = sliderValue
-        val sliderNode = findNode("Slider")
+        val sliderNode = findNodeWithTag("Slider")
         sliderNode.element?.accessibilityIncrement()
         assertTrue(oldValue < sliderValue)
 
@@ -177,19 +176,19 @@ class ComponentsAccessibilitySemanticTest {
             }
         }
 
-        findNode("Switch").element?.accessibilityActivate()
+        findNodeWithTag("Switch").element?.accessibilityActivate()
         assertTrue(switch)
         waitForIdle()
-        findNode("Switch").element?.accessibilityActivate()
+        findNodeWithTag("Switch").element?.accessibilityActivate()
         assertFalse(switch)
 
-        findNode("Checkbox").element?.accessibilityActivate()
+        findNodeWithTag("Checkbox").element?.accessibilityActivate()
         assertTrue(checkbox)
         waitForIdle()
-        findNode("Checkbox").element?.accessibilityActivate()
+        findNodeWithTag("Checkbox").element?.accessibilityActivate()
         assertFalse(checkbox)
 
-        findNode("TriStateCheckbox").element?.accessibilityActivate()
+        findNodeWithTag("TriStateCheckbox").element?.accessibilityActivate()
         assertEquals(ToggleableState.On, triStateCheckbox)
     }
 
@@ -227,7 +226,7 @@ class ComponentsAccessibilitySemanticTest {
             }
         }
 
-        findNode("RadioButton").element?.accessibilityActivate()
+        findNodeWithTag("RadioButton").element?.accessibilityActivate()
         assertAccessibilityTree {
             node {
                 isAccessibilityElement = true
