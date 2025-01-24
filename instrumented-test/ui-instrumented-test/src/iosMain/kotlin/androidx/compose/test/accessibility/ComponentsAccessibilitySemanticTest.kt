@@ -35,7 +35,6 @@ import androidx.compose.ui.viewinterop.UIKitView
 import platform.UIKit.*
 import kotlin.test.*
 
-@Ignore // TODO: Uncomment when switching to 1.8.0-alpha02
 class ComponentsAccessibilitySemanticTest {
     @OptIn(ExperimentalMaterialApi::class)
     @Test

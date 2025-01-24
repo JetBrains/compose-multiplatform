@@ -12,6 +12,10 @@ import platform.XCTest.XCTest
 import platform.XCTest.XCTestObservationCenter
 import platform.XCTest.XCTestSuite
 import kotlin.native.internal.test.*
+import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
+import kotlin.reflect.KFunction1
+
 
 // Top level suite name used to hold all Native tests
 internal const val TOP_LEVEL_SUITE = "Kotlin/Native test suite"
@@ -25,6 +29,14 @@ private const val TEST_ARGUMENTS_KEY = "KotlinNativeTestArgs"
  */
 private lateinit var testSettings: TestSettings
 
+@Suppress("unused")
+fun setupXCTestSuite(vararg tests: KClass<*>): XCTestSuite =
+    setupXCTestSuite(tests = tests.toSet(), testCases = null)
+
+@Suppress("unused")
+inline fun <reified Class>setupXCTestSuite(vararg tests: KFunction1<Class, *>): XCTestSuite =
+    setupXCTestSuite(tests = null, testCases = mapOf(Class::class.qualifiedName to tests.toSet()))
+
 /**
  * This is an entry-point of XCTestSuites and XCTestCases generation.
  * Function returns the XCTest's top level TestSuite that holds all the test cases
@@ -32,7 +44,7 @@ private lateinit var testSettings: TestSettings
  * This test suite can be run by either native launcher compiled to bundle or
  * by the other test suite (e.g. compiled as a framework).
  */
-fun setupXCTestSuite(): XCTestSuite {
+fun setupXCTestSuite(tests: Set<KClass<*>>? = null, testCases: Map<String?, Set<KFunction<*>>>? = null): XCTestSuite {
     val nativeTestSuite = XCTestSuite.testSuiteWithName(TOP_LEVEL_SUITE)
 
     // Initialize settings with the given args
@@ -52,16 +64,31 @@ fun setupXCTestSuite(): XCTestSuite {
     )
 
     if (testSettings.runTests) {
-        // Generate and add tests to the main suite
-        testSettings.testSuites.generate().forEach {
+        val includeAllTests = tests == null && testCases == null
+        val testSuiteNames = tests?.map { it.qualifiedName }.orEmpty() + testCases?.keys.orEmpty()
+        fun includeTestSuite(testSuite: TestSuite) =
+            includeAllTests || testSuiteNames.contains(testSuite.name)
 
+        // Generate and add tests to the main suite
+        testSettings.testSuites.generate(
+            addTestSuite = { testSuite ->
+                includeTestSuite(testSuite)
+            },
+            addTestCase = { testCase ->
+                includeTestSuite(testCase.suite) &&
+                        (testCases == null ||
+                                testCases[testCase.suite.name]?.firstOrNull { it.name == testCase.name } != null)
+            }
+        ).forEach {
             nativeTestSuite.addTest(it)
         }
 
-        // Tests created (self-check)
-        @Suppress("UNCHECKED_CAST")
-        check(testSettings.testSuites.size == (nativeTestSuite.tests as List<XCTest>).size) {
-            "The amount of generated XCTest suites should be equal to Kotlin test suites"
+        if (includeAllTests) {
+            // Tests created (self-check)
+            @Suppress("UNCHECKED_CAST")
+            check(testSettings.testSuites.size == (nativeTestSuite.tests as List<XCTest>).size) {
+                "The amount of generated XCTest suites should be equal to Kotlin test suites"
+            }
         }
     }
 
@@ -104,10 +131,13 @@ private fun testArguments(key: String): Array<String> {
 
 internal val TestCase.fullName get() = "${suite.name}.$name"
 
-private fun Collection<TestSuite>.generate(): List<XCTestSuite> {
-    return this.map { suite ->
+private fun Collection<TestSuite>.generate(
+    addTestSuite: (TestSuite) -> Boolean,
+    addTestCase: (TestCase) -> Boolean
+): List<XCTestSuite> {
+    return this.filter(addTestSuite).map { suite ->
         val xcSuite = XCTestSuiteWrapper(suite)
-        suite.testCases.values.map { testCase ->
+        suite.testCases.values.filter(addTestCase).map { testCase ->
             XCTestCaseWrapper(testCase)
         }.forEach {
             // add test to its test suite wrapper

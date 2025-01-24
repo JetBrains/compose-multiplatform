@@ -7,7 +7,7 @@ This project is a Compose Multiplatform module that implements instrumented UI t
 ## Requirements
 
 - Kotlin >= 2.1.0
-- Compose Multiplatform 1.8.0-alpha01
+- Compose Multiplatform 1.8.0-alpha02
 - iOS 12+
 
 ## Testing

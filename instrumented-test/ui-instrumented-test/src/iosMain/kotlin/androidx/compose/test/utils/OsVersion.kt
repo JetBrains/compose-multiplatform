@@ -13,9 +13,9 @@ import platform.Foundation.NSProcessInfo
 internal fun available(iosMajorVersion: Int, iosMinorVersion: Int = 0): Boolean {
     return NSProcessInfo.processInfo.operatingSystemVersion.useContents {
         when {
-            majorVersion.toInt() > iosMajorVersion -> false
-            majorVersion.toInt() < iosMajorVersion -> true
-            minorVersion.toInt() > iosMinorVersion -> false
+            majorVersion.toInt() < iosMajorVersion -> false
+            majorVersion.toInt() > iosMajorVersion -> true
+            minorVersion.toInt() < iosMinorVersion -> false
             else -> true
         }
     }

@@ -9,6 +9,14 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import androidx.compose.xctest.*
 import platform.XCTest.XCTestSuite
 
-// TODO: create a configuration setup procedure with test selection and reporting
+@Suppress("unused")
 @OptIn(ExperimentalForeignApi::class)
-fun testSuite(): XCTestSuite = setupXCTestSuite()
+fun testSuite(): XCTestSuite = setupXCTestSuite(
+    // Run all test cases from the tests
+    // BasicInteractionTest::class,
+    // LayersAccessibilityTest::class,
+
+    // Run test cases from a test
+    // BasicInteractionTest::testButtonClick,
+    // LayersAccessibilityTest::testLayersAppearanceOrder
+)
