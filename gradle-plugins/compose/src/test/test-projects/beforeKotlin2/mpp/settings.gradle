@@ -19,7 +19,6 @@ pluginManagement {
 }
 dependencyResolutionManagement {
     repositories {
-        mavenLocal()
         mavenCentral()
         google()
         maven {
@@ -28,6 +27,7 @@ dependencyResolutionManagement {
         maven {
             url 'https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/'
         }
+        mavenLocal()
     }
 }
 rootProject.name = "mpp"

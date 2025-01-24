@@ -47,11 +47,13 @@ replaceVersion() {
 replaceVersionInFile() {
     echo "Replace in $1"
     replaceVersion '^compose.version=.*' 'compose.version='"$COMPOSE_VERSION"'' $1
+    replaceVersion '<compose.version>.*<\/compose.version>' '<compose.version>'"$COMPOSE_VERSION"'<\/compose.version>' $1
     replaceVersion '^COMPOSE_CORE_VERSION=.*' 'COMPOSE_CORE_VERSION='"$COMPOSE_VERSION"'' $1
     replaceVersion '^COMPOSE_WEB_VERSION=.*' 'COMPOSE_WEB_VERSION='"$COMPOSE_VERSION"'' $1
     replaceVersion 'id("org.jetbrains.compose") version ".*"' 'id("org.jetbrains.compose") version "'"$COMPOSE_VERSION"'"' $1
     replaceVersion '"org.jetbrains.compose:compose-gradle-plugin:.*"' '"org.jetbrains.compose:compose-gradle-plugin:'"$COMPOSE_VERSION"'"' $1
     replaceVersion '^kotlin.version=.*' 'kotlin.version='"$KOTLIN_VERSION"'' $1
+    replaceVersion '<kotlin.version>.*<\/kotlin.version>' '<kotlin.version>'"$KOTLIN_VERSION"'<\/kotlin.version>' $1
     replaceVersion '^compose.tests.compiler.compatible.kotlin.version=.*' 'compose.tests.compiler.compatible.kotlin.version='"$KOTLIN_VERSION"'' $1
     replaceVersion '^compose.tests.js.compiler.compatible.kotlin.version=.*' 'compose.tests.js.compiler.compatible.kotlin.version='"$KOTLIN_VERSION"'' $1
     replaceVersion 'kotlin("multiplatform") version ".*"' 'kotlin("multiplatform") version "'"$KOTLIN_VERSION"'"' $1
@@ -65,5 +67,6 @@ replaceVersionInFolder() {
 for folder in "${folders[@]}"
 do
    replaceVersionInFolder $folder "**gradle.properties"
+   replaceVersionInFolder $folder "**pom.xml"
    replaceVersionInFolder $folder "**README.md"
 done
