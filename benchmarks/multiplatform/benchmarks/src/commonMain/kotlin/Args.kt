@@ -1,13 +1,15 @@
 enum class Mode {
-    CPU,
-    FRAMES,
-    FRAMES_GPU
+    SIMPLE,
+    VSYNC_EMULATION,
 }
 
 object Args {
     private val modes = mutableSetOf<Mode>()
 
     private val benchmarks = mutableMapOf<String, Int>()
+
+    var versionInfo = ""
+        private set
 
     private fun argToSet(arg: String): Set<String> = arg.substring(arg.indexOf('=') + 1)
         .split(",").filter{!it.isEmpty()}.map{it.uppercase()}.toSet()
@@ -32,12 +34,16 @@ object Args {
     fun parseArgs(args: Array<String>) {
         for (arg in args) {
             if (arg.startsWith("modes=", ignoreCase = true)) {
-                modes.addAll(argToSet(arg).map { Mode.valueOf(it) })
+                modes.addAll(argToSet(arg.decodeArg()).map { Mode.valueOf(it) })
             } else if (arg.startsWith("benchmarks=", ignoreCase = true)) {
-                benchmarks += argToMap(arg)
+                benchmarks += argToMap(arg.decodeArg())
+            } else if (arg.startsWith("versionInfo=", ignoreCase = true)) {
+                versionInfo = arg.substringAfter("=").decodeArg()
             }
         }
     }
+
+    private fun String.decodeArg() = replace("%20", " ")
 
     fun isModeEnabled(mode: Mode): Boolean = modes.isEmpty() || modes.contains(mode)
 
