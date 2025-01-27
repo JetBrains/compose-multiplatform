@@ -91,7 +91,7 @@ suspend fun measureComposable(
             val start = markNow()
 
             repeat(frameCount) {
-                val frameStart = start + nextVSync
+                val frameStart = markNow()
 
                 scene.render(canvas, nextVSync.inWholeNanoseconds)
                 surface.flushAndSubmit(false)
