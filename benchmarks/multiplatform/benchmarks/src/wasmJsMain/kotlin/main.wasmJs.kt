@@ -9,7 +9,7 @@ fun main() {
     val args = generateSequence { urlParams.get("arg${i++}") }.toList().toTypedArray()
     Args.parseArgs(args)
     MainScope().launch {
-        runBenchmarks()
+        benchmarksMain()
         println("Completed!")
     }
 }
