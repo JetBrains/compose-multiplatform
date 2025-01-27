@@ -8,3 +8,7 @@ fun main(args : Array<String>) {
     Args.parseArgs(args)
     runBlocking { runBenchmarks(graphicsContext = graphicsContext()) }
 }
+
+actual fun saveBenchmarksOnDisk(name: String, stats: BenchmarkStats) {
+    // ignore, not implemented
+}
