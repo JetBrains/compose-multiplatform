@@ -154,11 +154,11 @@ suspend fun runBenchmark(
     }
 }
 
-suspend fun runBenchmarks(
+private suspend fun runBenchmarks(
     width: Int = 1920,
     height: Int = 1080,
     targetFps: Int = 120,
-    graphicsContext: GraphicsContext? = null
+    graphicsContext: GraphicsContext?
 ) {
     println()
     println("Running emulating $targetFps FPS")
@@ -168,4 +168,14 @@ suspend fun runBenchmarks(
     runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext) { NYContent(width, height) }
     runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel()}
     runBenchmark("Example1", width, height, targetFps, 1000, graphicsContext) { Example1() }
+}
+
+suspend fun benchmarksMain(
+    graphicsContext: GraphicsContext? = null
+) {
+    try {
+        runBenchmarks(graphicsContext = graphicsContext)
+    } finally {
+        graphicsContext?.close()
+    }
 }
