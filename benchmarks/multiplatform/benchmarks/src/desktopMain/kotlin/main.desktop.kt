@@ -13,6 +13,6 @@ fun main(args: Array<String>) {
         // Start the benchmark server to receive results from browsers
         BenchmarksSaveServer.start()
     } else {
-        runBlocking(Dispatchers.Main) { runBenchmarks() }
+        runBlocking(Dispatchers.Main) { runBenchmarks(graphicsContext = graphicsContext()) }
     }
 }
