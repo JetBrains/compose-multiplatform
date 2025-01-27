@@ -8,5 +8,5 @@ import kotlinx.coroutines.runBlocking
 
 fun main(args: Array<String>) {
     Config.setGlobalFromArgs(args)
-    runBlocking(Dispatchers.Main) { runBenchmarks() }
+    runBlocking(Dispatchers.Main) { runBenchmarks(graphicsContext = graphicsContext()) }
 }
