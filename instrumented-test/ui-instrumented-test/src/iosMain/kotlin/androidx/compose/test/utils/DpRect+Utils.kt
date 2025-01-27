@@ -6,10 +6,7 @@
 package androidx.compose.test.utils
 
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.DpRect
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.*
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
@@ -35,6 +32,19 @@ internal fun Rect.toDpRect(density: Density): DpRect = DpRect(
     top = top.dp / density.density,
     bottom = bottom.dp / density.density
 )
+
+internal fun DpRectZero() = DpRect(0.dp, 0.dp, 0.dp, 0.dp)
+
+internal fun DpRect.intersect(other: DpRect): DpRect {
+    if (right < other.left || other.right < left) return DpRectZero()
+    if (bottom < other.top || other.bottom < top) return DpRectZero()
+    return DpRect(
+        left = max(left, other.left),
+        top = max(top, other.top),
+        right = min(right, other.right),
+        bottom = min(bottom, other.bottom)
+    )
+}
 
 @OptIn(ExperimentalForeignApi::class)
 internal fun CValue<CGPoint>.toDpOffset(): DpOffset = useContents { DpOffset(x.dp, y.dp) }
