@@ -16,7 +16,7 @@ internal fun UIWindow.touchDown(location: DpOffset): UITouch {
     return UITouch.touchAtPoint(
         point = location.toCGPoint(),
         inWindow = this,
-        tapCount = 1UL,
+        tapCount = 1L,
         fromEdge = false
     ).also {
         it.send()
