@@ -6,5 +6,5 @@ import kotlinx.coroutines.runBlocking
 
 fun main(args : Array<String>) {
     Args.parseArgs(args)
-    runBlocking { benchmarksMain(graphicsContext = graphicsContext()) }
+    runBlocking { runBenchmarks(graphicsContext = graphicsContext()) }
 }
