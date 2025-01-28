@@ -160,12 +160,16 @@ suspend fun runBenchmarks(
     targetFps: Int = 120,
     graphicsContext: GraphicsContext? = null
 ) {
-    println()
-    println("Running emulating $targetFps FPS")
-    println()
-    runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext) { AnimatedVisibility() }
-    runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext) { LazyGrid() }
-    runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext) { NYContent(width, height) }
-    runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel()}
-    runBenchmark("Example1", width, height, targetFps, 1000, graphicsContext) { Example1() }
+    try {
+        println()
+        println("Running emulating $targetFps FPS")
+        println()
+        runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext) { AnimatedVisibility() }
+        runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext) { LazyGrid() }
+        runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext) { NYContent(width, height) }
+        runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel() }
+        runBenchmark("Example1", width, height, targetFps, 1000, graphicsContext) { Example1() }
+    } finally {
+        graphicsContext?.close()
+    }
 }

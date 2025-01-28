@@ -17,6 +17,8 @@ interface GraphicsContext {
     fun surface(width: Int, height: Int): Surface
 
     suspend fun awaitGPUCompletion()
+
+    fun close() = Unit
 }
 
 expect fun runGC()
