@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 fun main(args : List<String>) {
     Args.parseArgs(args.toTypedArray())
     MainScope().launch {
-        benchmarksMain(graphicsContext = graphicsContext())
+        runBenchmarks(graphicsContext = graphicsContext())
         println("Completed!")
     }
 }

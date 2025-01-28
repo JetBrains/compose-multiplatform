@@ -154,27 +154,21 @@ suspend fun runBenchmark(
     }
 }
 
-private suspend fun runBenchmarks(
+suspend fun runBenchmarks(
     width: Int = 1920,
     height: Int = 1080,
     targetFps: Int = 120,
-    graphicsContext: GraphicsContext?
-) {
-    println()
-    println("Running emulating $targetFps FPS")
-    println()
-    runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext) { AnimatedVisibility() }
-    runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext) { LazyGrid() }
-    runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext) { NYContent(width, height) }
-    runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel()}
-    runBenchmark("Example1", width, height, targetFps, 1000, graphicsContext) { Example1() }
-}
-
-suspend fun benchmarksMain(
     graphicsContext: GraphicsContext? = null
 ) {
     try {
-        runBenchmarks(graphicsContext = graphicsContext)
+        println()
+        println("Running emulating $targetFps FPS")
+        println()
+        runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext) { AnimatedVisibility() }
+        runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext) { LazyGrid() }
+        runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext) { NYContent(width, height) }
+        runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel() }
+        runBenchmark("Example1", width, height, targetFps, 1000, graphicsContext) { Example1() }
     } finally {
         graphicsContext?.close()
     }
