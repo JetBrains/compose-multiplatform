@@ -5,8 +5,7 @@
 
 package androidx.compose.test.utils
 
-import androidx.compose.ui.unit.DpRect
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.*
 import kotlinx.cinterop.CValue
 import kotlin.test.assertEquals
 import kotlin.test.fail
@@ -16,6 +15,7 @@ import platform.CoreGraphics.CGRect
 import platform.UIKit.*
 import platform.darwin.NSIntegerMax
 import platform.darwin.NSObject
+import kotlin.test.assertTrue
 
 /**
  * Constructs an accessibility tree representation of the UI hierarchy starting from the window.
@@ -40,16 +40,8 @@ internal fun UIKitInstrumentedTest.getAccessibilityTree(): AccessibilityTestNode
         } else {
             val count = element.accessibilityElementCount()
             if (count == NSIntegerMax) {
-                when (element) {
-                    is UITableView -> {
-                        println("warning: UITableView is currently unsupported")
-                    }
-
-                    is UICollectionView -> {
-                        println("warning: UICollectionView is currently unsupported")
-                    }
-
-                    is UIView -> {
+                when {
+                    element is UIView -> {
                         element.subviews.mapNotNull {
                             children.add(buildNode(it as UIView, level = level + 1))
                         }
@@ -78,7 +70,9 @@ internal fun UIKitInstrumentedTest.getAccessibilityTree(): AccessibilityTestNode
                 element.accessibilityTraits and it != 0.toULong()
             },
             element = element
-        )
+        ).also { node ->
+            children.forEach { it.parent = node }
+        }
     }
 
     return buildNode(appDelegate.window!!, 0)
@@ -120,7 +114,8 @@ internal data class AccessibilityTestNode(
     var frame: DpRect? = null,
     var children: List<AccessibilityTestNode>? = null,
     var traits: List<UIAccessibilityTraits>? = null,
-    var element: NSObject? = null
+    var element: NSObject? = null,
+    var parent: AccessibilityTestNode? = null,
 ) {
     fun node(builder: AccessibilityTestNode.() -> Unit) {
         children = (children ?: emptyList()) + AccessibilityTestNode().apply(builder)
@@ -225,6 +220,20 @@ internal fun AccessibilityTestNode.normalized(): AccessibilityTestNode? {
     } else {
         null
     }
+}
+
+internal fun AccessibilityTestNode.assertVisibleInContainer() {
+    var frame = this.frame ?: DpRectZero()
+    var iterator = parent
+    while (iterator != null) {
+        frame = frame.intersect(iterator.frame ?: DpRectZero())
+        iterator = iterator.parent
+    }
+
+    assertTrue(
+        frame.width >= 1.dp && frame.height >= 1.dp,
+        "Element with frame ${this.frame} is not visible or has very small size"
+    )
 }
 
 /**

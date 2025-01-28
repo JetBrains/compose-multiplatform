@@ -15,7 +15,6 @@ import kotlinx.cinterop.*
 import platform.Foundation.*
 import platform.UIKit.*
 import platform.darwin.NSObject
-import platform.objc.*
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -146,44 +145,49 @@ internal class UIKitInstrumentedTest {
      *
      * @param position The position on the root hosting controller.
      */
-    fun tap(position: DpOffset) {
-        touchDown(position).up()
+    fun tap(position: DpOffset): UITouch {
+        return touchDown(position).up()
     }
 
     /**
      * Simulates a tap gesture for a given AccessibilityTestNode.
-     *
-     * @param position The position on the root hosting controller.
      */
-    fun AccessibilityTestNode.tap() {
+    fun AccessibilityTestNode.tap(): UITouch {
+        val frame = frame ?: error("Internal error. Frame is missing.")
+        return tap(frame.center())
+    }
+
+    fun AccessibilityTestNode.doubleTap(): UITouch {
         val frame = frame ?: error("Internal error. Frame is missing.")
         tap(frame.center())
+        delay(50)
+        return tap(frame.center())
     }
 
     /**
      * Simulates a drag gesture on the screen, moving the touch from its current location to a specified position
      * over a given duration.
      *
-     * @param position The target position of the drag in DpOffset.
+     * @param location The target position of the drag in DpOffset.
      * @param duration The duration of the drag gesture, defaulting to 0.5 seconds.
      * @return The same UITouch instance after completing the drag gesture.
      */
-    fun UITouch.dragTo(position: DpOffset, duration: Duration = 0.5.seconds): UITouch {
-        val startPosition = locationInView(appDelegate.window()!!).toDpOffset()
-        val endPosition = hostingViewController.view.convertPoint(
-            point = position.toCGPoint(),
+    fun UITouch.dragTo(location: DpOffset, duration: Duration = 0.5.seconds): UITouch {
+        val startLocation = locationInView(appDelegate.window()!!).toDpOffset()
+        val endLocation = hostingViewController.view.convertPoint(
+            point = location.toCGPoint(),
             toView = appDelegate.window()
         ).toDpOffset()
 
         val startTime = TimeSource.Monotonic.markNow()
         while (TimeSource.Monotonic.markNow() <= startTime + duration) {
             val progress = ((TimeSource.Monotonic.markNow() - startTime) / duration).coerceIn(0.0, 1.0)
-            val touchPosition = lerp(startPosition, endPosition, progress.toFloat())
+            val touchLocation = lerp(startLocation, endLocation, progress.toFloat())
 
-            this.moveToPositionOnWindow(touchPosition)
+            this.moveToLocationOnWindow(touchLocation)
             NSRunLoop.currentRunLoop().runUntilDate(NSDate.dateWithTimeIntervalSinceNow(1.0 / 60))
         }
-        this.moveToPositionOnWindow(endPosition)
+        this.moveToLocationOnWindow(endLocation)
         return this
     }
 
@@ -196,8 +200,7 @@ internal class UIKitInstrumentedTest {
      * @return The same UITouch instance after completing the drag gesture.
      */
     fun UITouch.dragBy(offset: DpOffset, duration: Duration = 0.5.seconds): UITouch {
-        val position = locationInView(hostingViewController.view).toDpOffset() + offset
-        return dragTo(position, duration)
+        return dragTo(location + offset, duration)
     }
 
     /**
@@ -211,6 +214,10 @@ internal class UIKitInstrumentedTest {
      */
     fun UITouch.dragBy(dx: Dp = 0.dp, dy: Dp = 0.dp, duration: Duration = 0.5.seconds): UITouch {
         return dragBy(DpOffset(dx, dy), duration)
+    }
+
+    val UITouch.location: DpOffset get() {
+        return locationInView(hostingViewController.view).toDpOffset()
     }
 }
 

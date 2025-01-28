@@ -3,8 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
+
+/* Begin PBXBuildFile section */
+		999869392D479FAB0096554D /* HIDEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 999869362D479FAB0096554D /* HIDEvent.m */; };
+		9998693A2D479FAB0096554D /* UITouch+Test.m in Sources */ = {isa = PBXBuildFile; fileRef = 999869382D479FAB0096554D /* UITouch+Test.m */; };
+/* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
 		995A49382D3023CC0091FB9B /* CopyFiles */ = {
@@ -20,15 +25,11 @@
 
 /* Begin PBXFileReference section */
 		995A493A2D3023CC0091FB9B /* libCMPTestUtils.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libCMPTestUtils.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		999869352D479FAB0096554D /* HIDEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HIDEvent.h; sourceTree = "<group>"; };
+		999869362D479FAB0096554D /* HIDEvent.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HIDEvent.m; sourceTree = "<group>"; };
+		999869372D479FAB0096554D /* UITouch+Test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UITouch+Test.h"; sourceTree = "<group>"; };
+		999869382D479FAB0096554D /* UITouch+Test.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UITouch+Test.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		9928B8252D330E8A006277AD /* CMPTestUtils */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = CMPTestUtils;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		995A49372D3023CC0091FB9B /* Frameworks */ = {
@@ -44,10 +45,11 @@
 		995A49032D301B510091FB9B = {
 			isa = PBXGroup;
 			children = (
-				9928B8252D330E8A006277AD /* CMPTestUtils */,
+				9998693B2D479FC80096554D /* CMPTestUtils */,
 				995A490E2D301B510091FB9B /* Products */,
 			);
 			sourceTree = "<group>";
+			wrapsLines = 1;
 		};
 		995A490E2D301B510091FB9B /* Products */ = {
 			isa = PBXGroup;
@@ -55,6 +57,17 @@
 				995A493A2D3023CC0091FB9B /* libCMPTestUtils.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9998693B2D479FC80096554D /* CMPTestUtils */ = {
+			isa = PBXGroup;
+			children = (
+				999869352D479FAB0096554D /* HIDEvent.h */,
+				999869362D479FAB0096554D /* HIDEvent.m */,
+				999869372D479FAB0096554D /* UITouch+Test.h */,
+				999869382D479FAB0096554D /* UITouch+Test.m */,
+			);
+			path = CMPTestUtils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -71,9 +84,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				9928B8252D330E8A006277AD /* CMPTestUtils */,
 			);
 			name = CMPTestUtils;
 			packageProductDependencies = (
@@ -97,6 +107,7 @@
 				};
 			};
 			buildConfigurationList = 995A49072D301B510091FB9B /* Build configuration list for PBXProject "CMPTestUtils" */;
+			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -105,7 +116,6 @@
 			);
 			mainGroup = 995A49032D301B510091FB9B;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			productRefGroup = 995A490E2D301B510091FB9B /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -120,6 +130,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				999869392D479FAB0096554D /* HIDEvent.m in Sources */,
+				9998693A2D479FAB0096554D /* UITouch+Test.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

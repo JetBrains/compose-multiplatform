@@ -12,9 +12,9 @@ import platform.UIKit.UITouchPhase
 import platform.UIKit.UIWindow
 
 @OptIn(ExperimentalForeignApi::class)
-internal fun UIWindow.touchDown(position: DpOffset): UITouch {
+internal fun UIWindow.touchDown(location: DpOffset): UITouch {
     return UITouch.touchAtPoint(
-        point = position.toCGPoint(),
+        point = location.toCGPoint(),
         inWindow = this,
         tapCount = 1L,
         fromEdge = false
@@ -24,8 +24,8 @@ internal fun UIWindow.touchDown(position: DpOffset): UITouch {
 }
 
 @OptIn(ExperimentalForeignApi::class)
-internal fun UITouch.moveToPositionOnWindow(position: DpOffset) {
-    setLocationInWindow(position.toCGPoint())
+internal fun UITouch.moveToLocationOnWindow(location: DpOffset) {
+    setLocationInWindow(location.toCGPoint())
     setPhase(UITouchPhase.UITouchPhaseMoved)
     send()
 }
