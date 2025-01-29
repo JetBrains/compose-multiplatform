@@ -72,6 +72,7 @@ private fun buildPreviewViaGradle(project: Project, previewLocation: PreviewLoca
             previewService.buildStarted()
         }
     }
+
     runTask(
         settings,
         DefaultRunExecutor.EXECUTOR_ID,

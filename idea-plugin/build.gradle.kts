@@ -59,9 +59,6 @@ tasks {
     runIde {
         systemProperty("idea.is.internal", true)
         systemProperty("idea.kotlin.plugin.use.k2", true)
-        jvmArgumentProviders += CommandLineArgumentProvider {
-            listOf("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005")
-        }
     }
 }
 

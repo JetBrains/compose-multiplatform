@@ -1,20 +1,33 @@
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    }
-    dependencies {
-        classpath("org.jetbrains.compose:compose-gradle-plugin:0.0.9-preview-images")
-        classpath(kotlin("gradle-plugin", version = "1.5.31"))
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
+
+plugins {
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.compose.compiler)
+    id("org.jetbrains.compose")
+}
+
+dependencies {
+    implementation(compose.desktop.currentOs)
+}
+
+compose.desktop.application {
+    mainClass = "PreviewKt"
+}
+
+tasks {
+    wrapper {
+        gradleVersion = project.properties["gradle.version"].toString()
     }
 }
 
-subprojects {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        google()
+tasks {
+    withType<JavaCompile> {
+        sourceCompatibility = "21"
+        targetCompatibility = "21"
+    }
+
+    withType<KotlinJvmCompile> {
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
     }
 }
