@@ -18,12 +18,10 @@ class BlobPolyfill {
         this._type = type;
     }
     get size() {
-        console.log('call size', this._uint8.byteLength);
         return this._uint8.byteLength;
     }
     get type() { return this._type; }
     async arrayBuffer() {
-        console.log('call arrayBuffer');
         return this._uint8.buffer;
     }
 }
@@ -33,12 +31,10 @@ globalThis.asyncReadBuffer = async (s) => {
 }
 
 globalThis.fetch = async (p) => {
-    console.log('fetch', p);
     let data;
     try {
         // data = await asyncReadBuffer("drawable/img.png");
         data = readbuffer("drawable/img.png");
-        console.log('readbuffer', p);
     } catch (err) {
         console.log('error', err);
     }
@@ -49,7 +45,6 @@ globalThis.fetch = async (p) => {
         ok: true,
         status: 200,
         async blob() {
-            console.log('blob access - ', p);
             return new BlobPolyfill(uint8, 'application/xml');
         },
     };

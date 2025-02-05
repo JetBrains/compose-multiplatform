@@ -2,7 +2,9 @@ import kotlinx.coroutines.*
 import kotlin.coroutines.suspendCoroutine
 import kotlin.js.Promise
 
-fun main() {
+fun main(args: Array<String>) {
+    println("Args = ${args.joinToString(separator = ", ")}")
+    // Args.parseArgs(args)
     Args.enableModes(Mode.CPU)
 
     val jsOne = 1.toJsNumber()

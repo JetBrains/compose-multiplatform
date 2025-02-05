@@ -114,17 +114,22 @@ configurations.all {
 
         if (
             group.startsWith(groupPrefix)) {
-            useVersion("25.1.6-SNAPSHOT")
+            useVersion("25.2.5-SNAPSHOT")
         }
     }
 }
 
 tasks.withType<D8Exec>().configureEach {
-
     doFirst {
         val file = rootProject.layout.buildDirectory.file(
             "js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin/compose-benchmarks-benchmarks-wasm-js.mjs"
         ).get().asFile
         file.appendText("\nawait import('./polyfills.mjs');\n")
     }
+}
+
+tasks.register("buildD8Distribution", Zip::class.java) {
+    from(rootProject.layout.buildDirectory.file("js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin"))
+    archiveFileName.set("d8-distribution.zip")
+    destinationDirectory.set(rootProject.layout.buildDirectory.dir("distributions"))
 }

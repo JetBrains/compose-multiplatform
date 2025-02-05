@@ -28,10 +28,6 @@ fun AnimatedVisibility() {
         val res = painterResource(Res.drawable.img)
         var showImage by remember { mutableStateOf(true) }
 
-        remember(res.intrinsicSize) {
-            println("intrinsicSize: ${res.intrinsicSize}")
-        }
-
         var transition: Transition<EnterExitState>? = null
         LaunchedEffect(showImage) {
             do {
