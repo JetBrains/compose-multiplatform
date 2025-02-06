@@ -364,19 +364,25 @@ fun String.removeLinks(): String = replace(Regex("\\[([^)]*)\\]\\([^\\]]*\\)"), 
  * Extract by format https://github.com/JetBrains/compose-multiplatform/blob/master/.github/PULL_REQUEST_TEMPLATE.md?plain=1
  */
 fun GitHubPullEntry.extractReleaseNotes(): ReleaseNotes? {
-    // extract body inside "## Release Notes"
-    val relNoteBody = run {
-        val after = body?.substringAfter("## Release Notes", "")?.ifBlank { null }
-            ?: body?.substringAfter("## Release notes", "")?.ifBlank { null } ?: body?.substringAfter(
-                "## RelNote",
-                ""
-            )?.ifBlank { null }
-
-        val before = after?.substringBefore("\n## ", "")?.ifBlank { null } ?: after?.substringBefore("\n# ", "")
-            ?.ifBlank { null } ?: after
-
-        before?.trim()
+    fun String?.substringBetween(begin: String, end: String): String? {
+        val after = this?.substringAfter(begin, "")?.ifBlank { null }
+        return after?.substringBefore(end, "")?.ifBlank { null } ?: after
     }
+
+    // extract body inside "# Release Notes"
+    val relNoteBody = body
+            ?.replace("# Release notes", "# Release Notes", ignoreCase = true)
+            ?.replace("#Release notes", "# Release Notes", ignoreCase = true)
+            ?.replace("# RelNote", "# Release Notes", ignoreCase = true)
+            ?.run {
+                substringBetween("# Release Notes", "\n# ")
+                    ?: substringBetween("## Release Notes", "\n## ")
+                    ?: substringBetween("### Release Notes", "\n### ")
+                    ?: substringBetween("## Release Notes", "\n# ")
+                    ?: substringBetween("### Release Notes", "\n## ")
+                    ?: substringBetween("### Release Notes", "\n# ")
+            }
+            ?.trim()
 
     if (relNoteBody == null) return null
     if (relNoteBody.trim().lowercase() == "n/a") return ReleaseNotes.NA
@@ -388,9 +394,9 @@ fun GitHubPullEntry.extractReleaseNotes(): ReleaseNotes? {
     var shouldPadLines = false
 
     for (line in relNoteBody.split("\n")) {
-        // parse "### Section - Subsection"
-        if (line.startsWith("### ")) {
-            val s = line.removePrefix("### ")
+        // parse "## Section - Subsection"
+        if (line.trim().startsWith("#")) {
+            val s = line.trimStart { it == '#' || it.isWhitespace() }
             section = s.substringBefore("-", "").trim().normalizeSectionName().ifEmpty { null }
             subsection = s.substringAfter("-", "").trim().normalizeSubsectionName().ifEmpty { null }
             isFirstLine = true
