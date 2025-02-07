@@ -19,6 +19,8 @@ fun graphicsContext(): GraphicsContext? = when {
 
 @OptIn(ExperimentalSkikoApi::class)
 class DirectXGraphicsContext() : GraphicsContext {
+    // Note: we don't close `context` and `texture` after using,
+    // because it is created once in the main function
     private val context = DirectXOffscreenContext()
     private var texture: DirectXOffscreenContext.Texture? = null
 
@@ -37,10 +39,5 @@ class DirectXGraphicsContext() : GraphicsContext {
 
     override suspend fun awaitGPUCompletion() {
         texture?.waitForCompletion()
-    }
-
-    override fun close() {
-        texture?.close()
-        context.close()
     }
 }
