@@ -134,6 +134,19 @@ suspend fun measureComposable(
 
 private val pictureRecorder = PictureRecorder()
 
+/**
+ * Mimic Skiko render logic from https://github.com/JetBrains/skiko/blob/eb1f04ec99d50ff0bdb2f592fdf49711a9251aa7/skiko/src/awtMain/kotlin/org/jetbrains/skiko/SkiaLayer.awt.kt#L531
+ *
+ * This is very simplified logic, and it still can differ from the real cases.
+ *
+ * Though one main function - rendering into picture - was affecting performance.
+ *
+ * Benchmarks showed an improvement by 10%, but there was a regression by 10%.
+ *
+ * Beware that this logic can be changed in some new version of Skiko.
+ *
+ * If Skiko stops using `picture`, we need to remove it here too.
+ */
 @OptIn(InternalComposeUiApi::class)
 fun ComposeScene.mimicSkikoRender(surface: Surface, time: Long, width: Int, height: Int) {
     val pictureCanvas = pictureRecorder.beginRecording(Rect(0f, 0f, width.toFloat(), height.toFloat()))
