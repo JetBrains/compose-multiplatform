@@ -40,6 +40,7 @@
 @file:DependsOn("com.google.code.gson:gson:2.10.1")
 
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import java.io.IOException
 import java.lang.ProcessBuilder.Redirect
 import java.net.URL
@@ -49,7 +50,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.system.exitProcess
-import kotlin.text.substringAfterLast
 
 //region ========================================== CONSTANTS =========================================
 
@@ -87,8 +87,10 @@ val argsKeyToValue = args
     .filter { it.contains("=") }
     .associate { it.substringBefore("=") to it.substringAfter("=") }
 
-val token = argsKeyToValue["token"] ?:
+val token = argsKeyToValue["token"]
+if (token != null) {
     println("To increase the rate limit, specify token (https://github.com/settings/tokens), adding token=yourtoken in the end")
+}
 
 println()
 
@@ -413,7 +415,7 @@ fun GitHubPullEntry.extractReleaseNotes(): ReleaseNotes? {
                     lineFixed,
                     section,
                     subsection,
-                    html_url.takeIf { isTopLevel }
+                    htmlUrl.takeIf { isTopLevel }
                 )
             )
             isFirstLine = false
@@ -433,20 +435,14 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
             requestJson<Array<GitHubPullEntry>>("https://api.github.com/repos/$repo/pulls?state=closed&per_page=100&page=$it").toList()
         }
 
-    val pullNumberToPull = pulls.associateBy { it.number }
-    val pullTitleToPull = pulls.associateBy { it.title }
-
-    fun prForCommit(commit: GitHubCompareResponse.CommitEntry): GitHubPullEntry? {
-        val (repoTitle, repoNumber) = repoTitleAndNumberForCommit(commit)
-        return repoNumber?.let(pullNumberToPull::get) ?: pullTitleToPull[repoTitle]
-    }
+    val shaToPull = pulls.associateBy { it.mergeCommitSha }
 
     fun changelogEntriesFor(
         pullRequest: GitHubPullEntry?
     ): List<ChangelogEntry> {
         return if (pullRequest != null) {
             pullRequest.extractReleaseNotes()?.entries ?:
-                listOf(ChangelogEntry("- ${pullRequest.title}", null, null, pullRequest.html_url))
+                listOf(ChangelogEntry("- ${pullRequest.title}", null, null, pullRequest.htmlUrl))
         } else {
             listOf()
         }
@@ -458,7 +454,7 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
         lateinit var mergeBaseCommit: String
         val commits = fetchPagedUntilEmpty { page ->
             val result = requestJson<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$firsCommitSha...$lastCommitSha?per_page=1000&page=$page")
-            mergeBaseCommit = result.merge_base_commit.sha
+            mergeBaseCommit = result.mergeBaseCommit.sha
             result.commits
         }
         return CommitsResult(commits, mergeBaseCommit)
@@ -466,8 +462,8 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
 
     val main = fetchCommits(firstCommit, lastCommit)
     val previous = fetchCommits(main.mergeBaseSha, firstCommit)
-    val pullRequests = main.commits.mapNotNull { prForCommit(it) }.toSet()
-    val previousVersionPullRequests = previous.commits.mapNotNull { prForCommit(it) }.toSet()
+    val pullRequests = main.commits.mapNotNull { shaToPull[it.sha] }.toSet()
+    val previousVersionPullRequests = previous.commits.mapNotNull { shaToPull[it.sha] }.toSet()
     return (pullRequests - previousVersionPullRequests).flatMap { changelogEntriesFor(it) }
 }
 
@@ -477,17 +473,6 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
  */
 fun pullRequest(repo: String, prNumber: String): GitHubPullEntry {
     return requestJson<GitHubPullEntry>("https://api.github.com/repos/$repo/pulls/$prNumber")
-}
-
-/**
- * Extract the PR number from the commit.
- */
-fun repoTitleAndNumberForCommit(commit: GitHubCompareResponse.CommitEntry): Pair<String, Int?> {
-    val commitTitle = commit.commit.message.substringBefore("\n")
-    // check title similar to `Fix import android flavors with compose resources (#4319)`
-    val title = commitTitle.substringBeforeLast(" (#")
-    val number = commitTitle.substringAfterLast(" (#").substringBefore(")").toIntOrNull()
-    return title to number
 }
 
 /**
@@ -547,14 +532,6 @@ sealed interface ReleaseNotes {
     }
 
     class Specified(override val entries: List<ChangelogEntry>): ReleaseNotes
-
-    fun ifEmpty(action: () -> ReleaseNotes): ReleaseNotes {
-        return if (entries.isEmpty()) {
-            action()
-        } else {
-            this
-        }
-    }
 }
 
 data class ChangelogEntry(
@@ -572,15 +549,22 @@ fun String.normalizeSectionName() = standardSections.find { it.lowercase() == th
 fun String.normalizeSubsectionName() = standardSubsections.find { it.lowercase() == this.lowercase() } ?: this
 
 // example https://api.github.com/repos/JetBrains/compose-multiplatform-core/compare/v1.6.0-rc02...release/1.6.0
-data class GitHubCompareResponse(val commits: List<CommitEntry>, val merge_base_commit: CommitEntry) {
+data class GitHubCompareResponse(
+    val commits: List<CommitEntry>,
+    @SerializedName("merge_base_commit") val mergeBaseCommit: CommitEntry
+) {
     data class CommitEntry(val sha: String, val commit: Commit)
     data class Commit(val message: String)
 }
 
 // example https://api.github.com/repos/JetBrains/compose-multiplatform-core/pulls?state=closed
-data class GitHubPullEntry(val html_url: String, val number: Int, val title: String, val body: String?, val labels: List<Label>) {
-    class Label(val name: String)
-}
+data class GitHubPullEntry(
+    @SerializedName("html_url") val htmlUrl: String,
+    val number: Int,
+    val title: String,
+    val body: String?,
+    @SerializedName("merge_commit_sha") val mergeCommitSha: String?,
+)
 
 //region ========================================== UTILS =========================================
 fun pipeProcess(command: String) = ProcessBuilder(command.split(" "))
