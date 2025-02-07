@@ -94,7 +94,7 @@ suspend fun measureComposable(
             val start = markNow()
 
             repeat(frameCount) {
-                val frameStart = markNow()
+                val frameStart = start + nextVSync
 
                 scene.mimicSkikoRender(surface, it * nextVSync.inWholeNanoseconds, width, height)
                 surface.flushAndSubmit(false)
