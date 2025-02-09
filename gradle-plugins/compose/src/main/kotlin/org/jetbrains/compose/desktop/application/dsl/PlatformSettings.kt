@@ -85,6 +85,7 @@ open class InfoPlistSettings {
 
 abstract class LinuxPlatformSettings : AbstractPlatformSettings() {
     var shortcut: Boolean = false
+    var packageDeps: String? = null
     var packageName: String? = null
     var appRelease: String? = null
     var appCategory: String? = null

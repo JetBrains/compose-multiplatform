@@ -134,6 +134,10 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
+    val linuxPackageDeps: Property<String?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
     val linuxPackageName: Property<String?> = objects.nullableProperty()
 
     @get:Input
@@ -446,6 +450,7 @@ abstract class AbstractJPackageTask @Inject constructor(
             when (currentOS) {
                 OS.Linux -> {
                     cliArg("--linux-shortcut", linuxShortcut)
+                    cliArg("--linux-package-deps", linuxPackageDeps)
                     cliArg("--linux-package-name", linuxPackageName)
                     cliArg("--linux-app-release", linuxAppRelease)
                     cliArg("--linux-app-category", linuxAppCategory)

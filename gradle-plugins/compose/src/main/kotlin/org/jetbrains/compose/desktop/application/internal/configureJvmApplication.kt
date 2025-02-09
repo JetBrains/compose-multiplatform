@@ -371,6 +371,7 @@ internal fun JvmApplicationContext.configurePlatformSettings(
                 packageTask.linuxAppRelease.set(provider { linux.appRelease })
                 packageTask.linuxDebMaintainer.set(provider { linux.debMaintainer })
                 packageTask.linuxMenuGroup.set(provider { linux.menuGroup })
+                packageTask.linuxPackageDeps.set(provider { linux.packageDeps })
                 packageTask.linuxPackageName.set(provider { linux.packageName })
                 packageTask.linuxRpmLicenseType.set(provider { linux.rpmLicenseType })
                 packageTask.iconFile.set(linux.iconFile.orElse(defaultResources.get { linuxIcon }))
