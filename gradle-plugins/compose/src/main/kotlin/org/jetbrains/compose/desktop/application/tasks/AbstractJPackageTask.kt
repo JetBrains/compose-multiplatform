@@ -206,6 +206,10 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
+    val macDmgContents: ListProperty<String> = objects.listProperty<String>(String::class.java)
+
+    @get:Input
+    @get:Optional
     val winConsole: Property<Boolean?> = objects.nullableProperty()
 
     @get:Input
@@ -468,7 +472,11 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--win-update-url", winUpdateUrl)
                     cliArg("--win-upgrade-uuid", winUpgradeUuid)
                 }
-                OS.MacOS -> {}
+                OS.MacOS -> {
+                    macDmgContents.get().forEach {
+                        cliArg("--mac-dmg-content", it)
+                    }
+                }
             }
         }
 

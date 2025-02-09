@@ -397,6 +397,7 @@ internal fun JvmApplicationContext.configurePlatformSettings(
         }
         OS.MacOS -> {
             app.nativeDistributions.macOS.also { mac ->
+                packageTask.macDmgContents.set(provider { mac.dmgContents })
                 packageTask.macPackageName.set(provider { mac.packageName })
                 packageTask.macDockName.set(
                     if (mac.setDockNameSameAsPackageName)
