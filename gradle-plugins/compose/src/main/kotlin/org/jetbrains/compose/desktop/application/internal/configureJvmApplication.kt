@@ -387,6 +387,7 @@ internal fun JvmApplicationContext.configurePlatformSettings(
                 packageTask.winShortcutPrompt.set(provider { win.shortcutPrompt })
                 packageTask.winMenu.set(provider { win.menu })
                 packageTask.winMenuGroup.set(provider { win.menuGroup })
+                packageTask.winUpdateUrl.set(provider { win.updateUrl })
                 packageTask.winUpgradeUuid.set(provider { win.upgradeUuid })
                 packageTask.iconFile.set(win.iconFile.orElse(defaultResources.get { windowsIcon }))
                 packageTask.installationPath.set(win.installationPath)

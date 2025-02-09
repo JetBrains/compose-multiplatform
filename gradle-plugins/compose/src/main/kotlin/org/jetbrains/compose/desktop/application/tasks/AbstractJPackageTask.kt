@@ -230,6 +230,10 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
+    val winUpdateUrl: Property<String?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
     val winUpgradeUuid: Property<String?> = objects.nullableProperty()
 
     @get:InputDirectory
@@ -456,6 +460,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--win-shortcut-prompt", winShortcutPrompt)
                     cliArg("--win-menu", winMenu)
                     cliArg("--win-menu-group", winMenuGroup)
+                    cliArg("--win-update-url", winUpdateUrl)
                     cliArg("--win-upgrade-uuid", winUpgradeUuid)
                 }
                 OS.MacOS -> {}
