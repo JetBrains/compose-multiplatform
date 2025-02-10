@@ -17,6 +17,8 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
+val skikoVersion = project.properties["skiko.version"] as? String
+
 kotlin {
     jvm("desktop")
 
@@ -51,17 +53,35 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(compose.ui)
-                implementation(compose.foundation)
-                implementation(compose.material)
-                implementation(compose.runtime)
-                implementation(compose.components.resources)
+                implementation(compose.ui) {
+                    exclude("org.jetbrains.skiko")
+                }
+                implementation(compose.foundation) {
+                    exclude("org.jetbrains.skiko")
+                }
+                implementation(compose.material) {
+                    exclude("org.jetbrains.skiko")
+                }
+                implementation(compose.runtime) {
+                    exclude("org.jetbrains.skiko")
+                }
+                implementation(compose.components.resources) {
+                    exclude("org.jetbrains.skiko")
+                }
             }
         }
 
         val desktopMain by getting {
             dependencies {
-                implementation(compose.desktop.currentOs)
+                implementation(compose.desktop.currentOs) {
+                    exclude("org.jetbrains.compose.ui")
+                    exclude("org.jetbrains.compose.foundation")
+                    exclude("org.jetbrains.compose.material")
+                    exclude("org.jetbrains.skiko")
+                }
+                implementation("org.jetbrains.skiko:skiko:$skikoVersion")
+                implementation("org.jetbrains.skiko:skiko-awt:$skikoVersion")
+                implementation("org.jetbrains.skiko:skiko-awt-runtime-windows-x64:$skikoVersion")
                 runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.1")
             }
         }
@@ -80,7 +100,7 @@ val kotlinVersion: String? = project.properties["kotlin.version"] as? String
 var appArgs = runArguments
     ?.split(" ")
     .orEmpty().let {
-       it + listOf("versionInfo=\"$composeVersion (Kotlin $kotlinVersion)\"")
+       it + listOf("versionInfo=\"$composeVersion (Skiko $skikoVersion)\"")
     }
     .map {
         it.replace(" ", "%20")
