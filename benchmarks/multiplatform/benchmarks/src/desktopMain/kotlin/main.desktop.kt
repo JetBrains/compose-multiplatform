@@ -13,6 +13,6 @@ fun main(args: Array<String>) {
 }
 
 object SoftwareGraphicsContext : GraphicsContext {
-    fun surface(width: Int, height: Int): Surface = Surface.makeRasterN32Premul(width, height)
-    suspend fun awaitGPUCompletion() = Unit
+    override fun surface(width: Int, height: Int): Surface = Surface.makeRasterN32Premul(width, height)
+    override suspend fun awaitGPUCompletion() = Unit
 }
