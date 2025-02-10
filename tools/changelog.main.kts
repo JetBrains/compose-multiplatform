@@ -88,7 +88,7 @@ val argsKeyToValue = args
     .associate { it.substringBefore("=") to it.substringAfter("=") }
 
 val token = argsKeyToValue["token"]
-if (token != null) {
+if (token == null) {
     println("To increase the rate limit, specify token (https://github.com/settings/tokens), adding token=yourtoken in the end")
 }
 
