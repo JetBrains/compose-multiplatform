@@ -5,8 +5,14 @@
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.skia.Surface
 
 fun main(args: Array<String>) {
     Args.parseArgs(args)
     runBlocking(Dispatchers.Main) { runBenchmarks(graphicsContext = graphicsContext()) }
+}
+
+object SoftwareGraphicsContext : GraphicsContext {
+    fun surface(width: Int, height: Int): Surface = Surface.makeRasterN32Premul(width, height)
+    suspend fun awaitGPUCompletion() = Unit
 }
