@@ -1,3 +1,82 @@
+# 1.8.0-alpha03 (February 2025)
+
+_Changes since 1.8.0-alpha02_
+
+## Highlights
+
+### Multiple Platforms
+
+- [Compose Multiplatform codebase is fully migrated to K2](https://github.com/JetBrains/compose-multiplatform-core/pull/1778). Please note that native and web klibs can be consumed only with Kotlin 2.1.0 or newer. Also, due to underlying changes in the compiler plugin, it's better to recompile libraries against the new version. Please let us know if you find any compatibility issues during this migration
+- [Implement multiplatform `BackHandler` and `PredictiveBackHandler`](https://github.com/JetBrains/compose-multiplatform-core/pull/1771). And use them in material3 widgets and androidx-navigation library
+
+## Breaking Changes
+
+### Multiple Platforms
+
+- [IdlingResource](https://developer.android.com/reference/kotlin/androidx/compose/ui/test/IdlingResource) interface was moved from commonMain to android and desktop source sets. The related experimental methods of [ComposeUiTest](https://developer.android.com/reference/kotlin/androidx/compose/ui/test/ComposeUiTest) were moved too. They are not available for Web and iOS anymore. Consider using [waitUntil function][(https://developer.android.com/reference/kotlin/androidx/compose/ui/test/ComposeUiTest#waitUntil(kotlin.String,kotlin.Long,kotlin.Function0)) as an alternative](https://github.com/JetBrains/compose-multiplatform-core/pull/1822). Note: it's a breaking change only for Web and iOS, but not for Desktop and Android
+
+### iOS
+
+- [Experimental classes `CupertinoScrollDecayAnimationSpec` and `CupertinoOverscrollEffect` are removed from public API](https://github.com/JetBrains/compose-multiplatform-core/pull/1806)
+
+## Features
+
+### Multiple Platforms
+
+- [Update skia to m132](https://github.com/JetBrains/compose-multiplatform-core/pull/1823)
+- [Adopt a new `Clipboard` interface with suspend functions, which work correctly on all targets including Web](https://github.com/JetBrains/compose-multiplatform-core/pull/1796). The `ClipboardManager` was deprecated because it was not possible to correctly implement it for Web
+
+### iOS
+
+- [Support VoiceControl on iOS](https://github.com/JetBrains/compose-multiplatform-core/pull/1780)
+- [`AccessibilitySyncOptions` removed](https://github.com/JetBrains/compose-multiplatform-core/pull/1780). The accessibility tree is built on demand
+- [Calculate the order and location of semantic elements in the same way as it's done on Android](https://github.com/JetBrains/compose-multiplatform-core/pull/1809)
+- [Support `UIAccessibilityContainerTypeSemanticGroup` for traversal groups](https://github.com/JetBrains/compose-multiplatform-core/pull/1809)
+- [Compose works correctly with nested `UIScrollView`s, as well as within `UIScrollView`s](https://github.com/JetBrains/compose-multiplatform-core/pull/1818)
+- [Added the ability to close modal Compose view controllers](https://github.com/JetBrains/compose-multiplatform-core/pull/1818) (with non-scrollable content on them) with a swipe gesture
+
+## Fixes
+
+
+### Multiple Platforms
+
+- [Fix light source position for shadow rendering to match the Material specification and Android behavior](https://github.com/JetBrains/compose-multiplatform-core/pull/1784)
+- [Fix inconsistency between Android and Desktop in `placeWithLayer` scale application: offset is not scaled now](https://github.com/JetBrains/compose-multiplatform-core/pull/1784) (Android behavior)
+- [Clear the canvas before rendering each frame in tests, to avoid drawing different frames on top of each other, resulting in incorrect images being returned by `captureToImage`](https://github.com/JetBrains/compose-multiplatform-core/pull/1820)
+
+### iOS
+
+- [Performance issues when iOS screen reader is active fixed](https://github.com/JetBrains/compose-multiplatform-core/pull/1780)
+- [Fixed issues where the interactive pop gesture would stop working](https://github.com/JetBrains/compose-multiplatform-core/pull/1818)
+- [Fixes an issue where it's not possible to close the `UIMenu` that appears over the Compose content](https://github.com/JetBrains/compose-multiplatform-core/pull/1818)
+- [Fix touches tracking for multitouch gestures](https://github.com/JetBrains/compose-multiplatform-core/pull/1827)
+
+### Desktop
+
+- [Elements marked with `Modifier.semantics { hideFromAccessibility() }` should now be correctly hidden from a11y](https://github.com/JetBrains/compose-multiplatform-core/pull/1798)
+- [Fixed the positioning of the IME candidate popup for `TextField(TextFieldState)`](https://github.com/JetBrains/compose-multiplatform-core/pull/1794) (aka `BasicTextField2`)
+- [Fixed input of diacritics via long-press on macOS in `TextField(TextFieldState)`](https://github.com/JetBrains/compose-multiplatform-core/pull/1810) (aka `BasicTextField2`)
+- [Radio buttons and any other elements using `Modifier.selectable` with `Role.RadioButton` will have their state reported to accessibility via `AccessibleValue.getCurrentAccessibleValue()` and as `AccessibleState.CHECKED` in `getAccessibleStateSet()`](https://github.com/JetBrains/compose-multiplatform-core/pull/1797)
+
+### Web
+
+- [The `BasicTextField` handles browser copy/cut/paste events correctly now](https://github.com/JetBrains/compose-multiplatform-core/pull/1795). Previously, they were ignored
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.8.0-alpha03`. Based on Jetpack Compose libraries:
+  - [Runtime 1.8.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.8.0-beta01)
+  - [UI 1.8.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.8.0-beta01)
+  - [Foundation 1.8.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.8.0-beta01)
+  - [Material 1.8.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.8.0-beta01)
+  - [Material3 1.4.0-alpha07](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-alpha07)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.0-alpha03`. Based on [Jetpack Lifecycle 2.9.0-alpha03](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.0-alpha03)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.8.0-alpha13`. Based on [Jetpack Navigation 2.8.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.8.4)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.1.0-alpha03`. Based on [Jetpack Material3 Adaptive 1.1.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.1.0-beta01)
+
+---
+
 # 1.8.0-alpha02 (January 2025)
 
 _Changes since 1.8.0-alpha01_
