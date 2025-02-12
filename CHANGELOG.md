@@ -62,7 +62,7 @@ _Changes since 1.8.0-alpha02_
 
 ### Web
 
-- The `BasicTextField` handles browser copy/cut/paste events correctly now](https://github.com/JetBrains/compose-multiplatform-core/pull/1795. Previously, they were ignored ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
+- The `BasicTextField` handles browser copy/cut/paste events correctly now. Previously, they were ignored ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
 
 ## Dependencies
 
