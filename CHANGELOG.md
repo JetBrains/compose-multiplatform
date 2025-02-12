@@ -6,63 +6,63 @@ _Changes since 1.8.0-alpha02_
 
 ### Multiple Platforms
 
-- Compose Multiplatform codebase is fully migrated to K2. Please note that native and web klibs can be consumed only with Kotlin 2.1.0 or newer. Also, due to underlying changes in the compiler plugin, it's better to recompile libraries against the new version. Please let us know if you find any compatibility issues during this migration ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
-- Implement multiplatform `BackHandler` and `PredictiveBackHandler`. And use them in material3 widgets and androidx-navigation library ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
+- Compose Multiplatform codebase is fully migrated to K2. Please note that native and web klibs can be consumed only with Kotlin 2.1.0 or newer. Also, due to underlying changes in the compiler plugin, it's better to recompile libraries against the new version. Please let us know if you find any compatibility issues during this migration. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
+- Implement multiplatform `BackHandler` and `PredictiveBackHandler`. And use them in material3 widgets and androidx-navigation library. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
 
 ## Breaking Changes
 
 ### Multiple Platforms
 
-- [IdlingResource](https://developer.android.com/reference/kotlin/androidx/compose/ui/test/IdlingResource) interface was moved from commonMain to android and desktop source sets. The related experimental methods of [ComposeUiTest](https://developer.android.com/reference/kotlin/androidx/compose/ui/test/ComposeUiTest) were moved too. They are not available for Web and iOS anymore. Consider using [waitUntil function](https://developer.android.com/reference/kotlin/androidx/compose/ui/test/ComposeUiTest#waitUntil(kotlin.String,kotlin.Long,kotlin.Function0)) as an alternative. Note: it's a breaking change only for Web and iOS, but not for Desktop and Android  ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
+- [IdlingResource](https://developer.android.com/reference/kotlin/androidx/compose/ui/test/IdlingResource) interface was moved from commonMain to android and desktop source sets. The related experimental methods of [ComposeUiTest](https://developer.android.com/reference/kotlin/androidx/compose/ui/test/ComposeUiTest) were moved too. They are not available for Web and iOS anymore. Consider using [waitUntil function](https://developer.android.com/reference/kotlin/androidx/compose/ui/test/ComposeUiTest#waitUntil(kotlin.String,kotlin.Long,kotlin.Function0)) as an alternative. Note: it's a breaking change only for Web and iOS, but not for Desktop and Android. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
 
 ### iOS
 
-- Experimental classes `CupertinoScrollDecayAnimationSpec` and `CupertinoOverscrollEffect` are removed from public API ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
+- Experimental classes `CupertinoScrollDecayAnimationSpec` and `CupertinoOverscrollEffect` are removed from public API. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
 
 ## Features
 
 ### Multiple Platforms
 
-- Update skia to m132 ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
-- Adopt a new `Clipboard` interface with suspend functions, which work correctly on all targets including Web. The `ClipboardManager` was deprecated because it was not possible to correctly implement it for Web ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
+- Update skia to m132. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
+- Adopt a new `Clipboard` interface with suspend functions, which work correctly on all targets including Web. The `ClipboardManager` was deprecated because it was not possible to correctly implement it for Web. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
 
 ### iOS
 
-- Support VoiceControl on iOS ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
-- `AccessibilitySyncOptions` removed. The accessibility tree is built on demand ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
-- Calculate the order and location of semantic elements in the same way as it's done on Android ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
-- Support `UIAccessibilityContainerTypeSemanticGroup` for traversal groups ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
-- Compose works correctly with nested `UIScrollView`s, as well as within `UIScrollView`s ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
-- Added the ability to close modal Compose view controllers (with non-scrollable content on them) with a swipe gesture ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
+- Support VoiceControl on iOS. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
+- `AccessibilitySyncOptions` removed. The accessibility tree is built on demand. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
+- Calculate the order and location of semantic elements in the same way as it's done on Android. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
+- Support `UIAccessibilityContainerTypeSemanticGroup` for traversal groups. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
+- Compose works correctly with nested `UIScrollView`s, as well as within `UIScrollView`s. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
+- Added the ability to close modal Compose view controllers (with non-scrollable content on them) with a swipe gesture. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
 
 ## Fixes
 
 ### Tests
 
-- Clear the canvas before rendering each frame in tests, to avoid drawing different frames on top of each other, resulting in incorrect images being returned by `captureToImage` ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
+- Clear the canvas before rendering each frame in tests, to avoid drawing different frames on top of each other, resulting in incorrect images being returned by `captureToImage`. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
 
 ### Multiple Platforms
 
-- Fix light source position for shadow rendering to match the Material specification and Android behavior ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
-- Fix inconsistency between Android and Desktop in `placeWithLayer` scale application: offset is not scaled now (Android behavior) ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
+- Fix light source position for shadow rendering to match the Material specification and Android behavior. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
+- Fix inconsistency between Android and Desktop in `placeWithLayer` scale application: offset is not scaled now (Android behavior). [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
 
 ### iOS
 
-- Performance issues when iOS screen reader is active fixed ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
-- Fixed issues where the interactive pop gesture would stop working ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
-- Fixes an issue where it's not possible to close the `UIMenu` that appears over the Compose content ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
-- Fix touches tracking for multitouch gestures ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
+- Performance issues when iOS screen reader is active fixed. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
+- Fixed issues where the interactive pop gesture would stop working. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
+- Fixes an issue where it's not possible to close the `UIMenu` that appears over the Compose content. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
+- Fix touches tracking for multitouch gestures. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
 
 ### Desktop
 
-- Elements marked with `Modifier.semantics { hideFromAccessibility() }` should now be correctly hidden from a11y ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
-- Fixed the positioning of the IME candidate popup for `TextField(TextFieldState)` (aka `BasicTextField2`) ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
-- Fixed input of diacritics via long-press on macOS in `TextField(TextFieldState)` (aka `BasicTextField2`) ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
-- Radio buttons and any other elements using `Modifier.selectable` with `Role.RadioButton` will have their state reported to accessibility via `AccessibleValue.getCurrentAccessibleValue()` and as `AccessibleState.CHECKED` in `getAccessibleStateSet()` ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
+- Elements marked with `Modifier.semantics { hideFromAccessibility() }` should now be correctly hidden from a11y. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
+- Fixed the positioning of the IME candidate popup for `TextField(TextFieldState)` (aka `BasicTextField2`). [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
+- Fixed input of diacritics via long-press on macOS in `TextField(TextFieldState)` (aka `BasicTextField2`). [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
+- Radio buttons and any other elements using `Modifier.selectable` with `Role.RadioButton` will have their state reported to accessibility via `AccessibleValue.getCurrentAccessibleValue()` and as `AccessibleState.CHECKED` in `getAccessibleStateSet()`. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
 
 ### Web
 
-- The `BasicTextField` handles browser copy/cut/paste events correctly now. Previously, they were ignored ([PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778))
+- The `BasicTextField` handles browser copy/cut/paste events correctly now. Previously, they were ignored. [PR](https://github.com/JetBrains/compose-multiplatform-core/pull/1778)
 
 ## Dependencies
 
