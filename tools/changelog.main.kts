@@ -193,7 +193,7 @@ fun generateChangelog() {
                             appendLine("### $subsection")
                             appendLine()
                             subsectionEntries.forEach {
-                                appendLine(it.format())
+                                appendLine(it.run { "$message [#$prNumber]($link)" })
                             }
                             appendLine()
                         }
@@ -310,59 +310,6 @@ fun checkPr() {
 fun currentChangelogDate() = LocalDate.now().format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.ENGLISH))
 
 /**
- * Formats:
- * - A new approach to implementation of `platformLayers`. Now extra layers (such as Dialogs and Popups) drawing is merged into a single screen size canvas.
- *
- * to:
- * - [A new approach to implementation of `platformLayers`](link). Now extra layers (such as Dialogs and Popups) drawing is merged into a single screen size canvas.
- */
-fun ChangelogEntry.format(): String {
-    return try {
-        tryFormat()
-    } catch (e: Exception) {
-        throw RuntimeException("Formatting error of ChangelogEntry. Message:\n$message", e)
-    }
-}
-
-fun ChangelogEntry.tryFormat(): String {
-    return if (link != null) {
-        val prefixRegex = "^[-\\s]*"   // "- "
-        val tagRegex1 = "\\(.*\\)\\s*" // "(something) "
-        val tagRegex2 = "\\[.*\\]\\s*" // "[something] "
-        val tagRegex3 = "_.*_\\s*"     // "_something_ "
-        val linkStartIndex = maxOf(
-            message.endIndexOfFirstGroup(Regex("($prefixRegex).*"))?.plus(1) ?: 0,
-            message.endIndexOfFirstGroup(Regex("($prefixRegex$tagRegex1).*"))?.plus(1) ?: 0,
-            message.endIndexOfFirstGroup(Regex("($prefixRegex$tagRegex2).*"))?.plus(1) ?: 0,
-            message.endIndexOfFirstGroup(Regex("($prefixRegex$tagRegex3).*"))?.plus(1) ?: 0,
-        )
-        val linkLastIndex = message.indexOfAny(listOf(". ", " ("), linkStartIndex).ifNegative { message.length }
-
-        val beforeLink = message.substring(0, linkStartIndex)
-        val inLink = message.substring(linkStartIndex, linkLastIndex).removeLinks()
-        val afterLink = message.substring(linkLastIndex, message.length)
-
-        "$beforeLink[$inLink]($link)$afterLink"
-    } else {
-        message
-    }
-}
-
-fun Int.ifNegative(value: () -> Int): Int = if (this < 0) value() else this
-
-fun String.endIndexOfFirstGroup(regex: Regex): Int? =
-    regex.find(this)?.groups?.toList()?.getOrNull(1)?.range?.endInclusive
-
-/**
- * Converts:
- * Message (title)[some link], message
- *
- * to:
- * Message title, message
- */
-fun String.removeLinks(): String = replace(Regex("\\[([^)]*)\\]\\([^\\]]*\\)"), "$1")
-
-/**
  * Extract by format https://github.com/JetBrains/compose-multiplatform/blob/master/.github/PULL_REQUEST_TEMPLATE.md?plain=1
  */
 fun GitHubPullEntry.extractReleaseNotes(): ReleaseNotes? {
@@ -421,6 +368,7 @@ fun GitHubPullEntry.extractReleaseNotes(): ReleaseNotes? {
                     lineFixed,
                     section,
                     subsection,
+                    number,
                     htmlUrl.takeIf { isTopLevel }
                 )
             )
@@ -448,7 +396,7 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
     ): List<ChangelogEntry> {
         return if (pullRequest != null) {
             pullRequest.extractReleaseNotes()?.entries ?:
-                listOf(ChangelogEntry("- ${pullRequest.title}", null, null, pullRequest.htmlUrl))
+                listOf(ChangelogEntry("- ${pullRequest.title}", null, null, pullRequest.number, pullRequest.htmlUrl))
         } else {
             listOf()
         }
@@ -544,6 +492,7 @@ data class ChangelogEntry(
     val message: String,
     val section: String?,
     val subsection: String?,
+    val prNumber: Int,
     val link: String?,
 )
 
