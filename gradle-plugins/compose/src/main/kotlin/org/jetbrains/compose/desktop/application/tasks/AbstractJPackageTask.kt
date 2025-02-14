@@ -473,9 +473,12 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--win-upgrade-uuid", winUpgradeUuid)
                 }
                 OS.MacOS -> {
-                    macDmgContents.get().forEach {
-                        cliArg("--mac-dmg-content", it)
+                    if (jvmRuntimeInfo.majorVersion >= 18) {
+                        macDmgContents.get().forEach {
+                            cliArg("--mac-dmg-content", it)
+                        }
                     }
+
                 }
             }
         }
