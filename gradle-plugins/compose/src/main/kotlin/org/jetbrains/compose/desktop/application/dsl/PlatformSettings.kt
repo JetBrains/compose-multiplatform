@@ -36,7 +36,7 @@ abstract class AbstractMacOSPlatformSettings : AbstractPlatformSettings() {
     var appCategory: String? = null
     var minimumSystemVersion: String? = null
 
-    var dmgContents = ArrayList<String>()
+    var dmgContents: String? = null
 
 
     /**

@@ -206,7 +206,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    val macDmgContents: ListProperty<String> = objects.listProperty<String>(String::class.java)
+    val macDmgContents: Property<String?> = objects.nullableProperty()
 
     @get:Input
     @get:Optional
@@ -474,11 +474,8 @@ abstract class AbstractJPackageTask @Inject constructor(
                 }
                 OS.MacOS -> {
                     if (jvmRuntimeInfo.majorVersion >= 18) {
-                        macDmgContents.get().forEach {
-                            cliArg("--mac-dmg-content", it)
-                        }
+                        cliArg("--mac-dmg-content", macDmgContents)
                     }
-
                 }
             }
         }
