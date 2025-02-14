@@ -8,9 +8,6 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.*
-import org.jetbrains.skia.Color
-import org.jetbrains.skia.PictureRecorder
-import org.jetbrains.skia.Rect
 import kotlin.time.TimeSource.Monotonic.markNow
 import kotlin.time.measureTime
 

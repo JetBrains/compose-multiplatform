@@ -4,6 +4,16 @@ import benchmarks.complexlazylist.components.MainUiNoImageUseModel
 import benchmarks.example1.Example1
 import benchmarks.lazygrid.LazyGrid
 import benchmarks.visualeffects.NYContent
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format.FormatStringsInDatetimeFormats
+import kotlinx.datetime.format.byUnicodePattern
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.io.buffered
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
+import kotlinx.io.readByteArray
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 
@@ -96,7 +106,10 @@ data class BenchmarkStats(
     val doubleBufferingMissedFrames: MissedFrames
 ) {
     fun prettyPrint() {
-        println("Version: " + Args.versionInfo)
+        val versionInfo = Args.versionInfo
+        if (versionInfo != null) {
+            println("Version: $versionInfo")
+        }
         conditions.prettyPrint()
         println()
         if (Args.isModeEnabled(Mode.SIMPLE)) {
@@ -115,7 +128,10 @@ data class BenchmarkStats(
     }
 
     fun putFormattedValuesTo(map: MutableMap<String, String>) {
-        map.put("Version", Args.versionInfo)
+        val versionInfo = Args.versionInfo
+        if (versionInfo != null) {
+            map.put("Version", versionInfo)
+        }
         conditions.putFormattedValuesTo(map)
         if (Args.isModeEnabled(Mode.SIMPLE)) {
             val frameInfo = requireNotNull(averageFrameInfo) { "frameInfo shouldn't be null with Mode.SIMPLE" }
@@ -179,7 +195,7 @@ class BenchmarkResult(
             frameBudget,
             conditions,
             averageFrameInfo,
-            listOf(0.01,  0.02, 0.05, 0.1, 0.25, 0.5).map { percentile ->
+            listOf(0.01, 0.02, 0.05, 0.1, 0.25, 0.5).map { percentile ->
                 val average = percentileAverageFrameTime(percentile, BenchmarkFrameTimeKind.CPU)
 
                 BenchmarkPercentileAverage(percentile, average)
@@ -201,6 +217,8 @@ class BenchmarkResult(
 
 }
 
+private fun Duration.formatAsMilliseconds(): String = (inWholeMicroseconds / 1000.0).toString()
+
 suspend fun runBenchmark(
     name: String,
     width: Int,
@@ -215,7 +233,7 @@ suspend fun runBenchmark(
         println("# $name")
         val stats = measureComposable(warmupCount, Args.getBenchmarkProblemSize(name, frameCount), width, height, targetFps, graphicsContext, content).generateStats()
         stats.prettyPrint()
-        saveBenchmarksOnDisk(name, stats)
+        saveBenchmarkStatsOnDisk(name, stats)
     }
 }
 
@@ -234,7 +252,3 @@ suspend fun runBenchmarks(
     runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel()}
     runBenchmark("Example1", width, height, targetFps, 1000, graphicsContext) { Example1() }
  }
-
-expect fun saveBenchmarksOnDisk(name: String, stats: BenchmarkStats)
-
-private fun Duration.formatAsMilliseconds(): String = (inWholeMicroseconds / 1000.0).toString()

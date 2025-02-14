@@ -8,7 +8,7 @@ object Args {
 
     private val benchmarks = mutableMapOf<String, Int>()
 
-    var versionInfo = ""
+    var versionInfo: String? = null
         private set
 
     private fun argToSet(arg: String): Set<String> = arg.substring(arg.indexOf('=') + 1)

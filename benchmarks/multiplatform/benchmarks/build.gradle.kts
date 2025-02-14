@@ -56,6 +56,8 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.runtime)
                 implementation(compose.components.resources)
+                implementation("org.jetbrains.kotlinx:kotlinx-io-core:0.6.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
             }
         }
 
