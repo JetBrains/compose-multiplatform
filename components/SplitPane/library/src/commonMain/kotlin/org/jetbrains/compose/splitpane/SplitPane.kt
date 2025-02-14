@@ -11,7 +11,7 @@ internal data class MinimalSizes(
 )
 
 /**
- * Pane that place it parts **vertically** from top to bottom and allows to change items **heights**.
+ * Pane that places it parts **vertically** from top to bottom and allows to change items' **heights**.
  * The [content] block defines DSL which allow you to configure top ([SplitPaneScope.first]),
  * bottom ([SplitPaneScope.second]).
  *
@@ -41,7 +41,7 @@ fun VerticalSplitPane(
 }
 
 /**
- * Pane that place it parts **horizontally** from left to right and allows to change items **width**.
+ * Pane that places it parts **horizontally** from left to right and allows to change items' **width**.
  * The [content] block defines DSL which allow you to configure left ([SplitPaneScope.first]),
  * right ([SplitPaneScope.second]) parts of split pane.
  *
@@ -74,7 +74,7 @@ fun HorizontalSplitPane(
 /**
  * Internal implementation of default splitter
  *
- * @param isHorizontal describes is it horizontal or vertical split pane
+ * @param isHorizontal describes whether it is a horizontal or vertical split pane
  * @param splitPaneState the state object to be used to control or observe the split pane state
  */
 @OptIn(ExperimentalSplitPaneApi::class)
