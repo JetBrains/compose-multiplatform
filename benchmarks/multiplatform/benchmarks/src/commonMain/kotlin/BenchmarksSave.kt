@@ -9,6 +9,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
 import kotlinx.datetime.format.byUnicodePattern
 import kotlinx.datetime.toLocalDateTime
+import kotlinx.io.IOException
 import kotlinx.io.RawSink
 import kotlinx.io.RawSource
 import kotlinx.io.buffered
@@ -35,11 +36,12 @@ fun saveBenchmarkStatsOnDisk(name: String, stats: BenchmarkStats) {
 
         SystemFileSystem.createDirectories(path.parent!!)
         SystemFileSystem.sink(path).writeText(text)
-
         println("Results saved to ${SystemFileSystem.resolve(path)}")
         println()
+    } catch (_: IOException) {
+        // IOException "Read-only file system" is thrown on iOS without writing permissions
     } catch (_: UnsupportedOperationException) {
-        println("Benchmarks stats aren't saved, because it is not supported on this platform")
+        // UnsupportedOperationException is thrown in browser
     }
 }
 
