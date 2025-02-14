@@ -36,7 +36,7 @@ fun saveBenchmarkStatsOnDisk(name: String, stats: BenchmarkStats) {
         SystemFileSystem.createDirectories(path.parent!!)
         SystemFileSystem.sink(path).writeText(text)
 
-        println("Results saved to $path")
+        println("Results saved to ${SystemFileSystem.resolve(path)}")
         println()
     } catch (_: UnsupportedOperationException) {
         println("Benchmarks stats aren't saved, because it is not supported on this platform")
