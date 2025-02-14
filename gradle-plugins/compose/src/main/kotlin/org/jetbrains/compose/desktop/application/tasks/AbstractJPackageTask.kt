@@ -473,8 +473,12 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--win-upgrade-uuid", winUpgradeUuid)
                 }
                 OS.MacOS -> {
-                    if (jvmRuntimeInfo.majorVersion >= 18) {
-                        cliArg("--mac-dmg-content", macDmgContents)
+                    if (macDmgContents.isPresent) {
+                        if (jvmRuntimeInfo.majorVersion >= 18) {
+                            cliArg("--mac-dmg-content", macDmgContents)
+                        } else {
+                            logger.warn("Option --mac-dmg-content is only supported from jdk 18")
+                        }
                     }
                 }
             }
