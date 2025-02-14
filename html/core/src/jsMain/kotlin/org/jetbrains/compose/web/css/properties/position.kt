@@ -46,3 +46,14 @@ fun StyleScope.right(value: CSSAutoKeyword) {
     property("right", value)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/inset
+fun StyleScope.inset(vararg value: CSSLengthOrPercentageValue) {
+    // no Typed OM yet
+    property("inset", value.joinToString(" "))
+}
+
+// https://developer.mozilla.org/en-US/docs/Web/CSS/inset
+fun StyleScope.inset(vararg value: CSSAutoKeyword) {
+    // no Typed OM yet
+    property("inset", value.joinToString(" "))
+}
