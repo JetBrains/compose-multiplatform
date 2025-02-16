@@ -249,6 +249,7 @@ private fun getChunkFileSpec(
         chunkFile.addAnnotation(
             AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
                 .addMember("org.jetbrains.compose.resources.InternalResourceApi::class")
+                .addMember("org.jetbrains.compose.resources.ExperimentalResourceApi::class")
                 .build()
         )
 
@@ -355,6 +356,7 @@ internal fun getActualResourceCollectorsFileSpec(
     file.addAnnotation(
         AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
             .addMember("org.jetbrains.compose.resources.InternalResourceApi::class")
+            .addMember("org.jetbrains.compose.resources.ExperimentalResourceApi::class")
             .build()
     )
 
