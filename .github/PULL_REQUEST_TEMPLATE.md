@@ -28,14 +28,14 @@ Possible sections:
 
 Possible subsections:
 - Multiple Platforms     // any module, 2 or more platform changes
-- iOS                    // any module, iOS only changes
-- Desktop                // any module, Desktop only changes
-- Web                    // any module, Web only changes
-- Android                // any module, Android only changes
-- Resources              // specific module, prefer using instead of the general ones
-- Gradle Plugin          // specific module, prefer using instead of the general ones
-- Lifecycle              // specific module, prefer using instead of the general ones
-- Navigation             // specific module, prefer using instead of the general ones
+- iOS                    // any module, iOS-only changes
+- Desktop                // any module, Desktop-only changes
+- Web                    // any module, Web-only changes
+- Android                // any module, Android-only changes
+- Resources              // specific module, prefer using instead of the platform one
+- Gradle Plugin          // specific module, prefer using instead of the platform one
+- Lifecycle              // specific module, prefer using instead of the platform one
+- Navigation             // specific module, prefer using instead of the platform one
 -->
 ### Section - Subsection
 - Describe a change for adding it to https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
