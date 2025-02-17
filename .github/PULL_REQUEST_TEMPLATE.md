@@ -39,7 +39,7 @@ Possible subsections:
 -->
 ### Section - Subsection
 - Describe a change for adding it to https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
-- _(prerelease fix)_ Fix some bug that introduced in a prerelease version (alpha/beta). It will be included in a dev/beta changelog, but excluded from a stable changelog
+- _(prerelease fix)_ Fix some bug that introduced in a prerelease version (alpha/beta). It will be included in a alpha/beta changelog, but excluded from a stable changelog
 
 ### Section - Subsection
 - Describe another change if needed
