@@ -21,7 +21,7 @@ Or enumerate sections, subsections and all changes.
 
 Possible sections:
 - Highlights             // new major features that need to be highlighted
-- Known Issues           // issues in the current release that has workaround or/and will be fixed
+- Known Issues           // issues that has workaround and will be fixed
 - Migration Notes        // deprecations, experimental removals, minimal versions increases, behavior changes, backward compatibility breaking changes
 - Features               // new minor features. new API, behavior improvements
 - Fixes                  // bug fixes
