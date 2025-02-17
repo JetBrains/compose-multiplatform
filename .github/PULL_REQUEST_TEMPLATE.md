@@ -27,19 +27,19 @@ Possible sections:
 - Fixes                  // bug fixes
 
 Possible subsections:
-- Multiple Platforms     // Compose only
-- iOS                    // Compose only
-- Desktop                // Compose only
-- Web                    // Compose only
-- Android                // Compose only
-- Resources
-- Gradle Plugin
-- Lifecycle
-- Navigation
+- Multiple Platforms     // any module, 2 or more platform changes
+- iOS                    // any module, iOS only changes
+- Desktop                // any module, Desktop only changes
+- Web                    // any module, Web only changes
+- Android                // any module, Android only changes
+- Resources              // specific module, prefer using instead of the general ones
+- Gradle Plugin          // specific module, prefer using instead of the general ones
+- Lifecycle              // specific module, prefer using instead of the general ones
+- Navigation             // specific module, prefer using instead of the general ones
 -->
 ### Section - Subsection
 - Describe a change for adding it to https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
-- _(prerelease fix)_ Fix some bug that introduced in a prerelease version (dev/beta). It will be included in a dev/beta changelog, but excluded from a stable changelog
+- _(prerelease fix)_ Fix some bug that introduced in a prerelease version (alpha/beta). It will be included in a dev/beta changelog, but excluded from a stable changelog
 
 ### Section - Subsection
 - Describe another change if needed
