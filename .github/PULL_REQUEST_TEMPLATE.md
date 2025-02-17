@@ -22,7 +22,7 @@ Or enumerate sections, subsections and all changes.
 Possible sections:
 - Highlights             // major features
 - Known Issues           // issues planned to be fixed, with possible workarounds
-- Migration Notes        // deprecations, experimental removals, minimal versions increases, behavior changes, compatibility breaking changes
+- Migration Notes        // deprecations, removals, compatibility changes
 - Features               // minor features
 - Fixes                  // bug fixes
 
