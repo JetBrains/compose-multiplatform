@@ -20,20 +20,22 @@ If we definitely shouldn't add Release Notes, add only N/A.
 Or enumerate sections, subsections and all changes.
 
 Possible sections:
-- Highlights
-- Known Issues
-- Breaking Changes
-- Features
-- Fixes
+- Highlights             // new major features that need to be highlighted
+- Known Issues           // issues in the current release that has workaround or/and will be fixed
+- Migration Notes        // deprecations, experimental removals, minimal versions increases, behavior changes, backward compatibility breaking changes
+- Features               // new minor features. new API, behavior improvements
+- Fixes                  // bug fixes
 
 Possible subsections:
-- Multiple Platforms
-- iOS
-- Desktop
-- Web
-- Android
+- Multiple Platforms     // Compose only
+- iOS                    // Compose only
+- Desktop                // Compose only
+- Web                    // Compose only
+- Android                // Compose only
 - Resources
 - Gradle Plugin
+- Lifecycle
+- Navigation
 -->
 ### Section - Subsection
 - Describe a change for adding it to https://github.com/JetBrains/compose-multiplatform/blob/master/CHANGELOG.md
