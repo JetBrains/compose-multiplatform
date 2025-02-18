@@ -22,9 +22,10 @@ Or enumerate sections, subsections and all changes.
 Possible sections:
 - Highlights             // major features
 - Known Issues           // issues planned to be fixed, with possible workarounds
-- Migration Notes        // deprecations, removals, minimal version increases, compatibility changes
+- Breaking Changes       // incompatible changes without deprecation cycle
+- Migration Notes        // deprecations, removals, minimal version increases, defined behavior changes
 - Features               // minor features
-- Fixes                  // bug fixes
+- Fixes                  // bug fixes, undefined behavior changes
 
 Possible subsections:
 - Multiple Platforms     // any module, 2 or more platform changes
