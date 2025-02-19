@@ -59,6 +59,7 @@ import kotlin.system.exitProcess
 val standardSections = listOf(
     "Highlights",
     "Known Issues",
+    "Breaking Changes",
     "Migration Notes",
     "Features",
     "Fixes",
