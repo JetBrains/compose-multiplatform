@@ -137,12 +137,19 @@ configurations.all {
     }
 }
 
+
+val isWasmBuildForJetstream3 = project.hasProperty("wasm.jetstream3")
 tasks.withType<D8Exec>().configureEach {
     doFirst {
-        val file = rootProject.layout.buildDirectory.file(
-            "js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin/compose-benchmarks-benchmarks-wasm-js.mjs"
-        ).get().asFile
+        val distributionDir = rootProject.layout.buildDirectory.dir(
+            "js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin/"
+        )
+        val file = distributionDir.get().asFile.resolve("compose-benchmarks-benchmarks-wasm-js.mjs")
         file.appendText("\nawait import('./polyfills.mjs');\n")
+
+        val newText = "\nglobalThis.isWasmBuildForJetstream3 = $isWasmBuildForJetstream3;\n" +
+                "\nglobalThis.isD8 = true;\n" + file.readText()
+        file.writeText(newText)
 
         // Use a special skiko mjs file for d8:
         val updText = file.readText()

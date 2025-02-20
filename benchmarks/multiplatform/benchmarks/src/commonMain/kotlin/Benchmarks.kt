@@ -261,6 +261,15 @@ suspend fun runBenchmarks(
     println()
     runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext) { AnimatedVisibility() }
     runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext) { LazyGrid() }
+    runBenchmark("LazyGrid-ItemLaunchedEffect", width, height, targetFps, 1000, graphicsContext) {
+        LazyGrid(smoothScroll = false, withLaunchedEffectInItem = true)
+    }
+    runBenchmark("LazyGrid-SmoothScroll", width, height, targetFps, 1000, graphicsContext) {
+        LazyGrid(smoothScroll = true)
+    }
+    runBenchmark("LazyGrid-SmoothScroll-ItemLaunchedEffect", width, height, targetFps, 1000, graphicsContext) {
+        LazyGrid(smoothScroll = true, withLaunchedEffectInItem = true)
+    }
     runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext) { NYContent(width, height) }
     runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel() }
     runBenchmark("Example1", width, height, targetFps, 1000, graphicsContext) { Example1() }
