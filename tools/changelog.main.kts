@@ -60,6 +60,7 @@ val standardSections = listOf(
     "Highlights",
     "Known Issues",
     "Breaking Changes",
+    "Migration Notes",
     "Features",
     "Fixes",
 )
