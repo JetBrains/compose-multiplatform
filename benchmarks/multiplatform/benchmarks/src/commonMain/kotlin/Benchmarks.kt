@@ -149,7 +149,15 @@ suspend fun runBenchmark(
 ) {
     if (Args.isBenchmarkEnabled(name)) {
         println("$name:")
-        val stats = measureComposable(warmupCount, Args.getBenchmarkProblemSize(name, frameCount), width, height, targetFps, graphicsContext, content).generateStats()
+        val stats = measureComposable(
+            warmupCount = warmupCount,
+            frameCount = Args.getBenchmarkProblemSize(name, frameCount),
+            width = width,
+            height = height,
+            targetFps = targetFps,
+            graphicsContext = graphicsContext,
+            content = content
+        ).generateStats()
         stats.prettyPrint()
     }
 }
@@ -165,6 +173,15 @@ suspend fun runBenchmarks(
     println()
     runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext) { AnimatedVisibility() }
     runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext) { LazyGrid() }
+    runBenchmark("LazyGrid-ItemLaunchedEffect", width, height, targetFps, 1000, graphicsContext) {
+        LazyGrid(smoothScroll = false, withLaunchedEffectInItem = true)
+    }
+    runBenchmark("LazyGrid-SmoothScroll", width, height, targetFps, 1000, graphicsContext) {
+        LazyGrid(smoothScroll = true)
+    }
+    runBenchmark("LazyGrid-SmoothScroll-ItemLaunchedEffect", width, height, targetFps, 1000, graphicsContext) {
+        LazyGrid(smoothScroll = true, withLaunchedEffectInItem = true)
+    }
     runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext) { NYContent(width, height) }
     runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel()}
     runBenchmark("Example1", width, height, targetFps, 1000, graphicsContext) { Example1() }
