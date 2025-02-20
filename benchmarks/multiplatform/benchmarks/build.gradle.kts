@@ -113,7 +113,7 @@ configurations.all {
 
         if (
             group.startsWith(groupPrefix)) {
-            useVersion("25.2.5-SNAPSHOT")
+            useVersion("25.2.19-SNAPSHOT")
         }
     }
 }
@@ -124,6 +124,11 @@ tasks.withType<D8Exec>().configureEach {
             "js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin/compose-benchmarks-benchmarks-wasm-js.mjs"
         ).get().asFile
         file.appendText("\nawait import('./polyfills.mjs');\n")
+
+        // Use a special skiko mjs file for d8:
+        val updText = file.readText()
+            .replace("from './skiko.mjs';", "from './skikod8.mjs';")
+        file.writeText(updText)
     }
 }
 
