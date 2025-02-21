@@ -29,6 +29,9 @@ class PreviewStateService : Disposable {
     private val configurePreviewTaskNameCache =
         ConfigurePreviewTaskNameCache(ConfigurePreviewTaskNameProviderImpl())
 
+    var lastPreviewLocation: PreviewLocation? = null
+        private set
+
     init {
         val projectRefreshListener = ConfigurePreviewTaskNameCacheInvalidator(configurePreviewTaskNameCache)
         ExternalSystemProgressNotificationManager.getInstance()
@@ -60,7 +63,8 @@ class PreviewStateService : Disposable {
         previewListener.onNewBuildRequest()
     }
 
-    internal fun buildFinished(success: Boolean) {
+    internal fun buildFinished(previewLocation: PreviewLocation, success: Boolean) {
+        lastPreviewLocation = previewLocation
         previewListener.onFinishedBuild(success)
     }
 }
