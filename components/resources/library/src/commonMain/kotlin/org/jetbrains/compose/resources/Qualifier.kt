@@ -2,7 +2,7 @@ package org.jetbrains.compose.resources
 
 interface Qualifier
 
-@InternalResourceApi
+@ExperimentalResourceApi
 class LanguageQualifier(
     val language: String
 ) : Qualifier {
@@ -24,7 +24,7 @@ class LanguageQualifier(
     }
 }
 
-@InternalResourceApi
+@ExperimentalResourceApi
 class RegionQualifier(
     val region: String
 ) : Qualifier {
@@ -46,7 +46,7 @@ class RegionQualifier(
     }
 }
 
-@InternalResourceApi
+@ExperimentalResourceApi
 enum class ThemeQualifier : Qualifier {
     LIGHT,
     DARK;
@@ -58,7 +58,7 @@ enum class ThemeQualifier : Qualifier {
 }
 
 //https://developer.android.com/guide/topics/resources/providing-resources
-@InternalResourceApi
+@ExperimentalResourceApi
 enum class DensityQualifier(val dpi: Int) : Qualifier {
     LDPI(120),
     MDPI(160),
