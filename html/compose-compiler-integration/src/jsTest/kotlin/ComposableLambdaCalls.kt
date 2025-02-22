@@ -25,7 +25,7 @@ class ComposableLambdaCalls {
             }
         }
 
-        assertEquals("<div>SomeText</div>", document.body!!.firstElementChild!!.outerHTML)
+        assertEquals("<div>SomeText</div>", document.body!!.lastElementChild!!.outerHTML)
     }
 
     @Test
@@ -36,7 +36,7 @@ class ComposableLambdaCalls {
             }
         }
 
-        assertEquals("<div>Text1</div>", document.body!!.firstElementChild!!.outerHTML)
+        assertEquals("<div>Text1</div>", document.body!!.lastElementChild!!.outerHTML)
     }
 
     @Test
@@ -51,7 +51,7 @@ class ComposableLambdaCalls {
             }
         }
 
-        assertEquals("<div>TextA</div>", document.body!!.firstElementChild!!.outerHTML)
+        assertEquals("<div>TextA</div>", document.body!!.lastElementChild!!.outerHTML)
     }
 
     @Test
@@ -64,7 +64,7 @@ class ComposableLambdaCalls {
             }
         }
 
-        assertEquals("<div></div>", document.body!!.firstElementChild!!.outerHTML)
+        assertEquals("<div></div>", document.body!!.lastElementChild!!.outerHTML)
     }
 
     @Test
@@ -84,7 +84,7 @@ class ComposableLambdaCalls {
             }
         }
 
-        assertEquals("<div></div>", document.body!!.firstElementChild!!.outerHTML)
+        assertEquals("<div></div>", document.body!!.lastElementChild!!.outerHTML)
         assertEquals(false, someIntInvoked, message = "someInt() should never be invoked as `l` is null")
     }
 
@@ -107,7 +107,7 @@ class ComposableLambdaCalls {
             }
         }
 
-        assertEquals("<div>Text10</div>", document.body!!.firstElementChild!!.outerHTML)
+        assertEquals("<div>Text10</div>", document.body!!.lastElementChild!!.outerHTML)
         assertEquals(true, someIntInvoked)
     }
 
@@ -123,7 +123,7 @@ class ComposableLambdaCalls {
             }
         }
 
-        assertEquals("<div>Text-SomeText</div>", document.body!!.firstElementChild!!.outerHTML)
+        assertEquals("<div>Text-SomeText</div>", document.body!!.lastElementChild!!.outerHTML)
     }
 
     @Test
@@ -136,6 +136,6 @@ class ComposableLambdaCalls {
             }
         }
 
-        assertEquals("<div>SuperText</div>", document.body!!.firstElementChild!!.outerHTML)
+        assertEquals("<div>SuperText</div>", document.body!!.lastElementChild!!.outerHTML)
     }
 }
