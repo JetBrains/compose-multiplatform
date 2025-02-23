@@ -16,7 +16,7 @@ import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.withIndent
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import java.nio.file.Path
-import java.util.*
+import java.util.TreeMap
 import kotlin.io.path.invariantSeparatorsPathString
 
 internal enum class ResourceType(val typeName: String, val accessorName: String) {
@@ -129,19 +129,19 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
 
 internal fun getResFileSpec(
     packageName: String,
-    fileName: String,
+    className: String,
     moduleDir: String,
-    isPublic: Boolean
+    isPublic: Boolean,
 ): FileSpec {
     val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
-    return FileSpec.builder(packageName, fileName).also { file ->
+    return FileSpec.builder(packageName, className).also { file ->
         file.addAnnotation(
             AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
                 .addMember("org.jetbrains.compose.resources.InternalResourceApi::class")
                 .addMember("org.jetbrains.compose.resources.ExperimentalResourceApi::class")
                 .build()
         )
-        file.addType(TypeSpec.objectBuilder("Res").also { resObject ->
+        file.addType(TypeSpec.objectBuilder(className).also { resObject ->
             resObject.addModifiers(resModifier)
 
             //readFileBytes
@@ -209,7 +209,8 @@ internal fun getAccessorsSpecs(
     packageName: String,
     sourceSetName: String,
     moduleDir: String,
-    isPublic: Boolean
+    resClassName: String,
+    isPublic: Boolean,
 ): List<FileSpec> {
     val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
     val files = mutableListOf<FileSpec>()
@@ -226,6 +227,7 @@ internal fun getAccessorsSpecs(
                     sourceSetName.uppercaseFirstChar() + type.accessorName.uppercaseFirstChar() + index,
                     packageName,
                     moduleDir,
+                    resClassName,
                     resModifier,
                     idToResources.subMap(ids.first(), true, ids.last(), true)
                 )
@@ -242,8 +244,9 @@ private fun getChunkFileSpec(
     chunkClassName: String,
     packageName: String,
     moduleDir: String,
+    resClassName: String,
     resModifier: KModifier,
-    idToResources: Map<String, List<ResourceItem>>
+    idToResources: Map<String, List<ResourceItem>>,
 ): FileSpec {
     return FileSpec.builder(packageName, fileName).also { chunkFile ->
         chunkFile.addAnnotation(
@@ -282,7 +285,7 @@ private fun getChunkFileSpec(
 
         idToResources.forEach { (resName, items) ->
             val accessor = PropertySpec.builder(resName, type.getClassName(), resModifier)
-                .receiver(ClassName(packageName, "Res", type.accessorName))
+                .receiver(ClassName(packageName, resClassName, type.accessorName))
                 .getter(FunSpec.getterBuilder().addStatement("return $chunkClassName.%N", resName).build())
                 .build()
             chunkFile.addProperty(accessor)
@@ -321,7 +324,8 @@ private fun getChunkFileSpec(
 internal fun getExpectResourceCollectorsFileSpec(
     packageName: String,
     fileName: String,
-    isPublic: Boolean
+    resClassName: String,
+    isPublic: Boolean,
 ): FileSpec {
     val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
     return FileSpec.builder(packageName, fileName).also { file ->
@@ -336,7 +340,7 @@ internal fun getExpectResourceCollectorsFileSpec(
                         resModifier
                     )
                     .addAnnotation(experimentalAnnotation)
-                    .receiver(ClassName(packageName, "Res"))
+                    .receiver(ClassName(packageName, resClassName))
                     .build()
             )
         }
@@ -346,9 +350,10 @@ internal fun getExpectResourceCollectorsFileSpec(
 internal fun getActualResourceCollectorsFileSpec(
     packageName: String,
     fileName: String,
+    resClassName: String,
     isPublic: Boolean,
     useActualModifier: Boolean, //e.g. java only project doesn't need actual modifiers
-    typeToCollectorFunctions: Map<ResourceType, List<String>>
+    typeToCollectorFunctions: Map<ResourceType, List<String>>,
 ): FileSpec = FileSpec.builder(packageName, fileName).also { file ->
     val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
 
@@ -384,7 +389,7 @@ internal fun getActualResourceCollectorsFileSpec(
                 mods
             )
             .addAnnotation(experimentalAnnotation)
-            .receiver(ClassName(packageName, "Res"))
+            .receiver(ClassName(packageName, resClassName))
             .delegate(initBlock)
             .build()
         file.addProperty(property)
