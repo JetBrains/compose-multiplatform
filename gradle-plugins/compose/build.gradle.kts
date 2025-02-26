@@ -39,7 +39,7 @@ sourceSets.main.configure {
     java.srcDir(buildConfig.flatMap { it.generatedOutputDir })
 }
 
-val embeddedDependencies by configurations.creating {
+val embeddedDependencies: Configuration by configurations.creating {
     isTransitive = false
 }
 
@@ -75,22 +75,22 @@ dependencies {
 
 val packagesToRelocate = listOf("de.undercouch", "com.squareup.kotlinpoet")
 
-val shadow = tasks.named<ShadowJar>("shadowJar") {
+val shadowJar = tasks.named<ShadowJar>("shadowJar") {
     for (packageToRelocate in packagesToRelocate) {
         relocate(packageToRelocate, "org.jetbrains.compose.internal.$packageToRelocate")
     }
-    archiveBaseName.set("shadow")
-    archiveClassifier.set("")
-    archiveVersion.set("")
+    archiveBaseName = "shadow"
+    archiveClassifier = ""
+    archiveVersion = ""
     configurations = listOf(embeddedDependencies)
     exclude("META-INF/gradle-plugins/de.undercouch.download.properties")
     exclude("META-INF/versions/**")
 }
 
 val jar = tasks.named<Jar>("jar") {
-    dependsOn(shadow)
-    from(zipTree(shadow.get().archiveFile))
-    this.duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    dependsOn(shadowJar)
+    from(zipTree(shadowJar.get().archiveFile))
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 val supportedGradleVersions = project.propertyList("compose.tests.gradle.versions")
@@ -150,7 +150,6 @@ for (jdkVersion in jdkVersionsForTests) {
     }
     val unpackJdkTask = tasks.register("unpackJdk$jdkVersion", Copy::class) {
         dependsOn(downloadJdkTask)
-        val archive = archive
         val archiveTree = when {
             archive.name.endsWith(".tar.gz") -> tarTree(archive)
             archive.name.endsWith(".zip") -> zipTree(archive)
