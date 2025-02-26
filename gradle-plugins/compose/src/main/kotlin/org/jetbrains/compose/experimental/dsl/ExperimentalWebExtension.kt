@@ -8,27 +8,24 @@ package org.jetbrains.compose.experimental.dsl
 import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
+import org.jetbrains.compose.internal.DEPRECATED_EXPERIMENTAL_MESSAGE_FOR_WEB_IN_CONFIGURATION
 import javax.inject.Inject
 
 @Deprecated(
-    message = "Starting from 1.6.10, Compose for Web goes to Alpha. Experimental configuration is not needed anymore.",
+    message = DEPRECATED_EXPERIMENTAL_MESSAGE_FOR_WEB_IN_CONFIGURATION,
 )
 abstract class ExperimentalWebExtension @Inject constructor(private val objectFactory: ObjectFactory) : ExtensionAware {
-    internal var _isApplicationInitialized = false
-        private set
-
+    @Suppress("DEPRECATION")
     @Deprecated(
-        message = "Starting from 1.6.10, Compose for Web goes to Alpha. Experimental configuration is not needed anymore.",
+        message = DEPRECATED_EXPERIMENTAL_MESSAGE_FOR_WEB_IN_CONFIGURATION,
     )
     val application: ExperimentalWebApplication by lazy {
-        _isApplicationInitialized = true
         objectFactory.newInstance(ExperimentalWebApplication::class.java, "main")
     }
 
+    @Suppress("DEPRECATION")
     @Deprecated(
-        message = "Starting from 1.6.10, Compose for Web goes to Alpha. Experimental configuration is not needed anymore.",
+        message = DEPRECATED_EXPERIMENTAL_MESSAGE_FOR_WEB_IN_CONFIGURATION,
     )
-    fun application(fn: Action<ExperimentalWebApplication>) {
-        fn.execute(application)
-    }
+    fun application(fn: Action<ExperimentalWebApplication>): Unit = fn.execute(application)
 }
