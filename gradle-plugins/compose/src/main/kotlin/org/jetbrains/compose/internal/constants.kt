@@ -12,3 +12,8 @@ internal const val KOTLIN_JS_PLUGIN_ID = "org.jetbrains.kotlin.js"
 internal const val COMPOSE_PLUGIN_ID = "org.jetbrains.compose"
 
 internal const val IDEA_IMPORT_TASK_NAME = "prepareKotlinIdeaImport"
+
+internal const val DEPRECATED_EXPERIMENTAL_MESSAGE_FOR_WEB: String =
+    "Starting from 1.6.10, Compose for Web goes to Alpha."
+internal const val DEPRECATED_EXPERIMENTAL_MESSAGE_FOR_WEB_IN_CONFIGURATION: String =
+    DEPRECATED_EXPERIMENTAL_MESSAGE_FOR_WEB + "Experimental configuration is not needed anymore."
