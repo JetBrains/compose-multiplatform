@@ -78,6 +78,7 @@ abstract class ComposePlugin : Plugin<Project> {
         val runtime = composeDependency("org.jetbrains.compose.runtime:runtime")
         val runtimeSaveable = composeDependency("org.jetbrains.compose.runtime:runtime-saveable")
         val ui = composeDependency("org.jetbrains.compose.ui:ui")
+        val uiBackHandler = composeDependency("org.jetbrains.compose.ui:ui-backhandler")
         val uiTest = composeDependency("org.jetbrains.compose.ui:ui-test")
         val uiTooling = composeDependency("org.jetbrains.compose.ui:ui-tooling")
         val uiUtil = composeDependency("org.jetbrains.compose.ui:ui-util")
