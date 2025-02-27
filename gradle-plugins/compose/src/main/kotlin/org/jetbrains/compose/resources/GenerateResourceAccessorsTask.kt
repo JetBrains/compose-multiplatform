@@ -19,6 +19,9 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     abstract val packageName: Property<String>
 
     @get:Input
+    abstract val resClassName: Property<String>
+
+    @get:Input
     abstract val sourceSetName: Property<String>
 
     @get:Input
@@ -68,9 +71,10 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
 
         val pkgName = packageName.get()
         val moduleDirectory = packagingDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
+        val resClassName = resClassName.get()
         val isPublic = makeAccessorsPublic.get()
         getAccessorsSpecs(
-            resources, pkgName, sourceSet, moduleDirectory, isPublic
+            resources, pkgName, sourceSet, moduleDirectory, resClassName, isPublic
         ).forEach { it.writeTo(kotlinDir) }
     }
 
