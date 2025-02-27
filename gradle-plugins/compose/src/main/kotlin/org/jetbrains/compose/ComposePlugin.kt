@@ -86,6 +86,9 @@ abstract class ComposePlugin : Plugin<Project> {
         val uiUtil = composeDependency("org.jetbrains.compose.ui:ui-util")
 
         @ExperimentalComposeLibrary
+        val uiBackHandler = composeDependency("org.jetbrains.compose.ui:ui-backhandler")
+
+        @ExperimentalComposeLibrary
         val uiTest = composeDependency("org.jetbrains.compose.ui:ui-test")
 
         @Deprecated("Use compose.html", replaceWith = ReplaceWith("html"))
