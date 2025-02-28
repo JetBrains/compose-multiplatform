@@ -1,5 +1,6 @@
 package org.jetbrains.compose.resources
 
+import org.jetbrains.compose.resources.internal.IgnoreWasmTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -147,6 +148,7 @@ class StringFormatTest {
     }
 
     @Test
+    @IgnoreWasmTest // https://youtrack.jetbrains.com/issue/KT-69014, wasm throws RuntimeError instead of IndexOutOfBounds
     fun `replaceWithArgs throws exception for unmatched placeholders`() {
         val template = "Hello %1\$s, your rank is %3\$s"
         val args = listOf("Alice", "1")
