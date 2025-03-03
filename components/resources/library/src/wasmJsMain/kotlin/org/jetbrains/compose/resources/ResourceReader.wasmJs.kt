@@ -28,7 +28,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader {
     return DefaultWasmResourceReader
 }
 
-internal val DefaultWasmResourceReader = object : ResourceReader {
+private val DefaultWasmResourceReader = object : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         return readAsBlob(path).asByteArray()
     }
@@ -72,43 +72,45 @@ internal val DefaultWasmResourceReader = object : ResourceReader {
 }
 
 // It uses a synchronous XmlHttpRequest (blocking!!!)
-internal val TestWasmResourceReader = object : ResourceReader {
-    override suspend fun read(path: String): ByteArray {
-        return readByteArray(path)
-    }
-
-    override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
-        return readByteArray(path).sliceArray(offset.toInt() until (offset + size).toInt())
-    }
-
-    override fun getUri(path: String): String {
-        val location = window.location
-        return getResourceUrl(location.origin, location.pathname, path)
-    }
-
-    private fun readByteArray(path: String): ByteArray {
-        val resPath = WebResourcesConfiguration.getResourcePath(path)
-        val request = XMLHttpRequest()
-        request.open("GET", resPath, false)
-        request.overrideMimeType("text/plain; charset=x-user-defined")
-        request.send()
-        if (request.status == 200.toShort()) {
-            return requestResponseAsByteArray(request).asByteArray()
+private val TestWasmResourceReader by lazy {
+    object : ResourceReader {
+        override suspend fun read(path: String): ByteArray {
+            return readByteArray(path)
         }
-        println("Request status is not 200 - $resPath, status: ${request.status}")
-        throw MissingResourceException("$resPath")
-    }
 
-    private fun Int8Array.asByteArray(): ByteArray {
-        val array = this
-        val size = array.length
+        override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
+            return readByteArray(path).sliceArray(offset.toInt() until (offset + size).toInt())
+        }
 
-        @OptIn(UnsafeWasmMemoryApi::class)
-        return withScopedMemoryAllocator { allocator ->
-            val memBuffer = allocator.allocate(size)
-            val dstAddress = memBuffer.address.toInt()
-            jsExportInt8ArrayToWasm(array, size, dstAddress)
-            ByteArray(size) { i -> (memBuffer + i).loadByte() }
+        override fun getUri(path: String): String {
+            val location = window.location
+            return getResourceUrl(location.origin, location.pathname, path)
+        }
+
+        private fun readByteArray(path: String): ByteArray {
+            val resPath = WebResourcesConfiguration.getResourcePath(path)
+            val request = XMLHttpRequest()
+            request.open("GET", resPath, false)
+            request.overrideMimeType("text/plain; charset=x-user-defined")
+            request.send()
+            if (request.status == 200.toShort()) {
+                return requestResponseAsByteArray(request).asByteArray()
+            }
+            println("Request status is not 200 - $resPath, status: ${request.status}")
+            throw MissingResourceException("$resPath")
+        }
+
+        private fun Int8Array.asByteArray(): ByteArray {
+            val array = this
+            val size = array.length
+
+            @OptIn(UnsafeWasmMemoryApi::class)
+            return withScopedMemoryAllocator { allocator ->
+                val memBuffer = allocator.allocate(size)
+                val dstAddress = memBuffer.address.toInt()
+                jsExportInt8ArrayToWasm(array, size, dstAddress)
+                ByteArray(size) { i -> (memBuffer + i).loadByte() }
+            }
         }
     }
 }
