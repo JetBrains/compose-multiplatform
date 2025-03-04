@@ -182,14 +182,14 @@ fun generateChangelog() {
 
             entries
                 .sortedBy { it.sectionOrder() }
-                .groupBy { it.sectionName() }
+                .groupBy { it.section }
                 .forEach { (section, sectionEntries) ->
                     appendLine("## $section")
                     appendLine()
 
                     sectionEntries
                         .sortedBy { it.subsectionOrder() }
-                        .groupBy { it.subsectionName() }
+                        .groupBy { it.subsection }
                         .forEach { (subsection, subsectionEntries) ->
                             appendLine("### $subsection")
                             appendLine()
@@ -218,24 +218,6 @@ fun generateChangelog() {
                     ---
                 """.trimIndent()
             )
-
-            appendLine()
-            appendLine()
-
-            val nonstandardSectionEntries = entries
-                .filter {
-                    it.section != null && it.subsection != null
-                            && it.section !in standardSections && it.subsection !in standardSubsections
-                }
-
-            if (nonstandardSectionEntries.isNotEmpty()) {
-                println()
-                println("WARNING! Changelog contains nonstandard sections. Please change them to the standard ones, or enhance the list in the PR template.")
-
-                for (entry in nonstandardSectionEntries) {
-                    println("${entry.section} - ${entry.subsection} in ${entry.link}")
-                }
-            }
         }
     }
 
@@ -351,7 +333,7 @@ fun GitHubPullEntry.extractReleaseNotes(): ReleaseNotes? {
             subsection = s.substringAfter("-", "").trim().normalizeSubsectionName().ifEmpty { null }
             isFirstLine = true
             shouldPadLines = false
-        } else if (section != null && line.isNotBlank()) {
+        } else if (section != null && subsection != null && line.isNotBlank()) {
             var lineFixed = line
 
             if (isFirstLine && !lineFixed.startsWith("-")) {
@@ -392,17 +374,6 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
 
     val shaToPull = pulls.associateBy { it.mergeCommitSha }
 
-    fun changelogEntriesFor(
-        pullRequest: GitHubPullEntry?
-    ): List<ChangelogEntry> {
-        return if (pullRequest != null) {
-            pullRequest.extractReleaseNotes()?.entries ?:
-                listOf(ChangelogEntry("- ${pullRequest.title}", null, null, pullRequest.number, pullRequest.htmlUrl))
-        } else {
-            listOf()
-        }
-    }
-
     class CommitsResult(val commits: List<GitHubCompareResponse.CommitEntry>, val mergeBaseSha: String)
 
     fun fetchCommits(firsCommitSha: String, lastCommitSha: String): CommitsResult {
@@ -419,7 +390,9 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
     val previous = fetchCommits(main.mergeBaseSha, firstCommit)
     val pullRequests = main.commits.mapNotNull { shaToPull[it.sha] }.toSet()
     val previousVersionPullRequests = previous.commits.mapNotNull { shaToPull[it.sha] }.toSet()
-    return (pullRequests - previousVersionPullRequests).flatMap { changelogEntriesFor(it) }
+    return (pullRequests - previousVersionPullRequests).flatMap {
+        it.extractReleaseNotes()?.entries ?: emptyList()
+    }
 }
 
 /**
@@ -491,16 +464,14 @@ sealed interface ReleaseNotes {
 
 data class ChangelogEntry(
     val message: String,
-    val section: String?,
-    val subsection: String?,
+    val section: String,
+    val subsection: String,
     val prNumber: Int,
     val link: String?,
 )
 
-fun ChangelogEntry.sectionOrder(): Int = section?.let(standardSections::indexOf) ?: standardSections.size
-fun ChangelogEntry.subsectionOrder(): Int = subsection?.let(standardSubsections::indexOf) ?: standardSubsections.size
-fun ChangelogEntry.sectionName(): String = section ?: "Unknown"
-fun ChangelogEntry.subsectionName(): String = subsection ?: "Unknown"
+fun ChangelogEntry.sectionOrder(): Int = section.let(standardSections::indexOf)
+fun ChangelogEntry.subsectionOrder(): Int = subsection.let(standardSubsections::indexOf)
 fun String.normalizeSectionName() = standardSections.find { it.lowercase() == this.lowercase() } ?: this
 fun String.normalizeSubsectionName() = standardSubsections.find { it.lowercase() == this.lowercase() } ?: this
 
