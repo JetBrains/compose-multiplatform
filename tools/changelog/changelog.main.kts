@@ -15,9 +15,11 @@
  *
  * Changelog entries are generated from reading Release Notes in GitHub PR's.
  *
- * ## Checking PRs
+ * ## Checking PR description in a file
+ * Not supposed to be called manually, used by GitHub workflow:
+ * https://github.com/JetBrains/compose-multiplatform/blob/master/tools/changelog/check-release-notes-github-action/action.yml)
  * ```
- * kotlin changelog.main.kts action=checkPr compose-multiplatform 5202
+ * kotlin changelog.main.kts action=checkPr prDescription.txt
  * ```
  *
  * compose-multiplatform - name of the GitHub repo
@@ -41,8 +43,10 @@
 
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import java.io.File
 import java.io.IOException
 import java.lang.ProcessBuilder.Redirect
+import java.lang.System.err
 import java.net.URL
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets.UTF_8
@@ -51,35 +55,9 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.system.exitProcess
 
-//region ========================================== CONSTANTS =========================================
-
-// Sections from the template https://github.com/JetBrains/compose-multiplatform/blob/master/.github/PULL_REQUEST_TEMPLATE.md?plain=1
-// Changelog should contain only these categories
-
-val standardSections = listOf(
-    "Highlights",
-    "Known Issues",
-    "Breaking Changes",
-    "Migration Notes",
-    "Features",
-    "Fixes",
-)
-
-val standardSubsections = listOf(
-    "Multiple Platforms",
-    "iOS",
-    "Desktop",
-    "Web",
-    "Android",
-    "Resources",
-    "Gradle Plugin",
-    "Lifecycle",
-    "Navigation",
-)
-
 val changelogFile = __FILE__.resolve("../../CHANGELOG.md").canonicalFile
-
-//endregion
+val prFormatFile = File("PR_FORMAT.md")
+val prFormatLink = "https://github.com/JetBrains/compose-multiplatform/blob/master/tools/changelog/PR_FORMAT.md"
 
 val argsKeyless = args
     .filter { !it.contains("=") }
@@ -89,9 +67,19 @@ val argsKeyToValue = args
     .associate { it.substringBefore("=") to it.substringAfter("=") }
 
 val token = argsKeyToValue["token"]
-if (token == null) {
-    println("To increase the rate limit, specify token (https://github.com/settings/tokens), adding token=yourtoken in the end")
-}
+
+// Parse sections from [PR_FORMAT.md]
+fun parseSections(title: String) = prFormatFile
+    .readText()
+    .substringAfter(title)
+    .substringAfter("```")
+    .substringBefore("```")
+    .split("\n")
+    .map { it.trim().removePrefix("-").substringBefore("#").substringBefore("\n").trim() }
+    .filter { it.isNotEmpty() }
+
+val standardSections = parseSections("### Sections")
+val standardSubsections = parseSections("### Subsections")
 
 println()
 
@@ -101,6 +89,10 @@ when (argsKeyToValue["action"]) {
 }
 
 fun generateChangelog() {
+    if (token == null) {
+        println("To increase the rate limit, specify token (https://github.com/settings/tokens), adding token=yourtoken in the end")
+    }
+
     val commitsArg = argsKeyless.getOrNull(0) ?: "HEAD"
 
     var previousVersionCommitArg: String?
@@ -253,54 +245,41 @@ fun generateChangelog() {
 }
 
 fun checkPr() {
-    val repo = argsKeyless.getOrNull(0) ?: error("Please specify PR number as the first argument")
-    val prNumber = argsKeyless.getOrNull(1) ?: error("Please specify PR number as the second argument")
-    val releaseNotes = pullRequest(repo, prNumber).extractReleaseNotes()
+    val filePath = argsKeyless.getOrNull(0) ?: error("Please specify a file that contains PR description as the first argument")
 
-    val commonDescription = """
-            Valid examples:
-            
-            ## Release Notes
-            ### Features - Desktop
-            - Added Drag&Drop support
-            - Fixed non-working Drag&Drop in dialogs
-            
-            ### Features - iOS
-            - Added Drag&Drop support
+    val body = File(filePath).readText()
+    val releaseNotes = extractReleaseNotes(body, 0, "https://github.com/JetBrains/compose-multiplatform/pull/0")
 
-            ## Release Notes
-            N/A
-            
-            Allowed sections: ${standardSections.joinToString(", ")}
-            Allowed subsections: ${standardSubsections.joinToString(", ")}
-    """.trimIndent()
+    val nonstandardSections = releaseNotes?.entries
+        .orEmpty()
+        .filter { it.section !in standardSections || it.subsection !in standardSubsections }
+        .map { "${it.section} - ${it.subsection}" }
+        .toSet()
 
-    val nonstandardSections = if (releaseNotes is ReleaseNotes.Specified) {
-        releaseNotes.entries
-            .filter { it.section !in standardSections || it.subsection !in standardSubsections }
-            .map { "${it.section} - ${it.subsection}" }
-            .toSet()
-    } else {
-        emptySet()
-    }
+    println()
 
     when {
-        releaseNotes == null -> {
-            System.err.println("""
-                    "## Release Notes" section is missing in the PR description
-                    
-                    
-                """.trimIndent() + commonDescription)
+        releaseNotes is ReleaseNotes.Specified && releaseNotes.entries.isEmpty() -> {
+            err.println("\"## Release Notes\" doesn't contain any items, or section isn't specified")
+            err.println()
+            err.println("See the format in $prFormatLink")
             exitProcess(1)
         }
-        nonstandardSections.isNotEmpty() -> {
-            System.err.println("""
-                    "## Release Notes" contains nonstandard sections:
-                    ${nonstandardSections.joinToString(", ")}
-                    
-                    
-                """.trimIndent() + commonDescription)
+        releaseNotes is ReleaseNotes.Specified && nonstandardSections.isNotEmpty() -> {
+            err.println("\"## Release Notes\" contains nonstandard sections:")
+            err.println(nonstandardSections.joinToString(", "))
+            err.println()
+            err.println("See possible sections in $prFormatLink#possible-sections")
             exitProcess(1)
+        }
+        releaseNotes == null -> {
+            err.println("\"## Release Notes\" section is missing in the PR description")
+            err.println()
+            err.println("See the format in $prFormatLink")
+            exitProcess(1)
+        }
+        else -> {
+            println("\"## Release Notes\" are correct")
         }
     }
 }
@@ -311,9 +290,9 @@ fun checkPr() {
 fun currentChangelogDate() = LocalDate.now().format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.ENGLISH))
 
 /**
- * Extract by format https://github.com/JetBrains/compose-multiplatform/blob/master/.github/PULL_REQUEST_TEMPLATE.md?plain=1
+ * Extract by format [PR_FORMAT.md]
  */
-fun GitHubPullEntry.extractReleaseNotes(): ReleaseNotes? {
+fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNotes? {
     fun String?.substringBetween(begin: String, end: String): String? {
         val after = this?.substringAfter(begin, "")?.ifBlank { null }
         return after?.substringBefore(end, "")?.ifBlank { null } ?: after
@@ -369,8 +348,8 @@ fun GitHubPullEntry.extractReleaseNotes(): ReleaseNotes? {
                     lineFixed,
                     section,
                     subsection,
-                    number,
-                    htmlUrl.takeIf { isTopLevel }
+                    prNumber,
+                    prLink.takeIf { isTopLevel }
                 )
             )
             isFirstLine = false
@@ -396,8 +375,10 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
         pullRequest: GitHubPullEntry?
     ): List<ChangelogEntry> {
         return if (pullRequest != null) {
-            pullRequest.extractReleaseNotes()?.entries ?:
-                listOf(ChangelogEntry("- ${pullRequest.title}", null, null, pullRequest.number, pullRequest.htmlUrl))
+            with(pullRequest) {
+                extractReleaseNotes(body, number, htmlUrl)?.entries ?:
+                    listOf(ChangelogEntry("- $title", null, null, number, htmlUrl))
+            }
         } else {
             listOf()
         }
