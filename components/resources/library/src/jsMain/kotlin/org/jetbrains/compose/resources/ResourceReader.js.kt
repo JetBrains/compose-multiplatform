@@ -14,7 +14,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader {
     return DefaultJsResourceReader
 }
 
-internal val DefaultJsResourceReader = object : ResourceReader {
+private val DefaultJsResourceReader = object : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         return readAsBlob(path).asByteArray()
     }
@@ -46,7 +46,7 @@ internal val DefaultJsResourceReader = object : ResourceReader {
 }
 
 // It uses a synchronous XmlHttpRequest (blocking!!!)
-internal val TestJsResourceReader = object : ResourceReader {
+private val TestJsResourceReader = object : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         return readByteArray(path)
     }
