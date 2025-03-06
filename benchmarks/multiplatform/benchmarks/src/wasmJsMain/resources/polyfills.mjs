@@ -26,15 +26,10 @@ class BlobPolyfill {
     }
 }
 
-globalThis.asyncReadBuffer = async (s) => {
-    return readbuffer(s);
-}
-
 globalThis.fetch = async (p) => {
     let data;
     try {
-        // data = await asyncReadBuffer("drawable/img.png");
-        data = readbuffer("drawable/img.png");
+        data = read("drawable/img.png", 'binary');
     } catch (err) {
         console.log('error', err);
     }

@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.internal.platform.wasm.BinaryenConfig.binaryenArgs
+import org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenRootPlugin.Companion.kotlinBinaryenExtension
 import org.jetbrains.kotlin.gradle.targets.js.d8.D8Exec
 import org.jetbrains.kotlin.gradle.targets.js.d8.D8Plugin.Companion.kotlinD8RootExtension
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
@@ -50,6 +52,8 @@ kotlin {
     wasmJs {
         binaries.executable()
         d8 {
+            // compilerOptions.freeCompilerArgs.add("-Xwasm-use-new-exception-proposal")
+            compilerOptions.freeCompilerArgs.add("-Xwasm-attach-js-exception")
             runTask {
                 d8Args.add("--abort-on-uncaught-exception")
 //                d8Args.add("--print-all-exceptions")
