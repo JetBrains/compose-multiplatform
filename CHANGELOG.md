@@ -1,3 +1,94 @@
+# 1.8.0-alpha04 (March 2025)
+
+_Changes since 1.8.0-alpha03_
+
+## Highlights
+
+### Desktop
+
+- Improved performance on Windows by replacing the native code compiler to Clang. See details in https://github.com/JetBrains/skiko/pull/1020#issuecomment-2649433785 [#1863](https://github.com/JetBrains/compose-multiplatform-core/pull/1863)
+  - DirectX rendering FPS is **17 % higher**
+  - Software rendering FPS is **73 % higher**
+  - Skiko binary size is reduced from **16.7 to 12.1 Mb on x64** and from **17.4 to 10.5 Mb on arm64**
+  - Note that the numbers are measured on one machine and also can differ between Compose 1.7 and Compose 1.8 (will be updated in the stable Release Notes)
+
+## Breaking Changes
+
+### Multiple Platforms
+
+- [Google Maven](https://maven.google.com/) now contains some artifacts for all Kotlin targets including Wasm and JS. Compose Multiplatform now depends on those artifacts and user projects might need to add `google()` repo to `repositories {...}` block if it is not there yet [#1819](https://github.com/JetBrains/compose-multiplatform-core/pull/1819)
+- Multiplatform lifecycle was migrated from a internal `core-bundle` module to the androidx SavedState. Libraries that use `org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-savedstate`  or `org.jetbrains.androidx.savedstate:savedstate` should migrate to the latest version [#1850](https://github.com/JetBrains/compose-multiplatform-core/pull/1850)
+- _(prerelease fix)_ Material3 is reverted from Jetpack Compose Material3 `1.4.0-alpha07` to `1.3.1` because 1.4.0 Stable will be released only after CMP 1.8.0. As a workaround to continue using the new API, replace:
+  ```
+  implementation(compose.material3)
+  ```
+  by:
+  ```
+  implementation("org.jetbrains.compose.material3:material3:1.8.0-alpha03")
+  ```
+  Jetpack Compose Material3 1.4.0 will be merged again sometime after the CMP 1.8.0 release [#1868](https://github.com/JetBrains/compose-multiplatform-core/pull/1868)
+
+## Features
+
+### iOS
+
+- Support new haptic feedback types [#1831](https://github.com/JetBrains/compose-multiplatform-core/pull/1831)
+- Support for focusable nodes when Full Keyboard Access is enabled on iOS [#1825](https://github.com/JetBrains/compose-multiplatform-core/pull/1825)
+- Floating cursor support for BasicTextField(TextFieldState) [#1598](https://github.com/JetBrains/compose-multiplatform-core/pull/1598)
+- Add support for Bold Text accessibility setting [#1846](https://github.com/JetBrains/compose-multiplatform-core/pull/1846)
+- Bhojpuri language support for VoiceOver [#1838](https://github.com/JetBrains/compose-multiplatform-core/pull/1838)
+- Add support for Reduce Motion accessibility setting [#1847](https://github.com/JetBrains/compose-multiplatform-core/pull/1847)
+- Default `androidx.navigation` transition animation on iOS is close as possible to the iOS back gesture [#1861](https://github.com/JetBrains/compose-multiplatform-core/pull/1861)
+- Support accessibility text input [#1875](https://github.com/JetBrains/compose-multiplatform-core/pull/1875)
+- Support text input for UI Tests [#1875](https://github.com/JetBrains/compose-multiplatform-core/pull/1875)
+- Accessibility: added ability to traverse nodes within a scrollable container [#1837](https://github.com/JetBrains/compose-multiplatform-core/pull/1837)
+
+## Fixes
+
+### Multiple Platforms
+
+- Fixed the output of `TextField(TextFieldState)` (aka `BasicTextField2`) transformations incorrectly leeching into the untransformed text itself, when input method is used (Chinese and other languages with multi-keystroke character input) [#1833](https://github.com/JetBrains/compose-multiplatform-core/pull/1833)
+- Fix possible `IllegalArgumentException: Object already closed` during `GraphicsLayer.record` [#1839](https://github.com/JetBrains/compose-multiplatform-core/pull/1839)
+- _(prerelease fix)_ Change an `Esc` button interception from `onPreviewKeyEvent` to `onKeyEvent` in the desktop `BackGestureDispatcher` implementation. It fixes problems when user's code handles the `Esc`-button [#1860](https://github.com/JetBrains/compose-multiplatform-core/pull/1860)
+- _(prerelease fix)_ Fix a problem when an `onBack` callback is updated but listener is not [#1860](https://github.com/JetBrains/compose-multiplatform-core/pull/1860)
+- _(prerelease fix)_ Fix memory leak in some cases of re-usage internal layout nodes [#1873](https://github.com/JetBrains/compose-multiplatform-core/pull/1873)
+- Compose runtime module now exposes its dependency on Kotlin Coroutines API (changed from `implementation()` to `api()`) [#1883](https://github.com/JetBrains/compose-multiplatform-core/pull/1883)
+- Correctly set `ScrollState.viewportSize` for (Basic)`TextField(TextFieldState)` [#1896](https://github.com/JetBrains/compose-multiplatform-core/pull/1896)
+
+### iOS
+
+- _(prerelease fix)_ Fixed issue where cross-directional scrolling could intercept and cancel each other [#1851](https://github.com/JetBrains/compose-multiplatform-core/pull/1851)
+- Fixed a bug where touches could be handled by back gesture and composable content at the same time [#1879](https://github.com/JetBrains/compose-multiplatform-core/pull/1879)
+
+### Desktop
+
+- _(prerelease fix)_ Fix "Could not resolve version conflict" in non-Gradle projects [#1872](https://github.com/JetBrains/compose-multiplatform-core/pull/1872)
+
+### Web
+
+- Mobile browsers: the virtual keyboard is shown when the TextField is clicked/focues [#1865](https://github.com/JetBrains/compose-multiplatform-core/pull/1865)
+- Fix text selection with mouse in TextField [#1876](https://github.com/JetBrains/compose-multiplatform-core/pull/1876)
+
+### Navigation
+
+- _(prerelease fix)_ Fix a desktop back navigation when Esc button clicked [#1890](https://github.com/JetBrains/compose-multiplatform-core/pull/1890)
+- _(prerelease fix)_ Fix an iOS back navigation after a swipe on disallowed edge [#1890](https://github.com/JetBrains/compose-multiplatform-core/pull/1890)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.8.0-alpha04`. Based on Jetpack Compose libraries:
+  - [Runtime 1.8.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.8.0-beta02)
+  - [UI 1.8.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.8.0-beta02)
+  - [Foundation 1.8.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.8.0-beta02)
+  - [Material 1.8.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.8.0-beta02)
+  - [Material3 1.3.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.1)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.0-alpha04`. Based on [Jetpack Lifecycle 2.9.0-alpha08](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.0-alpha08)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0-alpha14`. Based on [Jetpack Navigation 2.9.0-alpha07](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.0-alpha07)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.1.0-alpha04`. Based on [Jetpack Material3 Adaptive 1.1.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.1.0-beta01)
+
+---
+
 # 1.8.0-alpha03 (February 2025)
 
 _Changes since 1.8.0-alpha02_
