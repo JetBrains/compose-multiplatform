@@ -3,6 +3,7 @@ import kotlin.coroutines.suspendCoroutine
 import kotlin.js.Promise
 
 fun main(args: Array<String>) {
+    if (shouldSkipFunMain().toBoolean()) return
     println("Args = ${args.joinToString(separator = ", ")}")
     if (isSpecialJetstream3Build().toBoolean()) {
         val hardcodedArgs =
@@ -38,5 +39,32 @@ fun main(args: Array<String>) {
     }
 }
 
+@JsExport
+fun customLaunch(benchmarkName: String, frameCount: Int) {
+    val args = "benchmarks=$benchmarkName($frameCount)"
+    Args.parseArgs(arrayOf(args))
+    Args.enableModes(Mode.CPU)
+
+    val jsOne = 1.toJsNumber()
+
+    eventLoop = object : EventLoop {
+        override suspend fun runMicrotasks() {
+            suspendCoroutine { c ->
+                Promise.resolve(jsOne).then {
+                    c.resumeWith(Result.success(Unit))
+                    it
+                }
+            }
+        }
+    }
+
+    MainScope().launch {
+        runBenchmarks()
+    }
+}
+
 private fun isSpecialJetstream3Build(): JsBoolean =
     js("isWasmBuildForJetstream3 == true")
+
+private fun shouldSkipFunMain(): JsBoolean =
+    js("typeof skipFunMain !== 'undefined'")
