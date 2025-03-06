@@ -52,11 +52,11 @@ Will be includede in alpha/beta/rc changelog, excluded from stable.
 ### Sections
 <!-- This is parsed by changelog.main.kts -->
 ```
-- Highlights             # major features
+- Highlights             # major features, performance improvements
 - Known Issues           # issues planned to be fixed, with possible workarounds
 - Breaking Changes       # incompatible changes without deprecation cycle
 - Migration Notes        # deprecations, removals, minimal version increases, defined behavior changes
-- Features               # minor features
+- Features               # minor features, performance improvements
 - Fixes                  # bug fixes, undefined behavior changes
 ```
 
