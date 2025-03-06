@@ -117,7 +117,7 @@ configurations.all {
 
         if (
             group.startsWith(groupPrefix)) {
-            useVersion("25.2.19-SNAPSHOT")
+            useVersion("0.9.2")
         }
     }
 }
