@@ -269,7 +269,7 @@ fun checkPr() {
         }
         releaseNotes is ReleaseNotes.Specified && nonstandardSections.isNotEmpty() -> {
             err.println("""
-                "## Release Notes" contains nonstandard sections:
+                "## Release Notes" contains nonstandard section - subsection pairs:
                 ${nonstandardSections.joinToString(", ")}
             
                 Allowed sections: ${standardSections.joinToString(", ")}
