@@ -12,6 +12,12 @@ _Changes since 1.8.0-alpha03_
   - Skiko binary size is reduced from **16.7 to 12.1 Mb on x64** and from **17.4 to 10.5 Mb on arm64**
   - Note that the numbers are measured on one machine and also can differ between Compose 1.7 and Compose 1.8 (will be updated in the stable Release Notes)
 
+## Known Issues
+
+### iOS
+
+- Back gesture may remain stuck in the middle, the fix will be available in the next pre-release version [#1861](https://github.com/JetBrains/compose-multiplatform-core/pull/1861)
+
 ## Breaking Changes
 
 ### Multiple Platforms
@@ -38,7 +44,7 @@ _Changes since 1.8.0-alpha03_
 - Add support for Bold Text accessibility setting [#1846](https://github.com/JetBrains/compose-multiplatform-core/pull/1846)
 - Bhojpuri language support for VoiceOver [#1838](https://github.com/JetBrains/compose-multiplatform-core/pull/1838)
 - Add support for Reduce Motion accessibility setting [#1847](https://github.com/JetBrains/compose-multiplatform-core/pull/1847)
-- Default `androidx.navigation` transition animation on iOS is close as possible to the iOS back gesture [#1861](https://github.com/JetBrains/compose-multiplatform-core/pull/1861)
+- Default `androidx.navigation` transition animation on iOS is as close as possible to the iOS back gesture [#1861](https://github.com/JetBrains/compose-multiplatform-core/pull/1861)
 - Support accessibility text input [#1875](https://github.com/JetBrains/compose-multiplatform-core/pull/1875)
 - Support text input for UI Tests [#1875](https://github.com/JetBrains/compose-multiplatform-core/pull/1875)
 - Accessibility: added ability to traverse nodes within a scrollable container [#1837](https://github.com/JetBrains/compose-multiplatform-core/pull/1837)
@@ -62,6 +68,7 @@ _Changes since 1.8.0-alpha03_
 
 ### Desktop
 
+- _(prerelease fix)_ Restore compatibility with Ubuntu 20.04 [#1870](https://github.com/JetBrains/compose-multiplatform-core/pull/1870)
 - _(prerelease fix)_ Fix "Could not resolve version conflict" in non-Gradle projects [#1872](https://github.com/JetBrains/compose-multiplatform-core/pull/1872)
 
 ### Web
