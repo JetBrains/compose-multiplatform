@@ -24,7 +24,7 @@ _Changes since 1.8.0-alpha03_
 
 - [Google Maven](https://maven.google.com/) now contains some artifacts for all Kotlin targets including Wasm and JS. Compose Multiplatform now depends on those artifacts and user projects might need to add `google()` repo to `repositories {...}` block if it is not there yet [#1819](https://github.com/JetBrains/compose-multiplatform-core/pull/1819)
 - Multiplatform lifecycle was migrated from a internal `core-bundle` module to the androidx SavedState. Libraries that use `org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-savedstate`  or `org.jetbrains.androidx.savedstate:savedstate` should migrate to the latest version [#1850](https://github.com/JetBrains/compose-multiplatform-core/pull/1850)
-- _(prerelease fix)_ Material3 is reverted from Jetpack Compose Material3 `1.4.0-alpha07` to `1.3.1` because 1.4.0 Stable will be released only after CMP 1.8.0. As a workaround to continue using the new API, replace:
+- _(prerelease fix)_ Material3 is reverted from Jetpack Compose Material3 `1.4.0-alpha07` to `1.3.1` because 1.4.0 Stable will be released only after Compose Multiplatform 1.8.0. As a workaround to continue using the new API, replace:
   ```
   implementation(compose.material3)
   ```
@@ -32,7 +32,7 @@ _Changes since 1.8.0-alpha03_
   ```
   implementation("org.jetbrains.compose.material3:material3:1.8.0-alpha03")
   ```
-  Jetpack Compose Material3 1.4.0 will be merged again sometime after the CMP 1.8.0 release [#1868](https://github.com/JetBrains/compose-multiplatform-core/pull/1868)
+  Jetpack Compose Material3 1.4.0 will be merged again sometime after the Compose Multiplatform 1.8.0 release [#1868](https://github.com/JetBrains/compose-multiplatform-core/pull/1868)
 
 ## Features
 
@@ -40,7 +40,7 @@ _Changes since 1.8.0-alpha03_
 
 - Support new haptic feedback types [#1831](https://github.com/JetBrains/compose-multiplatform-core/pull/1831)
 - Support for focusable nodes when Full Keyboard Access is enabled on iOS [#1825](https://github.com/JetBrains/compose-multiplatform-core/pull/1825)
-- Floating cursor support for BasicTextField(TextFieldState) [#1598](https://github.com/JetBrains/compose-multiplatform-core/pull/1598)
+- Floating cursor support for `BasicTextField(TextFieldState)` [#1598](https://github.com/JetBrains/compose-multiplatform-core/pull/1598)
 - Add support for Bold Text accessibility setting [#1846](https://github.com/JetBrains/compose-multiplatform-core/pull/1846)
 - Bhojpuri language support for VoiceOver [#1838](https://github.com/JetBrains/compose-multiplatform-core/pull/1838)
 - Add support for Reduce Motion accessibility setting [#1847](https://github.com/JetBrains/compose-multiplatform-core/pull/1847)
