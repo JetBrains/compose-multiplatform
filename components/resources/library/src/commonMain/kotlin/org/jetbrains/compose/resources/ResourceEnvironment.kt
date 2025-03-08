@@ -6,41 +6,21 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.intl.Locale
 
 @ExperimentalResourceApi
-class ResourceEnvironment internal constructor(
-    internal val language: LanguageQualifier,
-    internal val region: RegionQualifier,
-    internal val theme: ThemeQualifier,
-    internal val density: DensityQualifier
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || this::class != other::class) return false
+data class ResourceEnvironment(
+    val language: LanguageQualifier,
+    val region: RegionQualifier,
+    val theme: ThemeQualifier,
+    val density: DensityQualifier
+)
 
-        other as ResourceEnvironment
-
-        if (language != other.language) return false
-        if (region != other.region) return false
-        if (theme != other.theme) return false
-        if (density != other.density) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = language.hashCode()
-        result = 31 * result + region.hashCode()
-        result = 31 * result + theme.hashCode()
-        result = 31 * result + density.hashCode()
-        return result
-    }
-}
-
-internal interface ComposeEnvironment {
+@ExperimentalResourceApi
+interface ComposeEnvironment {
     @Composable
     fun rememberEnvironment(): ResourceEnvironment
 }
 
-internal val DefaultComposeEnvironment = object : ComposeEnvironment {
+@ExperimentalResourceApi
+val DefaultComposeEnvironment = object : ComposeEnvironment {
     @Composable
     override fun rememberEnvironment(): ResourceEnvironment {
         val composeLocale = Locale.current
@@ -60,7 +40,8 @@ internal val DefaultComposeEnvironment = object : ComposeEnvironment {
 }
 
 //ComposeEnvironment provider will be overridden for tests
-internal val LocalComposeEnvironment = staticCompositionLocalOf { DefaultComposeEnvironment }
+@ExperimentalResourceApi
+val LocalComposeEnvironment = staticCompositionLocalOf { DefaultComposeEnvironment }
 
 /**
  * Returns an instance of [ResourceEnvironment].
