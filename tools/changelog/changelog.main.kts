@@ -260,22 +260,31 @@ fun checkPr() {
 
     when {
         releaseNotes is ReleaseNotes.Specified && releaseNotes.entries.isEmpty() -> {
-            err.println("\"## Release Notes\" doesn't contain any items, or section isn't specified")
-            err.println()
-            err.println("See the format in $prFormatLink")
+            err.println("""
+                "## Release Notes" doesn't contain any items, or "### Section - Subsection" isn't specified
+            
+                See the format in $prFormatLink
+            """.trimIndent())
             exitProcess(1)
         }
         releaseNotes is ReleaseNotes.Specified && nonstandardSections.isNotEmpty() -> {
-            err.println("\"## Release Notes\" contains nonstandard sections:")
-            err.println(nonstandardSections.joinToString(", "))
-            err.println()
-            err.println("See possible sections in $prFormatLink#possible-sections")
+            err.println("""
+                "## Release Notes" contains nonstandard "Section - Subsection" pairs:
+                ${nonstandardSections.joinToString(", ")}
+            
+                Allowed sections: ${standardSections.joinToString(", ")}
+                Allowed subsections: ${standardSubsections.joinToString(", ")}
+            
+                See the full format in $prFormatLink
+            """.trimIndent())
             exitProcess(1)
         }
         releaseNotes == null -> {
-            err.println("\"## Release Notes\" section is missing in the PR description")
-            err.println()
-            err.println("See the format in $prFormatLink")
+            err.println("""
+                "## Release Notes" section is missing in the PR description
+            
+                See the format in $prFormatLink
+            """.trimIndent())
             exitProcess(1)
         }
         else -> {

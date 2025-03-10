@@ -48,9 +48,14 @@ Will be includede in alpha/beta/rc changelog, excluded from stable.
 ```
 
 ## Possible Sections
-
+<!-- 
+- Note that this is parsed by [changelog.main.kts]
+- Update the PR templates after changing the sections:
+https://github.com/JetBrains/compose-multiplatform/edit/jb-main/.github/PULL_REQUEST_TEMPLATE.md
+https://github.com/JetBrains/compose-multiplatform-core/edit/jb-main/.github/PULL_REQUEST_TEMPLATE.md
+-->
+ 
 ### Sections
-<!-- This is parsed by changelog.main.kts -->
 ```
 - Highlights             # major features, performance improvements
 - Known Issues           # issues planned to be fixed, with possible workarounds
@@ -61,7 +66,6 @@ Will be includede in alpha/beta/rc changelog, excluded from stable.
 ```
 
 ### Subsections
-<!-- This is parsed by changelog.main.kts -->
 ```
 - Multiple Platforms     # any module, 2 or more platform changes
 - iOS                    # any module, iOS-only changes
