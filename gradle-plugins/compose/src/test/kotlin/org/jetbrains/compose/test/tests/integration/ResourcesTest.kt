@@ -22,6 +22,7 @@ import java.util.zip.ZipFile
 import kotlin.io.path.Path
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.relativeTo
+import kotlin.test.Ignore
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -241,6 +242,7 @@ class ResourcesTest : GradlePluginTestBase() {
         }
     }
 
+    @Ignore // ignored until compose update after https://github.com/JetBrains/compose-multiplatform/pull/5245
     @Test
     fun testMultiModuleResources() {
         val environment = defaultTestEnvironment
@@ -820,6 +822,7 @@ class ResourcesTest : GradlePluginTestBase() {
         }
     }
 
+    @Ignore // ignored until compose update after https://github.com/JetBrains/compose-multiplatform/pull/5245
     @Test
     fun checkTestResources() {
         with(testProject("misc/testResources")) {
