@@ -71,13 +71,16 @@ private fun checkTarget(project: Project, target: KotlinTarget): CheckResult {
 
     project.configurations.forEach { configuration ->
         if (configuration.isCanBeResolved && configuration.name in targetConfigurationNames) {
-            val containsSkikoArtifact = configuration.resolvedConfiguration.resolvedArtifacts.any {
-                it.id.displayName.contains(SKIKO_ARTIFACT_PREFIX)
-            }
-            if (containsSkikoArtifact) {
-                val targetIsDisabled = project.findLocalOrGlobalProperty(targetType.gradlePropertyName).map { it != "true" }
-                if (targetIsDisabled.get()) {
-                    return CheckResult.Fail(targetType)
+            val resolvedConfiguration = configuration.resolvedConfiguration
+            if (!resolvedConfiguration.hasError()) {
+                val containsSkikoArtifact = resolvedConfiguration.resolvedArtifacts.any {
+                    it.id.displayName.contains(SKIKO_ARTIFACT_PREFIX)
+                }
+                if (containsSkikoArtifact) {
+                    val targetIsDisabled = project.findLocalOrGlobalProperty(targetType.gradlePropertyName).map { it != "true" }
+                    if (targetIsDisabled.get()) {
+                        return CheckResult.Fail(targetType)
+                    }
                 }
             }
         }
