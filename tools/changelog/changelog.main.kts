@@ -261,7 +261,7 @@ fun checkPr() {
     when {
         releaseNotes is ReleaseNotes.Specified && releaseNotes.entries.isEmpty() -> {
             err.println("""
-                "## Release Notes" doesn't contain any items, or section isn't specified
+                "## Release Notes" doesn't contain any items, or "### Section - Subsection" isn't specified
             
                 See the format in $prFormatLink
             """.trimIndent())
@@ -269,7 +269,7 @@ fun checkPr() {
         }
         releaseNotes is ReleaseNotes.Specified && nonstandardSections.isNotEmpty() -> {
             err.println("""
-                "## Release Notes" contains nonstandard section - subsection pairs:
+                "## Release Notes" contains nonstandard "Section - Subsection" pairs:
                 ${nonstandardSections.joinToString(", ")}
             
                 Allowed sections: ${standardSections.joinToString(", ")}
