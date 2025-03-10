@@ -49,7 +49,8 @@ Will be includede in alpha/beta/rc changelog, excluded from stable.
 
 ## Possible Sections
 <!-- 
-When change this, please keep in mind that it is parsed by [changelog.main.kts], and the PR templates should be updated too:
+- Note that this is parsed by [changelog.main.kts]
+- Update the PR templates after changing the sections:
 https://github.com/JetBrains/compose-multiplatform/edit/jb-main/.github/PULL_REQUEST_TEMPLATE.md
 https://github.com/JetBrains/compose-multiplatform-core/edit/jb-main/.github/PULL_REQUEST_TEMPLATE.md
 -->
