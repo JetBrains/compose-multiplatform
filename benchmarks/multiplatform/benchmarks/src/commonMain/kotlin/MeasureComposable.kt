@@ -38,6 +38,7 @@ suspend inline fun preciseDelay(duration: Duration) {
 
 @OptIn(ExperimentalTime::class, InternalComposeUiApi::class)
 suspend fun measureComposable(
+    name: String,
     warmupCount: Int,
     frameCount: Int,
     width: Int,
@@ -118,6 +119,7 @@ suspend fun measureComposable(
         }
 
         return BenchmarkResult(
+            name,
             nanosPerFrame.nanoseconds,
             renderTime,
             frames

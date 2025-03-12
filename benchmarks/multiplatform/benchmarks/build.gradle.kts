@@ -2,9 +2,10 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 version = "1.0-SNAPSHOT"
@@ -55,13 +56,15 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.runtime)
                 implementation(compose.components.resources)
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.kotlinx.io)
             }
         }
 
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.1")
+                runtimeOnly(libs.kotlinx.coroutines.swing)
             }
         }
     }

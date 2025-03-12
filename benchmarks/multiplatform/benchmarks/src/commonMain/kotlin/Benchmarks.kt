@@ -4,6 +4,11 @@ import benchmarks.complexlazylist.components.MainUiNoImageUseModel
 import benchmarks.example1.Example1
 import benchmarks.lazygrid.LazyGrid
 import benchmarks.visualeffects.NYContent
+import kotlinx.io.buffered
+import kotlinx.io.files.Path
+import kotlinx.io.files.SystemFileSystem
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 
@@ -29,11 +34,13 @@ data class BenchmarkFrame(
         }
 }
 
+@Serializable
 data class BenchmarkPercentileAverage(
     val percentile: Double,
     val average: Duration
 )
 
+@Serializable
 data class MissedFrames(
     val count: Int,
     val ratio: Double
@@ -50,7 +57,11 @@ data class MissedFrames(
     }
 }
 
+private val json = Json { prettyPrint = true }
+
+@Serializable
 data class BenchmarkStats(
+    val name: String,
     val frameBudget: Duration,
     val frameCount: Int,
     val renderTime: Duration,
@@ -60,6 +71,7 @@ data class BenchmarkStats(
     val doubleBufferingMissedFrames: MissedFrames
 ) {
     fun prettyPrint() {
+        println("$name benchmark stats:")
         if (Args.isModeEnabled(Mode.CPU)) {
             println("$frameCount frames CPU render time: $renderTime")
             println()
@@ -83,9 +95,12 @@ data class BenchmarkStats(
             println("Worst p${(it.percentile * 100).roundToInt()} ${kind.toPrettyPrintString()} average: ${it.average}")
         }
     }
+
+    fun toJsonString(): String = json.encodeToString(serializer(), this)
 }
 
 class BenchmarkResult(
+    private val name: String,
     private val frameBudget: Duration,
     private val renderTime: Duration,
     private val frames: List<BenchmarkFrame>,
@@ -112,6 +127,7 @@ class BenchmarkResult(
         }
 
         return BenchmarkStats(
+            name,
             frameBudget,
             frames.size,
             renderTime,
@@ -148,9 +164,26 @@ suspend fun runBenchmark(
     content: @Composable () -> Unit
 ) {
     if (Args.isBenchmarkEnabled(name)) {
-        println("$name:")
-        val stats = measureComposable(warmupCount, Args.getBenchmarkProblemSize(name, frameCount), width, height, targetFps, graphicsContext, content).generateStats()
+        println("$name started:")
+        val stats = measureComposable(
+            name,
+            warmupCount,
+            Args.getBenchmarkProblemSize(name, frameCount),
+            width,
+            height,
+            targetFps,
+            graphicsContext,
+            content
+        ).generateStats()
         stats.prettyPrint()
+
+        val jsonString = stats.toJsonString()
+        SystemFileSystem.sink(Path("$name.json"))
+            .buffered()
+            .use {
+                it.write(jsonString.encodeToByteArray(), 0, jsonString.length)
+                it.flush()
+            }
     }
 }
 
@@ -166,6 +199,6 @@ suspend fun runBenchmarks(
     runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext) { AnimatedVisibility() }
     runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext) { LazyGrid() }
     runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext) { NYContent(width, height) }
-    runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel()}
+    runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel() }
     runBenchmark("Example1", width, height, targetFps, 1000, graphicsContext) { Example1() }
 }
