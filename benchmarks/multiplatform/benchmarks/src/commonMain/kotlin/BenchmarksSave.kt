@@ -36,7 +36,15 @@ fun saveBenchmarkStatsOnDisk(name: String, stats: BenchmarkStats) {
 
         SystemFileSystem.createDirectories(path.parent!!)
         SystemFileSystem.sink(path).writeText(text)
-        println("Results saved to ${SystemFileSystem.resolve(path)}")
+        println("CSV results saved to ${SystemFileSystem.resolve(path)}")
+        println()
+
+        val jsonString = stats.toJsonString()
+        val jsonPath = Path("build/benchmarks/json-reports/$name.json")
+
+        SystemFileSystem.createDirectories(jsonPath.parent!!)
+        SystemFileSystem.sink(jsonPath).writeText(jsonString)
+        println("JSON results saved to ${SystemFileSystem.resolve(jsonPath)}")
         println()
     } catch (_: IOException) {
         // IOException "Read-only file system" is thrown on iOS without writing permissions
