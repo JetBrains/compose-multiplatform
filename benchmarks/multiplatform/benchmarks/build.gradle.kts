@@ -59,7 +59,7 @@ kotlin {
                 implementation(compose.components.resources)
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.kotlinx.io)
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+                implementation(libs.kotlinx.datetime)
             }
         }
 
@@ -79,21 +79,23 @@ compose.desktop {
 }
 
 val runArguments: String? by project
-val composeVersion: String? = project.properties["compose.version"] as? String
-val kotlinVersion: String? = project.properties["kotlin.version"] as? String
-var appArgs = runArguments
-    ?.split(" ")
-    .orEmpty().let {
-       it + listOf("versionInfo=\"$composeVersion (Kotlin $kotlinVersion)\"")
-    }
-    .map {
-        it.replace(" ", "%20")
-    }
 
-println("runArguments: $appArgs")
+val composeVersion = libs.versions.compose.multiplatform
+val kotlinVersion = libs.versions.kotlin
 
 // Handle runArguments property
 gradle.taskGraph.whenReady {
+    var appArgs = runArguments
+        ?.split(" ")
+        .orEmpty().let {
+            it + listOf("versionInfo=\"${composeVersion.get()} (Kotlin ${kotlinVersion.get()})\"")
+        }
+        .map {
+            it.replace(" ", "%20")
+        }
+
+    println("runArguments: $appArgs")
+
     tasks.named<JavaExec>("run") {
         args(appArgs)
     }
