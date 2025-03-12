@@ -11,7 +11,10 @@ object Args {
     var versionInfo: String? = null
         private set
 
-    var saveStatsOnDisk: Boolean = false
+    var saveStatsToCSV: Boolean = false
+        private set
+
+    var saveStatsToJSON: Boolean = false
         private set
 
     private fun argToSet(arg: String): Set<String> = arg.substring(arg.indexOf('=') + 1)
@@ -42,8 +45,10 @@ object Args {
                 benchmarks += argToMap(arg.decodeArg())
             } else if (arg.startsWith("versionInfo=", ignoreCase = true)) {
                 versionInfo = arg.substringAfter("=").decodeArg()
-            } else if (arg.startsWith("saveStatsOnDisk=", ignoreCase = true)) {
-                saveStatsOnDisk = arg.substringAfter("=").toBoolean()
+            } else if (arg.startsWith("saveStatsToCSV=", ignoreCase = true)) {
+                saveStatsToCSV = arg.substringAfter("=").toBoolean()
+            } else if (arg.startsWith("saveStatsToJSON=", ignoreCase = true)) {
+                saveStatsToJSON = arg.substringAfter("=").toBoolean()
             }
         }
     }

@@ -3,9 +3,10 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import kotlin.text.replace
 
 plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 version = "1.0-SNAPSHOT"
@@ -56,7 +57,8 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.runtime)
                 implementation(compose.components.resources)
-                implementation("org.jetbrains.kotlinx:kotlinx-io-core:0.6.0")
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.kotlinx.io)
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
             }
         }
@@ -64,7 +66,7 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.1")
+                runtimeOnly(libs.kotlinx.coroutines.swing)
             }
         }
     }
