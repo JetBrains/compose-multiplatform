@@ -31,6 +31,7 @@ data class BenchmarkFrame(
         }
 }
 
+@Serializable
 data class BenchmarkConditions(
     val frameCount: Int,
     val warmupCount: Int
@@ -44,6 +45,7 @@ data class BenchmarkConditions(
     }
 }
 
+@Serializable
 data class FrameInfo(
     val cpuTime: Duration,
     val gpuTime: Duration,
