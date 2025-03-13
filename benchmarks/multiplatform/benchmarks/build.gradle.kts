@@ -142,3 +142,17 @@ tasks.withType<org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenExec>().c
 rootProject.the<BinaryenRootEnvSpec>().apply {
     version = "122"
 }
+
+
+val jsOrWasmRegex = Regex("js|wasm")
+
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group.startsWith("org.jetbrains.skiko") &&
+            jsOrWasmRegex.containsMatchIn(requested.name)
+        ) {
+            // to keep the readable names from Skiko
+            useVersion(requested.version!! + "+profiling")
+        }
+    }
+}
