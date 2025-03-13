@@ -21,5 +21,5 @@ await import('./polyfills.mjs');
  */
 let name = arguments[0] ? arguments[0] : 'AnimatedVisibility';
 let frameCount = arguments[1] ? parseInt(arguments[1]) : 1000;
-exports.customLaunch(name, frameCount);
+await exports.customLaunch(name, frameCount);
 console.log('Finished');

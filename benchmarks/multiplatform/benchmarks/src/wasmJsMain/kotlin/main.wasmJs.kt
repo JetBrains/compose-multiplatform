@@ -2,6 +2,9 @@ import kotlinx.coroutines.*
 import kotlin.coroutines.suspendCoroutine
 import kotlin.js.Promise
 
+val jsOne = 1.toJsNumber()
+
+@OptIn(ExperimentalCoroutinesApi::class)
 fun main(args: Array<String>) {
     if (shouldSkipFunMain().toBoolean()) return
     println("Args = ${args.joinToString(separator = ", ")}")
@@ -19,8 +22,6 @@ fun main(args: Array<String>) {
         Args.parseArgs(arrayOf(hardcodedArgs))
     }
     Args.enableModes(Mode.CPU)
-
-    val jsOne = 1.toJsNumber()
 
     eventLoop = object : EventLoop {
         override suspend fun runMicrotasks() {
@@ -40,26 +41,20 @@ fun main(args: Array<String>) {
 }
 
 @JsExport
-fun customLaunch(benchmarkName: String, frameCount: Int) {
+fun customLaunch(benchmarkName: String, frameCount: Int): Promise<JsAny?> {
     val args = "benchmarks=$benchmarkName($frameCount)"
     Args.parseArgs(arrayOf(args))
     Args.enableModes(Mode.CPU)
 
-    val jsOne = 1.toJsNumber()
-
     eventLoop = object : EventLoop {
         override suspend fun runMicrotasks() {
-            suspendCoroutine { c ->
-                Promise.resolve(jsOne).then {
-                    c.resumeWith(Result.success(Unit))
-                    it
-                }
-            }
+            yield()
         }
     }
 
-    MainScope().launch {
+    return MainScope().promise {
         runBenchmarks()
+        jsOne
     }
 }
 

@@ -1,8 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.internal.platform.wasm.BinaryenConfig.binaryenArgs
-import org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenRootPlugin.Companion.kotlinBinaryenExtension
+import org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenRootEnvSpec
 import org.jetbrains.kotlin.gradle.targets.js.d8.D8Exec
-import org.jetbrains.kotlin.gradle.targets.js.d8.D8Plugin.Companion.kotlinD8RootExtension
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 
 plugins {
@@ -110,19 +108,6 @@ gradle.taskGraph.whenReady {
 }
 
 
-configurations.all {
-    resolutionStrategy.eachDependency {
-        val groupPrefix = "org.jetbrains.skiko"
-        val group = requested.group
-
-        if (
-            group.startsWith(groupPrefix)) {
-            useVersion("0.9.2")
-        }
-    }
-}
-
-
 val isWasmBuildForJetstream3 = project.hasProperty("wasm.jetstream3")
 tasks.withType<D8Exec>().configureEach {
     doFirst {
@@ -147,4 +132,13 @@ tasks.register("buildD8Distribution", Zip::class.java) {
     from(rootProject.layout.buildDirectory.file("js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin"))
     archiveFileName.set("d8-distribution.zip")
     destinationDirectory.set(rootProject.layout.buildDirectory.dir("distributions"))
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenExec>().configureEach {
+    binaryenArgs.add("-g") // keep the readable names
+}
+
+@OptIn(ExperimentalWasmDsl::class)
+rootProject.the<BinaryenRootEnvSpec>().apply {
+    version = "122"
 }
