@@ -22,6 +22,7 @@ class BlobPolyfill {
     }
     get type() { return this._type; }
     async arrayBuffer() {
+        console.log('arrayBuffer called');
         return this._uint8.buffer;
     }
 }
