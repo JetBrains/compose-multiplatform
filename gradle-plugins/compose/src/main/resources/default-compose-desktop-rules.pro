@@ -30,7 +30,7 @@
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 
 # Kotlinx Datetime
-#   Material3 depends on it, and ir references `kotlinx.serialization`, which is optional
+#   Material3 depends on it, and it references `kotlinx.serialization`, which is optional
 #   Copied from https://github.com/Kotlin/kotlinx-datetime/blob/v0.6.2/core/jvm/resources/META-INF/proguard/datetime.pro
 #   with one additional rule
 -dontwarn kotlinx.serialization.KSerializer
