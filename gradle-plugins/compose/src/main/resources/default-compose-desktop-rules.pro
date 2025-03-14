@@ -37,7 +37,6 @@
 -dontwarn kotlinx.serialization.Serializable
 -dontwarn kotlinx.datetime.serializers.**
 
-
 # https://github.com/Kotlin/kotlinx.coroutines/issues/2046
 -dontwarn android.annotation.SuppressLint
 
