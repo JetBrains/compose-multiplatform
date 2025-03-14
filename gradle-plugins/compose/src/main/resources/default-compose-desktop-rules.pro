@@ -29,6 +29,15 @@
 -dontwarn java.lang.ClassValue
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 
+# Kotlinx Datetime
+#   Material3 depends on it, and ir references `kotlinx.serialization`, which is optional
+#   Copied from https://github.com/Kotlin/kotlinx-datetime/blob/v0.6.2/core/jvm/resources/META-INF/proguard/datetime.pro
+#   with one additional rule
+-dontwarn kotlinx.serialization.KSerializer
+-dontwarn kotlinx.serialization.Serializable
+-dontwarn kotlinx.datetime.serializers.**
+
+
 # https://github.com/Kotlin/kotlinx.coroutines/issues/2046
 -dontwarn android.annotation.SuppressLint
 
@@ -46,3 +55,6 @@
 -keep class kotlinx.coroutines.CoroutineScope
 # this is a weird one, but breaks build on some combinations of OS and JDK (reproduced on Windows 10 + Corretto 16)
 -dontwarn org.graalvm.compiler.core.aarch64.AArch64NodeMatchRules_MatchStatementSet*
+
+# Androidx
+-dontnote androidx.**
