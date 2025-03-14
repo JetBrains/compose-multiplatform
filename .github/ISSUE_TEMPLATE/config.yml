@@ -3,6 +3,3 @@ contact_links:
   - name: Create
     url: https://youtrack.jetbrains.com/newIssue?project=CMP
     about: Please report new issues to the JetBrains YouTrack
-  - name: Compose Multiplatform
-    url: https://jetbrains.com/lp/compose
-    about: Compose Multiplatform landing page
