@@ -10,6 +10,7 @@ plugins {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
     implementation compose.desktop.currentOs
+    implementation compose.material3
 }
 
 compose.desktop {
