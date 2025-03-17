@@ -30,6 +30,8 @@ object Args {
      * with values separated by commas.
      */
     fun parseArgs(args: Array<String>) {
+        // reset the previous configuration before setting a new one for cases when parseArgs is called more than once:
+        reset()
         for (arg in args) {
             if (arg.startsWith("modes=", ignoreCase = true)) {
                 modes.addAll(argToSet(arg).map { Mode.valueOf(it) })
@@ -37,6 +39,11 @@ object Args {
                 benchmarks += argToMap(arg)
             }
         }
+    }
+
+    private fun reset() {
+        modes.clear()
+        benchmarks.clear()
     }
 
     fun enableModes(vararg modes: Mode) = this.modes.addAll(modes)
