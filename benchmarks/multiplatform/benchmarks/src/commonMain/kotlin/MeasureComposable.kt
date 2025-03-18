@@ -139,7 +139,7 @@ private val pictureRecorder = PictureRecorder()
  * https://github.com/JetBrains/skiko/blob/eb1f04ec99d50ff0bdb2f592fdf49711a9251aa7/skiko/src/awtMain/kotlin/org/jetbrains/skiko/SkiaLayer.awt.kt#L531
  *
  * This is a simplified logic and it still can differ from the real cases:
- * - Rendering into an intermediate picture. Without it, benchmark can show incorrect results.
+ * - Rendering into an intermediate picture. Benchmarks can show incorrect results without it.
  *   For example, we had a case, when they showed an an improvement by 10%,
  *   but there was a regression by 10%
  * - Clearing the canvas each frame
