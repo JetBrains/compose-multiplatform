@@ -223,7 +223,7 @@ suspend fun runBenchmark(
         println("# $name")
         val stats = measureComposable(warmupCount, Args.getBenchmarkProblemSize(name, frameCount), width, height, targetFps, graphicsContext, content).generateStats()
         stats.prettyPrint()
-        if (Args.saveOnDisk) {
+        if (Args.saveStatsOnDisk) {
             saveBenchmarkStatsOnDisk(name, stats)
         }
     }
