@@ -135,16 +135,16 @@ suspend fun measureComposable(
 private val pictureRecorder = PictureRecorder()
 
 /**
- * Mimic Skiko render logic from https://github.com/JetBrains/skiko/blob/eb1f04ec99d50ff0bdb2f592fdf49711a9251aa7/skiko/src/awtMain/kotlin/org/jetbrains/skiko/SkiaLayer.awt.kt#L531
+ * Mimic Skiko render logic from
+ * https://github.com/JetBrains/skiko/blob/eb1f04ec99d50ff0bdb2f592fdf49711a9251aa7/skiko/src/awtMain/kotlin/org/jetbrains/skiko/SkiaLayer.awt.kt#L531
  *
- * This is very simplified logic, and it still can differ from the real cases.
- *
- * Though one main function - rendering into picture - was affecting performance.
- *
- * Benchmarks showed an improvement by 10%, but there was a regression by 10%.
+ * This is a simplified logic and it still can differ from the real cases:
+ * - Rendering into an intermediate picture. Without it, benchmark can show incorrect results.
+ *   For example, we had a case, when they showed an an improvement by 10%,
+ *   but there was a regression by 10%
+ * - Clearing the canvas each frame
  *
  * Beware that this logic can be changed in some new version of Skiko.
- *
  * If Skiko stops using `picture`, we need to remove it here too.
  */
 @OptIn(InternalComposeUiApi::class)
