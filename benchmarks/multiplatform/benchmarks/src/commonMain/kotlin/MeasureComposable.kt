@@ -2,12 +2,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.graphics.asComposeCanvas
 import androidx.compose.ui.scene.CanvasLayersComposeScene
+import androidx.compose.ui.scene.ComposeScene
 import androidx.compose.ui.unit.IntSize
 import org.jetbrains.skia.Surface
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.*
+import org.jetbrains.skia.Color
+import org.jetbrains.skia.PictureRecorder
+import org.jetbrains.skia.Rect
 import kotlin.time.TimeSource.Monotonic.markNow
 import kotlin.time.measureTime
 
@@ -46,16 +50,15 @@ suspend fun measureComposable(
     graphicsContext: GraphicsContext?,
     content: @Composable () -> Unit
 ): BenchmarkResult  {
+    val surface = graphicsContext?.surface(width, height) ?: Surface.makeNull(width, height)
     val scene = CanvasLayersComposeScene(size = IntSize(width, height))
     try {
         val nanosPerFrame = (1.0 / targetFps.toDouble() * nanosPerSecond).toLong()
         scene.setContent(content)
-        val surface = graphicsContext?.surface(width, height) ?: Surface.makeNull(width, height)
-        val canvas = surface.canvas.asComposeCanvas()
 
         // warmup
         repeat(warmupCount) {
-            scene.render(canvas, it * nanosPerFrame)
+            scene.mimicSkikoRender(surface, it * nanosPerFrame, width, height)
             surface.flushAndSubmit(false)
             graphicsContext?.awaitGPUCompletion()
         }
@@ -67,7 +70,7 @@ suspend fun measureComposable(
         if (Args.isModeEnabled(Mode.CPU)) {
             renderTime = measureTime {
                 repeat(frameCount) {
-                    scene.render(canvas, it * nanosPerFrame)
+                    scene.mimicSkikoRender(surface, it * nanosPerFrame, width, height)
                     surface.flushAndSubmit(false)
                     gpuTime += measureTime {
                         graphicsContext?.awaitGPUCompletion()
@@ -93,7 +96,7 @@ suspend fun measureComposable(
             repeat(frameCount) {
                 val frameStart = start + nextVSync
 
-                scene.render(canvas, nextVSync.inWholeNanoseconds)
+                scene.mimicSkikoRender(surface, it * nextVSync.inWholeNanoseconds, width, height)
                 surface.flushAndSubmit(false)
 
                 val cpuTime = frameStart.elapsedNow()
@@ -124,6 +127,33 @@ suspend fun measureComposable(
         )
     } finally {
         scene.close()
+        surface.close()
         runGC() // cleanup for next benchmarks
     }
+}
+
+private val pictureRecorder = PictureRecorder()
+
+/**
+ * Mimic Skiko render logic from
+ * https://github.com/JetBrains/skiko/blob/eb1f04ec99d50ff0bdb2f592fdf49711a9251aa7/skiko/src/awtMain/kotlin/org/jetbrains/skiko/SkiaLayer.awt.kt#L531
+ *
+ * This is a simplified logic and it still can differ from the real cases:
+ * - Rendering into an intermediate picture. Benchmarks can show incorrect results without it.
+ *   For example, we had a case when they showed an improvement by 10%,
+ *   but there was a regression by 10%
+ * - Clearing the canvas each frame
+ *
+ * Beware that this logic can be changed in some new version of Skiko.
+ * If Skiko stops using `picture`, we need to remove it here too.
+ */
+@OptIn(InternalComposeUiApi::class)
+fun ComposeScene.mimicSkikoRender(surface: Surface, time: Long, width: Int, height: Int) {
+    val pictureCanvas = pictureRecorder.beginRecording(Rect(0f, 0f, width.toFloat(), height.toFloat()))
+    render(pictureCanvas.asComposeCanvas(), time)
+    val picture = pictureRecorder.finishRecordingAsPicture()
+
+    surface.canvas.clear(Color.TRANSPARENT)
+    surface.canvas.drawPicture(picture)
+    picture.close()
 }
