@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
+import kotlin.text.replace
 
 plugins {
     kotlin("multiplatform")
@@ -55,6 +56,8 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.runtime)
                 implementation(compose.components.resources)
+                implementation("org.jetbrains.kotlinx:kotlinx-io-core:0.6.0")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
             }
         }
 
@@ -74,21 +77,33 @@ compose.desktop {
 }
 
 val runArguments: String? by project
+val composeVersion: String? = project.properties["compose.version"] as? String
+val kotlinVersion: String? = project.properties["kotlin.version"] as? String
+var appArgs = runArguments
+    ?.split(" ")
+    .orEmpty().let {
+       it + listOf("versionInfo=\"$composeVersion (Kotlin $kotlinVersion)\"")
+    }
+    .map {
+        it.replace(" ", "%20")
+    }
+
+println("runArguments: $appArgs")
 
 // Handle runArguments property
 gradle.taskGraph.whenReady {
     tasks.named<JavaExec>("run") {
-        args(runArguments?.split(" ") ?: listOf<String>())
+        args(appArgs)
     }
     tasks.forEach { t ->
         if ((t is Exec) && t.name.startsWith("runReleaseExecutableMacos")) {
-            t.args(runArguments?.split(" ") ?: listOf<String>())
+            t.args(appArgs)
         }
     }
     tasks.named<KotlinWebpack>("wasmJsBrowserProductionRun") {
-        val args = runArguments?.split(" ")
-            ?.mapIndexed { index, arg -> "arg$index=$arg" }
-            ?.joinToString("&") ?: ""
+        val args = appArgs
+            .mapIndexed { index, arg -> "arg$index=$arg" }
+            .joinToString("&")
 
         devServerProperty = devServerProperty.get().copy(
             open = "http://localhost:8080?$args"

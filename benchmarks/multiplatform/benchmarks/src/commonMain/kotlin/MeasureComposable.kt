@@ -65,26 +65,26 @@ suspend fun measureComposable(
 
         runGC()
 
-        var renderTime = Duration.ZERO
-        var gpuTime = Duration.ZERO
-        if (Args.isModeEnabled(Mode.CPU)) {
-            renderTime = measureTime {
+        var cpuTotalTime = Duration.ZERO
+        var gpuTotalTime = Duration.ZERO
+        if (Args.isModeEnabled(Mode.SIMPLE)) {
+            cpuTotalTime = measureTime {
                 repeat(frameCount) {
                     scene.mimicSkikoRender(surface, it * nanosPerFrame, width, height)
                     surface.flushAndSubmit(false)
-                    gpuTime += measureTime {
+                    gpuTotalTime += measureTime {
                         graphicsContext?.awaitGPUCompletion()
                     }
                 }
             }
-            renderTime -= gpuTime
+            cpuTotalTime -= gpuTotalTime
         }
 
         val frames = MutableList(frameCount) {
             BenchmarkFrame(Duration.INFINITE, Duration.INFINITE)
         }
 
-        if (Args.isModeEnabled(Mode.FRAMES)) {
+        if (Args.isModeEnabled(Mode.VSYNC_EMULATION)) {
 
             var nextVSync = Duration.ZERO
             var missedFrames = 0;
@@ -122,7 +122,8 @@ suspend fun measureComposable(
 
         return BenchmarkResult(
             nanosPerFrame.nanoseconds,
-            renderTime,
+            BenchmarkConditions(frameCount, warmupCount),
+            FrameInfo(cpuTotalTime / frameCount, gpuTotalTime / frameCount),
             frames
         )
     } finally {
