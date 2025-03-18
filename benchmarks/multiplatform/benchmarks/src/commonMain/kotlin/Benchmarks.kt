@@ -4,16 +4,6 @@ import benchmarks.complexlazylist.components.MainUiNoImageUseModel
 import benchmarks.example1.Example1
 import benchmarks.lazygrid.LazyGrid
 import benchmarks.visualeffects.NYContent
-import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.format.FormatStringsInDatetimeFormats
-import kotlinx.datetime.format.byUnicodePattern
-import kotlinx.datetime.toLocalDateTime
-import kotlinx.io.buffered
-import kotlinx.io.files.Path
-import kotlinx.io.files.SystemFileSystem
-import kotlinx.io.readByteArray
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 
@@ -233,7 +223,9 @@ suspend fun runBenchmark(
         println("# $name")
         val stats = measureComposable(warmupCount, Args.getBenchmarkProblemSize(name, frameCount), width, height, targetFps, graphicsContext, content).generateStats()
         stats.prettyPrint()
-        saveBenchmarkStatsOnDisk(name, stats)
+        if (Args.saveOnDisk) {
+            saveBenchmarkStatsOnDisk(name, stats)
+        }
     }
 }
 
@@ -251,4 +243,4 @@ suspend fun runBenchmarks(
     runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext) { NYContent(width, height) }
     runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel()}
     runBenchmark("Example1", width, height, targetFps, 1000, graphicsContext) { Example1() }
- }
+}

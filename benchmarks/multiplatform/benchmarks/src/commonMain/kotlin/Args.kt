@@ -11,6 +11,9 @@ object Args {
     var versionInfo: String? = null
         private set
 
+    var saveOnDisk: Boolean = false
+        private set
+
     private fun argToSet(arg: String): Set<String> = arg.substring(arg.indexOf('=') + 1)
         .split(",").filter{!it.isEmpty()}.map{it.uppercase()}.toSet()
 
@@ -39,6 +42,8 @@ object Args {
                 benchmarks += argToMap(arg.decodeArg())
             } else if (arg.startsWith("versionInfo=", ignoreCase = true)) {
                 versionInfo = arg.substringAfter("=").decodeArg()
+            } else if (arg.startsWith("saveOnDisk=", ignoreCase = true)) {
+                saveOnDisk = arg.substringAfter("=").toBoolean()
             }
         }
     }
