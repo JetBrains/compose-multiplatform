@@ -140,7 +140,7 @@ private val pictureRecorder = PictureRecorder()
  *
  * This is a simplified logic and it still can differ from the real cases:
  * - Rendering into an intermediate picture. Benchmarks can show incorrect results without it.
- *   For example, we had a case, when they showed an an improvement by 10%,
+ *   For example, we had a case when they showed an improvement by 10%,
  *   but there was a regression by 10%
  * - Clearing the canvas each frame
  *
