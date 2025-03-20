@@ -1,3 +1,55 @@
+# 1.8.0-beta01 (March 2025)
+
+_Changes since 1.8.0-alpha04_
+
+## Breaking Changes
+
+### Multiple Platforms
+
+- Add `@Composable` annotations to the actual `WindowInsets.Companion.*` extensions to match the expected declarations [#1919](https://github.com/JetBrains/compose-multiplatform-core/pull/1919), [#1720](https://github.com/JetBrains/compose-multiplatform-core/pull/1720)
+
+## Features
+
+### iOS
+
+- Add ability to recreate Composable after `ComposeUIViewController` leaves view controller hierarchy [#1877](https://github.com/JetBrains/compose-multiplatform-core/pull/1877)
+- Support trackpad pointer input [#1893](https://github.com/JetBrains/compose-multiplatform-core/pull/1893)
+- Save Composable state when view controller leaves view controller hierarchy [#1904](https://github.com/JetBrains/compose-multiplatform-core/pull/1904)
+
+## Fixes
+
+### iOS
+
+- Removed permissions alert when pasting text into a `TextField` [#1894](https://github.com/JetBrains/compose-multiplatform-core/pull/1894)
+- Fix crash when removing popup during scene size change animation [#1878](https://github.com/JetBrains/compose-multiplatform-core/pull/1878)
+- Fix accessibility elements rects when `ComposeUIViewController` is shifted [#1899](https://github.com/JetBrains/compose-multiplatform-core/pull/1899)
+- Fixed an issue where it wasn't possible to open a popup using pointer input devices [#1906](https://github.com/JetBrains/compose-multiplatform-core/pull/1906)
+- Fix popup safe drawing padding when `usePlatformInsets = true` [#1920](https://github.com/JetBrains/compose-multiplatform-core/pull/1920)
+- Fix an issue where Compose would retain the old state when its view was reappeared [#1921](https://github.com/JetBrains/compose-multiplatform-core/pull/1921)
+-  _(prerelease fix)_ Fix non-interactive UI after interop view tap [#1925](https://github.com/JetBrains/compose-multiplatform-core/pull/1925)
+
+### Desktop
+
+- [Windows] Fixed ordering of `SwingPanel`s when using `compose.interop.blending=true` [#1901](https://github.com/JetBrains/compose-multiplatform-core/pull/1901)
+- Fix the background flashing when closing a window/dialog [#1911](https://github.com/JetBrains/compose-multiplatform-core/pull/1911)
+- Fix `onRenderApiChanged` in `ComposeWindow` and `ComposeDialog` not working when the renderer changes due to fallback, rather than explicit change [#1911](https://github.com/JetBrains/compose-multiplatform-core/pull/1911)
+- [Swing Interop] Fixed `compose.interop.blending=true` completely breaking Swing interop on Windows when Direct3D is unsupported. Note that interop blending is still supported on Windows only if Direct3D is available [#1913](https://github.com/JetBrains/compose-multiplatform-core/pull/1913)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.8.0-beta01`. Based on Jetpack Compose libraries:
+  - [Runtime 1.8.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.8.0-beta02)
+  - [UI 1.8.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.8.0-beta02)
+  - [Foundation 1.8.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.8.0-beta02)
+  - [Material 1.8.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.8.0-beta02)
+  - [Material3 1.3.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.1)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.0-alpha05`. Based on [Jetpack Lifecycle 2.9.0-alpha12](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.0-alpha12)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0-alpha15`. Based on [Jetpack Navigation 2.9.0-alpha08](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.0-alpha08)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.1.0-beta01`. Based on [Jetpack Material3 Adaptive 1.1.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.1.0-beta01)
+
+---
+
 # 1.8.0-alpha04 (March 2025)
 
 _Changes since 1.8.0-alpha03_
