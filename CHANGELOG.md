@@ -4,9 +4,9 @@ _Changes since 1.8.0-alpha04_
 
 ## Breaking Changes
 
-### iOS
+### Multiple Platforms
 
-- Add Composable annotation to the `WindowInsets.Companion.waterfall` getter to match the expected API [#1919](https://github.com/JetBrains/compose-multiplatform-core/pull/1919)
+- Add `@Composable` annotations to the actual `WindowInsets.Companion.*` extensions to match the expected declarations [#1919](https://github.com/JetBrains/compose-multiplatform-core/pull/1919), [#1720](https://github.com/JetBrains/compose-multiplatform-core/pull/1720)
 
 ## Features
 
