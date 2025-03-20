@@ -18,13 +18,9 @@ _Changes since 1.8.0-alpha04_
 
 ## Fixes
 
-### Multiple Platforms
-
-- Changes pressing backspace in a textfield to delete diacritic marks, if any, rather than the entire character [#1869](https://github.com/JetBrains/compose-multiplatform-core/pull/1869)
-
 ### iOS
 
-- Removed permissions alert when pasting text into a TextField [#1894](https://github.com/JetBrains/compose-multiplatform-core/pull/1894)
+- Removed permissions alert when pasting text into a `TextField` [#1894](https://github.com/JetBrains/compose-multiplatform-core/pull/1894)
 - Fix crash when removing popup during scene size change animation [#1878](https://github.com/JetBrains/compose-multiplatform-core/pull/1878)
 - Fix accessibility elements rects when `ComposeUIViewController` is shifted [#1899](https://github.com/JetBrains/compose-multiplatform-core/pull/1899)
 - Fixed an issue where it wasn't possible to open a popup using pointer input devices [#1906](https://github.com/JetBrains/compose-multiplatform-core/pull/1906)
