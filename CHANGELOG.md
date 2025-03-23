@@ -31,7 +31,7 @@ _Changes since 1.8.0-alpha04_
 ### Desktop
 
 - [Windows] Fixed ordering of `SwingPanel`s when using `compose.interop.blending=true` [#1901](https://github.com/JetBrains/compose-multiplatform-core/pull/1901)
-- Fix the background flashing when closing a window/dialog [#1911](https://github.com/JetBrains/compose-multiplatform-core/pull/1911)
+- [macOS] Fix, for some cases, the background flashing when closing a window/dialog. This can still happen if an animation is running when the window or dialog is closing [#1911](https://github.com/JetBrains/compose-multiplatform-core/pull/1911)
 - Fix `onRenderApiChanged` in `ComposeWindow` and `ComposeDialog` not working when the renderer changes due to fallback, rather than explicit change [#1911](https://github.com/JetBrains/compose-multiplatform-core/pull/1911)
 - [Swing Interop] Fixed `compose.interop.blending=true` completely breaking Swing interop on Windows when Direct3D is unsupported. Note that interop blending is still supported on Windows only if Direct3D is available [#1913](https://github.com/JetBrains/compose-multiplatform-core/pull/1913)
 
