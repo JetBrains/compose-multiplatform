@@ -17,8 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, macos-14, windows-2022]
-        gradle: [7.4, 8.10.2]
-        agp: [8.1.0, 8.5.0, 8.8.0-alpha08]
+        gradle: [7.4, 8.13]
+        agp: [8.6.0, 8.9.0]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
