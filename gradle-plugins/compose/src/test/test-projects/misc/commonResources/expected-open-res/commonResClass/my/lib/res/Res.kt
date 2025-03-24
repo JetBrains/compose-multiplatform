@@ -1,14 +1,10 @@
-@file:OptIn(
-  org.jetbrains.compose.resources.InternalResourceApi::class,
-  org.jetbrains.compose.resources.ExperimentalResourceApi::class,
-)
+@file:OptIn(org.jetbrains.compose.resources.InternalResourceApi::class)
 
 package my.lib.res
 
 import kotlin.ByteArray
 import kotlin.OptIn
 import kotlin.String
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.getResourceUri
 import org.jetbrains.compose.resources.readResourceBytes
 
@@ -21,7 +17,6 @@ public object Res {
    * @param path The path of the file to read in the compose resource's directory.
    * @return The content of the file as a byte array.
    */
-  @ExperimentalResourceApi
   public suspend fun readBytes(path: String): ByteArray =
       readResourceBytes("composeResources/my.lib.res/" + path)
 
@@ -33,7 +28,6 @@ public object Res {
    * @param path The path of the file in the compose resource's directory.
    * @return The URI string of the file.
    */
-  @ExperimentalResourceApi
   public fun getUri(path: String): String = getResourceUri("composeResources/my.lib.res/" + path)
 
   public object drawable

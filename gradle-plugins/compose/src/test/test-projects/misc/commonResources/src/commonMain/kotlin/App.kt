@@ -11,7 +11,6 @@ import app.group.resources_test.generated.resources.emptyFont
 import app.group.resources_test.generated.resources.vector
 import org.jetbrains.compose.resources.*
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun App() {
     Column {
