@@ -66,7 +66,6 @@ expect fun Font(
  * @param resource The font resource.
  * @return The byte array representing the font resource.
  */
-@ExperimentalResourceApi
 suspend fun getFontResourceBytes(
     environment: ResourceEnvironment,
     resource: FontResource

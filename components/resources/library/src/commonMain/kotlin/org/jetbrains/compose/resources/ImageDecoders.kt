@@ -12,7 +12,6 @@ import org.jetbrains.compose.resources.vector.toImageVector
  *
  * @return The converted ImageBitmap.
  */
-@ExperimentalResourceApi
 fun ByteArray.decodeToImageBitmap(): ImageBitmap {
     val dumbDensity = 0 //any equal source and target density disable scaling here
     return this.toImageBitmap(dumbDensity, dumbDensity)
@@ -25,7 +24,6 @@ fun ByteArray.decodeToImageBitmap(): ImageBitmap {
  *
  * @return The converted ImageVector.
  */
-@ExperimentalResourceApi
 fun ByteArray.decodeToImageVector(density: Density): ImageVector {
     return this.toXmlElement().toImageVector(density)
 }

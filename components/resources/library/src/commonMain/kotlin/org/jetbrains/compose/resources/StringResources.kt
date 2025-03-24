@@ -50,7 +50,6 @@ suspend fun getString(resource: StringResource): String =
  *
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
-@ExperimentalResourceApi
 suspend fun getString(environment: ResourceEnvironment, resource: StringResource): String =
     loadString(resource, DefaultResourceReader, environment)
 
@@ -109,7 +108,6 @@ suspend fun getString(resource: StringResource, vararg formatArgs: Any): String 
  *
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
-@ExperimentalResourceApi
 suspend fun getString(
     environment: ResourceEnvironment,
     resource: StringResource,
