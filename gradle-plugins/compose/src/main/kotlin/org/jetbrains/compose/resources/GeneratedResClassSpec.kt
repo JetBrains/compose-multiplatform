@@ -55,9 +55,6 @@ private fun ResourceType.requiresKeyName() =
     this in setOf(ResourceType.STRING, ResourceType.STRING_ARRAY, ResourceType.PLURAL_STRING)
 
 private val resourceItemClass = ClassName("org.jetbrains.compose.resources", "ResourceItem")
-private val experimentalAnnotation = AnnotationSpec.builder(
-    ClassName("org.jetbrains.compose.resources", "ExperimentalResourceApi")
-).build()
 private val internalAnnotation = AnnotationSpec.builder(
     ClassName("org.jetbrains.compose.resources", "InternalResourceApi")
 ).build()
@@ -138,7 +135,6 @@ internal fun getResFileSpec(
         file.addAnnotation(
             AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
                 .addMember("org.jetbrains.compose.resources.InternalResourceApi::class")
-                .addMember("org.jetbrains.compose.resources.ExperimentalResourceApi::class")
                 .build()
         )
         file.addType(TypeSpec.objectBuilder("Res").also { resObject ->
@@ -158,7 +154,6 @@ internal fun getResFileSpec(
                     @return The content of the file as a byte array.
                 """.trimIndent()
                     )
-                    .addAnnotation(experimentalAnnotation)
                     .addParameter("path", String::class)
                     .addModifiers(KModifier.SUSPEND)
                     .returns(ByteArray::class)
@@ -180,7 +175,6 @@ internal fun getResFileSpec(
                     @return The URI string of the file.
                 """.trimIndent()
                     )
-                    .addAnnotation(experimentalAnnotation)
                     .addParameter("path", String::class)
                     .returns(String::class)
                     .addStatement("""return %M("$moduleDir" + path)""", getResourceUri)
@@ -335,7 +329,6 @@ internal fun getExpectResourceCollectorsFileSpec(
                         KModifier.EXPECT,
                         resModifier
                     )
-                    .addAnnotation(experimentalAnnotation)
                     .receiver(ClassName(packageName, "Res"))
                     .build()
             )
@@ -383,7 +376,6 @@ internal fun getActualResourceCollectorsFileSpec(
                 MAP.parameterizedBy(String::class.asClassName(), typeClassName),
                 mods
             )
-            .addAnnotation(experimentalAnnotation)
             .receiver(ClassName(packageName, "Res"))
             .delegate(initBlock)
             .build()

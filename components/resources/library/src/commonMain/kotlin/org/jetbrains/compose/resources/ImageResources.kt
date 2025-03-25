@@ -130,7 +130,6 @@ private fun svgPainter(resource: DrawableResource): Painter {
  * @param resource The drawable resource.
  * @return The byte array representing the drawable resource.
  */
-@ExperimentalResourceApi
 suspend fun getDrawableResourceBytes(
     environment: ResourceEnvironment,
     resource: DrawableResource
