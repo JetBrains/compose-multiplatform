@@ -109,7 +109,7 @@ fun generateChangelog() {
 
     val androidxLibToPreviousVersion = previousVersionCommitArg?.let(::androidxLibToVersion)
     val androidxLibToVersion = androidxLibToVersion(versionCommit)
-    val androidxLibToRedirectingVersion = androidxLibToRedirectingVersion(versionCommit)
+    val androidxLibToRedirectionVersion = androidxLibToRedirectionVersion(versionCommit)
 
     fun formatAndroidxLibPreviousVersion(libName: String) =
         androidxLibToPreviousVersion?.get(libName) ?: "PLACEHOLDER".also {
@@ -122,8 +122,8 @@ fun generateChangelog() {
         }
 
     fun formatAndroidxLibRedirectingVersion(libName: String) =
-        androidxLibToRedirectingVersion[libName] ?: "PLACEHOLDER".also {
-            println("Can't find $libName redirecting version. Using PLACEHOLDER")
+        androidxLibToRedirectionVersion[libName] ?: "PLACEHOLDER".also {
+            println("Can't find $libName redirection version. Using PLACEHOLDER")
         }
 
     val versionCompose = formatAndroidxLibVersion("COMPOSE")
@@ -132,8 +132,6 @@ fun generateChangelog() {
     val versionNavigation = formatAndroidxLibVersion("NAVIGATION")
 
     val versionRedirectingCompose = formatAndroidxLibRedirectingVersion("compose")
-    val versionRedirectingComposeFoundation = formatAndroidxLibRedirectingVersion("compose.foundation")
-    val versionRedirectingComposeMaterial = formatAndroidxLibRedirectingVersion("compose.material")
     val versionRedirectingComposeMaterial3 = formatAndroidxLibRedirectingVersion("compose.material3")
     val versionRedirectingComposeMaterial3Adaptive = formatAndroidxLibRedirectingVersion("compose.material3.adaptive")
     val versionRedirectingLifecycle = formatAndroidxLibRedirectingVersion("lifecycle")
@@ -199,8 +197,8 @@ fun generateChangelog() {
                     - Gradle Plugin `org.jetbrains.compose`, version `$versionCompose`. Based on Jetpack Compose libraries:
                       - [Runtime $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-runtime#$versionRedirectingCompose)
                       - [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose)
-                      - [Foundation $versionRedirectingComposeFoundation](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingComposeFoundation)
-                      - [Material $versionRedirectingComposeMaterial](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingComposeMaterial)
+                      - [Foundation $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingCompose)
+                      - [Material $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingCompose)
                       - [Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3)
     
                     - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:$versionLifecycle`. Based on [Jetpack Lifecycle $versionRedirectingLifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle#$versionRedirectingLifecycle)
@@ -421,16 +419,17 @@ fun pullRequest(repo: String, prNumber: String): GitHubPullEntry {
 }
 
 /**
- * Extract redirecting versions from core repo, file gradle.properties
+ * Extract redirection versions from core repo, file gradle.properties
  *
  * Example
  * https://raw.githubusercontent.com/JetBrains/compose-multiplatform-core/v1.8.0%2Bdev1966/gradle.properties
  * artifactRedirecting.androidx.graphics.version=1.0.1
  */
-fun androidxLibToRedirectingVersion(commit: String): Map<String, String> {
+fun androidxLibToRedirectionVersion(commit: String): Map<String, String> {
     val gradleProperties = githubContentOf("JetBrains/compose-multiplatform-core", "gradle.properties", commit)
-    val regex = Regex("artifactRedirection\\.version\\.androidx\\.(.*)=(.*)")
-    return regex.findAll(gradleProperties).associate { result ->
+    val regexV1 = Regex("artifactRedirecting\\.androidx\\.(.*)\\.version=(.*)")
+    val regexV2 = Regex("artifactRedirection\\.version\\.androidx\\.(.*)=(.*)") // changed in https://github.com/JetBrains/compose-multiplatform-core/pull/1946/files#diff-3d103fc7c312a3e136f88e81cef592424b8af2464c468116545c4d22d6edcf19R100
+    return listOf(regexV1, regexV2).flatMap { it.findAll(gradleProperties) }.associate { result ->
         result.groupValues[1].trim() to result.groupValues[2].trim()
     }
 }
