@@ -3,9 +3,10 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import kotlin.text.replace
 
 plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.kotlin.plugin.compose")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 version = "1.0-SNAPSHOT"
@@ -56,15 +57,16 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.runtime)
                 implementation(compose.components.resources)
-                implementation("org.jetbrains.kotlinx:kotlinx-io-core:0.6.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+                implementation(libs.kotlinx.serialization.json)
+                implementation(libs.kotlinx.io)
+                implementation(libs.kotlinx.datetime)
             }
         }
 
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.1")
+                runtimeOnly(libs.kotlinx.coroutines.swing)
             }
         }
     }
@@ -77,21 +79,23 @@ compose.desktop {
 }
 
 val runArguments: String? by project
-val composeVersion: String? = project.properties["compose.version"] as? String
-val kotlinVersion: String? = project.properties["kotlin.version"] as? String
-var appArgs = runArguments
-    ?.split(" ")
-    .orEmpty().let {
-       it + listOf("versionInfo=\"$composeVersion (Kotlin $kotlinVersion)\"")
-    }
-    .map {
-        it.replace(" ", "%20")
-    }
 
-println("runArguments: $appArgs")
+val composeVersion = libs.versions.compose.multiplatform
+val kotlinVersion = libs.versions.kotlin
 
 // Handle runArguments property
 gradle.taskGraph.whenReady {
+    var appArgs = runArguments
+        ?.split(" ")
+        .orEmpty().let {
+            it + listOf("versionInfo=\"${composeVersion.get()} (Kotlin ${kotlinVersion.get()})\"")
+        }
+        .map {
+            it.replace(" ", "%20")
+        }
+
+    println("runArguments: $appArgs")
+
     tasks.named<JavaExec>("run") {
         args(appArgs)
     }

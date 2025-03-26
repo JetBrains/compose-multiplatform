@@ -19,25 +19,35 @@ import kotlinx.io.readByteArray
 
 fun saveBenchmarkStatsOnDisk(name: String, stats: BenchmarkStats) {
     try {
-        val path = Path("build/benchmarks/$name.csv")
+        if (Args.saveStatsToCSV) {
+            val path = Path("build/benchmarks/$name.csv")
 
-        val keyToValue = mutableMapOf<String, String>()
-        keyToValue.put("Date", currentFormattedDate)
-        stats.putFormattedValuesTo(keyToValue)
+            val keyToValue = mutableMapOf<String, String>()
+            keyToValue.put("Date", currentFormattedDate)
+            stats.putFormattedValuesTo(keyToValue)
 
-        var text = if (SystemFileSystem.exists(path)) {
-            SystemFileSystem.source(path).readText()
-        } else {
-            keyToValue.keys.joinToString(",") + "\n"
+            var text = if (SystemFileSystem.exists(path)) {
+                SystemFileSystem.source(path).readText()
+            } else {
+                keyToValue.keys.joinToString(",") + "\n"
+            }
+
+            fun escapeForCSV(value: String) = value.replace(",", ";")
+            text += keyToValue.values.joinToString(",", transform = ::escapeForCSV) + "\n"
+
+            SystemFileSystem.createDirectories(path.parent!!)
+            SystemFileSystem.sink(path).writeText(text)
+            println("CSV results saved to ${SystemFileSystem.resolve(path)}")
+            println()
+        } else if (Args.saveStatsToJSON) {
+            val jsonString = stats.toJsonString()
+            val jsonPath = Path("build/benchmarks/json-reports/$name.json")
+
+            SystemFileSystem.createDirectories(jsonPath.parent!!)
+            SystemFileSystem.sink(jsonPath).writeText(jsonString)
+            println("JSON results saved to ${SystemFileSystem.resolve(jsonPath)}")
+            println()
         }
-
-        fun escapeForCSV(value: String) = value.replace(",", ";")
-        text += keyToValue.values.joinToString(",", transform = ::escapeForCSV) + "\n"
-
-        SystemFileSystem.createDirectories(path.parent!!)
-        SystemFileSystem.sink(path).writeText(text)
-        println("Results saved to ${SystemFileSystem.resolve(path)}")
-        println()
     } catch (_: IOException) {
         // IOException "Read-only file system" is thrown on iOS without writing permissions
     } catch (_: UnsupportedOperationException) {

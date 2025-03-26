@@ -4,6 +4,8 @@ import benchmarks.complexlazylist.components.MainUiNoImageUseModel
 import benchmarks.example1.Example1
 import benchmarks.lazygrid.LazyGrid
 import benchmarks.visualeffects.NYContent
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 
@@ -29,6 +31,7 @@ data class BenchmarkFrame(
         }
 }
 
+@Serializable
 data class BenchmarkConditions(
     val frameCount: Int,
     val warmupCount: Int
@@ -42,6 +45,7 @@ data class BenchmarkConditions(
     }
 }
 
+@Serializable
 data class FrameInfo(
     val cpuTime: Duration,
     val gpuTime: Duration,
@@ -61,11 +65,13 @@ data class FrameInfo(
     }
 }
 
+@Serializable
 data class BenchmarkPercentileAverage(
     val percentile: Double,
     val average: Duration
 )
 
+@Serializable
 data class MissedFrames(
     val count: Int,
     val ratio: Double
@@ -86,7 +92,11 @@ data class MissedFrames(
     }
 }
 
+private val json = Json { prettyPrint = true }
+
+@Serializable
 data class BenchmarkStats(
+    val name: String,
     val frameBudget: Duration,
     val conditions: BenchmarkConditions,
     val averageFrameInfo: FrameInfo?,
@@ -152,9 +162,12 @@ data class BenchmarkStats(
             )
         }
     }
+
+    fun toJsonString(): String = json.encodeToString(serializer(), this)
 }
 
 class BenchmarkResult(
+    private val name: String,
     private val frameBudget: Duration,
     private val conditions: BenchmarkConditions,
     private val averageFrameInfo: FrameInfo,
@@ -182,6 +195,7 @@ class BenchmarkResult(
         }
 
         return BenchmarkStats(
+            name,
             frameBudget,
             conditions,
             averageFrameInfo,
@@ -221,11 +235,18 @@ suspend fun runBenchmark(
 ) {
     if (Args.isBenchmarkEnabled(name)) {
         println("# $name")
-        val stats = measureComposable(warmupCount, Args.getBenchmarkProblemSize(name, frameCount), width, height, targetFps, graphicsContext, content).generateStats()
+        val stats = measureComposable(
+            name,
+            warmupCount,
+            Args.getBenchmarkProblemSize(name, frameCount),
+            width,
+            height,
+            targetFps,
+            graphicsContext,
+            content
+        ).generateStats()
         stats.prettyPrint()
-        if (Args.saveStatsOnDisk) {
-            saveBenchmarkStatsOnDisk(name, stats)
-        }
+        saveBenchmarkStatsOnDisk(name, stats)
     }
 }
 
@@ -241,6 +262,6 @@ suspend fun runBenchmarks(
     runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext) { AnimatedVisibility() }
     runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext) { LazyGrid() }
     runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext) { NYContent(width, height) }
-    runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel()}
+    runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel() }
     runBenchmark("Example1", width, height, targetFps, 1000, graphicsContext) { Example1() }
 }
