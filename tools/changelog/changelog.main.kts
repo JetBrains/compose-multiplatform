@@ -429,7 +429,7 @@ fun pullRequest(repo: String, prNumber: String): GitHubPullEntry {
  */
 fun androidxLibToRedirectingVersion(commit: String): Map<String, String> {
     val gradleProperties = githubContentOf("JetBrains/compose-multiplatform-core", "gradle.properties", commit)
-    val regex = Regex("artifactRedirecting\\.androidx\\.(.*)\\.version=(.*)")
+    val regex = Regex("artifactRedirection\\.version\\.androidx\\.(.*)=(.*)")
     return regex.findAll(gradleProperties).associate { result ->
         result.groupValues[1].trim() to result.groupValues[2].trim()
     }
