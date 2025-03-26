@@ -23,15 +23,8 @@ fun graphicsContext() = object : GraphicsContext {
     private val device = MTLCreateSystemDefaultDevice() ?: throw IllegalStateException("Can't create MTLDevice")
     private val commandQueue = device.newCommandQueue() ?: throw IllegalStateException("Can't create MTLCommandQueue")
     private val directContext = DirectContext.makeMetal(device.objcPtr(), commandQueue.objcPtr())
-            private var cachedSurface: Surface? = null
 
     override fun surface(width: Int, height: Int): Surface {
-        val oldSurface = cachedSurface
-
-        if (oldSurface != null && oldSurface.width == width && oldSurface.height == height) {
-            return oldSurface
-        }
-
         val descriptor = MTLTextureDescriptor()
         descriptor.width = width.toULong()
         descriptor.height = height.toULong()
@@ -51,9 +44,7 @@ fun graphicsContext() = object : GraphicsContext {
             SurfaceColorFormat.BGRA_8888,
             ColorSpace.sRGB,
             SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)
-        ).also {
-            cachedSurface = it
-        } ?: throw IllegalStateException("Can't create Surface")
+        ) ?: throw IllegalStateException("Can't create Surface")
     }
 
     override suspend fun awaitGPUCompletion() {
