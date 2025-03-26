@@ -53,7 +53,7 @@ fun customLaunch(benchmarkName: String, frameCount: Int): Promise<JsAny?> {
     }
 
     return MainScope().promise {
-        runBenchmarks()
+        runBenchmarks(warmupCount = 0)
         jsOne
     }
 }
