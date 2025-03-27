@@ -5,7 +5,7 @@ body:
     attributes:
       value: |
         Thank you for taking the time to file a bug report.
-        The Amper project works with issues in YouTrack, so please report issues over there:
+        The Compose Multiplatform project works with issues in YouTrack, so please report issues over there:
         https://youtrack.jetbrains.com/newIssue?project=CMP
 
         We had to create this issue template as a workaround for this GitHub bug:
