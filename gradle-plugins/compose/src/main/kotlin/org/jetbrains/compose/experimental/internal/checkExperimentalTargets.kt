@@ -20,14 +20,14 @@ private const val SKIKO_ARTIFACT_PREFIX = "org.jetbrains.skiko:skiko"
 
 private class TargetType(
     val id: String,
-    val presets: List<String>
+    val identifiers: List<String>
 )
 
 private val TargetType.gradlePropertyName get() = "org.jetbrains.compose.experimental.$id.enabled"
 
 private val EXPERIMENTAL_TARGETS: Set<TargetType> = setOf(
-    TargetType("macos", presets = listOf("macosX64", "macosArm64")),
-    TargetType("jscanvas", presets = listOf("jsIr", "js")),
+    TargetType("macos", identifiers = listOf("macosX64", "macosArm64")),
+    TargetType("jscanvas", identifiers = listOf("jsIr", "js")),
 )
 
 private sealed interface CheckResult {
@@ -59,10 +59,10 @@ private fun checkExperimentalTargetsWithSkikoIsEnabled(
 }
 
 private fun checkTarget(project: Project, target: KotlinTarget): CheckResult {
-    val presetName = target.preset?.name ?: return CheckResult.Success
+    val targetIdentifier = target.disambiguationClassifier ?: return CheckResult.Success
 
     val targetType = EXPERIMENTAL_TARGETS.firstOrNull {
-        it.presets.contains(presetName)
+        it.identifiers.contains(targetIdentifier)
     } ?: return CheckResult.Success
 
     val targetConfigurationNames = target.compilations.map { compilation ->
