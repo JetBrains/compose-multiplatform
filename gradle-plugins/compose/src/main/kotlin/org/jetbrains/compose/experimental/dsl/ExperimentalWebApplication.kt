@@ -5,14 +5,12 @@
 
 package org.jetbrains.compose.experimental.dsl
 
+import org.jetbrains.compose.internal.DEPRECATED_EXPERIMENTAL_MESSAGE_FOR_WEB_IN_CONFIGURATION
 import javax.inject.Inject
 
 @Deprecated(
-    message = "Starting from 1.6.10, Compose for Web goes to Alpha. Experimental configuration is not needed anymore.",
+    message = DEPRECATED_EXPERIMENTAL_MESSAGE_FOR_WEB_IN_CONFIGURATION,
 )
-abstract class ExperimentalWebApplication  @Inject constructor(
-    @Suppress("unused")
-    val name: String,
-) {
-
-}
+abstract class ExperimentalWebApplication @Inject constructor(
+    @Suppress("unused") val name: String,
+)
