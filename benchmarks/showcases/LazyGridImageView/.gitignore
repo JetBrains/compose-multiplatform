@@ -1,0 +1,11 @@
+.kotlin
+.gradle
+.idea
+**/build/
+local.properties
+iosApp/iosApp.xcworkspace/*
+iosApp/iosApp.xcodeproj/*
+!iosApp/iosApp.xcodeproj/project.pbxproj
+nativeiosApp/nativeiosApp.xcworkspace/*
+nativeiosApp/nativeiosApp.xcodeproj/*
+!nativeiosApp/nativeiosApp.xcodeproj/project.pbxproj

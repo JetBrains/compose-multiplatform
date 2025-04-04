@@ -1,0 +1,5 @@
+package org.jetbrains.lazygridimage
+
+import androidx.compose.ui.window.ComposeUIViewController
+
+fun MainViewController() = ComposeUIViewController { App() }
