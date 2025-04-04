@@ -1,10 +1,10 @@
 import kotlinx.validation.ExperimentalBCVApi
 import org.jetbrains.compose.ExperimentalComposeLibrary
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
+    id("org.jetbrains.kotlin.plugin.compose")
     id("maven-publish")
     id("com.android.library")
     id("org.jetbrains.kotlinx.binary-compatibility-validator")
@@ -30,8 +30,13 @@ kotlin {
             })
         }
     }
-    @OptIn(ExperimentalWasmDsl::class)
+
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs {
+        compilations.getByName("test").compileTaskProvider.configure {
+            // https://youtrack.jetbrains.com/issue/KT-69014
+            compilerOptions.freeCompilerArgs.add("-Xwasm-enable-array-range-checks")
+        }
         browser {
             testTask(Action {
                 useKarma {

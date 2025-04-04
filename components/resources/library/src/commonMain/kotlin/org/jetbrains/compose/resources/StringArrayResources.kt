@@ -57,7 +57,6 @@ suspend fun getStringArray(resource: StringArrayResource): List<String> =
  *
  * @throws IllegalStateException if the string array with the given ID is not found.
  */
-@ExperimentalResourceApi
 suspend fun getStringArray(
     environment: ResourceEnvironment,
     resource: StringArrayResource

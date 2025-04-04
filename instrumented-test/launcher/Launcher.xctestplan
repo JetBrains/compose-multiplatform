@@ -1,0 +1,28 @@
+{
+  "configurations" : [
+    {
+      "id" : "BD8089FB-4512-49DD-9E9F-FE08E8CF5266",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:CMPUIKitUtils.xcodeproj",
+      "identifier" : "997DFCF92B18E5D3000B56B5",
+      "name" : "CMPUIKitUtilsTestApp"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:Launcher.xcodeproj",
+        "identifier" : "997DFCE22B18D99E000B56B5",
+        "name" : "Launcher"
+      }
+    }
+  ],
+  "version" : 1
+}

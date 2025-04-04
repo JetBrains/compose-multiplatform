@@ -31,7 +31,6 @@ internal val androidInstrumentedContext get() = InstrumentationRegistry.getInstr
  * }
  * ```
  */
-@ExperimentalResourceApi
 @Composable
 fun PreviewContextConfigurationEffect() {
     if (LocalInspectionMode.current) {

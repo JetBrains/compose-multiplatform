@@ -3,6 +3,7 @@ import org.jetbrains.compose.gradle.standardConf
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 val integrationTestsEnabled: Boolean = project.properties.getValue("integrationTestsEnabled") == "true"

@@ -1,0 +1,18 @@
+name: "↓ Please use another option below ↓"
+description: Please do not use this template, and report issues in YouTrack instead
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to file a bug report.
+        The Compose Multiplatform project works with issues in YouTrack, so please report issues over there:
+        https://youtrack.jetbrains.com/newIssue?project=CMP
+
+        We had to create this issue template as a workaround for this GitHub bug:
+        https://github.com/orgs/community/discussions/153714
+  - type: checkboxes
+    attributes:
+      label: Please confirm that you understood the above message
+      options:
+        - label: "I have read the message and will create the issue in YouTrack instead"
+          required: true

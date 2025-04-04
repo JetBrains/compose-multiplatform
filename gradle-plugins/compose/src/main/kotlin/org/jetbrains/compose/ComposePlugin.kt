@@ -84,7 +84,7 @@ abstract class ComposePlugin : Plugin<Project> {
         val uiTooling get() = composeDependency("org.jetbrains.compose.ui:ui-tooling")
         val uiUtil get() = composeDependency("org.jetbrains.compose.ui:ui-util")
         val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
-        val materialIconsExtended get() = "org.jetbrains.compose.material:material-icons-extended:1.7.0-rc01"
+        val materialIconsExtended get() = "org.jetbrains.compose.material:material-icons-extended:1.7.3"
         val components get() = CommonComponentsDependencies
         @Deprecated("Use compose.html", replaceWith = ReplaceWith("html"))
         val web: WebDependencies get() = WebDependencies
@@ -98,6 +98,7 @@ abstract class ComposePlugin : Plugin<Project> {
         val linux_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-linux-x64")
         val linux_arm64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-linux-arm64")
         val windows_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-windows-x64")
+        val windows_arm64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-windows-arm64")
         val macos_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-x64")
         val macos_arm64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-arm64")
 

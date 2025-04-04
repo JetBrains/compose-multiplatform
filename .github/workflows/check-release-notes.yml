@@ -1,0 +1,21 @@
+# Checks Release Notes in the PR description, runs when:
+#   opened - PR is opened
+#   edited - The title/description are changed
+#   synchronize - New commits appeared.
+#                 We don't use the new content, but we still need to mark this commit Green/Red in GitHub UI
+
+name: Check Release Notes in the description
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: 'tools/changelog/check-release-notes-github-action'
+      - uses: ./tools/changelog/check-release-notes-github-action
+        with:
+          checkout_ref: ${{ github.ref }}
