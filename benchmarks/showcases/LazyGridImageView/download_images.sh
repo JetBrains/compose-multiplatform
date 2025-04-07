@@ -8,15 +8,15 @@ mkdir -p "$TARGET_DIR"
 mkdir -p "$TARGET_DIR_IOS"
 mkdir -p "$TARGET_DIR_ANDROID"
 
-echo "Downloading 1000 images from picsum.photos..."
+echo "Downloading 999 images from picsum.photos..."
 
-# Download 1000 images
-for i in $(seq 1 1000); do
+# Download 999 images
+for i in $(seq 1 999); do
     imagename="image$(printf "%03d" $i)" 
     filename="${imagename}.jpg"
     filepath="$TARGET_DIR/$filename"
 
-    echo "Downloading image $i/1000: $filename"
+    echo "Downloading image $i/999: $filename"
 
     # Use a specific image ID to ensure we get different images
     # picsum.photos has images with IDs from 0 to about 1084

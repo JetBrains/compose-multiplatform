@@ -54,7 +54,7 @@ fun App() {
     var currentIndex by remember { mutableStateOf(0) }
 
     val drawableResources = remember {
-        List(1000) { index ->
+        List(999) { index ->
             val imageFilenames = context.assets.list("drawable") ?: emptyArray()
             "drawable/${imageFilenames[index % imageFilenames.size]}"
         }

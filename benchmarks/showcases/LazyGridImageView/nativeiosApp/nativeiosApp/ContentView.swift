@@ -63,7 +63,8 @@ struct ContentView: View {
 
     private func loadImageNames() {
         var existingImages: [String] = []
-        (1...1000).forEach { index in
+        let numOfImages = 999
+        (1...numOfImages).forEach { index in
             let name = "image\(String(format: "%03d", index))"
             if (UIImage(named: name) != nil) {
                 existingImages.append(name)
@@ -74,7 +75,7 @@ struct ContentView: View {
             return
         }
      
-        imageNames = (0..<1000).map { index in
+        imageNames = (0..<numOfImages).map { index in
             existingImages[index % existingImages.count]
         }
     }

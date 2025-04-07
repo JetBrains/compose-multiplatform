@@ -8,7 +8,7 @@ The project includes three different implementations of the same functionality:
 2. **Native Android** - a pure Android implementation using Jetpack Compose
 3. **Native iOS** - a pure iOS implementation using SwiftUI
 
-The application displays 1000 images in a LazyVerticalGrid (or equivalent on each platform) with 3 columns. 
+The application displays 999 images in a LazyVerticalGrid (or equivalent on each platform) with 3 columns. 
 The images are loaded from local resources:
 
 - In the Compose Multiplatform version, images are loaded using the Compose Multiplatform resource system
@@ -34,7 +34,7 @@ size, startup time, FPS, CPU/GPU usage, etc.
 
 ## Downloading Images
 
-This project includes a script to download 1000 different images 
+This project includes a script to download 999 different images 
 from [Picsum Photos](https://picsum.photos/) with 512x512 resolution:
 
 `./download_images.sh`
