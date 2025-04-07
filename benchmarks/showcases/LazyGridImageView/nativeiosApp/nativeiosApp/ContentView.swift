@@ -1,12 +1,15 @@
 import SwiftUI
 import Foundation
 import UIKit
+import Combine
 
 struct ContentView: View {
-    // State to hold the list of image names
     @State private var imageNames: [String] = []
+    @State private var autoScroll: Bool = false
+    @State private var scrollPosition: Int = 0
+    @State private var scrollingDown: Bool = true
+    @State private var timer: AnyCancellable?
 
-    // Define grid layout with 3 columns
     private let columns = [
         GridItem(.flexible()),
         GridItem(.flexible()),
@@ -14,19 +17,47 @@ struct ContentView: View {
     ]
 
     var body: some View {
-        ScrollView {
-            // Grid with 3 columns
-            LazyVGrid(columns: columns, spacing: 8) {
-                ForEach(0..<imageNames.count, id: \.self) { index in
-                    GridItemView(imageName: imageNames[index])
-                        .aspectRatio(1, contentMode: .fill)
+        VStack {
+            // Toggle for auto-scrolling
+            Toggle(isOn: $autoScroll) {
+                Text("Auto Scroll")
+            }
+            .padding(.horizontal)
+            .onChange(of: autoScroll) { newValue in
+                if newValue {
+                    startAutoScroll()
+                } else {
+                    stopAutoScroll()
                 }
             }
-            .padding(8)
+
+            ScrollViewReader { proxy in
+                ScrollView {
+                    // Grid with 3 columns
+                    LazyVGrid(columns: columns, spacing: 8) {
+                        ForEach(0..<imageNames.count, id: \.self) { index in
+                            GridItemView(imageName: imageNames[index])
+                                .aspectRatio(1, contentMode: .fill)
+                                .id(index) // Add id for ScrollViewReader
+                        }
+                    }
+                    .padding(8)
+                }
+                .onChange(of: scrollPosition) { newPosition in
+                    // Scroll to the new position when scrollPosition changes
+                    withAnimation(.linear) {
+                        proxy.scrollTo(newPosition, anchor: .top)
+                    }
+                }
+            }
         }
         .onAppear {
             // Load image names when the view appears
             loadImageNames()
+        }
+        .onDisappear {
+            // Stop auto-scrolling when view disappears
+            stopAutoScroll()
         }
     }
 
@@ -45,6 +76,42 @@ struct ContentView: View {
      
         imageNames = (0..<1000).map { index in
             existingImages[index % existingImages.count]
+        }
+    }
+
+    private func startAutoScroll() {
+        // Cancel any existing timer
+        stopAutoScroll()
+
+        timer = Timer.publish(every: 0.1, on: .main, in: .common)
+            .autoconnect()
+            .sink { _ in
+                self.updateScrollPosition()
+            }
+    }
+
+    private func stopAutoScroll() {
+        timer?.cancel()
+        timer = nil
+    }
+
+    private func updateScrollPosition() {
+        if scrollingDown {
+            // Scrolling down
+            if scrollPosition < imageNames.count - columns.count - 1 {
+                scrollPosition += columns.count
+            } else {
+                // Reached bottom, change direction
+                scrollingDown = false
+            }
+        } else {
+            // Scrolling up
+            if scrollPosition > 0 {
+                scrollPosition -= columns.count
+            } else {
+                // Reached top, change direction
+                scrollingDown = true
+            }
         }
     }
 }
