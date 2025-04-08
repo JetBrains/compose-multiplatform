@@ -2,7 +2,7 @@
 
 TARGET_DIR="composeApp/src/commonMain/composeResources/drawable"
 TARGET_DIR_IOS="nativeiosApp/nativeiosApp/Assets.xcassets"
-TRAGET_DIR_ANDROID="nativeAndroidApp/app/src/main/assets/drawable"
+TARGET_DIR_ANDROID="nativeAndroidApp/app/src/main/assets/drawable"
 
 mkdir -p "$TARGET_DIR"
 mkdir -p "$TARGET_DIR_IOS"
@@ -18,13 +18,8 @@ for i in $(seq 1 999); do
 
     echo "Downloading image $i/999: $filename"
 
-    # Use a specific image ID to ensure we get different images
-    # picsum.photos has images with IDs from 0 to about 1084
-    # We'll use modulo to cycle through available IDs if we need more than available
-    image_id=$((i % 1085))
-
     # Download the image with specific ID, size 512x512, in JPG format
-    curl -s -L -o "$filepath" "https://picsum.photos/id/$image_id/512/512.jpg"
+    curl -f -s -L -o "$filepath" "https://picsum.photos/id/$i/512/512.jpg"
 
     # Check if download was successful
     if [ -s "$filepath" ]; then
@@ -65,12 +60,11 @@ for i in $(seq 1 999); do
   }
 }
 EOF
-        cp $filepath $TRAGET_DIR_ANDROID
+        cp $filepath $TARGET_DIR_ANDROID
         echo "Image $filename copied to $TARGET_DIR_ANDROID"
     fi
 
-    # Add a small delay to avoid overwhelming the server
-    sleep 0.2
+    sleep 0.1
 done
 
 echo "Download complete. Successfully downloaded images are in $TARGET_DIR, $TARGET_DIR_IOS, $TARGET_DIR_ANDROID"
