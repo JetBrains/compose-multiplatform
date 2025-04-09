@@ -40,6 +40,19 @@ suspend inline fun preciseDelay(duration: Duration) {
     while (liveDelayStart.elapsedNow() < liveDelay){}
 }
 
+/**
+ * Some of the benchmarks involved an asynchronous fetch operation for resources when running in a browser.
+ * To let the fetch operation result be handled by compose, the benchmark loop must yield the event loop.
+ * Otherwise, such benchmark do not run a part of workload, making the stats less meaningful.
+ * [EventLoop] is a helper util for this purpose.
+ * [eventLoop] is set only on main.wasmJs.kt file
+ */
+internal interface EventLoop {
+    suspend fun runMicrotasks()
+}
+
+internal var eventLoop: EventLoop? = null
+
 @OptIn(ExperimentalTime::class, InternalComposeUiApi::class)
 suspend fun measureComposable(
     name: String,
@@ -76,6 +89,7 @@ suspend fun measureComposable(
                     gpuTotalTime += measureTime {
                         graphicsContext?.awaitGPUCompletion()
                     }
+                    eventLoop?.runMicrotasks()
                 }
             }
             cpuTotalTime -= gpuTotalTime

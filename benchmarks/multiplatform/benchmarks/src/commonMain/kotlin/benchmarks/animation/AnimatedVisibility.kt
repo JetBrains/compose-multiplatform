@@ -17,7 +17,7 @@ import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import compose_benchmarks.benchmarks.generated.resources.Res
-import compose_benchmarks.benchmarks.generated.resources.compose_multiplatform
+import compose_benchmarks.benchmarks.generated.resources.img
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -38,7 +38,7 @@ fun AnimatedVisibility() {
             AnimatedVisibility(showImage) {
                 transition = this.transition
                 Image(
-                    painterResource(Res.drawable.compose_multiplatform),
+                    painterResource(Res.drawable.img),
                     null
                 )
             }
