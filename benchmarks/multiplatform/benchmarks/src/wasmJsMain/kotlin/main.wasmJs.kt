@@ -21,7 +21,7 @@ fun mainBrowser(args: Array<String>) {
     }
 
     Args.parseArgs(args)
-    Args.enableModes(Mode.CPU)
+    Args.enableModes(Mode.SIMPLE)
 
     MainScope().launch {
         runBenchmarks()
@@ -46,7 +46,7 @@ fun mainD8(args: Array<String>) {
 fun customLaunch(benchmarkName: String, frameCount: Int): Promise<JsAny?> {
     val args = "benchmarks=$benchmarkName($frameCount)"
     Args.parseArgs(arrayOf(args))
-    Args.enableModes(Mode.CPU)
+    Args.enableModes(Mode.SIMPLE)
 
     eventLoop = object : EventLoop {
         override suspend fun runMicrotasks() {
@@ -66,7 +66,7 @@ fun d8BenchmarksRunner(args: String): Promise<JsAny?> {
         println("Args = $args")
         Args.parseArgs(args.split(" ").toTypedArray())
     }
-    Args.enableModes(Mode.CPU)
+    Args.enableModes(Mode.SIMPLE)
 
     eventLoop = object : EventLoop {
         override suspend fun runMicrotasks() {
