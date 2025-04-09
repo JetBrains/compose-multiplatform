@@ -13,10 +13,10 @@ Alternatively you may open `iosApp/iosApp` project in XCode and run the app from
  - `./gradlew :benchmarks:runReleaseExecutableMacosX64` (Works on Intel processors)
 
 ## Run K/Wasm target in D8:
-`./gradlew clean :benchmarks:wasmJsD8ProductionRun`
+// TODO
 
 ## Run K/Wasm target in D8 for Jetstream3:
-`./gradlew clean :benchmarks:wasmJsD8ProductionRun -Pwasm.jetstream3=true`
+// TODO
 
 ## Run in web browser:
 

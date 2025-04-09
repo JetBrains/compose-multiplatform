@@ -47,11 +47,9 @@ kotlin {
     wasmJs {
         binaries.executable()
         d8 {
-            // compilerOptions.freeCompilerArgs.add("-Xwasm-use-new-exception-proposal")
             compilerOptions.freeCompilerArgs.add("-Xwasm-attach-js-exception")
             runTask {
                 d8Args.add("--abort-on-uncaught-exception")
-//                d8Args.add("--print-all-exceptions")
             }
         }
         browser()
@@ -108,7 +106,6 @@ gradle.taskGraph.whenReady {
 }
 
 
-val isWasmBuildForJetstream3 = project.hasProperty("wasm.jetstream3")
 tasks.withType<D8Exec>().configureEach {
     doFirst {
         val distributionDir = rootProject.layout.buildDirectory.dir(
@@ -117,8 +114,7 @@ tasks.withType<D8Exec>().configureEach {
         val file = distributionDir.get().asFile.resolve("compose-benchmarks-benchmarks-wasm-js.mjs")
         file.appendText("\nawait import('./polyfills.mjs');\n")
 
-        val newText = "\nglobalThis.isWasmBuildForJetstream3 = $isWasmBuildForJetstream3;\n" +
-                "\nglobalThis.isD8 = true;\n" + file.readText()
+        val newText = "globalThis.isD8 = true;\n" + file.readText()
         file.writeText(newText)
 
         // Use a special skiko mjs file for d8:
@@ -140,7 +136,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenExec>().c
 
 @OptIn(ExperimentalWasmDsl::class)
 rootProject.the<BinaryenRootEnvSpec>().apply {
-    version = "122"
+    // version = "122" // change only if needed
 }
 
 
