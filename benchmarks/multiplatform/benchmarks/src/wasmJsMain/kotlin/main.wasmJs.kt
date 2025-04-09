@@ -1,6 +1,8 @@
 @file:OptIn(ExperimentalJsExport::class)
 
+import kotlinx.browser.window
 import kotlinx.coroutines.*
+import org.w3c.dom.url.URLSearchParams
 import kotlin.js.Promise
 
 val jsOne = 1.toJsNumber()
@@ -9,18 +11,22 @@ fun main(args: Array<String>) {
     if (isD8env().toBoolean()) {
         mainD8(args)
     } else {
-        mainBrowser(args)
+        mainBrowser()
     }
 }
 
-fun mainBrowser(args: Array<String>) {
+fun mainBrowser() {
     eventLoop = object : EventLoop {
         override suspend fun runMicrotasks() {
             yield()
         }
     }
 
+    val urlParams = URLSearchParams(window.location.search.toJsString())
+    var i = 0
+    val args = generateSequence { urlParams.get("arg${i++}") }.toList().toTypedArray()
     Args.parseArgs(args)
+
     Args.enableModes(Mode.SIMPLE)
 
     MainScope().launch {
