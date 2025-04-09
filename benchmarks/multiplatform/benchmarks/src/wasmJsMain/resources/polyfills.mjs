@@ -11,6 +11,13 @@ if (!globalThis.navigator.languages) {
     globalThis.navigator.platform = "MacIntel";
 }
 
+if (!globalThis.gc) {
+    // No GC control in D8
+    globalThis.gc = () => {
+        // console.log('gc called');
+    };
+}
+
 // Minimal Blob polyfill
 class BlobPolyfill {
     constructor(uint8, type = '') {
@@ -30,7 +37,9 @@ class BlobPolyfill {
 globalThis.fetch = async (p) => {
     let data;
     try {
-        data = read("drawable/img.png", 'binary');
+        let path = p.replace(/^\.\//, '');
+        console.log('fetch', path);
+        data = read(path, 'binary');
     } catch (err) {
         console.log('error', err);
     }

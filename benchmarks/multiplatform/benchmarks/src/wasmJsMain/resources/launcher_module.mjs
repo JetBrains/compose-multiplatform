@@ -1,5 +1,3 @@
-globalThis.skipFunMain = true;
-globalThis.isWasmBuildForJetstream3 = false;
 globalThis.isD8 = true;
 
 import * as Li9za2lrby5tanM from './skikod8.mjs';

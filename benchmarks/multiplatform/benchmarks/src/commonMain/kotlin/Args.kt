@@ -8,6 +8,8 @@ object Args {
 
     private val benchmarks = mutableMapOf<String, Int>()
 
+    private val benchmarksToSkip = mutableSetOf<String>()
+
     var versionInfo: String? = null
         private set
 
@@ -66,10 +68,19 @@ object Args {
 
     fun isModeEnabled(mode: Mode): Boolean = modes.isEmpty() || modes.contains(mode)
 
-    fun isBenchmarkEnabled(benchmark: String): Boolean = benchmarks.isEmpty() || benchmarks.contains(benchmark.uppercase())
+    fun isBenchmarkEnabled(benchmark: String): Boolean {
+        return (benchmarks.isEmpty() || benchmarks.contains(benchmark.uppercase()))
+                && !benchmarksToSkip.contains(benchmark.uppercase())
+    }
 
     fun getBenchmarkProblemSize(benchmark: String, default: Int): Int {
         val result = benchmarks[benchmark.uppercase()]?: -1
         return if (result == -1) default else result
+    }
+
+    // Some targets can't support all the benchmarks (e.g. D8) due to limited APIs availability,
+    // so we skip them
+    fun skipBenchmark(benchmark: String) {
+        benchmarksToSkip.add(benchmark.uppercase())
     }
 }
