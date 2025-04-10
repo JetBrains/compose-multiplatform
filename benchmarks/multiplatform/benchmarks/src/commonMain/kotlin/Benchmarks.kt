@@ -254,14 +254,24 @@ suspend fun runBenchmarks(
     width: Int = 1920,
     height: Int = 1080,
     targetFps: Int = 120,
+    warmupCount: Int = 100,
     graphicsContext: GraphicsContext? = null
 ) {
     println()
     println("Running emulating $targetFps FPS")
     println()
-    runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext) { AnimatedVisibility() }
-    runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext) { LazyGrid() }
-    runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext) { NYContent(width, height) }
-    runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext) { MainUiNoImageUseModel() }
-    runBenchmark("Example1", width, height, targetFps, 1000, graphicsContext) { Example1() }
+    runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext, warmupCount) { AnimatedVisibility() }
+    runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext, warmupCount) { LazyGrid() }
+    runBenchmark("LazyGrid-ItemLaunchedEffect", width, height, targetFps, 1000, graphicsContext, warmupCount) {
+        LazyGrid(smoothScroll = false, withLaunchedEffectInItem = true)
+    }
+    runBenchmark("LazyGrid-SmoothScroll", width, height, targetFps, 1000, graphicsContext, warmupCount) {
+        LazyGrid(smoothScroll = true)
+    }
+    runBenchmark("LazyGrid-SmoothScroll-ItemLaunchedEffect", width, height, targetFps, 1000, graphicsContext, warmupCount) {
+        LazyGrid(smoothScroll = true, withLaunchedEffectInItem = true)
+    }
+    runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext, warmupCount) { NYContent(width, height) }
+    runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext, warmupCount) { MainUiNoImageUseModel()}
+    runBenchmark("Example1", width, height, targetFps, 1000, graphicsContext, warmupCount) { Example1() }
 }

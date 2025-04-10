@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenRootEnvSpec
+import org.jetbrains.kotlin.gradle.targets.js.d8.D8Exec
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import kotlin.text.replace
 
@@ -46,7 +48,13 @@ kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         binaries.executable()
-        browser ()
+        d8 {
+            compilerOptions.freeCompilerArgs.add("-Xwasm-attach-js-exception")
+            runTask {
+                d8Args.add("--abort-on-uncaught-exception")
+            }
+        }
+        browser()
     }
 
     sourceSets {
@@ -112,5 +120,53 @@ gradle.taskGraph.whenReady {
         devServerProperty = devServerProperty.get().copy(
             open = "http://localhost:8080?$args"
         )
+    }
+}
+
+
+tasks.withType<D8Exec>().configureEach {
+    doFirst {
+        val distributionDir = rootProject.layout.buildDirectory.dir(
+            "js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin/"
+        )
+        val file = distributionDir.get().asFile.resolve("compose-benchmarks-benchmarks-wasm-js.mjs")
+        file.appendText("\nawait import('./polyfills.mjs');\n")
+
+        val newText = "globalThis.isD8 = true;\n" + file.readText()
+        file.writeText(newText)
+
+        // Use a special skiko mjs file for d8:
+        val updText = file.readText()
+            .replace("from './skiko.mjs';", "from './skikod8.mjs';")
+        file.writeText(updText)
+    }
+}
+
+tasks.register("buildD8Distribution", Zip::class.java) {
+    from(rootProject.layout.buildDirectory.file("js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin"))
+    archiveFileName.set("d8-distribution.zip")
+    destinationDirectory.set(rootProject.layout.buildDirectory.dir("distributions"))
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenExec>().configureEach {
+    binaryenArgs.add("-g") // keep the readable names
+}
+
+@OptIn(ExperimentalWasmDsl::class)
+rootProject.the<BinaryenRootEnvSpec>().apply {
+    // version = "122" // change only if needed
+}
+
+
+val jsOrWasmRegex = Regex("js|wasm")
+
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group.startsWith("org.jetbrains.skiko") &&
+            jsOrWasmRegex.containsMatchIn(requested.name)
+        ) {
+            // to keep the readable names from Skiko
+            useVersion(requested.version!! + "+profiling")
+        }
     }
 }
