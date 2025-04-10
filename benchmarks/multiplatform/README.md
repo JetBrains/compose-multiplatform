@@ -33,3 +33,17 @@ Please run your browser with manual GC enabled before running the benchmark, lik
 `open -a Google\ Chrome --args --js-flags="--expose-gc"`
 
 - `./gradlew clean :benchmarks:wasmJsBrowserProductionRun` (you can see the results printed on the page itself)
+
+
+# Benchmarks description
+
+| Benchmark Name | File Path | Description |
+|----------------|-----------|-------------|
+| AnimatedVisibility | [benchmarks/src/commonMain/kotlin/benchmarks/animation/AnimatedVisibility.kt](benchmarks/src/commonMain/kotlin/benchmarks/animation/AnimatedVisibility.kt) | Tests the performance of the AnimatedVisibility component by repeatedly toggling the visibility of a PNG image. |
+| LazyGrid | [benchmarks/src/commonMain/kotlin/benchmarks/lazygrid/LazyGrid.kt](benchmarks/src/commonMain/kotlin/benchmarks/lazygrid/LazyGrid.kt) | Tests the performance of the LazyVerticalGrid component with 12,000 items and jumps to specific items multiple times while running. |
+| LazyGrid-ItemLaunchedEffect | [benchmarks/src/commonMain/kotlin/benchmarks/lazygrid/LazyGrid.kt](benchmarks/src/commonMain/kotlin/benchmarks/lazygrid/LazyGrid.kt) | Same as LazyGrid but adds a LaunchedEffect in each grid item that simulates an async task. |
+| LazyGrid-SmoothScroll | [benchmarks/src/commonMain/kotlin/benchmarks/lazygrid/LazyGrid.kt](benchmarks/src/commonMain/kotlin/benchmarks/lazygrid/LazyGrid.kt) | Same as LazyGrid but uses smooth scrolling instead of jumping to items. |
+| LazyGrid-SmoothScroll-ItemLaunchedEffect | [benchmarks/src/commonMain/kotlin/benchmarks/lazygrid/LazyGrid.kt](benchmarks/src/commonMain/kotlin/benchmarks/lazygrid/LazyGrid.kt) | Combines smooth scrolling with LaunchedEffect in each item. |
+| VisualEffects | [benchmarks/src/commonMain/kotlin/benchmarks/visualeffects/HappyNY.kt](benchmarks/src/commonMain/kotlin/benchmarks/visualeffects/HappyNY.kt) | Tests the performance of complex animations and visual effects including snow flakes, stars, and rocket particles. |
+| LazyList | [benchmarks/src/commonMain/kotlin/benchmarks/complexlazylist/components/MainUI.kt](benchmarks/src/commonMain/kotlin/benchmarks/complexlazylist/components/MainUI.kt) | Tests the performance of a complex LazyColumn implementation with features like pull-to-refresh, loading more items, and continuous scrolling. |
+| Example1 | [benchmarks/src/commonMain/kotlin/benchmarks/example1/Example1.kt](benchmarks/src/commonMain/kotlin/benchmarks/example1/Example1.kt) | Tests the performance of a comprehensive UI that showcases various Compose components including layouts, animations, and styled text. |
