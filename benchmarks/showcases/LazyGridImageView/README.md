@@ -12,7 +12,7 @@ The application displays 999 images in a LazyVerticalGrid (or equivalent on each
 The images are loaded from local resources:
 
 - In the Compose Multiplatform version, images are loaded using the Compose Multiplatform resource system
-- In the native Android version, images are loaded from the Android assets folder
+- In the native Android version, images are loaded using the Android resource system
 - In the native iOS version, images are loaded from the iOS asset catalog
 
 The project is used to compare Compose Multiplatform performance metrics with native counter-parts such us 
@@ -27,7 +27,7 @@ size, startup time, FPS, CPU/GPU usage, etc.
   - `desktopMain` - Desktop-specific code
 
 * `/nativeAndroidApp` - Contains a native Android implementation using Jetpack Compose
-  - Uses Android's asset system to load images
+  - Uses Android's resource system to load images
 
 * `/nativeiosApp` - Contains a native iOS implementation using SwiftUI
   - Uses iOS asset catalog to load images

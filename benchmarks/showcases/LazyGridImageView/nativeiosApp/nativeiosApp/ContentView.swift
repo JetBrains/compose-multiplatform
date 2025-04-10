@@ -4,6 +4,9 @@ import UIKit
 import Combine
 
 struct ContentView: View {
+    // in testing mode it is allowed to have not all images downloaded
+    private let testingMode: Bool = false
+    
     @State private var imageNames: [String] = []
     @State private var autoScroll: Bool = false
     @State private var scrollPosition: Int = 0
@@ -61,22 +64,29 @@ struct ContentView: View {
         }
     }
 
+
     private func loadImageNames() {
-        var existingImages: [String] = []
         let numOfImages = 999
-        (1...numOfImages).forEach { index in
-            let name = "image\(String(format: "%03d", index))"
-            if (UIImage(named: name) != nil) {
-                existingImages.append(name)
+        if testingMode {
+            var existingImages: [String] = []
+            (1...numOfImages).forEach { index in
+                let name = "image\(String(format: "%03d", index))"
+                if (UIImage(named: name) != nil) {
+                    existingImages.append(name)
+                }
             }
-        }
-        
-        if (existingImages.count == 0) {
-            return
-        }
-     
-        imageNames = (0..<numOfImages).map { index in
-            existingImages[index % existingImages.count]
+            
+            if (existingImages.count == 0) {
+                return
+            }
+         
+            imageNames = (0..<numOfImages).map { index in
+                existingImages[index % existingImages.count]
+            }
+        } else {
+            imageNames = (0..<numOfImages).map { index in
+                "image\(String(format: "%03d", index + 1))"
+            }
         }
     }
 

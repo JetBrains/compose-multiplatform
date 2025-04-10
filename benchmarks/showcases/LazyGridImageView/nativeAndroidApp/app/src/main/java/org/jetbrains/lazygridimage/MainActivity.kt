@@ -1,5 +1,6 @@
 package org.jetbrains.lazygridimage
 
+import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -27,9 +28,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -42,6 +43,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("DefaultLocale", "DiscouragedApi")
 @Composable
 fun App() {
     val context = LocalContext.current
@@ -54,9 +56,16 @@ fun App() {
     var currentIndex by remember { mutableStateOf(0) }
 
     val drawableResources = remember {
+        val availableResources: MutableList<Int> = mutableListOf()
+        for (i in 1..999) {
+            val resId = context.resources.getIdentifier(
+                "image" + String.format("%03d", i), "drawable", context.packageName
+            )
+            if (resId != 0) availableResources.add(resId)
+        }
+
         List(999) { index ->
-            val imageFilenames = context.assets.list("drawable") ?: emptyArray()
-            "drawable/${imageFilenames[index % imageFilenames.size]}"
+            availableResources[index % availableResources.size]
         }
     }
 
@@ -119,9 +128,9 @@ fun App() {
                     modifier = Modifier.fillMaxSize(),
                     state = gridState
                 ) {
-                    items(drawableResources) { imagePath ->
+                    items(drawableResources) { drawableResource ->
                         ImageCard(
-                            imagePath = imagePath,
+                            drawableResource = drawableResource,
                             modifier = Modifier.padding(4.dp)
                         )
                     }
@@ -133,7 +142,7 @@ fun App() {
 
 @Composable
 fun ImageCard(
-    imagePath: String,
+    drawableResource: Int,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -142,16 +151,12 @@ fun ImageCard(
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        val context = LocalContext.current
-        context.assets.open(imagePath).use { inputStream ->
-            val bitmap = BitmapFactory.decodeStream(inputStream)
-            Image(
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
+        Image(
+            painter = painterResource(drawableResource),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
     }
 }
 

@@ -2,7 +2,7 @@
 
 TARGET_DIR="composeApp/src/commonMain/composeResources/drawable"
 TARGET_DIR_IOS="nativeiosApp/nativeiosApp/Assets.xcassets"
-TARGET_DIR_ANDROID="nativeAndroidApp/app/src/main/assets/drawable"
+TARGET_DIR_ANDROID="nativeAndroidApp/app/src/main/res/drawable"
 
 mkdir -p "$TARGET_DIR"
 mkdir -p "$TARGET_DIR_IOS"

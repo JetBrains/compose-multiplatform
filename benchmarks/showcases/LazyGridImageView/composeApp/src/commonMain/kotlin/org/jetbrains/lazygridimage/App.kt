@@ -41,8 +41,8 @@ fun App() {
     var currentIndex by remember { mutableStateOf(0) }
 
     val drawableResources = remember {
+        val availableResources = Res.allDrawableResources.values.toList()
         List(999) { index ->
-            val availableResources = Res.allDrawableResources.values.toList()
             availableResources[index % availableResources.size]
         }
     }
