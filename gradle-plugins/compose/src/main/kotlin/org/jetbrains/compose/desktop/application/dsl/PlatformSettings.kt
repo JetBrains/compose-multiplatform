@@ -65,8 +65,8 @@ abstract class JvmMacOSPlatformSettings : AbstractMacOSPlatformSettings() {
     var dockName: String? = null
     var setDockNameSameAsPackageName: Boolean = true
     var appStore: Boolean = false
-    var entitlementsFile: RegularFileProperty = objects.fileProperty()
-    var runtimeEntitlementsFile: RegularFileProperty = objects.fileProperty()
+    val entitlementsFile: RegularFileProperty = objects.fileProperty()
+    val runtimeEntitlementsFile: RegularFileProperty = objects.fileProperty()
     var pkgPackageVersion: String? = null
     var pkgPackageBuildVersion: String? = null
 
