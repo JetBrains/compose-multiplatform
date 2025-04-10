@@ -59,7 +59,7 @@ fun App() {
         val availableResources: MutableList<Int> = mutableListOf()
         for (i in 1..999) {
             val resId = context.resources.getIdentifier(
-                "image" + String.format("%03d", i), "drawable", context.packageName
+                "downloaded_image" + String.format("%03d", i), "drawable", context.packageName
             )
             if (resId != 0) availableResources.add(resId)
         }

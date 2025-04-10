@@ -12,7 +12,7 @@ echo "Downloading 999 images from picsum.photos..."
 
 # Download 999 images
 for i in $(seq 1 999); do
-    imagename="image$(printf "%03d" $i)" 
+    imagename="downloaded_image$(printf "%03d" $i)" 
     filename="${imagename}.jpg"
     filepath="$TARGET_DIR/$filename"
 
@@ -38,7 +38,7 @@ for i in $(seq 1 999); do
 
     if [ -s "$filepath" ]; then
         imageset_dir="$TARGET_DIR_IOS/${imagename}.imageset"
-        
+
         mkdir -p "$imageset_dir"
 
         cp $filepath $imageset_dir
@@ -68,4 +68,3 @@ EOF
 done
 
 echo "Download complete. Successfully downloaded images are in $TARGET_DIR, $TARGET_DIR_IOS, $TARGET_DIR_ANDROID"
-
