@@ -36,10 +36,10 @@ fun mainBrowser() {
 }
 
 
-// To run all the benchmarks in d8:
-// ./gradlew :benchmarks:wasmJsProductionExecutableCompileSync --rerun-tasks
-// cd compose-multiplatform/benchmarks/multiplatform/build/js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin
-// ~/.gradle/d8/v8-mac-arm64-rel-12.5.170/d8 --module launcher.mjs
+// Currently, the initialization can't be adjusted to avoid calling the fun main, but
+// we don't want use the default fun main, because Jetstream3 requires running the workloads separately / independently of each other.
+// Also, they require that a benchmark completes before the function exists, which is not possible with if they just call fun main.
+// Therefore, they'll rely on fun customLaunch, which returns a Promise (can be awaited for).
 fun mainD8(args: Array<String>) {
     println("mainD8 is intentionally doing nothing. Read the comments in main.wasmJs.kt")
 
