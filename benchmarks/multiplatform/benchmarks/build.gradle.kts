@@ -51,7 +51,8 @@ kotlin {
         d8 {
             compilerOptions.freeCompilerArgs.add("-Xwasm-attach-js-exception")
             runTask {
-                d8Args.add("--abort-on-uncaught-exception")
+                // It aborts even on coroutine cancellation exceptions:
+                // d8Args.add("--abort-on-uncaught-exception")
             }
         }
         browser()
@@ -121,28 +122,20 @@ gradle.taskGraph.whenReady {
             open = "http://localhost:8080?$args"
         )
     }
-}
 
-
-tasks.withType<D8Exec>().configureEach {
-    doFirst {
-        val distributionDir = rootProject.layout.buildDirectory.dir(
-            "js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin/"
+    @OptIn(ExperimentalWasmDsl::class)
+    tasks.withType<D8Exec>().configureEach {
+        inputFileProperty.set(rootProject.layout.buildDirectory.file(
+            "js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin/launcher.mjs")
         )
-        val file = distributionDir.get().asFile.resolve("compose-benchmarks-benchmarks-wasm-js.mjs")
-        file.appendText("\nawait import('./polyfills.mjs');\n")
 
-        val newText = "globalThis.isD8 = true;\n" + file.readText()
-        file.writeText(newText)
-
-        // Use a special skiko mjs file for d8:
-        val updText = file.readText()
-            .replace("from './skiko.mjs';", "from './skikod8.mjs';")
-        file.writeText(updText)
+        args(appArgs)
     }
 }
 
+
 tasks.register("buildD8Distribution", Zip::class.java) {
+    dependsOn("wasmJsProductionExecutableCompileSync")
     from(rootProject.layout.buildDirectory.file("js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin"))
     archiveFileName.set("d8-distribution.zip")
     destinationDirectory.set(rootProject.layout.buildDirectory.dir("distributions"))
@@ -156,7 +149,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenExec>().c
 rootProject.the<BinaryenRootEnvSpec>().apply {
     // version = "122" // change only if needed
 }
-
 
 val jsOrWasmRegex = Regex("js|wasm")
 
