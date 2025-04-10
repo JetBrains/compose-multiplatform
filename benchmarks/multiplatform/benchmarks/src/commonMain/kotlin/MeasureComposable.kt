@@ -44,14 +44,13 @@ suspend inline fun preciseDelay(duration: Duration) {
  * Some of the benchmarks involved an asynchronous fetch operation for resources when running in a browser.
  * To let the fetch operation result be handled by compose, the benchmark loop must yield the event loop.
  * Otherwise, such benchmark do not run a part of workload, making the stats less meaningful.
- * [EventLoop] is a helper util for this purpose.
- * [eventLoop] is set only on main.wasmJs.kt file
+ *
+ * It makes sense for all platforms, since there could be some work scheduled to run on the same Thread
+ * as the benchmarks runner. But without yielding, it won't be dispatched.
  */
-internal interface EventLoop {
-    suspend fun runMicrotasks()
+private suspend inline fun yieldEventLoop() {
+    yield()
 }
-
-internal var eventLoop: EventLoop? = null
 
 @OptIn(ExperimentalTime::class, InternalComposeUiApi::class)
 suspend fun measureComposable(
@@ -75,6 +74,7 @@ suspend fun measureComposable(
             scene.mimicSkikoRender(surface, it * nanosPerFrame, width, height)
             surface.flushAndSubmit(false)
             graphicsContext?.awaitGPUCompletion()
+            yieldEventLoop()
         }
 
         runGC()
@@ -89,7 +89,7 @@ suspend fun measureComposable(
                     gpuTotalTime += measureTime {
                         graphicsContext?.awaitGPUCompletion()
                     }
-                    eventLoop?.runMicrotasks()
+                    yieldEventLoop()
                 }
             }
             cpuTotalTime -= gpuTotalTime
@@ -132,6 +132,8 @@ suspend fun measureComposable(
                     // Emulate waiting for next vsync
                     preciseDelay(timeUntilNextVSync)
                 }
+
+                yieldEventLoop()
             }
         }
 

@@ -16,12 +16,6 @@ fun main(args: Array<String>) {
 }
 
 fun mainBrowser() {
-    eventLoop = object : EventLoop {
-        override suspend fun runMicrotasks() {
-            yield()
-        }
-    }
-
     val urlParams = URLSearchParams(window.location.search.toJsString())
     var i = 0
     val args = generateSequence { urlParams.get("arg${i++}") }.toList().toTypedArray()
@@ -54,12 +48,6 @@ fun customLaunch(benchmarkName: String, frameCount: Int): Promise<JsAny?> {
     Args.parseArgs(arrayOf(args))
     Args.enableModes(Mode.SIMPLE)
 
-    eventLoop = object : EventLoop {
-        override suspend fun runMicrotasks() {
-            yield()
-        }
-    }
-
     return MainScope().promise {
         runBenchmarks(warmupCount = 0)
         jsOne
@@ -73,12 +61,6 @@ fun d8BenchmarksRunner(args: String): Promise<JsAny?> {
         Args.parseArgs(args.split(" ").toTypedArray())
     }
     Args.enableModes(Mode.SIMPLE)
-
-    eventLoop = object : EventLoop {
-        override suspend fun runMicrotasks() {
-            yield()
-        }
-    }
 
     return MainScope().promise {
         runBenchmarks()
