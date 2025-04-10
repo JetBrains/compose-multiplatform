@@ -13,10 +13,18 @@ Alternatively you may open `iosApp/iosApp` project in XCode and run the app from
  - `./gradlew :benchmarks:runReleaseExecutableMacosX64` (Works on Intel processors)
 
 ## Run K/Wasm target in D8:
-// TODO
+`./gradlew :benchmarks:wasmJsD8ProductionRun`
 
-## Run K/Wasm target in D8 for Jetstream3:
-// TODO
+or with arguments:
+
+`./gradlew :benchmarks:wasmJsD8ProductionRun -PrunArguments=benchmarks=AnimatedVisibility`
+
+## To build and run a K/Wasm D8 distribution for Jetstream3-like:
+`./gradlew :benchmarks:buildD8Distribution --rerun-tasks`
+
+then in a distribution directory run using your D8 binary:
+
+`~/.gradle/d8/v8-mac-arm64-rel-11.9.85/d8 --module launcher_jetstream3.mjs -- AnimatedVisibility 1000`
 
 ## Run in web browser:
 
