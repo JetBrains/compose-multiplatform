@@ -29,6 +29,12 @@
 -dontwarn java.lang.ClassValue
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 
+# https://youtrack.jetbrains.com/issue/CMP-3818/Update-ProGuard-to-version-7.4-to-support-new-Java-versions
+# https://youtrack.jetbrains.com/issue/CMP-7577/Desktop-runRelease-crash-when-upgrade-to-CMP-1.8.0-alpha02
+-keep,allowshrinking,allowobfuscation class kotlinx.coroutines.flow.FlowKt { *; }
+-keep,allowshrinking,allowobfuscation class kotlinx.coroutines.Job { *; }
+-dontnote kotlinx.coroutines.**
+
 # Kotlinx Datetime
 #   Material3 depends on it, and it references `kotlinx.serialization`, which is optional
 #   Copied from https://github.com/Kotlin/kotlinx-datetime/blob/v0.6.2/core/jvm/resources/META-INF/proguard/datetime.pro
@@ -56,4 +62,6 @@
 -dontwarn org.graalvm.compiler.core.aarch64.AArch64NodeMatchRules_MatchStatementSet*
 
 # Androidx
+-keep,allowshrinking,allowobfuscation class androidx.compose.runtime.SnapshotStateKt__DerivedStateKt { *; }
+-keep class androidx.compose.material3.SliderDefaults { *; }
 -dontnote androidx.**
