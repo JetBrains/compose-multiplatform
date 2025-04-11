@@ -8,6 +8,8 @@ object Args {
 
     private val benchmarks = mutableMapOf<String, Int>()
 
+    private val disabledBenchmarks = mutableSetOf<String>()
+
     var versionInfo: String? = null
         private set
 
@@ -55,12 +57,43 @@ object Args {
 
     private fun String.decodeArg() = replace("%20", " ")
 
+    /**
+     * We have a case when Args.parseArgs is called multiple times in the same process (for D8):
+     * the benchmarks run independently in the same process.
+     * Since the collections are static, they must be cleared before applying new arguments.
+     */
+    internal fun reset() {
+        modes.clear()
+        benchmarks.clear()
+    }
+
+    fun enableModes(vararg modes: Mode) = this.modes.addAll(modes)
+
     fun isModeEnabled(mode: Mode): Boolean = modes.isEmpty() || modes.contains(mode)
 
-    fun isBenchmarkEnabled(benchmark: String): Boolean = benchmarks.isEmpty() || benchmarks.contains(benchmark.uppercase())
+    fun isBenchmarkEnabled(benchmark: String): Boolean {
+        return (benchmarks.isEmpty() || benchmarks.contains(benchmark.uppercase()))
+                && !disabledBenchmarks.contains(benchmark.uppercase())
+    }
 
     fun getBenchmarkProblemSize(benchmark: String, default: Int): Int {
         val result = benchmarks[benchmark.uppercase()]?: -1
         return if (result == -1) default else result
+    }
+
+    /**
+     * Some targets can't support all the benchmarks (e.g. D8) due to limited APIs availability,
+     * so we disable them
+     */
+    fun disableBenchmark(benchmark: String) {
+        disabledBenchmarks.add(benchmark.uppercase())
+    }
+
+    /**
+     * In case of K/Wasm D8 fun customLaunch,
+     * it makes sense to configure the Args without parsing the args string
+     */
+    fun addBenchmark(benchmark: String, problemSize: Int) {
+        benchmarks[benchmark.uppercase()] = problemSize
     }
 }

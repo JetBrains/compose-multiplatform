@@ -40,6 +40,18 @@ suspend inline fun preciseDelay(duration: Duration) {
     while (liveDelayStart.elapsedNow() < liveDelay){}
 }
 
+/**
+ * Some of the benchmarks involved an asynchronous fetch operation for resources when running in a browser.
+ * To let the fetch operation result be handled by compose, the benchmark loop must yield the event loop.
+ * Otherwise, such benchmark do not run a part of workload, making the stats less meaningful.
+ *
+ * It makes sense for all platforms, since there could be some work scheduled to run on the same Thread
+ * as the benchmarks runner. But without yielding, it won't be dispatched.
+ */
+private suspend inline fun yieldEventLoop() {
+    yield()
+}
+
 @OptIn(ExperimentalTime::class, InternalComposeUiApi::class)
 suspend fun measureComposable(
     name: String,
@@ -62,6 +74,7 @@ suspend fun measureComposable(
             scene.mimicSkikoRender(surface, it * nanosPerFrame, width, height)
             surface.flushAndSubmit(false)
             graphicsContext?.awaitGPUCompletion()
+            yieldEventLoop()
         }
 
         runGC()
@@ -76,6 +89,7 @@ suspend fun measureComposable(
                     gpuTotalTime += measureTime {
                         graphicsContext?.awaitGPUCompletion()
                     }
+                    yieldEventLoop()
                 }
             }
             cpuTotalTime -= gpuTotalTime
@@ -118,6 +132,8 @@ suspend fun measureComposable(
                     // Emulate waiting for next vsync
                     preciseDelay(timeUntilNextVSync)
                 }
+
+                yieldEventLoop()
             }
         }
 
