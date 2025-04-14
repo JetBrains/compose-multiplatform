@@ -22,6 +22,13 @@ abstract class ResourcesExtension {
      */
     var packageOfResClass: String = ""
 
+    /**
+     * The name of the generated resources accessors class.
+     *
+     * The default is "Res".
+     */
+    var resClassName: String = "Res"
+
     enum class ResourceClassGeneration { Auto, Always, Never }
 
     //to support groovy DSL

@@ -37,3 +37,5 @@ jacoco.exec
 # Layout Inspector creates it.
 captures/
 __pycache__
+
+.kotlin/

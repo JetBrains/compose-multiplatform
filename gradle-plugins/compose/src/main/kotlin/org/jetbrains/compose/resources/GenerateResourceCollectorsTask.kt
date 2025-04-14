@@ -16,6 +16,9 @@ internal abstract class GenerateExpectResourceCollectorsTask : IdeaImportTask() 
     abstract val packageName: Property<String>
 
     @get:Input
+    abstract val resClassName: Property<String>
+
+    @get:Input
     abstract val makeAccessorsPublic: Property<Boolean>
 
     @get:OutputDirectory
@@ -31,8 +34,9 @@ internal abstract class GenerateExpectResourceCollectorsTask : IdeaImportTask() 
         logger.info("Generate expect ResourceCollectors for $kotlinDir")
 
         val pkgName = packageName.get()
+        val resClassName = resClassName.get()
         val isPublic = makeAccessorsPublic.get()
-        val spec = getExpectResourceCollectorsFileSpec(pkgName, "ExpectResourceCollectors", isPublic)
+        val spec = getExpectResourceCollectorsFileSpec(pkgName, "ExpectResourceCollectors", resClassName, isPublic)
         spec.writeTo(kotlinDir)
     }
 }
@@ -40,6 +44,9 @@ internal abstract class GenerateExpectResourceCollectorsTask : IdeaImportTask() 
 internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() {
     @get:Input
     abstract val packageName: Property<String>
+
+    @get:Input
+    abstract val resClassName: Property<String>
 
     @get:Input
     abstract val makeAccessorsPublic: Property<Boolean>
@@ -89,11 +96,13 @@ internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() 
         }.groupBy({ it.first }, { it.second })
 
         val pkgName = packageName.get()
+        val resClassName = resClassName.get()
         val isPublic = makeAccessorsPublic.get()
         val useActual = useActualModifier.get()
         val spec = getActualResourceCollectorsFileSpec(
             pkgName,
             "ActualResourceCollectors",
+            resClassName,
             isPublic,
             useActual,
             funNames
