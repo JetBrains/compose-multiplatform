@@ -11,7 +11,7 @@ import org.jetbrains.compose.resources.StringResource
 
 private const val MD: String = "composeResources/my.lib.res/"
 
-public val Res.string.android_str: StringResource by lazy {
+public val MyRes.string.android_str: StringResource by lazy {
       StringResource("string:android_str", "android_str", setOf(
         ResourceItem(setOf(), "${MD}values/strings.androidMain.cvr", 10, 39),
       ))

@@ -229,6 +229,7 @@ class ResourcesTest : GradlePluginTestBase() {
                 compose.resources {
                     publicResClass = true
                     packageOfResClass = "my.lib.res"
+                    nameOfResClass = "MyRes"
                 }
             """.trimIndent()
         }
