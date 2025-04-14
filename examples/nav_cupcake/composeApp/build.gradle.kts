@@ -141,6 +141,10 @@ compose.desktop {
             packageName = "org.jetbrains.nav_cupcake"
             packageVersion = "1.0.0"
         }
+
+        buildTypes.release.proguard {
+            configurationFiles.from(project.file("rules.pro"))
+        }
     }
 }
 
