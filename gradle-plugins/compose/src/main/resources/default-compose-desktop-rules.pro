@@ -35,6 +35,9 @@
 -keep,allowshrinking,allowobfuscation class kotlinx.coroutines.Job { *; }
 -dontnote kotlinx.coroutines.**
 
+# org.jetbrains.kotlinx:kotlinx-coroutines-swing
+-keep class kotlinx.coroutines.swing.SwingDispatcherFactory
+
 # Kotlinx Datetime
 #   Material3 depends on it, and it references `kotlinx.serialization`, which is optional
 #   Copied from https://github.com/Kotlin/kotlinx-datetime/blob/v0.6.2/core/jvm/resources/META-INF/proguard/datetime.pro
