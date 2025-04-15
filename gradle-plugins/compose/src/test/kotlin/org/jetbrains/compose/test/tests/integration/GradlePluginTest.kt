@@ -12,6 +12,7 @@ import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewLogger
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.RemoteConnection
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.receiveConfigFromGradle
 import org.jetbrains.compose.internal.Version
+import org.jetbrains.compose.newComposeCompilerError
 import org.jetbrains.compose.test.utils.GradlePluginTestBase
 import org.jetbrains.compose.test.utils.checkExists
 import org.jetbrains.compose.test.utils.checks
@@ -95,6 +96,41 @@ class GradlePluginTest : GradlePluginTestBase() {
                 check.taskSuccessful(":compileKotlinJs")
             }
         }
+
+    // Note: we can't test non-jvm targets with Kotlin older than 2.1.0, because of klib abi version bump in 2.1.0
+    private val oldestSupportedKotlinVersion = "2.1.0"
+    @Test
+    fun testOldestKotlinMpp() = with(
+        testProject(
+            "application/mpp",
+            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = oldestSupportedKotlinVersion)
+        )
+    ) {
+        val logLine = "Kotlin MPP app is running!"
+        gradle("run").checks {
+            check.taskSuccessful(":run")
+            check.logContains(logLine)
+        }
+    }
+
+    @Test
+    fun testOldestKotlinJsMpp() = with(
+        testProject(
+            "application/jsMpp",
+            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = oldestSupportedKotlinVersion)
+        )
+    ) {
+        gradle(":compileKotlinJs").checks {
+            check.taskSuccessful(":compileKotlinJs")
+        }
+    }
+
+    @Test
+    fun testOldComposePluginError() = with(testProject("misc/oldComposePlugin")) {
+        gradleFailure("tasks").checks {
+            check.logContains(newComposeCompilerError)
+        }
+    }
 
     @Test
     fun configurePreview() {
