@@ -94,6 +94,7 @@ val jar = tasks.named<Jar>("jar") {
 
 val supportedGradleVersions = project.propertyList("compose.tests.gradle.versions")
 val supportedAgpVersions = project.propertyList("compose.tests.agp.versions")
+val excludedGradleAgpVersions = project.propertyList("compose.tests.gradle-agp.exclude")
 
 fun Project.propertyList(name: String) =
     project.property(name).toString()
@@ -175,9 +176,8 @@ for (gradleVersion in supportedGradleVersions) {
              * > Failed to apply plugin 'com.android.internal.version-check'.
              * > Minimum supported Gradle version is 8.2. Current version is 7.4.
              */
-            val agpMajor = agpVersion.split('.').first().toInt()
-            val gradleMajor = gradleVersion.split('.').first().toInt()
-            onlyIf { agpMajor <= gradleMajor }
+            val isExcluded = excludedGradleAgpVersions.contains("$gradleVersion/$agpVersion")
+            onlyIf { !isExcluded }
 
             systemProperty("compose.tests.gradle.test.jdks.root", jdkForTestsRoot.absolutePath)
             systemProperty("compose.tests.gradle.version", gradleVersion)

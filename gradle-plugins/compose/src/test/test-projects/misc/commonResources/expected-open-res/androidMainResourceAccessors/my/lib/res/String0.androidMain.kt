@@ -9,8 +9,8 @@ import org.jetbrains.compose.resources.InternalResourceApi
 import org.jetbrains.compose.resources.StringResource
 
 private object AndroidMainString0 {
-  public val android_str: StringResource by 
-      lazy { init_android_str() }
+  public val android_str: StringResource by
+  lazy { init_android_str() }
 }
 
 @InternalResourceApi
@@ -23,8 +23,7 @@ public val Res.string.android_str: StringResource
 
 private fun init_android_str(): StringResource = org.jetbrains.compose.resources.StringResource(
   "string:android_str", "android_str",
-    setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(),
-    "composeResources/my.lib.res/values/strings.androidMain.cvr", 10, 39),
-    )
+  setOf(
+    org.jetbrains.compose.resources.ResourceItem(setOf(), "composeResources/my.lib.res/values/strings.androidMain.cvr", 10, 39),
+  )
 )
