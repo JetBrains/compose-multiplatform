@@ -9,8 +9,8 @@ import org.jetbrains.compose.resources.InternalResourceApi
 import org.jetbrains.compose.resources.PluralStringResource
 
 private object CommonMainPlurals0 {
-  public val numberOfSongsAvailable: PluralStringResource by 
-      lazy { init_numberOfSongsAvailable() }
+  public val numberOfSongsAvailable: PluralStringResource by
+  lazy { init_numberOfSongsAvailable() }
 }
 
 @InternalResourceApi
@@ -21,12 +21,9 @@ internal fun _collectCommonMainPlurals0Resources(map: MutableMap<String, PluralS
 internal val Res.plurals.numberOfSongsAvailable: PluralStringResource
   get() = CommonMainPlurals0.numberOfSongsAvailable
 
-private fun init_numberOfSongsAvailable(): PluralStringResource =
-    org.jetbrains.compose.resources.PluralStringResource(
+private fun init_numberOfSongsAvailable(): PluralStringResource = org.jetbrains.compose.resources.PluralStringResource(
   "plurals:numberOfSongsAvailable", "numberOfSongsAvailable",
-    setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(),
-    "composeResources/app.group.resources_test.generated.resources/values/strings.commonMain.cvr",
-    10, 124),
-    )
+  setOf(
+    org.jetbrains.compose.resources.ResourceItem(setOf(), "composeResources/app.group.resources_test.generated.resources/values/strings.commonMain.cvr", 10, 124),
+  )
 )

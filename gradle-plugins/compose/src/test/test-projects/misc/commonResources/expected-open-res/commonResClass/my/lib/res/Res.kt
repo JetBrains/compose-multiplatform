@@ -17,8 +17,7 @@ public object Res {
    * @param path The path of the file to read in the compose resource's directory.
    * @return The content of the file as a byte array.
    */
-  public suspend fun readBytes(path: String): ByteArray =
-      readResourceBytes("composeResources/my.lib.res/" + path)
+  public suspend fun readBytes(path: String): ByteArray = readResourceBytes("composeResources/my.lib.res/" + path)
 
   /**
    * Returns the URI string of the resource file at the specified path.
