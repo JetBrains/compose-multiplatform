@@ -546,6 +546,17 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun emptyResources() = with(testProject("application/emptyAppResources")) {
+        gradle(":run").checks {
+            check.taskSuccessful(":run")
+        }
+
+        gradle(":runDistributable").checks {
+            check.taskSuccessful(":runDistributable")
+        }
+    }
+
+    @Test
     fun testWixUnzip() {
         Assumptions.assumeTrue(currentOS == OS.Windows) { "The test is only relevant for Windows" }
 

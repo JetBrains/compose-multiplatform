@@ -1,0 +1,27 @@
+pluginManagement {
+    plugins {
+        id 'org.jetbrains.kotlin.jvm' version 'KOTLIN_VERSION_PLACEHOLDER'
+        id 'org.jetbrains.kotlin.plugin.compose' version 'KOTLIN_VERSION_PLACEHOLDER'
+        id 'org.jetbrains.compose' version 'COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER'
+    }
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+        mavenCentral()
+        google()
+        maven {
+            url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
+        }
+    }
+}
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        google()
+        maven {
+            url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
+        }
+        mavenLocal()
+    }
+}
+rootProject.name = "simple"
