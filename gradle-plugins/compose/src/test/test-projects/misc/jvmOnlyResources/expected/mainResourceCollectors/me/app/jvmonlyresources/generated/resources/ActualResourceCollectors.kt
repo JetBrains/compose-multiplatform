@@ -17,27 +17,22 @@ internal val Res.allDrawableResources: Map<String, DrawableResource> by lazy {
   return@lazy map
 }
 
-
 internal val Res.allStringResources: Map<String, StringResource> by lazy {
   val map = mutableMapOf<String, StringResource>()
   return@lazy map
 }
-
 
 internal val Res.allStringArrayResources: Map<String, StringArrayResource> by lazy {
   val map = mutableMapOf<String, StringArrayResource>()
   return@lazy map
 }
 
-
 internal val Res.allPluralStringResources: Map<String, PluralStringResource> by lazy {
   val map = mutableMapOf<String, PluralStringResource>()
   return@lazy map
 }
 
-
 internal val Res.allFontResources: Map<String, FontResource> by lazy {
   val map = mutableMapOf<String, FontResource>()
   return@lazy map
 }
-
