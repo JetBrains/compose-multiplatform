@@ -18,6 +18,7 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
+    implementation("org.jetbrains.compose.material:material-icons-core:1.6.11")
     testImplementation("junit", "junit", "4.12")
 }
 
