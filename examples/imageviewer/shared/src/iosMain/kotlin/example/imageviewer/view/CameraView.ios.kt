@@ -8,8 +8,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.interop.UIKitView
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.UIKitView
 import example.imageviewer.IosStorableImage
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.createNewPhotoNameAndDescription
@@ -17,14 +17,14 @@ import example.imageviewer.icon.IconPhotoCamera
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
-import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCAction
+import kotlinx.cinterop.readValue
 import kotlinx.cinterop.useContents
 import platform.AVFoundation.*
 import platform.AVFoundation.AVCaptureDeviceDiscoverySession.Companion.discoverySessionWithDeviceTypes
 import platform.AVFoundation.AVCaptureDeviceInput.Companion.deviceInputWithDevice
-import platform.CoreGraphics.CGRect
+import platform.CoreGraphics.CGRectZero
 import platform.CoreLocation.CLLocation
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.kCLLocationAccuracyBest
@@ -228,21 +228,21 @@ private fun BoxScope.RealDeviceCamera(
         }
     }
     UIKitView(
-        modifier = Modifier.fillMaxSize(),
-        background = Color.Black,
+        modifier = Modifier.fillMaxSize().background(Color.Black),
         factory = {
-            val cameraContainer = UIView()
+            val cameraContainer = object: UIView(frame = CGRectZero.readValue()) {
+                override fun layoutSubviews() {
+                    CATransaction.begin()
+                    CATransaction.setValue(true, kCATransactionDisableActions)
+                    layer.setFrame(frame)
+                    cameraPreviewLayer.setFrame(frame)
+                    CATransaction.commit()
+                }
+            }
             cameraContainer.layer.addSublayer(cameraPreviewLayer)
             cameraPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
             captureSession.startRunning()
             cameraContainer
-        },
-        onResize = { view: UIView, rect: CValue<CGRect> ->
-            CATransaction.begin()
-            CATransaction.setValue(true, kCATransactionDisableActions)
-            view.layer.setFrame(rect)
-            cameraPreviewLayer.setFrame(rect)
-            CATransaction.commit()
         },
     )
     CircularButton(
