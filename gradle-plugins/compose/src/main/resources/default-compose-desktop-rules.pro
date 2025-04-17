@@ -31,7 +31,7 @@
 
 # https://youtrack.jetbrains.com/issue/CMP-3818/Update-ProGuard-to-version-7.4-to-support-new-Java-versions
 # https://youtrack.jetbrains.com/issue/CMP-7577/Desktop-runRelease-crash-when-upgrade-to-CMP-1.8.0-alpha02
--keep,allowshrinking,allowobfuscation class kotlinx.coroutines.flow.FlowKt { *; }
+-keep,allowshrinking,allowobfuscation class kotlinx.coroutines.flow.FlowKt** { *; }
 -keep,allowshrinking,allowobfuscation class kotlinx.coroutines.Job { *; }
 -dontnote kotlinx.coroutines.**
 
