@@ -48,6 +48,7 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.material3)
+            implementation("org.jetbrains.compose.material:material-icons-core:1.6.11")
             implementation(project(":resources:library"))
         }
         desktopMain.dependencies {
@@ -80,9 +81,6 @@ android {
     }
     buildFeatures {
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
     }
 }
 
