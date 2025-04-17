@@ -39,6 +39,7 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
+                implementation("org.jetbrains.compose.material:material-icons-core:1.6.11")
                 implementation(compose.components.resources)
                 implementation(libs.kotlinx.coroutines)
             }

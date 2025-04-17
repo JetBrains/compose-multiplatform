@@ -57,6 +57,7 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.runtime)
                 implementation(compose.components.resources)
+                implementation("org.jetbrains.compose.material:material-icons-core:1.6.11")
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.kotlinx.io)
                 implementation(libs.kotlinx.datetime)
