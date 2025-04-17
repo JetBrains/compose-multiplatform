@@ -28,7 +28,6 @@ import org.jetbrains.compose.resources.configureComposeResources
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.compose.web.internal.configureWeb
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
-import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
@@ -49,7 +48,7 @@ abstract class ComposePlugin : Plugin<Project> {
         project.initializePreview(desktopExtension)
         composeExtension.extensions.create("web", WebExtension::class.java)
 
-        project.configureComposeCompilerPlugin()
+        project.checkComposeCompilerPlugin()
 
         project.configureComposeResources(resourcesExtension)
 
@@ -66,7 +65,6 @@ abstract class ComposePlugin : Plugin<Project> {
     @Suppress("DEPRECATION")
     class Dependencies(project: Project) {
         val desktop = DesktopDependencies
-        val compiler = CompilerDependencies(project)
         val animation get() = composeDependency("org.jetbrains.compose.animation:animation")
         val animationGraphics get() = composeDependency("org.jetbrains.compose.animation:animation-graphics")
         val foundation get() = composeDependency("org.jetbrains.compose.foundation:foundation")
@@ -107,16 +105,6 @@ abstract class ComposePlugin : Plugin<Project> {
         val currentOs by lazy {
             composeDependency("org.jetbrains.compose.desktop:desktop-jvm-${currentTarget.id}")
         }
-    }
-
-    class CompilerDependencies(private val project: Project) {
-        fun forKotlin(version: String) = "org.jetbrains.compose.compiler:compiler:" +
-                ComposeCompilerCompatibility.compilerVersionFor(version)
-
-        /**
-         * Compose Compiler that is chosen by the version of Kotlin applied to the Gradle project
-         */
-        val auto get() = forKotlin(project.getKotlinPluginVersion())
     }
 
     object CommonComponentsDependencies {
