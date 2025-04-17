@@ -31,6 +31,7 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
+                implementation("org.jetbrains.compose.material:material-icons-core:1.6.11")
             }
         }
         val androidMain by getting {
