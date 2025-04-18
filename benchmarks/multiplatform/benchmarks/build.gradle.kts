@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenRootEnvSpec
+import org.jetbrains.kotlin.gradle.targets.js.d8.D8Exec
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import kotlin.text.replace
 
@@ -46,7 +48,14 @@ kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         binaries.executable()
-        browser ()
+        d8 {
+            compilerOptions.freeCompilerArgs.add("-Xwasm-attach-js-exception")
+            runTask {
+                // It aborts even on coroutine cancellation exceptions:
+                // d8Args.add("--abort-on-uncaught-exception")
+            }
+        }
+        browser()
     }
 
     sourceSets {
@@ -113,5 +122,44 @@ gradle.taskGraph.whenReady {
         devServerProperty = devServerProperty.get().copy(
             open = "http://localhost:8080?$args"
         )
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    tasks.withType<D8Exec>().configureEach {
+        inputFileProperty.set(rootProject.layout.buildDirectory.file(
+            "js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin/launcher.mjs")
+        )
+
+        args(appArgs)
+    }
+}
+
+
+tasks.register("buildD8Distribution", Zip::class.java) {
+    dependsOn("wasmJsProductionExecutableCompileSync")
+    from(rootProject.layout.buildDirectory.file("js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin"))
+    archiveFileName.set("d8-distribution.zip")
+    destinationDirectory.set(rootProject.layout.buildDirectory.dir("distributions"))
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenExec>().configureEach {
+    binaryenArgs.add("-g") // keep the readable names
+}
+
+@OptIn(ExperimentalWasmDsl::class)
+rootProject.the<BinaryenRootEnvSpec>().apply {
+    // version = "122" // change only if needed
+}
+
+val jsOrWasmRegex = Regex("js|wasm")
+
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group.startsWith("org.jetbrains.skiko") &&
+            jsOrWasmRegex.containsMatchIn(requested.name)
+        ) {
+            // to keep the readable names from Skiko
+            useVersion(requested.version!! + "+profiling")
+        }
     }
 }
