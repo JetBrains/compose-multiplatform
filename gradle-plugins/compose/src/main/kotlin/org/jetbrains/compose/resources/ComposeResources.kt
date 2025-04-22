@@ -36,6 +36,7 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: Kotl
 
     if (kmpResourcesAreAvailable) {
         configureMultimoduleResources(kotlinExtension, config)
+        configureXCFrameworkComposeResources(kotlinExtension, kgp)
     } else {
         if (!disableMultimoduleResources) {
             if (!hasKmpResources) logger.info(

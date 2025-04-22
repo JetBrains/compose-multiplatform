@@ -17,6 +17,7 @@ subprojects {
         mavenCentral()
         google()
         mavenLocal()
+        maven("https://packages.jetbrains.team/maven/p/kt/dev")
     }
 
     plugins.withId("java") {
