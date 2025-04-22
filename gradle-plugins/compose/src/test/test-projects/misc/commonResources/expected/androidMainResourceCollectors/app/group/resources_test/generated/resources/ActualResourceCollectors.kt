@@ -17,7 +17,6 @@ internal actual val Res.allDrawableResources: Map<String, DrawableResource> by l
   return@lazy map
 }
 
-
 internal actual val Res.allStringResources: Map<String, StringResource> by lazy {
   val map = mutableMapOf<String, StringResource>()
   _collectAndroidMainString0Resources(map)
@@ -25,12 +24,10 @@ internal actual val Res.allStringResources: Map<String, StringResource> by lazy 
   return@lazy map
 }
 
-
 internal actual val Res.allStringArrayResources: Map<String, StringArrayResource> by lazy {
   val map = mutableMapOf<String, StringArrayResource>()
   return@lazy map
 }
-
 
 internal actual val Res.allPluralStringResources: Map<String, PluralStringResource> by lazy {
   val map = mutableMapOf<String, PluralStringResource>()
@@ -38,10 +35,8 @@ internal actual val Res.allPluralStringResources: Map<String, PluralStringResour
   return@lazy map
 }
 
-
 internal actual val Res.allFontResources: Map<String, FontResource> by lazy {
   val map = mutableMapOf<String, FontResource>()
   _collectCommonMainFont0Resources(map)
   return@lazy map
 }
-

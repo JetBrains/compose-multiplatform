@@ -17,8 +17,7 @@ internal object Res {
    * @param path The path of the file to read in the compose resource's directory.
    * @return The content of the file as a byte array.
    */
-  public suspend fun readBytes(path: String): ByteArray =
-    readResourceBytes("composeResources/me.app.jvmonlyresources.generated.resources/" + path)
+  public suspend fun readBytes(path: String): ByteArray = readResourceBytes("composeResources/me.app.jvmonlyresources.generated.resources/" + path)
 
   /**
    * Returns the URI string of the resource file at the specified path.
@@ -28,8 +27,7 @@ internal object Res {
    * @param path The path of the file in the compose resource's directory.
    * @return The URI string of the file.
    */
-  public fun getUri(path: String): String =
-    getResourceUri("composeResources/me.app.jvmonlyresources.generated.resources/" + path)
+  public fun getUri(path: String): String = getResourceUri("composeResources/me.app.jvmonlyresources.generated.resources/" + path)
 
   public object drawable
 
