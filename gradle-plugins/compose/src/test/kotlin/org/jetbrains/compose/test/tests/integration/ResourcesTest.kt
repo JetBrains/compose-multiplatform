@@ -613,6 +613,124 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun xcframeworkResourcesAreNotSupported() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+
+        with(
+            testProject(
+                "misc/appleResources",
+                defaultTestEnvironment.copy(kotlinVersion = "2.1.0"))
+        ) {
+            file("build.gradle.kts").modify { content ->
+                """
+                    |import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+                    |
+                    |plugins {
+                    |    kotlin("multiplatform")
+                    |    kotlin("plugin.compose")
+                    |    id("org.jetbrains.compose")
+                    |}
+                    |
+                    |kotlin {
+                    |    val xcf = XCFramework("ComposeApp")
+                    |
+                    |    macosArm64()
+                    |
+                    |    listOf(
+                    |        iosX64(),
+                    |        iosArm64(),
+                    |        iosSimulatorArm64()
+                    |    ).forEach {
+                    |        it.binaries.framework {
+                    |            baseName = "ComposeApp"
+                    |            isStatic = true
+                    |            xcf.add(this)
+                    |        }
+                    |    }
+                    |
+                    |    sourceSets {
+                    |        commonMain {
+                    |            dependencies {
+                    |                implementation(compose.runtime)
+                    |                implementation(compose.material)
+                    |                implementation(compose.components.resources)
+                    |            }
+                    |        }
+                    |    }
+                    |}
+                    |
+                """.trimMargin()
+            }
+            gradle(":assembleComposeAppDebugXCFramework", "--dry-run").checks {
+                check.logContains("Compose resources are supported in XCFrameworks since '2.2.0-Beta2-1' Kotlin Gradle plugin version")
+            }
+        }
+    }
+
+    @Test
+    fun xcframeworkResources() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        with(
+            testProject(
+                "misc/appleResources",
+                defaultTestEnvironment.copy(kotlinVersion = "2.2.0-Beta2-1"))
+        ) {
+            file("build.gradle.kts").modify { content ->
+                """
+                    |import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
+                    |
+                    |plugins {
+                    |    kotlin("multiplatform")
+                    |    kotlin("plugin.compose")
+                    |    id("org.jetbrains.compose")
+                    |}
+                    |
+                    |kotlin {
+                    |    val xcf = XCFramework("ComposeApp")
+                    |
+                    |    macosX64()
+                    |
+                    |    listOf(
+                    |        macosArm64(),
+                    |        iosArm64()
+                    |    ).forEach {
+                    |        it.binaries.framework {
+                    |            baseName = "ComposeApp"
+                    |            isStatic = true
+                    |            xcf.add(this)
+                    |        }
+                    |    }
+                    |
+                    |    sourceSets {
+                    |        commonMain {
+                    |            dependencies {
+                    |                implementation(compose.runtime)
+                    |                implementation(compose.material)
+                    |                implementation(compose.components.resources)
+                    |            }
+                    |        }
+                    |    }
+                    |}
+                    |
+                """.trimMargin()
+            }
+            gradle(":assembleComposeAppDebugXCFramework", "--dry-run").checks {
+                check.logContains("Configure compose resources in assembleComposeAppDebugXCFramework")
+            }
+            gradle(":assembleComposeAppDebugXCFramework").checks {
+                assertDirectoriesContentEquals(
+                    file("build/XCFrameworks/debug/ComposeApp.xcframework/ios-arm64/ComposeApp.framework/composeResources"),
+                    file("expected/XCFrameworks/iosComposeResources")
+                )
+                assertDirectoriesContentEquals(
+                    file("build/XCFrameworks/debug/ComposeApp.xcframework/macos-arm64/ComposeApp.framework/composeResources"),
+                    file("expected/XCFrameworks/macosComposeResources")
+                )
+            }
+        }
+    }
+
+    @Test
     fun iosResources() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
         val iosEnv = mapOf(
@@ -624,11 +742,11 @@ class ResourcesTest : GradlePluginTestBase() {
             additionalEnvVars = iosEnv
         )
 
-        with(TestProject("misc/iosResources", testEnv)) {
+        with(TestProject("misc/appleResources", testEnv)) {
             gradle(":podspec", "-Pkotlin.native.cocoapods.generate.wrapper=true").checks {
                 assertEqualTextFiles(
-                    file("iosResources.podspec"),
-                    file("expected/iosResources.podspec")
+                    file("appleResources.podspec"),
+                    file("expected/appleResources.podspec")
                 )
                 file("build/compose/cocoapods/compose-resources").checkExists()
             }
@@ -695,8 +813,30 @@ class ResourcesTest : GradlePluginTestBase() {
                 check.taskNoSource(":prepareComposeResourcesTaskForIosX64Main")
                 check.taskSkipped(":generateResourceAccessorsForIosX64Main")
 
-                file("build/compose/cocoapods/compose-resources/composeResources/iosresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
-                file("build/compose/cocoapods/compose-resources/composeResources/iosresources.generated.resources/drawable/icon.xml").checkExists()
+                file("build/compose/cocoapods/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
+                file("build/compose/cocoapods/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
+            }
+        }
+    }
+
+    @Test
+    fun cocoapodsIosXCFrameworkResources() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+
+        with(
+            testProject(
+                "misc/appleResources",
+                defaultTestEnvironment.copy(kotlinVersion = "2.2.0-Beta2-1"))
+        ) {
+            gradle(":podPublishDebugXCFramework").checks {
+                assertDirectoriesContentEquals(
+                    file("build/cocoapods/publish/debug/shared.xcframework/ios-arm64/shared.framework/composeResources"),
+                    file("expected/XCFrameworks/iosComposeResources")
+                )
+                assertDirectoriesContentEquals(
+                    file("build/cocoapods/publish/debug/shared.xcframework/ios-arm64_x86_64-simulator/shared.framework/composeResources"),
+                    file("expected/XCFrameworks/iosComposeResources")
+                )
             }
         }
     }
@@ -713,11 +853,26 @@ class ResourcesTest : GradlePluginTestBase() {
             additionalEnvVars = macosEnv
         )
 
-        with(TestProject("misc/macosResources", testEnv)) {
+        with(TestProject("misc/appleResources", testEnv)) {
+            file("build.gradle.kts").modify { content ->
+                content.replace(
+                    """
+                        |    iosX64()
+                        |    iosArm64()
+                        |    iosSimulatorArm64()
+                    """.trimMargin(),
+                    """
+                        |    macosX64()
+                        |    macosArm64()
+                    """.trimMargin()
+                )
+            }
+            file("src/iosMain").renameTo(file("src/macosMain"))
+
             gradle(":podspec", "-Pkotlin.native.cocoapods.generate.wrapper=true").checks {
                 assertEqualTextFiles(
-                    file("macosResources.podspec"),
-                    file("expected/macosResources.podspec")
+                    file("appleResources.podspec"),
+                    file("expected/appleResources.podspec")
                 )
                 file("build/compose/cocoapods/compose-resources").checkExists()
             }
@@ -784,8 +939,8 @@ class ResourcesTest : GradlePluginTestBase() {
                 check.taskNoSource(":prepareComposeResourcesTaskForMacosX64Main")
                 check.taskSkipped(":generateResourceAccessorsForMacosX64Main")
 
-                file("build/compose/cocoapods/compose-resources/composeResources/macosresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
-                file("build/compose/cocoapods/compose-resources/composeResources/macosresources.generated.resources/drawable/icon.xml").checkExists()
+                file("build/compose/cocoapods/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
+                file("build/compose/cocoapods/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
             }
         }
     }
@@ -793,14 +948,14 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun iosTestResources() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
-        with(testProject("misc/iosResources")) {
+        with(testProject("misc/appleResources")) {
             gradle(":linkDebugTestIosX64", "--dry-run").checks {
                 check.taskSkipped(":copyTestComposeResourcesForIosX64")
                 check.taskSkipped(":linkDebugTestIosX64")
             }
             gradle(":copyTestComposeResourcesForIosX64").checks {
-                file("build/bin/iosX64/debugTest/compose-resources/composeResources/iosresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
-                file("build/bin/iosX64/debugTest/compose-resources/composeResources/iosresources.generated.resources/drawable/icon.xml").checkExists()
+                file("build/bin/iosX64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
+                file("build/bin/iosX64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
             }
         }
     }
@@ -808,14 +963,28 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun macosTestResources() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
-        with(testProject("misc/macosResources")) {
+        with(testProject("misc/appleResources")) {
+            file("build.gradle.kts").modify { content ->
+                content.replace(
+                    """
+                        |    iosX64()
+                        |    iosArm64()
+                        |    iosSimulatorArm64()
+                    """.trimMargin(),
+                    """
+                        |    macosX64()
+                        |    macosArm64()
+                    """.trimMargin()
+                )
+            }
+            file("src/iosMain").renameTo(file("src/macosMain"))
             gradle(":linkDebugTestMacosX64", "--dry-run").checks {
                 check.taskSkipped(":copyTestComposeResourcesForMacosX64")
                 check.taskSkipped(":linkDebugTestMacosX64")
             }
             gradle(":copyTestComposeResourcesForMacosX64").checks {
-                file("build/bin/macosX64/debugTest/compose-resources/composeResources/macosresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
-                file("build/bin/macosX64/debugTest/compose-resources/composeResources/macosresources.generated.resources/drawable/icon.xml").checkExists()
+                file("build/bin/macosX64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
+                file("build/bin/macosX64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
             }
         }
     }
