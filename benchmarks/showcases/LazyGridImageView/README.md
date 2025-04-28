@@ -9,11 +9,11 @@ The project includes three different implementations of the same functionality:
 3. **Native iOS** - a pure iOS implementation using SwiftUI
 
 The application displays 999 images in a LazyVerticalGrid (or equivalent on each platform) with 3 columns. 
-The images are loaded from local resources:
+The images are loaded asynchronously from local resources:
 
-- In the Compose Multiplatform version, images are loaded using the Compose Multiplatform resource system
-- In the native Android version, images are loaded using the Android resource system
-- In the native iOS version, images are loaded from the iOS asset catalog
+- In the Compose Multiplatform version, images are loaded using [Coil library](https://coil-kt.github.io/coil/) from the Compose Multiplatform resources
+- In the native Android version, images are loaded using [Coil library](https://coil-kt.github.io/coil/) from the Android assets
+- In the native iOS version, images are loaded using `AsyncImage` from the local file sytem
 
 The project is used to compare Compose Multiplatform performance metrics with native counter-parts such us 
 size, startup time, FPS, CPU/GPU usage, etc.
