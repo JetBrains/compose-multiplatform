@@ -7,6 +7,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
 fun main(args: Array<String>) {
-    Args.parseArgs(args)
-    runBlocking(Dispatchers.Main) { runBenchmarks() }
+    val config = Args.parseArgs(args)
+    runBlocking(Dispatchers.Main) { runBenchmarks(config = config) }
 }

@@ -17,9 +17,9 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
 
-fun saveBenchmarkStatsOnDisk(name: String, stats: BenchmarkStats) {
+fun saveBenchmarkStatsOnDisk(name: String, stats: BenchmarkStats, config: Config) {
     try {
-        if (Args.saveStatsToCSV) {
+        if (config.saveStatsToCSV) {
             val path = Path("build/benchmarks/$name.csv")
 
             val keyToValue = mutableMapOf<String, String>()
@@ -39,7 +39,7 @@ fun saveBenchmarkStatsOnDisk(name: String, stats: BenchmarkStats) {
             SystemFileSystem.sink(path).writeText(text)
             println("CSV results saved to ${SystemFileSystem.resolve(path)}")
             println()
-        } else if (Args.saveStatsToJSON) {
+        } else if (config.saveStatsToJSON) {
             val jsonString = stats.toJsonString()
             val jsonPath = Path("build/benchmarks/json-reports/$name.json")
 

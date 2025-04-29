@@ -7,9 +7,9 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 fun main(args : List<String>) {
-    Args.parseArgs(args.toTypedArray())
+    val config = Args.parseArgs(args.toTypedArray())
     MainScope().launch {
-        runBenchmarks(graphicsContext = graphicsContext())
+        runBenchmarks(graphicsContext = graphicsContext(), config = config)
         println("Completed!")
     }
 }

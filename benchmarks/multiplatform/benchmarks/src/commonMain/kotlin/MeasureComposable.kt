@@ -53,7 +53,7 @@ private suspend inline fun yieldEventLoop() {
 }
 
 @OptIn(ExperimentalTime::class, InternalComposeUiApi::class)
-suspend fun measureComposable(
+internal suspend fun measureComposable(
     name: String,
     warmupCount: Int,
     frameCount: Int,
@@ -61,6 +61,7 @@ suspend fun measureComposable(
     height: Int,
     targetFps: Int,
     graphicsContext: GraphicsContext?,
+    config: Config,
     content: @Composable () -> Unit
 ): BenchmarkResult  {
     val surface = graphicsContext?.surface(width, height) ?: Surface.makeNull(width, height)
@@ -81,7 +82,7 @@ suspend fun measureComposable(
 
         var cpuTotalTime = Duration.ZERO
         var gpuTotalTime = Duration.ZERO
-        if (Args.isModeEnabled(Mode.SIMPLE)) {
+        if (config.isModeEnabled(Mode.SIMPLE)) {
             cpuTotalTime = measureTime {
                 repeat(frameCount) {
                     scene.mimicSkikoRender(surface, it * nanosPerFrame, width, height)
@@ -99,8 +100,7 @@ suspend fun measureComposable(
             BenchmarkFrame(Duration.INFINITE, Duration.INFINITE)
         }
 
-        if (Args.isModeEnabled(Mode.VSYNC_EMULATION)) {
-
+        if (config.isModeEnabled(Mode.VSYNC_EMULATION)) {
             var nextVSync = Duration.ZERO
             var missedFrames = 0;
 
@@ -142,7 +142,8 @@ suspend fun measureComposable(
             nanosPerFrame.nanoseconds,
             BenchmarkConditions(frameCount, warmupCount),
             FrameInfo(cpuTotalTime / frameCount, gpuTotalTime / frameCount),
-            frames
+            frames,
+            config = config
         )
     } finally {
         scene.close()

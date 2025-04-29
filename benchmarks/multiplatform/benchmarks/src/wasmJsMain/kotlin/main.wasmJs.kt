@@ -19,10 +19,10 @@ fun mainBrowser() {
     val urlParams = URLSearchParams(window.location.search.toJsString())
     var i = 0
     val args = generateSequence { urlParams.get("arg${i++}") }.toList().toTypedArray()
-    Args.parseArgs(args)
+    val config = Args.parseArgs(args)
 
     MainScope().launch {
-        runBenchmarks()
+        runBenchmarks(config)
         println("Completed!")
     }
 }
@@ -34,46 +34,39 @@ fun mainBrowser() {
 // Therefore, they'll rely on fun customLaunch, which returns a Promise (can be awaited for).
 fun mainD8(args: Array<String>) {
     println("mainD8 is intentionally doing nothing. Read the comments in main.wasmJs.kt")
-
-    // Example1 must use xml resources, but D8 doesn't have Xml parsing API,
-    // consider checking it in a browser
-    Args.disableBenchmark("Example1")
 }
+
+// Using only SIMPLE mode, because VSYNC_EMULATION calls delay(...),
+// which is implemented via setTimeout on web targets.
+// setTimeout implementation is simplified in D8, making
+// the VSYNC_EMULATION mode meaningless when running in D8
+private val basicConfigForD8 = Config(
+    modes = setOf(Mode.SIMPLE),
+    unsupportedBenchmarks = setOf("Example1"),
+)
 
 @JsExport
 fun customLaunch(benchmarkName: String, frameCount: Int): Promise<JsAny?> {
-    // reset the previous configuration before setting a new one for cases when parseArgs is called more than once
-    Args.reset()
-    Args.addBenchmark(benchmarkName, frameCount)
-
-    // Using only SIMPLE mode, because VSYNC_EMULATION calls delay(...),
-    // which is implemented via setTimeout on web targets.
-    // setTimeout implementation is simplified in D8, making
-    // the VSYNC_EMULATION mode meaningless when running in D8
-    Args.enableModes(Mode.SIMPLE)
+    val config = basicConfigForD8.copy(
+        benchmarks = mapOf(benchmarkName to frameCount)
+    )
 
     return MainScope().promise {
-        runBenchmarks(warmupCount = 0)
+        runBenchmarks(warmupCount = 0, config = config)
         jsOne
     }
 }
 
 @JsExport
 fun d8BenchmarksRunner(args: String): Promise<JsAny?> {
-    // reset the previous configuration before setting a new one for cases when parseArgs is called more than once:
-    Args.reset()
-
-    if (args.isNotBlank()) {
-        Args.parseArgs(args.split(" ").toTypedArray())
-    }
-    // Using only SIMPLE mode, because VSYNC_EMULATION calls delay(...),
-    // which is implemented via setTimeout on web targets.
-    // setTimeout implementation is simplified in D8, making
-    // the VSYNC_EMULATION mode meaningless when running in D8
-    Args.enableModes(Mode.SIMPLE)
+    val config = Args.parseArgs(args.split(" ").toTypedArray())
+        .copy(
+            modes = basicConfigForD8.modes,
+            unsupportedBenchmarks = basicConfigForD8.unsupportedBenchmarks
+        )
 
     return MainScope().promise {
-        runBenchmarks()
+        runBenchmarks(config = config)
         jsOne
     }
 }
