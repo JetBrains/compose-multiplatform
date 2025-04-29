@@ -8,5 +8,6 @@ import kotlinx.coroutines.runBlocking
 
 fun main(args: Array<String>) {
     val config = Args.parseArgs(args)
-    runBlocking(Dispatchers.Main) { runBenchmarks(config = config) }
+    Config.setGlobal(config)
+    runBlocking(Dispatchers.Main) { runBenchmarks() }
 }

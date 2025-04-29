@@ -21,16 +21,19 @@ object Args {
     private fun String.decodeArg() = replace("%20", " ")
 
     /**
-     * Parses command line arguments to determine modes and benchmarks settings.
+     * Parses command line arguments to create a [Config] for benchmarks run.
      *
      * @param args an array of strings representing the command line arguments.
-     * Each argument can specify either "modes" or "benchmarks" settings,
-     * with values separated by commas.
+     * Each argument can specify either of these settings:
+     * modes, benchmarks, disabledBenchmarks - comma separated values,
+     * versionInfo, saveStatsToCSV, saveStatsToJSON - single values.
+     *
+     * Example: benchmarks=AnimatedVisibility(100),modes=SIMPLE,versionInfo=Kotlin_2_1_20,saveStatsToCSV=true
      */
     fun parseArgs(args: Array<String>): Config {
         val modes = mutableSetOf<Mode>()
         val benchmarks = mutableMapOf<String, Int>()
-        val unsupportedBenchmarks = mutableSetOf<String>()
+        val disabledBenchmarks = mutableSetOf<String>()
         var versionInfo: String? = null
         var saveStatsToCSV: Boolean = false
         var saveStatsToJSON: Boolean = false
@@ -46,15 +49,15 @@ object Args {
                 saveStatsToCSV = arg.substringAfter("=").toBoolean()
             } else if (arg.startsWith("saveStatsToJSON=", ignoreCase = true)) {
                 saveStatsToJSON = arg.substringAfter("=").toBoolean()
-            } else if (arg.startsWith("unsupportedBenchmarks=", ignoreCase = true)) {
-                unsupportedBenchmarks += argToMap(arg.decodeArg()).keys
+            } else if (arg.startsWith("disabledBenchmarks=", ignoreCase = true)) {
+                disabledBenchmarks += argToMap(arg.decodeArg()).keys
             }
         }
 
         return Config(
             modes = modes,
             benchmarks = benchmarks,
-            unsupportedBenchmarks = unsupportedBenchmarks,
+            disabledBenchmarks = disabledBenchmarks,
             versionInfo = versionInfo,
             saveStatsToCSV = saveStatsToCSV,
             saveStatsToJSON = saveStatsToJSON
@@ -69,6 +72,7 @@ object Args {
  * @property benchmarks A map of explicitly mentioned benchmarks to their specific problem sizes.
  *                     A value of -1 indicates the benchmark is enabled but should use its default size.
  *                     If the map is empty, all benchmarks are considered enabled by default checks.
+ * @property disabledBenchmarks A set of benchmarks to skip.
  * @property versionInfo Optional string containing version information.
  * @property saveStatsToCSV Flag indicating whether statistics should be saved to a CSV file.
  * @property saveStatsToJSON Flag indicating whether statistics should be saved to a JSON file.
@@ -76,7 +80,7 @@ object Args {
 data class Config(
     val modes: Set<Mode> = emptySet(),
     val benchmarks: Map<String, Int> = emptyMap(), // Name -> Problem Size (-1 for default)
-    val unsupportedBenchmarks: Set<String> = emptySet(),
+    val disabledBenchmarks: Set<String> = emptySet(),
     val versionInfo: String? = null,
     val saveStatsToCSV: Boolean = false,
     val saveStatsToJSON: Boolean = false
@@ -88,32 +92,52 @@ data class Config(
     fun isModeEnabled(mode: Mode): Boolean = modes.isEmpty() || modes.contains(mode)
 
     /**
-     * Checks if a specific benchmark is enabled based *only* on the command line arguments (`benchmarks=` list).
-     * A benchmark is enabled if no benchmarks were specified (default) or if it's explicitly listed.
-     * Note: This does *not* account for runtime disabling (like `disableBenchmark` in the old Args).
-     *       That check should be performed separately by the caller if needed.
+     * Checks if a specific benchmark is enabled
      */
     fun isBenchmarkEnabled(benchmark: String): Boolean {
         val normalizedName = benchmark.uppercase()
         // Enabled if the benchmarks map is empty OR if the specific benchmark is present
         return (benchmarks.isEmpty() || benchmarks.containsKey(normalizedName))
-                && !unsupportedBenchmarks.contains(normalizedName)
-                && !unsupportedBenchmarks.contains(benchmark)
+                && !disabledBenchmarks.contains(normalizedName)
+                && !disabledBenchmarks.contains(benchmark)
     }
 
     /**
-     * Gets the specified problem size for a benchmark, falling back to a default if not specified
-     * or if explicitly set to use the default (-1).
+     * Returns the problem size configured for [benchmark], or [default] if not set.
      *
-     * @param benchmark The name of the benchmark (case-insensitive).
-     * @param default The default problem size to return if none is specified in the config.
-     * @return The specified problem size, or the default value.
+     * @param benchmark Benchmark name (case-insensitive).
+     * @param default Fallback size when no configuration is found.
+     * @return The problem size to use.
      */
     fun getBenchmarkProblemSize(benchmark: String, default: Int): Int {
-        val upperBenchmark = benchmark.uppercase()
-        // Get the specified size, default to -1 if not found
-        val specifiedSize = benchmarks[upperBenchmark] ?: -1
-        // Return default if size is -1, otherwise return the specified size
-        return if (specifiedSize == -1) default else specifiedSize
+        val normalizedName = benchmark.uppercase()
+        val problemSize = benchmarks[normalizedName] ?: -1
+        return if (problemSize == -1) default else problemSize
+    }
+
+    companion object {
+        private var global: Config = Config()
+
+        val versionInfo: String?
+            get() = global.versionInfo
+
+        val saveStatsToCSV: Boolean
+            get() = global.saveStatsToCSV
+
+        val saveStatsToJSON: Boolean
+            get() = global.saveStatsToJSON
+
+        fun setGlobal(global: Config) {
+            this.global = global
+        }
+
+        fun isModeEnabled(mode: Mode): Boolean =
+            global.isModeEnabled(mode)
+
+        fun isBenchmarkEnabled(benchmark: String): Boolean =
+            global.isBenchmarkEnabled(benchmark)
+
+        fun getBenchmarkProblemSize(benchmark: String, default: Int): Int =
+            global.getBenchmarkProblemSize(benchmark, default)
     }
 }

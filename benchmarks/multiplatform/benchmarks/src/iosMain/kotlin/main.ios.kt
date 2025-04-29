@@ -8,8 +8,9 @@ import kotlinx.coroutines.launch
 
 fun main(args : List<String>) {
     val config = Args.parseArgs(args.toTypedArray())
+    Config.setGlobal(config)
     MainScope().launch {
-        runBenchmarks(graphicsContext = graphicsContext(), config = config)
+        runBenchmarks(graphicsContext = graphicsContext())
         println("Completed!")
     }
 }

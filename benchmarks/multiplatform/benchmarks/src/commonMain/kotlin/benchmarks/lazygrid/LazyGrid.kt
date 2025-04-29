@@ -45,7 +45,7 @@ fun LazyGrid(smoothScroll: Boolean = false, withLaunchedEffectInItem: Boolean = 
     var direct by remember { mutableStateOf(true) }
     if (smoothScroll) {
         LaunchedEffect(Unit) {
-            while (smoothScroll) {
+            while (isActive) {
                 withFrameMillis { }
                 curItem = state.firstVisibleItemIndex
                 if (curItem == 0) direct = true

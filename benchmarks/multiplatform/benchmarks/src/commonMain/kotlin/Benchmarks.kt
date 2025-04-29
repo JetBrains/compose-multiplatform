@@ -105,21 +105,20 @@ data class BenchmarkStats(
     val percentileGPUAverage: List<BenchmarkPercentileAverage>,
     val noBufferingMissedFrames: MissedFrames,
     val doubleBufferingMissedFrames: MissedFrames,
-    @Transient val config: Config = Config(),
 ) {
     fun prettyPrint() {
-        val versionInfo = config.versionInfo
+        val versionInfo = Config.versionInfo
         if (versionInfo != null) {
             println("Version: $versionInfo")
         }
         conditions.prettyPrint()
         println()
-        if (config.isModeEnabled(Mode.SIMPLE)) {
+        if (Config.isModeEnabled(Mode.SIMPLE)) {
             val frameInfo = requireNotNull(averageFrameInfo) { "frameInfo shouldn't be null with Mode.SIMPLE" }
             frameInfo.prettyPrint()
             println()
         }
-        if (config.isModeEnabled(Mode.VSYNC_EMULATION)) {
+        if (Config.isModeEnabled(Mode.VSYNC_EMULATION)) {
             percentileCPUAverage.prettyPrint(BenchmarkFrameTimeKind.CPU)
             println()
             percentileGPUAverage.prettyPrint(BenchmarkFrameTimeKind.GPU)
@@ -130,16 +129,16 @@ data class BenchmarkStats(
     }
 
     fun putFormattedValuesTo(map: MutableMap<String, String>) {
-        val versionInfo = config.versionInfo
+        val versionInfo = Config.versionInfo
         if (versionInfo != null) {
             map.put("Version", versionInfo)
         }
         conditions.putFormattedValuesTo(map)
-        if (config.isModeEnabled(Mode.SIMPLE)) {
+        if (Config.isModeEnabled(Mode.SIMPLE)) {
             val frameInfo = requireNotNull(averageFrameInfo) { "frameInfo shouldn't be null with Mode.SIMPLE" }
             frameInfo.putFormattedValuesTo(map)
         }
-        if (config.isModeEnabled(Mode.VSYNC_EMULATION)) {
+        if (Config.isModeEnabled(Mode.VSYNC_EMULATION)) {
             percentileCPUAverage.putFormattedValuesTo(BenchmarkFrameTimeKind.CPU, map)
             percentileGPUAverage.putFormattedValuesTo(BenchmarkFrameTimeKind.GPU, map)
             noBufferingMissedFrames.putFormattedValuesTo("no buffering", map)
@@ -174,7 +173,6 @@ class BenchmarkResult(
     private val conditions: BenchmarkConditions,
     private val averageFrameInfo: FrameInfo,
     private val frames: List<BenchmarkFrame>,
-    private val config: Config,
 ) {
     private fun percentileAverageFrameTime(percentile: Double, kind: BenchmarkFrameTimeKind): Duration {
         require(percentile in 0.0..1.0)
@@ -214,7 +212,6 @@ class BenchmarkResult(
             },
             MissedFrames(noBufferingMissedFramesCount, noBufferingMissedFramesCount / frames.size.toDouble()),
             MissedFrames(doubleBufferingMissedFrames, doubleBufferingMissedFrames / frames.size.toDouble()),
-            config = config
         )
     }
 
@@ -227,7 +224,7 @@ class BenchmarkResult(
 
 private fun Duration.formatAsMilliseconds(): String = (inWholeMicroseconds / 1000.0).toString()
 
-private suspend fun Config.runBenchmark(
+suspend fun runBenchmark(
     name: String,
     width: Int,
     height: Int,
@@ -237,26 +234,24 @@ private suspend fun Config.runBenchmark(
     warmupCount: Int = 100,
     content: @Composable () -> Unit
 ) {
-    if (this.isBenchmarkEnabled(name)) {
+    if (Config.isBenchmarkEnabled(name)) {
         println("# $name")
         val stats = measureComposable(
             name = name,
             warmupCount = warmupCount,
-            frameCount = this.getBenchmarkProblemSize(name, frameCount),
+            frameCount = Config.getBenchmarkProblemSize(name, frameCount),
             width = width,
             height = height,
             targetFps = targetFps,
             graphicsContext = graphicsContext,
-            config = this,
             content = content
         ).generateStats()
         stats.prettyPrint()
-        saveBenchmarkStatsOnDisk(name = name, stats = stats, config = this)
+        saveBenchmarkStatsOnDisk(name = name, stats = stats)
     }
 }
 
 suspend fun runBenchmarks(
-    config: Config,
     width: Int = 1920,
     height: Int = 1080,
     targetFps: Int = 120,
@@ -266,23 +261,21 @@ suspend fun runBenchmarks(
     println()
     println("Running emulating $targetFps FPS")
     println()
-    with(config) {
-        runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext, warmupCount) { AnimatedVisibility() }
-        runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext, warmupCount) { LazyGrid() }
-        runBenchmark("LazyGrid-ItemLaunchedEffect", width, height, targetFps, 1000, graphicsContext, warmupCount) {
-            LazyGrid(smoothScroll = false, withLaunchedEffectInItem = true)
-        }
-        runBenchmark("LazyGrid-SmoothScroll", width, height, targetFps, 1000, graphicsContext, warmupCount) {
-            LazyGrid(smoothScroll = true)
-        }
-        runBenchmark("LazyGrid-SmoothScroll-ItemLaunchedEffect", width, height, targetFps, 1000, graphicsContext, warmupCount) {
-            LazyGrid(smoothScroll = true, withLaunchedEffectInItem = true)
-        }
-        runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext, warmupCount) { NYContent(width, height) }
-        runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext, warmupCount) { MainUiNoImageUseModel()}
-        runBenchmark("MultipleComponents", width, height, targetFps, 1000, graphicsContext, warmupCount) { MultipleComponentsExample() }
-        runBenchmark("MultipleComponents-NoVectorGraphics", width, height, targetFps, 1000, graphicsContext, warmupCount) {
-            MultipleComponentsExample(isVectorGraphicsSupported = false)
-        }
+    runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext, warmupCount) { AnimatedVisibility() }
+    runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext, warmupCount) { LazyGrid() }
+    runBenchmark("LazyGrid-ItemLaunchedEffect", width, height, targetFps, 1000, graphicsContext, warmupCount) {
+        LazyGrid(smoothScroll = false, withLaunchedEffectInItem = true)
+    }
+    runBenchmark("LazyGrid-SmoothScroll", width, height, targetFps, 1000, graphicsContext, warmupCount) {
+        LazyGrid(smoothScroll = true)
+    }
+    runBenchmark("LazyGrid-SmoothScroll-ItemLaunchedEffect", width, height, targetFps, 1000, graphicsContext, warmupCount) {
+        LazyGrid(smoothScroll = true, withLaunchedEffectInItem = true)
+    }
+    runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext, warmupCount) { NYContent(width, height) }
+    runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext, warmupCount) { MainUiNoImageUseModel()}
+    runBenchmark("MultipleComponents", width, height, targetFps, 1000, graphicsContext, warmupCount) { MultipleComponentsExample() }
+    runBenchmark("MultipleComponents-NoVectorGraphics", width, height, targetFps, 1000, graphicsContext, warmupCount) {
+        MultipleComponentsExample(isVectorGraphicsSupported = false)
     }
 }

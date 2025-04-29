@@ -61,7 +61,6 @@ internal suspend fun measureComposable(
     height: Int,
     targetFps: Int,
     graphicsContext: GraphicsContext?,
-    config: Config,
     content: @Composable () -> Unit
 ): BenchmarkResult  {
     val surface = graphicsContext?.surface(width, height) ?: Surface.makeNull(width, height)
@@ -82,7 +81,7 @@ internal suspend fun measureComposable(
 
         var cpuTotalTime = Duration.ZERO
         var gpuTotalTime = Duration.ZERO
-        if (config.isModeEnabled(Mode.SIMPLE)) {
+        if (Config.isModeEnabled(Mode.SIMPLE)) {
             cpuTotalTime = measureTime {
                 repeat(frameCount) {
                     scene.mimicSkikoRender(surface, it * nanosPerFrame, width, height)
@@ -100,7 +99,7 @@ internal suspend fun measureComposable(
             BenchmarkFrame(Duration.INFINITE, Duration.INFINITE)
         }
 
-        if (config.isModeEnabled(Mode.VSYNC_EMULATION)) {
+        if (Config.isModeEnabled(Mode.VSYNC_EMULATION)) {
             var nextVSync = Duration.ZERO
             var missedFrames = 0;
 
@@ -143,7 +142,6 @@ internal suspend fun measureComposable(
             BenchmarkConditions(frameCount, warmupCount),
             FrameInfo(cpuTotalTime / frameCount, gpuTotalTime / frameCount),
             frames,
-            config = config
         )
     } finally {
         scene.close()

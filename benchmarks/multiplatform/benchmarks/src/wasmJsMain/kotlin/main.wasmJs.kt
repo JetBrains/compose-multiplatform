@@ -19,10 +19,12 @@ fun mainBrowser() {
     val urlParams = URLSearchParams(window.location.search.toJsString())
     var i = 0
     val args = generateSequence { urlParams.get("arg${i++}") }.toList().toTypedArray()
+
     val config = Args.parseArgs(args)
+    Config.setGlobal(config)
 
     MainScope().launch {
-        runBenchmarks(config)
+        runBenchmarks()
         println("Completed!")
     }
 }
@@ -44,7 +46,7 @@ private val basicConfigForD8 = Config(
     modes = setOf(Mode.SIMPLE),
     // MultipleComponents is unsupported, because it uses vector icons. D8 doesn't provide XML parsing APIs.
     // But there is an alternative workload called 'MultipleComponents-NoVectorGraphics'
-    unsupportedBenchmarks = setOf("MultipleComponents"),
+    disabledBenchmarks = setOf("MultipleComponents"),
 )
 
 @JsExport
@@ -52,9 +54,10 @@ fun customLaunch(benchmarkName: String, frameCount: Int): Promise<JsAny?> {
     val config = basicConfigForD8.copy(
         benchmarks = mapOf(benchmarkName to frameCount)
     )
+    Config.setGlobal(config)
 
     return MainScope().promise {
-        runBenchmarks(warmupCount = 0, config = config)
+        runBenchmarks(warmupCount = 0)
         jsOne
     }
 }
@@ -64,11 +67,13 @@ fun d8BenchmarksRunner(args: String): Promise<JsAny?> {
     val config = Args.parseArgs(args.split(" ").toTypedArray())
         .copy(
             modes = basicConfigForD8.modes,
-            unsupportedBenchmarks = basicConfigForD8.unsupportedBenchmarks
+            disabledBenchmarks = basicConfigForD8.disabledBenchmarks
         )
 
+    Config.setGlobal(config)
+
     return MainScope().promise {
-        runBenchmarks(config = config)
+        runBenchmarks()
         jsOne
     }
 }
