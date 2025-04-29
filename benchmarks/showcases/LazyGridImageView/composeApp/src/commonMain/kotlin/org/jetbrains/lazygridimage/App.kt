@@ -1,6 +1,5 @@
 package org.jetbrains.lazygridimage
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -18,15 +17,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import lazygridimage.composeapp.generated.resources.Res
-import lazygridimage.composeapp.generated.resources.allDrawableResources
-import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
-
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -40,8 +36,16 @@ fun App() {
     var scrollingDown by remember { mutableStateOf(true) }
     var currentIndex by remember { mutableStateOf(0) }
 
-    val drawableResources = remember {
-        val availableResources = Res.allDrawableResources.values.toList()
+    val uris = remember {
+        val availableResources: MutableList<String> = mutableListOf()
+        for (index in 1..999) {
+            try {
+                val resUri = Res.getUri("files/downloaded_image${index.toString().padStart(3, '0')}.jpg")
+                availableResources.add(resUri)
+            } catch (e: Exception) {
+                //ignore
+            }
+        }
         List(999) { index ->
             availableResources[index % availableResources.size]
         }
@@ -56,7 +60,7 @@ fun App() {
                 delay(100)
 
                 if (scrollingDown) {
-                    if (currentIndex < drawableResources.size - numOfColumns - 1) {
+                    if (currentIndex < uris.size - numOfColumns - 1) {
                         currentIndex += numOfColumns
                     } else {
                         scrollingDown = false
@@ -106,9 +110,9 @@ fun App() {
                     modifier = Modifier.fillMaxSize(),
                     state = gridState
                 ) {
-                    items(drawableResources) { drawableResource ->
+                    items(uris) { uri ->
                         ImageCard(
-                            drawableResource = drawableResource,
+                            uri,
                             modifier = Modifier.padding(4.dp)
                         )
                     }
@@ -120,7 +124,7 @@ fun App() {
 
 @Composable
 fun ImageCard(
-    drawableResource: DrawableResource,
+    uri: String,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -129,8 +133,8 @@ fun ImageCard(
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Image(
-            painter = painterResource(drawableResource),
+        AsyncImage(
+            model = uri,
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()

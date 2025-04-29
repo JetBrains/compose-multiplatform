@@ -24,6 +24,10 @@
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		AB9D662C2DBF765C00A1F44B /* downloaded_images */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = downloaded_images; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
 /* Begin PBXFrameworksBuildPhase section */
 		ABDFB92F2D9C478900987917 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
@@ -55,6 +59,7 @@
 		ABDFB9342D9C478900987917 /* nativeiosApp */ = {
 			isa = PBXGroup;
 			children = (
+				AB9D662C2DBF765C00A1F44B /* downloaded_images */,
 				ABDFB9452D9C48EF00987917 /* App.swift */,
 				ABDFB9432D9C48DC00987917 /* GridItemView.swift */,
 				ABDFB9372D9C478900987917 /* ContentView.swift */,
@@ -94,6 +99,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AB9D662C2DBF765C00A1F44B /* downloaded_images */,
 			);
 			name = nativeiosApp;
 			productName = nativeiosApp;

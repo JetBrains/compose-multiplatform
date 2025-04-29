@@ -1,8 +1,8 @@
 #!/bin/bash
 
-TARGET_DIR="composeApp/src/commonMain/composeResources/drawable"
-TARGET_DIR_IOS="nativeiosApp/nativeiosApp/Assets.xcassets"
-TARGET_DIR_ANDROID="nativeAndroidApp/app/src/main/res/drawable"
+TARGET_DIR="composeApp/src/commonMain/composeResources/files"
+TARGET_DIR_IOS="nativeiosApp/nativeiosApp/downloaded_images"
+TARGET_DIR_ANDROID="nativeAndroidApp/app/src/main/assets/downloaded_images"
 
 mkdir -p "$TARGET_DIR"
 mkdir -p "$TARGET_DIR_IOS"
@@ -37,29 +37,9 @@ for i in $(seq 1 999); do
     fi     
 
     if [ -s "$filepath" ]; then
-        imageset_dir="$TARGET_DIR_IOS/${imagename}.imageset"
+        cp $filepath $TARGET_DIR_IOS
+        echo "Image $filename copied to $TARGET_DIR_IOS" 
 
-        mkdir -p "$imageset_dir"
-
-        cp $filepath $imageset_dir
-        echo "Image $filename copied to $imageset_dir" 
-
-        # Create Contents.json file for the imageset with only 1x scale
-        cat > "$imageset_dir/Contents.json" << EOF
-{
-  "images" : [
-    {
-      "idiom" : "universal",
-      "scale" : "1x",
-      "filename" : "${filename}"
-    }
-  ],
-  "info" : {
-    "version" : 1,
-    "author" : "xcode"
-  }
-}
-EOF
         cp $filepath $TARGET_DIR_ANDROID
         echo "Image $filename copied to $TARGET_DIR_ANDROID"
     fi
