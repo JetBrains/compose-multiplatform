@@ -23,13 +23,9 @@ New `WebTextInputService` seeks to achieve the following goals:
 
 ### Multiple Platforms
 
-- material3 library no longer adds a dependency to `material-icons-core` so if your project relied on that, you will have to explicitly add that dependency in your `build.gradle[.kts]` files: [#2025](https://github.com/JetBrains/compose-multiplatform-core/pull/2025)
+- material/material3 libraries no longer add a dependency to `material-icons-core` so if your project relied on that, you will have to explicitly add that dependency in your `build.gradle[.kts]` files: [#2025](https://github.com/JetBrains/compose-multiplatform-core/pull/2025), [#2030](https://github.com/JetBrains/compose-multiplatform-core/pull/2030)
 ```
-implementation("org.jetbrains.compose.material:material-icons-core:1.6.11")
-```
-- material/material3 libraries no longer add a dependency to `material-icons-core` so if your project relied on that, you will have to explicitly add that dependency in your `build.gradle[.kts]` files: [#2030](https://github.com/JetBrains/compose-multiplatform-core/pull/2030)
-```
-implementation("org.jetbrains.compose.material:material-icons-core:1.6.11")
+implementation("org.jetbrains.compose.material:material-icons-core:1.7.3")
 ```
 
 ### Gradle Plugin
