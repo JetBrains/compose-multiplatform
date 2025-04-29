@@ -5,7 +5,6 @@
 import kotlinx.coroutines.runBlocking
 
 fun main(args : Array<String>) {
-    val config = Args.parseArgs(args)
-    Config.setGlobal(config)
+    Config.setGlobalFromArgs(args)
     runBlocking { runBenchmarks(graphicsContext = graphicsContext()) }
 }

@@ -131,6 +131,10 @@ data class Config(
             this.global = global
         }
 
+        fun setGlobalFromArgs(args: Array<String>) {
+            this.global = Args.parseArgs(args)
+        }
+
         fun isModeEnabled(mode: Mode): Boolean =
             global.isModeEnabled(mode)
 

@@ -211,7 +211,7 @@ class BenchmarkResult(
                 BenchmarkPercentileAverage(percentile, average)
             },
             MissedFrames(noBufferingMissedFramesCount, noBufferingMissedFramesCount / frames.size.toDouble()),
-            MissedFrames(doubleBufferingMissedFrames, doubleBufferingMissedFrames / frames.size.toDouble()),
+            MissedFrames(doubleBufferingMissedFrames, doubleBufferingMissedFrames / frames.size.toDouble())
         )
     }
 

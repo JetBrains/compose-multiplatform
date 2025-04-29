@@ -20,8 +20,7 @@ fun mainBrowser() {
     var i = 0
     val args = generateSequence { urlParams.get("arg${i++}") }.toList().toTypedArray()
 
-    val config = Args.parseArgs(args)
-    Config.setGlobal(config)
+    Config.setGlobalFromArgs(args)
 
     MainScope().launch {
         runBenchmarks()
