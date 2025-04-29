@@ -40,8 +40,20 @@ suspend inline fun preciseDelay(duration: Duration) {
     while (liveDelayStart.elapsedNow() < liveDelay){}
 }
 
+/**
+ * Some of the benchmarks involved an asynchronous fetch operation for resources when running in a browser.
+ * To let the fetch operation result be handled by compose, the benchmark loop must yield the event loop.
+ * Otherwise, such benchmark do not run a part of workload, making the stats less meaningful.
+ *
+ * It makes sense for all platforms, since there could be some work scheduled to run on the same Thread
+ * as the benchmarks runner. But without yielding, it won't be dispatched.
+ */
+private suspend inline fun yieldEventLoop() {
+    yield()
+}
+
 @OptIn(ExperimentalTime::class, InternalComposeUiApi::class)
-suspend fun measureComposable(
+internal suspend fun measureComposable(
     name: String,
     warmupCount: Int,
     frameCount: Int,
@@ -62,13 +74,14 @@ suspend fun measureComposable(
             scene.mimicSkikoRender(surface, it * nanosPerFrame, width, height)
             surface.flushAndSubmit(false)
             graphicsContext?.awaitGPUCompletion()
+            yieldEventLoop()
         }
 
         runGC()
 
         var cpuTotalTime = Duration.ZERO
         var gpuTotalTime = Duration.ZERO
-        if (Args.isModeEnabled(Mode.SIMPLE)) {
+        if (Config.isModeEnabled(Mode.SIMPLE)) {
             cpuTotalTime = measureTime {
                 repeat(frameCount) {
                     scene.mimicSkikoRender(surface, it * nanosPerFrame, width, height)
@@ -76,6 +89,7 @@ suspend fun measureComposable(
                     gpuTotalTime += measureTime {
                         graphicsContext?.awaitGPUCompletion()
                     }
+                    yieldEventLoop()
                 }
             }
             cpuTotalTime -= gpuTotalTime
@@ -85,8 +99,7 @@ suspend fun measureComposable(
             BenchmarkFrame(Duration.INFINITE, Duration.INFINITE)
         }
 
-        if (Args.isModeEnabled(Mode.VSYNC_EMULATION)) {
-
+        if (Config.isModeEnabled(Mode.VSYNC_EMULATION)) {
             var nextVSync = Duration.ZERO
             var missedFrames = 0;
 
@@ -118,6 +131,8 @@ suspend fun measureComposable(
                     // Emulate waiting for next vsync
                     preciseDelay(timeUntilNextVSync)
                 }
+
+                yieldEventLoop()
             }
         }
 
@@ -126,7 +141,7 @@ suspend fun measureComposable(
             nanosPerFrame.nanoseconds,
             BenchmarkConditions(frameCount, warmupCount),
             FrameInfo(cpuTotalTime / frameCount, gpuTotalTime / frameCount),
-            frames
+            frames,
         )
     } finally {
         scene.close()
