@@ -1,7 +1,7 @@
 import androidx.compose.runtime.Composable
 import benchmarks.animation.AnimatedVisibility
 import benchmarks.complexlazylist.components.MainUiNoImageUseModel
-import benchmarks.example1.Example1
+import benchmarks.multipleComponents.MultipleComponentsExample
 import benchmarks.lazygrid.LazyGrid
 import benchmarks.visualeffects.NYContent
 import kotlinx.serialization.Serializable
@@ -280,6 +280,9 @@ suspend fun runBenchmarks(
         }
         runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext, warmupCount) { NYContent(width, height) }
         runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext, warmupCount) { MainUiNoImageUseModel()}
-        runBenchmark("Example1", width, height, targetFps, 1000, graphicsContext, warmupCount) { Example1() }
+        runBenchmark("MultipleComponents", width, height, targetFps, 1000, graphicsContext, warmupCount) { MultipleComponentsExample() }
+        runBenchmark("MultipleComponents-NoVectorGraphics", width, height, targetFps, 1000, graphicsContext, warmupCount) {
+            MultipleComponentsExample(isVectorGraphicsSupported = false)
+        }
     }
 }

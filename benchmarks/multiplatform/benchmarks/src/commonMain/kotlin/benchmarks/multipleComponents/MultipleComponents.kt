@@ -16,7 +16,7 @@
 
 // copy of https://github.com/JetBrains/compose-multiplatform-core/blob/d9e875b62e7bb4dd47b6b155d3a787251ff5bd38/compose/desktop/desktop/samples/src/jvmMain/kotlin/androidx/compose/desktop/examples/example1/Main.jvm.kt#L17
 
-package benchmarks.example1
+package benchmarks.multipleComponents
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.TweenSpec
@@ -79,8 +79,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory.component1
-import androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory.component2
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
@@ -146,7 +144,7 @@ import org.jetbrains.compose.resources.painterResource
 import kotlin.random.Random
 
 @Composable
-fun Example1() {
+fun MultipleComponentsExample(isVectorGraphicsSupported: Boolean = true) {
     val uriHandler = LocalUriHandler.current
     MaterialTheme {
         Scaffold(
@@ -154,10 +152,12 @@ fun Example1() {
                 TopAppBar(
                     title = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Image(
-                                painterResource(Res.drawable.example1_sailing),
-                                contentDescription = "Star"
-                            )
+                            if (isVectorGraphicsSupported) {
+                                Image(
+                                    painterResource(Res.drawable.example1_sailing),
+                                    contentDescription = "Star"
+                                )
+                            }
                             Text("Desktop Compose Elements")
                         }
                     }
@@ -184,7 +184,7 @@ fun Example1() {
             content = { innerPadding ->
                 Row(Modifier.padding(innerPadding)) {
                     LeftColumn(Modifier.weight(1f))
-                    MiddleColumn(Modifier.width(500.dp))
+                    MiddleColumn(Modifier.width(500.dp), isVectorGraphicsSupported = isVectorGraphicsSupported)
                     RightColumn(Modifier.width(200.dp))
                 }
             }
@@ -506,7 +506,7 @@ private fun ScrollableContent(scrollState: ScrollState) {
 }
 
 @Composable
-fun MiddleColumn(modifier: Modifier) = Column(modifier) {
+fun MiddleColumn(modifier: Modifier, isVectorGraphicsSupported: Boolean) = Column(modifier) {
     val (focusItem1, focusItem2) = FocusRequester.createRefs()
     val text = remember {
         mutableStateOf("Hello \uD83E\uDDD1\uD83C\uDFFF\u200D\uD83E\uDDB0")
@@ -564,12 +564,14 @@ fun MiddleColumn(modifier: Modifier) = Column(modifier) {
             Modifier.size(200.dp)
         )
 
-        Icon(
-            painterResource(Res.drawable.example1_ic_call_answer),
-            "Localized description",
-            Modifier.size(100.dp).align(Alignment.CenterVertically),
-            tint = Color.Blue.copy(alpha = 0.5f)
-        )
+        if (isVectorGraphicsSupported) {
+            Icon(
+                painterResource(Res.drawable.example1_ic_call_answer),
+                "Localized description",
+                Modifier.size(100.dp).align(Alignment.CenterVertically),
+                tint = Color.Blue.copy(alpha = 0.5f)
+            )
+        }
     }
 
     Box(

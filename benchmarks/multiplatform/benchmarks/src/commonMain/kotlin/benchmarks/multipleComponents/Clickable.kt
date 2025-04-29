@@ -17,7 +17,7 @@
 // copy of https://github.com/JetBrains/compose-multiplatform-core/blob/d9e875b62e7bb4dd47b6b155d3a787251ff5bd38/compose/foundation/foundation/src/desktopMain/kotlin/androidx/compose/foundation/Clickable.desktop.kt#L78
 // inefficient implementation of clickable for benchmarking purposes (Modifier.Node variant in AOSP is more optimized)
 
-package benchmarks.example1
+package benchmarks.multipleComponents
 
 import androidx.compose.foundation.Indication
 import androidx.compose.foundation.focusable
