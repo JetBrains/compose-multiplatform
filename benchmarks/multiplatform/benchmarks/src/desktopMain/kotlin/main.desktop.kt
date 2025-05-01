@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
 fun main(args: Array<String>) {
+    System.setProperty("skiko.gpu.priority", "integrated")
     Config.setGlobalFromArgs(args)
     runBlocking(Dispatchers.Main) { runBenchmarks(graphicsContext = graphicsContext()) }
 }

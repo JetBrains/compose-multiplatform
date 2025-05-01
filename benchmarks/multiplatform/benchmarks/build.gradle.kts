@@ -80,7 +80,7 @@ kotlin {
                 implementation(compose.desktop.currentOs)
                 runtimeOnly(libs.kotlinx.coroutines.swing)
 
-                if (composeVersion.get() == "1.7.3") {
+                if (composeVersion.get() in setOf("1.7.3", "1.8.0-alpha01", "1.8.0-alpha02")) {
                     implementation("org.jetbrains.skiko:skiko-awt:0.0.1-0.8.18-for-windows-benchmarking2")
                     implementation("org.jetbrains.skiko:skiko-awt-runtime-windows-x64:0.0.1-0.8.18-for-windows-benchmarking2")
                 }
@@ -89,7 +89,7 @@ kotlin {
     }
 }
 
-if (composeVersion.get() == "1.7.3") {
+if (composeVersion.get() in setOf("1.7.3", "1.8.0-alpha01", "1.8.0-alpha02")) {
     configurations.all {
         resolutionStrategy {
             force("org.jetbrains.skiko:skiko-awt:0.0.1-0.8.18-for-windows-benchmarking2")
