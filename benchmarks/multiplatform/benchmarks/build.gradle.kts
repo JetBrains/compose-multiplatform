@@ -20,6 +20,8 @@ repositories {
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
+val composeVersion = libs.versions.compose.multiplatform
+
 kotlin {
     jvm("desktop")
 
@@ -77,7 +79,21 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 runtimeOnly(libs.kotlinx.coroutines.swing)
+
+                if (composeVersion.get() == "1.7.3") {
+                    implementation("org.jetbrains.skiko:skiko-awt:0.0.1-0.8.18-for-windows-benchmarking2")
+                    implementation("org.jetbrains.skiko:skiko-awt-runtime-windows-x64:0.0.1-0.8.18-for-windows-benchmarking2")
+                }
             }
+        }
+    }
+}
+
+if (composeVersion.get() == "1.7.3") {
+    configurations.all {
+        resolutionStrategy {
+            force("org.jetbrains.skiko:skiko-awt:0.0.1-0.8.18-for-windows-benchmarking2")
+            force("org.jetbrains.skiko:skiko-awt-runtime-windows-x64:0.0.1-0.8.18-for-windows-benchmarking2")
         }
     }
 }
@@ -90,7 +106,6 @@ compose.desktop {
 
 val runArguments: String? by project
 
-val composeVersion = libs.versions.compose.multiplatform
 val kotlinVersion = libs.versions.kotlin
 
 // Handle runArguments property
