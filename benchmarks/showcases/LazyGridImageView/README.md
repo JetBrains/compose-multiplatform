@@ -13,7 +13,7 @@ The images are loaded asynchronously from local resources:
 
 - In the Compose Multiplatform version, images are loaded using [Coil library](https://coil-kt.github.io/coil/) from the Compose Multiplatform resources
 - In the native Android version, images are loaded using [Coil library](https://coil-kt.github.io/coil/) from the Android assets
-- In the native iOS version, images are loaded using `AsyncImage` from the local file sytem
+- In the native iOS version, images are loaded using `AsyncImage` from the local file system
 
 The project is used to compare Compose Multiplatform performance metrics with native counter-parts such us 
 size, startup time, FPS, CPU/GPU usage, etc.
