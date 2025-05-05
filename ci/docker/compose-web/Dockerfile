@@ -12,7 +12,8 @@ RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
     python-is-python3 \
     unzip \
     wget \
-    xvfb
+    xvfb \
+    xz-utils
 
 RUN apt-get update -yqq \
     && wget -qO- https://deb.nodesource.com/gpgkey/nodesource.gpg.key \
@@ -31,9 +32,10 @@ RUN export CHROME_DRIVER_VERSION=$(wget -qO- https://chromedriver.storage.google
     && wget https://chromedriver.storage.googleapis.com/${CHROME_DRIVER_VERSION}/chromedriver_linux64.zip -P ~/tmp \
     && mkdir -p /root/.gradle/selenium/chrome &&  unzip -d /root/.gradle/selenium/chrome  ~/tmp/chromedriver_linux64.zip && rm ~/tmp/chromedriver_linux64.zip
 
-RUN wget -q -O ./firefox.tar.bz2 "https://download.mozilla.org/?product=firefox-latest&os=linux64" \
-    && tar xvf ./firefox.tar.bz2 -C /opt/ \
+RUN wget -q -O firefox.tar.bz2 "https://download.mozilla.org/?product=firefox-latest&os=linux64" \
+    && tar xvf firefox.tar.bz2 -C /opt/ \
     && ln -s /opt/firefox/firefox-bin /usr/local/bin/firefox
+
 
 RUN wget https://github.com/mozilla/geckodriver/releases/download/v0.36.0/geckodriver-v0.36.0-linux64.tar.gz \
     && tar -xvzf geckodriver-v0.36.0-linux64.tar.gz && mkdir -p /root/.gradle/selenium/gecko  &&mv geckodriver /root/.gradle/selenium/gecko
