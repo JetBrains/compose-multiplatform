@@ -11,7 +11,7 @@ import org.jetbrains.compose.resources.ResourceItem
 
 private const val MD: String = "composeResources/my.lib.res/"
 
-public val Res.plurals.numberOfSongsAvailable: PluralStringResource by lazy {
+public val MyRes.plurals.numberOfSongsAvailable: PluralStringResource by lazy {
       PluralStringResource("plurals:numberOfSongsAvailable", "numberOfSongsAvailable", setOf(
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 10, 124),
       ))

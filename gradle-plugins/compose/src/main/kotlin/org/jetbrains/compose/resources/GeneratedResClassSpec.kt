@@ -125,12 +125,12 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
 
 internal fun getResFileSpec(
     packageName: String,
-    fileName: String,
+    className: String,
     moduleDir: String,
     isPublic: Boolean
 ): FileSpec {
     val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
-    return FileSpec.builder(packageName, fileName).also { file ->
+    return FileSpec.builder(packageName, className).also { file ->
         file.addAnnotation(
             AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
                 .addMember("%T::class", internalAnnotationClass)
@@ -142,7 +142,7 @@ internal fun getResFileSpec(
                 .addMember("%S", "REDUNDANT_VISIBILITY_MODIFIER")
                 .build()
         )
-        file.addType(TypeSpec.objectBuilder("Res").also { resObject ->
+        file.addType(TypeSpec.objectBuilder(className).also { resObject ->
             resObject.addModifiers(resModifier)
 
             //readFileBytes
@@ -153,7 +153,7 @@ internal fun getResFileSpec(
                         """
                     Reads the content of the resource file at the specified path and returns it as a byte array.
                     
-                    Example: `val bytes = Res.readBytes("files/key.bin")`
+                    Example: `val bytes = ${className}.readBytes("files/key.bin")`
                     
                     @param path The path of the file to read in the compose resource's directory.
                     @return The content of the file as a byte array.
@@ -174,7 +174,7 @@ internal fun getResFileSpec(
                         """
                     Returns the URI string of the resource file at the specified path.
                     
-                    Example: `val uri = Res.getUri("files/key.bin")`
+                    Example: `val uri = ${className}.getUri("files/key.bin")`
                     
                     @param path The path of the file in the compose resource's directory.
                     @return The URI string of the file.
@@ -208,6 +208,7 @@ internal fun getAccessorsSpecs(
     packageName: String,
     sourceSetName: String,
     moduleDir: String,
+    resClassName: String,
     isPublic: Boolean
 ): List<FileSpec> {
     val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
@@ -225,6 +226,7 @@ internal fun getAccessorsSpecs(
                     sourceSetName.uppercaseFirstChar() + type.accessorName.uppercaseFirstChar() + index,
                     packageName,
                     moduleDir,
+                    resClassName,
                     resModifier,
                     idToResources.subMap(ids.first(), true, ids.last(), true)
                 )
@@ -241,6 +243,7 @@ private fun getChunkFileSpec(
     chunkClassName: String,
     packageName: String,
     moduleDir: String,
+    resClassName: String,
     resModifier: KModifier,
     idToResources: Map<String, List<ResourceItem>>
 ): FileSpec {
@@ -281,7 +284,7 @@ private fun getChunkFileSpec(
                 .build()
 
             val accessor = PropertySpec.builder(resName, type.getClassName(), resModifier)
-                .receiver(ClassName(packageName, "Res", type.accessorName))
+                .receiver(ClassName(packageName, resClassName, type.accessorName))
                 .delegate(initializer)
                 .build()
             chunkFile.addProperty(accessor)
@@ -309,6 +312,7 @@ private fun getChunkFileSpec(
 internal fun getExpectResourceCollectorsFileSpec(
     packageName: String,
     fileName: String,
+    resClassName: String,
     isPublic: Boolean
 ): FileSpec {
     val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
@@ -323,7 +327,7 @@ internal fun getExpectResourceCollectorsFileSpec(
                         KModifier.EXPECT,
                         resModifier
                     )
-                    .receiver(ClassName(packageName, "Res"))
+                    .receiver(ClassName(packageName, resClassName))
                     .build()
             )
         }
@@ -333,6 +337,7 @@ internal fun getExpectResourceCollectorsFileSpec(
 internal fun getActualResourceCollectorsFileSpec(
     packageName: String,
     fileName: String,
+    resClassName: String,
     isPublic: Boolean,
     useActualModifier: Boolean, //e.g. java only project doesn't need actual modifiers
     typeToCollectorFunctions: Map<ResourceType, List<String>>
@@ -370,7 +375,7 @@ internal fun getActualResourceCollectorsFileSpec(
                 MAP.parameterizedBy(String::class.asClassName(), typeClassName),
                 mods
             )
-            .receiver(ClassName(packageName, "Res"))
+            .receiver(ClassName(packageName, resClassName))
             .delegate(initBlock)
             .build()
         file.addProperty(property)

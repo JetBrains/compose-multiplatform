@@ -9,12 +9,11 @@ import org.jetbrains.compose.internal.IdeaImportTask
 import java.io.File
 
 internal abstract class GenerateResClassTask : IdeaImportTask() {
-    companion object {
-        private const val RES_FILE_NAME = "Res"
-    }
-
     @get:Input
     abstract val packageName: Property<String>
+
+    @get:Input
+    abstract val resClassName: Property<String>
 
     @get:Input
     @get:Optional
@@ -31,11 +30,12 @@ internal abstract class GenerateResClassTask : IdeaImportTask() {
         dir.deleteRecursively()
         dir.mkdirs()
 
-        logger.info("Generate $RES_FILE_NAME.kt")
+        val resClassName = resClassName.get()
+        logger.info("Generate $resClassName.kt")
 
         val pkgName = packageName.get()
         val moduleDirectory = packagingDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
         val isPublic = makeAccessorsPublic.get()
-        getResFileSpec(pkgName, RES_FILE_NAME, moduleDirectory, isPublic).writeTo(dir)
+        getResFileSpec(pkgName, resClassName, moduleDirectory, isPublic).writeTo(dir)
     }
 }

@@ -12,7 +12,7 @@ import org.jetbrains.compose.resources.ResourceItem
 
 private const val MD: String = "composeResources/my.lib.res/"
 
-public val Res.font.emptyFont: FontResource by lazy {
+public val MyRes.font.emptyFont: FontResource by lazy {
       FontResource("font:emptyFont", setOf(
         ResourceItem(setOf(LanguageQualifier("en"), ), "${MD}font-en/emptyFont.otf", -1, -1),
         ResourceItem(setOf(), "${MD}font/emptyFont.otf", -1, -1),

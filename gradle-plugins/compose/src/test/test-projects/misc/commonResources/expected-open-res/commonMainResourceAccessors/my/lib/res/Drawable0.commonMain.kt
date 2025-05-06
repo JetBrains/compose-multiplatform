@@ -14,25 +14,25 @@ import org.jetbrains.compose.resources.ThemeQualifier
 
 private const val MD: String = "composeResources/my.lib.res/"
 
-public val Res.drawable._3_strange_name: DrawableResource by lazy {
+public val MyRes.drawable._3_strange_name: DrawableResource by lazy {
       DrawableResource("drawable:_3_strange_name", setOf(
         ResourceItem(setOf(), "${MD}drawable/3-strange-name.xml", -1, -1),
       ))
     }
 
-public val Res.drawable.camelCaseName: DrawableResource by lazy {
+public val MyRes.drawable.camelCaseName: DrawableResource by lazy {
       DrawableResource("drawable:camelCaseName", setOf(
         ResourceItem(setOf(), "${MD}drawable/camelCaseName.xml", -1, -1),
       ))
     }
 
-public val Res.drawable.`is`: DrawableResource by lazy {
+public val MyRes.drawable.`is`: DrawableResource by lazy {
       DrawableResource("drawable:is", setOf(
         ResourceItem(setOf(), "${MD}drawable/is.xml", -1, -1),
       ))
     }
 
-public val Res.drawable.vector: DrawableResource by lazy {
+public val MyRes.drawable.vector: DrawableResource by lazy {
       DrawableResource("drawable:vector", setOf(
         ResourceItem(setOf(LanguageQualifier("ast"), ), "${MD}drawable-ast/vector.xml", -1, -1),
         ResourceItem(setOf(LanguageQualifier("au"), RegionQualifier("US"), ), "${MD}drawable-au-rUS/vector.xml", -1, -1),
@@ -42,7 +42,7 @@ public val Res.drawable.vector: DrawableResource by lazy {
       ))
     }
 
-public val Res.drawable.vector_2: DrawableResource by lazy {
+public val MyRes.drawable.vector_2: DrawableResource by lazy {
       DrawableResource("drawable:vector_2", setOf(
         ResourceItem(setOf(), "${MD}drawable/vector_2.xml", -1, -1),
       ))
