@@ -159,18 +159,21 @@ fun generateChangelog() {
         previousVersion = previousVersionInChangelog
     }
 
-    fun getChangelog(firstCommit: String, lastCommit: String, firstVersion: String): String {
+    fun getChangelog(firstCommit: String, lastCommit: String, firstVersion: String, lastVersion: String): String {
+        val isPrerelease = lastVersion.contains("-")
+
         val entries = entriesForRepo("JetBrains/compose-multiplatform-core", firstCommit, lastCommit) +
                 entriesForRepo("JetBrains/compose-multiplatform", firstCommit, lastCommit)
 
         return buildString {
-            appendLine("# $versionName (${currentChangelogDate()})")
+            appendLine("# $lastVersion (${currentChangelogDate()})")
 
             appendLine()
             appendLine("_Changes since ${firstVersion}_")
             appendLine()
 
             entries
+                .filter { isPrerelease || !it.isPrerelease }
                 .sortedBy { it.sectionOrder() }
                 .groupBy { it.sectionName() }
                 .forEach { (section, sectionEntries) ->
@@ -236,7 +239,7 @@ fun generateChangelog() {
     println()
     println("Generating changelog between $previousVersion and $versionName")
 
-    val newChangelog = getChangelog(previousVersionCommit, versionCommit, previousVersion)
+    val newChangelog = getChangelog(previousVersionCommit, versionCommit, previousVersion, versionName)
 
     changelogFile.writeText(
         newChangelog + previousChangelog
@@ -351,13 +354,15 @@ fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNo
             lineFixed = lineFixed.trimEnd().removeSuffix(".")
 
             val isTopLevel = lineFixed.startsWith("-")
+            val isPrerelease = isTopLevel && lineFixed.contains("(prerelease fix)")
             list.add(
                 ChangelogEntry(
                     lineFixed,
                     section,
                     subsection,
                     prNumber,
-                    prLink.takeIf { isTopLevel }
+                    prLink.takeIf { isTopLevel },
+                    isPrerelease
                 )
             )
             isFirstLine = false
@@ -385,7 +390,7 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
         return if (pullRequest != null) {
             with(pullRequest) {
                 extractReleaseNotes(body, number, htmlUrl)?.entries ?:
-                    listOf(ChangelogEntry("- $title", null, null, number, htmlUrl))
+                    listOf(ChangelogEntry("- $title", null, null, number, htmlUrl, false))
             }
         } else {
             listOf()
@@ -485,6 +490,7 @@ data class ChangelogEntry(
     val subsection: String?,
     val prNumber: Int,
     val link: String?,
+    val isPrerelease: Boolean,
 )
 
 fun ChangelogEntry.sectionOrder(): Int = section?.let(standardSections::indexOf) ?: standardSections.size
