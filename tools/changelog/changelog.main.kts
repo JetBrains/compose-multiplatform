@@ -397,31 +397,9 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
         }
     }
 
-    class CommitsResult(val commits: List<GitHubCompareResponse.CommitEntry>, val mergeBaseSha: String)
-
-    fun fetchCommits(firsCommitSha: String, lastCommitSha: String): CommitsResult {
-        lateinit var mergeBaseCommit: String
-        val commits = fetchPagedUntilEmpty { page ->
-            val result = requestJson<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$firsCommitSha...$lastCommitSha?per_page=1000&page=$page")
-            mergeBaseCommit = result.mergeBaseCommit.sha
-            result.commits
-        }
-        return CommitsResult(commits, mergeBaseCommit)
-    }
-
-    val main = fetchCommits(firstCommit, lastCommit)
-    val previous = fetchCommits(main.mergeBaseSha, firstCommit)
-    val pullRequests = main.commits.mapNotNull { shaToPull[it.sha] }.toSet()
-    val previousVersionPullRequests = previous.commits.mapNotNull { shaToPull[it.sha] }.toSet()
-    return (pullRequests - previousVersionPullRequests).flatMap { changelogEntriesFor(it) }
-}
-
-/**
- * @param repo Example:
- *        JetBrains/compose-multiplatform-core
- */
-fun pullRequest(repo: String, prNumber: String): GitHubPullEntry {
-    return requestJson<GitHubPullEntry>("https://api.github.com/repos/$repo/pulls/$prNumber")
+    return gitLogShas(githubClone(repo), firstCommit, lastCommit)
+        .reversed() // older changes are at the bottom
+        .flatMap { changelogEntriesFor(shaToPull[it]) }
 }
 
 /**
@@ -474,6 +452,34 @@ fun spaceContentOf(repoUrl: String, path: String, tagName: String): String {
         .readText()
 }
 
+/**
+ * Return a list of shas between [firstCommit] and [lastCommit] in [folder]
+ */
+fun gitLogShas(folder: File, firstCommit: String, lastCommit: String): List<String> {
+    val absolutePath = folder.absolutePath
+    val commits = pipeProcess("git -C $absolutePath log --oneline --format=\"%H\" --cherry-pick --right-only $firstCommit...$lastCommit").
+            readText()
+    return commits.split("\n")
+}
+
+/**
+ * Clone or fetch GitHub repo into [result] folder
+ */
+fun githubClone(repo: String): File {
+    val url = "https://github.com/$repo"
+    val folder = File("build/github/$repo")
+    val absolutePath = folder.absolutePath
+    if (!folder.exists()) {
+        folder.mkdirs()
+        println("Cloning $url into ${folder.absolutePath}")
+        pipeProcess("git clone --bare $url $absolutePath").waitAndCheck()
+    } else {
+        println("Fetching $url into ${folder.absolutePath}")
+        pipeProcess("git -C $absolutePath fetch").waitAndCheck()
+    }
+    return folder
+}
+
 sealed interface ReleaseNotes {
     val entries: List<ChangelogEntry>
 
@@ -500,15 +506,6 @@ fun ChangelogEntry.subsectionName(): String = subsection ?: "Unknown"
 fun String.normalizeSectionName() = standardSections.find { it.lowercase() == this.lowercase() } ?: this
 fun String.normalizeSubsectionName() = standardSubsections.find { it.lowercase() == this.lowercase() } ?: this
 
-// example https://api.github.com/repos/JetBrains/compose-multiplatform-core/compare/v1.6.0-rc02...release/1.6.0
-data class GitHubCompareResponse(
-    val commits: List<CommitEntry>,
-    @SerializedName("merge_base_commit") val mergeBaseCommit: CommitEntry
-) {
-    data class CommitEntry(val sha: String, val commit: Commit)
-    data class Commit(val message: String)
-}
-
 // example https://api.github.com/repos/JetBrains/compose-multiplatform-core/pulls?state=closed
 data class GitHubPullEntry(
     @SerializedName("html_url") val htmlUrl: String,
@@ -529,6 +526,14 @@ fun Process.pipeTo(command: String): Process = pipeProcess(command).also {
         it.outputStream.use { out ->
             input.copyTo(out)
         }
+    }
+}
+
+fun Process.waitAndCheck() {
+    val exitCode = waitFor()
+    if (exitCode != 0) {
+        val message = errorStream.bufferedReader().use { it.readText() }
+        error("Command failed with exit code $exitCode:\n$message")
     }
 }
 
@@ -563,16 +568,6 @@ fun <T> exponentialRetry(block: () -> T): T {
         }
     }
     throw exception
-}
-
-inline fun <T> fetchPagedUntilEmpty(fetch: (page: Int) -> List<T>): MutableList<T> {
-    val all = mutableListOf<T>()
-    var page = 1
-    do {
-        val result = fetch(page++)
-        all.addAll(result)
-    } while (result.isNotEmpty())
-    return all
 }
 
 //endregion
