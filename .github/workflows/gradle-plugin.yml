@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-24.04', 'macos-14', 'windows-2022']
+        os: ['ubuntu-24.04', 'macos-14', 'windows-2025']
         gradle: ['8.7', '8.13']
         agp: ['8.6.0', '8.9.0']
     runs-on: ${{ matrix.os }}
