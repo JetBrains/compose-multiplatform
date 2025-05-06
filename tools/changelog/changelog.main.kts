@@ -468,7 +468,7 @@ fun spaceContentOf(repoUrl: String, path: String, tagName: String): String {
  */
 fun gitLogShas(folder: File, firstCommit: String, lastCommit: String, additionalArgs: String): List<String> {
     val absolutePath = folder.absolutePath
-    val commits = pipeProcess("git -C $absolutePath log --oneline --format=\"%H\" $additionalArgs $firstCommit...$lastCommit").
+    val commits = pipeProcess("git -C $absolutePath log --oneline --format=%H $additionalArgs $firstCommit...$lastCommit").
             readText()
     return commits.split("\n")
 }
