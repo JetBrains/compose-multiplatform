@@ -334,6 +334,7 @@ fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNo
     var section: String? = null
     var subsection: String? = null
     var isFirstLine = true
+    var isPrerelease = false
 
     for (line in relNoteBody.split("\n")) {
         // parse "## Section - Subsection"
@@ -342,6 +343,7 @@ fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNo
             section = s.substringBefore("-", "").trim().normalizeSectionName().ifEmpty { null }
             subsection = s.substringAfter("-", "").trim().normalizeSubsectionName().ifEmpty { null }
             isFirstLine = true
+            isPrerelease = false
         } else if (section != null && line.isNotBlank()) {
             var lineFixed = line
 
@@ -354,7 +356,9 @@ fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNo
             lineFixed = lineFixed.trimEnd().removeSuffix(".")
 
             val isTopLevel = lineFixed.startsWith("-")
-            val isPrerelease = isTopLevel && lineFixed.contains("(prerelease fix)")
+            if (isTopLevel) {
+                isPrerelease = lineFixed.contains("(prerelease fix)")
+            }
             list.add(
                 ChangelogEntry(
                     lineFixed,
