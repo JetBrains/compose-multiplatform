@@ -584,7 +584,7 @@ fun requestPlain(url: String): String = exponentialRetry {
     val connection = URL(url).openConnection()
     connection.setRequestProperty("User-Agent", "Compose-Multiplatform-Script")
     if (token != null) {
-        connection.setRequestProperty("Authorization", "Bearer $token")
+        connection.setRequestProperty("Authorization", if (token.startsWith("github_pat")) token else "Bearer $token")
     }
     connection.getInputStream().use {
         it.bufferedReader().readText()
