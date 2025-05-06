@@ -55,9 +55,8 @@ private fun ResourceType.requiresKeyName() =
     this in setOf(ResourceType.STRING, ResourceType.STRING_ARRAY, ResourceType.PLURAL_STRING)
 
 private val resourceItemClass = ClassName("org.jetbrains.compose.resources", "ResourceItem")
-private val internalAnnotation = AnnotationSpec.builder(
-    ClassName("org.jetbrains.compose.resources", "InternalResourceApi")
-).build()
+private val internalAnnotationClass = ClassName("org.jetbrains.compose.resources", "InternalResourceApi")
+private val internalAnnotation = AnnotationSpec.builder(internalAnnotationClass).build()
 
 private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlock.Builder {
     val languageQualifier = ClassName("org.jetbrains.compose.resources", "LanguageQualifier")
@@ -134,13 +133,13 @@ internal fun getResFileSpec(
     return FileSpec.builder(packageName, fileName).also { file ->
         file.addAnnotation(
             AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
-                .addMember("org.jetbrains.compose.resources.InternalResourceApi::class")
+                .addMember("%T::class", internalAnnotationClass)
                 .build()
         )
         file.addAnnotation(
             AnnotationSpec.builder(ClassName("kotlin", "Suppress"))
-                .addMember("%S","RedundantVisibilityModifier")
-                .addMember("%S","REDUNDANT_VISIBILITY_MODIFIER")
+                .addMember("%S", "RedundantVisibilityModifier")
+                .addMember("%S", "REDUNDANT_VISIBILITY_MODIFIER")
                 .build()
         )
         file.addType(TypeSpec.objectBuilder("Res").also { resObject ->
@@ -202,7 +201,7 @@ internal fun getResFileSpec(
 //
 // if accessor initializers are extracted from the single object but located in the same file
 // then a build may fail with: org.jetbrains.org.objectweb.asm.ClassTooLargeException: Class too large: Res$drawable
-private const val ITEMS_PER_FILE_LIMIT = 500
+private const val ITEMS_PER_FILE_LIMIT = 100
 internal fun getAccessorsSpecs(
     //type -> id -> items
     resources: Map<ResourceType, Map<String, List<ResourceItem>>>,
@@ -248,20 +247,45 @@ private fun getChunkFileSpec(
     return FileSpec.builder(packageName, fileName).also { chunkFile ->
         chunkFile.addAnnotation(
             AnnotationSpec.builder(ClassName("kotlin", "OptIn"))
-                .addMember("org.jetbrains.compose.resources.InternalResourceApi::class")
+                .addMember("%T::class", internalAnnotationClass)
                 .build()
         )
 
-        val objectSpec = TypeSpec.objectBuilder(chunkClassName).also { typeObject ->
-            typeObject.addModifiers(KModifier.PRIVATE)
-            val properties = idToResources.keys.map { resName ->
-                PropertySpec.builder(resName, type.getClassName())
-                    .delegate("\nlazy·{ %N() }", "init_$resName")
-                    .build()
-            }
-            typeObject.addProperties(properties)
-        }.build()
-        chunkFile.addType(objectSpec)
+        chunkFile.addProperty(
+            PropertySpec.builder("MD", String::class)
+                .addModifiers(KModifier.PRIVATE, KModifier.CONST)
+                .initializer("%S", moduleDir)
+                .build()
+        )
+
+        idToResources.forEach { (resName, items) ->
+            val initializer = CodeBlock.builder()
+                .beginControlFlow("lazy {")
+                .apply {
+                    if (type.requiresKeyName()) {
+                        add("%T(%S, %S, setOf(\n", type.getClassName(), "$type:$resName", resName)
+                    } else {
+                        add("%T(%S, setOf(\n", type.getClassName(), "$type:$resName")
+                    }
+                    items.forEach { item ->
+                        add("  %T(setOf(", resourceItemClass)
+                        addQualifiers(item)
+                        add("), ")
+                        //file separator should be '/' on all platforms
+                        add("\"${'$'}{MD}${item.path.invariantSeparatorsPathString}\", ${item.offset}, ${item.size}")
+                        add("),\n")
+                    }
+                    add("))\n")
+                }
+                .endControlFlow()
+                .build()
+
+            val accessor = PropertySpec.builder(resName, type.getClassName(), resModifier)
+                .receiver(ClassName(packageName, "Res", type.accessorName))
+                .delegate(initializer)
+                .build()
+            chunkFile.addProperty(accessor)
+        }
 
         //__collect${chunkClassName}Resources function
         chunkFile.addFunction(
@@ -274,47 +298,11 @@ private fun getChunkFileSpec(
                 )
                 .also { collectFun ->
                     idToResources.keys.forEach { resName ->
-                        collectFun.addStatement("map.put(%S, $chunkClassName.%N)", resName, resName)
+                        collectFun.addStatement("map.put(%S, %N.%N.%N)", resName, "Res", type.accessorName, resName)
                     }
                 }
                 .build()
         )
-
-        idToResources.forEach { (resName, items) ->
-            val accessor = PropertySpec.builder(resName, type.getClassName(), resModifier)
-                .receiver(ClassName(packageName, "Res", type.accessorName))
-                .getter(FunSpec.getterBuilder().addStatement("return $chunkClassName.%N", resName).build())
-                .build()
-            chunkFile.addProperty(accessor)
-
-            val initializer = FunSpec.builder("init_$resName")
-                .addModifiers(KModifier.PRIVATE)
-                .returns(type.getClassName())
-                .addStatement(
-                    CodeBlock.builder()
-                        .add("return %T(\n", type.getClassName()).withIndent {
-                            add("%S,", "$type:$resName")
-                            if (type.requiresKeyName()) add(" %S,", resName)
-                            withIndent {
-                                add("\nsetOf(\n").withIndent {
-                                    items.forEach { item ->
-                                        add("%T(", resourceItemClass)
-                                        add("setOf(").addQualifiers(item).add("), ")
-                                        //file separator should be '/' on all platforms
-                                        add("\"$moduleDir${item.path.invariantSeparatorsPathString}\", ")
-                                        add("${item.offset}, ${item.size}")
-                                        add("),\n")
-                                    }
-                                }
-                                add(")\n")
-                            }
-                        }
-                        .add(")")
-                        .build().toString()
-                )
-                .build()
-            chunkFile.addFunction(initializer)
-        }
     }.build()
 }
 
