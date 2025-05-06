@@ -184,7 +184,11 @@ fun generateChangelog() {
                             appendLine("### $subsection")
                             appendLine()
                             subsectionEntries.forEach {
-                                appendLine(it.run { "$message [#$prNumber]($link)" })
+                                if (it.link != null) {
+                                    appendLine(it.run { "$message [#$prNumber]($link)" })
+                                } else {
+                                    appendLine(it.message)
+                                }
                             }
                             appendLine()
                         }
@@ -327,7 +331,6 @@ fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNo
     var section: String? = null
     var subsection: String? = null
     var isFirstLine = true
-    var shouldPadLines = false
 
     for (line in relNoteBody.split("\n")) {
         // parse "## Section - Subsection"
@@ -336,15 +339,13 @@ fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNo
             section = s.substringBefore("-", "").trim().normalizeSectionName().ifEmpty { null }
             subsection = s.substringAfter("-", "").trim().normalizeSubsectionName().ifEmpty { null }
             isFirstLine = true
-            shouldPadLines = false
         } else if (section != null && line.isNotBlank()) {
             var lineFixed = line
 
             if (isFirstLine && !lineFixed.startsWith("-")) {
                 lineFixed = "- $lineFixed"
-                shouldPadLines = true
             }
-            if (!isFirstLine && shouldPadLines) {
+            if (!isFirstLine && !lineFixed.startsWithAny("  ", "-")) {
                 lineFixed = "  $lineFixed"
             }
             lineFixed = lineFixed.trimEnd().removeSuffix(".")
