@@ -567,6 +567,23 @@ class ResourcesTest : GradlePluginTestBase() {
         gradle("generateBuildConfig")
     }
 
+    //https://github.com/JetBrains/compose-multiplatform/issues/4194
+    //https://github.com/JetBrains/compose-multiplatform/issues/4285
+    //https://youtrack.jetbrains.com/issue/CMP-7934
+    //
+    // 25_000 icons + (25_000 * 80) strings!!!
+    @Test
+    fun testHugeNumberOfResources(): Unit = with(testProject("misc/hugeResources")) {
+        gradle(":generateResourceFiles")
+        gradle(":generateResourceAccessorsForCommonMain").checks {
+            val buildPath = "build/generated/compose/resourceGenerator/kotlin/commonMainResourceAccessors/app/group/huge/generated/resources"
+            assertEqualTextFiles(file("$buildPath/Drawable0.commonMain.kt"), file("expected/Drawable0.commonMain.kt"))
+            assertEqualTextFiles(file("$buildPath/Drawable100.commonMain.kt"), file("expected/Drawable100.commonMain.kt"))
+            assertEqualTextFiles(file("$buildPath/String0.commonMain.kt"), file("expected/String0.commonMain.kt"))
+            assertEqualTextFiles(file("$buildPath/String100.commonMain.kt"), file("expected/String100.commonMain.kt"))
+        }
+    }
+
     private fun assertDirectoriesContentEquals(actual: File, expected: File) {
         require(expected.isDirectory)
         require(actual.isDirectory)
