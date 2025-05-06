@@ -351,13 +351,21 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testDisableMultimoduleResourcesWithNewKotlin() {
-        with(testProject("misc/kmpResourcePublication")) {
+    fun testDisableMultimoduleResources() {
+        with(testProject("misc/commonResources")) {
             file("gradle.properties").modify { content ->
                 content + "\n" + ComposeProperties.DISABLE_MULTIMODULE_RESOURCES + "=true"
             }
-            gradle(":cmplib:build").checks {
+            gradle("desktopJar").checks {
                 check.logContains("Configure single-module compose resources")
+
+                val resDir = file("src/commonMain/composeResources")
+                val resourcesFiles = resDir.walkTopDown()
+                    .filter { !it.isDirectory && !it.isHidden }
+                    .getConvertedResources(resDir, "")
+
+                val jar = file("build/libs/Resources-Test-desktop.jar")
+                checkResourcesZip(jar, resourcesFiles, false)
             }
         }
     }
