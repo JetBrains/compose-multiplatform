@@ -447,7 +447,7 @@ fun androidxLibToVersion(commit: String): Map<String, String> {
     val libraryKt = spaceContentOf(repo, file, commit)
 
     return if (libraryKt.isBlank()) {
-        println("Can't clone $repo to know library versions. Please register your ssh key in https://jetbrains.team/m/me/authentication?tab=GitKeys")
+        println("Can't find library versions in $repo for $commit. Either the format is changed, or you need to register your ssh key in https://jetbrains.team/m/me/authentication?tab=GitKeys")
         emptyMap()
     } else {
         val regex = Regex("Library\\.(.*)\\s*->\\s*\"(.*)\"")
