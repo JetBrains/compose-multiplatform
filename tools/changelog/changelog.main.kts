@@ -399,9 +399,16 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
     }
 
     val repoFolder = githubClone(repo)
-    return gitLogShas(repoFolder, firstCommit, lastCommit)
+
+    // Commits that exist in [firstCommit] and not identified as cherry-picks.
+    // We identify them via reading a PR description "Cherry-picked from ..."
+    val cherryPickedPrsInFirstCommit = gitLogShas(repoFolder, firstCommit, lastCommit, "--cherry-pick --left-only")
+        .mapNotNull(::pullOf)
+
+    return gitLogShas(repoFolder, firstCommit, lastCommit, "--cherry-pick --right-only")
         .reversed() // older changes are at the bottom
         .mapNotNull(::pullOf)
+        .minus(cherryPickedPrsInFirstCommit)
         .distinctBy { it.number }
         .flatMap(::changelogEntriesFor)
 }
@@ -459,9 +466,9 @@ fun spaceContentOf(repoUrl: String, path: String, tagName: String): String {
 /**
  * Return a list of shas between [firstCommit] and [lastCommit] in [folder]
  */
-fun gitLogShas(folder: File, firstCommit: String, lastCommit: String): List<String> {
+fun gitLogShas(folder: File, firstCommit: String, lastCommit: String, additionalArgs: String): List<String> {
     val absolutePath = folder.absolutePath
-    val commits = pipeProcess("git -C $absolutePath log --oneline --format=\"%H\" --cherry-pick --right-only $firstCommit...$lastCommit").
+    val commits = pipeProcess("git -C $absolutePath log --oneline --format=\"%H\" $additionalArgs $firstCommit...$lastCommit").
             readText()
     return commits.split("\n")
 }
