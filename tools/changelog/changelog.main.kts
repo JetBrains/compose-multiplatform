@@ -382,24 +382,28 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
             requestJson<Array<GitHubPullEntry>>("https://api.github.com/repos/$repo/pulls?state=closed&per_page=100&page=$it").toList()
         }
 
-    val shaToPull = pulls.associateBy { it.mergeCommitSha }
-
-    fun changelogEntriesFor(
-        pullRequest: GitHubPullEntry?
-    ): List<ChangelogEntry> {
-        return if (pullRequest != null) {
-            with(pullRequest) {
-                extractReleaseNotes(body, number, htmlUrl)?.entries ?:
-                    listOf(ChangelogEntry("- $title", null, null, number, htmlUrl, false))
-            }
-        } else {
-            listOf()
-        }
+    val shaToOriginalPull = pulls.associateBy { it.mergeCommitSha }
+    val numberToPull = pulls.associateBy { it.number }
+    val pullToCherryPickPull = pulls.associateWith {
+        it.findCherryPickPullNumber()?.let(numberToPull::get)
     }
 
-    return gitLogShas(githubClone(repo), firstCommit, lastCommit)
+    fun pullOf(sha: String): GitHubPullEntry? {
+        val originalPr = shaToOriginalPull[sha]
+        return pullToCherryPickPull[originalPr] ?: originalPr
+    }
+
+    fun changelogEntriesFor(pullRequest: GitHubPullEntry) = with(pullRequest) {
+        extractReleaseNotes(body, number, htmlUrl)?.entries ?:
+            listOf(ChangelogEntry("- $title", null, null, number, htmlUrl, false))
+    }
+
+    val repoFolder = githubClone(repo)
+    return gitLogShas(repoFolder, firstCommit, lastCommit)
         .reversed() // older changes are at the bottom
-        .flatMap { changelogEntriesFor(shaToPull[it]) }
+        .mapNotNull(::pullOf)
+        .distinctBy { it.number }
+        .flatMap(::changelogEntriesFor)
 }
 
 /**
@@ -515,6 +519,32 @@ data class GitHubPullEntry(
     @SerializedName("merge_commit_sha") val mergeCommitSha: String?,
 )
 
+/**
+ * Find a link to the original Pull request:
+ * - to show the original PR instead of cherry-pick to users
+ *   (and the cherry-pick PR can be found in the comments, GitHub mentions all the links)
+ * - to distinguish in case the diff is changed
+ *
+ * The link should be in format "Cherry-picked from <link>"
+ */
+fun GitHubPullEntry.findCherryPickPullNumber(): Int? = body
+    ?.lowercase()
+    ?.split("\n")
+    ?.map { it.trim() }
+    ?.find { it.startsWithAny("cherry-pick", "cherrypick", "cherry pick") }
+    ?.let {
+        val numberFromLink = it
+            .substringAfter("http", "")
+            .substringAfter("/pull/", "")
+            .substringBefore(" ")
+            .toIntOrNull()
+        val numberFromId = it
+            .substringAfter("#", "")
+            .substringBefore(" ")
+            .toIntOrNull()
+        numberFromLink ?: numberFromId
+    }
+
 //region ========================================== UTILS =========================================
 fun pipeProcess(command: String) = ProcessBuilder(command.split(" "))
     .redirectOutput(Redirect.PIPE)
@@ -569,5 +599,7 @@ fun <T> exponentialRetry(block: () -> T): T {
     }
     throw exception
 }
+
+fun String.startsWithAny(vararg prefixes: String): Boolean = prefixes.any { startsWith(it) }
 
 //endregion
