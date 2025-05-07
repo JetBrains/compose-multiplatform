@@ -61,12 +61,12 @@ public val MyRes.string.str_template: StringResource by lazy {
 
 @InternalResourceApi
 internal fun _collectCommonMainString0Resources(map: MutableMap<String, StringResource>) {
-  map.put("PascalCase", Res.string.PascalCase)
-  map.put("_1_kebab_case", Res.string._1_kebab_case)
-  map.put("app_name", Res.string.app_name)
-  map.put("camelCase", Res.string.camelCase)
-  map.put("hello", Res.string.hello)
-  map.put("info_using_release_${'$'}x", Res.string.`info_using_release_$x`)
-  map.put("multi_line", Res.string.multi_line)
-  map.put("str_template", Res.string.str_template)
+  map.put("PascalCase", MyRes.string.PascalCase)
+  map.put("_1_kebab_case", MyRes.string._1_kebab_case)
+  map.put("app_name", MyRes.string.app_name)
+  map.put("camelCase", MyRes.string.camelCase)
+  map.put("hello", MyRes.string.hello)
+  map.put("info_using_release_${'$'}x", MyRes.string.`info_using_release_$x`)
+  map.put("multi_line", MyRes.string.multi_line)
+  map.put("str_template", MyRes.string.str_template)
 }

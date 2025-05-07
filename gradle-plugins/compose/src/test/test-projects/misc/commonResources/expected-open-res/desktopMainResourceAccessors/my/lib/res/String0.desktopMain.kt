@@ -19,5 +19,5 @@ public val MyRes.string.desktop_str: StringResource by lazy {
 
 @InternalResourceApi
 internal fun _collectDesktopMainString0Resources(map: MutableMap<String, StringResource>) {
-  map.put("desktop_str", Res.string.desktop_str)
+  map.put("desktop_str", MyRes.string.desktop_str)
 }
