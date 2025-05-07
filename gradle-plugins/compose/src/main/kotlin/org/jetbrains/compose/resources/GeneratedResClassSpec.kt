@@ -301,7 +301,7 @@ private fun getChunkFileSpec(
                 )
                 .also { collectFun ->
                     idToResources.keys.forEach { resName ->
-                        collectFun.addStatement("map.put(%S, %N.%N.%N)", resName, "Res", type.accessorName, resName)
+                        collectFun.addStatement("map.put(%S, %N.%N.%N)", resName, resClassName, type.accessorName, resName)
                     }
                 }
                 .build()

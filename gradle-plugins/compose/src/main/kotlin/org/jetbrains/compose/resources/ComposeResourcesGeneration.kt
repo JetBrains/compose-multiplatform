@@ -101,7 +101,7 @@ private fun Project.configureResClassGeneration(
     packagingDir: Provider<File>,
     generateModulePath: Boolean
 ) {
-    logger.info("Configure Res class generation for ${resClassSourceSet.name}")
+    logger.info("Configure '$resClassName' class generation for ${resClassSourceSet.name}")
 
     val genTask = tasks.register(
         "generateComposeResClass",
