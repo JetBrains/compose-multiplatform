@@ -19,5 +19,5 @@ public val MyRes.string.android_str: StringResource by lazy {
 
 @InternalResourceApi
 internal fun _collectAndroidMainString0Resources(map: MutableMap<String, StringResource>) {
-  map.put("android_str", Res.string.android_str)
+  map.put("android_str", MyRes.string.android_str)
 }
