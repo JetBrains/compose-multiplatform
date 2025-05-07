@@ -387,6 +387,25 @@ class ResourcesTest : GradlePluginTestBase() {
         }
     }
 
+
+    @Test
+    fun testJvmBuildWithResourcesCustomization(): Unit = with(testProject("misc/commonResources")) {
+        file("build.gradle.kts").appendText(
+            """
+                compose.resources {
+                    publicResClass = true
+                    packageOfResClass = "io.customized"
+                    nameOfResClass = "CustomName"
+                }
+            """.trimIndent()
+        )
+        file("src/commonMain/kotlin").deleteRecursively() //empty project
+
+        gradle("desktopJar").checks {
+            check.logContains("Generate CustomName.kt")
+        }
+    }
+
     @Test
     fun testFinalArtefacts(): Unit = with(testProject("misc/commonResources")) {
         //https://developer.android.com/build/build-variants?utm_source=android-studio#product-flavors

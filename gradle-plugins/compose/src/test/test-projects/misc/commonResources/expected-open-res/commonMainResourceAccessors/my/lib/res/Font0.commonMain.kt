@@ -21,5 +21,5 @@ public val MyRes.font.emptyFont: FontResource by lazy {
 
 @InternalResourceApi
 internal fun _collectCommonMainFont0Resources(map: MutableMap<String, FontResource>) {
-  map.put("emptyFont", Res.font.emptyFont)
+  map.put("emptyFont", MyRes.font.emptyFont)
 }

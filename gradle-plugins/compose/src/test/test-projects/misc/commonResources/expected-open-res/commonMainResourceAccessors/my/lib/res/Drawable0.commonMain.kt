@@ -50,9 +50,9 @@ public val MyRes.drawable.vector_2: DrawableResource by lazy {
 
 @InternalResourceApi
 internal fun _collectCommonMainDrawable0Resources(map: MutableMap<String, DrawableResource>) {
-  map.put("_3_strange_name", Res.drawable._3_strange_name)
-  map.put("camelCaseName", Res.drawable.camelCaseName)
-  map.put("is", Res.drawable.`is`)
-  map.put("vector", Res.drawable.vector)
-  map.put("vector_2", Res.drawable.vector_2)
+  map.put("_3_strange_name", MyRes.drawable._3_strange_name)
+  map.put("camelCaseName", MyRes.drawable.camelCaseName)
+  map.put("is", MyRes.drawable.`is`)
+  map.put("vector", MyRes.drawable.vector)
+  map.put("vector_2", MyRes.drawable.vector_2)
 }

@@ -19,5 +19,5 @@ public val MyRes.plurals.numberOfSongsAvailable: PluralStringResource by lazy {
 
 @InternalResourceApi
 internal fun _collectCommonMainPlurals0Resources(map: MutableMap<String, PluralStringResource>) {
-  map.put("numberOfSongsAvailable", Res.plurals.numberOfSongsAvailable)
+  map.put("numberOfSongsAvailable", MyRes.plurals.numberOfSongsAvailable)
 }
