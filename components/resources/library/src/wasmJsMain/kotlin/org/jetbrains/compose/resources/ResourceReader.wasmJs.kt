@@ -23,7 +23,9 @@ private external fun jsExportInt8ArrayToWasm(src: Int8Array, size: Int, dstAddr:
 @JsFun("(blob) => blob.arrayBuffer()")
 private external fun jsExportBlobAsArrayBuffer(blob: Blob): Promise<ArrayBuffer>
 
-internal actual fun getPlatformResourceReader(): ResourceReader {
+internal actual fun getPlatformResourceReader(
+    configuration: ResourceConfiguration,
+): ResourceReader {
     if (isInTestEnvironment()) return TestWasmResourceReader
     return DefaultWasmResourceReader
 }
@@ -128,3 +130,7 @@ private fun requestResponseAsByteArray(req: XMLHttpRequest): Int8Array =
 
 private fun isInTestEnvironment(): Boolean =
     js("window.composeResourcesTesting == true")
+
+actual val DefaultResourceConfiguration: ResourceConfiguration = ResourceConfiguration
+
+actual object ResourceConfiguration

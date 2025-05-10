@@ -9,7 +9,9 @@ import org.w3c.files.Blob
 import org.w3c.xhr.XMLHttpRequest
 import kotlin.js.Promise
 
-internal actual fun getPlatformResourceReader(): ResourceReader {
+internal actual fun getPlatformResourceReader(
+    configuration: ResourceConfiguration,
+): ResourceReader {
     if (isInTestEnvironment()) return TestJsResourceReader
     return DefaultJsResourceReader
 }
@@ -81,3 +83,7 @@ private val TestJsResourceReader by lazy {
 
 private fun isInTestEnvironment(): Boolean =
     js("window.composeResourcesTesting == true")
+
+actual val DefaultResourceConfiguration: ResourceConfiguration = ResourceConfiguration
+
+actual object ResourceConfiguration

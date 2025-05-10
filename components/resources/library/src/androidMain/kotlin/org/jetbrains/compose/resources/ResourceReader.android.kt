@@ -8,7 +8,9 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import java.io.FileNotFoundException
 import java.io.InputStream
 
-internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
+internal actual fun getPlatformResourceReader(
+    configuration: ResourceConfiguration,
+): ResourceReader = object : ResourceReader {
     private val assets: AssetManager by lazy {
         val context = androidContext ?: error(
             "Android context is not initialized. " +
@@ -85,7 +87,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
     }
 
     private fun getClassLoader(): ClassLoader {
-        return this.javaClass.classLoader ?: error("Cannot find class loader")
+        return configuration.classLoader
     }
 
     private fun AssetManager?.hasFile(path: String): Boolean {
@@ -103,6 +105,14 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
 
     private fun AssetManager?.open(path: String): InputStream =
         this?.open(path) ?: throw FileNotFoundException("Current AssetManager is null.")
+}
+
+actual val DefaultResourceConfiguration: ResourceConfiguration = ResourceConfiguration()
+
+actual class ResourceConfiguration(
+    val classLoader:ClassLoader = Companion::class.java.classLoader ?: error("Cannot find class loader"),
+) {
+    private companion object
 }
 
 internal actual val ProvidableCompositionLocal<ResourceReader>.currentOrPreview: ResourceReader

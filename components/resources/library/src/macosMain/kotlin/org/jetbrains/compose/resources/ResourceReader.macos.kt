@@ -5,7 +5,9 @@ import kotlinx.cinterop.usePinned
 import platform.Foundation.*
 import platform.posix.memcpy
 
-internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
+internal actual fun getPlatformResourceReader(
+    configuration: ResourceConfiguration,
+): ResourceReader = object : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         val data = readData(getPathOnDisk(path))
         return ByteArray(data.length.toInt()).apply {
@@ -68,3 +70,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
             .substringAfter("/") // remove PACKAGE path
     }
 }
+
+actual val DefaultResourceConfiguration: ResourceConfiguration = ResourceConfiguration
+
+actual object ResourceConfiguration
