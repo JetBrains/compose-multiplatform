@@ -13,7 +13,6 @@
 
 # Kotlinx Coroutines Rules
 # https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/resources/META-INF/proguard/coroutines.pro
-
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
 -keepclassmembers class kotlinx.coroutines.** {
@@ -68,6 +67,46 @@
 -keep,allowshrinking,allowobfuscation class androidx.compose.runtime.SnapshotStateKt__DerivedStateKt { *; }
 -keep class androidx.compose.material3.SliderDefaults { *; }
 -dontnote androidx.**
+
+# Kotlinx serialization, included by androidx.navigation
+# https://github.com/Kotlin/kotlinx.serialization/blob/master/rules/common.pro
+-if @kotlinx.serialization.Serializable class **
+-keepclassmembers class <1> {
+    static <1>$* Companion;
+}
+-keepnames @kotlinx.serialization.internal.NamedCompanion class *
+-if @kotlinx.serialization.internal.NamedCompanion class *
+-keepclassmembernames class * {
+    static <1> *;
+}
+-if @kotlinx.serialization.Serializable class ** {
+    static **$* *;
+}
+-keepclassmembers class <2>$<3> {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+# Keep `INSTANCE.serializer()` of serializable objects.
+-if @kotlinx.serialization.Serializable class ** {
+    public static ** INSTANCE;
+}
+-keepclassmembers class <1> {
+    public static <1> INSTANCE;
+    kotlinx.serialization.KSerializer serializer(...);
+}
+-keepattributes RuntimeVisibleAnnotations,AnnotationDefault
+-dontnote kotlinx.serialization.**
+-dontwarn kotlinx.serialization.internal.ClassValueReferences
+-keepclassmembers public class **$$serializer {
+    private ** descriptor;
+}
+
+# Kotlinx serialization, additional rules
+# Fixes:
+#   Exception in thread "main" kotlinx.serialization.SerializationException: Serializer for class 'SomeClass' is not found.
+#   Please ensure that class is marked as '@Serializable' and that the serialization compiler plugin is applied.
+-keep class **$$serializer {
+    *;
+}
 
 # org.jetbrains.runtime:jbr-api
 -dontwarn com.jetbrains.JBR**
