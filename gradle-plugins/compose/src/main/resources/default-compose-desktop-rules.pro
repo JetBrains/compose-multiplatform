@@ -68,3 +68,6 @@
 -keep,allowshrinking,allowobfuscation class androidx.compose.runtime.SnapshotStateKt__DerivedStateKt { *; }
 -keep class androidx.compose.material3.SliderDefaults { *; }
 -dontnote androidx.**
+
+# org.jetbrains.runtime:jbr-api
+-dontwarn com.jetbrains.JBR
