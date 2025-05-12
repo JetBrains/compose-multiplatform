@@ -107,3 +107,7 @@
 -keep class **$$serializer {
     *;
 }
+
+# org.jetbrains.runtime:jbr-api
+-dontwarn com.jetbrains.JBR**
+-dontnote com.jetbrains.JBR**
