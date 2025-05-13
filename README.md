@@ -10,7 +10,7 @@ It is based on [Jetpack Compose](https://developer.android.com/jetpack/compose) 
 
 You can choose the platforms across which to share your UIs using Compose Multiplatform:
 
-* [iOS](https://jb.gg/start-cmp) (Beta)
+* [iOS](https://jb.gg/start-cmp)
 * [Android](https://jb.gg/start-cmp) 
 * [Desktop](https://jb.gg/start-cmp) (Windows, MacOS, Linux)
 * [Web](https://jb.gg/start-cmp) (Alpha)
