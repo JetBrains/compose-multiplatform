@@ -1,12 +1,9 @@
-import org.gradle.accessors.dm.LibrariesForLibs
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
-import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
-import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
-group "com.example"
-version "1.0-SNAPSHOT"
+//group "com.example"
+//version "1.0-SNAPSHOT"
 
 fun Project.disableYarnLockMismatchReport() {
     plugins.withType<org.jetbrains.kotlin.gradle.targets.js.yarn.YarnPlugin> {
@@ -22,31 +19,23 @@ allprojects {
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/") // to test with kotlin dev builds
+
+        maven("https://packages.jetbrains.team/maven/p/kt/dev")
+        maven("https://redirector.kotlinlang.org/maven/dev")
         // mavenLocal()
     }
 
     afterEvaluate {
         tasks.withType<KotlinJsCompile>().configureEach {
-            kotlinOptions.freeCompilerArgs += listOf(
-                "-Xklib-enable-signature-clash-checks=false",
-            )
+            compilerOptions {
+                freeCompilerArgs.add("-Xklib-enable-signature-clash-checks=false")
+            }
         }
-
-        tasks.withType<KotlinCompile<*>>().configureEach {
-            kotlinOptions.freeCompilerArgs += "-Xpartial-linkage=disable"
+        tasks.withType<KotlinCompilationTask<*>>().configureEach {
+            compilerOptions {
+                freeCompilerArgs.add("-Xpartial-linkage=disable")
+            }
         }
-        //non-depracated?
-//        tasks.withType<KotlinCompilationTask<KotlinJsCompilerOptions>>() {
-//            compilerOptions {
-//                freeCompilerArgs.add("-Xklib-enable-signature-clash-checks=false")
-//            }
-//        }
-//
-//        tasks.withType<KotlinCompilationTask<*>>() {
-//            compilerOptions {
-//                freeCompilerArgs.add("-Xpartial-linkage=disable")
-//            }
-//        }
     }
     disableYarnLockMismatchReport()
 }
