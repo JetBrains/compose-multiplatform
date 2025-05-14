@@ -52,3 +52,7 @@ configureMavenPublication(
     name = "Experimental Compose Multiplatform tooling library API. This library provides the API required to declare " +
             "@Preview composables in user apps."
 )
+
+dependencies {
+    compileOnly(libs.androidx.ui.tooling.preview.android)
+}
