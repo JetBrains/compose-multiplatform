@@ -54,5 +54,5 @@ configureMavenPublication(
 )
 
 dependencies {
-    compileOnly(libs.androidx.ui.tooling.preview.android)
+    compileOnly(libs.androidx.ui.tooling.preview)
 }

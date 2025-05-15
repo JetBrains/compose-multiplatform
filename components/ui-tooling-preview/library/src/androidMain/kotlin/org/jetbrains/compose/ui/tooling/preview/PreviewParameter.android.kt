@@ -17,6 +17,7 @@
 package org.jetbrains.compose.ui.tooling.preview
 
 /**
- * On Android, we just typealias to the androidx.compose.ui.tooling.preview.PreviewParameterProvider.
+ * Interface to be implemented by any provider of values that you want to be injected as @[Preview]
+ * parameters. This allows providing sample information for previews.
  */
 actual typealias PreviewParameterProvider<T> = androidx.compose.ui.tooling.preview.PreviewParameterProvider<T>

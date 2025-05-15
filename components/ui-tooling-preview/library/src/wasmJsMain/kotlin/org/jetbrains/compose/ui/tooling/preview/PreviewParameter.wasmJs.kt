@@ -21,14 +21,14 @@ package org.jetbrains.compose.ui.tooling.preview
  * parameters. This allows providing sample information for previews.
  */
 actual interface PreviewParameterProvider<T> {
-  /**
-   * [Sequence] of values of type [T] to be passed as @[Preview] parameter.
-   */
-  actual val values: Sequence<T>
+    /**
+     * [Sequence] of values of type [T] to be passed as @[Preview] parameter.
+     */
+    actual val values: Sequence<T>
 
-  /**
-   * Returns the number of elements in the [values] [Sequence].
-   */
-  actual val count: Int
-    get() = values.count()
+    /**
+     * Returns the number of elements in the [values] [Sequence].
+     */
+    actual val count: Int
+        get() = values.count()
 }
