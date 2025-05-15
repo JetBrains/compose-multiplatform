@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 plugins {
@@ -31,6 +30,28 @@ kotlin {
     }
     macosX64()
     macosArm64()
+
+    applyDefaultHierarchyTemplate()
+
+    sourceSets {
+        val commonMain by getting
+
+        val nonAndroidMain by creating {
+            dependsOn(commonMain)
+        }
+
+        val appleMain by getting
+        appleMain.dependsOn(nonAndroidMain)
+
+        val desktopMain by getting
+        desktopMain.dependsOn(nonAndroidMain)
+
+        val jsMain by getting
+        jsMain.dependsOn(nonAndroidMain)
+
+        val wasmJsMain by getting
+        wasmJsMain.dependsOn(nonAndroidMain)
+    }
 }
 
 android {
