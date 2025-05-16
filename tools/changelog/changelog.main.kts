@@ -303,6 +303,11 @@ fun checkPr() {
  */
 fun currentChangelogDate() = LocalDate.now().format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.ENGLISH))
 
+fun GitHubPullEntry.extractReleaseNotes() = extractReleaseNotes(body, number, htmlUrl)
+
+fun GitHubPullEntry.unknownChangelogEntries() =
+    listOf(ChangelogEntry("- $title", null, null, number, htmlUrl, false))
+
 /**
  * Extract by format [PR_FORMAT.md]
  */
@@ -329,6 +334,14 @@ fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNo
 
     if (relNoteBody == null) return null
     if (relNoteBody.trim().lowercase() == "n/a") return ReleaseNotes.NA
+
+    // Check if the release notes contain only GitHub PR links
+    val pullRequests = relNoteBody
+        .split("\n")
+        .map { it.trim() }
+        .mapNotNull(PullRequestLink::parseOrNull)
+
+    if (pullRequests.isNotEmpty()) return ReleaseNotes.CherryPicks(pullRequests)
 
     val list = mutableListOf<ChangelogEntry>()
     var section: String? = null
@@ -386,35 +399,39 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
             requestJson<Array<GitHubPullEntry>>("https://api.github.com/repos/$repo/pulls?state=closed&per_page=100&page=$it").toList()
         }
 
-    val shaToOriginalPull = pulls.associateBy { it.mergeCommitSha }
+    val shaToPull = pulls.associateBy { it.mergeCommitSha }
     val numberToPull = pulls.associateBy { it.number }
-    val pullToCherryPickPull = pulls.associateWith {
-        it.findCherryPickPullNumber()?.let(numberToPull::get)
-    }
+    val pullToReleaseNotes = Cache( GitHubPullEntry::extractReleaseNotes)
 
-    fun pullOf(sha: String): GitHubPullEntry? {
-        val originalPr = shaToOriginalPull[sha]
-        return pullToCherryPickPull[originalPr] ?: originalPr
-    }
-
-    fun changelogEntriesFor(pullRequest: GitHubPullEntry) = with(pullRequest) {
-        extractReleaseNotes(body, number, htmlUrl)?.entries ?:
-            listOf(ChangelogEntry("- $title", null, null, number, htmlUrl, false))
+    // if GitHubPullEntry is a cherry-picks PR (contains a list of links to other PRs), replace it by the original PRs
+    fun List<GitHubPullEntry>.replaceCherryPicks(): List<GitHubPullEntry> = flatMap { pullRequest ->
+        val releaseNotes = pullToReleaseNotes[pullRequest]
+        if (releaseNotes is ReleaseNotes.CherryPicks) {
+            releaseNotes.pullRequests
+                .filter { it.repo == repo }
+                .mapNotNull { numberToPull[it.number] }
+        } else {
+            listOf(pullRequest)
+        }
     }
 
     val repoFolder = githubClone(repo)
 
-    // Commits that exist in [firstCommit] and not identified as cherry-picks.
-    // We identify them via reading a PR description "Cherry-picked from ..."
+    // Commits that exist in [firstCommit] and not identified as cherry-picks by `git log`
+    // We'll try to exclude them via manual links to cherry-picks
     val cherryPickedPrsInFirstCommit = gitLogShas(repoFolder, firstCommit, lastCommit, "--cherry-pick --left-only")
-        .mapNotNull(::pullOf)
+        .mapNotNull(shaToPull::get)
+        .replaceCherryPicks()
 
     return gitLogShas(repoFolder, firstCommit, lastCommit, "--cherry-pick --right-only")
         .reversed() // older changes are at the bottom
-        .mapNotNull(::pullOf)
+        .mapNotNull(shaToPull::get)
+        .replaceCherryPicks()
         .minus(cherryPickedPrsInFirstCommit)
         .distinctBy { it.number }
-        .flatMap(::changelogEntriesFor)
+        .flatMap {
+            pullToReleaseNotes[it]?.entries ?: it.unknownChangelogEntries()
+        }
 }
 
 /**
@@ -499,10 +516,26 @@ fun githubClone(repo: String): File {
     return folder
 }
 
+data class PullRequestLink(val repo: String, val number: Int) {
+    companion object {
+        fun parseOrNull(link: String): PullRequestLink? {
+            val (repo, number) = Regex("https://github\\.com/(.+)/pull/(\\d+)/?")
+                .matchEntire(link)
+                ?.destructured
+                ?: return null
+            return PullRequestLink(repo, number.toInt())
+        }
+    }
+}
+
 sealed interface ReleaseNotes {
     val entries: List<ChangelogEntry>
 
     object NA: ReleaseNotes {
+        override val entries: List<ChangelogEntry> get() = emptyList()
+    }
+
+    class CherryPicks(val pullRequests: List<PullRequestLink>): ReleaseNotes {
         override val entries: List<ChangelogEntry> get() = emptyList()
     }
 
@@ -533,32 +566,6 @@ data class GitHubPullEntry(
     val body: String?,
     @SerializedName("merge_commit_sha") val mergeCommitSha: String?,
 )
-
-/**
- * Find a link to the original Pull request:
- * - to show the original PR instead of cherry-pick to users
- *   (and the cherry-pick PR can be found in the comments, GitHub mentions all the links)
- * - to distinguish in case the diff is changed
- *
- * The link should be in format "Cherry-picked from <link>"
- */
-fun GitHubPullEntry.findCherryPickPullNumber(): Int? = body
-    ?.lowercase()
-    ?.split("\n")
-    ?.map { it.trim() }
-    ?.find { it.startsWithAny("cherry-pick", "cherrypick", "cherry pick") }
-    ?.let {
-        val numberFromLink = it
-            .substringAfter("http", "")
-            .substringAfter("/pull/", "")
-            .substringBefore(" ")
-            .toIntOrNull()
-        val numberFromId = it
-            .substringAfter("#", "")
-            .substringBefore(" ")
-            .toIntOrNull()
-        numberFromLink ?: numberFromId
-    }
 
 //region ========================================== UTILS =========================================
 fun pipeProcess(command: String) = ProcessBuilder(command.split(" "))
@@ -620,5 +627,10 @@ fun <T> exponentialRetry(block: () -> T): T {
 }
 
 fun String.startsWithAny(vararg prefixes: String): Boolean = prefixes.any { startsWith(it) }
+
+class Cache<K, V>(private val create: (K) -> V) {
+    private val map = mutableMapOf<K,V>()
+    operator fun get(key: K): V = map.getOrPut(key) { create(key) }
+}
 
 //endregion
