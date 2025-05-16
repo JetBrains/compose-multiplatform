@@ -394,7 +394,7 @@ fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNo
  *        JetBrains/compose-multiplatform-core
  */
 fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<ChangelogEntry> {
-    val pulls = (1..5)
+    val pulls = (1..10)
         .flatMap {
             requestJson<Array<GitHubPullEntry>>("https://api.github.com/repos/$repo/pulls?state=closed&per_page=100&page=$it").toList()
         }
