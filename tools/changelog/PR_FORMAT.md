@@ -40,11 +40,20 @@ N/A
 ```
 
 ### Prerelease Fix
-Will be includede in alpha/beta/rc changelog, excluded from stable.
+Will be included in alpha/beta/rc changelog, excluded from stable.
 ```
 ## Release Notes
 ### Fixes - Multiple Platforms
 - _(prerelease fix)_ Fixed CPU overheating on pressing Shift appeared in 1.8.0-alpha02
+```
+
+### Cherry-picks to a release branch
+The PR can contain only cherry-picks. We can point to them instead of copying the release notes.
+```
+## Release Notes
+https://github.com/JetBrains/compose-multiplatform/pull/5292
+https://github.com/JetBrains/compose-multiplatform/pull/5294
+https://github.com/JetBrains/compose-multiplatform/pull/5295
 ```
 
 ## Possible Sections
