@@ -443,7 +443,11 @@ fun androidxLibToRedirectionVersion(commit: String): Map<String, String> {
 fun androidxLibToVersion(commit: String): Map<String, String> {
     val repo = "ssh://git@git.jetbrains.team/ui/compose-teamcity-config.git"
     val file = ".teamcity/compose/Library.kt"
-    val libraryKt = spaceContentOf(repo, file, commit)
+    val libraryKt = try {
+        spaceContentOf(repo, file, commit)
+    } catch (_: Exception) {
+        ""
+    }
 
     return if (libraryKt.isBlank()) {
         println("Can't find library versions in $repo for $commit. Either the format is changed, or you need to register your ssh key in https://jetbrains.team/m/me/authentication?tab=GitKeys")
@@ -578,7 +582,11 @@ fun Process.waitAndCheck() {
     }
 }
 
-fun Process.readText(): String = inputStream.bufferedReader().use { it.readText() }
+fun Process.readText(): String = inputStream.bufferedReader().use {
+    it.readText().also {
+        waitAndCheck()
+    }
+}
 
 inline fun <reified T> requestJson(url: String): T =
     Gson().fromJson(requestPlain(url), T::class.java)
