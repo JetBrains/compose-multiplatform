@@ -200,18 +200,18 @@ fun generateChangelog() {
             append(
                 """
                     ## Dependencies
-            
+
                     - Gradle Plugin `org.jetbrains.compose`, version `$versionCompose`. Based on Jetpack Compose libraries:
                       - [Runtime $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-runtime#$versionRedirectingCompose)
                       - [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose)
                       - [Foundation $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingCompose)
                       - [Material $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingCompose)
                       - [Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3)
-    
+
                     - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:$versionLifecycle`. Based on [Jetpack Lifecycle $versionRedirectingLifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle#$versionRedirectingLifecycle)
                     - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:$versionNavigation`. Based on [Jetpack Navigation $versionRedirectingNavigation](https://developer.android.com/jetpack/androidx/releases/navigation#$versionRedirectingNavigation)
                     - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive`. Based on [Jetpack Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive)
-            
+
                     ---
                 """.trimIndent()
             )
@@ -267,7 +267,7 @@ fun checkPr() {
         releaseNotes is ReleaseNotes.Specified && releaseNotes.entries.isEmpty() -> {
             err.println("""
                 "## Release Notes" doesn't contain any items, or "### Section - Subsection" isn't specified
-            
+
                 See the format in $prFormatLink
             """.trimIndent())
             exitProcess(1)
@@ -276,10 +276,10 @@ fun checkPr() {
             err.println("""
                 "## Release Notes" contains nonstandard "Section - Subsection" pairs:
                 ${nonstandardSections.joinToString(", ")}
-            
+
                 Allowed sections: ${standardSections.joinToString(", ")}
                 Allowed subsections: ${standardSubsections.joinToString(", ")}
-            
+
                 See the full format in $prFormatLink
             """.trimIndent())
             exitProcess(1)
@@ -287,7 +287,7 @@ fun checkPr() {
         releaseNotes == null -> {
             err.println("""
                 "## Release Notes" section is missing in the PR description
-            
+
                 See the format in $prFormatLink
             """.trimIndent())
             exitProcess(1)
@@ -494,7 +494,7 @@ fun githubClone(repo: String): File {
         pipeProcess("git clone --bare $url $absolutePath").waitAndCheck()
     } else {
         println("Fetching $url into ${folder.absolutePath}")
-        pipeProcess("git -C $absolutePath fetch").waitAndCheck()
+        pipeProcess("git -C $absolutePath fetch --tags").waitAndCheck()
     }
     return folder
 }
