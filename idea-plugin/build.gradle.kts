@@ -34,7 +34,7 @@ dependencies {
 
 intellijPlatform {
     pluginConfiguration {
-        name = "Compose Multiplatform IDE Support"
+        name = "Compose Multiplatform for Desktop IDE Support"
         ideaVersion {
             sinceBuild = "242.20224"
             untilBuild = provider { null }
