@@ -1,3 +1,60 @@
+# 1.8.1 (May 2025)
+
+_Changes since 1.8.0_
+
+## Features
+
+### Resources
+
+- Now a Compose library with resources may be built and used as XCFramework (it requires Kotlin Gradle plugin 2.2 or higher) [#5294](https://github.com/JetBrains/compose-multiplatform/pull/5294)
+- Gradle Plugin DSL to change the generated `Res` class name [#5296](https://github.com/JetBrains/compose-multiplatform/pull/5296)
+
+## Fixes
+
+### Multiple Platforms
+
+- Fix incorrect pointer position calculation with rotation around unspecified pivot [#2082](https://github.com/JetBrains/compose-multiplatform-core/pull/2082)
+
+### iOS
+
+- Fix dialogs after modal view controller presentation [#2085](https://github.com/JetBrains/compose-multiplatform-core/pull/2085)
+- Fix issue where `androidx.compose.material3.ModalBottomSheet` closes after any tap [#2086](https://github.com/JetBrains/compose-multiplatform-core/pull/2086)
+- Fix context menu appearance after triple-tap [#2087](https://github.com/JetBrains/compose-multiplatform-core/pull/2087)
+- Fix a memory leak in `ComposeUIViewController` when text input starts [#2088](https://github.com/JetBrains/compose-multiplatform-core/pull/2088)
+- Use the cross-fade animation effect when rotating the screen with interop views [#2101](https://github.com/JetBrains/compose-multiplatform-core/pull/2101)
+- Show an error message when `UIKitViewController` inside `Popup` or `Dialog` [#2102](https://github.com/JetBrains/compose-multiplatform-core/pull/2102)
+- Fix an issue where the keyboard would appear after the second tap when the text input session was intercepted [#2103](https://github.com/JetBrains/compose-multiplatform-core/pull/2103)
+
+### Desktop
+
+- [Linux] Fix `svgPainter` doesn't show any images [#2096](https://github.com/JetBrains/compose-multiplatform-core/pull/2096)
+- Fix deadlock between `BroadcastFrameClock.lock` and `Recomposer.stateLock` [#2098](https://github.com/JetBrains/compose-multiplatform-core/pull/2098)
+- Fix "Serializer for class is not found" using `androidx.navigation` and running `./gradlew runRelease` [#5314](https://github.com/JetBrains/compose-multiplatform/pull/5314)
+- `kotlinx.serialization` ProGuard rules are bundled in the Compose Gradle plugin [#5314](https://github.com/JetBrains/compose-multiplatform/pull/5314)
+
+### Web
+
+- Fixed the positioning and the dimensions of the backing text input (HTML element). The bug used to lead to unexpected scrolls on the page due to the browser trying to bring the HTML element into a view [#2081](https://github.com/JetBrains/compose-multiplatform-core/pull/2081)
+
+### Resources
+
+- Fix IDE highlighting/resolution when a generated file with resource accessors is too big [#5298](https://github.com/JetBrains/compose-multiplatform/pull/5298)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.8.1`. Based on Jetpack Compose libraries:
+  - [Runtime 1.8.1](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.8.1)
+  - [UI 1.8.1](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.8.1)
+  - [Foundation 1.8.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.8.1)
+  - [Material 1.8.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.8.1)
+  - [Material3 1.3.2](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.2)
+
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.0`. Based on [Jetpack Lifecycle 2.9.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.0)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0-beta02`. Based on [Jetpack Navigation 2.9.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.0)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.1.1`. Based on [Jetpack Material3 Adaptive 1.1.0](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.1.0)
+
+---
+
 # 1.8.0 (May 2025)
 
 _Changes since 1.7.3_
