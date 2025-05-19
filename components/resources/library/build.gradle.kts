@@ -1,5 +1,6 @@
 import kotlinx.validation.ExperimentalBCVApi
 import org.jetbrains.compose.ExperimentalComposeLibrary
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("multiplatform")
@@ -14,11 +15,7 @@ kotlin {
     jvm("desktop")
     androidTarget {
         publishLibraryVariants("release")
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
-        }
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
     }
     iosX64()
     iosArm64()
