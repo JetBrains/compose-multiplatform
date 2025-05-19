@@ -2,7 +2,6 @@ import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.compose.gradle.kotlinKarmaConfig
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
-import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.targets
 
 plugins {
     kotlin("multiplatform") apply false
@@ -32,26 +31,26 @@ subprojects {
     group = "org.jetbrains.compose.html"
     version = COMPOSE_WEB_VERSION
 
-    if ((project.name != "html-widgets") && (project.name != "html-integration-widgets")) {
-        afterEvaluate {
-            if (plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
-                project.kotlinExtension.targets.forEach { target ->
-                    target.compilations.forEach { compilation ->
-                        compilation.kotlinOptions {
-                            allWarningsAsErrors = false
-                            // see https://kotlinlang.org/docs/opt-in-requirements.html
-                            freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    if ((project.name != "html-widgets") && (project.name != "html-integration-widgets")) {
+//        afterEvaluate {
+//            if (plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
+//                project.kotlinExtension.targets.forEach { target ->
+//                    target.compilations.forEach { compilation ->
+//                        compilation.kotlinOptions {
+//                            allWarningsAsErrors = false
+//                            // see https://kotlinlang.org/docs/opt-in-requirements.html
+//                            freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
-        kotlinOptions.jvmTarget = "11"
+        compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
     }
 
     pluginManager.withPlugin("maven-publish") {
