@@ -1,16 +1,20 @@
 <idea-plugin>
     <id>org.jetbrains.compose.desktop.ide</id>
-    <name>Compose Multiplatform IDE Support</name>
+    <name>Compose Multiplatform for Desktop IDE Support</name>
     <vendor>JetBrains</vendor>
     <description>
         <![CDATA[
-        IDE support for developing
-        <a href="https://www.jetbrains.com/lp/compose/">Compose for Desktop</a>
-        applications.
-        The main feature at the moment is IDE preview of composable functions
-        marked by @Preview annotation.
+<h3>⚠️ This plugin is in maintenance mode</h3>
+<p>The Compose Multiplatform for Desktop IDE Support plugin is no longer under active development.
+Its functionality is being gradually integrated into the new <a href="https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform">Kotlin Multiplatform plugin</a>,
+which already includes support for Compose Previews on macOS.</p>
+<p>What this means for you:</p>
+<ul>
+    <li>On macOS: We recommend switching to the <a href="https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform">Kotlin Multiplatform plugin</a>, which now includes improved Compose Previews support.</li>
+    <li>On Windows/Linux: You can continue using this plugin. It remains available and maintained for now, until equivalent support becomes available in the Kotlin Multiplatform plugin.</li>
+</ul>
+<p>No new features will be added, but we’ll address critical issues as needed during this transition.</p>
         ]]>
-
     </description>
 
     <!-- until-build is omitted, so we don't have to update it after each Intellij release -->
@@ -27,7 +31,10 @@
         <supportsKotlinPluginMode supportsK2="true" />
     </extensions>
 
+    <incompatible-with>com.jetbrains.kmm</incompatible-with>
     <extensions defaultExtensionNs="com.intellij">
+        <pluginReplacement implementation="org.jetbrains.compose.ComposePluginReplacement"/>
+
         <runLineMarkerContributor
                 language="kotlin"
                 implementationClass="org.jetbrains.compose.desktop.ide.preview.PreviewRunLineMarkerContributor"/>
