@@ -75,5 +75,5 @@ configureMavenPublication(
 )
 
 dependencies {
-    implementation(libs.androidx.ui.tooling.preview)
+    api(libs.androidx.ui.tooling.preview)
 }
