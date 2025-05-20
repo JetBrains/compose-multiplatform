@@ -4,10 +4,10 @@
 
 <picture>
     <source srcset="artwork/compose-logo-name-white.svg"  width="400" media="(prefers-color-scheme: dark)">
-    <img src="artwork/compose-logo-name-black.svg" alt="Compose Multiplatform logo and name" width="400">
+    <a href="https://jb.gg/cmp"><img src="artwork/compose-logo-name-black.svg" alt="Compose Multiplatform logo and name" width="400"></a>
 </picture>
 
-[**Compose Multiplatform**](https://jb.gg/cmp) is a declarative framework for sharing UI code across multiple platforms with Kotlin. 
+[Compose Multiplatform](https://jb.gg/cmp) is a declarative framework for sharing UI code across multiple platforms with Kotlin. 
 It is based on [Jetpack Compose](https://developer.android.com/jetpack/compose) and developed by [JetBrains](https://www.jetbrains.com/) and open-source contributors.
 
 You can choose the platforms across which to share your UI code using Compose Multiplatform:
