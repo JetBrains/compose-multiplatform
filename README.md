@@ -3,8 +3,8 @@
 [![dev](https://img.shields.io/github/v/tag/JetBrains/compose-multiplatform?include_prereleases&sort=semver&filter=v*%2Bdev*&label=dev&color=orange)](https://github.com/JetBrains/compose-multiplatform/tags)
 
 <picture>
-    <source srcset="artwork/compose-logo-name-white.svg"  media="(prefers-color-scheme: dark)">
-    <img src="artwork/compose-logo-name-black.svg" alt="Compose Multiplatform logo and name" width="200">
+    <source srcset="artwork/compose-logo-name-white.svg"  width="400" media="(prefers-color-scheme: dark)">
+    <img src="artwork/compose-logo-name-black.svg" alt="Compose Multiplatform logo and name" width="400">
 </picture>
 
 [**Compose Multiplatform**](https://jb.gg/cmp) is a declarative framework for sharing UI code across multiple platforms with Kotlin. 
