@@ -36,6 +36,10 @@ kotlin {
     sourceSets {
         val commonMain by getting
 
+        androidMain.dependencies {
+            api(libs.androidx.ui.tooling.preview)
+        }
+
         val nonAndroidMain by creating {
             dependsOn(commonMain)
         }
@@ -73,7 +77,3 @@ configureMavenPublication(
     name = "Experimental Compose Multiplatform tooling library API. This library provides the API required to declare " +
             "@Preview composables in user apps."
 )
-
-dependencies {
-    api(libs.androidx.ui.tooling.preview)
-}
