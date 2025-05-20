@@ -2,7 +2,10 @@
 [![stable](https://img.shields.io/github/v/release/JetBrains/compose-multiplatform?sort=semver&display_name=release&label=stable&color=brightgreen)](https://github.com/JetBrains/compose-multiplatform/releases/latest)
 [![dev](https://img.shields.io/github/v/tag/JetBrains/compose-multiplatform?include_prereleases&sort=semver&filter=v*%2Bdev*&label=dev&color=orange)](https://github.com/JetBrains/compose-multiplatform/tags)
 
-![Compose Multiplatform logo](https://resources.jetbrains.com/help/img/kotlin-multiplatform-dev/compose-multiplatform-logo.svg)
+<picture>
+    <source srcset="artwork/compose-logo-name-white.svg"  media="(prefers-color-scheme: dark)">
+    <img src="artwork/compose-logo-name-black.svg" alt="Compose Multiplatform logo and name" width="200">
+</picture>
 
 [**Compose Multiplatform**](https://jb.gg/cmp) is a declarative framework for sharing UI code across multiple platforms with Kotlin. 
 It is based on [Jetpack Compose](https://developer.android.com/jetpack/compose) and developed by [JetBrains](https://www.jetbrains.com/) and open-source contributors.
