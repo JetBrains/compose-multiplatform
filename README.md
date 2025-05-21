@@ -3,7 +3,7 @@
 [![dev](https://img.shields.io/github/v/tag/JetBrains/compose-multiplatform?include_prereleases&sort=semver&filter=v*%2Bdev*&label=dev&color=orange)](https://github.com/JetBrains/compose-multiplatform/tags)
 
 <picture>
-    <source srcset="artwork/compose-logo-name-white.svg"  width="400" media="(prefers-color-scheme: dark)">
+    <a href="https://jb.gg/cmp"><source srcset="artwork/compose-logo-name-white.svg"  width="400" media="(prefers-color-scheme: dark)"></a>
     <a href="https://jb.gg/cmp"><img src="artwork/compose-logo-name-black.svg" alt="Compose Multiplatform logo and name" width="400"></a>
 </picture>
 
