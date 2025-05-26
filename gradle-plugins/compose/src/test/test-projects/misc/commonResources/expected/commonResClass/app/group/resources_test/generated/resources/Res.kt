@@ -1,4 +1,4 @@
-@file:OptIn(org.jetbrains.compose.resources.InternalResourceApi::class)
+@file:OptIn(InternalResourceApi::class)
 @file:Suppress(
   "RedundantVisibilityModifier",
   "REDUNDANT_VISIBILITY_MODIFIER",
@@ -10,6 +10,7 @@ import kotlin.ByteArray
 import kotlin.OptIn
 import kotlin.String
 import kotlin.Suppress
+import org.jetbrains.compose.resources.InternalResourceApi
 import org.jetbrains.compose.resources.getResourceUri
 import org.jetbrains.compose.resources.readResourceBytes
 

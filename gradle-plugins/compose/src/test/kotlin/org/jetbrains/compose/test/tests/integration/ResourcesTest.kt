@@ -229,6 +229,7 @@ class ResourcesTest : GradlePluginTestBase() {
                 compose.resources {
                     publicResClass = true
                     packageOfResClass = "my.lib.res"
+                    nameOfResClass = "MyRes"
                 }
             """.trimIndent()
         }
@@ -350,13 +351,21 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testDisableMultimoduleResourcesWithNewKotlin() {
-        with(testProject("misc/kmpResourcePublication")) {
+    fun testDisableMultimoduleResources() {
+        with(testProject("misc/commonResources")) {
             file("gradle.properties").modify { content ->
                 content + "\n" + ComposeProperties.DISABLE_MULTIMODULE_RESOURCES + "=true"
             }
-            gradle(":cmplib:build").checks {
+            gradle("desktopJar").checks {
                 check.logContains("Configure single-module compose resources")
+
+                val resDir = file("src/commonMain/composeResources")
+                val resourcesFiles = resDir.walkTopDown()
+                    .filter { !it.isDirectory && !it.isHidden }
+                    .getConvertedResources(resDir, "")
+
+                val jar = file("build/libs/Resources-Test-desktop.jar")
+                checkResourcesZip(jar, resourcesFiles, false)
             }
         }
     }
@@ -375,6 +384,25 @@ class ResourcesTest : GradlePluginTestBase() {
                     assertNotNull(zip.getEntry(res), "file = '$res'")
                 }
             }
+        }
+    }
+
+
+    @Test
+    fun testJvmBuildWithResourcesCustomization(): Unit = with(testProject("misc/commonResources")) {
+        file("build.gradle.kts").appendText(
+            """
+                compose.resources {
+                    publicResClass = true
+                    packageOfResClass = "io.customized"
+                    nameOfResClass = "CustomName"
+                }
+            """.trimIndent()
+        )
+        file("src/commonMain/kotlin").deleteRecursively() //empty project
+
+        gradle("desktopJar").checks {
+            check.logContains("Generate CustomName.kt")
         }
     }
 
@@ -565,6 +593,23 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun testBundledKotlinPoet(): Unit = with(testProject("misc/bundledKotlinPoet")) {
         gradle("generateBuildConfig")
+    }
+
+    //https://github.com/JetBrains/compose-multiplatform/issues/4194
+    //https://github.com/JetBrains/compose-multiplatform/issues/4285
+    //https://youtrack.jetbrains.com/issue/CMP-7934
+    //
+    // 25_000 icons + (25_000 * 80) strings!!!
+    @Test
+    fun testHugeNumberOfResources(): Unit = with(testProject("misc/hugeResources")) {
+        gradle(":generateResourceFiles")
+        gradle(":generateResourceAccessorsForCommonMain").checks {
+            val buildPath = "build/generated/compose/resourceGenerator/kotlin/commonMainResourceAccessors/app/group/huge/generated/resources"
+            assertEqualTextFiles(file("$buildPath/Drawable0.commonMain.kt"), file("expected/Drawable0.commonMain.kt"))
+            assertEqualTextFiles(file("$buildPath/Drawable100.commonMain.kt"), file("expected/Drawable100.commonMain.kt"))
+            assertEqualTextFiles(file("$buildPath/String0.commonMain.kt"), file("expected/String0.commonMain.kt"))
+            assertEqualTextFiles(file("$buildPath/String100.commonMain.kt"), file("expected/String100.commonMain.kt"))
+        }
     }
 
     private fun assertDirectoriesContentEquals(actual: File, expected: File) {

@@ -44,6 +44,7 @@ internal fun Project.configureComposeResourcesGeneration(
         }
     }
     val packageName = config.getResourcePackage(project)
+    val resClassName = config.map { it.nameOfResClass }
     val makeAccessorsPublic = config.map { it.publicResClass }
     val packagingDir = config.getModuleResourcesDir(project)
 
@@ -53,6 +54,7 @@ internal fun Project.configureComposeResourcesGeneration(
                 sourceSet,
                 shouldGenerateCode,
                 packageName,
+                resClassName,
                 makeAccessorsPublic,
                 packagingDir,
                 generateModulePath
@@ -67,13 +69,20 @@ internal fun Project.configureComposeResourcesGeneration(
             preparedResources,
             shouldGenerateCode,
             packageName,
+            resClassName,
             makeAccessorsPublic,
             packagingDir,
             generateModulePath
         )
     }
 
-    configureResourceCollectorsGeneration(kotlinExtension, shouldGenerateCode, packageName, makeAccessorsPublic)
+    configureResourceCollectorsGeneration(
+        kotlinExtension,
+        shouldGenerateCode,
+        packageName,
+        resClassName,
+        makeAccessorsPublic
+    )
 
     //setup task execution during IDE import
     tasks.configureEach { importTask ->
@@ -87,17 +96,19 @@ private fun Project.configureResClassGeneration(
     resClassSourceSet: KotlinSourceSet,
     shouldGenerateCode: Provider<Boolean>,
     packageName: Provider<String>,
+    resClassName: Provider<String>,
     makeAccessorsPublic: Provider<Boolean>,
     packagingDir: Provider<File>,
     generateModulePath: Boolean
 ) {
-    logger.info("Configure Res class generation for ${resClassSourceSet.name}")
+    logger.info("Configure '$resClassName' class generation for ${resClassSourceSet.name}")
 
     val genTask = tasks.register(
         "generateComposeResClass",
         GenerateResClassTask::class.java
     ) { task ->
         task.packageName.set(packageName)
+        task.resClassName.set(resClassName)
         task.makeAccessorsPublic.set(makeAccessorsPublic)
         task.codeDir.set(layout.buildDirectory.dir("$RES_GEN_DIR/kotlin/commonResClass"))
 
@@ -120,6 +131,7 @@ private fun Project.configureResourceAccessorsGeneration(
     resourcesDir: Provider<File>,
     shouldGenerateCode: Provider<Boolean>,
     packageName: Provider<String>,
+    resClassName: Provider<String>,
     makeAccessorsPublic: Provider<Boolean>,
     packagingDir: Provider<File>,
     generateModulePath: Boolean
@@ -131,6 +143,7 @@ private fun Project.configureResourceAccessorsGeneration(
         GenerateResourceAccessorsTask::class.java
     ) { task ->
         task.packageName.set(packageName)
+        task.resClassName.set(resClassName)
         task.sourceSetName.set(sourceSet.name)
         task.makeAccessorsPublic.set(makeAccessorsPublic)
         task.resDir.set(resourcesDir)
@@ -159,6 +172,7 @@ private fun Project.configureResourceCollectorsGeneration(
     kotlinExtension: KotlinProjectExtension,
     shouldGenerateCode: Provider<Boolean>,
     packageName: Provider<String>,
+    resClassName: Provider<String>,
     makeAccessorsPublic: Provider<Boolean>
 ) {
     if (kotlinExtension is KotlinMultiplatformExtension) {
@@ -169,6 +183,7 @@ private fun Project.configureResourceCollectorsGeneration(
                     commonMainSourceSet,
                     shouldGenerateCode,
                     packageName,
+                    resClassName,
                     makeAccessorsPublic
                 )
             }
@@ -180,6 +195,7 @@ private fun Project.configureResourceCollectorsGeneration(
                         androidMain,
                         shouldGenerateCode,
                         packageName,
+                        resClassName,
                         makeAccessorsPublic,
                         true
                     )
@@ -190,6 +206,7 @@ private fun Project.configureResourceCollectorsGeneration(
                         compilation.defaultSourceSet,
                         shouldGenerateCode,
                         packageName,
+                        resClassName,
                         makeAccessorsPublic,
                         true
                     )
@@ -205,6 +222,7 @@ private fun Project.configureResourceCollectorsGeneration(
                     compilation.defaultSourceSet,
                     shouldGenerateCode,
                     packageName,
+                    resClassName,
                     makeAccessorsPublic,
                     false
                 )
@@ -217,6 +235,7 @@ private fun Project.configureExpectResourceCollectorsGeneration(
     sourceSet: KotlinSourceSet,
     shouldGenerateCode: Provider<Boolean>,
     packageName: Provider<String>,
+    resClassName: Provider<String>,
     makeAccessorsPublic: Provider<Boolean>
 ) {
     logger.info("Configure expect resource collectors generation for ${sourceSet.name}")
@@ -227,6 +246,7 @@ private fun Project.configureExpectResourceCollectorsGeneration(
         GenerateExpectResourceCollectorsTask::class.java
     ) { task ->
         task.packageName.set(packageName)
+        task.resClassName.set(resClassName)
         task.makeAccessorsPublic.set(makeAccessorsPublic)
         task.codeDir.set(layout.buildDirectory.dir("$RES_GEN_DIR/kotlin/${sourceSet.name}ResourceCollectors"))
         task.onlyIf { shouldGenerateCode.get() }
@@ -244,6 +264,7 @@ private fun Project.configureActualResourceCollectorsGeneration(
     sourceSet: KotlinSourceSet,
     shouldGenerateCode: Provider<Boolean>,
     packageName: Provider<String>,
+    resClassName: Provider<String>,
     makeAccessorsPublic: Provider<Boolean>,
     useActualModifier: Boolean
 ) {
@@ -269,6 +290,7 @@ private fun Project.configureActualResourceCollectorsGeneration(
         GenerateActualResourceCollectorsTask::class.java
     ) { task ->
         task.packageName.set(packageName)
+        task.resClassName.set(resClassName)
         task.makeAccessorsPublic.set(makeAccessorsPublic)
         task.useActualModifier.set(useActualModifier)
         task.resourceAccessorDirs.from(accessorDirs)
