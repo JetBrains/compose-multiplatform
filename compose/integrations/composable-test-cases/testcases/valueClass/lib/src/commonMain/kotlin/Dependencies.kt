@@ -62,3 +62,5 @@ value class VCPrivateAllNonPrimitive private constructor(private val value: Stri
         val V2 = VCPrivateAllNonPrimitive("V2")
     }
 }
+
+data class DCCopyAvailable(val value: Int)
