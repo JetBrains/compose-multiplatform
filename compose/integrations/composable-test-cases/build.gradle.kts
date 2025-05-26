@@ -26,11 +26,6 @@ allprojects {
     }
 
     afterEvaluate {
-        tasks.withType<KotlinJsCompile>().configureEach {
-            compilerOptions {
-                freeCompilerArgs.add("-Xklib-enable-signature-clash-checks=false")
-            }
-        }
         tasks.withType<KotlinCompilationTask<*>>().configureEach {
             compilerOptions {
                 freeCompilerArgs.add("-Xpartial-linkage=disable")
