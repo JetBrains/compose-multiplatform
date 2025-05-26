@@ -1,7 +1,7 @@
 [versions]
-kotlin="2.1.0"
+kotlin="2.1.21" # should be provided via `-Pkotlin_version=<kotlin version to test with>`
 kotlinx-coroutines = "1.8.0"
-compose = "1.7.0"
+compose = "1.8.1"
 
 [libraries]
 kotlinx-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
