@@ -25,10 +25,10 @@ dependencyResolutionManagement {
     versionCatalogs {
         register("libs").configure {
             val kotlinVersion = providers.gradleProperty("kotlin_version").orNull
-//            if (kotlinVersion != null) {
-//                version("kotlin", kotlinVersion)
+            if (kotlinVersion != null) {
+                version("kotlin", kotlinVersion)
 //                println("kotlin version applied: $kotlinVersion")
-//            }
+            }
         }
     }
 }

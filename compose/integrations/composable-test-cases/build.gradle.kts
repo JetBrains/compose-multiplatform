@@ -22,16 +22,9 @@ allprojects {
 
         maven("https://packages.jetbrains.team/maven/p/kt/dev")
         maven("https://redirector.kotlinlang.org/maven/dev")
-         mavenLocal()
+//        mavenLocal()
     }
 
-    afterEvaluate {
-        tasks.withType<KotlinCompilationTask<*>>().configureEach {
-            compilerOptions {
-                freeCompilerArgs.add("-Xpartial-linkage=disable")
-            }
-        }
-    }
     disableYarnLockMismatchReport()
 }
 
@@ -80,6 +73,10 @@ subprojects {
                         }
                     }
                 }
+            }
+
+            compilerOptions {
+                freeCompilerArgs.add("-Xpartial-linkage=disable")
             }
         }
     }
