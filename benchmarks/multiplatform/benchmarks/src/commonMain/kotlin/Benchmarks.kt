@@ -5,7 +5,6 @@ import benchmarks.multipleComponents.MultipleComponentsExample
 import benchmarks.lazygrid.LazyGrid
 import benchmarks.visualeffects.NYContent
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.json.Json
 import kotlin.math.roundToInt
 import kotlin.time.Duration
@@ -247,7 +246,9 @@ suspend fun runBenchmark(
             content = content
         ).generateStats()
         stats.prettyPrint()
-        saveBenchmarkStatsOnDisk(name = name, stats = stats)
+        if (Config.saveStats()) {
+            saveBenchmarkStats(name = name, stats = stats)
+        }
     }
 }
 

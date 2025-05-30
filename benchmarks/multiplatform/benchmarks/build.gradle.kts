@@ -70,6 +70,9 @@ kotlin {
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.kotlinx.io)
                 implementation(libs.kotlinx.datetime)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.kotlinx.json)
             }
         }
 
@@ -77,6 +80,19 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.currentOs)
                 runtimeOnly(libs.kotlinx.coroutines.swing)
+                implementation(libs.ktor.server.core)
+                implementation(libs.ktor.server.netty)
+                implementation(libs.ktor.server.content.negotiation)
+                implementation(libs.ktor.client.java)
+                implementation(libs.ktor.server.cors)
+            }
+        }
+
+        val wasmJsMain by getting {
+            dependencies {
+                implementation(libs.ktor.client.js)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.kotlinx.json)
             }
         }
     }
@@ -140,6 +156,41 @@ tasks.register("buildD8Distribution", Zip::class.java) {
     from(rootProject.layout.buildDirectory.file("js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin"))
     archiveFileName.set("d8-distribution.zip")
     destinationDirectory.set(rootProject.layout.buildDirectory.dir("distributions"))
+}
+
+tasks.register("runBrowserAndSaveStats") {
+    fun printProcessOutput(inputStream: java.io.InputStream) {
+        Thread {
+            inputStream.bufferedReader().use { reader ->
+                reader.lines().forEach { line ->
+                    println(line)
+                }
+            }
+        }.start()
+    }
+
+    doFirst {
+        var serverProcess: Process? = null
+        var clientProcess: Process? = null
+        try {
+            serverProcess = ProcessBuilder("./gradlew", "benchmarks:run", "-PrunArguments=runServer=true saveStatsToJSON=true")
+                .start()
+            printProcessOutput(serverProcess.inputStream)
+            printProcessOutput(serverProcess.errorStream)
+
+            clientProcess = ProcessBuilder("./gradlew", "benchmarks:wasmJsBrowserProductionRun")
+                .start()
+            printProcessOutput(clientProcess.inputStream)
+            printProcessOutput(clientProcess.errorStream)
+
+            serverProcess.waitFor()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        } finally {
+            serverProcess?.destroy()
+            clientProcess?.destroy()
+        }
+    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenExec>().configureEach {

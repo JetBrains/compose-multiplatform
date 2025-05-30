@@ -17,6 +17,9 @@ import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
 
+// port for the benchmarks save server
+val BENCHMARK_SERVER_PORT = 8090
+
 fun saveBenchmarkStatsOnDisk(name: String, stats: BenchmarkStats) {
     try {
         if (Config.saveStatsToCSV) {
@@ -55,11 +58,17 @@ fun saveBenchmarkStatsOnDisk(name: String, stats: BenchmarkStats) {
     }
 }
 
+/**
+ * Saves benchmark statistics to disk or sends them to a server.
+ * This is an expect function with platform-specific implementations.
+ */
+expect fun saveBenchmarkStats(name: String, stats: BenchmarkStats)
+
 private fun RawSource.readText() = use {
     it.buffered().readByteArray().decodeToString()
 }
 
-private fun RawSink.writeText(text: String) = use {
+internal fun RawSink.writeText(text: String) = use {
     it.buffered().apply {
         write(text.encodeToByteArray())
         flush()

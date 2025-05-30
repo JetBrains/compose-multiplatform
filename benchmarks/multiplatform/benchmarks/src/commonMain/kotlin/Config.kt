@@ -37,6 +37,7 @@ object Args {
         var versionInfo: String? = null
         var saveStatsToCSV: Boolean = false
         var saveStatsToJSON: Boolean = false
+        var runServer: Boolean = false
 
         for (arg in args) {
             if (arg.startsWith("modes=", ignoreCase = true)) {
@@ -51,6 +52,8 @@ object Args {
                 saveStatsToJSON = arg.substringAfter("=").toBoolean()
             } else if (arg.startsWith("disabledBenchmarks=", ignoreCase = true)) {
                 disabledBenchmarks += argToMap(arg.decodeArg()).keys
+            } else if (arg.startsWith("runServer=", ignoreCase = true)) {
+                runServer = arg.substringAfter("=").toBoolean()
             }
         }
 
@@ -60,7 +63,8 @@ object Args {
             disabledBenchmarks = disabledBenchmarks,
             versionInfo = versionInfo,
             saveStatsToCSV = saveStatsToCSV,
-            saveStatsToJSON = saveStatsToJSON
+            saveStatsToJSON = saveStatsToJSON,
+            runServer = runServer,
         )
     }
 }
@@ -83,7 +87,8 @@ data class Config(
     val disabledBenchmarks: Set<String> = emptySet(),
     val versionInfo: String? = null,
     val saveStatsToCSV: Boolean = false,
-    val saveStatsToJSON: Boolean = false
+    val saveStatsToJSON: Boolean = false,
+    val runServer: Boolean = false,
 ) {
     /**
      * Checks if a specific mode is enabled based on the configuration.
@@ -127,6 +132,9 @@ data class Config(
         val saveStatsToJSON: Boolean
             get() = global.saveStatsToJSON
 
+        val runServer: Boolean
+            get() = global.runServer
+
         fun setGlobal(global: Config) {
             this.global = global
         }
@@ -143,5 +151,7 @@ data class Config(
 
         fun getBenchmarkProblemSize(benchmark: String, default: Int): Int =
             global.getBenchmarkProblemSize(benchmark, default)
-    }
+
+        fun saveStats() = saveStatsToCSV || saveStatsToJSON
+   }
 }

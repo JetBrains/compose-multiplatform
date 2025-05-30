@@ -8,5 +8,11 @@ import kotlinx.coroutines.runBlocking
 
 fun main(args: Array<String>) {
     Config.setGlobalFromArgs(args)
-    runBlocking(Dispatchers.Main) { runBenchmarks() }
+
+    if (Config.runServer) {
+        // Start the benchmark server to receive results from browsers
+        BenchmarksSaveServer.start()
+    } else {
+        runBlocking(Dispatchers.Main) { runBenchmarks() }
+    }
 }
