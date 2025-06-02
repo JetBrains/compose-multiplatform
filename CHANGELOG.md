@@ -1579,7 +1579,7 @@ _Changes since 1.6.10_
 
 ### Resources
 
-- [Fix a cached font if the resource acessor was changed](https://github.com/JetBrains/compose-multiplatform/pull/4864)
+- [Fix a cached font if the resource accessor was changed](https://github.com/JetBrains/compose-multiplatform/pull/4864)
 
 ### Gradle Plugin
 
