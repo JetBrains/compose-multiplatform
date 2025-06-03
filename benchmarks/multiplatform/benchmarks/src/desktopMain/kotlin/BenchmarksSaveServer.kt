@@ -49,7 +49,7 @@ object BenchmarksSaveServer {
                 allowMethod(HttpMethod.Get)
                 allowMethod(HttpMethod.Post)
                 allowHeader(HttpHeaders.ContentType)
-                allowHost("localhost:8080")
+                anyHost()
             }
             routing {
                 post("/benchmark") {
@@ -64,10 +64,7 @@ object BenchmarksSaveServer {
 
                     withContext(Dispatchers.IO) {
                         if (Config.saveStatsToJSON) {
-                            val jsonPath = Path("build/benchmarks/json-reports/${result.name}.json")
-                            SystemFileSystem.createDirectories(jsonPath.parent!!)
-                            SystemFileSystem.sink(jsonPath).writeText(result.stats)
-                            println("JSON results saved to ${SystemFileSystem.resolve(jsonPath)}")
+                            saveJson(result.name, result.stats)
                         }
 
                         if (Config.saveStatsToCSV) {

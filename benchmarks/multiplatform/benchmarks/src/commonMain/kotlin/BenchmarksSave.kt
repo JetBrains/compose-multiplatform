@@ -20,10 +20,21 @@ import kotlinx.io.readByteArray
 // port for the benchmarks save server
 val BENCHMARK_SERVER_PORT = 8090
 
+private val BENCHMARKS_SAVE_DIR = "build/benchmarks"
+private fun pathToCsv(name: String) = Path("$BENCHMARKS_SAVE_DIR/$name.csv")
+private fun pathToJson(name: String) = Path("$BENCHMARKS_SAVE_DIR/json-reports/$name.json")
+
+internal fun saveJson(benchmarkName: String, jsonString: String) {
+    val jsonPath = pathToJson(benchmarkName)
+    SystemFileSystem.createDirectories(jsonPath.parent!!)
+    SystemFileSystem.sink(jsonPath).writeText(jsonString)
+    println("JSON results saved to ${SystemFileSystem.resolve(jsonPath)}")
+}
+
 fun saveBenchmarkStatsOnDisk(name: String, stats: BenchmarkStats) {
     try {
         if (Config.saveStatsToCSV) {
-            val path = Path("build/benchmarks/$name.csv")
+            val path = pathToCsv(name)
 
             val keyToValue = mutableMapOf<String, String>()
             keyToValue.put("Date", currentFormattedDate)
@@ -43,12 +54,7 @@ fun saveBenchmarkStatsOnDisk(name: String, stats: BenchmarkStats) {
             println("CSV results saved to ${SystemFileSystem.resolve(path)}")
             println()
         } else if (Config.saveStatsToJSON) {
-            val jsonString = stats.toJsonString()
-            val jsonPath = Path("build/benchmarks/json-reports/$name.json")
-
-            SystemFileSystem.createDirectories(jsonPath.parent!!)
-            SystemFileSystem.sink(jsonPath).writeText(jsonString)
-            println("JSON results saved to ${SystemFileSystem.resolve(jsonPath)}")
+            saveJson(name, stats.toJsonString())
             println()
         }
     } catch (_: IOException) {
