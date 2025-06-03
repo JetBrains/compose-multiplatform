@@ -169,19 +169,22 @@ tasks.register("runBrowserAndSaveStats") {
         }.start()
     }
 
+    fun runCommand(vararg command: String): Process {
+        return ProcessBuilder(*command).start().also {
+            printProcessOutput(it.inputStream)
+            printProcessOutput(it.errorStream)
+        }
+    }
+
     doFirst {
         var serverProcess: Process? = null
         var clientProcess: Process? = null
         try {
-            serverProcess = ProcessBuilder("./gradlew", "benchmarks:run", "-PrunArguments=runServer=true saveStatsToJSON=true")
-                .start()
-            printProcessOutput(serverProcess.inputStream)
-            printProcessOutput(serverProcess.errorStream)
+            serverProcess = runCommand("./gradlew", "benchmarks:run",
+                "-PrunArguments=runServer=true saveStatsToJSON=true")
 
-            clientProcess = ProcessBuilder("./gradlew", "benchmarks:wasmJsBrowserProductionRun")
-                .start()
-            printProcessOutput(clientProcess.inputStream)
-            printProcessOutput(clientProcess.errorStream)
+            clientProcess = runCommand("./gradlew", "benchmarks:wasmJsBrowserProductionRun",
+                "-PrunArguments=$runArguments saveStatsToJSON=true")
 
             serverProcess.waitFor()
         } catch (e: Throwable) {

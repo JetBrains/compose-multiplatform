@@ -56,6 +56,7 @@ object BenchmarksSaveServer {
                     val result = call.receive<BenchmarkResultFromClient>()
                     if (result.name.isEmpty()) {
                         println("Stopping server! Received empty name from client")
+                        call.respond(HttpStatusCode.OK, "Server stopped.")
                         stop()
                         return@post
                     }
@@ -71,6 +72,7 @@ object BenchmarksSaveServer {
 
                         if (Config.saveStatsToCSV) {
                             // TODO: for CSV, we would need to convert JSON to the values
+                            println("CSV results are not yet supported for the browser.")
                         }
                     }
 
