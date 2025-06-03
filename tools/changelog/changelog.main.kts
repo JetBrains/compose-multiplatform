@@ -130,12 +130,18 @@ fun generateChangelog() {
     val versionComposeMaterial3Adaptive = formatAndroidxLibVersion("COMPOSE_MATERIAL3_ADAPTIVE")
     val versionLifecycle = formatAndroidxLibVersion("LIFECYCLE")
     val versionNavigation = formatAndroidxLibVersion("NAVIGATION")
+    val versionSavedstate = formatAndroidxLibVersion("SAVEDSTATE")
+    val versionGraphicsShapes = formatAndroidxLibVersion("GRAPHICS_SHAPES")
+    val versionWindow = formatAndroidxLibVersion("WINDOW")
 
     val versionRedirectingCompose = formatAndroidxLibRedirectingVersion("compose")
     val versionRedirectingComposeMaterial3 = formatAndroidxLibRedirectingVersion("compose.material3")
     val versionRedirectingComposeMaterial3Adaptive = formatAndroidxLibRedirectingVersion("compose.material3.adaptive")
     val versionRedirectingLifecycle = formatAndroidxLibRedirectingVersion("lifecycle")
     val versionRedirectingNavigation = formatAndroidxLibRedirectingVersion("navigation")
+    val versionRedirectingSavedstate = formatAndroidxLibRedirectingVersion("savedstate")
+    val versionRedirectingGraphicsShapes = formatAndroidxLibRedirectingVersion("graphics")
+    val versionRedirectingWindow = formatAndroidxLibRedirectingVersion("window")
 
     val versionName = versionCompose
 
@@ -208,9 +214,12 @@ fun generateChangelog() {
                       - [Material $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingCompose)
                       - [Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3)
 
+                    - Graphics-Shapes library `org.jetbrains.androidx.graphics:graphics-shapes:$versionGraphicsShapes`. Based on [Jetpack Graphics-Shapes $versionRedirectingGraphicsShapes](https://developer.android.com/jetpack/androidx/releases/graphics#graphics-shapes-#$versionRedirectingGraphicsShapes)
                     - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:$versionLifecycle`. Based on [Jetpack Lifecycle $versionRedirectingLifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle#$versionRedirectingLifecycle)
-                    - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:$versionNavigation`. Based on [Jetpack Navigation $versionRedirectingNavigation](https://developer.android.com/jetpack/androidx/releases/navigation#$versionRedirectingNavigation)
                     - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive`. Based on [Jetpack Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive)
+                    - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:$versionNavigation`. Based on [Jetpack Navigation $versionRedirectingNavigation](https://developer.android.com/jetpack/androidx/releases/navigation#$versionRedirectingNavigation)
+                    - Savedstate library `org.jetbrains.androidx.savedstate:savedstate:$versionSavedstate`. Based on [Jetpack Savedstate $versionRedirectingSavedstate](https://developer.android.com/jetpack/androidx/releases/savedstate#$versionRedirectingSavedstate)
+                    - WindowManager Core library `org.jetbrains.androidx.window:window-core:$versionWindow`. Based on [Jetpack WindowManager $versionRedirectingWindow](https://developer.android.com/jetpack/androidx/releases/window#$versionRedirectingWindow)
 
                     ---
                 """.trimIndent()
