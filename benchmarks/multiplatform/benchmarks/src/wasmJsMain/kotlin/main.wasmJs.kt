@@ -23,8 +23,17 @@ fun mainBrowser() {
     Config.setGlobalFromArgs(args)
 
     MainScope().launch {
+        if (Config.saveStats() && !BenchmarksSaveServerClient.isServerAlive()) {
+            println("No benchmark server found.")
+            return@launch
+        }
         runBenchmarks()
         println("Completed!")
+        if (Config.saveStats()) {
+            GlobalScope.launch {
+                BenchmarksSaveServerClient.stopServer()
+            }
+        }
     }
 }
 
