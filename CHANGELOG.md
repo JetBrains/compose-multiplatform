@@ -57,7 +57,6 @@ _Changes since 1.8.1_
 ### iOS
 
 - Fix issue where keyboard would appear after second tap when text input session was intercepted [#2049](https://github.com/JetBrains/compose-multiplatform-core/pull/2049)
-- _(prerelease fix)_ Fix keyboard jumps when switching between text fields [#2062](https://github.com/JetBrains/compose-multiplatform-core/pull/2062)
 
 ### Desktop
 
@@ -66,7 +65,6 @@ _Changes since 1.8.1_
 - [macOS] Fixed strange glyph being displayed in a text field if window becomes unfocused, then focused again while there's an active composition in the text field (after pressing e.g. backspace) [#2026](https://github.com/JetBrains/compose-multiplatform-core/pull/2026)
 - [macOS] Fix showing the input method toolbar before any text field becomes focused (on JBR only; other runtimes continue to be buggy) [#2047](https://github.com/JetBrains/compose-multiplatform-core/pull/2047)
 - Improved performance for `ComposePanel` with `System.setProperty("compose.swing.render.on.graphics", "true")` [#2097](https://github.com/JetBrains/compose-multiplatform-core/pull/2097)
-- [Linux] Fix `svgPainter` doesn't show any images [#2097](https://github.com/JetBrains/compose-multiplatform-core/pull/2097)
 - Fix the positioning of the IME popup being too far away from the text, on screens with density greater than 1 [#2118](https://github.com/JetBrains/compose-multiplatform-core/pull/2118)
 - Fixed the position of the IME popup, which was below the previous, rather than the current, cursor position [#2122](https://github.com/JetBrains/compose-multiplatform-core/pull/2122)
 

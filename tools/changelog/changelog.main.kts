@@ -432,6 +432,15 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
         .mapNotNull(shaToPull::get)
         .replaceCherryPicks()
 
+    // Exclude the same entries for partial cherry-picked PRs (example https://github.com/JetBrains/compose-multiplatform-core/pull/2096)
+    val cherryPickedIdsInFirstCommit = cherryPickedPrsInFirstCommit
+        .flatMap {
+            pullToReleaseNotes[it]?.entries.orEmpty()
+        }
+        .mapTo(mutableSetOf()) {
+            it.id
+        }
+
     return gitLogShas(repoFolder, firstCommit, lastCommit, "--cherry-pick --right-only")
         .reversed() // older changes are at the bottom
         .mapNotNull(shaToPull::get)
@@ -441,6 +450,7 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
         .flatMap {
             pullToReleaseNotes[it]?.entries ?: it.unknownChangelogEntries()
         }
+        .filterNot { it.id in cherryPickedIdsInFirstCommit }
 }
 
 /**
@@ -558,7 +568,12 @@ data class ChangelogEntry(
     val prNumber: Int,
     val link: String?,
     val isPrerelease: Boolean,
-)
+) {
+    /**
+     * Unique entry id used for excluding cherry-picked entries
+     */
+    val id: UUID = UUID.nameUUIDFromBytes((section + subsection + message).toByteArray(Charsets.UTF_8))
+}
 
 fun ChangelogEntry.sectionOrder(): Int = section?.let(standardSections::indexOf) ?: standardSections.size
 fun ChangelogEntry.subsectionOrder(): Int = subsection?.let(standardSubsections::indexOf) ?: standardSubsections.size
