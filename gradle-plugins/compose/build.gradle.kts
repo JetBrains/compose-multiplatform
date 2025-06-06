@@ -58,7 +58,7 @@ dependencies {
     compileOnly(gradleApi())
     compileOnly(localGroovy())
     //the version supports XCFramework with resources https://youtrack.jetbrains.com/issue/KT-75823
-    compileOnly(kotlin("gradle-plugin", "2.2.0-Beta2-1"))
+    compileOnly(kotlin("gradle-plugin", "2.2.0-RC2"))
     compileOnly(kotlin("native-utils"))
     compileOnly(libs.plugin.android)
     compileOnly(libs.plugin.android.api)

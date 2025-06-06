@@ -1,6 +1,6 @@
 package org.jetbrains.compose.resources
 
-import com.android.build.api.dsl.KotlinMultiplatformAndroidTarget
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.HasAndroidTest
 import com.android.build.api.variant.KotlinMultiplatformAndroidComponentsExtension
@@ -123,15 +123,16 @@ private fun Project.getAndroidKmpComponentComposeResources(
     kotlinExtension: KotlinMultiplatformExtension,
     componentName: String
 ): FileCollection = project.files({
-    kotlinExtension.targets.withType(KotlinMultiplatformAndroidTarget::class.java).flatMap { androidTarget ->
-        androidTarget.compilations.flatMap { compilation ->
-            if (compilation.componentName == componentName) {
-                compilation.allKotlinSourceSets.map { kotlinSourceSet ->
-                    getPreparedComposeResourcesDir(kotlinSourceSet)
-                }
-            } else emptyList()
+    kotlinExtension.targets.withType(KotlinMultiplatformAndroidLibraryTarget::class.java)
+        .flatMap { androidTarget ->
+            androidTarget.compilations.flatMap { compilation ->
+                if (compilation.componentName == componentName) {
+                    compilation.allKotlinSourceSets.map { kotlinSourceSet ->
+                        getPreparedComposeResourcesDir(kotlinSourceSet)
+                    }
+                } else emptyList()
+            }
         }
-    }
 })
 
 private fun Project.configureGeneratedAndroidComponentAssets(

@@ -718,7 +718,7 @@ class ResourcesTest : GradlePluginTestBase() {
         with(
             testProject(
                 "misc/appleResources",
-                defaultTestEnvironment.copy(kotlinVersion = "2.2.0-Beta2-1"))
+                defaultTestEnvironment.copy(kotlinVersion = "2.2.0-RC2"))
         ) {
             file("build.gradle.kts").modify { content ->
                 """
@@ -871,7 +871,7 @@ class ResourcesTest : GradlePluginTestBase() {
         with(
             testProject(
                 "misc/appleResources",
-                defaultTestEnvironment.copy(kotlinVersion = "2.2.0-Beta2-1"))
+                defaultTestEnvironment.copy(kotlinVersion = "2.2.0-RC2"))
         ) {
             gradle(":podPublishDebugXCFramework").checks {
                 assertDirectoriesContentEquals(

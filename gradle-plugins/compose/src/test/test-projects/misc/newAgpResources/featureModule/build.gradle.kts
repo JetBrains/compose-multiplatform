@@ -24,3 +24,8 @@ kotlin {
         }
     }
 }
+
+//https://youtrack.jetbrains.com/issue/CMP-8325
+compose.desktop {
+    application { }
+}

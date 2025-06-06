@@ -13,9 +13,9 @@ import org.jetbrains.compose.desktop.application.dsl.JvmApplicationBuildType
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.javaSourceSets
-import org.jetbrains.compose.internal.utils.joinDashLowercaseNonEmpty
 import org.jetbrains.compose.internal.mppExt
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.compose.internal.utils.joinDashLowercaseNonEmpty
+import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 
 internal data class JvmApplicationContext(
     val project: Project,
@@ -56,7 +56,7 @@ internal data class JvmApplicationContext(
         if (project.plugins.hasPlugin(KOTLIN_MPP_PLUGIN_ID)) {
             var isJvmTargetConfigured = false
             project.mppExt.targets.all { target ->
-                if (target.platformType == KotlinPlatformType.jvm) {
+                if (target is KotlinJvmTarget) {
                     if (!isJvmTargetConfigured) {
                         appInternal.from(target)
                         isJvmTargetConfigured = true
