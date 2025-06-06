@@ -1,4 +1,4 @@
-# 1.9.0-alpha01 (June 2025)
+# 1.9.0-alpha02 (June 2025)
 
 _Changes since 1.8.1_
 
@@ -70,19 +70,19 @@ _Changes since 1.8.1_
 
 ## Dependencies
 
-- Gradle Plugin `org.jetbrains.compose`, version `1.9.0-alpha01`. Based on Jetpack Compose libraries:
+- Gradle Plugin `org.jetbrains.compose`, version `1.9.0-alpha02`. Based on Jetpack Compose libraries:
   - [Runtime 1.9.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.9.0-alpha03)
   - [UI 1.9.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.9.0-alpha03)
   - [Foundation 1.9.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.9.0-alpha03)
   - [Material 1.9.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material#1.9.0-alpha03)
   - [Material3 1.4.0-alpha15](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-alpha15)
 
-- Graphics-Shapes library `org.jetbrains.androidx.graphics:graphics-shapes:1.0.0-alpha07`. Based on [Jetpack Graphics-Shapes 1.0.1](https://developer.android.com/jetpack/androidx/releases/graphics#graphics-shapes-#1.0.1)
+- Graphics-Shapes library `org.jetbrains.androidx.graphics:graphics-shapes:1.0.0-alpha08`. Based on [Jetpack Graphics-Shapes 1.0.1](https://developer.android.com/jetpack/androidx/releases/graphics#graphics-shapes-#1.0.1)
 - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.0`. Based on [Jetpack Lifecycle 2.9.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.0)
-- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-alpha01`. Based on [Jetpack Material3 Adaptive 1.2.0-alpha06](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-alpha06)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-alpha02`. Based on [Jetpack Material3 Adaptive 1.2.0-alpha06](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-alpha06)
 - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0-beta02`. Based on [Jetpack Navigation 2.9.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.0)
 - Savedstate library `org.jetbrains.androidx.savedstate:savedstate:1.3.0`. Based on [Jetpack Savedstate 1.3.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.3.0)
-- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.4.0-alpha01`. Based on [Jetpack WindowManager 1.4.0](https://developer.android.com/jetpack/androidx/releases/window#1.4.0)
+- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.4.0-alpha07`. Based on [Jetpack WindowManager 1.4.0](https://developer.android.com/jetpack/androidx/releases/window#1.4.0)
 
 ---
 
