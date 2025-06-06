@@ -1,3 +1,91 @@
+# 1.9.0-alpha02 (June 2025)
+
+_Changes since 1.8.1_
+
+## Highlights
+
+### Multiple Platforms
+
+- `material3` library now includes new experimental `MaterialExpressiveTheme` [#2127](https://github.com/JetBrains/compose-multiplatform-core/pull/2127)
+
+## Migration Notes
+
+### Gradle Plugin
+
+- The Compose Gradle plugin requires the Kotlin Gradle plugin version 2.+ now. Old `org.jetbrains.compose.compiler` is not supported anymore and the API to configure it was removed [#5283](https://github.com/JetBrains/compose-multiplatform/pull/5283)
+
+## Features
+
+### Multiple Platforms
+
+- Adopted a change in `ComposeUiTest` API. The  `block` in `runComposeUiTest` is `suspend` now. It allows to call `awaitIdle` and other suspend functions. It ensures a correct execution of a test on all platforms. See the web specifics in `kotlinx.coroutines.test.runTest` [documentation](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-test/kotlinx.coroutines.test/run-test.html) [#2066](https://github.com/JetBrains/compose-multiplatform-core/pull/2066)
+
+### iOS
+
+- Add support for native IME configuration with `PlatformImeOptions` [#2108](https://github.com/JetBrains/compose-multiplatform-core/pull/2108)
+
+### Desktop
+
+- Add accessibility role for `Switch`, reporting it as a checkbox [#2136](https://github.com/JetBrains/compose-multiplatform-core/pull/2136)
+
+## Fixes
+
+### Multiple Platforms
+
+- Fixed `TextField(TextFieldValue)` when used with a visual transformation with a non-identity offset mapping (potentially even crashing) [#2117](https://github.com/JetBrains/compose-multiplatform-core/pull/2117)
+- Fixed a memory leak and performance degradation when `ComposeUiFlags.isRectTrackingEnabled` set to `true` (default) [#2112](https://github.com/JetBrains/compose-multiplatform-core/pull/2112)
+- Support Preview parameters for Previews in common source sets in IJ and AS. Note: IDEs also need to implement support on their end. Please check the respective IDE release notes to confirm this is supported [#5319](https://github.com/JetBrains/compose-multiplatform/pull/5319)
+  Example usage:
+  ```
+  import androidx.compose.runtime.Composable
+  import org.jetbrains.compose.ui.tooling.preview.Preview
+  import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+  import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
+  class MyPreviewParameterProvider : PreviewParameterProvider<String> {
+    override val values = sequenceOf("Hello, Compose!", "Hello, World!")
+  }
+  /**
+   * This function will generate two preview images with different texts
+   */
+  @Preview
+  @Composable
+  fun MyPreview(@PreviewParameter(MyPreviewParameterProvider::class) text: String) {
+    Text(text)
+  }
+  ```
+
+### iOS
+
+- Fix issue where keyboard would appear after second tap when text input session was intercepted [#2049](https://github.com/JetBrains/compose-multiplatform-core/pull/2049)
+
+### Desktop
+
+- [macOS] Fix the background flashing when closing a window/dialog and an animation is running [#2058](https://github.com/JetBrains/compose-multiplatform-core/pull/2058)
+- [macOS; JBR] Fixed the current composition in a text field being duplicated into another text field when switching focus to it [#2026](https://github.com/JetBrains/compose-multiplatform-core/pull/2026)
+- [macOS] Fixed strange glyph being displayed in a text field if window becomes unfocused, then focused again while there's an active composition in the text field (after pressing e.g. backspace) [#2026](https://github.com/JetBrains/compose-multiplatform-core/pull/2026)
+- [macOS] Fix showing the input method toolbar before any text field becomes focused (on JBR only; other runtimes continue to be buggy) [#2047](https://github.com/JetBrains/compose-multiplatform-core/pull/2047)
+- Improved performance for `ComposePanel` with `System.setProperty("compose.swing.render.on.graphics", "true")` [#2097](https://github.com/JetBrains/compose-multiplatform-core/pull/2097)
+- Fix the positioning of the IME popup being too far away from the text, on screens with density greater than 1 [#2118](https://github.com/JetBrains/compose-multiplatform-core/pull/2118)
+- Fixed the position of the IME popup, which was below the previous, rather than the current, cursor position [#2122](https://github.com/JetBrains/compose-multiplatform-core/pull/2122)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.9.0-alpha02`. Based on Jetpack Compose libraries:
+  - [Runtime 1.9.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.9.0-alpha03)
+  - [UI 1.9.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.9.0-alpha03)
+  - [Foundation 1.9.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.9.0-alpha03)
+  - [Material 1.9.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material#1.9.0-alpha03)
+  - [Material3 1.4.0-alpha15](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-alpha15)
+
+- Graphics-Shapes library `org.jetbrains.androidx.graphics:graphics-shapes:1.0.0-alpha08`. Based on [Jetpack Graphics-Shapes 1.0.1](https://developer.android.com/jetpack/androidx/releases/graphics#graphics-shapes-#1.0.1)
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.0`. Based on [Jetpack Lifecycle 2.9.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.0)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-alpha02`. Based on [Jetpack Material3 Adaptive 1.2.0-alpha06](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-alpha06)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0-beta02`. Based on [Jetpack Navigation 2.9.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.0)
+- Savedstate library `org.jetbrains.androidx.savedstate:savedstate:1.3.0`. Based on [Jetpack Savedstate 1.3.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.3.0)
+- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.4.0-alpha07`. Based on [Jetpack WindowManager 1.4.0](https://developer.android.com/jetpack/androidx/releases/window#1.4.0)
+
+---
+
 # 1.8.1 (May 2025)
 
 _Changes since 1.8.0_
