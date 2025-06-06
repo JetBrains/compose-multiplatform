@@ -117,7 +117,7 @@ class GradlePluginTest : GradlePluginTestBase() {
     fun testOldestKotlinJsMpp() = with(
         testProject(
             "application/jsMpp",
-            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = oldestSupportedKotlinVersion)
+            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = "2.2.0-RC2")
         )
     ) {
         gradle(":compileKotlinJs").checks {
