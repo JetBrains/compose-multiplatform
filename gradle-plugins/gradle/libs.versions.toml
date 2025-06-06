@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.2.0-Beta1"
+kotlin = "2.2.0-RC2"
 gradle-download-plugin = "5.5.0"
 kotlin-poet = "2.1.0"
 plugin-android = "8.9.1"
