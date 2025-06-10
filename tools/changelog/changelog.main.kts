@@ -130,12 +130,18 @@ fun generateChangelog() {
     val versionComposeMaterial3Adaptive = formatAndroidxLibVersion("COMPOSE_MATERIAL3_ADAPTIVE")
     val versionLifecycle = formatAndroidxLibVersion("LIFECYCLE")
     val versionNavigation = formatAndroidxLibVersion("NAVIGATION")
+    val versionSavedstate = formatAndroidxLibVersion("SAVEDSTATE")
+    val versionGraphicsShapes = formatAndroidxLibVersion("GRAPHICS_SHAPES")
+    val versionWindow = formatAndroidxLibVersion("WINDOW")
 
     val versionRedirectingCompose = formatAndroidxLibRedirectingVersion("compose")
     val versionRedirectingComposeMaterial3 = formatAndroidxLibRedirectingVersion("compose.material3")
     val versionRedirectingComposeMaterial3Adaptive = formatAndroidxLibRedirectingVersion("compose.material3.adaptive")
     val versionRedirectingLifecycle = formatAndroidxLibRedirectingVersion("lifecycle")
     val versionRedirectingNavigation = formatAndroidxLibRedirectingVersion("navigation")
+    val versionRedirectingSavedstate = formatAndroidxLibRedirectingVersion("savedstate")
+    val versionRedirectingGraphicsShapes = formatAndroidxLibRedirectingVersion("graphics")
+    val versionRedirectingWindow = formatAndroidxLibRedirectingVersion("window")
 
     val versionName = versionCompose
 
@@ -159,18 +165,21 @@ fun generateChangelog() {
         previousVersion = previousVersionInChangelog
     }
 
-    fun getChangelog(firstCommit: String, lastCommit: String, firstVersion: String): String {
+    fun getChangelog(firstCommit: String, lastCommit: String, firstVersion: String, lastVersion: String): String {
+        val isPrerelease = lastVersion.contains("-")
+
         val entries = entriesForRepo("JetBrains/compose-multiplatform-core", firstCommit, lastCommit) +
                 entriesForRepo("JetBrains/compose-multiplatform", firstCommit, lastCommit)
 
         return buildString {
-            appendLine("# $versionName (${currentChangelogDate()})")
+            appendLine("# $lastVersion (${currentChangelogDate()})")
 
             appendLine()
             appendLine("_Changes since ${firstVersion}_")
             appendLine()
 
             entries
+                .filter { isPrerelease || !it.isPrerelease }
                 .sortedBy { it.sectionOrder() }
                 .groupBy { it.sectionName() }
                 .forEach { (section, sectionEntries) ->
@@ -184,7 +193,11 @@ fun generateChangelog() {
                             appendLine("### $subsection")
                             appendLine()
                             subsectionEntries.forEach {
-                                appendLine(it.run { "$message [#$prNumber]($link)" })
+                                if (it.link != null) {
+                                    appendLine(it.run { "$message [#$prNumber]($link)" })
+                                } else {
+                                    appendLine(it.message)
+                                }
                             }
                             appendLine()
                         }
@@ -193,18 +206,21 @@ fun generateChangelog() {
             append(
                 """
                     ## Dependencies
-            
+
                     - Gradle Plugin `org.jetbrains.compose`, version `$versionCompose`. Based on Jetpack Compose libraries:
                       - [Runtime $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-runtime#$versionRedirectingCompose)
                       - [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose)
                       - [Foundation $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingCompose)
                       - [Material $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingCompose)
                       - [Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3)
-    
+
+                    - Graphics-Shapes library `org.jetbrains.androidx.graphics:graphics-shapes:$versionGraphicsShapes`. Based on [Jetpack Graphics-Shapes $versionRedirectingGraphicsShapes](https://developer.android.com/jetpack/androidx/releases/graphics#graphics-shapes-#$versionRedirectingGraphicsShapes)
                     - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:$versionLifecycle`. Based on [Jetpack Lifecycle $versionRedirectingLifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle#$versionRedirectingLifecycle)
-                    - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:$versionNavigation`. Based on [Jetpack Navigation $versionRedirectingNavigation](https://developer.android.com/jetpack/androidx/releases/navigation#$versionRedirectingNavigation)
                     - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive`. Based on [Jetpack Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive)
-            
+                    - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:$versionNavigation`. Based on [Jetpack Navigation $versionRedirectingNavigation](https://developer.android.com/jetpack/androidx/releases/navigation#$versionRedirectingNavigation)
+                    - Savedstate library `org.jetbrains.androidx.savedstate:savedstate:$versionSavedstate`. Based on [Jetpack Savedstate $versionRedirectingSavedstate](https://developer.android.com/jetpack/androidx/releases/savedstate#$versionRedirectingSavedstate)
+                    - WindowManager Core library `org.jetbrains.androidx.window:window-core:$versionWindow`. Based on [Jetpack WindowManager $versionRedirectingWindow](https://developer.android.com/jetpack/androidx/releases/window#$versionRedirectingWindow)
+
                     ---
                 """.trimIndent()
             )
@@ -232,7 +248,7 @@ fun generateChangelog() {
     println()
     println("Generating changelog between $previousVersion and $versionName")
 
-    val newChangelog = getChangelog(previousVersionCommit, versionCommit, previousVersion)
+    val newChangelog = getChangelog(previousVersionCommit, versionCommit, previousVersion, versionName)
 
     changelogFile.writeText(
         newChangelog + previousChangelog
@@ -260,7 +276,7 @@ fun checkPr() {
         releaseNotes is ReleaseNotes.Specified && releaseNotes.entries.isEmpty() -> {
             err.println("""
                 "## Release Notes" doesn't contain any items, or "### Section - Subsection" isn't specified
-            
+
                 See the format in $prFormatLink
             """.trimIndent())
             exitProcess(1)
@@ -269,10 +285,10 @@ fun checkPr() {
             err.println("""
                 "## Release Notes" contains nonstandard "Section - Subsection" pairs:
                 ${nonstandardSections.joinToString(", ")}
-            
+
                 Allowed sections: ${standardSections.joinToString(", ")}
                 Allowed subsections: ${standardSubsections.joinToString(", ")}
-            
+
                 See the full format in $prFormatLink
             """.trimIndent())
             exitProcess(1)
@@ -280,7 +296,7 @@ fun checkPr() {
         releaseNotes == null -> {
             err.println("""
                 "## Release Notes" section is missing in the PR description
-            
+
                 See the format in $prFormatLink
             """.trimIndent())
             exitProcess(1)
@@ -295,6 +311,11 @@ fun checkPr() {
  * September 2024
  */
 fun currentChangelogDate() = LocalDate.now().format(DateTimeFormatter.ofPattern("MMMM yyyy", Locale.ENGLISH))
+
+fun GitHubPullEntry.extractReleaseNotes() = extractReleaseNotes(body, number, htmlUrl)
+
+fun GitHubPullEntry.unknownChangelogEntries() =
+    listOf(ChangelogEntry("- $title", null, null, number, htmlUrl, false))
 
 /**
  * Extract by format [PR_FORMAT.md]
@@ -323,11 +344,19 @@ fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNo
     if (relNoteBody == null) return null
     if (relNoteBody.trim().lowercase() == "n/a") return ReleaseNotes.NA
 
+    // Check if the release notes contain only GitHub PR links
+    val pullRequests = relNoteBody
+        .split("\n")
+        .map { it.trim() }
+        .mapNotNull(PullRequestLink::parseOrNull)
+
+    if (pullRequests.isNotEmpty()) return ReleaseNotes.CherryPicks(pullRequests)
+
     val list = mutableListOf<ChangelogEntry>()
     var section: String? = null
     var subsection: String? = null
     var isFirstLine = true
-    var shouldPadLines = false
+    var isPrerelease = false
 
     for (line in relNoteBody.split("\n")) {
         // parse "## Section - Subsection"
@@ -336,27 +365,30 @@ fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNo
             section = s.substringBefore("-", "").trim().normalizeSectionName().ifEmpty { null }
             subsection = s.substringAfter("-", "").trim().normalizeSubsectionName().ifEmpty { null }
             isFirstLine = true
-            shouldPadLines = false
+            isPrerelease = false
         } else if (section != null && line.isNotBlank()) {
             var lineFixed = line
 
             if (isFirstLine && !lineFixed.startsWith("-")) {
                 lineFixed = "- $lineFixed"
-                shouldPadLines = true
             }
-            if (!isFirstLine && shouldPadLines) {
+            if (!isFirstLine && !lineFixed.startsWithAny("  ", "-")) {
                 lineFixed = "  $lineFixed"
             }
             lineFixed = lineFixed.trimEnd().removeSuffix(".")
 
             val isTopLevel = lineFixed.startsWith("-")
+            if (isTopLevel) {
+                isPrerelease = lineFixed.contains("(prerelease fix)")
+            }
             list.add(
                 ChangelogEntry(
                     lineFixed,
                     section,
                     subsection,
                     prNumber,
-                    prLink.takeIf { isTopLevel }
+                    prLink.takeIf { isTopLevel },
+                    isPrerelease
                 )
             )
             isFirstLine = false
@@ -371,51 +403,54 @@ fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNo
  *        JetBrains/compose-multiplatform-core
  */
 fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<ChangelogEntry> {
-    val pulls = (1..5)
+    val pulls = (1..10)
         .flatMap {
             requestJson<Array<GitHubPullEntry>>("https://api.github.com/repos/$repo/pulls?state=closed&per_page=100&page=$it").toList()
         }
 
     val shaToPull = pulls.associateBy { it.mergeCommitSha }
+    val numberToPull = pulls.associateBy { it.number }
+    val pullToReleaseNotes = Cache( GitHubPullEntry::extractReleaseNotes)
 
-    fun changelogEntriesFor(
-        pullRequest: GitHubPullEntry?
-    ): List<ChangelogEntry> {
-        return if (pullRequest != null) {
-            with(pullRequest) {
-                extractReleaseNotes(body, number, htmlUrl)?.entries ?:
-                    listOf(ChangelogEntry("- $title", null, null, number, htmlUrl))
-            }
+    // if GitHubPullEntry is a cherry-picks PR (contains a list of links to other PRs), replace it by the original PRs
+    fun List<GitHubPullEntry>.replaceCherryPicks(): List<GitHubPullEntry> = flatMap { pullRequest ->
+        val releaseNotes = pullToReleaseNotes[pullRequest]
+        if (releaseNotes is ReleaseNotes.CherryPicks) {
+            releaseNotes.pullRequests
+                .filter { it.repo == repo }
+                .mapNotNull { numberToPull[it.number] }
         } else {
-            listOf()
+            listOf(pullRequest)
         }
     }
 
-    class CommitsResult(val commits: List<GitHubCompareResponse.CommitEntry>, val mergeBaseSha: String)
+    val repoFolder = githubClone(repo)
 
-    fun fetchCommits(firsCommitSha: String, lastCommitSha: String): CommitsResult {
-        lateinit var mergeBaseCommit: String
-        val commits = fetchPagedUntilEmpty { page ->
-            val result = requestJson<GitHubCompareResponse>("https://api.github.com/repos/$repo/compare/$firsCommitSha...$lastCommitSha?per_page=1000&page=$page")
-            mergeBaseCommit = result.mergeBaseCommit.sha
-            result.commits
+    // Commits that exist in [firstCommit] and not identified as cherry-picks by `git log`
+    // We'll try to exclude them via manual links to cherry-picks
+    val cherryPickedPrsInFirstCommit = gitLogShas(repoFolder, firstCommit, lastCommit, "--cherry-pick --left-only")
+        .mapNotNull(shaToPull::get)
+        .replaceCherryPicks()
+
+    // Exclude the same entries for partial cherry-picked PRs (example https://github.com/JetBrains/compose-multiplatform-core/pull/2096)
+    val cherryPickedIdsInFirstCommit = cherryPickedPrsInFirstCommit
+        .flatMap {
+            pullToReleaseNotes[it]?.entries.orEmpty()
         }
-        return CommitsResult(commits, mergeBaseCommit)
-    }
+        .mapTo(mutableSetOf()) {
+            it.id
+        }
 
-    val main = fetchCommits(firstCommit, lastCommit)
-    val previous = fetchCommits(main.mergeBaseSha, firstCommit)
-    val pullRequests = main.commits.mapNotNull { shaToPull[it.sha] }.toSet()
-    val previousVersionPullRequests = previous.commits.mapNotNull { shaToPull[it.sha] }.toSet()
-    return (pullRequests - previousVersionPullRequests).flatMap { changelogEntriesFor(it) }
-}
-
-/**
- * @param repo Example:
- *        JetBrains/compose-multiplatform-core
- */
-fun pullRequest(repo: String, prNumber: String): GitHubPullEntry {
-    return requestJson<GitHubPullEntry>("https://api.github.com/repos/$repo/pulls/$prNumber")
+    return gitLogShas(repoFolder, firstCommit, lastCommit, "--cherry-pick --right-only")
+        .reversed() // older changes are at the bottom
+        .mapNotNull(shaToPull::get)
+        .replaceCherryPicks()
+        .minus(cherryPickedPrsInFirstCommit)
+        .distinctBy { it.number }
+        .flatMap {
+            pullToReleaseNotes[it]?.entries ?: it.unknownChangelogEntries()
+        }
+        .filterNot { it.id in cherryPickedIdsInFirstCommit }
 }
 
 /**
@@ -444,10 +479,14 @@ fun androidxLibToRedirectionVersion(commit: String): Map<String, String> {
 fun androidxLibToVersion(commit: String): Map<String, String> {
     val repo = "ssh://git@git.jetbrains.team/ui/compose-teamcity-config.git"
     val file = ".teamcity/compose/Library.kt"
-    val libraryKt = spaceContentOf(repo, file, commit)
+    val libraryKt = try {
+        spaceContentOf(repo, file, commit)
+    } catch (_: Exception) {
+        ""
+    }
 
     return if (libraryKt.isBlank()) {
-        println("Can't clone $repo to know library versions. Please register your ssh key in https://jetbrains.team/m/me/authentication?tab=GitKeys")
+        println("Can't find library versions in $repo for $commit. Either the format is changed, or you need to register your ssh key in https://jetbrains.team/m/me/authentication?tab=GitKeys")
         emptyMap()
     } else {
         val regex = Regex("Library\\.(.*)\\s*->\\s*\"(.*)\"")
@@ -468,10 +507,54 @@ fun spaceContentOf(repoUrl: String, path: String, tagName: String): String {
         .readText()
 }
 
+/**
+ * Return a list of shas between [firstCommit] and [lastCommit] in [folder]
+ */
+fun gitLogShas(folder: File, firstCommit: String, lastCommit: String, additionalArgs: String): List<String> {
+    val absolutePath = folder.absolutePath
+    val commits = pipeProcess("git -C $absolutePath log --oneline --format=%H $additionalArgs $firstCommit...$lastCommit").
+            readText()
+    return commits.split("\n")
+}
+
+/**
+ * Clone or fetch GitHub repo into [result] folder
+ */
+fun githubClone(repo: String): File {
+    val url = "https://github.com/$repo"
+    val folder = File("build/github/$repo")
+    val absolutePath = folder.absolutePath
+    if (!folder.exists()) {
+        folder.mkdirs()
+        println("Cloning $url into ${folder.absolutePath}")
+        pipeProcess("git clone --bare $url $absolutePath").waitAndCheck()
+    } else {
+        println("Fetching $url into ${folder.absolutePath}")
+        pipeProcess("git -C $absolutePath fetch --tags").waitAndCheck()
+    }
+    return folder
+}
+
+data class PullRequestLink(val repo: String, val number: Int) {
+    companion object {
+        fun parseOrNull(link: String): PullRequestLink? {
+            val (repo, number) = Regex("https://github\\.com/(.+)/pull/(\\d+)/?")
+                .matchEntire(link)
+                ?.destructured
+                ?: return null
+            return PullRequestLink(repo, number.toInt())
+        }
+    }
+}
+
 sealed interface ReleaseNotes {
     val entries: List<ChangelogEntry>
 
     object NA: ReleaseNotes {
+        override val entries: List<ChangelogEntry> get() = emptyList()
+    }
+
+    class CherryPicks(val pullRequests: List<PullRequestLink>): ReleaseNotes {
         override val entries: List<ChangelogEntry> get() = emptyList()
     }
 
@@ -484,7 +567,13 @@ data class ChangelogEntry(
     val subsection: String?,
     val prNumber: Int,
     val link: String?,
-)
+    val isPrerelease: Boolean,
+) {
+    /**
+     * Unique entry id used for excluding cherry-picked entries
+     */
+    val id: UUID = UUID.nameUUIDFromBytes((section + subsection + message).toByteArray(Charsets.UTF_8))
+}
 
 fun ChangelogEntry.sectionOrder(): Int = section?.let(standardSections::indexOf) ?: standardSections.size
 fun ChangelogEntry.subsectionOrder(): Int = subsection?.let(standardSubsections::indexOf) ?: standardSubsections.size
@@ -492,15 +581,6 @@ fun ChangelogEntry.sectionName(): String = section ?: "Unknown"
 fun ChangelogEntry.subsectionName(): String = subsection ?: "Unknown"
 fun String.normalizeSectionName() = standardSections.find { it.lowercase() == this.lowercase() } ?: this
 fun String.normalizeSubsectionName() = standardSubsections.find { it.lowercase() == this.lowercase() } ?: this
-
-// example https://api.github.com/repos/JetBrains/compose-multiplatform-core/compare/v1.6.0-rc02...release/1.6.0
-data class GitHubCompareResponse(
-    val commits: List<CommitEntry>,
-    @SerializedName("merge_base_commit") val mergeBaseCommit: CommitEntry
-) {
-    data class CommitEntry(val sha: String, val commit: Commit)
-    data class Commit(val message: String)
-}
 
 // example https://api.github.com/repos/JetBrains/compose-multiplatform-core/pulls?state=closed
 data class GitHubPullEntry(
@@ -525,7 +605,19 @@ fun Process.pipeTo(command: String): Process = pipeProcess(command).also {
     }
 }
 
-fun Process.readText(): String = inputStream.bufferedReader().use { it.readText() }
+fun Process.waitAndCheck() {
+    val exitCode = waitFor()
+    if (exitCode != 0) {
+        val message = errorStream.bufferedReader().use { it.readText() }
+        error("Command failed with exit code $exitCode:\n$message")
+    }
+}
+
+fun Process.readText(): String = inputStream.bufferedReader().use {
+    it.readText().also {
+        waitAndCheck()
+    }
+}
 
 inline fun <reified T> requestJson(url: String): T =
     Gson().fromJson(requestPlain(url), T::class.java)
@@ -558,14 +650,11 @@ fun <T> exponentialRetry(block: () -> T): T {
     throw exception
 }
 
-inline fun <T> fetchPagedUntilEmpty(fetch: (page: Int) -> List<T>): MutableList<T> {
-    val all = mutableListOf<T>()
-    var page = 1
-    do {
-        val result = fetch(page++)
-        all.addAll(result)
-    } while (result.isNotEmpty())
-    return all
+fun String.startsWithAny(vararg prefixes: String): Boolean = prefixes.any { startsWith(it) }
+
+class Cache<K, V>(private val create: (K) -> V) {
+    private val map = mutableMapOf<K,V>()
+    operator fun get(key: K): V = map.getOrPut(key) { create(key) }
 }
 
 //endregion
