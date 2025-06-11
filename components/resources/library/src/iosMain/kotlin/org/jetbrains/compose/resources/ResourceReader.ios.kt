@@ -26,7 +26,9 @@ import platform.Foundation.seekToFileOffset
 import platform.posix.memcpy
 
 @OptIn(BetaInteropApi::class)
-internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
+internal actual fun getPlatformResourceReader(
+    configuration: ResourceConfiguration,
+): ResourceReader = object : ResourceReader {
     private val composeResourcesDir: String by lazy { findComposeResourcesPath() }
 
     override suspend fun read(path: String): ByteArray {
@@ -106,3 +108,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         }
     }
 }
+
+actual val DefaultResourceConfiguration: ResourceConfiguration = ResourceConfiguration
+
+actual object ResourceConfiguration
