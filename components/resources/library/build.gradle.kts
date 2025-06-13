@@ -214,6 +214,18 @@ apiValidation {
 tasks.register<GeneratePluralRuleListsTask>("generatePluralRuleLists") {
     val projectDir = project.layout.projectDirectory
     pluralsFile = projectDir.file("CLDRPluralRules/plurals.xml")
-    outputFile = projectDir.file("src/commonMain/kotlin/org/jetbrains/compose/resources/plural/CLDRPluralRuleLists.kt")
-    samplesOutputFile = projectDir.file("src/commonTest/kotlin/org/jetbrains/compose/resources/CLDRPluralRuleLists.test.kt")
+    outputFile =
+        projectDir.file("src/commonMain/kotlin/org/jetbrains/compose/resources/plural/CLDRPluralRuleLists.kt")
+    samplesOutputFile =
+        projectDir.file("src/commonTest/kotlin/org/jetbrains/compose/resources/CLDRPluralRuleLists.test.kt")
+}
+
+tasks {
+    val desktopTestProcessResources =
+        named<ProcessResources>("desktopTestProcessResources")
+
+    withType<Test> {
+        dependsOn(desktopTestProcessResources)
+        environment("RESOURCES_PATH", desktopTestProcessResources.map { it.destinationDir.absolutePath }.get())
+    }
 }

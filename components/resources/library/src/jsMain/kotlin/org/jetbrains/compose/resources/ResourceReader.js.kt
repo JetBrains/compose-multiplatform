@@ -9,7 +9,8 @@ import org.w3c.files.Blob
 import org.w3c.xhr.XMLHttpRequest
 import kotlin.js.Promise
 
-internal actual fun getPlatformResourceReader(): ResourceReader {
+actual val DefaultResourceReader: ResourceReader
+    get() {
     if (isInTestEnvironment()) return TestJsResourceReader
     return DefaultJsResourceReader
 }
