@@ -24,18 +24,16 @@ suspend fun readResourceBytes(path: String): ByteArray = DefaultResourceReader.r
 @InternalResourceApi
 fun getResourceUri(path: String): String = DefaultResourceReader.getUri(path)
 
-internal interface ResourceReader {
+interface ResourceReader {
     suspend fun read(path: String): ByteArray
     suspend fun readPart(path: String, offset: Long, size: Long): ByteArray
     fun getUri(path: String): String
 }
 
-internal expect fun getPlatformResourceReader(): ResourceReader
-
-internal val DefaultResourceReader = getPlatformResourceReader()
+expect val DefaultResourceReader: ResourceReader
 
 //ResourceReader provider will be overridden for tests
-internal val LocalResourceReader = staticCompositionLocalOf { DefaultResourceReader }
+val LocalResourceReader = staticCompositionLocalOf { DefaultResourceReader }
 
 //For an android preview we need to initialize the resource reader with the local context
 internal expect val ProvidableCompositionLocal<ResourceReader>.currentOrPreview: ResourceReader

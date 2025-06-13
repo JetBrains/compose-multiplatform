@@ -23,7 +23,8 @@ private external fun jsExportInt8ArrayToWasm(src: Int8Array, size: Int, dstAddr:
 @JsFun("(blob) => blob.arrayBuffer()")
 private external fun jsExportBlobAsArrayBuffer(blob: Blob): Promise<ArrayBuffer>
 
-internal actual fun getPlatformResourceReader(): ResourceReader {
+actual val DefaultResourceReader: ResourceReader
+    get() {
     if (isInTestEnvironment()) return TestWasmResourceReader
     return DefaultWasmResourceReader
 }
