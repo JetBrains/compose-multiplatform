@@ -26,7 +26,9 @@ import platform.Foundation.seekToFileOffset
 import platform.posix.memcpy
 
 @OptIn(BetaInteropApi::class)
-actual val DefaultResourceReader: ResourceReader = object : ResourceReader {
+actual fun getDefaultResourceReader(): ResourceReader = DefaultIOsResourceReader
+
+object DefaultIOsResourceReader : ResourceReader {
     private val composeResourcesDir: String by lazy { findComposeResourcesPath() }
 
     override suspend fun read(path: String): ByteArray {
@@ -48,11 +50,13 @@ actual val DefaultResourceReader: ResourceReader = object : ResourceReader {
     }
 
     private fun readData(path: String): NSData {
-        return NSFileManager.defaultManager().contentsAtPath(path) ?: throw MissingResourceException(path)
+        return NSFileManager.defaultManager().contentsAtPath(path)
+            ?: throw MissingResourceException(path)
     }
 
     private fun readData(path: String, offset: Long, size: Long): NSData {
-        val fileHandle = NSFileHandle.fileHandleForReadingAtPath(path) ?: throw MissingResourceException(path)
+        val fileHandle =
+            NSFileHandle.fileHandleForReadingAtPath(path) ?: throw MissingResourceException(path)
         if (available(OS.Ios to OSVersion(major = 13))) {
             memScoped {
                 val error = alloc<ObjCObjectVar<NSError?>>()
@@ -81,7 +85,8 @@ actual val DefaultResourceReader: ResourceReader = object : ResourceReader {
     private fun findComposeResourcesPath(): String {
         val mainBundle = NSBundle.mainBundle
         val fm = NSFileManager.defaultManager()
-        val frameworkDirs = fm.findSubDirs(mainBundle.resourcePath + "/Frameworks") { it.endsWith(".framework") }
+        val frameworkDirs =
+            fm.findSubDirs(mainBundle.resourcePath + "/Frameworks") { it.endsWith(".framework") }
         val frameworkResourcesDir = frameworkDirs.firstOrNull { frameworkDir ->
             fm.findSubDirs(frameworkDir) { it.endsWith("composeResources") }.isNotEmpty()
         }
@@ -89,7 +94,10 @@ actual val DefaultResourceReader: ResourceReader = object : ResourceReader {
         return frameworkResourcesDir ?: defaultDir
     }
 
-    private fun NSFileManager.findSubDirs(parentDir: String, filter: (String) -> Boolean): List<String> = memScoped {
+    private fun NSFileManager.findSubDirs(
+        parentDir: String,
+        filter: (String) -> Boolean
+    ): List<String> = memScoped {
         if (!fileExistsAtPath(parentDir)) return emptyList()
         val contents = contentsOfDirectoryAtURL(
             url = NSURL(fileURLWithPath = parentDir),

@@ -12,7 +12,9 @@ import platform.Foundation.fileHandleForReadingAtPath
 import platform.Foundation.readDataOfLength
 import platform.posix.memcpy
 
-actual val DefaultResourceReader: ResourceReader = object : ResourceReader {
+actual fun getDefaultResourceReader(): ResourceReader = DefaultMacOsResourceReader
+
+object DefaultMacOsResourceReader : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         val data = readData(getPathOnDisk(path))
         return ByteArray(data.length.toInt()).apply {
@@ -32,11 +34,13 @@ actual val DefaultResourceReader: ResourceReader = object : ResourceReader {
     }
 
     private fun readData(path: String): NSData {
-        return NSFileManager.defaultManager().contentsAtPath(path) ?: throw MissingResourceException(path)
+        return NSFileManager.defaultManager().contentsAtPath(path)
+            ?: throw MissingResourceException(path)
     }
 
     private fun readData(path: String, offset: Long, size: Long): NSData {
-        val fileHandle = NSFileHandle.fileHandleForReadingAtPath(path) ?: throw MissingResourceException(path)
+        val fileHandle =
+            NSFileHandle.fileHandleForReadingAtPath(path) ?: throw MissingResourceException(path)
         fileHandle.seekToOffset(offset.toULong(), null)
         val result = fileHandle.readDataOfLength(size.toULong())
         fileHandle.closeFile()
@@ -57,7 +61,7 @@ actual val DefaultResourceReader: ResourceReader = object : ResourceReader {
             "$currentDirectoryPath/src/macosTest/composeResources/$pathFix",
             "$currentDirectoryPath/src/commonMain/composeResources/$pathFix",
             "$currentDirectoryPath/src/commonTest/composeResources/$pathFix"
-        ).firstOrNull { p -> fm.fileExistsAtPath(p) }  ?: throw MissingResourceException(path)
+        ).firstOrNull { p -> fm.fileExistsAtPath(p) } ?: throw MissingResourceException(path)
     }
 
     private fun getPathWithoutPackage(path: String): String {

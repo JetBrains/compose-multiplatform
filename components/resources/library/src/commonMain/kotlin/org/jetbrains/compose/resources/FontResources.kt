@@ -2,8 +2,10 @@ package org.jetbrains.compose.resources
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontVariation
+import androidx.compose.ui.text.font.FontWeight
 
 /**
  * Represents a font resource.
@@ -71,5 +73,5 @@ suspend fun getFontResourceBytes(
     resource: FontResource
 ): ByteArray {
     val resourceItem = resource.getResourceItemByEnvironment(environment)
-    return DefaultResourceReader.read(resourceItem.path)
+    return getDefaultResourceReader().read(resourceItem.path)
 }

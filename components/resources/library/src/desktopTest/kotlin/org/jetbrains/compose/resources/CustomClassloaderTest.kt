@@ -21,7 +21,6 @@ class CustomClassloaderTest {
 
     @Test
     fun testCustomClassloader() = runTest {
-
         val actualResourceText =
             CustomClassloaderTest::class
                 .java

@@ -1,6 +1,8 @@
 package org.jetbrains.compose.resources
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
 import org.jetbrains.compose.resources.plural.PluralCategory
 import org.jetbrains.compose.resources.plural.PluralRuleList
 
@@ -43,7 +45,7 @@ fun pluralStringResource(resource: PluralStringResource, quantity: Int): String 
  * @throws IllegalArgumentException If the provided ID or the pluralization is not found in the resource file.
  */
 suspend fun getPluralString(resource: PluralStringResource, quantity: Int): String =
-    loadPluralString(resource, quantity, DefaultResourceReader, getSystemResourceEnvironment())
+    loadPluralString(resource, quantity, getDefaultResourceReader(), getSystemResourceEnvironment())
 
 /**
  * Loads a string using the specified string resource.
@@ -59,7 +61,7 @@ suspend fun getPluralString(
     environment: ResourceEnvironment,
     resource: PluralStringResource,
     quantity: Int
-): String = loadPluralString(resource, quantity, DefaultResourceReader, environment)
+): String = loadPluralString(resource, quantity, getDefaultResourceReader(), environment)
 
 private suspend fun loadPluralString(
     resource: PluralStringResource,
@@ -114,7 +116,7 @@ suspend fun getPluralString(resource: PluralStringResource, quantity: Int, varar
     loadPluralString(
         resource, quantity,
         formatArgs.map { it.toString() },
-        DefaultResourceReader,
+        getDefaultResourceReader(),
         getSystemResourceEnvironment(),
     )
 
@@ -137,7 +139,7 @@ suspend fun getPluralString(
 ): String = loadPluralString(
     resource, quantity,
     formatArgs.map { it.toString() },
-    DefaultResourceReader,
+    getDefaultResourceReader(),
     environment
 )
 

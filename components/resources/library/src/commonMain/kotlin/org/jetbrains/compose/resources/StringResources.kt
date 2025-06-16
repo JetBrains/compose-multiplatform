@@ -1,6 +1,8 @@
 package org.jetbrains.compose.resources
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
 
 /**
  * Represents a string resource in the application.
@@ -39,7 +41,7 @@ fun stringResource(resource: StringResource): String {
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
 suspend fun getString(resource: StringResource): String =
-    loadString(resource, DefaultResourceReader, getSystemResourceEnvironment())
+    loadString(resource, getDefaultResourceReader(), getSystemResourceEnvironment())
 
 /**
  * Loads a string using the specified string resource.
@@ -51,7 +53,7 @@ suspend fun getString(resource: StringResource): String =
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
 suspend fun getString(environment: ResourceEnvironment, resource: StringResource): String =
-    loadString(resource, DefaultResourceReader, environment)
+    loadString(resource, getDefaultResourceReader(), environment)
 
 private suspend fun loadString(
     resource: StringResource,
@@ -94,7 +96,7 @@ fun stringResource(resource: StringResource, vararg formatArgs: Any): String {
 suspend fun getString(resource: StringResource, vararg formatArgs: Any): String = loadString(
     resource,
     formatArgs.map { it.toString() },
-    DefaultResourceReader,
+    getDefaultResourceReader(),
     getSystemResourceEnvironment()
 )
 
@@ -115,7 +117,7 @@ suspend fun getString(
 ): String = loadString(
     resource,
     formatArgs.map { it.toString() },
-    DefaultResourceReader,
+    getDefaultResourceReader(),
     environment
 )
 
