@@ -14,7 +14,6 @@ plugins {
 }
 
 kotlin {
-
     jvm("desktop")
     androidTarget {
         publishLibraryVariants("release")
