@@ -1,0 +1,159 @@
+package org.jetbrains.compose.desktop.application.dsl
+
+import org.jetbrains.compose.internal.utils.packagedAppJarFilesDir
+import java.io.File
+import java.io.Serializable
+
+/**
+ * The configuration of AppCDS for the native distribution.
+ */
+abstract class AppCdsConfiguration {
+    /**
+     * The AppCDS mode to use.
+     */
+    var mode: AppCdsMode = AppCdsMode.None
+
+    /**
+     * Whether to ask the JVM to log AppCDS-related actions.
+     */
+    @Suppress("MemberVisibilityCanBePrivate")
+    var logging: Boolean = false
+
+    /**
+     * Returns the AppCDS-related arguments to pass the JVM when running the app.
+     */
+    internal fun runtimeJvmArgs() = buildList {
+        addAll(mode.runtimeJvmArgs())
+        if (logging) add("-Xlog:cds")
+    }
+}
+
+/**
+ * The mode of use of AppCDS.
+ */
+abstract class AppCdsMode : Serializable {
+
+    /**
+     * Whether to generate a classes.jsa archive for the JRE classes.
+     */
+    internal abstract val generateJreClassesArchive: Boolean
+
+    /**
+     * Returns whether this mode creates an archive of app classes at build time.
+     */
+    internal open val generateAppClassesArchive: Boolean get() = false
+
+    /**
+     * The arguments to pass to the JVM when running the app to create
+     * the archive for the app's class files.
+     *
+     * This will only be called if [generateAppClassesArchive] is `true`.
+     */
+    internal open fun appClassesArchiveCreationJvmArgs(): List<String> =
+        error("AppCdsMode '$this' does not create an archive")
+
+    /**
+     * Returns the app's classes archive file, given the root directory of
+     * the packaged app.
+     */
+    internal open fun appClassesArchiveFile(packagedAppRootDir: File): File =
+        error("AppCdsMode '$this' does not create an archive")
+
+    /**
+     * The arguments to pass to the JVM when running the final app.
+     */
+    internal abstract fun runtimeJvmArgs(): List<String>
+
+    /**
+     * Checks whether this mode is compatible with the given JDK major version.
+     * Throws an exception if not.
+     */
+    internal open fun checkJdkCompatibility(jdkMajorVersion: Int) = Unit
+
+
+    companion object {
+
+        /**
+         * The name of the AppCds archive file.
+         */
+        private const val ARCHIVE_NAME = "app.jsa"
+
+        /**
+         * AppCDS is not used.
+         */
+        val None = object : AppCdsMode() {
+            override val generateJreClassesArchive: Boolean get() = false
+            override fun runtimeJvmArgs() = emptyList<String>()
+            override fun toString() = "None"
+        }
+
+        /**
+         * AppCDS is used via a dynamic shared archive created automatically
+         * when the app is run (using `-XX:+AutoCreateSharedArchive`).
+         *
+         * Pros:
+         * - Simplest - no additional step is needed to build the archive.
+         * - Creates a smaller distributable.
+         *
+         * Cons:
+         * - Requires JDK 19 or later.
+         * - The archive is not available at the first execution of the app,
+         *   so it is slower. The archive is created when at shutdown time
+         *   of the first execution, which also takes a little longer.
+         */
+        @Suppress("unused")
+        val Auto = object : AppCdsMode() {
+            private val MIN_JDK_VERSION = 19
+            override val generateJreClassesArchive: Boolean get() = true
+            override fun runtimeJvmArgs() =
+                listOf(
+                    "-XX:SharedArchiveFile=\$APPDIR/$ARCHIVE_NAME",
+                    "-XX:+AutoCreateSharedArchive"
+                )
+            override fun checkJdkCompatibility(jdkMajorVersion: Int) {
+                if (jdkMajorVersion < MIN_JDK_VERSION) {
+                    error(
+                        "AppCdsMode '$this' is not supported on JDK earlier than" +
+                                " $MIN_JDK_VERSION; current is $jdkMajorVersion"
+                    )
+                }
+            }
+            override fun toString() = "Auto"
+        }
+
+        /**
+         * AppCDS is used via a dynamic shared archive created by executing
+         * the app before packaging (using `-XX:ArchiveClassesAtExit`).
+         *
+         * Pros:
+         * - Can be used with JDKs earlier than 19.
+         * - The first run of the distributed app is fast too.
+         *
+         * Cons:
+         * - Requires an additional step of running the app when building the
+         *   distributable.
+         * - The distributable is larger because it includes the archive of
+         *   the app's classes.
+         */
+        @Suppress("unused")
+        val Prebuild = object : AppCdsMode() {
+            override val generateJreClassesArchive: Boolean get() = true
+            override val generateAppClassesArchive: Boolean get() = true
+            override fun appClassesArchiveCreationJvmArgs() =
+                listOf(
+                    "-XX:ArchiveClassesAtExit=\$APPDIR/$ARCHIVE_NAME",
+                    "-Dcompose.cds.create-archive=true"
+                )
+            override fun appClassesArchiveFile(packagedAppRootDir: File): File {
+                val appDir = packagedAppJarFilesDir(packagedAppRootDir)
+                return appDir.resolve(ARCHIVE_NAME)
+            }
+            override fun runtimeJvmArgs() =
+                listOf(
+                    "-XX:SharedArchiveFile=\$APPDIR/$ARCHIVE_NAME",
+                )
+
+            override fun toString() = "Prebuild"
+        }
+    }
+}

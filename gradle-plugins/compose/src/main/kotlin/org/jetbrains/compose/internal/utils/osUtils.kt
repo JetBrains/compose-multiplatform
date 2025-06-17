@@ -5,7 +5,9 @@
 
 package org.jetbrains.compose.internal.utils
 
+import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
+import org.gradle.process.ExecOperations
 import org.jetbrains.compose.desktop.application.internal.files.checkExistingFile
 import org.jetbrains.compose.desktop.application.tasks.MIN_JAVA_RUNTIME_VERSION
 import java.io.File
@@ -51,6 +53,51 @@ internal val currentOS: OS by lazy {
 
 internal fun executableName(nameWithoutExtension: String): String =
     if (currentOS == OS.Windows) "$nameWithoutExtension.exe" else nameWithoutExtension
+
+internal fun packagedAppRootDir(appImageRootDir: Directory): File {
+    return appImageRootDir.asFile.let { appImageRoot ->
+        val files = appImageRoot.listFiles()
+            // Sometimes ".DS_Store" files are created on macOS, so ignore them.
+            ?.filterNot { it.name == ".DS_Store" }
+        if (files.isNullOrEmpty()) {
+            error("Could not find application image: $appImageRoot is empty!")
+        } else if (files.size > 1) {
+            error("Could not find application image: $appImageRoot contains multiple children [${files.joinToString(", ")}]")
+        } else files.single()
+    }
+}
+
+internal fun packagedAppExecutableName(packageName: String): String {
+    val appExecutableName = executableName(packageName)
+    return when (currentOS) {
+        OS.Linux ->  "bin/$appExecutableName"
+        OS.Windows -> appExecutableName
+        OS.MacOS -> "Contents/MacOS/$appExecutableName"
+    }
+}
+
+internal fun packagedAppJarFilesDir(packagedRootDir: File): File {
+    return packagedRootDir.resolve(
+        when (currentOS) {
+            OS.Linux -> "lib/app/"
+            OS.Windows -> "app/"
+            OS.MacOS -> "Contents/app/"
+        }
+    )
+}
+
+internal fun ExecOperations.executePackagedApp(
+    appImageRootDir: Directory,
+    packageName: String
+) {
+    val workingDir = packagedAppRootDir(appImageRootDir = appImageRootDir)
+    val executableName = packagedAppExecutableName(packageName = packageName)
+
+    exec { spec ->
+        spec.workingDir(workingDir)
+        spec.executable(workingDir.resolve(executableName).absolutePath)
+    }.assertNormalExitValue()
+}
 
 internal fun javaExecutable(javaHome: String): String =
     File(javaHome).resolve("bin/${executableName("java")}").absolutePath
