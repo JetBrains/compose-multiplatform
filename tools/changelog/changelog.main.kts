@@ -90,7 +90,7 @@ when (argsKeyToValue["action"]) {
 
 fun generateChangelog() {
     if (token == null) {
-        println("To increase the rate limit, specify token (https://github.com/settings/tokens), adding token=yourtoken in the end")
+        println("To increase the rate limit, specify token (https://github.com/settings/tokens), adding token=yourtoken in the end\n")
     }
 
     val commitsArg = argsKeyless.getOrNull(0) ?: "HEAD"
@@ -194,9 +194,12 @@ fun generateChangelog() {
                             appendLine()
                             subsectionEntries.forEach {
                                 if (it.link != null) {
-                                    appendLine(it.run { "$message [#$prNumber]($link)" })
+                                    appendLine(it.run { "$title [#$prNumber]($link)" })
                                 } else {
-                                    appendLine(it.message)
+                                    appendLine(it.title)
+                                }
+                                if (it.details != null) {
+                                    appendLine(it.details)
                                 }
                             }
                             appendLine()
@@ -315,7 +318,7 @@ fun currentChangelogDate() = LocalDate.now().format(DateTimeFormatter.ofPattern(
 fun GitHubPullEntry.extractReleaseNotes() = extractReleaseNotes(body, number, htmlUrl)
 
 fun GitHubPullEntry.unknownChangelogEntries() =
-    listOf(ChangelogEntry("- $title", null, null, number, htmlUrl, false))
+    listOf(ChangelogEntry("- $title", null, null, null, number, htmlUrl, false))
 
 /**
  * Extract by format [PR_FORMAT.md]
@@ -352,50 +355,36 @@ fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNo
 
     if (pullRequests.isNotEmpty()) return ReleaseNotes.CherryPicks(pullRequests)
 
-    val list = mutableListOf<ChangelogEntry>()
-    var section: String? = null
-    var subsection: String? = null
-    var isFirstLine = true
-    var isPrerelease = false
+    class RawSectionEntry(val section: String?, val subsection: String?, val body: String)
+    class RawChangeEntry(val section: RawSectionEntry, val body: String)
 
-    for (line in relNoteBody.split("\n")) {
-        // parse "## Section - Subsection"
-        if (line.trim().startsWith("#")) {
-            val s = line.trimStart { it == '#' || it.isWhitespace() }
-            section = s.substringBefore("-", "").trim().normalizeSectionName().ifEmpty { null }
-            subsection = s.substringAfter("-", "").trim().normalizeSubsectionName().ifEmpty { null }
-            isFirstLine = true
-            isPrerelease = false
-        } else if (section != null && line.isNotBlank()) {
-            var lineFixed = line
-
-            if (isFirstLine && !lineFixed.startsWith("-")) {
-                lineFixed = "- $lineFixed"
-            }
-            if (!isFirstLine && !lineFixed.startsWithAny("  ", "-")) {
-                lineFixed = "  $lineFixed"
-            }
-            lineFixed = lineFixed.trimEnd().removeSuffix(".")
-
-            val isTopLevel = lineFixed.startsWith("-")
-            if (isTopLevel) {
-                isPrerelease = lineFixed.contains("(prerelease fix)")
-            }
-            list.add(
-                ChangelogEntry(
-                    lineFixed,
-                    section,
-                    subsection,
-                    prNumber,
-                    prLink.takeIf { isTopLevel },
-                    isPrerelease
+    // Extract bodies between "## Section - Subsection"
+    fun String.splitBySections(): List<RawSectionEntry> =
+        this
+            .split(Regex("\\n.\\s#"))
+            .mapNotNull {
+                val firstLine = it.substringBefore("\n").trimStart { it == '#' || it.isWhitespace() }.trimEnd()
+                val body = it.substringAfter("\n").trim()
+                RawSectionEntry(
+                    section = firstLine.substringBefore("-", "")
+                        .trim().normalizeSectionName().ifEmpty { return@mapNotNull null },
+                    subsection = firstLine.substringAfter("-", "")
+                        .trim().normalizeSubsectionName().ifEmpty { return@mapNotNull null },
+                    body
                 )
-            )
-            isFirstLine = false
-        }
-    }
+            }
 
-    return ReleaseNotes.Specified(list)
+    // Extract bodies for individual "- title\ndetails"
+    fun RawSectionEntry.splitByChanges(): List<ChangelogEntry> =
+        body
+            .split("\n")
+            .joinToString("\n") { it.trim() }
+            .split("\n#")
+
+    return relNoteBody
+        .splitBySections()
+        .flatMap { it.splitByChanges() }
+        .let { ReleaseNotes.Specified(it) }
 }
 
 /**
@@ -410,14 +399,14 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
 
     val shaToPull = pulls.associateBy { it.mergeCommitSha }
     val numberToPull = pulls.associateBy { it.number }
-    val pullToReleaseNotes = Cache( GitHubPullEntry::extractReleaseNotes)
+    val pullToReleaseNotes = Cache(GitHubPullEntry::extractReleaseNotes)
 
     // if GitHubPullEntry is a cherry-picks PR (contains a list of links to other PRs), replace it by the original PRs
     fun List<GitHubPullEntry>.replaceCherryPicks(): List<GitHubPullEntry> = flatMap { pullRequest ->
         val releaseNotes = pullToReleaseNotes[pullRequest]
         if (releaseNotes is ReleaseNotes.CherryPicks) {
             releaseNotes.pullRequests
-                .filter { it.repo == repo }
+                .filter { it.repo.equals(repo, ignoreCase = true) }
                 .mapNotNull { numberToPull[it.number] }
         } else {
             listOf(pullRequest)
@@ -562,7 +551,8 @@ sealed interface ReleaseNotes {
 }
 
 data class ChangelogEntry(
-    val message: String,
+    val title: String,
+    val details: String?,
     val section: String?,
     val subsection: String?,
     val prNumber: Int,
@@ -572,7 +562,7 @@ data class ChangelogEntry(
     /**
      * Unique entry id used for excluding cherry-picked entries
      */
-    val id: UUID = UUID.nameUUIDFromBytes((section + subsection + message).toByteArray(Charsets.UTF_8))
+    val id: UUID = UUID.nameUUIDFromBytes((section + subsection + title + details).toByteArray(Charsets.UTF_8))
 }
 
 fun ChangelogEntry.sectionOrder(): Int = section?.let(standardSections::indexOf) ?: standardSections.size
