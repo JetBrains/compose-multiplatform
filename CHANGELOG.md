@@ -52,7 +52,6 @@ _Changes since 1.8.1_
   - [Material 1.8.2](https://developer.android.com/jetpack/androidx/releases/compose-material#1.8.2)
   - [Material3 1.3.2](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.2)
 
-- Graphics-Shapes library `org.jetbrains.androidx.graphics:graphics-shapes:1.0.0-alpha07`. Based on [Jetpack Graphics-Shapes 1.0.1](https://developer.android.com/jetpack/androidx/releases/graphics#graphics-shapes-#1.0.1)
 - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.1`. Based on [Jetpack Lifecycle 2.9.1](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.1)
 - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.1.2`. Based on [Jetpack Material3 Adaptive 1.1.0](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.1.0)
 - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0-beta03`. Based on [Jetpack Navigation 2.9.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.0)
