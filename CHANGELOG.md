@@ -1,3 +1,66 @@
+# 1.8.2 (June 2025)
+
+_Changes since 1.8.1_
+
+## Fixes
+
+### Multiple Platforms
+
+- Fixed `TextField(TextFieldValue)` when used with a visual transformation with a non-identity offset mapping (potentially even crashing) [#2130](https://github.com/JetBrains/compose-multiplatform-core/pull/2130)
+- Fixed a memory leak and performance degradation when `ComposeUiFlags.isRectTrackingEnabled` set to `true` (by default) [#2123](https://github.com/JetBrains/compose-multiplatform-core/pull/2123)
+- Fixed caret placement near glyphs if glyphs are compound symbols and part of them are non-spacing marks [#2155](https://github.com/JetBrains/compose-multiplatform-core/pull/2155)
+- Support Preview parameters for Previews in common source sets in IJ and AS. Note: IDEs also need to implement support on their end. Please check the respective IDE release notes to confirm this is supported [#5323](https://github.com/JetBrains/compose-multiplatform/pull/5323)
+  
+  Example usage:
+  
+  ```
+  import androidx.compose.runtime.Composable
+  import org.jetbrains.compose.ui.tooling.preview.Preview
+  import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
+  import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
+  
+  class MyPreviewParameterProvider : PreviewParameterProvider<String> {
+    override val values = sequenceOf("Hello, Compose!", "Hello, World!")
+  }
+  
+  /**
+   * This function will generate two preview images with different texts.
+   */
+  @Preview
+  @Composable
+  fun MyPreview(@PreviewParameter(MyPreviewParameterProvider::class) text: String) {
+    Text(text)
+  }
+  ```
+  
+
+### Desktop
+
+- Fix the positioning of the IME popup being too far away from the text, on screens with density greater than `1.0` [#2158](https://github.com/JetBrains/compose-multiplatform-core/pull/2158)
+
+### Navigation
+
+- Fix the browser navigation integration problem due encoded routes [#2143](https://github.com/JetBrains/compose-multiplatform-core/pull/2143)
+- Fix a crash on iOS when a `NavHost` is located in a scrollable container [#2146](https://github.com/JetBrains/compose-multiplatform-core/pull/2146)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.8.2`. Based on Jetpack Compose libraries:
+  - [Runtime 1.8.2](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.8.2)
+  - [UI 1.8.2](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.8.2)
+  - [Foundation 1.8.2](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.8.2)
+  - [Material 1.8.2](https://developer.android.com/jetpack/androidx/releases/compose-material#1.8.2)
+  - [Material3 1.3.2](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.2)
+
+- Graphics-Shapes library `org.jetbrains.androidx.graphics:graphics-shapes:1.0.0-alpha07`. Based on [Jetpack Graphics-Shapes 1.0.1](https://developer.android.com/jetpack/androidx/releases/graphics#graphics-shapes-#1.0.1)
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.1`. Based on [Jetpack Lifecycle 2.9.1](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.1)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.1.2`. Based on [Jetpack Material3 Adaptive 1.1.0](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.1.0)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0-beta03`. Based on [Jetpack Navigation 2.9.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.0)
+- Savedstate library `org.jetbrains.androidx.savedstate:savedstate:1.3.1`. Based on [Jetpack Savedstate 1.3.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.3.0)
+- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.4.0-alpha07`. Based on [Jetpack WindowManager 1.4.0-alpha04](https://developer.android.com/jetpack/androidx/releases/window#1.4.0-alpha04)
+
+---
+
 # 1.9.0-alpha02 (June 2025)
 
 _Changes since 1.8.1_
