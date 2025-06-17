@@ -30,9 +30,8 @@ actual fun getDefaultResourceReader(): ResourceReader =
     }
 
 object DefaultWasmResourceReader : ResourceReader {
-    override suspend fun read(path: String): ByteArray {
-        return readAsBlob(path).asByteArray()
-    }
+    override suspend fun read(path: String): ByteArray =
+        readAsBlob(path).asByteArray()
 
     override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
         val part = readAsBlob(path).slice(offset.toInt(), (offset + size).toInt())
@@ -116,14 +115,16 @@ private object TestWasmResourceReader : ResourceReader {
 // For blocking XmlHttpRequest the response can be only in text form, so we convert it to bytes manually
 private fun requestResponseAsByteArray(req: XMLHttpRequest): Int8Array =
     js(
-        """ {
+    """
+    {
         var text = req.responseText;
         var int8Arr = new Int8Array(text.length);
         for (var i = 0; i < text.length; i++) {
             int8Arr[i] = text.charCodeAt(i) & 0xFF;
         }
         return int8Arr;
-    }"""
+    }
+    """
     )
 
 private fun isInTestEnvironment(): Boolean =

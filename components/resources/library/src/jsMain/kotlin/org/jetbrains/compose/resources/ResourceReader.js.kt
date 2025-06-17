@@ -16,9 +16,8 @@ actual fun getDefaultResourceReader(): ResourceReader =
     }
 
 object DefaultJsResourceReader : ResourceReader {
-    override suspend fun read(path: String): ByteArray {
-        return readAsBlob(path).asByteArray()
-    }
+    override suspend fun read(path: String): ByteArray =
+        readAsBlob(path).asByteArray()
 
     override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
         val part = readAsBlob(path).slice(offset.toInt(), (offset + size).toInt())

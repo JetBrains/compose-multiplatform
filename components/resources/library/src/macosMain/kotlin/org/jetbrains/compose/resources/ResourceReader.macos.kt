@@ -29,14 +29,11 @@ object DefaultMacOsResourceReader : ResourceReader {
         }
     }
 
-    override fun getUri(path: String): String {
-        return NSURL.fileURLWithPath(getPathOnDisk(path)).toString()
-    }
+    override fun getUri(path: String): String =
+        NSURL.fileURLWithPath(getPathOnDisk(path)).toString()
 
-    private fun readData(path: String): NSData {
-        return NSFileManager.defaultManager().contentsAtPath(path)
-            ?: throw MissingResourceException(path)
-    }
+    private fun readData(path: String): NSData =
+        NSFileManager.defaultManager().contentsAtPath(path) ?: throw MissingResourceException(path)
 
     private fun readData(path: String, offset: Long, size: Long): NSData {
         val fileHandle =

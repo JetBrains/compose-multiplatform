@@ -45,14 +45,11 @@ object DefaultIOsResourceReader : ResourceReader {
         }
     }
 
-    override fun getUri(path: String): String {
-        return NSURL.fileURLWithPath(getPathInBundle(path)).toString()
-    }
+    override fun getUri(path: String): String =
+        NSURL.fileURLWithPath(getPathInBundle(path)).toString()
 
-    private fun readData(path: String): NSData {
-        return NSFileManager.defaultManager().contentsAtPath(path)
-            ?: throw MissingResourceException(path)
-    }
+    private fun readData(path: String): NSData =
+        NSFileManager.defaultManager().contentsAtPath(path) ?: throw MissingResourceException(path)
 
     private fun readData(path: String, offset: Long, size: Long): NSData {
         val fileHandle =
@@ -71,9 +68,8 @@ object DefaultIOsResourceReader : ResourceReader {
         return result
     }
 
-    private fun getPathInBundle(path: String): String {
-        return "$composeResourcesDir/$path"
-    }
+    private fun getPathInBundle(path: String): String =
+        "$composeResourcesDir/$path"
 
     /**
      * Determines the path to the compose resources directory.

@@ -2,10 +2,10 @@ package org.jetbrains.compose.resources
 
 import java.io.InputStream
 
-internal actual fun getDefaultResourceReader(): ResourceReader =
+actual fun getDefaultResourceReader(): ResourceReader =
     JvmResourceReader.DEFAULT
 
-internal class JvmResourceReader(
+class JvmResourceReader(
     private val classLoader: ClassLoader = JvmResourceReader::class.java.classLoader
 ) : ResourceReader {
 

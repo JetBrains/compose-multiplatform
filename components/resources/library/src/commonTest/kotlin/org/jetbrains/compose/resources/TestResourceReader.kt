@@ -14,7 +14,6 @@ internal class TestResourceReader : ResourceReader {
         return getDefaultResourceReader().readPart(path, offset, size)
     }
 
-    override fun getUri(path: String): String {
-        return getDefaultResourceReader().getUri(path)
-    }
+    override fun getUri(path: String): String =
+        getDefaultResourceReader().getUri(path)
 }
