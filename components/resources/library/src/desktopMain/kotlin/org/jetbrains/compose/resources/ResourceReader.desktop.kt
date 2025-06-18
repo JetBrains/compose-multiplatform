@@ -3,14 +3,14 @@ package org.jetbrains.compose.resources
 import java.io.InputStream
 
 actual fun getDefaultResourceReader(): ResourceReader =
-    JvmResourceReader.DEFAULT
+    JvmResourceReader.Default
 
 class JvmResourceReader(
     private val classLoader: ClassLoader = JvmResourceReader::class.java.classLoader
 ) : ResourceReader {
 
     companion object {
-        val DEFAULT = JvmResourceReader()
+        val Default = JvmResourceReader()
     }
 
     override suspend fun read(path: String): ByteArray =
