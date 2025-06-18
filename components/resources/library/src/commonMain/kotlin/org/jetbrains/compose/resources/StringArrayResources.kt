@@ -1,13 +1,8 @@
 package org.jetbrains.compose.resources
 
-import androidx.compose.runtime.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
-import org.jetbrains.compose.resources.plural.PluralCategory
-import org.jetbrains.compose.resources.plural.PluralRuleList
-import org.jetbrains.compose.resources.vector.xmldom.Element
-import org.jetbrains.compose.resources.vector.xmldom.NodeList
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
 
 /**
  * Represents a string array resource in the application.
@@ -46,7 +41,7 @@ fun stringArrayResource(resource: StringArrayResource): List<String> {
  * @throws IllegalStateException if the string array with the given ID is not found.
  */
 suspend fun getStringArray(resource: StringArrayResource): List<String> =
-    loadStringArray(resource, DefaultResourceReader, getSystemResourceEnvironment())
+    loadStringArray(resource, getDefaultResourceReader(), getSystemResourceEnvironment())
 
 /**
  * Loads a list of strings using the specified string array resource.
@@ -60,7 +55,7 @@ suspend fun getStringArray(resource: StringArrayResource): List<String> =
 suspend fun getStringArray(
     environment: ResourceEnvironment,
     resource: StringArrayResource
-): List<String> = loadStringArray(resource, DefaultResourceReader, environment)
+): List<String> = loadStringArray(resource, getDefaultResourceReader(), environment)
 
 private suspend fun loadStringArray(
     resource: StringArrayResource,

@@ -135,7 +135,7 @@ suspend fun getDrawableResourceBytes(
     resource: DrawableResource
 ): ByteArray {
     val resourceItem = resource.getResourceItemByEnvironment(environment)
-    return DefaultResourceReader.read(resourceItem.path)
+    return getDefaultResourceReader().read(resourceItem.path)
 }
 
 internal expect fun ByteArray.toImageBitmap(resourceDensity: Int, targetDensity: Int): ImageBitmap

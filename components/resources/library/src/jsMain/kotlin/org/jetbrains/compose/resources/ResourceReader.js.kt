@@ -9,15 +9,17 @@ import org.w3c.files.Blob
 import org.w3c.xhr.XMLHttpRequest
 import kotlin.js.Promise
 
-internal actual fun getPlatformResourceReader(): ResourceReader {
-    if (isInTestEnvironment()) return TestJsResourceReader
-    return DefaultJsResourceReader
-}
-
-private val DefaultJsResourceReader = object : ResourceReader {
-    override suspend fun read(path: String): ByteArray {
-        return readAsBlob(path).asByteArray()
+@ExperimentalResourceApi
+actual fun getDefaultResourceReader(): ResourceReader =
+    when {
+        isInTestEnvironment() -> TestResourceReader
+        else -> DefaultJsResourceReader
     }
+
+@ExperimentalResourceApi
+object DefaultJsResourceReader : ResourceReader {
+    override suspend fun read(path: String): ByteArray =
+        readAsBlob(path).asByteArray()
 
     override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
         val part = readAsBlob(path).slice(offset.toInt(), (offset + size).toInt())
@@ -45,37 +47,34 @@ private val DefaultJsResourceReader = object : ResourceReader {
     }
 }
 
-// It uses a synchronous XmlHttpRequest (blocking!!!)
-private val TestJsResourceReader by lazy {
-    object : ResourceReader {
-        override suspend fun read(path: String): ByteArray {
-            return readByteArray(path)
-        }
+private object TestResourceReader : ResourceReader {
+    override suspend fun read(path: String): ByteArray {
+        return readByteArray(path)
+    }
 
-        override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
-            return readByteArray(path).sliceArray(offset.toInt() until (offset + size).toInt())
-        }
+    override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
+        return readByteArray(path).sliceArray(offset.toInt() until (offset + size).toInt())
+    }
 
-        override fun getUri(path: String): String {
-            val location = window.location
-            return getResourceUrl(location.origin, location.pathname, path)
-        }
+    override fun getUri(path: String): String {
+        val location = window.location
+        return getResourceUrl(location.origin, location.pathname, path)
+    }
 
-        private fun readByteArray(path: String): ByteArray {
-            val resPath = WebResourcesConfiguration.getResourcePath(path)
-            val request = XMLHttpRequest()
-            request.open("GET", resPath, false)
-            request.overrideMimeType("text/plain; charset=x-user-defined")
-            request.send()
-            if (request.status == 200.toShort()) {
-                // For blocking XmlHttpRequest the response can be only in text form, so we convert it to bytes manually
-                val text = request.responseText
-                val bytes = Uint8Array(text.length)
-                js("for (var i = 0; i < text.length; i++) { bytes[i] = text.charCodeAt(i) & 0xFF; }")
-                return bytes.unsafeCast<ByteArray>()
-            }
-            throw MissingResourceException("$resPath")
+    private fun readByteArray(path: String): ByteArray {
+        val resPath = WebResourcesConfiguration.getResourcePath(path)
+        val request = XMLHttpRequest()
+        request.open("GET", resPath, false)
+        request.overrideMimeType("text/plain; charset=x-user-defined")
+        request.send()
+        if (request.status == 200.toShort()) {
+            // For blocking XmlHttpRequest the response can be only in text form, so we convert it to bytes manually
+            val text = request.responseText
+            val bytes = Uint8Array(text.length)
+            js("for (var i = 0; i < text.length; i++) { bytes[i] = text.charCodeAt(i) & 0xFF; }")
+            return bytes.unsafeCast<ByteArray>()
         }
+        throw MissingResourceException(resPath)
     }
 }
 

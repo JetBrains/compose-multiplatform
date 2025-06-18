@@ -13,7 +13,7 @@ class MissingResourceException(path: String) : Exception("Missing resource with 
  * @return The content of the file as a byte array.
  */
 @InternalResourceApi
-suspend fun readResourceBytes(path: String): ByteArray = DefaultResourceReader.read(path)
+suspend fun readResourceBytes(path: String): ByteArray = getDefaultResourceReader().read(path)
 
 /**
  * Provides the platform dependent URI for a given resource path.
@@ -22,20 +22,22 @@ suspend fun readResourceBytes(path: String): ByteArray = DefaultResourceReader.r
  * @return The URI string of the specified resource.
  */
 @InternalResourceApi
-fun getResourceUri(path: String): String = DefaultResourceReader.getUri(path)
+fun getResourceUri(path: String): String = getDefaultResourceReader().getUri(path)
 
-internal interface ResourceReader {
+@ExperimentalResourceApi
+interface ResourceReader {
     suspend fun read(path: String): ByteArray
     suspend fun readPart(path: String, offset: Long, size: Long): ByteArray
     fun getUri(path: String): String
 }
 
-internal expect fun getPlatformResourceReader(): ResourceReader
-
-internal val DefaultResourceReader = getPlatformResourceReader()
+@ExperimentalResourceApi
+expect fun getDefaultResourceReader(): ResourceReader
 
 //ResourceReader provider will be overridden for tests
-internal val LocalResourceReader = staticCompositionLocalOf { DefaultResourceReader }
+@ExperimentalResourceApi
+val LocalResourceReader =
+    staticCompositionLocalOf { getDefaultResourceReader() }
 
 //For an android preview we need to initialize the resource reader with the local context
 internal expect val ProvidableCompositionLocal<ResourceReader>.currentOrPreview: ResourceReader

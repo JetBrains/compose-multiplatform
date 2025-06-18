@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalComposeLibrary::class, ExperimentalWasmDsl::class)
+
 import kotlinx.validation.ExperimentalBCVApi
 import org.jetbrains.compose.ExperimentalComposeLibrary
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     kotlin("multiplatform")
@@ -25,25 +28,24 @@ kotlin {
     iosSimulatorArm64()
     js {
         browser {
-            testTask(Action {
+            testTask {
                 enabled = false
-            })
+            }
         }
     }
 
-    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs {
         compilations.getByName("test").compileTaskProvider.configure {
             // https://youtrack.jetbrains.com/issue/KT-69014
             compilerOptions.freeCompilerArgs.add("-Xwasm-enable-array-range-checks")
         }
         browser {
-            testTask(Action {
+            testTask {
                 useKarma {
                     useChromeHeadless()
                     useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("wasm"))
                 }
-            })
+            }
         }
         binaries.executable()
     }
@@ -83,7 +85,6 @@ kotlin {
                 implementation(kotlin("test"))
                 implementation(libs.kotlinx.coroutines.test)
                 implementation(compose.material3)
-                @OptIn(ExperimentalComposeLibrary::class)
                 implementation(compose.uiTest)
             }
         }
@@ -214,6 +215,18 @@ apiValidation {
 tasks.register<GeneratePluralRuleListsTask>("generatePluralRuleLists") {
     val projectDir = project.layout.projectDirectory
     pluralsFile = projectDir.file("CLDRPluralRules/plurals.xml")
-    outputFile = projectDir.file("src/commonMain/kotlin/org/jetbrains/compose/resources/plural/CLDRPluralRuleLists.kt")
-    samplesOutputFile = projectDir.file("src/commonTest/kotlin/org/jetbrains/compose/resources/CLDRPluralRuleLists.test.kt")
+    outputFile =
+        projectDir.file("src/commonMain/kotlin/org/jetbrains/compose/resources/plural/CLDRPluralRuleLists.kt")
+    samplesOutputFile =
+        projectDir.file("src/commonTest/kotlin/org/jetbrains/compose/resources/CLDRPluralRuleLists.test.kt")
+}
+
+tasks {
+    val desktopTestProcessResources =
+        named<ProcessResources>("desktopTestProcessResources")
+
+    withType<Test> {
+        dependsOn(desktopTestProcessResources)
+        environment("RESOURCES_PATH", desktopTestProcessResources.map { it.destinationDir.absolutePath }.get())
+    }
 }

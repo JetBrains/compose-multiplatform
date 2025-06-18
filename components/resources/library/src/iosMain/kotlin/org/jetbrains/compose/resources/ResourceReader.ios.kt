@@ -1,6 +1,5 @@
 package org.jetbrains.compose.resources
 
-import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.BooleanVar
 import kotlinx.cinterop.ObjCObjectVar
 import kotlinx.cinterop.addressOf
@@ -25,8 +24,11 @@ import platform.Foundation.readDataOfLength
 import platform.Foundation.seekToFileOffset
 import platform.posix.memcpy
 
-@OptIn(BetaInteropApi::class)
-internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
+@ExperimentalResourceApi
+actual fun getDefaultResourceReader(): ResourceReader = DefaultIOsResourceReader
+
+@ExperimentalResourceApi
+object DefaultIOsResourceReader : ResourceReader {
     private val composeResourcesDir: String by lazy { findComposeResourcesPath() }
 
     override suspend fun read(path: String): ByteArray {
@@ -43,16 +45,15 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         }
     }
 
-    override fun getUri(path: String): String {
-        return NSURL.fileURLWithPath(getPathInBundle(path)).toString()
-    }
+    override fun getUri(path: String): String =
+        NSURL.fileURLWithPath(getPathInBundle(path)).toString()
 
-    private fun readData(path: String): NSData {
-        return NSFileManager.defaultManager().contentsAtPath(path) ?: throw MissingResourceException(path)
-    }
+    private fun readData(path: String): NSData =
+        NSFileManager.defaultManager().contentsAtPath(path) ?: throw MissingResourceException(path)
 
     private fun readData(path: String, offset: Long, size: Long): NSData {
-        val fileHandle = NSFileHandle.fileHandleForReadingAtPath(path) ?: throw MissingResourceException(path)
+        val fileHandle =
+            NSFileHandle.fileHandleForReadingAtPath(path) ?: throw MissingResourceException(path)
         if (available(OS.Ios to OSVersion(major = 13))) {
             memScoped {
                 val error = alloc<ObjCObjectVar<NSError?>>()
@@ -67,9 +68,8 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         return result
     }
 
-    private fun getPathInBundle(path: String): String {
-        return "$composeResourcesDir/$path"
-    }
+    private fun getPathInBundle(path: String): String =
+        "$composeResourcesDir/$path"
 
     /**
      * Determines the path to the compose resources directory.
@@ -81,7 +81,8 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
     private fun findComposeResourcesPath(): String {
         val mainBundle = NSBundle.mainBundle
         val fm = NSFileManager.defaultManager()
-        val frameworkDirs = fm.findSubDirs(mainBundle.resourcePath + "/Frameworks") { it.endsWith(".framework") }
+        val frameworkDirs =
+            fm.findSubDirs(mainBundle.resourcePath + "/Frameworks") { it.endsWith(".framework") }
         val frameworkResourcesDir = frameworkDirs.firstOrNull { frameworkDir ->
             fm.findSubDirs(frameworkDir) { it.endsWith("composeResources") }.isNotEmpty()
         }
@@ -89,7 +90,10 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
         return frameworkResourcesDir ?: defaultDir
     }
 
-    private fun NSFileManager.findSubDirs(parentDir: String, filter: (String) -> Boolean): List<String> = memScoped {
+    private fun NSFileManager.findSubDirs(
+        parentDir: String,
+        filter: (String) -> Boolean
+    ): List<String> = memScoped {
         if (!fileExistsAtPath(parentDir)) return emptyList()
         val contents = contentsOfDirectoryAtURL(
             url = NSURL(fileURLWithPath = parentDir),
