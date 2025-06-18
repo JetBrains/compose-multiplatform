@@ -24,15 +24,18 @@ suspend fun readResourceBytes(path: String): ByteArray = getDefaultResourceReade
 @InternalResourceApi
 fun getResourceUri(path: String): String = getDefaultResourceReader().getUri(path)
 
+@ExperimentalResourceApi
 interface ResourceReader {
     suspend fun read(path: String): ByteArray
     suspend fun readPart(path: String, offset: Long, size: Long): ByteArray
     fun getUri(path: String): String
 }
 
+@ExperimentalResourceApi
 expect fun getDefaultResourceReader(): ResourceReader
 
 //ResourceReader provider will be overridden for tests
+@ExperimentalResourceApi
 val LocalResourceReader =
     staticCompositionLocalOf { getDefaultResourceReader() }
 

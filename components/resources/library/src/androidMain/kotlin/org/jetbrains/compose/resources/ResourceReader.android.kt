@@ -8,8 +8,10 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import java.io.FileNotFoundException
 import java.io.InputStream
 
+@ExperimentalResourceApi
 actual fun getDefaultResourceReader(): ResourceReader = DefaultAndroidResourceReader
 
+@ExperimentalResourceApi
 object DefaultAndroidResourceReader : ResourceReader {
     private val assets: AssetManager by lazy {
         val context = androidContext ?: error(

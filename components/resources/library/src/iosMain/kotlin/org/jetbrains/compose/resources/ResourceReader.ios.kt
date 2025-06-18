@@ -1,6 +1,5 @@
 package org.jetbrains.compose.resources
 
-import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.BooleanVar
 import kotlinx.cinterop.ObjCObjectVar
 import kotlinx.cinterop.addressOf
@@ -25,9 +24,10 @@ import platform.Foundation.readDataOfLength
 import platform.Foundation.seekToFileOffset
 import platform.posix.memcpy
 
-@OptIn(BetaInteropApi::class)
+@ExperimentalResourceApi
 actual fun getDefaultResourceReader(): ResourceReader = DefaultIOsResourceReader
 
+@ExperimentalResourceApi
 object DefaultIOsResourceReader : ResourceReader {
     private val composeResourcesDir: String by lazy { findComposeResourcesPath() }
 

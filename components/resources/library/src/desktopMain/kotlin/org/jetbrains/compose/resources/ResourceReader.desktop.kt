@@ -2,9 +2,11 @@ package org.jetbrains.compose.resources
 
 import java.io.InputStream
 
+@ExperimentalResourceApi
 actual fun getDefaultResourceReader(): ResourceReader =
     JvmResourceReader.Default
 
+@ExperimentalResourceApi
 class JvmResourceReader(
     private val classLoader: ClassLoader = JvmResourceReader::class.java.classLoader
 ) : ResourceReader {

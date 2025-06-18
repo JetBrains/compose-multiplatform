@@ -9,12 +9,14 @@ import org.w3c.files.Blob
 import org.w3c.xhr.XMLHttpRequest
 import kotlin.js.Promise
 
+@ExperimentalResourceApi
 actual fun getDefaultResourceReader(): ResourceReader =
     when {
         isInTestEnvironment() -> TestResourceReader
         else -> DefaultJsResourceReader
     }
 
+@ExperimentalResourceApi
 object DefaultJsResourceReader : ResourceReader {
     override suspend fun read(path: String): ByteArray =
         readAsBlob(path).asByteArray()

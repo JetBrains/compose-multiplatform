@@ -12,8 +12,10 @@ import platform.Foundation.fileHandleForReadingAtPath
 import platform.Foundation.readDataOfLength
 import platform.posix.memcpy
 
+@ExperimentalResourceApi
 actual fun getDefaultResourceReader(): ResourceReader = DefaultMacOsResourceReader
 
+@ExperimentalResourceApi
 object DefaultMacOsResourceReader : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         val data = readData(getPathOnDisk(path))

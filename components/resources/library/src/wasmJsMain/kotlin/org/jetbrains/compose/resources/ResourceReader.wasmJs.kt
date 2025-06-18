@@ -23,12 +23,14 @@ private external fun jsExportInt8ArrayToWasm(src: Int8Array, size: Int, dstAddr:
 @JsFun("(blob) => blob.arrayBuffer()")
 private external fun jsExportBlobAsArrayBuffer(blob: Blob): Promise<ArrayBuffer>
 
+@ExperimentalResourceApi
 actual fun getDefaultResourceReader(): ResourceReader =
     when {
         isInTestEnvironment() -> TestWasmResourceReader
         else -> DefaultWasmResourceReader
     }
 
+@ExperimentalResourceApi
 object DefaultWasmResourceReader : ResourceReader {
     override suspend fun read(path: String): ByteArray =
         readAsBlob(path).asByteArray()
