@@ -23,7 +23,7 @@ abstract class AbstractCreateAppCdsArchiveTask @Inject constructor(
     internal val packageName: Provider<String> = createDistributable.flatMap { it.packageName }
 
     @get:Input
-    internal val appCdsMode: Property<AppCdsMode> = objects.notNullProperty()
+    internal abstract val appCdsMode: Property<AppCdsMode>
 
     @Suppress("unused")
     @OutputFile

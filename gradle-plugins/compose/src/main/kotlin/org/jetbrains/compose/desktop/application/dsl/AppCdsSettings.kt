@@ -18,14 +18,14 @@ abstract class AppCdsConfiguration {
      */
     @Suppress("MemberVisibilityCanBePrivate")
     var logging: Boolean = false
+}
 
-    /**
-     * Returns the AppCDS-related arguments to pass the JVM when running the app.
-     */
-    internal fun runtimeJvmArgs() = buildList {
-        addAll(mode.runtimeJvmArgs())
-        if (logging) add("-Xlog:cds")
-    }
+/**
+ * Returns the AppCDS-related arguments to pass the JVM when running the app.
+ */
+internal fun AppCdsConfiguration.runtimeJvmArgs() = buildList {
+    addAll(mode.runtimeJvmArgs())
+    if (logging) add("-Xlog:cds")
 }
 
 /**
