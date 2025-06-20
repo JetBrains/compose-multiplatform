@@ -36,16 +36,16 @@ abstract class AbstractCreateAppCdsArchiveTask @Inject constructor(
     // Can't just use appImageRootDir because the AppCDS archive needs to be excluded
     @Suppress("unused")
     @get:InputFiles
-    internal val dependencyFiles: Provider<FileTree> = provider {
+    internal val dependencyFiles: FileTree get() {
         // If the app image root directory doesn't exist, return an empty file tree
         appImageRootDir.get().let {
             if (!it.asFile.isDirectory) {
-                return@provider it.asFileTree
+                return it.asFileTree
             }
         }
 
         val appCdsArchiveFile = appCdsArchiveFile.get().relativeTo(appImageRootDir.get().asFile).path
-        appImageRootDir.get().asFileTree.matching { it.exclude(appCdsArchiveFile) }
+        return appImageRootDir.get().asFileTree.matching { it.exclude(appCdsArchiveFile) }
     }
 
     @TaskAction
