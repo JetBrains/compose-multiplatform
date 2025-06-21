@@ -10,6 +10,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
+import org.jetbrains.compose.desktop.application.dsl.AppCdsConfiguration
 import org.jetbrains.compose.desktop.application.dsl.JvmApplicationDistributions
 import org.jetbrains.compose.desktop.application.dsl.JvmApplicationBuildTypes
 import org.jetbrains.compose.internal.utils.new
@@ -38,4 +39,5 @@ internal open class JvmApplicationData @Inject constructor(
     val jvmArgs: MutableList<String> = ArrayList()
     val nativeDistributions: JvmApplicationDistributions = objects.new()
     val buildTypes: JvmApplicationBuildTypes = objects.new()
+    val appCds: AppCdsConfiguration = objects.new()
 }

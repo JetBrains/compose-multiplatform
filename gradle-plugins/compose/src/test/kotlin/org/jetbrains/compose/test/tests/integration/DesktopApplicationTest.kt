@@ -6,6 +6,8 @@
 package org.jetbrains.compose.test.tests.integration
 
 import org.gradle.internal.impldep.org.testng.Assert
+import org.gradle.internal.jvm.inspection.JvmVendor
+import org.jetbrains.compose.desktop.application.dsl.AppCdsMode
 import org.jetbrains.compose.internal.utils.MacUtils
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentArch
@@ -33,6 +35,7 @@ import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.*
 import java.util.jar.JarFile
+import kotlin.test.assertFails
 
 class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
@@ -569,6 +572,87 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 file("wix311").checkNotExists()
             }
         }
+    }
+
+    @Suppress("SameParameterValue")
+    private fun appCdsProject(
+        appCdsMode: AppCdsMode,
+        javaVersion: Int,
+        javaVendor: JvmVendor.KnownJvmVendor = JvmVendor.KnownJvmVendor.ORACLE
+    ) : TestProject {
+        return testProject("application/appCds").apply {
+            modifyText("build.gradle.kts") {
+                it
+                    .replace("%APP_CDS_MODE%", "AppCdsMode.$appCdsMode")
+                    .replace("%JAVA_VERSION%", "$javaVersion")
+                    .replace("%JVM_VENDOR%", javaVendor.name)
+            }
+        }
+    }
+
+    @Test
+    fun testAppCdsAutoFailsOnJdk17() = with(appCdsProject(AppCdsMode.Auto, 17)) {
+        fun testRunTask(runTask: String) {
+            assertFails {
+                gradle(runTask)
+            }
+        }
+
+        testRunTask(":runDistributable")
+    }
+
+    @Test
+    fun testAppCdsAuto() = with(appCdsProject(AppCdsMode.Auto, 21)) {
+        fun testRunTask(runTask: String) {
+            gradle(runTask).checks {
+                check.taskSuccessful(runTask)
+                check.logContains("[cds] Dumping shared data to file")
+            }
+            gradle(runTask).checks {
+                check.taskSuccessful(runTask)
+                check.logContainsMatch(Regex("\\[cds] Opened archive .*/build/compose/binaries/.*/app/.*/app\\.jsa"))
+                check.logDoesntContain("[cds] Specified shared archive not found")
+                check.logDoesntContain("[cds] Dumping shared data to file")
+                check.logDoesntContain("[cds] Initialize dynamic archive failed")
+                check.logDoesntContain("[cds] An error has occurred while processing the shared archive file")
+                check.logDoesntContain("[cds] Failed to initialize dynamic archive")
+            }
+            gradle(":clean")
+        }
+
+        testRunTask(":runDistributable")
+        testRunTask(":runReleaseDistributable")
+    }
+
+    @Test
+    fun testAppCdsPrebuild() = with(appCdsProject(AppCdsMode.Prebuild, 17)) {
+        fun testPackageAndRun(release: Boolean) {
+            val releaseTag = if (release) "Release" else ""
+            val packageTaskName = ":package${releaseTag}DistributionForCurrentOS"
+            val createAppCdsTaskName = ":create${releaseTag}AppCdsArchive"
+            val runDistributableTaskName = ":run${releaseTag}Distributable"
+            gradle(packageTaskName).checks {
+                check.taskSuccessful(packageTaskName)
+                check.taskSuccessful(createAppCdsTaskName)
+                check.logContains("[cds] Dumping shared data to file")
+                check.logContains("Running app to create archive: true")
+            }
+
+            gradle(runDistributableTaskName).checks {
+                check.taskSuccessful(runDistributableTaskName)
+                check.taskUpToDate(createAppCdsTaskName)
+                check.logContainsMatch(Regex("\\[cds] Opened archive .*/build/compose/binaries/.*/app/.*/app\\.jsa"))
+                check.logContains("Running app to create archive: false")
+                check.logDoesntContain("[cds] Specified shared archive not found")
+                check.logDoesntContain("[cds] Dumping shared data to file")
+                check.logDoesntContain("[cds] Initialize dynamic archive failed")
+                check.logDoesntContain("[cds] An error has occurred while processing the shared archive file")
+                check.logDoesntContain("[cds] Failed to initialize dynamic archive")
+            }
+        }
+
+        testPackageAndRun(release = false)
+        testPackageAndRun(release = true)
     }
 
     private fun TestProject.enableJoinOutputJars() {
