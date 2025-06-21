@@ -31,7 +31,7 @@ internal fun AppCdsConfiguration.runtimeJvmArgs() = buildList {
 /**
  * The mode of use of AppCDS.
  */
-abstract class AppCdsMode : Serializable {
+abstract class AppCdsMode(val name: String) : Serializable {
 
     /**
      * Whether to generate a classes.jsa archive for the JRE classes.
@@ -70,21 +70,26 @@ abstract class AppCdsMode : Serializable {
      */
     internal open fun checkJdkCompatibility(jdkMajorVersion: Int) = Unit
 
+    override fun toString() = name
 
     companion object {
 
         /**
-         * The name of the AppCds archive file.
+         * The name of the AppCDS archive file.
          */
         private const val ARCHIVE_NAME = "app.jsa"
 
         /**
+         * The AppCDS archive file.
+         */
+        internal const val ARCHIVE_FILE_ARGUMENT = "\$APPDIR/$ARCHIVE_NAME"
+
+        /**
          * AppCDS is not used.
          */
-        val None = object : AppCdsMode() {
+        val None = object : AppCdsMode("None") {
             override val generateJreClassesArchive: Boolean get() = false
             override fun runtimeJvmArgs() = emptyList<String>()
-            override fun toString() = "None"
         }
 
         /**
@@ -102,12 +107,12 @@ abstract class AppCdsMode : Serializable {
          *   of the first execution, which also takes a little longer.
          */
         @Suppress("unused")
-        val Auto = object : AppCdsMode() {
+        val Auto = object : AppCdsMode("Auto") {
             private val MIN_JDK_VERSION = 19
             override val generateJreClassesArchive: Boolean get() = true
             override fun runtimeJvmArgs() =
                 listOf(
-                    "-XX:SharedArchiveFile=\$APPDIR/$ARCHIVE_NAME",
+                    "-XX:SharedArchiveFile=$ARCHIVE_FILE_ARGUMENT",
                     "-XX:+AutoCreateSharedArchive"
                 )
             override fun checkJdkCompatibility(jdkMajorVersion: Int) {
@@ -118,7 +123,6 @@ abstract class AppCdsMode : Serializable {
                     )
                 }
             }
-            override fun toString() = "Auto"
         }
 
         /**
@@ -136,13 +140,13 @@ abstract class AppCdsMode : Serializable {
          *   the app's classes.
          */
         @Suppress("unused")
-        val Prebuild = object : AppCdsMode() {
+        val Prebuild = object : AppCdsMode("Prebuild") {
             override val generateJreClassesArchive: Boolean get() = true
             override val generateAppClassesArchive: Boolean get() = true
             override fun appClassesArchiveCreationJvmArgs() =
                 listOf(
-                    "-XX:ArchiveClassesAtExit=\$APPDIR/$ARCHIVE_NAME",
-                    "-Dcompose.cds.create-archive=true"
+                    "-XX:ArchiveClassesAtExit=$ARCHIVE_FILE_ARGUMENT",
+                    "-Dcompose.appcds.create-archive=true"
                 )
             override fun appClassesArchiveFile(packagedAppRootDir: File): File {
                 val appDir = packagedAppJarFilesDir(packagedAppRootDir)
@@ -150,10 +154,8 @@ abstract class AppCdsMode : Serializable {
             }
             override fun runtimeJvmArgs() =
                 listOf(
-                    "-XX:SharedArchiveFile=\$APPDIR/$ARCHIVE_NAME",
+                    "-XX:SharedArchiveFile=$ARCHIVE_FILE_ARGUMENT",
                 )
-
-            override fun toString() = "Prebuild"
         }
     }
 }

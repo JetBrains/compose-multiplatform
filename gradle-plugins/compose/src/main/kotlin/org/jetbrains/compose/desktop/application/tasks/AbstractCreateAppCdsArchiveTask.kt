@@ -26,10 +26,10 @@ abstract class AbstractCreateAppCdsArchiveTask @Inject constructor(
     internal abstract val appCdsMode: Property<AppCdsMode>
 
     @Suppress("unused")
-    @OutputFile
-    val appCdsArchiveFile: Provider<File> = provider {
+    @get:OutputFile
+    val appCdsArchiveFile: File get() {
         val packagedAppRootDir = packagedAppRootDir(appImageRootDir.get())
-        appCdsMode.get().appClassesArchiveFile(packagedAppRootDir)
+        return appCdsMode.get().appClassesArchiveFile(packagedAppRootDir)
     }
 
     // This is needed to correctly describe the dependencies to Gradle.
@@ -44,7 +44,7 @@ abstract class AbstractCreateAppCdsArchiveTask @Inject constructor(
             }
         }
 
-        val appCdsArchiveFile = appCdsArchiveFile.get().relativeTo(appImageRootDir.get().asFile).path
+        val appCdsArchiveFile = appCdsArchiveFile.relativeTo(appImageRootDir.get().asFile).path
         return appImageRootDir.get().asFileTree.matching { it.exclude(appCdsArchiveFile) }
     }
 
