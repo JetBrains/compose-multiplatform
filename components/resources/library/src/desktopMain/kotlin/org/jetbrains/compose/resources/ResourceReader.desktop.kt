@@ -1,10 +1,20 @@
 package org.jetbrains.compose.resources
 
-import java.io.EOFException
-import java.io.IOException
 import java.io.InputStream
 
-internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
+@ExperimentalResourceApi
+internal actual fun getPlatformResourceReader(): ResourceReader =
+    JvmResourceReader.Default
+
+@ExperimentalResourceApi
+class JvmResourceReader(
+    private val classLoader: ClassLoader = JvmResourceReader::class.java.classLoader
+) : ResourceReader {
+
+    companion object {
+        val Default = JvmResourceReader()
+    }
+
     override suspend fun read(path: String): ByteArray {
         val resource = getResourceAsStream(path)
         return resource.use { input -> input.readBytes() }
@@ -31,17 +41,12 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
     }
 
     override fun getUri(path: String): String {
-        val classLoader = getClassLoader()
         val resource = classLoader.getResource(path) ?: throw MissingResourceException(path)
         return resource.toURI().toString()
     }
 
     private fun getResourceAsStream(path: String): InputStream {
-        val classLoader = getClassLoader()
         return classLoader.getResourceAsStream(path) ?: throw MissingResourceException(path)
     }
 
-    private fun getClassLoader(): ClassLoader {
-        return this.javaClass.classLoader ?: error("Cannot find class loader")
-    }
 }

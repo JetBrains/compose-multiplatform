@@ -5,7 +5,11 @@ import kotlinx.cinterop.usePinned
 import platform.Foundation.*
 import platform.posix.memcpy
 
-internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
+@ExperimentalResourceApi
+internal actual fun getPlatformResourceReader(): ResourceReader = DefaultMacOsResourceReader
+
+@ExperimentalResourceApi
+object DefaultMacOsResourceReader : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         val data = readData(getPathOnDisk(path))
         return ByteArray(data.length.toInt()).apply {
