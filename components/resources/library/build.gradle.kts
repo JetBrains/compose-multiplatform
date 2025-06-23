@@ -217,3 +217,13 @@ tasks.register<GeneratePluralRuleListsTask>("generatePluralRuleLists") {
     outputFile = projectDir.file("src/commonMain/kotlin/org/jetbrains/compose/resources/plural/CLDRPluralRuleLists.kt")
     samplesOutputFile = projectDir.file("src/commonTest/kotlin/org/jetbrains/compose/resources/CLDRPluralRuleLists.test.kt")
 }
+
+tasks {
+    val desktopTestProcessResources =
+        named<ProcessResources>("desktopTestProcessResources")
+
+    withType<Test> {
+        dependsOn(desktopTestProcessResources)
+        environment("RESOURCES_PATH", desktopTestProcessResources.map { it.destinationDir.absolutePath }.get())
+    }
+}

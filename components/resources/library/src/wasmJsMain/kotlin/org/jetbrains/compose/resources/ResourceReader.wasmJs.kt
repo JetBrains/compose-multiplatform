@@ -23,12 +23,14 @@ private external fun jsExportInt8ArrayToWasm(src: Int8Array, size: Int, dstAddr:
 @JsFun("(blob) => blob.arrayBuffer()")
 private external fun jsExportBlobAsArrayBuffer(blob: Blob): Promise<ArrayBuffer>
 
+@ExperimentalResourceApi
 internal actual fun getPlatformResourceReader(): ResourceReader {
     if (isInTestEnvironment()) return TestWasmResourceReader
     return DefaultWasmResourceReader
 }
 
-private val DefaultWasmResourceReader = object : ResourceReader {
+@ExperimentalResourceApi
+object DefaultWasmResourceReader : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         return readAsBlob(path).asByteArray()
     }
@@ -72,45 +74,43 @@ private val DefaultWasmResourceReader = object : ResourceReader {
 }
 
 // It uses a synchronous XmlHttpRequest (blocking!!!)
-private val TestWasmResourceReader by lazy {
-    object : ResourceReader {
-        override suspend fun read(path: String): ByteArray {
-            return readByteArray(path)
+private object TestWasmResourceReader : ResourceReader {
+    override suspend fun read(path: String): ByteArray {
+        return readByteArray(path)
+    }
+
+    override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
+        return readByteArray(path).sliceArray(offset.toInt() until (offset + size).toInt())
+    }
+
+    override fun getUri(path: String): String {
+        val location = window.location
+        return getResourceUrl(location.origin, location.pathname, path)
+    }
+
+    private fun readByteArray(path: String): ByteArray {
+        val resPath = WebResourcesConfiguration.getResourcePath(path)
+        val request = XMLHttpRequest()
+        request.open("GET", resPath, false)
+        request.overrideMimeType("text/plain; charset=x-user-defined")
+        request.send()
+        if (request.status == 200.toShort()) {
+            return requestResponseAsByteArray(request).asByteArray()
         }
+        println("Request status is not 200 - $resPath, status: ${request.status}")
+        throw MissingResourceException(resPath)
+    }
 
-        override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
-            return readByteArray(path).sliceArray(offset.toInt() until (offset + size).toInt())
-        }
+    private fun Int8Array.asByteArray(): ByteArray {
+        val array = this
+        val size = array.length
 
-        override fun getUri(path: String): String {
-            val location = window.location
-            return getResourceUrl(location.origin, location.pathname, path)
-        }
-
-        private fun readByteArray(path: String): ByteArray {
-            val resPath = WebResourcesConfiguration.getResourcePath(path)
-            val request = XMLHttpRequest()
-            request.open("GET", resPath, false)
-            request.overrideMimeType("text/plain; charset=x-user-defined")
-            request.send()
-            if (request.status == 200.toShort()) {
-                return requestResponseAsByteArray(request).asByteArray()
-            }
-            println("Request status is not 200 - $resPath, status: ${request.status}")
-            throw MissingResourceException("$resPath")
-        }
-
-        private fun Int8Array.asByteArray(): ByteArray {
-            val array = this
-            val size = array.length
-
-            @OptIn(UnsafeWasmMemoryApi::class)
-            return withScopedMemoryAllocator { allocator ->
-                val memBuffer = allocator.allocate(size)
-                val dstAddress = memBuffer.address.toInt()
-                jsExportInt8ArrayToWasm(array, size, dstAddress)
-                ByteArray(size) { i -> (memBuffer + i).loadByte() }
-            }
+        @OptIn(UnsafeWasmMemoryApi::class)
+        return withScopedMemoryAllocator { allocator ->
+            val memBuffer = allocator.allocate(size)
+            val dstAddress = memBuffer.address.toInt()
+            jsExportInt8ArrayToWasm(array, size, dstAddress)
+            ByteArray(size) { i -> (memBuffer + i).loadByte() }
         }
     }
 }
