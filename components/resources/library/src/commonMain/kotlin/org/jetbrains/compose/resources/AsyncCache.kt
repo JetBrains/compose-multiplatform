@@ -11,6 +11,11 @@ internal class AsyncCache<K, V> {
     private val mutex = Mutex()
     private val cache = mutableMapOf<K, Deferred<V>>()
 
+    init {
+        @Suppress("UNCHECKED_CAST")
+        registerCache(this as AsyncCache<Any, Any>)
+    }
+
     suspend fun getOrLoad(key: K, load: suspend () -> V): V = coroutineScope {
         val deferred = mutex.withLock {
             var cached = cache[key]
@@ -24,7 +29,6 @@ internal class AsyncCache<K, V> {
         deferred.await()
     }
 
-    //@TestOnly
     fun clear() {
         cache.clear()
     }

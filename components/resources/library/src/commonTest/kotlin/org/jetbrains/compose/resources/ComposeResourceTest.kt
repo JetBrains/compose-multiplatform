@@ -5,18 +5,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runComposeUiTest
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
 import kotlin.test.*
 
 @OptIn(ExperimentalTestApi::class, InternalResourceApi::class)
 class ComposeResourceTest {
 
     init {
-        dropStringItemsCache()
-        dropImageCache()
+        dropResourceCaches()
         getResourceEnvironment = ::getTestEnvironment
     }
 
@@ -58,6 +54,18 @@ class ComposeResourceTest {
 
         assertEquals(
             expected = listOf("1.png", "2.png"), //no second read of 1.png
+            actual = testResourceReader.readPaths
+        )
+
+        dropResourceCaches()
+
+        res = TestDrawableResource("2.png")
+        waitForIdle()
+        res = TestDrawableResource("1.png")
+        waitForIdle()
+
+        assertEquals(
+            expected = listOf("1.png", "2.png", "2.png", "1.png"), // read images again
             actual = testResourceReader.readPaths
         )
     }
@@ -144,6 +152,21 @@ class ComposeResourceTest {
             ), //only three different
             actual = testResourceReader.readPaths
         )
+
+        dropResourceCaches()
+        res = TestStringResource("hello")
+        waitForIdle()
+        assertEquals(str, "\uD83D\uDE0A Hello world!")
+        assertEquals(
+            expected = listOf(
+                "strings.cvr/314-44",
+                "strings.cvr/211-47",
+                "strings.cvr/359-37",
+                "strings.cvr/314-44",
+            ), //read the first item again
+            actual = testResourceReader.readPaths
+        )
+
     }
 
     @Test

@@ -150,11 +150,6 @@ private sealed interface ImageCache {
 
 private val imageCache = AsyncCache<String, ImageCache>()
 
-//@TestOnly
-internal fun dropImageCache() {
-    imageCache.clear()
-}
-
 private suspend fun loadImage(
     path: String,
     cacheKey: String,
