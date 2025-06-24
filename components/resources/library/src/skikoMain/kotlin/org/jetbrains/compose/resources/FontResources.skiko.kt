@@ -34,6 +34,9 @@ private val fontCache = AsyncCache<String, Font>()
 internal val Font.isEmptyPlaceholder: Boolean
     get() = this == defaultEmptyFont
 
+
+internal expect fun checksum(data: ByteArray): Long
+
 @Deprecated(
     message = "Use the new Font function with variationSettings instead.",
     level = DeprecationLevel.HIDDEN
@@ -46,7 +49,7 @@ actual fun Font(resource: FontResource, weight: FontWeight, style: FontStyle): F
         val key = "$path:$weight:$style"
         fontCache.getOrLoad(key) {
             val fontBytes = resourceReader.read(path)
-            Font(path, fontBytes, weight, style)
+            Font("$path@${checksum(fontBytes)}", fontBytes, weight, style)
         }
     }
     return fontFile
@@ -65,7 +68,7 @@ actual fun Font(
         val key = "$path:$weight:$style:${variationSettings.getCacheKey()}"
         fontCache.getOrLoad(key) {
             val fontBytes = resourceReader.read(path)
-            Font(key, fontBytes, weight, style, variationSettings)
+            Font("$key@${checksum(fontBytes)}", fontBytes, weight, style, variationSettings)
         }
     }
     return fontFile
