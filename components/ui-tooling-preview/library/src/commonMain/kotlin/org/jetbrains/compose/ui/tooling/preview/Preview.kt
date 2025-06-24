@@ -29,4 +29,12 @@ package org.jetbrains.compose.ui.tooling.preview
     AnnotationTarget.FUNCTION
 )
 @Repeatable
-annotation class Preview
+annotation class Preview(
+    val name: String = "",
+    val group: String = "",
+    val widthDp: Int = -1,
+    val heightDp: Int = -1,
+    val locale: String = "",
+    val showBackground: Boolean = false,
+    val backgroundColor: Long = 0,
+)
