@@ -35,7 +35,7 @@ internal val Font.isEmptyPlaceholder: Boolean
     get() = this == defaultEmptyFont
 
 
-internal expect fun checksum(data: ByteArray): Long
+private fun checksum(data: ByteArray) = data.fold(0) { acc, byte -> acc * 31 + byte }
 
 @Deprecated(
     message = "Use the new Font function with variationSettings instead.",

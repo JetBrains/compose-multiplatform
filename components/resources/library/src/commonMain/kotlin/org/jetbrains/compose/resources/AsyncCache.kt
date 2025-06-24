@@ -12,8 +12,7 @@ internal class AsyncCache<K, V> {
     private val cache = mutableMapOf<K, Deferred<V>>()
 
     init {
-        @Suppress("UNCHECKED_CAST")
-        registerCache(this as AsyncCache<Any, Any>)
+        registerCache(this)
     }
 
     suspend fun getOrLoad(key: K, load: suspend () -> V): V = coroutineScope {
