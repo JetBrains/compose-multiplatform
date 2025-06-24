@@ -10,6 +10,7 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.jetbrains.compose.desktop.application.dsl.AppCdsMode
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
@@ -38,6 +39,9 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
 
     @get:Input
     abstract val checkJdkVendor: Property<Boolean>
+
+    @get:Input
+    val appCdsMode: Property<AppCdsMode> = objects.notNullProperty()
 
     private val taskDir = project.layout.buildDirectory.dir("compose/tmp/$name")
 
@@ -75,8 +79,8 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
         val jdkHome = jdkHomeFile
         val javaExecutable = jdkHome.getJdkTool("java")
         val jlinkExecutable = jdkHome.getJdkTool("jlink")
-        val jpackageExecutabke = jdkHome.getJdkTool("jpackage")
-        ensureToolsExist(javaExecutable, jlinkExecutable, jpackageExecutabke)
+        val jpackageExecutable = jdkHome.getJdkTool("jpackage")
+        ensureToolsExist(javaExecutable, jlinkExecutable, jpackageExecutable)
 
         val jdkRuntimeProperties = getJDKRuntimeProperties(javaExecutable)
 
@@ -108,6 +112,8 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
                 }
             }
         }
+
+        appCdsMode.get().checkJdkCompatibility(jdkMajorVersion)
 
         val modules = arrayListOf<String>()
         runExternalTool(
