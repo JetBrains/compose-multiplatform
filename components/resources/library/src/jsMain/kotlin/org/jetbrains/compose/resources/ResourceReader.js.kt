@@ -47,6 +47,7 @@ object DefaultJsResourceReader : ResourceReader {
     }
 }
 
+// It uses a synchronous XmlHttpRequest (blocking!!!)
 private object TestJsResourceReader : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         return readByteArray(path)
