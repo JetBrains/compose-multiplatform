@@ -16,10 +16,6 @@ internal sealed interface StringItem {
 }
 
 private val stringItemsCache = AsyncCache<String, StringItem>()
-//@TestOnly
-internal fun dropStringItemsCache() {
-    stringItemsCache.clear()
-}
 
 internal suspend fun getStringItem(
     resourceItem: ResourceItem,
