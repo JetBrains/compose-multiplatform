@@ -2,14 +2,7 @@ package org.jetbrains.compose.resources
 
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
-import platform.Foundation.NSBundle
-import platform.Foundation.NSData
-import platform.Foundation.NSFileHandle
-import platform.Foundation.NSFileManager
-import platform.Foundation.NSURL
-import platform.Foundation.closeFile
-import platform.Foundation.fileHandleForReadingAtPath
-import platform.Foundation.readDataOfLength
+import platform.Foundation.*
 import platform.posix.memcpy
 
 @ExperimentalResourceApi
