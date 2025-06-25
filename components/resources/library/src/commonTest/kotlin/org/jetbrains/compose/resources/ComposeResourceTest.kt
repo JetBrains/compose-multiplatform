@@ -12,7 +12,7 @@ import kotlin.test.*
 class ComposeResourceTest {
 
     init {
-        ResourceCaches.drop()
+        ResourceCaches.clear()
         getResourceEnvironment = ::getTestEnvironment
     }
 
@@ -57,7 +57,7 @@ class ComposeResourceTest {
             actual = testResourceReader.readPaths
         )
 
-        ResourceCaches.drop()
+        ResourceCaches.clear()
 
         res = TestDrawableResource("2.png")
         waitForIdle()
@@ -153,7 +153,7 @@ class ComposeResourceTest {
             actual = testResourceReader.readPaths
         )
 
-        ResourceCaches.drop()
+        ResourceCaches.clear()
         res = TestStringResource("hello")
         waitForIdle()
         assertEquals(str, "\uD83D\uDE0A Hello world!")

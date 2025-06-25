@@ -47,7 +47,7 @@ object ResourceCaches {
      * Note that frequent or unnecessary calls to this function may impact
      * performance by removing resources that might otherwise benefit from being cached.
      */
-    fun drop() {
+    fun clear() {
         caches.forEach { it.clear() }
     }
 }
