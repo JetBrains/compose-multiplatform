@@ -17,7 +17,7 @@ import kotlin.test.assertNotEquals
 class FontCacheTest {
 
     init {
-        dropResourceCaches()
+        ResourceCaches.drop()
     }
 
     @Test
@@ -49,7 +49,7 @@ class FontCacheTest {
             actual = testResourceReader.readPaths
         )
 
-        dropResourceCaches()
+        ResourceCaches.drop()
 
         res = TestFontResource(font2)
         waitForIdle()
@@ -93,7 +93,7 @@ class FontCacheTest {
 
         assertNotEquals(id1, id2)
 
-        dropResourceCaches()
+        ResourceCaches.drop()
         testResourceReader.replaceNextReadWith(font2)
         res = TestFontResource(font1)
         waitForIdle()
