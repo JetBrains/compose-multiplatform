@@ -35,7 +35,7 @@ internal val Font.isEmptyPlaceholder: Boolean
     get() = this == defaultEmptyFont
 
 
-private fun checksum(data: ByteArray) = data.fold(0) { acc, byte -> acc * 31 + byte }
+private fun ByteArray.footprint() = "[$size:${lastOrNull()?.toInt()}]"
 
 @Deprecated(
     message = "Use the new Font function with variationSettings instead.",
@@ -49,7 +49,7 @@ actual fun Font(resource: FontResource, weight: FontWeight, style: FontStyle): F
         val key = "$path:$weight:$style"
         fontCache.getOrLoad(key) {
             val fontBytes = resourceReader.read(path)
-            Font("$path@${checksum(fontBytes)}", fontBytes, weight, style)
+            Font("$path${fontBytes.footprint()}", fontBytes, weight, style)
         }
     }
     return fontFile
@@ -68,7 +68,7 @@ actual fun Font(
         val key = "$path:$weight:$style:${variationSettings.getCacheKey()}"
         fontCache.getOrLoad(key) {
             val fontBytes = resourceReader.read(path)
-            Font("$key@${checksum(fontBytes)}", fontBytes, weight, style, variationSettings)
+            Font("$key${fontBytes.footprint()}", fontBytes, weight, style, variationSettings)
         }
     }
     return fontFile
