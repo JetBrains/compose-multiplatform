@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm") version "2.1.10" apply false
     id("com.github.johnrengelman.shadow") version "7.1.0" apply false
@@ -19,6 +22,16 @@ subprojects {
                 if (sourceSets.names.contains(SourceSet.MAIN_SOURCE_SET_NAME)) {
                     withJavadocJar()
                     withSourcesJar()
+                }
+            }
+        }
+    }
+
+    plugins.withId("org.jetbrains.kotlin.jvm") {
+        afterEvaluate {
+            tasks.withType<KotlinCompile> {
+                compilerOptions {
+                    jvmTarget.set(JvmTarget.JVM_1_8)
                 }
             }
         }
