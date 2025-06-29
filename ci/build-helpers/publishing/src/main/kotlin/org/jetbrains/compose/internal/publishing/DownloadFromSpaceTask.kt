@@ -7,10 +7,12 @@ package org.jetbrains.compose.internal.publishing
 
 import de.undercouch.gradle.tasks.download.DownloadAction
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.compose.internal.publishing.utils.ModuleValidator
 import org.jsoup.Jsoup
 import java.net.URL
 

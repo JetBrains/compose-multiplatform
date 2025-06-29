@@ -13,21 +13,14 @@ class MavenCentralProperties(private val myProject: Project) {
     val coordinates: Provider<String> =
         propertyProvider("maven.central.coordinates")
 
-    val stage: Provider<String> =
-        propertyProvider("maven.central.stage")
-
-    val description: Provider<String> =
-        propertyProvider("maven.central.description")
+    val deployName: Provider<String> =
+        propertyProvider("maven.central.deployName")
 
     val user: Provider<String> =
         propertyProvider("maven.central.user", envVar = "MAVEN_CENTRAL_USER")
 
-    val password: Provider<String> =
-        propertyProvider("maven.central.password", envVar = "MAVEN_CENTRAL_PASSWORD")
-
-    val autoCommitOnSuccess: Provider<Boolean> =
-        propertyProvider("maven.central.staging.close.after.upload", defaultValue = "false")
-            .map { it.toBoolean() }
+    val token: Provider<String> =
+        propertyProvider("maven.central.token", envVar = "MAVEN_CENTRAL_TOKEN")
 
     val signArtifacts: Boolean
         get() = myProject.findProperty("maven.central.sign") == "true"

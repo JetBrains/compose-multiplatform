@@ -10,7 +10,6 @@ import org.jetbrains.compose.internal.publishing.ModuleToUpload
 import java.io.File
 
 internal class ModuleValidator(
-    private val stagingProfile: StagingProfile,
     private val module: ModuleToUpload,
 ) {
     private val errors = arrayListOf<String>()
@@ -32,10 +31,6 @@ internal class ModuleValidator(
     }
 
     private fun validateImpl() {
-        if (!module.groupId.startsWith(stagingProfile.name)) {
-            errors.add("Module's group id '${module.groupId}' does not match staging repo '${stagingProfile.name}'")
-        }
-
         val pomFile = artifactFile(extension = "pom")
         val pom = when {
             pomFile.exists() ->

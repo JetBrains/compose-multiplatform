@@ -5,78 +5,115 @@
 
 package org.jetbrains.compose.internal.publishing
 
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
+import io.ktor.client.request.accept
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.forms.*
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.request.url
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.*
+import io.ktor.http.headers
+import kotlinx.coroutines.runBlocking
 import org.gradle.api.DefaultTask
-import org.gradle.api.provider.ListProperty
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.compose.internal.publishing.utils.*
+import java.io.File
+import java.util.*
+import kotlin.io.readBytes
 
 @Suppress("unused") // public api
 abstract class UploadToSonatypeTask : DefaultTask() {
     // the task must always re-run anyway, so all inputs can be declared Internal
-    @get:Internal
-    abstract val sonatypeServer: Property<String>
 
     @get:Internal
     abstract val user: Property<String>
 
     @get:Internal
-    abstract val password: Property<String>
+    abstract val token: Property<String>
 
     @get:Internal
-    abstract val stagingProfileName: Property<String>
+    abstract val deploymentName: Property<String>
 
     @get:Internal
-    abstract val stagingDescription: Property<String>
-
-    @get:Internal
-    abstract val autoCommitOnSuccess: Property<Boolean>
-
-    @get:Internal
-    abstract val modulesToUpload: ListProperty<ModuleToUpload>
+    abstract val deploymentBundleFile: RegularFileProperty
 
     @TaskAction
     fun run() {
-        SonatypeRestApiClient(
-            sonatypeServer = sonatypeServer.get(),
-            user = user.get(),
-            password = password.get(),
-            logger = logger
-        ).use { client -> run(client) }
-    }
-
-    private fun run(sonatype: SonatypeApi) {
-        val stagingProfiles = sonatype.stagingProfiles()
-        val stagingProfileName = stagingProfileName.get()
-        val stagingProfile = stagingProfiles.data.firstOrNull { it.name == stagingProfileName }
-            ?: error(
-                "Cannot find staging profile '$stagingProfileName' among existing staging profiles: " +
-                        stagingProfiles.data.joinToString { "'${it.name}'" }
-            )
-        val modules = modulesToUpload.get()
-
-        validate(stagingProfile, modules)
-
-        val stagingRepo = sonatype.createStagingRepo(
-            stagingProfile, stagingDescription.get()
-        )
-        try {
-            for (module in modules) {
-                sonatype.upload(stagingRepo, module)
+        runBlocking {
+            HttpClient(CIO).use { client ->
+                client.publish()
             }
-            if (autoCommitOnSuccess.get()) {
-                sonatype.closeStagingRepo(stagingRepo)
-            }
-        } catch (e: Exception) {
-            throw e
         }
     }
 
-    private fun validate(stagingProfile: StagingProfile, modules: List<ModuleToUpload>) {
+    // By the doc https://central.sonatype.org/publish/publish-portal-api/
+    private suspend fun HttpClient.publish() {
+        val bearerToken = Base64.getEncoder().encode(
+            "${user.get()}:${token.get()}".toByteArray()
+        ).toString(Charsets.UTF_8)
+
+        val response = submitForm {
+            url("https://central.sonatype.com/api/v1/publisher/upload")
+            parameter("name", deploymentName.get())
+            parameter("publishingType", "USER_MANAGED")
+            bearerAuth(bearerToken)
+            setBody(
+                MultiPartFormDataContent(
+                    formData {
+                        append("bundle", deploymentBundleFile.get().readBytes(), headers {
+                            append(HttpHeaders.ContentType, ContentType.Application.OctetStream.contentType)
+                            append(HttpHeaders.ContentDisposition, "filename=\"bundle.zip\"")
+                        })
+                    }
+                )
+            )
+            onUpload { bytesSentTotal, contentLength ->
+                logger.info("Sent $bytesSentTotal bytes from $contentLength")
+            }
+        }
+
+        if (response.status != HttpStatusCode.Created) {
+            error("Deployment failed (${response.status}):\n ${response.bodyAsText()}")
+        }
+
+        val deploymentId = response.bodyAsText().trim()
+
+        logger.quiet("Deployment ID: $deploymentId")
+
+        while (true) {
+            logger.quiet("Checking Deployment Status: $deploymentId")
+
+            val statusResponse = post {
+                bearerAuth(bearerToken)
+                accept(ContentType.Application.Json)
+                url("https://central.sonatype.com/api/v1/publisher/status")
+                parameter("id", deploymentId)
+            }
+            if (statusResponse.status != HttpStatusCode.OK) {
+                error("Deployment failed (${statusResponse.status}):\n ${statusResponse.bodyAsText()}")
+            }
+
+            logger.quiet(statusResponse.bodyAsText())
+            if (statusResponse.bodyAsText().contains("PUBLISHED")) break
+            if (statusResponse.bodyAsText().contains("FAILED")) {
+                error("Deployment failed (${statusResponse.status}):\n ${statusResponse.bodyAsText()}")
+            }
+        }
+    }
+
+    private fun validate(modules: List<ModuleToUpload>) {
         val validationIssues = arrayListOf<Pair<ModuleToUpload, ModuleValidator.Status.Error>>()
         for (module in modules) {
-            val status = ModuleValidator(stagingProfile, module).validate()
+            val status = ModuleValidator(module).validate()
             if (status is ModuleValidator.Status.Error) {
                 validationIssues.add(module to status)
             }

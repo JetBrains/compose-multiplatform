@@ -35,6 +35,8 @@ val downloadArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenR
             originalArtifactsRoot
         )
     })
+    deploymentBundleFile.set(preparedArtifactsRoot)
+
     spaceRepoUrl.set("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
@@ -49,12 +51,9 @@ val reuploadArtifactsToMavenCentral by tasks.registering(UploadToSonatypeTask::c
 
     modulesToUpload.set(project.provider { readComposeModules(modulesFile, preparedArtifactsRoot) })
 
-    sonatypeServer.set("https://oss.sonatype.org")
     user.set(mavenCentral.user)
-    password.set(mavenCentral.password)
-    autoCommitOnSuccess.set(mavenCentral.autoCommitOnSuccess)
-    stagingProfileName.set(mavenCentral.stage)
-    stagingDescription.set(mavenCentral.description)
+    token.set(mavenCentral.token)
+    deploymentName.set(mavenCentral.deploymentName)
 }
 
 fun readComposeModules(
