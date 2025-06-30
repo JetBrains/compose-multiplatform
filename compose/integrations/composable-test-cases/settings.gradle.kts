@@ -16,7 +16,7 @@ pluginManagement {
 dependencyResolutionManagement {
     versionCatalogs {
         register("libs").configure {
-            val kotlinVersion = providers.gradleProperty("kotlin_version").orNull
+            val kotlinVersion = providers.gradleProperty("kotlin.version").orNull
             if (kotlinVersion != null) {
                 version("kotlin", kotlinVersion)
 //                println("kotlin version applied: $kotlinVersion")
