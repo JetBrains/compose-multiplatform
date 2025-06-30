@@ -18,14 +18,14 @@ package org.jetbrains.compose.ui.tooling.preview
 
 /**
  * [Preview] can be applied to either of the following:
- * - @[Composable] methods with no parameters to show them in the Android Studio preview.
+ * - @[Composable] methods with no parameters to show them in the IDE preview.
  * - Annotation classes, that could then be used to annotate @[Composable] methods or other
  *   annotation classes, which will then be considered as indirectly annotated with that [Preview].
  *
  * The annotation contains a number of parameters that allow to define the way the @[Composable]
  * will be rendered within the preview.
  *
- * The passed parameters are only read by Studio when rendering the preview.
+ * The passed parameters are only read by IDE when rendering the preview.
  *
  * @param name Display name of this preview allowing to identify it in the panel.
  * @param group Group name for this @[Preview]. This allows grouping them in the UI and display only
