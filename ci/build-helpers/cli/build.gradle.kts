@@ -49,12 +49,10 @@ val reuploadArtifactsToMavenCentral by tasks.registering(UploadToSonatypeTask::c
 
     modulesToUpload.set(project.provider { readComposeModules(modulesFile, preparedArtifactsRoot) })
 
-    sonatypeServer.set("https://oss.sonatype.org")
     user.set(mavenCentral.user)
     password.set(mavenCentral.password)
-    autoCommitOnSuccess.set(mavenCentral.autoCommitOnSuccess)
-    stagingProfileName.set(mavenCentral.stage)
-    stagingDescription.set(mavenCentral.description)
+    deployName.set(mavenCentral.deployName)
+    publishAfterUploading.set(mavenCentral.publishAfterUploading)
 }
 
 fun readComposeModules(
