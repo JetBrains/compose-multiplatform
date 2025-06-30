@@ -6,7 +6,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.platform.LoadedFont
 import kotlin.test.Test
@@ -16,18 +15,14 @@ import kotlin.test.assertNotEquals
 @OptIn(ExperimentalTestApi::class)
 class FontCacheTest {
 
-    init {
-        ResourceCaches.clear()
-    }
-
     @Test
-    fun testFontResourceCache() = runComposeUiTest {
+    fun testFontResourceCache() = runComposeResourceTest {
         val font1 = "font_awesome.otf"
         val font2 = "Workbench-Regular.ttf"
 
         val testResourceReader = TestResourceReader()
         var res by mutableStateOf(TestFontResource(font1))
-        setContent {
+        val clearCaches = setContentWithResourceCacheCleaning {
             CompositionLocalProvider(
                 LocalResourceReader provides testResourceReader,
                 LocalComposeEnvironment provides TestComposeEnvironment
@@ -49,7 +44,7 @@ class FontCacheTest {
             actual = testResourceReader.readPaths
         )
 
-        ResourceCaches.clear()
+        clearCaches()
 
         res = TestFontResource(font2)
         waitForIdle()
@@ -63,14 +58,14 @@ class FontCacheTest {
     }
 
     @Test
-    fun testFontReplacement() = runComposeUiTest {
+    fun testFontReplacement() = runComposeResourceTest {
         val font1 = "font_awesome.otf"
         val font2 = "Workbench-Regular.ttf"
 
         val testResourceReader = TestFontResourceReplacementReader()
         var res by mutableStateOf(TestFontResource(font1))
         var fontIdentity = ""
-        setContent {
+        val clearCaches = setContentWithResourceCacheCleaning {
             CompositionLocalProvider(
                 LocalResourceReader provides testResourceReader,
                 LocalComposeEnvironment provides TestComposeEnvironment
@@ -93,7 +88,7 @@ class FontCacheTest {
 
         assertNotEquals(id1, id2)
 
-        ResourceCaches.clear()
+        clearCaches()
         testResourceReader.replaceNextReadWith(font2)
         res = TestFontResource(font1)
         waitForIdle()

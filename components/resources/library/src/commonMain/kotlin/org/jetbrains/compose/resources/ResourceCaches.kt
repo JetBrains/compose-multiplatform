@@ -28,26 +28,25 @@ internal class AsyncCache<K, V> {
         deferred.await()
     }
 
-    fun clear() {
-        cache.clear()
+    suspend fun clear() {
+        mutex.withLock {
+            cache.clear()
+        }
     }
 }
 
+/**
+ * Manages internal resource caches.
+ *
+ * While the caches are managed automatically, there might be scenarios where manual cache clearing
+ * is desired. For such cases, we provide an API to reset the caches.
+*/
 object ResourceCaches {
     private val caches = mutableListOf<AsyncCache<*, *>>()
 
     internal fun registerCache(cache: AsyncCache<*, *>) = caches.add(cache)
 
-    /**
-     * Clears any cached resources maintained internally by the system.
-     *
-     * It can be useful to release memory or reset cached resources that
-     * may be changed or no longer be required.
-     *
-     * Note that frequent or unnecessary calls to this function may impact
-     * performance by removing resources that might otherwise benefit from being cached.
-     */
-    fun clear() {
+    internal suspend fun asyncClear() {
         caches.forEach { it.clear() }
     }
 }
