@@ -180,4 +180,44 @@ class StringFormatTest {
         // Only the first argument should be used, ignoring the rest
         assertEquals("Hello Alice!", result)
     }
+
+    @Test
+    fun `replaceWithArgs handle single argument format`() {
+        val template = "Hello %s!"
+        val args = listOf("Alice")
+
+        val result = template.replaceWithArgs(args)
+
+        assertEquals("Hello Alice!", result)
+    }
+
+    @Test
+    fun `replaceWithArgs handle multiple placeholders for single argument`() {
+        val template = "%s and %s are best friends!"
+        val args = listOf("Alice")
+
+        val result = template.replaceWithArgs(args)
+
+        assertEquals("Alice and Alice are best friends!", result)
+    }
+
+    @Test
+    fun `replaceWithArgs throw exception when multiple different arguments with single placeholder format`() {
+        val template = "Hello %s, you have %d new messages!"
+        val args = listOf("Alice", "15")
+
+        assertFailsWith<IllegalArgumentException> {
+            template.replaceWithArgs(args)
+        }
+    }
+
+    @Test
+    fun `replaceWithArgs throw exception when mixing single and multiple placeholders format`() {
+        val template = "Hello %1\$s, you have %s new messages!"
+        val args = listOf("Alice", "15")
+
+        assertFailsWith<IllegalArgumentException> {
+            template.replaceWithArgs(args)
+        }
+    }
 }
