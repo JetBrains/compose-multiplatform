@@ -36,7 +36,7 @@ class ComposeResourceTest {
     fun testImageResourceCache() = runComposeResourceTest {
         val testResourceReader = TestResourceReader()
         var res by mutableStateOf(TestDrawableResource("1.png"))
-        val clearCaches = setContentWithResourceCacheCleaning {
+        setContent {
             CompositionLocalProvider(
                 LocalResourceReader provides testResourceReader,
                 LocalComposeEnvironment provides TestComposeEnvironment
@@ -55,7 +55,7 @@ class ComposeResourceTest {
             actual = testResourceReader.readPaths
         )
 
-        clearCaches()
+        cleanResourceCaches()
 
         res = TestDrawableResource("2.png")
         waitForIdle()
@@ -112,7 +112,7 @@ class ComposeResourceTest {
         var res by mutableStateOf(TestStringResource("app_name"))
         var str = ""
 
-        val clearCaches = setContentWithResourceCacheCleaning {
+        setContent {
             CompositionLocalProvider(
                 LocalResourceReader provides testResourceReader,
                 LocalComposeEnvironment provides TestComposeEnvironment
@@ -152,7 +152,7 @@ class ComposeResourceTest {
             actual = testResourceReader.readPaths
         )
 
-        clearCaches()
+        cleanResourceCaches()
 
         res = TestStringResource("hello")
         waitForIdle()

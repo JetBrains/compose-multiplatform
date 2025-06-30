@@ -22,7 +22,7 @@ class FontCacheTest {
 
         val testResourceReader = TestResourceReader()
         var res by mutableStateOf(TestFontResource(font1))
-        val clearCaches = setContentWithResourceCacheCleaning {
+        setContent {
             CompositionLocalProvider(
                 LocalResourceReader provides testResourceReader,
                 LocalComposeEnvironment provides TestComposeEnvironment
@@ -44,7 +44,7 @@ class FontCacheTest {
             actual = testResourceReader.readPaths
         )
 
-        clearCaches()
+        cleanResourceCaches()
 
         res = TestFontResource(font2)
         waitForIdle()
@@ -65,7 +65,7 @@ class FontCacheTest {
         val testResourceReader = TestFontResourceReplacementReader()
         var res by mutableStateOf(TestFontResource(font1))
         var fontIdentity = ""
-        val clearCaches = setContentWithResourceCacheCleaning {
+        setContent {
             CompositionLocalProvider(
                 LocalResourceReader provides testResourceReader,
                 LocalComposeEnvironment provides TestComposeEnvironment
@@ -88,7 +88,8 @@ class FontCacheTest {
 
         assertNotEquals(id1, id2)
 
-        clearCaches()
+        cleanResourceCaches()
+
         testResourceReader.replaceNextReadWith(font2)
         res = TestFontResource(font1)
         waitForIdle()

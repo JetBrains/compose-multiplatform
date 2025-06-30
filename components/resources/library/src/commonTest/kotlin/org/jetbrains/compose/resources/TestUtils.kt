@@ -1,13 +1,11 @@
 package org.jetbrains.compose.resources
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runComposeUiTest
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.plural.PluralCategory
 import org.jetbrains.compose.resources.plural.PluralRule
 import org.jetbrains.compose.resources.plural.PluralRuleList
@@ -77,46 +75,28 @@ internal fun pluralRuleListOf(vararg rules: Pair<PluralCategory, String>): Plura
 }
 
 /**
+ * Clears the resource cache for Compose UI tests.
+ */
+@OptIn(ExperimentalTestApi::class)
+fun ComposeUiTest.cleanResourceCaches() {
+    var areCachesCleared = false
+
+    MainScope().launch(start = CoroutineStart.UNDISPATCHED) {
+        ResourceCaches.asyncClear()
+        areCachesCleared = true
+    }
+
+    waitUntil { areCachesCleared }
+}
+
+/**
  * Executes a test block within a Compose UI testing environment while ensuring
  * that any cached resources are cleared before the test begins.
  */
 @OptIn(ExperimentalTestApi::class)
 fun runComposeResourceTest(block: ComposeUiTest.() -> Unit) = runComposeUiTest {
-    var areCachesCleared = false
-    setContent {
-        LaunchedEffect(Unit) {
-            ResourceCaches.asyncClear()
-            areCachesCleared = true
-        }
-    }
-    waitUntil { areCachesCleared }
+    cleanResourceCaches()
     block()
-}
-
-/**
- * Injects resource cache clearing to the content and returns a callback to clear resource caches.
- * Used for tests that need to test some conditions after cache clearing.
- * Note: a returned call-back can be used only once.
- */
-@OptIn(ExperimentalTestApi::class)
-fun ComposeUiTest.setContentWithResourceCacheCleaning(content: @Composable () -> Unit): ComposeUiTest.()->Unit {
-    var clearCaches by mutableStateOf(false)
-    var areCachesCleared = false
-
-    this.setContent {
-        content()
-        LaunchedEffect(clearCaches) {
-            if (clearCaches) {
-                ResourceCaches.asyncClear()
-                areCachesCleared = true
-            }
-        }
-    }
-
-    return {
-        clearCaches = true
-        waitUntil { areCachesCleared }
-    }
 }
 
 
