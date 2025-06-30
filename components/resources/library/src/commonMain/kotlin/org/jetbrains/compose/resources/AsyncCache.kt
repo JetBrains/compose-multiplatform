@@ -15,7 +15,7 @@ internal class AsyncCache<K, V> {
         val deferred = mutex.withLock {
             var cached = cache[key]
             if (cached == null || cached.isCancelled) {
-                //LAZY - to free the mutex lock as fast as possible
+                // LAZY - to release the mutex as quickly as possible and defer the work
                 cached = async(start = CoroutineStart.LAZY) { load() }
                 cache[key] = cached
             }
