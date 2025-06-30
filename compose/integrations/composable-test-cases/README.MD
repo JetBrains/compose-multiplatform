@@ -1,10 +1,10 @@
 ## Run:
 
-`./gradlew build -Pkotlin_version=2.1.21`
+`./gradlew build -Pkotlin.version=2.1.21`
 to build and run the tests,
 
 or
-`./gradlew allTests -Pkotlin_version=2.1.21`
+`./gradlew allTests -Pkotlin.version=2.1.21`
 to only run the tests.
 
 It will build and run the tests for all available targets (depends on a host machine).

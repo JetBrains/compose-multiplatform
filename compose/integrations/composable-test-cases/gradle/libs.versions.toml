@@ -1,5 +1,5 @@
 [versions]
-kotlin="2.1.21" # should be provided via `-Pkotlin_version=<kotlin version to test with>`
+kotlin="2.1.21" # should be provided via `-Pkotlin.version=<kotlin version to test with>`
 kotlinx-coroutines = "1.8.0"
 compose = "1.8.1"
 

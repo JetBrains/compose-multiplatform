@@ -7,24 +7,16 @@ pluginManagement {
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
         maven("https://packages.jetbrains.team/maven/p/kt/dev")
         maven("https://redirector.kotlinlang.org/maven/dev")
-//        mavenLocal()
+        maven {
+            url = uri("${rootDir}/build/maven-project")
+        }
     }
 }
 
 dependencyResolutionManagement {
-    repositories {
-        google()
-        mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
-        maven("https://packages.jetbrains.team/maven/p/kt/dev")
-        maven("https://redirector.kotlinlang.org/maven/dev")
-//        mavenLocal()
-    }
-
     versionCatalogs {
         register("libs").configure {
-            val kotlinVersion = providers.gradleProperty("kotlin_version").orNull
+            val kotlinVersion = providers.gradleProperty("kotlin.version").orNull
             if (kotlinVersion != null) {
                 version("kotlin", kotlinVersion)
 //                println("kotlin version applied: $kotlinVersion")

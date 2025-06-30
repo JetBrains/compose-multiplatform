@@ -1,6 +1,4 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 //group "com.example"
 //version "1.0-SNAPSHOT"
@@ -22,7 +20,9 @@ allprojects {
 
         maven("https://packages.jetbrains.team/maven/p/kt/dev")
         maven("https://redirector.kotlinlang.org/maven/dev")
-//        mavenLocal()
+        maven {
+            url = uri("${rootDir}/build/maven-project")
+        }
     }
 
     disableYarnLockMismatchReport()
