@@ -3,9 +3,6 @@ package org.jetbrains.compose.resources
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runComposeUiTest
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.plural.PluralCategory
 import org.jetbrains.compose.resources.plural.PluralRule
 import org.jetbrains.compose.resources.plural.PluralRuleList
@@ -75,27 +72,12 @@ internal fun pluralRuleListOf(vararg rules: Pair<PluralCategory, String>): Plura
 }
 
 /**
- * Clears the resource cache for Compose UI tests.
- */
-@OptIn(ExperimentalTestApi::class)
-fun ComposeUiTest.cleanResourceCaches() {
-    var areCachesCleared = false
-
-    MainScope().launch(start = CoroutineStart.UNDISPATCHED) {
-        ResourceCaches.asyncClear()
-        areCachesCleared = true
-    }
-
-    waitUntil { areCachesCleared }
-}
-
-/**
  * Executes a test block within a Compose UI testing environment while ensuring
  * that any cached resources are cleared before the test begins.
  */
 @OptIn(ExperimentalTestApi::class)
-fun runComposeResourceTest(block: ComposeUiTest.() -> Unit) = runComposeUiTest {
-    cleanResourceCaches()
+fun runComposeResourceTest(block: suspend ComposeUiTest.() -> Unit) = runComposeUiTest {
+    ResourceCaches.asyncClear()
     block()
 }
 

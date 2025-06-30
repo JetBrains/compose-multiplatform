@@ -44,7 +44,7 @@ class FontCacheTest {
             actual = testResourceReader.readPaths
         )
 
-        cleanResourceCaches()
+        ResourceCaches.asyncClear()
 
         res = TestFontResource(font2)
         waitForIdle()
@@ -88,7 +88,7 @@ class FontCacheTest {
 
         assertNotEquals(id1, id2)
 
-        cleanResourceCaches()
+        ResourceCaches.asyncClear()
 
         testResourceReader.replaceNextReadWith(font2)
         res = TestFontResource(font1)

@@ -55,7 +55,7 @@ class ComposeResourceTest {
             actual = testResourceReader.readPaths
         )
 
-        cleanResourceCaches()
+        ResourceCaches.asyncClear()
 
         res = TestDrawableResource("2.png")
         waitForIdle()
@@ -152,7 +152,7 @@ class ComposeResourceTest {
             actual = testResourceReader.readPaths
         )
 
-        cleanResourceCaches()
+        ResourceCaches.asyncClear()
 
         res = TestStringResource("hello")
         waitForIdle()
