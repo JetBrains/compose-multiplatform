@@ -2,14 +2,21 @@ package org.jetbrains.compose.resources
 
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
-import platform.Foundation.*
+import platform.Foundation.NSBundle
+import platform.Foundation.NSData
+import platform.Foundation.NSFileHandle
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSURL
+import platform.Foundation.closeFile
+import platform.Foundation.fileHandleForReadingAtPath
+import platform.Foundation.readDataOfLength
 import platform.posix.memcpy
 
 @ExperimentalResourceApi
 internal actual fun getPlatformResourceReader(): ResourceReader = DefaultMacOsResourceReader
 
 @ExperimentalResourceApi
-object DefaultMacOsResourceReader : ResourceReader {
+internal object DefaultMacOsResourceReader : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         val data = readData(getPathOnDisk(path))
         return ByteArray(data.length.toInt()).apply {

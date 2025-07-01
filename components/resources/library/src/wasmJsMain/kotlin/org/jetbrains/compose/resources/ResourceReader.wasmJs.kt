@@ -30,7 +30,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader {
 }
 
 @ExperimentalResourceApi
-object DefaultWasmResourceReader : ResourceReader {
+internal object DefaultWasmResourceReader : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         return readAsBlob(path).asByteArray()
     }

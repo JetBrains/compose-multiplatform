@@ -8,11 +8,11 @@ internal actual fun getPlatformResourceReader(): ResourceReader =
 
 @ExperimentalResourceApi
 class JvmResourceReader(
-    private val classLoader: ClassLoader = JvmResourceReader::class.java.classLoader
+    private val classLoader: ClassLoader
 ) : ResourceReader {
 
     companion object {
-        val Default = JvmResourceReader()
+        internal val Default = JvmResourceReader(JvmResourceReader::class.java.classLoader)
     }
 
     override suspend fun read(path: String): ByteArray {

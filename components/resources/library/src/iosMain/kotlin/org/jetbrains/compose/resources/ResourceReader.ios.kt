@@ -30,7 +30,7 @@ import platform.posix.memcpy
 internal actual fun getPlatformResourceReader(): ResourceReader = DefaultIOsResourceReader
 
 @ExperimentalResourceApi
-object DefaultIOsResourceReader : ResourceReader {
+internal object DefaultIOsResourceReader : ResourceReader {
     private val composeResourcesDir: String by lazy { findComposeResourcesPath() }
 
     override suspend fun read(path: String): ByteArray {

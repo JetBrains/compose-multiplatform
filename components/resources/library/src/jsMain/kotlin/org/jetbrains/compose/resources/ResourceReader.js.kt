@@ -16,7 +16,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader {
 }
 
 @ExperimentalResourceApi
-object DefaultJsResourceReader : ResourceReader {
+internal object DefaultJsResourceReader : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         return readAsBlob(path).asByteArray()
     }

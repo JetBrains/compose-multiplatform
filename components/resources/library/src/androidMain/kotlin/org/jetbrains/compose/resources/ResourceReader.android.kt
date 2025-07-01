@@ -12,7 +12,7 @@ import java.io.InputStream
 internal actual fun getPlatformResourceReader(): ResourceReader = DefaultAndroidResourceReader
 
 @ExperimentalResourceApi
-object DefaultAndroidResourceReader : ResourceReader {
+internal object DefaultAndroidResourceReader : ResourceReader {
     private val assets: AssetManager by lazy {
         val context = androidContext ?: error(
             "Android context is not initialized. " +
