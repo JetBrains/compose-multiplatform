@@ -30,7 +30,5 @@ abstract class JvmApplication {
     abstract fun nativeDistributions(fn: Action<JvmApplicationDistributions>)
     abstract val buildTypes: JvmApplicationBuildTypes
     abstract fun buildTypes(fn: Action<JvmApplicationBuildTypes>)
-    abstract val appCds: AppCdsConfiguration
-    abstract fun appCds(fn: Action<AppCdsConfiguration>)
 }
 
