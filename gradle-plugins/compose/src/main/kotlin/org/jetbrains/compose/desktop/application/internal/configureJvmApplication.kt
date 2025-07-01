@@ -60,7 +60,7 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         taskNameObject = "runtime"
     ) {
         jdkHome.set(app.javaHomeProvider)
-        appCdsMode.set(app.appCds.mode)
+        appCdsMode.set(app.nativeDistributions.appCds.mode)
         checkJdkVendor.set(ComposeProperties.checkJdkVendor(project.providers))
         jdkVersionProbeJar.from(
             project.detachedComposeGradleDependency(
@@ -106,7 +106,7 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         includeAllModules.set(provider { app.nativeDistributions.includeAllModules })
         javaRuntimePropertiesFile.set(checkRuntime.flatMap { it.javaRuntimePropertiesFile })
         destinationDir.set(appTmpDir.dir("runtime"))
-        generateCdsArchive.set(app.appCds.mode.generateJreClassesArchive)
+        generateCdsArchive.set(app.nativeDistributions.appCds.mode.generateJreClassesArchive)
     }
 
     return CommonJvmDesktopTasks(
@@ -145,7 +145,7 @@ private fun JvmApplicationContext.configurePackagingTasks(
         )
     }
 
-    val appCdsMode = app.appCds.mode
+    val appCdsMode = app.nativeDistributions.appCds.mode
     val createAppCdsArchive = if (appCdsMode.generateAppClassesArchive) {
         tasks.register<AbstractCreateAppCdsArchiveTask>(
             taskNameAction = "create",
@@ -359,7 +359,7 @@ private fun JvmApplicationContext.configurePackageTask(
 
     packageTask.launcherMainClass.set(provider { app.mainClass })
     packageTask.launcherJvmArgs.set(
-        provider { defaultJvmArgs + app.appCds.runtimeJvmArgs() + app.jvmArgs }
+        provider { defaultJvmArgs + app.nativeDistributions.appCds.runtimeJvmArgs() + app.jvmArgs }
     )
     packageTask.launcherArgs.set(provider { app.args })
 }

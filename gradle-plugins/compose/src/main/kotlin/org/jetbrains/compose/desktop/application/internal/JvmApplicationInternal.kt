@@ -10,7 +10,6 @@ import org.gradle.api.Task
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.SourceSet
-import org.jetbrains.compose.desktop.application.dsl.AppCdsConfiguration
 import org.jetbrains.compose.desktop.application.dsl.JvmApplication
 import org.jetbrains.compose.desktop.application.dsl.JvmApplicationDistributions
 import org.jetbrains.compose.desktop.application.dsl.JvmApplicationBuildTypes
@@ -71,10 +70,4 @@ internal open class JvmApplicationInternal @Inject constructor(
     final override fun buildTypes(fn: Action<JvmApplicationBuildTypes>) {
         fn.execute(data.buildTypes)
     }
-
-    final override val appCds: AppCdsConfiguration by data::appCds
-    final override fun appCds(fn: Action<AppCdsConfiguration>) {
-        fn.execute(data.appCds)
-    }
-
 }

@@ -26,12 +26,13 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageVersion = "1.0.0"
+
+            appCds {
+                mode = %APP_CDS_MODE%
+                logging = true
+            }
         }
 
         jvmArgs += "-Xshare:on"  // This forces failure if AppCDS doesn't work
-        appCds {
-            mode = %APP_CDS_MODE%
-            logging = true
-        }
     }
 }
