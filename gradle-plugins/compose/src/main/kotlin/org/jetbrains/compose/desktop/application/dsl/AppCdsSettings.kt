@@ -12,21 +12,12 @@ abstract class AppCdsConfiguration {
      * The AppCDS mode to use.
      */
     var mode: AppCdsMode = AppCdsMode.None
-
-    /**
-     * Whether to ask the JVM to log AppCDS-related actions.
-     */
-    @Suppress("MemberVisibilityCanBePrivate")
-    var logging: Boolean = false
 }
 
 /**
  * Returns the AppCDS-related arguments to pass the JVM when running the app.
  */
-internal fun AppCdsConfiguration.runtimeJvmArgs() = buildList {
-    addAll(mode.runtimeJvmArgs())
-    if (logging) add("-Xlog:cds")
-}
+internal fun AppCdsConfiguration.runtimeJvmArgs() = mode.runtimeJvmArgs()
 
 /**
  * The mode of use of AppCDS.
