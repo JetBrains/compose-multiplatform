@@ -14,6 +14,11 @@ abstract class AppCdsConfiguration {
      * The AppCDS mode to use.
      */
     var mode: AppCdsMode = AppCdsMode.None
+
+    /**
+     * Whether to fail running the app if unable to load the AppCDS archive.
+     */
+    var exitAppOnCdsFailure: Boolean = false
 }
 
 /**
@@ -21,6 +26,9 @@ abstract class AppCdsConfiguration {
  */
 internal fun AppCdsConfiguration.runtimeJvmArgs(context: JvmApplicationContext) = buildList {
     addAll(mode.runtimeJvmArgs())
+    if (exitAppOnCdsFailure) {
+        add("-Xshare:on")
+    }
     if (context.buildType.cdsLogging.get()) {
         add("-Xlog:cds")
     }
