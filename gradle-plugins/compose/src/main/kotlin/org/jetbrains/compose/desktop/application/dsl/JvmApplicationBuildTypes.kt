@@ -7,7 +7,9 @@ package org.jetbrains.compose.desktop.application.dsl
 
 import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.Property
 import org.jetbrains.compose.internal.utils.new
+import org.jetbrains.compose.internal.utils.notNullProperty
 import javax.inject.Inject
 
 abstract class JvmApplicationBuildTypes @Inject constructor(
@@ -25,6 +27,7 @@ abstract class JvmApplicationBuildTypes @Inject constructor(
 
     val release: JvmApplicationBuildType = objects.new<JvmApplicationBuildType>("release").apply {
         proguard.isEnabled.set(true)
+        cdsLogging.set(false)
     }
     fun release(fn: Action<JvmApplicationBuildType>) {
         fn.execute(release)
@@ -43,4 +46,6 @@ abstract class JvmApplicationBuildType @Inject constructor(
     fun proguard(fn: Action<ProguardSettings>) {
         fn.execute(proguard)
     }
+
+    val cdsLogging: Property<Boolean> = objects.notNullProperty(true)
 }

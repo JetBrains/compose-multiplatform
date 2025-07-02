@@ -2,6 +2,7 @@ package org.jetbrains.compose.desktop.application.dsl
 
 import org.gradle.api.file.Directory
 import org.gradle.api.file.RegularFile
+import org.jetbrains.compose.desktop.application.internal.JvmApplicationContext
 import org.jetbrains.compose.internal.utils.packagedAppJarFilesDir
 import java.io.Serializable
 
@@ -18,7 +19,12 @@ abstract class AppCdsConfiguration {
 /**
  * Returns the AppCDS-related arguments to pass the JVM when running the app.
  */
-internal fun AppCdsConfiguration.runtimeJvmArgs() = mode.runtimeJvmArgs()
+internal fun AppCdsConfiguration.runtimeJvmArgs(context: JvmApplicationContext) = buildList {
+    addAll(mode.runtimeJvmArgs())
+    if (context.buildType.cdsLogging.get()) {
+        add("-Xlog:cds")
+    }
+}
 
 /**
  * The mode of use of AppCDS.
@@ -151,7 +157,8 @@ abstract class AppCdsMode(val name: String) : Serializable {
             override fun appClassesArchiveCreationJvmArgs() =
                 listOf(
                     "-XX:ArchiveClassesAtExit=$ARCHIVE_FILE_ARGUMENT",
-                    "-Dcompose.appcds.create-archive=true"
+                    "-Dcompose.appcds.create-archive=true",
+                    "-Xlog:cds"
                 )
             override fun appClassesArchiveFile(packagedAppRootDir: Directory): RegularFile {
                 val appDir = packagedAppJarFilesDir(packagedAppRootDir)
