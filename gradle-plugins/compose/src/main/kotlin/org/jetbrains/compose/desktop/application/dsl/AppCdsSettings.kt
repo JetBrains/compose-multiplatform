@@ -86,16 +86,21 @@ abstract class AppCdsMode(val name: String) : Serializable {
         /**
          * AppCDS is used via a dynamic shared archive created automatically
          * when the app is run (using `-XX:+AutoCreateSharedArchive`).
+         * Due to the drawbacks below, this mode is mostly recommended only
+         * to experiment and see how fast your app starts up with AppCDS.
+         * In production, we recomment [Prebuild] mode.
          *
-         * Pros:
+         * Advantages:
          * - Simplest - no additional step is needed to build the archive.
          * - Creates a smaller distributable.
          *
-         * Cons:
+         * Drawbacks:
          * - Requires JDK 19 or later.
          * - The archive is not available at the first execution of the app,
-         *   so it is slower. The archive is created when at shutdown time
-         *   of the first execution, which also takes a little longer.
+         *   so it is slower (and possibly even slower than regular execution),
+         *   The archive is created when at shutdown time of the first execution,
+         *   which also takes a little longer.
+         * - Some OSes may block the creation of the archive file at runtime.
          */
         @Suppress("unused")
         val Auto = object : AppCdsMode("Auto") {
@@ -120,11 +125,18 @@ abstract class AppCdsMode(val name: String) : Serializable {
          * AppCDS is used via a dynamic shared archive created by executing
          * the app before packaging (using `-XX:ArchiveClassesAtExit`).
          *
-         * Pros:
+         * When using this mode, the app will be run during the creation of
+         * the distributable. In this run, a system property
+         * `compose.appcds.create-archive` will be set to the value `true`.
+         * The app should "exercise" itself and cause the loading of all
+         * the classes that should be written into the AppCDS archive. It
+         * should then shut down in order to let the build process continue.
+         *
+         * Advantages:
          * - Can be used with JDKs earlier than 19.
          * - The first run of the distributed app is fast too.
          *
-         * Cons:
+         * Drawbacks:
          * - Requires an additional step of running the app when building the
          *   distributable.
          * - The distributable is larger because it includes the archive of
