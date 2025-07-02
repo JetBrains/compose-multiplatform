@@ -35,7 +35,6 @@ import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.*
 import java.util.jar.JarFile
-import kotlin.test.assertTrue
 
 class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
@@ -664,6 +663,24 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 check.logDoesntContain("[cds] Initialize dynamic archive failed")
                 check.logDoesntContain("[cds] An error has occurred while processing the shared archive file")
                 check.logDoesntContain("[cds] Failed to initialize dynamic archive")
+            }
+        }
+
+        testPackageAndRun(release = false)
+        testPackageAndRun(release = true)
+    }
+
+    @Test
+    fun testAppCdsCreateDistributable() = with(appCdsProject(AppCdsMode.Prebuild, 17)) {
+        fun testPackageAndRun(release: Boolean) {
+            val releaseTag = if (release) "Release" else ""
+            val createDistributableTaskName = ":create${releaseTag}Distributable"
+            val createAppCdsTaskName = ":create${releaseTag}AppCdsArchive"
+            gradle(createDistributableTaskName).checks {
+                check.taskSuccessful(createDistributableTaskName)
+                check.taskSuccessful(createAppCdsTaskName)
+                check.logContains("[cds] Dumping shared data to file")
+                check.logContains("Running app to create archive: true")
             }
         }
 

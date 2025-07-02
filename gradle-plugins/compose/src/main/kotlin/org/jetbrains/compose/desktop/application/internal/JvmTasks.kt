@@ -29,23 +29,31 @@ internal class JvmTasks(
         taskNameAction: String,
         taskNameObject: String = "",
         args: List<Any> = emptyList(),
+        isHidden: Boolean = false,
         noinline configureFn: T.() -> Unit = {}
     ): TaskProvider<T> {
         val buildTypeClassifier = buildType.classifier.uppercaseFirstChar()
         val objectClassifier = taskNameObject.uppercaseFirstChar()
         val taskName = "$taskNameAction$buildTypeClassifier$objectClassifier"
-        return register(taskName, klass = T::class.java, args = args, configureFn = configureFn)
+        return register(
+            name = taskName,
+            klass = T::class.java,
+            args = args,
+            isHidden = isHidden,
+            configureFn = configureFn
+        )
     }
 
     fun <T : Task> register(
         name: String,
         klass: Class<T>,
         args: List<Any>,
+        isHidden: Boolean = false,
         configureFn: T.() -> Unit
     ): TaskProvider<T> =
         project.tasks.register(name, klass, *args.toTypedArray()).apply {
             configure { task ->
-                task.group = taskGroup
+                task.group = if (isHidden) null else taskGroup
                 task.configureFn()
             }
         }

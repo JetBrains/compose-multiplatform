@@ -6,6 +6,7 @@
 package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.Task
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.JavaExec
@@ -130,10 +131,11 @@ private fun JvmApplicationContext.configurePackagingTasks(
         }
     } else null
 
-    val createDistributable = tasks.register<AbstractJPackageTask>(
+    val createDistributableImpl = tasks.register<AbstractJPackageTask>(
         taskNameAction = "create",
-        taskNameObject = "distributable",
-        args = listOf(TargetFormat.AppImage)
+        taskNameObject = "distributableImpl",
+        args = listOf(TargetFormat.AppImage),
+        isHidden = true,
     ) {
         configurePackageTask(
             this,
@@ -150,12 +152,23 @@ private fun JvmApplicationContext.configurePackagingTasks(
         tasks.register<AbstractCreateAppCdsArchiveTask>(
             taskNameAction = "create",
             taskNameObject = "appCdsArchive",
-            args = listOf(createDistributable)
+            args = listOf(createDistributableImpl),
+            isHidden = true,
         ) {
-            dependsOn(createDistributable)
+            dependsOn(createDistributableImpl)
             this.appCdsMode.set(appCdsMode)
         }
     } else null
+
+    val createDistributable = tasks.register<Task>(
+        taskNameAction = "create",
+        taskNameObject = "distributable",
+    ) {
+        dependsOn(createDistributableImpl)
+        if (createAppCdsArchive != null) {
+            dependsOn(createAppCdsArchive)
+        }
+    }
 
     val packageFormats = app.nativeDistributions.targetFormats.map { targetFormat ->
         val packageFormat = tasks.register<AbstractJPackageTask>(
@@ -182,7 +195,7 @@ private fun JvmApplicationContext.configurePackagingTasks(
             } else {
                 configurePackageTask(
                     this,
-                    createAppImage = createDistributable,
+                    createAppImage = createDistributableImpl,
                     checkRuntime = commonTasks.checkRuntime,
                     unpackDefaultResources = commonTasks.unpackDefaultResources,
                     createAppCdsArchive = createAppCdsArchive
@@ -242,11 +255,9 @@ private fun JvmApplicationContext.configurePackagingTasks(
     val runDistributable = tasks.register<AbstractRunDistributableTask>(
         taskNameAction = "run",
         taskNameObject = "distributable",
-        args = listOf(createDistributable)
+        args = listOf(createDistributableImpl)
     ) {
-        if (createAppCdsArchive != null) {
-            dependsOn(createAppCdsArchive)
-        }
+        dependsOn(createDistributable)
     }
 
     val run = tasks.register<JavaExec>(taskNameAction = "run") {
