@@ -1,7 +1,8 @@
 package org.jetbrains.compose.desktop.application.dsl
 
+import org.gradle.api.file.Directory
+import org.gradle.api.file.RegularFile
 import org.jetbrains.compose.internal.utils.packagedAppJarFilesDir
-import java.io.File
 import java.io.Serializable
 
 /**
@@ -47,7 +48,7 @@ abstract class AppCdsMode(val name: String) : Serializable {
      * Returns the app's classes archive file, given the root directory of
      * the packaged app.
      */
-    internal open fun appClassesArchiveFile(packagedAppRootDir: File): File =
+    internal open fun appClassesArchiveFile(packagedAppRootDir: Directory): RegularFile =
         error("AppCdsMode '$this' does not create an archive")
 
     /**
@@ -151,9 +152,9 @@ abstract class AppCdsMode(val name: String) : Serializable {
                     "-XX:ArchiveClassesAtExit=$ARCHIVE_FILE_ARGUMENT",
                     "-Dcompose.appcds.create-archive=true"
                 )
-            override fun appClassesArchiveFile(packagedAppRootDir: File): File {
+            override fun appClassesArchiveFile(packagedAppRootDir: Directory): RegularFile {
                 val appDir = packagedAppJarFilesDir(packagedAppRootDir)
-                return appDir.resolve(ARCHIVE_NAME)
+                return appDir.file(ARCHIVE_NAME)
             }
             override fun runtimeJvmArgs() =
                 listOf(

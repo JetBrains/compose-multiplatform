@@ -54,17 +54,12 @@ internal val currentOS: OS by lazy {
 internal fun executableName(nameWithoutExtension: String): String =
     if (currentOS == OS.Windows) "$nameWithoutExtension.exe" else nameWithoutExtension
 
-internal fun packagedAppRootDir(appImageRootDir: Directory): File {
-    return appImageRootDir.asFile.let { appImageRoot ->
-        val files = appImageRoot.listFiles()
-            // Sometimes ".DS_Store" files are created on macOS, so ignore them.
-            ?.filterNot { it.name == ".DS_Store" }
-        if (files.isNullOrEmpty()) {
-            error("Could not find application image: $appImageRoot is empty!")
-        } else if (files.size > 1) {
-            error("Could not find application image: $appImageRoot contains multiple children [${files.joinToString(", ")}]")
-        } else files.single()
+internal fun packagedAppRootDir(appImageRootDir: Directory, packageName: String): Directory {
+    val dirName = when (currentOS) {
+        OS.MacOS -> "$packageName.app"
+        else -> packageName
     }
+    return appImageRootDir.dir(dirName)
 }
 
 internal fun packagedAppExecutableName(packageName: String): String {
@@ -76,8 +71,8 @@ internal fun packagedAppExecutableName(packageName: String): String {
     }
 }
 
-internal fun packagedAppJarFilesDir(packagedRootDir: File): File {
-    return packagedRootDir.resolve(
+internal fun packagedAppJarFilesDir(packagedRootDir: Directory): Directory {
+    return packagedRootDir.dir(
         when (currentOS) {
             OS.Linux -> "lib/app/"
             OS.Windows -> "app/"
@@ -90,12 +85,12 @@ internal fun ExecOperations.executePackagedApp(
     appImageRootDir: Directory,
     packageName: String
 ) {
-    val workingDir = packagedAppRootDir(appImageRootDir = appImageRootDir)
+    val workingDir = packagedAppRootDir(appImageRootDir = appImageRootDir, packageName = packageName)
     val executableName = packagedAppExecutableName(packageName = packageName)
 
     exec { spec ->
         spec.workingDir(workingDir)
-        spec.executable(workingDir.resolve(executableName).absolutePath)
+        spec.executable(workingDir.asFile.resolve(executableName).absolutePath)
     }.assertNormalExitValue()
 }
 
