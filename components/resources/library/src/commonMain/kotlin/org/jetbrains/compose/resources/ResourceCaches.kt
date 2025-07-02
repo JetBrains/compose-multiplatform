@@ -11,6 +11,10 @@ internal class AsyncCache<K, V> {
     private val mutex = Mutex()
     private val cache = mutableMapOf<K, Deferred<V>>()
 
+    init {
+        ResourceCaches.registerCache(this)
+    }
+
     suspend fun getOrLoad(key: K, load: suspend () -> V): V = coroutineScope {
         val deferred = mutex.withLock {
             var cached = cache[key]
@@ -24,8 +28,25 @@ internal class AsyncCache<K, V> {
         deferred.await()
     }
 
-    //@TestOnly
-    fun clear() {
-        cache.clear()
+    suspend fun clear() {
+        mutex.withLock {
+            cache.clear()
+        }
+    }
+}
+
+object ResourceCaches {
+    private val caches = mutableListOf<AsyncCache<*, *>>()
+
+    internal fun registerCache(cache: AsyncCache<*, *>) = caches.add(cache)
+
+    /**
+     * Clears any cached resources maintained internally by the system.
+     *
+     * It can be useful to release memory or reset cached resources that
+     * may be changed or no longer be required.
+     */
+    internal suspend fun clear() {
+        caches.forEach { it.clear() }
     }
 }

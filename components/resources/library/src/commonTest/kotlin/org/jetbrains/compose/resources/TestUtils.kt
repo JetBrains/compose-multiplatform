@@ -1,5 +1,8 @@
 package org.jetbrains.compose.resources
 
+import androidx.compose.ui.test.ComposeUiTest
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.runComposeUiTest
 import org.jetbrains.compose.resources.plural.PluralCategory
 import org.jetbrains.compose.resources.plural.PluralRule
 import org.jetbrains.compose.resources.plural.PluralRuleList
@@ -67,3 +70,15 @@ internal fun pluralRuleListOf(vararg rules: Pair<PluralCategory, String>): Plura
     val pluralRules = rules.map { PluralRule(it.first, it.second) } + PluralRule(PluralCategory.OTHER, "")
     return PluralRuleList(pluralRules.toTypedArray())
 }
+
+/**
+ * Executes a test block within a Compose UI testing environment while ensuring
+ * that any cached resources are cleared before the test begins.
+ */
+@OptIn(ExperimentalTestApi::class)
+fun clearResourceCachesAndRunUiTest(block: suspend ComposeUiTest.() -> Unit) = runComposeUiTest {
+    ResourceCaches.clear()
+    block()
+}
+
+
