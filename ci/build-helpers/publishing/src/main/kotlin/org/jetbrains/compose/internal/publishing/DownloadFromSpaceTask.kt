@@ -30,6 +30,7 @@ abstract class DownloadFromSpaceMavenRepoTask : DefaultTask() {
     }
 
     private fun downloadArtifactsFromComposeDev(module: ModuleToUpload) {
+        logger.info("Downloading ${module.coordinate}...")
         val groupUrl = module.groupId.replace(".", "/")
 
         val filesListingDocument =
