@@ -366,6 +366,7 @@ private fun JvmApplicationContext.configurePackageTask(
 
     if (createAppCdsArchive != null) {
         packageTask.dependsOn(createAppCdsArchive)
+        packageTask.files.from(project.file(createAppCdsArchive.flatMap { it.appCdsArchiveFile }))
     }
 
     packageTask.launcherMainClass.set(provider { app.mainClass })

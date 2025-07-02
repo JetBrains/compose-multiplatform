@@ -2,6 +2,7 @@ package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileTree
+import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
@@ -25,11 +26,13 @@ abstract class AbstractCreateAppCdsArchiveTask @Inject constructor(
     @get:Input
     internal abstract val appCdsMode: Property<AppCdsMode>
 
-    @Suppress("unused")
     @get:OutputFile
-    val appCdsArchiveFile: File get() {
-        val packagedAppRootDir = packagedAppRootDir(appImageRootDir.get())
-        return appCdsMode.get().appClassesArchiveFile(packagedAppRootDir)
+    val appCdsArchiveFile: Provider<RegularFile> = provider {
+        val appImageRootDir = appImageRootDir.get()
+        val packageName = packageName.get()
+        val appCdsMode = appCdsMode.get()
+        val packagedAppRootDir = packagedAppRootDir(appImageRootDir, packageName)
+        appCdsMode.appClassesArchiveFile(packagedAppRootDir)
     }
 
     // This is needed to correctly describe the dependencies to Gradle.
@@ -44,7 +47,7 @@ abstract class AbstractCreateAppCdsArchiveTask @Inject constructor(
             }
         }
 
-        val appCdsArchiveFile = appCdsArchiveFile.relativeTo(appImageRootDir.get().asFile).path
+        val appCdsArchiveFile = appCdsArchiveFile.ioFile.relativeTo(appImageRootDir.get().asFile).path
         return appImageRootDir.get().asFileTree.matching { it.exclude(appCdsArchiveFile) }
     }
 
@@ -54,9 +57,9 @@ abstract class AbstractCreateAppCdsArchiveTask @Inject constructor(
         // AppCdsMode.runtimeJvmArgs with AppCdsMode.appClassesArchiveCreationJvmArgs
         // This must be done because, for example, -XX:SharedArchiveFile and
         // -XX:ArchiveClassesAtExit can't be used at the same time
-        val packagedRootDir = packagedAppRootDir(appImageRootDir.get())
+        val packagedRootDir = packagedAppRootDir(appImageRootDir.get(), packageName = packageName.get())
         val appDir = packagedAppJarFilesDir(packagedRootDir)
-        val cfgFile = appDir.resolve("${packageName.get()}.cfg")
+        val cfgFile = appDir.asFile.resolve("${packageName.get()}.cfg")
         val cfgFileTempCopy = File(cfgFile.parentFile, "${cfgFile.name}.tmp")
 
         // Save the original cfg file
