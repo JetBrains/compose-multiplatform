@@ -76,8 +76,8 @@ internal fun pluralRuleListOf(vararg rules: Pair<PluralCategory, String>): Plura
  * that any cached resources are cleared before the test begins.
  */
 @OptIn(ExperimentalTestApi::class)
-fun runComposeResourceTest(block: suspend ComposeUiTest.() -> Unit) = runComposeUiTest {
-    ResourceCaches.asyncClear()
+fun clearResourceCachesAndRunUiTest(block: suspend ComposeUiTest.() -> Unit) = runComposeUiTest {
+    ResourceCaches.clear()
     block()
 }
 

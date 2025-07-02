@@ -46,7 +46,13 @@ object ResourceCaches {
 
     internal fun registerCache(cache: AsyncCache<*, *>) = caches.add(cache)
 
-    internal suspend fun asyncClear() {
+    /**
+     * Clears any cached resources maintained internally by the system.
+     *
+     * It can be useful to release memory or reset cached resources that
+     * may be changed or no longer be required.
+     */
+    internal suspend fun clear() {
         caches.forEach { it.clear() }
     }
 }

@@ -16,7 +16,7 @@ import kotlin.test.assertNotEquals
 class FontCacheTest {
 
     @Test
-    fun testFontResourceCache() = runComposeResourceTest {
+    fun testFontResourceCache() = clearResourceCachesAndRunUiTest {
         val font1 = "font_awesome.otf"
         val font2 = "Workbench-Regular.ttf"
 
@@ -44,7 +44,7 @@ class FontCacheTest {
             actual = testResourceReader.readPaths
         )
 
-        ResourceCaches.asyncClear()
+        ResourceCaches.clear()
 
         res = TestFontResource(font2)
         waitForIdle()
@@ -58,7 +58,7 @@ class FontCacheTest {
     }
 
     @Test
-    fun testFontReplacement() = runComposeResourceTest {
+    fun testFontReplacement() = clearResourceCachesAndRunUiTest {
         val font1 = "font_awesome.otf"
         val font2 = "Workbench-Regular.ttf"
 
@@ -88,7 +88,7 @@ class FontCacheTest {
 
         assertNotEquals(id1, id2)
 
-        ResourceCaches.asyncClear()
+        ResourceCaches.clear()
 
         testResourceReader.replaceNextReadWith(font2)
         res = TestFontResource(font1)

@@ -9,6 +9,6 @@ import kotlinx.coroutines.runBlocking
  * may be changed or no longer be required.
  */
 @ExperimentalResourceApi
-fun ResourceCaches.clear() {
-    runBlocking { asyncClear() }
+fun ResourceCaches.clearBlocking() {
+    runBlocking { clear() }
 }
