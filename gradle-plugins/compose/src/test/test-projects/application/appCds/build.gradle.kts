@@ -29,10 +29,9 @@ compose.desktop {
 
             appCds {
                 mode = %APP_CDS_MODE%
+                exitAppOnCdsFailure = true
             }
         }
-
-        jvmArgs += "-Xshare:on"  // This forces failure if AppCDS doesn't work
         jvmArgs += "-Xlog:cds"
     }
 }
