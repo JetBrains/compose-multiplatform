@@ -8,7 +8,11 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import java.io.FileNotFoundException
 import java.io.InputStream
 
-internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
+@ExperimentalResourceApi
+internal actual fun getPlatformResourceReader(): ResourceReader = DefaultAndroidResourceReader
+
+@ExperimentalResourceApi
+internal object DefaultAndroidResourceReader : ResourceReader {
     private val assets: AssetManager by lazy {
         val context = androidContext ?: error(
             "Android context is not initialized. " +
