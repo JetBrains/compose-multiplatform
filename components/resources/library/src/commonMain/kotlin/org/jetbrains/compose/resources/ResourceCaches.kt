@@ -35,12 +35,6 @@ internal class AsyncCache<K, V> {
     }
 }
 
-/**
- * Manages internal resource caches.
- *
- * While the caches are managed automatically, there might be scenarios where manual cache clearing
- * is desired. For such cases, we provide an API to reset the caches.
-*/
 object ResourceCaches {
     private val caches = mutableListOf<AsyncCache<*, *>>()
 
