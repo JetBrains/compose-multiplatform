@@ -101,7 +101,8 @@ abstract class AppCdsMode(val name: String) : Serializable {
          *   so it is slower (and possibly even slower than regular execution),
          *   The archive is created when at shutdown time of the first execution,
          *   which also takes a little longer.
-         * - Some OSes may block the creation of the archive file at runtime.
+         * - Some OSes may block writing the archive file to the application's
+         *   directory at runtime.
          */
         @Suppress("unused")
         val Auto = object : AppCdsMode("Auto") {
