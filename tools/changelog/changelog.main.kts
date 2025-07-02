@@ -90,7 +90,7 @@ when (argsKeyToValue["action"]) {
 
 fun generateChangelog() {
     if (token == null) {
-        println("To increase the rate limit, specify token (https://github.com/settings/tokens), adding token=yourtoken in the end")
+        println("To increase the rate limit, specify token (https://github.com/settings/tokens), adding token=yourtoken in the end\n")
     }
 
     val commitsArg = argsKeyless.getOrNull(0) ?: "HEAD"
@@ -193,10 +193,12 @@ fun generateChangelog() {
                             appendLine("### $subsection")
                             appendLine()
                             subsectionEntries.forEach {
-                                if (it.link != null) {
-                                    appendLine(it.run { "$message [#$prNumber]($link)" })
-                                } else {
-                                    appendLine(it.message)
+                                appendLine(it.run { "- $title [#$prNumber]($link)" })
+                                if (it.details != null) {
+                                    if (!it.details.startsWith("-")) {
+                                        appendLine()
+                                    }
+                                    appendLine(it.details.prependIndent("  "))
                                 }
                             }
                             appendLine()
@@ -315,7 +317,7 @@ fun currentChangelogDate() = LocalDate.now().format(DateTimeFormatter.ofPattern(
 fun GitHubPullEntry.extractReleaseNotes() = extractReleaseNotes(body, number, htmlUrl)
 
 fun GitHubPullEntry.unknownChangelogEntries() =
-    listOf(ChangelogEntry("- $title", null, null, number, htmlUrl, false))
+    listOf(ChangelogEntry("- $title", null, null, null, number, htmlUrl, false))
 
 /**
  * Extract by format [PR_FORMAT.md]
@@ -352,50 +354,46 @@ fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNo
 
     if (pullRequests.isNotEmpty()) return ReleaseNotes.CherryPicks(pullRequests)
 
-    val list = mutableListOf<ChangelogEntry>()
-    var section: String? = null
-    var subsection: String? = null
-    var isFirstLine = true
-    var isPrerelease = false
+    /**
+     * Parses bodies like:
+     * ```
+     * ### Highlights - iOS
+     * - Describe change 1
+     * details (multiline)
+     *
+     * - Describe change 2
+     *   details (multiline)
+     * ```
+     */
+    fun parseChangelogEntries(sectionBody: StringList): List<ChangelogEntry> {
+        val s = sectionBody.first().trimStart { it == '#' || it.isWhitespace() }
+        val section = s.substringBefore("-", "").trim()
+            .normalizeSectionName().ifEmpty { return emptyList() }
+        val subsection = s.substringAfter("-", "").trim()
+            .normalizeSubsectionName().ifEmpty { return emptyList() }
 
-    for (line in relNoteBody.split("\n")) {
-        // parse "## Section - Subsection"
-        if (line.trim().startsWith("#")) {
-            val s = line.trimStart { it == '#' || it.isWhitespace() }
-            section = s.substringBefore("-", "").trim().normalizeSectionName().ifEmpty { null }
-            subsection = s.substringAfter("-", "").trim().normalizeSubsectionName().ifEmpty { null }
-            isFirstLine = true
-            isPrerelease = false
-        } else if (section != null && line.isNotBlank()) {
-            var lineFixed = line
-
-            if (isFirstLine && !lineFixed.startsWith("-")) {
-                lineFixed = "- $lineFixed"
+        return sectionBody
+            .drop(1)
+            .split { it.startsWith("-") }
+            .map { entryBody ->
+                val title = entryBody.first().trim().removePrefix("-").removeSuffix(".").trim()
+                val details = entryBody.drop(1)
+                    .dropWhile { it.isBlank() }
+                    .dropLastWhile { it.isBlank() }
+                    .joinToString("\n")
+                    .trimIndent()
+                    .ifBlank { null }
+                val isPrerelease = title.contains("(prerelease fix)")
+                ChangelogEntry(title, details, section, subsection, prNumber, prLink, isPrerelease)
             }
-            if (!isFirstLine && !lineFixed.startsWithAny("  ", "-")) {
-                lineFixed = "  $lineFixed"
-            }
-            lineFixed = lineFixed.trimEnd().removeSuffix(".")
-
-            val isTopLevel = lineFixed.startsWith("-")
-            if (isTopLevel) {
-                isPrerelease = lineFixed.contains("(prerelease fix)")
-            }
-            list.add(
-                ChangelogEntry(
-                    lineFixed,
-                    section,
-                    subsection,
-                    prNumber,
-                    prLink.takeIf { isTopLevel },
-                    isPrerelease
-                )
-            )
-            isFirstLine = false
-        }
     }
 
-    return ReleaseNotes.Specified(list)
+    return ReleaseNotes.Specified(
+        relNoteBody
+            .split("\n")
+            .split { it.trim().startsWith("#") }
+            .flatMap(::parseChangelogEntries)
+    )
 }
 
 /**
@@ -410,14 +408,14 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
 
     val shaToPull = pulls.associateBy { it.mergeCommitSha }
     val numberToPull = pulls.associateBy { it.number }
-    val pullToReleaseNotes = Cache( GitHubPullEntry::extractReleaseNotes)
+    val pullToReleaseNotes = Cache(GitHubPullEntry::extractReleaseNotes)
 
     // if GitHubPullEntry is a cherry-picks PR (contains a list of links to other PRs), replace it by the original PRs
     fun List<GitHubPullEntry>.replaceCherryPicks(): List<GitHubPullEntry> = flatMap { pullRequest ->
         val releaseNotes = pullToReleaseNotes[pullRequest]
         if (releaseNotes is ReleaseNotes.CherryPicks) {
             releaseNotes.pullRequests
-                .filter { it.repo == repo }
+                .filter { it.repo.equals(repo, ignoreCase = true) }
                 .mapNotNull { numberToPull[it.number] }
         } else {
             listOf(pullRequest)
@@ -561,18 +559,29 @@ sealed interface ReleaseNotes {
     class Specified(override val entries: List<ChangelogEntry>): ReleaseNotes
 }
 
+/**
+ * Describes a single entry in a format:
+ *
+ * ### section - subsection
+ * ...
+ * - title (single line)
+ * details (line 1)
+ * details (line 2)
+ * ...
+ */
 data class ChangelogEntry(
-    val message: String,
+    val title: String, /**  */
+    val details: String?,
     val section: String?,
     val subsection: String?,
     val prNumber: Int,
-    val link: String?,
+    val link: String,
     val isPrerelease: Boolean,
 ) {
     /**
      * Unique entry id used for excluding cherry-picked entries
      */
-    val id: UUID = UUID.nameUUIDFromBytes((section + subsection + message).toByteArray(Charsets.UTF_8))
+    val id: UUID = UUID.nameUUIDFromBytes((section + subsection + title + details).toByteArray(Charsets.UTF_8))
 }
 
 fun ChangelogEntry.sectionOrder(): Int = section?.let(standardSections::indexOf) ?: standardSections.size
@@ -650,7 +659,17 @@ fun <T> exponentialRetry(block: () -> T): T {
     throw exception
 }
 
-fun String.startsWithAny(vararg prefixes: String): Boolean = prefixes.any { startsWith(it) }
+
+typealias StringList = List<String>
+
+fun StringList.split(shouldSplit: (line: String) -> Boolean): List<StringList> =
+    fold(initial = mutableListOf<MutableList<String>>()) { acc, it ->
+        if (acc.isEmpty() || shouldSplit(it)) {
+            acc.add(mutableListOf())
+        }
+        acc.last().add(it)
+        acc
+    }
 
 class Cache<K, V>(private val create: (K) -> V) {
     private val map = mutableMapOf<K,V>()
