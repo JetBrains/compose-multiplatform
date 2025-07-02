@@ -371,7 +371,7 @@ private fun JvmApplicationContext.configurePackageTask(
 
     packageTask.launcherMainClass.set(provider { app.mainClass })
     packageTask.launcherJvmArgs.set(
-        provider { defaultJvmArgs + app.nativeDistributions.appCds.runtimeJvmArgs() + app.jvmArgs }
+        provider { defaultJvmArgs + app.nativeDistributions.appCds.runtimeJvmArgs(this) + app.jvmArgs }
     )
     packageTask.launcherArgs.set(provider { app.args })
 }
