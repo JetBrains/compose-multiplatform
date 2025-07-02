@@ -713,6 +713,24 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         testPackageAndRun(release = true)
     }
 
+    @Test
+    fun testAppCdsCreateDistributable() = with(appCdsProject(AppCdsMode.Prebuild, 17)) {
+        fun testPackageAndRun(release: Boolean) {
+            val releaseTag = if (release) "Release" else ""
+            val createDistributableTaskName = ":create${releaseTag}Distributable"
+            val createAppCdsTaskName = ":create${releaseTag}AppCdsArchive"
+            gradle(createDistributableTaskName).checks {
+                check.taskSuccessful(createDistributableTaskName)
+                check.taskSuccessful(createAppCdsTaskName)
+                check.logContains("[cds] Dumping shared data to file")
+                check.logContains("Running app to create archive: true")
+            }
+        }
+
+        testPackageAndRun(release = false)
+        testPackageAndRun(release = true)
+    }
+
     private fun TestProject.enableJoinOutputJars() {
         val enableJoinOutputJars = """
                     compose.desktop {
