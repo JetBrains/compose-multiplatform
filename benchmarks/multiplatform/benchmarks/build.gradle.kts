@@ -1,7 +1,6 @@
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenRootEnvSpec
-import org.jetbrains.kotlin.gradle.targets.js.d8.D8Exec
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
+import org.jetbrains.kotlin.gradle.targets.wasm.d8.D8Exec
 import kotlin.text.replace
 
 plugins {
@@ -143,7 +142,7 @@ gradle.taskGraph.whenReady {
     @OptIn(ExperimentalWasmDsl::class)
     tasks.withType<D8Exec>().configureEach {
         inputFileProperty.set(rootProject.layout.buildDirectory.file(
-            "js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin/launcher.mjs")
+            "wasm/packages/compose-benchmarks-benchmarks/kotlin/launcher.mjs")
         )
 
         args(appArgs)
@@ -153,7 +152,7 @@ gradle.taskGraph.whenReady {
 
 tasks.register("buildD8Distribution", Zip::class.java) {
     dependsOn("wasmJsProductionExecutableCompileSync")
-    from(rootProject.layout.buildDirectory.file("js/packages/compose-benchmarks-benchmarks-wasm-js/kotlin"))
+    from(rootProject.layout.buildDirectory.file("wasm/packages/compose-benchmarks-benchmarks/kotlin"))
     archiveFileName.set("d8-distribution.zip")
     destinationDirectory.set(rootProject.layout.buildDirectory.dir("distributions"))
 }
@@ -196,12 +195,12 @@ tasks.register("runBrowserAndSaveStats") {
     }
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.targets.js.binaryen.BinaryenExec>().configureEach {
+tasks.withType<org.jetbrains.kotlin.gradle.targets.wasm.binaryen.BinaryenExec>().configureEach {
     binaryenArgs.add("-g") // keep the readable names
 }
 
 @OptIn(ExperimentalWasmDsl::class)
-rootProject.the<BinaryenRootEnvSpec>().apply {
+project.the<org.jetbrains.kotlin.gradle.targets.wasm.binaryen.BinaryenEnvSpec>().apply {
     // version = "122" // change only if needed
 }
 
