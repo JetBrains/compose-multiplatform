@@ -1,74 +1,91 @@
-import org.jetbrains.compose.internal.publishing.*
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    signing
+    kotlin("jvm") version "2.1.10" apply false
+    id("com.github.johnrengelman.shadow") version "7.1.0" apply false
 }
 
-val mavenCentral = MavenCentralProperties(project)
-if (mavenCentral.signArtifacts) {
-    signing.useInMemoryPgpKeys(
-        mavenCentral.signArtifactsKey.get(),
-        mavenCentral.signArtifactsPassword.get()
-    )
-}
+subprojects {
+    group = "org.jetbrains.compose.internal.build-helpers"
+    version = project.property("deploy.version") as String
 
-val publishingDir = project.layout.buildDirectory.dir("publishing")
-val originalArtifactsRoot = publishingDir.map { it.dir("original") }
-val preparedArtifactsRoot = publishingDir.map { it.dir("prepared") }
-val modulesFile = publishingDir.map { it.file("modules.txt") }
+    repositories {
+        mavenCentral()
+    }
 
-val findComposeModules by tasks.registering(FindModulesInSpaceTask::class) {
-    requestedCoordinates.set(mavenCentral.coordinates)
-    spaceInstanceUrl.set("https://public.jetbrains.space")
-    spaceClientId.set(System.getenv("COMPOSE_REPO_USERNAME") ?: "")
-    spaceClientSecret.set(System.getenv("COMPOSE_REPO_KEY") ?: "")
-    spaceProjectId.set(System.getenv("COMPOSE_DEV_REPO_PROJECT_ID") ?: "")
-    spaceRepoId.set(System.getenv("COMPOSE_DEV_REPO_REPO_ID") ?: "")
-    modulesTxtFile.set(modulesFile)
-}
-
-val downloadArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenRepoTask::class) {
-    dependsOn(findComposeModules)
-    modulesToDownload.set(project.provider {
-        readComposeModules(
-            modulesFile,
-            originalArtifactsRoot
-        )
-    })
-    spaceRepoUrl.set("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-}
-
-val fixModulesBeforePublishing by tasks.registering(FixModulesBeforePublishingTask::class) {
-    dependsOn(downloadArtifactsFromComposeDev)
-    inputRepoDir.set(originalArtifactsRoot)
-    outputRepoDir.set(preparedArtifactsRoot)
-}
-
-val reuploadArtifactsToMavenCentral by tasks.registering(UploadToSonatypeTask::class) {
-    dependsOn(fixModulesBeforePublishing)
-
-    modulesToUpload.set(project.provider { readComposeModules(modulesFile, preparedArtifactsRoot) })
-
-    sonatypeServer.set("https://oss.sonatype.org")
-    user.set(mavenCentral.user)
-    password.set(mavenCentral.password)
-    autoCommitOnSuccess.set(mavenCentral.autoCommitOnSuccess)
-    stagingProfileName.set(mavenCentral.stage)
-    stagingDescription.set(mavenCentral.description)
-}
-
-fun readComposeModules(
-    modulesFile: Provider<out FileSystemLocation>,
-    repoRoot: Provider<out FileSystemLocation>
-): List<ModuleToUpload> =
-    modulesFile.get().asFile.readLines()
-        .filter { it.isNotBlank() }
-        .map { line ->
-            val (group, artifact, version) = line.split(":")
-            ModuleToUpload(
-                groupId = group,
-                artifactId = artifact,
-                version = version,
-                localDir = repoRoot.get().asFile.resolve("$group/$artifact/$version")
-            )
+    plugins.withType(JavaBasePlugin::class.java) {
+        afterEvaluate {
+            configureIfExists<JavaPluginExtension> {
+                sourceCompatibility = JavaVersion.VERSION_1_8
+                targetCompatibility = JavaVersion.VERSION_1_8
+                if (sourceSets.names.contains(SourceSet.MAIN_SOURCE_SET_NAME)) {
+                    withJavadocJar()
+                    withSourcesJar()
+                }
+            }
         }
+    }
+
+    plugins.withId("org.jetbrains.kotlin.jvm") {
+        afterEvaluate {
+            tasks.withType<KotlinCompile> {
+                compilerOptions {
+                    jvmTarget.set(JvmTarget.JVM_1_8)
+                }
+            }
+        }
+    }
+
+    plugins.withId("maven-publish") {
+        configureIfExists<PublishingExtension> {
+            configurePublishing(project)
+        }
+    }
+}
+
+fun PublishingExtension.configurePublishing(project: Project) {
+    repositories {
+        configureEach {
+            val repoName = name
+            project.tasks.register("publishTo${repoName}") {
+                group = "publishing"
+                dependsOn(project.tasks.named("publishAllPublicationsTo${repoName}Repository"))
+            }
+        }
+        maven {
+            name = "BuildRepo"
+            url = uri("${rootProject.buildDir}/repo")
+        }
+        maven {
+            name = "ComposeInternalRepo"
+            url = uri(
+                System.getenv("COMPOSE_INTERNAL_REPO_URL")
+                    ?: "https://maven.pkg.jetbrains.space/public/p/compose/internal"
+            )
+            credentials {
+                username =
+                    System.getenv("COMPOSE_INTERNAL_REPO_USERNAME")
+                        ?: System.getenv("COMPOSE_REPO_USERNAME")
+                                ?: ""
+                password =
+                    System.getenv("COMPOSE_INTERNAL_REPO_KEY")
+                        ?: System.getenv("COMPOSE_REPO_KEY")
+                                ?: ""
+            }
+        }
+    }
+    publications {
+        create<MavenPublication>("main") {
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+
+            from(project.components["java"])
+        }
+    }
+}
+
+inline fun <reified T> Project.configureIfExists(fn: T.() -> Unit) {
+    extensions.findByType(T::class.java)?.fn()
+}
