@@ -79,13 +79,15 @@ abstract class UploadToSonatypeTask : DefaultTask() {
 
         ZipOutputStream(FileOutputStream(zipFile)).use { zipOut ->
             val sourcesToDestinations = modules.map { it.localDir to it.mavenDirectory() }
+            val addedEntries = mutableSetOf<String>()
 
             for ((sourceDir, destDir) in sourcesToDestinations) {
                 val files = sourceDir.listFiles() ?: continue
 
                 for (file in files) {
-                    if (file.isFile) {
-                        val entryPath = "$destDir/${file.name}"
+                    val entryPath = "$destDir/${file.name}"
+                    if (file.isFile && !addedEntries.contains(entryPath)) {
+                        addedEntries.add(entryPath)
                         val entry = ZipEntry(entryPath)
                         zipOut.putNextEntry(entry)
                         file.inputStream().use { input ->
