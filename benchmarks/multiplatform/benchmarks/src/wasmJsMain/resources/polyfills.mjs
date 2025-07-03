@@ -11,6 +11,9 @@ if (!globalThis.navigator.languages) {
     globalThis.navigator.platform = "MacIntel";
 }
 
+// Compose reads `window.isSecureContext` in its Clipboard feature:
+globalThis.isSecureContext = false;
+
 if (!globalThis.gc) {
     // No GC control in D8
     globalThis.gc = () => {

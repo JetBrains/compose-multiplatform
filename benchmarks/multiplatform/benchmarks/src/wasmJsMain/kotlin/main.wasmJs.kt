@@ -60,7 +60,7 @@ private val basicConfigForD8 = Config(
 @JsExport
 fun customLaunch(benchmarkName: String, frameCount: Int): Promise<JsAny?> {
     val config = basicConfigForD8.copy(
-        benchmarks = mapOf(benchmarkName to frameCount)
+        benchmarks = mapOf(benchmarkName.uppercase() to frameCount)
     )
     Config.setGlobal(config)
 
