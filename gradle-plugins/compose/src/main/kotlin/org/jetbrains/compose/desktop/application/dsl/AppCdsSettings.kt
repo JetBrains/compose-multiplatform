@@ -8,6 +8,10 @@ import java.io.Serializable
 
 /**
  * The configuration of AppCDS for the native distribution.
+ *
+ * AppCDS is a JVM mechanism that allows to significantly speed up application
+ * startup by creating an archive of the classes it uses that can be loaded
+ * and used much faster than class files.
  */
 abstract class AppCdsConfiguration {
     /**
