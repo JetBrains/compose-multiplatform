@@ -110,7 +110,8 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
         }
 
         val type = ResourceType.fromString(typeString) ?: error("Unknown resource type: '$typeString'.")
-        return listOf(ResourceItem(type, qualifiers, file.nameWithoutExtension.asUnderscoredIdentifier(), path))
+        return listOf(ResourceItem(type, qualifiers, file.nameWithoutExtension.asUnderscoredIdentifier(), path,
+            file.readBytes().contentHashCode()))
     }
 
     private fun getValueResourceItems(dataFile: File, qualifiers: List<String>, path: Path): List<ResourceItem> {
@@ -141,7 +142,8 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
         path: Path
     ): ResourceItem {
         val record = ValueResourceRecord.createFromString(recordString)
-        return ResourceItem(record.type, qualifiers, record.key.asUnderscoredIdentifier(), path, offset, size)
+        return ResourceItem(record.type, qualifiers, record.key.asUnderscoredIdentifier(), path,
+            record.content.hashCode(), offset, size)
     }
 }
 
