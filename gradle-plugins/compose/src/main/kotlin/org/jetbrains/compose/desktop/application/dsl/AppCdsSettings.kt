@@ -152,6 +152,19 @@ abstract class AppCdsMode(val name: String) : Serializable {
          * the classes that should be written into the AppCDS archive. It
          * should then shut down in order to let the build process continue.
          *
+         * For example:
+         * ```
+         * application {
+         *     ...
+         *     if (System.getProperty("compose.appcds.create-archive") == "true") {
+         *         LaunchedEffect(Unit) {
+         *             delay(10.seconds)  // Or a custom event indicating startup finished
+         *             exitApplication()
+         *         }
+         *     }
+         * }
+         * ```
+         *
          * Advantages:
          * - Can be used with JDKs earlier than 19.
          * - The first run of the distributed app is fast too.
