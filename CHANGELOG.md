@@ -1,3 +1,84 @@
+# 1.9.0-alpha03 (July 2025)
+
+_Changes since 1.9.0-alpha02_
+
+## Highlights
+
+### Web
+
+- Added a `WebElementView` Composable function for embedding the absolutely positioned HTML content in Compose for web target. It's supported only when using `ComposeViewport` entry point and it's not supported with `CanvasBasedWindow`, which is deprecated now [#2145](https://github.com/JetBrains/compose-multiplatform-core/pull/2145)
+
+## Migration Notes
+
+### Desktop
+
+- `Window` and `DialogWindow` overloads that create a `ComposeWindow`/`ComposeDialog` have been renamed to `SwingWindow`/`SwingDialog` and the old versions have been deprecated [#2141](https://github.com/JetBrains/compose-multiplatform-core/pull/2141)
+- When the window is iconified, converting to/from screen coordinates (with e.g.`LayoutCoordinates.positionOnScreen()`) will return `Offset.Unspecified` [#2163](https://github.com/JetBrains/compose-multiplatform-core/pull/2163)
+- Deprecated experimental `Modifier.mouseClickable` is removed. See https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-desktop-mouse-events.html for alternatives [#2194](https://github.com/JetBrains/compose-multiplatform-core/pull/2194)
+
+### Web
+
+- Setting `org.jetbrains.compose.experimental.jscanvas.enabled=true` is not required anymore when having a kotlin/js target [#5340](https://github.com/JetBrains/compose-multiplatform/pull/5340)
+
+## Features
+
+### Multiple Platforms
+
+- Support customizable shadows [#2183](https://github.com/JetBrains/compose-multiplatform-core/pull/2183)
+
+### iOS
+
+- Add support for `keepScreenOn` modifier [#2180](https://github.com/JetBrains/compose-multiplatform-core/pull/2180)
+
+### Desktop
+
+- Added `SwingFrame` and `SwingDialog` composables that allow configuring the window/dialog before it is shown [#2139](https://github.com/JetBrains/compose-multiplatform-core/pull/2139)
+- Full `AnnotatedString` is available as a data flavor in `ClipEntry`, instead of only its text [#2092](https://github.com/JetBrains/compose-multiplatform-core/pull/2092)
+- Add `RenderSettings.SwingGraphics` option for `ComposePanel.renderSettings` argument [#2071](https://github.com/JetBrains/compose-multiplatform-core/pull/2071)
+
+## Fixes
+
+### Multiple Platforms
+
+- Fixed caret placement near glyphs if glyphs are compound symbols and part of them are non-spacing marks [#2147](https://github.com/JetBrains/compose-multiplatform-core/pull/2147)
+- _(prerelease fix)_ Fix applying `colorFilter` and `blendMode` from `GraphicsLayerScope` to `GraphicsLayer` [#2184](https://github.com/JetBrains/compose-multiplatform-core/pull/2184)
+
+### Desktop
+
+- [Accessibility, macOS] Fixed VoiceOver to announce a Slider's value on every change [#2152](https://github.com/JetBrains/compose-multiplatform-core/pull/2152)
+- Return `Offset.Unspecified` instead of throwing an exception in `LayoutCoordinates.localToScreen` and `LayoutCoordinates.screenToLocal` [#2160](https://github.com/JetBrains/compose-multiplatform-core/pull/2160)
+- When the window moves or becomes iconified/de-iconified, all instances of `Modifier.onGloballyPositioned` will be called [#2163](https://github.com/JetBrains/compose-multiplatform-core/pull/2163)
+- Implemented a context menu for `BasicTextField(TextFieldState)` [#2168](https://github.com/JetBrains/compose-multiplatform-core/pull/2168)
+- _(prerelease fix)_ `Could not find org.jetbrains.androidx.window:window-core-desktop:1.4.0-alpha07` when using `material-adaptive` or `material3-adaptive-navigation-suite` [#2179](https://github.com/JetBrains/compose-multiplatform-core/pull/2179)
+- `SemanticsProperties.Text` and `SemanticsProperties.ContentDescription` values will now be correctly concatenated when `Modifier.semantics(mergeDescendants = true)` is used [#2202](https://github.com/JetBrains/compose-multiplatform-core/pull/2202)
+
+### Web
+
+- Fixed an unexpected back gesture after a horizontal scroll [#2186](https://github.com/JetBrains/compose-multiplatform-core/pull/2186)
+- Mitigate a typing delay regression in Safari browsers [#2195](https://github.com/JetBrains/compose-multiplatform-core/pull/2195)
+
+### Gradle Plugin
+
+- Don't fail gradle sync if TargetFormat.AppImage is specified in `targetFormats` on macOS [#5332](https://github.com/JetBrains/compose-multiplatform/pull/5332)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.9.0-alpha03`. Based on Jetpack Compose libraries:
+  - [Runtime 1.9.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.9.0-beta01)
+  - [UI 1.9.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.9.0-beta01)
+  - [Foundation 1.9.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.9.0-beta01)
+  - [Material 1.9.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.9.0-beta01)
+  - [Material3 1.4.0-alpha16](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-alpha16)
+
+- Graphics-Shapes library `org.jetbrains.androidx.graphics:graphics-shapes:1.0.0-alpha09`. Based on [Jetpack Graphics-Shapes 1.0.1](https://developer.android.com/jetpack/androidx/releases/graphics#graphics-shapes-#1.0.1)
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.1`. Based on [Jetpack Lifecycle 2.9.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.0)
+- Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-alpha03`. Based on [Jetpack Material3 Adaptive 1.2.0-alpha07](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-alpha07)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0-beta03`. Based on [Jetpack Navigation 2.9.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.0)
+- Savedstate library `org.jetbrains.androidx.savedstate:savedstate:1.3.1`. Based on [Jetpack Savedstate 1.3.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.3.0)
+- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.4.0-alpha08`. Based on [Jetpack WindowManager 1.4.0](https://developer.android.com/jetpack/androidx/releases/window#1.4.0)
+
+---
+
 # 1.8.2 (June 2025)
 
 _Changes since 1.8.1_
