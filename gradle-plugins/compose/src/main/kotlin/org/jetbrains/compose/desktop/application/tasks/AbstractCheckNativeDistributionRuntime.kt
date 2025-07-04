@@ -7,14 +7,15 @@ package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.jetbrains.compose.desktop.application.dsl.AppCdsMode
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
 import org.jetbrains.compose.desktop.application.internal.JdkVersionProbe
+import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentOS
@@ -41,7 +42,7 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
     abstract val checkJdkVendor: Property<Boolean>
 
     @get:Input
-    val appCdsMode: Property<AppCdsMode> = objects.notNullProperty()
+    val appCdsModes: ListProperty<AppCdsMode> = objects.listProperty(AppCdsMode::class.java)
 
     private val taskDir = project.layout.buildDirectory.dir("compose/tmp/$name")
 
@@ -113,7 +114,9 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
             }
         }
 
-        appCdsMode.get().checkJdkCompatibility(jdkMajorVersion)
+        for (appCdsMode in appCdsModes.get()) {
+            appCdsMode.checkJdkCompatibility(jdkMajorVersion)
+        }
 
         val modules = arrayListOf<String>()
         runExternalTool(
