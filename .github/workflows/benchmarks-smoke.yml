@@ -1,0 +1,37 @@
+name: Test Gradle plugin
+on:
+  pull_request:
+    paths:
+      - 'benchmarks/multiplatform/**'
+      - '.github/workflows/benchmarks-smoke.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'benchmarks/multiplatform/**'
+      - '.github/workflows/benchmarks-smoke.yml'
+
+jobs:
+  build-benchmarks-multiplatform:
+    runs-on: 'macos-14'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+      - name: Desktop/JVM target
+        shell: bash
+        run: |
+          cd benchmarks/multiplatform
+          ./gradlew :benchmarks:run
+      - name: K/Native MacOS arm64
+        shell: bash
+        run: |
+          cd benchmarks/multiplatform
+          ./gradlew :benchmarks:runReleaseExecutableMacosArm64
+      - name: K/Wasm D8
+        shell: bash
+        run: |
+          cd benchmarks/multiplatform
+          ./gradlew :benchmarks:wasmJsD8ProductionRun
