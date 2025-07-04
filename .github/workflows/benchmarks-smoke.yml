@@ -1,4 +1,4 @@
-name: Test Gradle plugin
+name: Build and run benchmarks/multiplatform
 on:
   pull_request:
     paths:
