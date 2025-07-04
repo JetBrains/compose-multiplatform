@@ -1,0 +1,55 @@
+name: Build and run benchmarks/multiplatform
+on:
+  pull_request:
+    paths:
+      - 'benchmarks/multiplatform/**'
+      - '.github/workflows/benchmarks-smoke.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'benchmarks/multiplatform/**'
+      - '.github/workflows/benchmarks-smoke.yml'
+
+jobs:
+  benchmarks-macos-arm64:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+      - name: K/Native MacOS arm64
+        shell: bash
+        run: |
+          cd benchmarks/multiplatform
+          ./gradlew :benchmarks:runReleaseExecutableMacosArm64
+
+  benchmarks-desktop-jvm:
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        distribution: 'corretto'
+        java-version: '17'
+    - name: Desktop/JVM target
+      shell: bash
+      run: |
+        cd benchmarks/multiplatform
+        ./gradlew :benchmarks:run
+
+  benchmarks-wasm-d8:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+      - name: K/Wasm D8
+        shell: bash
+        run: |
+          cd benchmarks/multiplatform
+          ./gradlew :benchmarks:wasmJsD8ProductionRun
