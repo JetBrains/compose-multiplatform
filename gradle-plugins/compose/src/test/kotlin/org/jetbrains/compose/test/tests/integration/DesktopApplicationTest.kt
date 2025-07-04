@@ -633,14 +633,14 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testAppCdsAutoFailsOnJdk17() = with(appCdsProject(AppCdsMode.Auto, 17)) {
+    fun testAppCdsAutoFailsOnJdk17() = with(appCdsProject(AppCdsMode.Auto, javaVersion = 17)) {
         fun testRunTask(runTask: String) {
             gradleFailure(runTask).checks {
                 check.logContains("AppCdsMode 'Auto' is not supported on JDK earlier than 19; current is 17")
             }
         }
 
-        testRunTask(":runDistributable")
+        testRunTask(":runReleaseDistributable")
     }
 
     private val loggedArchivePathRegex =
@@ -660,7 +660,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         )
 
     @Test
-    fun testAppCdsAuto() = with(appCdsProject(AppCdsMode.Auto, 21)) {
+    fun testAppCdsAuto() = with(appCdsProject(AppCdsMode.Auto, javaVersion = 21)) {
         fun testRunTask(taskName: String) {
             gradle(taskName).checks {
                 check.taskSuccessful(taskName)
@@ -678,12 +678,11 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             gradle(":clean")
         }
 
-        testRunTask(":runDistributable")
         testRunTask(":runReleaseDistributable")
     }
 
     @Test
-    fun testAppCdsPrebuild() = with(appCdsProject(AppCdsMode.Prebuild, 17)) {
+    fun testAppCdsPrebuild() = with(appCdsProject(AppCdsMode.Prebuild, javaVersion = 17)) {
         fun testPackageAndRun(release: Boolean) {
             val releaseTag = if (release) "Release" else ""
             val packageTaskName = ":package${releaseTag}DistributionForCurrentOS"
@@ -709,12 +708,11 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             }
         }
 
-        testPackageAndRun(release = false)
         testPackageAndRun(release = true)
     }
 
     @Test
-    fun testAppCdsCreateDistributable() = with(appCdsProject(AppCdsMode.Prebuild, 17)) {
+    fun testAppCdsCreateDistributable() = with(appCdsProject(AppCdsMode.Prebuild, javaVersion = 17)) {
         fun testPackageAndRun(release: Boolean) {
             val releaseTag = if (release) "Release" else ""
             val createDistributableTaskName = ":create${releaseTag}Distributable"
@@ -727,7 +725,6 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             }
         }
 
-        testPackageAndRun(release = false)
         testPackageAndRun(release = true)
     }
 

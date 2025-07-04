@@ -2,7 +2,6 @@ package org.jetbrains.compose.desktop.application.dsl
 
 import org.gradle.api.file.Directory
 import org.gradle.api.file.RegularFile
-import org.jetbrains.compose.desktop.application.internal.JvmApplicationContext
 import org.jetbrains.compose.internal.utils.packagedAppJarFilesDir
 import java.io.Serializable
 
@@ -20,6 +19,11 @@ abstract class AppCdsConfiguration {
     var mode: AppCdsMode = AppCdsMode.None
 
     /**
+     * Whether to print AppCDS-related messages at application runtime.
+     */
+    var logging: Boolean = false
+
+    /**
      * Whether to fail running the app if unable to load the AppCDS archive.
      */
     var exitAppOnCdsFailure: Boolean = false
@@ -28,12 +32,12 @@ abstract class AppCdsConfiguration {
 /**
  * Returns the AppCDS-related arguments to pass the JVM when running the app.
  */
-internal fun AppCdsConfiguration.runtimeJvmArgs(context: JvmApplicationContext) = buildList {
+internal fun AppCdsConfiguration.runtimeJvmArgs() = buildList {
     addAll(mode.runtimeJvmArgs())
     if (exitAppOnCdsFailure) {
         add("-Xshare:on")
     }
-    if (context.buildType.cdsLogging.get()) {
+    if (logging) {
         add("-Xlog:cds")
     }
 }

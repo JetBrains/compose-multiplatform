@@ -26,12 +26,13 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageVersion = "1.0.0"
-
+        }
+        buildTypes.release {
             appCds {
                 mode = %APP_CDS_MODE%
+                logging = true
                 exitAppOnCdsFailure = true
             }
         }
-        jvmArgs += "-Xlog:cds"
     }
 }
