@@ -75,8 +75,10 @@ internal class MacSignerImpl(
                     "find-certificate",
                     "-a",
                     "-c",
-                    settings.fullDeveloperID,
-                    settings.keychain?.absolutePath
+                    "\"${settings.fullDeveloperID}\"",
+                    settings.keychain?.absolutePath?.let { 
+                        "\"$it\""
+                    }
                 ),
                 processStdout = { signKeyValue = matchCertificates(it) }
             )
