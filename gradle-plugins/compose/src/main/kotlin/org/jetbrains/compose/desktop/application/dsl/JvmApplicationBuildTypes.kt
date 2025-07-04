@@ -7,14 +7,13 @@ package org.jetbrains.compose.desktop.application.dsl
 
 import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
-import org.gradle.api.provider.Property
 import org.jetbrains.compose.internal.utils.new
-import org.jetbrains.compose.internal.utils.notNullProperty
+import java.io.Serializable
 import javax.inject.Inject
 
 abstract class JvmApplicationBuildTypes @Inject constructor(
     objects: ObjectFactory
-) {
+): Serializable {
     /**
      * The default build type does not have a classifier
      * to preserve compatibility with tasks, existing before
@@ -27,11 +26,12 @@ abstract class JvmApplicationBuildTypes @Inject constructor(
 
     val release: JvmApplicationBuildType = objects.new<JvmApplicationBuildType>("release").apply {
         proguard.isEnabled.set(true)
-        cdsLogging.set(false)
     }
     fun release(fn: Action<JvmApplicationBuildType>) {
         fn.execute(release)
     }
+
+    internal val all: List<JvmApplicationBuildType> = listOf(default, release)
 }
 
 abstract class JvmApplicationBuildType @Inject constructor(
@@ -47,5 +47,8 @@ abstract class JvmApplicationBuildType @Inject constructor(
         fn.execute(proguard)
     }
 
-    val cdsLogging: Property<Boolean> = objects.notNullProperty(true)
+    val appCds: AppCdsConfiguration = objects.new()
+    fun appCds(fn: Action<AppCdsConfiguration>) {
+        fn.execute(appCds)
+    }
 }

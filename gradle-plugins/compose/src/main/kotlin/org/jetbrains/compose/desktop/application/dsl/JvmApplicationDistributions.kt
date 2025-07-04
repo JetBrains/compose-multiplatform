@@ -43,10 +43,4 @@ abstract class JvmApplicationDistributions : AbstractDistributions() {
         windows.fileAssociation(mimeType, extension, description, windowsIconFile)
         macOS.fileAssociation(mimeType, extension, description, macOSIconFile)
     }
-
-    val appCds: AppCdsConfiguration = objects.newInstance(AppCdsConfiguration::class.java)
-    fun appCds(fn: Action<AppCdsConfiguration>) {
-        fn.execute(appCds)
-    }
-
 }
