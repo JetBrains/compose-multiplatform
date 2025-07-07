@@ -29,8 +29,6 @@ import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.compose.web.internal.configureWeb
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 
-internal val composeVersion get() = ComposeBuildConfig.composeVersion
-
 abstract class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val composeExtension = project.extensions.create("compose", ComposeExtension::class.java, project)
@@ -65,28 +63,31 @@ abstract class ComposePlugin : Plugin<Project> {
     @Suppress("DEPRECATION")
     class Dependencies(project: Project) {
         val desktop = DesktopDependencies
-        val animation get() = composeDependency("org.jetbrains.compose.animation:animation")
-        val animationGraphics get() = composeDependency("org.jetbrains.compose.animation:animation-graphics")
-        val foundation get() = composeDependency("org.jetbrains.compose.foundation:foundation")
-        val material get() = composeDependency("org.jetbrains.compose.material:material")
-        val material3 get() = composeDependency("org.jetbrains.compose.material3:material3")
-        val material3AdaptiveNavigationSuite get() = composeDependency("org.jetbrains.compose.material3:material3-adaptive-navigation-suite")
-        val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
-        val runtimeSaveable get() = composeDependency("org.jetbrains.compose.runtime:runtime-saveable")
-        val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
+        val animation = composeDependency("org.jetbrains.compose.animation:animation")
+        val animationGraphics = composeDependency("org.jetbrains.compose.animation:animation-graphics")
+        val foundation = composeDependency("org.jetbrains.compose.foundation:foundation")
+        val material = composeDependency("org.jetbrains.compose.material:material")
+        val material3 = composeDependency("org.jetbrains.compose.material3:material3")
+        val material3AdaptiveNavigationSuite = composeDependency("org.jetbrains.compose.material3:material3-adaptive-navigation-suite")
+        val runtime = composeDependency("org.jetbrains.compose.runtime:runtime")
+        val runtimeSaveable = composeDependency("org.jetbrains.compose.runtime:runtime-saveable")
+        val ui = composeDependency("org.jetbrains.compose.ui:ui")
+
         @Deprecated("Use desktop.uiTestJUnit4", replaceWith = ReplaceWith("desktop.uiTestJUnit4"))
         @ExperimentalComposeLibrary
-        val uiTestJUnit4 get() = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
+        val uiTestJUnit4 = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
+
         @ExperimentalComposeLibrary
-        val uiTest get() = composeDependency("org.jetbrains.compose.ui:ui-test")
-        val uiTooling get() = composeDependency("org.jetbrains.compose.ui:ui-tooling")
-        val uiUtil get() = composeDependency("org.jetbrains.compose.ui:ui-util")
-        val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
-        val materialIconsExtended get() = "org.jetbrains.compose.material:material-icons-extended:1.7.3"
-        val components get() = CommonComponentsDependencies
+        val uiTest = composeDependency("org.jetbrains.compose.ui:ui-test")
+        val uiTooling = composeDependency("org.jetbrains.compose.ui:ui-tooling")
+        val uiUtil = composeDependency("org.jetbrains.compose.ui:ui-util")
+        val preview = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
+        val materialIconsExtended = "org.jetbrains.compose.material:material-icons-extended:1.7.3"
+        val components = CommonComponentsDependencies
+
         @Deprecated("Use compose.html", replaceWith = ReplaceWith("html"))
-        val web: WebDependencies get() = WebDependencies
-        val html: HtmlDependencies get() = HtmlDependencies
+        val web: WebDependencies = WebDependencies
+        val html: HtmlDependencies = HtmlDependencies
     }
 
     object DesktopDependencies {
@@ -100,7 +101,7 @@ abstract class ComposePlugin : Plugin<Project> {
         val macos_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-x64")
         val macos_arm64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-arm64")
 
-        val uiTestJUnit4 get() = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
+        val uiTestJUnit4 = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
 
         val currentOs by lazy {
             composeDependency("org.jetbrains.compose.desktop:desktop-jvm-${currentTarget.id}")
@@ -122,31 +123,19 @@ abstract class ComposePlugin : Plugin<Project> {
 
     @Deprecated("Use compose.html")
     object WebDependencies {
-        val core by lazy {
-            composeDependency("org.jetbrains.compose.html:html-core")
-        }
+        val core = composeDependency("org.jetbrains.compose.html:html-core")
 
-        val svg by lazy {
-            composeDependency("org.jetbrains.compose.html:html-svg")
-        }
+        val svg = composeDependency("org.jetbrains.compose.html:html-svg")
 
-        val testUtils by lazy {
-            composeDependency("org.jetbrains.compose.html:html-test-utils")
-        }
+        val testUtils = composeDependency("org.jetbrains.compose.html:html-test-utils")
     }
 
     object HtmlDependencies {
-        val core by lazy {
-            composeDependency("org.jetbrains.compose.html:html-core")
-        }
+        val core = composeDependency("org.jetbrains.compose.html:html-core")
 
-        val svg by lazy {
-            composeDependency("org.jetbrains.compose.html:html-svg")
-        }
+        val svg = composeDependency("org.jetbrains.compose.html:html-svg")
 
-        val testUtils by lazy {
-            composeDependency("org.jetbrains.compose.html:html-test-utils")
-        }
+        val testUtils = composeDependency("org.jetbrains.compose.html:html-test-utils")
     }
 }
 
@@ -157,7 +146,7 @@ fun KotlinDependencyHandler.compose(groupWithArtifact: String) = composeDependen
 
 fun DependencyHandler.compose(groupWithArtifact: String) = composeDependency(groupWithArtifact)
 
-private fun composeDependency(groupWithArtifact: String) = "$groupWithArtifact:$composeVersion"
+private fun composeDependency(groupWithArtifact: String) = "$groupWithArtifact:${ComposeBuildConfig.composeVersion}"
 
 private fun setUpGroovyDslExtensions(project: Project) {
     project.plugins.withId("org.jetbrains.kotlin.multiplatform") {
