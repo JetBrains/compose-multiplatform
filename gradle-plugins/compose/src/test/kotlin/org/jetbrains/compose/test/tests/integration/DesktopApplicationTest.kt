@@ -366,19 +366,34 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         }
     }
 
-    @Test
-    fun testMacSignConfiguration() {
-        Assumptions.assumeTrue(currentOS == OS.MacOS)
-
-        with(testProject("application/macSign")) {
-            gradle("--dry-run", ":createDistributable")
+    private fun macSignProject(
+        identity: String,
+        keychainFilename: String,
+        javaVersion: String = "17"
+    ) = testProject("application/macSign").apply {
+        modifyText("build.gradle") {
+            it
+                .replace("%IDENTITY%", identity)
+                .replace("%KEYCHAIN%", keychainFilename)
+                .replace("%JAVA_VERSION%", javaVersion)
         }
     }
 
     @Test
-    @Disabled
-    // the test does not work on CI and locally unless test keychain is opened manually
-    fun testMacSign() {
+    fun testMacSignConfiguration() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+
+        with(macSignProject(identity = "Compose Test", keychainFilename = "compose.test.keychain")) {
+            gradle("--dry-run", ":createDistributable")
+        }
+    }
+
+    private fun testMacSign(
+        identity: String,
+        keychainFilename: String,
+        keychainPassword: String,
+        javaVersion: String = "17"
+    ) {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
 
         fun security(vararg args: Any): ProcessRunResult {
@@ -403,13 +418,12 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             }
         }
 
-        with(testProject("application/macSign")) {
-            val keychain = file("compose.test.keychain")
-            val password = "compose.test"
+        with(macSignProject(identity = identity, keychainFilename = keychainFilename, javaVersion = javaVersion)) {
+            val keychain = file(keychainFilename)
 
             withNewDefaultKeychain(keychain) {
                 security("default-keychain", "-s", keychain)
-                security("unlock-keychain", "-p", password, keychain)
+                security("unlock-keychain", "-p", keychainPassword, keychain)
 
                 gradle(":createDistributable").checks {
                     check.taskSuccessful(":createDistributable")
@@ -429,6 +443,29 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 }
             }
         }
+    }
+
+    @Test
+    @Disabled
+    // the test does not work on CI and locally unless test keychain is opened manually
+    fun testMacSign() {
+        testMacSign(
+            identity = "Compose Test",
+            keychainFilename = "compose.test.keychain",
+            keychainPassword = "compose.test"
+        )
+    }
+
+    @Test
+    @Disabled
+    // the test does not work on CI and locally unless test keychain is opened manually
+    fun testMacSignWithNonAsciiDeveloperId() {
+        testMacSign(
+            identity = "Cömpose Test",
+            keychainFilename = "compose.test-non-ascii.keychain",
+            keychainPassword = "compose.test",
+            javaVersion = "21",  // https://bugs.openjdk.org/browse/JDK-8308042 fixed in JDK 21
+        )
     }
 
     @Test
