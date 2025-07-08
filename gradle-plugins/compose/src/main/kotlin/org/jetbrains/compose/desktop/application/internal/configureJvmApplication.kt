@@ -174,31 +174,13 @@ private fun JvmApplicationContext.configurePackagingTasks(
             taskNameObject = targetFormat.name,
             args = listOf(targetFormat)
         ) {
-            // On Mac we want to patch bundled Info.plist file,
-            // so we create an app image, change its Info.plist,
-            // then create an installer based on the app image.
-            // We could create an installer the same way on other platforms, but
-            // in some cases there are failures with JDK 15.
-            // See [AbstractJPackageTask.patchInfoPlistIfNeeded]
-            if (currentOS != OS.MacOS) {
-                configurePackageTask(
-                    this,
-                    createRuntimeImage = createRuntimeImage,
-                    prepareAppResources = commonTasks.prepareAppResources,
-                    checkRuntime = commonTasks.checkRuntime,
-                    unpackDefaultResources = commonTasks.unpackDefaultResources,
-                    runProguard = runProguard,
-                    createAppCdsArchive = createAppCdsArchive
-                )
-            } else {
-                configurePackageTask(
-                    this,
-                    createAppImage = createDistributableImpl,
-                    checkRuntime = commonTasks.checkRuntime,
-                    unpackDefaultResources = commonTasks.unpackDefaultResources,
-                    createAppCdsArchive = createAppCdsArchive
-                )
-            }
+            configurePackageTask(
+                this,
+                createAppImage = createDistributableImpl,
+                checkRuntime = commonTasks.checkRuntime,
+                unpackDefaultResources = commonTasks.unpackDefaultResources,
+                createAppCdsArchive = createAppCdsArchive
+            )
         }
 
         if (targetFormat.isCompatibleWith(OS.MacOS)) {
