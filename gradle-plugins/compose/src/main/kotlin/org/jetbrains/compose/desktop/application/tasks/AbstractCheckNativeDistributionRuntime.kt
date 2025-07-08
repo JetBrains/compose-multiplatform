@@ -92,8 +92,8 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
             )
         }
 
+        val vendor = jdkRuntimeProperties.getProperty(JdkVersionProbe.JDK_VENDOR_KEY)
         if (checkJdkVendor.get()) {
-            val vendor = jdkRuntimeProperties.getProperty(JdkVersionProbe.JDK_VENDOR_KEY)
             if (vendor == null) {
                 logger.warn("JDK vendor probe failed: $jdkHome")
             } else {
@@ -111,7 +111,7 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
         }
 
         for (appCdsMode in appCdsModes.get()) {
-            appCdsMode.checkJdkCompatibility(jdkMajorVersion)
+            appCdsMode.checkJdkCompatibility(jdkMajorVersion, vendor)
         }
 
         val modules = arrayListOf<String>()

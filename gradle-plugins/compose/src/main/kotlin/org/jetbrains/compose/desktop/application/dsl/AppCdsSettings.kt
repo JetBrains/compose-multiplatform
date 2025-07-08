@@ -48,6 +48,11 @@ internal fun AppCdsConfiguration.runtimeJvmArgs() = buildList {
 abstract class AppCdsMode(val name: String) : Serializable {
 
     /**
+     * The minimum JDK version for which this mode is supported.
+     */
+    internal open val minJdkVersion: Int? = null
+
+    /**
      * Whether to generate a classes.jsa archive for the JRE classes.
      */
     internal abstract val generateJreClassesArchive: Boolean
@@ -82,7 +87,15 @@ abstract class AppCdsMode(val name: String) : Serializable {
      * Checks whether this mode is compatible with the given JDK major version.
      * Throws an exception if not.
      */
-    internal open fun checkJdkCompatibility(jdkMajorVersion: Int) = Unit
+    internal open fun checkJdkCompatibility(jdkMajorVersion: Int, jdkVendor: String) {
+        val minMajorJdkVersion = minJdkVersion ?: return
+        if (jdkMajorVersion < minMajorJdkVersion) {
+            error(
+                "AppCdsMode '$this' is not supported on JDK earlier than" +
+                        " $minMajorJdkVersion; current is $jdkMajorVersion"
+            )
+        }
+    }
 
     override fun toString() = name
 
@@ -109,9 +122,6 @@ abstract class AppCdsMode(val name: String) : Serializable {
         /**
          * AppCDS is used via a dynamic shared archive created automatically
          * when the app is run (using `-XX:+AutoCreateSharedArchive`).
-         * Due to the drawbacks below, this mode is mostly recommended only
-         * to experiment and see how fast your app starts up with AppCDS.
-         * In production, we recomment [Prebuild] mode.
          *
          * Advantages:
          * - Simplest - no additional step is needed to build the archive.
@@ -124,25 +134,20 @@ abstract class AppCdsMode(val name: String) : Serializable {
          *   The archive is created when at shutdown time of the first execution,
          *   which also takes a little longer.
          * - Some OSes may block writing the archive file to the application's
-         *   directory at runtime.
+         *   directory at runtime. Due to this, `Auto` mode is mostly recommended
+         *   only to experiment and see how fast your app starts up with AppCDS.
+         *   In production, we recommend [Prebuild] mode.
+         *
          */
         @Suppress("unused")
         val Auto = object : AppCdsMode("Auto") {
-            private val MIN_JDK_VERSION = 19
+            override val minJdkVersion = 19
             override val generateJreClassesArchive: Boolean get() = true
             override fun runtimeJvmArgs() =
                 listOf(
                     "-XX:SharedArchiveFile=$ARCHIVE_FILE_ARGUMENT",
                     "-XX:+AutoCreateSharedArchive"
                 )
-            override fun checkJdkCompatibility(jdkMajorVersion: Int) {
-                if (jdkMajorVersion < MIN_JDK_VERSION) {
-                    error(
-                        "AppCdsMode '$this' is not supported on JDK earlier than" +
-                                " $MIN_JDK_VERSION; current is $jdkMajorVersion"
-                    )
-                }
-            }
         }
 
         /**
@@ -170,10 +175,10 @@ abstract class AppCdsMode(val name: String) : Serializable {
          * ```
          *
          * Advantages:
-         * - Can be used with JDKs earlier than 19.
          * - The first run of the distributed app is fast too.
          *
          * Drawbacks:
+         * - Requires JDK 22 or later.
          * - Requires an additional step of running the app when building the
          *   distributable.
          * - The distributable is larger because it includes the archive of
@@ -181,13 +186,13 @@ abstract class AppCdsMode(val name: String) : Serializable {
          */
         @Suppress("unused")
         val Prebuild = object : AppCdsMode("Prebuild") {
+            override val minJdkVersion = 21  // required due to https://bugs.openjdk.org/browse/JDK-8279366
             override val generateJreClassesArchive: Boolean get() = true
             override val generateAppClassesArchive: Boolean get() = true
             override fun appClassesArchiveCreationJvmArgs() =
                 listOf(
                     "-XX:ArchiveClassesAtExit=$ARCHIVE_FILE_ARGUMENT",
                     "-Dcompose.appcds.create-archive=true",
-                    "-Xlog:cds"
                 )
             override fun appClassesArchiveFile(packagedAppRootDir: Directory): RegularFile {
                 val appDir = packagedAppJarFilesDir(packagedAppRootDir)
