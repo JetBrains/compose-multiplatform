@@ -55,6 +55,16 @@ kotlin {
             }
         }
         browser()
+
+        binaries.configureEach {
+            compilation.compileTaskProvider.configure {
+                compilerOptions {
+                    freeCompilerArgs.apply {
+                        add("-Xwasm-use-new-exception-proposal")
+                    }
+                }
+            }
+        }
     }
 
     sourceSets {
