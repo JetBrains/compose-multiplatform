@@ -390,6 +390,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         if (targetFormat == TargetFormat.AppImage || appImage.orNull == null) {
             // Args, that can only be used, when creating an app image or an installer w/o --app-image parameter
             cliArg("--input", libsDir)
+            javaOption("-Duser.dir=\$APPDIR")
             cliArg("--runtime-image", runtimeImage)
             cliArg("--resource-dir", jpackageResources)
 
