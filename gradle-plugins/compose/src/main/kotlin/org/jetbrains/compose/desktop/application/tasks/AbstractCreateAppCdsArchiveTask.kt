@@ -62,20 +62,6 @@ abstract class AbstractCreateAppCdsArchiveTask @Inject constructor(
         val cfgFile = appDir.asFile.resolve("${packageName.get()}.cfg")
         val cfgFileTempCopy = File(cfgFile.parentFile, "${cfgFile.name}.tmp")
 
-        // Edit the cfg file, changing $APPDATA to a relative path
-        val cfgFileContentsWithRelativeAppData = buildString {
-            cfgFile.useLines { lines ->
-                lines.forEach { line ->
-                    if (line.startsWith("app.classpath=\$APPDIR/")) {
-                        appendLine(line.replace("\$APPDIR/", ""))
-                    } else {
-                        appendLine(line)
-                    }
-                }
-            }
-        }
-        cfgFile.writeText(cfgFileContentsWithRelativeAppData)
-
         // Save the cfg file before making changes for the AppCDS archive-creating run
         Files.copy(cfgFile.toPath(), cfgFileTempCopy.toPath(), StandardCopyOption.REPLACE_EXISTING)
         try {
