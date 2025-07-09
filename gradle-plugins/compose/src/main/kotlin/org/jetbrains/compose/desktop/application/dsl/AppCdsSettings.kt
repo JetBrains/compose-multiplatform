@@ -34,7 +34,7 @@ abstract class AppCdsConfiguration {
  */
 internal fun AppCdsConfiguration.runtimeJvmArgs() = buildList {
     addAll(mode.runtimeJvmArgs())
-    if (exitAppOnCdsFailure) {
+    if (exitAppOnCdsFailure && (mode != AppCdsMode.None)) {
         add("-Xshare:on")
     }
     if (logging) {
