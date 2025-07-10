@@ -93,7 +93,11 @@ internal class MacSignerImpl(
     }
 
     private fun matchCertificates(certificates: String): String {
-        val regex = Pattern.compile("\"alis\"<blob>=\"([^\"]+)\"")
+        // When the developer id contains non-ascii characters, the output of `security find-certificate` is
+        // slightly different. The `alis` line first has the hex-encoded developer id, then some spaces,
+        // and then the developer id with non-ascii characters encoded as octal.
+        // See https://bugs.openjdk.org/browse/JDK-8308042
+        val regex = Pattern.compile("\"alis\"<blob>=(0x[0-9A-F]+)?\\s*\"([^\"]+)\"")
         val m = regex.matcher(certificates)
         if (!m.find()) {
             val keychainPath = settings.keychain?.absolutePath
@@ -102,14 +106,24 @@ internal class MacSignerImpl(
                         " in keychain [${keychainPath.orEmpty()}]"
             )
         }
-
-        val result = m.group(1)
-        if (m.find())
-            error(
-                "Multiple matching certificates are found for '${settings.fullDeveloperID}'. " +
-                "Please specify keychain containing unique matching certificate."
-            )
-        return result
+        val hexEncoded = m.group(1)
+        if (hexEncoded.isNullOrBlank()) {
+            // Regular case; developer id only has ascii characters
+            val result = m.group(2)
+            if (m.find())
+                error(
+                    "Multiple matching certificates are found for '${settings.fullDeveloperID}'. " +
+                            "Please specify keychain containing unique matching certificate."
+                )
+            return result
+        } else {
+            return hexEncoded
+                .substring(2)
+                .chunked(2)
+                .map { it.toInt(16).toByte() }
+                .toByteArray()
+                .toString(Charsets.UTF_8)
+        }
     }
 }
 
