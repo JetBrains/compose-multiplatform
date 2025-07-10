@@ -3,7 +3,7 @@ kotlin = "2.2.0-RC2"
 gradle-download-plugin = "5.5.0"
 kotlin-poet = "2.1.0"
 plugin-android = "8.9.1"
-shadow-jar = "8.1.1"
+shadow-jar = "8.3.6"
 publish-plugin = "1.2.1"
 
 [libraries]
@@ -15,5 +15,5 @@ plugin-android-api = { module = "com.android.tools.build:gradle-api", version.re
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 download = { id = "de.undercouch.download", version.ref = "gradle-download-plugin" }
-shadow-jar = { id = "com.github.johnrengelman.shadow", version.ref = "shadow-jar" }
+shadow-jar = { id = "com.gradleup.shadow", version.ref = "shadow-jar" }
 publish-plugin = { id = "com.gradle.plugin-publish", version.ref = "publish-plugin" }

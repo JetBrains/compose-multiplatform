@@ -5,10 +5,11 @@
 
 package org.jetbrains.compose.experimental.web.tasks
 
+import org.jetbrains.compose.internal.DEPRECATED_EXPERIMENTAL_MESSAGE_FOR_WEB
 import org.jetbrains.compose.web.tasks.UnpackSkikoWasmRuntimeTask
 
 @Deprecated(
-    message = "Starting from 1.6.10 Compose for Web goes to Alpha",
+    message = DEPRECATED_EXPERIMENTAL_MESSAGE_FOR_WEB,
     replaceWith = ReplaceWith("UnpackSkikoWasmRuntimeTask")
 )
 abstract class ExperimentalUnpackSkikoWasmRuntimeTask : UnpackSkikoWasmRuntimeTask()
