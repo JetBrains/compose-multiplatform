@@ -11,11 +11,8 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
-import org.jetbrains.compose.internal.utils.OS
-import org.jetbrains.compose.internal.utils.currentOS
-import org.jetbrains.compose.internal.utils.executableName
-import org.jetbrains.compose.internal.utils.ioFile
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
+import org.jetbrains.compose.internal.utils.executePackagedApp
 import javax.inject.Inject
 
 // Custom task is used instead of Exec, because Exec does not support
@@ -32,26 +29,9 @@ abstract class AbstractRunDistributableTask @Inject constructor(
 
     @TaskAction
     fun run() {
-        val appDir = appImageRootDir.ioFile.let { appImageRoot ->
-            val files = appImageRoot.listFiles()
-                // Sometimes ".DS_Store" files are created on macOS, so ignore them.
-                ?.filterNot { it.name == ".DS_Store" }
-            if (files == null || files.isEmpty()) {
-                error("Could not find application image: $appImageRoot is empty!")
-            } else if (files.size > 1) {
-                error("Could not find application image: $appImageRoot contains multiple children [${files.joinToString(", ")}]")
-            } else files.single()
-        }
-        val appExecutableName = executableName(packageName.get())
-        val (workingDir, executable) = when (currentOS) {
-            OS.Linux ->  appDir to "bin/$appExecutableName"
-            OS.Windows -> appDir to appExecutableName
-            OS.MacOS -> appDir.resolve("Contents") to "MacOS/$appExecutableName"
-        }
-
-        execOperations.exec { spec ->
-            spec.workingDir(workingDir)
-            spec.executable(workingDir.resolve(executable).absolutePath)
-        }.assertNormalExitValue()
+        execOperations.executePackagedApp(
+            appImageRootDir = appImageRootDir.get(),
+            packageName = packageName.get()
+        )
     }
 }
