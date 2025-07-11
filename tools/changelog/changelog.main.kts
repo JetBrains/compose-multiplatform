@@ -127,6 +127,7 @@ fun generateChangelog() {
         }
 
     val versionCompose = formatAndroidxLibVersion("COMPOSE")
+    val versionComposeMaterial3 = formatAndroidxLibVersion("COMPOSE_MATERIAL3")
     val versionComposeMaterial3Adaptive = formatAndroidxLibVersion("COMPOSE_MATERIAL3_ADAPTIVE")
     val versionLifecycle = formatAndroidxLibVersion("LIFECYCLE")
     val versionNavigation = formatAndroidxLibVersion("NAVIGATION")
@@ -214,11 +215,14 @@ fun generateChangelog() {
                       - [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose)
                       - [Foundation $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingCompose)
                       - [Material $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingCompose)
-                      - [Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3)
+                      <To change the placeholder see https://github.com/JetBrains/compose-multiplatform/blob/COMMIT/gradle-plugins/compose/src/main/kotlin/org/jetbrains/compose/ComposePlugin.kt#L72> and find redirection in:
+                      https://github.com/JetBrains/compose-multiplatform-core/blob/VERSION/gradle.properties#L112>
+                      - [Material3 <PLACEHOLDER>](https://developer.android.com/jetpack/androidx/releases/compose-material3#<PLACEHOLDER>)
 
+                    - Material3 libraries `org.jetbrains.compose.material3:material3*:$versionComposeMaterial3`. Based on [Jetpack Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3)
+                    - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive`. Based on [Jetpack Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive)
                     - Graphics-Shapes library `org.jetbrains.androidx.graphics:graphics-shapes:$versionGraphicsShapes`. Based on [Jetpack Graphics-Shapes $versionRedirectingGraphicsShapes](https://developer.android.com/jetpack/androidx/releases/graphics#graphics-shapes-#$versionRedirectingGraphicsShapes)
                     - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:$versionLifecycle`. Based on [Jetpack Lifecycle $versionRedirectingLifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle#$versionRedirectingLifecycle)
-                    - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive`. Based on [Jetpack Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive)
                     - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:$versionNavigation`. Based on [Jetpack Navigation $versionRedirectingNavigation](https://developer.android.com/jetpack/androidx/releases/navigation#$versionRedirectingNavigation)
                     - Savedstate library `org.jetbrains.androidx.savedstate:savedstate:$versionSavedstate`. Based on [Jetpack Savedstate $versionRedirectingSavedstate](https://developer.android.com/jetpack/androidx/releases/savedstate#$versionRedirectingSavedstate)
                     - WindowManager Core library `org.jetbrains.androidx.window:window-core:$versionWindow`. Based on [Jetpack WindowManager $versionRedirectingWindow](https://developer.android.com/jetpack/androidx/releases/window#$versionRedirectingWindow)
