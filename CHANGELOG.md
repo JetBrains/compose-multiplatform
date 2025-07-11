@@ -71,7 +71,7 @@ _Changes since 1.9.0-alpha02_
   - [Material3 1.4.0-alpha16](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-alpha16)
 
 - Graphics-Shapes library `org.jetbrains.androidx.graphics:graphics-shapes:1.0.0-alpha09`. Based on [Jetpack Graphics-Shapes 1.0.1](https://developer.android.com/jetpack/androidx/releases/graphics#graphics-shapes-#1.0.1)
-- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.1`. Based on [Jetpack Lifecycle 2.9.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.0)
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.1`. Based on [Jetpack Lifecycle 2.9.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.1)
 - Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-alpha03`. Based on [Jetpack Material3 Adaptive 1.2.0-alpha07](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-alpha07)
 - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0-beta03`. Based on [Jetpack Navigation 2.9.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.0)
 - Savedstate library `org.jetbrains.androidx.savedstate:savedstate:1.3.1`. Based on [Jetpack Savedstate 1.3.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.3.0)
