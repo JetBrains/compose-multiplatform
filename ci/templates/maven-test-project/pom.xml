@@ -14,6 +14,7 @@
         <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
         <kotlin.version>2.1.20</kotlin.version>
         <compose.version>1.8.2</compose.version>
+        <compose.material3.version>1.8.2</compose.material3.version>
     </properties>
 
     <repositories>
@@ -99,9 +100,14 @@
             <version>${kotlin.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains.compose.foundation</groupId>
+            <artifactId>foundation-desktop</artifactId>
+            <version>${compose.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.jetbrains.compose.material3</groupId>
             <artifactId>material3-desktop</artifactId>
-            <version>${compose.version}</version>
+            <version>${compose.material3.version}</version>
         </dependency>
 
         <dependency>
