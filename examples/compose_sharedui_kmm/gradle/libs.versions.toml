@@ -1,0 +1,26 @@
+[versions]
+activityCompose = "1.7.1"
+agp = "8.0.1"
+androidxCore = "1.10.1"
+androidxMaterial = "1.9.0"
+ballast = "3.0.1"
+composeMultiplatform = "1.4.0"
+jetpackCompose = "1.3.2"
+kobweb = "0.13.2"
+kotlin = "1.8.20" # Max Kotlin version supported by Compose-Multiplatform 1.4.0 is Kotlin 1.8.20
+
+[libraries]
+androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
+androidx-material = { module = "com.google.android.material:material", version.ref = "androidxMaterial" }
+
+ballast-core = { module = "io.github.copper-leaf:ballast-core", version.ref = "ballast" }
+ballast-navigation = { module = "io.github.copper-leaf:ballast-navigation", version.ref = "ballast" }
+ballast-savedState = { module = "io.github.copper-leaf:ballast-saved-state", version.ref = "ballast" }
+
+jetpackCompose-activity = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+
+kobweb-core = { module = "com.varabyte.kobweb:kobweb-core", version.ref = "kobweb" }
+kobweb-silk = { module = "com.varabyte.kobweb:kobweb-silk", version.ref = "kobweb" }
+
+[plugins]
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
