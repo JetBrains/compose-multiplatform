@@ -35,6 +35,5 @@ runGradle chat
 runGradle codeviewer
 runGradle imageviewer
 runGradle todoapp-lite
-runGradle widgets-gallery
 runGradle graphics-2d
 runGradle jetsnack
