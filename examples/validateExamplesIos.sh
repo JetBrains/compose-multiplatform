@@ -34,6 +34,5 @@ runGradle() {
 runGradle chat
 runGradle codeviewer
 runGradle imageviewer
-runGradle todoapp-lite
 runGradle graphics-2d
 runGradle jetsnack

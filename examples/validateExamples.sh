@@ -23,6 +23,5 @@ runGradle chat packageDistributionForCurrentOS
 runGradle codeviewer packageDistributionForCurrentOS
 runGradle imageviewer packageDistributionForCurrentOS
 runGradle issues packageDistributionForCurrentOS
-runGradle todoapp-lite packageDistributionForCurrentOS
 runGradle graphics-2d packageDistributionForCurrentOS
 runGradle jetsnack packageDistributionForCurrentOS
