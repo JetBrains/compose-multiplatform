@@ -54,6 +54,10 @@ _Changes since 1.9.0-alpha03_
 
 - Added `JvmResourceReader` API and made `LocalResourceReader` public to allow providing a custom classloader for desktop target [#5334](https://github.com/JetBrains/compose-multiplatform/pull/5334)
 
+### Navigation
+
+- A new API was added to bind the browser navigation state with the `NavController` - `suspend fun NavController.bindToBrowserNavigation`. And the existing function `suspend fun Window.bindToNavigation` is deprecated now [#2189](https://github.com/JetBrains/compose-multiplatform-core/pull/2189)
+
 ## Fixes
 
 ### Multiple Platforms
