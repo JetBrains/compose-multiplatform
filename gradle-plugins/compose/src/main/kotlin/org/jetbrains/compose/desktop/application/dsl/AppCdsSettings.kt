@@ -178,7 +178,7 @@ abstract class AppCdsMode(val name: String) : Serializable {
          * - The first run of the distributed app is fast too.
          *
          * Drawbacks:
-         * - Requires JDK 22 or later.
+         * - Requires JDK 21 or later.
          * - Requires an additional step of running the app when building the
          *   distributable.
          * - The distributable is larger because it includes the archive of
@@ -186,12 +186,22 @@ abstract class AppCdsMode(val name: String) : Serializable {
          */
         @Suppress("unused")
         val Prebuild = object : AppCdsMode("Prebuild") {
-            override val minJdkVersion = 21  // required due to https://bugs.openjdk.org/browse/JDK-8279366
+            override val minJdkVersion = 21
+            override fun checkJdkCompatibility(jdkMajorVersion: Int, jdkVendor: String) {
+                super.checkJdkCompatibility(jdkMajorVersion, jdkVendor)
+//                if (jdkVendor != "JetBrains s.r.o.") {
+//                    error(
+//                        "Prebuild AppCDS mode is only supported on JetBrains JDK; " +
+//                                "current vendor is '$jdkVendor'"
+//                    )
+//                }
+            }
             override val generateJreClassesArchive: Boolean get() = true
             override val generateAppClassesArchive: Boolean get() = true
             override fun appClassesArchiveCreationJvmArgs() =
                 listOf(
                     "-XX:ArchiveClassesAtExit=$ARCHIVE_FILE_ARGUMENT",
+                    "-XX:+NoClasspathInArchive",
                     "-Dcompose.appcds.create-archive=true",
                 )
             override fun appClassesArchiveFile(packagedAppRootDir: Directory): RegularFile {
@@ -201,6 +211,7 @@ abstract class AppCdsMode(val name: String) : Serializable {
             override fun runtimeJvmArgs() =
                 listOf(
                     "-XX:SharedArchiveFile=$ARCHIVE_FILE_ARGUMENT",
+                    "-XX:+NoClasspathInArchive",
                 )
         }
     }
