@@ -93,6 +93,7 @@ internal fun Project.configureSyncIosComposeResources(
                 val projectPath = project.path
                 specAttributes["resources"] = specAttr
                 project.tasks.named("podspec").configure {
+                    it.outputs.dir(syncDir)
                     it.doFirst {
                         if (specAttributes["resources"] != specAttr) error(
                             """
@@ -101,7 +102,6 @@ internal fun Project.configureSyncIosComposeResources(
                                 |  * Alternative action: turn off Compose Multiplatform's resources management for iOS by adding '${ComposeProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties;
                             """.trimMargin()
                         )
-                        syncDir.mkdirs()
                     }
                 }
             }
