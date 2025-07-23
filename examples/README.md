@@ -6,7 +6,6 @@
 | [Chat](chat)                         | A simple chat                                                                                | Android, iOS, Desktop |
 | [Graphics2D](graphics-2d)            | 2D Games and graphics examples                                                               | Android, iOS, Desktop |
 | [Widgets Gallery](widgets-gallery)   | Gallery of standard widgets                                                                  | Android, iOS, Desktop |
-| [Todoapp Lite](todoapp-lite)         | A simple todo app fully based on Compose                                                     | Android, iOS, Desktop |
 | [Nav Cupcake](nav_cupcake)           | Multiscreen app to demonstrate the use of Compose Navigation                                 | Android, iOS, Desktop |
 | [Issues tracker](issues)             | GitHub issue tracker with an adaptive UI and ktor-client                                     | Android, Desktop      |
 | [Notepad](notepad)                   | Notepad, using the Composable Window API                                                     | Desktop               |
