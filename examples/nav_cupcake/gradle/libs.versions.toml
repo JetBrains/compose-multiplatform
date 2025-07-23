@@ -9,7 +9,7 @@ androidx-navigation = "2.7.0-alpha06"
 compose-android = "1.6.7"
 compose-multiplatform = "1.7.0"
 junit = "4.13.2"
-kotlin = "2.1.0"
+kotlin = "2.2.20-Beta1"
 kotlinx-datetime = "0.6.0"
 
 [libraries]
