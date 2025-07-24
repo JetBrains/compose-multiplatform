@@ -64,13 +64,16 @@ private fun Project.introduceComposeWebCompatibilityTask(targets: Collection<Kot
     val jsAppRenamed = "__jsApp.js"
     val wasmAppRenamed = "__wasmApp.js"
 
+    val jsDistTask = targets.firstOrNull { it.name == "js" } ?: return
+    val wasmDistTask = targets.firstOrNull { it.name == "wasmJs" } ?: return
+
     registerTask<Copy>("composeWebCompatibilityDist") {
-        val jsTarget = targets.firstOrNull { it.name == "js" }?.outputModuleName
-        val wasmTarget = targets.firstOrNull { it.name == "wasmJs" }?.outputModuleName
+        val jsTargetModuleName = jsDistTask.outputModuleName
+        val wasmTargetModuleName = wasmDistTask.outputModuleName
 
         duplicatesStrategy = DuplicatesStrategy.WARN
         onlyIf {
-            jsTarget != null && wasmTarget != null
+            jsTargetModuleName != null && wasmTargetModuleName != null
         }
 
         into(webProductionDist)
@@ -89,7 +92,7 @@ private fun Project.introduceComposeWebCompatibilityTask(targets: Collection<Kot
                 }
             }
         }, copySpec { spec ->
-            val wasmTarget = targets.firstOrNull { it.name == "wasmJs" }?.outputModuleName
+            val wasmTarget = wasmDistTask?.outputModuleName
             spec.apply {
                 from( tasks.named("wasmJsBrowserDistribution")) {
                     rename { name ->
@@ -137,11 +140,11 @@ private fun Project.introduceComposeWebCompatibilityTask(targets: Collection<Kot
             
             """.trimIndent()
 
-            webProductionDist.file("${jsTarget!!.get()}.js").get().asFile.writeText(
+            webProductionDist.file("${jsTargetModuleName!!.get()}.js").get().asFile.writeText(
                 fallbackResolverCode
             )
 
-            webProductionDist.file("${wasmTarget!!.get()}.js").get().asFile.writeText(
+            webProductionDist.file("${wasmTargetModuleName!!.get()}.js").get().asFile.writeText(
                 fallbackResolverCode
             )
         }
