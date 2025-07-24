@@ -21,9 +21,7 @@ import org.jetbrains.compose.internal.utils.file
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.compose.web.tasks.UnpackSkikoWasmRuntimeTask
-import org.jetbrains.kotlin.gradle.targets.js.KotlinWasmTargetType
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
-import org.jetbrains.kotlin.gradle.tasks.IncrementalSyncTask
 
 internal fun Project.configureWeb(
     composeExt: ComposeExtension,
@@ -84,6 +82,98 @@ internal fun configureWebApplication(
 
         skikoRuntimeFiles = skikoJsWasmRuntimeConfiguration
         outputDir.set(unpackedRuntimeDir)
+    }
+
+    val webProductionDist = project.layout.buildDirectory.dir("dist/web/productionExecutable")
+    val jsAppRenamed = "__jsApp.js"
+    val wasmAppRenamed = "__wasmApp.js"
+
+    val copyJsDistSpec = project.copySpec { spec ->
+        val jsTarget = targets.firstOrNull { it.name == "js" }?.outputModuleName
+        spec.apply {
+            from( project.tasks.named("jsBrowserDistribution")) {
+                rename { name ->
+                    val moduleName = jsTarget?.get()
+                    when (name) {
+                        "${moduleName}.js" -> jsAppRenamed
+                        "${moduleName}.js.map" -> "${jsAppRenamed}.map"
+                        else -> name
+                    }
+                }
+            }
+        }
+    }
+
+    val copyWasmDistSpec = project.copySpec { spec ->
+        val wasmTarget = targets.firstOrNull { it.name == "wasmJs" }?.outputModuleName
+        spec.apply {
+            from( project.tasks.named("wasmJsBrowserDistribution")) {
+                rename { name ->
+                    val moduleName = wasmTarget?.get()
+                    when (name) {
+                        "${moduleName}.js" -> wasmAppRenamed
+                        "${moduleName}.js.map" -> "${wasmAppRenamed}.map"
+                        else -> name
+                    }
+                }
+            }
+        }
+    }
+
+
+    val composeWebCompatibilityDistTask = project.registerTask<Copy>("composeWebCompatibilityDist") {
+        val jsTarget = targets.firstOrNull { it.name == "js" }?.outputModuleName
+        val wasmTarget = targets.firstOrNull { it.name == "wasmJs" }?.outputModuleName
+
+        duplicatesStrategy = DuplicatesStrategy.WARN
+        onlyIf {
+            jsTarget != null && wasmTarget != null
+        }
+
+        into(webProductionDist)
+        with(copyJsDistSpec, copyWasmDistSpec)
+
+        doLast {
+            val fallbackResolverCode = """
+                 const simpleWasmModule = new Uint8Array([
+                0,  97, 115, 109,   1,   0,   0,  0,   1,   8,   2,  95,
+                1, 120,   0,  96,   0,   0,   3,  3,   2,   1,   1,  10,
+               14,   2,   6,   0,   6,  64,  25, 11,  11,   5,   0, 208,
+              112,  26,  11,   0,  45,   4, 110, 97, 109, 101,   1,  15,
+                2,   0,   5, 102, 117, 110,  99, 48,   1,   5, 102, 117,
+              110,  99,  49,   4,   8,   1,   0,  5, 116, 121, 112, 101,
+               48,  10,  11,   1,   0,   1,   0,  6, 102, 105, 101, 108,
+              100,  48
+                ]);
+
+            const hasSupportOfAllRequiredWasmFeatures = () =>
+                typeof WebAssembly !== "undefined" &&
+                typeof WebAssembly?.validate === "function" &&
+                WebAssembly.validate(simpleWasmModule);
+
+            const createScript = (src) => {
+                const script = document.createElement("script");
+                script.src = src;
+                script.type = "application/javascript";
+                return script;
+            }
+            
+            if (hasSupportOfAllRequiredWasmFeatures()) {
+                document.body.appendChild(createScript('$wasmAppRenamed'));
+            } else {
+                document.body.appendChild(createScript('$jsAppRenamed'));
+            }
+            
+            """.trimIndent()
+
+            webProductionDist.file("${jsTarget!!.get()}.js").get().asFile.writeText(
+                fallbackResolverCode
+            )
+
+            webProductionDist.file("${wasmTarget!!.get()}.js").get().asFile.writeText(
+                fallbackResolverCode
+            )
+        }
     }
 
     val processSkikoRuntimeForKWasm = project.registerTask<Copy>("processSkikoRuntimeForKWasm") {
