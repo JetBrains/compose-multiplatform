@@ -59,12 +59,12 @@ internal fun Project.configureWeb(
 }
 
 private fun Project.introduceComposeWebCompatibilityTask(targets: Collection<KotlinJsIrTarget>) {
-    val webProductionDist = project.layout.buildDirectory.dir("dist/web/productionExecutable")
+    val webProductionDist = layout.buildDirectory.dir("dist/web/productionExecutable")
 
     val jsAppRenamed = "__jsApp.js"
     val wasmAppRenamed = "__wasmApp.js"
 
-    project.registerTask<Copy>("composeWebCompatibilityDist") {
+    registerTask<Copy>("composeWebCompatibilityDist") {
         val jsTarget = targets.firstOrNull { it.name == "js" }?.outputModuleName
         val wasmTarget = targets.firstOrNull { it.name == "wasmJs" }?.outputModuleName
 
@@ -74,10 +74,10 @@ private fun Project.introduceComposeWebCompatibilityTask(targets: Collection<Kot
         }
 
         into(webProductionDist)
-        with(project.copySpec { spec ->
+        with(copySpec { spec ->
             val jsTarget = targets.firstOrNull { it.name == "js" }?.outputModuleName
             spec.apply {
-                from( project.tasks.named("jsBrowserDistribution")) {
+                from( tasks.named("jsBrowserDistribution")) {
                     rename { name ->
                         val moduleName = jsTarget?.get()
                         when (name) {
@@ -88,10 +88,10 @@ private fun Project.introduceComposeWebCompatibilityTask(targets: Collection<Kot
                     }
                 }
             }
-        }, project.copySpec { spec ->
+        }, copySpec { spec ->
             val wasmTarget = targets.firstOrNull { it.name == "wasmJs" }?.outputModuleName
             spec.apply {
-                from( project.tasks.named("wasmJsBrowserDistribution")) {
+                from( tasks.named("wasmJsBrowserDistribution")) {
                     rename { name ->
                         val moduleName = wasmTarget?.get()
                         when (name) {
