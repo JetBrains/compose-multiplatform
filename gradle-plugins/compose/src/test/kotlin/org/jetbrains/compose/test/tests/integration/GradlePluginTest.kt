@@ -24,6 +24,7 @@ import java.net.SocketTimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
+import kotlin.test.assertContentEquals
 import kotlin.test.assertFalse
 
 class GradlePluginTest : GradlePluginTestBase() {
@@ -86,7 +87,7 @@ class GradlePluginTest : GradlePluginTestBase() {
             }
         }
 
-    // Note: we can't test non-jvm targets with Kotlin older than 2.1.0, because of klib abi version bump in 2.1.0
+    // Note: we can"t test non-jvm targets with Kotlin older than 2.1.0, because of klib abi version bump in 2.1.0
     private val oldestSupportedKotlinVersion = "2.1.0"
     @Test
     fun testOldestKotlinMpp() = with(
@@ -111,6 +112,32 @@ class GradlePluginTest : GradlePluginTestBase() {
     ) {
         gradle(":compileKotlinJs").checks {
             check.taskSuccessful(":compileKotlinJs")
+        }
+    }
+
+    @Test
+    fun testWebJsWasm() = with(
+        testProject(
+            "application/webJsWasm",
+            testEnvironment = defaultTestEnvironment.copy()
+        )
+    ) {
+        gradle(":composeApp:composeWebCompatibilityDist").checks {
+            check.taskSuccessful(":composeApp:composeWebCompatibilityDist")
+
+            file("./composeApp/build/dist/web/productionExecutable").apply {
+                checkExists()
+                assertTrue(isDirectory)
+                val distributionFiles = listFiles()!!.map { it.name }.toSet()
+
+                assertTrue(distributionFiles.any { it.endsWith(".wasm") })
+
+                assertContentEquals(distributionFiles.filter { !it.endsWith(".wasm") }, setOf(
+                    "composeResources", "index.html",
+                    "__jsApp.js.map", "styles.css", "composeApp.js", "__jsApp.js",
+                    "__wasmApp.js.map", "__wasmApp.js")
+                )
+            }
         }
     }
 
