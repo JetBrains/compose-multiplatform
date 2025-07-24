@@ -58,70 +58,13 @@ internal fun Project.configureWeb(
     }
 }
 
-internal fun configureWebApplication(
-    targets: Collection<KotlinJsIrTarget>,
-    project: Project,
-    shouldRunUnpackSkiko: Provider<Boolean>
-) {
-    val skikoJsWasmRuntimeConfiguration = project.configurations.create("COMPOSE_SKIKO_JS_WASM_RUNTIME")
-    val skikoJsWasmRuntimeDependency = skikoVersionProvider(project).map { skikoVersion ->
-        project.dependencies.create("org.jetbrains.skiko:skiko-js-wasm-runtime:$skikoVersion")
-    }
-    skikoJsWasmRuntimeConfiguration.defaultDependencies {
-        it.addLater(skikoJsWasmRuntimeDependency)
-    }
-
-    val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-for-web-runtime")
-    val processedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-runtime-processed-wasmjs")
-    val taskName = "unpackSkikoWasmRuntime"
-
-    val unpackRuntime = project.registerTask<UnpackSkikoWasmRuntimeTask>(taskName) {
-        onlyIf {
-            shouldRunUnpackSkiko.get()
-        }
-
-        skikoRuntimeFiles = skikoJsWasmRuntimeConfiguration
-        outputDir.set(unpackedRuntimeDir)
-    }
-
+private fun Project.introduceComposeWebCompatibilityTask(targets: Collection<KotlinJsIrTarget>) {
     val webProductionDist = project.layout.buildDirectory.dir("dist/web/productionExecutable")
+
     val jsAppRenamed = "__jsApp.js"
     val wasmAppRenamed = "__wasmApp.js"
 
-    val copyJsDistSpec = project.copySpec { spec ->
-        val jsTarget = targets.firstOrNull { it.name == "js" }?.outputModuleName
-        spec.apply {
-            from( project.tasks.named("jsBrowserDistribution")) {
-                rename { name ->
-                    val moduleName = jsTarget?.get()
-                    when (name) {
-                        "${moduleName}.js" -> jsAppRenamed
-                        "${moduleName}.js.map" -> "${jsAppRenamed}.map"
-                        else -> name
-                    }
-                }
-            }
-        }
-    }
-
-    val copyWasmDistSpec = project.copySpec { spec ->
-        val wasmTarget = targets.firstOrNull { it.name == "wasmJs" }?.outputModuleName
-        spec.apply {
-            from( project.tasks.named("wasmJsBrowserDistribution")) {
-                rename { name ->
-                    val moduleName = wasmTarget?.get()
-                    when (name) {
-                        "${moduleName}.js" -> wasmAppRenamed
-                        "${moduleName}.js.map" -> "${wasmAppRenamed}.map"
-                        else -> name
-                    }
-                }
-            }
-        }
-    }
-
-
-    val composeWebCompatibilityDistTask = project.registerTask<Copy>("composeWebCompatibilityDist") {
+    project.registerTask<Copy>("composeWebCompatibilityDist") {
         val jsTarget = targets.firstOrNull { it.name == "js" }?.outputModuleName
         val wasmTarget = targets.firstOrNull { it.name == "wasmJs" }?.outputModuleName
 
@@ -131,7 +74,35 @@ internal fun configureWebApplication(
         }
 
         into(webProductionDist)
-        with(copyJsDistSpec, copyWasmDistSpec)
+        with(project.copySpec { spec ->
+            val jsTarget = targets.firstOrNull { it.name == "js" }?.outputModuleName
+            spec.apply {
+                from( project.tasks.named("jsBrowserDistribution")) {
+                    rename { name ->
+                        val moduleName = jsTarget?.get()
+                        when (name) {
+                            "${moduleName}.js" -> jsAppRenamed
+                            "${moduleName}.js.map" -> "${jsAppRenamed}.map"
+                            else -> name
+                        }
+                    }
+                }
+            }
+        }, project.copySpec { spec ->
+            val wasmTarget = targets.firstOrNull { it.name == "wasmJs" }?.outputModuleName
+            spec.apply {
+                from( project.tasks.named("wasmJsBrowserDistribution")) {
+                    rename { name ->
+                        val moduleName = wasmTarget?.get()
+                        when (name) {
+                            "${moduleName}.js" -> wasmAppRenamed
+                            "${moduleName}.js.map" -> "${wasmAppRenamed}.map"
+                            else -> name
+                        }
+                    }
+                }
+            }
+        })
 
         doLast {
             val fallbackResolverCode = """
@@ -175,6 +146,33 @@ internal fun configureWebApplication(
             )
         }
     }
+}
+
+internal fun configureWebApplication(
+    targets: Collection<KotlinJsIrTarget>,
+    project: Project,
+    shouldRunUnpackSkiko: Provider<Boolean>
+) {
+    val skikoJsWasmRuntimeConfiguration = project.configurations.create("COMPOSE_SKIKO_JS_WASM_RUNTIME")
+    val skikoJsWasmRuntimeDependency = skikoVersionProvider(project).map { skikoVersion ->
+        project.dependencies.create("org.jetbrains.skiko:skiko-js-wasm-runtime:$skikoVersion")
+    }
+    skikoJsWasmRuntimeConfiguration.defaultDependencies {
+        it.addLater(skikoJsWasmRuntimeDependency)
+    }
+
+    val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-for-web-runtime")
+    val processedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-runtime-processed-wasmjs")
+    val taskName = "unpackSkikoWasmRuntime"
+
+    val unpackRuntime = project.registerTask<UnpackSkikoWasmRuntimeTask>(taskName) {
+        onlyIf {
+            shouldRunUnpackSkiko.get()
+        }
+
+        skikoRuntimeFiles = skikoJsWasmRuntimeConfiguration
+        outputDir.set(unpackedRuntimeDir)
+    }
 
     val processSkikoRuntimeForKWasm = project.registerTask<Copy>("processSkikoRuntimeForKWasm") {
         dependsOn(unpackRuntime)
@@ -194,6 +192,8 @@ internal fun configureWebApplication(
             }
         }
     }
+
+    project.introduceComposeWebCompatibilityTask(targets)
 
     targets.forEach { target ->
         target.compilations.all { compilation ->
