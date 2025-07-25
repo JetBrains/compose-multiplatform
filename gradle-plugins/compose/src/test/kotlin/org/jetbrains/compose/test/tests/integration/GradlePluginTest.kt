@@ -128,15 +128,13 @@ class GradlePluginTest : GradlePluginTestBase() {
             file("./composeApp/build/dist/web/productionExecutable").apply {
                 checkExists()
                 assertTrue(isDirectory)
-                val distributionFiles = listFiles()!!.map { it.name }.toSet()
+                val distributionFiles = listFiles()!!.map { it.name }.toList().sorted()
 
                 assertTrue(distributionFiles.any { it.endsWith(".wasm") })
 
-                assertContentEquals(distributionFiles.filter { !it.endsWith(".wasm") }, setOf(
-                    "composeResources", "index.html",
-                    "__jsApp.js.map", "styles.css", "composeApp.js", "__jsApp.js",
-                    "__wasmApp.js.map", "__wasmApp.js")
-                )
+                assertContentEquals(distributionFiles.filter { !it.endsWith(".wasm") }, listOf(
+                    "__jsApp.js", "__jsApp.js.map", "__wasmApp.js", "__wasmApp.js.map", "composeApp.js", "composeResources", "index.html", "styles.css"
+                ))
             }
         }
     }
