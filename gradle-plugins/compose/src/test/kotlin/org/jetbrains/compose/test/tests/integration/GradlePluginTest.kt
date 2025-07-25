@@ -60,8 +60,7 @@ class GradlePluginTest : GradlePluginTestBase() {
                 assertTrue(isDirectory)
                 val distributionFiles = listFiles()!!.map { it.name }.toList()
                 assertTrue(distributionFiles.contains("skiko.wasm"))
-                assertTrue(distributionFiles.contains("skiko.js"))
-                assertFalse(this.resolve("skiko.js").readText().contains("skiko.js is redundant"))
+                assertTrue(distributionFiles.contains("skiko.mjs"))
             }
         }
     }
