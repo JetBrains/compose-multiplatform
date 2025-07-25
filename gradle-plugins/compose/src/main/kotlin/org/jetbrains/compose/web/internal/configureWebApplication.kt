@@ -90,19 +90,6 @@ internal fun configureWebApplication(
         dependsOn(unpackRuntime)
         from(unpackedRuntimeDir)
         into(processedRuntimeDir)
-
-        doLast {
-            // TODO: in the next versions we can simply filter skiko.js out for k/wasm target
-            processedRuntimeDir.file("skiko.js").get().apply {
-                asFile.appendText("\n\n// Warn about skiko.js redundancy in case of K/Wasm target:\n")
-                asFile.appendText(
-                    """console.warn("Note: skiko.js is redundant in K/Wasm Compose for Web applications. 
-                        |Consider removing it from index.html, 
-                        |it will be removed from the distribution in next Compose Multiplatform versions");
-                        """.trimMargin().replace("\n", "")
-                )
-            }
-        }
     }
 
     targets.forEach { target ->
