@@ -128,13 +128,12 @@ private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformE
     val webProductionDist = layout.buildDirectory.dir("dist/web/productionExecutable")
 
     mppPlugin.targets.matching { it is KotlinJsIrTarget }.all { target ->
-        if (target.name ==  "js") {
-            jsOutputName.set((target as KotlinJsIrTarget).outputModuleName)
+        val outputName = when {
+            (target as KotlinJsIrTarget).wasmTargetType == null -> wasmOutputName
+            else -> jsOutputName
         }
 
-        if (target.name ==  "wasmJs") {
-            wasmOutputName.set((target as KotlinJsIrTarget).outputModuleName)
-        }
+        outputName.set(target.outputModuleName)
     }
 
     onlyIf {
