@@ -1,0 +1,153 @@
+package org.jetbrains.compose.web.tasks
+
+import org.gradle.api.DefaultTask
+import org.gradle.api.Project
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileSystemOperations
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.TaskAction
+import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
+import org.jetbrains.compose.internal.mppExt
+import org.jetbrains.compose.internal.utils.clearDirs
+import org.jetbrains.compose.internal.utils.registerTask
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
+import javax.inject.Inject
+
+abstract class WebCompatibilityTask : DefaultTask() {
+    @get:Inject
+    internal abstract val fileOperations: FileSystemOperations
+
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @get:InputFiles
+    lateinit var jsDistFiles: FileCollection
+
+    @get:InputFiles
+    lateinit var wasmDistFiles: FileCollection
+
+    @get:Input
+    @get:Optional
+    abstract val jsOutputName: Property<String>
+
+    @get:Input
+    @get:Optional
+    abstract val wasmOutputName: Property<String>
+
+    @TaskAction
+    fun run() {
+        val jsAppRenamed = "__jsApp.js"
+        val wasmAppRenamed = "__wasmApp.js"
+
+        fileOperations.clearDirs(outputDir)
+
+        fileOperations.copy { copySpec ->
+            copySpec.duplicatesStrategy = DuplicatesStrategy.WARN
+
+            copySpec.from(jsDistFiles) {
+                copySpec.rename { name ->
+                    val moduleName = jsOutputName.get()
+                    when (name) {
+                        "${moduleName}.js" -> jsAppRenamed
+                        "${moduleName}.js.map" -> "${jsAppRenamed}.map"
+                        else -> name
+                    }
+                }
+            }
+
+            copySpec.into(outputDir)
+        }
+
+        fileOperations.copy { copySpec ->
+            copySpec.duplicatesStrategy = DuplicatesStrategy.WARN
+
+            copySpec.from(wasmDistFiles) {
+                copySpec.rename { name ->
+                    val moduleName = wasmOutputName.get()
+                    when (name) {
+                        "${moduleName}.js" -> wasmAppRenamed
+                        "${moduleName}.js.map" -> "${wasmAppRenamed}.map"
+                        else -> name
+                    }
+                }
+            }
+
+            copySpec.into(outputDir)
+        }
+
+        val fallbackResolverCode = """
+                 const simpleWasmModule = new Uint8Array([
+                0,  97, 115, 109,   1,   0,   0,  0,   1,   8,   2,  95,
+                1, 120,   0,  96,   0,   0,   3,  3,   2,   1,   1,  10,
+               14,   2,   6,   0,   6,  64,  25, 11,  11,   5,   0, 208,
+              112,  26,  11,   0,  45,   4, 110, 97, 109, 101,   1,  15,
+                2,   0,   5, 102, 117, 110,  99, 48,   1,   5, 102, 117,
+              110,  99,  49,   4,   8,   1,   0,  5, 116, 121, 112, 101,
+               48,  10,  11,   1,   0,   1,   0,  6, 102, 105, 101, 108,
+              100,  48
+                ]);
+
+            const hasSupportOfAllRequiredWasmFeatures = () =>
+                typeof WebAssembly !== "undefined" &&
+                typeof WebAssembly?.validate === "function" &&
+                WebAssembly.validate(simpleWasmModule);
+
+            const createScript = (src) => {
+                const script = document.createElement("script");
+                script.src = src;
+                script.type = "application/javascript";
+                return script;
+            }
+            
+            if (hasSupportOfAllRequiredWasmFeatures()) {
+                document.body.appendChild(createScript('$wasmAppRenamed'));
+            } else {
+                document.body.appendChild(createScript('$jsAppRenamed'));
+            }
+            
+            """.trimIndent()
+
+        outputDir.file("${jsOutputName.get()}.js").get().asFile.writeText(
+            fallbackResolverCode
+        )
+
+        outputDir.file("${wasmOutputName.get()}.js").get().asFile.writeText(
+            fallbackResolverCode
+        )
+    }
+}
+
+private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformExtension)  =  registerTask<WebCompatibilityTask>("composeWebCompatibilityDist") {
+    val webProductionDist = layout.buildDirectory.dir("dist/web/productionExecutable")
+
+    mppPlugin.targets.matching { it is KotlinJsIrTarget }.all { target ->
+        if (target.name ==  "js") {
+            jsOutputName.set((target as KotlinJsIrTarget).outputModuleName)
+        }
+
+        if (target.name ==  "wasmJs") {
+            wasmOutputName.set((target as KotlinJsIrTarget).outputModuleName)
+        }
+    }
+
+    onlyIf {
+        jsOutputName.orNull != null && wasmOutputName.orNull != null
+    }
+
+    outputDir.set(webProductionDist)
+    jsDistFiles = tasks.named("jsBrowserDistribution").get().outputs.files
+    wasmDistFiles = tasks.named("wasmJsBrowserDistribution").get().outputs.files
+}
+
+internal fun Project.configureWebCompatibility() {
+    plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
+            project.registerWebCompatibilityTask(mppExt)
+    }
+}

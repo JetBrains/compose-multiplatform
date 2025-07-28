@@ -27,6 +27,7 @@ import org.jetbrains.compose.resources.ResourcesExtension
 import org.jetbrains.compose.resources.configureComposeResources
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.compose.web.internal.configureWeb
+import org.jetbrains.compose.web.tasks.configureWebCompatibility
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
@@ -51,6 +52,8 @@ abstract class ComposePlugin : Plugin<Project> {
         project.checkComposeCompilerPlugin()
 
         project.configureComposeResources(resourcesExtension)
+
+        project.configureWebCompatibility()
 
         project.afterEvaluate {
             configureDesktop(project, desktopExtension)

@@ -10,7 +10,6 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.artifacts.UnresolvedDependency
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
-import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
 import org.gradle.language.jvm.tasks.ProcessResources
@@ -58,99 +57,6 @@ internal fun Project.configureWeb(
     }
 }
 
-private fun Project.introduceComposeWebCompatibilityTask(targets: Collection<KotlinJsIrTarget>) {
-    val webProductionDist = layout.buildDirectory.dir("dist/web/productionExecutable")
-
-    val jsAppRenamed = "__jsApp.js"
-    val wasmAppRenamed = "__wasmApp.js"
-
-    val jsDistTask = targets.firstOrNull { it.name == "js" } ?: return
-    val wasmDistTask = targets.firstOrNull { it.name == "wasmJs" } ?: return
-
-    registerTask<Copy>("composeWebCompatibilityDist") {
-        val jsTargetModuleName = jsDistTask.outputModuleName
-        val wasmTargetModuleName = wasmDistTask.outputModuleName
-
-        duplicatesStrategy = DuplicatesStrategy.WARN
-        onlyIf {
-            jsTargetModuleName != null && wasmTargetModuleName != null
-        }
-
-        into(webProductionDist)
-        with(copySpec { spec ->
-            val jsTarget = targets.firstOrNull { it.name == "js" }?.outputModuleName
-            spec.apply {
-                from( tasks.named("jsBrowserDistribution")) {
-                    rename { name ->
-                        val moduleName = jsTarget?.get()
-                        when (name) {
-                            "${moduleName}.js" -> jsAppRenamed
-                            "${moduleName}.js.map" -> "${jsAppRenamed}.map"
-                            else -> name
-                        }
-                    }
-                }
-            }
-        }, copySpec { spec ->
-            val wasmTarget = wasmDistTask?.outputModuleName
-            spec.apply {
-                from( tasks.named("wasmJsBrowserDistribution")) {
-                    rename { name ->
-                        val moduleName = wasmTarget?.get()
-                        when (name) {
-                            "${moduleName}.js" -> wasmAppRenamed
-                            "${moduleName}.js.map" -> "${wasmAppRenamed}.map"
-                            else -> name
-                        }
-                    }
-                }
-            }
-        })
-
-        doLast {
-            val fallbackResolverCode = """
-                 const simpleWasmModule = new Uint8Array([
-                0,  97, 115, 109,   1,   0,   0,  0,   1,   8,   2,  95,
-                1, 120,   0,  96,   0,   0,   3,  3,   2,   1,   1,  10,
-               14,   2,   6,   0,   6,  64,  25, 11,  11,   5,   0, 208,
-              112,  26,  11,   0,  45,   4, 110, 97, 109, 101,   1,  15,
-                2,   0,   5, 102, 117, 110,  99, 48,   1,   5, 102, 117,
-              110,  99,  49,   4,   8,   1,   0,  5, 116, 121, 112, 101,
-               48,  10,  11,   1,   0,   1,   0,  6, 102, 105, 101, 108,
-              100,  48
-                ]);
-
-            const hasSupportOfAllRequiredWasmFeatures = () =>
-                typeof WebAssembly !== "undefined" &&
-                typeof WebAssembly?.validate === "function" &&
-                WebAssembly.validate(simpleWasmModule);
-
-            const createScript = (src) => {
-                const script = document.createElement("script");
-                script.src = src;
-                script.type = "application/javascript";
-                return script;
-            }
-            
-            if (hasSupportOfAllRequiredWasmFeatures()) {
-                document.body.appendChild(createScript('$wasmAppRenamed'));
-            } else {
-                document.body.appendChild(createScript('$jsAppRenamed'));
-            }
-            
-            """.trimIndent()
-
-            webProductionDist.file("${jsTargetModuleName!!.get()}.js").get().asFile.writeText(
-                fallbackResolverCode
-            )
-
-            webProductionDist.file("${wasmTargetModuleName!!.get()}.js").get().asFile.writeText(
-                fallbackResolverCode
-            )
-        }
-    }
-}
-
 internal fun configureWebApplication(
     targets: Collection<KotlinJsIrTarget>,
     project: Project,
@@ -195,8 +101,6 @@ internal fun configureWebApplication(
             }
         }
     }
-
-    project.introduceComposeWebCompatibilityTask(targets)
 
     targets.forEach { target ->
         target.compilations.all { compilation ->
