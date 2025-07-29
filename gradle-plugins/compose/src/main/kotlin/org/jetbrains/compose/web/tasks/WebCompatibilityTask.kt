@@ -127,6 +127,9 @@ abstract class WebCompatibilityTask : DefaultTask() {
 }
 
 private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformExtension)  =  registerTask<WebCompatibilityTask>("composeWebCompatibilityDist") {
+    group = "compose"
+    description = "This task combines both js and wasm distributions into one so that wasm application fallback to js target if modern wasm feature are not supported"
+
     val webProductionDist = layout.buildDirectory.dir("dist/web/productionExecutable")
     outputDir.set(webProductionDist)
 
