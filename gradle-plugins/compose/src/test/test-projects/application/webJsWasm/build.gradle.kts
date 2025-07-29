@@ -5,3 +5,9 @@ plugins {
     id("org.jetbrains.compose") apply false
     id("org.jetbrains.kotlin.plugin.compose") apply false
 }
+
+allprojects {
+    tasks.configureEach {
+        if (name == "kotlinStoreYarnLock") enabled = false
+    }
+}
