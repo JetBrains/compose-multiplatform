@@ -2,6 +2,7 @@ package org.jetbrains.compose.web.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.file.FileCollection
@@ -19,6 +20,7 @@ import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import javax.inject.Inject
+import kotlin.math.log
 
 abstract class WebCompatibilityTask : DefaultTask() {
     @get:Inject
@@ -28,10 +30,10 @@ abstract class WebCompatibilityTask : DefaultTask() {
     abstract val outputDir: DirectoryProperty
 
     @get:InputFiles
-    lateinit var jsDistFiles: FileCollection
+    abstract val jsDistFiles: ConfigurableFileCollection
 
     @get:InputFiles
-    lateinit var wasmDistFiles: FileCollection
+    abstract val wasmDistFiles: ConfigurableFileCollection
 
     @get:Input
     @get:Optional
@@ -126,10 +128,11 @@ abstract class WebCompatibilityTask : DefaultTask() {
 
 private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformExtension)  =  registerTask<WebCompatibilityTask>("composeWebCompatibilityDist") {
     val webProductionDist = layout.buildDirectory.dir("dist/web/productionExecutable")
+    outputDir.set(webProductionDist)
 
     mppPlugin.targets.matching { it is KotlinJsIrTarget }.all { target ->
         val outputName = when {
-            (target as KotlinJsIrTarget).wasmTargetType == null -> wasmOutputName
+            (target as KotlinJsIrTarget).wasmTargetType != null -> wasmOutputName
             else -> jsOutputName
         }
 
@@ -137,12 +140,24 @@ private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformE
     }
 
     onlyIf {
-        jsOutputName.orNull != null && wasmOutputName.orNull != null
+        val hasBothDistributions = !jsDistFiles.isEmpty && !wasmDistFiles.isEmpty
+        val hasBothOutputs = jsOutputName.orNull != null && wasmOutputName.orNull != null
+
+        if (!hasBothDistributions) {
+            logger.lifecycle("Task ${this.name} skipped: no js and wasm distributions found, both are required for compatibility")
+        } else if (!hasBothOutputs) {
+            logger.lifecycle("Task ${this.name} skipped: no js and wasm output names specified")
+        }
+        hasBothDistributions && hasBothOutputs
     }
 
-    outputDir.set(webProductionDist)
-    jsDistFiles = tasks.named("jsBrowserDistribution").get().outputs.files
-    wasmDistFiles = tasks.named("wasmJsBrowserDistribution").get().outputs.files
+    jsDistFiles.from(project.provider {
+        project.tasks.findByName("jsBrowserDistribution")?.outputs?.files ?: project.files()
+    })
+
+    wasmDistFiles.from(project.provider {
+        project.tasks.findByName("wasmJsBrowserDistribution")?.outputs?.files ?: project.files()
+    })
 }
 
 internal fun Project.configureWebCompatibility() {

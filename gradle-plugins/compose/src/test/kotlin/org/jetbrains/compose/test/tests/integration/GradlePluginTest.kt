@@ -124,6 +124,8 @@ class GradlePluginTest : GradlePluginTestBase() {
     ) {
         gradle(":composeApp:composeWebCompatibilityDist").checks {
             check.taskSuccessful(":composeApp:composeWebCompatibilityDist")
+            check.taskSuccessful(":composeApp:jsBrowserDistribution")
+            check.taskSuccessful(":composeApp:wasmJsBrowserDistribution")
 
             file("./composeApp/build/dist/web/productionExecutable").apply {
                 checkExists()
