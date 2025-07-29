@@ -130,7 +130,7 @@ private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformE
     group = "compose"
     description = "This task combines both js and wasm distributions into one so that wasm application fallback to js target if modern wasm feature are not supported"
 
-    val webProductionDist = layout.buildDirectory.dir("dist/web/productionExecutable")
+    val webProductionDist = layout.buildDirectory.dir("dist/composeWebCompatibility/productionExecutable")
     outputDir.set(webProductionDist)
 
     mppPlugin.targets.matching { it is KotlinJsIrTarget }.all { target ->

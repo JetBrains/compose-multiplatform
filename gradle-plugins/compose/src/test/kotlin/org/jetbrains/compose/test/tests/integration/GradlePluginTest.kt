@@ -127,7 +127,7 @@ class GradlePluginTest : GradlePluginTestBase() {
             check.taskSuccessful(":composeApp:jsBrowserDistribution")
             check.taskSuccessful(":composeApp:wasmJsBrowserDistribution")
 
-            file("./composeApp/build/dist/web/productionExecutable").apply {
+            file("./composeApp/build/dist/composeWebCompatibility/productionExecutable").apply {
                 checkExists()
                 assertTrue(isDirectory)
                 val distributionFiles = listFiles()!!.map { it.name }.toList().sorted()
