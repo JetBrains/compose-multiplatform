@@ -122,8 +122,8 @@ class GradlePluginTest : GradlePluginTestBase() {
             testEnvironment = defaultTestEnvironment.copy()
         )
     ) {
-        gradle(":composeApp:composeWebCompatibilityDist").checks {
-            check.taskSuccessful(":composeApp:composeWebCompatibilityDist")
+        gradle(":composeApp:composeCompatibilityBrowserDistribution").checks {
+            check.taskSuccessful(":composeApp:composeCompatibilityBrowserDistribution")
             check.taskSuccessful(":composeApp:jsBrowserDistribution")
             check.taskSuccessful(":composeApp:wasmJsBrowserDistribution")
 

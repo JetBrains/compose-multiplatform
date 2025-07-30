@@ -126,7 +126,7 @@ abstract class WebCompatibilityTask : DefaultTask() {
     }
 }
 
-private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformExtension)  =  registerTask<WebCompatibilityTask>("composeWebCompatibilityDist") {
+private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformExtension)  =  registerTask<WebCompatibilityTask>("composeCompatibilityBrowserDistribution") {
     group = "compose"
     description = "This task combines both js and wasm distributions into one so that wasm application fallback to js target if modern wasm feature are not supported"
 
@@ -138,6 +138,7 @@ private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformE
             (target as KotlinJsIrTarget).wasmTargetType != null -> wasmOutputName
             else -> jsOutputName
         }
+
 
         outputName.set(target.outputModuleName)
     }
