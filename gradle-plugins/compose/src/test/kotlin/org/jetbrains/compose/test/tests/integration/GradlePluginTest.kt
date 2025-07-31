@@ -24,6 +24,7 @@ import java.net.SocketTimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
+import kotlin.test.assertContentEquals
 import kotlin.test.assertFalse
 
 class GradlePluginTest : GradlePluginTestBase() {
