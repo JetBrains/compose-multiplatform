@@ -5,7 +5,6 @@ import org.gradle.api.Project
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -18,9 +17,10 @@ import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.utils.clearDirs
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import javax.inject.Inject
-import kotlin.math.log
 
 abstract class WebCompatibilityTask : DefaultTask() {
     @get:Inject
@@ -54,28 +54,21 @@ abstract class WebCompatibilityTask : DefaultTask() {
             copySpec.duplicatesStrategy = DuplicatesStrategy.WARN
 
             copySpec.from(jsDistFiles) {
-                copySpec.rename { name ->
+                it.rename { name ->
                     val moduleName = jsOutputName.get()
                     when (name) {
-                        "${moduleName}.js" -> jsAppRenamed
-                        "${moduleName}.js.map" -> "${jsAppRenamed}.map"
+                        "${moduleName}" -> jsAppRenamed
+                        "${moduleName}.map" -> "${jsAppRenamed}.map"
                         else -> name
                     }
                 }
             }
-
-            copySpec.into(outputDir)
-        }
-
-        fileOperations.copy { copySpec ->
-            copySpec.duplicatesStrategy = DuplicatesStrategy.WARN
-
             copySpec.from(wasmDistFiles) {
-                copySpec.rename { name ->
+                it.rename { name ->
                     val moduleName = wasmOutputName.get()
                     when (name) {
-                        "${moduleName}.js" -> wasmAppRenamed
-                        "${moduleName}.js.map" -> "${wasmAppRenamed}.map"
+                        "${moduleName}" -> wasmAppRenamed
+                        "${moduleName}.map" -> "${wasmAppRenamed}.map"
                         else -> name
                     }
                 }
@@ -116,56 +109,65 @@ abstract class WebCompatibilityTask : DefaultTask() {
             
             """.trimIndent()
 
-        outputDir.file("${jsOutputName.get()}.js").get().asFile.writeText(
+        outputDir.file("${jsOutputName.get()}").get().asFile.writeText(
             fallbackResolverCode
         )
 
-        outputDir.file("${wasmOutputName.get()}.js").get().asFile.writeText(
+        outputDir.file("${wasmOutputName.get()}").get().asFile.writeText(
             fallbackResolverCode
         )
     }
 }
 
-private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformExtension)  =  registerTask<WebCompatibilityTask>("composeCompatibilityBrowserDistribution") {
-    group = "compose"
-    description = "This task combines both js and wasm distributions into one so that wasm application fallback to js target if modern wasm feature are not supported"
+private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformExtension) =
+    registerTask<WebCompatibilityTask>("composeCompatibilityBrowserDistribution") {
+        group = "compose"
+        description =
+            "This task combines both js and wasm distributions into one so that wasm application fallback to js target if modern wasm feature are not supported"
 
-    val webProductionDist = layout.buildDirectory.dir("dist/composeWebCompatibility/productionExecutable")
-    outputDir.set(webProductionDist)
+        val webProductionDist = layout.buildDirectory.dir("dist/composeWebCompatibility/productionExecutable")
+        outputDir.set(webProductionDist)
 
-    mppPlugin.targets.matching { it is KotlinJsIrTarget }.all { target ->
-        val outputName = when {
-            (target as KotlinJsIrTarget).wasmTargetType != null -> wasmOutputName
-            else -> jsOutputName
+        mppPlugin.targets.withType(KotlinJsIrTarget::class.java).configureEach { target ->
+            if (target.platformType == KotlinPlatformType.wasm) {
+                wasmOutputName.set(
+                    tasks.named(
+                        "${target.name}BrowserProductionWebpack",
+                        KotlinWebpack::class.java
+                    ).flatMap { it.mainOutputFileName }
+                )
+                wasmDistFiles.from(
+                    tasks.named("${target.name}BrowserDistribution").map { it.outputs.files }
+                )
+            } else if (target.platformType == KotlinPlatformType.js) {
+                jsOutputName.set(
+                    tasks.named(
+                        "${target.name}BrowserProductionWebpack",
+                        KotlinWebpack::class.java
+                    ).flatMap { it.mainOutputFileName }
+                )
+                jsDistFiles.from(
+                    tasks.named("${target.name}BrowserDistribution").map { it.outputs.files }
+                )
+            }
+
+            onlyIf {
+                val hasBothDistributions = !jsDistFiles.isEmpty && !wasmDistFiles.isEmpty
+                val hasBothOutputs = jsOutputName.orNull != null && wasmOutputName.orNull != null
+
+                if (!hasBothDistributions) {
+                    logger.lifecycle("Task ${this.name} skipped: no js and wasm distributions found, both are required for compatibility")
+                } else if (!hasBothOutputs) {
+                    logger.lifecycle("Task ${this.name} skipped: no js and wasm output names specified")
+                }
+                hasBothDistributions && hasBothOutputs
+            }
+
         }
-
-
-        outputName.set(target.outputModuleName)
     }
-
-    onlyIf {
-        val hasBothDistributions = !jsDistFiles.isEmpty && !wasmDistFiles.isEmpty
-        val hasBothOutputs = jsOutputName.orNull != null && wasmOutputName.orNull != null
-
-        if (!hasBothDistributions) {
-            logger.lifecycle("Task ${this.name} skipped: no js and wasm distributions found, both are required for compatibility")
-        } else if (!hasBothOutputs) {
-            logger.lifecycle("Task ${this.name} skipped: no js and wasm output names specified")
-        }
-        hasBothDistributions && hasBothOutputs
-    }
-
-    jsDistFiles.from(project.provider {
-        project.tasks.findByName("jsBrowserDistribution")?.outputs?.files ?: project.files()
-    })
-
-    wasmDistFiles.from(project.provider {
-        project.tasks.findByName("wasmJsBrowserDistribution")?.outputs?.files ?: project.files()
-    })
-}
 
 internal fun Project.configureWebCompatibility() {
     plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
-            project.registerWebCompatibilityTask(mppExt)
+        project.registerWebCompatibilityTask(mppExt)
     }
 }

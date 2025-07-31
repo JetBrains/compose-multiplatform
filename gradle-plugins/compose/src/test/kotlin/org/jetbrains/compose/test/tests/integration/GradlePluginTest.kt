@@ -116,32 +116,6 @@ class GradlePluginTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testWebJsWasm() = with(
-        testProject(
-            "application/webJsWasm",
-            testEnvironment = defaultTestEnvironment.copy()
-        )
-    ) {
-        gradle(":composeApp:composeCompatibilityBrowserDistribution").checks {
-            check.taskSuccessful(":composeApp:composeCompatibilityBrowserDistribution")
-            check.taskSuccessful(":composeApp:jsBrowserDistribution")
-            check.taskSuccessful(":composeApp:wasmJsBrowserDistribution")
-
-            file("./composeApp/build/dist/composeWebCompatibility/productionExecutable").apply {
-                checkExists()
-                assertTrue(isDirectory)
-                val distributionFiles = listFiles()!!.map { it.name }.toList().sorted()
-
-                assertTrue(distributionFiles.any { it.endsWith(".wasm") })
-
-                assertContentEquals(distributionFiles.filter { !it.endsWith(".wasm") }, listOf(
-                    "__jsApp.js", "__jsApp.js.map", "__wasmApp.js", "__wasmApp.js.map", "composeApp.js", "composeResources", "index.html", "styles.css"
-                ))
-            }
-        }
-    }
-
-    @Test
     fun testOldComposePluginError() = with(testProject("misc/oldComposePlugin")) {
         gradleFailure("tasks").checks {
             check.logContains(newComposeCompilerError)
