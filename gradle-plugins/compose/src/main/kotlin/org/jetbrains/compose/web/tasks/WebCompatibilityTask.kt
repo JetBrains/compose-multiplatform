@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
+import java.io.File
 import javax.inject.Inject
 
 abstract class WebCompatibilityTask : DefaultTask() {
@@ -111,13 +112,10 @@ abstract class WebCompatibilityTask : DefaultTask() {
             
             """.trimIndent()
 
-        outputDir.file("${jsOutputName.get()}").get().asFile.writeText(
-            fallbackResolverCode
-        )
 
-        outputDir.file("${wasmOutputName.get()}").get().asFile.writeText(
-            fallbackResolverCode
-        )
+        val outputDir = outputDir.get().asFile
+        File(outputDir, jsAppFileName).writeText(fallbackResolverCode)
+        File(outputDir, wasmAppFileName).writeText(fallbackResolverCode)
     }
 }
 
