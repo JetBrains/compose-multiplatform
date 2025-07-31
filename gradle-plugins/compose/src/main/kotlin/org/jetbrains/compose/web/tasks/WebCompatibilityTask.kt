@@ -15,6 +15,7 @@ import org.gradle.api.tasks.TaskAction
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.utils.clearDirs
+import org.jetbrains.compose.internal.utils.joinLowerCamelCase
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
@@ -45,8 +46,11 @@ abstract class WebCompatibilityTask : DefaultTask() {
 
     @TaskAction
     fun run() {
-        val jsAppRenamed = "__jsApp.js"
-        val wasmAppRenamed = "__wasmApp.js"
+        val prefix = "origin"
+        val jsAppFileName = jsOutputName.get()
+        val jsAppRenamed = joinLowerCamelCase(prefix, "js", jsAppFileName)
+        val wasmAppFileName = wasmOutputName.get()
+        val wasmAppRenamed = joinLowerCamelCase(prefix, "wasm", wasmAppFileName)
 
         fileOperations.clearDirs(outputDir)
 
@@ -55,20 +59,18 @@ abstract class WebCompatibilityTask : DefaultTask() {
 
             copySpec.from(jsDistFiles) {
                 it.rename { name ->
-                    val moduleName = jsOutputName.get()
                     when (name) {
-                        "${moduleName}" -> jsAppRenamed
-                        "${moduleName}.map" -> "${jsAppRenamed}.map"
+                        jsAppFileName -> jsAppRenamed
+                        "${jsAppFileName}.map" -> "${jsAppRenamed}.map"
                         else -> name
                     }
                 }
             }
             copySpec.from(wasmDistFiles) {
                 it.rename { name ->
-                    val moduleName = wasmOutputName.get()
                     when (name) {
-                        "${moduleName}" -> wasmAppRenamed
-                        "${moduleName}.map" -> "${wasmAppRenamed}.map"
+                        wasmAppFileName -> wasmAppRenamed
+                        "${wasmAppFileName}.map" -> "${wasmAppRenamed}.map"
                         else -> name
                     }
                 }

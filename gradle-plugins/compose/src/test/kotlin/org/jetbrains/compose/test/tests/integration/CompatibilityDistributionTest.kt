@@ -28,7 +28,7 @@ class CompatibilityDistributionTest : GradlePluginTestBase() {
                 assertTrue(distributionFiles.any { it.endsWith(".wasm") })
 
                 assertContentEquals(distributionFiles.filter { !it.endsWith(".wasm") }, listOf(
-                    "__jsApp.js", "__jsApp.js.map", "__wasmApp.js", "__wasmApp.js.map", "composeApp.js", "composeResources", "index.html", "styles.css"
+                    "composeApp.js", "composeResources", "index.html", "originJsComposeApp.js", "originJsComposeApp.js.map", "originWasmComposeApp.js", "originWasmComposeApp.js.map", "styles.css"
                 ))
             }
         }
@@ -54,8 +54,10 @@ class CompatibilityDistributionTest : GradlePluginTestBase() {
 
                 assertTrue(distributionFiles.any { it.endsWith(".wasm") })
 
+                println(distributionFiles.filter { !it.endsWith(".wasm") }.sorted().joinToString(", ") { "\"$it\"" })
+
                 assertContentEquals(distributionFiles.filter { !it.endsWith(".wasm") }, listOf(
-                    "__jsApp.js", "__jsApp.js.map", "__wasmApp.js", "__wasmApp.js.map", "composeApp.js", "composeResources", "index.html", "styles.css"
+                    "composeApp.js", "composeResources", "index.html", "originJsComposeApp.js", "originJsComposeApp.js.map", "originWasmComposeApp.js", "originWasmComposeApp.js.map", "styles.css"
                 ))
             }
         }
