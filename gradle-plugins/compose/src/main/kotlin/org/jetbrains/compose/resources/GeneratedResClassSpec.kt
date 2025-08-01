@@ -39,6 +39,7 @@ internal data class ResourceItem(
     val qualifiers: List<String>,
     val name: String,
     val path: Path,
+    val contentHash: Int,
     val offset: Long = -1,
     val size: Long = -1,
 )
@@ -57,6 +58,8 @@ private fun ResourceType.requiresKeyName() =
 private val resourceItemClass = ClassName("org.jetbrains.compose.resources", "ResourceItem")
 private val internalAnnotationClass = ClassName("org.jetbrains.compose.resources", "InternalResourceApi")
 private val internalAnnotation = AnnotationSpec.builder(internalAnnotationClass).build()
+
+private val resourceContentHashAnnotationClass = ClassName("org.jetbrains.compose.resources", "ResourceContentHash")
 
 private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlock.Builder {
     val languageQualifier = ClassName("org.jetbrains.compose.resources", "LanguageQualifier")
@@ -283,7 +286,12 @@ private fun getChunkFileSpec(
                 .endControlFlow()
                 .build()
 
+            val resourceContentHashAnnotation = AnnotationSpec.builder(resourceContentHashAnnotationClass)
+                .useSiteTarget(AnnotationSpec.UseSiteTarget.DELEGATE)
+                .addMember("%L", items.fold(0){acc, item -> ((acc * 31) + item.contentHash)}).build()
+
             val accessor = PropertySpec.builder(resName, type.getClassName(), resModifier)
+                .addAnnotation(resourceContentHashAnnotation)
                 .receiver(ClassName(packageName, resClassName, type.accessorName))
                 .delegate(initializer)
                 .build()
