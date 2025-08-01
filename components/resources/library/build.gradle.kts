@@ -140,7 +140,7 @@ kotlin {
             dependsOn(skikoTest)
             dependsOn(blockingTest)
         }
-        val webMain by creating {
+        val webMain by getting {
             dependsOn(skikoMain)
         }
         val jsMain by getting {
