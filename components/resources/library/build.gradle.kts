@@ -149,7 +149,7 @@ kotlin {
         val wasmJsMain by getting {
             dependsOn(webMain)
         }
-        val webTest by creating {
+        val webTest by getting {
             dependsOn(skikoTest)
         }
         val jsTest by getting {
