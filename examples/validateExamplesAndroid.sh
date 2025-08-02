@@ -25,7 +25,6 @@ runGradle codeviewer installDebug
 runGradle imageviewer installDebug
 runGradle issues installDebug
 runGradle graphics-2d installDebug
-runGradle todoapp-lite installDebug
 runGradle widgets-gallery installDebug
 runGradle todoapp installDebug
 runGradle jetsnack installDebug
