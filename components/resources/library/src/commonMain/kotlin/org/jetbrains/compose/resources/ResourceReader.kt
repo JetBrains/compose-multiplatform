@@ -33,6 +33,8 @@ interface ResourceReader {
 
 internal expect fun getPlatformResourceReader(): ResourceReader
 
+internal expect suspend inline fun ResourceReader.readStringItem(path: String, offset: Long, size: Long): ByteArray
+
 @ExperimentalResourceApi
 internal val DefaultResourceReader = getPlatformResourceReader()
 
