@@ -5,9 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ImageViewer</title>
     <script src="skiko.js"> </script>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: white;
+            overflow: hidden;
+        }
+
+        #warning {
+            position: absolute;
+            top: 100px;
+            left: 100px;
+            max-width: 830px;
+            z-index: 100;
+            background-color: white;
+            font-size: initial;
+            display: none;
+        }
+        #warning li {
+            padding-bottom: 15px;
+        }
+
+        #warning span.code {
+            font-family: monospace;
+        }
+
+        ul {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        #footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: white;
+            font-size: initial;
+        }
+
+        #close {
+            position: absolute;
+            top: 0;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        #composeApp {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
 </head>
 <body>
-<canvas id="ComposeTarget"></canvas>
+<div id="composeApp" />
 <script src="imageviewer.js"> </script>
 </body>
 </html>
