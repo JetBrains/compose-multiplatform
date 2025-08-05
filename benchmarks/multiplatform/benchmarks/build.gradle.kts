@@ -222,7 +222,10 @@ configurations.all {
             jsOrWasmRegex.containsMatchIn(requested.name)
         ) {
             // to keep the readable names from Skiko
-            useVersion(requested.version!! + "+profiling")
+            //useVersion(requested.version!! + "+profiling")
+
+            // To hotfix https://youtrack.jetbrains.com/issue/SKIKO-1040, we use this custom skiko:
+            useVersion("0.9.4.3" + "+profiling")
         }
     }
 }

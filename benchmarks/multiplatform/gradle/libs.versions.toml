@@ -1,5 +1,5 @@
 [versions]
-compose-multiplatform = "1.8.1"
+compose-multiplatform = "1.8.2"
 kotlin = "2.2.0"
 kotlinx-coroutines = "1.8.0"
 kotlinx-serialization = "1.8.0"
