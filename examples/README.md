@@ -9,5 +9,4 @@
 | [Nav Cupcake](nav_cupcake)           | Multiscreen app to demonstrate the use of Compose Navigation                                 | Android, iOS, Desktop |
 | [Issues tracker](issues)             | GitHub issue tracker with an adaptive UI and ktor-client                                     | Android, Desktop      |
 | [Notepad](notepad)                   | Notepad, using the Composable Window API                                                     | Desktop               |
-| [IDEA plugin](intellij-plugin)       | Plugin for IDEA using Compose for Desktop                                                    | Desktop               |
 | [HTML based samples](html/README.md) | Examples written with Compose HTML Library                                                   |
