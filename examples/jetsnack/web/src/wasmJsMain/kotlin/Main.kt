@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.Font
-import androidx.compose.ui.window.CanvasBasedWindow
+import androidx.compose.ui.window.ComposeViewport
 import com.example.jetsnack.JetSnackAppEntryPoint
 import com.example.jetsnack.ui.components.loadImage
 import com.example.jetsnack.ui.components.toByteArray
@@ -23,7 +23,7 @@ fun main() {
         // same as default - this is not necessary to add here. It's here to show this feature
         resourcePathMapping { path -> "./$path" }
     }
-    CanvasBasedWindow("JetSnack", canvasElementId = "jetsnackCanvas") {
+    ComposeViewport("jetsnackApp") {
         var loading: Boolean by remember { mutableStateOf(true) }
 
         if (loading) {
