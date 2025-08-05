@@ -153,7 +153,7 @@ private fun isInTestEnvironment(): Boolean =
 
 internal object StringResourceWebCache {
     private val CACHE_NAME = "compose_cvr_cache"
-    private val mutex = Mutex()
+    private val mutexes = mutableMapOf<String, Mutex>()
 
     suspend fun load(path: String, onNoCacheHit: suspend (path: String) -> Response): Response {
         // With session storage, we avoid resetting the cache on page refresh.
@@ -167,6 +167,7 @@ internal object StringResourceWebCache {
 
         val cache = window.caches.open(CACHE_NAME).await<Cache>()
 
+        val mutex = mutexes.getOrPut(path) { Mutex() }
         return mutex.withLock {
             val response = cache.match(path).await<Response?>()
 
@@ -175,6 +176,8 @@ internal object StringResourceWebCache {
                     cache.put(path, it.clone()).await<JsBoolean>()
                 }
             }
+        }.also {
+            mutexes.remove(path)
         }
     }
 }
