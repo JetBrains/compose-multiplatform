@@ -286,16 +286,17 @@ private fun getChunkFileSpec(
                 .endControlFlow()
                 .build()
 
-            val resourceContentHashAnnotation = AnnotationSpec.builder(resourceContentHashAnnotationClass)
-                .useSiteTarget(AnnotationSpec.UseSiteTarget.DELEGATE)
-                .addMember("%L", items.fold(0){acc, item -> ((acc * 31) + item.contentHash)}).build()
-
-            val accessor = PropertySpec.builder(resName, type.getClassName(), resModifier)
-                .addAnnotation(resourceContentHashAnnotation)
+            val accessorBuilder = PropertySpec.builder(resName, type.getClassName(), resModifier)
                 .receiver(ClassName(packageName, resClassName, type.accessorName))
                 .delegate(initializer)
-                .build()
-            chunkFile.addProperty(accessor)
+            if (System.getProperty("compose.resources.generate.ResourceContentHash.annotation") == "true") {
+                accessorBuilder.addAnnotation(
+                    AnnotationSpec.builder(resourceContentHashAnnotationClass)
+                    .useSiteTarget(AnnotationSpec.UseSiteTarget.DELEGATE)
+                    .addMember("%L", items.fold(0){acc, item -> ((acc * 31) + item.contentHash)}).build()
+                )
+            }
+            chunkFile.addProperty(accessorBuilder.build())
         }
 
         //__collect${chunkClassName}Resources function

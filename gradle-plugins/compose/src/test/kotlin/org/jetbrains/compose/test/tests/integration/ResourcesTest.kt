@@ -579,6 +579,17 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun testGeneratedAccessorsAnnotatedWithResourceContentHash(): Unit = with(testProject("misc/commonResourcesAnnotatedWithResourceContentHash")) {
+        //check generated resource's accessors
+        gradle("prepareKotlinIdeaImport", "-Dcompose.resources.generate.ResourceContentHash.annotation=true").checks {
+            assertDirectoriesContentEquals(
+                file("build/generated/compose/resourceGenerator/kotlin"),
+                file("expected")
+            )
+        }
+    }
+
+    @Test
     fun testJvmOnlyProject(): Unit = with(testProject("misc/jvmOnlyResources")) {
         gradle("jar").checks {
             check.logContains("Configure java-only compose resources")
