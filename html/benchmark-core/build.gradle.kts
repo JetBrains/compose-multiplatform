@@ -19,6 +19,10 @@ kotlin {
             }
         }
         binaries.executable()
+
+        compilerOptions {
+            freeCompilerArgs.add("-Xes-long-as-bigint")
+        }
     }
 
     sourceSets {
