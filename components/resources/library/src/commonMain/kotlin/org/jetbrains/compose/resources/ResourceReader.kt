@@ -30,12 +30,11 @@ fun getResourceUri(path: String): String = DefaultResourceReader.getUri(path)
 interface ResourceReader {
     suspend fun read(path: String): ByteArray
     suspend fun readPart(path: String, offset: Long, size: Long): ByteArray
+    suspend fun readStringItem(path: String, offset: Long, size: Long): ByteArray = readPart(path, offset, size)
     fun getUri(path: String): String
 }
 
 internal expect fun getPlatformResourceReader(): ResourceReader
-
-internal expect suspend inline fun ResourceReader.readStringItem(path: String, offset: Long, size: Long): ByteArray
 
 @ExperimentalResourceApi
 internal val DefaultResourceReader = getPlatformResourceReader()

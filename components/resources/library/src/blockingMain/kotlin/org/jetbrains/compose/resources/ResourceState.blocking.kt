@@ -64,7 +64,3 @@ internal actual fun <T> rememberResourceState(
         )
     }
 }
-
-internal actual suspend inline fun ResourceReader.readStringItem(path: String, offset: Long, size: Long): ByteArray {
-    return this.readPart(path, offset, size)
-}

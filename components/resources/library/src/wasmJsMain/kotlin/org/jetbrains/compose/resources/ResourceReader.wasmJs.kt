@@ -2,13 +2,10 @@ package org.jetbrains.compose.resources
 
 import kotlinx.browser.window
 import kotlinx.coroutines.await
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 import org.w3c.fetch.Response
 import org.w3c.files.Blob
-import org.w3c.workers.Cache
 import org.w3c.xhr.XMLHttpRequest
 import kotlin.js.Promise
 import kotlin.wasm.unsafe.UnsafeWasmMemoryApi
@@ -33,7 +30,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader {
 }
 
 @ExperimentalResourceApi
-internal object DefaultWasmResourceReader : WebResourceReader {
+internal object DefaultWasmResourceReader : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         return readAsBlob(path).asByteArray()
     }
@@ -44,7 +41,7 @@ internal object DefaultWasmResourceReader : WebResourceReader {
     }
 
     override suspend fun readStringItem(path: String, offset: Long, size: Long): ByteArray {
-        val res = StringResourceWebCache.load(path) {
+        val res = WasmResourceWebCache.load(path) {
             window.fetch(path).await()
         }
         if (!res.ok) {
@@ -87,27 +84,18 @@ internal object DefaultWasmResourceReader : WebResourceReader {
 }
 
 // It uses a synchronous XmlHttpRequest (blocking!!!)
-private object TestWasmResourceReader : WebResourceReader {
+private object TestWasmResourceReader : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         return readByteArray(path)
     }
 
     override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
-        return readPartSync(path, offset, size)
+        return readByteArray(path).sliceArray(offset.toInt() until (offset + size).toInt())
     }
 
     override fun getUri(path: String): String {
         val location = window.location
         return getResourceUrl(location.origin, location.pathname, path)
-    }
-
-    // No Web Cache API used for tests, because it's async and we need synchronous execution
-    override suspend fun readStringItem(path: String, offset: Long, size: Long): ByteArray {
-        return readPartSync(path, offset, size)
-    }
-
-    private fun readPartSync(path: String, offset: Long, size: Long): ByteArray {
-        return readByteArray(path).sliceArray(offset.toInt() until (offset + size).toInt())
     }
 
     private fun readByteArray(path: String): ByteArray {
@@ -150,34 +138,3 @@ private fun requestResponseAsByteArray(req: XMLHttpRequest): Int8Array =
 
 private fun isInTestEnvironment(): Boolean =
     js("window.composeResourcesTesting == true")
-
-internal object StringResourceWebCache {
-    private val CACHE_NAME = "compose_cvr_cache"
-    private val mutexes = mutableMapOf<String, Mutex>()
-
-    suspend fun load(path: String, onNoCacheHit: suspend (path: String) -> Response): Response {
-        // With session storage, we avoid resetting the cache on page refresh.
-        // The cache is reset only when a tab is re-opened.
-        val isNewSession = window.sessionStorage.getItem(CACHE_NAME) == null
-
-        if (isNewSession) {
-            window.caches.delete(CACHE_NAME).await<JsBoolean>()
-            window.sessionStorage.setItem(CACHE_NAME, "1")
-        }
-
-        val cache = window.caches.open(CACHE_NAME).await<Cache>()
-
-        val mutex = mutexes.getOrPut(path) { Mutex() }
-        return mutex.withLock {
-            val response = cache.match(path).await<Response?>()
-
-            response?.clone() ?: onNoCacheHit(path).clone().also {
-                if (it.ok) {
-                    cache.put(path, it.clone()).await<JsBoolean>()
-                }
-            }
-        }.also {
-            mutexes.remove(path)
-        }
-    }
-}
