@@ -30,6 +30,10 @@ RUN `
 
 RUN setx /M SKIKO_VSBT_PATH "C:\BuildTools"
 
+ADD https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.7/LLVM-20.1.7-win64.exe C:\Temp\llvm.exe
+RUN powershell C:\Temp\llvm.exe -ArgumentList /S -Wait
+RUN setx /M PATH "C:\Program Files\LLVM\bin;%PATH%"
+
 # Install Java
 COPY install_jdk.ps1 C:\TEMP\install_jdk.ps1
 RUN powershell C:\TEMP\install_jdk.ps1 -url https://corretto.aws/downloads/latest/amazon-corretto-11-x64-windows-jdk.zip -targetDir C:\jdk11
