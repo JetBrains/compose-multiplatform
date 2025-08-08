@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class CompatibilityDistributionTest : GradlePluginTestBase() {
+class WebCompatibilityDistributionTest : GradlePluginTestBase() {
     private val defaultDistDir = "./composeApp/build/dist/composeWebCompatibility/productionExecutable"
 
     private fun TestProject.assertCompatibilityDistribution(
