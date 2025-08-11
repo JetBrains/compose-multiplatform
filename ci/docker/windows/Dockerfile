@@ -31,7 +31,7 @@ RUN `
 RUN setx /M SKIKO_VSBT_PATH "C:\BuildTools"
 
 ADD https://github.com/llvm/llvm-project/releases/download/llvmorg-20.1.7/LLVM-20.1.7-win64.exe C:\Temp\llvm.exe
-RUN powershell C:\Temp\llvm.exe -ArgumentList /S -Wait
+RUN powershell Start-Process -Wait C:\Temp\llvm.exe -ArgumentList /S
 RUN setx /M PATH "C:\Program Files\LLVM\bin;%PATH%"
 
 # Install Java
