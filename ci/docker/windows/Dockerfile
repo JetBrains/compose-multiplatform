@@ -22,7 +22,7 @@ RUN `
     --installChannelUri C:\Temp\VisualStudio.chman `
     --add Microsoft.VisualStudio.Workload.VCTools;includeRecommended `
     --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
-    --add Microsoft.VisualStudio.Component.VC.Tools.ARM `
+    --add Microsoft.VisualStudio.Component.VC.Tools.ARM64 `
     --add Microsoft.Component.MSBuild `
     --remove Microsoft.VisualStudio.Component.Windows10SDK.10240 `
     --remove Microsoft.VisualStudio.Component.Windows10SDK.10586 `
