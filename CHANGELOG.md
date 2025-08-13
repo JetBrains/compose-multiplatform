@@ -28,7 +28,7 @@ _Changes since 1.9.0-beta01_
 
 - Support of the new context menu toolbar in web mobile targets [#2251](https://github.com/JetBrains/compose-multiplatform-core/pull/2251)
 - [js] there's no need to manually add skiko.js to the html page any more [#2264](https://github.com/JetBrains/compose-multiplatform-core/pull/2264)
-- Introduce `composeCompatibilityBrowserDistribution`  task. This task combines two prod distributions - for js and for wasm in such way so that if modern require features are not supported by the consumer browser, application switch to js mode [#5375](https://github.com/JetBrains/compose-multiplatform/pull/5375)
+- Introduce `composeCompatibilityBrowserDistribution`  task. This task combines two prod distributions - for js and for wasm in such way so that if modern required features are not supported by the consumer browser, application switch to js mode [#5375](https://github.com/JetBrains/compose-multiplatform/pull/5375)
 
 ## Fixes
 
