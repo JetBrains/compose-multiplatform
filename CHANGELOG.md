@@ -1,4 +1,4 @@
-# 1.9.0-beta02 (August 2025)
+# 1.9.0-beta03 (August 2025)
 
 _Changes since 1.9.0-beta01_
 
@@ -66,14 +66,14 @@ _Changes since 1.9.0-beta01_
 
 ## Dependencies
 
-- Gradle Plugin `org.jetbrains.compose`, version `1.9.0-beta02`. Based on Jetpack Compose libraries:
+- Gradle Plugin `org.jetbrains.compose`, version `1.9.0-beta03`. Based on Jetpack Compose libraries:
   - [Runtime 1.9.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.9.0-rc01)
   - [UI 1.9.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.9.0-rc01)
   - [Foundation 1.9.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.9.0-rc01)
   - [Material 1.9.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.9.0-rc01)
   - [Material3 1.3.2](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.2)
 
-- Compose Material3 libraries `org.jetbrains.compose.material3:material3*:1.9.0-beta01`. Based on [Jetpack Compose Material3 1.4.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-beta01)
+- Compose Material3 libraries `org.jetbrains.compose.material3:material3*:1.9.0-beta03`. Based on [Jetpack Compose Material3 1.4.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-beta01)
 - Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-alpha05`. Based on [Jetpack Compose Material3 Adaptive 1.2.0-alpha10](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-alpha10)
 - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.2`. Based on [Jetpack Lifecycle 2.9.2](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.2)
 - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0-beta05`. Based on [Jetpack Navigation 2.9.1](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.1)
