@@ -1,3 +1,87 @@
+# 1.9.0-beta03 (August 2025)
+
+_Changes since 1.9.0-beta01_
+
+## Breaking Changes
+
+### Multiple Platforms
+
+- _(prerelease fix)_ All public APIs tagged with `ExperimentalMaterial3ExpressiveApi` or `ExperimentalMaterial3ComponentOverrideApi` have been removed, see [Google Jetpack changelog](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-beta01). Please use the previous Material3 alpha version explicitly to continue enjoying these features: [#2278](https://github.com/JetBrains/compose-multiplatform-core/pull/2278)
+
+  ```
+  implementation("org.jetbrains.compose.material3:material3:1.9.0-alpha04")
+  ```
+
+## Migration Notes
+
+### Multiple Platforms
+
+- `kotlinx-datetime` is updated to `0.7.1`. If you also use it in your projects, please update it to this version to ensure compatibility [#2276](https://github.com/JetBrains/compose-multiplatform-core/pull/2276)
+
+### Desktop
+
+- Kotlin 2.1 is required for all platforms including JVM (it was required only for native and web before) [#2276](https://github.com/JetBrains/compose-multiplatform-core/pull/2276)
+
+### Web
+
+- `CanvasBasedWindow` is deprecated, use `ComposeViewport` instead. Unlike `CanvasBasedWindow`, which expect as an input param the id to the `HTMLCanvasElement` that will be used for rendering, `ComposeViewport` one passes `parentContainer` (and corresponding HTML Canvas element will be created automatically). By default such container is `document.body` [#2280](https://github.com/JetBrains/compose-multiplatform-core/pull/2280)
+
+## Features
+
+### Web
+
+- Support of the new context menu toolbar in web mobile targets [#2251](https://github.com/JetBrains/compose-multiplatform-core/pull/2251)
+- [js] there's no need to manually add skiko.js to the html page any more [#2264](https://github.com/JetBrains/compose-multiplatform-core/pull/2264)
+- Introduce `composeCompatibilityBrowserDistribution`  task. This task combines two prod distributions - for js and for wasm in such way so that if modern required features are not supported by the consumer browser, application switch to js mode [#5375](https://github.com/JetBrains/compose-multiplatform/pull/5375)
+
+## Fixes
+
+### Multiple Platforms
+
+- Fix text ellipsis if there's not enough vertical space to fit all lines [#2246](https://github.com/JetBrains/compose-multiplatform-core/pull/2246)
+- Fix "IrLinkageError: Function can not be called: No function found for symbol" [#2293](https://github.com/JetBrains/compose-multiplatform-core/pull/2293)
+- `ExperimentalMaterial3ExpressiveApi` annotation removed from no-longer-experimental API [#2298](https://github.com/JetBrains/compose-multiplatform-core/pull/2298)
+
+### iOS
+
+- Do not flatten accessibility tree inside accessibility elements [#2243](https://github.com/JetBrains/compose-multiplatform-core/pull/2243)
+
+### Desktop
+
+- [macOS] Fix composite (e.g. Chinese) input after pressing backspace [#2250](https://github.com/JetBrains/compose-multiplatform-core/pull/2250)
+- [TextField] Fixed duplication of the composed characters when moving the caret by clicking during a composition [#2255](https://github.com/JetBrains/compose-multiplatform-core/pull/2255)
+- _(prerelease fix)_ Close the context menu when a menu item is clicked (old context menu API) [#2259](https://github.com/JetBrains/compose-multiplatform-core/pull/2259)
+- Correctly remove `SwingPanel` children of `ComposePanel`, when the compose panel is itself removed from the hierarchy [#2277](https://github.com/JetBrains/compose-multiplatform-core/pull/2277)
+- _(prerelease fix)_ Fix `DialogWindow` causing a taskbar icon to be displayed in some cases where it shouldn't [#2291](https://github.com/JetBrains/compose-multiplatform-core/pull/2291)
+
+### Web
+
+- Fix software keyboard behaviour for Compose Text Fields in iOS Safari [#2260](https://github.com/JetBrains/compose-multiplatform-core/pull/2260)
+- Fixed the bugs with composite text input [#2256](https://github.com/JetBrains/compose-multiplatform-core/pull/2256)
+- _(prerelease fix)_ Hide disabled context menu items in the web text toolbar menu [#2268](https://github.com/JetBrains/compose-multiplatform-core/pull/2268)
+- _(prerelease fix)_ Show the "paste" item regardless of the the clipboard content state if the Clipboard  API is supported [#2267](https://github.com/JetBrains/compose-multiplatform-core/pull/2267)
+- _(prerelease fix)_ The context menu will not show the Clipboard-related items when the Clipboard API are not supported by a browser [#2266](https://github.com/JetBrains/compose-multiplatform-core/pull/2266)
+- Fixed the issue with software keyboard when it was shown repeatedly in Chrome mobile [#2279](https://github.com/JetBrains/compose-multiplatform-core/pull/2279)
+- _(prerelease fix)_ The context menu had only "Select All" item when targeting k/js [#2296](https://github.com/JetBrains/compose-multiplatform-core/pull/2296)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.9.0-beta03`. Based on Jetpack Compose libraries:
+  - [Runtime 1.9.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.9.0-rc01)
+  - [UI 1.9.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.9.0-rc01)
+  - [Foundation 1.9.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.9.0-rc01)
+  - [Material 1.9.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.9.0-rc01)
+  - [Material3 1.3.2](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.2)
+
+- Compose Material3 libraries `org.jetbrains.compose.material3:material3*:1.9.0-beta03`. Based on [Jetpack Compose Material3 1.4.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-beta01)
+- Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-alpha05`. Based on [Jetpack Compose Material3 Adaptive 1.2.0-alpha10](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-alpha10)
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.2`. Based on [Jetpack Lifecycle 2.9.2](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.2)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0-beta05`. Based on [Jetpack Navigation 2.9.1](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.1)
+- Savedstate library `org.jetbrains.androidx.savedstate:savedstate:1.3.2`. Based on [Jetpack Savedstate 1.3.1](https://developer.android.com/jetpack/androidx/releases/savedstate#1.3.1)
+- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.4.0-beta01`. Based on [Jetpack WindowManager 1.4.0](https://developer.android.com/jetpack/androidx/releases/window#1.4.0)
+
+---
+
 # 1.9.0-beta01 (July 2025)
 
 _Changes since 1.9.0-alpha03_
