@@ -6,13 +6,17 @@ _Changes since 1.9.0-beta01_
 
 ### Multiple Platforms
 
-- _(prerelease fix)_ All public APIs tagged with `ExperimentalMaterial3ExpressiveApi` or `ExperimentalMaterial3ComponentOverrideApi` have been removed, please stay with previous alpha version to continue enjoying these features. See [Google Jetpack changelog](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-beta01) [#2278](https://github.com/JetBrains/compose-multiplatform-core/pull/2278)
+- _(prerelease fix)_ All public APIs tagged with `ExperimentalMaterial3ExpressiveApi` or `ExperimentalMaterial3ComponentOverrideApi` have been removed, see [Google Jetpack changelog](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-beta01). Please use the previous Material3 alpha version explicitly to continue enjoying these features: [#2278](https://github.com/JetBrains/compose-multiplatform-core/pull/2278)
+
+  ```
+  implementation("org.jetbrains.compose.material3:material3:1.9.0-alpha04")
+  ```
 
 ## Migration Notes
 
 ### Multiple Platforms
 
-- Update `kotlinx-datetime` to `0.7.1` [#2276](https://github.com/JetBrains/compose-multiplatform-core/pull/2276)
+- `kotlinx-datetime` is updated to `0.7.1`. If you also use it in your projects, please update it to this version to ensure compatibility [#2276](https://github.com/JetBrains/compose-multiplatform-core/pull/2276)
 
 ### Desktop
 
