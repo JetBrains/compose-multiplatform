@@ -5,10 +5,12 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
     id "org.jetbrains.kotlin.plugin.compose"
     id "org.jetbrains.compose"
+    id "org.jetbrains.kotlin.plugin.serialization"
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0"
     implementation compose.desktop.currentOs
     implementation compose.material3
 }
@@ -17,6 +19,9 @@ compose.desktop {
     application {
         mainClass = "Main"
         nativeDistributions {
+            windows {
+                console = true
+            }
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
         }
 
