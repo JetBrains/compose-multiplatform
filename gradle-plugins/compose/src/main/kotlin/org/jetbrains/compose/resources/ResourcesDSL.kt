@@ -7,7 +7,7 @@ import java.io.File
 
 abstract class ResourcesExtension {
     /**
-     * Whether the generated resources accessors class should be public or not.
+     * Whether the generated resource accessor class should be public or not.
      *
      * Default is false.
      */
@@ -15,15 +15,14 @@ abstract class ResourcesExtension {
 
     /**
      * The unique identifier of the resources in the current project.
-     * Uses as package for the generated Res class and for isolation resources in a final artefact.
+     * Used as the package for the generated Res class and for isolating resources in a final artifact.
      *
-     * If it is empty then `{group name}.{module name}.generated.resources` will be used.
-     *
+     * If it's empty, then `{group name}.{module name}.generated.resources` will be used instead.
      */
     var packageOfResClass: String = ""
 
     /**
-     * The name of the generated resources accessors class.
+     * The name of the generated resource accessor class.
      *
      * The default is "Res".
      */
@@ -39,7 +38,7 @@ abstract class ResourcesExtension {
     /**
      * The mode of resource class generation.
      *
-     * - `auto`: The Res class will be generated if the current project has an explicit "implementation" or "api" dependency on the resource's library.
+     * - `auto`: The Res class will be generated if the current project has a direct "implementation" or "api" dependency on the resources library.
      * - `always`: Unconditionally generate the Res class. This may be useful when the resources library is available transitively.
      * - `never`: Never generate the Res class.
      */
@@ -66,6 +65,6 @@ internal fun Provider<ResourcesExtension>.getResourcePackage(project: Project) =
         "$id.generated.resources"
     }
 }
-//the dir where resources must be placed in the final artefact
+//the dir where resources must be placed in the final artifact
 internal fun Provider<ResourcesExtension>.getModuleResourcesDir(project: Project) =
     getResourcePackage(project).map { packageName -> File("$COMPOSE_RESOURCES_DIR/$packageName") }
