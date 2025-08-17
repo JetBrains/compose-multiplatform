@@ -97,7 +97,7 @@ private fun Project.configureAndroidComposeResources(
     moduleResourceDir: Provider<File>?
 ) {
     logger.info("Configure compose resources with KotlinMultiplatformAndroidComponentsExtension")
-    androidComponents.onVariant { variant ->
+    androidComponents.onVariants { variant ->
         val variantAssets = getAndroidKmpComponentComposeResources(kotlinExtension, variant.name)
         configureGeneratedAndroidComponentAssets(
             variant.name,
