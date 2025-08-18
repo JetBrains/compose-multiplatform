@@ -101,11 +101,21 @@
 }
 
 # Kotlinx serialization, additional rules
+
 # Fixes:
 #   Exception in thread "main" kotlinx.serialization.SerializationException: Serializer for class 'SomeClass' is not found.
 #   Please ensure that class is marked as '@Serializable' and that the serialization compiler plugin is applied.
 -keep class **$$serializer {
     *;
+}
+-dontnote **$$serializer
+
+# Fixes:
+#   Exception in thread "main" kotlinx.a.g: Serializer for class 'MyClass' is not found
+# When `@InternalSerializationApi kotlinx.serialization.serializer` is used with obfuscation enabled
+-if @kotlinx.serialization.Serializable class **
+-keepclassmembers class <1>$** {
+    kotlinx.serialization.KSerializer serializer(...);
 }
 
 # org.jetbrains.runtime:jbr-api
