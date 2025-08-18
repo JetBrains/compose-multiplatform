@@ -108,6 +108,7 @@
 -keep class **$$serializer {
     *;
 }
+-dontnote **$$serializer
 
 # Fixes:
 #   Exception in thread "main" kotlinx.a.g: Serializer for class 'MyClass' is not found
