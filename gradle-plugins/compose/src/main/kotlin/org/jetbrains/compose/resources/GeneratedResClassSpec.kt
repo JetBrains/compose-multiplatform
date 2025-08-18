@@ -292,8 +292,9 @@ private fun getChunkFileSpec(
             if (System.getProperty("compose.resources.generate.ResourceContentHash.annotation") == "true") {
                 accessorBuilder.addAnnotation(
                     AnnotationSpec.builder(resourceContentHashAnnotationClass)
-                    .useSiteTarget(AnnotationSpec.UseSiteTarget.DELEGATE)
-                    .addMember("%L", items.fold(0){acc, item -> ((acc * 31) + item.contentHash)}).build()
+                        .useSiteTarget(AnnotationSpec.UseSiteTarget.DELEGATE)
+                        .addMember("%L", items.fold(0) { acc, item -> ((acc * 31) + item.contentHash) })
+                        .build()
                 )
             }
             chunkFile.addProperty(accessorBuilder.build())
