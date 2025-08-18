@@ -113,7 +113,7 @@
 #   Exception in thread "main" kotlinx.a.g: Serializer for class 'MyClass' is not found
 # When `@InternalSerializationApi kotlinx.serialization.serializer` is used with obfuscation enabled
 -if @kotlinx.serialization.Serializable class **
--keepclassmembers class <1> {
+-keepclassmembers class <1>$** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
