@@ -10,6 +10,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.renderComposeScene
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.serializer
 import org.jetbrains.skia.EncodedImageFormat
 import java.io.File
 import java.util.*
@@ -34,6 +37,8 @@ object Main {
             .mapTo(TreeSet()) { it.name }
             .joinToString("\n")
         workingDir.resolve("main-methods.actual.txt").writeText(mainMethods)
+
+        serializer()
     }
 
     @Composable
@@ -55,6 +60,13 @@ object Main {
     fun keptByKeepRule() {
         fillShape(Color.Blue, CircleShape)
     }
+
+    // https://youtrack.jetbrains.com/issue/CMP-8050/Desktop-runRelease-crash-when-upgrade-to-CMP-1.8.0-rc01#focus=Comments-27-11963863.0-0
+    @OptIn(InternalSerializationApi::class)
+    fun serializer() {
+        LoginRoute::class.serializer()
+        LoginRoute.serializer()
+    }
 }
 
 @Composable
@@ -74,3 +86,6 @@ fun fillShape(color: Color, shape: Shape){
         )
     }
 }
+
+@Serializable
+data class LoginRoute(val id: Long? = null)
