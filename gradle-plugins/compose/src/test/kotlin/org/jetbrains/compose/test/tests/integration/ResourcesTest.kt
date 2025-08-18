@@ -579,12 +579,12 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testGeneratedAccessorsAnnotatedWithResourceContentHash(): Unit = with(testProject("misc/commonResourcesAnnotatedWithResourceContentHash")) {
+    fun testGeneratedAccessorsAnnotatedWithResourceContentHash(): Unit = with(testProject("misc/commonResources")) {
         //check generated resource's accessors
         gradle("prepareKotlinIdeaImport", "-Dcompose.resources.generate.ResourceContentHash.annotation=true").checks {
             assertDirectoriesContentEquals(
                 file("build/generated/compose/resourceGenerator/kotlin"),
-                file("expected")
+                file("expected-with-hash")
             )
         }
     }
