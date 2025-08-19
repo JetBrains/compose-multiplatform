@@ -60,7 +60,7 @@ https://github.com/JetBrains/compose-multiplatform/pull/5295
 <!-- 
 - Note that this is parsed by [changelog.main.kts]
 - Update the PR templates after changing the sections:
-https://github.com/JetBrains/compose-multiplatform/edit/jb-main/.github/PULL_REQUEST_TEMPLATE.md
+https://github.com/JetBrains/compose-multiplatform/edit/master/.github/PULL_REQUEST_TEMPLATE.md
 https://github.com/JetBrains/compose-multiplatform-core/edit/jb-main/.github/PULL_REQUEST_TEMPLATE.md
 -->
  
