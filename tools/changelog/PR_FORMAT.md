@@ -85,4 +85,5 @@ https://github.com/JetBrains/compose-multiplatform-core/edit/jb-main/.github/PUL
 - Gradle Plugin          # specific module, prefer it over the platform ones
 - Lifecycle              # specific module, prefer it over the platform ones
 - Navigation             # specific module, prefer it over the platform ones
+- SavedState             # specific module, prefer it over the platform ones
 ```
