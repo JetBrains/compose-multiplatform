@@ -579,6 +579,26 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun testGeneratedAccessorsAnnotatedWithResourceContentHash(): Unit = with(testProject("misc/commonResources")) {
+        //check generated resource's accessors
+        gradle("prepareKotlinIdeaImport", "-Dcompose.resources.generate.ResourceContentHash.annotation=true").checks {
+            val expected = if (System.getProperty("os.name").lowercase().contains("windows")) {
+                // Windows has different line endings in comparison with Unixes,
+                // thus the XML resource files differ and produce different content hashes,
+                // so we have different test data for it.
+                file("expected-with-hash-windows")
+            } else {
+                file("expected-with-hash")
+            }
+
+            assertDirectoriesContentEquals(
+                file("build/generated/compose/resourceGenerator/kotlin"),
+                expected
+            )
+        }
+    }
+
+    @Test
     fun testJvmOnlyProject(): Unit = with(testProject("misc/jvmOnlyResources")) {
         gradle("jar").checks {
             check.logContains("Configure java-only compose resources")
