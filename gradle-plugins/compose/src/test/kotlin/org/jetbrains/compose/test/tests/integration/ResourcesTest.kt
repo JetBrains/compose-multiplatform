@@ -334,11 +334,17 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun testNewAgpResources() {
         Assumptions.assumeTrue(defaultTestEnvironment.parsedGradleVersion >= GradleVersion.version("8.10.2"))
-        Assumptions.assumeTrue(Version.fromString(defaultTestEnvironment.agpVersion) >= Version.fromString("8.8.0-alpha08"))
+
+        val agpVersion = Version.fromString(defaultTestEnvironment.agpVersion)
+        Assumptions.assumeTrue(agpVersion >= Version.fromString("8.8.0-alpha08"))
 
         with(testProject("misc/newAgpResources", defaultTestEnvironment)) {
             gradle(":appModule:assembleDebug").checks {
-                check.logContains("Configure compose resources with KotlinMultiplatformAndroidComponentsExtension")
+                if (agpVersion >= Version.fromString("8.10")) {
+                    check.logContains("Configure compose resources with KotlinMultiplatformAndroidComponentsExtension")
+                } else {
+                    check.logContains("Configure compose resources with outdated KotlinMultiplatformAndroidComponentsExtension < 8.10")
+                }
 
                 val resourcesFiles = sequenceOf(
                     "composeResources/newagpresources.appmodule.generated.resources/values/strings.commonMain.cvr",
