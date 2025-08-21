@@ -670,7 +670,7 @@ class ResourcesTest : GradlePluginTestBase() {
         with(
             testProject(
                 "misc/appleResources",
-                defaultTestEnvironment.copy(kotlinVersion = "2.1.0"))
+                defaultTestEnvironment.copy(kotlinVersion = "2.1.21"))
         ) {
             file("build.gradle.kts").modify { content ->
                 """
