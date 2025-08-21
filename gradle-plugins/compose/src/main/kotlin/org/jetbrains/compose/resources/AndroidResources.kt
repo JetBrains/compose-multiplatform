@@ -20,6 +20,7 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.compose.internal.Version
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -90,30 +91,61 @@ private fun Project.getAndroidComponentComposeResources(
     }
 })
 
+private const val AGP_8_10 = "8.10"
+
 @Suppress("UnstableApiUsage")
 private fun Project.configureAndroidComposeResources(
     kotlinExtension: KotlinMultiplatformExtension,
     androidComponents: KotlinMultiplatformAndroidComponentsExtension,
     moduleResourceDir: Provider<File>?
 ) {
-    logger.info("Configure compose resources with KotlinMultiplatformAndroidComponentsExtension")
-    androidComponents.onVariant { variant ->
-        val variantAssets = getAndroidKmpComponentComposeResources(kotlinExtension, variant.name)
-        configureGeneratedAndroidComponentAssets(
-            variant.name,
-            variant.sources,
-            variantAssets,
-            moduleResourceDir
-        )
 
-        variant.androidTest?.let { androidTest ->
-            val androidTestAssets = getAndroidKmpComponentComposeResources(kotlinExtension, androidTest.name)
+    // AGP 8.10 introduced new onVariantS {} API
+    // AGP 9.0.0-alpha01 removed onVariant {} API
+    // https://github.com/JetBrains/compose-multiplatform/pull/5385
+
+    val agpVersion = Version.fromString(androidComponents.pluginVersion.version)
+    if (agpVersion >= Version.fromString(AGP_8_10)) {
+        logger.info("Configure compose resources with KotlinMultiplatformAndroidComponentsExtension")
+        androidComponents.onVariants { variant ->
+            val variantAssets = getAndroidKmpComponentComposeResources(kotlinExtension, variant.name)
             configureGeneratedAndroidComponentAssets(
-                androidTest.name,
-                androidTest.sources,
-                androidTestAssets,
+                variant.name,
+                variant.sources,
+                variantAssets,
                 moduleResourceDir
             )
+
+            variant.androidTest?.let { androidTest ->
+                val androidTestAssets = getAndroidKmpComponentComposeResources(kotlinExtension, androidTest.name)
+                configureGeneratedAndroidComponentAssets(
+                    androidTest.name,
+                    androidTest.sources,
+                    androidTestAssets,
+                    moduleResourceDir
+                )
+            }
+        }
+    } else {
+        logger.info("Configure compose resources with outdated KotlinMultiplatformAndroidComponentsExtension < 8.10")
+        androidComponents.onVariant { variant ->
+            val variantAssets = getAndroidKmpComponentComposeResources(kotlinExtension, variant.name)
+            configureGeneratedAndroidComponentAssets(
+                variant.name,
+                variant.sources,
+                variantAssets,
+                moduleResourceDir
+            )
+
+            variant.androidTest?.let { androidTest ->
+                val androidTestAssets = getAndroidKmpComponentComposeResources(kotlinExtension, androidTest.name)
+                configureGeneratedAndroidComponentAssets(
+                    androidTest.name,
+                    androidTest.sources,
+                    androidTestAssets,
+                    moduleResourceDir
+                )
+            }
         }
     }
 }
