@@ -41,7 +41,7 @@ class WebCompatibilityDistributionTest : GradlePluginTestBase() {
                 testEnvironment = defaultTestEnvironment.copy()
             )
         ) {
-            gradle(":composeApp:composeCompatibilityBrowserDistribution").checks {
+            gradle(taskName).checks {
                 onExecution(this@with)
             }
         }
