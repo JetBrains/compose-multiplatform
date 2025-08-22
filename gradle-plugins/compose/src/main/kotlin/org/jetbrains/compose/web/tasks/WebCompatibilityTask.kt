@@ -133,24 +133,20 @@ private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformE
 
         mppPlugin.targets.withType(KotlinJsIrTarget::class.java).configureEach { target ->
             if (target.platformType == KotlinPlatformType.wasm) {
-                wasmOutputName.set(
-                    tasks.named(
-                        "${target.name}BrowserProductionWebpack",
-                        KotlinWebpack::class.java
-                    ).flatMap { it.mainOutputFileName }
-                )
+                tasks.withType(KotlinWebpack::class.java).findByName("${target.name}BrowserProductionWebpack")?.let {
+                    wasmOutputName.set(it.mainOutputFileName)
+                }
+
                 wasmDistFiles.from(
-                    tasks.named("${target.name}BrowserDistribution").map { it.outputs.files }
+                    tasks.matching { it.name == "${target.name}BrowserDistribution" }.map { it.outputs.files }
                 )
             } else if (target.platformType == KotlinPlatformType.js) {
-                jsOutputName.set(
-                    tasks.named(
-                        "${target.name}BrowserProductionWebpack",
-                        KotlinWebpack::class.java
-                    ).flatMap { it.mainOutputFileName }
-                )
+                tasks.withType(KotlinWebpack::class.java).findByName("${target.name}BrowserProductionWebpack")?.let {
+                    jsOutputName.set(it.mainOutputFileName)
+                }
+
                 jsDistFiles.from(
-                    tasks.named("${target.name}BrowserDistribution").map { it.outputs.files }
+                    tasks.matching { it.name == "${target.name}BrowserDistribution" }.map { it.outputs.files }
                 )
             }
 

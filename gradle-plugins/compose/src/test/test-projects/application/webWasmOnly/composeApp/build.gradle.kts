@@ -8,18 +8,8 @@ plugins {
 }
 
 kotlin {
-    js(name = "webJs", IR) {
-        outputModuleName.set("composeApp")
-        browser {
-            commonWebpackConfig {
-                outputFileName = "composeApp.js"
-            }
-        }
-        binaries.executable()
-    }
-
     @OptIn(ExperimentalWasmDsl::class)
-    wasmJs(name = "webWasm") {
+    wasmJs {
         outputModuleName.set("composeApp")
         browser {
             val rootDirPath = project.rootDir.path
@@ -41,11 +31,7 @@ kotlin {
             dependsOn(commonMain.get())
         }
 
-        val webJsMain by getting {
-            dependsOn(webMain)
-        }
-
-        val webWasmMain by getting {
+        val wasmJsMain by getting {
             dependsOn(webMain)
         }
     }
