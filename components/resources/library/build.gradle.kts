@@ -168,7 +168,7 @@ android {
     compileSdk = 35
     namespace = "org.jetbrains.compose.components.resources"
     defaultConfig {
-        minSdk = 21
+        minSdk = 23
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {

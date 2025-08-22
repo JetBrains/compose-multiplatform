@@ -61,7 +61,7 @@ android {
     compileSdk = 35
     namespace = "org.jetbrains.compose.ui.tooling.preview.demo.shared"
     defaultConfig {
-        minSdk = 21
+        minSdk = 23
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

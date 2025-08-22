@@ -29,11 +29,11 @@ kotlin {
 
 android {
     namespace = "org.jetbrains.compose.testapp"
-    compileSdk = 31
+    compileSdk = 35
 
     defaultConfig {
-        minSdk = 21
-        targetSdk = 31
+        minSdk = 23
+        targetSdk = 35
     }
 }
 

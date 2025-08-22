@@ -62,7 +62,7 @@ android {
     compileSdk = 35
     namespace = "org.jetbrains.compose.ui.tooling.preview"
     defaultConfig {
-        minSdk = 21
+        minSdk = 23
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
