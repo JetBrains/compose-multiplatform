@@ -31,8 +31,6 @@ kotlin {
         binaries.executable()
     }
 
-    // Simple task that prints "Hello World" to the console
-
     sourceSets {
         commonMain.dependencies {
             implementation(compose.runtime)

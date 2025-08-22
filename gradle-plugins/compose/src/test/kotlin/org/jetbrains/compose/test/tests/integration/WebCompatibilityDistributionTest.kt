@@ -1,5 +1,6 @@
 package org.jetbrains.compose.test.tests.integration
 
+import org.jetbrains.compose.test.utils.ChecksWrapper
 import org.jetbrains.compose.test.utils.GradlePluginTestBase
 import org.jetbrains.compose.test.utils.TestProject
 import org.jetbrains.compose.test.utils.checkExists
@@ -33,26 +34,40 @@ class WebCompatibilityDistributionTest : GradlePluginTestBase() {
         }
     }
 
-    private fun runCompatibilityTest(
+    private fun runTaskAndCheck(projectPath: String, taskName: String, onExecution: ChecksWrapper.(project: TestProject) -> Unit) {
+        with(
+            testProject(
+                projectPath,
+                testEnvironment = defaultTestEnvironment.copy()
+            )
+        ) {
+            gradle(":composeApp:composeCompatibilityBrowserDistribution").checks {
+                onExecution(this@with)
+            }
+        }
+    }
+
+    private fun assertSuccessfulCompatibilityRun(
         projectPath: String,
         successfulTasks: List<String>,
         distDir: String = defaultDistDir,
         expectedFiles: Set<String>
-    ) = with(
-        testProject(
-            projectPath,
-            testEnvironment = defaultTestEnvironment.copy()
-        )
     ) {
-        gradle(":composeApp:composeCompatibilityBrowserDistribution").checks {
+        runTaskAndCheck(projectPath, ":composeApp:composeCompatibilityBrowserDistribution") { testProject ->
             check.taskSuccessful(":composeApp:composeCompatibilityBrowserDistribution")
             successfulTasks.forEach { check.taskSuccessful(it) }
-            assertCompatibilityDistribution(dirPath = distDir, expectedFileNames = expectedFiles)
+            testProject.assertCompatibilityDistribution(dirPath = distDir, expectedFileNames = expectedFiles)
+        }
+    }
+
+    private fun assertSkippedCompatibilityRun(projectPath: String) {
+        runTaskAndCheck(projectPath, ":composeApp:composeCompatibilityBrowserDistribution") {
+            check.taskSkipped(":composeApp:composeCompatibilityBrowserDistribution")
         }
     }
 
     @Test
-    fun testWebJsWasm() = runCompatibilityTest(
+    fun testWebJsWasm() = assertSuccessfulCompatibilityRun(
         projectPath = "application/webJsWasm",
         successfulTasks = listOf(
             ":composeApp:jsBrowserDistribution",
@@ -71,7 +86,22 @@ class WebCompatibilityDistributionTest : GradlePluginTestBase() {
     )
 
     @Test
-    fun testWebJsWasmNonStandard() = runCompatibilityTest(
+    fun testWebJsOnly() = assertSkippedCompatibilityRun(
+        projectPath = "application/webJsOnly"
+    )
+
+    @Test
+    fun testWebWasmOnly() = assertSkippedCompatibilityRun(
+        projectPath = "application/webWasmOnly"
+    )
+
+    @Test
+    fun testWebJsNonExecutable() = assertSkippedCompatibilityRun(
+        projectPath = "application/webJsWasmNonExecutable"
+    )
+
+    @Test
+    fun testWebJsWasmNonStandard() = assertSuccessfulCompatibilityRun(
         projectPath = "application/webJsWasmNonStandard",
         successfulTasks = listOf(
             ":composeApp:webJsBrowserDistribution",
@@ -90,7 +120,7 @@ class WebCompatibilityDistributionTest : GradlePluginTestBase() {
     )
 
     @Test
-    fun testWebJsWasmReconfigured() = runCompatibilityTest(
+    fun testWebJsWasmReconfigured() = assertSuccessfulCompatibilityRun(
         projectPath = "application/webJsWasmReconfigured",
         successfulTasks = listOf(
             ":composeApp:wasmRepack",
