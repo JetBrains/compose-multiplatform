@@ -31,6 +31,9 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     @get:Input
     abstract val makeAccessorsPublic: Property<Boolean>
 
+    @get:Input
+    abstract val generateResourceContentHashAnnotation: Property<Boolean>
+
     @get:InputFiles
     @get:SkipWhenEmpty
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -73,13 +76,15 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
         val moduleDirectory = packagingDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
         val resClassName = resClassName.get()
         val isPublic = makeAccessorsPublic.get()
+        val generateResourceContentHashAnnotation = generateResourceContentHashAnnotation.get()
         getAccessorsSpecs(
             resources,
             pkgName,
             sourceSet,
             moduleDirectory,
             resClassName,
-            isPublic
+            isPublic,
+            generateResourceContentHashAnnotation
         ).forEach { it.writeTo(kotlinDir) }
     }
 

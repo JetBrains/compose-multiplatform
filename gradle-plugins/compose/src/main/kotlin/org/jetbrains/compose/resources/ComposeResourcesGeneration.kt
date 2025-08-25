@@ -153,6 +153,8 @@ private fun Project.configureResourceAccessorsGeneration(
             task.packagingDir.set(packagingDir)
         }
         task.onlyIf { shouldGenerateCode.get() }
+        task.generateResourceContentHashAnnotation.set(
+            System.getProperty("compose.resources.generate.ResourceContentHash.annotation") == "true")
     }
 
     //register generated source set
