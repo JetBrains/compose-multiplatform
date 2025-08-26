@@ -154,7 +154,11 @@ private fun Project.configureResourceAccessorsGeneration(
         }
         task.onlyIf { shouldGenerateCode.get() }
         task.generateResourceContentHashAnnotation.set(
-            System.getProperty("compose.resources.generate.ResourceContentHash.annotation") == "true")
+            project.providers
+                .systemProperty("compose.resources.generate.ResourceContentHash.annotation")
+                .map { it.toBoolean() }
+                .orElse(false)
+        )
     }
 
     //register generated source set
