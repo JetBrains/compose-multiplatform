@@ -212,7 +212,8 @@ internal fun getAccessorsSpecs(
     sourceSetName: String,
     moduleDir: String,
     resClassName: String,
-    isPublic: Boolean
+    isPublic: Boolean,
+    generateResourceContentHashAnnotation: Boolean
 ): List<FileSpec> {
     val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
     val files = mutableListOf<FileSpec>()
@@ -231,7 +232,8 @@ internal fun getAccessorsSpecs(
                     moduleDir,
                     resClassName,
                     resModifier,
-                    idToResources.subMap(ids.first(), true, ids.last(), true)
+                    idToResources.subMap(ids.first(), true, ids.last(), true),
+                    generateResourceContentHashAnnotation
                 )
             )
         }
@@ -248,7 +250,8 @@ private fun getChunkFileSpec(
     moduleDir: String,
     resClassName: String,
     resModifier: KModifier,
-    idToResources: Map<String, List<ResourceItem>>
+    idToResources: Map<String, List<ResourceItem>>,
+    generateResourceContentHashAnnotation: Boolean
 ): FileSpec {
     return FileSpec.builder(packageName, fileName).also { chunkFile ->
         chunkFile.addAnnotation(
@@ -289,7 +292,7 @@ private fun getChunkFileSpec(
             val accessorBuilder = PropertySpec.builder(resName, type.getClassName(), resModifier)
                 .receiver(ClassName(packageName, resClassName, type.accessorName))
                 .delegate(initializer)
-            if (System.getProperty("compose.resources.generate.ResourceContentHash.annotation") == "true") {
+            if (generateResourceContentHashAnnotation) {
                 accessorBuilder.addAnnotation(
                     AnnotationSpec.builder(resourceContentHashAnnotationClass)
                         .useSiteTarget(AnnotationSpec.UseSiteTarget.DELEGATE)
