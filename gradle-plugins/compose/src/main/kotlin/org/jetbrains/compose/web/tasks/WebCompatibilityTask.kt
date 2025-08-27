@@ -48,9 +48,9 @@ abstract class WebCompatibilityTask : DefaultTask() {
     @TaskAction
     fun run() {
         val prefix = "origin"
-        val jsAppFileName = jsOutputName.get()
+        val jsAppFileName = jsOutputName.orNull ?: return
         val jsAppRenamed = joinLowerCamelCase(prefix, "js", jsAppFileName)
-        val wasmAppFileName = wasmOutputName.get()
+        val wasmAppFileName = wasmOutputName.orNull ?: return
         val wasmAppRenamed = joinLowerCamelCase(prefix, "wasm", wasmAppFileName)
 
         fileOperations.clearDirs(outputDir)
@@ -137,17 +137,27 @@ private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformE
                     wasmOutputName.set(it.mainOutputFileName)
                 }
 
-                wasmDistFiles.from(
-                    tasks.matching { it.name == "${target.name}BrowserDistribution" }.map { it.outputs.files }
-                )
+                val taskDistributionName = "${target.name}BrowserDistribution"
+                wasmDistFiles.from(provider {
+                    if (tasks.names.contains(taskDistributionName)) {
+                        tasks.getByName(taskDistributionName).outputs.files
+                    } else {
+                        emptyList()
+                    }
+                })
             } else if (target.platformType == KotlinPlatformType.js) {
                 tasks.withType(KotlinWebpack::class.java).findByName("${target.name}BrowserProductionWebpack")?.let {
                     jsOutputName.set(it.mainOutputFileName)
                 }
 
-                jsDistFiles.from(
-                    tasks.matching { it.name == "${target.name}BrowserDistribution" }.map { it.outputs.files }
-                )
+                val taskDistributionName = "${target.name}BrowserDistribution"
+                jsDistFiles.from(provider {
+                    if (tasks.names.contains(taskDistributionName)) {
+                        tasks.getByName(taskDistributionName).outputs.files
+                    } else {
+                        emptyList()
+                    }
+                })
             }
 
             onlyIf {
