@@ -31,6 +31,7 @@ import org.jetbrains.compose.web.tasks.configureWebCompatibility
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
+internal val composeMaterial3Version get() = ComposeBuildConfig.composeMaterial3Version
 
 abstract class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
@@ -72,8 +73,8 @@ abstract class ComposePlugin : Plugin<Project> {
         val animationGraphics get() = composeDependency("org.jetbrains.compose.animation:animation-graphics")
         val foundation get() = composeDependency("org.jetbrains.compose.foundation:foundation")
         val material get() = composeDependency("org.jetbrains.compose.material:material")
-        val material3 get() = composeDependency("org.jetbrains.compose.material3:material3")
-        val material3AdaptiveNavigationSuite get() = composeDependency("org.jetbrains.compose.material3:material3-adaptive-navigation-suite")
+        val material3 get() = composeMaterial3Dependency("org.jetbrains.compose.material3:material3")
+        val material3AdaptiveNavigationSuite get() = composeMaterial3Dependency("org.jetbrains.compose.material3:material3-adaptive-navigation-suite")
         val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
         val runtimeSaveable get() = composeDependency("org.jetbrains.compose.runtime:runtime-saveable")
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
@@ -161,6 +162,7 @@ fun KotlinDependencyHandler.compose(groupWithArtifact: String) = composeDependen
 fun DependencyHandler.compose(groupWithArtifact: String) = composeDependency(groupWithArtifact)
 
 private fun composeDependency(groupWithArtifact: String) = "$groupWithArtifact:$composeVersion"
+private fun composeMaterial3Dependency(groupWithArtifact: String) = "$groupWithArtifact:$composeMaterial3Version"
 
 private fun setUpGroovyDslExtensions(project: Project) {
     project.plugins.withId("org.jetbrains.kotlin.multiplatform") {
