@@ -12,9 +12,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.code.style>official</kotlin.code.style>
         <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
-        <kotlin.version>2.1.20</kotlin.version>
-        <compose.version>1.8.2</compose.version>
-        <compose.material3.version>1.8.2</compose.material3.version>
+        <kotlin.version>2.2.10</kotlin.version>
+        <compose.version>1.9.0-rc01</compose.version>
+        <compose.material3.version>1.9.0-rc01</compose.material3.version>
     </properties>
 
     <repositories>
