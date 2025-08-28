@@ -1,3 +1,44 @@
+# 1.9.0-rc01 (August 2025)
+
+_Changes since 1.9.0-beta03_
+
+## Fixes
+
+### Multiple Platforms
+
+- _(prerelease fix)_ Fix incorrect light source position for dynamic shadows in some cases [#2328](https://github.com/JetBrains/compose-multiplatform-core/pull/2328)
+
+### Desktop
+
+- _(prerelease fix)_ Fixed focus indication being shown in touch input mode [#2342](https://github.com/JetBrains/compose-multiplatform-core/pull/2342)
+- Fix `runRelease` task when navigation and `obfuscate.set(true)` are used [#5384](https://github.com/JetBrains/compose-multiplatform/pull/5384)
+
+### Lifecycle
+
+- Fix dependency to Compose in `lifecycle-viewmodel-compose` module: `2.9.2` incorrectly refer Compose Multiplatform `1.9.0-beta03`. Now it reverted back to `1.8.2` [#2318](https://github.com/JetBrains/compose-multiplatform-core/pull/2318)
+
+### SavedState
+
+- Fix dependency to Compose in `savedstate-compose` module: `1.3.2` incorrectly refer Compose Multiplatform `1.9.0-beta03`. Now it reverted back to `1.8.2` [#2321](https://github.com/JetBrains/compose-multiplatform-core/pull/2321)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.9.0-rc01`. Based on Jetpack Compose libraries:
+  - [Runtime 1.9.0](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.9.0)
+  - [UI 1.9.0](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.9.0)
+  - [Foundation 1.9.0](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.9.0)
+  - [Material 1.9.0](https://developer.android.com/jetpack/androidx/releases/compose-material#1.9.0)
+  - [Material3 1.3.2](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.2)
+
+- Compose Material3 libraries `org.jetbrains.compose.material3:material3*:1.9.0-beta04`. Based on [Jetpack Compose Material3 1.4.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-beta02)
+- Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-alpha05`. Based on [Jetpack Compose Material3 Adaptive 1.2.0-alpha10](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-alpha10)
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.3`. Based on [Jetpack Lifecycle 2.9.2](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.2)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0-rc01`. Based on [Jetpack Navigation 2.9.1](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.1)
+- Savedstate library `org.jetbrains.androidx.savedstate:savedstate:1.3.3`. Based on [Jetpack Savedstate 1.3.1](https://developer.android.com/jetpack/androidx/releases/savedstate#1.3.1)
+- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.4.0-rc01`. Based on [Jetpack WindowManager 1.4.0](https://developer.android.com/jetpack/androidx/releases/window#1.4.0)
+
+---
+
 # 1.9.0-beta03 (August 2025)
 
 _Changes since 1.9.0-beta01_
