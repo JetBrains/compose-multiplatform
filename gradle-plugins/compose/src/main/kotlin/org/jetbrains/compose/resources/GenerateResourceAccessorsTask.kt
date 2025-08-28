@@ -14,7 +14,18 @@ import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.relativeTo
 
-internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
+/**
+ * Defines a property responsible for enabling or disabling
+ * generation of @ResourceContentHash annotation for resource accessors.
+ */
+interface ResourceContentHashAnnotationGenerationConfiguration {
+    @get:Input
+    val generateResourceContentHashAnnotation: Property<Boolean>
+}
+
+internal abstract class GenerateResourceAccessorsTask : IdeaImportTask(),
+    ResourceContentHashAnnotationGenerationConfiguration
+{
     @get:Input
     abstract val packageName: Property<String>
 
@@ -30,9 +41,6 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
 
     @get:Input
     abstract val makeAccessorsPublic: Property<Boolean>
-
-    @get:Input
-    abstract val generateResourceContentHashAnnotation: Property<Boolean>
 
     @get:InputFiles
     @get:SkipWhenEmpty
