@@ -1,5 +1,5 @@
 [versions]
-agp = "8.8.1"
+agp = "8.9.0"
 android-compileSdk = "35"
 android-minSdk = "24"
 android-targetSdk = "35"
@@ -8,13 +8,13 @@ androidx-appcompat = "1.7.0"
 androidx-constraintlayout = "2.2.1"
 androidx-core-ktx = "1.15.0"
 androidx-espresso-core = "3.6.1"
-androidx-lifecycle = "2.8.4"
+androidx-lifecycle = "2.9.2"
 androidx-material = "1.12.0"
 androidx-test-junit = "1.2.1"
 coilCompose = "3.1.0"
-compose-multiplatform = "1.8.0"
+compose-multiplatform = "1.9.0-rc01"
 junit = "4.13.2"
-kotlin = "2.1.20"
+kotlin = "2.2.10"
 kotlinx-coroutines = "1.10.1"
 
 [libraries]
