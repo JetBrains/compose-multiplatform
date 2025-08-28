@@ -123,7 +123,8 @@ if (properties.getOrDefault("dev.junit.parallel", "false") == "true") {
     tasks.withType(Test::class.java) {
         //https://junit.org/junit5/docs/current/user-guide/#writing-tests-parallel-execution-config-properties
         systemProperties["junit.jupiter.execution.parallel.enabled"] = true
-        systemProperties["junit.jupiter.execution.parallel.mode.default"] = "concurrent"
+        systemProperties["junit.jupiter.execution.parallel.mode.default"] = "same_thread"
+        systemProperties["junit.jupiter.execution.parallel.mode.classes.default"] = "concurrent"
     }
 }
 
