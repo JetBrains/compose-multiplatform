@@ -36,8 +36,8 @@ subprojects {
                 // must be set to a language version of the kotlin compiler & runtime,
                 // which is bundled to the oldest supported Gradle
                 // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
-                languageVersion.set(KotlinVersion.KOTLIN_1_8)
-                apiVersion.set(KotlinVersion.KOTLIN_1_8)
+                languageVersion.set(KotlinVersion.KOTLIN_2_0)
+                apiVersion.set(KotlinVersion.KOTLIN_2_0)
                 jvmTarget.set(JvmTarget.JVM_11)
             }
         }

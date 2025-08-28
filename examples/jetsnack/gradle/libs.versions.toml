@@ -41,7 +41,7 @@ ksp = "1.8.0-1.0.9"
 maps-compose = "2.5.3"
 material = "1.9.0-beta01"
 # @keep
-minSdk = "21"
+minSdk = "23"
 okhttp = "4.10.0"
 robolectric = "4.9.2"
 rome = "1.18.0"
