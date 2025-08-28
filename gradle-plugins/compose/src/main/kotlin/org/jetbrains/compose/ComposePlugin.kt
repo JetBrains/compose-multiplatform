@@ -72,8 +72,8 @@ abstract class ComposePlugin : Plugin<Project> {
         val animationGraphics get() = composeDependency("org.jetbrains.compose.animation:animation-graphics")
         val foundation get() = composeDependency("org.jetbrains.compose.foundation:foundation")
         val material get() = composeDependency("org.jetbrains.compose.material:material")
-        val material3 get() = "org.jetbrains.compose.material3:material3:1.8.2"
-        val material3AdaptiveNavigationSuite get() = "org.jetbrains.compose.material3:material3-adaptive-navigation-suite:1.8.2"
+        val material3 get() = composeDependency("org.jetbrains.compose.material3:material3")
+        val material3AdaptiveNavigationSuite get() = composeDependency("org.jetbrains.compose.material3:material3-adaptive-navigation-suite")
         val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
         val runtimeSaveable get() = composeDependency("org.jetbrains.compose.runtime:runtime-saveable")
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
