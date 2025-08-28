@@ -1,8 +1,12 @@
+import jetbrains.compose.web.gradle.SeleniumDriverPlugin
 import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.compose.gradle.kotlinKarmaConfig
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.targets
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("multiplatform") apply false
@@ -15,7 +19,7 @@ val COMPOSE_WEB_BUILD_WITH_SAMPLES = project.property("compose.web.buildSamples"
 
 kotlinKarmaConfig.rootDir = rootProject.rootDir.toString()
 
-apply<jetbrains.compose.web.gradle.SeleniumDriverPlugin>()
+apply<SeleniumDriverPlugin>()
 
 fun Project.isSampleProject() = projectDir.parentFile.name == "examples"
 
@@ -35,12 +39,18 @@ subprojects {
     if ((project.name != "html-widgets") && (project.name != "html-integration-widgets")) {
         afterEvaluate {
             if (plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
-                project.kotlinExtension.targets.forEach { target ->
-                    target.compilations.forEach { compilation ->
-                        compilation.kotlinOptions {
-                            allWarningsAsErrors = false
-                            // see https://kotlinlang.org/docs/opt-in-requirements.html
-                            freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+                project.extensions.getByType<KotlinMultiplatformExtension>().apply {
+                    targets.configureEach {
+                        compilations.configureEach {
+                            compileTaskProvider.configure {
+                                compilerOptions {
+                                    allWarningsAsErrors.set(false)
+                                    freeCompilerArgs.addAll(
+                                        // see https://kotlinlang.org/docs/opt-in-requirements.html
+                                        "-opt-in=kotlin.RequiresOptIn"
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -50,8 +60,10 @@ subprojects {
 
 
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
-        kotlinOptions.jvmTarget = "11"
+    tasks.withType<KotlinCompile> {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
     }
 
     pluginManager.withPlugin("maven-publish") {
