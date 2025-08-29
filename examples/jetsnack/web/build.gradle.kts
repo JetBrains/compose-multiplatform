@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
@@ -10,7 +11,7 @@ group = "com.example"
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    @OptIn(org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl::class)
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "jetsnackwasmapp"
         browser {
