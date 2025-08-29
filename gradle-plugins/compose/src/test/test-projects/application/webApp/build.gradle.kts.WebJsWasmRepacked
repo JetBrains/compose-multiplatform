@@ -1,0 +1,71 @@
+plugins {
+    id("org.jetbrains.kotlin.multiplatform")
+    id("org.jetbrains.compose")
+    id("org.jetbrains.kotlin.plugin.compose")
+}
+
+kotlin {
+    js {
+        browser { }
+        binaries.executable()
+    }
+
+    wasmJs {
+        browser { }
+        binaries.executable()
+    }
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(compose.runtime)
+        }
+
+        val webMain by creating { dependsOn(commonMain.get()) }
+        jsMain { dependsOn(webMain) }
+        wasmJsMain { dependsOn(webMain) }
+    }
+}
+
+val wasmRepack = tasks.register<RepackTask>("wasmRepack") {
+    sourceFiles.from(project.tasks.named("wasmJsBrowserDistribution").map { it.outputs.files })
+    outputDir.set(project.layout.buildDirectory.dir("dist/repackedWasm"))
+}
+
+val jsRepack = tasks.register<RepackTask>("jsRepack") {
+    sourceFiles.from(project.tasks.named("jsBrowserDistribution").map { it.outputs.files })
+    outputDir.set(project.layout.buildDirectory.dir("dist/repackedJs"))
+}
+
+project.tasks.withType<org.jetbrains.compose.web.tasks.WebCompatibilityTask>().configureEach {
+    jsOutputName.set("repackedApp.js")
+    wasmOutputName.set("repackedApp.js")
+    jsDistFiles.setFrom(jsRepack)
+    wasmDistFiles.setFrom(wasmRepack)
+}
+
+abstract class RepackTask : DefaultTask() {
+    @get:Inject
+    internal abstract val fileOperations: FileSystemOperations
+
+    @get:InputFiles
+    abstract val sourceFiles: ConfigurableFileCollection
+
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
+
+    @TaskAction
+    fun run() {
+        fileOperations.copy {
+            from(sourceFiles) {
+                this.rename { name ->
+                    when (name) {
+                        "composeApp.js" -> "repackedApp.js"
+                        "composeApp.js.map" -> "repackedApp.js.map"
+                        else -> name
+                    }
+                }
+            }
+            into(outputDir)
+        }
+    }
+}
