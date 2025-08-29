@@ -42,7 +42,8 @@ kotlin {
     }
 
     sourceSets {
-        val jsWasmMain by creating {
+        val webMain by creating {
+            dependsOn(commonMain.get())
             dependencies {
                 implementation(project(":shared"))
                 implementation(compose.runtime)
@@ -54,10 +55,10 @@ kotlin {
             }
         }
         val jsMain by getting {
-            dependsOn(jsWasmMain)
+            dependsOn(webMain)
         }
         val wasmJsMain by getting {
-            dependsOn(jsWasmMain)
+            dependsOn(webMain)
         }
     }
 }

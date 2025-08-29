@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.compose")
@@ -16,6 +18,7 @@ kotlin {
         browser()
         useEsModules()
     }
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs { browser() }
 
     listOf(
@@ -62,7 +65,7 @@ kotlin {
             implementation("com.google.maps.android:maps-compose:2.11.2")
         }
 
-        val jsWasmMain by creating {
+        val webMain by creating {
             dependsOn(commonMain.get())
             dependencies {
                 implementation(npm("uuid", "^9.0.1"))
@@ -70,11 +73,11 @@ kotlin {
         }
 
         val jsMain by getting {
-            dependsOn(jsWasmMain)
+            dependsOn(webMain)
         }
 
         val wasmJsMain by getting {
-            dependsOn(jsWasmMain)
+            dependsOn(webMain)
         }
 
         val desktopMain by getting
