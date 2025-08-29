@@ -13,7 +13,7 @@ version = "1.0-SNAPSHOT"
 kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "jetsnackwasmapp"
+        outputModuleName = "jetsnackwasmapp"
         browser {
             commonWebpackConfig {
                 outputFileName = "jetsnackwasmapp.js"
