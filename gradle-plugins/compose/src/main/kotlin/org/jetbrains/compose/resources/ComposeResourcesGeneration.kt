@@ -153,7 +153,6 @@ private fun Project.configureResourceAccessorsGeneration(
             task.packagingDir.set(packagingDir)
         }
         task.onlyIf { shouldGenerateCode.get() }
-        task.generateResourceContentHashAnnotation.set(false)
     }
 
     //register generated source set

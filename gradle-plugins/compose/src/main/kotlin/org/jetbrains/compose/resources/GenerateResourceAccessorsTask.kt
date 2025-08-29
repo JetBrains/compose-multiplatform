@@ -15,17 +15,17 @@ import java.nio.file.Path
 import kotlin.io.path.relativeTo
 
 /**
- * Defines a property responsible for enabling or disabling
- * generation of @ResourceContentHash annotation for resource accessors.
+ * Configuration for resource accessors generation.
+ *
+ * ### Properties
+ * - `generateResourceContentHashAnnotation`:
+ *    A property that defines whether to generate @ResourceContentHash annotation for resource accessors.
  */
-interface ResourceContentHashAnnotationGenerationConfiguration {
-    @get:Input
+interface ResourceAccessorsConfiguration {
     val generateResourceContentHashAnnotation: Property<Boolean>
 }
 
-internal abstract class GenerateResourceAccessorsTask : IdeaImportTask(),
-    ResourceContentHashAnnotationGenerationConfiguration
-{
+internal abstract class GenerateResourceAccessorsTask : IdeaImportTask(), ResourceAccessorsConfiguration {
     @get:Input
     abstract val packageName: Property<String>
 
@@ -42,6 +42,9 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask(),
     @get:Input
     abstract val makeAccessorsPublic: Property<Boolean>
 
+    @get:Input
+    abstract override val generateResourceContentHashAnnotation: Property<Boolean>
+
     @get:InputFiles
     @get:SkipWhenEmpty
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -49,6 +52,10 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask(),
 
     @get:OutputDirectory
     abstract val codeDir: DirectoryProperty
+
+    init {
+        generateResourceContentHashAnnotation.convention(false)
+    }
 
     override fun safeAction() {
         val kotlinDir = codeDir.get().asFile

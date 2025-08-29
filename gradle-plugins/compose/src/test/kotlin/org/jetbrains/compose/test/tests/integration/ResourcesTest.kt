@@ -589,7 +589,7 @@ class ResourcesTest : GradlePluginTestBase() {
         file("build.gradle.kts").appendText(
             """
                 tasks.configureEach {  
-                    if (this is org.jetbrains.compose.resources.ResourceContentHashAnnotationGenerationConfiguration) {
+                    if (this is org.jetbrains.compose.resources.ResourceAccessorsConfiguration) {
                         generateResourceContentHashAnnotation.set(true)
                     }
                 }    
