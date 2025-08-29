@@ -60,12 +60,14 @@ fun build(
     failureExpected: Boolean = false,
     composeVersion: String,
     kotlinVersion: String,
-    vararg buildCmd: String = arrayOf("build", "jsNodeRun")
+    vararg buildCmd: String = arrayOf("build", "jsNodeDevelopmentRun")
 ) {
     val isWin = System.getProperty("os.name").startsWith("Win")
     val arguments = buildCmd.toMutableList().also {
         it.add("-Pcompose.version=$composeVersion")
         it.add("-Pkotlin.version=$kotlinVersion")
+        it.add("--stacktrace")
+        it.add("--info")
     }.toTypedArray()
 
     val procBuilder = if (isWin) {

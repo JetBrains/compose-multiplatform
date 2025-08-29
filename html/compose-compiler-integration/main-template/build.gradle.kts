@@ -31,4 +31,4 @@ kotlin {
 }
 
 tasks.findByName("jsBrowserProductionWebpack")!!.mustRunAfter("jsDevelopmentExecutableCompileSync")
-tasks.findByName("jsNodeRun")!!.mustRunAfter("jsProductionExecutableCompileSync")
+tasks.findByName("jsNodeDevelopmentRun")!!.mustRunAfter("jsProductionExecutableCompileSync")
