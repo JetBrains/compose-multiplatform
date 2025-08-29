@@ -586,8 +586,18 @@ class ResourcesTest : GradlePluginTestBase() {
 
     @Test
     fun testGeneratedAccessorsAnnotatedWithResourceContentHash(): Unit = with(testProject("misc/commonResources")) {
+        file("build.gradle.kts").appendText(
+            """
+                tasks.configureEach {  
+                    if (this is org.jetbrains.compose.resources.ResourceAccessorsConfiguration) {
+                        generateResourceContentHashAnnotation.set(true)
+                    }
+                }    
+        """.trimIndent()
+        )
+
         //check generated resource's accessors
-        gradle("prepareKotlinIdeaImport", "-Dcompose.resources.generate.ResourceContentHash.annotation=true").checks {
+        gradle("prepareKotlinIdeaImport").checks {
             val expected = if (System.getProperty("os.name").lowercase().contains("windows")) {
                 // Windows has different line endings in comparison with Unixes,
                 // thus the XML resource files differ and produce different content hashes,
