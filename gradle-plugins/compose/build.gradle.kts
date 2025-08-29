@@ -29,6 +29,7 @@ val buildConfig = tasks.register("buildConfig", GenerateBuildConfig::class.java)
     classFqName.set("org.jetbrains.compose.ComposeBuildConfig")
     generatedOutputDir.set(buildConfigDir)
     fieldsToGenerate.put("composeVersion", BuildProperties.composeVersion(project))
+    fieldsToGenerate.put("composeMaterial3Version", BuildProperties.composeMaterial3Version(project))
     fieldsToGenerate.put("composeGradlePluginVersion", BuildProperties.deployVersion(project))
 }
 tasks.named("compileKotlin", KotlinCompilationTask::class) {
@@ -196,8 +197,4 @@ configureAllTests {
     val summaryDir = project.layout.buildDirectory.get().asFile.resolve("test-summary")
     systemProperty("compose.tests.summary.file", summaryDir.resolve("$name.md").absolutePath)
     systemProperties(project.properties.filter { it.key.startsWith("compose.") })
-}
-
-task("printAllAndroidxReplacements") {
-    doLast { printAllAndroidxReplacements() }
 }
