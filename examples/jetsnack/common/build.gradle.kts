@@ -1,4 +1,5 @@
-import org.jetbrains.compose.compose
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("multiplatform")
@@ -12,11 +13,16 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     androidTarget()
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs { browser() }
 
     jvm("desktop") {
         compilations.all {
-            kotlinOptions.jvmTarget = "17"
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget.set(JvmTarget.JVM_17)
+                }
+            }
         }
     }
 
