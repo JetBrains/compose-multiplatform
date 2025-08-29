@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.ir.DefaultIncrementalSyncTask
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
@@ -12,7 +12,7 @@ val rootDirPath = project.rootDir.path
 
 kotlin {
     js {
-        moduleName = "imageviewer"
+        outputModuleName = "imageviewer"
         browser {
             commonWebpackConfig {
                 outputFileName = "imageviewer.js"
@@ -24,7 +24,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "imageviewer"
+        outputModuleName = "imageviewer"
         browser {
              // TODO: uncomment when https://youtrack.jetbrains.com/issue/KT-68614 is fixed (it doesn't work with configuration cache)
 //            commonWebpackConfig {
