@@ -56,7 +56,7 @@ import java.util.*
 import kotlin.system.exitProcess
 
 val changelogFile = __FILE__.resolve("../../../CHANGELOG.md").canonicalFile
-val prFormatFile = File("PR_FORMAT.md")
+val prFormatFile = File("tools/changelog/PR_FORMAT.md")
 val prFormatLink = "https://github.com/JetBrains/compose-multiplatform/blob/master/tools/changelog/PR_FORMAT.md"
 
 val argsKeyless = args
