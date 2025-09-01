@@ -16,12 +16,16 @@ import kotlin.io.path.relativeTo
 
 /**
  * Configuration for resource accessors generation.
- *
- * ### Properties
- * - `generateResourceContentHashAnnotation`:
- *    A property that defines whether to generate @ResourceContentHash annotation for resource accessors.
  */
 interface ResourceAccessorsConfiguration {
+
+    /**
+     * Property that defines whether to generate `@ResourceContentHash` annotation for resource accessors.
+     *
+     * `@ResourceContentHash` annotation is used to mark resource accessors with the resource content hash.
+     * It can be used by a client to determine if the resource content is changed or not.
+     * By default, the annotation is not generated but the client may override it by setting this property to `true`.
+     */
     val generateResourceContentHashAnnotation: Property<Boolean>
 }
 
