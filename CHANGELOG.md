@@ -85,9 +85,7 @@ _Changes since 1.9.0-rc02_
   - [UI 1.10.0-alpha02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.10.0-alpha02)
   - [Foundation 1.10.0-alpha02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.10.0-alpha02)
   - [Material 1.10.0-alpha02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.10.0-alpha02)
-  <To change the placeholder see https://github.com/JetBrains/compose-multiplatform/blob/COMMIT/gradle-plugins/compose/src/main/kotlin/org/jetbrains/compose/ComposePlugin.kt#L72> and find redirection in:
-  https://github.com/JetBrains/compose-multiplatform-core/blob/VERSION/gradle.properties#L112>
-  - [Material3 <PLACEHOLDER>](https://developer.android.com/jetpack/androidx/releases/compose-material3#<PLACEHOLDER>)
+  - [Material3 1.5.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha03)
 
 - Compose Material3 libraries `org.jetbrains.compose.material3:material3*:1.10.0-alpha01`. Based on [Jetpack Compose Material3 1.5.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha03)
 - Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-alpha06`. Based on [Jetpack Compose Material3 Adaptive 1.2.0-alpha11](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-alpha11)
