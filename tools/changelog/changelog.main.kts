@@ -130,18 +130,14 @@ fun generateChangelog() {
     val versionComposeMaterial3 = formatAndroidxLibVersion("COMPOSE_MATERIAL3")
     val versionComposeMaterial3Adaptive = formatAndroidxLibVersion("COMPOSE_MATERIAL3_ADAPTIVE")
     val versionLifecycle = formatAndroidxLibVersion("LIFECYCLE")
-    val versionNavigation = formatAndroidxLibVersion("NAVIGATION")
     val versionSavedstate = formatAndroidxLibVersion("SAVEDSTATE")
-    val versionGraphicsShapes = formatAndroidxLibVersion("GRAPHICS_SHAPES")
     val versionWindow = formatAndroidxLibVersion("WINDOW")
 
     val versionRedirectingCompose = formatAndroidxLibRedirectingVersion("compose")
     val versionRedirectingComposeMaterial3 = formatAndroidxLibRedirectingVersion("compose.material3")
     val versionRedirectingComposeMaterial3Adaptive = formatAndroidxLibRedirectingVersion("compose.material3.adaptive")
     val versionRedirectingLifecycle = formatAndroidxLibRedirectingVersion("lifecycle")
-    val versionRedirectingNavigation = formatAndroidxLibRedirectingVersion("navigation")
     val versionRedirectingSavedstate = formatAndroidxLibRedirectingVersion("savedstate")
-    val versionRedirectingGraphicsShapes = formatAndroidxLibRedirectingVersion("graphics")
     val versionRedirectingWindow = formatAndroidxLibRedirectingVersion("window")
 
     val versionName = versionCompose
@@ -215,9 +211,7 @@ fun generateChangelog() {
                       - [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose)
                       - [Foundation $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingCompose)
                       - [Material $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingCompose)
-                      <To change the placeholder see https://github.com/JetBrains/compose-multiplatform/blob/COMMIT/gradle-plugins/compose/src/main/kotlin/org/jetbrains/compose/ComposePlugin.kt#L72> and find redirection in:
-                      https://github.com/JetBrains/compose-multiplatform-core/blob/VERSION/gradle.properties#L112>
-                      - [Material3 <PLACEHOLDER>](https://developer.android.com/jetpack/androidx/releases/compose-material3#<PLACEHOLDER>)
+                      - [Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3)
 
                     - Compose Material3 libraries `org.jetbrains.compose.material3:material3*:$versionComposeMaterial3`. Based on [Jetpack Compose Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3)
                     - Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive`. Based on [Jetpack Compose Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive)
