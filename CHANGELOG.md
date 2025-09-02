@@ -45,10 +45,6 @@ _Changes since 1.9.0-rc01_
 - Added `modalityType` parameter to `DialogWindow()` [#2300](https://github.com/JetBrains/compose-multiplatform-core/pull/2300)
 - The Compose entry points on the desktop (`ComposeWindow`, `ComposePanel` and `ImageComposeScene`) now expose `val semanticsOwners: Collection<SemanticsOwner>` [#2358](https://github.com/JetBrains/compose-multiplatform-core/pull/2358)
 
-### Navigation
-
-- Enable publication of the Navigation3 library for non-android targets with `org.jetbrains.androidx.navigation3` coordinates [#2351](https://github.com/JetBrains/compose-multiplatform-core/pull/2351)
-
 ## Fixes
 
 ### Multiple Platforms
