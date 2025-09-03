@@ -31,6 +31,7 @@ _Changes since 1.9.0-rc01_
 
 - Update skia to m138 (see [release notes](https://skia.googlesource.com/skia/+/refs/heads/chrome/m138/RELEASE_NOTES.md)) [#2304](https://github.com/JetBrains/compose-multiplatform-core/pull/2304)
 - The new context menu is enabled by default on all platforms now. It still might be disabled via `ComposeFoundationFlags.isNewContextMenuEnabled` flag in case of issues [#2341](https://github.com/JetBrains/compose-multiplatform-core/pull/2341)
+- Provide public API for `@ResourceContentHash` annotation generation [#5402](https://github.com/JetBrains/compose-multiplatform/pull/5402)
 
 ### iOS
 
@@ -59,6 +60,7 @@ _Changes since 1.9.0-rc01_
 - Fix the ability to use UIKitViewController inside `Popup`s and `Dialog`s [#2270](https://github.com/JetBrains/compose-multiplatform-core/pull/2270)
 - Fix Accessibility announcing the old state of component [#2327](https://github.com/JetBrains/compose-multiplatform-core/pull/2327)
 - Align the semantics of TextFields with iOS text inputs [#2331](https://github.com/JetBrains/compose-multiplatform-core/pull/2331)
+- Fix crash when removing characters after string replacement [#2361](https://github.com/JetBrains/compose-multiplatform-core/pull/2361)
 
 ### Desktop
 
