@@ -72,6 +72,10 @@ _Changes since 1.9.0-rc01_
 - `SwingPanel` no longer requires to be manually sized to a fixed value; it will size according to its content's min/pref/max sizes [#2310](https://github.com/JetBrains/compose-multiplatform-core/pull/2310)
 - Made disabled new context menu items actually disabled, including the right semantics [#2347](https://github.com/JetBrains/compose-multiplatform-core/pull/2347)
 
+### Web
+
+- Fix the issue where deleting a word in the middle of a sentence also affects the word next to it [#2372](https://github.com/JetBrains/compose-multiplatform-core/pull/2372)
+
 ### Gradle Plugin
 
 - Support `AGP 9.0.0` [#5391](https://github.com/JetBrains/compose-multiplatform/pull/5391)
