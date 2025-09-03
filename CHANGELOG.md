@@ -4,6 +4,10 @@ _Changes since 1.9.0-rc01_
 
 ## Fixes
 
+### Web
+
+- Fix the issue where deleting a word in the middle of a sentence also affects the word next to it [#2372](https://github.com/JetBrains/compose-multiplatform-core/pull/2372)
+
 ### Gradle Plugin
 
 - _(prerelease fix)_ Fix composeCompatibilityBrowserDistribution task lazy configuration [#5398](https://github.com/JetBrains/compose-multiplatform/pull/5398)
