@@ -10,7 +10,7 @@ _Changes since 1.9.0-rc01_
 
 ### Gradle Plugin
 
-- _(prerelease fix)_ Fix composeCompatibilityBrowserDistribution task lazy configuration [#5398](https://github.com/JetBrains/compose-multiplatform/pull/5398)
+- _(prerelease fix)_ Fix `composeCompatibilityBrowserDistribution` task lazy configuration [#5398](https://github.com/JetBrains/compose-multiplatform/pull/5398)
 
 ## Dependencies
 
