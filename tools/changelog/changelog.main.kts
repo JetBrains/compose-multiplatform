@@ -525,7 +525,7 @@ fun githubClone(repo: String): File {
         pipeProcess("git clone --bare $url $absolutePath").waitAndCheck()
     } else {
         println("Fetching $url into ${folder.absolutePath}")
-        pipeProcess("git -C $absolutePath fetch --tags").waitAndCheck()
+        pipeProcess("git -C $absolutePath fetch --force --tags").waitAndCheck()
     }
     return folder
 }
