@@ -13,7 +13,7 @@ To setup the environment, please consult these [instructions](https://www.jetbra
 
 ## How to run
 
-If you already runned this sample before, then you need to execute command at least once: 
+If you already ran this sample before, then you need to execute command at least once: 
 `/gradlew podInstall`
 
 Choose a run configuration for an appropriate target in IDE and run it.
