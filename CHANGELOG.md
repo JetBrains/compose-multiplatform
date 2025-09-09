@@ -28,9 +28,9 @@ _Changes since 1.9.0-rc01_
 
 - Compose Material3 libraries `org.jetbrains.compose.material3:material3*:1.9.0-beta05`. Based on [Jetpack Compose Material3 1.4.0-beta03](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-beta03)
 - Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-alpha06`. Based on [Jetpack Compose Material3 Adaptive 1.2.0-alpha11](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-alpha10)
-- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.4-rc01`. Based on [Jetpack Lifecycle 2.9.3](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.3)
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.4-rc01`. Based on [Jetpack Lifecycle 2.9.2](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.2)
 - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0-rc02`. Based on [Jetpack Navigation 2.9.1](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.1)
-- Savedstate library `org.jetbrains.androidx.savedstate:savedstate:1.3.4-rc01`. Based on [Jetpack Savedstate 1.3.2](https://developer.android.com/jetpack/androidx/releases/savedstate#1.3.2)
+- Savedstate library `org.jetbrains.androidx.savedstate:savedstate:1.3.4-rc01`. Based on [Jetpack Savedstate 1.3.1](https://developer.android.com/jetpack/androidx/releases/savedstate#1.3.1)
 - WindowManager Core library `org.jetbrains.androidx.window:window-core:1.4.0-rc02`. Based on [Jetpack WindowManager 1.4.0](https://developer.android.com/jetpack/androidx/releases/window#1.4.0)
 
 ---
