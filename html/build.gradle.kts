@@ -4,8 +4,6 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.compose.gradle.kotlinKarmaConfig
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
-import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.targets
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -57,8 +55,6 @@ subprojects {
             }
         }
     }
-
-
 
     tasks.withType<KotlinCompile> {
         compilerOptions {
@@ -143,9 +139,9 @@ subprojects {
         val printTestBundleSize by tasks.registering {
             dependsOn(tasks.named("jsTest"))
             doLast {
-                val bundlePath = buildDir.resolve(
+                val bundlePath = layout.buildDirectory.file(
                     "compileSync/test/testDevelopmentExecutable/kotlin/${rootProject.name}-${project.name}-test.js"
-                )
+                ).get().asFile
                 if (bundlePath.exists()) {
                     val size = bundlePath.length()
                     println("##teamcity[buildStatisticValue key='testBundleSize::${project.name}' value='$size']")
@@ -163,7 +159,7 @@ subprojects {
         val printBundleSize by tasks.registering {
             dependsOn(tasks.named("jsBrowserDistribution"))
             doLast {
-                val jsFile = buildDir.resolve("distributions/${project.name}.js")
+                val jsFile = layout.buildDirectory.file("distributions/${project.name}.js").get().asFile
                 val size = jsFile.length()
                 println("##teamcity[buildStatisticValue key='bundleSize::${project.name}' value='$size']")
             }

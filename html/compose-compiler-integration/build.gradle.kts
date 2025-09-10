@@ -40,7 +40,7 @@ kotlin {
 
 
 fun cloneTemplate(templateName: String, contentMain: String, contentLib: String): File {
-    val tempDir = file("${project.buildDir.absolutePath}/temp/cloned-$templateName")
+    val tempDir = layout.buildDirectory.dir("temp/cloned-$templateName").get().asFile
     tempDir.deleteRecursively()
     tempDir.mkdirs()
     file("${projectDir.absolutePath}/main-template").copyRecursively(tempDir)
