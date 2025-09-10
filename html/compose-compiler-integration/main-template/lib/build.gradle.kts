@@ -1,6 +1,6 @@
 plugins {
-    kotlin("multiplatform")// version "1.5.10"
-    id("org.jetbrains.compose")// version (System.getenv("COMPOSE_INTEGRATION_VERSION") ?: "0.0.0-SNASPHOT")
+    kotlin("multiplatform")
+    id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
