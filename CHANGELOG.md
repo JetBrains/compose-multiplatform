@@ -1,3 +1,40 @@
+# 1.9.0-rc02 (September 2025)
+
+_Changes since 1.9.0-rc01_
+
+## Fixes
+
+### Multiple Platforms
+
+- _(prerelease fix)_ Fix "Cinterop fails with an error when Compilation works fine" [#2386](https://github.com/JetBrains/compose-multiplatform-core/pull/2386)
+- _(prerelease fix)_ Fix "warning: KLIB resolver: Could not find" [#2386](https://github.com/JetBrains/compose-multiplatform-core/pull/2386)
+
+### Web
+
+- Fix the issue where deleting a word in the middle of a sentence also affects the word next to it [#2372](https://github.com/JetBrains/compose-multiplatform-core/pull/2372)
+
+### Gradle Plugin
+
+- _(prerelease fix)_ Fix `composeCompatibilityBrowserDistribution` task lazy configuration [#5398](https://github.com/JetBrains/compose-multiplatform/pull/5398)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.9.0-rc02`. Based on Jetpack Compose libraries:
+  - [Runtime 1.9.0](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.9.0)
+  - [UI 1.9.0](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.9.0)
+  - [Foundation 1.9.0](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.9.0)
+  - [Material 1.9.0](https://developer.android.com/jetpack/androidx/releases/compose-material#1.9.0)
+  - [Material3 1.3.2](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.3.2)
+
+- Compose Material3 libraries `org.jetbrains.compose.material3:material3*:1.9.0-beta05`. Based on [Jetpack Compose Material3 1.4.0-beta03](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0-beta03)
+- Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-alpha06`. Based on [Jetpack Compose Material3 Adaptive 1.2.0-alpha11](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-alpha10)
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.4-rc01`. Based on [Jetpack Lifecycle 2.9.2](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.2)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0-rc02`. Based on [Jetpack Navigation 2.9.1](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.1)
+- Savedstate library `org.jetbrains.androidx.savedstate:savedstate:1.3.4-rc01`. Based on [Jetpack Savedstate 1.3.1](https://developer.android.com/jetpack/androidx/releases/savedstate#1.3.1)
+- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.4.0-rc02`. Based on [Jetpack WindowManager 1.4.0](https://developer.android.com/jetpack/androidx/releases/window#1.4.0)
+
+---
+
 # 1.10.0-alpha01 (September 2025)
 
 _Changes since 1.9.0-rc01_
