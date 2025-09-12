@@ -6,7 +6,7 @@ import java.net.URL
 
 // https://googlechromelabs.github.io/chrome-for-testing/
 private val CHROME_DRIVER_VERSION = "140.0.7339.82"
-private val GECKO_DRIVER_VERSION = "0.31.0"
+private val GECKO_DRIVER_VERSION = "0.36.0"
 
 private fun download(url: String, file: File) {
     println("downloading ${url} to ${file}")
