@@ -14,18 +14,34 @@ import org.jetbrains.compose.web.css.timingFunction
 import org.jetbrains.compose.web.css.transitions
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.testutils.runTest
+import org.w3c.dom.css.CSSStyleDeclaration
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @ExperimentalComposeWebApi
 class TransitionsTests {
+
+    private fun CSSStyleDeclaration.computedTransition(): String {
+        val cssDelimiter = Regex(",\\s*")
+
+        // setting transition property affects subProperties, but we should check for them separately
+        val props = transitionProperty.split(cssDelimiter)
+        val durations = transitionDuration.split(cssDelimiter)
+        val timings = transitionTimingFunction.split(cssDelimiter)
+        val delays = transitionDelay.split(cssDelimiter)
+
+        return props.indices.joinToString(", ") { i ->
+            "${props[i]} ${durations[i]} ${timings[i]} ${delays[i]}"
+        }
+    }
+
 	@Test
 	fun duration() = runTest {
 		composition {
 			Div({ style { transitions { "width" { duration(1.s) } }}})
 		}
 		
-		assertEquals("width 1s ease 0s", nextChild().style.transition)
+		assertEquals("width 1s ease 0s", nextChild().style.computedTransition())
 	}
 	
 	@Test
@@ -34,7 +50,7 @@ class TransitionsTests {
 			Div({ style { transitions { "width" { duration(1.s) }; "height" { duration(2.s) } }}})
 		}
 		
-		assertEquals("width 1s ease 0s, height 2s ease 0s", nextChild().style.transition)
+		assertEquals("width 1s ease 0s, height 2s ease 0s", nextChild().style.computedTransition())
 	}
 	
 	@Test
@@ -43,7 +59,7 @@ class TransitionsTests {
 			Div({ style { transitions { all { duration(1.s) } }}})
 		}
 		
-		assertEquals("all 1s ease 0s", nextChild().style.transition)
+		assertEquals("all 1s ease 0s", nextChild().style.computedTransition())
 	}
 	
 	@Test
@@ -52,7 +68,7 @@ class TransitionsTests {
 			Div({ style { transitions { "width" { duration(1.s); timingFunction(AnimationTimingFunction.EaseInOut) }}}})
 		}
 		
-		assertEquals("width 1s ease-in-out 0s", nextChild().style.transition)
+		assertEquals("width 1s ease-in-out 0s", nextChild().style.computedTransition())
 	}
 	
 	@Test
@@ -61,7 +77,7 @@ class TransitionsTests {
 			Div({ style { transitions { "width" { duration(1.s); delay(2.s) }}}})
 		}
 		
-		assertEquals("width 1s ease 2s", nextChild().style.transition)
+		assertEquals("width 1s ease 2s", nextChild().style.computedTransition())
 	}
 	
 	@Test
@@ -73,8 +89,8 @@ class TransitionsTests {
 			Div({ style { transitions { defaultDuration(1.s); myList { duration(2.s) }}}})
 		}
 		
-		assertEquals("width 1s ease 0s, height 1s ease 0s", nextChild().style.transition)
-		assertEquals("width 0s ease 0s, height 1s ease 0s, width 2s ease 0s", nextChild().style.transition)
-		assertEquals("width 2s ease 0s, height 2s ease 0s", nextChild().style.transition)
+		assertEquals("width 1s ease 0s, height 1s ease 0s", nextChild().style.computedTransition())
+		assertEquals("width 0s ease 0s, height 1s ease 0s, width 2s ease 0s", nextChild().style.computedTransition())
+		assertEquals("width 2s ease 0s, height 2s ease 0s", nextChild().style.computedTransition())
 	}
 }
