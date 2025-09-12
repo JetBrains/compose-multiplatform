@@ -75,14 +75,12 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key
     rm -rf /var/lib/apt/lists/*
 
 # Install Firefox
-ARG FIREFOX_VERSION="142.0.1~build1"
+ARG FIREFOX_VERSION="142.0"
 ARG GECKO_DRIVER_VERSION="0.36.0"
-RUN install -d -m 0755 /etc/apt/keyrings && \
-    wget -q https://packages.mozilla.org/apt/repo-signing-key.gpg -O- > /etc/apt/keyrings/packages.mozilla.org.asc && \
-    echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" > /etc/apt/sources.list.d/mozilla.list && \
-    echo 'Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000' > /etc/apt/preferences.d/mozilla && \
-    apt update -y && \
-    apt install -y firefox=$FIREFOX_VERSION && \
+RUN wget -q -O /tmp/firefox.deb https://ftp.mozilla.org/pub/firefox/releases/${FIREFOX_VERSION}/linux-x86_64/en-US/firefox-${FIREFOX_VERSION}.deb && \
+    dpkg -i /tmp/firefox.deb && \
+    rm /tmp/firefox.deb && \
+    apt --fix-broken install -y && \
     wget https://github.com/mozilla/geckodriver/releases/download/v$GECKO_DRIVER_VERSION/geckodriver-v$GECKO_DRIVER_VERSION-linux64.tar.gz && \
     tar -xvzf geckodriver-v$GECKO_DRIVER_VERSION-linux64.tar.gz && \
     mkdir -p /root/.gradle/selenium/gecko && \
