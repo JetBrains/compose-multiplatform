@@ -139,14 +139,6 @@ See also [What's new](https://www.jetbrains.com/help/kotlin-multiplatform-dev/wh
 - Don't fail gradle sync if `TargetFormat.AppImage` is specified in `targetFormats` on macOS [#5332](https://github.com/JetBrains/compose-multiplatform/pull/5332)
 - Fix codesigning on macOS when the developer id contains non-ASCII characters. Note that this requires JDK 21 or later [#5358](https://github.com/JetBrains/compose-multiplatform/pull/5358)
 
-### Lifecycle
-
-- Fix dependency on Compose in `lifecycle-viewmodel-compose` module: `2.9.2` incorrectly refer Compose Multiplatform `1.9.0-beta03`. Now it reverted back to `1.8.2` [#2318](https://github.com/JetBrains/compose-multiplatform-core/pull/2318)
-
-### SavedState
-
-- Fix dependency on Compose in `savedstate-compose` module: `1.3.2` incorrectly refer Compose Multiplatform `1.9.0-beta03`. Now it reverted back to `1.8.2` [#2321](https://github.com/JetBrains/compose-multiplatform-core/pull/2321)
-
 ## Dependencies
 
 - Gradle Plugin `org.jetbrains.compose`, version `1.9.0`. Based on Jetpack Compose libraries:
