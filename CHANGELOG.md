@@ -6,10 +6,6 @@ See also [What's new](https://www.jetbrains.com/help/kotlin-multiplatform-dev/wh
 
 ## Highlights
 
-### Multiple Platforms
-
-- `material3` library now includes new experimental `MaterialExpressiveTheme` [#2127](https://github.com/JetBrains/compose-multiplatform-core/pull/2127)
-
 ### Web
 
 - Added a `WebElementView` Composable function for embedding the absolutely positioned HTML content in Compose for web target. It's supported only when using `ComposeViewport` entry point and it's not supported with `CanvasBasedWindow`, which is deprecated now [#2145](https://github.com/JetBrains/compose-multiplatform-core/pull/2145)
