@@ -144,11 +144,11 @@ _Changes since 1.8.2_
 
 ### Lifecycle
 
-- Fix dependency to Compose in `lifecycle-viewmodel-compose` module: `2.9.2` incorrectly refer Compose Multiplatform `1.9.0-beta03`. Now it reverted back to `1.8.2` [#2318](https://github.com/JetBrains/compose-multiplatform-core/pull/2318)
+- Fix dependency on Compose in `lifecycle-viewmodel-compose` module: `2.9.2` incorrectly refer Compose Multiplatform `1.9.0-beta03`. Now it reverted back to `1.8.2` [#2318](https://github.com/JetBrains/compose-multiplatform-core/pull/2318)
 
 ### SavedState
 
-- Fix dependency to Compose in `savedstate-compose` module: `1.3.2` incorrectly refer Compose Multiplatform `1.9.0-beta03`. Now it reverted back to `1.8.2` [#2321](https://github.com/JetBrains/compose-multiplatform-core/pull/2321)
+- Fix dependency on Compose in `savedstate-compose` module: `1.3.2` incorrectly refer Compose Multiplatform `1.9.0-beta03`. Now it reverted back to `1.8.2` [#2321](https://github.com/JetBrains/compose-multiplatform-core/pull/2321)
 
 ## Dependencies
 
