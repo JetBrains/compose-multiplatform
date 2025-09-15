@@ -519,13 +519,16 @@ fun githubClone(repo: String): File {
     val url = "https://github.com/$repo"
     val folder = File("build/github/$repo")
     val absolutePath = folder.absolutePath
-    if (!folder.exists()) {
+    if (!folder.exists() || folder.listFiles()?.isEmpty() == true) {
         folder.mkdirs()
         println("Cloning $url into ${folder.absolutePath}")
         pipeProcess("git clone --bare $url $absolutePath").waitAndCheck()
     } else {
         println("Fetching $url into ${folder.absolutePath}")
         pipeProcess("git -C $absolutePath fetch --force --tags").waitAndCheck()
+    }
+    check(folder.listFiles()?.isNotEmpty() == true) {
+        "Cloning $url failed"
     }
     return folder
 }
