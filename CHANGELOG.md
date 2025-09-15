@@ -24,7 +24,7 @@ See also [What's new](https://www.jetbrains.com/help/kotlin-multiplatform-dev/wh
 - Material3 versioning is decoupled for the Compose Multiplatform 1.9.* release due the upstream Jetpack Compose Material3 1.4 has not been released as stable yet [#5360](https://github.com/JetBrains/compose-multiplatform/pull/5360)
 - `compose.material3` now points to the latest stable Material3 version, 1.8.2. If the latest Material3 features are needed, please include it this way: [#5360](https://github.com/JetBrains/compose-multiplatform/pull/5360)
   ```
-  implementation("org.jetbrains.compose.material3:material3:1.9.0-alpha04")
+  implementation("org.jetbrains.compose.material3:material3:1.9.0-beta06")
   ```
 
 ### iOS
@@ -140,7 +140,7 @@ See also [What's new](https://www.jetbrains.com/help/kotlin-multiplatform-dev/wh
 
 ### Gradle Plugin
 
-- Don't fail gradle sync if TargetFormat.AppImage is specified in `targetFormats` on macOS [#5332](https://github.com/JetBrains/compose-multiplatform/pull/5332)
+- Don't fail gradle sync if `TargetFormat.AppImage` is specified in `targetFormats` on macOS [#5332](https://github.com/JetBrains/compose-multiplatform/pull/5332)
 - Fix codesigning on macOS when the developer id contains non-ASCII characters. Note that this requires JDK 21 or later [#5358](https://github.com/JetBrains/compose-multiplatform/pull/5358)
 
 ### Lifecycle
