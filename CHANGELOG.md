@@ -2,6 +2,8 @@
 
 _Changes since 1.8.2_
 
+See also [What's new](https://www.jetbrains.com/help/kotlin-multiplatform-dev/whats-new-compose-190.html).
+
 ## Highlights
 
 ### Multiple Platforms
