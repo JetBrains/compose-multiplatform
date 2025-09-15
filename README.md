@@ -57,11 +57,11 @@ It has desktop extensions for menus, keyboard shortcuts, window manipulation, an
 > We would appreciate your feedback on it in the public Slack channel [#compose-web](https://kotlinlang.slack.com/archives/C01F2HV7868/p1678887590205449). 
 > If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
 
-You can experiment with sharing your mobile or desktop UIs with the web. Compose for Web is based on [Kotlin/Wasm](https://kotl.in/wasm), 
+You can experiment with sharing your mobile or desktop UIs with the web. Compose Multiplatform for web is based on [Kotlin/Wasm](https://kotl.in/wasm), 
 the newest target for Kotlin Multiplatform projects. It allows Kotlin developers to run their code in the browser with 
 all the benefits that WebAssembly has to offer, such as good and predictable performance for your applications.
 
-**[Get started with Compose for Web](https://jb.gg/start-cmp)**
+**[Get started with Compose Multiplatform for web](https://jb.gg/start-cmp)**
 
 ## Libraries
 
