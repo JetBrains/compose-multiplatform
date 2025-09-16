@@ -18,6 +18,7 @@ import org.jetbrains.compose.desktop.tasks.AbstractUnpackDefaultComposeApplicati
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.internal.utils.joinLowerCamelCase
+import org.jetbrains.compose.internal.utils.provider
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBinary
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeOutputKind
@@ -70,6 +71,13 @@ private fun configureNativeApplication(
         copyright.set(project.provider {
             app.distributions.copyright ?: "Copyright (C) ${Calendar.getInstance().get(Calendar.YEAR)}"
         })
+        if (binary.outputKind == NativeOutputKind.EXECUTABLE) {
+            val binaryResources = (binary.compilation.associatedCompilations + binary.compilation).flatMap { compilation ->
+                compilation.allKotlinSourceSets.map { it.resources }
+            }
+            inputs.files(binaryResources)
+            composeResourcesDirs.set(provider { binaryResources })
+        }
     }
 
     if (TargetFormat.Dmg in app.distributions.targetFormats) {

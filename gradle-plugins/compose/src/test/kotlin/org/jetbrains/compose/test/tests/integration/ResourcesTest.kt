@@ -1027,6 +1027,22 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun macosExecutableResources() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        with(testProject("misc/macosNativeResources")) {
+            val appName = "Test Resources"
+            gradle(":createDistributableNativeDebugMacosX64", "--dry-run").checks {
+                check.taskSkipped(":createDistributableNativeDebugMacosX64")
+            }
+            gradle(":createDistributableNativeDebugMacosX64").checks {
+                val targetResourcesDir = "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources"
+                file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
+                file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
+            }
+        }
+    }
+
+    @Test
     fun iosTestResources() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
         with(testProject("misc/appleResources")) {
