@@ -65,7 +65,7 @@ kotlin {
             implementation("com.google.maps.android:maps-compose:2.11.2")
         }
 
-        val webMain by creating {
+        val webMain by getting {
             dependsOn(commonMain.get())
             dependencies {
                 implementation(npm("uuid", "^9.0.1"))
