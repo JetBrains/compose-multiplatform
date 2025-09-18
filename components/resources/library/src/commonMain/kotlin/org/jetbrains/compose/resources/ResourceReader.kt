@@ -4,7 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 
-class MissingResourceException(path: String) : Exception("Missing resource with path: $path")
+class MissingResourceException(path: String) : Exception("Missing resource with path: $path") {
+    internal constructor(path: String, message: String) : this("$path. $message")
+}
 
 /**
  * Reads the content of the resource file at the specified path and returns it as a byte array.
