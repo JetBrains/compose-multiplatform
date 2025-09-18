@@ -5,9 +5,8 @@
 
 package org.jetbrains.compose.desktop.application.tasks
 
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.file.SourceDirectorySet
-import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
@@ -48,7 +47,7 @@ abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMac
     @get:InputFiles
     @get:Optional
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
-    val composeResourcesDirs: ListProperty<SourceDirectorySet> = objects.listProperty(SourceDirectorySet::class.java)
+    val composeResourcesDirs: Property<FileCollection?> = objects.nullableProperty()
 
     override fun createPackage(destinationDir: File, workingDir: File) {
         val packageName = packageName.get()
