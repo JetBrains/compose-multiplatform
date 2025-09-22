@@ -70,6 +70,13 @@ private fun configureNativeApplication(
         copyright.set(project.provider {
             app.distributions.copyright ?: "Copyright (C) ${Calendar.getInstance().get(Calendar.YEAR)}"
         })
+        if (binary.outputKind == NativeOutputKind.EXECUTABLE) {
+            val binaryResources = (binary.compilation.associatedCompilations + binary.compilation).flatMap { compilation ->
+                compilation.allKotlinSourceSets.map { it.resources }
+            }
+            inputs.files(binaryResources)
+            composeResourcesDirs.setFrom(binaryResources)
+        }
     }
 
     if (TargetFormat.Dmg in app.distributions.targetFormats) {
