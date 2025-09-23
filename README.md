@@ -18,7 +18,7 @@ You can choose the platforms across which to share your UI code using Compose Mu
 * [iOS](https://jb.gg/start-cmp)
 * [Android](https://jb.gg/start-cmp) 
 * [Desktop](https://jb.gg/start-cmp) (Windows, MacOS, and Linux)
-* [Web](https://jb.gg/start-cmp) (Alpha)
+* [Web](https://jb.gg/start-cmp) (Beta)
 
 For example, you can share UIs between iOS and Android or Windows and MacOS.
 
@@ -53,7 +53,7 @@ It has desktop extensions for menus, keyboard shortcuts, window manipulation, an
 
 ## Web
 
-> Web support is in Alpha. It may change incompatibly and require manual migration in the future.
+> Web support is in Beta, making it a great time to give it a try. Check out our [blog post](https://blog.jetbrains.com/kotlin/2025/09/compose-multiplatform-1-9-0-compose-for-web-beta/) to learn more about the progress made to reach this milestone.
 > We would appreciate your feedback on it in the public Slack channel [#compose-web](https://kotlinlang.slack.com/archives/C01F2HV7868/p1678887590205449). 
 > If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
 
