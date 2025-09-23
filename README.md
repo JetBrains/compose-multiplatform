@@ -18,7 +18,7 @@ You can choose the platforms across which to share your UI code using Compose Mu
 * [iOS](https://jb.gg/start-cmp)
 * [Android](https://jb.gg/start-cmp) 
 * [Desktop](https://jb.gg/start-cmp) (Windows, MacOS, and Linux)
-* [Web](https://jb.gg/start-cmp) (Alpha)
+* [Web](https://jb.gg/start-cmp) (Beta)
 
 For example, you can share UIs between iOS and Android or Windows and MacOS.
 
