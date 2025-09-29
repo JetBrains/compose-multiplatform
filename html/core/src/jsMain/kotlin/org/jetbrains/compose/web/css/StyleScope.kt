@@ -194,6 +194,7 @@ internal fun StylePropertyList.nativeEquals(properties: StylePropertyList): Bool
     return all { prop ->
         val otherProp = properties[index++]
         prop.name == otherProp.name &&
-            prop.value.toString() == otherProp.value.toString()
+            prop.value.toString() == otherProp.value.toString() &&
+                prop.important == otherProp.important
     }
 }
