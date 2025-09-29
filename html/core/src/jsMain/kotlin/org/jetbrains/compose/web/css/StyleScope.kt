@@ -42,11 +42,14 @@ interface StyleScope {
      * })
      * ```
      */
-    fun property(propertyName: String, value: StylePropertyValue)
+    fun property(propertyName: String, value: StylePropertyValue, important: Boolean)
+    fun property(propertyName: String, value: StylePropertyValue) = property(propertyName, value, false)
     fun variable(variableName: String, value: StylePropertyValue)
 
-    fun property(propertyName: String, value: String) = property(propertyName, StylePropertyValue(value))
-    fun property(propertyName: String, value: Number) = property(propertyName, StylePropertyValue(value))
+    fun property(propertyName: String, value: String, important: Boolean) = property(propertyName, StylePropertyValue(value), important)
+    fun property(propertyName: String, value: String) = property(propertyName, value, false)
+    fun property(propertyName: String, value: Number, important: Boolean) = property(propertyName, StylePropertyValue(value), important)
+    fun property(propertyName: String, value: Number) = property(propertyName, value, false)
     fun variable(variableName: String, value: String) = variable(variableName, StylePropertyValue(value))
     fun variable(variableName: String, value: Number) = variable(variableName, StylePropertyValue(value))
 
@@ -150,8 +153,8 @@ open class StyleScopeBuilder : StyleScope, StyleHolder {
     override val properties: MutableStylePropertyList = mutableListOf()
     override val variables: MutableStylePropertyList = mutableListOf()
 
-    override fun property(propertyName: String, value: StylePropertyValue) {
-        properties.add(StylePropertyDeclaration(propertyName, value))
+    override fun property(propertyName: String, value: StylePropertyValue, important: Boolean) {
+        properties.add(StylePropertyDeclaration(propertyName, value, important))
     }
 
     override fun variable(variableName: String, value: StylePropertyValue) {
@@ -175,10 +178,11 @@ open class StyleScopeBuilder : StyleScope, StyleHolder {
 
 data class StylePropertyDeclaration(
     val name: String,
-    val value: StylePropertyValue
+    val value: StylePropertyValue,
+    val important: Boolean = false,
 ) {
-    constructor(name: String, value: String) : this(name, value.unsafeCast<StylePropertyValue>())
-    constructor(name: String, value: Number) : this(name, value.unsafeCast<StylePropertyValue>())
+    constructor(name: String, value: String, important: Boolean = false) : this(name, value.unsafeCast<StylePropertyValue>(), important)
+    constructor(name: String, value: Number, important: Boolean = false) : this(name, value.unsafeCast<StylePropertyValue>(), important)
 }
 typealias StylePropertyList = List<StylePropertyDeclaration>
 typealias MutableStylePropertyList = MutableList<StylePropertyDeclaration>
