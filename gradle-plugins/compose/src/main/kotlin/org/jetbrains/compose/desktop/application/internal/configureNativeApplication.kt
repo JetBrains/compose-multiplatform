@@ -74,7 +74,6 @@ private fun configureNativeApplication(
             val binaryResources = (binary.compilation.associatedCompilations + binary.compilation).flatMap { compilation ->
                 compilation.allKotlinSourceSets.map { it.resources }
             }
-            inputs.files(binaryResources)
             composeResourcesDirs.setFrom(binaryResources)
         }
     }
