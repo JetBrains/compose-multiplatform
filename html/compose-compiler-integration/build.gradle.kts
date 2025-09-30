@@ -110,19 +110,6 @@ private fun build(
         throw GradleException("Gradle process timed out for $caseName. Command: ${command.joinToString(" ")}")
     }
 
-    // If process printed the version marker, it will already be in the console; still try to extract from stdout if available
-    // Can't read inputStream when inherited; attempt only if available
-    try {
-        val out = proc.inputStream?.bufferedReader()?.readText()
-        if (out != null) {
-            "(COMPOSE_INTEGRATION_VERSION=\\[.*\\])".toRegex().find(out)?.also {
-                println(it.groupValues[1])
-            }
-        }
-    } catch (_: Throwable) {
-        // ignored — streams may be redirected
-    }
-
     if (proc.exitValue() != 0 && !failureExpected) {
         throw GradleException("Error compiling $caseName (exit code ${proc.exitValue()})")
     }
