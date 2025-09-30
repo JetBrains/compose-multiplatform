@@ -54,7 +54,7 @@ fun cloneTemplate(templateName: String, contentMain: String, contentLib: String)
     return tempDir
 }
 
-fun build(
+private fun build(
     caseName: String,
     directory: File,
     failureExpected: Boolean = false,
@@ -70,29 +70,61 @@ fun build(
         it.add("--info")
     }.toTypedArray()
 
-    val procBuilder = if (isWin) {
-        ProcessBuilder("gradlew.bat", *arguments)
+    val gradlewFile = File(directory, if (isWin) "gradlew.bat" else "gradlew")
+
+    println("[compose-compiler-integration] Working directory: ${directory.absolutePath}")
+
+    if (!gradlewFile.exists()) {
+        throw GradleException("gradlew not found in ${directory.absolutePath}. Please ensure the Gradle wrapper is present.")
+    }
+
+    if (!isWin) {
+        if (!gradlewFile.canExecute()) {
+            val isExecutable = gradlewFile.setExecutable(true)
+            if (!isExecutable) {
+                throw GradleException("Failed to make gradlew executable: ${gradlewFile.absolutePath}")
+            }
+        }
+    }
+
+    val command: List<String> = if (isWin) {
+        listOf("cmd", "/c", "gradlew.bat") + arguments
     } else {
-        ProcessBuilder("bash", "./gradlew", *arguments)
+        listOf("./gradlew") + arguments
     }
-    val proc = procBuilder
-        .directory(directory)
-        .redirectOutput(ProcessBuilder.Redirect.PIPE)
-        .redirectError(ProcessBuilder.Redirect.PIPE)
-        .start()
+    println("[compose-compiler-integration] Executing: ${command.joinToString(" ")}")
 
-    proc.waitFor(5, TimeUnit.MINUTES)
-
-    "(COMPOSE_INTEGRATION_VERSION=\\[.*\\])".toRegex().find(
-        proc.inputStream.bufferedReader().readText()
-    )?.also {
-        println(it.groupValues[1])
+    val proc = try {
+        ProcessBuilder(command)
+            .directory(directory)
+            .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+            .redirectError(ProcessBuilder.Redirect.INHERIT)
+            .start()
+    } catch (e: Exception) {
+        throw GradleException("Failed to start Gradle process. Command: ${command.joinToString(" ")}", e)
     }
 
-    println(proc.errorStream.bufferedReader().readText())
+    val finished = proc.waitFor(5, TimeUnit.MINUTES)
+    if (!finished) {
+        proc.destroyForcibly()
+        throw GradleException("Gradle process timed out for $caseName. Command: ${command.joinToString(" ")}")
+    }
+
+    // If process printed the version marker, it will already be in the console; still try to extract from stdout if available
+    // Can't read inputStream when inherited; attempt only if available
+    try {
+        val out = proc.inputStream?.bufferedReader()?.readText()
+        if (out != null) {
+            "(COMPOSE_INTEGRATION_VERSION=\\[.*\\])".toRegex().find(out)?.also {
+                println(it.groupValues[1])
+            }
+        }
+    } catch (_: Throwable) {
+        // ignored — streams may be redirected
+    }
 
     if (proc.exitValue() != 0 && !failureExpected) {
-        throw GradleException("Error compiling $caseName")
+        throw GradleException("Error compiling $caseName (exit code ${proc.exitValue()})")
     }
 
     if (failureExpected && proc.exitValue() == 0) {
