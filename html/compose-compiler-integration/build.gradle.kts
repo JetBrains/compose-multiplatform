@@ -104,7 +104,7 @@ private fun build(
         throw GradleException("Failed to start Gradle process. Command: ${command.joinToString(" ")}", e)
     }
 
-    val finished = proc.waitFor(5, TimeUnit.MINUTES)
+    val finished = proc.waitFor(10, TimeUnit.MINUTES)
     if (!finished) {
         proc.destroyForcibly()
         throw GradleException("Gradle process timed out for $caseName. Command: ${command.joinToString(" ")}")
