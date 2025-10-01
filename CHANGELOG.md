@@ -1,3 +1,73 @@
+# 1.10.0-alpha02 (October 2025)
+
+_Changes since 1.10.0-alpha01_
+
+## Highlights
+
+### Multiple Platforms
+
+- `androidx.compose.ui.tooling.preview.Preview` annotation is now available from `commonMain` source set [#2424](https://github.com/JetBrains/compose-multiplatform-core/pull/2424)
+
+### Navigation
+
+- Provide required `NavigationEventDispatcherOwner` for a correct Navigation3 support [#2382](https://github.com/JetBrains/compose-multiplatform-core/pull/2382)
+
+## Features
+
+### Multiple Platforms
+
+- Provide `LocalLifecycleOwner` inside `runComposeUiTest` by default [#2400](https://github.com/JetBrains/compose-multiplatform-core/pull/2400)
+
+### Desktop
+
+- Experimental `-Dskiko.gpu.resourceCacheLimit` VM property is introduced to limit GPU resource cache used for one window (default is 256M) [#2422](https://github.com/JetBrains/compose-multiplatform-core/pull/2422)
+
+### Resources
+
+- Add `setResourceReaderAndroidContext` to configure Android context in cases when a provider initialization is not available [#5434](https://github.com/JetBrains/compose-multiplatform/pull/5434)
+
+## Fixes
+
+### Multiple Platforms
+
+- _(prerelease fix)_ Fix "Cinterop fails with an error when Compilation works fine" [#2386](https://github.com/JetBrains/compose-multiplatform-core/pull/2386)
+- _(prerelease fix)_ Fix "warning: KLIB resolver: Could not find" [#2386](https://github.com/JetBrains/compose-multiplatform-core/pull/2386)
+
+### iOS
+
+- Clear TextField focus when another view becomes first responder [#2337](https://github.com/JetBrains/compose-multiplatform-core/pull/2337)
+- Fix context menu appearance for text fields with transformation [#2377](https://github.com/JetBrains/compose-multiplatform-core/pull/2377)
+- Fix input session restarts triggered by `PlatformImeOptionsImpl` not being `@Immutable` [#2413](https://github.com/JetBrains/compose-multiplatform-core/pull/2413)
+- Add ability to reach internal accessibility elements inside accessibility nodes [#2416](https://github.com/JetBrains/compose-multiplatform-core/pull/2416)
+
+### Desktop
+
+- Fixed `ComposePanel` not initially focusing the first focusable node, when running in JetBrains Runtime JVM [#2384](https://github.com/JetBrains/compose-multiplatform-core/pull/2384)
+- Fixed background flashing when a window or dialog are closed [#2403](https://github.com/JetBrains/compose-multiplatform-core/pull/2403)
+- Fix "ComposePanel doesn't use hardware acceleration with `RenderSettings.SwingGraphics` on Linux" [#2422](https://github.com/JetBrains/compose-multiplatform-core/pull/2422)
+
+### Resources
+
+- Fix resource access in a Robolectric test environment [#5433](https://github.com/JetBrains/compose-multiplatform/pull/5433)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.10.0-alpha02`. Based on Jetpack Compose libraries:
+  - [Runtime 1.10.0-alpha04](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.10.0-alpha04)
+  - [UI 1.10.0-alpha04](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.10.0-alpha04)
+  - [Foundation 1.10.0-alpha04](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.10.0-alpha04)
+  - [Material 1.10.0-alpha04](https://developer.android.com/jetpack/androidx/releases/compose-material#1.10.0-alpha04)
+  - [Material3 1.5.0-alpha04](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha04)
+
+- Compose Material3 libraries `org.jetbrains.compose.material3:material3*:1.10.0-alpha02`. Based on [Jetpack Compose Material3 1.5.0-alpha04](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha04)
+- Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-alpha07`. Based on [Jetpack Compose Material3 Adaptive 1.2.0-beta03](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-beta03)
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.10.0-alpha02`. Based on [Jetpack Lifecycle 2.10.0-alpha04](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.10.0-alpha04)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0-rc01`. Based on [Jetpack Navigation 2.9.1](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.1)
+- Savedstate library `org.jetbrains.androidx.savedstate:savedstate:1.4.0-alpha02`. Based on [Jetpack Savedstate 1.4.0-alpha03](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0-alpha03)
+- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.5.0-alpha02`. Based on [Jetpack WindowManager 1.5.0-rc01](https://developer.android.com/jetpack/androidx/releases/window#1.5.0-rc01)
+
+---
+
 # 1.9.0 (September 2025)
 
 _Changes since 1.8.2_
