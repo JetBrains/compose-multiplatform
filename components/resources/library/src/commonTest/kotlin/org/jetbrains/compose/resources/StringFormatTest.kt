@@ -52,9 +52,13 @@ class StringFormatTest {
         val template = "Hello %1\$s, %2\$s!"
         val args = listOf("Alice")
 
-        assertFailsWith<IndexOutOfBoundsException> {
+        val exception = assertFailsWith<IllegalArgumentException> {
             template.replaceWithArgs(args)
         }
+        assertEquals(
+            "Formatting failed: Placeholder '%2\$s' at position 2 is out of bounds. Only 1 argument(s) provided for format string \"Hello %1\$s, %2\$s!\"",
+            exception.message
+        )
     }
 
     @Test
@@ -72,9 +76,13 @@ class StringFormatTest {
         val template = "Hello %1\$s, you have %3\$s messages"
         val args = listOf("Alice")
 
-        assertFailsWith<IndexOutOfBoundsException> {
+        val exception = assertFailsWith<IllegalArgumentException> {
             template.replaceWithArgs(args)
         }
+        assertEquals(
+            "Formatting failed: Placeholder '%3\$s' at position 3 is out of bounds. Only 1 argument(s) provided for format string \"Hello %1\$s, you have %3\$s messages\"",
+            exception.message
+        )
     }
 
     @Test
@@ -142,9 +150,13 @@ class StringFormatTest {
         val args = listOf("Alice")
 
         // An exception should be thrown because the second argument (%2$d) is missing
-        assertFailsWith<IndexOutOfBoundsException> {
+        val exception = assertFailsWith<IllegalArgumentException> {
             template.replaceWithArgs(args)
         }
+        assertEquals(
+            "Formatting failed: Placeholder '%2\$d' at position 2 is out of bounds. Only 1 argument(s) provided for format string \"Hello %1\$s, you have %2\$d messages!\"",
+            exception.message
+        )
     }
 
     @Test
@@ -154,9 +166,13 @@ class StringFormatTest {
         val args = listOf("Alice", "1")
 
         // The template has a %3$s placeholder, but there is no third argument
-        assertFailsWith<IndexOutOfBoundsException> {
+        val exception = assertFailsWith<IllegalArgumentException> {
             template.replaceWithArgs(args)
         }
+        assertEquals(
+            "Formatting failed: Placeholder '%3\$s' at position 3 is out of bounds. Only 2 argument(s) provided for format string \"Hello %1\$s, your rank is %3\$s\"",
+            exception.message
+        )
     }
 
     @Test

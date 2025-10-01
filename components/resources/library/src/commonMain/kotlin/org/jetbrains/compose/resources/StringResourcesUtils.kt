@@ -19,7 +19,11 @@ internal fun String.replaceWithArgs(args: List<String>): String {
                 )
             }
         }
-        args[index]
+        args.getOrElse(index) {
+            throw IllegalArgumentException(
+                "Formatting failed: Placeholder '${match.value}' at position ${index + 1} is out of bounds. Only ${args.size} argument(s) provided for format string \"$this\""
+            )
+        }
     }
 }
 
@@ -37,7 +41,7 @@ internal fun dropStringItemsCache() {
 
 internal suspend fun getStringItem(
     resourceItem: ResourceItem,
-    resourceReader: ResourceReader
+    resourceReader: ResourceReader,
 ): StringItem = stringItemsCache.getOrLoad(
     key = "${resourceItem.path}/${resourceItem.offset}-${resourceItem.size}"
 ) {
