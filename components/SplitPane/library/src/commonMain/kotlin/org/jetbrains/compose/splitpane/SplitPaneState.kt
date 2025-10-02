@@ -8,9 +8,12 @@ import androidx.compose.runtime.setValue
 class SplitPaneState(
     initialPositionPercentage: Float,
     moveEnabled: Boolean,
+    firstVisible: Boolean = true
 ) {
 
     var moveEnabled by mutableStateOf(moveEnabled)
+
+    var firstVisible by mutableStateOf(firstVisible)
 
     private var _positionPercentage by mutableStateOf(initialPositionPercentage)
     var positionPercentage: Float
