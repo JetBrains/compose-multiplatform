@@ -13,6 +13,7 @@ import org.jetbrains.compose.test.utils.TestProject
 import org.jetbrains.compose.test.utils.assertEqualTextFiles
 import org.jetbrains.compose.test.utils.assertNotEqualTextFiles
 import org.jetbrains.compose.test.utils.checkExists
+import org.jetbrains.compose.test.utils.checkNotExists
 import org.jetbrains.compose.test.utils.checks
 import org.jetbrains.compose.test.utils.modify
 import org.junit.jupiter.api.Assumptions
@@ -1022,6 +1023,88 @@ class ResourcesTest : GradlePluginTestBase() {
 
                 file("build/compose/cocoapods/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
                 file("build/compose/cocoapods/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
+            }
+        }
+    }
+
+    @Test
+    fun macosExecutableResources() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        with(testProject("misc/macosNativeResources")) {
+            val appName = "Test Resources"
+            gradle(":createDistributableNativeDebugMacosX64").checks {
+                val targetResourcesDir = "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources"
+                file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
+                file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
+            }
+        }
+    }
+
+    @Test
+    fun macosExecutableResourcesWithResourceChanged() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        with(testProject("misc/macosNativeResources")) {
+            val appName = "Test Resources"
+            val taskName = ":createDistributableNativeDebugMacosX64"
+            val comment = "<!-- Test resources changed -->"
+            val fileNames = listOf(
+                "compose-multiplatform.xml",
+                "icon.xml"
+            )
+            val targetResourcesDir = "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources/compose-resources/composeResources/appleresources.generated.resources/drawable/"
+            gradle(taskName).checks {
+                fileNames.forEach { name ->
+                    check(!file(targetResourcesDir + name).readText().startsWith(comment)) {
+                        "The resources file contains the test content before change"
+                    }
+                }
+            }
+
+            listOf(
+                "src/commonMain/composeResources/drawable/compose-multiplatform.xml",
+                "src/macosMain/composeResources/drawable/icon.xml"
+            ).forEach { path ->
+                file(path).modify {
+                    comment + it
+                }
+            }
+            gradle(taskName).checks {
+                check.taskSuccessful(taskName)
+                fileNames.forEach { name ->
+                    check(file(targetResourcesDir + name).readText().startsWith(comment)) {
+                        "The resources file does not contain the test content after changed"
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun macosExecutableResourcesWithResourceDeleted() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        with(testProject("misc/macosNativeResources")) {
+            val appName = "Test Resources"
+            val taskName = ":createDistributableNativeDebugMacosX64"
+
+            val targetResource = "src/commonMain/composeResources/drawable/compose-multiplatform2.xml"
+            file(targetResource).apply {
+                check(createNewFile())
+                writeText(file(targetResource.replace("compose-multiplatform2", "compose-multiplatform")).readText())
+            }
+
+            gradle(taskName).checks {
+                val targetResourcesDir = "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources"
+                file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
+                file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform2.xml").checkExists()
+                file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
+            }
+            check(file(targetResource).delete())
+            gradle(taskName).checks {
+                check.taskSuccessful(taskName)
+                val targetResourcesDir = "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources"
+                file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
+                file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform2.xml").checkNotExists()
+                file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
             }
         }
     }
