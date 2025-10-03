@@ -64,6 +64,14 @@ abstract class ComposePlugin : Plugin<Project> {
                 project.configureExperimentalTargetsFlagsCheck(mppExt)
             }
         }
+
+        try {
+            project.pluginManager.apply("org.jetbrains.compose.hot-reload")
+        } catch (_: Exception) {
+            // If a user does not set up the hot-reload plugin explicitly, set up the embedded one.
+            // TODO: issue a warning/error if the embedded version is higher than explicit one
+            project.pluginManager.apply("org.jetbrains.compose.embedded.hot-reload")
+        }
     }
 
     @Suppress("DEPRECATION")

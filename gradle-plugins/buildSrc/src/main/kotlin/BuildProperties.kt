@@ -23,4 +23,6 @@ object BuildProperties {
     fun deployVersion(project: Project): String =
         System.getenv("COMPOSE_GRADLE_PLUGIN_VERSION")
             ?: project.findProperty("deploy.version") as String
+    fun hotReloadVersion(project: Project): String =
+        project.findProperty("hotreload.version") as String
 }
