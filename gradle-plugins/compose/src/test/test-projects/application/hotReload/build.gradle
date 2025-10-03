@@ -1,0 +1,69 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
+plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.kotlin.plugin.compose"
+    id "org.jetbrains.compose"
+}
+
+kotlin {
+    // empty stub (no actual android app) to detect configuration conflicts
+    // like https://github.com/JetBrains/compose-jb/issues/2345
+    androidTarget()
+
+    jvm()
+    sourceSets {
+        jvmMain {
+            dependsOn(commonMain)
+
+            dependencies {
+                implementation(compose.desktop.currentOs)
+            }
+        }
+    }
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
+
+android {
+    namespace = "org.jetbrains.compose.testapp"
+    compileSdk = 35
+
+    defaultConfig {
+        minSdk = 23
+        targetSdk = 35
+    }
+}
+
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+
+            packageVersion = "1.0.0"
+            packageName = "TestPackage"
+            description = "Test description"
+            copyright = "Test Copyright Holder"
+            vendor = "Test Vendor"
+
+            linux {
+                shortcut = true
+                packageName = "test-package"
+                debMaintainer = "example@example.com"
+                menuGroup = "menu-group"
+            }
+            windows {
+                console = true
+                dirChooser = true
+                perUserInstall = true
+                shortcut = true
+                menu = true
+                menuGroup = "compose"
+                upgradeUuid = "2d6ff464-75be-40ad-a256-56420b9cc374"
+            }
+        }
+    }
+}
