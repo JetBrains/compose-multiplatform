@@ -81,7 +81,7 @@ internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() 
         val funNames = inputFiles.mapNotNull { inputFile ->
             if (inputFile.nameWithoutExtension.contains('.')) {
                 val (fileName, suffix) = inputFile.nameWithoutExtension.split('.')
-                val type = ResourceType.values().firstOrNull { fileName.startsWith(it.accessorName, true) }
+                val type = ResourceType.entries.firstOrNull { fileName.startsWith(it.accessorName, true) }
                 val name = "_collect${suffix.uppercaseFirstChar()}${fileName}Resources"
 
                 if (type == null) {
@@ -98,7 +98,9 @@ internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() 
                 logger.warn("Unknown file name: `$inputFile`")
                 null
             }
-        }.groupBy({ it.first }, { it.second })
+        }
+            .groupBy({ it.first }, { it.second })
+            .mapValues { (_, values) -> values.sorted() }
 
         val pkgName = packageName.get()
         val resClassName = resClassName.get()

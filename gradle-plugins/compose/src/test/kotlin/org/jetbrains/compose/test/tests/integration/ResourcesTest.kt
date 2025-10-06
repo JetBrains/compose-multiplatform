@@ -647,6 +647,10 @@ class ResourcesTest : GradlePluginTestBase() {
             assertEqualTextFiles(file("$buildPath/String0.commonMain.kt"), file("expected/String0.commonMain.kt"))
             assertEqualTextFiles(file("$buildPath/String100.commonMain.kt"), file("expected/String100.commonMain.kt"))
         }
+        gradle(":generateActualResourceCollectorsForDesktopMain").checks {
+            val desktopPath = "build/generated/compose/resourceGenerator/kotlin/desktopMainResourceCollectors/app/group/huge/generated/resources"
+            assertEqualTextFiles(file("$desktopPath/ActualResourceCollectors.kt"), file("expected/ActualResourceCollectors.kt"))
+        }
     }
 
     private fun assertDirectoriesContentEquals(actual: File, expected: File) {
