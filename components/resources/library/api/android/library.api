@@ -1,5 +1,6 @@
 public final class org/jetbrains/compose/resources/AndroidContextProviderKt {
 	public static final fun PreviewContextConfigurationEffect (Landroidx/compose/runtime/Composer;I)V
+	public static final fun setResourceReaderAndroidContext (Landroid/content/Context;)V
 }
 
 public final class org/jetbrains/compose/resources/DensityQualifier$Companion {
@@ -23,7 +24,13 @@ public final class org/jetbrains/compose/resources/FontResourcesKt {
 }
 
 public final class org/jetbrains/compose/resources/FontResources_androidKt {
-	public static final fun Font-DnXFreY (Lorg/jetbrains/compose/resources/FontResource;Landroidx/compose/ui/text/font/FontWeight;ILandroidx/compose/runtime/Composer;II)Landroidx/compose/ui/text/font/Font;
+	public static final synthetic fun Font-DnXFreY (Lorg/jetbrains/compose/resources/FontResource;Landroidx/compose/ui/text/font/FontWeight;ILandroidx/compose/runtime/Composer;II)Landroidx/compose/ui/text/font/Font;
+	public static final fun Font-r4zq5rk (Lorg/jetbrains/compose/resources/FontResource;Landroidx/compose/ui/text/font/FontWeight;ILandroidx/compose/ui/text/font/FontVariation$Settings;Landroidx/compose/runtime/Composer;II)Landroidx/compose/ui/text/font/Font;
+}
+
+public final class org/jetbrains/compose/resources/ImageDecodersKt {
+	public static final fun decodeToImageBitmap ([B)Landroidx/compose/ui/graphics/ImageBitmap;
+	public static final fun decodeToImageVector ([BLandroidx/compose/ui/unit/Density;)Landroidx/compose/ui/graphics/vector/ImageVector;
 }
 
 public final class org/jetbrains/compose/resources/ImageResourcesKt {
@@ -65,6 +72,15 @@ public abstract class org/jetbrains/compose/resources/Resource {
 	public fun hashCode ()I
 }
 
+public final class org/jetbrains/compose/resources/ResourceCaches {
+	public static final field $stable I
+	public static final field INSTANCE Lorg/jetbrains/compose/resources/ResourceCaches;
+}
+
+public abstract interface annotation class org/jetbrains/compose/resources/ResourceContentHash : java/lang/annotation/Annotation {
+	public abstract fun hash ()I
+}
+
 public final class org/jetbrains/compose/resources/ResourceEnvironment {
 	public static final field $stable I
 	public fun equals (Ljava/lang/Object;)Z
@@ -74,6 +90,16 @@ public final class org/jetbrains/compose/resources/ResourceEnvironment {
 public final class org/jetbrains/compose/resources/ResourceEnvironmentKt {
 	public static final fun getSystemResourceEnvironment ()Lorg/jetbrains/compose/resources/ResourceEnvironment;
 	public static final fun rememberResourceEnvironment (Landroidx/compose/runtime/Composer;I)Lorg/jetbrains/compose/resources/ResourceEnvironment;
+}
+
+public abstract interface class org/jetbrains/compose/resources/ResourceReader {
+	public abstract fun getUri (Ljava/lang/String;)Ljava/lang/String;
+	public abstract fun read (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun readPart (Ljava/lang/String;JJLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class org/jetbrains/compose/resources/ResourceReaderKt {
+	public static final fun getLocalResourceReader ()Landroidx/compose/runtime/ProvidableCompositionLocal;
 }
 
 public final class org/jetbrains/compose/resources/StringArrayResource : org/jetbrains/compose/resources/Resource {
