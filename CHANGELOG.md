@@ -18,6 +18,10 @@ _Changes since 1.10.0-alpha01_
 
 - Provide `LocalLifecycleOwner` inside `runComposeUiTest` by default [#2400](https://github.com/JetBrains/compose-multiplatform-core/pull/2400)
 
+### iOS
+
+- Add API to configure `UITextInputTraits.writingToolsBehavior` with `PlatformImeOptions` [#2435](https://github.com/JetBrains/compose-multiplatform-core/pull/2435)
+
 ### Desktop
 
 - Experimental `-Dskiko.gpu.resourceCacheLimit` VM property is introduced to limit GPU resource cache used for one window (default is 256M) [#2422](https://github.com/JetBrains/compose-multiplatform-core/pull/2422)
@@ -25,6 +29,10 @@ _Changes since 1.10.0-alpha01_
 ### Resources
 
 - Add `setResourceReaderAndroidContext` to configure Android context in cases when a provider initialization is not available [#5434](https://github.com/JetBrains/compose-multiplatform/pull/5434)
+
+### Navigation
+
+- Basic support of the navigation3 library [#2436](https://github.com/JetBrains/compose-multiplatform-core/pull/2436)
 
 ## Fixes
 
@@ -63,8 +71,9 @@ _Changes since 1.10.0-alpha01_
 - Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-alpha07`. Based on [Jetpack Compose Material3 Adaptive 1.2.0-beta03](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-beta03)
 - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.10.0-alpha02`. Based on [Jetpack Lifecycle 2.10.0-alpha04](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.10.0-alpha04)
 - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.0`. Based on [Jetpack Navigation 2.9.1](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.1)
+- Navigation Event library `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.0.0-alpha01`. Based on [Jetpack Navigation Event 1.0.0-alpha09](https://developer.android.com/jetpack/androidx/releases/navigation#1.0.0-alpha09)
 - Savedstate library `org.jetbrains.androidx.savedstate:savedstate:1.4.0-alpha02`. Based on [Jetpack Savedstate 1.4.0-alpha03](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0-alpha03)
-- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.5.0-alpha02`. Based on [Jetpack WindowManager 1.5.0-rc01](https://developer.android.com/jetpack/androidx/releases/window#1.5.0-rc01)
+- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.5.0-alpha02`. Based on [Jetpack WindowManager 1.5.0](https://developer.android.com/jetpack/androidx/releases/window#1.5.0)
 
 ---
 
