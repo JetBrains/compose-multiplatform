@@ -52,6 +52,9 @@
     </extensions>
 
     <actions>
+        <group id="Compose.Desktop.Preview">
+            <action class="org.jetbrains.compose.desktop.ide.preview.RefreshShownPreviewAction"/>
+        </group>
         <group id="Compose.Desktop.Preview.Editor.Toolbar">
             <action class="org.jetbrains.compose.desktop.ide.preview.RefreshOrRunPreviewAction"/>
         </group>
