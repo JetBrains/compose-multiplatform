@@ -1,9 +1,5 @@
-import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import de.undercouch.gradle.tasks.download.Download
-import org.apache.tools.zip.ZipEntry
-import org.apache.tools.zip.ZipOutputStream
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 
 plugins {
@@ -64,9 +60,6 @@ dependencies {
         embeddedDependencies(dep)
     }
 
-    fun hotReloadDep(dep: String) = embedded(
-        "org.jetbrains.compose.hot-reload:$dep:$hotReloadVersion"
-    )
 
     compileOnly(gradleApi())
     compileOnly(localGroovy())
@@ -79,14 +72,14 @@ dependencies {
     testImplementation(gradleTestKit())
     testImplementation(kotlin("gradle-plugin-api"))
 
+    shadowRuntimeElements("org.jetbrains.compose.hot-reload:hot-reload-gradle-plugin") {
+        version {
+            prefer(hotReloadVersion)
+        }
+    }
+
     embedded(libs.download.task)
     embedded(libs.kotlin.poet)
-    hotReloadDep("hot-reload-gradle-plugin")
-    hotReloadDep("hot-reload-gradle-core")
-    hotReloadDep("hot-reload-gradle-idea")
-    hotReloadDep("hot-reload-core")
-    hotReloadDep("hot-reload-orchestration")
-    hotReloadDep("hot-reload-annotations-jvm")
     embedded(project(":preview-rpc"))
     embedded(project(":jdk-version-probe"))
 }
@@ -100,56 +93,17 @@ val hotReloadPackage = "org.jetbrains.compose.reload"
 
 val hotReloadPackageRelocated = "$relocationPackage.$hotReloadPackage"
 
-val hotReloadPropertiesPath = "META-INF/gradle-plugins/org.jetbrains.compose.hot-reload.properties"
-
-private class HotReloadPropertiesTransformer(hotReloadPackageRelocated: String) : com.github.jengelman.gradle.plugins.shadow.transformers.Transformer {
-    private val targetPath = "META-INF/gradle-plugins/org.jetbrains.compose.embedded.hot-reload.properties"
-    private val content = """
-        implementation-class=$hotReloadPackageRelocated.gradle.ComposeHotReloadPlugin
-    """.trimIndent()
-
-    override fun canTransformResource(element: FileTreeElement?): Boolean = false
-    override fun transform(context: TransformerContext?) = Unit
-    override fun hasTransformedResource(): Boolean = true
-
-    override fun modifyOutputStream(os: ZipOutputStream?, preserveFileTimestamps: Boolean) {
-        val entry = ZipEntry(targetPath)
-        entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
-        os?.run {
-            putNextEntry(entry)
-            write(content.toByteArray())
-            closeEntry()
-        }
-    }
-
-    override fun getName(): String = "Hot reload properties transformer"
-}
-
-fun ShadowJar.relocateHotReload() {
-    val relocator = object : SimpleRelocator(hotReloadPackage, hotReloadPackageRelocated, ArrayList(), ArrayList()) {
-        override fun canRelocatePath(path: String?): Boolean {
-            return super.canRelocatePath(path) &&
-                    // do not relocate orchestration as its objects are used in serialization.
-                    path?.startsWith("org/jetbrains/compose/reload/orchestration/") == false
-        }
-    }
-    relocate(relocator)
-}
 
 val shadow = tasks.named<ShadowJar>("shadowJar") {
     for (packageToRelocate in packagesToRelocate) {
         relocate(packageToRelocate, "$relocationPackage.$packageToRelocate")
     }
-    relocateHotReload()
-
-    transform(HotReloadPropertiesTransformer(hotReloadPackageRelocated))
 
     archiveBaseName.set("shadow")
     archiveClassifier.set("")
     archiveVersion.set("")
     configurations = listOf(embeddedDependencies)
     exclude("META-INF/gradle-plugins/de.undercouch.download.properties")
-    exclude(hotReloadPropertiesPath)
     exclude("META-INF/versions/**")
 }
 
