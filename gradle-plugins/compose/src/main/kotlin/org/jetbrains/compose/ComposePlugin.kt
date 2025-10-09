@@ -78,6 +78,7 @@ abstract class ComposePlugin : Plugin<Project> {
         val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
         val runtimeSaveable get() = composeDependency("org.jetbrains.compose.runtime:runtime-saveable")
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
+        val uiBackHandler get() = composeDependency("org.jetbrains.compose.ui:ui-backhandler")
         @Deprecated("Use desktop.uiTestJUnit4", replaceWith = ReplaceWith("desktop.uiTestJUnit4"))
         @ExperimentalComposeLibrary
         val uiTestJUnit4 get() = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
