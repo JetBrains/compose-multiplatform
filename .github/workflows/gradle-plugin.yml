@@ -24,13 +24,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          distribution: 'corretto'
-          java-version: '17'
+          distribution: 'jetbrains'
+          java-version: '21'
       - name: Test Gradle plugin
         shell: bash
         run: |
           cd gradle-plugins
           ./gradlew assemble
+          ./gradlew ':compose:test-Gradle(${{ matrix.gradle }})-Agp(${{ matrix.agp }})' --tests "org.jetbrains.compose.test.tests.integration.HotReloadTest.testHotReload" --info
           ./gradlew --continue :preview-rpc:test :compose:test ':compose:test-Gradle(${{ matrix.gradle }})-Agp(${{ matrix.agp }})'
       - name: Upload Reports
         uses: actions/upload-artifact@v4
