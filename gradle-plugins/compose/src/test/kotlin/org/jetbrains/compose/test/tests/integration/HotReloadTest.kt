@@ -1,10 +1,12 @@
 package org.jetbrains.compose.test.tests.integration
 
 import org.gradle.testkit.runner.BuildResult
+import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.compose.ComposeBuildConfig
 import org.jetbrains.compose.test.utils.GradlePluginTestBase
 import org.jetbrains.compose.test.utils.checks
 import org.jetbrains.compose.test.utils.modify
+import org.junit.jupiter.api.fail
 import org.junit.jupiter.api.Test
 import kotlin.concurrent.thread
 
@@ -32,8 +34,22 @@ class HotReloadTest : GradlePluginTestBase() {
             result = gradle("hotRunJvm")
         }
 
+        val timeoutMs = 30000L
+        val startTimeMs = System.currentTimeMillis()
+        // wait until the test is ready for hot reload
         while (!file("started").exists()) {
+            if (!hotRunThread.isAlive) {
+                if (result?.task(":hotRunJvm")?.outcome != TaskOutcome.SUCCESS) {
+                    fail("hotRunJvm task failed")
+                } else {
+                    fail("hotRunJvm task completed unexpectedly")
+                }
+            }
             Thread.sleep(200)
+            if (System.currentTimeMillis() - startTimeMs > timeoutMs) {
+                hotRunThread.interrupt()
+                fail("timeout: hotRunJvm task did not start within $timeoutMs ms")
+            }
         }
 
         modifyText("src/jvmMain/kotlin/main.kt") {
