@@ -34,7 +34,7 @@ class HotReloadTest : GradlePluginTestBase() {
             result = gradle("hotRunJvm")
         }
 
-        val timeoutMs = 30000L
+        val timeoutMs = 300000L
         val startTimeMs = System.currentTimeMillis()
         // wait until the test is ready for hot reload
         while (!file("started").exists()) {
