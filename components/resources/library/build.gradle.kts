@@ -147,7 +147,7 @@ kotlin {
             dependsOn(skikoTest)
             dependsOn(blockingTest)
         }
-        val webMain by creating {
+        val webMain by getting {
             dependsOn(skikoMain)
         }
         val jsMain by getting {
@@ -156,7 +156,7 @@ kotlin {
         val wasmJsMain by getting {
             dependsOn(webMain)
         }
-        val webTest by creating {
+        val webTest by getting {
             dependsOn(skikoTest)
         }
         val jsTest by getting {
