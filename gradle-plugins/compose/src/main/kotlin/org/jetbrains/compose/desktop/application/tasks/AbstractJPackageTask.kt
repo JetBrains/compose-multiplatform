@@ -299,10 +299,6 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     internal val macLayeredIcons: DirectoryProperty = objects.directoryProperty()
 
-    @get:InputDirectory
-    @get:Optional
-    internal val macAssetsDir: DirectoryProperty = objects.directoryProperty()
-
     private val iconMapping by lazy {
         val icons = fileAssociations.get().mapNotNull { it.iconFile }.distinct()
         if (icons.isEmpty()) return@lazy emptyMap()
