@@ -12,6 +12,7 @@ import org.jetbrains.compose.internal.utils.currentArch
 import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
+import org.jetbrains.compose.test.utils.ChecksWrapper
 import org.jetbrains.compose.test.utils.GradlePluginTestBase
 import org.jetbrains.compose.test.utils.JDK_11_BYTECODE_VERSION
 import org.jetbrains.compose.test.utils.ProcessRunResult
@@ -363,6 +364,77 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 val expectedInfoPlistNormalized = expectedInfoPlist.readText().normalized()
                 Assert.assertEquals(actualInfoPlistNormalized, expectedInfoPlistNormalized)
             }
+        }
+    }
+
+    @Test
+    fun testMacLayeredIcon() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+
+        with(testProject("application/macLayeredIcon")) {
+            val supportedString = "compile mac assets is starting, supported actool version:"
+
+            fun ChecksWrapper.checkContent(buildDir: String) {
+                if (check.log.contains(supportedString)) {
+                    val targetAssetsFile = file("${buildDir}/Test Layered Icon.app/Contents/Resources/Assets.car")
+                    targetAssetsFile.checkExists()
+                } else {
+                    Assert.assertTrue(check.log.contains("Can not compile layered icon:"))
+                }
+            }
+
+            gradle(":packageDistributionForCurrentOS").checks {
+                checkContent(buildDir = "build/compose/binaries/main/app")
+            }
+            gradle(":createDistributableNativeDebugMacosX64").checks {
+                checkContent(buildDir = "build/compose/binaries/main/native-macosX64-debug-app-image")
+            }
+        }
+    }
+
+    @Test
+    fun testMacLayeredIconRemove() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+
+        with(testProject("application/macLayeredIcon")) {
+            val supportedString = "compile mac assets is starting, supported actool version:"
+            val unSupportedString = "Can not compile layered icon:"
+
+            fun ChecksWrapper.checkContent(buildDir: String, hasLayeredIcon: Boolean = true) {
+                if (hasLayeredIcon) {
+                    if (check.log.contains(supportedString)) {
+                        val targetAssetsFile =
+                            file("${buildDir}/Test Layered Icon.app/Contents/Resources/Assets.car")
+                        targetAssetsFile.checkExists()
+                    } else {
+                        Assert.assertTrue(check.log.contains(unSupportedString))
+                    }
+                } else {
+                    val targetAssetsFile =
+                        file("${buildDir}/Test Layered Icon.app/Contents/Resources/Assets.car")
+                    targetAssetsFile.checkNotExists()
+                    Assert.assertTrue(!check.log.contains(supportedString) && !check.log.contains(unSupportedString))
+                }
+            }
+
+            gradle(":packageDistributionForCurrentOS").checks {
+                checkContent(buildDir = "build/compose/binaries/main/app")
+            }
+            gradle(":createDistributableNativeDebugMacosX64").checks {
+                checkContent(buildDir = "build/compose/binaries/main/native-macosX64-debug-app-image")
+            }
+
+            file("build.gradle.kts").modify {
+                it.replace("layeredIconDir.set(project.file(\"subdir/kotlin_icon_big.icon\"))", "")
+            }
+
+            gradle(":packageDistributionForCurrentOS").checks {
+                checkContent(buildDir = "build/compose/binaries/main/app", hasLayeredIcon = false)
+            }
+            gradle(":createDistributableNativeDebugMacosX64").checks {
+                checkContent(buildDir = "build/compose/binaries/main/native-macosX64-debug-app-image", hasLayeredIcon = false)
+            }
+
         }
     }
 
