@@ -58,7 +58,7 @@
                 </executions>
                 <configuration>
                     <args>
-                        <arg>-Xplugin=${user.home}/.m2/repository/org/jetbrains/kotlin/kotlin-compose-compiler-plugin/${kotlin.version}/kotlin-compose-compiler-plugin-${kotlin.version}.jar</arg>
+                        <arg>-Xplugin=${user.home}/.m2/repository/org/jetbrains/kotlin/kotlin-compose-compiler-plugin-embeddable/${kotlin.version}/kotlin-compose-compiler-plugin-embeddable-${kotlin.version}.jar</arg>
                     </args>
                 </configuration>
             </plugin>
@@ -187,7 +187,7 @@
 
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-compose-compiler-plugin</artifactId>
+            <artifactId>kotlin-compose-compiler-plugin-embeddable</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
     </dependencies>
