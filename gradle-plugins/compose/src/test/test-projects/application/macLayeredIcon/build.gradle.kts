@@ -8,19 +8,6 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-val extraInfoPlistKeys = """
-    <key>CFBundleURLTypes</key>
-    <array>
-      <dict>
-        <key>CFBundleURLName</key>
-        <string>Example URL</string>
-        <key>CFBundleURLSchemes</key>
-        <array>
-          <string>exampleUrl</string>
-        </array>
-      </dict>
-    </array>"""
-
 kotlin {
 
     jvm()
@@ -70,9 +57,6 @@ compose.desktop {
             macOS {
                 dockName = "CustomDockName"
                 minimumSystemVersion = "12.0"
-                infoPlist {
-                    extraKeysRawXml = extraInfoPlistKeys
-                }
                 iconFile.set(project.file("subdir/Kotlin_icon_big.icns"))
                 layeredIconDir.set(project.file("subdir/kotlin_icon_big.icon"))
             }
