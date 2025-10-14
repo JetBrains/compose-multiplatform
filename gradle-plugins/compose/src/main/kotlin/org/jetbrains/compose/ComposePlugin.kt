@@ -113,6 +113,10 @@ abstract class ComposePlugin : Plugin<Project> {
 
     object CommonComponentsDependencies {
         val resources = composeDependency("org.jetbrains.compose.components:components-resources")
+        @Deprecated(
+            "Use org.jetbrains.compose.ui:ui-tooling-preview module instead",
+            ReplaceWith("compose.preview")
+        )
         val uiToolingPreview = composeDependency("org.jetbrains.compose.components:components-ui-tooling-preview")
     }
 
