@@ -6,7 +6,7 @@ _Changes since 1.9.0_
 
 ### Multiple Platforms
 
-- `compose.material3` alias from Gradle plugin now points to `org.jetbrains.compose.material3:material3:1.9.0` (based on Jetpack Compose `1.4.0`), it was `org.jetbrains.compose.material3:material3:1.8.2` (based on Jetpack Compose `1.3.2`) in Compose Multiplatform `1.9.0`. If you want to stay on the same minor version, replace the alias by an explicit dependency: [#5441](https://github.com/JetBrains/compose-multiplatform/pull/5441)
+- `compose.material3` alias from Gradle plugin now points to `org.jetbrains.compose.material3:material3:1.9.0` (based on Jetpack Compose Material3 `1.4.0`), it was `org.jetbrains.compose.material3:material3:1.8.2` (based on Jetpack Compose Material3 `1.3.2`) in Compose Multiplatform `1.9.0`. If you want to stay on the same minor version, replace the alias by an explicit dependency: [#5441](https://github.com/JetBrains/compose-multiplatform/pull/5441)
 
   ```
   // was
