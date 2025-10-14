@@ -8,16 +8,17 @@ repositories {
 }
 
 group = "org.jetbrains.compose"
-version = "2025.10.00"
+version = "2025.10.01"
 
 catalog {
   versionCatalog {
     // versions
-    version("compose", "1.9.0")
-    version("material3", "1.9.0-beta06")
-    version("lifecycle", "2.9.4")
-    version("navigation", "2.9.0")
-    version("savedstate", "1.3.4")
+    version("compose", "1.9.1")
+    version("material3", "1.9.0")
+    version("material3-navigation", "1.9.1")
+    version("lifecycle", "2.9.5")
+    version("navigation", "2.9.1")
+    version("savedstate", "1.3.5")
     version("window", "1.4.0")
 
     // libraries
@@ -74,11 +75,11 @@ catalog {
     library("ui-util", "org.jetbrains.compose.ui", "ui-util").versionRef("compose")
 
     library("material3", "org.jetbrains.compose.material3", "material3").versionRef("material3")
-    library("material3-adaptive-navigation-suite", "org.jetbrains.compose.material3", "material3-adaptive-navigation-suite").versionRef("material3")
+    library("material3-adaptive-navigation-suite", "org.jetbrains.compose.material3", "material3-adaptive-navigation-suite").versionRef("material3-navigation")
     library("material3-window-sizeclass", "org.jetbrains.compose.material3", "material3-window-size-class").versionRef("material3")
     library("material3-adaptive", "org.jetbrains.compose.material3.adaptive", "adaptive").versionRef("material3")
     library("material3-adaptive-layout", "org.jetbrains.compose.material3.adaptive", "adaptive-layout").versionRef("material3")
-    library("material3-adaptive-navigation", "org.jetbrains.compose.material3.adaptive", "adaptive-navigation").versionRef("material3")
+    library("material3-adaptive-navigation", "org.jetbrains.compose.material3.adaptive", "adaptive-navigation").versionRef("material3-navigation")
 
     library("lifecycle-common", "org.jetbrains.androidx.lifecycle", "lifecycle-common").versionRef("lifecycle")
     library("lifecycle-runtime", "org.jetbrains.androidx.lifecycle", "lifecycle-runtime").versionRef("lifecycle")
