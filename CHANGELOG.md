@@ -1,3 +1,52 @@
+# 1.9.1 (October 2025)
+
+_Changes since 1.9.0_
+
+## Migration Notes
+
+### Multiple Platforms
+
+- `compose.material3` alias from Gradle plugin now points to `org.jetbrains.compose.material3:material3:1.9.0` (based on Jetpack Compose `1.4.0`), it was `org.jetbrains.compose.material3:material3:1.8.2` (based on Jetpack Compose `1.3.2`) in Compose Multiplatform `1.9.0`. If you want to stay on the same minor version, replace the alias by an explicit dependency: [#5441](https://github.com/JetBrains/compose-multiplatform/pull/5441)
+
+  ```
+  // was
+  implementation(compose.material3)
+  
+  // replace by
+  implementation("org.jetbrains.compose.material3:material3:1.8.2")
+  ```
+
+## Fixes
+
+### iOS
+
+- Add ability to reach internal accessibility elements inside accessibility nodes [#2416](https://github.com/JetBrains/compose-multiplatform-core/pull/2416)
+- Fix input session restarts triggered by `PlatformImeOptionsImpl` not being `@Immutable` [#2413](https://github.com/JetBrains/compose-multiplatform-core/pull/2413)
+- Fix crash when removing characters after string replacement [#2361](https://github.com/JetBrains/compose-multiplatform-core/pull/2361)
+- Fix context menu appearance for text fields with transformation [#2377](https://github.com/JetBrains/compose-multiplatform-core/pull/2377)
+
+### Desktop
+
+- `ComposePanel` can now re-dispatch unconsumed mouse wheel events, allowing scrollable components beneath to be scrolled. To enable this behavior, set the system property `"compose.swing.redispatchMouseWheelEvents"` to `"true"` [#2438](https://github.com/JetBrains/compose-multiplatform-core/pull/2438)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.9.1`. Based on Jetpack Compose libraries:
+  - [Runtime 1.9.3](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.9.3)
+  - [UI 1.9.3](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.9.3)
+  - [Foundation 1.9.3](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.9.3)
+  - [Material 1.9.3](https://developer.android.com/jetpack/androidx/releases/compose-material#1.9.3)
+  - [Material3 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0)
+
+- Compose Material3 libraries `org.jetbrains.compose.material3:material3*:1.9.0`. Based on [Jetpack Compose Material3 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0)
+- Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-alpha05`. Based on [Jetpack Compose Material3 Adaptive 1.2.0-alpha10](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-alpha10)
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.5`. Based on [Jetpack Lifecycle 2.9.4](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.4)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.1`. Based on [Jetpack Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4)
+- Savedstate library `org.jetbrains.androidx.savedstate:savedstate:1.3.5`. Based on [Jetpack Savedstate 1.3.3](https://developer.android.com/jetpack/androidx/releases/savedstate#1.3.3)
+- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.4.0`. Based on [Jetpack WindowManager 1.4.0](https://developer.android.com/jetpack/androidx/releases/window#1.4.0)
+
+---
+
 # 1.10.0-alpha02 (October 2025)
 
 _Changes since 1.10.0-alpha01_
