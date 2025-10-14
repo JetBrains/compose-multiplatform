@@ -20,4 +20,9 @@ package org.jetbrains.compose.ui.tooling.preview
  * Interface to be implemented by any provider of values that you want to be injected as @[Preview]
  * parameters. This allows providing sample information for previews.
  */
+@Deprecated(
+    "Use androidx.compose.ui.tooling.preview.PreviewParameterProvider from " +
+            "org.jetbrains.compose.ui:ui-tooling-preview module instead",
+    ReplaceWith("PreviewParameterProvider", "androidx.compose.ui.tooling.preview.PreviewParameterProvider")
+)
 actual typealias PreviewParameterProvider<T> = androidx.compose.ui.tooling.preview.PreviewParameterProvider<T>
