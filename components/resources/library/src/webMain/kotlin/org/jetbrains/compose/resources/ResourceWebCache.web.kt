@@ -1,11 +1,17 @@
 package org.jetbrains.compose.resources
 
 import kotlinx.browser.window
-import kotlinx.coroutines.await
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.w3c.fetch.Response
 import org.w3c.workers.Cache
+import org.w3c.workers.CacheQueryOptions
+import kotlin.coroutines.resumeWithException
+import kotlin.js.ExperimentalWasmJsInterop
+import kotlin.js.JsAny
+import kotlin.js.Promise
+import kotlin.js.asJsException
 
 /**
  * We use [Cache] and [org.w3c.dom.WindowSessionStorage] APIs to cache the successful strings.cvr responses.
@@ -20,7 +26,8 @@ import org.w3c.workers.Cache
  * NOTE: due to unavailability of k/js + k/wasm shared w3c API,
  * we duplicate this implementation between k/js and k/wasm with minor differences.
  */
-internal object JsResourceWebCache {
+@OptIn(ExperimentalWasmJsInterop::class)
+internal object ResourceWebCache {
     // This cache will be shared between all Compose instances (independent ComposeViewport) in the same session
     private const val CACHE_NAME = "compose_web_resources_cache"
 
@@ -43,11 +50,11 @@ internal object JsResourceWebCache {
             }
         }
 
-
         val mutex = mutexes.getOrPut(path) { Mutex() }
+
         return mutex.withLock {
             val cache = window.caches.open(CACHE_NAME).await()
-            val response = cache.match(path).await() as Response?
+            val response = (cache.match(path, CacheQueryOptions()) as Promise<Response?>).await()
 
             response?.clone() ?: onNoCacheHit(path).also {
                 if (it.ok) {
@@ -67,4 +74,12 @@ internal object JsResourceWebCache {
     private fun isNewSession(): Boolean {
         return window.sessionStorage.getItem(CACHE_NAME) == null
     }
+}
+
+@OptIn(ExperimentalWasmJsInterop::class)
+private suspend fun <R : JsAny?> Promise<R>.await(): R = suspendCancellableCoroutine { continuation ->
+    this.then(
+        onFulfilled = { continuation.resumeWith(Result.success(it)); null },
+        onRejected = { continuation.resumeWithException(it.asJsException()); null }
+    )
 }

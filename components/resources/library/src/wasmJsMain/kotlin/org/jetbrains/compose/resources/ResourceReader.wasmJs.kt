@@ -30,6 +30,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader {
 }
 
 @ExperimentalResourceApi
+@OptIn(ExperimentalWasmJsInterop::class)
 internal object DefaultWasmResourceReader : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         return readAsBlob(path).asByteArray()
@@ -41,7 +42,7 @@ internal object DefaultWasmResourceReader : ResourceReader {
     }
 
     override suspend fun readStringItem(path: String, offset: Long, size: Long): ByteArray {
-        val res = WasmResourceWebCache.load(path) {
+        val res = ResourceWebCache.load(path) {
             window.fetch(path).await()
         }
         if (!res.ok) {

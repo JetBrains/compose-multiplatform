@@ -5,6 +5,7 @@ import kotlinx.coroutines.await
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.Uint8Array
+import org.w3c.fetch.Response
 import org.w3c.files.Blob
 import org.w3c.xhr.XMLHttpRequest
 import kotlin.js.Promise
@@ -27,8 +28,8 @@ internal object DefaultJsResourceReader : ResourceReader {
     }
 
     override suspend fun readStringItem(path: String, offset: Long, size: Long): ByteArray {
-        val res = JsResourceWebCache.load(path) {
-            window.fetch(path).await()
+        val res = ResourceWebCache.load(path) {
+            js("window.fetch(path)").unsafeCast<Promise<Response>>().await()
         }
         if (!res.ok) {
             throw MissingResourceException(path)
@@ -43,7 +44,7 @@ internal object DefaultJsResourceReader : ResourceReader {
 
     private suspend fun readAsBlob(path: String): Blob {
         val resPath = WebResourcesConfiguration.getResourcePath(path)
-        val response = window.fetch(resPath).await()
+        val response = js("window.fetch(resPath)").unsafeCast<Promise<Response>>().await()
         if (!response.ok) {
             throw MissingResourceException(resPath)
         }
