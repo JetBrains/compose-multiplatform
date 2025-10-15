@@ -31,4 +31,4 @@ dependencyResolutionManagement {
         mavenLocal()
     }
 }
-rootProject.name = "hotReload"
+rootProject.name = "nonJvm"

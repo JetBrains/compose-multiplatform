@@ -15,15 +15,10 @@ kotlin {
     jvm()
     sourceSets {
         jvmMain {
-            dependsOn(commonMain)
-
             dependencies {
                 implementation(compose.desktop.currentOs)
             }
         }
-    }
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
     }
 }
 
@@ -40,30 +35,5 @@ android {
 compose.desktop {
     application {
         mainClass = "MainKt"
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-
-            packageVersion = "1.0.0"
-            packageName = "TestPackage"
-            description = "Test description"
-            copyright = "Test Copyright Holder"
-            vendor = "Test Vendor"
-
-            linux {
-                shortcut = true
-                packageName = "test-package"
-                debMaintainer = "example@example.com"
-                menuGroup = "menu-group"
-            }
-            windows {
-                console = true
-                dirChooser = true
-                perUserInstall = true
-                shortcut = true
-                menu = true
-                menuGroup = "compose"
-                upgradeUuid = "2d6ff464-75be-40ad-a256-56420b9cc374"
-            }
-        }
     }
 }

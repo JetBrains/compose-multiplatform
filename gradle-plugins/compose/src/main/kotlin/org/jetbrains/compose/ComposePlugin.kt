@@ -64,8 +64,6 @@ abstract class ComposePlugin : Plugin<Project> {
                 project.configureExperimentalTargetsFlagsCheck(mppExt)
             }
         }
-
-        project.pluginManager.apply("org.jetbrains.compose.hot-reload")
     }
 
     @Suppress("DEPRECATION")
