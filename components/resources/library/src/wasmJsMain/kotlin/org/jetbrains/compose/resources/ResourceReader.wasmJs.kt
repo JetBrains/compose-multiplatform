@@ -41,16 +41,6 @@ internal object DefaultWasmResourceReader : ResourceReader {
         return part.asByteArray()
     }
 
-    override suspend fun readStringItem(path: String, offset: Long, size: Long): ByteArray {
-        val res = ResourceWebCache.load(path) {
-            window.fetch(path).await()
-        }
-        if (!res.ok) {
-            throw MissingResourceException(path)
-        }
-        return res.blob().await<Blob>().slice(offset.toInt(), (offset + size).toInt()).asByteArray()
-    }
-
     override fun getUri(path: String): String {
         val location = window.location
         return getResourceUrl(location.origin, location.pathname, path)
@@ -58,7 +48,9 @@ internal object DefaultWasmResourceReader : ResourceReader {
 
     private suspend fun readAsBlob(path: String): Blob {
         val resPath = WebResourcesConfiguration.getResourcePath(path)
-        val response = window.fetch(resPath).await<Response>()
+        val response = ResourceWebCache.load(resPath) {
+            window.fetch(resPath).await()
+        }
         if (!response.ok) {
             throw MissingResourceException(resPath)
         }

@@ -14,17 +14,12 @@ import kotlin.js.Promise
 import kotlin.js.asJsException
 
 /**
- * We use [Cache] and [org.w3c.dom.WindowSessionStorage] APIs to cache the successful strings.cvr responses.
+ * We use [Cache] APIs to cache the successful strings.cvr and other responses.
  * We can't rely on the default browser cache because it makes http requests to check if the cached value is not expired,
  * which may take long if the connection is slow.
  *
- * With session storage, we avoid resetting the cache on page refresh.
- * The cache is reset only when a tab is re-opened.
- * TODO: Do we need to provide a way to reset the cache on the user side?
- * (it's already possible, but relying on the implementation details such as CACHE_NAME value)
- *
- * NOTE: due to unavailability of k/js + k/wasm shared w3c API,
- * we duplicate this implementation between k/js and k/wasm with minor differences.
+ * Cache limits:
+ * https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria#other_web_technologies
  */
 @OptIn(ExperimentalWasmJsInterop::class)
 internal object ResourceWebCache {
@@ -45,6 +40,7 @@ internal object ResourceWebCache {
                 // Checking isNewSession() again in case it was just changed by another load request.
                 // I avoid wrapping withLock in if (isNewSession()) check to avoid unnecessary locking on every load request
                 if (isNewSession()) {
+                    sessionStarted = true
                     resetCache()
                 }
             }
@@ -68,11 +64,14 @@ internal object ResourceWebCache {
 
     suspend fun resetCache() {
         window.caches.delete(CACHE_NAME).await()
-        window.sessionStorage.setItem(CACHE_NAME, "1")
     }
 
+    // In this case it's not true session as browsers mean it.
+    // Here a new session is created on every page refresh.
+    private var sessionStarted = false
+
     private fun isNewSession(): Boolean {
-        return window.sessionStorage.getItem(CACHE_NAME) == null
+        return !sessionStarted
     }
 }
 

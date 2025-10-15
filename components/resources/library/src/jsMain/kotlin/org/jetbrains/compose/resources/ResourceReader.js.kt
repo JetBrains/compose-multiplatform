@@ -5,9 +5,6 @@ import kotlinx.coroutines.await
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.Uint8Array
-import org.w3c.fetch.NO_CACHE
-import org.w3c.fetch.RequestCache
-import org.w3c.fetch.RequestInit
 import org.w3c.fetch.Response
 import org.w3c.files.Blob
 import org.w3c.xhr.XMLHttpRequest
@@ -30,17 +27,6 @@ internal object DefaultJsResourceReader : ResourceReader {
         return part.asByteArray()
     }
 
-    override suspend fun readStringItem(path: String, offset: Long, size: Long): ByteArray {
-        val res = ResourceWebCache.load(path) {
-            // TODO: avoid js(...) calls here after https://github.com/Kotlin/kotlinx-browser/issues/24
-            js("window.fetch(path)").unsafeCast<Promise<Response>>().await()
-        }
-        if (!res.ok) {
-            throw MissingResourceException(path)
-        }
-        return res.blob().await().slice(offset.toInt(), (offset + size).toInt()).asByteArray()
-    }
-
     override fun getUri(path: String): String {
         val location = window.location
         return getResourceUrl(location.origin, location.pathname, path)
@@ -48,8 +34,10 @@ internal object DefaultJsResourceReader : ResourceReader {
 
     private suspend fun readAsBlob(path: String): Blob {
         val resPath = WebResourcesConfiguration.getResourcePath(path)
-        // TODO: avoid js(...) calls here after https://github.com/Kotlin/kotlinx-browser/issues/24
-        val response = js("window.fetch(resPath)").unsafeCast<Promise<Response>>().await()
+        val response =  ResourceWebCache.load(resPath) {
+            // TODO: avoid js(...) calls here after https://github.com/Kotlin/kotlinx-browser/issues/24
+            js("window.fetch(resPath)").unsafeCast<Promise<Response>>().await()
+        }
         if (!response.ok) {
             throw MissingResourceException(resPath)
         }

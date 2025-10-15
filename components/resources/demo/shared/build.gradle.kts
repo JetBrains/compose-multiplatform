@@ -69,6 +69,10 @@ kotlin {
             nativeMain.get().dependsOn(this)
             jsMain.get().dependsOn(this)
         }
+
+        webMain.dependencies {
+            implementation(libs.kotlinx.browser)
+        }
     }
 }
 

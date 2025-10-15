@@ -23,7 +23,7 @@ internal suspend fun getStringItem(
 ): StringItem = stringItemsCache.getOrLoad(
     key = "${resourceItem.path}/${resourceItem.offset}-${resourceItem.size}"
 ) {
-    val record = resourceReader.readStringItem(
+    val record = resourceReader.readPart(
         path = resourceItem.path,
         offset = resourceItem.offset,
         size = resourceItem.size,
