@@ -5,7 +5,6 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.compose.ComposeBuildConfig
 import org.jetbrains.compose.test.utils.GradlePluginTestBase
 import org.jetbrains.compose.test.utils.checks
-import org.jetbrains.compose.test.utils.modify
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.fail
 import org.junit.jupiter.api.Test
@@ -14,17 +13,22 @@ import kotlin.concurrent.thread
 class HotReloadTest : GradlePluginTestBase() {
     @Test
     fun smokeTestHotRunTask() = with(testProject("application/jvm")) {
-        file("build.gradle").modify {
-            it + """
-                afterEvaluate {
-                    tasks.getByName("hotRun").doFirst {
-                        throw new StopExecutionException("Skip hotRun task")
-                    }
-                }
-            """.trimIndent()
+        gradle("hotRun", "--dry-run").checks {
+            check.logContains(":hotRun")
         }
-        gradle("hotRun").checks {
-            check.taskSuccessful(":hotRun")
+    }
+
+    @Test
+    fun testDisableHotReload() = with(testProject("application/jvm")) {
+        gradleFailure("hotRun", "-Porg.jetbrains.compose.hot.reload.disable=true").checks {
+            check.logContains("Task 'hotRun' not found")
+        }
+    }
+
+    @Test
+    fun testNonJvmProject() = with(testProject("application/nonJvm")) {
+        gradleFailure("hotRun").checks {
+            check.logContains("Task 'hotRun' not found")
         }
     }
 
@@ -77,18 +81,22 @@ class HotReloadTest : GradlePluginTestBase() {
     fun testExternalHotReload() = with(testProject("application/mpp")) {
         val externalHotReloadVersion = "1.0.0-beta04"
         modifyText("settings.gradle") {
+            //  Set the explicit version of Compose Hot Reload in the "pluginManagement {" block
             it.replace(
-                "plugins {", "plugins {\n" +
-                        """
-                        id 'org.jetbrains.compose.hot-reload' version '$externalHotReloadVersion'
+                "plugins {",
+                """
+                         plugins {
+                             id 'org.jetbrains.compose.hot-reload' version '$externalHotReloadVersion'
                 """.trimIndent()
             )
         }
         modifyText("build.gradle") {
+            //  Apply hot reload plugin explicitly
             it.replace(
-                "plugins {", "plugins {\n" +
-                        """
-                        id "org.jetbrains.compose.hot-reload"
+                "plugins {",
+                """
+                        plugins {
+                            id "org.jetbrains.compose.hot-reload"
                 """.trimIndent()
             )
         }
