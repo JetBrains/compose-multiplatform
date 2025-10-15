@@ -76,6 +76,8 @@ internal object ResourceWebCache {
     }
 }
 
+// Promise.await is not yet available in webMain: https://github.com/Kotlin/kotlinx.coroutines/issues/4544
+// TODO(o.karpovich): get rid of this function, when kotlinx-coroutines provide Promise.await in webMain out of a box
 @OptIn(ExperimentalWasmJsInterop::class)
 private suspend fun <R : JsAny?> Promise<R>.await(): R = suspendCancellableCoroutine { continuation ->
     this.then(
