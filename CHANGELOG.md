@@ -12,12 +12,15 @@ _Changes since 1.10.0-alpha02_
 
 ### Multiple Platforms
 
-- Deprecate `androidx.compose.desktop.ui.tooling.preview.Preview` annotation in favor of `androidx.compose.ui.tooling.preview.Preview` [#2474](https://github.com/JetBrains/compose-multiplatform-core/pull/2474)
 - Deprecate `org.jetbrains.compose.ui.tooling.preview.Preview` annotation in favor of `androidx.compose.ui.tooling.preview.Preview` to reduce variety of Preview annotations [#5453](https://github.com/JetBrains/compose-multiplatform/pull/5453)
 
 ### iOS
 
 - Remove experimental annotation from `LocalUIView` [#2478](https://github.com/JetBrains/compose-multiplatform-core/pull/2478)
+
+### Desktop
+
+- Deprecate `androidx.compose.desktop.ui.tooling.preview.Preview` annotation in favor of `androidx.compose.ui.tooling.preview.Preview` to reduce variety of Preview annotations [#2474](https://github.com/JetBrains/compose-multiplatform-core/pull/2474)
 
 ## Features
 
