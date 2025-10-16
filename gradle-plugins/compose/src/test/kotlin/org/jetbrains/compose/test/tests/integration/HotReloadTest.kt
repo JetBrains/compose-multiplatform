@@ -105,5 +105,7 @@ class HotReloadTest : GradlePluginTestBase() {
             check.logContains("Compose Hot Reload ($externalHotReloadVersion)")
             check.logContains("Kotlin MPP app is running!")
         }
+        // wait for java process to complete
+        Thread.sleep(1000)
     }
 }
