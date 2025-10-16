@@ -587,18 +587,9 @@ class ResourcesTest : GradlePluginTestBase() {
 
     @Test
     fun testGeneratedAccessorsAnnotatedWithResourceContentHash(): Unit = with(testProject("misc/commonResources")) {
-        file("build.gradle.kts").appendText(
-            """
-                tasks.configureEach {  
-                    if (this is org.jetbrains.compose.resources.ResourceAccessorsConfiguration) {
-                        generateResourceContentHashAnnotation.set(true)
-                    }
-                }    
-        """.trimIndent()
-        )
-
+        val disabaleProperty = ComposeProperties.DISABLE_RESOURCE_CONTENT_HASH_GENERATION
         //check generated resource's accessors
-        gradle("prepareKotlinIdeaImport").checks {
+        gradle("prepareKotlinIdeaImport", "-P$disabaleProperty=false").checks {
             val expected = if (System.getProperty("os.name").lowercase().contains("windows")) {
                 // Windows has different line endings in comparison with Unixes,
                 // thus the XML resource files differ and produce different content hashes,
@@ -607,6 +598,15 @@ class ResourcesTest : GradlePluginTestBase() {
             } else {
                 file("expected-with-hash")
             }
+
+            assertDirectoriesContentEquals(
+                file("build/generated/compose/resourceGenerator/kotlin"),
+                expected
+            )
+        }
+
+        gradle("prepareKotlinIdeaImport", "-P$disabaleProperty=true").checks {
+            val expected = file("expected")
 
             assertDirectoriesContentEquals(
                 file("build/generated/compose/resourceGenerator/kotlin"),
