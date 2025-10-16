@@ -1,3 +1,4 @@
+@file:JsFileName("cssColor")
 @file:Suppress("unused", "MemberVisibilityCanBePrivate")
 
 package org.jetbrains.compose.web.css
