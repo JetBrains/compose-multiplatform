@@ -149,6 +149,9 @@ kotlin {
         }
         val webMain by getting {
             dependsOn(skikoMain)
+            dependencies {
+                 implementation(libs.kotlinx.browser)
+            }
         }
         val jsMain by getting {
             dependsOn(webMain)

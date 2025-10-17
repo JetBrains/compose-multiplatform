@@ -30,6 +30,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader {
 }
 
 @ExperimentalResourceApi
+@OptIn(ExperimentalWasmJsInterop::class)
 internal object DefaultWasmResourceReader : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         return readAsBlob(path).asByteArray()
@@ -47,7 +48,9 @@ internal object DefaultWasmResourceReader : ResourceReader {
 
     private suspend fun readAsBlob(path: String): Blob {
         val resPath = WebResourcesConfiguration.getResourcePath(path)
-        val response = window.fetch(resPath).await<Response>()
+        val response = ResourceWebCache.load(resPath) {
+            window.fetch(resPath).await()
+        }
         if (!response.ok) {
             throw MissingResourceException(resPath)
         }

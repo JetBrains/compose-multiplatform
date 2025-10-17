@@ -24,9 +24,9 @@ internal suspend fun getStringItem(
     key = "${resourceItem.path}/${resourceItem.offset}-${resourceItem.size}"
 ) {
     val record = resourceReader.readPart(
-        resourceItem.path,
-        resourceItem.offset,
-        resourceItem.size
+        path = resourceItem.path,
+        offset = resourceItem.offset,
+        size = resourceItem.size,
     ).decodeToString()
     val recordItems = record.split('|')
     val recordType = recordItems.first()
