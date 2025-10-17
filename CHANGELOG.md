@@ -2,16 +2,11 @@
 
 _Changes since 1.10.0-alpha02_
 
-## Breaking Changes
-
-### Multiple Platforms
-
-- _(prerelease fix)_ Disabled the new text context menus until they are fully supported [#2466](https://github.com/JetBrains/compose-multiplatform-core/pull/2466)
-
 ## Migration Notes
 
 ### Multiple Platforms
 
+- _(prerelease fix)_ Disabled (by default) the new text context menus until they are fully supported. You can enable them by setting `ComposeFoundationFlags.isNewContextMenuEnabled = true` [#2466](https://github.com/JetBrains/compose-multiplatform-core/pull/2466)
 - Deprecate `org.jetbrains.compose.ui.tooling.preview.Preview` annotation in favor of `androidx.compose.ui.tooling.preview.Preview` to reduce variety of Preview annotations [#5453](https://github.com/JetBrains/compose-multiplatform/pull/5453)
 
 ### iOS
@@ -45,7 +40,7 @@ _Changes since 1.10.0-alpha02_
 
 ### Web
 
-- Removed an outline on a Canvas element when it's focused [#2450](https://github.com/JetBrains/compose-multiplatform-core/pull/2450)
+- Removed an outline on a `Canvas` element when it's focused [#2450](https://github.com/JetBrains/compose-multiplatform-core/pull/2450)
 - Fix focus with Tab behaviour in Text Fields [#2452](https://github.com/JetBrains/compose-multiplatform-core/pull/2452)
 - Mobile. Composite input. When a syllable block is created, a new block is added instead of replacing the old one [#2454](https://github.com/JetBrains/compose-multiplatform-core/pull/2454)
 
@@ -72,6 +67,7 @@ _Changes since 1.10.0-alpha02_
 - Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-beta01`. Based on [Jetpack Compose Material3 Adaptive 1.2.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-rc01)
 - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.10.0-alpha03`. Based on [Jetpack Lifecycle 2.10.0-alpha05](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.10.0-alpha05)
 - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.1`. Based on [Jetpack Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4)
+- Navigation 3 libraries `org.jetbrains.androidx.navigation:navigation3-*:1.0.0-alpha03`. Based on [Jetpack Navigation 3](https://developer.android.com/jetpack/androidx/releases/navigation3#1.0.0-alpha11)
 - Navigation Event library `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.0.0-alpha02`. Based on [Jetpack Navigation Event 1.0.0-beta01](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.0.0-beta01)
 - Savedstate library `org.jetbrains.androidx.savedstate:savedstate:1.4.0-alpha03`. Based on [Jetpack Savedstate 1.4.0-beta01](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0-beta01)
 - WindowManager Core library `org.jetbrains.androidx.window:window-core:1.5.0-beta01`. Based on [Jetpack WindowManager 1.5.0](https://developer.android.com/jetpack/androidx/releases/window#1.5.0)
