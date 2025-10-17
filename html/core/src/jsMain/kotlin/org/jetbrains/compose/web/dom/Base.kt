@@ -67,8 +67,9 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
 
                 val style = node.unsafeCast<ElementCSSInlineStyle>().style
 
-                styleApplier.properties.forEach { (name, value) ->
-                    style.setProperty(name, value.toString())
+                styleApplier.properties.forEach { (name, value, important) ->
+                    if (important) error("important")
+                    style.setProperty(name, value.toString(), if (important) "important" else "")
                 }
 
                 styleApplier.variables.forEach { (name, value) ->
