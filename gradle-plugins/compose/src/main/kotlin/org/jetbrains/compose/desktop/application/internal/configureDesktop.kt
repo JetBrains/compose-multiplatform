@@ -24,4 +24,6 @@ internal fun configureDesktop(project: Project, desktopExtension: DesktopExtensi
         ) {}
         configureNativeApplication(project, desktopExtension.nativeApplication, unpackDefaultResources)
     }
+
+    project.configureHotReload()
 }

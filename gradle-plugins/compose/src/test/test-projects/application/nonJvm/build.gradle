@@ -1,0 +1,23 @@
+plugins {
+    id "com.android.application"
+    id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.kotlin.plugin.compose"
+    id "org.jetbrains.compose"
+}
+
+kotlin {
+    androidTarget()
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+}
+
+android {
+    namespace = "org.jetbrains.compose.testapp"
+    compileSdk = 35
+
+    defaultConfig {
+        minSdk = 23
+        targetSdk = 35
+    }
+}
