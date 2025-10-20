@@ -59,7 +59,7 @@ dependencies {
 
     fun hotReloadDep(dep: Any) {
         // We need to explicitly depend on the Hot Reload Gradle plugin to be able to apply it by id.
-        // Thus, we need to publish the dependency in the resulting pom.xml.
+        // Thus, we need to publish the dependency in the resulting .pom/.module files.
         // Other dependencies are embedded, so we use `shadow` for the publication.
         shadow(dep)
 

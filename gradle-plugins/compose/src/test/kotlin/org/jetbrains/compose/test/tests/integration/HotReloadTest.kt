@@ -12,9 +12,16 @@ import kotlin.concurrent.thread
 
 class HotReloadTest : GradlePluginTestBase() {
     @Test
-    fun smokeTestHotRunTask() = with(testProject("application/jvm")) {
+    fun testHotReloadTaskRegisteredInJvmProject() = with(testProject("application/jvm")) {
         gradle("hotRun", "--dry-run").checks {
-            check.logContains(":hotRun")
+            check.taskSkipped(":hotRun")
+        }
+    }
+
+    @Test
+    fun testHotReloadTaskRegisteredInKmpProject() = with(testProject("application/mpp")) {
+        gradle("hotRunJvm", "--dry-run").checks {
+            check.taskSkipped(":hotRunJvm")
         }
     }
 
