@@ -25,6 +25,10 @@ _Changes since 1.10.0-alpha02_
 
 ## Fixes
 
+### Multiple Platforms
+
+- _(prerelease fix)_ Provide `LocalWindowInfo.current.containerDpSize` value [#2493](https://github.com/JetBrains/compose-multiplatform-core/pull/2493)
+
 ### iOS
 
 - Fix crash when `parallelRendering` is enabled [#2448](https://github.com/JetBrains/compose-multiplatform-core/pull/2448)
@@ -32,6 +36,8 @@ _Changes since 1.10.0-alpha02_
 - Fix crash when dragging two Scrollable components with two fingers [#2456](https://github.com/JetBrains/compose-multiplatform-core/pull/2456)
 - Fix the crash that occurs when the magnifier appears in text fields that are zero size [#2460](https://github.com/JetBrains/compose-multiplatform-core/pull/2460)
 - Fix Lifecycle status updates for multi-window applications using `UIScene` notifications [#2472](https://github.com/JetBrains/compose-multiplatform-core/pull/2472)
+- Support updating of the `WindowInfo.isWindowFocused` property when the window's state changes [#2482](https://github.com/JetBrains/compose-multiplatform-core/pull/2482)
+- Fix the text removal issue when inputting text using dictation [#2488](https://github.com/JetBrains/compose-multiplatform-core/pull/2488)
 
 ### Desktop
 
@@ -49,6 +55,7 @@ _Changes since 1.10.0-alpha02_
 - Fixed an issue where resources were not copied when packaging the macOS native target, causing the application to crash when it attempted to read those resources [#5431](https://github.com/JetBrains/compose-multiplatform/pull/5431)
 - Fixed resources generated code to be reproducible between different machines [#5446](https://github.com/JetBrains/compose-multiplatform/pull/5446)
 - Fix a crash when calling `getString` and the Locale has no region specified [#5447](https://github.com/JetBrains/compose-multiplatform/pull/5447)
+- Use the non-empty font as the default when awaiting a asynchronous request completion on the web [#5456](https://github.com/JetBrains/compose-multiplatform/pull/5456)
 
 ### Navigation
 
