@@ -587,30 +587,18 @@ class ResourcesTest : GradlePluginTestBase() {
 
     @Test
     fun testGeneratedAccessorsAnnotatedWithResourceContentHash(): Unit = with(testProject("misc/commonResources")) {
-        val disabaleProperty = ComposeProperties.DISABLE_RESOURCE_CONTENT_HASH_GENERATION
-        //check generated resource's accessors
-        gradle("prepareKotlinIdeaImport", "-P$disabaleProperty=false").checks {
-            val expected = if (System.getProperty("os.name").lowercase().contains("windows")) {
-                // Windows has different line endings in comparison with Unixes,
-                // thus the XML resource files differ and produce different content hashes,
-                // so we have different test data for it.
-                file("expected-with-hash-windows")
-            } else {
-                file("expected-with-hash")
-            }
-
+        val disableProperty = ComposeProperties.DISABLE_RESOURCE_CONTENT_HASH_GENERATION
+        gradle("prepareKotlinIdeaImport", "-P$disableProperty=false").checks {
             assertDirectoriesContentEquals(
                 file("build/generated/compose/resourceGenerator/kotlin"),
-                expected
+                file("expected-with-hash")
             )
         }
 
-        gradle("prepareKotlinIdeaImport", "-P$disabaleProperty=true").checks {
-            val expected = file("expected")
-
+        gradle("prepareKotlinIdeaImport", "-P$disableProperty=true").checks {
             assertDirectoriesContentEquals(
                 file("build/generated/compose/resourceGenerator/kotlin"),
-                expected
+                file("expected")
             )
         }
     }

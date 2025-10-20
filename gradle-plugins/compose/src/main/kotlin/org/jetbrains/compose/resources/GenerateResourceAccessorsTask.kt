@@ -88,6 +88,21 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
         ).forEach { it.writeTo(kotlinDir) }
     }
 
+    private fun File.resourceContentHash(type: ResourceType): Int {
+        if (System.getProperty("os.name").lowercase().contains("windows") &&
+            (type == ResourceType.DRAWABLE) && path.endsWith(".xml", true)
+        ) {
+            // Windows has different line endings in comparison with Unixes,
+            // thus the vector drawable XML resource files binary differ there, so we need to handle this.
+            return readText().replace("\r\n", "\n").toByteArray().contentHashCode()
+        } else {
+            // Once a new text resource file is introduced, we have to catch it and handle its line endings.
+            check(type == ResourceType.DRAWABLE || type == ResourceType.FONT) { "Cannot calculate content hash for $type resource type!" }
+
+            return readBytes().contentHashCode()
+        }
+    }
+
     private fun File.fileToResourceItems(
         relativeTo: Path
     ): List<ResourceItem>? {
@@ -121,7 +136,7 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
                 qualifiers,
                 file.nameWithoutExtension.asUnderscoredIdentifier(),
                 path,
-                file.readBytes().contentHashCode()
+                file.resourceContentHash(type)
             )
         )
     }
