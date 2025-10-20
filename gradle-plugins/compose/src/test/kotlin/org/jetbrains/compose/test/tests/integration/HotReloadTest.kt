@@ -39,6 +39,13 @@ class HotReloadTest : GradlePluginTestBase() {
         }
     }
 
+    private fun gradleRunnerWorkaround() {
+        // Gradle seems not waiting for spawned processes to complete (see related https://github.com/gradle/gradle/issues/7603).
+        // which block test directory on Windows, and a test may fail because of it.
+        // We use this dirty workaround to handle this.
+        Thread.sleep(1000)
+    }
+
     @Test
     @Disabled("Temporally disabled because it fails on GitHub actions")
     fun testHotReload() = with(testProject("application/hotReload")) {
@@ -82,6 +89,7 @@ class HotReloadTest : GradlePluginTestBase() {
             check.logContains("KMP app is running!")
             check.logContains("Compose Hot Reload (${ComposeBuildConfig.composeHotReloadVersion})")
         }
+        gradleRunnerWorkaround()
     }
 
     @Test
@@ -112,7 +120,6 @@ class HotReloadTest : GradlePluginTestBase() {
             check.logContains("Compose Hot Reload ($externalHotReloadVersion)")
             check.logContains("Kotlin MPP app is running!")
         }
-        // wait for java process to complete
-        Thread.sleep(1000)
+        gradleRunnerWorkaround()
     }
 }
