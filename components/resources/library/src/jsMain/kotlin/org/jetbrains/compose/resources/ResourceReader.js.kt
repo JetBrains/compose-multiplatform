@@ -5,6 +5,7 @@ import kotlinx.coroutines.await
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.Uint8Array
+import org.w3c.fetch.Response
 import org.w3c.files.Blob
 import org.w3c.xhr.XMLHttpRequest
 import kotlin.js.Promise
@@ -33,7 +34,10 @@ internal object DefaultJsResourceReader : ResourceReader {
 
     private suspend fun readAsBlob(path: String): Blob {
         val resPath = WebResourcesConfiguration.getResourcePath(path)
-        val response = window.fetch(resPath).await()
+        val response =  ResourceWebCache.load(resPath) {
+            // TODO: avoid js(...) calls here after https://github.com/Kotlin/kotlinx-browser/issues/24
+            js("window.fetch(resPath)").unsafeCast<Promise<Response>>().await()
+        }
         if (!response.ok) {
             throw MissingResourceException(resPath)
         }
