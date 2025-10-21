@@ -90,10 +90,11 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
 
     private fun File.resourceContentHash(type: ResourceType): Int {
         if (System.getProperty("os.name").lowercase().contains("windows") &&
-            (type == ResourceType.DRAWABLE) && path.endsWith(".xml", true)
+            (type == ResourceType.DRAWABLE) &&
+            (path.endsWith(".xml", true) || path.endsWith(".svg", true))
         ) {
             // Windows has different line endings in comparison with Unixes,
-            // thus the vector drawable XML resource files binary differ there, so we need to handle this.
+            // thus the XML-based resource files binary differ there, so we need to handle this.
             return readText().replace("\r\n", "\n").toByteArray().contentHashCode()
         } else {
             // Once a new text resource file is introduced, we have to catch it and handle its line endings.
