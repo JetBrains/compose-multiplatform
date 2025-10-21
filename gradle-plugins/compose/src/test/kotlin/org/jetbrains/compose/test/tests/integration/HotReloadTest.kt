@@ -3,9 +3,9 @@ package org.jetbrains.compose.test.tests.integration
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.compose.ComposeBuildConfig
+import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.test.utils.GradlePluginTestBase
 import org.jetbrains.compose.test.utils.checks
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.fail
 import org.junit.jupiter.api.Test
 import kotlin.concurrent.thread
@@ -27,7 +27,7 @@ class HotReloadTest : GradlePluginTestBase() {
 
     @Test
     fun testDisableHotReload() = with(testProject("application/jvm")) {
-        gradleFailure("hotRun", "-Porg.jetbrains.compose.hot.reload.disable=true").checks {
+        gradleFailure("hotRun", "-P${ComposeProperties.DISABLE_HOT_RELOAD}=true").checks {
             check.logContains("Task 'hotRun' not found")
         }
     }
@@ -93,7 +93,7 @@ class HotReloadTest : GradlePluginTestBase() {
 
     @Test
     fun testExternalHotReload() = with(testProject("application/mpp")) {
-        val externalHotReloadVersion = "1.0.0-beta04"
+        val externalHotReloadVersion = "1.0.0-rc01"
         modifyText("settings.gradle") {
             //  Set the explicit version of Compose Hot Reload in the "pluginManagement {" block
             it.replace(
