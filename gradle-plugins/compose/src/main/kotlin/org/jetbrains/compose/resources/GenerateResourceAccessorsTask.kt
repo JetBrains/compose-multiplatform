@@ -10,6 +10,8 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.jetbrains.compose.internal.IdeaImportTask
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentOS
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.relativeTo
@@ -88,13 +90,16 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
         ).forEach { it.writeTo(kotlinDir) }
     }
 
+    private fun File.isTextResourceFile(): Boolean =
+        path.endsWith(".xml", true) || path.endsWith(".svg", true)
+
     private fun File.resourceContentHash(type: ResourceType): Int {
-        if (System.getProperty("os.name").lowercase().contains("windows") &&
+        if ((currentOS == OS.Windows) &&
             (type == ResourceType.DRAWABLE) &&
-            (path.endsWith(".xml", true) || path.endsWith(".svg", true))
+            isTextResourceFile()
         ) {
             // Windows has different line endings in comparison with Unixes,
-            // thus the XML-based resource files binary differ there, so we need to handle this.
+            // thus XML-based resource files binary differ there, so we need to handle this.
             return readText().replace("\r\n", "\n").toByteArray().contentHashCode()
         } else {
             // Once a new text resource file is introduced, we have to catch it and handle its line endings.
