@@ -47,11 +47,10 @@ class HotReloadTest : GradlePluginTestBase() {
     }
 
     @Test
-    @Disabled("Temporally disabled because it fails on GitHub actions")
     fun testHotReload() = with(testProject("application/hotReload")) {
         var result: BuildResult? = null
         val hotRunThread = thread {
-            result = gradle("hotRunJvm")
+            result = gradle("hotRunJvm", "-Pcompose.reload.headless=true")
         }
 
         val timeoutMs = 300000L
@@ -115,7 +114,7 @@ class HotReloadTest : GradlePluginTestBase() {
                 """.trimIndent()
             )
         }
-        gradle("hotRunJvm").checks {
+        gradle("hotRunJvm", "-Pcompose.reload.headless=true").checks {
             check.taskSuccessful(":hotRunJvm")
             check.logContains("Compose Hot Reload ($externalHotReloadVersion)")
             check.logContains("Kotlin MPP app is running!")
