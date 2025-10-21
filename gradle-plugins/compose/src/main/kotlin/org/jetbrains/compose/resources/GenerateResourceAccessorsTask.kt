@@ -93,18 +93,12 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     private fun File.isTextResourceFile(): Boolean =
         path.endsWith(".xml", true) || path.endsWith(".svg", true)
 
-    private fun File.resourceContentHash(type: ResourceType): Int {
-        if ((currentOS == OS.Windows) &&
-            (type == ResourceType.DRAWABLE) &&
-            isTextResourceFile()
-        ) {
+    private fun File.resourceContentHash(): Int {
+        if ((currentOS == OS.Windows) && isTextResourceFile()) {
             // Windows has different line endings in comparison with Unixes,
-            // thus XML-based resource files binary differ there, so we need to handle this.
+            // thus text resource files binary differ there, so we need to handle this.
             return readText().replace("\r\n", "\n").toByteArray().contentHashCode()
         } else {
-            // Once a new text resource file is introduced, we have to catch it and handle its line endings.
-            check(type == ResourceType.DRAWABLE || type == ResourceType.FONT) { "Cannot calculate content hash for $type resource type!" }
-
             return readBytes().contentHashCode()
         }
     }
@@ -142,7 +136,7 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
                 qualifiers,
                 file.nameWithoutExtension.asUnderscoredIdentifier(),
                 path,
-                file.resourceContentHash(type)
+                file.resourceContentHash()
             )
         )
     }
