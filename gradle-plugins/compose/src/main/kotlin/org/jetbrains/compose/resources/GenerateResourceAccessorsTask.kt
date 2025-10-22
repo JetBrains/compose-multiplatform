@@ -10,26 +10,13 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.jetbrains.compose.internal.IdeaImportTask
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentOS
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.relativeTo
 
-/**
- * Configuration for resource accessors generation.
- */
-interface ResourceAccessorsConfiguration {
-
-    /**
-     * Property that defines whether to generate `@ResourceContentHash` annotation for resource accessors.
-     *
-     * `@ResourceContentHash` annotation is used to mark resource accessors with the resource content hash.
-     * It can be used by a client to determine if the resource content is changed or not.
-     * By default, the annotation is not generated but the client may override it by setting this property to `true`.
-     */
-    val generateResourceContentHashAnnotation: Property<Boolean>
-}
-
-internal abstract class GenerateResourceAccessorsTask : IdeaImportTask(), ResourceAccessorsConfiguration {
+internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     @get:Input
     abstract val packageName: Property<String>
 
@@ -47,7 +34,7 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask(), Resour
     abstract val makeAccessorsPublic: Property<Boolean>
 
     @get:Input
-    abstract override val generateResourceContentHashAnnotation: Property<Boolean>
+    abstract val disableResourceContentHashGeneration: Property<Boolean>
 
     @get:InputFiles
     @get:SkipWhenEmpty
@@ -56,10 +43,6 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask(), Resour
 
     @get:OutputDirectory
     abstract val codeDir: DirectoryProperty
-
-    init {
-        generateResourceContentHashAnnotation.convention(false)
-    }
 
     override fun safeAction() {
         val kotlinDir = codeDir.get().asFile
@@ -95,7 +78,7 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask(), Resour
         val moduleDirectory = packagingDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
         val resClassName = resClassName.get()
         val isPublic = makeAccessorsPublic.get()
-        val generateResourceContentHashAnnotation = generateResourceContentHashAnnotation.get()
+        val generateResourceContentHashAnnotation = !disableResourceContentHashGeneration.get()
         getAccessorsSpecs(
             resources,
             pkgName,
@@ -105,6 +88,19 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask(), Resour
             isPublic,
             generateResourceContentHashAnnotation
         ).forEach { it.writeTo(kotlinDir) }
+    }
+
+    private fun File.isTextResourceFile(): Boolean =
+        path.endsWith(".xml", true) || path.endsWith(".svg", true)
+
+    private fun File.resourceContentHash(): Int {
+        if ((currentOS == OS.Windows) && isTextResourceFile()) {
+            // Windows has different line endings in comparison with Unixes,
+            // thus text resource files binary differ there, so we need to handle this.
+            return readText().replace("\r\n", "\n").toByteArray().contentHashCode()
+        } else {
+            return readBytes().contentHashCode()
+        }
     }
 
     private fun File.fileToResourceItems(
@@ -140,7 +136,7 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask(), Resour
                 qualifiers,
                 file.nameWithoutExtension.asUnderscoredIdentifier(),
                 path,
-                file.readBytes().contentHashCode()
+                file.resourceContentHash()
             )
         )
     }

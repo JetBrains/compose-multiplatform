@@ -31,6 +31,7 @@ val buildConfig = tasks.register("buildConfig", GenerateBuildConfig::class.java)
     fieldsToGenerate.put("composeVersion", BuildProperties.composeVersion(project))
     fieldsToGenerate.put("composeMaterial3Version", BuildProperties.composeMaterial3Version(project))
     fieldsToGenerate.put("composeGradlePluginVersion", BuildProperties.deployVersion(project))
+    fieldsToGenerate.put("composeHotReloadVersion", libs.plugin.hot.reload.get().version)
 }
 tasks.named("compileKotlin", KotlinCompilationTask::class) {
     dependsOn(buildConfig)
@@ -56,6 +57,16 @@ dependencies {
         embeddedDependencies(dep)
     }
 
+    fun hotReloadDep(dep: Any) {
+        // We need to explicitly depend on the Hot Reload Gradle plugin to be able to apply it by id.
+        // Thus, we need to publish the dependency in the resulting .pom/.module files.
+        // Other dependencies are embedded, so we use `shadow` for the publication.
+        shadow(dep)
+
+        // we still need `runtimeOnly` because `gradle-plugin` is included in the `components` project
+        runtimeOnly(dep)
+    }
+
     compileOnly(gradleApi())
     compileOnly(localGroovy())
     compileOnly(kotlin("gradle-plugin"))
@@ -71,6 +82,8 @@ dependencies {
     embedded(libs.kotlin.poet)
     embedded(project(":preview-rpc"))
     embedded(project(":jdk-version-probe"))
+
+    hotReloadDep(libs.plugin.hot.reload)
 }
 
 val packagesToRelocate = listOf("de.undercouch", "com.squareup.kotlinpoet")
