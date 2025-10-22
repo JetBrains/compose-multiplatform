@@ -1,3 +1,86 @@
+# 1.10.0-alpha03 (October 2025)
+
+_Changes since 1.10.0-alpha02_
+
+## Migration Notes
+
+### Multiple Platforms
+
+- _(prerelease fix)_ Disabled (by default) the new text context menus until they are fully supported. You can enable them by setting `ComposeFoundationFlags.isNewContextMenuEnabled = true` [#2466](https://github.com/JetBrains/compose-multiplatform-core/pull/2466)
+- Deprecate `org.jetbrains.compose.ui.tooling.preview.Preview` annotation in favor of `androidx.compose.ui.tooling.preview.Preview` to reduce variety of Preview annotations [#5453](https://github.com/JetBrains/compose-multiplatform/pull/5453)
+
+### iOS
+
+- Remove experimental annotation from `LocalUIView` [#2478](https://github.com/JetBrains/compose-multiplatform-core/pull/2478)
+
+### Desktop
+
+- Deprecate `androidx.compose.desktop.ui.tooling.preview.Preview` annotation in favor of `androidx.compose.ui.tooling.preview.Preview` to reduce variety of Preview annotations [#2474](https://github.com/JetBrains/compose-multiplatform-core/pull/2474)
+
+## Features
+
+### Lifecycle
+
+- Publish multiplatform `lifecycle-viewmodel-navigation3` library [#2476](https://github.com/JetBrains/compose-multiplatform-core/pull/2476)
+
+## Fixes
+
+### Multiple Platforms
+
+- _(prerelease fix)_ Provide `LocalWindowInfo.current.containerDpSize` value [#2493](https://github.com/JetBrains/compose-multiplatform-core/pull/2493)
+
+### iOS
+
+- Fix crash when `parallelRendering` is enabled [#2448](https://github.com/JetBrains/compose-multiplatform-core/pull/2448)
+- Fix text context menu interaction on `Popup`s and `Dialog`s [#2434](https://github.com/JetBrains/compose-multiplatform-core/pull/2434)
+- Fix crash when dragging two Scrollable components with two fingers [#2456](https://github.com/JetBrains/compose-multiplatform-core/pull/2456)
+- Fix the crash that occurs when the magnifier appears in text fields that are zero size [#2460](https://github.com/JetBrains/compose-multiplatform-core/pull/2460)
+- Fix Lifecycle status updates for multi-window applications using `UIScene` notifications [#2472](https://github.com/JetBrains/compose-multiplatform-core/pull/2472)
+- Support updating of the `WindowInfo.isWindowFocused` property when the window's state changes [#2482](https://github.com/JetBrains/compose-multiplatform-core/pull/2482)
+- Fix the text removal issue when inputting text using dictation [#2488](https://github.com/JetBrains/compose-multiplatform-core/pull/2488)
+
+### Desktop
+
+- ComposePanel now re-dispatches unconsumed mouse wheel events, allowing scrollable components beneath to be scrolled. To disable this, set the system property `"compose.swing.redispatchMouseWheelEvents"` to `"false"` [#2425](https://github.com/JetBrains/compose-multiplatform-core/pull/2425)
+- Fix background flashing when showing a window/dialog [#2471](https://github.com/JetBrains/compose-multiplatform-core/pull/2471)
+
+### Web
+
+- Removed an outline on a `Canvas` element when it's focused [#2450](https://github.com/JetBrains/compose-multiplatform-core/pull/2450)
+- Fix focus with Tab behaviour in Text Fields [#2452](https://github.com/JetBrains/compose-multiplatform-core/pull/2452)
+- Mobile. Composite input. When a syllable block is created, a new block is added instead of replacing the old one [#2454](https://github.com/JetBrains/compose-multiplatform-core/pull/2454)
+
+### Resources
+
+- Fixed an issue where resources were not copied when packaging the macOS native target, causing the application to crash when it attempted to read those resources [#5431](https://github.com/JetBrains/compose-multiplatform/pull/5431)
+- Fixed resources generated code to be reproducible between different machines [#5446](https://github.com/JetBrains/compose-multiplatform/pull/5446)
+- Fix a crash when calling `getString` and the Locale has no region specified [#5447](https://github.com/JetBrains/compose-multiplatform/pull/5447)
+- Use the non-empty font as the default when awaiting a asynchronous request completion on the web [#5456](https://github.com/JetBrains/compose-multiplatform/pull/5456)
+
+### Navigation
+
+- Ignore back gestures in navigation in case of open dialog for non-android targets [#2439](https://github.com/JetBrains/compose-multiplatform-core/pull/2439)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.10.0-alpha03`. Based on Jetpack Compose libraries:
+  - [Runtime 1.10.0-alpha05](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.10.0-alpha05)
+  - [UI 1.10.0-alpha05](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.10.0-alpha05)
+  - [Foundation 1.10.0-alpha05](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.10.0-alpha05)
+  - [Material 1.10.0-alpha05](https://developer.android.com/jetpack/androidx/releases/compose-material#1.10.0-alpha05)
+  - [Material3 1.5.0-alpha06](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha06)
+
+- Compose Material3 libraries `org.jetbrains.compose.material3:material3*:1.10.0-alpha03`. Based on [Jetpack Compose Material3 1.5.0-alpha06](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha06)
+- Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0-beta01`. Based on [Jetpack Compose Material3 Adaptive 1.2.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0-rc01)
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.10.0-alpha03`. Based on [Jetpack Lifecycle 2.10.0-alpha05](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.10.0-alpha05)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.1`. Based on [Jetpack Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4)
+- Navigation 3 libraries `org.jetbrains.androidx.navigation:navigation3-*:1.0.0-alpha03`. Based on [Jetpack Navigation 3](https://developer.android.com/jetpack/androidx/releases/navigation3#1.0.0-alpha11)
+- Navigation Event library `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.0.0-alpha02`. Based on [Jetpack Navigation Event 1.0.0-beta01](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.0.0-beta01)
+- Savedstate library `org.jetbrains.androidx.savedstate:savedstate:1.4.0-alpha03`. Based on [Jetpack Savedstate 1.4.0-beta01](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0-beta01)
+- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.5.0-beta01`. Based on [Jetpack WindowManager 1.5.0](https://developer.android.com/jetpack/androidx/releases/window#1.5.0)
+
+---
+
 # 1.9.1 (October 2025)
 
 _Changes since 1.9.0_
