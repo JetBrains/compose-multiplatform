@@ -43,6 +43,14 @@ RUN apt update -y && \
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 ENV JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
 
+# Install JBR
+ARG JBR_DISTR=jbr_jcef-21.0.8-linux-x64-b1163.62
+ARG JBR_DISTR_ARCH=$JBR_DISTR.tar.gz
+RUN wget https://cache-redirector.jetbrains.com/intellij-jbr/$JBR_DISTR_ARCH && \
+    tar xzf $JBR_DISTR_ARCH && \
+    rm $JBR_DISTR_ARCH && \
+    mv $JBR_DISTR /usr/lib/jvm
+
 # Install Android SDK
 ENV ANDROID_HOME=/android/sdk
 ARG CMD_TOOLS_VERSION=13114758
@@ -61,7 +69,7 @@ RUN yes | $SDK_MANAGER --licenses && \
     ls -1 | grep -v android.jar | xargs rm -rf
 
 # Install Google Chrome
-ARG CHROME_VERSION="140.0.7339.127-1"
+ARG CHROME_VERSION="141.0.7390.122-1"
 # https://googlechromelabs.github.io/chrome-for-testing/
 ARG CHROME_DRIVER_VERSION="140.0.7339.82"
 ARG CHROME_BIN=/usr/bin/google-chrome-stable
