@@ -97,16 +97,13 @@ abstract class ComposePlugin : Plugin<Project> {
         val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
         @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.material:material-icons-extended:1.7.3\""))
         val materialIconsExtended get() = "org.jetbrains.compose.material:material-icons-extended:1.7.3"
-        @Deprecated("Specify dependency via version catalog")
         val components get() = CommonComponentsDependencies
         @Deprecated("Specify dependency via version catalog")
         val web: WebDependencies get() = WebDependencies
-        @Deprecated("Specify dependency via version catalog")
         val html: HtmlDependencies get() = HtmlDependencies
     }
 
     object DesktopDependencies {
-        @Deprecated("Specify dependency via version catalog")
         val components = DesktopComponentsDependencies
 
         @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop:${ComposeBuildConfig.composeVersion}\""))
@@ -135,10 +132,7 @@ abstract class ComposePlugin : Plugin<Project> {
     object CommonComponentsDependencies {
         @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.components:components-resources:${ComposeBuildConfig.composeVersion}\""))
         val resources = composeDependency("org.jetbrains.compose.components:components-resources")
-        @Deprecated(
-            "Use org.jetbrains.compose.ui:ui-tooling-preview module instead",
-            ReplaceWith("compose.preview")
-        )
+        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-tooling-preview:${ComposeBuildConfig.composeVersion}\""))
         val uiToolingPreview = composeDependency("org.jetbrains.compose.components:components-ui-tooling-preview")
     }
 
