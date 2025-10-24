@@ -42,8 +42,26 @@ interface StyleScope {
      * })
      * ```
      */
-    fun property(propertyName: String, value: StylePropertyValue, important: Boolean)
-    fun property(propertyName: String, value: StylePropertyValue) = property(propertyName, value, false)
+    fun property(propertyName: String, value: StylePropertyValue)
+    /**
+     * Adds arbitrary CSS property to the inline style of the element. By default throws an error for backward compatibility
+     * @param propertyName - the name of css property as [per spec](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)
+     * @param value - the value, it can be either String or specialized type like [CSSNumeric] or [CSSColorValue]
+     * @param important - the flag which will be passed to property call in CSS
+     *
+     * Most frequent CSS property values can be set via specialized methods, like [width], [display] etc.
+     *
+     * Example:
+     * ```
+     * Div({
+     *  style {
+     *      property("some-exotic-css-property", "I am a string value", true)
+     *      property("some-exotic-css-property-width", 5.px, false)
+     *  }
+     * })
+     * ```
+     */
+    fun property(propertyName: String, value: StylePropertyValue, important: Boolean): Unit = error("!important is not supported by this implementation")
     fun variable(variableName: String, value: StylePropertyValue)
 
     fun property(propertyName: String, value: String, important: Boolean) = property(propertyName, StylePropertyValue(value), important)
@@ -155,6 +173,10 @@ open class StyleScopeBuilder : StyleScope, StyleHolder {
 
     override fun property(propertyName: String, value: StylePropertyValue, important: Boolean) {
         properties.add(StylePropertyDeclaration(propertyName, value, important))
+    }
+
+    override fun property(propertyName: String, value: StylePropertyValue) {
+        property(propertyName = propertyName, value = value, important = false)
     }
 
     override fun variable(variableName: String, value: StylePropertyValue) {
