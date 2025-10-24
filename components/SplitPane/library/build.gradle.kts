@@ -16,8 +16,8 @@ kotlin {
         }
 
         commonMain.dependencies {
-            api(compose.runtime)
-            api(compose.foundation)
+            api(libs.compose.runtime)
+            api(libs.compose.foundation)
         }
     }
 }

@@ -77,8 +77,8 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                implementation(compose.runtime)
-                implementation(compose.foundation)
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.foundation)
                 implementation(libs.kotlinx.coroutines.core)
             }
         }
@@ -86,9 +86,8 @@ kotlin {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(libs.kotlinx.coroutines.test)
-                implementation(compose.material3)
-                @OptIn(ExperimentalComposeLibrary::class)
-                implementation(compose.uiTest)
+                implementation(libs.material3)
+                implementation(compose.ui.test)
             }
         }
         val blockingMain by creating {

@@ -12,11 +12,11 @@ kotlin {
     sourceSets {
         named("commonMain") {
             dependencies {
-                api(compose.runtime)
-                api(compose.foundation)
-                api(compose.material)
+                api(libs.compose.runtime)
+                api(libs.compose.foundation)
+                api(libs.compose.material)
                 // Needed only for preview.
-                implementation(compose.preview)
+                implementation(libs.compose.ui.tooling.preview)
             }
         }
         named("androidMain") {
