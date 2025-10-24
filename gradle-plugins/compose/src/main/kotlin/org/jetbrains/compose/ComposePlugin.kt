@@ -83,9 +83,6 @@ abstract class ComposePlugin : Plugin<Project> {
         val runtimeSaveable get() = composeDependency("org.jetbrains.compose.runtime:runtime-saveable")
         @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui:${ComposeBuildConfig.composeVersion}\""))
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-test-junit4:${ComposeBuildConfig.composeVersion}\""))
-        @ExperimentalComposeLibrary
-        val uiTestJUnit4 get() = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
         @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-test:${ComposeBuildConfig.composeVersion}\""))
         @ExperimentalComposeLibrary
         val uiTest get() = composeDependency("org.jetbrains.compose.ui:ui-test")
@@ -98,12 +95,15 @@ abstract class ComposePlugin : Plugin<Project> {
         @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.material:material-icons-extended:1.7.3\""))
         val materialIconsExtended get() = "org.jetbrains.compose.material:material-icons-extended:1.7.3"
         val components get() = CommonComponentsDependencies
-        @Deprecated("Specify dependency via version catalog")
+        @Deprecated("Use compose.html", replaceWith = ReplaceWith("html"), level = DeprecationLevel.ERROR)
         val web: WebDependencies get() = WebDependencies
+        @Deprecated("Specify dependency via version catalog")
         val html: HtmlDependencies get() = HtmlDependencies
     }
 
+    @Deprecated("Specify dependency via version catalog")
     object DesktopDependencies {
+        @Deprecated("Specify dependency via version catalog")
         val components = DesktopComponentsDependencies
 
         @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop:${ComposeBuildConfig.composeVersion}\""))
@@ -129,6 +129,7 @@ abstract class ComposePlugin : Plugin<Project> {
         }
     }
 
+    @Deprecated("Specify dependency via version catalog")
     object CommonComponentsDependencies {
         @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.components:components-resources:${ComposeBuildConfig.composeVersion}\""))
         val resources = composeDependency("org.jetbrains.compose.components:components-resources")
@@ -136,6 +137,7 @@ abstract class ComposePlugin : Plugin<Project> {
         val uiToolingPreview = composeDependency("org.jetbrains.compose.components:components-ui-tooling-preview")
     }
 
+    @Deprecated("Specify dependency via version catalog")
     object DesktopComponentsDependencies {
         @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.components:components-splitpane:${ComposeBuildConfig.composeVersion}\""))
         @ExperimentalComposeLibrary
@@ -164,6 +166,7 @@ abstract class ComposePlugin : Plugin<Project> {
         }
     }
 
+    @Deprecated("Specify dependency via version catalog")
     object HtmlDependencies {
         @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.html:html-core:${ComposeBuildConfig.composeVersion}\""))
         val core by lazy {
