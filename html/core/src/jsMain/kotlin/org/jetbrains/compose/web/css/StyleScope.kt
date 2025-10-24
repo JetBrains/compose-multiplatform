@@ -179,10 +179,15 @@ open class StyleScopeBuilder : StyleScope, StyleHolder {
 data class StylePropertyDeclaration(
     val name: String,
     val value: StylePropertyValue,
-    val important: Boolean = false,
+    val important: Boolean,
 ) {
-    constructor(name: String, value: String, important: Boolean = false) : this(name, value.unsafeCast<StylePropertyValue>(), important)
-    constructor(name: String, value: Number, important: Boolean = false) : this(name, value.unsafeCast<StylePropertyValue>(), important)
+    constructor(name: String, value: StylePropertyValue) : this(name, value, false)
+
+    constructor(name: String, value: String, important: Boolean) : this(name, value.unsafeCast<StylePropertyValue>(), important)
+    constructor(name: String, value: String) : this(name, value, false)
+
+    constructor(name: String, value: Number, important: Boolean) : this(name, value.unsafeCast<StylePropertyValue>(), important)
+    constructor(name: String, value: Number) : this(name, value, false)
 }
 typealias StylePropertyList = List<StylePropertyDeclaration>
 typealias MutableStylePropertyList = MutableList<StylePropertyDeclaration>
