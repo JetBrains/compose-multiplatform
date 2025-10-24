@@ -86,7 +86,7 @@ abstract class ComposePlugin : Plugin<Project> {
         @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-test:${ComposeBuildConfig.composeVersion}\""))
         @ExperimentalComposeLibrary
         val uiTest get() = composeDependency("org.jetbrains.compose.ui:ui-test")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-tooling:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Use org.jetbrains.compose.ui:ui-tooling-preview module instead", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-tooling:${ComposeBuildConfig.composeVersion}\""))
         val uiTooling get() = composeDependency("org.jetbrains.compose.ui:ui-tooling")
         @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-util:${ComposeBuildConfig.composeVersion}\""))
         val uiUtil get() = composeDependency("org.jetbrains.compose.ui:ui-util")
