@@ -94,6 +94,7 @@ abstract class ComposePlugin : Plugin<Project> {
         val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
         @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.material:material-icons-extended:1.7.3\""))
         val materialIconsExtended get() = "org.jetbrains.compose.material:material-icons-extended:1.7.3"
+        @Deprecated("Specify dependency via version catalog")
         val components get() = CommonComponentsDependencies
         @Deprecated("Use compose.html", replaceWith = ReplaceWith("html"), level = DeprecationLevel.ERROR)
         val web: WebDependencies get() = WebDependencies
