@@ -36,17 +36,10 @@ dependencyResolutionManagement {
 
     versionCatalogs {
         create("libs") {
-            from(files("gradle/catalog.versions.toml"))
-            val composeVersion = if (extra.has("compose.version")) extra["compose.version"].toString() else null
-            if (composeVersion != null) {
-                version("compose", composeVersion)
-            }
-            val material3version = if (extra.has("compose.material3.version")) extra["compose.material3.version"].toString() else null
-            if (material3version != null) {
-              version("material3", material3version)
-            } else if (composeVersion != null) {
-              version("material3", composeVersion)
-            }
+            val composeVersion = extra["compose.version"].toString()
+            val material3version = if (extra.has("compose.material3.version")) extra["compose.material3.version"].toString() else composeVersion
+            version("compose", composeVersion)
+            version("material3", material3version)
         }
     }
 }
