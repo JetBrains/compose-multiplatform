@@ -1,0 +1,12 @@
+[versions]
+compose = "1.9.1"
+kotlinxDatetime = "0.5.0"
+
+[libraries]
+compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
+compose-desktop = { module = "org.jetbrains.compose.desktop:desktop", version.ref = "compose" }
+material = { module = "org.jetbrains.compose.material:material", version.ref = "compose" }
+material-icons-core = { module = "org.jetbrains.compose.material:material-icons-core", version = "1.7.3" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
+components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose"}

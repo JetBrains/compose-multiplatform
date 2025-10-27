@@ -54,12 +54,12 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                implementation(compose.ui)
-                implementation(compose.foundation)
-                implementation(compose.material)
-                implementation(compose.components.resources)
-                implementation("org.jetbrains.compose.material:material-icons-core:1.6.11")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.5.0")
+                implementation(libs.compose.ui)
+                implementation(libs.compose.foundation)
+                implementation(libs.material)
+                implementation(libs.components.resources)
+                implementation(libs.material.icons.core)
+                implementation(libs.kotlinx.datetime)
             }
         }
         val androidMain by getting {
@@ -83,7 +83,7 @@ kotlin {
         }
         val desktopMain by getting {
             dependencies {
-                implementation(compose.desktop.common)
+                implementation(libs.compose.desktop)
             }
         }
 
