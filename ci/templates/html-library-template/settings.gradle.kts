@@ -10,3 +10,14 @@ pluginManagement {
         id("org.jetbrains.compose").version(extra["compose.version"] as String)
     }
 }
+
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            from(files("gradle/catalog.versions.toml"))
+            if (extra.has("compose.version"))  {
+                version("compose", extra["compose.version"].toString())
+            }
+        }
+    }
+}

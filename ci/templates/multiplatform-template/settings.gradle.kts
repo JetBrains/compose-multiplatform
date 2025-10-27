@@ -16,6 +16,17 @@ pluginManagement {
     }
 }
 
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            from(files("gradle/catalog.versions.toml"))
+            if (extra.has("compose.version"))  {
+                version("compose", extra["compose.version"].toString())
+            }
+        }
+    }
+}
+
 plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version("0.4.0")
 }
