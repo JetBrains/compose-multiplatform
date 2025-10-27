@@ -33,6 +33,16 @@ dependencyResolutionManagement {
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
+
+    versionCatalogs {
+        create("libs") {
+            from(files("gradle/catalog.versions.toml"))
+            val composeVersion = extra["compose.version"]?.toString()
+            if (composeVersion != null) {
+                version("compose", composeVersion)
+            }
+        }
+    }
 }
 
 include(":SplitPane:library")

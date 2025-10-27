@@ -1,3 +1,5 @@
+# Version catalog has been renamed to be imported manually with overriden 'compose' version
+
 [versions]
 kotlinx-coroutines = "1.8.0"
 androidx-appcompat = "1.6.1"

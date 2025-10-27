@@ -87,7 +87,7 @@ kotlin {
                 implementation(kotlin("test"))
                 implementation(libs.kotlinx.coroutines.test)
                 implementation(libs.material3)
-                implementation(compose.ui.test)
+                implementation(libs.compose.ui.test)
             }
         }
         val blockingMain by creating {
