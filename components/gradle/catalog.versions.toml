@@ -8,7 +8,7 @@ androidx-test = "1.5.0"
 androidx-compose = "1.6.1"
 kotlinx-browser = "0.5.0"
 compose = "1.9.0"
-material3 = "1.9.0-beta03"
+material3 = "1.9.0"
 
 [libraries]
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
