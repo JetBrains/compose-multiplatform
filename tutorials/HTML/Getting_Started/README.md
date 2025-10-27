@@ -56,8 +56,8 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(compose.html.core)
-                implementation(compose.runtime)
+                implementation("org.jetbrains.compose.html:html-core:1.9.0")
+                implementation("org.jetbrains.compose:compose-runtime:1.9.0")
             }
         }
     }

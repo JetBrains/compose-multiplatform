@@ -20,8 +20,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     dependencies {
-        implementation(compose.ui)
-        implementation(compose.foundation)
+        implementation(libs.compose.ui)
+        implementation(libs.compose.foundation)
         implementation(libs.androidx.appcompat)
         implementation(libs.androidx.activity.compose)
         implementation(project(":resources:demo:shared"))

@@ -33,6 +33,12 @@ dependencyResolutionManagement {
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
+
+    versionCatalogs {
+        create("libs") {
+            version("compose", extra["compose.version"].toString())
+        }
+    }
 }
 
 include(":SplitPane:library")
