@@ -50,8 +50,8 @@ kotlin {
 
         commonMain.dependencies {
             implementation(libs.compose.runtime)
-            implementation(libs.material3)
-            implementation(libs.material.icons.core)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.material.icons.core)
             implementation(project(":resources:library"))
         }
         desktopMain.dependencies {

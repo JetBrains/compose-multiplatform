@@ -51,7 +51,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(libs.compose.runtime)
-            implementation(libs.material3)
+            implementation(libs.compose.material3)
             implementation(project(":ui-tooling-preview:library"))
         }
         val desktopMain by getting
