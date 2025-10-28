@@ -64,10 +64,10 @@ interface StyleScope {
     fun property(propertyName: String, value: StylePropertyValue, important: Boolean): Unit = error("!important is not supported by this implementation")
     fun variable(variableName: String, value: StylePropertyValue)
 
+    fun property(propertyName: String, value: String) = property(propertyName, StylePropertyValue(value))
     fun property(propertyName: String, value: String, important: Boolean) = property(propertyName, StylePropertyValue(value), important)
-    fun property(propertyName: String, value: String) = property(propertyName, value, false)
+    fun property(propertyName: String, value: Number) = property(propertyName, StylePropertyValue(value))
     fun property(propertyName: String, value: Number, important: Boolean) = property(propertyName, StylePropertyValue(value), important)
-    fun property(propertyName: String, value: Number) = property(propertyName, value, false)
     fun variable(variableName: String, value: String) = variable(variableName, StylePropertyValue(value))
     fun variable(variableName: String, value: Number) = variable(variableName, StylePropertyValue(value))
 
