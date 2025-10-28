@@ -1,6 +1,6 @@
 [versions]
 compose-multiplatform = "1.9.1"
-kotlin = "2.3.0-Beta1"
+kotlin = "2.3.0-Beta2"
 kotlinx-coroutines = "1.8.0"
 kotlinx-serialization = "1.8.0"
 kotlinx-io = "0.7.0"
