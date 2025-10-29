@@ -87,7 +87,7 @@ class GradlePluginTest : GradlePluginTestBase() {
         }
 
     // Note: we can't test non-jvm targets with Kotlin older than 2.2.0, because of klib abi version bump in 2.2.0
-    private val oldestSupportedKotlinVersion = "2.2.0"
+    private val oldestSupportedKotlinVersion = "2.3.0-Beta2"
     @Test
     fun testOldestKotlinMpp() = with(
         testProject(
