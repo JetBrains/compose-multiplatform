@@ -3,7 +3,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("plugin.compose")
     id("maven-publish")
-    id("com.android.library")
+    id("com.android.kotlin.multiplatform.library")
 }
 
 group = "me.sample.library"
@@ -17,7 +17,12 @@ publishing {
 }
 
 kotlin {
-    androidTarget { publishLibraryVariants("release") }
+    androidLibrary {
+        compileSdk = 35
+        namespace = "me.sample.library"
+        minSdk = 24
+        androidResources.enable = true
+    }
     jvm()
     iosX64()
     iosArm64()
@@ -33,18 +38,6 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.components.resources)
         }
-    }
-}
-
-android {
-    namespace = "me.sample.library"
-    compileSdk = 35
-    defaultConfig {
-        minSdk = 24
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 

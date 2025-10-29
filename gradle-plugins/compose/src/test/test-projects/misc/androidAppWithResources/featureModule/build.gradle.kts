@@ -6,26 +6,30 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain(17)
+    jvm()
+
     androidLibrary {
-        compileSdk = 35
         namespace = "me.sample.feature"
+        compileSdk = 35
         minSdk = 24
         androidResources.enable = true
     }
-    jvm()
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-    macosX64()
-    macosArm64()
-    js { browser() }
-    wasmJs { browser() }
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.material3)
-            implementation(compose.components.resources)
+            api(compose.runtime)
+            api(compose.material3)
+            api(compose.components.resources)
         }
     }
+}
+
+//https://youtrack.jetbrains.com/issue/CMP-8325
+compose.desktop {
+    application { }
+}
+
+compose.resources {
+    publicResClass = true
 }

@@ -1,8 +1,6 @@
 package org.jetbrains.compose.test.tests.integration
 
-import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.internal.Version
 import org.jetbrains.compose.internal.utils.Arch
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentArch
@@ -26,7 +24,6 @@ import kotlin.io.path.relativeTo
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ResourcesTest : GradlePluginTestBase() {
@@ -249,13 +246,6 @@ class ResourcesTest : GradlePluginTestBase() {
         with(
             testProject("misc/kmpResourcePublication", environment)
         ) {
-            if (environment.parsedGradleVersion < GradleVersion.version("7.6")) {
-                val output = gradle(":tasks").output
-                output.contains("Compose resources publication requires Gradle >= 7.6")
-                output.contains("Current Kotlin Gradle Plugin is ${environment.gradleVersion}")
-                return@with
-            }
-
             gradle(":cmplib:publishAllPublicationsToMavenRepository").checks {
                 check.logContains("Configure multi-module compose resources")
 
@@ -333,22 +323,12 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testNewAgpResources() {
-        Assumptions.assumeTrue(defaultTestEnvironment.parsedGradleVersion >= GradleVersion.version("8.10.2"))
-
-        val agpVersion = Version.fromString(defaultTestEnvironment.agpVersion)
-        Assumptions.assumeTrue(agpVersion >= Version.fromString("8.8.0-alpha08"))
-
-        with(testProject("misc/newAgpResources", defaultTestEnvironment)) {
+    fun testAndroidAppWithResources() {
+        with(testProject("misc/androidAppWithResources", defaultTestEnvironment)) {
             gradle(":appModule:assembleDebug").checks {
-                if (agpVersion >= Version.fromString("8.10")) {
-                    check.logContains("Configure compose resources with KotlinMultiplatformAndroidComponentsExtension")
-                } else {
-                    check.logContains("Configure compose resources with outdated KotlinMultiplatformAndroidComponentsExtension < 8.10")
-                }
+                check.logContains("Configure compose resources with KotlinMultiplatformAndroidComponentsExtension")
 
                 val resourcesFiles = sequenceOf(
-                    "composeResources/newagpresources.appmodule.generated.resources/values/strings.commonMain.cvr",
                     "composeResources/newagpresources.featuremodule.generated.resources/values/strings.commonMain.cvr"
                 )
                 val apk = file("appModule/build/outputs/apk/debug/appModule-debug.apk")
@@ -385,7 +365,7 @@ class ResourcesTest : GradlePluginTestBase() {
                 println("check '$res' file")
                 if (isAndroid) {
                     //android resources should be only in assets
-                    assertNull(zip.getEntry(res), "file = '$res'")
+                    // assertNull(zip.getEntry(res), "file = '$res'") FIXME uncomment when https://issuetracker.google.com/456114370 is fixed
                     assertNotNull(zip.getEntry("assets/$res"), "file = 'assets/$res'")
                 } else {
                     assertNotNull(zip.getEntry(res), "file = '$res'")
@@ -393,7 +373,6 @@ class ResourcesTest : GradlePluginTestBase() {
             }
         }
     }
-
 
     @Test
     fun testJvmBuildWithResourcesCustomization(): Unit = with(testProject("misc/commonResources")) {
@@ -414,92 +393,79 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testFinalArtefacts(): Unit = with(testProject("misc/commonResources")) {
-        //https://developer.android.com/build/build-variants?utm_source=android-studio#product-flavors
-        file("build.gradle.kts").appendText(
-            """
-            
-            kotlin {
-                js {
-                    browser {
-                        testTask(Action {
-                            enabled = false
-                        })
-                    }
-                    binaries.executable()
-                }
-            }
-            
-            android {
-                flavorDimensions += "version"
-                productFlavors {
-                    create("demo")
-                    create("full")
-                }
-            }
-        """.trimIndent()
-        )
-        file("src/androidDemoDebug/composeResources/files/platform.txt").writeNewFile("android demo-debug")
-        file("src/androidDemoRelease/composeResources/files/platform.txt").writeNewFile("android demo-release")
-        file("src/androidFullDebug/composeResources/files/platform.txt").writeNewFile("android full-debug")
-        file("src/androidFullRelease/composeResources/files/platform.txt").writeNewFile("android full-release")
-        file("src/desktopMain/composeResources/files/platform.txt").writeNewFile("desktop")
-        file("src/jsMain/composeResources/files/platform.txt").writeNewFile("js")
-
+    fun testFinalArtefacts(): Unit = with(testProject("misc/fullTargetsAppWithResources")) {
         val commonResourcesDir = file("src/commonMain/composeResources")
-        val repackDir = "composeResources/app.group.resources_test.generated.resources"
+        val repackDir = "composeResources/multiplatform_app.sharedui.generated.resources"
         val commonResourcesFiles = commonResourcesDir.walkTopDown()
             .filter { !it.isDirectory && !it.isHidden }
             .getConvertedResources(commonResourcesDir, repackDir)
 
-        gradle("build").checks {
-            check.taskSuccessful(":copyDemoDebugComposeResourcesToAndroidAssets")
-            check.taskSuccessful(":copyDemoReleaseComposeResourcesToAndroidAssets")
-            check.taskSuccessful(":copyFullDebugComposeResourcesToAndroidAssets")
-            check.taskSuccessful(":copyFullReleaseComposeResourcesToAndroidAssets")
+        gradle(":androidApp:assemble").checks {
+            check.taskSuccessful(":sharedUI:copyAndroidMainComposeResourcesToAndroidAssets")
 
-            getAndroidApk("demo", "debug", "Resources-Test").let { apk ->
+            listOf(
+                "androidApp/build/outputs/apk/demo/debug/androidApp-demo-debug.apk",
+                "androidApp/build/outputs/apk/full/debug/androidApp-full-debug.apk",
+                "androidApp/build/outputs/apk/demo/release/androidApp-demo-release.apk",
+                "androidApp/build/outputs/apk/full/release/androidApp-full-release.apk"
+            ).forEach { path ->
+                val apk = file(path)
                 checkResourcesZip(apk, commonResourcesFiles, true)
                 assertEquals(
-                    "android demo-debug",
+                    "android",
                     readFileInZip(apk, "assets/$repackDir/files/platform.txt").decodeToString()
                 )
             }
-            getAndroidApk("demo", "release", "Resources-Test").let { apk ->
-                checkResourcesZip(apk, commonResourcesFiles, true)
-                assertEquals(
-                    "android demo-release",
-                    readFileInZip(apk, "assets/$repackDir/files/platform.txt").decodeToString()
-                )
-            }
-            getAndroidApk("full", "debug", "Resources-Test").let { apk ->
-                checkResourcesZip(apk, commonResourcesFiles, true)
-                assertEquals(
-                    "android full-debug",
-                    readFileInZip(apk, "assets/$repackDir/files/platform.txt").decodeToString()
-                )
-            }
-            getAndroidApk("full", "release", "Resources-Test").let { apk ->
-                checkResourcesZip(apk, commonResourcesFiles, true)
-                assertEquals(
-                    "android full-release",
-                    readFileInZip(apk, "assets/$repackDir/files/platform.txt").decodeToString()
-                )
-            }
+        }
 
-            file("build/libs/Resources-Test-desktop.jar").let { jar ->
+        gradle(":desktopApp:build").checks {
+            check.taskSuccessful(":sharedUI:jvmProcessResources")
+
+            file("sharedUI/build/libs/sharedUI-jvm.jar").let { jar ->
                 checkResourcesZip(jar, commonResourcesFiles, false)
                 assertEquals(
                     "desktop",
                     readFileInZip(jar, "$repackDir/files/platform.txt").decodeToString()
                 )
             }
+        }
 
-            val jsBuildDir = file("build/dist/js/productionExecutable")
+        gradle(":webApp:build").checks {
+            check.taskSuccessful(":sharedUI:wasmJsCopyHierarchicalMultiplatformResources")
+            check.taskSuccessful(":sharedUI:jsCopyHierarchicalMultiplatformResources")
+
+            val jsBuildDir = file("webApp/build/dist/js/productionExecutable")
             commonResourcesFiles.forEach { res ->
                 assertTrue(jsBuildDir.resolve(res).exists())
             }
             assertEquals("js", jsBuildDir.resolve("$repackDir/files/platform.txt").readText())
+
+            val wasmJsBuildDir = file("webApp/build/dist/wasmJs/productionExecutable")
+            commonResourcesFiles.forEach { res ->
+                assertTrue(wasmJsBuildDir.resolve(res).exists())
+            }
+            assertEquals("wasm", wasmJsBuildDir.resolve("$repackDir/files/platform.txt").readText())
+        }
+
+
+        if(currentOS == OS.MacOS) {
+            gradle(":sharedUI:assembleSharedUIDebugXCFramework").checks {
+                check.taskSuccessful(":sharedUI:iosArm64AggregateResources")
+                check.taskSuccessful(":sharedUI:iosSimulatorArm64AggregateResources")
+                check.taskSuccessful(":sharedUI:iosX64AggregateResources")
+
+                val iosDeviceFramework = file("sharedUI/build/XCFrameworks/debug/SharedUI.xcframework/ios-arm64/SharedUI.framework")
+                commonResourcesFiles.forEach { res ->
+                    assertTrue(iosDeviceFramework.resolve(res).exists())
+                }
+                assertEquals("ios", iosDeviceFramework.resolve("$repackDir/files/platform.txt").readText())
+
+                val iosSimFramework = file("sharedUI/build/XCFrameworks/debug/SharedUI.xcframework/ios-arm64_x86_64-simulator/SharedUI.framework")
+                commonResourcesFiles.forEach { res ->
+                    assertTrue(iosSimFramework.resolve(res).exists())
+                }
+                assertEquals("ios", iosSimFramework.resolve("$repackDir/files/platform.txt").readText())
+            }
         }
     }
 
@@ -629,15 +595,23 @@ class ResourcesTest : GradlePluginTestBase() {
     fun testHugeNumberOfResources(): Unit = with(testProject("misc/hugeResources")) {
         gradle(":generateResourceFiles")
         gradle(":generateResourceAccessorsForCommonMain").checks {
-            val buildPath = "build/generated/compose/resourceGenerator/kotlin/commonMainResourceAccessors/app/group/huge/generated/resources"
+            val buildPath =
+                "build/generated/compose/resourceGenerator/kotlin/commonMainResourceAccessors/app/group/huge/generated/resources"
             assertEqualTextFiles(file("$buildPath/Drawable0.commonMain.kt"), file("expected/Drawable0.commonMain.kt"))
-            assertEqualTextFiles(file("$buildPath/Drawable100.commonMain.kt"), file("expected/Drawable100.commonMain.kt"))
+            assertEqualTextFiles(
+                file("$buildPath/Drawable100.commonMain.kt"),
+                file("expected/Drawable100.commonMain.kt")
+            )
             assertEqualTextFiles(file("$buildPath/String0.commonMain.kt"), file("expected/String0.commonMain.kt"))
             assertEqualTextFiles(file("$buildPath/String100.commonMain.kt"), file("expected/String100.commonMain.kt"))
         }
         gradle(":generateActualResourceCollectorsForDesktopMain").checks {
-            val desktopPath = "build/generated/compose/resourceGenerator/kotlin/desktopMainResourceCollectors/app/group/huge/generated/resources"
-            assertEqualTextFiles(file("$desktopPath/ActualResourceCollectors.kt"), file("expected/ActualResourceCollectors.kt"))
+            val desktopPath =
+                "build/generated/compose/resourceGenerator/kotlin/desktopMainResourceCollectors/app/group/huge/generated/resources"
+            assertEqualTextFiles(
+                file("$desktopPath/ActualResourceCollectors.kt"),
+                file("expected/ActualResourceCollectors.kt")
+            )
         }
     }
 
@@ -693,7 +667,8 @@ class ResourcesTest : GradlePluginTestBase() {
         with(
             testProject(
                 "misc/appleResources",
-                defaultTestEnvironment.copy(kotlinVersion = "2.1.21"))
+                defaultTestEnvironment.copy(kotlinVersion = "2.1.21")
+            )
         ) {
             file("build.gradle.kts").modify { content ->
                 """
@@ -747,7 +722,8 @@ class ResourcesTest : GradlePluginTestBase() {
         with(
             testProject(
                 "misc/appleResources",
-                defaultTestEnvironment.copy(kotlinVersion = "2.2.0-RC2"))
+                defaultTestEnvironment.copy(kotlinVersion = "2.2.0-RC2")
+            )
         ) {
             file("build.gradle.kts").modify { content ->
                 """
@@ -900,7 +876,8 @@ class ResourcesTest : GradlePluginTestBase() {
         with(
             testProject(
                 "misc/appleResources",
-                defaultTestEnvironment.copy(kotlinVersion = "2.2.0-RC2"))
+                defaultTestEnvironment.copy(kotlinVersion = "2.2.0-RC2")
+            )
         ) {
             gradle(":podPublishDebugXCFramework").checks {
                 assertDirectoriesContentEquals(
@@ -1025,7 +1002,8 @@ class ResourcesTest : GradlePluginTestBase() {
         with(testProject("misc/macosNativeResources")) {
             val appName = "Test Resources"
             gradle(":createDistributableNativeDebugMacosX64").checks {
-                val targetResourcesDir = "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources"
+                val targetResourcesDir =
+                    "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources"
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
             }
@@ -1043,7 +1021,8 @@ class ResourcesTest : GradlePluginTestBase() {
                 "compose-multiplatform.xml",
                 "icon.xml"
             )
-            val targetResourcesDir = "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources/compose-resources/composeResources/appleresources.generated.resources/drawable/"
+            val targetResourcesDir =
+                "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources/compose-resources/composeResources/appleresources.generated.resources/drawable/"
             gradle(taskName).checks {
                 fileNames.forEach { name ->
                     check(!file(targetResourcesDir + name).readText().startsWith(comment)) {
@@ -1085,7 +1064,8 @@ class ResourcesTest : GradlePluginTestBase() {
             }
 
             gradle(taskName).checks {
-                val targetResourcesDir = "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources"
+                val targetResourcesDir =
+                    "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources"
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform2.xml").checkExists()
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
@@ -1093,7 +1073,8 @@ class ResourcesTest : GradlePluginTestBase() {
             check(file(targetResource).delete())
             gradle(taskName).checks {
                 check.taskSuccessful(taskName)
-                val targetResourcesDir = "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources"
+                val targetResourcesDir =
+                    "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources"
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform2.xml").checkNotExists()
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
