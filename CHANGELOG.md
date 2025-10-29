@@ -1,3 +1,36 @@
+# 1.9.2 (October 2025)
+
+_Changes since 1.9.1_
+
+## Fixes
+
+### Multiple Platforms
+
+- Prevent possible symbol duplicates in `savedstate-compose` due to redirects to Google's `runtime-saveable` that supports all KMP platforms [#2503](https://github.com/JetBrains/compose-multiplatform-core/pull/2503)
+
+### Web
+
+- Removed an outline on a `Canvas` element when it's focused [#2450](https://github.com/JetBrains/compose-multiplatform-core/pull/2450)
+- Fix focus with Tab behaviour in Text Fields [#2452](https://github.com/JetBrains/compose-multiplatform-core/pull/2452)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.9.2`. Based on Jetpack Compose libraries:
+  - [Runtime 1.9.4](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.9.4)
+  - [UI 1.9.4](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.9.4)
+  - [Foundation 1.9.4](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.9.4)
+  - [Material 1.9.4](https://developer.android.com/jetpack/androidx/releases/compose-material#1.9.4)
+  - [Material3 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0)
+
+- Compose Material3 libraries `org.jetbrains.compose.material3:material3*:1.9.0`. Based on [Jetpack Compose Material3 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0)
+- Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.2.0`. Based on [Jetpack Compose Material3 Adaptive 1.2.0](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.2.0)
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.9.5`. Based on [Jetpack Lifecycle 2.9.4](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.9.4)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.1`. Based on [Jetpack Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4)
+- Savedstate library `org.jetbrains.androidx.savedstate:savedstate*:1.3.5`. Based on [Jetpack Savedstate 1.3.3](https://developer.android.com/jetpack/androidx/releases/savedstate#1.3.3)
+- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.4.0`. Based on [Jetpack WindowManager 1.4.0](https://developer.android.com/jetpack/androidx/releases/window#1.4.0)
+
+---
+
 # 1.10.0-alpha03 (October 2025)
 
 _Changes since 1.10.0-alpha02_

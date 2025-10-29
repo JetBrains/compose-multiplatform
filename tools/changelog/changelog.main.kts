@@ -223,7 +223,7 @@ fun generateChangelog() {
                     - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.1`. Based on [Jetpack Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4)
                     - Navigation 3 libraries `org.jetbrains.androidx.navigation:navigation3-*:$versionNavigation3`. Based on [Jetpack Navigation 3](https://developer.android.com/jetpack/androidx/releases/navigation3#$versionRedirectingNavigation3)
                     - Navigation Event library `org.jetbrains.androidx.navigationevent:navigationevent-compose:$versionNavigationEvent`. Based on [Jetpack Navigation Event $versionRedirectingNavigationEvent](https://developer.android.com/jetpack/androidx/releases/navigationevent#$versionRedirectingNavigationEvent)
-                    - Savedstate library `org.jetbrains.androidx.savedstate:savedstate:$versionSavedstate`. Based on [Jetpack Savedstate $versionRedirectingSavedstate](https://developer.android.com/jetpack/androidx/releases/savedstate#$versionRedirectingSavedstate)
+                    - Savedstate library `org.jetbrains.androidx.savedstate:savedstate*:$versionSavedstate`. Based on [Jetpack Savedstate $versionRedirectingSavedstate](https://developer.android.com/jetpack/androidx/releases/savedstate#$versionRedirectingSavedstate)
                     - WindowManager Core library `org.jetbrains.androidx.window:window-core:$versionWindow`. Based on [Jetpack WindowManager $versionRedirectingWindow](https://developer.android.com/jetpack/androidx/releases/window#$versionRedirectingWindow)
 
                     ---
