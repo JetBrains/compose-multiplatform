@@ -12,6 +12,7 @@ import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.JsAny
 import kotlin.js.Promise
 import kotlin.js.asJsException
+import kotlin.js.js
 
 /**
  * We use [Cache] APIs to cache the successful strings.cvr and other responses.
@@ -20,6 +21,9 @@ import kotlin.js.asJsException
  *
  * Cache limits:
  * https://developer.mozilla.org/en-US/docs/Web/API/Storage_API/Storage_quotas_and_eviction_criteria#other_web_technologies
+ *
+ * The Cache API is available only in secure contexts (HTTPS or localhost).
+ * In non-secure contexts it will behave as if there are no cached values.
  */
 @OptIn(ExperimentalWasmJsInterop::class)
 internal object ResourceWebCache {
@@ -33,7 +37,11 @@ internal object ResourceWebCache {
     // A mutex to avoid multiple cache reset
     private val resetMutex = Mutex()
 
+    private val supportsCacheApi: Boolean by lazy { supportsCacheApi() }
+
     suspend fun load(path: String, onNoCacheHit: suspend (path: String) -> Response): Response {
+        if (!supportsCacheApi) return onNoCacheHit(path)
+
         if (isNewSession()) {
             // There can be many load requests, and there must be 1 reset max. Therefore, using `resetMutex`.
             resetMutex.withLock {
@@ -74,6 +82,11 @@ internal object ResourceWebCache {
         return !sessionStarted
     }
 }
+
+
+// https://developer.mozilla.org/en-US/docs/Web/API/Window/caches
+// Supported only in secure contexts (HTTPS or localhost)
+private fun supportsCacheApi(): Boolean = js("Boolean(window.caches)")
 
 // Promise.await is not yet available in webMain: https://github.com/Kotlin/kotlinx.coroutines/issues/4544
 // TODO(o.karpovich): get rid of this function, when kotlinx-coroutines provide Promise.await in webMain out of a box
