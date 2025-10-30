@@ -12,7 +12,7 @@ kotlin {
     androidLibrary {
         namespace = "me.sample.feature"
         compileSdk = 35
-        minSdk = 24
+        minSdk = 23
         androidResources.enable = true
     }
 

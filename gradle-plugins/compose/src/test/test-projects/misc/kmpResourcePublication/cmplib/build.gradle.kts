@@ -20,7 +20,7 @@ kotlin {
     androidLibrary {
         compileSdk = 35
         namespace = "me.sample.library"
-        minSdk = 24
+        minSdk = 23
         androidResources.enable = true
     }
     jvm()
