@@ -719,12 +719,7 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun xcframeworkResources() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
-        with(
-            testProject(
-                "misc/appleResources",
-                defaultTestEnvironment.copy(kotlinVersion = "2.2.0-RC2")
-            )
-        ) {
+        with(testProject("misc/appleResources")) {
             file("build.gradle.kts").modify { content ->
                 """
                     |import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFramework
@@ -872,13 +867,7 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun cocoapodsIosXCFrameworkResources() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
-
-        with(
-            testProject(
-                "misc/appleResources",
-                defaultTestEnvironment.copy(kotlinVersion = "2.2.0-RC2")
-            )
-        ) {
+        with(testProject("misc/appleResources")) {
             gradle(":podPublishDebugXCFramework").checks {
                 assertDirectoriesContentEquals(
                     file("build/cocoapods/publish/debug/shared.xcframework/ios-arm64/shared.framework/composeResources"),
