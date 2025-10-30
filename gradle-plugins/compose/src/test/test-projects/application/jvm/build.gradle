@@ -11,12 +11,6 @@ dependencies {
     implementation compose.desktop.currentOs
 }
 
-kotlin {
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
-    }
-}
-
 compose.desktop {
     application {
         mainClass = "MainKt"

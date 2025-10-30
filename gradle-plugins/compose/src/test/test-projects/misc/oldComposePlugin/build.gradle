@@ -27,14 +27,6 @@ kotlin {
     }
 }
 
-kotlin {
-    jvm {
-        jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of(11))
-        }
-    }
-}
-
 compose.desktop {
     application {
         mainClass = "MainKt"
