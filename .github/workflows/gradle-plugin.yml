@@ -16,35 +16,54 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-24.04', 'macos-14', 'windows-2022']
+        os: ['ubuntu-24.04', 'macos-15-xlarge', 'windows-2022']
         gradle: ['8.7', '9.0.0']
         agp: ['8.6.0', '8.9.0', '9.0.0-alpha01']
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
         with:
           distribution: 'jetbrains'
           java-version: '21'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          # Only save Gradle User Home state for builds on the 'master' branch.
+          # Builds on other branches will only read existing entries from the cache.
+          cache-read-only: ${{ github.ref != 'refs/heads/master' }}
+
+          # Limit the size of the cache entry.
+          # These directories contain instrumented/transformed dependency jars which can be reconstructed relatively quickly.
+          gradle-home-cache-excludes: |
+            caches/jars-9
+            caches/transforms-3
+
       - name: Test Gradle plugin
         shell: bash
+        working-directory: gradle-plugins
         run: |
-          cd gradle-plugins
           ./gradlew assemble
           ./gradlew --continue :preview-rpc:test :compose:test ':compose:test-Gradle(${{ matrix.gradle }})-Agp(${{ matrix.agp }})'
+
       - name: Upload Reports
         uses: actions/upload-artifact@v4
         with:
           name: Test-Reports-${{ matrix.os }}-Gradle-${{ matrix.gradle }}-Agp${{ matrix.agp }}
           path: gradle-plugins/compose/build/reports
         if: always()
+
       - name: Print summary
         shell: bash
+        working-directory: gradle-plugins/compose/build/test-summary
         if: always()
         run: |
-          cd gradle-plugins/compose/build/test-summary
           for SUMMARY_FILE in `find . -name "*.md"`; do
             FILE_NAME=`basename $SUMMARY_FILE`
             echo "## $FILE_NAME" >> $GITHUB_STEP_SUMMARY
