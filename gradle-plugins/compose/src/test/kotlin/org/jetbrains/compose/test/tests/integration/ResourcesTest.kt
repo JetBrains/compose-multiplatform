@@ -24,6 +24,7 @@ import kotlin.io.path.relativeTo
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ResourcesTest : GradlePluginTestBase() {
@@ -365,7 +366,7 @@ class ResourcesTest : GradlePluginTestBase() {
                 println("check '$res' file")
                 if (isAndroid) {
                     //android resources should be only in assets
-                    // assertNull(zip.getEntry(res), "file = '$res'") FIXME uncomment when https://issuetracker.google.com/456114370 is fixed
+                    assertNull(zip.getEntry(res), "file = '$res'")
                     assertNotNull(zip.getEntry("assets/$res"), "file = 'assets/$res'")
                 } else {
                     assertNotNull(zip.getEntry(res), "file = '$res'")
@@ -452,19 +453,21 @@ class ResourcesTest : GradlePluginTestBase() {
         }
 
 
-        if(currentOS == OS.MacOS) {
+        if (currentOS == OS.MacOS) {
             gradle(":sharedUI:assembleSharedUIDebugXCFramework").checks {
                 check.taskSuccessful(":sharedUI:iosArm64AggregateResources")
                 check.taskSuccessful(":sharedUI:iosSimulatorArm64AggregateResources")
                 check.taskSuccessful(":sharedUI:iosX64AggregateResources")
 
-                val iosDeviceFramework = file("sharedUI/build/XCFrameworks/debug/SharedUI.xcframework/ios-arm64/SharedUI.framework")
+                val iosDeviceFramework =
+                    file("sharedUI/build/XCFrameworks/debug/SharedUI.xcframework/ios-arm64/SharedUI.framework")
                 commonResourcesFiles.forEach { res ->
                     assertTrue(iosDeviceFramework.resolve(res).exists())
                 }
                 assertEquals("ios", iosDeviceFramework.resolve("$repackDir/files/platform.txt").readText())
 
-                val iosSimFramework = file("sharedUI/build/XCFrameworks/debug/SharedUI.xcframework/ios-arm64_x86_64-simulator/SharedUI.framework")
+                val iosSimFramework =
+                    file("sharedUI/build/XCFrameworks/debug/SharedUI.xcframework/ios-arm64_x86_64-simulator/SharedUI.framework")
                 commonResourcesFiles.forEach { res ->
                     assertTrue(iosSimFramework.resolve(res).exists())
                 }
