@@ -2,11 +2,16 @@ plugins {
     id("org.jetbrains.compose")
     kotlin("multiplatform")
     kotlin("plugin.compose")
-    id("com.android.library")
+    id("com.android.kotlin.multiplatform.library")
 }
 
 kotlin {
-    androidTarget()
+    androidLibrary {
+        compileSdk = 35
+        namespace = "me.sample.feature"
+        minSdk = 23
+        androidResources.enable = true
+    }
     jvm()
     iosX64()
     iosArm64()
@@ -22,18 +27,5 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.components.resources)
         }
-    }
-}
-
-android {
-    namespace = "me.sample.feature"
-    compileSdk = 35
-
-    defaultConfig {
-        minSdk = 24
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
 }
