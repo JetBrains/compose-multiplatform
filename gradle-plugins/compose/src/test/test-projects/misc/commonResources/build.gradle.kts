@@ -19,11 +19,11 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                implementation(compose.runtime)
-                implementation(compose.material)
-                //there is the api to check correctness of the api configuration
-                //https://github.com/JetBrains/compose-multiplatform/issues/4405
-                api(compose.components.resources)
+                implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER")
+                implementation("org.jetbrains.compose.material:material:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER")
+                // there is the api to check correctness of the api configuration
+                // https://youtrack.jetbrains.com/issue/CMP-4405
+                api("org.jetbrains.compose.components:components-resources:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER")
             }
         }
     }

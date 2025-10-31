@@ -6,20 +6,21 @@ plugins {
 }
 
 kotlin {
+    jvmToolchain(11)
     jvm()
 
     androidLibrary {
+        experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
         namespace = "me.sample.feature"
         compileSdk = 35
-        minSdk = 23
-        androidResources.enable = true
+        minSdk = 24
     }
 
     sourceSets {
         commonMain.dependencies {
-            api(compose.runtime)
-            api(compose.material3)
-            api(compose.components.resources)
+            api("org.jetbrains.compose.runtime:runtime:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER")
+            api("org.jetbrains.compose.material3:material3:1.9.0")
+            api("org.jetbrains.compose.components:components-resources:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER")
         }
     }
 }
@@ -27,8 +28,4 @@ kotlin {
 //https://youtrack.jetbrains.com/issue/CMP-8325
 compose.desktop {
     application { }
-}
-
-compose.resources {
-    publicResClass = true
 }
