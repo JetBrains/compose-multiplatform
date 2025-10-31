@@ -9,10 +9,10 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api compose.runtime
-            api compose.foundation
-            api compose.material
-            api compose.uiTooling
+            api "org.jetbrains.compose.runtime:runtime:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER"
+            api "org.jetbrains.compose.foundation:foundation:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER"
+            api "org.jetbrains.compose.material:material:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER"
+            api "org.jetbrains.compose.ui:ui-tooling:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER"
         }
         desktopMain.dependencies {
             implementation compose.desktop.currentOs
