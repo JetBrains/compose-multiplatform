@@ -325,6 +325,10 @@ class ResourcesTest : GradlePluginTestBase() {
 
     @Test
     fun testAndroidAppWithResources() {
+        //FIXME delete the filter when https://issuetracker.google.com/456657404 is fixed
+        Assumptions.assumeFalse {
+            currentOS == OS.Windows && defaultTestEnvironment.gradleVersion.contains("9.0.0")
+        }
         with(testProject("misc/androidAppWithResources", defaultTestEnvironment)) {
             gradle(":appModule:assembleDebug").checks {
                 check.logContains("Configure compose resources with KotlinMultiplatformAndroidComponentsExtension")
