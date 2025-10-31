@@ -18,10 +18,10 @@ kotlin {
     sourceSets {
         getByName("commonMain") {
             dependencies {
-                implementation(compose.ui)
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material3)
+                implementation("org.jetbrains.compose.ui:ui:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER")
+                implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER")
+                implementation("org.jetbrains.compose.foundation:foundation:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER")
+                implementation("org.jetbrains.compose.material3:material3:1.9.0")
             }
         }
     }
