@@ -1,0 +1,99 @@
+[versions]
+kotlin = "2.2.21"
+publish-plugin = "2.0.0"
+
+jetpack-compose-bom = "2025.10.00"
+
+compose = "1.9.2"
+material3 = "1.9.0"
+material3-adaptive = "1.2.0"
+lifecycle = "2.9.5"
+navigation = "2.9.1"
+savedstate = "1.3.5"
+window-core = "1.4.0"
+
+[libraries]
+jetpack-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "jetpack-compose-bom" }
+
+animation = { group = "org.jetbrains.compose.animation", name = "animation", version.ref = "compose" }
+animation-core = { group = "org.jetbrains.compose.animation", name = "animation-core", version.ref = "compose" }
+animation-graphics = { group = "org.jetbrains.compose.animation", name = "animation-graphics", version.ref = "compose" }
+
+annotation-internal = { group = "org.jetbrains.compose.annotation-internal", name = "annotation", version.ref = "compose" }
+collection-internal = { group = "org.jetbrains.compose.collection-internal", name = "collection", version.ref = "compose" }
+
+components-animatedimage = { group = "org.jetbrains.compose.components", name = "components-animatedimage", version.ref = "compose" }
+components-resources = { group = "org.jetbrains.compose.components", name = "components-resources", version.ref = "compose" }
+components-splitpane = { group = "org.jetbrains.compose.components", name = "components-splitpane", version.ref = "compose" }
+components-ui-tooling-preview = { group = "org.jetbrains.compose.components", name = "components-ui-tooling-preview", version.ref = "compose" }
+
+desktop = { group = "org.jetbrains.compose.desktop", name = "desktop", version.ref = "compose" }
+desktop-jvm = { group = "org.jetbrains.compose.desktop", name = "desktop-jvm", version.ref = "compose" }
+
+foundation = { group = "org.jetbrains.compose.foundation", name = "foundation", version.ref = "compose" }
+
+html-benchmark-core = { group = "org.jetbrains.compose.html", name = "html-benchmark-core", version.ref = "compose" }
+html-core = { group = "org.jetbrains.compose.html", name = "html-core", version.ref = "compose" }
+html-integration-core = { group = "org.jetbrains.compose.html", name = "html-integration-core", version.ref = "compose" }
+html-svg = { group = "org.jetbrains.compose.html", name = "html-svg", version.ref = "compose" }
+html-test-utils = { group = "org.jetbrains.compose.html", name = "html-test-utils", version.ref = "compose" }
+html-internal-html-core-runtime = { group = "org.jetbrains.compose.html", name = "internal-html-core-runtime", version.ref = "compose" }
+
+material = { group = "org.jetbrains.compose.material", name = "material", version.ref = "compose" }
+material-navigation = { group = "org.jetbrains.compose.material", name = "material-navigation", version.ref = "compose" }
+material-ripple = { group = "org.jetbrains.compose.material", name = "material-ripple", version.ref = "compose" }
+
+#!material-icons-extended = { group = "org.jetbrains.compose.material", name = "material-icons-extended" }
+#!material-icons-core = { group = "org.jetbrains.compose.material", name = "material-icons-core" }
+
+runtime = { group = "org.jetbrains.compose.runtime", name = "runtime", version.ref = "compose" }
+runtime-saveable = { group = "org.jetbrains.compose.runtime", name = "runtime-saveable", version.ref = "compose" }
+
+ui = { group = "org.jetbrains.compose.ui", name = "ui", version.ref = "compose" }
+ui-backhandler = { group = "org.jetbrains.compose.ui", name = "ui-backhandler", version.ref = "compose" }
+ui-desktop = { group = "org.jetbrains.compose.ui", name = "ui-desktop", version.ref = "compose" }
+ui-geometry = { group = "org.jetbrains.compose.ui", name = "ui-geometry", version.ref = "compose" }
+ui-graphics = { group = "org.jetbrains.compose.ui", name = "ui-graphics", version.ref = "compose" }
+ui-test = { group = "org.jetbrains.compose.ui", name = "ui-test", version.ref = "compose" }
+ui-text = { group = "org.jetbrains.compose.ui", name = "ui-text", version.ref = "compose" }
+ui-tooling = { group = "org.jetbrains.compose.ui", name = "ui-tooling", version.ref = "compose" }
+ui-tooling-data = { group = "org.jetbrains.compose.ui", name = "ui-tooling-data", version.ref = "compose" }
+ui-tooling-preview = { group = "org.jetbrains.compose.ui", name = "ui-tooling-preview", version.ref = "compose" }
+ui-unit = { group = "org.jetbrains.compose.ui", name = "ui-unit", version.ref = "compose" }
+ui-util = { group = "org.jetbrains.compose.ui", name = "ui-util", version.ref = "compose" }
+
+#org.jetbrains.compose.web:compose-compiler-integration:1.9.0...
+#org.jetbrains.compose.web:compose-compiler-integration-lib:1.9.0...
+#org.jetbrains.compose.web:internal-web-core-runtime:1.9.0...
+#org.jetbrains.compose.web:test-utils:1.9.0...
+#org.jetbrains.compose.web:web-benchmark-core:1.9.0...
+#org.jetbrains.compose.web:web-core:1.9.0...
+#org.jetbrains.compose.web:web-integration-core:1.9.0...
+#org.jetbrains.compose.web:web-svg:1.9.0...
+
+material3 = { group = "org.jetbrains.compose.material3", name = "material3", version.ref = "material3" }
+material3-adaptive-navigation-suite = { group = "org.jetbrains.compose.material3", name = "material3-adaptive-navigation-suite", version.ref = "material3" }
+material3-window-sizeclass = { group = "org.jetbrains.compose.material3", name = "material3-window-size-class", version.ref = "material3" }
+material3-adaptive = { group = "org.jetbrains.compose.material3.adaptive", name = "adaptive", version.ref = "material3-adaptive" }
+material3-adaptive-layout = { group = "org.jetbrains.compose.material3.adaptive", name = "adaptive-layout", version.ref = "material3-adaptive" }
+material3-adaptive-navigation = { group = "org.jetbrains.compose.material3.adaptive", name = "adaptive-navigation", version.ref = "material3-adaptive" }
+
+lifecycle-common = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-common", version.ref = "lifecycle" }
+lifecycle-runtime = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime", version.ref = "lifecycle" }
+lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycle" }
+lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "lifecycle" }
+lifecycle-viewmodel-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+lifecycle-viewmodel-savedstate = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-savedstate", version.ref = "lifecycle" }
+
+navigation-common = { group = "org.jetbrains.androidx.navigation", name = "navigation-common", version.ref = "navigation" }
+navigation-compose = { group = "org.jetbrains.androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+navigation-runtime = { group = "org.jetbrains.androidx.navigation", name = "navigation-runtime", version.ref = "navigation" }
+
+savedstate = { group = "org.jetbrains.androidx.savedstate", name = "savedstate", version.ref = "savedstate" }
+savedstate-compose = { group = "org.jetbrains.androidx.savedstate", name = "savedstate-compose", version.ref = "savedstate" }
+
+window-core = { group = "org.jetbrains.androidx.window", name = "window-core", version.ref = "window-core" }
+
+[plugins]
+publish-plugin = { id = "com.gradle.plugin-publish", version.ref = "publish-plugin" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose" }
