@@ -400,21 +400,25 @@ class ResourcesTest : GradlePluginTestBase() {
             .filter { !it.isDirectory && !it.isHidden }
             .getConvertedResources(commonResourcesDir, repackDir)
 
-        gradle(":androidApp:assemble").checks {
-            check.taskSuccessful(":sharedUI:copyAndroidMainComposeResourcesToAndroidAssets")
+        //FIXME delete the filter when https://issuetracker.google.com/456657404 is fixed
+        val skipAndroidCheck = currentOS == OS.Windows && defaultTestEnvironment.gradleVersion.contains("9.0.0")
+        if (!skipAndroidCheck) {
+            gradle(":androidApp:assemble").checks {
+                check.taskSuccessful(":sharedUI:copyAndroidMainComposeResourcesToAndroidAssets")
 
-            listOf(
-                "androidApp/build/outputs/apk/demo/debug/androidApp-demo-debug.apk",
-                "androidApp/build/outputs/apk/full/debug/androidApp-full-debug.apk",
-                "androidApp/build/outputs/apk/demo/release/androidApp-demo-release.apk",
-                "androidApp/build/outputs/apk/full/release/androidApp-full-release.apk"
-            ).forEach { path ->
-                val apk = file(path)
-                checkResourcesZip(apk, commonResourcesFiles, true)
-                assertEquals(
-                    "android",
-                    readFileInZip(apk, "assets/$repackDir/files/platform.txt").decodeToString()
-                )
+                listOf(
+                    "androidApp/build/outputs/apk/demo/debug/androidApp-demo-debug.apk",
+                    "androidApp/build/outputs/apk/full/debug/androidApp-full-debug.apk",
+                    "androidApp/build/outputs/apk/demo/release/androidApp-demo-release.apk",
+                    "androidApp/build/outputs/apk/full/release/androidApp-full-release.apk"
+                ).forEach { path ->
+                    val apk = file(path)
+                    checkResourcesZip(apk, commonResourcesFiles, true)
+                    assertEquals(
+                        "android",
+                        readFileInZip(apk, "assets/$repackDir/files/platform.txt").decodeToString()
+                    )
+                }
             }
         }
 
