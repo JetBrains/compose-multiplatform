@@ -1,7 +1,7 @@
 [versions]
-kotlin = "1.9.23"
-ideaPlugin = "2.1.0"
-idea = "2024.2.1"
+kotlin = "2.1.21"
+ideaPlugin = "2.9.0"
+idea = "2025.2.2"
 changelog = "2.2.0"
 
 [plugins]
