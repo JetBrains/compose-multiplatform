@@ -17,8 +17,7 @@ pluginManagement {
         id("org.jetbrains.kotlin.multiplatform").version("KOTLIN_VERSION_PLACEHOLDER")
         id("org.jetbrains.kotlin.plugin.compose").version("KOTLIN_VERSION_PLACEHOLDER")
         id("org.jetbrains.compose").version("COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER")
-        id("com.android.library").version("AGP_VERSION_PLACEHOLDER")
-        id("com.android.application").version("AGP_VERSION_PLACEHOLDER")
+        id("com.android.kotlin.multiplatform.library").version("AGP_VERSION_PLACEHOLDER")
     }
 }
 dependencyResolutionManagement {

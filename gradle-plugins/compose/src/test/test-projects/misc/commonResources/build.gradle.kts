@@ -1,21 +1,18 @@
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.compose")
-    id("com.android.application")
+    id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.compose")
 }
 
 group = "app.group"
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            compileTaskProvider {
-                compilerOptions {
-                    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
-                }
-            }
-        }
+    androidLibrary {
+        compileSdk = 35
+        namespace = "org.jetbrains.compose.resources.test"
+        minSdk = 23
+        androidResources.enable = true
     }
     jvm("desktop")
 
@@ -29,43 +26,6 @@ kotlin {
                 api(compose.components.resources)
             }
         }
-    }
-}
-
-android {
-    compileSdk = 35
-    namespace = "org.jetbrains.compose.resources.test"
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    defaultConfig {
-        applicationId = "org.example.project"
-        minSdk = 23
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
-    }
-    signingConfigs {
-        create("testkey") {
-            storeFile = project.file("key/debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
-        }
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("testkey")
-        }
-        getByName("debug") {
-            signingConfig = signingConfigs.getByName("testkey")
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    lint {
-        checkReleaseBuilds = false
     }
 }
 

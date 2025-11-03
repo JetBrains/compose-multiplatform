@@ -4,11 +4,16 @@ plugins {
     id("org.jetbrains.compose")
     kotlin("multiplatform")
     kotlin("plugin.compose")
-    id("com.android.application")
+    id("com.android.kotlin.multiplatform.library")
 }
 
 kotlin {
-    androidTarget()
+    androidLibrary {
+        compileSdk = 35
+        namespace = "me.sample.app"
+        minSdk = 23
+        androidResources.enable = true
+    }
     jvm()
     iosX64()
     iosArm64()
@@ -36,22 +41,5 @@ kotlin {
             @OptIn(ExperimentalComposeLibrary::class)
             implementation(compose.uiTest)
         }
-    }
-}
-
-android {
-    namespace = "me.sample.app"
-    compileSdk = 35
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    defaultConfig {
-        applicationId = "org.example.project"
-        minSdk = 24
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
 }
