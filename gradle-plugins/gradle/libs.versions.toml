@@ -1,8 +1,8 @@
 [versions]
-kotlin = "2.2.0-RC2"
+kotlin = "2.2.0"
 gradle-download-plugin = "5.5.0"
 kotlin-poet = "2.1.0"
-plugin-android = "8.9.1"
+plugin-android = "8.10.1"
 shadow-jar = "8.1.1"
 publish-plugin = "1.2.1"
 
