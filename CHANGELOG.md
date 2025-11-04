@@ -1,3 +1,93 @@
+# 1.10.0-beta01 (November 2025)
+
+_Changes since 1.10.0-alpha03_
+
+## Highlights
+
+### Desktop
+
+- Compose Hot Reload Gradle plugin is bundled with Compose Gradle plugin (no need to configure it separately) [#5444](https://github.com/JetBrains/compose-multiplatform/pull/5444)
+
+## Known Issues
+
+### Multiple Platforms
+
+- Due to the bundled Hot Reload Gradle plugin, Compose Multiplatform requires Kotlin version 2.1.20 or higher [#5444](https://github.com/JetBrains/compose-multiplatform/pull/5444)
+
+## Migration Notes
+
+### Multiple Platforms
+
+- Remove experimental annotation from `usePlatformInsets`, `useSoftwareKeyboardInset` and `scrimColor` in `DialogProperties` [#2495](https://github.com/JetBrains/compose-multiplatform-core/pull/2495)
+- Remove experimental annotation from `usePlatformDefaultWidth`, `usePlatformInsets` in `PopupProperties` [#2495](https://github.com/JetBrains/compose-multiplatform-core/pull/2495)
+- Deprecation level of `Popup` overloads without `PopupProperties` parameter changed from `WARNING` to `ERROR` [#2495](https://github.com/JetBrains/compose-multiplatform-core/pull/2495)
+- Dependency aliases in Gradle plugin (e.g. `compose.ui`) are now deprecated. Use provided direct artifact coordinates and add them to the version catalog [#5462](https://github.com/JetBrains/compose-multiplatform/pull/5462)
+
+## Features
+
+### iOS
+
+- Add support for self-sizing of UIKit interop views in Compose [#2485](https://github.com/JetBrains/compose-multiplatform-core/pull/2485)
+- Add experimental `UIKitInteropProperties.placedAsOverlay` flag, which allows to place interop views above the Compose canvas. This allows interop views with a transparent background or shader effect to be used [#2501](https://github.com/JetBrains/compose-multiplatform-core/pull/2501)
+
+### Web
+
+- Esc button calls back navigation event on the web now [#2499](https://github.com/JetBrains/compose-multiplatform-core/pull/2499)
+- Add support of `important` keyword for CSS properties [#5439](https://github.com/JetBrains/compose-multiplatform/pull/5439)
+
+### Navigation
+
+- Published `org.jetbrains.compose.material3.adaptive:adaptive-navigation3` library [#2516](https://github.com/JetBrains/compose-multiplatform-core/pull/2516)
+- Add a new configuration option in `ComposeUIViewController` to set end-edge gestures behavior [#2519](https://github.com/JetBrains/compose-multiplatform-core/pull/2519)
+
+## Fixes
+
+### Multiple Platforms
+
+- Align `roundToPx()` behavior between platforms: `NaN` value produces `0` instead of `IllegalArgumentException` on non-JVM platforms now [#2526](https://github.com/JetBrains/compose-multiplatform-core/pull/2526)
+- Added previously missing `ExperimentalComposeUiApi` annotation to platform-specific `DragAndDropTransferData`, `DragAndDropEvent` and `ClipEntry` constructors on Desktop and Web. Working with these APIs already requires this annotation due to types of parameters, so it wasn't supposed to be marked as "stable" yet. You can follow [CMP-7624](https://youtrack.jetbrains.com/issue/CMP-7624) to track the updates about finalizing the shape of these APIs [#2538](https://github.com/JetBrains/compose-multiplatform-core/pull/2538)
+
+### iOS
+
+- Fix `onKeyEvent` handling when `Full Keyboard Access` is enabled [#2494](https://github.com/JetBrains/compose-multiplatform-core/pull/2494)
+- Fix incorrect tap responses in `Dialog` when `LocalDensity` is modified [#2527](https://github.com/JetBrains/compose-multiplatform-core/pull/2527)
+- _(prerelease fix)_ Fix crash when interacting with scrollables with overscroll [#2532](https://github.com/JetBrains/compose-multiplatform-core/pull/2532)
+
+### Desktop
+
+- Fix `SwingPanel` blocking mouse wheel scroll events from going to its parent [#2486](https://github.com/JetBrains/compose-multiplatform-core/pull/2486)
+
+### Web
+
+- Correct drag-and-drop behaviour on mobile devices [#2510](https://github.com/JetBrains/compose-multiplatform-core/pull/2510)
+- Fix incorrect interpretation of `ontouchend` events [#2490](https://github.com/JetBrains/compose-multiplatform-core/pull/2490)
+- Unblock autocomplete and the other keyboard features on mobile iOS [#2529](https://github.com/JetBrains/compose-multiplatform-core/pull/2529)
+- Correct behaviour when a virtual keyboard suggestion was accepted while the cursor was in the middle of the word [#2530](https://github.com/JetBrains/compose-multiplatform-core/pull/2530)
+
+### Resources
+
+- Use Web Cache API for all resources to avoid repeated and redundant HTTP requests [#5379](https://github.com/JetBrains/compose-multiplatform/pull/5379)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.10.0-beta01`. Based on Jetpack Compose libraries:
+  - [Runtime 1.10.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.10.0-beta01)
+  - [UI 1.10.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.10.0-beta01)
+  - [Foundation 1.10.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.10.0-beta01)
+  - [Material 1.10.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.10.0-beta01)
+  - [Material3 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0)
+
+- Compose Material3 libraries `org.jetbrains.compose.material3:material3*:1.10.0-alpha04`. Based on [Jetpack Compose Material3 1.5.0-alpha07](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha07)
+- Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha01`. Based on [Jetpack Compose Material3 Adaptive 1.3.0-alpha02](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha02)
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.10.0-alpha04`. Based on [Jetpack Lifecycle 2.10.0-beta01](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.10.0-beta01)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.1`. Based on [Jetpack Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4)
+- Navigation 3 libraries `org.jetbrains.androidx.navigation:navigation3-*:1.0.0-alpha04`. Based on [Jetpack Navigation 3](https://developer.android.com/jetpack/androidx/releases/navigation3#1.0.0-beta01)
+- Navigation Event library `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.0.0-beta01`. Based on [Jetpack Navigation Event 1.0.0-beta01](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.0.0-beta01)
+- Savedstate library `org.jetbrains.androidx.savedstate:savedstate*:1.4.0-beta01`. Based on [Jetpack Savedstate 1.4.0-rc01](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0-rc01)
+- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.5.0-rc01`. Based on [Jetpack WindowManager 1.5.0](https://developer.android.com/jetpack/androidx/releases/window#1.5.0)
+
+---
+
 # 1.9.2 (October 2025)
 
 _Changes since 1.9.1_
