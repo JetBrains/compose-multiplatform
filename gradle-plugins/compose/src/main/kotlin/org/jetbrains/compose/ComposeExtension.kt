@@ -15,6 +15,8 @@ import org.jetbrains.compose.internal.utils.nullableProperty
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import javax.inject.Inject
 
+private const val newCompilerIsAvailableVersion = "2.0.0"
+
 abstract class ComposeExtension @Inject constructor(
     objects: ObjectFactory,
     project: Project
