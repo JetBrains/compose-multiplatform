@@ -76,7 +76,7 @@ _Changes since 1.10.0-alpha03_
   - [UI 1.10.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.10.0-beta01)
   - [Foundation 1.10.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.10.0-beta01)
   - [Material 1.10.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.10.0-beta01)
-  - [Material3 1.9.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0)
+  - [Material3 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0)
 
 - Compose Material3 libraries `org.jetbrains.compose.material3:material3*:1.10.0-alpha04`. Based on [Jetpack Compose Material3 1.5.0-alpha07](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha07)
 - Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha01`. Based on [Jetpack Compose Material3 Adaptive 1.3.0-alpha02](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha02)
