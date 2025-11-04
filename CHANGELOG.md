@@ -33,7 +33,6 @@ _Changes since 1.10.0-alpha03_
 ### Web
 
 - Esc button calls back navigation event on the web now [#2499](https://github.com/JetBrains/compose-multiplatform-core/pull/2499)
--  [#5439](https://github.com/JetBrains/compose-multiplatform/pull/5439)
 - Add support of `important` keyword for CSS properties [#5439](https://github.com/JetBrains/compose-multiplatform/pull/5439)
 
 ### Navigation
