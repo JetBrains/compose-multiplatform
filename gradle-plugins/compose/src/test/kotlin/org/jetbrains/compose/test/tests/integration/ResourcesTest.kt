@@ -327,7 +327,7 @@ class ResourcesTest : GradlePluginTestBase() {
     fun testAndroidAppWithResources() {
         //FIXME delete the filter when https://issuetracker.google.com/456657404 is fixed
         Assumptions.assumeFalse {
-            currentOS == OS.Windows && defaultTestEnvironment.gradleVersion.contains("9.0.0")
+            currentOS == OS.Windows && defaultTestEnvironment.agpVersion.contains("9.0.0")
         }
         with(testProject("misc/androidAppWithResources", defaultTestEnvironment)) {
             gradle(":appModule:assembleDebug").checks {
@@ -406,7 +406,7 @@ class ResourcesTest : GradlePluginTestBase() {
             .getConvertedResources(commonResourcesDir, repackDir)
 
         //FIXME delete the filter when https://issuetracker.google.com/456657404 is fixed
-        val skipAndroidCheck = currentOS == OS.Windows && defaultTestEnvironment.gradleVersion.contains("9.0.0")
+        val skipAndroidCheck = currentOS == OS.Windows && defaultTestEnvironment.agpVersion.contains("9.0.0")
         if (!skipAndroidCheck) {
             gradle(":androidApp:assemble").checks {
                 check.taskSuccessful(":sharedUI:copyAndroidMainComposeResourcesToAndroidAssets")

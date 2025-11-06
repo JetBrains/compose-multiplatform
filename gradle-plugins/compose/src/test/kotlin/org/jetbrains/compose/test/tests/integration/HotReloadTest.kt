@@ -5,6 +5,7 @@ import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.compose.ComposeBuildConfig
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.test.utils.GradlePluginTestBase
+import org.jetbrains.compose.test.utils.TestEnvironment
 import org.jetbrains.compose.test.utils.checks
 import org.junit.jupiter.api.fail
 import org.junit.jupiter.api.Test
@@ -28,6 +29,16 @@ class HotReloadTest : GradlePluginTestBase() {
     @Test
     fun testDisableHotReload() = with(testProject("application/jvm")) {
         gradleFailure("hotRun", "-P${ComposeProperties.DISABLE_HOT_RELOAD}=true").checks {
+            check.logContains("Task 'hotRun' not found")
+        }
+    }
+
+    @Test
+    fun testIncompatibleKotlin() = with(testProject("application/jvm",
+        TestEnvironment(defaultTestEnvironment.workingDir, kotlinVersion = "2.1.0")))
+    {
+        gradleFailure("hotRun").checks {
+            check.logContains("w: Compose Hot Reload is disabled")
             check.logContains("Task 'hotRun' not found")
         }
     }
