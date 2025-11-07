@@ -28,20 +28,20 @@ internal fun Project.checkComposeCompilerPlugin() {
     }
 }
 
+internal const val minimalSupportedKgpVersion = "2.1.0"
 internal const val minimalSupportedKgpVersionError = "e: Configuration problem: " +
-        "Minimal supported Kotlin Gradle Plugin version is 2.0.0"
-internal const val newCompilerIsAvailableVersion = "2.0.0"
+        "Minimal supported Kotlin Gradle Plugin version is $minimalSupportedKgpVersion"
 internal const val newComposeCompilerKotlinSupportPluginId = "org.jetbrains.kotlin.plugin.compose"
 internal const val newComposeCompilerError =
-    "Since Kotlin 2.0.0 to use Compose Multiplatform " +
-            "you must apply \"$newComposeCompilerKotlinSupportPluginId\" plugin." +
+    "Starting with Compose Multiplatform 1.6.10, " +
+            "you should apply \"$newComposeCompilerKotlinSupportPluginId\" plugin." +
             "\nSee the migration guide https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compiler.html#migrating-a-compose-multiplatform-project"
 
 private fun Project.checkComposeCompilerPlugin(kgp: KotlinBasePlugin) {
     val kgpVersion = kgp.pluginVersion
     val ideaIsInSync = project.ideaIsInSyncProvider().get()
 
-    if (Version.fromString(kgpVersion) < Version.fromString(newCompilerIsAvailableVersion)) {
+    if (Version.fromString(kgpVersion) < Version.fromString(minimalSupportedKgpVersion)) {
         if (ideaIsInSync) logger.error(minimalSupportedKgpVersionError)
         else error(minimalSupportedKgpVersionError)
     } else {
