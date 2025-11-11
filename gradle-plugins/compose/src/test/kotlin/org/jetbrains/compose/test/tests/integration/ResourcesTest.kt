@@ -735,9 +735,9 @@ class ResourcesTest : GradlePluginTestBase() {
                     |    sourceSets {
                     |        commonMain {
                     |            dependencies {
-                    |                implementation("org.jetbrains.compose.runtime:runtime:${defaultTestEnvironment.composeGradlePluginVersion}")
-                    |                implementation("org.jetbrains.compose.material:material:${defaultTestEnvironment.composeGradlePluginVersion}")
-                    |                implementation("org.jetbrains.compose.components:components-resources:${defaultTestEnvironment.composeGradlePluginVersion}")
+                    |                implementation("org.jetbrains.compose.runtime:runtime:${defaultTestEnvironment.composeVersion}")
+                    |                implementation("org.jetbrains.compose.material:material:${defaultTestEnvironment.composeVersion}")
+                    |                implementation("org.jetbrains.compose.components:components-resources:${defaultTestEnvironment.composeVersion}")
                     |            }
                     |        }
                     |    }
@@ -784,9 +784,9 @@ class ResourcesTest : GradlePluginTestBase() {
                     |    sourceSets {
                     |        commonMain {
                     |            dependencies {
-                    |                implementation("org.jetbrains.compose.runtime:runtime:${defaultTestEnvironment.composeGradlePluginVersion}")
-                    |                implementation("org.jetbrains.compose.material:material:${defaultTestEnvironment.composeGradlePluginVersion}")
-                    |                implementation("org.jetbrains.compose.components:components-resources:${defaultTestEnvironment.composeGradlePluginVersion}")
+                    |                implementation("org.jetbrains.compose.runtime:runtime:${defaultTestEnvironment.composeVersion}")
+                    |                implementation("org.jetbrains.compose.material:material:${defaultTestEnvironment.composeVersion}")
+                    |                implementation("org.jetbrains.compose.components:components-resources:${defaultTestEnvironment.composeVersion}")
                     |            }
                     |        }
                     |    }
