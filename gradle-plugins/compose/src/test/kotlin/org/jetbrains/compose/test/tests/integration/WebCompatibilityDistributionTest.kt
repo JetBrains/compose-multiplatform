@@ -34,7 +34,7 @@ class WebCompatibilityDistributionTest : GradlePluginTestBase() {
     }
 
     private fun TestProject.applyBuildConfig(caseName: String) {
-        file("build.gradle.kts.${caseName}").renameTo(file("build.gradle.kts"))
+        file("build.${caseName}.gradle.kts").renameTo(file("build.gradle.kts"))
     }
 
     @Test
