@@ -1,6 +1,8 @@
 package org.jetbrains.compose.test.tests.integration
 
+import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
+import org.jetbrains.compose.internal.Version
 import org.jetbrains.compose.internal.utils.Arch
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentArch
@@ -338,6 +340,28 @@ class ResourcesTest : GradlePluginTestBase() {
                 )
                 val apk = file("appModule/build/outputs/apk/debug/appModule-debug.apk")
                 checkResourcesZip(apk, resourcesFiles, true)
+            }
+        }
+    }
+
+    @Test
+    fun testAndroidPreviewCallsResourcesPackaging() {
+        // Valid for AGP < 9.0.0 only
+        // https://youtrack.jetbrains.com/issue/CMP-7170
+        Assumptions.assumeTrue { Version.fromString(defaultTestEnvironment.agpVersion).major < 9 }
+        with(testProject("misc/oldAndroidTargetAppWithResources", defaultTestEnvironment)) {
+            //AndroidStudio previews call `compileDebugSources` task
+            gradle(":appModule:compileDebugSources").checks {
+                check.taskSuccessful(":appModule:packageDebugResources")
+                check.taskSuccessful(":featureModule:packageDebugResources")
+                check.taskSuccessful(":featureModule:copyDebugComposeResourcesToAndroidAssets")
+
+                val resourceFile = "composeResources/oldagpresources.featuremodule.generated.resources/values/strings.commonMain.cvr"
+                assertTrue {
+                    file(
+                        "featureModule/build/generated/assets/copyDebugComposeResourcesToAndroidAssets/$resourceFile"
+                    ).exists()
+                }
             }
         }
     }
