@@ -15,8 +15,8 @@ kotlin {
         }
         named("jsMain") { 
             dependencies {
-                implementation("org.jetbrains.compose.html:html-core:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER")
-                implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER")
+                implementation("org.jetbrains.compose.html:html-core:COMPOSE_VERSION_PLACEHOLDER")
+                implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
             }
         }
         named("jvmMain") {

@@ -18,9 +18,9 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api("org.jetbrains.compose.runtime:runtime:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER")
+            api("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
             api("org.jetbrains.compose.material3:material3:1.9.0")
-            api("org.jetbrains.compose.components:components-resources:COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER")
+            api("org.jetbrains.compose.components:components-resources:COMPOSE_VERSION_PLACEHOLDER")
         }
     }
 }
