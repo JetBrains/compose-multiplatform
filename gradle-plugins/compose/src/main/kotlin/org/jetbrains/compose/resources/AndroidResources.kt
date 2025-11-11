@@ -189,7 +189,7 @@ private fun Project.configureGeneratedAndroidComponentAssets(
     )
     tasks.configureEach { task ->
         //fix agp task dependencies for AndroidStudio preview
-        if (task.name == "compile${camelComponentName}Sources") {
+        if (task.name == "package${camelComponentName}Resources") {
             task.dependsOn(copyComponentAssets)
         }
         //fix linter task dependencies for `build` task
