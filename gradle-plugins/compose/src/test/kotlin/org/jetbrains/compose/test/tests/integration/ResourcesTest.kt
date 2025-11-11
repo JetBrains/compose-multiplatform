@@ -549,8 +549,8 @@ class ResourcesTest : GradlePluginTestBase() {
 
         modifyText("build.gradle.kts") { str ->
             str.replace(
-                "api(compose.components.resources)",
-                "//api(compose.components.resources)"
+                "api(\"org.jetbrains.compose.components:components-resources:${defaultTestEnvironment.composeVersion}\")",
+                "//api(\"org.jetbrains.compose.components:components-resources:${defaultTestEnvironment.composeVersion}\")"
             )
         }
         gradle("prepareKotlinIdeaImport").checks {
@@ -559,8 +559,8 @@ class ResourcesTest : GradlePluginTestBase() {
 
         modifyText("build.gradle.kts") { str ->
             str.replace(
-                "//api(compose.components.resources)",
-                "api(compose.components.resources)"
+                "//api(\"org.jetbrains.compose.components:components-resources:${defaultTestEnvironment.composeVersion}\")",
+                "api(\"org.jetbrains.compose.components:components-resources:${defaultTestEnvironment.composeVersion}\")"
             )
         }
         modifyText("build.gradle.kts") { str ->
