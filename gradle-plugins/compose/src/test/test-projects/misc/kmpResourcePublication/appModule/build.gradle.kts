@@ -1,5 +1,3 @@
-import org.jetbrains.compose.ExperimentalComposeLibrary
-
 plugins {
     id("org.jetbrains.compose")
     kotlin("multiplatform")
