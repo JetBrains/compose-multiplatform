@@ -6,14 +6,13 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain(11)
     jvm()
 
     androidLibrary {
-        experimentalProperties["android.experimental.kmp.enableAndroidResources"] = true
         namespace = "me.sample.feature"
         compileSdk = 35
         minSdk = 23
+        androidResources.enable = true
     }
 
     sourceSets {
@@ -28,4 +27,8 @@ kotlin {
 //https://youtrack.jetbrains.com/issue/CMP-8325
 compose.desktop {
     application { }
+}
+
+compose.resources {
+    publicResClass = true
 }
