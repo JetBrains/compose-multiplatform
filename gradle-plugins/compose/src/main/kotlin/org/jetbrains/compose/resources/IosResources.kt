@@ -11,9 +11,12 @@ import org.jetbrains.compose.internal.utils.joinLowerCamelCase
 import org.jetbrains.compose.internal.utils.registerOrConfigure
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.cocoapods.CocoapodsExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBinary
+import org.jetbrains.kotlin.gradle.plugin.mpp.StaticLibrary
 import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.io.File
@@ -34,38 +37,48 @@ internal fun Project.configureSyncIosComposeResources(
 
     kotlinExtension.targets.withType(KotlinNativeTarget::class.java).all { nativeTarget ->
         if (nativeTarget.isIosOrMacTarget()) {
-            nativeTarget.binaries.withType(Framework::class.java).all { iosFramework ->
-                val frameworkClassifier = iosFramework.getClassifier()
-                val checkNoSandboxTask = tasks.registerOrConfigure<CheckCanAccessComposeResourcesDirectory>(
-                    "checkCanSync${frameworkClassifier}ComposeResourcesForIos"
-                ) {}
-
-                val frameworkResources = files()
-                iosFramework.compilation.allKotlinSourceSets.forAll { ss ->
-                    frameworkResources.from(ss.resources.sourceDirectories)
+            nativeTarget.binaries.withType(NativeBinary::class.java)
+                .matching { binary ->
+                    binary is Framework || binary.isSwiftExportStaticLibrary()
                 }
-                val syncComposeResourcesTask = tasks.registerOrConfigure<SyncComposeResourcesForIosTask>(
-                    iosFramework.getSyncResourcesTaskName()
-                ) {
-                    dependsOn(checkNoSandboxTask)
-                    dependsOn(frameworkResources)  //!!! explicit dependency because targetResources is not an input
+                .all { binary ->
+                    val binClassifier = binary.getClassifier()
+                    val checkNoSandboxTask = tasks.registerOrConfigure<CheckCanAccessComposeResourcesDirectory>(
+                        "checkCanSync${binClassifier}ComposeResourcesForIos"
+                    ) {}
+                    val frameworkResources = files()
+                    binary.compilation.allKotlinSourceSets.forAll { ss ->
+                        frameworkResources.from(ss.resources.sourceDirectories)
+                    }
+                    val syncComposeResourcesTask = tasks.registerOrConfigure<SyncComposeResourcesForIosTask>(
+                        binary.getSyncResourcesTaskName()
+                    ) {
+                        dependsOn(checkNoSandboxTask)
+                        dependsOn(frameworkResources)  //!!! explicit dependency because targetResources is not an input
 
-                    outputDir.set(iosFramework.getFinalResourcesDir())
-                    targetResources.put(iosFramework.target.konanTarget.name, frameworkResources)
-                }
+                        outputDir.set(binary.getFinalResourcesDir())
+                        targetResources.put(binary.target.konanTarget.name, frameworkResources)
+                    }
 
-                val externalTaskName = if (iosFramework.isCocoapodsFramework()) {
-                    "syncFramework"
-                } else {
-                    "embedAndSign${frameworkClassifier}AppleFrameworkForXcode"
-                }
+                    val externalTaskName = when {
+                        binary.isCocoapodsFramework() -> "syncFramework"
+                        binary.isSwiftExportStaticLibrary() -> "embedSwiftExportForXcode"
+                        else -> "embedAndSign${binClassifier}AppleFrameworkForXcode"
+                    }
 
-                project.tasks.configureEach { task ->
-                    if (task.name == externalTaskName) {
-                        task.dependsOn(syncComposeResourcesTask)
+                    project.tasks.configureEach { task ->
+                        if (task.name == externalTaskName) {
+                            task.dependsOn(syncComposeResourcesTask)
+                        }
+
+                        //FIXME: https://youtrack.jetbrains.com/issue/KT-82332
+                        if (binary.isSwiftExportStaticLibrary() &&
+                            task.name.let { it.startsWith("copy") && it.endsWith("SPMIntermediates") }
+                        ) {
+                            task.dependsOn(syncComposeResourcesTask)
+                        }
                     }
                 }
-            }
 
             nativeTarget.binaries.withType(TestExecutable::class.java).all { testExec ->
                 val copyTestResourcesTask = tasks.registerOrConfigure<Copy>(
@@ -109,17 +122,18 @@ internal fun Project.configureSyncIosComposeResources(
     }
 }
 
-private fun Framework.getClassifier(): String {
+private fun NativeBinary.getClassifier(): String {
     val suffix = joinLowerCamelCase(buildType.getName(), outputKind.taskNameClassifier)
     return if (name == suffix) ""
     else name.substringBeforeLast(suffix.uppercaseFirstChar()).uppercaseFirstChar()
 }
 
-internal fun Framework.getSyncResourcesTaskName() = "sync${getClassifier()}ComposeResourcesForIos"
+private fun NativeBinary.getSyncResourcesTaskName() = "sync${getClassifier()}ComposeResourcesForIos"
 
-private fun Framework.isCocoapodsFramework() = name.startsWith("pod")
+private fun NativeBinary.isCocoapodsFramework() = this is Framework && name.startsWith("pod")
+private fun NativeBinary.isSwiftExportStaticLibrary() = this is StaticLibrary && baseName == "SwiftExportBinary"
 
-private fun Framework.getFinalResourcesDir(): Provider<Directory> {
+private fun NativeBinary.getFinalResourcesDir(): Provider<Directory> {
     val providers = project.providers
     return if (isCocoapodsFramework()) {
         project.layout.buildDirectory.dir("compose/cocoapods/$IOS_COMPOSE_RESOURCES_ROOT_DIR/")
