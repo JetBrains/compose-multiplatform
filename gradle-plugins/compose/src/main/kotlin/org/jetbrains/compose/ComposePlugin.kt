@@ -65,64 +65,64 @@ abstract class ComposePlugin : Plugin<Project> {
     @Suppress("DEPRECATION")
     class Dependencies(project: Project) {
         val desktop = DesktopDependencies
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.animation:animation:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.animation:animation:${ComposeBuildConfig.composeVersion}\""))
         val animation get() = composeDependency("org.jetbrains.compose.animation:animation")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.animation:animation-graphics:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.animation:animation-graphics:${ComposeBuildConfig.composeVersion}\""))
         val animationGraphics get() = composeDependency("org.jetbrains.compose.animation:animation-graphics")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.foundation:foundation:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.foundation:foundation:${ComposeBuildConfig.composeVersion}\""))
         val foundation get() = composeDependency("org.jetbrains.compose.foundation:foundation")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.material:material:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.material:material:${ComposeBuildConfig.composeVersion}\""))
         val material get() = composeDependency("org.jetbrains.compose.material:material")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.material3:material3:${ComposeBuildConfig.composeMaterial3Version}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.material3:material3:${ComposeBuildConfig.composeMaterial3Version}\""))
         val material3 get() = composeMaterial3Dependency("org.jetbrains.compose.material3:material3")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.material3:material3-adaptive-navigation-suite:${ComposeBuildConfig.composeMaterial3Version}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.material3:material3-adaptive-navigation-suite:${ComposeBuildConfig.composeMaterial3Version}\""))
         val material3AdaptiveNavigationSuite get() = composeMaterial3Dependency("org.jetbrains.compose.material3:material3-adaptive-navigation-suite")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.runtime:runtime:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.runtime:runtime:${ComposeBuildConfig.composeVersion}\""))
         val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.runtime:runtime-saveable:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.runtime:runtime-saveable:${ComposeBuildConfig.composeVersion}\""))
         val runtimeSaveable get() = composeDependency("org.jetbrains.compose.runtime:runtime-saveable")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui:${ComposeBuildConfig.composeVersion}\""))
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-test:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-test:${ComposeBuildConfig.composeVersion}\""))
         @ExperimentalComposeLibrary
         val uiTest get() = composeDependency("org.jetbrains.compose.ui:ui-test")
         @Deprecated("Use org.jetbrains.compose.ui:ui-tooling-preview module instead", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-tooling:${ComposeBuildConfig.composeVersion}\""))
         val uiTooling get() = composeDependency("org.jetbrains.compose.ui:ui-tooling")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-util:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-util:${ComposeBuildConfig.composeVersion}\""))
         val uiUtil get() = composeDependency("org.jetbrains.compose.ui:ui-util")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-tooling-preview:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-tooling-preview:${ComposeBuildConfig.composeVersion}\""))
         val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.material:material-icons-extended:1.7.3\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.material:material-icons-extended:1.7.3\""))
         val materialIconsExtended get() = "org.jetbrains.compose.material:material-icons-extended:1.7.3"
-        @Deprecated("Specify dependency via version catalog")
+        @Deprecated("Specify dependency directly")
         val components get() = CommonComponentsDependencies
         @Deprecated("Use compose.html", replaceWith = ReplaceWith("html"), level = DeprecationLevel.ERROR)
         val web: WebDependencies get() = WebDependencies
-        @Deprecated("Specify dependency via version catalog")
+        @Deprecated("Specify dependency directly")
         val html: HtmlDependencies get() = HtmlDependencies
     }
 
-    @Deprecated("Specify dependency via version catalog")
+    @Deprecated("Specify dependency directly")
     object DesktopDependencies {
-        @Deprecated("Specify dependency via version catalog")
+        @Deprecated("Specify dependency directly")
         val components = DesktopComponentsDependencies
 
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop:${ComposeBuildConfig.composeVersion}\""))
         val common = composeDependency("org.jetbrains.compose.desktop:desktop")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop-jvm-linux-x64:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop-jvm-linux-x64:${ComposeBuildConfig.composeVersion}\""))
         val linux_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-linux-x64")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop-jvm-linux-arm64:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop-jvm-linux-arm64:${ComposeBuildConfig.composeVersion}\""))
         val linux_arm64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-linux-arm64")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop-jvm-windows-x64:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop-jvm-windows-x64:${ComposeBuildConfig.composeVersion}\""))
         val windows_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-windows-x64")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop-jvm-windows-arm64:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop-jvm-windows-arm64:${ComposeBuildConfig.composeVersion}\""))
         val windows_arm64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-windows-arm64")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop-jvm-macos-x64:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop-jvm-macos-x64:${ComposeBuildConfig.composeVersion}\""))
         val macos_x64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-x64")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop-jvm-macos-arm64:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop-jvm-macos-arm64:${ComposeBuildConfig.composeVersion}\""))
         val macos_arm64 = composeDependency("org.jetbrains.compose.desktop:desktop-jvm-macos-arm64")
 
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-test-junit4:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-test-junit4:${ComposeBuildConfig.composeVersion}\""))
         val uiTestJUnit4 get() = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
 
         val currentOs by lazy {
@@ -130,56 +130,56 @@ abstract class ComposePlugin : Plugin<Project> {
         }
     }
 
-    @Deprecated("Specify dependency via version catalog")
+    @Deprecated("Specify dependency directly")
     object CommonComponentsDependencies {
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.components:components-resources:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.components:components-resources:${ComposeBuildConfig.composeVersion}\""))
         val resources = composeDependency("org.jetbrains.compose.components:components-resources")
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-tooling-preview:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-tooling-preview:${ComposeBuildConfig.composeVersion}\""))
         val uiToolingPreview = composeDependency("org.jetbrains.compose.components:components-ui-tooling-preview")
     }
 
-    @Deprecated("Specify dependency via version catalog")
+    @Deprecated("Specify dependency directly")
     object DesktopComponentsDependencies {
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.components:components-splitpane:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.components:components-splitpane:${ComposeBuildConfig.composeVersion}\""))
         @ExperimentalComposeLibrary
         val splitPane = composeDependency("org.jetbrains.compose.components:components-splitpane")
 
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.components:components-animatedimage:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.components:components-animatedimage:${ComposeBuildConfig.composeVersion}\""))
         @ExperimentalComposeLibrary
         val animatedImage = composeDependency("org.jetbrains.compose.components:components-animatedimage")
     }
 
     @Deprecated("Use compose.html")
     object WebDependencies {
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.html:html-core:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.html:html-core:${ComposeBuildConfig.composeVersion}\""))
         val core by lazy {
             composeDependency("org.jetbrains.compose.html:html-core")
         }
 
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.html:html-svg:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.html:html-svg:${ComposeBuildConfig.composeVersion}\""))
         val svg by lazy {
             composeDependency("org.jetbrains.compose.html:html-svg")
         }
 
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.html:html-test-utils:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.html:html-test-utils:${ComposeBuildConfig.composeVersion}\""))
         val testUtils by lazy {
             composeDependency("org.jetbrains.compose.html:html-test-utils")
         }
     }
 
-    @Deprecated("Specify dependency via version catalog")
+    @Deprecated("Specify dependency directly")
     object HtmlDependencies {
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.html:html-core:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.html:html-core:${ComposeBuildConfig.composeVersion}\""))
         val core by lazy {
             composeDependency("org.jetbrains.compose.html:html-core")
         }
 
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.html:html-svg:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.html:html-svg:${ComposeBuildConfig.composeVersion}\""))
         val svg by lazy {
             composeDependency("org.jetbrains.compose.html:html-svg")
         }
 
-        @Deprecated("Specify dependency via version catalog", replaceWith = ReplaceWith("\"org.jetbrains.compose.html:html-test-utils:${ComposeBuildConfig.composeVersion}\""))
+        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.html:html-test-utils:${ComposeBuildConfig.composeVersion}\""))
         val testUtils by lazy {
             composeDependency("org.jetbrains.compose.html:html-test-utils")
         }
