@@ -28,10 +28,10 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(compose.runtime)
-            api(compose.ui)
-            api(compose.foundation)
-            api(compose.components.resources)
+            api("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
+            api("org.jetbrains.compose.ui:ui:COMPOSE_VERSION_PLACEHOLDER")
+            api("org.jetbrains.compose.foundation:foundation:COMPOSE_VERSION_PLACEHOLDER")
+            api("org.jetbrains.compose.components:components-resources:COMPOSE_VERSION_PLACEHOLDER")
         }
     }
 
