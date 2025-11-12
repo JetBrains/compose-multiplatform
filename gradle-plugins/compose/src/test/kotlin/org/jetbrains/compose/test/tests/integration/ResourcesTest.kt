@@ -549,8 +549,8 @@ class ResourcesTest : GradlePluginTestBase() {
 
         modifyText("build.gradle.kts") { str ->
             str.replace(
-                "api(compose.components.resources)",
-                "//api(compose.components.resources)"
+                "api(\"org.jetbrains.compose.components:components-resources:${defaultTestEnvironment.composeVersion}\")",
+                "//api(\"org.jetbrains.compose.components:components-resources:${defaultTestEnvironment.composeVersion}\")"
             )
         }
         gradle("prepareKotlinIdeaImport").checks {
@@ -559,8 +559,8 @@ class ResourcesTest : GradlePluginTestBase() {
 
         modifyText("build.gradle.kts") { str ->
             str.replace(
-                "//api(compose.components.resources)",
-                "api(compose.components.resources)"
+                "//api(\"org.jetbrains.compose.components:components-resources:${defaultTestEnvironment.composeVersion}\")",
+                "api(\"org.jetbrains.compose.components:components-resources:${defaultTestEnvironment.composeVersion}\")"
             )
         }
         modifyText("build.gradle.kts") { str ->
@@ -735,9 +735,9 @@ class ResourcesTest : GradlePluginTestBase() {
                     |    sourceSets {
                     |        commonMain {
                     |            dependencies {
-                    |                implementation(compose.runtime)
-                    |                implementation(compose.material)
-                    |                implementation(compose.components.resources)
+                    |                implementation("org.jetbrains.compose.runtime:runtime:${defaultTestEnvironment.composeVersion}")
+                    |                implementation("org.jetbrains.compose.material:material:${defaultTestEnvironment.composeVersion}")
+                    |                implementation("org.jetbrains.compose.components:components-resources:${defaultTestEnvironment.composeVersion}")
                     |            }
                     |        }
                     |    }
@@ -784,9 +784,9 @@ class ResourcesTest : GradlePluginTestBase() {
                     |    sourceSets {
                     |        commonMain {
                     |            dependencies {
-                    |                implementation(compose.runtime)
-                    |                implementation(compose.material)
-                    |                implementation(compose.components.resources)
+                    |                implementation("org.jetbrains.compose.runtime:runtime:${defaultTestEnvironment.composeVersion}")
+                    |                implementation("org.jetbrains.compose.material:material:${defaultTestEnvironment.composeVersion}")
+                    |                implementation("org.jetbrains.compose.components:components-resources:${defaultTestEnvironment.composeVersion}")
                     |            }
                     |        }
                     |    }

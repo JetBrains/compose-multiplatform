@@ -12,9 +12,9 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            api(compose.runtime)
-            api(compose.material3)
-            api(compose.components.resources)
+            api("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
+            api("org.jetbrains.compose.material:material:COMPOSE_VERSION_PLACEHOLDER")
+            api("org.jetbrains.compose.components:components-resources:COMPOSE_VERSION_PLACEHOLDER")
         }
     }
 }

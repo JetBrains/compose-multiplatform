@@ -1,24 +1,27 @@
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("org.jetbrains.kotlin.plugin.compose")
     id("org.jetbrains.compose")
-    id("co.touchlab.kmmbridge").version("0.5.7")
+    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 kotlin {
     js {
-        browser { }
+        browser {
+            commonWebpackConfig { outputFileName = "myApp.js" }
+        }
         binaries.executable()
     }
 
     wasmJs {
-        browser { }
+        browser {
+            commonWebpackConfig { outputFileName = "myApp.js" }
+        }
         binaries.executable()
     }
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
+            implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
         }
 
         val webMain by creating { dependsOn(commonMain.get()) }

@@ -17,7 +17,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
+            implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
         }
 
         val webMain by creating { dependsOn(commonMain.get()) }

@@ -5,23 +5,23 @@ plugins {
 }
 
 kotlin {
-    js {
+    js("webJs") {
         browser { }
         binaries.executable()
     }
 
-    wasmJs {
+    wasmJs("webWasm") {
         browser { }
         binaries.executable()
     }
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
+            implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
         }
 
         val webMain by creating { dependsOn(commonMain.get()) }
-        jsMain { dependsOn(webMain) }
-        wasmJsMain { dependsOn(webMain) }
+        val webJsMain by getting { dependsOn(webMain) }
+        val webWasmMain by getting { dependsOn(webMain) }
     }
 }

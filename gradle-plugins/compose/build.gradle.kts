@@ -207,6 +207,7 @@ for (gradleVersion in supportedGradleVersions) {
 configureAllTests {
     dependsOn(":publishToMavenLocal")
     systemProperty("compose.tests.compose.gradle.plugin.version", BuildProperties.deployVersion(project))
+    systemProperty("compose.tests.compose.version", BuildProperties.composeVersion(project))
     val summaryDir = project.layout.buildDirectory.get().asFile.resolve("test-summary")
     systemProperty("compose.tests.summary.file", summaryDir.resolve("$name.md").absolutePath)
     systemProperties(project.properties.filter { it.key.startsWith("compose.") })
