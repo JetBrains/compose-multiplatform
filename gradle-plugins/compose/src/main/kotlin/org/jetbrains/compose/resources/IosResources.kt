@@ -70,6 +70,13 @@ internal fun Project.configureSyncIosComposeResources(
                         if (task.name == externalTaskName) {
                             task.dependsOn(syncComposeResourcesTask)
                         }
+
+                        //FIXME: https://youtrack.jetbrains.com/issue/KT-82332
+                        if (binary.isSwiftExportStaticLibrary() &&
+                            task.name.let { it.startsWith("copy") && it.endsWith("SPMIntermediates") }
+                        ) {
+                            task.dependsOn(syncComposeResourcesTask)
+                        }
                     }
                 }
 
