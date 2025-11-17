@@ -1,3 +1,66 @@
+# 1.10.0-beta02 (November 2025)
+
+_Changes since 1.10.0-beta01_
+
+## Known Issues
+
+### Resources
+
+- Kotlin `2.2.21` is required on Web platforms due to [KT-82208](https://youtrack.jetbrains.com/issue/KT-82208) [#5475](https://github.com/JetBrains/compose-multiplatform/pull/5475)
+
+## Fixes
+
+### Multiple Platforms
+
+- Fixed `LocalInputModeManager.current.inputMode` not being reset between tests [#2548](https://github.com/JetBrains/compose-multiplatform-core/pull/2548)
+
+### iOS
+
+- Fix the spoken text in merged accessibility nodes [#2539](https://github.com/JetBrains/compose-multiplatform-core/pull/2539)
+- Fix an issue where accessibility elements inside other accessibility elements may not be accessible [#2539](https://github.com/JetBrains/compose-multiplatform-core/pull/2539)
+- Fix crash on iOS older than 17 when accessibility is enabled [#2541](https://github.com/JetBrains/compose-multiplatform-core/pull/2541)
+
+### Desktop
+
+- Fix the accessibility issue where screen readers cannot review text in a text field [#2553](https://github.com/JetBrains/compose-multiplatform-core/pull/2553)
+- Fix the accessibility issue where scrollable text fields are not accessible for screen readers [#2553](https://github.com/JetBrains/compose-multiplatform-core/pull/2553)
+- Children of nodes with `isTraversalNode` semantics are now ordered according to their `traversalIndex` [#2544](https://github.com/JetBrains/compose-multiplatform-core/pull/2544)
+- _(prerelease fix)_ Fixed issue where it's unable to create run task 'jvmDesktopRun' [#5477](https://github.com/JetBrains/compose-multiplatform/pull/5477)
+- _(prerelease fix)_ Fixed issue where the Java installation could not be found [#5477](https://github.com/JetBrains/compose-multiplatform/pull/5477)
+
+### Web
+
+- Fix the issue where Hangul input behaves inconsistently after deleting with Backspace [#2559](https://github.com/JetBrains/compose-multiplatform-core/pull/2559)
+
+### Resources
+
+- Fix resource gradle tasks invocation on AGP < 9.0.0 for Android Studio previews [#5478](https://github.com/JetBrains/compose-multiplatform/pull/5478)
+- Update iOS resource copying to an iOS app bundle to support Swift Export libraries [#5480](https://github.com/JetBrains/compose-multiplatform/pull/5480)
+
+### SavedState
+
+- All platforms have `HasDefaultViewModelProviderFactory` implementation now, and it provides an ability to use `createSavedStateHandle()` function without a navigation library [#2554](https://github.com/JetBrains/compose-multiplatform-core/pull/2554)
+
+## Dependencies
+
+- Gradle Plugin `org.jetbrains.compose`, version `1.10.0-beta02`. Based on Jetpack Compose libraries:
+  - [Runtime 1.10.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.10.0-beta02)
+  - [UI 1.10.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.10.0-beta02)
+  - [Foundation 1.10.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.10.0-beta02)
+  - [Material 1.10.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.10.0-beta02)
+  - [Material3 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.4.0)
+
+- Compose Material3 libraries `org.jetbrains.compose.material3:material3*:1.10.0-alpha05`. Based on [Jetpack Compose Material3 1.5.0-alpha08](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha08)
+- Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha02`. Based on [Jetpack Compose Material3 Adaptive 1.3.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha03)
+- Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:2.10.0-alpha05`. Based on [Jetpack Lifecycle 2.10.0-rc01](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.10.0-rc01)
+- Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.1`. Based on [Jetpack Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4)
+- Navigation 3 libraries `org.jetbrains.androidx.navigation:navigation3-*:1.0.0-alpha05`. Based on [Jetpack Navigation 3](https://developer.android.com/jetpack/androidx/releases/navigation3#1.0.0-rc01)
+- Navigation Event library `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.0.0-beta02`. Based on [Jetpack Navigation Event 1.0.0-rc01](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.0.0-rc01)
+- Savedstate library `org.jetbrains.androidx.savedstate:savedstate*:1.4.0-rc01`. Based on [Jetpack Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0)
+- WindowManager Core library `org.jetbrains.androidx.window:window-core:1.5.0`. Based on [Jetpack WindowManager 1.5.0](https://developer.android.com/jetpack/androidx/releases/window#1.5.0)
+
+---
+
 # 1.9.3 (November 2025)
 
 _Changes since 1.9.2_
