@@ -2,12 +2,6 @@
 
 _Changes since 1.10.0-beta01_
 
-## Known Issues
-
-### Resources
-
-- Kotlin `2.2.21` is required on Web platforms due to [KT-82208](https://youtrack.jetbrains.com/issue/KT-82208) [#5475](https://github.com/JetBrains/compose-multiplatform/pull/5475)
-
 ## Fixes
 
 ### Multiple Platforms
