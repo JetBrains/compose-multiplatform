@@ -14,32 +14,33 @@ class RuntimeLibrariesCompatibilityCheckTest : GradlePluginTestBase() {
     fun correctConfigurationDoesntPrintWarning(): Unit = with(
         testProject("misc/compatibilityLibCheck")
     ) {
+        val logMsg = "w: Compose Multiplatform runtime dependencies' versions don't match with plugin version."
         gradle("assembleAndroidMain").checks {
             check.logDoesntContain("checkAndroidMainComposeLibrariesCompatibility")
-            check.logDoesntContain("w: Compose Multiplatform runtime dependencies version didn't match with plugin version.")
+            check.logDoesntContain(logMsg)
         }
         gradle("metadataMainClasses").checks {
             check.logDoesntContain("checkMetadataMainComposeLibrariesCompatibility")
-            check.logDoesntContain("w: Compose Multiplatform runtime dependencies version didn't match with plugin version.")
+            check.logDoesntContain(logMsg)
         }
         gradle("jvmMainClasses").checks {
             check.taskSuccessful(":checkJvmMainComposeLibrariesCompatibility")
-            check.logDoesntContain("w: Compose Multiplatform runtime dependencies version didn't match with plugin version.")
+            check.logDoesntContain(logMsg)
         }
         gradle("jvmTestClasses").checks {
             check.taskSuccessful(":checkJvmMainComposeLibrariesCompatibility")
             check.taskSuccessful(":checkJvmTestComposeLibrariesCompatibility")
-            check.logDoesntContain("w: Compose Multiplatform runtime dependencies version didn't match with plugin version.")
+            check.logDoesntContain(logMsg)
         }
         gradle("wasmJsMainClasses").checks {
             check.taskSuccessful(":checkWasmJsMainComposeLibrariesCompatibility")
-            check.logDoesntContain("w: Compose Multiplatform runtime dependencies version didn't match with plugin version.")
+            check.logDoesntContain(logMsg)
         }
 
         if (currentOS == OS.MacOS) {
             gradle("compileKotlinIosSimulatorArm64").checks {
                 check.taskSuccessful(":checkIosSimulatorArm64MainComposeLibrariesCompatibility")
-                check.logDoesntContain("w: Compose Multiplatform runtime dependencies version didn't match with plugin version.")
+                check.logDoesntContain(logMsg)
             }
         }
 
@@ -50,7 +51,7 @@ class RuntimeLibrariesCompatibilityCheckTest : GradlePluginTestBase() {
             )
         }
         val msg = buildString {
-            appendLine("w: Compose Multiplatform runtime dependencies version didn't match with plugin version.")
+            appendLine("w: Compose Multiplatform runtime dependencies' versions don't match with plugin version.")
             appendLine("    expected: 'org.jetbrains.compose.ui:ui:${defaultTestEnvironment.composeVersion}'")
             appendLine("    actual:   'org.jetbrains.compose.ui:ui:1.9.3'")
         }

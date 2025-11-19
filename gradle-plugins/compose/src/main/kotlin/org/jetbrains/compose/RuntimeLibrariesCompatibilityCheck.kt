@@ -121,18 +121,18 @@ internal abstract class RuntimeLibrariesCompatibilityCheck : DefaultTask() {
         problemLibs: List<ProblemLibrary>,
         expectedVersion: String
     ): String = buildString {
-        appendLine("w: Compose Multiplatform runtime dependencies version didn't match with plugin version.")
+        appendLine("w: Compose Multiplatform runtime dependencies' versions don't match with plugin version.")
         problemLibs.forEach { lib ->
             appendLine("    expected: '${lib.name}:$expectedVersion'")
             appendLine("    actual:   '${lib.name}:${lib.version}'")
             appendLine()
         }
         appendLine("This may lead to compilation errors or unexpected behavior at runtime.")
-        appendLine("Such version mismatch might be caused by dependency constrains in one of the included libraries.")
+        appendLine("Such version mismatch might be caused by dependency constraints in one of the included libraries.")
         val taskName = if (projectName.isNotEmpty() && !projectName.endsWith(":")) "$projectName:dependencies" else "${projectName}dependencies"
         appendLine("You can inspect resulted dependencies tree via `./gradlew $taskName  --configuration ${configurationName}`.")
         appendLine("See more details in Gradle documentation: https://docs.gradle.org/current/userguide/viewing_debugging_dependencies.html#sec:listing-dependencies")
         appendLine()
-        appendLine("Please update Compose Multiplatform gradle plugin version or align dependencies' versions to match the current plugin version.")
+        appendLine("Please update Compose Multiplatform Gradle plugin's version or align dependencies' versions to match the current plugin version.")
     }
 }
