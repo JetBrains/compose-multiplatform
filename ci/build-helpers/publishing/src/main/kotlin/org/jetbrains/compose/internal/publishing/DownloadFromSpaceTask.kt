@@ -34,7 +34,9 @@ abstract class DownloadFromSpaceMavenRepoTask : DefaultTask() {
         val groupUrl = module.groupId.replace(".", "/")
 
         val filesListingDocument =
-            Jsoup.connect("${spaceRepoUrl.get()}/$groupUrl/${module.artifactId}/${module.version}/").get()
+            Jsoup.connect("${spaceRepoUrl.get()}/$groupUrl/${module.artifactId}/${module.version}/")
+                .timeout(180_000)
+                .get()
         val downloadableFiles = HashMap<String, URL>()
         for (a in filesListingDocument.select("#contents > a")) {
             val href = a.attributes().get("href")
