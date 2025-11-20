@@ -4,9 +4,30 @@ import org.jetbrains.compose.resources.plural.PluralCategory
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-private val SimpleStringFormatRegex = Regex("""%(\d+)\$[ds]""")
+private val SimpleStringFormatRegex = Regex("""%(\d+)\$(0?)(\d+)?([ds])""")
+
 internal fun String.replaceWithArgs(args: List<String>) = SimpleStringFormatRegex.replace(this) { matchResult ->
-    args[matchResult.groupValues[1].toInt() - 1]
+    val index = matchResult.groupValues[1].toInt() - 1
+    val flag = matchResult.groupValues[2]
+    val width = matchResult.groupValues[3].takeIf { it.isNotEmpty() }?.toInt() ?: 0
+    val type = matchResult.groupValues[4]
+
+    val value = args[index]
+
+    when (type) {
+        "d" -> {
+            when(flag) {
+                "0" -> {
+                    value.padStart(width, '0')
+                }
+                else -> {
+                    value.padStart(width)
+                }
+            }
+        }
+        "s" -> value.padStart(width)
+        else -> value
+    }
 }
 
 internal sealed interface StringItem {
