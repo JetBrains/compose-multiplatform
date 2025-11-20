@@ -210,10 +210,10 @@ fun generateChangelog() {
                 """
                     ## Dependencies
 
-                    Gradle Plugin `org.jetbrains.compose`, version `$versionCompose`
+                    Gradle Plugin `org.jetbrains.compose` version `$versionCompose`
 
-                    | Library | Coordinates | Based on Jetpack library |
-                    |---------|-------------|--------------------------|
+                    | Library group | Coordinates | Based on Jetpack |
+                    |---------------|-------------|------------------|
                     | Runtime | `org.jetbrains.compose.runtime:runtime*:$versionCompose` | [Runtime $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-runtime#$versionRedirectingCompose) |
                     | UI | `org.jetbrains.compose.ui:ui*:$versionCompose` | [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose) |
                     | Foundation | `org.jetbrains.compose.foundation:foundation*:$versionCompose` | [Foundation $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingCompose) |

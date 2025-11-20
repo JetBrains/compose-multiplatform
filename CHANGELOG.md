@@ -37,14 +37,14 @@ _Changes since 1.10.0-beta01_
 
 ## Dependencies
 
-- Gradle Plugin `org.jetbrains.compose`, version `1.10.0-beta02`
+Gradle Plugin `org.jetbrains.compose` version `1.10.0-beta02`
 
-| Library | Coordinates | Based on Jetpack library |
-|---------|-------------|--------------------------|
-| Runtime | `org.jetbrains.compose.runtime:runtime:1.10.0-beta02` | [Runtime 1.10.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.10.0-beta02) |
-| UI | `org.jetbrains.compose.ui:ui:1.10.0-beta02` | [UI 1.10.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.10.0-beta02) |
-| Foundation | `org.jetbrains.compose.foundation:foundation:1.10.0-beta02` | [Foundation 1.10.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.10.0-beta02) |
-| Material | `org.jetbrains.compose.material:material:1.10.0-beta02` | [Material 1.10.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.10.0-beta02) |
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.10.0-beta02` | [Runtime 1.10.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.10.0-beta02) |
+| UI | `org.jetbrains.compose.ui:ui*:1.10.0-beta02` | [UI 1.10.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.10.0-beta02) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.10.0-beta02` | [Foundation 1.10.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.10.0-beta02) |
+| Material | `org.jetbrains.compose.material:material*:1.10.0-beta02` | [Material 1.10.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.10.0-beta02) |
 | Material3 | `org.jetbrains.compose.material3:material3*:1.10.0-alpha05` | [Material3 1.5.0-alpha08](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha08) |
 | Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha02` | [Material3 Adaptive 1.3.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha03) |
 | Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.10.0-alpha05` | [Lifecycle 2.10.0-rc01](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.10.0-rc01) |
