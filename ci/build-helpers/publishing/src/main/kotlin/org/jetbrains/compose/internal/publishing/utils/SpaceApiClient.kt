@@ -57,7 +57,7 @@ internal class SpaceApiClient(
             HttpClient(OkHttp) {
                 configureKtorClientForSpace()
                 install(HttpTimeout) {
-                    socketTimeoutMillis = 120_000
+                    socketTimeoutMillis = 180_000
                 }
             }.use { client ->
                 val space = SpaceClient(
