@@ -214,10 +214,10 @@ fun generateChangelog() {
 
                     | Library | Coordinates | Based on Jetpack library |
                     |---------|-------------|--------------------------|
-                    | Runtime | `org.jetbrains.compose.runtime:runtime:$versionCompose` | [Runtime $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-runtime#$versionRedirectingCompose) |
-                    | UI | `org.jetbrains.compose.ui:ui:$versionCompose` | [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose) |
-                    | Foundation | `org.jetbrains.compose.foundation:foundation:$versionCompose` | [Foundation $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingCompose) |
-                    | Material | `org.jetbrains.compose.material:material:$versionCompose` | [Material $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingCompose) |
+                    | Runtime | `org.jetbrains.compose.runtime:runtime*:$versionCompose` | [Runtime $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-runtime#$versionRedirectingCompose) |
+                    | UI | `org.jetbrains.compose.ui:ui*:$versionCompose` | [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose) |
+                    | Foundation | `org.jetbrains.compose.foundation:foundation*:$versionCompose` | [Foundation $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingCompose) |
+                    | Material | `org.jetbrains.compose.material:material*:$versionCompose` | [Material $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingCompose) |
                     | Material3 | `org.jetbrains.compose.material3:material3*:$versionComposeMaterial3` | [Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3) |
                     | Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive` | [Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive) |
                     | Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:$versionLifecycle` | [Lifecycle $versionRedirectingLifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle#$versionRedirectingLifecycle) |
