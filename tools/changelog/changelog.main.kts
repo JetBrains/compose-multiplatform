@@ -208,23 +208,28 @@ fun generateChangelog() {
 
             append(
                 """
-                    ## Dependencies
+                    ## Components
 
-                    - Gradle Plugin `org.jetbrains.compose`, version `$versionCompose`. Based on Jetpack Compose libraries:
-                      - [Runtime $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-runtime#$versionRedirectingCompose)
-                      - [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose)
-                      - [Foundation $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingCompose)
-                      - [Material $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingCompose)
-                      - [Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3)
+                    ### Gradle plugin
 
-                    - Compose Material3 libraries `org.jetbrains.compose.material3:material3*:$versionComposeMaterial3`. Based on [Jetpack Compose Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3)
-                    - Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive`. Based on [Jetpack Compose Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive)
-                    - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:$versionLifecycle`. Based on [Jetpack Lifecycle $versionRedirectingLifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle#$versionRedirectingLifecycle)
-                    - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:2.9.1`. Based on [Jetpack Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4)
-                    - Navigation 3 libraries `org.jetbrains.androidx.navigation:navigation3-*:$versionNavigation3`. Based on [Jetpack Navigation 3](https://developer.android.com/jetpack/androidx/releases/navigation3#$versionRedirectingNavigation3)
-                    - Navigation Event library `org.jetbrains.androidx.navigationevent:navigationevent-compose:$versionNavigationEvent`. Based on [Jetpack Navigation Event $versionRedirectingNavigationEvent](https://developer.android.com/jetpack/androidx/releases/navigationevent#$versionRedirectingNavigationEvent)
-                    - Savedstate library `org.jetbrains.androidx.savedstate:savedstate*:$versionSavedstate`. Based on [Jetpack Savedstate $versionRedirectingSavedstate](https://developer.android.com/jetpack/androidx/releases/savedstate#$versionRedirectingSavedstate)
-                    - WindowManager Core library `org.jetbrains.androidx.window:window-core:$versionWindow`. Based on [Jetpack WindowManager $versionRedirectingWindow](https://developer.android.com/jetpack/androidx/releases/window#$versionRedirectingWindow)
+                    `org.jetbrains.compose` version `$versionCompose`
+
+                    ### Libraries
+
+                    | Library group | Coordinates | Based on Jetpack |
+                    |---------------|-------------|------------------|
+                    | Runtime | `org.jetbrains.compose.runtime:runtime*:$versionCompose` | [Runtime $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-runtime#$versionRedirectingCompose) |
+                    | UI | `org.jetbrains.compose.ui:ui*:$versionCompose` | [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose) |
+                    | Foundation | `org.jetbrains.compose.foundation:foundation*:$versionCompose` | [Foundation $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingCompose) |
+                    | Material | `org.jetbrains.compose.material:material*:$versionCompose` | [Material $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingCompose) |
+                    | Material3 | `org.jetbrains.compose.material3:material3*:$versionComposeMaterial3` | [Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3) |
+                    | Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive` | [Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive) |
+                    | Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:$versionLifecycle` | [Lifecycle $versionRedirectingLifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle#$versionRedirectingLifecycle) |
+                    | Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.1` | [Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4) |
+                    | Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:$versionNavigation3` | [Navigation3 $versionRedirectingNavigation3](https://developer.android.com/jetpack/androidx/releases/navigation3#$versionRedirectingNavigation3) |
+                    | Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:$versionNavigationEvent` | [Navigation Event $versionRedirectingNavigationEvent](https://developer.android.com/jetpack/androidx/releases/navigationevent#$versionRedirectingNavigationEvent) |
+                    | Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:$versionSavedstate` | [Savedstate $versionRedirectingSavedstate](https://developer.android.com/jetpack/androidx/releases/savedstate#$versionRedirectingSavedstate) |
+                    | WindowManager Core | `org.jetbrains.androidx.window:window-core:$versionWindow` | [WindowManager $versionRedirectingWindow](https://developer.android.com/jetpack/androidx/releases/window#$versionRedirectingWindow) |
 
                     ---
                 """.trimIndent()
