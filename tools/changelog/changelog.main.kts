@@ -208,9 +208,13 @@ fun generateChangelog() {
 
             append(
                 """
-                    ## Dependencies
+                    ## Components
 
-                    Gradle Plugin `org.jetbrains.compose` version `$versionCompose`
+                    ### Gradle plugin
+
+                    `org.jetbrains.compose` version `$versionCompose`
+
+                    ### Libraries
 
                     | Library group | Coordinates | Based on Jetpack |
                     |---------------|-------------|------------------|

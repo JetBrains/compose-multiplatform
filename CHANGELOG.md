@@ -35,9 +35,13 @@ _Changes since 1.10.0-beta01_
 
 - All platforms have `HasDefaultViewModelProviderFactory` implementation now, and it provides an ability to use `createSavedStateHandle()` function without a navigation library [#2554](https://github.com/JetBrains/compose-multiplatform-core/pull/2554)
 
-## Dependencies
+## Components
 
-Gradle Plugin `org.jetbrains.compose` version `1.10.0-beta02`
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.10.0-beta02`
+
+### Libraries
 
 | Library group | Coordinates | Based on Jetpack |
 |---------------|-------------|------------------|
