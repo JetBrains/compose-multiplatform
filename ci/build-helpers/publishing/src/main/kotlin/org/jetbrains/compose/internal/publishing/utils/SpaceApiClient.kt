@@ -7,10 +7,14 @@ package org.jetbrains.compose.internal.publishing.utils
 
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
+import io.ktor.client.plugins.*
 import kotlinx.coroutines.runBlocking
 import space.jetbrains.api.runtime.*
+import space.jetbrains.api.runtime.SpaceAuth.ClientCredentials
 import space.jetbrains.api.runtime.resources.projects
-import space.jetbrains.api.runtime.types.*
+import space.jetbrains.api.runtime.types.PackageData
+import space.jetbrains.api.runtime.types.PackageRepositoryIdentifier
+import space.jetbrains.api.runtime.types.ProjectIdentifier
 
 internal class SpaceApiClient(
     private val serverUrl: String,
@@ -48,13 +52,18 @@ internal class SpaceApiClient(
         }
     }
 
-    private fun withSpaceClient(fn: suspend SpaceHttpClientWithCallContext.() -> Unit) {
+    private fun withSpaceClient(fn: suspend SpaceClient.() -> Unit) {
         runBlocking {
-            HttpClient(OkHttp).use { client ->
-                val space = SpaceHttpClient(client).withServiceAccountTokenSource(
-                    serverUrl = serverUrl,
-                    clientId = clientId,
-                    clientSecret = clientSecret
+            HttpClient(OkHttp) {
+                configureKtorClientForSpace()
+                install(HttpTimeout) {
+                    socketTimeoutMillis = 120_000
+                }
+            }.use { client ->
+                val space = SpaceClient(
+                    ktorClient = client,
+                    appInstance = SpaceAppInstance(clientId, clientSecret, serverUrl),
+                    auth = ClientCredentials(PermissionScope.fromString("**"))
                 )
                 space.fn()
             }
@@ -80,7 +89,7 @@ internal class SpaceApiClient(
         }
     }
 
-    private suspend fun SpaceHttpClientWithCallContext.forEachPackage(
+    private suspend fun SpaceClient.forEachPackage(
         projectId: ProjectIdentifier,
         repoId: PackageRepositoryIdentifier,
         fn: suspend (PackageData) -> Unit
