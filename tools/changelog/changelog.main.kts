@@ -22,6 +22,13 @@
  * kotlin changelog.main.kts action=checkPr prDescription.txt
  * ```
  *
+ * ## Checking YouTrack reference in a file
+ * Not supposed to be called manually, used by GitHub workflow:
+ * https://github.com/JetBrains/compose-multiplatform/blob/master/tools/changelog/check-issue-number-github-action/action.yml)
+ * ```
+ * kotlin changelog.main.kts action=checkIssueNumber prDescription.txt
+ * ```
+ *
  * compose-multiplatform - name of the GitHub repo
  * 5202 - PR number
  *
@@ -85,6 +92,7 @@ println()
 
 when (argsKeyToValue["action"]) {
     "checkPr" -> checkPr()
+    "checkIssueNumber" -> checkIssueNumber()
     else -> generateChangelog()
 }
 
@@ -313,6 +321,29 @@ fun checkPr() {
         }
         else -> {
             println("\"## Release Notes\" are correct")
+        }
+    }
+}
+
+fun checkIssueNumber() {
+    val filePath = argsKeyless.getOrNull(0) ?: error("Please specify a file that contains PR description as the first argument")
+
+    val body = File(filePath).readLines()
+
+    if (body.any { it == "No related YouTrack issue" }) {
+        println("Author explicitly acknowledged YouTrack issue is missing")
+    } else {
+        val regexes = listOf(
+            Regex("^Fixes CMP-(\\d*)$"),
+            Regex("^Fixes https://youtrack.jetbrains.com/issue/CMP-(\\d*)$"),
+            Regex("^Fixes \\[CMP-(\\d*)\\](https://youtrack.jetbrains.com/issue/CMP-(\\d*))$"),
+        )
+        val fixes = body.filter {
+            regexes.any{ r -> it.matches(r) }
+        }
+        if (fixes.isEmpty()) {
+            println("No YouTrack issue is mentioned in the PR description")
+            exitProcess(1)
         }
     }
 }
