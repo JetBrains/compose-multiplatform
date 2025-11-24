@@ -52,6 +52,8 @@ abstract class ComposePlugin : Plugin<Project> {
 
         project.configureWebCompatibility()
 
+        project.configureRuntimeLibrariesCompatibilityCheck()
+
         project.afterEvaluate {
             configureDesktop(project, desktopExtension)
             project.configureWeb(composeExtension)
