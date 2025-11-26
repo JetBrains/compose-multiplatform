@@ -62,6 +62,17 @@ internal class HtmlElementStringNode(
     fun hasAttr(name: String): Boolean = attributes.containsKey(name)
     fun removeAttr(name: String) { attributes.remove(name) }
 
+    fun updateAttrs(attrs: Map<String, String>) {
+        attributes.clear()
+        attrs.forEach {
+            if (it.value.isEmpty()) {
+                attr(it.key, present = true)
+            } else  {
+                attr(it.key, value = it.value)
+            }
+        }
+    }
+
     // ---------------------- Styles API ----------------------
     fun setStyle(name: String, value: String) { styles[name] = value }
     fun getStyle(name: String): String? = styles[name]

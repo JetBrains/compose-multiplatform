@@ -1,19 +1,11 @@
 package org.jetbrains.compose.html2
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ControlledComposition
 import androidx.compose.runtime.Recomposer
 import kotlinx.coroutines.Dispatchers
-import org.jetbrains.compose.html2.internal.ComposeDomNode
-import org.jetbrains.compose.html2.internal.ComposeHtml2Context
-import org.jetbrains.compose.html2.internal.HtmlApplier
-import org.jetbrains.compose.html2.internal.HtmlElementStringNode
-import org.jetbrains.compose.html2.internal.HtmlStringNodeWrapper
-import org.jetbrains.compose.html2.internal.HtmlTextStringNode
-import org.jetbrains.compose.html2.internal.LocalComposeHtml2Context
-import org.jetbrains.compose.html2.internal.StringBasedComposeHtml2Context
+import org.jetbrains.compose.html2.internal.*
 
 fun composeHtmlToString(
     content: @Composable () -> Unit
@@ -42,7 +34,7 @@ fun composeHtmlToString(
 
 @Composable
 fun Div(
-    attrsScope: () -> Unit = {},
+    attrsScope: AttrsScope.() -> Unit = {},
     content: @Composable () -> Unit = {}
 ) {
     LocalComposeHtml2Context.current.TagElement("div", attrsScope, content)
