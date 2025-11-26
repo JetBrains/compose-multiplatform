@@ -85,12 +85,12 @@ class HtmlElementStringNodeTest {
     }
 
     @Test
-    fun testEscapingTabsNewlinesInAttributesAndStyles() {
+    fun testNoAutomaticEscapingTabsNewlinesInAttributesAndStyles() {
         val n = HtmlElementStringNode("div")
         n.attr("title", "a\tb\nc\r\" & < >")
         n.setStyle("k\t\n\r<>&", "v\t\n\r<>&")
         assertEquals(
-            "<div style=\"k&#9;&#10;&#13;&amp;lt;&amp;gt;&amp;amp;: v&#9;&#10;&#13;&amp;lt;&amp;gt;&amp;amp;\" title=\"a&#9;b&#10;c&#13;&quot; &amp; &lt; &gt;\"></div>",
+            "<div style=\"k\t\n\r<>&: v\t\n\r<>&\" title=\"a\tb\nc\r\" & < >\"></div>",
             n.toHtmlString()
         )
     }
@@ -139,7 +139,7 @@ class HtmlElementStringNodeTest {
     @Test
     fun testStandaloneTextNodeSerialization() {
         val t = HtmlTextStringNode("Fish & Chips <3>")
-        assertEquals("Fish &amp; Chips &lt;3&gt;", t.toHtmlString())
+        assertEquals("Fish & Chips <3>", t.toHtmlString())
     }
 
     @Test
@@ -238,8 +238,8 @@ class HtmlElementStringNodeTest {
     fun textDoesNotRecognizeEntities() {
         val p = HtmlElementStringNode("p")
         p.appendText("Fish &amp; Chips")
-        // ampersand in source is escaped; existing &amp; becomes &amp;amp;
-        assertEquals("<p>Fish &amp;amp; Chips</p>", p.toHtmlString())
+        // Entities are not decoded; verbatim output
+        assertEquals("<p>Fish &amp; Chips</p>", p.toHtmlString())
     }
 
     @Test
@@ -247,7 +247,7 @@ class HtmlElementStringNodeTest {
         val span = HtmlElementStringNode("span")
         span.attr("title", "\"quoted\"")
         span.appendText("\"quoted\"")
-        assertEquals("<span title=\"&quot;quoted&quot;\">\"quoted\"</span>", span.toHtmlString())
+        assertEquals("<span title=\"\"quoted\"\">\"quoted\"</span>", span.toHtmlString())
     }
 
     @Test
@@ -358,7 +358,7 @@ class HtmlElementStringNodeTest {
         val n = HtmlElementStringNode("span")
         n.attr("title", "5 < 6 & 7 > 3 \"quote\"")
         n.appendText("5 < 6 & 7 > 3")
-        assertEquals("<span title=\"5 &lt; 6 &amp; 7 &gt; 3 &quot;quote&quot;\">5 &lt; 6 &amp; 7 &gt; 3</span>", n.toHtmlString())
+        assertEquals("<span title=\"5 < 6 & 7 > 3 \"quote\"\">5 < 6 & 7 > 3</span>", n.toHtmlString())
     }
 
     @Test

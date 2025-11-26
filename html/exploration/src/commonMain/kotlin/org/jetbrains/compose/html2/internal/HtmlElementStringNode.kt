@@ -100,31 +100,41 @@ internal class HtmlElementStringNode(
     // ---------------------- Serialization ----------------------
     fun toHtmlString(): String {
         val sb = StringBuilder()
-        
-        if (!isRoot()) {
+        appendHtml(sb)
+        return sb.toString()
+    }
+
+    // Append this node's HTML into a shared StringBuilder (no intermediate strings)
+    private fun appendHtml(sb: StringBuilder) {
+        val isRoot = isCompositionRoot()
+
+        if (!isRoot) {
             sb.append('<').append(tag)
 
             // merge classes and styles into attributes on the fly for output
             if (classSet.isNotEmpty()) {
                 // Deterministic join by insertion order
                 val cls = classSet.joinToString(" ")
-                sb.append(' ').append("class\u003D\"").append(escapeAttr(cls)).append('\"')
+                sb.append(' ').append("class\u003D\"")
+                sb.append(cls)
+                sb.append('\"')
             }
             if (styles.isNotEmpty()) {
-                val styleStr = styles.entries.joinToString("; ") { (k, v) -> "${escapeText(k)}: ${escapeText(v)}" }
-                sb.append(' ').append("style\u003D\"").append(escapeAttr(styleStr)).append('\"')
+                val styleStr = styles.entries.joinToString("; ") { (k, v) -> "$k: $v" }
+                sb.append(' ').append("style\u003D\"")
+                sb.append(styleStr)
+                sb.append('\"')
             }
 
             // other attributes (skip class/style to avoid duplication)
             for ((name, v) in attributes) {
                 if (name == "class" || name == "style") continue
                 when (v) {
-                    is AttrValue.Bool -> {
-                        sb.append(' ').append(name)
-                    }
-
+                    is AttrValue.Bool -> sb.append(' ').append(name)
                     is AttrValue.Str -> {
-                        sb.append(' ').append(name).append("=\"").append(escapeAttr(v.value)).append('\"')
+                        sb.append(' ').append(name).append("=\"")
+                        sb.append(v.value)
+                        sb.append('\"')
                     }
                 }
             }
@@ -132,31 +142,27 @@ internal class HtmlElementStringNode(
 
         if (children.isEmpty()) {
             // Follow HTML rules: void elements have no closing tag; non-void must not be self-closing
-            return if (isVoidTag(tag)) {
+            if (!isRoot) {
                 sb.append('>')
-                sb.toString()
-            } else {
-                sb.append('>')
-                sb.append("</").append(tag).append('>')
-                sb.toString()
+                if (!isVoidTag(tag)) {
+                    sb.append("</").append(tag).append('>')
+                }
+            }
+            return
+        }
+
+        if (!isRoot) sb.append('>')
+
+        for (c in children) {
+            when (c) {
+                is Child.Text -> c.node.appendHtml(sb)
+                is Child.Element -> c.node.appendHtml(sb)
             }
         }
 
-        if (!isRoot()) {
-            sb.append('>')
-        }
-        for (c in children) {
-            when (c) {
-                is Child.Text -> sb.append(c.node.toHtmlString())
-                is Child.Element -> sb.append(c.node.toHtmlString())
-            }
-        }
-        
-        if (!isRoot()) {
+        if (!isRoot) {
             sb.append("</").append(tag).append('>')
         }
-        
-        return sb.toString()
     }
 
     private fun isVoidTag(name: String): Boolean {
@@ -169,29 +175,10 @@ internal class HtmlElementStringNode(
         }
     }
 
-    private fun escapeAttr(s: String): String = buildString(s.length) {
-        for (ch in s) when (ch) {
-            '\n' -> append("&#10;")
-            '\r' -> append("&#13;")
-            '\t' -> append("&#9;")
-            '"' -> append("&quot;")
-            '&' -> append("&amp;")
-            '<' -> append("&lt;")
-            '>' -> append("&gt;")
-            else -> append(ch)
-        }
-    }
-
-    private fun escapeText(s: String): String = buildString(s.length) {
-        for (ch in s) when (ch) {
-            '&' -> append("&amp;")
-            '<' -> append("&lt;")
-            '>' -> append("&gt;")
-            else -> append(ch)
-        }
-    }
+    private fun escapeAttr(s: String): String = buildString(s.length) { appendEscapedAttr(this, s) }
+    private fun escapeText(s: String): String = buildString(s.length) { appendEscapedText(this, s) }
     
-    private fun isRoot(): Boolean {
+    private fun isCompositionRoot(): Boolean {
         return tag == "compose-html-root"
     }
     
@@ -204,14 +191,32 @@ internal class HtmlElementStringNode(
 internal class HtmlTextStringNode(
     var text: String
 ) {
-    fun toHtmlString(): String = escapeText(text)
+    fun toHtmlString(): String = text
 
-    private fun escapeText(s: String): String = buildString(s.length) {
-        for (ch in s) when (ch) {
-            '&' -> append("&amp;")
-            '<' -> append("&lt;")
-            '>' -> append("&gt;")
-            else -> append(ch)
-        }
+    internal fun appendHtml(sb: StringBuilder) {
+        sb.append(text)
+    }
+}
+
+// Shared escaping helpers to stream directly into a StringBuilder
+private fun appendEscapedAttr(sb: StringBuilder, s: String) {
+    for (ch in s) when (ch) {
+        '\n' -> sb.append("&#10;")
+        '\r' -> sb.append("&#13;")
+        '\t' -> sb.append("&#9;")
+        '"' -> sb.append("&quot;")
+        '&' -> sb.append("&amp;")
+        '<' -> sb.append("&lt;")
+        '>' -> sb.append("&gt;")
+        else -> sb.append(ch)
+    }
+}
+
+private fun appendEscapedText(sb: StringBuilder, s: String) {
+    for (ch in s) when (ch) {
+        '&' -> sb.append("&amp;")
+        '<' -> sb.append("&lt;")
+        '>' -> sb.append("&gt;")
+        else -> sb.append(ch)
     }
 }

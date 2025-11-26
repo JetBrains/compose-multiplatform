@@ -1,6 +1,7 @@
 package org.jetbrains.compose.html2.internal
 
 import androidx.compose.runtime.*
+import org.jetbrains.compose.html2.AttrsScope
 
 internal interface ComposeHtml2Context {
 

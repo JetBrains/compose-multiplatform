@@ -11,7 +11,7 @@ fun composeHtmlToString(
     content: @Composable () -> Unit
 ): String {
     val rootElement = HtmlElementStringNode.root()
-    val recomposer = Recomposer(Dispatchers.Unconfined)
+    val recomposer = Recomposer(Dispatchers.Default)
     val composition = ControlledComposition(
         HtmlApplier(root = HtmlStringNodeWrapper(rootElement)),
         parent = recomposer

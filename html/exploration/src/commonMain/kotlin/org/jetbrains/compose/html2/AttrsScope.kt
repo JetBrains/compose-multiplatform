@@ -1,4 +1,4 @@
-package org.jetbrains.compose.html2.internal
+package org.jetbrains.compose.html2
 
 interface AttrsScope {
 

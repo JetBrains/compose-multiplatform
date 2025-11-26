@@ -12,6 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ComposeHtmlToStringTest {
@@ -51,8 +52,8 @@ class ComposeHtmlToStringTest {
         val html = composeHtmlToString {
             Div { Text("Tom & Jerry <3 > all") }
         }
-        // '&', '<', '>' must be escaped inside text nodes
-        assertEquals("<div>Tom &amp; Jerry &lt;3 &gt; all</div>", html)
+        // Now emitted verbatim: caller is responsible for escaping
+        assertEquals("<div>Tom & Jerry <3 > all</div>", html)
     }
 
     @Test
@@ -77,6 +78,7 @@ class ComposeHtmlToStringTest {
                 }
 
                 LaunchedEffect(Unit) {
+                    // This block won't run because Recomposer is created using non-Unconfined Dispatcher (see composeHtmlToString)
                     runLaunchedEffect = true
                     showText = true
                 }
@@ -88,7 +90,7 @@ class ComposeHtmlToStringTest {
         }
 
         assertTrue(runDisposeEffect)
-        assertTrue(runLaunchedEffect)
+        assertFalse(runLaunchedEffect)
         assertTrue(runSideEffect)
         assertEquals("<div></div>", html)
     }
