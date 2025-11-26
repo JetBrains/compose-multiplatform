@@ -89,28 +89,32 @@ internal class HtmlElementStringNode(
     // ---------------------- Serialization ----------------------
     fun toHtmlString(): String {
         val sb = StringBuilder()
-        sb.append('<').append(tag)
+        
+        if (!isRoot()) {
+            sb.append('<').append(tag)
 
-        // merge classes and styles into attributes on the fly for output
-        if (classSet.isNotEmpty()) {
-            // Deterministic join by insertion order
-            val cls = classSet.joinToString(" ")
-            sb.append(' ').append("class\u003D\"").append(escapeAttr(cls)).append('\"')
-        }
-        if (styles.isNotEmpty()) {
-            val styleStr = styles.entries.joinToString("; ") { (k, v) -> "${escapeText(k)}: ${escapeText(v)}" }
-            sb.append(' ').append("style\u003D\"").append(escapeAttr(styleStr)).append('\"')
-        }
+            // merge classes and styles into attributes on the fly for output
+            if (classSet.isNotEmpty()) {
+                // Deterministic join by insertion order
+                val cls = classSet.joinToString(" ")
+                sb.append(' ').append("class\u003D\"").append(escapeAttr(cls)).append('\"')
+            }
+            if (styles.isNotEmpty()) {
+                val styleStr = styles.entries.joinToString("; ") { (k, v) -> "${escapeText(k)}: ${escapeText(v)}" }
+                sb.append(' ').append("style\u003D\"").append(escapeAttr(styleStr)).append('\"')
+            }
 
-        // other attributes (skip class/style to avoid duplication)
-        for ((name, v) in attributes) {
-            if (name == "class" || name == "style") continue
-            when (v) {
-                is AttrValue.Bool -> {
-                    sb.append(' ').append(name)
-                }
-                is AttrValue.Str -> {
-                    sb.append(' ').append(name).append("=\"").append(escapeAttr(v.value)).append('\"')
+            // other attributes (skip class/style to avoid duplication)
+            for ((name, v) in attributes) {
+                if (name == "class" || name == "style") continue
+                when (v) {
+                    is AttrValue.Bool -> {
+                        sb.append(' ').append(name)
+                    }
+
+                    is AttrValue.Str -> {
+                        sb.append(' ').append(name).append("=\"").append(escapeAttr(v.value)).append('\"')
+                    }
                 }
             }
         }
@@ -127,14 +131,20 @@ internal class HtmlElementStringNode(
             }
         }
 
-        sb.append('>')
+        if (!isRoot()) {
+            sb.append('>')
+        }
         for (c in children) {
             when (c) {
                 is Child.Text -> sb.append(c.node.toHtmlString())
                 is Child.Element -> sb.append(c.node.toHtmlString())
             }
         }
-        sb.append("</").append(tag).append('>')
+        
+        if (!isRoot()) {
+            sb.append("</").append(tag).append('>')
+        }
+        
         return sb.toString()
     }
 
@@ -168,6 +178,14 @@ internal class HtmlElementStringNode(
             '>' -> append("&gt;")
             else -> append(ch)
         }
+    }
+    
+    private fun isRoot(): Boolean {
+        return tag == "compose-html-root"
+    }
+    
+    companion object {
+        fun root() = HtmlElementStringNode("compose-html-root")
     }
 }
 

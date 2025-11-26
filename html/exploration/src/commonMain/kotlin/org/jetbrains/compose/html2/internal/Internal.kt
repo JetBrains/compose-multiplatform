@@ -24,11 +24,10 @@ internal val LocalComposeHtml2Context = staticCompositionLocalOf<ComposeHtml2Con
 
 @Composable
 @ExplicitGroupsComposable
-internal inline fun <TScope, T> ComposeDomNode(
+internal inline fun <T> ComposeDomNode(
     crossinline factory: () -> T,
-    elementScope: TScope,
-    attrsSkippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
-    content: (@Composable TScope.() -> Unit)
+    //attrsSkippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
+    content: (@Composable () -> Unit)
 ) {
     currentComposer.startNode()
     if (currentComposer.inserting) {
@@ -39,10 +38,37 @@ internal inline fun <TScope, T> ComposeDomNode(
         currentComposer.useNode()
     }
 
-    attrsSkippableUpdate.invoke(SkippableUpdater(currentComposer))
+    //attrsSkippableUpdate.invoke(SkippableUpdater(currentComposer))
 
     currentComposer.startReplaceableGroup(0x7ab4aae9)
-    content.invoke(elementScope)
+    content.invoke()
     currentComposer.endReplaceableGroup()
     currentComposer.endNode()
+}
+
+internal val StringBasedComposeHtml2Context = object : ComposeHtml2Context {
+    @Composable
+    override fun TagElement(
+        tag: String,
+        attrsScope: () -> Unit,
+        content: @Composable (() -> Unit)
+    ) {
+        ComposeDomNode(
+            factory = { HtmlStringNodeWrapper(element = HtmlElementStringNode(tag)) },
+            content = content
+        )
+    }
+
+    @Composable
+    override fun TagElement(tag: String) {
+        TagElement(tag = tag, attrsScope = {}, content = {})
+    }
+
+    @Composable
+    override fun TextElement(text: String) {
+        ComposeDomNode(
+            factory = { HtmlStringNodeWrapper(text = HtmlTextStringNode(text)) },
+            content = { }
+        )
+    }
 }

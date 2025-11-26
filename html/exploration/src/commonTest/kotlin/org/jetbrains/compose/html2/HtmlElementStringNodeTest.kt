@@ -1,4 +1,4 @@
-package html2
+package org.jetbrains.compose.html2
 
 import org.jetbrains.compose.html2.internal.HtmlElementStringNode
 import org.jetbrains.compose.html2.internal.HtmlTextStringNode
