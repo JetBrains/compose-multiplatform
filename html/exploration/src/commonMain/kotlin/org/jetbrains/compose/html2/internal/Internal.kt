@@ -47,6 +47,12 @@ internal inline fun <T> ComposeDomNode(
     currentComposer.endNode()
 }
 
+@Composable
+internal inline fun cacheContent(content: @Composable () -> Unit) {
+    // TODO: implement a node which "knows" how to cache the serialized state
+    // Probably its implementation should be provided by LocalComposeHtml2Context
+}
+
 internal class AttrsScopeBuilder : AttrsScope {
     internal val attrs = mutableMapOf<String, String>()
 
