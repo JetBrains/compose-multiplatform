@@ -21,7 +21,7 @@ It would help to avoid situations when the change conflicts with some other feat
 
 Currently only committers can assign issues to themselves so just add a comment if you're starting work on it.
 
-Make sure to follow the [development guide](https://github.com/JetBrains/compose-multiplatform-core/blob/jb-main/MULTIPLATFORM.md) in the core repository for local set up.
+If you are working on the [compose-multiplatform-core](https://github.com/JetBrains/compose-multiplatform-core) repo, make sure to follow the [development guide](https://github.com/JetBrains/compose-multiplatform-core/blob/jb-main/MULTIPLATFORM.md) in the core repository for local set up.
 
 ## Submitting patches
 
