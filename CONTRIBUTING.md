@@ -1,6 +1,6 @@
 # What this repository is
 
-This repository contains sources of Compose Multiplatform supporting projects (Gradle plugin, Resources, samples, templates, etc.) which are used in [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform).
+This repository contains sources of Compose Multiplatform supporting projects (Gradle plugin, Resources, samples, templates, etc.).
 Compose Multiplatform project provides support only for non-Android targets.
 
 # What this repository is not
