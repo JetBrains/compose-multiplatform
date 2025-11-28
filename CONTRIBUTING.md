@@ -1,7 +1,6 @@
 # What this repository is
 
 This repository contains sources of Compose Multiplatform supporting projects (Gradle plugin, Resources, samples, templates, etc.).
-Compose Multiplatform project provides support only for non-Android targets.
 
 # What this repository is not
 
@@ -21,7 +20,7 @@ It would help to avoid situations when the change conflicts with some other feat
 
 Currently only committers can assign issues to themselves so just add a comment if you're starting work on it.
 
-If you are working on the [compose-multiplatform-core](https://github.com/JetBrains/compose-multiplatform-core) repo, make sure to follow the [development guide](https://github.com/JetBrains/compose-multiplatform-core/blob/jb-main/MULTIPLATFORM.md) in the core repository for local set up.
+If you are working on the [compose-multiplatform-core](https://github.com/JetBrains/compose-multiplatform-core) repo, make sure to follow the [development guide](https://github.com/JetBrains/compose-multiplatform-core/blob/jb-main/MULTIPLATFORM.md) for local set up.
 
 ## Submitting patches
 
@@ -41,17 +40,15 @@ which will help keep your pull request simple and easy to apply.
 Most of these rules are originated from the [How to Write a Git Commit Message](https://chris.beams.io/posts/git-commit/)
 article, and it's highly recommended to read it.
 
-### Rules on commit messages' content
+### Rules on pull requests' description
 
-1. Use the body to explain what and why vs. how
+1. Explain what and why vs. how
     * Please make an extra effort to explain why changes are needed for every non-trivial modification.
     * Describe how you tested your changes
     * Add Release Notes
     * Follow the [PR template](https://github.com/JetBrains/compose-multiplatform/blob/master/.github/PULL_REQUEST_TEMPLATE.md)
-2. Significant commits must mention relevant [YouTrack](https://youtrack.jetbrains.com/issues/CMP) issues in their messages
+2. Mention relevant [YouTrack](https://youtrack.jetbrains.com/issues/CMP) issues in their messages
 3. Commit changes together with the corresponding tests, unless the resulting commit becomes too unwieldy to grasp
-4. Keep the subject (first line of the commit message) clean and readable. All additional information and directives for external tools
-   should be moved to the message body.
 
 ### Rules on commit messages' style/formatting
 
