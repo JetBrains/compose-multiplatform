@@ -3,7 +3,7 @@
 We do our best to make sure our products are free of security vulnerabilities. To reduce the risk of introducing a vulnerability,
 you can follow these best practices:
 
-* Always use the latest release. For security purposes, we sign our releases published on [Maven Central](https://central.sonatype.com/search?q=g:org.jetbrains.skiko)
+* Always use the latest release. For security purposes, we sign our releases published on Maven Central
   with these PGP keys:
 
     * Key ID: **compose@jetbrains.com**
