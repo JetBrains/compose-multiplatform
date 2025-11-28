@@ -7,7 +7,7 @@ Compose Multiplatform project provides support only for non-Android targets.
 
 The main codebase for Compose Multiplatform is located in a [separate repository](https://github.com/JetBrains/compose-multiplatform-core),
 which is a fork of [AOSP](https://github.com/androidx/androidx).
-Android-specific contributions should be submitted in AndroidX repository.
+Contributions that affect Android or common code of the main codebase should be submitted in AndroidX repository.
 
 # Contributing
 
