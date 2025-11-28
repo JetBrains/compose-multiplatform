@@ -45,6 +45,9 @@ article, and it's highly recommended to read it.
 
 1. Use the body to explain what and why vs. how
     * Please make an extra effort to explain why changes are needed for every non-trivial modification.
+    * Describe how you tested your changes
+    * Add Release Notes
+    * Follow the [PR template](https://github.com/JetBrains/compose-multiplatform/blob/master/.github/PULL_REQUEST_TEMPLATE.md)
 2. Significant commits must mention relevant [YouTrack](https://youtrack.jetbrains.com/issues/CMP) issues in their messages
 3. Commit changes together with the corresponding tests, unless the resulting commit becomes too unwieldy to grasp
 4. Keep the subject (first line of the commit message) clean and readable. All additional information and directives for external tools
