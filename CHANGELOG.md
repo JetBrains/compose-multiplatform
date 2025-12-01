@@ -1,3 +1,67 @@
+# 1.10.0-rc01 (December 2025)
+
+_Changes since 1.10.0-beta02_
+
+## Migration Notes
+
+### iOS
+
+- Removed deprecated since 1.8.0 `defaultUIKitMain()`. Please follow [up-to-date guidelines to create an iOS application](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-multiplatform-create-first-app.html) [#2578](https://github.com/JetBrains/compose-multiplatform-core/pull/2578)
+
+## Fixes
+
+### Multiple Platforms
+
+- Fix crash when selecting text that only contains inline content [#2600](https://github.com/JetBrains/compose-multiplatform-core/pull/2600)
+
+### iOS
+
+- Fix `NSRangeException` on back gesture [#2605](https://github.com/JetBrains/compose-multiplatform-core/pull/2605)
+- Fix focusing of `Dialog` and `Popup` when the Full Keyboard Mode is enabled [#2606](https://github.com/JetBrains/compose-multiplatform-core/pull/2606)
+
+### Desktop
+
+- [macOs] Fix `[MTLTextureDescriptorInternal validateWithDevice:]` crash when using zero-size `ComposePanel` with `compose.swing.render.on.graphics=true` [#2585](https://github.com/JetBrains/compose-multiplatform-core/pull/2585)
+- [Linux] Support distributions with glibc 2.27 [#2585](https://github.com/JetBrains/compose-multiplatform-core/pull/2585)
+- Fixed a race condition that occurred when multiple processes attempted to unpack Skiko binary files at startup [#2585](https://github.com/JetBrains/compose-multiplatform-core/pull/2585)
+
+### Resources
+
+- _(prerelease fix)_ Fixed compatibility with Kotlin 2.2.20 on Web [#5484](https://github.com/JetBrains/compose-multiplatform/pull/5484)
+
+### Lifecycle
+
+- _(prerelease fix)_ Fixed `lifecycle-viewmodel-compose` 2.10 compatibility with Compose `1.9.*` [#2579](https://github.com/JetBrains/compose-multiplatform-core/pull/2579)
+
+### SavedState
+
+- _(prerelease fix)_ Fix `SavedStateHandles` initialization on web [#2576](https://github.com/JetBrains/compose-multiplatform-core/pull/2576)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.10.0-rc01`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.10.0-rc01` | [Runtime 1.10.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.10.0-rc01) |
+| UI | `org.jetbrains.compose.ui:ui*:1.10.0-rc01` | [UI 1.10.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.10.0-rc01) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.10.0-rc01` | [Foundation 1.10.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.10.0-rc01) |
+| Material | `org.jetbrains.compose.material:material*:1.10.0-rc01` | [Material 1.10.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.10.0-rc01) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.10.0-alpha05` | [Material3 1.5.0-alpha08](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha08) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha02` | [Material3 Adaptive 1.3.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha03) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.10.0-alpha06` | [Lifecycle 2.10.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.10.0) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.1` | [Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.0.0-alpha06` | [Navigation3 1.0.0](https://developer.android.com/jetpack/androidx/releases/navigation3#1.0.0) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.0.0-rc01` | [Navigation Event 1.0.0](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.0.0) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.10.0-beta02 (November 2025)
 
 _Changes since 1.10.0-beta01_
