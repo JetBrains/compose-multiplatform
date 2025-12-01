@@ -10,6 +10,9 @@ you can follow these best practices:
     * Fingerprint: **2072 3A63 99BC 0601 5428 3B37 CFAE 163B 64AC 9189**
     * Key type: **ed25519**
 
+* Follow the Gradle [Dependency Verification Guide](https://docs.gradle.org/current/userguide/dependency_verification.html)
+  to set up continuous verification or learn how to [manually verify a dependency](https://docs.gradle.org/current/userguide/dependency_verification.html#sec:manual-checking-dependency). 
+
 * Use the latest versions of your application's dependencies. If you need to use a specific version of a dependency,
   periodically check if any new security vulnerabilities have been discovered. You can follow
   [the guidelines from GitHub](https://docs.github.com/en/code-security)
