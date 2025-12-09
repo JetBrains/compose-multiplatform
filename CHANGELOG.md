@@ -10,7 +10,7 @@ _Changes since 1.10.0-rc01_
 
 ### iOS
 
-- Fix crash in Accessibility when SemanticNode is not attached [#2616](https://github.com/JetBrains/compose-multiplatform-core/pull/2616)
+- Fix crash in accessibility when `SemanticNode` is not attached [#2616](https://github.com/JetBrains/compose-multiplatform-core/pull/2616)
 
 ## Components
 
