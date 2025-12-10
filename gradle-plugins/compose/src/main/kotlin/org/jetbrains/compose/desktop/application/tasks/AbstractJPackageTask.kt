@@ -611,14 +611,14 @@ abstract class AbstractJPackageTask @Inject constructor(
 
             macLayeredIcons.ioFileOrNull?.let { layeredIcon ->
                 if (layeredIcon.exists()) {
-                    runCatching {
+                    try {
                         macAssetsTool.compileAssets(
                             layeredIcon,
                             workingDir.ioFile,
                             systemVersion
                         )
-                    }.onFailure {
-                        logger.warn("Can not compile layered icon: ${it.message}")
+                    } catch (e: Exception) {
+                        logger.warn("Can not compile layered icon: ${e.message}")
                     }
                 }
             }

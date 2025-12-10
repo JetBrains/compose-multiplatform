@@ -70,14 +70,14 @@ abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMac
         appExecutableFile.setExecutable(true)
 
         macLayeredIcons.orNull?.let {
-            runCatching {
+            try {
                 macAssetsTool.compileAssets(
                     iconDir = it.asFile,
                     workingDir = workingDir,
                     minimumSystemVersion = minimumSystemVersion.getOrElse(KOTLIN_NATIVE_MIN_SUPPORTED_MAC_OS)
                 )
-            }.onFailure { error ->
-                logger.warn("Can not compile layered icon: ${error.message}")
+            } catch (e: Exception) {
+                logger.warn("Can not compile layered icon: ${e.message}")
             }
         }
 
