@@ -369,7 +369,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun testMacLayeredIcon() {
-        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        Assumptions.assumeTrue(currentOS == OS.MacOS && (getActoolMajorVersion() ?: 0) >= 26)
 
         with(testProject("application/macLayeredIcon")) {
             val supportedString = "compile mac assets is starting, supported actool version:"
@@ -394,7 +394,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun testMacLayeredIconRemove() {
-        Assumptions.assumeTrue(currentOS == OS.MacOS)
+        Assumptions.assumeTrue(currentOS == OS.MacOS && (getActoolMajorVersion() ?: 0) >= 26)
 
         with(testProject("application/macLayeredIcon")) {
             val supportedString = "compile mac assets is starting, supported actool version:"
@@ -436,6 +436,20 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             }
 
         }
+    }
+
+    private fun getActoolMajorVersion(): Int? {
+        val command = """xcrun actool --version | plutil -extract "com\.apple\.actool\.version.short-bundle-version" raw -expect string -o - -"""
+
+        val process = ProcessBuilder("/bin/bash", "-c", command)
+            .redirectErrorStream(true)
+            .start()
+
+        val output = process.inputStream.bufferedReader().readText().trim()
+        process.waitFor()
+        return output.split(".")
+            .firstOrNull()
+            ?.toIntOrNull()
     }
 
     private fun macSignProject(

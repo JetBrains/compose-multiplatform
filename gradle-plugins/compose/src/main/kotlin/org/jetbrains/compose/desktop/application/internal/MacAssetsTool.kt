@@ -3,8 +3,6 @@ package org.jetbrains.compose.desktop.application.internal
 import org.gradle.api.logging.Logger
 import org.jetbrains.compose.internal.utils.MacUtils
 import java.io.File
-import java.io.StringReader
-import javax.xml.parsers.DocumentBuilderFactory
 
 internal class MacAssetsTool(private val runTool: ExternalToolRunner, private val logger: Logger) {
 
@@ -55,42 +53,38 @@ internal class MacAssetsTool(private val runTool: ExternalToolRunner, private va
         }
 
         val versionString: String? = try {
-            val dbFactory = DocumentBuilderFactory.newInstance()
-            // Disable DTD loading to prevent XXE vulnerabilities and issues with network access or missing DTDs
-            dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false)
-            dbFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false)
-            val dBuilder = dbFactory.newDocumentBuilder()
-            val xmlInput = org.xml.sax.InputSource(StringReader(outputContent))
-            val doc = dBuilder.parse(xmlInput)
-            doc.documentElement.normalize() // Recommended practice
-            val nodeList = doc.getElementsByTagName("key")
-            var version: String? = null
-            for (i in 0 until nodeList.length) {
-                if ("short-bundle-version" == nodeList.item(i).textContent) {
-                    // Find the next sibling element which should be <string>
-                    var nextSibling = nodeList.item(i).nextSibling
-                    while (nextSibling != null && nextSibling.nodeType != org.w3c.dom.Node.ELEMENT_NODE) {
-                        nextSibling = nextSibling.nextSibling
-                    }
-                    if (nextSibling != null && nextSibling.nodeName == "string") {
-                        version = nextSibling.textContent
-                        break
-                    }
+            var versionContent = ""
+            runTool(
+                tool = MacUtils.plutil,
+                args = listOf(
+                    "-extract",
+                    "com\\.apple\\.actool\\.version.short-bundle-version",
+                    "raw",
+                    "-expect",
+                    "string",
+                    "-o",
+                    "-",
+                    "-"
+                ),
+                stdinStr = outputContent,
+                processStdout = {
+                    versionContent = it
                 }
-            }
-            version
+            )
+            versionContent
         } catch (e: Exception) {
-            error("Could not parse actool version XML from output: '$outputContent'. Error: ${e.message}")
+            error("Could not check actool version. Error: ${e.message}")
         }
 
-        if (versionString == null) {
+        if (versionString.isNullOrBlank()) {
             error("Could not extract short-bundle-version from actool output: '$outputContent'. Assuming it meets requirements.")
         }
 
-        val majorVersion = versionString.split(".").firstOrNull()?.toIntOrNull()
-        if (majorVersion == null) {
-            error("Could not get actool major version from version string '$versionString' . Output was: '$outputContent'. Assuming it meets requirements.")
-        }
+        val majorVersion = versionString
+            .split(".")
+            .firstOrNull()
+            ?.toIntOrNull()
+            ?: error("Could not get actool major version from version string '$versionString' . Output was: '$outputContent'. Assuming it meets requirements.")
 
         if (majorVersion < requiredVersion) {
             error(
