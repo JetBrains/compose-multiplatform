@@ -6,7 +6,7 @@ _Changes since 1.10.0-rc02_
 
 ### Multiple Platforms
 
-- The project has migrated to Kotlin language version and api version `2.2`. The projects depending on Compose Multiplatform need to use the same version or newer [#2614](https://github.com/JetBrains/compose-multiplatform-core/pull/2614)
+- The project has migrated to Kotlin language version and API version `2.2`. The projects depending on Compose Multiplatform need to use the same version or newer [#2614](https://github.com/JetBrains/compose-multiplatform-core/pull/2614)
 
 ## Features
 
