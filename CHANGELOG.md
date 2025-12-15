@@ -13,8 +13,8 @@ _Changes since 1.10.0-rc02_
 ### Multiple Platforms
 
 - Clicking outside of any focusable node using the mouse will now clear focus from the currently focused node, if any. This behavior can be disabled by setting `isClearFocusOnMouseDownEnabled = false` in `ComposePanel`, `ComposeWindow` or `ComposeDialog` [#2533](https://github.com/JetBrains/compose-multiplatform-core/pull/2533)
-- Migrate window insets padding modifiers from composed API to `InsetsPaddingModifierNode` [#2572](https://github.com/JetBrains/compose-multiplatform-core/pull/2572)
-- Add enter end exit animation for `Dialog`. It might have disabled via `DialogProperties.animateTransition` or via global feature flag `ComposeUiFlags.isDialogAnimationEnabled` [#2596](https://github.com/JetBrains/compose-multiplatform-core/pull/2596)
+- Migrate window insets padding modifiers from `composed` API to `InsetsPaddingModifierNode` [#2572](https://github.com/JetBrains/compose-multiplatform-core/pull/2572)
+- Add enter end exit animation for `Dialog`. It can be disabled via `DialogProperties.animateTransition` or via global feature flag `ComposeUiFlags.isDialogAnimationEnabled` [#2596](https://github.com/JetBrains/compose-multiplatform-core/pull/2596)
 
 ### Desktop
 
@@ -29,14 +29,14 @@ _Changes since 1.10.0-rc02_
 
 ### iOS
 
-- Fix incorrectly consumed insets in ModalBottomSheet [#2572](https://github.com/JetBrains/compose-multiplatform-core/pull/2572)
+- Fix incorrectly consumed insets in `ModalBottomSheet` [#2572](https://github.com/JetBrains/compose-multiplatform-core/pull/2572)
 - The rendering queue is running with the highest priority when `parallelRendering` is enabled [#2623](https://github.com/JetBrains/compose-multiplatform-core/pull/2623)
 - Fix possible text styles cache corruption (text color is sometimes randomly black) [#2629](https://github.com/JetBrains/compose-multiplatform-core/pull/2629)
 
 ### Desktop
 
-- Fixed changing the pointer from one custom cursor to another [#2613](https://github.com/JetBrains/compose-multiplatform-core/pull/2613)
-- Fix exception/crash when pasting in TextField in headless mode [#2612](https://github.com/JetBrains/compose-multiplatform-core/pull/2612)
+- Fix changing the pointer from one custom cursor to another [#2613](https://github.com/JetBrains/compose-multiplatform-core/pull/2613)
+- Fix exception/crash when pasting in `TextField` in headless mode [#2612](https://github.com/JetBrains/compose-multiplatform-core/pull/2612)
 - When there is no selection in `SelectionContainer`, the "Copy" menu item will be disabled [#2617](https://github.com/JetBrains/compose-multiplatform-core/pull/2617)
 - Fix unnecessary redraws caused by `WindowInsetsRulers` implementation using `RulerScope.coordinates.size` [#2628](https://github.com/JetBrains/compose-multiplatform-core/pull/2628)
 
@@ -49,7 +49,7 @@ _Changes since 1.10.0-rc02_
 
 - Fix crash in `getSystemEnvironment` on headless desktop [#5471](https://github.com/JetBrains/compose-multiplatform/pull/5471)
 
-### SavedState
+### Lifecycle
 
 - Fix saveable state restoration on non-android targets [#2615](https://github.com/JetBrains/compose-multiplatform-core/pull/2615)
 
@@ -73,8 +73,8 @@ _Changes since 1.10.0-rc02_
 | Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.1` | [Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4) |
 | Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.1.0-alpha01` | [Navigation3 1.1.0-alpha01](https://developer.android.com/jetpack/androidx/releases/navigation3#1.1.0-alpha01) |
 | Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.0.10-alpha01` | [Navigation Event 1.0.0-rc01](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.0.0-rc01) |
-| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.10-alpha01` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
-| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.10-alpha01` | [WindowManager 1.5.0](https://developer.android.com/jetpack/androidx/releases/window#1.5.0) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
 
 ---
 
