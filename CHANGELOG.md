@@ -72,7 +72,7 @@ _Changes since 1.10.0-rc02_
 | Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.10.0-alpha07` | [Lifecycle 2.10.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.10.0) |
 | Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.1` | [Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4) |
 | Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.1.0-alpha01` | [Navigation3 1.1.0-alpha01](https://developer.android.com/jetpack/androidx/releases/navigation3#1.1.0-alpha01) |
-| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.0.10-alpha01` | [Navigation Event 1.0.0-rc01](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.0.0-rc01) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.0.0-rc02` | [Navigation Event 1.0.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.0.1) |
 | Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
 | WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
 
