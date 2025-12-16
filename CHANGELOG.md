@@ -1,3 +1,83 @@
+# 1.11.0-alpha01 (December 2025)
+
+_Changes since 1.10.0-rc02_
+
+## Migration Notes
+
+### Multiple Platforms
+
+- The project has migrated to Kotlin language version and API version `2.2`. The projects depending on Compose Multiplatform need to use the same version or newer [#2614](https://github.com/JetBrains/compose-multiplatform-core/pull/2614)
+
+## Features
+
+### Multiple Platforms
+
+- Clicking outside of any focusable node using the mouse will now clear focus from the currently focused node, if any. This behavior can be disabled by setting `isClearFocusOnMouseDownEnabled = false` in `ComposePanel`, `ComposeWindow` or `ComposeDialog` [#2533](https://github.com/JetBrains/compose-multiplatform-core/pull/2533)
+- Migrate window insets padding modifiers from `composed` API to `InsetsPaddingModifierNode` [#2572](https://github.com/JetBrains/compose-multiplatform-core/pull/2572)
+- Add enter end exit animation for `Dialog`. It can be disabled via `DialogProperties.animateTransition` or via global feature flag `ComposeUiFlags.isDialogAnimationEnabled` [#2596](https://github.com/JetBrains/compose-multiplatform-core/pull/2596)
+
+### Desktop
+
+- Allow specifying AWT `AccessibleRole` directly via `SemanticsPropertyReceiver.awtRole` [#2577](https://github.com/JetBrains/compose-multiplatform-core/pull/2577)
+- Menu items in the context menu for text fields and `SelectionContainer` can now be disabled [#2617](https://github.com/JetBrains/compose-multiplatform-core/pull/2617)
+
+### Gradle Plugin
+
+- Add a compatibility check for runtime libraries to ensure consistency with the expected Compose version [#5485](https://github.com/JetBrains/compose-multiplatform/pull/5485)
+
+## Fixes
+
+### iOS
+
+- Fix incorrectly consumed insets in `ModalBottomSheet` [#2572](https://github.com/JetBrains/compose-multiplatform-core/pull/2572)
+- The rendering queue is running with the highest priority when `parallelRendering` is enabled [#2623](https://github.com/JetBrains/compose-multiplatform-core/pull/2623)
+- Fix possible text styles cache corruption (text color is sometimes randomly black) [#2629](https://github.com/JetBrains/compose-multiplatform-core/pull/2629)
+
+### Desktop
+
+- Fix changing the pointer from one custom cursor to another [#2613](https://github.com/JetBrains/compose-multiplatform-core/pull/2613)
+- Fix exception/crash when pasting in `TextField` in headless mode [#2612](https://github.com/JetBrains/compose-multiplatform-core/pull/2612)
+- When there is no selection in `SelectionContainer`, the "Copy" menu item will be disabled [#2617](https://github.com/JetBrains/compose-multiplatform-core/pull/2617)
+- Fix unnecessary redraws caused by `WindowInsetsRulers` implementation using `RulerScope.coordinates.size` [#2628](https://github.com/JetBrains/compose-multiplatform-core/pull/2628)
+
+### Web
+
+- `WebElementView` is now available in `webMain` source set [#2614](https://github.com/JetBrains/compose-multiplatform-core/pull/2614)
+- Deprecated `CanvasBasedWindow` has been deleted [#2614](https://github.com/JetBrains/compose-multiplatform-core/pull/2614)
+
+### Resources
+
+- Fix crash in `getSystemEnvironment` on headless desktop [#5471](https://github.com/JetBrains/compose-multiplatform/pull/5471)
+
+### Lifecycle
+
+- Fix saveable state restoration on non-android targets [#2615](https://github.com/JetBrains/compose-multiplatform-core/pull/2615)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.11.0-alpha01`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.11.0-alpha01` | [Runtime 1.11.0-alpha01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.11.0-alpha01) |
+| UI | `org.jetbrains.compose.ui:ui*:1.11.0-alpha01` | [UI 1.11.0-alpha01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.11.0-alpha01) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.11.0-alpha01` | [Foundation 1.11.0-alpha01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.11.0-alpha01) |
+| Material | `org.jetbrains.compose.material:material*:1.11.0-alpha01` | [Material 1.11.0-alpha01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.11.0-alpha01) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.11.0-alpha01` | [Material3 1.5.0-alpha10](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha10) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha03` | [Material3 Adaptive 1.3.0-alpha05](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha05) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.10.0-alpha07` | [Lifecycle 2.10.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.10.0) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.1` | [Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.1.0-alpha01` | [Navigation3 1.1.0-alpha01](https://developer.android.com/jetpack/androidx/releases/navigation3#1.1.0-alpha01) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.0.0-rc02` | [Navigation Event 1.0.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.0.1) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.10.0-rc02 (December 2025)
 
 _Changes since 1.10.0-rc01_
