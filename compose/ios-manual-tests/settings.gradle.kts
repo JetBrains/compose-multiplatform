@@ -15,6 +15,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "ios-tests"
+rootProject.name = "ios-manual-tests"
 
 include(":shared")
