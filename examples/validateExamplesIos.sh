@@ -36,4 +36,3 @@ runGradle codeviewer
 runGradle imageviewer
 runGradle graphics-2d
 runGradle jetsnack
-runGradle ios-tests
