@@ -28,7 +28,7 @@ internal fun Project.checkComposeCompilerPlugin() {
     }
 }
 
-internal const val minimalSupportedKgpVersion = "2.1.0"
+internal const val minimalSupportedKgpVersion = "2.2.0"
 internal const val minimalSupportedKgpVersionError = "e: Configuration problem: " +
         "Minimal supported Kotlin Gradle Plugin version is $minimalSupportedKgpVersion"
 internal const val newComposeCompilerKotlinSupportPluginId = "org.jetbrains.kotlin.plugin.compose"
