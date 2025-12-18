@@ -38,8 +38,7 @@ class HotReloadTest : GradlePluginTestBase() {
         TestEnvironment(defaultTestEnvironment.workingDir, kotlinVersion = "2.1.0")))
     {
         gradleFailure("hotRun").checks {
-            check.logContains("w: Compose Hot Reload is disabled")
-            check.logContains("Task 'hotRun' not found")
+            check.logContains("e: Configuration problem: Minimal supported Kotlin")
         }
     }
 
