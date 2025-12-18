@@ -745,8 +745,8 @@ class ResourcesTest : GradlePluginTestBase() {
                     |
                 """.trimMargin()
             }
-            gradle(":assembleComposeAppDebugXCFramework", "--dry-run").checks {
-                check.logContains("Compose resources are supported in XCFrameworks since '2.2.0-Beta2-1' Kotlin Gradle plugin version")
+            gradleFailure(":assembleComposeAppDebugXCFramework", "--dry-run").checks {
+                check.logContains("e: Configuration problem: Minimal supported Kotlin")
             }
         }
     }
