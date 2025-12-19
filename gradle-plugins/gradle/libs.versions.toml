@@ -6,7 +6,7 @@ plugin-android = "8.10.1"
 shadow-jar = "8.1.1"
 publish-plugin = "1.2.1"
 # we use "prefer" here for the strategy: "explicitly specified hot reload plugin always wins".
-plugin-hot-reload = { prefer = "1.0.0" }
+plugin-hot-reload = { prefer = "1.1.0-alpha03" }
 
 [libraries]
 download-task = { module = "de.undercouch:gradle-download-task", version.ref = "gradle-download-plugin" }
