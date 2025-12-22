@@ -24,8 +24,8 @@ dependencies {
     implementation("org.jetbrains.compose:preview-rpc")
 
     intellijPlatform {
+        @Suppress("DEPRECATION")
         intellijIdeaCommunity(libs.versions.idea)
-        instrumentationTools()
         pluginVerifier()
 
         bundledPlugins("com.intellij.java", "org.jetbrains.kotlin", "com.intellij.gradle")
@@ -34,9 +34,9 @@ dependencies {
 
 intellijPlatform {
     pluginConfiguration {
-        name = "Compose Multiplatform IDE Support"
+        name = "Compose Multiplatform for Desktop IDE Support"
         ideaVersion {
-            sinceBuild = "242.20224"
+            sinceBuild = "252.26199"
             untilBuild = provider { null }
         }
     }
