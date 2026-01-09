@@ -22,6 +22,7 @@ class PreviewToolWindow : ToolWindowFactory, DumbAware {
     }
 
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
+        toolWindow.setTitleActions(listOf(RefreshShownPreviewAction()))
         toolWindow.contentManager.let { content ->
             val panel = PreviewPanel(project)
             val loadingPanel = JBLoadingPanel(BorderLayout(), toolWindow.disposable)
