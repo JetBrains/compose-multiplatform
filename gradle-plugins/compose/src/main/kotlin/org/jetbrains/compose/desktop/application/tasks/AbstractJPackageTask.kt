@@ -424,12 +424,12 @@ abstract class AbstractJPackageTask @Inject constructor(
 
         if (targetFormat != TargetFormat.AppImage) {
             // Args, that can only be used, when creating an installer
-            if (currentOS == OS.MacOS && jvmRuntimeInfo.majorVersion >= 18) {
-                // This is needed to prevent a directory does not exist error.
-                cliArg("--app-image", appImage.dir("${packageName.get()}.app"))
-            } else {
-                cliArg("--app-image", appImage)
+            val appImageDir = when {
+                jvmRuntimeInfo.majorVersion < 18 -> appImage
+                currentOS == OS.MacOS -> appImage.dir("${packageName.get()}.app")
+                else -> appImage.dir(packageName.get())
             }
+            cliArg("--app-image", appImageDir)
             cliArg("--install-dir", installationPath)
             cliArg("--license-file", licenseFile)
             cliArg("--resource-dir", jpackageResources)
