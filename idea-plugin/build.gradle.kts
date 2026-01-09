@@ -42,6 +42,7 @@ intellijPlatform {
     }
     buildSearchableOptions = false
     autoReload = false
+    projectName = "compose-multiplatform-plugin"
 
     publishing {
         token = System.getenv("IDE_PLUGIN_PUBLISH_TOKEN")
