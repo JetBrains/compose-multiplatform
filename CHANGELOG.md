@@ -9,7 +9,6 @@ See also [What's new](https://kotlinlang.org/docs/multiplatform/whats-new-compos
 ### Multiple Platforms
 
 - `androidx.compose.ui.tooling.preview.Preview` annotation is now available from `commonMain` source set [#2424](https://github.com/JetBrains/compose-multiplatform-core/pull/2424)
-- `widgets-gallery` sample has been removed in favor of the [interactive API reference](https://kotlinlang.org/api/compose-multiplatform/stories/material3/) [#5365](https://github.com/JetBrains/compose-multiplatform/pull/5365)
 
 ### Desktop
 
@@ -40,6 +39,7 @@ See also [What's new](https://kotlinlang.org/docs/multiplatform/whats-new-compos
 - Remove experimental annotation from `usePlatformInsets`, `useSoftwareKeyboardInset` and `scrimColor` in `DialogProperties` [#2495](https://github.com/JetBrains/compose-multiplatform-core/pull/2495)
 - Remove experimental annotation from `usePlatformDefaultWidth`, `usePlatformInsets` in `PopupProperties` [#2495](https://github.com/JetBrains/compose-multiplatform-core/pull/2495)
 - Deprecation level of `Popup` overloads without `PopupProperties` parameter changed from `WARNING` to `ERROR` [#2495](https://github.com/JetBrains/compose-multiplatform-core/pull/2495)
+- `widgets-gallery` sample has been removed in favor of the [interactive API reference](https://kotlinlang.org/api/compose-multiplatform/stories/material3/) [#5365](https://github.com/JetBrains/compose-multiplatform/pull/5365)
 - Deprecate `org.jetbrains.compose.ui.tooling.preview.Preview` annotation in favor of `androidx.compose.ui.tooling.preview.Preview` to reduce variety of Preview annotations [#5453](https://github.com/JetBrains/compose-multiplatform/pull/5453)
 - Dependency aliases in Gradle plugin (e.g. `compose.ui`) are now deprecated. Use provided direct artifact coordinates and add them to the version catalog [#5462](https://github.com/JetBrains/compose-multiplatform/pull/5462)
 
