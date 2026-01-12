@@ -2,6 +2,8 @@
 
 _Changes since 1.9.3_
 
+See also [What's new](https://kotlinlang.org/docs/multiplatform/whats-new-compose-110.html).
+
 ## Highlights
 
 ### Multiple Platforms
