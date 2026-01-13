@@ -55,6 +55,10 @@ See also [What's new](https://kotlinlang.org/docs/multiplatform/whats-new-compos
 
 ## Features
 
+### HTML
+
+- Add support of `important` keyword for CSS properties [#5439](https://github.com/JetBrains/compose-multiplatform/pull/5439)
+
 ### Multiple Platforms
 
 - Update skia to m138 (see [release notes](https://skia.googlesource.com/skia/+/refs/heads/chrome/m138/RELEASE_NOTES.md)) [#2304](https://github.com/JetBrains/compose-multiplatform-core/pull/2304)
@@ -81,7 +85,6 @@ See also [What's new](https://kotlinlang.org/docs/multiplatform/whats-new-compos
 ### Web
 
 - Esc button calls back navigation event on the web now [#2499](https://github.com/JetBrains/compose-multiplatform-core/pull/2499)
-- Add support of `important` keyword for CSS properties [#5439](https://github.com/JetBrains/compose-multiplatform/pull/5439)
 
 ### Resources
 
