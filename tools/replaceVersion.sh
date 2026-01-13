@@ -54,6 +54,7 @@ replaceVersionInFile() {
     replaceVersion '"org.jetbrains.compose:compose-gradle-plugin:.*"' '"org.jetbrains.compose:compose-gradle-plugin:'"$COMPOSE_VERSION"'"' $1
     replaceVersion '^kotlin.version=.*' 'kotlin.version='"$KOTLIN_VERSION"'' $1
     replaceVersion '<kotlin.version>.*<\/kotlin.version>' '<kotlin.version>'"$KOTLIN_VERSION"'<\/kotlin.version>' $1
+    replaceVersion '^compose.tests.kotlin.version=.*' 'compose.tests.kotlin.version='"$KOTLIN_VERSION"'' $1
     replaceVersion '^compose.tests.compiler.compatible.kotlin.version=.*' 'compose.tests.compiler.compatible.kotlin.version='"$KOTLIN_VERSION"'' $1
     replaceVersion '^compose.tests.js.compiler.compatible.kotlin.version=.*' 'compose.tests.js.compiler.compatible.kotlin.version='"$KOTLIN_VERSION"'' $1
     replaceVersion 'kotlin("multiplatform") version ".*"' 'kotlin("multiplatform") version "'"$KOTLIN_VERSION"'"' $1
