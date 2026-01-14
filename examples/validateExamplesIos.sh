@@ -35,4 +35,3 @@ runGradle chat
 runGradle codeviewer
 runGradle imageviewer
 runGradle graphics-2d
-runGradle jetsnack
