@@ -24,4 +24,3 @@ runGradle codeviewer packageDistributionForCurrentOS
 runGradle imageviewer packageDistributionForCurrentOS
 runGradle issues packageDistributionForCurrentOS
 runGradle graphics-2d packageDistributionForCurrentOS
-runGradle jetsnack packageDistributionForCurrentOS

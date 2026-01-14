@@ -25,4 +25,3 @@ runGradle codeviewer installDebug
 runGradle imageviewer installDebug
 runGradle issues installDebug
 runGradle graphics-2d installDebug
-runGradle jetsnack installDebug
