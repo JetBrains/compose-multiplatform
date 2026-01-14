@@ -12,17 +12,11 @@ See also [What's new](https://kotlinlang.org/docs/multiplatform/whats-new-compos
 
 ### Desktop
 
-- Compose Hot Reload Gradle plugin is bundled with Compose Gradle plugin (no need to configure it separately) [#5444](https://github.com/JetBrains/compose-multiplatform/pull/5444)
+- Compose Hot Reload Gradle plugin is bundled with the Compose Gradle plugin and is enabled for Kotlin version 2.1.20 or higher (no need to configure it separately) [#5444](https://github.com/JetBrains/compose-multiplatform/pull/5444)
 
 ### Navigation
 
 - Provide required `NavigationEventDispatcherOwner` for a correct Navigation3 support [#2382](https://github.com/JetBrains/compose-multiplatform-core/pull/2382)
-
-## Known Issues
-
-### Multiple Platforms
-
-- Due to the bundled Hot Reload Gradle plugin, Compose Multiplatform requires Kotlin version 2.1.20 or higher [#5444](https://github.com/JetBrains/compose-multiplatform/pull/5444)
 
 ## Breaking Changes
 
@@ -55,15 +49,10 @@ See also [What's new](https://kotlinlang.org/docs/multiplatform/whats-new-compos
 
 ## Features
 
-### HTML
-
-- Add support of `important` keyword for CSS properties [#5439](https://github.com/JetBrains/compose-multiplatform/pull/5439)
-
 ### Multiple Platforms
 
 - Update skia to m138 (see [release notes](https://skia.googlesource.com/skia/+/refs/heads/chrome/m138/RELEASE_NOTES.md)) [#2304](https://github.com/JetBrains/compose-multiplatform-core/pull/2304)
 - Provide `LocalLifecycleOwner` inside `runComposeUiTest` by default [#2400](https://github.com/JetBrains/compose-multiplatform-core/pull/2400)
-- Provide public API for `@ResourceContentHash` annotation generation [#5402](https://github.com/JetBrains/compose-multiplatform/pull/5402)
 
 ### iOS
 
@@ -99,6 +88,10 @@ See also [What's new](https://kotlinlang.org/docs/multiplatform/whats-new-compos
 - Basic support of the navigation3 library [#2436](https://github.com/JetBrains/compose-multiplatform-core/pull/2436)
 - Published `org.jetbrains.compose.material3.adaptive:adaptive-navigation3` library [#2516](https://github.com/JetBrains/compose-multiplatform-core/pull/2516)
 - Add a new configuration option in `ComposeUIViewController` to set end-edge gestures behavior [#2519](https://github.com/JetBrains/compose-multiplatform-core/pull/2519)
+
+### HTML
+
+- Add support of `important` keyword for CSS properties [#5439](https://github.com/JetBrains/compose-multiplatform/pull/5439)
 
 ## Fixes
 
