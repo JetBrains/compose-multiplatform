@@ -824,9 +824,11 @@ class ResourcesTest : GradlePluginTestBase() {
 
         with(TestProject("misc/appleResources", testEnv)) {
             gradle(":podspec", "-Pkotlin.native.cocoapods.generate.wrapper=true").checks {
-                assertEqualTextFiles(
-                    file("appleResources.podspec"),
-                    file("expected/appleResources.podspec")
+                // Kotlin 2.3.0 generates podspec with no blank lines
+                fun File.podspecContent() = readLines().filterNot { it.isBlank() }.joinToString("\n") { it.trim() }
+                assertEquals(
+                    file("appleResources.podspec").podspecContent(),
+                    file("expected/appleResources.podspec").podspecContent()
                 )
                 file("build/compose/cocoapods/compose-resources").checkExists()
             }
@@ -945,9 +947,11 @@ class ResourcesTest : GradlePluginTestBase() {
             file("src/iosMain").renameTo(file("src/macosMain"))
 
             gradle(":podspec", "-Pkotlin.native.cocoapods.generate.wrapper=true").checks {
-                assertEqualTextFiles(
-                    file("appleResources.podspec"),
-                    file("expected/appleResources.podspec")
+                // Kotlin 2.3.0 generates podspec with no blank lines
+                fun File.podspecContent() = readLines().filterNot { it.isBlank() }.joinToString("\n") { it.trim() }
+                assertEquals(
+                    file("appleResources.podspec").podspecContent(),
+                    file("expected/appleResources.podspec").podspecContent()
                 )
                 file("build/compose/cocoapods/compose-resources").checkExists()
             }
