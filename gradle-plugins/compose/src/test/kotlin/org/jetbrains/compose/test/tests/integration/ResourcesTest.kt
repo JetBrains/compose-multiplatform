@@ -267,8 +267,6 @@ class ResourcesTest : GradlePluginTestBase() {
                 checkResourcesZip(jar, resourcesFiles, false)
 
                 if (currentOS == OS.MacOS) {
-                    val iosx64ResZip = file(libpath("iosx64", "-kotlin_resources.kotlin_resources.zip"))
-                    checkResourcesZip(iosx64ResZip, resourcesFiles, false)
                     val iosarm64ResZip = file(libpath("iosarm64", "-kotlin_resources.kotlin_resources.zip"))
                     checkResourcesZip(iosarm64ResZip, resourcesFiles, false)
                     val iossimulatorarm64ResZip = file(
@@ -276,9 +274,6 @@ class ResourcesTest : GradlePluginTestBase() {
                     )
                     checkResourcesZip(iossimulatorarm64ResZip, resourcesFiles, false)
 
-                    val macosx64ResZip =
-                        file(libpath("macosx64", "-kotlin_resources.kotlin_resources.zip"))
-                    checkResourcesZip(macosx64ResZip, resourcesFiles, false)
                     val macosarm64ResZip =
                         file(libpath("macosarm64", "-kotlin_resources.kotlin_resources.zip"))
                     checkResourcesZip(macosarm64ResZip, resourcesFiles, false)
@@ -296,18 +291,10 @@ class ResourcesTest : GradlePluginTestBase() {
             gradle(":appModule:jvmTest", "-i")
 
             if (currentOS == OS.MacOS) {
-                val iosTask = if (currentArch == Arch.X64) {
-                    ":appModule:iosX64Test"
-                } else {
-                    ":appModule:iosSimulatorArm64Test"
-                }
+                val iosTask = ":appModule:iosSimulatorArm64Test"
                 gradle(iosTask)
 
-                val macosTask = if (currentArch == Arch.X64) {
-                    ":appModule:macosX64Test"
-                } else {
-                    ":appModule:macosArm64Test"
-                }
+                val macosTask = ":appModule:macosArm64Test"
                 gradle(macosTask)
             }
 
@@ -485,7 +472,6 @@ class ResourcesTest : GradlePluginTestBase() {
             gradle(":sharedUI:assembleSharedUIDebugXCFramework").checks {
                 check.taskSuccessful(":sharedUI:iosArm64AggregateResources")
                 check.taskSuccessful(":sharedUI:iosSimulatorArm64AggregateResources")
-                check.taskSuccessful(":sharedUI:iosX64AggregateResources")
 
                 val iosDeviceFramework =
                     file("sharedUI/build/XCFrameworks/debug/SharedUI.xcframework/ios-arm64/SharedUI.framework")
@@ -495,7 +481,7 @@ class ResourcesTest : GradlePluginTestBase() {
                 assertEquals("ios", iosDeviceFramework.resolve("$repackDir/files/platform.txt").readText())
 
                 val iosSimFramework =
-                    file("sharedUI/build/XCFrameworks/debug/SharedUI.xcframework/ios-arm64_x86_64-simulator/SharedUI.framework")
+                    file("sharedUI/build/XCFrameworks/debug/SharedUI.xcframework/ios-arm64-simulator/SharedUI.framework")
                 commonResourcesFiles.forEach { res ->
                     assertTrue(iosSimFramework.resolve(res).exists())
                 }
@@ -721,7 +707,6 @@ class ResourcesTest : GradlePluginTestBase() {
                     |    macosArm64()
                     |
                     |    listOf(
-                    |        iosX64(),
                     |        iosArm64(),
                     |        iosSimulatorArm64()
                     |    ).forEach {
@@ -767,8 +752,6 @@ class ResourcesTest : GradlePluginTestBase() {
                     |
                     |kotlin {
                     |    val xcf = XCFramework("ComposeApp")
-                    |
-                    |    macosX64()
                     |
                     |    listOf(
                     |        macosArm64(),
@@ -862,11 +845,6 @@ class ResourcesTest : GradlePluginTestBase() {
                 check.taskSkipped(":prepareComposeResourcesTaskForIosMain")
                 check.taskSkipped(":generateResourceAccessorsForIosMain")
 
-                check.taskSkipped(":convertXmlValueResourcesForIosX64Main")
-                check.taskSkipped(":copyNonXmlValueResourcesForIosX64Main")
-                check.taskSkipped(":prepareComposeResourcesTaskForIosX64Main")
-                check.taskSkipped(":generateResourceAccessorsForIosX64Main")
-
                 check.taskSkipped(":syncPodComposeResourcesForIos")
             }
             gradle(":syncPodComposeResourcesForIos").checks {
@@ -890,11 +868,6 @@ class ResourcesTest : GradlePluginTestBase() {
                 check.taskSuccessful(":prepareComposeResourcesTaskForIosMain")
                 check.taskSkipped(":generateResourceAccessorsForIosMain")
 
-                check.taskNoSource(":convertXmlValueResourcesForIosX64Main")
-                check.taskNoSource(":copyNonXmlValueResourcesForIosX64Main")
-                check.taskNoSource(":prepareComposeResourcesTaskForIosX64Main")
-                check.taskSkipped(":generateResourceAccessorsForIosX64Main")
-
                 file("build/compose/cocoapods/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
                 file("build/compose/cocoapods/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
             }
@@ -911,7 +884,7 @@ class ResourcesTest : GradlePluginTestBase() {
                     file("expected/XCFrameworks/iosComposeResources")
                 )
                 assertDirectoriesContentEquals(
-                    file("build/cocoapods/publish/debug/shared.xcframework/ios-arm64_x86_64-simulator/shared.framework/composeResources"),
+                    file("build/cocoapods/publish/debug/shared.xcframework/ios-arm64-simulator/shared.framework/composeResources"),
                     file("expected/XCFrameworks/iosComposeResources")
                 )
             }
@@ -934,12 +907,10 @@ class ResourcesTest : GradlePluginTestBase() {
             file("build.gradle.kts").modify { content ->
                 content.replace(
                     """
-                        |    iosX64()
                         |    iosArm64()
                         |    iosSimulatorArm64()
                     """.trimMargin(),
                     """
-                        |    macosX64()
                         |    macosArm64()
                     """.trimMargin()
                 )
@@ -985,11 +956,6 @@ class ResourcesTest : GradlePluginTestBase() {
                 check.taskSkipped(":prepareComposeResourcesTaskForMacosMain")
                 check.taskSkipped(":generateResourceAccessorsForMacosMain")
 
-                check.taskSkipped(":convertXmlValueResourcesForMacosX64Main")
-                check.taskSkipped(":copyNonXmlValueResourcesForMacosX64Main")
-                check.taskSkipped(":prepareComposeResourcesTaskForMacosX64Main")
-                check.taskSkipped(":generateResourceAccessorsForMacosX64Main")
-
                 check.taskSkipped(":syncPodComposeResourcesForIos")
             }
             gradle(":syncPodComposeResourcesForIos").checks {
@@ -1013,11 +979,6 @@ class ResourcesTest : GradlePluginTestBase() {
                 check.taskSuccessful(":prepareComposeResourcesTaskForMacosMain")
                 check.taskSkipped(":generateResourceAccessorsForMacosMain")
 
-                check.taskNoSource(":convertXmlValueResourcesForMacosX64Main")
-                check.taskNoSource(":copyNonXmlValueResourcesForMacosX64Main")
-                check.taskNoSource(":prepareComposeResourcesTaskForMacosX64Main")
-                check.taskSkipped(":generateResourceAccessorsForMacosX64Main")
-
                 file("build/compose/cocoapods/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
                 file("build/compose/cocoapods/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
             }
@@ -1029,9 +990,9 @@ class ResourcesTest : GradlePluginTestBase() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
         with(testProject("misc/macosNativeResources")) {
             val appName = "Test Resources"
-            gradle(":createDistributableNativeDebugMacosX64").checks {
+            gradle(":createDistributableNativeDebugMacosArm64").checks {
                 val targetResourcesDir =
-                    "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources"
+                    "build/compose/binaries/main/native-macosArm64-debug-app-image/${appName}.app/Contents/Resources"
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
             }
@@ -1043,14 +1004,14 @@ class ResourcesTest : GradlePluginTestBase() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
         with(testProject("misc/macosNativeResources")) {
             val appName = "Test Resources"
-            val taskName = ":createDistributableNativeDebugMacosX64"
+            val taskName = ":createDistributableNativeDebugMacosArm64"
             val comment = "<!-- Test resources changed -->"
             val fileNames = listOf(
                 "compose-multiplatform.xml",
                 "icon.xml"
             )
             val targetResourcesDir =
-                "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources/compose-resources/composeResources/appleresources.generated.resources/drawable/"
+                "build/compose/binaries/main/native-macosArm64-debug-app-image/${appName}.app/Contents/Resources/compose-resources/composeResources/appleresources.generated.resources/drawable/"
             gradle(taskName).checks {
                 fileNames.forEach { name ->
                     check(!file(targetResourcesDir + name).readText().startsWith(comment)) {
@@ -1083,7 +1044,7 @@ class ResourcesTest : GradlePluginTestBase() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
         with(testProject("misc/macosNativeResources")) {
             val appName = "Test Resources"
-            val taskName = ":createDistributableNativeDebugMacosX64"
+            val taskName = ":createDistributableNativeDebugMacosArm64"
 
             val targetResource = "src/commonMain/composeResources/drawable/compose-multiplatform2.xml"
             file(targetResource).apply {
@@ -1093,7 +1054,7 @@ class ResourcesTest : GradlePluginTestBase() {
 
             gradle(taskName).checks {
                 val targetResourcesDir =
-                    "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources"
+                    "build/compose/binaries/main/native-macosArm64-debug-app-image/${appName}.app/Contents/Resources"
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform2.xml").checkExists()
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
@@ -1102,7 +1063,7 @@ class ResourcesTest : GradlePluginTestBase() {
             gradle(taskName).checks {
                 check.taskSuccessful(taskName)
                 val targetResourcesDir =
-                    "build/compose/binaries/main/native-macosX64-debug-app-image/${appName}.app/Contents/Resources"
+                    "build/compose/binaries/main/native-macosArm64-debug-app-image/${appName}.app/Contents/Resources"
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform2.xml").checkNotExists()
                 file("$targetResourcesDir/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
@@ -1114,13 +1075,13 @@ class ResourcesTest : GradlePluginTestBase() {
     fun iosTestResources() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
         with(testProject("misc/appleResources")) {
-            gradle(":linkDebugTestIosX64", "--dry-run").checks {
-                check.taskSkipped(":copyTestComposeResourcesForIosX64")
-                check.taskSkipped(":linkDebugTestIosX64")
+            gradle(":linkDebugTestIosSimulatorArm64", "--dry-run").checks {
+                check.taskSkipped(":copyTestComposeResourcesForIosSimulatorArm64")
+                check.taskSkipped(":linkDebugTestIosSimulatorArm64")
             }
-            gradle(":copyTestComposeResourcesForIosX64").checks {
-                file("build/bin/iosX64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
-                file("build/bin/iosX64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
+            gradle(":copyTestComposeResourcesForIosSimulatorArm64").checks {
+                file("build/bin/iosSimulatorArm64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
+                file("build/bin/iosSimulatorArm64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
             }
         }
     }
@@ -1132,24 +1093,22 @@ class ResourcesTest : GradlePluginTestBase() {
             file("build.gradle.kts").modify { content ->
                 content.replace(
                     """
-                        |    iosX64()
                         |    iosArm64()
                         |    iosSimulatorArm64()
                     """.trimMargin(),
                     """
-                        |    macosX64()
                         |    macosArm64()
                     """.trimMargin()
                 )
             }
             file("src/iosMain").renameTo(file("src/macosMain"))
-            gradle(":linkDebugTestMacosX64", "--dry-run").checks {
-                check.taskSkipped(":copyTestComposeResourcesForMacosX64")
-                check.taskSkipped(":linkDebugTestMacosX64")
+            gradle(":linkDebugTestMacosArm64", "--dry-run").checks {
+                check.taskSkipped(":copyTestComposeResourcesForMacosArm64")
+                check.taskSkipped(":linkDebugTestMacosArm64")
             }
-            gradle(":copyTestComposeResourcesForMacosX64").checks {
-                file("build/bin/macosX64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
-                file("build/bin/macosX64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
+            gradle(":copyTestComposeResourcesForMacosArm64").checks {
+                file("build/bin/macosArm64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
+                file("build/bin/macosArm64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
             }
         }
     }
@@ -1160,14 +1119,10 @@ class ResourcesTest : GradlePluginTestBase() {
             gradle("check").checks {
                 check.logContains("Configure main resources for 'desktop' target")
                 check.logContains("Configure test resources for 'desktop' target")
-                check.logContains("Configure main resources for 'iosX64' target")
-                check.logContains("Configure test resources for 'iosX64' target")
                 check.logContains("Configure main resources for 'iosArm64' target")
                 check.logContains("Configure test resources for 'iosArm64' target")
                 check.logContains("Configure main resources for 'iosSimulatorArm64' target")
                 check.logContains("Configure test resources for 'iosSimulatorArm64' target")
-                check.logContains("Configure main resources for 'macosX64' target")
-                check.logContains("Configure test resources for 'macosX64' target")
                 check.logContains("Configure main resources for 'macosArm64' target")
                 check.logContains("Configure test resources for 'macosArm64' target")
 

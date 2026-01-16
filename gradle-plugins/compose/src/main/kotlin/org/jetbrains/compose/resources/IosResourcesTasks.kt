@@ -112,7 +112,6 @@ private fun getRequestedKonanTargetsByXcode(platform: String, archs: List<String
             targets.addAll(archs.map { arch ->
                 when (arch) {
                     "arm64", "arm64e" -> KonanTarget.IOS_SIMULATOR_ARM64
-                    "x86_64" -> KonanTarget.IOS_X64
                     else -> error("Unknown iOS simulator arch: '$arch'")
                 }
             })
@@ -122,7 +121,6 @@ private fun getRequestedKonanTargetsByXcode(platform: String, archs: List<String
             targets.addAll(archs.map { arch ->
                 when (arch) {
                     "arm64" -> KonanTarget.MACOS_ARM64
-                    "x86_64" -> KonanTarget.MACOS_X64
                     else -> error("Unknown macOS arch: '$arch'")
                 }
             })

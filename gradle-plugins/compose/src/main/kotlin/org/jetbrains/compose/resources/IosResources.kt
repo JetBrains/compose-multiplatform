@@ -151,7 +151,7 @@ private fun NativeBinary.getFinalResourcesDir(): Provider<Directory> {
 }
 
 private fun KotlinNativeTarget.isIosSimulatorTarget(): Boolean =
-    konanTarget === KonanTarget.IOS_X64 || konanTarget === KonanTarget.IOS_SIMULATOR_ARM64
+    konanTarget === KonanTarget.IOS_SIMULATOR_ARM64
 
 private fun KotlinNativeTarget.isIosDeviceTarget(): Boolean =
     konanTarget === KonanTarget.IOS_ARM64
@@ -160,7 +160,7 @@ private fun KotlinNativeTarget.isIosTarget(): Boolean =
     isIosSimulatorTarget() || isIosDeviceTarget()
 
 private fun KotlinNativeTarget.isMacTarget(): Boolean =
-    konanTarget === KonanTarget.MACOS_X64 || konanTarget === KonanTarget.MACOS_ARM64
+    konanTarget === KonanTarget.MACOS_ARM64
 
 private fun KotlinNativeTarget.isIosOrMacTarget(): Boolean =
     isIosTarget() || isMacTarget()

@@ -26,7 +26,7 @@ private class TargetType(
 private val TargetType.gradlePropertyName get() = "org.jetbrains.compose.experimental.$id.enabled"
 
 private val EXPERIMENTAL_TARGETS: Set<TargetType> = setOf(
-    TargetType("macos", identifiers = listOf("macosX64", "macosArm64")),
+    TargetType("macos", identifiers = listOf("macosArm64")),
 )
 
 private sealed interface CheckResult {
