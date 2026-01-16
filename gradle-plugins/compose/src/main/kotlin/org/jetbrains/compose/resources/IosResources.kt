@@ -29,7 +29,7 @@ internal fun Project.configureSyncIosComposeResources(
 ) {
     if (ComposeProperties.dontSyncResources(project).get()) {
         logger.info(
-            "Compose Multiplatform resource management for iOS is disabled: " +
+            "Compose Multiplatform resource management for Apple platforms (iOS, tvOS, macOS) is disabled: " +
                     "'${ComposeProperties.SYNC_RESOURCES_PROPERTY}' value is 'false'"
         )
         return
@@ -110,9 +110,9 @@ internal fun Project.configureSyncIosComposeResources(
                     it.doFirst {
                         if (specAttributes["resources"] != specAttr) error(
                             """
-                                |Kotlin.cocoapods.extraSpecAttributes["resources"] is not compatible with Compose Multiplatform's resources management for iOS.
+                                |Kotlin.cocoapods.extraSpecAttributes["resources"] is not compatible with Compose Multiplatform's resources management for Apple platforms.
                                 |  * Recommended action: remove extraSpecAttributes["resources"] from '$buildFile' and run '$projectPath:podspec' once;
-                                |  * Alternative action: turn off Compose Multiplatform's resources management for iOS by adding '${ComposeProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties;
+                                |  * Alternative action: turn off Compose Multiplatform's resources management for Apple platforms by adding '${ComposeProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties;
                             """.trimMargin()
                         )
                     }
@@ -159,8 +159,18 @@ private fun KotlinNativeTarget.isIosDeviceTarget(): Boolean =
 private fun KotlinNativeTarget.isIosTarget(): Boolean =
     isIosSimulatorTarget() || isIosDeviceTarget()
 
+private fun KotlinNativeTarget.isTvosSimulatorTarget(): Boolean =
+    konanTarget === KonanTarget.TVOS_X64 || konanTarget === KonanTarget.TVOS_SIMULATOR_ARM64
+
+private fun KotlinNativeTarget.isTvosDeviceTarget(): Boolean =
+    konanTarget === KonanTarget.TVOS_ARM64
+
+private fun KotlinNativeTarget.isTvosTarget(): Boolean =
+    isTvosSimulatorTarget() || isTvosDeviceTarget()
+
 private fun KotlinNativeTarget.isMacTarget(): Boolean =
     konanTarget === KonanTarget.MACOS_X64 || konanTarget === KonanTarget.MACOS_ARM64
 
+
 private fun KotlinNativeTarget.isIosOrMacTarget(): Boolean =
-    isIosTarget() || isMacTarget()
+    isIosTarget() || isMacTarget() || isTvosTarget()
