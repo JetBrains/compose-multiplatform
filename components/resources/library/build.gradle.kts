@@ -24,7 +24,6 @@ kotlin {
             }
         }
     }
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
     js {
@@ -51,7 +50,6 @@ kotlin {
         }
         binaries.executable()
     }
-    macosX64()
     macosArm64()
 
     applyDefaultHierarchyTemplate()

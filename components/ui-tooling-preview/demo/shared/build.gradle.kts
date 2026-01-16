@@ -19,7 +19,6 @@ kotlin {
     }
     jvm("desktop")
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -38,7 +37,6 @@ kotlin {
     }
 
     listOf(
-        macosX64(),
         macosArm64()
     ).forEach { macosTarget ->
         macosTarget.binaries {
