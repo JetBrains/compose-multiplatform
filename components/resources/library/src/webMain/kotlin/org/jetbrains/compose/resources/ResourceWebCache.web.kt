@@ -37,10 +37,15 @@ internal object ResourceWebCache {
     // A mutex to avoid multiple cache reset
     private val resetMutex = Mutex()
 
-    private val supportsCacheApi: Boolean by lazy { supportsCacheApi() }
+    private val supportsCacheApi: Boolean by lazy {
+        supportsCacheApi() && isCacheableProtocol()
+    }
 
     suspend fun load(path: String, onNoCacheHit: suspend (path: String) -> Response): Response {
-        if (!supportsCacheApi) return onNoCacheHit(path)
+        if (!supportsCacheApi) {
+            return onNoCacheHit(path)
+        }
+
 
         if (isNewSession()) {
             // There can be many load requests, and there must be 1 reset max. Therefore, using `resetMutex`.
@@ -87,6 +92,12 @@ internal object ResourceWebCache {
 // https://developer.mozilla.org/en-US/docs/Web/API/Window/caches
 // Supported only in secure contexts (HTTPS or localhost)
 private fun supportsCacheApi(): Boolean = js("Boolean(window.caches)")
+
+// https://developer.mozilla.org/en-US/docs/Web/API/Location/protocol
+// Protocols like "vscode-webview:" don't support CacheStorage
+private fun isCacheableProtocol(): Boolean {
+    return window.location.protocol == "https:"
+}
 
 // Promise.await is not yet available in webMain: https://github.com/Kotlin/kotlinx.coroutines/issues/4544
 // TODO(o.karpovich): get rid of this function, when kotlinx-coroutines provide Promise.await in webMain out of a box
