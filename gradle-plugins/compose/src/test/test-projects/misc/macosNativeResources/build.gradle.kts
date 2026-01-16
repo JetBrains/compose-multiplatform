@@ -11,7 +11,6 @@ plugins {
 kotlin {
 
     listOf(
-        macosX64(),
         macosArm64(),
     ).forEach {
         it.binaries {
