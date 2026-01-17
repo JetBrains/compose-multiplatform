@@ -1,16 +1,12 @@
 <idea-plugin>
     <id>org.jetbrains.compose.desktop.ide</id>
-    <name>Compose Multiplatform IDE Support</name>
+    <name>Compose Multiplatform for Desktop IDE Support</name>
     <vendor>JetBrains</vendor>
     <description>
         <![CDATA[
-        IDE support for developing
-        <a href="https://www.jetbrains.com/lp/compose/">Compose for Desktop</a>
-        applications.
-        The main feature at the moment is IDE preview of composable functions
-        marked by @Preview annotation.
+<h3>⚠️ This plugin is in no longer supported</h3>
+<p>Its functionality is integrated into the new <a href="https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform">Kotlin Multiplatform plugin</a>.</p>
         ]]>
-
     </description>
 
     <!-- until-build is omitted, so we don't have to update it after each Intellij release -->
@@ -27,33 +23,9 @@
         <supportsKotlinPluginMode supportsK2="true" />
     </extensions>
 
+    <incompatible-with>com.jetbrains.kmm</incompatible-with>
     <extensions defaultExtensionNs="com.intellij">
-        <runLineMarkerContributor
-                language="kotlin"
-                implementationClass="org.jetbrains.compose.desktop.ide.preview.PreviewRunLineMarkerContributor"/>
-        <deadCode implementation="org.jetbrains.compose.desktop.ide.preview.PreviewEntryPoint" />
-
-        <runLineMarkerContributor
-                language="kotlin"
-                implementationClass="org.jetbrains.compose.web.ide.run.WebRunLineMarkerContributor"/>
-        <runConfigurationProducer
-                implementation="org.jetbrains.compose.web.ide.run.WebRunConfigurationProducer"/>
-
-        <toolWindow
-                factoryClass="org.jetbrains.compose.desktop.ide.preview.PreviewToolWindow"
-                id="Desktop Preview" doNotActivateOnStart="true"
-                anchor="right" />
-
-        <lang.inspectionSuppressor language="kotlin" implementationClass="org.jetbrains.compose.inspections.ComposeSuppressor"/>
-
-        <notificationGroup id="Compose MPP Notifications" displayType="BALLOON"/>
-
-        <editorFloatingToolbarProvider implementation="org.jetbrains.compose.desktop.ide.preview.PreviewFloatingToolbarProvider"/>
+        <pluginReplacement implementation="org.jetbrains.compose.ComposePluginReplacement"/>
     </extensions>
 
-    <actions>
-        <group id="Compose.Desktop.Preview.Editor.Toolbar">
-            <action class="org.jetbrains.compose.desktop.ide.preview.RefreshOrRunPreviewAction"/>
-        </group>
-    </actions>
 </idea-plugin>
