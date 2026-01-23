@@ -7,7 +7,7 @@ androidx-activity-compose = "1.8.2"
 androidx-test = "1.5.0"
 androidx-compose = "1.6.1"
 kotlinx-browser = "0.5.0"
-compose = "1.9.0"
+compose = "1.11.0-SNAPSHOT+ok-check-kotlin-2-3-20"
 material3 = "1.9.0"
 
 [libraries]
