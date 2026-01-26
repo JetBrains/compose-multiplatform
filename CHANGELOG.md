@@ -4,10 +4,6 @@ _Changes since 1.11.0-alpha01_
 
 ## Migration Notes
 
-### Multiple Platforms
-
-- JetSnack sample is removed in favor of [JetCaster](https://github.com/kotlin-hands-on/jetcaster-kmp-migration) sample [#5511](https://github.com/JetBrains/compose-multiplatform/pull/5511)
-
 ### iOS
 
 - Compose Multiplatform doesn't support Apple x86_64 targets anymore due to [deprecation in Kotlin](https://youtrack.jetbrains.com/issue/KT-81596) [#5514](https://github.com/JetBrains/compose-multiplatform/pull/5514)
