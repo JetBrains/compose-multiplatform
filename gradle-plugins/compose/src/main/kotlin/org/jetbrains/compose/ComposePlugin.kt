@@ -94,7 +94,12 @@ abstract class ComposePlugin : Plugin<Project> {
         val uiUtil get() = composeDependency("org.jetbrains.compose.ui:ui-util")
         @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-tooling-preview:${ComposeBuildConfig.composeVersion}\""))
         val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
-        @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.material:material-icons-extended:1.7.3\""))
+        @Deprecated(
+            "This artifact is pinned to version 1.7.3 and will not receive updates. " +
+                "Either use this version explicitly or migrate to Material Symbols (vector resources). " +
+                "See https://kotlinlang.org/docs/multiplatform/whats-new-compose-180.html",
+            replaceWith = ReplaceWith("\"org.jetbrains.compose.material:material-icons-extended:1.7.3\"")
+        )
         val materialIconsExtended get() = "org.jetbrains.compose.material:material-icons-extended:1.7.3"
         @Deprecated("Specify dependency directly")
         val components get() = CommonComponentsDependencies
