@@ -2,6 +2,12 @@
 
 _Changes since 1.11.0-alpha01_
 
+## Known Issues
+
+### Desktop
+
+- [macOS] [`SwingPanel` doesn't render](https://youtrack.jetbrains.com/issue/CMP-9690) [#2669](https://github.com/JetBrains/compose-multiplatform-core/pull/2669)
+
 ## Migration Notes
 
 ### iOS
