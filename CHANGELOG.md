@@ -1,3 +1,114 @@
+# 1.11.0-alpha02 (January 2026)
+
+_Changes since 1.11.0-alpha01_
+
+## Migration Notes
+
+### Multiple Platforms
+
+- JetSnack sample is removed in favor of [JetCaster](https://github.com/kotlin-hands-on/jetcaster-kmp-migration) sample [#5511](https://github.com/JetBrains/compose-multiplatform/pull/5511)
+
+### iOS
+
+- Compose Multiplatform doesn't support Apple x86_64 targets anymore due to [deprecation in Kotlin](https://youtrack.jetbrains.com/issue/KT-81596) [#5514](https://github.com/JetBrains/compose-multiplatform/pull/5514)
+
+### Web
+
+- Renamed `WebElementView` to `HtmlElementView` to better reflect its HTML-specific purpose [#2636](https://github.com/JetBrains/compose-multiplatform-core/pull/2636)
+- `WebElementView` has been deprecated in favor of `HtmlElementView` [#2641](https://github.com/JetBrains/compose-multiplatform-core/pull/2641)
+
+### Navigation
+
+- A deprecated `suspend fun Window.bindToNavigation` method has been removed [#2675](https://github.com/JetBrains/compose-multiplatform-core/pull/2675)
+
+## Features
+
+### iOS
+
+- Added a new `ComposeUIView` API enabling Compose embedding in view hierarchy [#2589](https://github.com/JetBrains/compose-multiplatform-core/pull/2589)
+- Add ability to adjust `isClearFocusOnMouseDownEnabled` in the `configure` lambda when creating Compose components [#2644](https://github.com/JetBrains/compose-multiplatform-core/pull/2644)
+- Support semantics for links in text [#2649](https://github.com/JetBrains/compose-multiplatform-core/pull/2649)
+- Popups and Dialogs now use the same interface orientation and status bar behaviour as the root view controller on the window [#2686](https://github.com/JetBrains/compose-multiplatform-core/pull/2686)
+
+### Desktop
+
+- Cleanup old unpacked binaries from `~/.skiko` (this folder is used if the application is launched via `./gradlew run`). Use [#2645](https://github.com/JetBrains/compose-multiplatform-core/pull/2645)
+
+  `skiko.data.cleanup.days` to configure the retention period in days
+- It is now possible to configure the mouse-wheel propagation-to-parent behavior per `ComposePanel` via `ComposePanel.redispatchUnconsumedMouseWheelEvents` flag [#2659](https://github.com/JetBrains/compose-multiplatform-core/pull/2659)
+- [Linux] Improve window dragging experience when using `WindowDraggableArea` on Linux with JetBrains Runtime [#2674](https://github.com/JetBrains/compose-multiplatform-core/pull/2674)
+- _(prerelease fix)_  Compose 1.11 pre-release versions come with pre-release versions of [Compose Hot Reload ](https://github.com/JetBrains/compose-hot-reload) 1.1 now [#5502](https://github.com/JetBrains/compose-multiplatform/pull/5502)
+
+### Navigation
+
+- Add `unveilIn` and `veilOut` animations to default iOS transition specs in Navigation3 [#2655](https://github.com/JetBrains/compose-multiplatform-core/pull/2655)
+
+## Fixes
+
+### Multiple Platforms
+
+- Fixed exception thrown when using `Bullets` with `Em` units [#2667](https://github.com/JetBrains/compose-multiplatform-core/pull/2667)
+- Fix window insets consumption in system window insets padding modifiers [#2665](https://github.com/JetBrains/compose-multiplatform-core/pull/2665)
+
+### iOS
+
+- Fix ability to place Compose inside the SwiftUI `Form` view [#2589](https://github.com/JetBrains/compose-multiplatform-core/pull/2589)
+- Fix the traversal order of accessibility nodes where a parent node may follow its child node [#2643](https://github.com/JetBrains/compose-multiplatform-core/pull/2643)
+- Fix crash when closing popup simultaneously with back navigation [#2651](https://github.com/JetBrains/compose-multiplatform-core/pull/2651)
+- Fix the issue where the keyboard may focus on the wrong container and become stuck [#2652](https://github.com/JetBrains/compose-multiplatform-core/pull/2652)
+- Fix the crash that may occur when the Compose container disposes [#2672](https://github.com/JetBrains/compose-multiplatform-core/pull/2672)
+- Fix issue where the first frame may not be rendered on Compose container appearance [#2683](https://github.com/JetBrains/compose-multiplatform-core/pull/2683)
+- Fix an issue where fonts and icons may become corrupted [#2684](https://github.com/JetBrains/compose-multiplatform-core/pull/2684)
+
+### Desktop
+
+- [A11y, Windows] Fixed the accessibility hierarchy, allowing NVDA traversal commands to work correctly [#2637](https://github.com/JetBrains/compose-multiplatform-core/pull/2637)
+- [A11y] Correctly report focused status of a newly created, but already focused, node [#2637](https://github.com/JetBrains/compose-multiplatform-core/pull/2637)
+- [A11y] Correctly re-report focused state of focused node when the Compose container becomes focused, such as when the window is brought to the foreground [#2637](https://github.com/JetBrains/compose-multiplatform-core/pull/2637)
+- _(prerelease fix)_ [Windows] Don't fallback to Software rendering on some non-DX12 compatible GPUs (for example, Parallels Virtual GPU) [#2645](https://github.com/JetBrains/compose-multiplatform-core/pull/2645)
+- `org.jetbrains.compose.ui:ui-test` no longer depends on `com.google.truth:truth` [#2648](https://github.com/JetBrains/compose-multiplatform-core/pull/2648)
+- [macOS] Fixed [Crash: Failed assertion when MTLTextureDescriptor is greater than the maximum allowed size](https://youtrack.jetbrains.com/issue/SKIKO-950) [#2669](https://github.com/JetBrains/compose-multiplatform-core/pull/2669)
+- Fixed `ComposePanel` drawing the background that was set on it [#2670](https://github.com/JetBrains/compose-multiplatform-core/pull/2670)
+- _(prerelease fix)_ Fixed VoiceOver highlighting the entire Compose content and calling it "JavaAxIgnore" when using a composable `Window` [#2678](https://github.com/JetBrains/compose-multiplatform-core/pull/2678)
+- Fixed `JPopupContextMenuRepresentation` to correctly recreate the menu when the `createMenu` argument changes [#2702](https://github.com/JetBrains/compose-multiplatform-core/pull/2702)
+
+### Web
+
+- Fix `Ctrl/Cmd + C` (copy) event handling for the selected text wrapped in SelectionContainer [#2700](https://github.com/JetBrains/compose-multiplatform-core/pull/2700)
+
+### Resources
+
+- Fixes an issue where web resources failed to load when calling the Cache Storage API with unsupported protocols (e.g., vscode-webview: in VS Code webviews) [#5516](https://github.com/JetBrains/compose-multiplatform/pull/5516)
+
+### Gradle Plugin
+
+- Corrected version validation for MacOS CFBundleVersion. The major version may now be 0 [#5504](https://github.com/JetBrains/compose-multiplatform/pull/5504)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.11.0-alpha02`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.11.0-alpha02` | [Runtime 1.11.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.11.0-alpha03) |
+| UI | `org.jetbrains.compose.ui:ui*:1.11.0-alpha02` | [UI 1.11.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.11.0-alpha03) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.11.0-alpha02` | [Foundation 1.11.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.11.0-alpha03) |
+| Material | `org.jetbrains.compose.material:material*:1.11.0-alpha02` | [Material 1.11.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material#1.11.0-alpha03) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.11.0-alpha02` | [Material3 1.5.0-alpha12](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha12) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha04` | [Material3 Adaptive 1.3.0-alpha06](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha06) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.10.0-alpha08` | [Lifecycle 2.10.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.10.0) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.1` | [Navigation 2.9.4](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.4) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.1.0-alpha02` | [Navigation3 1.1.0-alpha02](https://developer.android.com/jetpack/androidx/releases/navigation3#1.1.0-alpha02) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.0.0` | [Navigation Event 1.0.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.0.1) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.10-alpha01` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.10-alpha01` | [WindowManager 1.5.0](https://developer.android.com/jetpack/androidx/releases/window#1.5.0) |
+
+---
+
 # 1.10.0 (January 2026)
 
 _Changes since 1.9.3_
