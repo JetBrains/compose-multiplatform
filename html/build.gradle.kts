@@ -68,10 +68,10 @@ subprojects {
             repositories {
                 maven {
                     name = "internal"
-                    url = uri(COMPOSE_REPO_URL ?: "https://packages.jetbrains.team/maven/p/cmp/dev")
+                    url = uri(COMPOSE_REPO_URL ?: System.getenv("COMPOSE_REPO_URL") ?: "https://packages.jetbrains.team/maven/p/cmp/dev")
                     credentials {
-                        username = COMPOSE_REPO_USERNAME ?: ""
-                        password = COMPOSE_REPO_KEY ?: ""
+                        username = COMPOSE_REPO_USERNAME ?: System.getenv("COMPOSE_REPO_USERNAME") ?: ""
+                        password = COMPOSE_REPO_KEY ?: System.getenv("COMPOSE_REPO_KEY") ?: ""
                     }
                 }
             }
