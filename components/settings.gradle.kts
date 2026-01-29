@@ -3,7 +3,7 @@ pluginManagement {
         google()
         gradlePluginPortal()
         mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
         if (extra["compose.useMavenLocal"] == "true") {
             mavenLocal()
         }
@@ -31,7 +31,7 @@ dependencyResolutionManagement {
         }
         google()
         mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
     }
 
     versionCatalogs {

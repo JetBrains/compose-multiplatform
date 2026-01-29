@@ -11,6 +11,7 @@ plugins {
 }
 
 val COMPOSE_WEB_VERSION: String = extra["compose.version"] as String
+val COMPOSE_REPO_URL: String? by project
 val COMPOSE_REPO_USERNAME: String? by project
 val COMPOSE_REPO_KEY: String? by project
 val COMPOSE_WEB_BUILD_WITH_SAMPLES = project.property("compose.web.buildSamples")!!.toString().toBoolean()
@@ -67,7 +68,7 @@ subprojects {
             repositories {
                 maven {
                     name = "internal"
-                    url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+                    url = uri(COMPOSE_REPO_URL ?: "https://packages.jetbrains.team/maven/p/cmp/dev")
                     credentials {
                         username = COMPOSE_REPO_USERNAME ?: ""
                         password = COMPOSE_REPO_KEY ?: ""
@@ -185,13 +186,7 @@ subprojects {
         gradlePluginPortal()
         mavenCentral()
         maven {
-            url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        }
-        maven {
-            url = uri("https://maven.pkg.jetbrains.space/public/p/kotlinx-coroutines/maven")
-        }
-        maven {
-            url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
+            url = uri("https://packages.jetbrains.team/maven/p/cmp/dev")
         }
         google()
         mavenLocal()
