@@ -6,11 +6,14 @@ import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.test.utils.GradlePluginTestBase
 import org.jetbrains.compose.test.utils.checks
 import org.jetbrains.compose.test.utils.modify
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 class RuntimeLibrariesCompatibilityCheckTest : GradlePluginTestBase() {
 
     @Test
+    @Ignore("Disabled because the check doesn't trigger, and theoretically the situation can no longer happen. " +
+            "See https://youtrack.jetbrains.com/issue/CMP-9706/Remove-the-compose-libraries-compatibility-check for removal")
     fun correctConfigurationDoesntPrintWarning(): Unit = with(
         testProject("misc/compatibilityLibCheck")
     ) {
