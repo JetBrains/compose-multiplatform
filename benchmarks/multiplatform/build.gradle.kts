@@ -12,7 +12,6 @@ allprojects {
         google()
         mavenCentral()
         maven("https://packages.jetbrains.team/maven/p/cmp/dev")
-        maven("https://redirector.kotlinlang.org/wasm/experimental")
         mavenLocal()
     }
 }

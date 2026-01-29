@@ -216,6 +216,8 @@ project.the<org.jetbrains.kotlin.gradle.targets.wasm.binaryen.BinaryenEnvSpec>()
 
 val jsOrWasmRegex = Regex("js|wasm")
 
+// not needed for now
+/*
 configurations.all {
     resolutionStrategy.eachDependency {
         if (requested.group.startsWith("org.jetbrains.skiko") &&
@@ -226,3 +228,4 @@ configurations.all {
         }
     }
 }
+*/
