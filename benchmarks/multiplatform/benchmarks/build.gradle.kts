@@ -47,8 +47,6 @@ kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         binaries.executable()
-        // todo: restore d8 benchmark after Compose update
-/*
         d8 {
             compilerOptions.freeCompilerArgs.add("-Xwasm-attach-js-exception")
             runTask {
@@ -56,7 +54,6 @@ kotlin {
                 // d8Args.add("--abort-on-uncaught-exception")
             }
         }
-*/
         browser()
 
         binaries.configureEach {
