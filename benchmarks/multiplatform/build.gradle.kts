@@ -12,7 +12,7 @@ allprojects {
         google()
         mavenCentral()
         maven("https://packages.jetbrains.team/maven/p/cmp/dev")
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+        maven("https://redirector.kotlinlang.org/wasm/experimental")
         mavenLocal()
     }
 }
