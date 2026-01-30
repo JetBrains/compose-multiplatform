@@ -6,7 +6,7 @@ For exmaple, for [Skiko](https://github.com/JetBrains/skiko/blob/29d227acb689317
 ./gradlew publish
 ```
 
-It is published automatically to https://maven.pkg.jetbrains.space/public/p/compose/internal on any change in the CMP sources by this CI task:
+It is published automatically to https://packages.jetbrains.team/maven/p/cmp/dev on any change in the CMP sources by this CI task:
 https://teamcity.jetbrains.com/buildConfiguration/JetBrainsPublicProjects_Compose_PublishBuildHelpers
 
 ## Publish as a local library
