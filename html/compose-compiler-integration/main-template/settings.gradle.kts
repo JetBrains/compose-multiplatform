@@ -2,7 +2,7 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         maven {
-            url = uri("https://packages.jetbrains.team/maven/p/cmp/dev")
+            url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         }
         mavenLocal()
     }

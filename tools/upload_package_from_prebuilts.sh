@@ -8,7 +8,7 @@
 #<repositories>
 #    <repository>
 #        <id>SpaceDev</id>
-#        <url>https://packages.jetbrains.team/maven/p/cmp/dev</url>
+#        <url>https://maven.pkg.jetbrains.space/public/p/compose/dev</url>
 #        <snapshots>
 #            <enabled>false</enabled>
 #        </snapshots>
@@ -38,7 +38,7 @@ export PACKAGE=${PACKAGE_ID}-${VERSION}
 export POM=${DIR}/${PACKAGE}.pom
 export JAR=${DIR}/${PACKAGE}.jar
 export SOURCES=${DIR}/${PACKAGE}-sources.jar
-export REPO=https://packages.jetbrains.team/maven/p/cmp/dev
+export REPO=https://maven.pkg.jetbrains.space/public/p/compose/dev
 
 mvn deploy:deploy-file \
   -Dfile=${JAR} \

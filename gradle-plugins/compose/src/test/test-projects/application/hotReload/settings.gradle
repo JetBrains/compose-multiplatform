@@ -11,10 +11,10 @@ pluginManagement {
         mavenCentral()
         google()
         maven {
-            url 'https://packages.jetbrains.team/maven/p/cmp/dev'
+            url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
         }
         maven {
-            url 'https://redirector.kotlinlang.org/maven/dev/'
+            url 'https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/'
         }
     }
 }
@@ -23,10 +23,10 @@ dependencyResolutionManagement {
         mavenCentral()
         google()
         maven {
-            url 'https://packages.jetbrains.team/maven/p/cmp/dev'
+            url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
         }
         maven {
-            url 'https://redirector.kotlinlang.org/maven/dev/'
+            url 'https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/'
         }
         mavenLocal()
     }

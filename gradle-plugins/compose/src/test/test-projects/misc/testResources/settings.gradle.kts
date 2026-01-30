@@ -4,7 +4,7 @@ pluginManagement {
         mavenLocal()
         gradlePluginPortal()
         google()
-        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
     plugins {
         id("org.jetbrains.kotlin.multiplatform").version("KOTLIN_VERSION_PLACEHOLDER")
@@ -14,7 +14,7 @@ pluginManagement {
 }
 dependencyResolutionManagement {
     repositories {
-        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         mavenCentral()
         gradlePluginPortal()
         google()

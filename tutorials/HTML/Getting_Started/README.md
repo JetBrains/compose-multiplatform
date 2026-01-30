@@ -27,6 +27,7 @@ If you want to create the project manually, perform the following steps:
 pluginManagement {
     repositories {
         gradlePluginPortal()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
 ```
@@ -42,6 +43,7 @@ plugins {
 // Add maven repositories
 repositories {
     mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     google()
 }
 
