@@ -6,7 +6,6 @@ import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.test.utils.GradlePluginTestBase
 import org.jetbrains.compose.test.utils.checks
 import org.jetbrains.compose.test.utils.modify
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 class RuntimeLibrariesCompatibilityCheckTest : GradlePluginTestBase() {
