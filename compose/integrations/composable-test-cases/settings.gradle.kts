@@ -3,7 +3,9 @@ pluginManagement {
         google()
         gradlePluginPortal()
         mavenCentral()
-        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+        maven("https://packages.jetbrains.team/maven/p/kt/dev")
         maven("https://redirector.kotlinlang.org/maven/dev")
         maven {
             url = uri("${rootDir}/build/maven-project")

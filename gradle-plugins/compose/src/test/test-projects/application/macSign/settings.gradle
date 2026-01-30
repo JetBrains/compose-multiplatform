@@ -11,7 +11,7 @@ pluginManagement {
         mavenCentral()
         google()
         maven {
-            url 'https://packages.jetbrains.team/maven/p/cmp/dev'
+            url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
         }
     }
 }
@@ -23,7 +23,7 @@ dependencyResolutionManagement {
         mavenCentral()
         google()
         maven {
-            url 'https://packages.jetbrains.team/maven/p/cmp/dev'
+            url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
         }
         mavenLocal()
     }

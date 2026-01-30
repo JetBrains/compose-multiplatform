@@ -16,7 +16,7 @@ repositories {
     mavenLocal()
     google()
     mavenCentral()
-    maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 kotlin {
@@ -216,8 +216,6 @@ project.the<org.jetbrains.kotlin.gradle.targets.wasm.binaryen.BinaryenEnvSpec>()
 
 val jsOrWasmRegex = Regex("js|wasm")
 
-// not needed for now
-/*
 configurations.all {
     resolutionStrategy.eachDependency {
         if (requested.group.startsWith("org.jetbrains.skiko") &&
@@ -228,4 +226,3 @@ configurations.all {
         }
     }
 }
-*/

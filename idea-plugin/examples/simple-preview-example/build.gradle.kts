@@ -2,7 +2,7 @@ buildscript {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
     dependencies {
         classpath("org.jetbrains.compose:compose-gradle-plugin:0.0.9-preview-images")
@@ -14,7 +14,7 @@ subprojects {
     repositories {
         mavenLocal()
         mavenCentral()
-        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         google()
     }
 }

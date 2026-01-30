@@ -35,7 +35,7 @@ val downloadArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenR
             originalArtifactsRoot
         )
     })
-    spaceRepoUrl.set("https://packages.jetbrains.team/maven/p/cmp/dev")
+    spaceRepoUrl.set("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 val fixModulesBeforePublishing by tasks.registering(FixModulesBeforePublishingTask::class) {

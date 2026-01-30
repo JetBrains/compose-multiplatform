@@ -194,7 +194,7 @@ abstract class ComposePlugin : Plugin<Project> {
 }
 
 fun RepositoryHandler.jetbrainsCompose(): MavenArtifactRepository =
-    maven { repo -> repo.setUrl("https://packages.jetbrains.team/maven/p/cmp/dev") }
+    maven { repo -> repo.setUrl("https://maven.pkg.jetbrains.space/public/p/compose/dev") }
 
 fun KotlinDependencyHandler.compose(groupWithArtifact: String) = composeDependency(groupWithArtifact)
 

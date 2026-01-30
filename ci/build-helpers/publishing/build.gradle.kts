@@ -10,7 +10,7 @@ plugins {
 }
 
 repositories {
-    maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+    maven("https://maven.pkg.jetbrains.space/public/p/space/maven")
 }
 
 val embeddedDependencies by configurations.creating { isTransitive = false }
