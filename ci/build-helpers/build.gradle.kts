@@ -61,7 +61,7 @@ fun PublishingExtension.configurePublishing(project: Project) {
             name = "ComposeInternalRepo"
             url = uri(
                 System.getenv("COMPOSE_INTERNAL_REPO_URL")
-                    ?: "https://maven.pkg.jetbrains.space/public/p/compose/internal"
+                    ?: "https://packages.jetbrains.team/maven/p/cmp/dev"
             )
             credentials {
                 username =

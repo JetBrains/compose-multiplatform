@@ -1,11 +1,11 @@
 [versions]
-compose-multiplatform = "1.8.1"
-kotlin = "2.2.0"
-kotlinx-coroutines = "1.8.0"
-kotlinx-serialization = "1.8.0"
-kotlinx-io = "0.7.0"
+compose-multiplatform = "1.9.3"
+kotlin = "2.2.21"
+kotlinx-coroutines = "1.10.2"
+kotlinx-serialization = "1.9.0"
+kotlinx-io = "0.8.2"
 kotlinx-datetime = "0.6.2"
-ktor = "3.0.0-wasm2"
+ktor = "3.3.3"
 
 [libraries]
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
