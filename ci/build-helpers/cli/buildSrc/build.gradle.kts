@@ -4,7 +4,7 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/space/maven")
+    maven("https://packages.jetbrains.team/maven/p/cmp/dev")
 }
 
 dependencies {

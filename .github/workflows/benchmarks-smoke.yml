@@ -41,6 +41,8 @@ jobs:
         ./gradlew :benchmarks:run
 
   benchmarks-wasm-d8:
+    # temporarily disabled after Compose update
+    if: false
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
