@@ -7,8 +7,8 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
         google()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+        maven("https://redirector.kotlinlang.org/maven/dev/")
     }
     plugins {
         id("org.jetbrains.kotlin.multiplatform").version("KOTLIN_VERSION_PLACEHOLDER")
@@ -22,8 +22,8 @@ dependencyResolutionManagement {
     repositories {
         mavenCentral()
         google()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/")
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+        maven("https://redirector.kotlinlang.org/maven/dev/")
         mavenLocal()
     }
 }
