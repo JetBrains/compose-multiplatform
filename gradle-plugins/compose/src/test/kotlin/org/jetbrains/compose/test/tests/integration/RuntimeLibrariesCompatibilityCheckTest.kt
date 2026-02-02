@@ -47,13 +47,19 @@ class RuntimeLibrariesCompatibilityCheckTest : GradlePluginTestBase() {
         file("build.gradle.kts").modify {
             it.replace(
                 "api(\"org.jetbrains.compose.ui:ui:${defaultTestEnvironment.composeVersion}\")",
-                "api(\"org.jetbrains.compose.ui:ui\") { version { strictly(\"1.9.3\") } }"
+                "api(\"org.jetbrains.compose.ui:ui:1.9.3\")"
+            ).replace(
+                "api(\"org.jetbrains.compose.foundation:foundation:${defaultTestEnvironment.composeVersion}\")",
+                "api(\"org.jetbrains.compose.foundation:foundation:1.9.3\")"
             )
         }
         val msg = buildString {
             appendLine("w: Compose Multiplatform runtime dependencies' versions don't match with plugin version.")
             appendLine("    expected: 'org.jetbrains.compose.ui:ui:${defaultTestEnvironment.composeVersion}'")
             appendLine("    actual:   'org.jetbrains.compose.ui:ui:1.9.3'")
+            appendLine("")
+            appendLine("    expected: 'org.jetbrains.compose.foundation:foundation:${defaultTestEnvironment.composeVersion}'")
+            appendLine("    actual:   'org.jetbrains.compose.foundation:foundation:1.9.3'")
         }
         gradle("jvmMainClasses").checks {
             check.taskSuccessful(":checkJvmMainComposeLibrariesCompatibility")
