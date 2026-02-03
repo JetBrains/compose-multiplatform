@@ -1,4 +1,14 @@
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.runtime.withFrameNanos
+import kotlin.time.TimeSource
 import benchmarks.animation.AnimatedVisibility
 import benchmarks.complexlazylist.components.MainUiNoImageUseModel
 import benchmarks.multipleComponents.MultipleComponentsExample
@@ -8,6 +18,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.math.roundToInt
 import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 enum class BenchmarkFrameTimeKind {
     CPU, GPU
@@ -223,31 +234,111 @@ class BenchmarkResult(
 
 private fun Duration.formatAsMilliseconds(): String = (inWholeMicroseconds / 1000.0).toString()
 
+data class Benchmark(
+    val name: String,
+    val frameCount: Int,
+    val content: @Composable () -> Unit
+)
+
+fun Benchmark(name: String, content: @Composable () -> Unit): Benchmark {
+    return Benchmark(name, Config.getBenchmarkProblemSize(name, 1000), content)
+}
+
+fun getBenchmarks(): List<Benchmark> = listOf(
+    Benchmark("AnimatedVisibility") { AnimatedVisibility() },
+    Benchmark("LazyGrid") { LazyGrid() },
+    Benchmark("LazyGrid-ItemLaunchedEffect") {
+        LazyGrid(smoothScroll = false, withLaunchedEffectInItem = true)
+    },
+    Benchmark("LazyGrid-SmoothScroll") {
+        LazyGrid(smoothScroll = true)
+    },
+    Benchmark("LazyGrid-SmoothScroll-ItemLaunchedEffect") {
+        LazyGrid(smoothScroll = true, withLaunchedEffectInItem = true)
+    },
+    Benchmark("VisualEffects") {
+        NYContent(1920, 1080)
+    },
+    Benchmark("LazyList") { MainUiNoImageUseModel() },
+    Benchmark("MultipleComponents") { MultipleComponentsExample() },
+    Benchmark("MultipleComponents-NoVectorGraphics") {
+        MultipleComponentsExample(isVectorGraphicsSupported = false)
+    }
+)
+
 suspend fun runBenchmark(
-    name: String,
+    benchmark: Benchmark,
     width: Int,
     height: Int,
     targetFps: Int,
-    frameCount: Int,
     graphicsContext: GraphicsContext?,
-    warmupCount: Int = 100,
-    content: @Composable () -> Unit
+    warmupCount: Int = 100
 ) {
-    if (Config.isBenchmarkEnabled(name)) {
-        println("# $name")
+    if (Config.isBenchmarkEnabled(benchmark.name)) {
+        println("# ${benchmark.name}")
         val stats = measureComposable(
-            name = name,
+            name = benchmark.name,
             warmupCount = warmupCount,
-            frameCount = Config.getBenchmarkProblemSize(name, frameCount),
+            frameCount = benchmark.frameCount,
             width = width,
             height = height,
             targetFps = targetFps,
             graphicsContext = graphicsContext,
-            content = content
+            content = benchmark.content
         ).generateStats()
         stats.prettyPrint()
         if (Config.saveStats()) {
-            saveBenchmarkStats(name = name, stats = stats)
+            saveBenchmarkStats(name = benchmark.name, stats = stats)
+        }
+    }
+}
+
+suspend fun runBenchmarks(
+    benchmarks: List<Benchmark>,
+    width: Int = 1920,
+    height: Int = 1080,
+    targetFps: Int = 120,
+    warmupCount: Int = 100,
+    graphicsContext: GraphicsContext? = null
+) {
+    println()
+    println("Running emulating $targetFps FPS")
+    println()
+    for (benchmark in benchmarks) {
+        runBenchmark(benchmark, width, height, targetFps, graphicsContext, warmupCount)
+    }
+}
+
+@Composable
+fun BenchmarkRunner(
+    benchmarks: List<Benchmark>,
+    onExit: () -> Unit
+) {
+    var currentBenchmarkIndex by remember { mutableStateOf(0) }
+    if (currentBenchmarkIndex == benchmarks.size) {
+        onExit()
+        return
+    }
+    val benchmark = benchmarks[currentBenchmarkIndex]
+    if (Config.isBenchmarkEnabled(benchmark.name)) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            benchmark.content()
+
+            LaunchedEffect(benchmark.name) {
+                val start = TimeSource.Monotonic.markNow()
+                repeat(benchmark.frameCount) {
+                    withFrameNanos { }
+                }
+                val duration = start.elapsedNow()
+                val fps = benchmark.frameCount.toDouble() / duration.toDouble(DurationUnit.SECONDS)
+                // TODO: unify reporting with other modes
+                println("${benchmark.name}: $fps fps")
+                currentBenchmarkIndex++
+            }
+        }
+    } else {
+        LaunchedEffect(benchmark.name) {
+            currentBenchmarkIndex++
         }
     }
 }
@@ -259,24 +350,5 @@ suspend fun runBenchmarks(
     warmupCount: Int = 100,
     graphicsContext: GraphicsContext? = null
 ) {
-    println()
-    println("Running emulating $targetFps FPS")
-    println()
-    runBenchmark("AnimatedVisibility", width, height, targetFps, 1000, graphicsContext, warmupCount) { AnimatedVisibility() }
-    runBenchmark("LazyGrid", width, height, targetFps, 1000, graphicsContext, warmupCount) { LazyGrid() }
-    runBenchmark("LazyGrid-ItemLaunchedEffect", width, height, targetFps, 1000, graphicsContext, warmupCount) {
-        LazyGrid(smoothScroll = false, withLaunchedEffectInItem = true)
-    }
-    runBenchmark("LazyGrid-SmoothScroll", width, height, targetFps, 1000, graphicsContext, warmupCount) {
-        LazyGrid(smoothScroll = true)
-    }
-    runBenchmark("LazyGrid-SmoothScroll-ItemLaunchedEffect", width, height, targetFps, 1000, graphicsContext, warmupCount) {
-        LazyGrid(smoothScroll = true, withLaunchedEffectInItem = true)
-    }
-    runBenchmark("VisualEffects", width, height, targetFps, 1000, graphicsContext, warmupCount) { NYContent(width, height) }
-    runBenchmark("LazyList", width, height, targetFps, 1000, graphicsContext, warmupCount) { MainUiNoImageUseModel()}
-    runBenchmark("MultipleComponents", width, height, targetFps, 1000, graphicsContext, warmupCount) { MultipleComponentsExample() }
-    runBenchmark("MultipleComponents-NoVectorGraphics", width, height, targetFps, 1000, graphicsContext, warmupCount) {
-        MultipleComponentsExample(isVectorGraphicsSupported = false)
-    }
+    runBenchmarks(getBenchmarks(), width, height, targetFps, warmupCount, graphicsContext)
 }

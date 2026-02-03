@@ -1,6 +1,7 @@
 enum class Mode {
     SIMPLE,
     VSYNC_EMULATION,
+    REAL
 }
 
 object Args {
@@ -38,6 +39,7 @@ object Args {
         var saveStatsToCSV: Boolean = false
         var saveStatsToJSON: Boolean = false
         var runServer: Boolean = false
+        var parallelRendering: Boolean = false
 
         for (arg in args) {
             if (arg.startsWith("modes=", ignoreCase = true)) {
@@ -54,6 +56,8 @@ object Args {
                 disabledBenchmarks += argToMap(arg.decodeArg()).keys
             } else if (arg.startsWith("runServer=", ignoreCase = true)) {
                 runServer = arg.substringAfter("=").toBoolean()
+            } else if (arg.startsWith("parallel=", ignoreCase = true)) {
+                parallelRendering = arg.substringAfter("=").toBoolean()
             }
         }
 
@@ -65,6 +69,7 @@ object Args {
             saveStatsToCSV = saveStatsToCSV,
             saveStatsToJSON = saveStatsToJSON,
             runServer = runServer,
+            parallelRendering = parallelRendering
         )
     }
 }
@@ -89,12 +94,13 @@ data class Config(
     val saveStatsToCSV: Boolean = false,
     val saveStatsToJSON: Boolean = false,
     val runServer: Boolean = false,
+    val parallelRendering: Boolean = false
 ) {
     /**
      * Checks if a specific mode is enabled based on the configuration.
-     * A mode is considered enabled if no modes were specified (default) or if it's explicitly listed.
+     * A mode is considered enabled if no modes were specified (default) except `real` mode or if it's explicitly listed.
      */
-    fun isModeEnabled(mode: Mode): Boolean = modes.isEmpty() || modes.contains(mode)
+    fun isModeEnabled(mode: Mode): Boolean = (modes.isEmpty() && mode !=  Mode.REAL) || modes.contains(mode)
 
     /**
      * Checks if a specific benchmark is enabled
@@ -134,6 +140,9 @@ data class Config(
 
         val runServer: Boolean
             get() = global.runServer
+
+        val parallelRendering: Boolean
+            get() = global.parallelRendering
 
         fun setGlobal(global: Config) {
             this.global = global
