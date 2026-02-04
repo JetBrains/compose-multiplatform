@@ -1,5 +1,8 @@
 @file:OptIn(ExperimentalJsExport::class)
 
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.window.ComposeViewport
+import kotlinx.browser.document
 import kotlinx.browser.window
 import kotlinx.coroutines.*
 import org.w3c.dom.url.URLSearchParams
@@ -15,6 +18,7 @@ fun main(args: Array<String>) {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 fun mainBrowser() {
     val urlParams = URLSearchParams(window.location.search.toJsString())
     var i = 0
@@ -22,18 +26,28 @@ fun mainBrowser() {
 
     Config.setGlobalFromArgs(args)
 
-    MainScope().launch {
-        if (Config.saveStats() && !BenchmarksSaveServerClient.isServerAlive()) {
-            println("No benchmark server found.")
-            return@launch
+    val composeRoot = document.getElementById("root")!!
+    if (Config.isModeEnabled(Mode.REAL)) {
+        val frameRate = 120 // can we get this from device?
+        ComposeViewport(composeRoot) {
+            BenchmarkRunner(getBenchmarks(), frameRate, onExit = { composeRoot.remove() })
         }
-        awaitSkikoWasm()
+    } else {
+        composeRoot.remove()
+        println("Wait for the benchmarks to complete...\n")
+        MainScope().launch {
+            if (Config.saveStats() && !BenchmarksSaveServerClient.isServerAlive()) {
+                println("No benchmark server found.")
+                return@launch
+            }
+            awaitSkikoWasm()
 
-        runBenchmarks()
-        println("Completed!")
-        if (Config.saveStats()) {
-            GlobalScope.launch {
-                BenchmarksSaveServerClient.stopServer()
+            runBenchmarks()
+            println("Completed!")
+            if (Config.saveStats()) {
+                GlobalScope.launch {
+                    BenchmarksSaveServerClient.stopServer()
+                }
             }
         }
     }
