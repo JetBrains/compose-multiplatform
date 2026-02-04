@@ -12,6 +12,7 @@ import kotlinx.coroutines.*
 import org.jetbrains.skia.Color
 import org.jetbrains.skia.PictureRecorder
 import org.jetbrains.skia.Rect
+import kotlin.time.DurationUnit
 import kotlin.time.TimeSource.Monotonic.markNow
 import kotlin.time.measureTime
 
@@ -141,6 +142,7 @@ internal suspend fun measureComposable(
             nanosPerFrame.nanoseconds,
             BenchmarkConditions(frameCount, warmupCount),
             FrameInfo(cpuTotalTime / frameCount, gpuTotalTime / frameCount),
+            FPSInfo(frameCount.toDouble() / (cpuTotalTime + gpuTotalTime).toDouble(DurationUnit.SECONDS)),
             frames,
         )
     } finally {

@@ -28,8 +28,9 @@ fun mainBrowser() {
 
     val composeRoot = document.getElementById("root")!!
     if (Config.isModeEnabled(Mode.REAL)) {
+        val frameRate = 120 // can we get this from device?
         ComposeViewport(composeRoot) {
-            BenchmarkRunner(getBenchmarks(), onExit = { composeRoot.remove() })
+            BenchmarkRunner(getBenchmarks(), frameRate, onExit = { composeRoot.remove() })
         }
     } else {
         composeRoot.remove()

@@ -14,13 +14,14 @@ fun main(args : Array<String>) {
     Config.setGlobalFromArgs(args)
     if (Config.isModeEnabled(Mode.REAL)) {
         NSApplication.sharedApplication()
+        val frameRate = 120 // TODO: get from device
         Window(
             "Benchmarks",
             DpSize(
                 width = 1920.dp, height = 1080.dp
             )
         ) {
-            BenchmarkRunner(getBenchmarks(), { exitProcess(0) })
+            BenchmarkRunner(getBenchmarks(), frameRate, { exitProcess(0) })
         }
         NSApp?.run()
     } else {

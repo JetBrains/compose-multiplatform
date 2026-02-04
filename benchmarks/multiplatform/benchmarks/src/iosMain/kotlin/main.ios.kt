@@ -7,6 +7,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeUIViewController
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import platform.UIKit.UIScreen
 import platform.UIKit.UIViewController
 import kotlin.system.exitProcess
 
@@ -26,6 +27,6 @@ fun runBenchmarks() {
 @OptIn(ExperimentalComposeUiApi::class)
 fun MainViewController(): UIViewController {
     return ComposeUIViewController(configure = { parallelRendering = Config.parallelRendering }) {
-        BenchmarkRunner(getBenchmarks(), { exitProcess(0) })
+        BenchmarkRunner(getBenchmarks(), UIScreen.mainScreen.maximumFramesPerSecond.toInt(), { exitProcess(0) })
     }
 }

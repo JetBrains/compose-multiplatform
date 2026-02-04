@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.runtime.withFrameNanos
+import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.TimeSource
 import benchmarks.animation.AnimatedVisibility
 import benchmarks.complexlazylist.components.MainUiNoImageUseModel
@@ -18,6 +19,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.math.roundToInt
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
 enum class BenchmarkFrameTimeKind {
@@ -53,6 +55,20 @@ data class BenchmarkConditions(
 
     fun putFormattedValuesTo(map: MutableMap<String, String>) {
         map.put("Frames/warmup", "$frameCount/$warmupCount")
+    }
+}
+
+@Serializable
+data class FPSInfo(
+    val fps: Double
+) {
+
+    fun prettyPrint() {
+        println("Average FPS: $fps")
+    }
+
+    fun putFormattedValuesTo(map: MutableMap<String, String>) {
+        map.put("Average FPS", fps.toString())
     }
 }
 
@@ -111,12 +127,14 @@ data class BenchmarkStats(
     val frameBudget: Duration,
     val conditions: BenchmarkConditions,
     val averageFrameInfo: FrameInfo?,
+    val averageFPSInfo: FPSInfo,
     val percentileCPUAverage: List<BenchmarkPercentileAverage>,
     val percentileGPUAverage: List<BenchmarkPercentileAverage>,
     val noBufferingMissedFrames: MissedFrames,
     val doubleBufferingMissedFrames: MissedFrames,
 ) {
     fun prettyPrint() {
+        println("# $name")
         val versionInfo = Config.versionInfo
         if (versionInfo != null) {
             println("Version: $versionInfo")
@@ -136,6 +154,10 @@ data class BenchmarkStats(
             noBufferingMissedFrames.prettyPrint("no buffering")
             doubleBufferingMissedFrames.prettyPrint("double buffering")
         }
+        if (Config.isModeEnabled(Mode.REAL)) {
+            averageFPSInfo.prettyPrint()
+            println()
+        }
     }
 
     fun putFormattedValuesTo(map: MutableMap<String, String>) {
@@ -153,6 +175,9 @@ data class BenchmarkStats(
             percentileGPUAverage.putFormattedValuesTo(BenchmarkFrameTimeKind.GPU, map)
             noBufferingMissedFrames.putFormattedValuesTo("no buffering", map)
             doubleBufferingMissedFrames.putFormattedValuesTo("double buffering", map)
+        }
+        if (Config.isModeEnabled(Mode.REAL)) {
+            averageFPSInfo.putFormattedValuesTo(map)
         }
     }
 
@@ -182,6 +207,7 @@ class BenchmarkResult(
     private val frameBudget: Duration,
     private val conditions: BenchmarkConditions,
     private val averageFrameInfo: FrameInfo,
+    private val averageFPSInfo: FPSInfo,
     private val frames: List<BenchmarkFrame>,
 ) {
     private fun percentileAverageFrameTime(percentile: Double, kind: BenchmarkFrameTimeKind): Duration {
@@ -210,6 +236,7 @@ class BenchmarkResult(
             frameBudget,
             conditions,
             averageFrameInfo,
+            averageFPSInfo,
             listOf(0.01, 0.02, 0.05, 0.1, 0.25, 0.5).map { percentile ->
                 val average = percentileAverageFrameTime(percentile, BenchmarkFrameTimeKind.CPU)
 
@@ -275,7 +302,6 @@ suspend fun runBenchmark(
     warmupCount: Int = 100
 ) {
     if (Config.isBenchmarkEnabled(benchmark.name)) {
-        println("# ${benchmark.name}")
         val stats = measureComposable(
             name = benchmark.name,
             warmupCount = warmupCount,
@@ -312,6 +338,7 @@ suspend fun runBenchmarks(
 @Composable
 fun BenchmarkRunner(
     benchmarks: List<Benchmark>,
+    frameRate: Int,
     onExit: () -> Unit
 ) {
     var currentBenchmarkIndex by remember { mutableStateOf(0) }
@@ -326,13 +353,27 @@ fun BenchmarkRunner(
 
             LaunchedEffect(benchmark.name) {
                 val start = TimeSource.Monotonic.markNow()
+                val frames = MutableList(benchmark.frameCount) {
+                    BenchmarkFrame(Duration.ZERO, Duration.ZERO)
+                }
                 repeat(benchmark.frameCount) {
+                    val frameStart = TimeSource.Monotonic.markNow()
                     withFrameNanos { }
+                    frames[it] = BenchmarkFrame(frameStart.elapsedNow(), Duration.ZERO)
                 }
                 val duration = start.elapsedNow()
-                val fps = benchmark.frameCount.toDouble() / duration.toDouble(DurationUnit.SECONDS)
-                // TODO: unify reporting with other modes
-                println("${benchmark.name}: $fps fps")
+                val stats = BenchmarkResult(
+                    name = benchmark.name,
+                    frameBudget = (1.seconds.inWholeNanoseconds / frameRate).nanoseconds,
+                    conditions = BenchmarkConditions(benchmark.frameCount, 0),
+                    averageFrameInfo = FrameInfo(duration / benchmark.frameCount, Duration.ZERO),
+                    averageFPSInfo = FPSInfo(benchmark.frameCount.toDouble() / duration.toDouble(DurationUnit.SECONDS)),
+                    frames = frames
+                ).generateStats()
+                stats.prettyPrint()
+                if (Config.saveStats()) {
+                    saveBenchmarkStats(name = benchmark.name, stats = stats)
+                }
                 currentBenchmarkIndex++
             }
         }
