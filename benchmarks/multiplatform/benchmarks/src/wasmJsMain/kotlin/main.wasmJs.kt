@@ -27,12 +27,23 @@ fun mainBrowser() {
             println("No benchmark server found.")
             return@launch
         }
+        awaitSkikoWasm()
+
         runBenchmarks()
         println("Completed!")
         if (Config.saveStats()) {
             GlobalScope.launch {
                 BenchmarksSaveServerClient.stopServer()
             }
+        }
+    }
+}
+
+private suspend fun awaitSkikoWasm() {
+    suspendCancellableCoroutine { c ->
+        @Suppress("INVISIBLE_REFERENCE")
+        androidx.compose.ui.window.onSkikoReady {
+            c.resumeWith(Result.success(Unit))
         }
     }
 }
