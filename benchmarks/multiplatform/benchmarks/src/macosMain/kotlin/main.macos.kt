@@ -8,13 +8,15 @@ import androidx.compose.ui.window.Window
 import kotlinx.coroutines.runBlocking
 import platform.AppKit.NSApp
 import platform.AppKit.NSApplication
+import platform.AppKit.NSScreen
+import platform.AppKit.maximumFramesPerSecond
 import kotlin.system.exitProcess
 
 fun main(args : Array<String>) {
     Config.setGlobalFromArgs(args)
     if (Config.isModeEnabled(Mode.REAL)) {
         NSApplication.sharedApplication()
-        val frameRate = 120 // TODO: get from device
+        val frameRate = (NSScreen.mainScreen?.maximumFramesPerSecond?.toInt()) ?: 120
         Window(
             "Benchmarks",
             DpSize(

@@ -338,7 +338,7 @@ suspend fun runBenchmarks(
 @Composable
 fun BenchmarkRunner(
     benchmarks: List<Benchmark>,
-    frameRate: Int,
+    deviceFrameRate: Int,
     onExit: () -> Unit
 ) {
     var currentBenchmarkIndex by remember { mutableStateOf(0) }
@@ -364,7 +364,7 @@ fun BenchmarkRunner(
                 val duration = start.elapsedNow()
                 val stats = BenchmarkResult(
                     name = benchmark.name,
-                    frameBudget = (1.seconds.inWholeNanoseconds / frameRate).nanoseconds,
+                    frameBudget = (1.seconds.inWholeNanoseconds / deviceFrameRate).nanoseconds,
                     conditions = BenchmarkConditions(benchmark.frameCount, 0),
                     averageFrameInfo = FrameInfo(duration / benchmark.frameCount, Duration.ZERO),
                     averageFPSInfo = FPSInfo(benchmark.frameCount.toDouble() / duration.toDouble(DurationUnit.SECONDS)),
