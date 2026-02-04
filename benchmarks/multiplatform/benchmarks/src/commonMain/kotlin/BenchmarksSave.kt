@@ -3,7 +3,6 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
@@ -16,6 +15,7 @@ import kotlinx.io.buffered
 import kotlinx.io.files.Path
 import kotlinx.io.files.SystemFileSystem
 import kotlinx.io.readByteArray
+import kotlin.time.ExperimentalTime
 
 // port for the benchmarks save server
 val BENCHMARK_SERVER_PORT = 8090
@@ -81,9 +81,9 @@ internal fun RawSink.writeText(text: String) = use {
     }
 }
 
-@OptIn(FormatStringsInDatetimeFormats::class)
+@OptIn(FormatStringsInDatetimeFormats::class, ExperimentalTime::class)
 private val currentFormattedDate: String get() {
-    val currentTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val currentTime = kotlin.time.Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
     return LocalDateTime.Format {
         byUnicodePattern("dd-MM-yyyy HH:mm:ss")
     }.format(currentTime)

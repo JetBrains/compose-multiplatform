@@ -1,10 +1,10 @@
 [versions]
-compose-multiplatform = "1.9.3"
-kotlin = "2.2.21"
+compose-multiplatform = "1.10.0"
+kotlin = "2.3.20-Beta2"
 kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.9.0"
 kotlinx-io = "0.8.2"
-kotlinx-datetime = "0.6.2"
+kotlinx-datetime = "0.7.1"
 ktor = "3.3.3"
 
 [libraries]
