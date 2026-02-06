@@ -7,6 +7,7 @@ package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.Project
 import org.jetbrains.compose.desktop.DesktopExtension
+import org.jetbrains.compose.desktop.internal.configureDesktopPlatformDependencies
 import org.jetbrains.compose.desktop.tasks.AbstractUnpackDefaultComposeApplicationResourcesTask
 import org.jetbrains.compose.internal.utils.registerTask
 
@@ -26,4 +27,5 @@ internal fun configureDesktop(project: Project, desktopExtension: DesktopExtensi
     }
 
     project.configureHotReload()
+    project.configureDesktopPlatformDependencies()
 }

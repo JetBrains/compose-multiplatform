@@ -23,8 +23,12 @@ val composeVersion: String by lazy {
 }
 
 dependencies {
-    implementation("org.jetbrains.compose.desktop:desktop-jvm-macos-x64:$composeVersion")
-    implementation("org.jetbrains.compose.desktop:desktop-jvm-linux-x64:$composeVersion")
+    implementation("org.jetbrains.compose.desktop:desktop-jvm-macos-x64:$composeVersion") {
+        exclude("org.jetbrains.skiko", "skiko-awt-runtime")
+    }
+    implementation("org.jetbrains.compose.desktop:desktop-jvm-linux-x64:$composeVersion") {
+        exclude("org.jetbrains.skiko", "skiko-awt-runtime")
+    }
 }
 
 val shadowJar = tasks.named("shadowJar", ShadowJar::class) {
