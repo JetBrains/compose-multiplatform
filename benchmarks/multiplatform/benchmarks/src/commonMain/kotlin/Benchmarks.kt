@@ -82,9 +82,13 @@ data class FrameInfo(
     val totalTime = cpuTime + gpuTime
 
     fun prettyPrint() {
-        println("CPU average frame time: $cpuTime")
-        println("GPU average frame time: $gpuTime")
-        println("TOTAL average frame time: $totalTime")
+        if (gpuTime == Duration.ZERO) {
+            println("Average frame time: $totalTime")
+        } else {
+            println("CPU average frame time: $cpuTime")
+            println("GPU average frame time: $gpuTime")
+            println("TOTAL average frame time: $totalTime")
+        }
     }
 
     fun putFormattedValuesTo(map: MutableMap<String, String>) {
@@ -158,6 +162,8 @@ data class BenchmarkStats(
         }
         if (Config.isModeEnabled(Mode.REAL)) {
             averageFPSInfo.prettyPrint()
+            averageFrameInfo?.prettyPrint()
+            noBufferingMissedFrames.prettyPrint("estimation of real")
             println()
         }
     }
@@ -346,8 +352,13 @@ fun BenchmarkRunner(
     var currentBenchmarkIndex by remember { mutableStateOf(0) }
     var isWarmup by remember { mutableStateOf(Config.warmupCount > 0) }
     var isEmptyScreen by remember { mutableStateOf(false) }
+    val results = remember { mutableListOf<BenchmarkStats>() }
+    val nanosPerFrame = 1.seconds.inWholeNanoseconds / deviceFrameRate
 
     if (currentBenchmarkIndex == benchmarks.size) {
+        if (Config.reportAtTheEnd) {
+            results.forEach { it.prettyPrint() }
+        }
         onExit()
         return
     }
@@ -374,21 +385,34 @@ fun BenchmarkRunner(
                     val frames = MutableList(benchmark.frameCount) {
                         BenchmarkFrame(Duration.ZERO, Duration.ZERO)
                     }
+                    // skip first frame waiting
+                    withFrameNanos {  }
                     repeat(benchmark.frameCount) {
                         val frameStart = TimeSource.Monotonic.markNow()
                         withFrameNanos { }
-                        frames[it] = BenchmarkFrame(frameStart.elapsedNow(), Duration.ZERO)
+                        val rawFrameTime = frameStart.elapsedNow()
+                        // rawFrameTime isn't reliable for missed-frame checks: small timing inaccuracies can push
+                        // it just over the frame budget even when the frame would effectively fit.
+                        // Instead, estimate how many vsync intervals the frame took by rounding the measured time to
+                        // the nearest multiple of nanosPerFrame.
+                        // Note: this is only an estimate — we can’t determine here whether a frame was truly missed.
+                        val normalizedFrameTime = ((rawFrameTime.inWholeNanoseconds + nanosPerFrame/2) / nanosPerFrame) * nanosPerFrame
+                        frames[it] = BenchmarkFrame(normalizedFrameTime.nanoseconds, Duration.ZERO)
                     }
                     val duration = start.elapsedNow()
                     val stats = BenchmarkResult(
                         name = benchmark.name,
-                        frameBudget = (1.seconds.inWholeNanoseconds / deviceFrameRate).nanoseconds,
+                        frameBudget = nanosPerFrame.nanoseconds,
                         conditions = BenchmarkConditions(benchmark.frameCount, 0),
                         averageFrameInfo = FrameInfo(duration / benchmark.frameCount, Duration.ZERO),
                         averageFPSInfo = FPSInfo(benchmark.frameCount.toDouble() / duration.toDouble(DurationUnit.SECONDS)),
                         frames = frames
                     ).generateStats()
-                    stats.prettyPrint()
+                    if (!Config.reportAtTheEnd) {
+                        stats.prettyPrint()
+                    } else {
+                        results.add(stats)
+                    }
                     if (Config.saveStats()) {
                         saveBenchmarkStats(name = benchmark.name, stats = stats)
                     }

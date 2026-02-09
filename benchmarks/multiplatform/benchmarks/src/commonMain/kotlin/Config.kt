@@ -27,9 +27,9 @@ object Args {
      * @param args an array of strings representing the command line arguments.
      * Each argument can specify either of these settings:
      * modes, benchmarks, disabledBenchmarks - comma separated values,
-     * versionInfo, saveStatsToCSV, saveStatsToJSON, parallel, warmupCount, frameCount, emptyScreenDelay - single values.
+     * versionInfo, saveStatsToCSV, saveStatsToJSON, parallel, warmupCount, frameCount, emptyScreenDelay, reportAtTheEnd - single values.
      *
-     * Example: benchmarks=AnimatedVisibility(100),modes=SIMPLE,versionInfo=Kotlin_2_1_20,saveStatsToCSV=true,warmupCount=50,frameCount=100,emptyScreenDelay=2000
+     * Example: benchmarks=AnimatedVisibility(100),modes=SIMPLE,versionInfo=Kotlin_2_1_20,saveStatsToCSV=true,warmupCount=50,frameCount=100,emptyScreenDelay=2000,reportAtTheEnd=true
      */
     fun parseArgs(args: Array<String>): Config {
         val modes = mutableSetOf<Mode>()
@@ -43,6 +43,7 @@ object Args {
         var warmupCount: Int? = null
         var frameCount: Int? = null
         var emptyScreenDelay: Long? = null
+        var reportAtTheEnd: Boolean = false
 
         for (arg in args) {
             if (arg.startsWith("modes=", ignoreCase = true)) {
@@ -67,6 +68,8 @@ object Args {
                 frameCount = arg.substringAfter("=").toInt()
             } else if (arg.startsWith("emptyScreenDelay=", ignoreCase = true)) {
                 emptyScreenDelay = arg.substringAfter("=").toLong()
+            } else if (arg.startsWith("reportAtTheEnd=", ignoreCase = true)) {
+                reportAtTheEnd = arg.substringAfter("=").toBoolean()
             } else {
                 println("WARNING: unknown argument $arg")
             }
@@ -85,7 +88,8 @@ object Args {
             parallelRendering = parallelRendering,
             warmupCount = warmupCount ?: defaultWarmupCount,
             frameCount = frameCount ?: 1000,
-            emptyScreenDelay = emptyScreenDelay ?: 2000L
+            emptyScreenDelay = emptyScreenDelay ?: 2000L,
+            reportAtTheEnd = reportAtTheEnd
         )
     }
 }
@@ -105,6 +109,7 @@ object Args {
  * @property warmupCount Number of warmup frames to run before starting the benchmark.
  * @property frameCount Number of frames to run for each benchmark.
  * @property emptyScreenDelay Delay in milliseconds between warmup and benchmark.
+ * @property reportAtTheEnd Flag indicating whether we should report results at the end of all benchmarks.
  */
 data class Config(
     val modes: Set<Mode> = emptySet(),
@@ -117,7 +122,8 @@ data class Config(
     val parallelRendering: Boolean = false,
     val warmupCount: Int = 100,
     val frameCount: Int = 1000,
-    val emptyScreenDelay: Long = 0
+    val emptyScreenDelay: Long = 2000L,
+    val reportAtTheEnd: Boolean = false
 ) {
     /**
      * Checks if a specific mode is enabled based on the configuration.
@@ -175,6 +181,9 @@ data class Config(
 
         val emptyScreenDelay: Long
             get() = global.emptyScreenDelay
+
+        val reportAtTheEnd: Boolean
+            get() = global.reportAtTheEnd
 
         fun setGlobal(global: Config) {
             this.global = global
