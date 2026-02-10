@@ -1,3 +1,54 @@
+# 1.10.1 (February 2026)
+
+_Changes since 1.10.0_
+
+## Fixes
+
+### Multiple Platforms
+
+- Improved the deprecation message for `compose.materialIconsExtended` to explain that the artifact is pinned to version `1.7.3` and suggest migration to Material Symbols [#5521](https://github.com/JetBrains/compose-multiplatform/pull/5521)
+
+### iOS
+
+- Fix possible text styles cache corruption (text color is sometimes randomly black) [#2630](https://github.com/JetBrains/compose-multiplatform-core/pull/2630)
+- Fix an issue where fonts and icons may become corrupted [#2693](https://github.com/JetBrains/compose-multiplatform-core/pull/2693)
+- Fix an issue where the first frame may not be rendered on Compose container appearance [#2692](https://github.com/JetBrains/compose-multiplatform-core/pull/2692)
+- Fix the crash that may occur when the Compose container disposes [#2691](https://github.com/JetBrains/compose-multiplatform-core/pull/2691)
+
+### Web
+
+- Fix `Ctrl/Cmd + C` (copy) event handling for the selected text wrapped in `SelectionContainer` [#2701](https://github.com/JetBrains/compose-multiplatform-core/pull/2701)
+- Fix mouse wheel scrolling on web by accounting for screen density [#2725](https://github.com/JetBrains/compose-multiplatform-core/pull/2725)
+
+### Resources
+
+- Fixes an issue where web resources failed to load when calling the Cache Storage API with unsupported protocols (e.g., vscode-webview: in VS Code webviews) [#5518](https://github.com/JetBrains/compose-multiplatform/pull/5518)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.10.1`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.10.1` | [Runtime 1.10.2](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.10.2) |
+| UI | `org.jetbrains.compose.ui:ui*:1.10.1` | [UI 1.10.2](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.10.2) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.10.1` | [Foundation 1.10.2](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.10.2) |
+| Material | `org.jetbrains.compose.material:material*:1.10.1` | [Material 1.10.2](https://developer.android.com/jetpack/androidx/releases/compose-material#1.10.2) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.10.0-alpha05` | [Material3 1.5.0-alpha08](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha08) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha02` | [Material3 Adaptive 1.3.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha03) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.10.0-alpha06` | [Lifecycle 2.10.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.10.0) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.2` | [Navigation 2.9.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.7) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.0.0-alpha06` | [Navigation3 1.0.0](https://developer.android.com/jetpack/androidx/releases/navigation3#1.0.0) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.0.1` | [Navigation Event 1.0.2](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.0.2) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.11.0-alpha02 (January 2026)
 
 _Changes since 1.11.0-alpha01_
@@ -810,7 +861,7 @@ _Changes since 1.9.0_
   ```
   // was
   implementation(compose.material3)
-  
+
   // replace by
   implementation("org.jetbrains.compose.material3:material3:1.8.2")
   ```
@@ -1549,19 +1600,19 @@ _Changes since 1.8.1_
 - Fixed a memory leak and performance degradation when `ComposeUiFlags.isRectTrackingEnabled` set to `true` (by default) [#2123](https://github.com/JetBrains/compose-multiplatform-core/pull/2123)
 - Fixed caret placement near glyphs if glyphs are compound symbols and part of them are non-spacing marks [#2155](https://github.com/JetBrains/compose-multiplatform-core/pull/2155)
 - Support Preview parameters for Previews in common source sets in IJ and AS. Note: IDEs also need to implement support on their end. Please check the respective IDE release notes to confirm this is supported [#5323](https://github.com/JetBrains/compose-multiplatform/pull/5323)
-  
+
   Example usage:
-  
+
   ```
   import androidx.compose.runtime.Composable
   import org.jetbrains.compose.ui.tooling.preview.Preview
   import org.jetbrains.compose.ui.tooling.preview.PreviewParameter
   import org.jetbrains.compose.ui.tooling.preview.PreviewParameterProvider
-  
+
   class MyPreviewParameterProvider : PreviewParameterProvider<String> {
     override val values = sequenceOf("Hello, Compose!", "Hello, World!")
   }
-  
+
   /**
    * This function will generate two preview images with different texts.
    */
@@ -1571,7 +1622,7 @@ _Changes since 1.8.1_
     Text(text)
   }
   ```
-  
+
 
 ### Desktop
 
@@ -4680,7 +4731,7 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 
 ### Fixes
 * [Expanded `ModalBottomSheet`: scrim doesn't occupy complete screen](https://github.com/JetBrains/compose-multiplatform/issues/3701)
-* [Fix interop view intercepting touches for popups](https://github.com/JetBrains/compose-multiplatform-core/pull/835) 
+* [Fix interop view intercepting touches for popups](https://github.com/JetBrains/compose-multiplatform-core/pull/835)
 * [Fix applying `WindowInsets` inside `Popup`/`Dialog`](https://github.com/JetBrains/compose-multiplatform-core/pull/832)
 
 
@@ -5507,7 +5558,7 @@ import androidx.compose.ui.window.application
 fun main() = application {
     val scope = rememberCoroutineScope()
     val someApplicationObject = remember(scope) { SomeApplicationObject(scope) }
-    
+
     DisposableEffect(Unit) {
         SomeGlobalObject.init(scope)
         onDispose {  }
@@ -5632,7 +5683,7 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 
 ### API changes
 - Controlled Inputs were added
-- New API for testing - test-utils was added 
+- New API for testing - test-utils was added
 
 # 1.0.0-alpha (Aug 2021)
 ## Common
