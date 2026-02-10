@@ -17,7 +17,7 @@ _Changes since 1.10.0_
 
 ### Web
 
-- Fix `Ctrl/Cmd + C` (copy) event handling for the selected text wrapped in SelectionContainer [#2701](https://github.com/JetBrains/compose-multiplatform-core/pull/2701)
+- Fix `Ctrl/Cmd + C` (copy) event handling for the selected text wrapped in `SelectionContainer` [#2701](https://github.com/JetBrains/compose-multiplatform-core/pull/2701)
 - Fix mouse wheel scrolling on web by accounting for screen density [#2725](https://github.com/JetBrains/compose-multiplatform-core/pull/2725)
 
 ### Resources
