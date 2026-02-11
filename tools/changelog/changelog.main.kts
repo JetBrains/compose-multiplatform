@@ -133,7 +133,6 @@ fun generateChangelog() {
     val versionNavigationEvent = formatAndroidxLibVersion("NAVIGATION_EVENT")
     val versionSavedstate = formatAndroidxLibVersion("SAVEDSTATE")
     val versionWindow = formatAndroidxLibVersion("WINDOW")
-    val versionNavigation = formatAndroidxLibVersion("NAVIGATION")
     val versionNavigation3 = formatAndroidxLibVersion("NAVIGATION_3")
 
     val versionRedirectingCompose = formatAndroidxLibRedirectingVersion("compose")
@@ -143,7 +142,6 @@ fun generateChangelog() {
     val versionRedirectingNavigationEvent = formatAndroidxLibRedirectingVersion("navigationevent")
     val versionRedirectingSavedstate = formatAndroidxLibRedirectingVersion("savedstate")
     val versionRedirectingWindow = formatAndroidxLibRedirectingVersion("window")
-    val versionRedirectingNavigation = formatAndroidxLibRedirectingVersion("navigation")
     val versionRedirectingNavigation3 = formatAndroidxLibRedirectingVersion("navigation3")
 
     val versionName = versionCompose
@@ -227,7 +225,7 @@ fun generateChangelog() {
                     | Material3 | `org.jetbrains.compose.material3:material3*:$versionComposeMaterial3` | [Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3) |
                     | Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive` | [Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive) |
                     | Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:$versionLifecycle` | [Lifecycle $versionRedirectingLifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle#$versionRedirectingLifecycle) |
-                    | Navigation | `org.jetbrains.androidx.navigation:navigation-*:$versionNavigation` | [Navigation $versionRedirectingNavigation](https://developer.android.com/jetpack/androidx/releases/navigation#$versionRedirectingNavigation) |
+                    | Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.2` | [Navigation 2.9.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.7) |
                     | Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:$versionNavigation3` | [Navigation3 $versionRedirectingNavigation3](https://developer.android.com/jetpack/androidx/releases/navigation3#$versionRedirectingNavigation3) |
                     | Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:$versionNavigationEvent` | [Navigation Event $versionRedirectingNavigationEvent](https://developer.android.com/jetpack/androidx/releases/navigationevent#$versionRedirectingNavigationEvent) |
                     | Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:$versionSavedstate` | [Savedstate $versionRedirectingSavedstate](https://developer.android.com/jetpack/androidx/releases/savedstate#$versionRedirectingSavedstate) |
