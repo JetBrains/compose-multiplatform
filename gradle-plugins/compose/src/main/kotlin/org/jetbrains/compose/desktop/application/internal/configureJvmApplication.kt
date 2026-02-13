@@ -367,6 +367,7 @@ internal fun JvmApplicationContext.configurePlatformSettings(
                 packageTask.linuxAppRelease.set(provider { linux.appRelease })
                 packageTask.linuxDebMaintainer.set(provider { linux.debMaintainer })
                 packageTask.linuxMenuGroup.set(provider { linux.menuGroup })
+                packageTask.linuxPackageDeps.set(provider { linux.packageDeps })
                 packageTask.linuxPackageName.set(provider { linux.packageName })
                 packageTask.linuxRpmLicenseType.set(provider { linux.rpmLicenseType })
                 packageTask.iconFile.set(linux.iconFile.orElse(defaultResources.get { linuxIcon }))
@@ -380,8 +381,10 @@ internal fun JvmApplicationContext.configurePlatformSettings(
                 packageTask.winDirChooser.set(provider { win.dirChooser })
                 packageTask.winPerUserInstall.set(provider { win.perUserInstall })
                 packageTask.winShortcut.set(provider { win.shortcut })
+                packageTask.winShortcutPrompt.set(provider { win.shortcutPrompt })
                 packageTask.winMenu.set(provider { win.menu })
                 packageTask.winMenuGroup.set(provider { win.menuGroup })
+                packageTask.winUpdateUrl.set(provider { win.updateUrl })
                 packageTask.winUpgradeUuid.set(provider { win.upgradeUuid })
                 packageTask.iconFile.set(win.iconFile.orElse(defaultResources.get { windowsIcon }))
                 packageTask.installationPath.set(win.installationPath)
@@ -390,6 +393,7 @@ internal fun JvmApplicationContext.configurePlatformSettings(
         }
         OS.MacOS -> {
             app.nativeDistributions.macOS.also { mac ->
+                packageTask.macDmgContents.set(provider { mac.dmgContents })
                 packageTask.macPackageName.set(provider { mac.packageName })
                 packageTask.macDockName.set(
                     if (mac.setDockNameSameAsPackageName)
