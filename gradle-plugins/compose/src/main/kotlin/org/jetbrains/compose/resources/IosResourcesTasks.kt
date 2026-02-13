@@ -24,7 +24,7 @@ internal abstract class SyncComposeResourcesForIosTask : DefaultTask() {
         return this.orElse(noProvidedValue).map {
             if (it == noProvidedValue) {
                 error(
-                    "Could not infer iOS target $attribute. Make sure to build " +
+                    "Could not infer Apple target $attribute. Make sure to build " +
                             "via XCode (directly or via Kotlin Multiplatform Mobile plugin for Android Studio)"
                 )
             }
@@ -117,6 +117,26 @@ private fun getRequestedKonanTargetsByXcode(platform: String, archs: List<String
             })
         }
 
+        // Add tvOS support
+        platform.startsWith("appletvos") -> {
+            targets.addAll(archs.map { arch ->
+                when (arch) {
+                    "arm64", "arm64e" -> KonanTarget.TVOS_ARM64
+                    else -> error("Unknown tvOS device arch: '$arch'")
+                }
+            })
+        }
+
+        platform.startsWith("appletvsimulator") -> {
+            targets.addAll(archs.map { arch ->
+                when (arch) {
+                    "arm64", "arm64e" -> KonanTarget.TVOS_SIMULATOR_ARM64
+                    "x86_64" -> KonanTarget.TVOS_X64
+                    else -> error("Unknown tvOS simulator arch: '$arch'")
+                }
+            })
+        }
+
         platform.startsWith("macosx") -> {
             targets.addAll(archs.map { arch ->
                 when (arch) {
@@ -137,6 +157,7 @@ private fun getRequestedKonanTargetsByXcode(platform: String, archs: List<String
  * It's set in project.pbxproj
  *
  * SyncComposeResourcesForIosTask fails to work with it right now.
+ * (Note: Despite the name, this task handles all Apple platforms: iOS, tvOS, and macOS)
  *
  * Gradle attempts to create an output folder for SyncComposeResourcesForIosTask on our behalf,
  * so we can't handle an exception when it occurs. Therefore, we make SyncComposeResourcesForIosTask
