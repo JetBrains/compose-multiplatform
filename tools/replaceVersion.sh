@@ -11,6 +11,7 @@ declare -a folders=(
     "$ROOT/ci"
     "$ROOT/tutorials"
     "$ROOT/html"
+    "$ROOT/components"
 )
 
 if [ ! -z "$COMPOSE_TEMPLATES_FOLDER" ]; then
