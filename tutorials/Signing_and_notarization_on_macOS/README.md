@@ -263,7 +263,7 @@ compose.desktop.application {
                 val providers = project.providers
                 appleID.set(providers.environmentVariable("NOTARIZATION_APPLE_ID"))
                 password.set(providers.environmentVariable("NOTARIZATION_PASSWORD"))
-                teamId.set(providers.environmentVariable("NOTARIZATION_TEAM_ID"))
+                teamID.set(providers.environmentVariable("NOTARIZATION_TEAM_ID"))
             }
         }
     }
