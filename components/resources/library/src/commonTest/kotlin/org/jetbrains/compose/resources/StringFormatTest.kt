@@ -52,9 +52,13 @@ class StringFormatTest {
         val template = "Hello %1\$s, %2\$s!"
         val args = listOf("Alice")
 
-        assertFailsWith<IndexOutOfBoundsException> {
+        val exception = assertFailsWith<IllegalArgumentException> {
             template.replaceWithArgs(args)
         }
+        assertEquals(
+            "Formatting failed: Placeholder '%2\$s' at position 2 is out of bounds. Only 1 argument(s) provided for format string \"Hello %1\$s, %2\$s!\"",
+            exception.message
+        )
     }
 
     @Test
@@ -72,9 +76,13 @@ class StringFormatTest {
         val template = "Hello %1\$s, you have %3\$s messages"
         val args = listOf("Alice")
 
-        assertFailsWith<IndexOutOfBoundsException> {
+        val exception = assertFailsWith<IllegalArgumentException> {
             template.replaceWithArgs(args)
         }
+        assertEquals(
+            "Formatting failed: Placeholder '%3\$s' at position 3 is out of bounds. Only 1 argument(s) provided for format string \"Hello %1\$s, you have %3\$s messages\"",
+            exception.message
+        )
     }
 
     @Test
@@ -142,9 +150,13 @@ class StringFormatTest {
         val args = listOf("Alice")
 
         // An exception should be thrown because the second argument (%2$d) is missing
-        assertFailsWith<IndexOutOfBoundsException> {
+        val exception = assertFailsWith<IllegalArgumentException> {
             template.replaceWithArgs(args)
         }
+        assertEquals(
+            "Formatting failed: Placeholder '%2\$d' at position 2 is out of bounds. Only 1 argument(s) provided for format string \"Hello %1\$s, you have %2\$d messages!\"",
+            exception.message
+        )
     }
 
     @Test
@@ -154,9 +166,13 @@ class StringFormatTest {
         val args = listOf("Alice", "1")
 
         // The template has a %3$s placeholder, but there is no third argument
-        assertFailsWith<IndexOutOfBoundsException> {
+        val exception = assertFailsWith<IllegalArgumentException> {
             template.replaceWithArgs(args)
         }
+        assertEquals(
+            "Formatting failed: Placeholder '%3\$s' at position 3 is out of bounds. Only 2 argument(s) provided for format string \"Hello %1\$s, your rank is %3\$s\"",
+            exception.message
+        )
     }
 
     @Test
@@ -179,5 +195,45 @@ class StringFormatTest {
 
         // Only the first argument should be used, ignoring the rest
         assertEquals("Hello Alice!", result)
+    }
+
+    @Test
+    fun `replaceWithArgs handle single argument format`() {
+        val template = "Hello %s!"
+        val args = listOf("Alice")
+
+        val result = template.replaceWithArgs(args)
+
+        assertEquals("Hello Alice!", result)
+    }
+
+    @Test
+    fun `replaceWithArgs handle multiple placeholders for single argument`() {
+        val template = "%s and %s are best friends!"
+        val args = listOf("Alice")
+
+        val result = template.replaceWithArgs(args)
+
+        assertEquals("Alice and Alice are best friends!", result)
+    }
+
+    @Test
+    fun `replaceWithArgs throw exception when multiple different arguments with single placeholder format`() {
+        val template = "Hello %s, you have %d new messages!"
+        val args = listOf("Alice", "15")
+
+        assertFailsWith<IllegalArgumentException> {
+            template.replaceWithArgs(args)
+        }
+    }
+
+    @Test
+    fun `replaceWithArgs throw exception when mixing single and multiple placeholders format`() {
+        val template = "Hello %1\$s, you have %s new messages!"
+        val args = listOf("Alice", "15")
+
+        assertFailsWith<IllegalArgumentException> {
+            template.replaceWithArgs(args)
+        }
     }
 }
