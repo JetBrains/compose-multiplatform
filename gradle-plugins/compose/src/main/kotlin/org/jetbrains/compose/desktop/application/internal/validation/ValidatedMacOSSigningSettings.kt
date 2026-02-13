@@ -24,9 +24,13 @@ internal data class ValidatedMacOSSigningSettings(
         get() {
             val developerIdPrefix = "Developer ID Application: "
             val thirdPartyMacDeveloperPrefix = "3rd Party Mac Developer Application: "
+            val appleDevelopmentPrefix = "Apple Development: "
+            val appleDistributionPrefix = "Apple Distribution: "
             return when {
                 identity.startsWith(developerIdPrefix) -> identity
                 identity.startsWith(thirdPartyMacDeveloperPrefix) -> identity
+                identity.startsWith(appleDevelopmentPrefix) -> identity
+                identity.startsWith(appleDistributionPrefix) -> identity
                 else -> (if (!appStore) developerIdPrefix else thirdPartyMacDeveloperPrefix) + identity
             }
         }
