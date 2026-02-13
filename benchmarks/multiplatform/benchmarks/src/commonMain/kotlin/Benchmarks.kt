@@ -381,12 +381,12 @@ fun BenchmarkRunner(
                     withFrameNanos {  }
                     isEmptyScreen = false
                 } else {
-                    val start = TimeSource.Monotonic.markNow()
                     val frames = MutableList(benchmark.frameCount) {
                         BenchmarkFrame(Duration.ZERO, Duration.ZERO)
                     }
                     // skip first frame waiting
                     withFrameNanos {  }
+                    val start = TimeSource.Monotonic.markNow()
                     repeat(benchmark.frameCount) {
                         val frameStart = TimeSource.Monotonic.markNow()
                         withFrameNanos { }
