@@ -15,10 +15,12 @@ import benchmarks.complexlazylist.components.MainUiNoImageUseModel
 import benchmarks.multipleComponents.MultipleComponentsExample
 import benchmarks.lazygrid.LazyGrid
 import benchmarks.visualeffects.NYContent
+import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlin.math.roundToInt
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
@@ -80,9 +82,13 @@ data class FrameInfo(
     val totalTime = cpuTime + gpuTime
 
     fun prettyPrint() {
-        println("CPU average frame time: $cpuTime")
-        println("GPU average frame time: $gpuTime")
-        println("TOTAL average frame time: $totalTime")
+        if (gpuTime == Duration.ZERO) {
+            println("Average frame time: $totalTime")
+        } else {
+            println("CPU average frame time: $cpuTime")
+            println("GPU average frame time: $gpuTime")
+            println("TOTAL average frame time: $totalTime")
+        }
     }
 
     fun putFormattedValuesTo(map: MutableMap<String, String>) {
@@ -156,6 +162,8 @@ data class BenchmarkStats(
         }
         if (Config.isModeEnabled(Mode.REAL)) {
             averageFPSInfo.prettyPrint()
+            averageFrameInfo?.prettyPrint()
+            noBufferingMissedFrames.prettyPrint("estimation of real")
             println()
         }
     }
@@ -268,7 +276,7 @@ data class Benchmark(
 )
 
 fun Benchmark(name: String, content: @Composable () -> Unit): Benchmark {
-    return Benchmark(name, Config.getBenchmarkProblemSize(name, 1000), content)
+    return Benchmark(name, Config.getBenchmarkProblemSize(name, Config.frameCount), content)
 }
 
 fun getBenchmarks(): List<Benchmark> = listOf(
@@ -299,7 +307,7 @@ suspend fun runBenchmark(
     height: Int,
     targetFps: Int,
     graphicsContext: GraphicsContext?,
-    warmupCount: Int = 100
+    warmupCount: Int = Config.warmupCount,
 ) {
     if (Config.isBenchmarkEnabled(benchmark.name)) {
         val stats = measureComposable(
@@ -324,7 +332,7 @@ suspend fun runBenchmarks(
     width: Int = 1920,
     height: Int = 1080,
     targetFps: Int = 120,
-    warmupCount: Int = 100,
+    warmupCount: Int = Config.warmupCount,
     graphicsContext: GraphicsContext? = null
 ) {
     println()
@@ -342,39 +350,76 @@ fun BenchmarkRunner(
     onExit: () -> Unit
 ) {
     var currentBenchmarkIndex by remember { mutableStateOf(0) }
+    var isWarmup by remember { mutableStateOf(Config.warmupCount > 0) }
+    var isEmptyScreen by remember { mutableStateOf(false) }
+    val results = remember { mutableListOf<BenchmarkStats>() }
+    val nanosPerFrame = 1.seconds.inWholeNanoseconds / deviceFrameRate
+
     if (currentBenchmarkIndex == benchmarks.size) {
+        if (Config.reportAtTheEnd) {
+            results.forEach { it.prettyPrint() }
+        }
         onExit()
         return
     }
     val benchmark = benchmarks[currentBenchmarkIndex]
     if (Config.isBenchmarkEnabled(benchmark.name)) {
         Box(modifier = Modifier.fillMaxSize()) {
-            benchmark.content()
+            if (!isEmptyScreen) {
+                benchmark.content()
+            }
 
-            LaunchedEffect(benchmark.name) {
-                val start = TimeSource.Monotonic.markNow()
-                val frames = MutableList(benchmark.frameCount) {
-                    BenchmarkFrame(Duration.ZERO, Duration.ZERO)
+            LaunchedEffect(benchmark.name, isWarmup, isEmptyScreen) {
+                if (isWarmup) {
+                    repeat(Config.warmupCount) {
+                        withFrameNanos { }
+                    }
+                    isWarmup = false
+                    isEmptyScreen = true
+                } else if (isEmptyScreen) {
+                    delay(Config.emptyScreenDelay.milliseconds)
+                    withFrameNanos {  }
+                    isEmptyScreen = false
+                } else {
+                    val frames = MutableList(benchmark.frameCount) {
+                        BenchmarkFrame(Duration.ZERO, Duration.ZERO)
+                    }
+                    // skip first frame waiting
+                    withFrameNanos {  }
+                    val start = TimeSource.Monotonic.markNow()
+                    repeat(benchmark.frameCount) {
+                        val frameStart = TimeSource.Monotonic.markNow()
+                        withFrameNanos { }
+                        val rawFrameTime = frameStart.elapsedNow()
+                        // rawFrameTime isn't reliable for missed-frame checks: small timing inaccuracies can push
+                        // it just over the frame budget even when the frame would effectively fit.
+                        // Instead, estimate how many vsync intervals the frame took by rounding the measured time to
+                        // the nearest multiple of nanosPerFrame.
+                        // Note: this is only an estimate — we can’t determine here whether a frame was truly missed.
+                        val normalizedFrameTime = ((rawFrameTime.inWholeNanoseconds + nanosPerFrame/2) / nanosPerFrame) * nanosPerFrame
+                        frames[it] = BenchmarkFrame(normalizedFrameTime.nanoseconds, Duration.ZERO)
+                    }
+                    val duration = start.elapsedNow()
+                    val stats = BenchmarkResult(
+                        name = benchmark.name,
+                        frameBudget = nanosPerFrame.nanoseconds,
+                        conditions = BenchmarkConditions(benchmark.frameCount, 0),
+                        averageFrameInfo = FrameInfo(duration / benchmark.frameCount, Duration.ZERO),
+                        averageFPSInfo = FPSInfo(benchmark.frameCount.toDouble() / duration.toDouble(DurationUnit.SECONDS)),
+                        frames = frames
+                    ).generateStats()
+                    if (!Config.reportAtTheEnd) {
+                        stats.prettyPrint()
+                    } else {
+                        results.add(stats)
+                    }
+                    if (Config.saveStats()) {
+                        saveBenchmarkStats(name = benchmark.name, stats = stats)
+                    }
+                    currentBenchmarkIndex++
+                    isWarmup = Config.warmupCount > 0
+                    isEmptyScreen = true
                 }
-                repeat(benchmark.frameCount) {
-                    val frameStart = TimeSource.Monotonic.markNow()
-                    withFrameNanos { }
-                    frames[it] = BenchmarkFrame(frameStart.elapsedNow(), Duration.ZERO)
-                }
-                val duration = start.elapsedNow()
-                val stats = BenchmarkResult(
-                    name = benchmark.name,
-                    frameBudget = (1.seconds.inWholeNanoseconds / deviceFrameRate).nanoseconds,
-                    conditions = BenchmarkConditions(benchmark.frameCount, 0),
-                    averageFrameInfo = FrameInfo(duration / benchmark.frameCount, Duration.ZERO),
-                    averageFPSInfo = FPSInfo(benchmark.frameCount.toDouble() / duration.toDouble(DurationUnit.SECONDS)),
-                    frames = frames
-                ).generateStats()
-                stats.prettyPrint()
-                if (Config.saveStats()) {
-                    saveBenchmarkStats(name = benchmark.name, stats = stats)
-                }
-                currentBenchmarkIndex++
             }
         }
     } else {
@@ -388,7 +433,7 @@ suspend fun runBenchmarks(
     width: Int = 1920,
     height: Int = 1080,
     targetFps: Int = 120,
-    warmupCount: Int = 100,
+    warmupCount: Int = Config.warmupCount,
     graphicsContext: GraphicsContext? = null
 ) {
     runBenchmarks(getBenchmarks(), width, height, targetFps, warmupCount, graphicsContext)
