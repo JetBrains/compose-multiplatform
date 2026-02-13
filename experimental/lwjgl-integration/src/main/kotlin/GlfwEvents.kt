@@ -1,8 +1,10 @@
-import androidx.compose.ui.ComposeScene
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.scene.ComposeScene
 import androidx.compose.ui.unit.Density
 import org.lwjgl.glfw.GLFW.*
 import java.awt.Component
@@ -11,7 +13,7 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseWheelEvent
 import java.awt.event.KeyEvent as AwtKeyEvent
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(InternalComposeUiApi::class)
 fun ComposeScene.subscribeToGLFWEvents(windowHandle: Long) {
     glfwSetMouseButtonCallback(windowHandle) { _, button, action, mods ->
         sendPointerEvent(
@@ -21,7 +23,7 @@ fun ComposeScene.subscribeToGLFWEvents(windowHandle: Long) {
                 GLFW_RELEASE -> PointerEventType.Release
                 else -> PointerEventType.Unknown
             },
-            nativeEvent =  MouseEvent(getAwtMods(windowHandle))
+            nativeEvent = MouseEvent(getAwtMods(windowHandle))
         )
     }
 
@@ -29,7 +31,7 @@ fun ComposeScene.subscribeToGLFWEvents(windowHandle: Long) {
         sendPointerEvent(
             position = Offset(xpos.toFloat(), ypos.toFloat()),
             eventType = PointerEventType.Move,
-            nativeEvent =  MouseEvent(getAwtMods(windowHandle))
+            nativeEvent = MouseEvent(getAwtMods(windowHandle))
         )
     }
 
@@ -37,7 +39,7 @@ fun ComposeScene.subscribeToGLFWEvents(windowHandle: Long) {
         sendPointerEvent(
             position = glfwGetCursorPos(windowHandle),
             eventType = if (entered) PointerEventType.Enter else PointerEventType.Exit,
-            nativeEvent =  MouseEvent(getAwtMods(windowHandle))
+            nativeEvent = MouseEvent(getAwtMods(windowHandle))
         )
     }
 
@@ -46,7 +48,7 @@ fun ComposeScene.subscribeToGLFWEvents(windowHandle: Long) {
             eventType = PointerEventType.Scroll,
             position = glfwGetCursorPos(windowHandle),
             scrollDelta = Offset(xoffset.toFloat(), -yoffset.toFloat()),
-            nativeEvent =  MouseWheelEvent(getAwtMods(windowHandle))
+            nativeEvent = MouseWheelEvent(getAwtMods(windowHandle))
         )
     }
 
@@ -62,13 +64,31 @@ fun ComposeScene.subscribeToGLFWEvents(windowHandle: Long) {
 
         // Note that we don't distinguish between Left/Right Shift, Del from numpad or not, etc.
         // To distinguish we should change `location` parameter
-        sendKeyEvent(KeyEvent(awtId, time, getAwtMods(windowHandle), awtKey, 0.toChar(), AwtKeyEvent.KEY_LOCATION_STANDARD))
+        sendKeyEvent(
+            KeyEvent(
+                awtId,
+                time,
+                getAwtMods(windowHandle),
+                awtKey,
+                0.toChar(),
+                AwtKeyEvent.KEY_LOCATION_STANDARD
+            )
+        )
     }
 
     glfwSetCharCallback(windowHandle) { _, codepoint ->
         for (char in Character.toChars(codepoint)) {
             val time = System.nanoTime() / 1_000_000
-            sendKeyEvent(KeyEvent(AwtKeyEvent.KEY_TYPED, time, getAwtMods(windowHandle), 0, char, AwtKeyEvent.KEY_LOCATION_UNKNOWN))
+            sendKeyEvent(
+                KeyEvent(
+                    AwtKeyEvent.KEY_TYPED,
+                    time,
+                    getAwtMods(windowHandle),
+                    0,
+                    char,
+                    AwtKeyEvent.KEY_LOCATION_UNKNOWN
+                )
+            )
         }
     }
 
@@ -87,8 +107,12 @@ private fun glfwGetCursorPos(window: Long): Offset {
 // in the future versions of Compose we plan to get rid of the need of AWT events/components
 val awtComponent = object : Component() {}
 
+@OptIn(InternalComposeUiApi::class)
 private fun KeyEvent(awtId: Int, time: Long, awtMods: Int, key: Int, char: Char, location: Int) = KeyEvent(
-    AwtKeyEvent(awtComponent, awtId, time, awtMods, key, char, location)
+    key = Key(key),
+    codePoint = char.code,
+    type = if (awtId == AwtKeyEvent.KEY_PRESSED) KeyEventType.KeyDown else if (awtId == AwtKeyEvent.KEY_RELEASED) KeyEventType.KeyUp else KeyEventType.Unknown,
+    nativeEvent = AwtKeyEvent(awtComponent, awtId, time, awtMods, key, char, location)
 )
 
 private fun MouseEvent(awtMods: Int) = MouseEvent(
@@ -111,11 +135,23 @@ private fun getAwtMods(windowHandle: Long): Int {
         awtMods = awtMods or (1 shl 14)
     if (glfwGetMouseButton(windowHandle, GLFW_MOUSE_BUTTON_5) == GLFW_PRESS)
         awtMods = awtMods or (1 shl 15)
-    if (glfwGetKey(windowHandle, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(windowHandle, GLFW_KEY_RIGHT_CONTROL) == GLFW_PRESS)
+    if (glfwGetKey(windowHandle, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS || glfwGetKey(
+            windowHandle,
+            GLFW_KEY_RIGHT_CONTROL
+        ) == GLFW_PRESS
+    )
         awtMods = awtMods or InputEvent.CTRL_DOWN_MASK
-    if (glfwGetKey(windowHandle, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(windowHandle, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS)
+    if (glfwGetKey(windowHandle, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS || glfwGetKey(
+            windowHandle,
+            GLFW_KEY_RIGHT_SHIFT
+        ) == GLFW_PRESS
+    )
         awtMods = awtMods or InputEvent.SHIFT_DOWN_MASK
-    if (glfwGetKey(windowHandle, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(windowHandle, GLFW_KEY_RIGHT_ALT) == GLFW_PRESS)
+    if (glfwGetKey(windowHandle, GLFW_KEY_LEFT_ALT) == GLFW_PRESS || glfwGetKey(
+            windowHandle,
+            GLFW_KEY_RIGHT_ALT
+        ) == GLFW_PRESS
+    )
         awtMods = awtMods or InputEvent.ALT_DOWN_MASK
     return awtMods
 }

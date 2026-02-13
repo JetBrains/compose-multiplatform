@@ -1,6 +1,9 @@
-import androidx.compose.ui.ComposeScene
-import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.InternalComposeUiApi
+import androidx.compose.ui.graphics.asComposeCanvas
+import androidx.compose.ui.scene.CanvasLayersComposeScene
+import androidx.compose.ui.scene.ComposeScene
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import org.jetbrains.skia.*
 import org.jetbrains.skia.FramebufferFormat.Companion.GR_GL_RGBA8
 import org.jetbrains.skiko.FrameDispatcher
@@ -11,6 +14,7 @@ import org.lwjgl.opengl.GL30.GL_FRAMEBUFFER_BINDING
 import org.lwjgl.system.MemoryUtil.NULL
 import kotlin.system.exitProcess
 
+@OptIn(InternalComposeUiApi::class)
 fun main() {
     var width = 640
     var height = 480
@@ -35,9 +39,10 @@ fun main() {
     lateinit var composeScene: ComposeScene
 
     fun render() {
-        surface.canvas.clear(Color.WHITE)
-        composeScene.constraints = Constraints(maxWidth = width, maxHeight = height)
-        composeScene.render(surface.canvas, System.nanoTime())
+        surface ?: return
+        surface!!.canvas.clear(Color.WHITE)
+        composeScene.size = IntSize(width, height)
+        composeScene.render(surface!!.canvas.asComposeCanvas(), System.nanoTime())
 
         context.flush()
         glfwSwapBuffers(windowHandle)
@@ -46,12 +51,17 @@ fun main() {
     val frameDispatcher = FrameDispatcher(glfwDispatcher) { render() }
 
     val density = Density(glfwGetWindowContentScale(windowHandle))
-    composeScene = ComposeScene(glfwDispatcher, density, invalidate = frameDispatcher::scheduleFrame)
+    composeScene =
+        CanvasLayersComposeScene(
+            density = density,
+            coroutineContext = glfwDispatcher,
+            invalidate = frameDispatcher::scheduleFrame
+        )
 
     glfwSetWindowSizeCallback(windowHandle) { _, windowWidth, windowHeight ->
         width = windowWidth
         height = windowHeight
-        surface.close()
+        surface?.close()
         surface = createSurface(width, height, context)
 
         glfwSwapInterval(0)
@@ -71,7 +81,7 @@ fun main() {
     exitProcess(0)
 }
 
-private fun createSurface(width: Int, height: Int, context: DirectContext): Surface {
+private fun createSurface(width: Int, height: Int, context: DirectContext): Surface? {
     val fbId = GL11.glGetInteger(GL_FRAMEBUFFER_BINDING)
     val renderTarget = BackendRenderTarget.makeGL(width, height, 0, 8, fbId, GR_GL_RGBA8)
     return Surface.makeFromBackendRenderTarget(

@@ -2,8 +2,9 @@ import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    kotlin("jvm") version "1.5.31"
-    id("org.jetbrains.compose") version "1.0.0"
+    kotlin("jvm") version "2.1.10"
+    id("org.jetbrains.kotlin.plugin.compose") version "2.1.10"
+    id("org.jetbrains.compose") version "1.8.0-alpha02"
 }
 
 repositories {
