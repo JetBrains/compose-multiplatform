@@ -10,6 +10,7 @@ declare -a folders=(
     "$ROOT/gradle-plugins"
     "$ROOT/ci"
     "$ROOT/tutorials"
+    "$ROOT/html"
 )
 
 if [ ! -z "$COMPOSE_TEMPLATES_FOLDER" ]; then
@@ -62,7 +63,7 @@ replaceVersionInFile() {
 }
 
 replaceVersionInFolder() {
-    find $1 -wholename $2 -not -path "**/build**" -not -path "**/.gradle**" | while read file; do replaceVersionInFile "$file"; done
+    find $1 -wholename $2 -not -path "**/build/*" -not -path "**/.gradle**" | while read file; do replaceVersionInFile "$file"; done
 }
 
 for folder in "${folders[@]}"
