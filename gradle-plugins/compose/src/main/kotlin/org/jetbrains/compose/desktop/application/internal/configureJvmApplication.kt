@@ -413,6 +413,7 @@ internal fun JvmApplicationContext.configurePlatformSettings(
                 packageTask.iconFile.set(mac.iconFile.orElse(defaultResources.get { macIcon }))
                 packageTask.installationPath.set(mac.installationPath)
                 packageTask.fileAssociations.set(provider { mac.fileAssociations })
+                packageTask.macLayeredIcons.set(mac.layeredIconDir)
             }
         }
     }
