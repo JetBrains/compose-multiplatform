@@ -38,8 +38,14 @@ fun stringResource(resource: StringResource): String {
  *
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
-suspend fun getString(resource: StringResource): String =
-    loadString(resource, DefaultResourceReader, getSystemResourceEnvironment())
+suspend fun getString(
+    resource: StringResource,
+    reader: ResourceReader = DefaultResourceReader
+): String = loadString(
+    resource = resource,
+    resourceReader = reader,
+    environment = getSystemResourceEnvironment()
+)
 
 /**
  * Loads a string using the specified string resource.
@@ -50,8 +56,15 @@ suspend fun getString(resource: StringResource): String =
  *
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
-suspend fun getString(environment: ResourceEnvironment, resource: StringResource): String =
-    loadString(resource, DefaultResourceReader, environment)
+suspend fun getString(
+    environment: ResourceEnvironment,
+    resource: StringResource,
+    reader: ResourceReader = DefaultResourceReader
+): String = loadString(
+    resource = resource,
+    resourceReader = reader,
+    environment = environment
+)
 
 private suspend fun loadString(
     resource: StringResource,
@@ -91,11 +104,15 @@ fun stringResource(resource: StringResource, vararg formatArgs: Any): String {
  *
  * @throws IllegalArgumentException If the provided ID is not found in the resource file.
  */
-suspend fun getString(resource: StringResource, vararg formatArgs: Any): String = loadString(
-    resource,
-    formatArgs.map { it.toString() },
-    DefaultResourceReader,
-    getSystemResourceEnvironment()
+suspend fun getString(
+    resource: StringResource,
+    reader: ResourceReader = DefaultResourceReader,
+    vararg formatArgs: Any
+): String = loadString(
+    resource = resource,
+    args = formatArgs.map { it.toString() },
+    resourceReader = reader,
+    environment = getSystemResourceEnvironment()
 )
 
 /**
@@ -111,12 +128,13 @@ suspend fun getString(resource: StringResource, vararg formatArgs: Any): String 
 suspend fun getString(
     environment: ResourceEnvironment,
     resource: StringResource,
+    reader: ResourceReader = DefaultResourceReader,
     vararg formatArgs: Any
 ): String = loadString(
-    resource,
-    formatArgs.map { it.toString() },
-    DefaultResourceReader,
-    environment
+    resource = resource,
+    args = formatArgs.map { it.toString() },
+    resourceReader = reader,
+    environment = environment
 )
 
 private suspend fun loadString(

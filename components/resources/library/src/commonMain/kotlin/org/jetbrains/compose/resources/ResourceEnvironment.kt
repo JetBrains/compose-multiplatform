@@ -5,11 +5,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.intl.Locale
 
-class ResourceEnvironment internal constructor(
-    internal val language: LanguageQualifier,
-    internal val region: RegionQualifier,
-    internal val theme: ThemeQualifier,
-    internal val density: DensityQualifier
+@ExperimentalResourceApi
+class ResourceEnvironment(
+   val language: LanguageQualifier,
+   val region: RegionQualifier,
+   val theme: ThemeQualifier,
+   val density: DensityQualifier
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -32,6 +33,18 @@ class ResourceEnvironment internal constructor(
         result = 31 * result + density.hashCode()
         return result
     }
+
+    fun copy(
+        language: LanguageQualifier = this.language,
+        region: RegionQualifier = this.region,
+        theme: ThemeQualifier = this.theme,
+        density: DensityQualifier = this.density
+    ) = ResourceEnvironment(
+        language = language,
+        region = region,
+        theme = theme,
+        density = density
+    )
 }
 
 internal interface ComposeEnvironment {
