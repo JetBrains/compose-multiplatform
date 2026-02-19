@@ -1,5 +1,6 @@
 package org.jetbrains.compose.internal.publishing.utils
 
+import kotlinx.io.IOException
 import org.gradle.api.logging.Logger
 
 fun <T> retry(
@@ -14,7 +15,7 @@ fun <T> retry(
     while (true) {
         try {
             return block()
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             if (retries >= count) {
                 throw e
             }
