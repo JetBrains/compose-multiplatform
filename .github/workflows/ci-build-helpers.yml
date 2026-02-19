@@ -3,13 +3,13 @@ on:
   pull_request:
     paths:
       - 'ci/build-helpers/**'
-      - '.github/workflows/build-helpers.yml'
+      - '.github/workflows/ci-build-helpers.yml'
   push:
     branches:
       - master
     paths:
       - 'ci/build-helpers/**'
-      - '.github/workflows/build-helpers.yml'
+      - '.github/workflows/ci-build-helpers.yml'
 
 jobs:
   build-helpers-publish:
