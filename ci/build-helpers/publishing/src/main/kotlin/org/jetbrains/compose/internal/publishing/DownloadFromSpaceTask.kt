@@ -11,6 +11,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.compose.internal.publishing.utils.retry
 import org.jsoup.Jsoup
 import java.net.URL
 
@@ -33,10 +34,11 @@ abstract class DownloadFromSpaceMavenRepoTask : DefaultTask() {
         logger.info("Downloading ${module.coordinate}...")
         val groupUrl = module.groupId.replace(".", "/")
 
-        val filesListingDocument =
+        val filesListingDocument = retry(logger, count = 5, initialDelay = 1000L, exponentialDelayMultiplier = 3) {
             Jsoup.connect("${spaceRepoUrl.get()}/$groupUrl/${module.artifactId}/${module.version}/")
                 .timeout(180_000)
                 .get()
+        }
         val downloadableFiles = HashMap<String, URL>()
         for (a in filesListingDocument.select("#contents > a")) {
             val href = a.attributes().get("href")
@@ -78,6 +80,11 @@ abstract class DownloadFromSpaceMavenRepoTask : DefaultTask() {
         DownloadAction(project, this).apply {
             src(downloadableFiles.values)
             dest(destinationDir)
+            // it doesn't add delays between retries unfortunately
+            // https://github.com/michel-kraemer/gradle-download-task/blob/720c9a084759941ebdabb1ad9113fc8fb7994e1d/src/main/java/de/undercouch/gradle/tasks/download/internal/DefaultHttpClientFactory.java#L71
+            // but it might help avoiding flaky 500 Server error, encountered earlier:
+            // Server Error (HTTP status code: 500, URL: https://packages.jetbrains.team/maven/p/cmp/dev/org/jetbrains/skiko/skiko-linuxarm64/0.144.1/skiko-linuxarm64-0.144.1-javadoc.jar.sha1
+            retries(5)
         }.execute()
     }
 }
