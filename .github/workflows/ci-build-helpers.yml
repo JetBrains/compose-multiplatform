@@ -26,14 +26,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-read-only: ${{ github.ref != 'refs/heads/master' }}
-          gradle-home-cache-excludes: |
-            caches/jars-9
-            caches/transforms-3
-
       - name: Publish to Maven Local
         shell: bash
         working-directory: ci/build-helpers
