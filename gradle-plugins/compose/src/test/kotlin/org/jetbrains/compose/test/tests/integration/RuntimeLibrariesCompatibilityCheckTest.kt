@@ -56,7 +56,7 @@ class RuntimeLibrariesCompatibilityCheckTest : GradlePluginTestBase() {
     fun skikoIncompatibleWarning(): Unit = with(
         testProject("misc/compatibilityLibCheck")
     ) {
-        val logMsg = "w: Skiko dependencies use incompatible versions in the dependency tree."
+        val logMsg = "w: Skiko dependencies' versions are incompatible."
         gradle("metadataMainClasses").checks {
             check.logDoesntContain("checkMetadataMainComposeLibrariesCompatibility")
             check.logDoesntContain(logMsg)

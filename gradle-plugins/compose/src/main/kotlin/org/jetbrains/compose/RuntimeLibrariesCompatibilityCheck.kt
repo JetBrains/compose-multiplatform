@@ -2,8 +2,15 @@ package org.jetbrains.compose
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.artifacts.ModuleVersionIdentifier
+import org.gradle.api.artifacts.component.ComponentIdentifier
+import org.gradle.api.artifacts.component.ComponentSelector
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.artifacts.component.ModuleComponentSelector
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
+import org.gradle.api.artifacts.component.ProjectComponentSelector
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.gradle.api.artifacts.result.ResolvedComponentResult
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.provider.SetProperty
@@ -72,7 +79,7 @@ internal abstract class RuntimeLibrariesCompatibilityCheck : DefaultTask() {
             "org.jetbrains.compose.foundation:foundation",
             "org.jetbrains.compose.ui:ui"
         )
-        const val skikoGroup = "org.jetbrains.skiko"
+        val skikoLibraryForCheck = "org.jetbrains.skiko:skiko"
 
         private val majorMinorRegex = """^(\d+)\.(\d+)""".toRegex()
         fun majorMinorVersion(version: String): String {
@@ -81,13 +88,6 @@ internal abstract class RuntimeLibrariesCompatibilityCheck : DefaultTask() {
             val minor = match.groupValues[2]
             return "$major.$minor"
         }
-
-        fun hasIncompatibleVersions(usages: List<DependencyUsage>): Boolean =
-            usages
-                .flatMap { usage -> listOfNotNull(usage.requestedVersion, usage.selectedVersion) }
-                .map(::majorMinorVersion)
-                .distinct()
-                .size > 1
     }
 
     @get:Inject
@@ -114,72 +114,52 @@ internal abstract class RuntimeLibrariesCompatibilityCheck : DefaultTask() {
     @TaskAction
     fun run() {
         val expectedRuntimeVersion = expectedVersion.get()
-        val composeLibs = allDependencies.get()
+        val composeLibraries = allDependencies.get()
             .mapNotNull { it.selected.moduleVersion }
-            .filter { lib -> lib.group + ":" + lib.name in composeLibrariesForCheck }
+            .filter { lib -> "${lib.group}:${lib.name}" in composeLibrariesForCheck }
             .distinctBy { lib -> "${lib.group}:${lib.name}:${lib.version}" }
-        val composeProblems = composeLibs.mapNotNull { lib ->
-            if (lib.version == expectedRuntimeVersion) return@mapNotNull null
-            ProblemLibrary(lib.group + ":" + lib.name, lib.version)
+        val composeInconsistentVersions = composeLibraries.filter { lib ->
+            lib.version != expectedRuntimeVersion
         }
-        if (composeProblems.isNotEmpty()) {
+        if (composeInconsistentVersions.isNotEmpty()) {
             logger.warn(
                 getComposeMessage(
                     projectPath.get(),
                     configurationName.get(),
-                    composeProblems,
+                    composeInconsistentVersions,
                     expectedRuntimeVersion
                 )
             )
         }
 
-        val dependencyUsages = allDependencies.get().mapNotNull { dep ->
-            val requested = dep.requested as? ModuleComponentSelector
-            val selected = dep.selected.moduleVersion
-
-            val requestedGroup = requested?.group
-            val selectedGroup = selected?.group
-            if (requestedGroup != skikoGroup && selectedGroup != skikoGroup) {
-                return@mapNotNull null
-            }
-
-            DependencyUsage(
-                requestedName = requested?.let { "${it.group}:${it.module}" },
-                requestedVersion = requested?.version,
-                selectedName = selected?.let { "${it.group}:${it.name}" },
-                selectedVersion = selected?.version,
-            )
-        }.distinct()
-
-        if (hasIncompatibleVersions(dependencyUsages)) {
+        val skikoIncompatibleDependencyUsages = allDependencies.get().filter { dependency ->
+            val requested = dependency.requested as? ModuleComponentSelector ?: return@filter false
+            val selected = dependency.selected.moduleVersion ?: return@filter false
+            if ("${requested.group}:${requested.module}" != skikoLibraryForCheck) return@filter false
+            if ("${selected.group}:${selected.name}" != skikoLibraryForCheck) return@filter false
+            majorMinorVersion(requested.version) != majorMinorVersion(selected.version)
+        }
+        if (skikoIncompatibleDependencyUsages.isNotEmpty()) {
             logger.warn(
                 getSkikoMessage(
                     projectPath.get(),
                     configurationName.get(),
-                    dependencyUsages
+                    skikoIncompatibleDependencyUsages
                 )
             )
         }
     }
 
-    private data class ProblemLibrary(val name: String, val version: String)
-    private data class DependencyUsage(
-        val requestedName: String?,
-        val requestedVersion: String?,
-        val selectedName: String?,
-        val selectedVersion: String?,
-    )
-
     private fun getComposeMessage(
         projectName: String,
         configurationName: String,
-        problemLibs: List<ProblemLibrary>,
+        composeInconsistentVersions: List<ModuleVersionIdentifier>,
         expectedVersion: String,
     ): String = buildString {
         appendLine("w: Compose Multiplatform runtime dependencies' versions don't match with plugin version.")
-        problemLibs.forEach { lib ->
-            appendLine("    expected: '${lib.name}:$expectedVersion'")
-            appendLine("    actual:   '${lib.name}:${lib.version}'")
+        composeInconsistentVersions.forEach { library ->
+            appendLine("    expected: '${library.group}:${library.name}:$expectedVersion'")
+            appendLine("    actual:   '${library.group}:${library.name}:${library.version}'")
             appendLine()
         }
         appendNoteAboutDependencyMismatch(projectName, configurationName)
@@ -190,20 +170,21 @@ internal abstract class RuntimeLibrariesCompatibilityCheck : DefaultTask() {
     private fun getSkikoMessage(
         projectName: String,
         configurationName: String,
-        dependencyUsages: List<DependencyUsage>,
+        dependencyUsages: List<ResolvedDependencyResult>,
     ): String = buildString {
-        appendLine("w: Skiko dependencies use incompatible versions in the dependency tree.")
+        appendLine("w: Skiko dependencies' versions are incompatible.")
         dependencyUsages.forEach { usage ->
-                val requested = usage.requestedName?.let { "$it:${usage.requestedVersion}" } ?: "<unknown>"
-                val selected = usage.selectedName?.let { "$it:${usage.selectedVersion}" } ?: "<unknown>"
-                appendLine("    requested: '$requested'")
-                appendLine("    selected:  '$selected'")
-                appendLine()
-            }
+            val from = usage.from.moduleVersion
+            val requested = usage.requested
+            val selected = usage.selected.moduleVersion
+            appendLine("    ${from.toModuleString()}")
+            appendLine("    \\--- ${requested.toModuleString()} -> ${selected?.version}")
+            appendLine()
+        }
         appendNoteAboutDependencyMismatch(projectName, configurationName)
         appendLine()
         appendLine("Note: Skiko is considered implementation detail in Compose Multiplatform and might be incompatible across versions.")
-        appendLine("Please align Skiko dependencies to the same version. If possible, avoid direct skiko references and use Compose APIs instead.")
+        appendLine("Please align Skiko dependencies to the same version. If possible, avoid direct Skiko references and use Compose APIs instead.")
     }
 
     private fun StringBuilder.appendNoteAboutDependencyMismatch(
@@ -215,5 +196,16 @@ internal abstract class RuntimeLibrariesCompatibilityCheck : DefaultTask() {
         val taskName = if (projectName.isNotEmpty() && !projectName.endsWith(":")) "$projectName:dependencies" else "${projectName}dependencies"
         appendLine("You can inspect resulted dependencies tree via `./gradlew $taskName  --configuration ${configurationName}`.")
         appendLine("See more details in Gradle documentation: https://docs.gradle.org/current/userguide/viewing_debugging_dependencies.html#sec:listing-dependencies")
+    }
+
+    private fun ModuleVersionIdentifier?.toModuleString() = when (this) {
+        null -> "<unknown>"
+        else -> "$group:$name:$version"
+    }
+    private fun ComponentSelector?.toModuleString(): String = when (this) {
+        is ProjectComponentSelector -> "project $projectPath"
+        is ModuleComponentSelector -> "$group:$module:$version"
+        null -> "<unknown>"
+        else -> displayName
     }
 }
