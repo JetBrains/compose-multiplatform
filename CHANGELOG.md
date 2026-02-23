@@ -29,10 +29,6 @@ _Changes since 1.11.0-alpha02_
 
 ## Fixes
 
-### Multiple Platforms
-
-- Improved the deprecation message for `compose.materialIconsExtended` to explain that the artifact is pinned to version `1.7.3` and suggest migration to Material Symbols [#5520](https://github.com/JetBrains/compose-multiplatform/pull/5520)
-
 ### iOS
 
 - Fix crash when manually posting `UIKeyboardWillHideNotification` without `userInfo` [#2713](https://github.com/JetBrains/compose-multiplatform-core/pull/2713)
@@ -67,12 +63,6 @@ _Changes since 1.11.0-alpha02_
 - Support cursor control using space bar sliding gesture on Android Web [#2762](https://github.com/JetBrains/compose-multiplatform-core/pull/2762)
 - Fix scrolling sudden stops or speed-ups in web apps [#2764](https://github.com/JetBrains/compose-multiplatform-core/pull/2764)
 - Improvements of the Web scroll behavior [#2766](https://github.com/JetBrains/compose-multiplatform-core/pull/2766)
-
-## Unknown
-
-### Unknown
-
-- - nav_cupcake android compilesdk 35 [#5522](https://github.com/JetBrains/compose-multiplatform/pull/5522)
 
 ## Components
 
