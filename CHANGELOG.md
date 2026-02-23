@@ -1,3 +1,106 @@
+# 1.11.0-alpha03 (February 2026)
+
+_Changes since 1.11.0-alpha02_
+
+## Migration Notes
+
+### Multiple Platforms
+
+- `navigation-runtime`, `navigation-common` no longer provide `androidx.collection` as an `api` transitive dependency. Add this if your project doesn't compile with unresolved `androidx.collection...` classes: [#2749](https://github.com/JetBrains/compose-multiplatform-core/pull/2749)
+
+  ```
+  implementation("androidx.collection:collection:1.5.0")
+  ```
+  This change is required to avoid differences with the original Jetpack libraries and allow reusing the same code without additional changes needed.
+
+### iOS
+
+- `parallelRendering` flag now enabled by default [#2732](https://github.com/JetBrains/compose-multiplatform-core/pull/2732)
+
+## Features
+
+### iOS
+
+- Add support for tvOS Siri Remote button events (Select, Menu, Play/Pause) [#2717](https://github.com/JetBrains/compose-multiplatform-core/pull/2717)
+
+### Desktop
+
+- `singleWindowApplication` content's receiver now subclasses `ApplicationScope` too, allowing to programmatically exit the app [#2703](https://github.com/JetBrains/compose-multiplatform-core/pull/2703)
+
+## Fixes
+
+### Multiple Platforms
+
+- Improved the deprecation message for `compose.materialIconsExtended` to explain that the artifact is pinned to version `1.7.3` and suggest migration to Material Symbols [#5520](https://github.com/JetBrains/compose-multiplatform/pull/5520)
+
+### iOS
+
+- Fix crash when manually posting `UIKeyboardWillHideNotification` without `userInfo` [#2713](https://github.com/JetBrains/compose-multiplatform-core/pull/2713)
+- Fix an ability to use `scrollsToTop` for native `UIScrollView`s [#2705](https://github.com/JetBrains/compose-multiplatform-core/pull/2705)
+- _(prerelease fix)_ Fix an issue where manually overriding the user interface style does not propagate properly to the `LocalSystemTheme` [#2735](https://github.com/JetBrains/compose-multiplatform-core/pull/2735)
+- Fix crash in `MetalRedrawer` that occurs when `Popup` or `Dialog` box opens and closes quickly [#2756](https://github.com/JetBrains/compose-multiplatform-core/pull/2756)
+- Fix hit test for Accessibility Elements [#2760](https://github.com/JetBrains/compose-multiplatform-core/pull/2760)
+- Fix crashes when `parallelRendering` is enabled [#2732](https://github.com/JetBrains/compose-multiplatform-core/pull/2732)
+- Fix issues with custom context menu items on iOS 15 or earlier [#2771](https://github.com/JetBrains/compose-multiplatform-core/pull/2771)
+
+### Desktop
+
+- Fix accessibility focus continuing to highlight a removed element [#2695](https://github.com/JetBrains/compose-multiplatform-core/pull/2695)
+- [macOS] Fix Wubi input for `(Basic)TextField(TextFieldValue)` [#2722](https://github.com/JetBrains/compose-multiplatform-core/pull/2722)
+- [macOS, accessibility] Fix VoiceOver sometimes "clicking" the wrong button when a button click is triggered by the user [#2720](https://github.com/JetBrains/compose-multiplatform-core/pull/2720)
+-  [#2680](https://github.com/JetBrains/compose-multiplatform-core/pull/2680)
+- Fix `TextField` accessibility issue where `contentDescription` was ignored by screen readers (VoiceOver). `TextField` now properly uses `contentDescription` as the accessible name/label, making forms usable with assistive technologies [#2680](https://github.com/JetBrains/compose-multiplatform-core/pull/2680)
+
+  **Note:** I have signed the Google Contributor's License Agreement at https://cla.developers.google.com
+- The coroutine context of `launchApplication` and `awaitApplication` is now correctly used in windows and dialogs of the application [#2742](https://github.com/JetBrains/compose-multiplatform-core/pull/2742)
+- _(prerelease fix)_ Fix `SwingPanel` not being visible at all [#2751](https://github.com/JetBrains/compose-multiplatform-core/pull/2751)
+- Fix an issue with "Pinyin - Simplified" input in `BasicTextField(TextFieldState)` when the temporary (composed) english text was not removed when the composition is committed [#2763](https://github.com/JetBrains/compose-multiplatform-core/pull/2763)
+- Fix incorrect pointer Enter/Move events sometimes being sent immediately following the mouse pointer exiting the compose scene [#2750](https://github.com/JetBrains/compose-multiplatform-core/pull/2750)
+- _(prerelease fix)_ Bump Compose Hot Reload to [1.1.0-alpha05](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.1.0-alpha05) [#5530](https://github.com/JetBrains/compose-multiplatform/pull/5530)
+
+### Web
+
+- Adjust HTML hierarchy for proper interop container location outside the shadow DOM [#2710](https://github.com/JetBrains/compose-multiplatform-core/pull/2710)
+- Fix mouse wheel scrolling on web by accounting for screen density [#2724](https://github.com/JetBrains/compose-multiplatform-core/pull/2724)
+- Ignore duplicate mouse events following touch events on web to avoid unintended clicks [#2741](https://github.com/JetBrains/compose-multiplatform-core/pull/2741)
+- Fix Apple Magic mouse behavior [#2748](https://github.com/JetBrains/compose-multiplatform-core/pull/2748)
+- Fix too early tap detection on web during scrolling [#2753](https://github.com/JetBrains/compose-multiplatform-core/pull/2753)
+- Fix sudden scroll stops during fast gestures [#2759](https://github.com/JetBrains/compose-multiplatform-core/pull/2759)
+- Support cursor control using space bar sliding gesture on Android Web [#2762](https://github.com/JetBrains/compose-multiplatform-core/pull/2762)
+- Fix scrolling sudden stops or speed-ups in web apps [#2764](https://github.com/JetBrains/compose-multiplatform-core/pull/2764)
+- Improvements of the Web scroll behavior [#2766](https://github.com/JetBrains/compose-multiplatform-core/pull/2766)
+
+## Unknown
+
+### Unknown
+
+- - nav_cupcake android compilesdk 35 [#5522](https://github.com/JetBrains/compose-multiplatform/pull/5522)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.11.0-alpha03`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.11.0-alpha03` | [Runtime 1.11.0-alpha05](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.11.0-alpha05) |
+| UI | `org.jetbrains.compose.ui:ui*:1.11.0-alpha03` | [UI 1.11.0-alpha05](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.11.0-alpha05) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.11.0-alpha03` | [Foundation 1.11.0-alpha05](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.11.0-alpha05) |
+| Material | `org.jetbrains.compose.material:material*:1.11.0-alpha03` | [Material 1.11.0-alpha05](https://developer.android.com/jetpack/androidx/releases/compose-material#1.11.0-alpha05) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.11.0-alpha03` | [Material3 1.5.0-alpha14](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha14) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha05` | [Material3 Adaptive 1.3.0-alpha08](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha08) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.10.0-alpha08` | [Lifecycle 2.10.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.10.0) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.2` | [Navigation 2.9.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.7) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.1.0-alpha03` | [Navigation3 1.1.0-alpha04](https://developer.android.com/jetpack/androidx/releases/navigation3#1.1.0-alpha04) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.0.1` | [Navigation Event 1.0.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.0.1) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.10.1 (February 2026)
 
 _Changes since 1.10.0_
