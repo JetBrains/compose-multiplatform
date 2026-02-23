@@ -50,8 +50,6 @@ _Changes since 1.11.0-alpha02_
 - [macOS, accessibility] Fix VoiceOver sometimes "clicking" the wrong button when a button click is triggered by the user [#2720](https://github.com/JetBrains/compose-multiplatform-core/pull/2720)
 -  [#2680](https://github.com/JetBrains/compose-multiplatform-core/pull/2680)
 - Fix `TextField` accessibility issue where `contentDescription` was ignored by screen readers (VoiceOver). `TextField` now properly uses `contentDescription` as the accessible name/label, making forms usable with assistive technologies [#2680](https://github.com/JetBrains/compose-multiplatform-core/pull/2680)
-
-  **Note:** I have signed the Google Contributor's License Agreement at https://cla.developers.google.com
 - The coroutine context of `launchApplication` and `awaitApplication` is now correctly used in windows and dialogs of the application [#2742](https://github.com/JetBrains/compose-multiplatform-core/pull/2742)
 - _(prerelease fix)_ Fix `SwingPanel` not being visible at all [#2751](https://github.com/JetBrains/compose-multiplatform-core/pull/2751)
 - Fix an issue with "Pinyin - Simplified" input in `BasicTextField(TextFieldState)` when the temporary (composed) english text was not removed when the composition is committed [#2763](https://github.com/JetBrains/compose-multiplatform-core/pull/2763)
