@@ -19,7 +19,7 @@ val modulesFile = publishingDir.map { it.file("modules.txt") }
 
 val findComposeModules by tasks.registering(FindModulesInSpaceTask::class) {
     requestedCoordinates.set(mavenCentral.coordinates)
-    spaceInstanceUrl.set("https://public.jetbrains.space")
+    spaceInstanceUrl.set("https://jetbrains.team")
     spaceClientId.set(System.getenv("COMPOSE_REPO_USERNAME") ?: "")
     spaceClientSecret.set(System.getenv("COMPOSE_REPO_KEY") ?: "")
     spaceProjectId.set(System.getenv("COMPOSE_DEV_REPO_PROJECT_ID") ?: "")
