@@ -6,12 +6,7 @@ _Changes since 1.11.0-alpha02_
 
 ### Multiple Platforms
 
-- `navigation-runtime`, `navigation-common` no longer provide `androidx.collection` as an `api` transitive dependency. Add this if your project doesn't compile with unresolved `androidx.collection...` classes: [#2749](https://github.com/JetBrains/compose-multiplatform-core/pull/2749)
-
-  ```
-  implementation("androidx.collection:collection:1.5.0")
-  ```
-  This change is required to avoid differences with the original Jetpack libraries and allow reusing the same code without additional changes needed.
+- `navigation-runtime`, `navigation-common` no longer provide `androidx.collection` as an `api` transitive dependency. If your project doesn't compile with unresolved `androidx.collection...` classes add `implementation("androidx.collection:collection:1.5.0")`. This change is required to avoid differences with the original Jetpack libraries and allow reusing the same code without additional changes needed [#2749](https://github.com/JetBrains/compose-multiplatform-core/pull/2749)
 - Kotlin 2.3 is required for native and web platforms [#2755](https://github.com/JetBrains/compose-multiplatform-core/pull/2755)
 
 ### iOS
