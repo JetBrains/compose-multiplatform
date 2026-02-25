@@ -12,6 +12,7 @@ _Changes since 1.11.0-alpha02_
   implementation("androidx.collection:collection:1.5.0")
   ```
   This change is required to avoid differences with the original Jetpack libraries and allow reusing the same code without additional changes needed.
+- Kotlin 2.3 is required for native and web platforms [#2755](https://github.com/JetBrains/compose-multiplatform-core/pull/2755)
 
 ### iOS
 
