@@ -9,6 +9,7 @@ ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"/..
 
 # Add folders which should contain up-to-date versions
 declare -a folders=(
+    "$ROOT/gradle-plugins"
     "$ROOT/html"
     "$ROOT/components"
 )
