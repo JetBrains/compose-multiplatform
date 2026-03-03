@@ -18,7 +18,7 @@ jobs:
       matrix:
         os: ['ubuntu-24.04', 'macos-15-xlarge', 'windows-2022']
         gradle: ['8.13', '9.3.0']
-        agp: ['8.12.3', '9.0.0']
+        agp: ['8.13.2', '9.0.0']
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Repository
