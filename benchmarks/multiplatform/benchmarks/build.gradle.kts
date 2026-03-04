@@ -67,6 +67,11 @@ kotlin {
         }
     }
 
+    js {
+        browser()
+        binaries.executable()
+    }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -97,12 +102,22 @@ kotlin {
             }
         }
 
-        val wasmJsMain by getting {
+        val webMain by creating {
+            dependsOn(commonMain)
             dependencies {
                 implementation(libs.ktor.client.js)
                 implementation(libs.ktor.client.content.negotiation)
                 implementation(libs.ktor.serialization.kotlinx.json)
+                implementation(libs.kotlinx.browser)
             }
+        }
+
+        val jsMain by getting {
+            dependsOn(webMain)
+        }
+
+        val wasmJsMain by getting {
+            dependsOn(webMain)
         }
     }
 }

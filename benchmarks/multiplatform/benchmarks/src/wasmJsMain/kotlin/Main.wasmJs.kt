@@ -1,11 +1,5 @@
-@file:OptIn(ExperimentalJsExport::class)
-
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.ComposeViewport
-import kotlinx.browser.document
-import kotlinx.browser.window
-import kotlinx.coroutines.*
-import org.w3c.dom.url.URLSearchParams
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.promise
 import kotlin.js.Promise
 
 val jsOne = 1.toJsNumber()
@@ -17,51 +11,6 @@ fun main(args: Array<String>) {
         mainBrowser()
     }
 }
-
-@OptIn(ExperimentalComposeUiApi::class)
-fun mainBrowser() {
-    val urlParams = URLSearchParams(window.location.search.toJsString())
-    var i = 0
-    val args = generateSequence { urlParams.get("arg${i++}") }.toList().toTypedArray()
-
-    Config.setGlobalFromArgs(args)
-
-    val composeRoot = document.getElementById("root")!!
-    if (Config.isModeEnabled(Mode.REAL)) {
-        val frameRate = 120 // can we get this from device?
-        ComposeViewport(composeRoot) {
-            BenchmarkRunner(getBenchmarks(), frameRate, onExit = { composeRoot.remove() })
-        }
-    } else {
-        composeRoot.remove()
-        println("Wait for the benchmarks to complete...\n")
-        MainScope().launch {
-            if (Config.saveStats() && !BenchmarksSaveServerClient.isServerAlive()) {
-                println("No benchmark server found.")
-                return@launch
-            }
-            awaitSkikoWasm()
-
-            runBenchmarks()
-            println("Completed!")
-            if (Config.saveStats()) {
-                GlobalScope.launch {
-                    BenchmarksSaveServerClient.stopServer()
-                }
-            }
-        }
-    }
-}
-
-private suspend fun awaitSkikoWasm() {
-    suspendCancellableCoroutine { c ->
-        @Suppress("INVISIBLE_REFERENCE")
-        androidx.compose.ui.window.onSkikoReady {
-            c.resumeWith(Result.success(Unit))
-        }
-    }
-}
-
 
 // Currently, the initialization can't be adjusted to avoid calling the fun main, but
 // we don't want use the default fun main, because Jetstream3 requires running the workloads separately / independently of each other.
