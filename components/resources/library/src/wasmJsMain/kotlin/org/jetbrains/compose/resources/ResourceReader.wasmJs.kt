@@ -59,20 +59,7 @@ internal object DefaultWasmResourceReader : ResourceReader {
 
     private suspend fun Blob.asByteArray(): ByteArray {
         val buffer: ArrayBuffer = jsExportBlobAsArrayBuffer(this).await()
-        return Int8Array(buffer).asByteArray()
-    }
-
-    private fun Int8Array.asByteArray(): ByteArray {
-        val array = this
-        val size = array.length
-
-        @OptIn(UnsafeWasmMemoryApi::class)
-        return withScopedMemoryAllocator { allocator ->
-            val memBuffer = allocator.allocate(size)
-            val dstAddress = memBuffer.address.toInt()
-            jsExportInt8ArrayToWasm(array, size, dstAddress)
-            ByteArray(size) { i -> (memBuffer + i).loadByte() }
-        }
+        return fastArrayBufferToByteArray(buffer)
     }
 }
 
