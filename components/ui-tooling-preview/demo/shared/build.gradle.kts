@@ -54,7 +54,7 @@ kotlin {
         }
         val desktopMain by getting
         desktopMain.dependencies {
-            implementation(libs.compose.desktop)
+            implementation(libs.compose.ui)
         }
     }
 }

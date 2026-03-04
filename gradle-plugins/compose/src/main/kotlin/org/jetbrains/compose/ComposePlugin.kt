@@ -66,6 +66,7 @@ abstract class ComposePlugin : Plugin<Project> {
 
     @Suppress("DEPRECATION")
     class Dependencies(project: Project) {
+        @Deprecated("Desktop module is no longer needed")
         val desktop = DesktopDependencies
         @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.animation:animation:${ComposeBuildConfig.composeVersion}\""))
         val animation get() = composeDependency("org.jetbrains.compose.animation:animation")
@@ -132,6 +133,7 @@ abstract class ComposePlugin : Plugin<Project> {
         @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-test-junit4:${ComposeBuildConfig.composeVersion}\""))
         val uiTestJUnit4 get() = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
 
+        @Deprecated("Desktop module is no longer needed")
         val currentOs by lazy {
             composeDependency("org.jetbrains.compose.desktop:desktop-jvm-${currentTarget.id}")
         }
@@ -193,11 +195,14 @@ abstract class ComposePlugin : Plugin<Project> {
     }
 }
 
+@Deprecated("Compose Multiplatform releases are published to Maven Central")
 fun RepositoryHandler.jetbrainsCompose(): MavenArtifactRepository =
     maven { repo -> repo.setUrl("https://packages.jetbrains.team/maven/p/cmp/dev") }
 
+@Deprecated("Specify dependency directly")
 fun KotlinDependencyHandler.compose(groupWithArtifact: String) = composeDependency(groupWithArtifact)
 
+@Deprecated("Specify dependency directly")
 fun DependencyHandler.compose(groupWithArtifact: String) = composeDependency(groupWithArtifact)
 
 private fun composeDependency(groupWithArtifact: String) = "$groupWithArtifact:$composeVersion"

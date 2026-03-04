@@ -83,7 +83,7 @@ kotlin {
         }
         val desktopMain by getting {
             dependencies {
-                implementation(libs.compose.desktop)
+                implementation(libs.compose.ui)
             }
         }
 

@@ -54,7 +54,7 @@ kotlin {
             implementation(project(":resources:library"))
         }
         desktopMain.dependencies {
-            implementation(libs.compose.desktop)
+            implementation(libs.compose.ui)
         }
         androidMain.dependencies {
             implementation(libs.androidx.ui.tooling)

@@ -29,7 +29,7 @@ internal fun Project.configureDesktopPlatformDependencies() {
         )
 
         project.configurations.all { configuration ->
-            if (!configuration.isCanBeConsumed || configuration.isCanBeResolved) {
+            if (configuration.isCanBeResolved) {
                 try {
                     configuration.dependencyConstraints.add(project.dependencies.constraints.create("org.jetbrains.skiko:skiko-awt-runtime") {
                         it.attributes { attrs ->

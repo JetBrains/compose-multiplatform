@@ -13,10 +13,7 @@ repositories {
 }
 
 dependencies {
-    // Note, if you develop a library, you should use compose.desktop.common.
-    // compose.desktop.currentOs should be used in launcher-sourceSet
-    // (in a separate module for demo project and in testMain).
-    implementation("org.jetbrains.compose.desktop:desktop:${project.extra["compose.version"]}")
+    implementation("org.jetbrains.compose.ui:ui:${project.extra["compose.version"]}")
     implementation("org.jetbrains.compose.material:material:${project.extra["compose.version"]}")
 
     // Include the Test API
