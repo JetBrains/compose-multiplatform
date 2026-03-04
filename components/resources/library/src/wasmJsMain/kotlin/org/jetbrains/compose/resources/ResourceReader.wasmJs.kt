@@ -4,10 +4,21 @@ import kotlinx.browser.window
 import kotlinx.coroutines.await
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
-import org.khronos.webgl.toByteArray
+import org.w3c.fetch.Response
 import org.w3c.files.Blob
 import org.w3c.xhr.XMLHttpRequest
 import kotlin.js.Promise
+import kotlin.wasm.unsafe.UnsafeWasmMemoryApi
+import kotlin.wasm.unsafe.withScopedMemoryAllocator
+
+@JsFun(
+    """ (src, size, dstAddr) => {
+        const mem8 = new Int8Array(wasmExports.memory.buffer, dstAddr, size);
+        mem8.set(src);
+    }
+"""
+)
+private external fun jsExportInt8ArrayToWasm(src: Int8Array, size: Int, dstAddr: Int)
 
 @JsFun("(blob) => blob.arrayBuffer()")
 private external fun jsExportBlobAsArrayBuffer(blob: Blob): Promise<ArrayBuffer>
@@ -48,7 +59,7 @@ internal object DefaultWasmResourceReader : ResourceReader {
 
     private suspend fun Blob.asByteArray(): ByteArray {
         val buffer: ArrayBuffer = jsExportBlobAsArrayBuffer(this).await()
-        return Int8Array(buffer).toByteArray()
+        return fastArrayBufferToByteArray(buffer)
     }
 }
 
@@ -74,10 +85,23 @@ private object TestWasmResourceReader : ResourceReader {
         request.overrideMimeType("text/plain; charset=x-user-defined")
         request.send()
         if (request.status == 200.toShort()) {
-            return requestResponseAsByteArray(request).toByteArray()
+            return requestResponseAsByteArray(request).asByteArray()
         }
         println("Request status is not 200 - $resPath, status: ${request.status}")
         throw MissingResourceException(resPath)
+    }
+
+    private fun Int8Array.asByteArray(): ByteArray {
+        val array = this
+        val size = array.length
+
+        @OptIn(UnsafeWasmMemoryApi::class)
+        return withScopedMemoryAllocator { allocator ->
+            val memBuffer = allocator.allocate(size)
+            val dstAddress = memBuffer.address.toInt()
+            jsExportInt8ArrayToWasm(array, size, dstAddress)
+            ByteArray(size) { i -> (memBuffer + i).loadByte() }
+        }
     }
 }
 
