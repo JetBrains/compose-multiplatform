@@ -2,6 +2,8 @@
 
 _Changes since 1.10.1_
 
+No Compose Multiplatform specific changes
+
 ## Components
 
 ### Gradle plugin
