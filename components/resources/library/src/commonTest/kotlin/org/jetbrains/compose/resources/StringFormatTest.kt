@@ -180,4 +180,86 @@ class StringFormatTest {
         // Only the first argument should be used, ignoring the rest
         assertEquals("Hello Alice!", result)
     }
+
+    @Test
+    fun `replaceWithArgs work with width flag for d`() {
+        val template = "%1\$5d"
+        val args = listOf("42", "65")
+
+        val result = template.replaceWithArgs(args)
+
+        assertEquals("   42", result)
+    }
+
+    @Test
+    fun `replaceWithArgs work with over width flag for d`() {
+        val template = "%1\$5d"
+        val args = listOf("999999")
+
+        val result = template.replaceWithArgs(args)
+
+        assertEquals("999999", result)
+    }
+
+    @Test
+    fun `replaceWithArgs work with width flag for s`() {
+        val template = "%1\$5s"
+        val args = listOf("qwer")
+
+        val result = template.replaceWithArgs(args)
+
+        assertEquals(" qwer", result)
+    }
+
+    @Test
+    fun `replaceWithArgs work with over width flag for s`() {
+        val template = "%1\$5s"
+        val args = listOf("qwerasdf")
+
+        val result = template.replaceWithArgs(args)
+
+        assertEquals("qwerasdf", result)
+    }
+
+    @Test
+    fun `replaceWithArgs work with width and zero flag for d`() {
+        val template = "%1\$02d : %2\$02d"
+        val args = listOf("6", "9")
+
+        val result = template.replaceWithArgs(args)
+
+        assertEquals("06 : 09", result)
+    }
+
+    @Test
+    fun `replaceWithArgs work with over width and zero flag for d`() {
+        val template = "%1\$02d : %2\$02d"
+        val args = listOf("666", "999")
+
+        val result = template.replaceWithArgs(args)
+
+        assertEquals("666 : 999", result)
+    }
+
+    @Test
+    fun `replaceWithArgs work with width and zero flag for s`() {
+        val template = "%1\$02s : %2\$02s"
+        val args = listOf("6", "9")
+
+        val result = template.replaceWithArgs(args)
+
+        //Not Effect Zero flag on s
+        assertEquals(" 6 :  9", result)
+    }
+
+    @Test
+    fun `replaceWithArgs work with over width and zero flag for s`() {
+        val template = "%1\$02s : %2\$02s"
+        val args = listOf("666", "999")
+
+        val result = template.replaceWithArgs(args)
+
+        //Not Effect Zero flag on s
+        assertEquals("666 : 999", result)
+    }
 }
