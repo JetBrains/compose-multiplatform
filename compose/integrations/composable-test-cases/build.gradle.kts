@@ -78,7 +78,7 @@ subprojects {
                 target.compilations.all {
                     compileTaskProvider.configure{
                         compilerOptions {
-                            freeCompilerArgs.add("-Xpartial-linkage=disable")
+                            freeCompilerArgs.add("-Xpartial-linkage-loglevel=ERROR")
                         }
                     }
                 }
