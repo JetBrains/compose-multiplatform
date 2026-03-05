@@ -261,6 +261,10 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
+    val winShortcutPrompt: Property<Boolean?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
     val winMenu: Property<Boolean?> = objects.nullableProperty()
 
     @get:Input
@@ -475,6 +479,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--win-dir-chooser", winDirChooser)
                     cliArg("--win-per-user-install", winPerUserInstall)
                     cliArg("--win-shortcut", winShortcut)
+                    cliArg("--win-shortcut-prompt", winShortcutPrompt)
                     cliArg("--win-menu", winMenu)
                     cliArg("--win-menu-group", winMenuGroup)
                     cliArg("--win-upgrade-uuid", winUpgradeUuid)
