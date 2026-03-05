@@ -32,7 +32,11 @@ Please run your browser with manual GC enabled before running the benchmark, lik
 
 `open -a Google\ Chrome --args --js-flags="--expose-gc"`
 
+### K/Wasm
 - `./gradlew clean :benchmarks:wasmJsBrowserProductionRun` (you can see the results printed on the page itself)
+
+### K/JS
+- `./gradlew clean :benchmarks:jsBrowserProductionRun` (you can see the results printed on the page itself)
 
 
 # Benchmarks description
