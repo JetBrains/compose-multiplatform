@@ -10,7 +10,7 @@ kotlin {
     jvm()
     sourceSets {
         jvmMain.dependencies {
-            implementation(compose.desktop.currentOs)
+            implementation(libs.compose.ui)
             implementation(project(":shared"))
         }
     }

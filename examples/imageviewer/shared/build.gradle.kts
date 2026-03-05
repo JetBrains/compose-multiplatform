@@ -82,12 +82,11 @@ kotlin {
 
         val desktopMain by getting
         desktopMain.dependencies {
-            implementation(compose.desktop.common)
+            implementation(libs.compose.ui)
             implementation(project(":mapview-desktop"))
         }
         val desktopTest by getting
         desktopTest.dependencies {
-            implementation(compose.desktop.currentOs)
             implementation(compose.desktop.uiTestJUnit4)
         }
     }
