@@ -72,6 +72,8 @@ kotlin {
         binaries.executable()
     }
 
+    applyDefaultHierarchyTemplate()
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -102,7 +104,7 @@ kotlin {
             }
         }
 
-        val webMain by creating {
+        val webMain by getting {
             dependsOn(commonMain)
             dependencies {
                 implementation(libs.ktor.client.js)
@@ -110,14 +112,6 @@ kotlin {
                 implementation(libs.ktor.serialization.kotlinx.json)
                 implementation(libs.kotlinx.browser)
             }
-        }
-
-        val jsMain by getting {
-            dependsOn(webMain)
-        }
-
-        val wasmJsMain by getting {
-            dependsOn(webMain)
         }
     }
 }
