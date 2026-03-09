@@ -4,9 +4,17 @@
 - `./gradlew :benchmarks:run`
 
 ## Run native on iOS
-Open the project in Fleet or Android Studio with KMM plugin installed and 
+Open the project in Fleet or Android Studio with KMM plugin installed and
 choose `iosApp` run configuration. Make sure that you build the app in `Release` configuration.
 Alternatively you may open `iosApp/iosApp` project in XCode and run the app from there.
+
+## Run automated iOS benchmarks
+1. To run on device, open `iosApp/iosApp.xcodeproj` and properly configure the Signing section on the Signing & Capabilities project tab.
+2. Use the following command to get list of all iOS devices:
+- `xcrun xctrace list devices`
+3. From the benchmarks directory run:
+- `./iosApp/run_ios_benchmarks.sh <DEVICE ID>`
+4. Results are saved as `.txt` files in `benchmarks_result/`.
 
 ## Run native on MacOS
  - `./gradlew :benchmarks:runReleaseExecutableMacosArm64` (Works on Arm64 processors)
@@ -48,3 +56,6 @@ Please run your browser with manual GC enabled before running the benchmark, lik
 | LazyList                                 | [benchmarks/src/commonMain/kotlin/benchmarks/complexlazylist/components/MainUI.kt](benchmarks/src/commonMain/kotlin/benchmarks/complexlazylist/components/MainUI.kt) | Tests the performance of a complex LazyColumn implementation with features like pull-to-refresh, loading more items, and continuous scrolling. |
 | MultipleComponents                       | [benchmarks/src/commonMain/kotlin/benchmarks/example1/Example1.kt](benchmarks/src/commonMain/kotlin/benchmarks/multipleComponents/MultipleComponents.kt)             | Tests the performance of a comprehensive UI that showcases various Compose components including layouts, animations, and styled text.          |
 | MultipleComponents-NoVectorGraphics      | [benchmarks/src/commonMain/kotlin/benchmarks/example1/Example1.kt](benchmarks/src/commonMain/kotlin/benchmarks/multipleComponents/MultipleComponents.kt)             | Same as MultipleComponents but skips the Composables with vector graphics rendering.                                                           |
+| TextLayout                               | [benchmarks/src/commonMain/kotlin/benchmarks/textlayout/TextLayout.kt](benchmarks/src/commonMain/kotlin/benchmarks/textlayout/TextLayout.kt)                         | Tests text layout and rendering performance by continuously scrolling column with big number of heady to layout items.                         |
+| CanvasDrawing                            | [benchmarks/src/commonMain/kotlin/benchmarks/canvasdrawing/CanvasDrawing.kt](benchmarks/src/commonMain/kotlin/benchmarks/canvasdrawing/CanvasDrawing.kt)             | Tests Canvas drawing performance by scrolling items with massive amount of graphic shapes.                                                     |
+| HeavyShader                              | [benchmarks/src/commonMain/kotlin/benchmarks/heavyshader/HeavyShader.kt](benchmarks/src/commonMain/kotlin/benchmarks/heavyshader/HeavyShader.kt)                     | Tests GPU shader performance by scrolling items with a complex GPU shader.                                                                     |
