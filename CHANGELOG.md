@@ -1,3 +1,108 @@
+# 1.11.0-alpha04 (March 2026)
+
+_Changes since 1.11.0-alpha03_
+
+## Breaking Changes
+
+### Multiple Platforms
+
+- To decouple common Compose graphics APIs from direct Skia/Skiko types, non-Android `Shader` is now a dedicated Compose wrapper type. Since it's not an ABI-compatible change, you might need to update some libraries that use this API to newer, compatible versions. Migration: [#2810](https://github.com/JetBrains/compose-multiplatform-core/pull/2810)
+  - If you pass raw Skia/Skiko shaders into Compose APIs, wrap with `SkShader.asComposeShader()`.
+  - If you need low-level Skia/Skiko access from Compose Shader, use `Shader.skiaShader` extension.
+
+## Migration Notes
+
+### Multiple Platforms
+
+- `Key.Home` has been deprecated, as it has been incorrectly mapped to the keyboard "Home" key. Use `Key.MoveHome` instead [#2801](https://github.com/JetBrains/compose-multiplatform-core/pull/2801)
+- `androidx.compose.ui.graphics.NativePaint` and `androidx.compose.ui.graphics.NativeCanvas` typealiases are deprecated, use direct references to native types instead [#2802](https://github.com/JetBrains/compose-multiplatform-core/pull/2802)
+- `Paint.asFrameworkPaint()` was replaced with `Paint.skiaPaint` extension to avoid exposing a platform type into `commonMain` sourceset via `typealias` [#2802](https://github.com/JetBrains/compose-multiplatform-core/pull/2802)
+- `RenderEffect.asSkiaImageFilter()` was replaced with `RenderEffect.skiaImageFilter` extension to avoid exposing a platform type into `commonMain` types [#2809](https://github.com/JetBrains/compose-multiplatform-core/pull/2809)
+- Deprecate `Canvas.nativeCanvas` extension in favor of `Canvas.skiaCanvas` to avoid ambiguity [#2809](https://github.com/JetBrains/compose-multiplatform-core/pull/2809)
+
+### Web
+
+- Kotlin 2.3.10 or newer is required to use Compose Multiplatform with Kotlin/Wasm target [#2790](https://github.com/JetBrains/compose-multiplatform-core/pull/2790)
+
+## Features
+
+### Multiple Platforms
+
+- Update skia to m144 [#2779](https://github.com/JetBrains/compose-multiplatform-core/pull/2779)
+
+### iOS
+
+- Adds an opt-in **Native iOS Text Input** mode for Compose `BasicTextField` (both `TextFieldValue` and `TextFieldState`) enabled via `PlatformImeOptions.usingNativeTextInput(enabled)` in iOS source set [#2602](https://github.com/JetBrains/compose-multiplatform-core/pull/2602)
+- With the native iOS text input flag set to `true`, `BasicTextField` uses native UIKit editing and interaction, including: [#2602](https://github.com/JetBrains/compose-multiplatform-core/pull/2602)
+  - Native caret placement and movement (tap-to-place caret, spacebar caret movement, “ghost caret”)
+  - Native magnifier
+  - Native selection gestures (double-tap word selection, triple-tap paragraph selection) and iOS-like selection UI (region + handles)
+  - Native context menu behavior is supported for both the legacy and the new context menu (`isNewContextMenu = true`) configurations.
+  - Native context menu behavior when interacting with the caret, selection region, or selection handles
+  - Native text field context menu actions (e.g. Translate, Look Up, Share) (not available without this mode)
+  - Autocorrect / typo replacement support
+  - Autofill support for text fields, including filling from saved passwords one field at a time
+- Support automatic sizing for Auto Layout–based views together with supporting explicit remeasurement via `rememberUIKitInteropRemeasureRequester()` + `Modifier.remeasureRequester(...)` with `UIKitInteropRemeasureRequester.requestRemeasure()` for propagating UIKit-side size changes to Compose [#2797](https://github.com/JetBrains/compose-multiplatform-core/pull/2797)
+
+### Desktop
+
+- New compile-time warnings for invalid ui/menu composable mixing that previously failed only at runtime [#2777](https://github.com/JetBrains/compose-multiplatform-core/pull/2777)
+
+### Web
+
+- Add `isClearFocusOnMouseDownEnabled` in `ComposeViewportConfiguration` to configure the focus behaviour on mouse press [#2781](https://github.com/JetBrains/compose-multiplatform-core/pull/2781)
+
+### Gradle Plugin
+
+- Add a compatibility check for skiko libraries to ensure consistency [#5541](https://github.com/JetBrains/compose-multiplatform/pull/5541)
+
+## Fixes
+
+### iOS
+
+- Fix traffic lights overlapping content on iPad by adopting the new iOS 26 `LayoutRegion` API [#2555](https://github.com/JetBrains/compose-multiplatform-core/pull/2555)
+- The haptic feedback when selecting text now works closer to the way it does with iOS text fields [#2786](https://github.com/JetBrains/compose-multiplatform-core/pull/2786)
+
+### Desktop
+
+- Correctly react to numpad arrows, `NumPadPageUp`, `NumPadPageDown`, `NumPadHome` and `NumPadEnd` keys in text fields [#2800](https://github.com/JetBrains/compose-multiplatform-core/pull/2800)
+- _(prerelease fix)_ Fixed a11y crash when focused element is removed [#2803](https://github.com/JetBrains/compose-multiplatform-core/pull/2803)
+- Match key modifiers exactly (without ignoring the state of other modifiers) when determining the corresponding text field action/command. This also fixes inputting 'a' and 'z' diacritics (e.g. 'ą' and 'ż') in text fields on Windows [#2804](https://github.com/JetBrains/compose-multiplatform-core/pull/2804)
+- Fix the condition for hiding the tooltip in a `TooltipArea` on a pointer-exit event while the pointer is still inside the area [#2798](https://github.com/JetBrains/compose-multiplatform-core/pull/2798)
+- _(prerelease fix)_ Fix black rectangle remaining after removing/hiding `SwingPanel` [#2821](https://github.com/JetBrains/compose-multiplatform-core/pull/2821)
+- Some key shortcuts (e.g. shift-backspace, shift-delete on macOS) that previously didn't work in text fields now perform the correct action [#2827](https://github.com/JetBrains/compose-multiplatform-core/pull/2827)
+
+### Web
+
+- _(pre-release)_  Make canvas focused so it receives key events (e.g. ESC) [#2796](https://github.com/JetBrains/compose-multiplatform-core/pull/2796)
+- Unified touch and pointer event handling for better consistency and performance on Web [#2799](https://github.com/JetBrains/compose-multiplatform-core/pull/2799)
+- Fix Magic mouse behaviour in Safari and Firefox [#2811](https://github.com/JetBrains/compose-multiplatform-core/pull/2811)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.11.0-alpha04`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.11.0-alpha04` | [Runtime 1.11.0-alpha06](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.11.0-alpha06) |
+| UI | `org.jetbrains.compose.ui:ui*:1.11.0-alpha04` | [UI 1.11.0-alpha06](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.11.0-alpha06) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.11.0-alpha04` | [Foundation 1.11.0-alpha06](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.11.0-alpha06) |
+| Material | `org.jetbrains.compose.material:material*:1.11.0-alpha04` | [Material 1.11.0-alpha06](https://developer.android.com/jetpack/androidx/releases/compose-material#1.11.0-alpha06) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.11.0-alpha04` | [Material3 1.5.0-alpha15](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha15) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha06` | [Material3 Adaptive 1.3.0-alpha09](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha09) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0-alpha01` | [Lifecycle 2.11.0-alpha01](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0-alpha01) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.2` | [Navigation 2.9.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.7) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.1.0-alpha04` | [Navigation3 1.1.0-alpha05](https://developer.android.com/jetpack/androidx/releases/navigation3#1.1.0-alpha05) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0-alpha01` | [Navigation Event 1.1.0-alpha01](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.0-alpha01) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.10.2 (March 2026)
 
 _Changes since 1.10.1_
