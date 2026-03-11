@@ -15,6 +15,9 @@ import benchmarks.complexlazylist.components.MainUiNoImageUseModel
 import benchmarks.multipleComponents.MultipleComponentsExample
 import benchmarks.lazygrid.LazyGrid
 import benchmarks.visualeffects.NYContent
+import benchmarks.textlayout.TextLayout
+import benchmarks.canvasdrawing.CanvasDrawing
+import benchmarks.heavyshader.HeavyShader
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -298,8 +301,11 @@ fun getBenchmarks(): List<Benchmark> = listOf(
     Benchmark("MultipleComponents") { MultipleComponentsExample() },
     Benchmark("MultipleComponents-NoVectorGraphics") {
         MultipleComponentsExample(isVectorGraphicsSupported = false)
-    }
-)
+    },
+    Benchmark("TextLayout") { TextLayout() },
+    Benchmark("CanvasDrawing") { CanvasDrawing() },
+    Benchmark("HeavyShader") { HeavyShader() }
+).sortedBy { it.name }
 
 suspend fun runBenchmark(
     benchmark: Benchmark,
@@ -403,7 +409,7 @@ fun BenchmarkRunner(
                     val stats = BenchmarkResult(
                         name = benchmark.name,
                         frameBudget = nanosPerFrame.nanoseconds,
-                        conditions = BenchmarkConditions(benchmark.frameCount, 0),
+                        conditions = BenchmarkConditions(benchmark.frameCount, warmupCount = Config.warmupCount),
                         averageFrameInfo = FrameInfo(duration / benchmark.frameCount, Duration.ZERO),
                         averageFPSInfo = FPSInfo(benchmark.frameCount.toDouble() / duration.toDouble(DurationUnit.SECONDS)),
                         frames = frames
