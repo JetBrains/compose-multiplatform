@@ -1,0 +1,13 @@
+site:
+  title: "Ballast"
+
+server:
+  files:
+    dev:
+      contentRoot: "build/processedResources/js/main/public"
+      script: "build/developmentExecutable/web.js"
+    prod:
+      script: "build/distributions/web.js"
+      siteRoot: ".kobweb/site"
+
+  port: 8080
