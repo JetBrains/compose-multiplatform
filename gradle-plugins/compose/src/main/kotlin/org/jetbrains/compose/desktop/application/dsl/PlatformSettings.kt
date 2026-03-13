@@ -36,6 +36,8 @@ abstract class AbstractMacOSPlatformSettings : AbstractPlatformSettings() {
     var appCategory: String? = null
     var minimumSystemVersion: String? = null
 
+    var dmgContents: String? = null
+
 
     /**
      * An application's unique identifier across Apple's ecosystem.
@@ -85,6 +87,7 @@ open class InfoPlistSettings {
 
 abstract class LinuxPlatformSettings : AbstractPlatformSettings() {
     var shortcut: Boolean = false
+    var packageDeps: String? = null
     var packageName: String? = null
     var appRelease: String? = null
     var appCategory: String? = null
@@ -100,9 +103,11 @@ abstract class WindowsPlatformSettings : AbstractPlatformSettings() {
     var dirChooser: Boolean = true
     var perUserInstall: Boolean = false
     var shortcut: Boolean = false
+    var shortcutPrompt: Boolean = false
     var menu: Boolean = false
         get() = field || menuGroup != null
     var menuGroup: String? = null
+    var updateUrl: String? = null
     var upgradeUuid: String? = null
     var msiPackageVersion: String? = null
     var exePackageVersion: String? = null
