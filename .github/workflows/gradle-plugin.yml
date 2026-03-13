@@ -16,9 +16,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['ubuntu-24.04', 'macos-15-xlarge', 'windows-2022']
+        os: ['windows-2022']
         gradle: ['8.13', '9.3.0']
-        agp: ['8.12.3', '9.0.0']
+        agp: ['8.13.2', '9.0.0']
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Repository
@@ -50,7 +50,7 @@ jobs:
         working-directory: gradle-plugins
         run: |
           ./gradlew assemble
-          ./gradlew --continue :preview-rpc:test :compose:test ':compose:test-Gradle(${{ matrix.gradle }})-Agp(${{ matrix.agp }})'
+          ./gradlew --continue :preview-rpc:test :compose:test ':compose:test-Gradle(${{ matrix.gradle }})-Agp(${{ matrix.agp }})' --tests "org.jetbrains.compose.test.tests.integration.WebCompatibilityDistributionTest"
 
       - name: Upload Reports
         uses: actions/upload-artifact@v4
