@@ -68,7 +68,7 @@ fun main() = singleWindowApplication {
     Column {
         AsyncImage(
             load = { loadImageBitmap(File("sample.png")) },
-            painterFor = { remember { BitmapPainter(it) } },
+            painterFor = { remember(it) { BitmapPainter(it) } },
             contentDescription = "Sample",
             modifier = Modifier.width(200.dp)
         )
@@ -97,7 +97,7 @@ fun <T> AsyncImage(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Fit,
 ) {
-    val image: T? by produceState<T?>(null) {
+    val image: T? by produceState<T?>(null, load) {
         value = withContext(Dispatchers.IO) {
             try {
                 load()
