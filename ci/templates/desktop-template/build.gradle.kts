@@ -16,12 +16,12 @@ dependencies {
     // Note, if you develop a library, you should use compose.desktop.common.
     // compose.desktop.currentOs should be used in launcher-sourceSet
     // (in a separate module for demo project and in testMain).
-    // With compose.desktop.common you will also lose @Preview functionality
-    implementation(compose.desktop.currentOs)
+    implementation("org.jetbrains.compose.desktop:desktop:${project.extra["compose.version"]}")
+    implementation("org.jetbrains.compose.material:material:${project.extra["compose.version"]}")
 
     // Include the Test API
     // compileOnly instead of testImplementation for checking compilation of the tutorials
-    compileOnly(compose.desktop.uiTestJUnit4)
+    compileOnly("org.jetbrains.compose.ui:ui-test-junit4:${project.extra["compose.version"]}")
 }
 
 compose.desktop {
