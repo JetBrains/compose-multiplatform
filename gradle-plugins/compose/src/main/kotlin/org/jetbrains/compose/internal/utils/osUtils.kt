@@ -5,7 +5,9 @@
 
 package org.jetbrains.compose.internal.utils
 
+import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
+import org.gradle.process.ExecOperations
 import org.jetbrains.compose.desktop.application.internal.files.checkExistingFile
 import org.jetbrains.compose.desktop.application.tasks.MIN_JAVA_RUNTIME_VERSION
 import java.io.File
@@ -51,6 +53,46 @@ internal val currentOS: OS by lazy {
 
 internal fun executableName(nameWithoutExtension: String): String =
     if (currentOS == OS.Windows) "$nameWithoutExtension.exe" else nameWithoutExtension
+
+internal fun packagedAppRootDir(appImageRootDir: Directory, packageName: String): Directory {
+    val dirName = when (currentOS) {
+        OS.MacOS -> "$packageName.app"
+        else -> packageName
+    }
+    return appImageRootDir.dir(dirName)
+}
+
+internal fun packagedAppExecutableName(packageName: String): String {
+    val appExecutableName = executableName(packageName)
+    return when (currentOS) {
+        OS.Linux ->  "bin/$appExecutableName"
+        OS.Windows -> appExecutableName
+        OS.MacOS -> "Contents/MacOS/$appExecutableName"
+    }
+}
+
+internal fun packagedAppJarFilesDir(packagedRootDir: Directory): Directory {
+    return packagedRootDir.dir(
+        when (currentOS) {
+            OS.Linux -> "lib/app/"
+            OS.Windows -> "app/"
+            OS.MacOS -> "Contents/app/"
+        }
+    )
+}
+
+internal fun ExecOperations.executePackagedApp(
+    appImageRootDir: Directory,
+    packageName: String
+) {
+    val workingDir = packagedAppRootDir(appImageRootDir = appImageRootDir, packageName = packageName)
+    val executableName = packagedAppExecutableName(packageName = packageName)
+
+    exec { spec ->
+        spec.workingDir(workingDir)
+        spec.executable(workingDir.asFile.resolve(executableName).absolutePath)
+    }.assertNormalExitValue()
+}
 
 internal fun javaExecutable(javaHome: String): String =
     File(javaHome).resolve("bin/${executableName("java")}").absolutePath

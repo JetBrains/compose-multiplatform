@@ -48,7 +48,7 @@ internal fun File.contentHash(): String {
 private fun MessageDigest.digestContent(file: File) {
     file.inputStream().buffered().use { fis ->
         DigestInputStream(fis, this).use { ds ->
-            while (ds.read() != -1) {}
+            ds.readAllBytes()
         }
     }
 }
@@ -75,6 +75,11 @@ internal fun copyZipEntry(
     val newEntry = ZipEntry(entry.name).apply {
         comment = entry.comment
         extra = entry.extra
+        // Need to preserve timestamp so that identical inputs result in identical outputs
+        // (the jar files are hashed)
+        entry.time.let {
+            time = if (it == -1L) 0L else it
+        }
     }
     to.withNewEntry(newEntry) {
         from.copyTo(to)
