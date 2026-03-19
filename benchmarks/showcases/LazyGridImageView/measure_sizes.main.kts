@@ -135,6 +135,8 @@ for (res in results) {
 println("=".repeat(60))
 
 if (jsonOutputFile != null) {
+    val outputFile = File(jsonOutputFile)
+    outputFile.parentFile?.mkdirs()
     val jsonContent = buildString {
         append("[\n")
         results.forEachIndexed { index, res ->
