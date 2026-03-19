@@ -82,6 +82,13 @@ val targets = listOf(
 
 val results = mutableListOf<Result>()
 
+var jsonOutputFile: String? = null
+for (i in args.indices) {
+    if (args[i] == "--json" && i + 1 < args.size) {
+        jsonOutputFile = args[i + 1]
+    }
+}
+
 for (target in targets) {
     println("\nBuilding ${target.name}...")
     val success = if (target.customCommand != null) {
@@ -126,6 +133,29 @@ for (res in results) {
     println("%-20s | %-25s | %-10s".format(res.name, res.description, sizeStr))
 }
 println("=".repeat(60))
+
+if (jsonOutputFile != null) {
+    val jsonContent = buildString {
+        append("[\n")
+        results.forEachIndexed { index, res ->
+            append("  {\n")
+            append("    \"name\": \"${res.name}\",\n")
+            append("    \"description\": \"${res.description}\",\n")
+            append("    \"success\": ${res.success}")
+            if (res.size != null) {
+                append(",\n    \"size\": \"${res.size}\"\n")
+            } else {
+                append("\n")
+            }
+            append("  }")
+            if (index < results.size - 1) append(",")
+            append("\n")
+        }
+        append("]\n")
+    }
+    File(jsonOutputFile).writeText(jsonContent)
+    println("\nResults written to $jsonOutputFile")
+}
 
 fun runCommand(vararg command: String): Boolean {
     val process = ProcessBuilder(*command)
