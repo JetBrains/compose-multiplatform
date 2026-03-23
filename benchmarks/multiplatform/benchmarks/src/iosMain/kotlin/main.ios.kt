@@ -25,6 +25,8 @@ fun runBenchmarks() {
     }
 }
 
+actual val isIosTarget: Boolean = true
+
 @OptIn(ExperimentalComposeUiApi::class)
 fun MainViewController(): UIViewController {
     return ComposeUIViewController(configure = { parallelRendering = Config.parallelRendering }) {

@@ -30,8 +30,9 @@ import java.util.concurrent.TimeUnit
 val ROOT_DIR = File(".").absoluteFile
 val PROJECT_DIR = File(ROOT_DIR, "iosApp")
 val MULTIPLATFORM_DIR = ROOT_DIR
-val OUTPUT_DIR = File(MULTIPLATFORM_DIR, "build/benchmarks")
+val OUTPUT_DIR = File(MULTIPLATFORM_DIR, "benchmarks/build/benchmarks")
 val TEXT_REPORTS_DIR = File(OUTPUT_DIR, "text-reports")
+val JSON_REPORTS_DIR = File(OUTPUT_DIR, "json-reports")
 val SCHEME = "iosApp"
 val CONFIGURATION = "Release"
 val BUILD_DIR = File(MULTIPLATFORM_DIR, ".benchmark_build")
@@ -133,15 +134,47 @@ fun execWithTee(command: List<String>, outputFile: File, workingDir: File = ROOT
     outputFile.parentFile.mkdirs()
     outputFile.bufferedWriter().use { writer ->
         var line: String? = reader.readLine()
+        var capturingJson = false
+        var capturedJson = StringBuilder()
         while (line != null) {
             println(line)
             writer.write(line)
             writer.newLine()
+
+            if (line == "JSON_START") {
+                capturingJson = true
+                capturedJson = StringBuilder()
+            } else if (line == "JSON_END") {
+                capturingJson = false
+                saveCapturedJson(capturedJson.toString())
+            } else if (capturingJson) {
+                capturedJson.append(line).append("\n")
+            }
+
             line = reader.readLine()
         }
     }
 
     return process.waitFor()
+}
+
+fun saveCapturedJson(json: String) {
+    try {
+        val jsonNode = json.trim()
+        if (jsonNode.isEmpty()) return
+        
+        // Extract benchmark name from JSON
+        val nameRegex = Regex("\"name\":\\s*\"([^\"]+)\"")
+        val match = nameRegex.find(jsonNode)
+        val benchmarkName = match?.groupValues?.get(1) ?: "unknown"
+        
+        JSON_REPORTS_DIR.mkdirs()
+        val jsonFile = File(JSON_REPORTS_DIR, "${benchmarkName}.json")
+        jsonFile.writeText(jsonNode)
+        println("            → Captured JSON saved to ${jsonFile.relativeTo(ROOT_DIR).path}")
+    } catch (e: Exception) {
+        println("            ⚠  Failed to save captured JSON: ${e.message}")
+    }
 }
 
 // ── 1. Detect target device or simulator ──────────────────────────────────────

@@ -12,6 +12,8 @@ import platform.AppKit.NSScreen
 import platform.AppKit.maximumFramesPerSecond
 import kotlin.system.exitProcess
 
+actual val isIosTarget: Boolean = true
+
 fun main(args : Array<String>) {
     Config.setGlobalFromArgs(args)
     if (Config.isModeEnabled(Mode.REAL)) {

@@ -4,3 +4,5 @@
  */
 
 actual fun saveBenchmarkStats(name: String, stats: BenchmarkStats) = saveBenchmarkStatsOnDisk(name, stats)
+
+actual val isIosTarget: Boolean = false

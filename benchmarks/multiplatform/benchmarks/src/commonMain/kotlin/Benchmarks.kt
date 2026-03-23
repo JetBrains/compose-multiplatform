@@ -327,6 +327,11 @@ suspend fun runBenchmark(
             content = benchmark.content
         ).generateStats()
         stats.prettyPrint()
+        if (Config.saveStatsToJSON && isIosTarget) {
+            println("JSON_START")
+            println(stats.toJsonString())
+            println("JSON_END")
+        }
         if (Config.saveStats()) {
             saveBenchmarkStats(name = benchmark.name, stats = stats)
         }
@@ -418,6 +423,11 @@ fun BenchmarkRunner(
                         stats.prettyPrint()
                     } else {
                         results.add(stats)
+                    }
+                    if (Config.saveStatsToJSON && isIosTarget) {
+                        println("JSON_START")
+                        println(stats.toJsonString())
+                        println("JSON_END")
                     }
                     if (Config.saveStats()) {
                         saveBenchmarkStats(name = benchmark.name, stats = stats)
