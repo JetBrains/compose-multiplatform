@@ -21,6 +21,7 @@ fun runBenchmarks() {
     MainScope().launch {
         runBenchmarks(graphicsContext = graphicsContext())
         println("Completed!")
+        exitProcess(0)
     }
 }
 
