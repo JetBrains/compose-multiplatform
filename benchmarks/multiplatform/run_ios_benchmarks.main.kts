@@ -37,21 +37,6 @@ val SCHEME = "iosApp"
 val CONFIGURATION = "Release"
 val BUILD_DIR = File(MULTIPLATFORM_DIR, ".benchmark_build")
 
-val DEFAULT_BENCHMARKS = listOf(
-    "AnimatedVisibility",
-    "LazyGrid",
-    "LazyGrid-ItemLaunchedEffect",
-    "LazyGrid-SmoothScroll",
-    "LazyGrid-SmoothScroll-ItemLaunchedEffect",
-    "VisualEffects",
-    "LazyList",
-    "MultipleComponents",
-    "MultipleComponents-NoVectorGraphics",
-    "TextLayout",
-    "CanvasDrawing",
-    "HeavyShader"
-)
-
 // ── Argument Parsing ──────────────────────────────────────────────────────────
 
 val parsedArgs = mutableMapOf<String, String>()
@@ -78,7 +63,6 @@ rawArgs.forEach { arg ->
 }
 
 val benchmarksFromArgs = parsedArgs["benchmarks"]?.split(",")?.map { it.substringBefore("(").trim() }?.filter { it.isNotEmpty() }
-val benchmarksToRun = benchmarksFromArgs ?: DEFAULT_BENCHMARKS
 val separateProcess = parsedArgs["separateprocess"]?.toBoolean() ?: true
 
 // Arguments to pass to the app
@@ -335,6 +319,27 @@ println("  $ mkdir -p $OUTPUT_DIR")
 OUTPUT_DIR.mkdirs()
 
 // ── 4. Run benchmarks ──────────────────────────────────────────────────────────
+
+fun fetchBenchmarks(): List<String> {
+    try {
+        val output = exec("./gradlew", ":benchmarks:run", "-PrunArguments=listBenchmarks=true")
+        val lines = output.lines()
+        val startIndex = lines.indexOf("AVAILABLE_BENCHMARKS_START")
+        val endIndex = lines.indexOf("AVAILABLE_BENCHMARKS_END")
+        if (startIndex != -1 && endIndex != -1 && endIndex > startIndex) {
+            return lines.subList(startIndex + 1, endIndex).filter { it.isNotBlank() }
+        }
+    } catch (e: Exception) {
+        println("            ⚠  Failed to fetch benchmarks list via Gradle: ${e.message}")
+    }
+    return emptyList()
+}
+
+val benchmarksToRun = if (benchmarksFromArgs == null || benchmarksFromArgs.isEmpty()) fetchBenchmarks() else benchmarksFromArgs
+
+if (benchmarksToRun.isEmpty()) {
+    die("No benchmarks found to run.")
+}
 
 val total = if (separateProcess) benchmarksToRun.size else 1
 

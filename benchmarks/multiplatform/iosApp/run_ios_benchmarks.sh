@@ -32,21 +32,6 @@ CONFIGURATION="Release"
 ATTEMPTS=5
 BUILD_DIR="$MULTIPLATFORM_DIR/.benchmark_build"
 
-BENCHMARKS=(
-    "AnimatedVisibility"
-    "LazyGrid"
-    "LazyGrid-ItemLaunchedEffect"
-    "LazyGrid-SmoothScroll"
-    "LazyGrid-SmoothScroll-ItemLaunchedEffect"
-    "VisualEffects"
-    "LazyList"
-    "MultipleComponents"
-    "MultipleComponents-NoVectorGraphics"
-    "TextLayout"
-    "CanvasDrawing"
-    "HeavyShader"
-)
-
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
 die() { echo ""; echo "ERROR: $*" >&2; exit 1; }
@@ -191,6 +176,18 @@ echo "  $ mkdir -p $OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR"
 
 # ── 4. Run benchmarks ──────────────────────────────────────────────────────────
+
+echo ""
+echo "==> [4/4] Fetching benchmarks list via Gradle..."
+TEMP_LIST=$(mktemp)
+(cd "$MULTIPLATFORM_DIR" && ./gradlew :benchmarks:run -PrunArguments=listBenchmarks=true) > "$TEMP_LIST" 2>&1
+
+BENCHMARKS=($(awk '/AVAILABLE_BENCHMARKS_START/{p=1;next} /AVAILABLE_BENCHMARKS_END/{p=0} p && NF{print}' "$TEMP_LIST"))
+rm "$TEMP_LIST"
+
+if [[ ${#BENCHMARKS[@]} -eq 0 ]]; then
+    die "No benchmarks found to run."
+fi
 
 TOTAL=$(( ${#BENCHMARKS[@]} * 2 * ATTEMPTS ))
 CURRENT=0
