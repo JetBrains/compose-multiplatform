@@ -40,9 +40,20 @@ kotlin {
         }
     }
 
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    js {
+        browser {
+            commonWebpackConfig {
+                outputFileName = "composeApp.js"
+            }
+            binaries.executable()
+        }
+    }
+
     sourceSets {
         val desktopMain by getting
         val wasmJsMain by getting
+        val jsMain by getting
 
         androidMain.dependencies {
             implementation(compose.preview)

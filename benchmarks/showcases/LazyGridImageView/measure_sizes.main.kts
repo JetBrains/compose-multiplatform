@@ -73,10 +73,16 @@ val targets = listOf(
         description = "iOS App Bundle"
     ),
     Target(
-        "Web (Wasm/JS)",
+        "Web (Wasm)",
         task = ":composeApp:wasmJsBrowserDistribution",
         outputPaths = listOf("composeApp/build/dist/wasmJs/productionExecutable"),
-        description = "Web Distribution"
+        description = "Wasm Distribution"
+    ),
+    Target(
+        "Web (JS)",
+        task = ":composeApp:jsBrowserDistribution",
+        outputPaths = listOf("composeApp/build/dist/js/productionExecutable"),
+        description = "JS Distribution"
     )
 )
 
