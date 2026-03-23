@@ -9,10 +9,10 @@ import java.util.concurrent.TimeUnit
  * run_ios_benchmarks.main.kts
  *
  * Builds the iosApp, installs it on a real device or simulator, then runs
- * every benchmark (from Benchmarks.kt) with parallel=true and parallel=false,
- * ATTEMPTS times each. Console output is saved to:
+ * every benchmark (from Benchmarks.kt).
+ * Console output is saved to:
  *
- *   benchmarks_result/<device>_<ios>_parallel_<true|false>_<BenchmarkName>_<N>.txt
+ *   benchmarks_result/<device>_<ios>_<BenchmarkName>.txt
  *
  * Requirements:
  *   - Xcode 15+ (uses xcrun devicectl for real devices, xcrun simctl for simulators)
@@ -33,10 +33,9 @@ val MULTIPLATFORM_DIR = ROOT_DIR
 val OUTPUT_DIR = File(MULTIPLATFORM_DIR, "benchmarks_result")
 val SCHEME = "iosApp"
 val CONFIGURATION = "Release"
-val ATTEMPTS = 5
 val BUILD_DIR = File(MULTIPLATFORM_DIR, ".benchmark_build")
 
-val BENCHMARKS = listOf(
+val DEFAULT_BENCHMARKS = listOf(
     "AnimatedVisibility",
     "LazyGrid",
     "LazyGrid-ItemLaunchedEffect",
@@ -50,6 +49,39 @@ val BENCHMARKS = listOf(
     "CanvasDrawing",
     "HeavyShader"
 )
+
+// ── Argument Parsing ──────────────────────────────────────────────────────────
+
+val parsedArgs = mutableMapOf<String, String>()
+val rawArgs = if (args.isEmpty() || (args.size == 1 && !args[0].contains("="))) {
+    val gradleProps = File(ROOT_DIR, "gradle.properties")
+    if (gradleProps.exists()) {
+        val runArgsLine = gradleProps.readLines().find { it.startsWith("runArguments=") }
+        runArgsLine?.substringAfter("runArguments=")?.split(" ")?.filter { it.isNotBlank() } ?: emptyList()
+    } else {
+        emptyList()
+    }
+} else {
+    args.toList()
+}
+
+// UDID can be passed as a standalone first argument if it doesn't contain '='
+val argUdidFromArgs = if (args.isNotEmpty() && !args[0].contains("=") && !args[0].startsWith("-")) args[0] else null
+
+rawArgs.forEach { arg ->
+    if (arg.contains("=")) {
+        val (key, value) = arg.split("=", limit = 2)
+        parsedArgs[key.lowercase()] = value
+    }
+}
+
+val benchmarksFromArgs = parsedArgs["benchmarks"]?.split(",")?.map { it.substringBefore("(").trim() }?.filter { it.isNotEmpty() }
+val benchmarksToRun = benchmarksFromArgs ?: DEFAULT_BENCHMARKS
+val separateProcess = parsedArgs["separateprocess"]?.toBoolean() ?: true
+
+// Arguments to pass to the app
+val appArgs = parsedArgs.toMutableMap()
+appArgs.remove("separateprocess")
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
@@ -154,12 +186,11 @@ if (allDeviceLines.isEmpty()) {
     die("No iOS device or simulator found.")
 }
 
-val argUdid = args.getOrNull(0)
-val deviceLine = if (argUdid != null) {
-    allDeviceLines.find { it.contains(argUdid) } ?: run {
+val deviceLine = if (argUdidFromArgs != null) {
+    allDeviceLines.find { it.contains(argUdidFromArgs) } ?: run {
         println("Available devices and simulators:")
         allDeviceLines.forEach { println(it) }
-        die("Device with UDID '$argUdid' not found among the above.")
+        die("Device with UDID '$argUdidFromArgs' not found among the above.")
     }
 } else {
     if (allRealLines.isNotEmpty()) allRealLines.first() else allSimLines.first()
@@ -187,7 +218,7 @@ println("    Name      : $deviceName")
 println("    iOS       : $deviceIos")
 println("    UDID      : $deviceId")
 println("    Simulator : $isSimulator")
-println("    Prefix    : ${devicePrefix}_parallel_<true|false>_<Benchmark>_<N>.txt")
+println("    Prefix    : ${devicePrefix}_<Benchmark>.txt")
 
 // ── 2. Build ───────────────────────────────────────────────────────────────────
 
@@ -198,9 +229,9 @@ BUILD_DIR.mkdirs()
 val xcodeLog = File(BUILD_DIR, "xcodebuild.log")
 
 // Clean stale Kotlin Native build artifacts to avoid klib ABI version mismatches.
-println("  $ ./gradlew clean")
-execInheritIO("./gradlew", "clean")
-
+//println("  $ ./gradlew clean")
+//execInheritIO("./gradlew", "clean")
+//
 println("  $ xcodebuild build -project ${PROJECT_DIR.path}/iosApp.xcodeproj -scheme $SCHEME -configuration $CONFIGURATION -destination id=$deviceId ONLY_ACTIVE_ARCH=YES SYMROOT=${BUILD_DIR.path}")
 
 val xcodebuildProcess = ProcessBuilder(
@@ -271,62 +302,73 @@ OUTPUT_DIR.mkdirs()
 
 // ── 4. Run benchmarks ──────────────────────────────────────────────────────────
 
-val total = BENCHMARKS.size * 2 * ATTEMPTS
-var current = 0
+val total = if (separateProcess) benchmarksToRun.size else 1
 
 println("\n==> [4/4] Running $total benchmark sessions")
-println("    ${BENCHMARKS.size} benchmarks  ×  2 parallel modes  ×  $ATTEMPTS attempts\n")
+if (separateProcess) {
+    println("    ${benchmarksToRun.size} benchmarks individually\n")
+} else {
+    println("    All benchmarks together\n")
+}
 
-for (benchmark in BENCHMARKS) {
-    for (parallel in listOf("true", "false")) {
-        for (attempt in 1..ATTEMPTS) {
-            current++
+if (separateProcess) {
+    for ((index, benchmark) in benchmarksToRun.withIndex()) {
+        val outFileName = "${devicePrefix}_${benchmark}.txt"
+        val outFile = File(OUTPUT_DIR, outFileName)
 
-            val outFileName = "${devicePrefix}_parallel_${parallel}_${benchmark}_${attempt}.txt"
-            val outFile = File(OUTPUT_DIR, outFileName)
+        println("  [%3d/%3d]  %-52s".format(index + 1, total, benchmark))
+        println("            → ${outFile.name}")
 
-            System.out.format("  [%3d/%3d]  %-52s  parallel=%-5s  attempt=%d\n",
-                current, total, benchmark, parallel, attempt)
-            println("            → ${outFile.name}")
+        val finalAppArgs = appArgs.toMutableMap()
+        finalAppArgs["benchmarks"] = benchmark
 
-            val runArgs = mutableListOf<String>()
-            val exitCode = if (isSimulator) {
-                runArgs.addAll(listOf(
-                    "xcrun", "simctl", "launch", "--console", deviceId, bundleId,
-                    "benchmarks=$benchmark",
-                    "parallel=$parallel",
-                    "warmupCount=100",
-                    "modes=REAL",
-                    "reportAtTheEnd=true"
-                ))
-                println("  $ ${runArgs.joinToString(" ")}")
-                execWithTee(runArgs, outFile)
-            } else {
-                runArgs.addAll(listOf(
-                    "xcrun", "devicectl", "device", "process", "launch", "--console", "--device", deviceId, bundleId,
-                    "--",
-                    "benchmarks=$benchmark",
-                    "parallel=$parallel",
-                    "warmupCount=100",
-                    "modes=REAL",
-                    "reportAtTheEnd=true"
-                ))
-                println("  $ ${runArgs.joinToString(" ")}")
-                execWithTee(runArgs, outFile)
-            }
+        val exitCode = runBenchmark(deviceId, bundleId, isSimulator, finalAppArgs, outFile)
 
-            if (exitCode != 0) {
-                System.out.format("            ⚠  WARNING: process exited with code %d\n", exitCode)
-            } else {
-                println("            ✓  done")
-            }
-
-            // Brief cooldown between runs so the device settles
-            println("  $ sleep 3")
-            Thread.sleep(3000)
+        if (exitCode != 0) {
+            println("            ⚠  WARNING: process exited with code $exitCode")
+        } else {
+            println("            ✓  done")
         }
+
+        // Brief cooldown between runs so the device settles
+        println("  $ sleep 3")
+        Thread.sleep(3000)
+    }
+} else {
+    val outFileName = "${devicePrefix}_all_benchmarks.txt"
+    val outFile = File(OUTPUT_DIR, outFileName)
+
+    println("  [%3d/%3d]  %-52s".format(1, total, "All Benchmarks"))
+    println("            → ${outFile.name}")
+
+    val finalAppArgs = appArgs.toMutableMap()
+    finalAppArgs["benchmarks"] = benchmarksToRun.joinToString(",")
+
+    val exitCode = runBenchmark(deviceId, bundleId, isSimulator, finalAppArgs, outFile)
+
+    if (exitCode != 0) {
+        println("            ⚠  WARNING: process exited with code $exitCode")
+    } else {
+        println("            ✓  done")
+    }
+}
+
+fun runBenchmark(deviceId: String, bundleId: String, isSimulator: Boolean, finalAppArgs: Map<String, String>, outFile: File): Int {
+    val runArgs = mutableListOf<String>()
+    val appArgsList = finalAppArgs.map { "${it.key}=${it.value}" }
+
+    return if (isSimulator) {
+        runArgs.addAll(listOf("xcrun", "simctl", "launch", "--console", deviceId, bundleId))
+        runArgs.addAll(appArgsList)
+        println("  $ ${runArgs.joinToString(" ")}")
+        execWithTee(runArgs, outFile)
+    } else {
+        runArgs.addAll(listOf("xcrun", "devicectl", "device", "process", "launch", "--console", "--device", deviceId, bundleId, "--"))
+        runArgs.addAll(appArgsList)
+        println("  $ ${runArgs.joinToString(" ")}")
+        execWithTee(runArgs, outFile)
     }
 }
 
 println("\n==> All done!")
-System.out.format("    %d output files written to: %s\n\n", total, OUTPUT_DIR.path)
+println("    %d output files written to: %s\n".format(total, OUTPUT_DIR.path))
