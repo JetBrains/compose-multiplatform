@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
  * every benchmark (from Benchmarks.kt).
  * Console output is saved to:
  *
- *   benchmarks_result/<device>_<ios>_<BenchmarkName>.txt
+ *   build/benchmarks/text-reports/<BenchmarkName>.txt
  *
  * Requirements:
  *   - Xcode 15+ (uses xcrun devicectl for real devices, xcrun simctl for simulators)
@@ -30,7 +30,8 @@ import java.util.concurrent.TimeUnit
 val ROOT_DIR = File(".").absoluteFile
 val PROJECT_DIR = File(ROOT_DIR, "iosApp")
 val MULTIPLATFORM_DIR = ROOT_DIR
-val OUTPUT_DIR = File(MULTIPLATFORM_DIR, "benchmarks_result")
+val OUTPUT_DIR = File(MULTIPLATFORM_DIR, "build/benchmarks")
+val TEXT_REPORTS_DIR = File(OUTPUT_DIR, "text-reports")
 val SCHEME = "iosApp"
 val CONFIGURATION = "Release"
 val BUILD_DIR = File(MULTIPLATFORM_DIR, ".benchmark_build")
@@ -218,7 +219,7 @@ println("    Name      : $deviceName")
 println("    iOS       : $deviceIos")
 println("    UDID      : $deviceId")
 println("    Simulator : $isSimulator")
-println("    Prefix    : ${devicePrefix}_<Benchmark>.txt")
+println("    Filename  : <Benchmark>.txt")
 
 // ── 2. Build ───────────────────────────────────────────────────────────────────
 
@@ -313,11 +314,11 @@ if (separateProcess) {
 
 if (separateProcess) {
     for ((index, benchmark) in benchmarksToRun.withIndex()) {
-        val outFileName = "${devicePrefix}_${benchmark}.txt"
-        val outFile = File(OUTPUT_DIR, outFileName)
+        val (finalOutputDir, outFileName) = TEXT_REPORTS_DIR to "${benchmark}.txt"
+        val outFile = File(finalOutputDir, outFileName)
 
         println("  [%3d/%3d]  %-52s".format(index + 1, total, benchmark))
-        println("            → ${outFile.name}")
+        println("            → ${outFile.name} in ${finalOutputDir.relativeTo(ROOT_DIR).path}")
 
         val finalAppArgs = appArgs.toMutableMap()
         finalAppArgs["benchmarks"] = benchmark
@@ -335,11 +336,11 @@ if (separateProcess) {
         Thread.sleep(3000)
     }
 } else {
-    val outFileName = "${devicePrefix}_all_benchmarks.txt"
-    val outFile = File(OUTPUT_DIR, outFileName)
+    val (finalOutputDir, outFileName) = TEXT_REPORTS_DIR to "all_benchmarks.txt"
+    val outFile = File(finalOutputDir, outFileName)
 
     println("  [%3d/%3d]  %-52s".format(1, total, "All Benchmarks"))
-    println("            → ${outFile.name}")
+    println("            → ${outFile.name} in ${finalOutputDir.relativeTo(ROOT_DIR).path}")
 
     val finalAppArgs = appArgs.toMutableMap()
     finalAppArgs["benchmarks"] = benchmarksToRun.joinToString(",")
@@ -371,4 +372,4 @@ fun runBenchmark(deviceId: String, bundleId: String, isSimulator: Boolean, final
 }
 
 println("\n==> All done!")
-println("    %d output files written to: %s\n".format(total, OUTPUT_DIR.path))
+println("    %d output files written to: %s\n".format(total, TEXT_REPORTS_DIR.relativeTo(ROOT_DIR).path))
