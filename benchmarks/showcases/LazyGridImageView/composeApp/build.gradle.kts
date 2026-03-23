@@ -30,8 +30,30 @@ kotlin {
 
     jvm("desktop")
 
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    wasmJs {
+        browser {
+            commonWebpackConfig {
+                outputFileName = "composeApp.js"
+            }
+            binaries.executable()
+        }
+    }
+
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    js {
+        browser {
+            commonWebpackConfig {
+                outputFileName = "composeApp.js"
+            }
+            binaries.executable()
+        }
+    }
+
     sourceSets {
         val desktopMain by getting
+        val wasmJsMain by getting
+        val jsMain by getting
 
         androidMain.dependencies {
             implementation(compose.preview)
@@ -52,6 +74,8 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+        }
+        wasmJsMain.dependencies {
         }
     }
 }
