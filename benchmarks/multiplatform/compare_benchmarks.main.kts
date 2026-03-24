@@ -17,7 +17,7 @@ fun main(args: Array<String>) {
     val v2 = argMap["v2"] ?: args.getOrNull(1)
     
     if (v1 == null || v2 == null) {
-        println("Usage: ./compare_benchmarks.main.kts v1=<version1> v2=<version2> [runs=3] [benchmarks=<benchmarkName>] [platform=macos|desktop|web|ios] [skipExisting=true]")
+        println("Usage: ./compare_benchmarks.main.kts v1=<version1> v2=<version2> [runs=3] [benchmarks=<benchmarkName>] [platform=macos|desktop|web|ios] [skipExisting=true] [separateProcess=true]")
         return
     }
 
@@ -25,6 +25,7 @@ fun main(args: Array<String>) {
     val benchmarkName = argMap["benchmarks"] ?: null
     val platform = argMap["platform"] ?: "macos"
     val skipExisting = argMap["skipExisting"]?.toBoolean() ?: false
+    val separateProcess = argMap["separateProcess"]?.toBoolean() ?: false
     val runServer = platform == "web"
     val isWeb = platform == "web"
     val isIos = platform == "ios"
@@ -35,17 +36,20 @@ fun main(args: Array<String>) {
     if (skipExisting) {
         println("Skip existing results: true")
     }
+    if (separateProcess) {
+        println("Separate process: true")
+    }
     benchmarkName?.let { println("Filtering by benchmark: $it") }
 
-    val resultsV1 = runBenchmarksForVersion(v1, runs, benchmarkName, platform, runServer, isWeb, isIos, skipExisting)
-    val resultsV2 = runBenchmarksForVersion(v2, runs, benchmarkName, platform, runServer, isWeb, isIos, skipExisting)
+    val resultsV1 = runBenchmarksForVersion(v1, runs, benchmarkName, platform, runServer, isWeb, isIos, skipExisting, separateProcess)
+    val resultsV2 = runBenchmarksForVersion(v2, runs, benchmarkName, platform, runServer, isWeb, isIos, skipExisting, separateProcess)
 
     compareResults(v1, resultsV1, v2, resultsV2)
 }
 
 data class BenchmarkResult(val name: String, val totalMs: Double)
 
-fun runBenchmarksForVersion(version: String, runs: Int, benchmarkName: String?, platform: String, runServer: Boolean, isWeb: Boolean, isIos: Boolean, skipExisting: Boolean): Map<String, List<Double>> {
+fun runBenchmarksForVersion(version: String, runs: Int, benchmarkName: String?, platform: String, runServer: Boolean, isWeb: Boolean, isIos: Boolean, skipExisting: Boolean, separateProcess: Boolean): Map<String, List<Double>> {
     println("\n=== Running benchmarks for version: $version ===")
 
     val allRunsResults = mutableMapOf<String, MutableList<Double>>()
@@ -73,6 +77,9 @@ fun runBenchmarksForVersion(version: String, runs: Int, benchmarkName: String?, 
         runArgs.add("modes=SIMPLE")
         runArgs.add("saveStatsToJSON=true")
         runArgs.add("frameCount=1000")
+        if (separateProcess) {
+            runArgs.add("separateProcess=true")
+        }
         if (benchmarkName != null) {
             runArgs.add("benchmarks=$benchmarkName")
         }

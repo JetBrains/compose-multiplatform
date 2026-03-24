@@ -4,7 +4,7 @@ import java.io.File
 /**
  * Usage: ./run_benchmarks.main.kts <platform> [runs=1] [benchmarks=<benchmarkName>] [version=<version>] [any other gradle args]
  *
- * Example: ./run_benchmarks.main.kts macos benchmarks=LazyList runs=3 version=1.6.0
+ * Example: ./run_benchmarks.main.kts macos benchmarks=LazyList runs=3 version=1.10.0
  *
  * JSON results are archived to: benchmarks/build/benchmarks/archive/${platform}/${version}_run${runIndex}
  */
@@ -12,6 +12,12 @@ fun main(args: Array<String>) {
     if (args.isEmpty()) {
         println("Usage: ./run_benchmarks.main.kts <platform> [runs=1] [benchmarks=<benchmarkName>] [version=<version>] [any other gradle args]")
         println("Platforms: macos, desktop, web, ios")
+        println("Arguments:")
+        println("  runs=<number> (default: 1)")
+        println("  benchmarks=<name1,name2,...>")
+        println("  version=<version>")
+        println("  separateProcess=true|false (default: false)")
+        println("  any other gradle args")
         return
     }
 
@@ -27,6 +33,7 @@ fun main(args: Array<String>) {
     val versionArg = argMap.remove("version")
     val version = versionArg ?: getCurrentComposeVersion()
     val benchmarkName = argMap["benchmarks"]
+    val separateProcess = argMap.remove("separateProcess")?.toBoolean() ?: false
     
     val runServer = platform == "web"
     val isWeb = platform == "web"
@@ -35,6 +42,7 @@ fun main(args: Array<String>) {
     println("Running benchmarks for platform: $platform")
     println("Compose version: $version")
     println("Number of runs: $runs")
+    println("Separate process: $separateProcess")
     println("Run server: $runServer")
     benchmarkName?.let { println("Filtering by benchmark: $it") }
 
@@ -59,7 +67,7 @@ fun main(args: Array<String>) {
                 resultsDir.listFiles { f -> f.extension == "json" }?.forEach { it.delete() }
             }
             
-            executeBenchmarks(version, i, platform, runServer, isWeb, isIos, argMap)
+            executeBenchmarks(version, i, platform, runServer, isWeb, isIos, separateProcess, benchmarkName, argMap)
             collectResults(platform, version, i)
         }
     } finally {
@@ -107,6 +115,8 @@ fun executeBenchmarks(
     runServer: Boolean, 
     isWeb: Boolean, 
     isIos: Boolean,
+    separateProcess: Boolean,
+    benchmarkName: String?,
     extraArgs: Map<String, String>
 ) {
     val (versionedExecutable, defaultExecutable, task) = when (platform) {
@@ -139,7 +149,7 @@ fun executeBenchmarks(
     if (runServer) {
         runArgs.add("runServer=true")
     }
-    
+
     // Add extra args provided by user, override defaults if necessary
     extraArgs.forEach { (k, v) ->
         if (v.isNotEmpty()) {
@@ -187,7 +197,8 @@ fun executeBenchmarks(
         Thread.sleep(5000)
         
         try {
-            executeBenchmarksOnce(version, platform, task, runArgs, versionedExecutable, defaultExecutable, isWeb, isIos, serverStopped)
+            executeBenchmarksWithPlatform(version, platform, task, runArgs, versionedExecutable, defaultExecutable, isWeb, isIos, separateProcess,
+                serverStopped, benchmarkName)
         } finally {
             println("Stopping benchmark server...")
             serverProcess.destroy()
@@ -196,8 +207,70 @@ fun executeBenchmarks(
             monitorThread.interrupt()
         }
     } else {
-        executeBenchmarksOnce(version, platform, task, runArgs, versionedExecutable, defaultExecutable, isWeb, isIos, null)
+        executeBenchmarksWithPlatform(version, platform, task, runArgs, versionedExecutable, defaultExecutable, isWeb, isIos, separateProcess,
+            null, benchmarkName)
     }
+}
+
+fun executeBenchmarksWithPlatform(
+    version: String,
+    platform: String,
+    task: String,
+    runArgs: List<String>,
+    versionedExecutable: File?,
+    defaultExecutable: File?,
+    isWeb: Boolean,
+    isIos: Boolean,
+    separateProcess: Boolean,
+    serverStopped: java.util.concurrent.atomic.AtomicBoolean?,
+    benchmarksToRun: String?
+) {
+    if (separateProcess) {
+        println("Running benchmarks in separate processes...")
+        val benchmarks = if (!benchmarksToRun.isNullOrBlank()) {
+            benchmarksToRun.split(",").map { it.trim() }.filter { it.isNotEmpty() }
+        } else {
+            listBenchmarks()
+        }
+        for (benchmark in benchmarks) {
+            println("\n--- Running benchmark: $benchmark ---")
+            val benchmarkArgs = runArgs.toMutableList()
+            // Replace or add benchmarks parameter
+            benchmarkArgs.removeIf { it.startsWith("benchmarks=") }
+            benchmarkArgs.add("benchmarks=$benchmark")
+            executeBenchmarksOnce(version, platform, task, benchmarkArgs, versionedExecutable, defaultExecutable, isWeb, isIos, serverStopped)
+        }
+    } else {
+        executeBenchmarksOnce(version, platform, task, runArgs, versionedExecutable, defaultExecutable, isWeb, isIos, serverStopped)
+    }
+}
+
+fun listBenchmarks(): List<String> {
+    println("Fetching list of benchmarks using desktop run task...")
+
+    val process = ProcessBuilder(
+        "./gradlew", ":benchmarks:run",
+        "-PrunArguments=listBenchmarks=true"
+    ).start()
+    val output = process.inputStream.bufferedReader().readText()
+    process.waitFor()
+    
+    val benchmarks = mutableListOf<String>()
+    var inList = false
+    output.lines().forEach { line ->
+        if (line.contains("AVAILABLE_BENCHMARKS_START")) {
+            inList = true
+        } else if (line.contains("AVAILABLE_BENCHMARKS_END")) {
+            inList = false
+        } else if (inList && line.isNotBlank()) {
+            benchmarks.add(line.trim())
+        }
+    }
+    
+    if (benchmarks.isEmpty()) {
+        println("Warning: Could not fetch benchmarks list. Output: $output")
+    }
+    return benchmarks
 }
 
 fun executeBenchmarksOnce(
@@ -213,7 +286,6 @@ fun executeBenchmarksOnce(
 ) {
     if (isIos) {
         println("Running version $version on iOS...")
-        updateComposeVersion(version)
         val processBuilder = ProcessBuilder(
             "./run_ios_benchmarks.main.kts",
             *runArgs.toTypedArray()
@@ -242,8 +314,7 @@ fun executeBenchmarksOnce(
         } else {
             println("Executable for version $version not found. Building...")
         }
-        updateComposeVersion(version)
-        
+
         val processBuilder = ProcessBuilder(
             "./gradlew", task,
             "-PrunArguments=${runArgs.joinToString(" ")}"

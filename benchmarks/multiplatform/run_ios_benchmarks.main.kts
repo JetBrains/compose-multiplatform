@@ -63,7 +63,7 @@ rawArgs.forEach { arg ->
 }
 
 val benchmarksFromArgs = parsedArgs["benchmarks"]?.split(",")?.map { it.substringBefore("(").trim() }?.filter { it.isNotEmpty() }
-val separateProcess = parsedArgs["separateprocess"]?.toBoolean() ?: true
+val separateProcess = parsedArgs["separateprocess"]?.toBoolean() ?: false
 
 // Arguments to pass to the app
 val appArgs = parsedArgs.toMutableMap()
