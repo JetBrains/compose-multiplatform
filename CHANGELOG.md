@@ -31,15 +31,15 @@ _Changes since 1.11.0-alpha04_
 
 ### Desktop
 
-- [Windows] Alt-backspace now correctly performs UNDO [#2870](https://github.com/JetBrains/compose-multiplatform-core/pull/2870)
+- [Windows] `Alt-backspace` now correctly performs undo action [#2870](https://github.com/JetBrains/compose-multiplatform-core/pull/2870)
 - _(prerelease fix)_ Bump Compose Hot Reload to [1.1.0-beta01](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.1.0-beta01) [#5559](https://github.com/JetBrains/compose-multiplatform/pull/5559)
 
 ### Web
 
 - Fix incorrect mouse click detection [#2844](https://github.com/JetBrains/compose-multiplatform-core/pull/2844)
-- Fix wheel event resolves buttons state incorrectly in Safari and Firefox [#2844](https://github.com/JetBrains/compose-multiplatform-core/pull/2844)
-- Allow browser to handle additional copy/paste/cut key commands, such as shift-insert [#2871](https://github.com/JetBrains/compose-multiplatform-core/pull/2871)
-- Fix 'Fast delete' deletes characters one by one slowly instead of removing words in text field on iOS [#2875](https://github.com/JetBrains/compose-multiplatform-core/pull/2875)
+- Fix an issue where wheel events reported incorrect mouse button state in Safari and Firefox [#2844](https://github.com/JetBrains/compose-multiplatform-core/pull/2844)
+- The browser now handles additional cut, copy, and paste keyboard shortcuts, such as `Shift+Insert` [#2871](https://github.com/JetBrains/compose-multiplatform-core/pull/2871)
+- Fix an issue where "fast delete" action removed characters one by one instead of deleting whole words in text fields on iOS [#2875](https://github.com/JetBrains/compose-multiplatform-core/pull/2875)
 
 ## Components
 
