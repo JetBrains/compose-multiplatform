@@ -1,3 +1,71 @@
+# 1.11.0-beta01 (March 2026)
+
+_Changes since 1.11.0-alpha04_
+
+## Breaking Changes
+
+### iOS
+
+- Platform layers are now located on a system transition view above the root view controller, but below modally displayed view controllers. That may affect presentation of interop view controllers [#2833](https://github.com/JetBrains/compose-multiplatform-core/pull/2833)
+
+## Fixes
+
+### Multiple Platforms
+
+- Remove check for arbitrary transforms in `Matrix` conversions due to incorrect detection of regular rotation. Now the behaviour is aligned with Android [#2850](https://github.com/JetBrains/compose-multiplatform-core/pull/2850)
+
+### iOS
+
+- Fix an issue where `Popup` and `Dialog` may not close when clicked outside of their bounds [#2815](https://github.com/JetBrains/compose-multiplatform-core/pull/2815)
+- Fix crash caused by mouse hover [#2834](https://github.com/JetBrains/compose-multiplatform-core/pull/2834)
+- Fix an issue where the text cursor appeared in the wrong position when dragging it after selecting text [#2833](https://github.com/JetBrains/compose-multiplatform-core/pull/2833)
+- Fix an issue where selection handles were not rendered inside the magnifier [#2833](https://github.com/JetBrains/compose-multiplatform-core/pull/2833)
+- Fix an issue where popups and dialogs were displayed above a modally presented view controller [#2833](https://github.com/JetBrains/compose-multiplatform-core/pull/2833)
+- Traversal groups now convert into an additional node in the accessibility hierarchy [#2848](https://github.com/JetBrains/compose-multiplatform-core/pull/2848)
+- _(prerelease fix)_ Fix issues with interop views addition and removal [#2842](https://github.com/JetBrains/compose-multiplatform-core/pull/2842)
+- _(prerelease fix)_ Fix an issue where system context menu items (Look Up, Translate, Search, etc.) are not presented [#2837](https://github.com/JetBrains/compose-multiplatform-core/pull/2837)
+- Fix `Cmd + C` (copy) event handling for the selected text wrapped in `SelectionContainer` when using a hardware keyboard [#2872](https://github.com/JetBrains/compose-multiplatform-core/pull/2872)
+- Fix the scrolling inertia issue when performing short scroll gestures [#2851](https://github.com/JetBrains/compose-multiplatform-core/pull/2851)
+- Fix an issue where a fling may occur unexpectedly when lifting a finger [#2851](https://github.com/JetBrains/compose-multiplatform-core/pull/2851)
+- _(prerelease fix)_ Fix high memory consumption caused by the Compose container resizing when `parallelRendering` is enabled [#2882](https://github.com/JetBrains/compose-multiplatform-core/pull/2882)
+
+### Desktop
+
+- [Windows] Alt-backspace now correctly performs UNDO [#2870](https://github.com/JetBrains/compose-multiplatform-core/pull/2870)
+- _(prerelease fix)_ Bump Compose Hot Reload to [1.1.0-beta01](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.1.0-beta01) [#5559](https://github.com/JetBrains/compose-multiplatform/pull/5559)
+
+### Web
+
+- Fix incorrect mouse click detection [#2844](https://github.com/JetBrains/compose-multiplatform-core/pull/2844)
+- Fix wheel event resolves buttons state incorrectly in Safari and Firefox [#2844](https://github.com/JetBrains/compose-multiplatform-core/pull/2844)
+- Allow browser to handle additional copy/paste/cut key commands, such as shift-insert [#2871](https://github.com/JetBrains/compose-multiplatform-core/pull/2871)
+- Fix 'Fast delete' deletes characters one by one slowly instead of removing words in text field on iOS [#2875](https://github.com/JetBrains/compose-multiplatform-core/pull/2875)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.11.0-beta01`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.11.0-beta01` | [Runtime 1.11.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.11.0-beta01) |
+| UI | `org.jetbrains.compose.ui:ui*:1.11.0-beta01` | [UI 1.11.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.11.0-beta01) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.11.0-beta01` | [Foundation 1.11.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.11.0-beta01) |
+| Material | `org.jetbrains.compose.material:material*:1.11.0-beta01` | [Material 1.11.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.11.0-beta01) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.11.0-alpha05` | [Material3 1.5.0-alpha15](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha15) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha07` | [Material3 Adaptive 1.3.0-alpha09](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha09) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0-alpha02` | [Lifecycle 2.11.0-alpha02](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0-alpha02) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.2` | [Navigation 2.9.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.7) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.1.0-beta01` | [Navigation3 1.1.0-beta01](https://developer.android.com/jetpack/androidx/releases/navigation3#1.1.0-beta01) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0-alpha02` | [Navigation Event 1.1.0-alpha01](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.0-alpha01) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.10.3 (March 2026)
 
 _Changes since 1.10.2_
