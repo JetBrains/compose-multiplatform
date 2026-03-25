@@ -6,7 +6,7 @@ _Changes since 1.11.0-alpha04_
 
 ### iOS
 
-- Platform layers are now located on a system transition view above the root view controller, but below modally displayed view controllers. That may affect presentation of interop view controllers [#2833](https://github.com/JetBrains/compose-multiplatform-core/pull/2833)
+- `Dialog` and `Popup` container views are now located on a system transition view above the root view controller, but below modally presented view controllers. This may affect presentation of interop view controllers [#2833](https://github.com/JetBrains/compose-multiplatform-core/pull/2833)
 
 ## Fixes
 
