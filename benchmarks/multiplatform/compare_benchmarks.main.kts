@@ -44,7 +44,8 @@ fun main(args: Array<String>) {
     val resultsV1 = runBenchmarksForVersion(v1, runs, benchmarkName, platform, runServer, isWeb, isIos, skipExisting, separateProcess)
     val resultsV2 = runBenchmarksForVersion(v2, runs, benchmarkName, platform, runServer, isWeb, isIos, skipExisting, separateProcess)
 
-    compareResults(v1, resultsV1, v2, resultsV2)
+    val requestedBenchmarks = benchmarkName?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }?.toSet()
+    compareResults(v1, resultsV1, v2, resultsV2, requestedBenchmarks)
 }
 
 data class BenchmarkResult(val name: String, val totalMs: Double)
@@ -54,21 +55,40 @@ fun runBenchmarksForVersion(version: String, runs: Int, benchmarkName: String?, 
 
     val allRunsResults = mutableMapOf<String, MutableList<Double>>()
 
-    var allExist = true
+    val requestedBenchmarks = benchmarkName?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }?.toSet()
+    
+    var missingBenchmarks: List<String>? = null
     if (skipExisting) {
+        val missing = mutableSetOf<String>()
         for (i in 1..runs) {
             val archiveDir = File("benchmarks/build/benchmarks/archive/${platform}/${version}_run${i}")
-            if (!archiveDir.exists() || archiveDir.listFiles { f -> f.extension == "json" }?.isEmpty() != false) {
-                allExist = false
+            if (!archiveDir.exists()) {
+                // If any run directory is missing, we need to rerun everything requested
+                missingBenchmarks = requestedBenchmarks?.toList()
+                break
+            }
+            val existingBenchmarks = archiveDir.listFiles { f -> f.extension == "json" }?.map { it.nameWithoutExtension }?.toSet() ?: emptySet()
+            if (requestedBenchmarks != null) {
+                requestedBenchmarks.forEach { 
+                    if (!existingBenchmarks.contains(it)) {
+                        missing.add(it)
+                    }
+                }
+            } else if (existingBenchmarks.isEmpty()) {
+                // No benchmarks requested, but also none exist. We'll rerun all.
+                missingBenchmarks = null
                 break
             }
         }
+        if (missingBenchmarks == null && requestedBenchmarks != null) {
+            missingBenchmarks = missing.toList()
+        }
     } else {
-        allExist = false
+        missingBenchmarks = requestedBenchmarks?.toList()
     }
 
-    if (allExist) {
-        println("All $runs runs already exist for version $version, skipping benchmarks execution.")
+    if (skipExisting && missingBenchmarks?.isEmpty() == true) {
+        println("All requested runs already exist for version $version, skipping benchmarks execution.")
     } else {
         val runArgs = mutableListOf<String>()
         runArgs.add(platform)
@@ -80,20 +100,30 @@ fun runBenchmarksForVersion(version: String, runs: Int, benchmarkName: String?, 
         if (separateProcess) {
             runArgs.add("separateProcess=true")
         }
-        if (benchmarkName != null) {
-            runArgs.add("benchmarks=$benchmarkName")
+        
+        val benchmarksToRun = if (skipExisting) missingBenchmarks else requestedBenchmarks?.toList()
+        if (benchmarksToRun != null) {
+            if (benchmarksToRun.isNotEmpty()) {
+                runArgs.add("benchmarks=${benchmarksToRun.joinToString(",")}")
+            } else {
+                 // Should not happen based on logic above
+            }
+        } else if (benchmarkName != null) {
+             runArgs.add("benchmarks=$benchmarkName")
         }
 
-        val processBuilder = ProcessBuilder(
-            "./run_benchmarks.main.kts",
-            *runArgs.toTypedArray()
-        ).inheritIO()
-        
-        val process = processBuilder.start()
-        val exitCode = process.waitFor()
+        if (!(skipExisting && benchmarksToRun?.isEmpty() == true)) {
+            val processBuilder = ProcessBuilder(
+                "./run_benchmarks.main.kts",
+                *runArgs.toTypedArray()
+            ).inheritIO()
+            
+            val process = processBuilder.start()
+            val exitCode = process.waitFor()
 
-        if (exitCode != 0) {
-            println("Warning: run_benchmarks.main.kts failed with exit code $exitCode")
+            if (exitCode != 0) {
+                println("Warning: run_benchmarks.main.kts failed with exit code $exitCode")
+            }
         }
     }
 
@@ -162,12 +192,12 @@ fun parseTotalMsFromJson(json: String): Double? {
     return cpu + gpu
 }
 
-fun compareResults(v1: String, res1: Map<String, List<Double>>, v2: String, res2: Map<String, List<Double>>) {
+fun compareResults(v1: String, res1: Map<String, List<Double>>, v2: String, res2: Map<String, List<Double>>, requestedBenchmarks: Set<String>?) {
     println("\n=== Comparison Report (Diff > 5%) ===")
     println(String.format("%-30s | %-15s | %-15s | %-10s", "Benchmark", v1 + " (avg ms)", v2 + " (avg ms)", "Diff %"))
     println("-".repeat(75))
 
-    val allBenchmarks = (res1.keys + res2.keys).sorted()
+    val allBenchmarks = (res1.keys + res2.keys).filter { requestedBenchmarks == null || requestedBenchmarks.contains(it) }.sorted()
 
     for (name in allBenchmarks) {
         val times1 = res1[name]
