@@ -63,12 +63,13 @@ Alternatively you may open `iosApp/iosApp` project in XCode and run the app from
 To run specific benchmarks:
 - `./run_ios_benchmarks.main.kts <DEVICE ID> benchmarks=AnimatedVisibility,LazyGrid`
 
-To run all benchmarks in a single process (faster, but may be less stable):
+To run all benchmarks in a single process (faster but may be less reliable as some 
+benchmarks may affect others within one process):
 - `./run_ios_benchmarks.main.kts <DEVICE ID> separateProcess=false`
 
 4. Results are saved in `benchmarks/build/benchmarks/text-reports/` (when using `.main.kts`) or `benchmarks_result/` (when using `.sh`).
 
- ## Run native on MacOS
+## Run native on MacOS
  - `./gradlew :benchmarks:runReleaseExecutableMacosArm64` (Works on Arm64 processors)
  - `./gradlew :benchmarks:runReleaseExecutableMacosX64` (Works on Intel processors)
 
