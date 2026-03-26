@@ -27,7 +27,7 @@ object Args {
      * @param args an array of strings representing the command line arguments.
      * Each argument can specify either of these settings:
      * modes, benchmarks, disabledBenchmarks - comma separated values,
-     * versionInfo, saveStatsToCSV, saveStatsToJSON, parallel, warmupCount, frameCount, emptyScreenDelay, reportAtTheEnd - single values.
+     * versionInfo, saveStatsToCSV, saveStatsToJSON, parallel, warmupCount, frameCount, emptyScreenDelay, reportAtTheEnd, listBenchmarks - single values.
      *
      * Example: benchmarks=AnimatedVisibility(100),modes=SIMPLE,versionInfo=Kotlin_2_1_20,saveStatsToCSV=true,warmupCount=50,frameCount=100,emptyScreenDelay=2000,reportAtTheEnd=true
      */
@@ -44,6 +44,7 @@ object Args {
         var frameCount: Int? = null
         var emptyScreenDelay: Long? = null
         var reportAtTheEnd: Boolean = false
+        var listBenchmarks: Boolean = false
 
         for (arg in args) {
             if (arg.startsWith("modes=", ignoreCase = true)) {
@@ -70,6 +71,8 @@ object Args {
                 emptyScreenDelay = arg.substringAfter("=").toLong()
             } else if (arg.startsWith("reportAtTheEnd=", ignoreCase = true)) {
                 reportAtTheEnd = arg.substringAfter("=").toBoolean()
+            } else if (arg.startsWith("listBenchmarks=", ignoreCase = true)) {
+                listBenchmarks = arg.substringAfter("=").toBoolean()
             } else {
                 println("WARNING: unknown argument $arg")
             }
@@ -89,7 +92,8 @@ object Args {
             warmupCount = warmupCount ?: defaultWarmupCount,
             frameCount = frameCount ?: 1000,
             emptyScreenDelay = emptyScreenDelay ?: 2000L,
-            reportAtTheEnd = reportAtTheEnd
+            reportAtTheEnd = reportAtTheEnd,
+            listBenchmarks = listBenchmarks
         )
     }
 }
@@ -110,6 +114,7 @@ object Args {
  * @property frameCount Number of frames to run for each benchmark.
  * @property emptyScreenDelay Delay in milliseconds between warmup and benchmark.
  * @property reportAtTheEnd Flag indicating whether we should report results at the end of all benchmarks.
+ * @property listBenchmarks Flag indicating whether we should print available benchmarks and exit.
  */
 data class Config(
     val modes: Set<Mode> = emptySet(),
@@ -123,7 +128,8 @@ data class Config(
     val warmupCount: Int = 100,
     val frameCount: Int = 1000,
     val emptyScreenDelay: Long = 2000L,
-    val reportAtTheEnd: Boolean = false
+    val reportAtTheEnd: Boolean = false,
+    val listBenchmarks: Boolean = false
 ) {
     /**
      * Checks if a specific mode is enabled based on the configuration.
@@ -184,6 +190,9 @@ data class Config(
 
         val reportAtTheEnd: Boolean
             get() = global.reportAtTheEnd
+
+        val listBenchmarks: Boolean
+            get() = global.listBenchmarks
 
         fun setGlobal(global: Config) {
             this.global = global

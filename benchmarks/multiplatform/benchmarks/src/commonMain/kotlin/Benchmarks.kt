@@ -327,6 +327,11 @@ suspend fun runBenchmark(
             content = benchmark.content
         ).generateStats()
         stats.prettyPrint()
+        if (Config.saveStatsToJSON && isIosTarget) {
+            println("JSON_START")
+            println(stats.toJsonString())
+            println("JSON_END")
+        }
         if (Config.saveStats()) {
             saveBenchmarkStats(name = benchmark.name, stats = stats)
         }
@@ -341,6 +346,12 @@ suspend fun runBenchmarks(
     warmupCount: Int = Config.warmupCount,
     graphicsContext: GraphicsContext? = null
 ) {
+    if (Config.listBenchmarks) {
+        println("AVAILABLE_BENCHMARKS_START")
+        benchmarks.forEach { println(it.name) }
+        println("AVAILABLE_BENCHMARKS_END")
+        return
+    }
     println()
     println("Running emulating $targetFps FPS")
     println()
@@ -418,6 +429,11 @@ fun BenchmarkRunner(
                         stats.prettyPrint()
                     } else {
                         results.add(stats)
+                    }
+                    if (Config.saveStatsToJSON && isIosTarget) {
+                        println("JSON_START")
+                        println(stats.toJsonString())
+                        println("JSON_END")
                     }
                     if (Config.saveStats()) {
                         saveBenchmarkStats(name = benchmark.name, stats = stats)

@@ -17,7 +17,7 @@ fun main(args: Array<String>) {
     val v2 = argMap["v2"] ?: args.getOrNull(1)
     
     if (v1 == null || v2 == null) {
-        println("Usage: compare_benchmarks.main.kts v1=<version1> v2=<version2> [runs=3] [benchmarks=<benchmarkName>] [platform=macos|desktop|web]")
+        println("Usage: ./compare_benchmarks.main.kts v1=<version1> v2=<version2> [runs=3] [benchmarks=<benchmarkName>] [platform=macos|desktop|web|ios]")
         return
     }
 
@@ -26,28 +26,29 @@ fun main(args: Array<String>) {
     val platform = argMap["platform"] ?: "macos"
     val runServer = platform == "web"
     val isWeb = platform == "web"
+    val isIos = platform == "ios"
 
     println("Comparing Compose versions: $v1 and $v2")
     println("Number of runs: $runs")
     println("Platform: $platform")
     benchmarkName?.let { println("Filtering by benchmark: $it") }
 
-    val resultsV1 = runBenchmarksForVersion(v1, runs, benchmarkName, platform, runServer, isWeb)
-    val resultsV2 = runBenchmarksForVersion(v2, runs, benchmarkName, platform, runServer, isWeb)
+    val resultsV1 = runBenchmarksForVersion(v1, runs, benchmarkName, platform, runServer, isWeb, isIos)
+    val resultsV2 = runBenchmarksForVersion(v2, runs, benchmarkName, platform, runServer, isWeb, isIos)
 
     compareResults(v1, resultsV1, v2, resultsV2)
 }
 
 data class BenchmarkResult(val name: String, val totalMs: Double)
 
-fun runBenchmarksForVersion(version: String, runs: Int, benchmarkName: String?, platform: String, runServer: Boolean, isWeb: Boolean): Map<String, List<Double>> {
+fun runBenchmarksForVersion(version: String, runs: Int, benchmarkName: String?, platform: String, runServer: Boolean, isWeb: Boolean, isIos: Boolean): Map<String, List<Double>> {
     println("\n=== Running benchmarks for version: $version ===")
 
     val allRunsResults = mutableMapOf<String, MutableList<Double>>()
 
     for (i in 1..runs) {
         println("Run $i/$runs...")
-        executeBenchmarks(version, i, benchmarkName, platform, runServer, isWeb)
+        executeBenchmarks(version, i, benchmarkName, platform, runServer, isWeb, isIos)
         val runResults = collectResults(version, i)
         runResults.forEach { (name, value) ->
             allRunsResults.getOrPut(name) { mutableListOf() }.add(value)
@@ -65,7 +66,7 @@ fun updateComposeVersion(version: String) {
     println("Updated gradle/libs.versions.toml to version $version")
 }
 
-fun executeBenchmarks(version: String, runIndex: Int, benchmarkName: String?, platform: String, runServer: Boolean, isWeb: Boolean) {
+fun executeBenchmarks(version: String, runIndex: Int, benchmarkName: String?, platform: String, runServer: Boolean, isWeb: Boolean, isIos: Boolean) {
     val (versionedExecutable, defaultExecutable, task) = when (platform) {
         "macos" -> Triple(
             File("benchmarks/build/bin/macosArm64/releaseExecutable/benchmarks-$version.kexe"),
@@ -81,6 +82,11 @@ fun executeBenchmarks(version: String, runIndex: Int, benchmarkName: String?, pl
             null,
             null,
             ":benchmarks:wasmJsBrowserProductionRun"
+        )
+        "ios" -> Triple(
+            null,
+            null,
+            "ios"
         )
         else -> throw IllegalArgumentException("Unsupported platform: $platform")
     }
@@ -131,7 +137,7 @@ fun executeBenchmarks(version: String, runIndex: Int, benchmarkName: String?, pl
         Thread.sleep(5000)
         
         try {
-            executeBenchmarksOnce(version, platform, task, runArgs, versionedExecutable, defaultExecutable, isWeb, serverStopped)
+            executeBenchmarksOnce(version, platform, task, runArgs, versionedExecutable, defaultExecutable, isWeb, isIos, serverStopped)
         } finally {
             println("Stopping benchmark server...")
             serverProcess.destroy()
@@ -140,7 +146,7 @@ fun executeBenchmarks(version: String, runIndex: Int, benchmarkName: String?, pl
             monitorThread.interrupt()
         }
     } else {
-        executeBenchmarksOnce(version, platform, task, runArgs, versionedExecutable, defaultExecutable, isWeb, null)
+        executeBenchmarksOnce(version, platform, task, runArgs, versionedExecutable, defaultExecutable, isWeb, isIos, null)
     }
 }
 
@@ -152,8 +158,24 @@ fun executeBenchmarksOnce(
     versionedExecutable: File?,
     defaultExecutable: File?,
     isWeb: Boolean,
+    isIos: Boolean,
     serverStopped: java.util.concurrent.atomic.AtomicBoolean?
 ) {
+    if (isIos) {
+        println("Running version $version on iOS...")
+        updateComposeVersion(version)
+        val processBuilder = ProcessBuilder(
+            "./run_ios_benchmarks.main.kts",
+            *runArgs.toTypedArray()
+        ).inheritIO()
+        val process = processBuilder.start()
+        val exitCode = process.waitFor()
+        if (exitCode != 0) {
+            println("Warning: iOS Benchmark run failed with exit code $exitCode")
+        }
+        return
+    }
+
     if (versionedExecutable != null && versionedExecutable.exists()) {
         println("Using existing executable for version $version: ${versionedExecutable.absolutePath}")
 
