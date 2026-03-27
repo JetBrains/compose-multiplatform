@@ -502,10 +502,15 @@ abstract class AbstractJPackageTask @Inject constructor(
             cliArg("--mac-entitlements", macEntitlementsFile)
 
             macSigner?.settings?.let { signingSettings ->
-                cliArg("--mac-sign", true)
-                cliArg("--mac-signing-key-user-name", signingSettings.identity)
-                cliArg("--mac-signing-keychain", signingSettings.keychain)
-                cliArg("--mac-package-signing-prefix", signingSettings.prefix)
+                // jpackage only supports "Developer ID Application" and "3rd Party Mac Developer Application"
+                // certificates. For other types (Apple Development, Apple Distribution, Mac App Distribution,
+                // Mac Development), skip jpackage signing.
+                if (signingSettings.isJPackageCompatible) {
+                    cliArg("--mac-sign", true)
+                    cliArg("--mac-signing-key-user-name", signingSettings.fullDeveloperID)
+                    cliArg("--mac-signing-keychain", signingSettings.keychain)
+                    cliArg("--mac-package-signing-prefix", signingSettings.prefix)
+                }
             }
         }
     }
