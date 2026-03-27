@@ -56,6 +56,7 @@ import org.jetbrains.compose.desktop.application.internal.files.normalizedPath
 import org.jetbrains.compose.desktop.application.internal.files.transformJar
 import org.jetbrains.compose.desktop.application.internal.javaOption
 import org.jetbrains.compose.desktop.application.internal.validation.validate
+import org.jetbrains.compose.internal.utils.MacUtils
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.clearDirs
 import org.jetbrains.compose.internal.utils.currentArch
@@ -637,8 +638,49 @@ abstract class AbstractJPackageTask @Inject constructor(
     override fun checkResult(result: ExecResult) {
         super.checkResult(result)
         modifyRuntimeOnMacOsIfNeeded()
+        signPkgIfNeeded()
         val outputFile = findOutputFileOrDir(destinationDir.ioFile, targetFormat)
         logger.lifecycle("The distribution is written to ${outputFile.canonicalPath}")
+    }
+
+    private fun signPkgIfNeeded() {
+        if (currentOS != OS.MacOS || targetFormat != TargetFormat.Pkg) return
+        val signingSettings = macSigner?.settings ?: return
+        if (signingSettings.isJPackageCompatible) return // jpackage already signed it
+
+        val candidates = signingSettings.installerSigningIdentityCandidates
+        if (candidates.isEmpty()) return
+
+        val pkgFile = findOutputFileOrDir(destinationDir.ioFile, targetFormat)
+        val tmpPkg = pkgFile.resolveSibling("${pkgFile.nameWithoutExtension}-unsigned.pkg")
+        check(pkgFile.renameTo(tmpPkg)) {
+            "Failed to rename ${pkgFile.absolutePath} to ${tmpPkg.absolutePath}"
+        }
+
+        var lastError: IllegalStateException? = null
+        for (installerIdentity in candidates) {
+            val args = mutableListOf("--sign", installerIdentity)
+            signingSettings.keychain?.let {
+                args.addAll(listOf("--keychain", it.absolutePath))
+            }
+            args.addAll(listOf(tmpPkg.absolutePath, pkgFile.absolutePath))
+
+            try {
+                runExternalTool(
+                    tool = MacUtils.productsign,
+                    args = args
+                )
+                tmpPkg.delete()
+                return
+            } catch (e: IllegalStateException) {
+                lastError = e
+                pkgFile.delete()
+            }
+        }
+        check(tmpPkg.renameTo(pkgFile)) {
+            "Failed to restore unsigned PKG from ${tmpPkg.absolutePath} to ${pkgFile.absolutePath}"
+        }
+        throw lastError!!
     }
 
     private fun modifyRuntimeOnMacOsIfNeeded() {

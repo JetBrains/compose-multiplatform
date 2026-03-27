@@ -44,6 +44,31 @@ internal data class ValidatedMacOSSigningSettings(
             identity.startsWith("3rd Party Mac Developer Application: ") ||
             // Unknown prefix — let jpackage add its default prefix
             fullDeveloperID != identity
+
+    /**
+     * Returns possible installer signing identities for PKG signing.
+     * Multiple candidates are returned because Apple's documentation uses "Mac Installer Distribution"
+     * but currently still issues certificates as "3rd Party Mac Developer Installer".
+     */
+    val installerSigningIdentityCandidates: List<String>
+        get() {
+            val name = when {
+                identity.startsWith("Developer ID Application: ") ->
+                    return listOf(identity.replaceFirst("Developer ID Application: ", "Developer ID Installer: "))
+                identity.startsWith("3rd Party Mac Developer Application: ") ->
+                    identity.removePrefix("3rd Party Mac Developer Application: ")
+                identity.startsWith("Apple Distribution: ") ->
+                    identity.removePrefix("Apple Distribution: ")
+                identity.startsWith("Mac App Distribution: ") ->
+                    identity.removePrefix("Mac App Distribution: ")
+                !appStore -> return listOf("Developer ID Installer: " + identity)
+                else -> identity
+            }
+            return listOf(
+                "3rd Party Mac Developer Installer: $name",
+                "Mac Installer Distribution: $name",
+            )
+        }
 }
 
 internal fun MacOSSigningSettings.validate(

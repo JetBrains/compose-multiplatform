@@ -76,6 +76,10 @@ internal object MacUtils {
         File("/usr/bin/make").checkExistingFile()
     }
 
+    val productsign: File by lazy {
+        File("/usr/bin/productsign").checkExistingFile()
+    }
+
     val open: File by lazy {
         File("/usr/bin/open").checkExistingFile()
     }
