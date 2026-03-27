@@ -85,7 +85,8 @@ fun checkDegradation(v1: String, v2: String, benchmarkName: String, platform: St
     // but calling it as a separate process is safer for a script.
     
     val process = ProcessBuilder(
-        "./compare_benchmarks.main.kts", "v1=$v1", "v2=$v2", "runs=3", "benchmarks=$benchmarkName", "platform=$platform"
+        "./compare_benchmarks.main.kts", "v1=$v1", "v2=$v2", "runs=3",
+                  "benchmarks=$benchmarkName", "platform=$platform", "skipExisting=true"
     ).redirectErrorStream(true).start()
     
     val output = process.inputStream.bufferedReader().readText()
