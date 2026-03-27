@@ -1,71 +1,31 @@
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.compose")
-    id("com.android.application")
+    id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.compose")
 }
 
 group = "app.group"
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            compileTaskProvider {
-                compilerOptions {
-                    jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
-                }
-            }
-        }
+    androidLibrary {
+        compileSdk = 35
+        namespace = "org.jetbrains.compose.resources.test"
+        minSdk = 23
+        androidResources.enable = true
     }
     jvm("desktop")
 
     sourceSets {
         commonMain {
             dependencies {
-                implementation(compose.runtime)
-                implementation(compose.material)
-                //there is the api to check correctness of the api configuration
-                //https://github.com/JetBrains/compose-multiplatform/issues/4405
-                api(compose.components.resources)
+                implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
+                implementation("org.jetbrains.compose.material:material:COMPOSE_VERSION_PLACEHOLDER")
+                // there is the api to check correctness of the api configuration
+                // https://youtrack.jetbrains.com/issue/CMP-4405
+                api("org.jetbrains.compose.components:components-resources:COMPOSE_VERSION_PLACEHOLDER")
             }
         }
-    }
-}
-
-android {
-    compileSdk = 35
-    namespace = "org.jetbrains.compose.resources.test"
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    defaultConfig {
-        applicationId = "org.example.project"
-        minSdk = 21
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
-    }
-    signingConfigs {
-        create("testkey") {
-            storeFile = project.file("key/debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
-        }
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("testkey")
-        }
-        getByName("debug") {
-            signingConfig = signingConfigs.getByName("testkey")
-        }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    lint {
-        checkReleaseBuilds = false
     }
 }
 

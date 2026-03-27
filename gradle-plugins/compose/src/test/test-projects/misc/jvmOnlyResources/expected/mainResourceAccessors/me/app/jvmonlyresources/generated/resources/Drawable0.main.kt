@@ -1,4 +1,4 @@
-@file:OptIn(org.jetbrains.compose.resources.InternalResourceApi::class)
+@file:OptIn(InternalResourceApi::class)
 
 package me.app.jvmonlyresources.generated.resources
 
@@ -7,24 +7,17 @@ import kotlin.String
 import kotlin.collections.MutableMap
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.InternalResourceApi
+import org.jetbrains.compose.resources.ResourceItem
 
-private object MainDrawable0 {
-  public val vector: DrawableResource by 
-      lazy { init_vector() }
-}
+private const val MD: String = "composeResources/me.app.jvmonlyresources.generated.resources/"
+
+internal val Res.drawable.vector: DrawableResource by lazy {
+      DrawableResource("drawable:vector", setOf(
+        ResourceItem(setOf(), "${MD}drawable/vector.xml", -1, -1),
+      ))
+    }
 
 @InternalResourceApi
 internal fun _collectMainDrawable0Resources(map: MutableMap<String, DrawableResource>) {
-  map.put("vector", MainDrawable0.vector)
+  map.put("vector", Res.drawable.vector)
 }
-
-internal val Res.drawable.vector: DrawableResource
-  get() = MainDrawable0.vector
-
-private fun init_vector(): DrawableResource = org.jetbrains.compose.resources.DrawableResource(
-  "drawable:vector",
-    setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(),
-        "composeResources/me.app.jvmonlyresources.generated.resources/drawable/vector.xml", -1, -1),
-    )
-)

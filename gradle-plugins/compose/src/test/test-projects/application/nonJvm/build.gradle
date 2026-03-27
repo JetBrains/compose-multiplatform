@@ -1,0 +1,16 @@
+plugins {
+    id "com.android.kotlin.multiplatform.library"
+    id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.kotlin.plugin.compose"
+    id "org.jetbrains.compose"
+}
+
+kotlin {
+    androidLibrary {
+        namespace = "org.jetbrains.compose.testapp"
+        compileSdk = 35
+        minSdk = 23
+    }
+    iosArm64()
+    iosSimulatorArm64()
+}

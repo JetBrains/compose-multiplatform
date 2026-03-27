@@ -16,6 +16,9 @@ internal abstract class GenerateExpectResourceCollectorsTask : IdeaImportTask() 
     abstract val packageName: Property<String>
 
     @get:Input
+    abstract val resClassName: Property<String>
+
+    @get:Input
     abstract val makeAccessorsPublic: Property<Boolean>
 
     @get:OutputDirectory
@@ -31,8 +34,14 @@ internal abstract class GenerateExpectResourceCollectorsTask : IdeaImportTask() 
         logger.info("Generate expect ResourceCollectors for $kotlinDir")
 
         val pkgName = packageName.get()
+        val resClassName = resClassName.get()
         val isPublic = makeAccessorsPublic.get()
-        val spec = getExpectResourceCollectorsFileSpec(pkgName, "ExpectResourceCollectors", isPublic)
+        val spec = getExpectResourceCollectorsFileSpec(
+            packageName = pkgName,
+            fileName = "ExpectResourceCollectors",
+            resClassName = resClassName,
+            isPublic = isPublic
+        )
         spec.writeTo(kotlinDir)
     }
 }
@@ -40,6 +49,9 @@ internal abstract class GenerateExpectResourceCollectorsTask : IdeaImportTask() 
 internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() {
     @get:Input
     abstract val packageName: Property<String>
+
+    @get:Input
+    abstract val resClassName: Property<String>
 
     @get:Input
     abstract val makeAccessorsPublic: Property<Boolean>
@@ -69,7 +81,7 @@ internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() 
         val funNames = inputFiles.mapNotNull { inputFile ->
             if (inputFile.nameWithoutExtension.contains('.')) {
                 val (fileName, suffix) = inputFile.nameWithoutExtension.split('.')
-                val type = ResourceType.values().firstOrNull { fileName.startsWith(it.accessorName, true) }
+                val type = ResourceType.entries.firstOrNull { fileName.startsWith(it.accessorName, true) }
                 val name = "_collect${suffix.uppercaseFirstChar()}${fileName}Resources"
 
                 if (type == null) {
@@ -86,17 +98,21 @@ internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() 
                 logger.warn("Unknown file name: `$inputFile`")
                 null
             }
-        }.groupBy({ it.first }, { it.second })
+        }
+            .groupBy({ it.first }, { it.second })
+            .mapValues { (_, values) -> values.sorted() }
 
         val pkgName = packageName.get()
+        val resClassName = resClassName.get()
         val isPublic = makeAccessorsPublic.get()
         val useActual = useActualModifier.get()
         val spec = getActualResourceCollectorsFileSpec(
-            pkgName,
-            "ActualResourceCollectors",
-            isPublic,
-            useActual,
-            funNames
+            packageName = pkgName,
+            fileName = "ActualResourceCollectors",
+            resClassName = resClassName,
+            isPublic = isPublic,
+            useActualModifier = useActual,
+            typeToCollectorFunctions = funNames
         )
         spec.writeTo(kotlinDir)
     }

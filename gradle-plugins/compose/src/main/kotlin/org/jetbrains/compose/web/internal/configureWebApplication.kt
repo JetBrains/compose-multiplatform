@@ -10,7 +10,6 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.artifacts.UnresolvedDependency
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
-import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
 import org.gradle.language.jvm.tasks.ProcessResources
@@ -21,9 +20,7 @@ import org.jetbrains.compose.internal.utils.file
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.compose.web.tasks.UnpackSkikoWasmRuntimeTask
-import org.jetbrains.kotlin.gradle.targets.js.KotlinWasmTargetType
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
-import org.jetbrains.kotlin.gradle.tasks.IncrementalSyncTask
 
 internal fun Project.configureWeb(
     composeExt: ComposeExtension,
@@ -90,19 +87,6 @@ internal fun configureWebApplication(
         dependsOn(unpackRuntime)
         from(unpackedRuntimeDir)
         into(processedRuntimeDir)
-
-        doLast {
-            // TODO: in the next versions we can simply filter skiko.js out for k/wasm target
-            processedRuntimeDir.file("skiko.js").get().apply {
-                asFile.appendText("\n\n// Warn about skiko.js redundancy in case of K/Wasm target:\n")
-                asFile.appendText(
-                    """console.warn("Note: skiko.js is redundant in K/Wasm Compose for Web applications. 
-                        |Consider removing it from index.html, 
-                        |it will be removed from the distribution in next Compose Multiplatform versions");
-                        """.trimMargin().replace("\n", "")
-                )
-            }
-        }
     }
 
     targets.forEach { target ->

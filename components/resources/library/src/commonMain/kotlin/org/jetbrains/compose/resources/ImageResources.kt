@@ -130,7 +130,6 @@ private fun svgPainter(resource: DrawableResource): Painter {
  * @param resource The drawable resource.
  * @return The byte array representing the drawable resource.
  */
-@ExperimentalResourceApi
 suspend fun getDrawableResourceBytes(
     environment: ResourceEnvironment,
     resource: DrawableResource
@@ -150,11 +149,6 @@ private sealed interface ImageCache {
 }
 
 private val imageCache = AsyncCache<String, ImageCache>()
-
-//@TestOnly
-internal fun dropImageCache() {
-    imageCache.clear()
-}
 
 private suspend fun loadImage(
     path: String,

@@ -10,7 +10,7 @@ android {
     namespace = "org.jetbrains.compose.resources.demo"
     defaultConfig {
         applicationId = "me.user.androidApp"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -20,8 +20,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     dependencies {
-        implementation(compose.ui)
-        implementation(compose.foundation)
+        implementation(libs.compose.ui)
+        implementation(libs.compose.foundation)
         implementation(libs.androidx.appcompat)
         implementation(libs.androidx.activity.compose)
         implementation(project(":resources:demo:shared"))

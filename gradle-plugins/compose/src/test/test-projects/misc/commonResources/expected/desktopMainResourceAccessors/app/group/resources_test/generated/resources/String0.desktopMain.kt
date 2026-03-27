@@ -1,4 +1,4 @@
-@file:OptIn(org.jetbrains.compose.resources.InternalResourceApi::class)
+@file:OptIn(InternalResourceApi::class)
 
 package app.group.resources_test.generated.resources
 
@@ -6,26 +6,18 @@ import kotlin.OptIn
 import kotlin.String
 import kotlin.collections.MutableMap
 import org.jetbrains.compose.resources.InternalResourceApi
+import org.jetbrains.compose.resources.ResourceItem
 import org.jetbrains.compose.resources.StringResource
 
-private object DesktopMainString0 {
-  public val desktop_str: StringResource by 
-      lazy { init_desktop_str() }
-}
+private const val MD: String = "composeResources/app.group.resources_test.generated.resources/"
+
+internal val Res.string.desktop_str: StringResource by lazy {
+      StringResource("string:desktop_str", "desktop_str", setOf(
+        ResourceItem(setOf(), "${MD}values/desktop_strings.desktopMain.cvr", 10, 39),
+      ))
+    }
 
 @InternalResourceApi
 internal fun _collectDesktopMainString0Resources(map: MutableMap<String, StringResource>) {
-  map.put("desktop_str", DesktopMainString0.desktop_str)
+  map.put("desktop_str", Res.string.desktop_str)
 }
-
-internal val Res.string.desktop_str: StringResource
-  get() = DesktopMainString0.desktop_str
-
-private fun init_desktop_str(): StringResource = org.jetbrains.compose.resources.StringResource(
-  "string:desktop_str", "desktop_str",
-    setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(),
-    "composeResources/app.group.resources_test.generated.resources/values/desktop_strings.desktopMain.cvr",
-    10, 39),
-    )
-)

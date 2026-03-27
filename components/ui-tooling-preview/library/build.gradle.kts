@@ -1,5 +1,5 @@
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     kotlin("multiplatform")
@@ -12,12 +12,13 @@ kotlin {
     androidTarget {
         publishLibraryVariants("release")
         compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget.set(JvmTarget.JVM_11)
+                }
             }
         }
     }
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
     js {
@@ -29,15 +30,40 @@ kotlin {
         browser {
         }
     }
-    macosX64()
     macosArm64()
+
+    applyDefaultHierarchyTemplate()
+
+    sourceSets {
+        val commonMain by getting
+
+        androidMain.dependencies {
+            api(libs.androidx.ui.tooling.preview)
+        }
+
+        val nonAndroidMain by creating {
+            dependsOn(commonMain)
+        }
+
+        val appleMain by getting
+        appleMain.dependsOn(nonAndroidMain)
+
+        val desktopMain by getting
+        desktopMain.dependsOn(nonAndroidMain)
+
+        val jsMain by getting
+        jsMain.dependsOn(nonAndroidMain)
+
+        val wasmJsMain by getting
+        wasmJsMain.dependsOn(nonAndroidMain)
+    }
 }
 
 android {
     compileSdk = 35
     namespace = "org.jetbrains.compose.ui.tooling.preview"
     defaultConfig {
-        minSdk = 21
+        minSdk = 23
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {

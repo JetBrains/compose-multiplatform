@@ -8,14 +8,12 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import java.io.FileNotFoundException
 import java.io.InputStream
 
-internal actual fun getPlatformResourceReader(): ResourceReader = object : ResourceReader {
-    private val assets: AssetManager by lazy {
-        val context = androidContext ?: error(
-            "Android context is not initialized. " +
-                    "If it happens in the Preview mode then call PreviewContextConfigurationEffect() function."
-        )
-        context.assets
-    }
+@ExperimentalResourceApi
+internal actual fun getPlatformResourceReader(): ResourceReader = DefaultAndroidResourceReader
+
+@ExperimentalResourceApi
+internal object DefaultAndroidResourceReader : ResourceReader {
+    private val assets: AssetManager? get() = androidContext?.assets
 
     private val instrumentedAssets: AssetManager?
         get() = try {
@@ -65,7 +63,7 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
             Uri.parse("file:///android_asset/$path")
         } else {
             val classLoader = getClassLoader()
-            val resource = classLoader.getResource(path) ?: throw MissingResourceException(path)
+            val resource = classLoader.getResource(path) ?: throwMissingResourceException(path)
             resource.toURI()
         }
         return uri.toString()
@@ -79,8 +77,20 @@ internal actual fun getPlatformResourceReader(): ResourceReader = object : Resou
                 instrumentedAssets.open(path)
             } catch (e: FileNotFoundException) {
                 val classLoader = getClassLoader()
-                classLoader.getResourceAsStream(path) ?: throw MissingResourceException(path)
+                classLoader.getResourceAsStream(path) ?: throwMissingResourceException(path)
             }
+        }
+    }
+
+    private fun throwMissingResourceException(path: String): Nothing {
+        if (androidContext == null) {
+            throw MissingResourceException(
+                path = path,
+                message = "Android context is not initialized. " +
+                    "If it happens in the Preview mode then call PreviewContextConfigurationEffect() function."
+            )
+        } else {
+            throw MissingResourceException(path)
         }
     }
 

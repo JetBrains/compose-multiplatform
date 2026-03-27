@@ -1,5 +1,3 @@
-import org.jetbrains.compose.ExperimentalComposeLibrary
-
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.compose")
@@ -11,23 +9,23 @@ group = "app.group"
 kotlin {
     jvm("desktop")
 
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
+
+    macosArm64()
 
     sourceSets {
         commonMain {
             dependencies {
-                implementation(compose.runtime)
-                implementation(compose.material)
-                implementation(compose.components.resources)
+                implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
+                implementation("org.jetbrains.compose.material:material:COMPOSE_VERSION_PLACEHOLDER")
+                implementation("org.jetbrains.compose.components:components-resources:COMPOSE_VERSION_PLACEHOLDER")
             }
         }
         commonTest {
             dependencies {
                 implementation(kotlin("test"))
-                @OptIn(ExperimentalComposeLibrary::class)
-                implementation(compose.uiTest)
+                implementation("org.jetbrains.compose.ui:ui-test:COMPOSE_VERSION_PLACEHOLDER")
             }
         }
         val desktopMain by getting {

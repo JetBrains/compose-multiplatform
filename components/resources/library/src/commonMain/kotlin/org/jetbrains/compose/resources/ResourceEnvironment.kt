@@ -5,7 +5,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.intl.Locale
 
-@ExperimentalResourceApi
 class ResourceEnvironment internal constructor(
     internal val language: LanguageQualifier,
     internal val region: RegionQualifier,
@@ -69,7 +68,6 @@ internal val LocalComposeEnvironment = staticCompositionLocalOf { DefaultCompose
  *
  * @return An instance of [ResourceEnvironment] representing the current environment.
  */
-@ExperimentalResourceApi
 @Composable
 fun rememberResourceEnvironment(): ResourceEnvironment {
     val composeEnvironment = LocalComposeEnvironment.current
@@ -86,7 +84,6 @@ internal var getResourceEnvironment = ::getSystemEnvironment
  * Provides the resource environment for non-composable access to resources.
  * It is an expensive operation! Don't use it in composable functions with no cache!
  */
-@ExperimentalResourceApi
 fun getSystemResourceEnvironment(): ResourceEnvironment = getResourceEnvironment()
 
 @OptIn(InternalResourceApi::class)

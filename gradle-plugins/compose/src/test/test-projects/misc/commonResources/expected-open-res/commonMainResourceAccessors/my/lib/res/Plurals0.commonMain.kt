@@ -1,4 +1,4 @@
-@file:OptIn(org.jetbrains.compose.resources.InternalResourceApi::class)
+@file:OptIn(InternalResourceApi::class)
 
 package my.lib.res
 
@@ -7,25 +7,17 @@ import kotlin.String
 import kotlin.collections.MutableMap
 import org.jetbrains.compose.resources.InternalResourceApi
 import org.jetbrains.compose.resources.PluralStringResource
+import org.jetbrains.compose.resources.ResourceItem
 
-private object CommonMainPlurals0 {
-  public val numberOfSongsAvailable: PluralStringResource by 
-      lazy { init_numberOfSongsAvailable() }
-}
+private const val MD: String = "composeResources/my.lib.res/"
+
+public val MyRes.plurals.numberOfSongsAvailable: PluralStringResource by lazy {
+      PluralStringResource("plurals:numberOfSongsAvailable", "numberOfSongsAvailable", setOf(
+        ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 10, 124),
+      ))
+    }
 
 @InternalResourceApi
 internal fun _collectCommonMainPlurals0Resources(map: MutableMap<String, PluralStringResource>) {
-  map.put("numberOfSongsAvailable", CommonMainPlurals0.numberOfSongsAvailable)
+  map.put("numberOfSongsAvailable", MyRes.plurals.numberOfSongsAvailable)
 }
-
-public val Res.plurals.numberOfSongsAvailable: PluralStringResource
-  get() = CommonMainPlurals0.numberOfSongsAvailable
-
-private fun init_numberOfSongsAvailable(): PluralStringResource =
-    org.jetbrains.compose.resources.PluralStringResource(
-  "plurals:numberOfSongsAvailable", "numberOfSongsAvailable",
-    setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(),
-    "composeResources/my.lib.res/values/strings.commonMain.cvr", 10, 124),
-    )
-)

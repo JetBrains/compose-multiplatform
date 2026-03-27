@@ -3,19 +3,27 @@ pluginManagement {
         mavenLocal()
         mavenCentral()
         gradlePluginPortal()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
         google()
-    }
-
-    plugins {
-        val kotlinVersion = extra["kotlin.version"] as String
-        kotlin("multiplatform").version(kotlinVersion)
-        id("org.jetbrains.kotlin.plugin.compose").version(kotlinVersion)
-        val composeVersion = extra["compose.version"] as String
-        id("org.jetbrains.compose").version(composeVersion)
     }
 }
 
 rootProject.name = "compose-benchmarks"
+
+dependencyResolutionManagement {
+    versionCatalogs{
+        create("libs") {
+            // Override Kotlin and Compose versions with properties
+            providers.run {
+                with(gradleProperty("kotlin.version")) {
+                    if (isPresent) version("kotlin", get())
+                }
+                with(gradleProperty("compose.version")) {
+                    if (isPresent) version("compose-multiplatform", get())
+                }
+            }
+        }
+    }
+}
 
 include(":benchmarks")

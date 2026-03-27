@@ -13,14 +13,18 @@ compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
+            javaHome = javaToolchains.launcherFor {
+                languageVersion.set(JavaLanguageVersion.of(%JAVA_VERSION%))
+            }.get().metadata.installationPath.asFile.absolutePath
+
             packageName = "TestPackage"
             macOS {
                 bundleID = "signing.test.package"
 
                 signing {
                     sign.set(true)
-                    identity.set("Compose Test")
-                    keychain.set("compose.test.keychain")
+                    identity.set("%IDENTITY%")
+                    keychain.set("%KEYCHAIN%")
                 }
             }
         }

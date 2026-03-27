@@ -4,13 +4,12 @@ import app.group.resources_test.generated.resources.Res
 import app.group.resources_test.generated.resources.app_name
 import app.group.resources_test.generated.resources.test_string
 import kotlinx.coroutines.test.runTest
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
-@OptIn(ExperimentalTestApi::class, ExperimentalResourceApi::class)
+@OptIn(ExperimentalTestApi::class)
 class CommonUiTest {
 
     @Test

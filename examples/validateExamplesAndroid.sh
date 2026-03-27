@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script to build most of the examples, to verify if they can compile.
-# Don't add examples, which don't depend on maven.pkg.jetbrains.space, because they won't be able to compile.
+# Example must be buildable with dev builds, so they should have dev maven repo set up.
 
 set -euo pipefail
 
@@ -25,7 +25,3 @@ runGradle codeviewer installDebug
 runGradle imageviewer installDebug
 runGradle issues installDebug
 runGradle graphics-2d installDebug
-runGradle todoapp-lite installDebug
-runGradle widgets-gallery installDebug
-runGradle todoapp installDebug
-runGradle jetsnack installDebug

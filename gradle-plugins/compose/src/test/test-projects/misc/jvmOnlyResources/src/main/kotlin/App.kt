@@ -4,7 +4,6 @@ import me.app.jvmonlyresources.generated.resources.Res
 import me.app.jvmonlyresources.generated.resources.vector
 import org.jetbrains.compose.resources.*
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun App() {
     Image(

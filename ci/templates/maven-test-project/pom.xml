@@ -12,8 +12,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.code.style>official</kotlin.code.style>
         <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
-        <kotlin.version>2.1.0</kotlin.version>
-        <compose.version>1.8.0-alpha02</compose.version>
+        <kotlin.version>2.3.20</kotlin.version>
+        <compose.version>1.10.1</compose.version>
+        <compose.material3.version>1.9.0</compose.material3.version>
     </properties>
 
     <repositories>
@@ -27,7 +28,7 @@
         </repository>
         <repository>
             <id>composeDev</id>
-            <url>https://maven.pkg.jetbrains.space/public/p/compose/dev</url>
+            <url>https://packages.jetbrains.team/maven/p/cmp/dev</url>
         </repository>
     </repositories>
 
@@ -56,23 +57,23 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <args>org.jetbrains.kotlin:kotlin-compose-compiler-plugin-embeddable
-                        <arg>-Xplugin=${user.home}/.m2/repository/org/jetbrains/kotlin/kotlin-compose-compiler-plugin/${kotlin.version}/kotlin-compose-compiler-plugin-${kotlin.version}.jar</arg>
+                    <args>
+                        <arg>-Xplugin=${user.home}/.m2/repository/org/jetbrains/kotlin/kotlin-compose-compiler-plugin-embeddable/${kotlin.version}/kotlin-compose-compiler-plugin-embeddable-${kotlin.version}.jar</arg>
                     </args>
                 </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.5.3</version>
             </plugin>
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.5.3</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
+                <version>3.5.1</version>
                 <configuration>
                     <mainClass>MainKt</mainClass>
                 </configuration>
@@ -99,9 +100,19 @@
             <version>${kotlin.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains.compose.ui</groupId>
+            <artifactId>ui-desktop</artifactId>
+            <version>${compose.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.compose.foundation</groupId>
+            <artifactId>foundation-desktop</artifactId>
+            <version>${compose.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.jetbrains.compose.material3</groupId>
             <artifactId>material3-desktop</artifactId>
-            <version>${compose.version}</version>
+            <version>${compose.material3.version}</version>
         </dependency>
 
         <dependency>
@@ -181,7 +192,7 @@
 
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-compose-compiler-plugin</artifactId>
+            <artifactId>kotlin-compose-compiler-plugin-embeddable</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
     </dependencies>

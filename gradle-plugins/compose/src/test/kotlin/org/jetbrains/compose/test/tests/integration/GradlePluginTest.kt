@@ -12,6 +12,7 @@ import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewLogger
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.RemoteConnection
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.receiveConfigFromGradle
 import org.jetbrains.compose.internal.Version
+import org.jetbrains.compose.newComposeCompilerError
 import org.jetbrains.compose.test.utils.GradlePluginTestBase
 import org.jetbrains.compose.test.utils.checkExists
 import org.jetbrains.compose.test.utils.checks
@@ -23,6 +24,7 @@ import java.net.SocketTimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
+import kotlin.test.assertContentEquals
 import kotlin.test.assertFalse
 
 class GradlePluginTest : GradlePluginTestBase() {
@@ -34,17 +36,6 @@ class GradlePluginTest : GradlePluginTestBase() {
             defaultTestEnvironment.copy(useGradleConfigurationCache = false)
         )
     ) {
-        fun jsCanvasEnabled(value: Boolean) {
-            modifyGradleProperties { put("org.jetbrains.compose.experimental.jscanvas.enabled", value.toString()) }
-
-        }
-
-        jsCanvasEnabled(false)
-        gradleFailure(":build").checks {
-            check.logContains("ERROR: Compose targets '[jscanvas]' are experimental and may have bugs!")
-        }
-
-        jsCanvasEnabled(true)
         gradle(":build").checks {
             check.taskSuccessful(":unpackSkikoWasmRuntime")
             check.taskSuccessful(":processSkikoRuntimeForKWasm")
@@ -70,8 +61,7 @@ class GradlePluginTest : GradlePluginTestBase() {
                 assertTrue(isDirectory)
                 val distributionFiles = listFiles()!!.map { it.name }.toList()
                 assertTrue(distributionFiles.contains("skiko.wasm"))
-                assertTrue(distributionFiles.contains("skiko.js"))
-                assertFalse(this.resolve("skiko.js").readText().contains("skiko.js is redundant"))
+                assertTrue(distributionFiles.contains("skiko.mjs"))
             }
         }
     }
@@ -95,6 +85,41 @@ class GradlePluginTest : GradlePluginTestBase() {
                 check.taskSuccessful(":compileKotlinJs")
             }
         }
+
+    // Note: we can't test non-jvm targets with Kotlin older than 2.3.0, because of klib abi version bump in 2.3.0
+    private val oldestSupportedKotlinVersion = "2.3.0"
+    @Test
+    fun testOldestKotlinMpp() = with(
+        testProject(
+            "application/mpp",
+            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = oldestSupportedKotlinVersion)
+        )
+    ) {
+        val logLine = "Kotlin MPP app is running!"
+        gradle("run").checks {
+            check.taskSuccessful(":run")
+            check.logContains(logLine)
+        }
+    }
+
+    @Test
+    fun testOldestKotlinJsMpp() = with(
+        testProject(
+            "application/jsMpp",
+            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = oldestSupportedKotlinVersion)
+        )
+    ) {
+        gradle(":compileKotlinJs").checks {
+            check.taskSuccessful(":compileKotlinJs")
+        }
+    }
+
+    @Test
+    fun testOldComposePluginError() = with(testProject("misc/oldComposePlugin")) {
+        gradleFailure("tasks").checks {
+            check.logContains(newComposeCompilerError)
+        }
+    }
 
     @Test
     fun configurePreview() {

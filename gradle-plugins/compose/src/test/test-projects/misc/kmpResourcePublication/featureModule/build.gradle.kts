@@ -2,41 +2,28 @@ plugins {
     id("org.jetbrains.compose")
     kotlin("multiplatform")
     kotlin("plugin.compose")
-    id("com.android.library")
+    id("com.android.kotlin.multiplatform.library")
 }
 
 kotlin {
-    androidTarget()
+    androidLibrary {
+        compileSdk = 35
+        namespace = "me.sample.feature"
+        minSdk = 23
+        androidResources.enable = true
+    }
     jvm()
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
+    macosArm64()
     js { browser() }
     wasmJs { browser() }
 
     sourceSets {
-        all {
-            languageSettings {
-                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
-            }
-        }
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.material3)
-            implementation(compose.components.resources)
+            implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
+            implementation("org.jetbrains.compose.material3:material3:1.9.0")
+            implementation("org.jetbrains.compose.components:components-resources:COMPOSE_VERSION_PLACEHOLDER")
         }
-    }
-}
-
-android {
-    namespace = "me.sample.feature"
-    compileSdk = 35
-
-    defaultConfig {
-        minSdk = 24
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
 }

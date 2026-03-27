@@ -8,6 +8,6 @@ group = "me.app"
 
 dependencies {
     implementation(compose.desktop.currentOs)
-    implementation(compose.components.resources)
+    implementation("org.jetbrains.compose.components:components-resources:COMPOSE_VERSION_PLACEHOLDER")
 }
 

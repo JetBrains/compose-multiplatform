@@ -1,0 +1,21 @@
+plugins {
+    id("org.jetbrains.kotlin.multiplatform")
+    id("org.jetbrains.compose")
+    id("org.jetbrains.kotlin.plugin.compose")
+}
+
+kotlin {
+    wasmJs {
+        browser { }
+        binaries.executable()
+    }
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
+        }
+
+        val webMain by creating { dependsOn(commonMain.get()) }
+        wasmJsMain { dependsOn(webMain) }
+    }
+}

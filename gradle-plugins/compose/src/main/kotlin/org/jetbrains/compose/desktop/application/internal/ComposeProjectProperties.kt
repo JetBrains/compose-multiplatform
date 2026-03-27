@@ -26,6 +26,9 @@ internal object ComposeProperties {
     internal const val CHECK_JDK_VENDOR = "compose.desktop.packaging.checkJdkVendor"
     internal const val DISABLE_MULTIMODULE_RESOURCES = "org.jetbrains.compose.resources.multimodule.disable"
     internal const val SYNC_RESOURCES_PROPERTY = "compose.ios.resources.sync"
+    internal const val DISABLE_HOT_RELOAD = "org.jetbrains.compose.hot.reload.disable"
+    internal const val DISABLE_RESOURCE_CONTENT_HASH_GENERATION = "org.jetbrains.compose.resources.content.hash.generation.disable"
+    internal const val DISABLE_LIBRARY_COMPATIBILITY_CHECK = "org.jetbrains.compose.library.compatibility.check.disable"
 
     fun isVerbose(providers: ProviderFactory): Provider<Boolean> =
         providers.valueOrNull(VERBOSE).toBooleanProvider(false)
@@ -59,6 +62,15 @@ internal object ComposeProperties {
 
     fun disableMultimoduleResources(providers: ProviderFactory): Provider<Boolean> =
         providers.valueOrNull(DISABLE_MULTIMODULE_RESOURCES).toBooleanProvider(false)
+
+    fun disableHotReload(providers: ProviderFactory): Provider<Boolean> =
+        providers.valueOrNull(DISABLE_HOT_RELOAD).toBooleanProvider(false)
+
+    fun disableResourceContentHashGeneration(providers: ProviderFactory): Provider<Boolean> =
+        providers.valueOrNull(DISABLE_RESOURCE_CONTENT_HASH_GENERATION).toBooleanProvider(false)
+
+    fun disableLibraryCompatibilityCheck(providers: ProviderFactory): Provider<Boolean> =
+        providers.valueOrNull(DISABLE_LIBRARY_COMPATIBILITY_CHECK).toBooleanProvider(false)
 
     //providers.valueOrNull works only with root gradle.properties
     fun dontSyncResources(project: Project): Provider<Boolean> =

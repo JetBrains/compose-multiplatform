@@ -16,10 +16,6 @@ internal sealed interface StringItem {
 }
 
 private val stringItemsCache = AsyncCache<String, StringItem>()
-//@TestOnly
-internal fun dropStringItemsCache() {
-    stringItemsCache.clear()
-}
 
 internal suspend fun getStringItem(
     resourceItem: ResourceItem,
@@ -28,9 +24,9 @@ internal suspend fun getStringItem(
     key = "${resourceItem.path}/${resourceItem.offset}-${resourceItem.size}"
 ) {
     val record = resourceReader.readPart(
-        resourceItem.path,
-        resourceItem.offset,
-        resourceItem.size
+        path = resourceItem.path,
+        offset = resourceItem.offset,
+        size = resourceItem.size,
     ).decodeToString()
     val recordItems = record.split('|')
     val recordType = recordItems.first()

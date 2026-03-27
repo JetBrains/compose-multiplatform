@@ -16,6 +16,7 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
+                implementation("org.jetbrains.compose.material:material-icons-core:1.6.11")
                 implementation("com.apollographql.apollo:apollo-runtime:2.3.0")
                 implementation("org.ocpsoft.prettytime:prettytime:4.0.4.Final")
             }

@@ -10,6 +10,8 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.jetbrains.compose.internal.IdeaImportTask
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentOS
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.relativeTo
@@ -17,6 +19,9 @@ import kotlin.io.path.relativeTo
 internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     @get:Input
     abstract val packageName: Property<String>
+
+    @get:Input
+    abstract val resClassName: Property<String>
 
     @get:Input
     abstract val sourceSetName: Property<String>
@@ -27,6 +32,9 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
 
     @get:Input
     abstract val makeAccessorsPublic: Property<Boolean>
+
+    @get:Input
+    abstract val disableResourceContentHashGeneration: Property<Boolean>
 
     @get:InputFiles
     @get:SkipWhenEmpty
@@ -68,10 +76,31 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
 
         val pkgName = packageName.get()
         val moduleDirectory = packagingDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
+        val resClassName = resClassName.get()
         val isPublic = makeAccessorsPublic.get()
+        val generateResourceContentHashAnnotation = !disableResourceContentHashGeneration.get()
         getAccessorsSpecs(
-            resources, pkgName, sourceSet, moduleDirectory, isPublic
+            resources,
+            pkgName,
+            sourceSet,
+            moduleDirectory,
+            resClassName,
+            isPublic,
+            generateResourceContentHashAnnotation
         ).forEach { it.writeTo(kotlinDir) }
+    }
+
+    private fun File.isTextResourceFile(): Boolean =
+        path.endsWith(".xml", true) || path.endsWith(".svg", true)
+
+    private fun File.resourceContentHash(): Int {
+        if ((currentOS == OS.Windows) && isTextResourceFile()) {
+            // Windows has different line endings in comparison with Unixes,
+            // thus text resource files binary differ there, so we need to handle this.
+            return readText().replace("\r\n", "\n").toByteArray().contentHashCode()
+        } else {
+            return readBytes().contentHashCode()
+        }
     }
 
     private fun File.fileToResourceItems(
@@ -101,7 +130,15 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
         }
 
         val type = ResourceType.fromString(typeString) ?: error("Unknown resource type: '$typeString'.")
-        return listOf(ResourceItem(type, qualifiers, file.nameWithoutExtension.asUnderscoredIdentifier(), path))
+        return listOf(
+            ResourceItem(
+                type,
+                qualifiers,
+                file.nameWithoutExtension.asUnderscoredIdentifier(),
+                path,
+                file.resourceContentHash()
+            )
+        )
     }
 
     private fun getValueResourceItems(dataFile: File, qualifiers: List<String>, path: Path): List<ResourceItem> {
@@ -132,7 +169,15 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
         path: Path
     ): ResourceItem {
         val record = ValueResourceRecord.createFromString(recordString)
-        return ResourceItem(record.type, qualifiers, record.key.asUnderscoredIdentifier(), path, offset, size)
+        return ResourceItem(
+            record.type,
+            qualifiers,
+            record.key.asUnderscoredIdentifier(),
+            path,
+            record.content.hashCode(),
+            offset,
+            size
+        )
     }
 }
 

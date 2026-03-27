@@ -6,7 +6,7 @@ import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
-import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import org.jetbrains.compose.internal.kotlinJvmExt
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.plugin.extraProperties
@@ -36,6 +36,7 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: Kotl
 
     if (kmpResourcesAreAvailable) {
         configureMultimoduleResources(kotlinExtension, config)
+        configureXCFrameworkComposeResources(kotlinExtension)
     } else {
         if (!disableMultimoduleResources) {
             if (!hasKmpResources) logger.info(
@@ -59,8 +60,7 @@ private fun Project.onKgpApplied(config: Provider<ResourcesExtension>, kgp: Kotl
 }
 
 internal fun Project.onKotlinJvmApplied(config: Provider<ResourcesExtension>) {
-    val kotlinExtension = project.extensions.getByType(KotlinJvmProjectExtension::class.java)
-    configureJvmOnlyResources(kotlinExtension, config)
+    configureJvmOnlyResources(kotlinJvmExt, config)
 }
 
 internal fun Project.onAgpApplied(block: (pluginId: String) -> Unit) {

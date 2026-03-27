@@ -1,2 +1,4 @@
+import androidx.compose.runtime.Composable
+
 actual val Abc.composableIntVal: Int
-    get() = 100
+    @Composable get() = 100

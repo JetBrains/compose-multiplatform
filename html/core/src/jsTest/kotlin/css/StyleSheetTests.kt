@@ -43,6 +43,33 @@ class StyleSheetTests {
     }
 
     @Test
+    fun useImportantStyleSheet() {
+        val styleSheet = object : StyleSheet(usePrefix = false) {
+            val someClassName by style {
+                property("color", "red", true)
+            }
+        }
+
+        val childStyleSheet = object : StyleSheet(styleSheet, usePrefix = false) {
+            val someClassName by style {
+                property("color", "green", false)
+            }
+        }
+
+        assertContentEquals(
+            listOf(".someClassName { color: red !important;}", ".someClassName { color: green;}"),
+            styleSheet.serializeRules(),
+            "styleSheet rules"
+        )
+
+        assertContentEquals(
+            listOf(".someClassName { color: red !important;}", ".someClassName { color: green;}"),
+            childStyleSheet.serializeRules(),
+            "childStyleSheet rules"
+        )
+    }
+
+    @Test
     fun stylesheetCorrectlyUsingIncomingPrefix() {
         val testPrefixParent = "test_prefix_parent-"
         val testPrefixChild = "test_prefix_child-"

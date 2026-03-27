@@ -4,24 +4,18 @@ import androidx.compose.foundation.Image
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.runComposeUiTest
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
 import kotlin.test.*
 
 @OptIn(ExperimentalTestApi::class, InternalResourceApi::class)
 class ComposeResourceTest {
 
     init {
-        dropStringItemsCache()
-        dropImageCache()
         getResourceEnvironment = ::getTestEnvironment
     }
 
     @Test
-    fun testCountRecompositions() = runComposeUiTest {
+    fun testCountRecompositions() = clearResourceCachesAndRunUiTest {
         var res by mutableStateOf(TestDrawableResource("1.png"))
         val recompositionsCounter = RecompositionsCounter()
         setContent {
@@ -39,7 +33,7 @@ class ComposeResourceTest {
     }
 
     @Test
-    fun testImageResourceCache() = runComposeUiTest {
+    fun testImageResourceCache() = clearResourceCachesAndRunUiTest {
         val testResourceReader = TestResourceReader()
         var res by mutableStateOf(TestDrawableResource("1.png"))
         setContent {
@@ -60,10 +54,22 @@ class ComposeResourceTest {
             expected = listOf("1.png", "2.png"), //no second read of 1.png
             actual = testResourceReader.readPaths
         )
+
+        ResourceCaches.clear()
+
+        res = TestDrawableResource("2.png")
+        waitForIdle()
+        res = TestDrawableResource("1.png")
+        waitForIdle()
+
+        assertEquals(
+            expected = listOf("1.png", "2.png", "2.png", "1.png"), // read images again
+            actual = testResourceReader.readPaths
+        )
     }
 
     @Test
-    fun testImageResourceDensity() = runComposeUiTest {
+    fun testImageResourceDensity() = clearResourceCachesAndRunUiTest {
         val testResourceReader = TestResourceReader()
         val imgRes = DrawableResource(
             "test_id", setOf(
@@ -101,10 +107,11 @@ class ComposeResourceTest {
     }
 
     @Test
-    fun testStringResourceCache() = runComposeUiTest {
+    fun testStringResourceCache() = clearResourceCachesAndRunUiTest {
         val testResourceReader = TestResourceReader()
         var res by mutableStateOf(TestStringResource("app_name"))
         var str = ""
+
         setContent {
             CompositionLocalProvider(
                 LocalResourceReader provides testResourceReader,
@@ -144,10 +151,26 @@ class ComposeResourceTest {
             ), //only three different
             actual = testResourceReader.readPaths
         )
+
+        ResourceCaches.clear()
+
+        res = TestStringResource("hello")
+        waitForIdle()
+        assertEquals(str, "\uD83D\uDE0A Hello world!")
+        assertEquals(
+            expected = listOf(
+                "strings.cvr/314-44",
+                "strings.cvr/211-47",
+                "strings.cvr/359-37",
+                "strings.cvr/359-37",
+            ), //read hello item again
+            actual = testResourceReader.readPaths
+        )
+
     }
 
     @Test
-    fun testReadStringResource() = runComposeUiTest {
+    fun testReadStringResource() = clearResourceCachesAndRunUiTest {
         var app_name = ""
         var accentuated_characters = ""
         var str_template = ""
@@ -170,7 +193,7 @@ class ComposeResourceTest {
 
     // https://github.com/JetBrains/compose-multiplatform/issues/4325
     @Test
-    fun testReadStringFromDifferentArgs() = runComposeUiTest {
+    fun testReadStringFromDifferentArgs() = clearResourceCachesAndRunUiTest {
         var arg by mutableStateOf(42)
         var str1 = ""
         var str2 = ""
@@ -202,7 +225,7 @@ class ComposeResourceTest {
     }
 
     @Test
-    fun testPluralStringResourceCache() = runComposeUiTest {
+    fun testPluralStringResourceCache() = clearResourceCachesAndRunUiTest {
         val testResourceReader = TestResourceReader()
         var res by mutableStateOf(TestPluralStringResource("plurals"))
         var quantity by mutableStateOf(0)
@@ -245,7 +268,7 @@ class ComposeResourceTest {
     }
 
     @Test
-    fun testReadPluralStringResource() = runComposeUiTest {
+    fun testReadPluralStringResource() = clearResourceCachesAndRunUiTest {
         var plurals = ""
         var another_plurals = ""
         setContent {
@@ -261,7 +284,7 @@ class ComposeResourceTest {
     }
 
     @Test
-    fun testReadQualityStringFromDifferentArgs() = runComposeUiTest {
+    fun testReadQualityStringFromDifferentArgs() = clearResourceCachesAndRunUiTest {
         // we're putting different integers to arguments and the quantity
         var quantity by mutableStateOf(0)
 
@@ -329,7 +352,7 @@ class ComposeResourceTest {
     }
 
     @Test
-    fun testGetResourceUri() = runComposeUiTest {
+    fun testGetResourceUri() = clearResourceCachesAndRunUiTest {
         var uri1 = ""
         var uri2 = ""
         setContent {
@@ -357,7 +380,7 @@ class ComposeResourceTest {
 
     @OptIn(ExperimentalResourceApi::class)
     @Test
-    fun testGetResourceEnvironment() = runComposeUiTest {
+    fun testGetResourceEnvironment() = clearResourceCachesAndRunUiTest {
         var environment: ResourceEnvironment? = null
         setContent {
             CompositionLocalProvider(LocalComposeEnvironment provides TestComposeEnvironment) {
@@ -371,7 +394,7 @@ class ComposeResourceTest {
     }
 
     @Test
-    fun rememberResourceStateAffectedByEnvironmentChanges() = runComposeUiTest {
+    fun rememberResourceStateAffectedByEnvironmentChanges() = clearResourceCachesAndRunUiTest {
         val env2 = ResourceEnvironment(
             language = LanguageQualifier("en"),
             region = RegionQualifier("CA"),

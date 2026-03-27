@@ -11,9 +11,12 @@ import org.jetbrains.compose.internal.utils.joinLowerCamelCase
 import org.jetbrains.compose.internal.utils.registerOrConfigure
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.cocoapods.CocoapodsExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.Framework
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBinary
+import org.jetbrains.kotlin.gradle.plugin.mpp.StaticLibrary
 import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.io.File
@@ -33,39 +36,49 @@ internal fun Project.configureSyncIosComposeResources(
     }
 
     kotlinExtension.targets.withType(KotlinNativeTarget::class.java).all { nativeTarget ->
-        if (nativeTarget.isIosTarget()) {
-            nativeTarget.binaries.withType(Framework::class.java).all { iosFramework ->
-                val frameworkClassifier = iosFramework.getClassifier()
-                val checkNoSandboxTask = tasks.registerOrConfigure<CheckCanAccessComposeResourcesDirectory>(
-                    "checkCanSync${frameworkClassifier}ComposeResourcesForIos"
-                ) {}
-
-                val frameworkResources = files()
-                iosFramework.compilation.allKotlinSourceSets.forAll { ss ->
-                    frameworkResources.from(ss.resources.sourceDirectories)
+        if (nativeTarget.isIosOrMacTarget()) {
+            nativeTarget.binaries.withType(NativeBinary::class.java)
+                .matching { binary ->
+                    binary is Framework || binary.isSwiftExportStaticLibrary()
                 }
-                val syncComposeResourcesTask = tasks.registerOrConfigure<SyncComposeResourcesForIosTask>(
-                    iosFramework.getSyncResourcesTaskName()
-                ) {
-                    dependsOn(checkNoSandboxTask)
-                    dependsOn(frameworkResources)  //!!! explicit dependency because targetResources is not an input
+                .all { binary ->
+                    val binClassifier = binary.getClassifier()
+                    val checkNoSandboxTask = tasks.registerOrConfigure<CheckCanAccessComposeResourcesDirectory>(
+                        "checkCanSync${binClassifier}ComposeResourcesForIos"
+                    ) {}
+                    val frameworkResources = files()
+                    binary.compilation.allKotlinSourceSets.forAll { ss ->
+                        frameworkResources.from(ss.resources.sourceDirectories)
+                    }
+                    val syncComposeResourcesTask = tasks.registerOrConfigure<SyncComposeResourcesForIosTask>(
+                        binary.getSyncResourcesTaskName()
+                    ) {
+                        dependsOn(checkNoSandboxTask)
+                        dependsOn(frameworkResources)  //!!! explicit dependency because targetResources is not an input
 
-                    outputDir.set(iosFramework.getFinalResourcesDir())
-                    targetResources.put(iosFramework.target.konanTarget.name, frameworkResources)
-                }
+                        outputDir.set(binary.getFinalResourcesDir())
+                        targetResources.put(binary.target.konanTarget.name, frameworkResources)
+                    }
 
-                val externalTaskName = if (iosFramework.isCocoapodsFramework()) {
-                    "syncFramework"
-                } else {
-                    "embedAndSign${frameworkClassifier}AppleFrameworkForXcode"
-                }
+                    val externalTaskName = when {
+                        binary.isCocoapodsFramework() -> "syncFramework"
+                        binary.isSwiftExportStaticLibrary() -> "embedSwiftExportForXcode"
+                        else -> "embedAndSign${binClassifier}AppleFrameworkForXcode"
+                    }
 
-                project.tasks.configureEach { task ->
-                    if (task.name == externalTaskName) {
-                        task.dependsOn(syncComposeResourcesTask)
+                    project.tasks.configureEach { task ->
+                        if (task.name == externalTaskName) {
+                            task.dependsOn(syncComposeResourcesTask)
+                        }
+
+                        //FIXME: https://youtrack.jetbrains.com/issue/KT-82332
+                        if (binary.isSwiftExportStaticLibrary() &&
+                            task.name.let { it.startsWith("copy") && it.endsWith("SPMIntermediates") }
+                        ) {
+                            task.dependsOn(syncComposeResourcesTask)
+                        }
                     }
                 }
-            }
 
             nativeTarget.binaries.withType(TestExecutable::class.java).all { testExec ->
                 val copyTestResourcesTask = tasks.registerOrConfigure<Copy>(
@@ -93,6 +106,7 @@ internal fun Project.configureSyncIosComposeResources(
                 val projectPath = project.path
                 specAttributes["resources"] = specAttr
                 project.tasks.named("podspec").configure {
+                    it.outputs.dir(syncDir)
                     it.doFirst {
                         if (specAttributes["resources"] != specAttr) error(
                             """
@@ -101,7 +115,6 @@ internal fun Project.configureSyncIosComposeResources(
                                 |  * Alternative action: turn off Compose Multiplatform's resources management for iOS by adding '${ComposeProperties.SYNC_RESOURCES_PROPERTY}=false' to your gradle.properties;
                             """.trimMargin()
                         )
-                        syncDir.mkdirs()
                     }
                 }
             }
@@ -109,25 +122,27 @@ internal fun Project.configureSyncIosComposeResources(
     }
 }
 
-private fun Framework.getClassifier(): String {
+private fun NativeBinary.getClassifier(): String {
     val suffix = joinLowerCamelCase(buildType.getName(), outputKind.taskNameClassifier)
     return if (name == suffix) ""
     else name.substringBeforeLast(suffix.uppercaseFirstChar()).uppercaseFirstChar()
 }
 
-internal fun Framework.getSyncResourcesTaskName() = "sync${getClassifier()}ComposeResourcesForIos"
-private fun Framework.isCocoapodsFramework() = name.startsWith("pod")
+private fun NativeBinary.getSyncResourcesTaskName() = "sync${getClassifier()}ComposeResourcesForIos"
 
-private fun Framework.getFinalResourcesDir(): Provider<Directory> {
+private fun NativeBinary.isCocoapodsFramework() = this is Framework && name.startsWith("pod")
+private fun NativeBinary.isSwiftExportStaticLibrary() = this is StaticLibrary && baseName == "SwiftExportBinary"
+
+private fun NativeBinary.getFinalResourcesDir(): Provider<Directory> {
     val providers = project.providers
     return if (isCocoapodsFramework()) {
         project.layout.buildDirectory.dir("compose/cocoapods/$IOS_COMPOSE_RESOURCES_ROOT_DIR/")
     } else {
         providers.environmentVariable("BUILT_PRODUCTS_DIR")
             .zip(
-                providers.environmentVariable("CONTENTS_FOLDER_PATH")
-            ) { builtProductsDir, contentsFolderPath ->
-                File("$builtProductsDir/$contentsFolderPath/$IOS_COMPOSE_RESOURCES_ROOT_DIR").canonicalPath
+                providers.environmentVariable("UNLOCALIZED_RESOURCES_FOLDER_PATH")
+            ) { builtProductsDir, unlocalizedResourcesFolderPath ->
+                File("$builtProductsDir/$unlocalizedResourcesFolderPath/$IOS_COMPOSE_RESOURCES_ROOT_DIR").canonicalPath
             }
             .flatMap {
                 project.objects.directoryProperty().apply { set(File(it)) }
@@ -136,10 +151,16 @@ private fun Framework.getFinalResourcesDir(): Provider<Directory> {
 }
 
 private fun KotlinNativeTarget.isIosSimulatorTarget(): Boolean =
-    konanTarget === KonanTarget.IOS_X64 || konanTarget === KonanTarget.IOS_SIMULATOR_ARM64
+    konanTarget === KonanTarget.IOS_SIMULATOR_ARM64
 
 private fun KotlinNativeTarget.isIosDeviceTarget(): Boolean =
     konanTarget === KonanTarget.IOS_ARM64
 
 private fun KotlinNativeTarget.isIosTarget(): Boolean =
     isIosSimulatorTarget() || isIosDeviceTarget()
+
+private fun KotlinNativeTarget.isMacTarget(): Boolean =
+    konanTarget === KonanTarget.MACOS_ARM64
+
+private fun KotlinNativeTarget.isIosOrMacTarget(): Boolean =
+    isIosTarget() || isMacTarget()

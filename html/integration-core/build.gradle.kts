@@ -16,7 +16,7 @@ kotlin {
 
                 systemProperty(
                     "COMPOSE_WEB_INTEGRATION_TESTS_DISTRIBUTION",
-                    File(buildDir, "developmentExecutable")
+                    layout.buildDirectory.dir("developmentExecutable").get().asFile
                 )
             }
         }

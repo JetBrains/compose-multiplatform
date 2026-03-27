@@ -19,11 +19,14 @@ config.proxies["/"] = path.resolve(basePath, "kotlin");
 config.files = [
     {pattern: path.resolve(generatedAssetsPath, "**/*"), included: false, served: true, watched: false},
     {pattern: path.resolve(basePath, "kotlin", "**/*.png"), included: false, served: true, watched: false},
+    {pattern: path.resolve(basePath, "kotlin", "**/*.cvr"), included: false, served: true, watched: false},
+    {pattern: path.resolve(basePath, "kotlin", "**/*.otf"), included: false, served: true, watched: false},
     {pattern: path.resolve(basePath, "kotlin", "**/*.gif"), included: false, served: true, watched: false},
     {pattern: path.resolve(basePath, "kotlin", "**/*.ttf"), included: false, served: true, watched: false},
     {pattern: path.resolve(basePath, "kotlin", "**/*.txt"), included: false, served: true, watched: false},
     {pattern: path.resolve(basePath, "kotlin", "**/*.json"), included: false, served: true, watched: false},
     {pattern: path.resolve(basePath, "kotlin", "**/*.xml"), included: false, served: true, watched: false},
+    path.resolve(basePath, "kotlin", "test_setup.js"),
 ].concat(config.files);
 
 function KarmaWebpackOutputFramework(config) {

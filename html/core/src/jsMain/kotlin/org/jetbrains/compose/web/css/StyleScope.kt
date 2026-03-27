@@ -43,10 +43,31 @@ interface StyleScope {
      * ```
      */
     fun property(propertyName: String, value: StylePropertyValue)
+    /**
+     * Adds arbitrary CSS property to the inline style of the element. By default throws an error for backward compatibility
+     * @param propertyName - the name of css property as [per spec](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)
+     * @param value - the value, it can be either String or specialized type like [CSSNumeric] or [CSSColorValue]
+     * @param important - the flag which will be passed to property call in CSS
+     *
+     * Most frequent CSS property values can be set via specialized methods, like [width], [display] etc.
+     *
+     * Example:
+     * ```
+     * Div({
+     *  style {
+     *      property("some-exotic-css-property", "I am a string value", true)
+     *      property("some-exotic-css-property-width", 5.px, false)
+     *  }
+     * })
+     * ```
+     */
+    fun property(propertyName: String, value: StylePropertyValue, important: Boolean): Unit = error("!important is not supported by this implementation")
     fun variable(variableName: String, value: StylePropertyValue)
 
     fun property(propertyName: String, value: String) = property(propertyName, StylePropertyValue(value))
+    fun property(propertyName: String, value: String, important: Boolean) = property(propertyName, StylePropertyValue(value), important)
     fun property(propertyName: String, value: Number) = property(propertyName, StylePropertyValue(value))
+    fun property(propertyName: String, value: Number, important: Boolean) = property(propertyName, StylePropertyValue(value), important)
     fun variable(variableName: String, value: String) = variable(variableName, StylePropertyValue(value))
     fun variable(variableName: String, value: Number) = variable(variableName, StylePropertyValue(value))
 
@@ -150,8 +171,12 @@ open class StyleScopeBuilder : StyleScope, StyleHolder {
     override val properties: MutableStylePropertyList = mutableListOf()
     override val variables: MutableStylePropertyList = mutableListOf()
 
+    override fun property(propertyName: String, value: StylePropertyValue, important: Boolean) {
+        properties.add(StylePropertyDeclaration(propertyName, value, important))
+    }
+
     override fun property(propertyName: String, value: StylePropertyValue) {
-        properties.add(StylePropertyDeclaration(propertyName, value))
+        property(propertyName = propertyName, value = value, important = false)
     }
 
     override fun variable(variableName: String, value: StylePropertyValue) {
@@ -175,10 +200,16 @@ open class StyleScopeBuilder : StyleScope, StyleHolder {
 
 data class StylePropertyDeclaration(
     val name: String,
-    val value: StylePropertyValue
+    val value: StylePropertyValue,
+    val important: Boolean,
 ) {
-    constructor(name: String, value: String) : this(name, value.unsafeCast<StylePropertyValue>())
-    constructor(name: String, value: Number) : this(name, value.unsafeCast<StylePropertyValue>())
+    constructor(name: String, value: StylePropertyValue) : this(name, value, false)
+
+    constructor(name: String, value: String, important: Boolean) : this(name, value.unsafeCast<StylePropertyValue>(), important)
+    constructor(name: String, value: String) : this(name, value, false)
+
+    constructor(name: String, value: Number, important: Boolean) : this(name, value.unsafeCast<StylePropertyValue>(), important)
+    constructor(name: String, value: Number) : this(name, value, false)
 }
 typealias StylePropertyList = List<StylePropertyDeclaration>
 typealias MutableStylePropertyList = MutableList<StylePropertyDeclaration>
@@ -190,6 +221,7 @@ internal fun StylePropertyList.nativeEquals(properties: StylePropertyList): Bool
     return all { prop ->
         val otherProp = properties[index++]
         prop.name == otherProp.name &&
-            prop.value.toString() == otherProp.value.toString()
+            prop.important == otherProp.important && prop.value.toString() == otherProp.value.toString()
+                
     }
 }

@@ -4,10 +4,10 @@ pluginManagement {
         mavenLocal()
         gradlePluginPortal()
         google()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
     }
     plugins {
-        id("com.android.application").version("AGP_VERSION_PLACEHOLDER")
+        id("com.android.kotlin.multiplatform.library").version("AGP_VERSION_PLACEHOLDER")
         id("org.jetbrains.kotlin.multiplatform").version("KOTLIN_VERSION_PLACEHOLDER")
         id("org.jetbrains.kotlin.plugin.compose").version("KOTLIN_VERSION_PLACEHOLDER")
         id("org.jetbrains.compose").version("COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER")
@@ -15,7 +15,7 @@ pluginManagement {
 }
 dependencyResolutionManagement {
     repositories {
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
         mavenCentral()
         gradlePluginPortal()
         google()

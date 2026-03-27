@@ -3,23 +3,17 @@ package my.lib.res
 import kotlin.String
 import kotlin.collections.Map
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.FontResource
 import org.jetbrains.compose.resources.PluralStringResource
 import org.jetbrains.compose.resources.StringArrayResource
 import org.jetbrains.compose.resources.StringResource
 
-@ExperimentalResourceApi
-public expect val Res.allDrawableResources: Map<String, DrawableResource>
+public expect val MyRes.allDrawableResources: Map<String, DrawableResource>
 
-@ExperimentalResourceApi
-public expect val Res.allStringResources: Map<String, StringResource>
+public expect val MyRes.allStringResources: Map<String, StringResource>
 
-@ExperimentalResourceApi
-public expect val Res.allStringArrayResources: Map<String, StringArrayResource>
+public expect val MyRes.allStringArrayResources: Map<String, StringArrayResource>
 
-@ExperimentalResourceApi
-public expect val Res.allPluralStringResources: Map<String, PluralStringResource>
+public expect val MyRes.allPluralStringResources: Map<String, PluralStringResource>
 
-@ExperimentalResourceApi
-public expect val Res.allFontResources: Map<String, FontResource>
+public expect val MyRes.allFontResources: Map<String, FontResource>

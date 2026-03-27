@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script to build most of the examples, to verify if they can compile.
-# Don't add examples, which don't depend on maven.pkg.jetbrains.space, because they won't be able to compile.
+# Example must be buildable with dev builds, so they should have dev maven repo set up.
 
 set -euo pipefail
 
@@ -22,5 +22,4 @@ runGradle() {
 runGradle html/compose-bird build
 runGradle html/landing build
 runGradle html/with-react build
-runGradle jetsnack :web:wasmJsBrowserDistribution
 runGradle imageviewer :webApp:wasmJsBrowserDistribution

@@ -5,17 +5,24 @@ plugins {
     id "org.jetbrains.kotlin.jvm"
     id "org.jetbrains.kotlin.plugin.compose"
     id "org.jetbrains.compose"
+    id "org.jetbrains.kotlin.plugin.serialization"
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:1.9.0"
     implementation compose.desktop.currentOs
+    // material3 is not used, but it is a part of the test
+    implementation "org.jetbrains.compose.material3:material3:1.9.0"
 }
 
 compose.desktop {
     application {
         mainClass = "Main"
         nativeDistributions {
+            windows {
+                console = true
+            }
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
         }
 

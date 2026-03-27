@@ -1,13 +1,13 @@
 plugins {
-    kotlin("multiplatform")// version "1.5.10"
-    id("org.jetbrains.compose")// version (System.getenv("COMPOSE_INTEGRATION_VERSION") ?: "0.0.0-SNASPHOT")
+    kotlin("multiplatform")
+    id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
 repositories {
     google()
     mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://packages.jetbrains.team/maven/p/cmp/dev")
     mavenLocal()
 }
 
@@ -31,4 +31,4 @@ kotlin {
 
 
 tasks.findByName("jsBrowserProductionWebpack")!!.mustRunAfter("jsDevelopmentExecutableCompileSync")
-tasks.findByName("jsNodeRun")!!.mustRunAfter("jsProductionExecutableCompileSync")
+tasks.findByName("jsNodeDevelopmentRun")!!.mustRunAfter("jsProductionExecutableCompileSync")

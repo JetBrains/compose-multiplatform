@@ -5,34 +5,77 @@
 
 package org.jetbrains.compose.desktop.application.tasks
 
-import org.gradle.api.file.*
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.Directory
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileSystemOperations
+import org.gradle.api.file.RegularFile
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
-import org.gradle.api.tasks.*
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.LocalState
+import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.process.ExecResult
 import org.gradle.work.ChangeType
 import org.gradle.work.InputChanges
 import org.jetbrains.compose.desktop.application.dsl.FileAssociation
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.compose.desktop.application.internal.*
-import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.*
-import org.jetbrains.compose.desktop.application.internal.files.*
-import org.jetbrains.compose.desktop.application.internal.files.MacJarSignFileCopyingProcessor
+import org.jetbrains.compose.desktop.application.internal.APP_RESOURCES_DIR
+import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder
+import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.InfoPlistListValue
+import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.InfoPlistMapValue
+import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.InfoPlistStringValue
 import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
+import org.jetbrains.compose.desktop.application.internal.MacSigner
+import org.jetbrains.compose.desktop.application.internal.MacSignerImpl
+import org.jetbrains.compose.desktop.application.internal.NoCertificateSigner
+import org.jetbrains.compose.desktop.application.internal.PlistKeys
+import org.jetbrains.compose.desktop.application.internal.SKIKO_LIBRARY_PATH
+import org.jetbrains.compose.desktop.application.internal.cliArg
+import org.jetbrains.compose.desktop.application.internal.files.FileCopyingProcessor
+import org.jetbrains.compose.desktop.application.internal.files.MacJarSignFileCopyingProcessor
+import org.jetbrains.compose.desktop.application.internal.files.SimpleFileCopyingProcessor
+import org.jetbrains.compose.desktop.application.internal.files.copyTo
+import org.jetbrains.compose.desktop.application.internal.files.copyZipEntry
+import org.jetbrains.compose.desktop.application.internal.files.findOutputFileOrDir
+import org.jetbrains.compose.desktop.application.internal.files.isDylibPath
+import org.jetbrains.compose.desktop.application.internal.files.isJarFile
+import org.jetbrains.compose.desktop.application.internal.files.mangledName
+import org.jetbrains.compose.desktop.application.internal.files.normalizedPath
+import org.jetbrains.compose.desktop.application.internal.files.transformJar
+import org.jetbrains.compose.desktop.application.internal.javaOption
 import org.jetbrains.compose.desktop.application.internal.validation.validate
-import org.jetbrains.compose.internal.utils.*
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.clearDirs
+import org.jetbrains.compose.internal.utils.currentArch
+import org.jetbrains.compose.internal.utils.currentOS
+import org.jetbrains.compose.internal.utils.currentTarget
+import org.jetbrains.compose.internal.utils.delete
+import org.jetbrains.compose.internal.utils.ioFile
+import org.jetbrains.compose.internal.utils.ioFileOrNull
+import org.jetbrains.compose.internal.utils.mkdirs
+import org.jetbrains.compose.internal.utils.notNullProperty
+import org.jetbrains.compose.internal.utils.nullableProperty
+import org.jetbrains.compose.internal.utils.stacktraceToString
 import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
-import java.io.*
+import java.io.File
+import java.io.ObjectInputStream
+import java.io.ObjectOutputStream
+import java.io.Serializable
 import java.nio.file.LinkOption
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
-import kotlin.collections.ArrayList
 import kotlin.io.path.isExecutable
 import kotlin.io.path.isRegularFile
 
@@ -325,23 +368,6 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Internal
     val appResourcesDir: DirectoryProperty = objects.directoryProperty()
-
-    /**
-     * Gradle runtime verification fails,
-     * if InputDirectory is not null, but a directory does not exist.
-     * The directory might not exist, because prepareAppResources task
-     * does not create output directory if there are no resources.
-     *
-     * To work around this, appResourcesDir is used as a real property,
-     * but it is annotated as @Internal, so it ignored during inputs checking.
-     * This property is used only for inputs checking.
-     * It returns appResourcesDir value if the underlying directory exists.
-     */
-    @Suppress("unused")
-    @get:InputDirectory
-    @get:Optional
-    internal val appResourcesDirInputDirHackForVerification: Provider<Directory>
-        get() = appResourcesDir.map { it.takeIf { it.asFile.exists() } }
 
     @get:Internal
     private val libsMappingFile: Provider<RegularFile> = workingDir.map {

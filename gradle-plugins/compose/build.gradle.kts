@@ -29,7 +29,9 @@ val buildConfig = tasks.register("buildConfig", GenerateBuildConfig::class.java)
     classFqName.set("org.jetbrains.compose.ComposeBuildConfig")
     generatedOutputDir.set(buildConfigDir)
     fieldsToGenerate.put("composeVersion", BuildProperties.composeVersion(project))
+    fieldsToGenerate.put("composeMaterial3Version", BuildProperties.composeMaterial3Version(project))
     fieldsToGenerate.put("composeGradlePluginVersion", BuildProperties.deployVersion(project))
+    fieldsToGenerate.put("composeHotReloadVersion", libs.plugin.hot.reload.get().version)
 }
 tasks.named("compileKotlin", KotlinCompilationTask::class) {
     dependsOn(buildConfig)
@@ -55,6 +57,16 @@ dependencies {
         embeddedDependencies(dep)
     }
 
+    fun hotReloadDep(dep: Any) {
+        // We need to explicitly depend on the Hot Reload Gradle plugin to be able to apply it by id.
+        // Thus, we need to publish the dependency in the resulting .pom/.module files.
+        // Other dependencies are embedded, so we use `shadow` for the publication.
+        shadow(dep)
+
+        // we still need `runtimeOnly` because `gradle-plugin` is included in the `components` project
+        runtimeOnly(dep)
+    }
+
     compileOnly(gradleApi())
     compileOnly(localGroovy())
     compileOnly(kotlin("gradle-plugin"))
@@ -70,6 +82,8 @@ dependencies {
     embedded(libs.kotlin.poet)
     embedded(project(":preview-rpc"))
     embedded(project(":jdk-version-probe"))
+
+    hotReloadDep(libs.plugin.hot.reload)
 }
 
 val packagesToRelocate = listOf("de.undercouch", "com.squareup.kotlinpoet")
@@ -94,6 +108,7 @@ val jar = tasks.named<Jar>("jar") {
 
 val supportedGradleVersions = project.propertyList("compose.tests.gradle.versions")
 val supportedAgpVersions = project.propertyList("compose.tests.agp.versions")
+val excludedGradleAgpVersions = project.propertyList("compose.tests.gradle-agp.exclude")
 
 fun Project.propertyList(name: String) =
     project.property(name).toString()
@@ -175,9 +190,8 @@ for (gradleVersion in supportedGradleVersions) {
              * > Failed to apply plugin 'com.android.internal.version-check'.
              * > Minimum supported Gradle version is 8.2. Current version is 7.4.
              */
-            val agpMajor = agpVersion.split('.').first().toInt()
-            val gradleMajor = gradleVersion.split('.').first().toInt()
-            onlyIf { agpMajor <= gradleMajor }
+            val isExcluded = excludedGradleAgpVersions.contains("$gradleVersion/$agpVersion")
+            onlyIf { !isExcluded }
 
             systemProperty("compose.tests.gradle.test.jdks.root", jdkForTestsRoot.absolutePath)
             systemProperty("compose.tests.gradle.version", gradleVersion)
@@ -193,11 +207,8 @@ for (gradleVersion in supportedGradleVersions) {
 configureAllTests {
     dependsOn(":publishToMavenLocal")
     systemProperty("compose.tests.compose.gradle.plugin.version", BuildProperties.deployVersion(project))
+    systemProperty("compose.tests.compose.version", BuildProperties.composeVersion(project))
     val summaryDir = project.layout.buildDirectory.get().asFile.resolve("test-summary")
     systemProperty("compose.tests.summary.file", summaryDir.resolve("$name.md").absolutePath)
     systemProperties(project.properties.filter { it.key.startsWith("compose.") })
-}
-
-task("printAllAndroidxReplacements") {
-    doLast { printAllAndroidxReplacements() }
 }

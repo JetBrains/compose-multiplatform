@@ -1,5 +1,5 @@
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.CanvasBasedWindow
+import androidx.compose.ui.window.ComposeViewport
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.configureWebResources
 
@@ -8,7 +8,7 @@ fun main() {
     configureWebResources {
         resourcePathMapping { path -> "./$path" }
     }
-    CanvasBasedWindow("ImageViewer") {
+    ComposeViewport("composeApp") {
         ImageViewerWeb()
     }
 }

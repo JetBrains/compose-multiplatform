@@ -12,7 +12,7 @@ import org.jetbrains.compose.internal.utils.notNullProperty
 import org.jetbrains.compose.internal.utils.nullableProperty
 import javax.inject.Inject
 
-private const val DEFAULT_PROGUARD_VERSION = "7.2.2"
+private const val DEFAULT_PROGUARD_VERSION = "7.7.0"
 
 abstract class ProguardSettings @Inject constructor(
     objects: ObjectFactory,

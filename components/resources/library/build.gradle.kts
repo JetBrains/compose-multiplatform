@@ -1,6 +1,7 @@
 import kotlinx.validation.ExperimentalBCVApi
 import org.jetbrains.compose.ExperimentalComposeLibrary
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("multiplatform")
@@ -16,12 +17,13 @@ kotlin {
     androidTarget {
         publishLibraryVariants("release")
         compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget.set(JvmTarget.JVM_11)
+                }
             }
         }
     }
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
     js {
@@ -31,8 +33,13 @@ kotlin {
             })
         }
     }
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
+        compilations.getByName("test").compileTaskProvider.configure {
+            // https://youtrack.jetbrains.com/issue/KT-69014
+            compilerOptions.freeCompilerArgs.add("-Xwasm-enable-array-range-checks")
+        }
         browser {
             testTask(Action {
                 useKarma {
@@ -43,7 +50,6 @@ kotlin {
         }
         binaries.executable()
     }
-    macosX64()
     macosArm64()
 
     applyDefaultHierarchyTemplate()
@@ -69,8 +75,8 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                implementation(compose.runtime)
-                implementation(compose.foundation)
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.foundation)
                 implementation(libs.kotlinx.coroutines.core)
             }
         }
@@ -78,9 +84,8 @@ kotlin {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(libs.kotlinx.coroutines.test)
-                implementation(compose.material3)
-                @OptIn(ExperimentalComposeLibrary::class)
-                implementation(compose.uiTest)
+                implementation(libs.compose.material3)
+                implementation(libs.compose.ui.test)
             }
         }
         val blockingMain by creating {
@@ -139,8 +144,11 @@ kotlin {
             dependsOn(skikoTest)
             dependsOn(blockingTest)
         }
-        val webMain by creating {
+        val webMain by getting {
             dependsOn(skikoMain)
+            dependencies {
+                 implementation(libs.kotlinx.browser)
+            }
         }
         val jsMain by getting {
             dependsOn(webMain)
@@ -148,7 +156,7 @@ kotlin {
         val wasmJsMain by getting {
             dependsOn(webMain)
         }
-        val webTest by creating {
+        val webTest by getting {
             dependsOn(skikoTest)
         }
         val jsTest by getting {
@@ -164,7 +172,7 @@ android {
     compileSdk = 35
     namespace = "org.jetbrains.compose.components.resources"
     defaultConfig {
-        minSdk = 21
+        minSdk = 23
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
@@ -212,4 +220,14 @@ tasks.register<GeneratePluralRuleListsTask>("generatePluralRuleLists") {
     pluralsFile = projectDir.file("CLDRPluralRules/plurals.xml")
     outputFile = projectDir.file("src/commonMain/kotlin/org/jetbrains/compose/resources/plural/CLDRPluralRuleLists.kt")
     samplesOutputFile = projectDir.file("src/commonTest/kotlin/org/jetbrains/compose/resources/CLDRPluralRuleLists.test.kt")
+}
+
+tasks {
+    val desktopTestProcessResources =
+        named<ProcessResources>("desktopTestProcessResources")
+
+    withType<Test> {
+        dependsOn(desktopTestProcessResources)
+        environment("RESOURCES_PATH", desktopTestProcessResources.map { it.destinationDir.absolutePath }.get())
+    }
 }

@@ -17,6 +17,7 @@ subprojects {
         mavenCentral()
         google()
         mavenLocal()
+        maven("https://packages.jetbrains.team/maven/p/kt/dev")
     }
 
     plugins.withId("java") {
@@ -34,8 +35,9 @@ subprojects {
             compilerOptions {
                 // must be set to a language version of the kotlin compiler & runtime,
                 // which is bundled to the oldest supported Gradle
-                languageVersion.set(KotlinVersion.KOTLIN_1_5)
-                apiVersion.set(KotlinVersion.KOTLIN_1_5)
+                // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
+                languageVersion.set(KotlinVersion.KOTLIN_2_0)
+                apiVersion.set(KotlinVersion.KOTLIN_2_0)
                 jvmTarget.set(JvmTarget.JVM_11)
             }
         }

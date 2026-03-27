@@ -1,4 +1,5 @@
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     kotlin("multiplatform")
@@ -10,14 +11,15 @@ plugins {
 kotlin {
     androidTarget {
         compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
+            compileTaskProvider.configure {
+                compilerOptions {
+                    jvmTarget.set(JvmTarget.JVM_11)
+                }
             }
         }
     }
     jvm("desktop")
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -46,12 +48,13 @@ kotlin {
         val wasmJsMain by getting
 
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.material3)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.material.icons.core)
             implementation(project(":resources:library"))
         }
         desktopMain.dependencies {
-            implementation(compose.desktop.common)
+            implementation(libs.compose.desktop)
         }
         androidMain.dependencies {
             implementation(libs.androidx.ui.tooling)
@@ -72,7 +75,7 @@ android {
     compileSdk = 35
     namespace = "org.jetbrains.compose.resources.demo.shared"
     defaultConfig {
-        minSdk = 21
+        minSdk = 23
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -81,13 +84,6 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.11"
-    }
-}
-
-compose.experimental {
-    web.application {}
 }
 
 //because the dependency on the compose library is a project dependency

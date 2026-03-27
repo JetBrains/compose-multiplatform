@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.desktop.application.tasks
 
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
@@ -43,6 +44,11 @@ abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMac
     @get:Optional
     val minimumSystemVersion: Property<String?> = objects.nullableProperty()
 
+    @get:InputFiles
+    @get:Optional
+    @get:PathSensitive(PathSensitivity.ABSOLUTE)
+    val composeResourcesDirs: ConfigurableFileCollection = objects.fileCollection()
+
     override fun createPackage(destinationDir: File, workingDir: File) {
         val packageName = packageName.get()
         val appDir = destinationDir.resolve("$packageName.app").apply { mkdirs() }
@@ -60,6 +66,13 @@ abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMac
         InfoPlistBuilder().apply {
             setupInfoPlist(executableName = appExecutableFile.name)
             writeToFile(contentsDir.resolve("Info.plist"))
+        }
+
+        if (!composeResourcesDirs.isEmpty) {
+            fileOperations.copy { copySpec ->
+                copySpec.from(composeResourcesDirs)
+                copySpec.into(appResourcesDir.resolve("compose-resources").apply { mkdirs() })
+            }
         }
     }
 

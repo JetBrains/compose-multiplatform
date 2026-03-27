@@ -27,7 +27,6 @@ If you want to create the project manually, perform the following steps:
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
 ```
@@ -36,14 +35,13 @@ pluginManagement {
 ``` kotlin
 // Add compose gradle plugin
 plugins {
-    kotlin("multiplatform") version "2.1.0"
-    id("org.jetbrains.compose") version "1.7.3"
+    kotlin("multiplatform") version "2.3.20"
+    id("org.jetbrains.compose") version "1.10.1"
 }
 
 // Add maven repositories
 repositories {
     mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     google()
 }
 
@@ -56,8 +54,8 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(compose.html.core)
-                implementation(compose.runtime)
+                implementation("org.jetbrains.compose.html:html-core:1.9.0")
+                implementation("org.jetbrains.compose:compose-runtime:1.9.0")
             }
         }
     }

@@ -1,0 +1,19 @@
+.kotlin
+.gradle
+.idea
+**/build/
+local.properties
+iosApp/iosApp.xcworkspace/*
+iosApp/iosApp.xcodeproj/*
+!iosApp/iosApp.xcodeproj/project.pbxproj
+nativeiosApp/nativeiosApp.xcworkspace/*
+nativeiosApp/nativeiosApp.xcodeproj/*
+!nativeiosApp/nativeiosApp.xcodeproj/project.pbxproj
+
+# Ignore downloaded images except the first one
+composeApp/src/commonMain/composeResources/files/downloaded_image*.jpg
+nativeiosApp/nativeiosApp/downloaded_images/downloaded_image*.jpg
+nativeAndroidApp/app/src/main/assets/downloaded_images/downloaded_image*.jpg
+!composeApp/src/commonMain/composeResources/files/downloaded_image001.jpg
+!nativeiosApp/nativeiosApp/downloaded_images/downloaded_image001.jpg
+!nativeAndroidApp/app/src/main/assets/downloaded_images/downloaded_image001.jpg

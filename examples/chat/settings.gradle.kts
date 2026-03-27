@@ -1,7 +1,7 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
         google()
     }
 
@@ -18,6 +18,13 @@ pluginManagement {
         id("com.android.application").version(agpVersion)
         id("com.android.library").version(agpVersion)
         id("org.jetbrains.compose").version(composeVersion)
+    }
+}
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            version("compose", extra["compose.version"].toString())
+        }
     }
 }
 

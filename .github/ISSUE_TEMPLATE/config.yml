@@ -3,3 +3,6 @@ contact_links:
   - name: Create
     url: https://youtrack.jetbrains.com/newIssue?project=CMP
     about: Please report new issues to the JetBrains YouTrack
+  - name: Jetpack Compose tracker
+    url: https://issuetracker.google.com/issues/new?component=612128
+    about: If the issue is in the API with `androidx.*` namespace and affects Android, report it in the Jetpack Compose tracker, mentioning the corresponding Jetpack version.

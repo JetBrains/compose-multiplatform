@@ -181,10 +181,6 @@ private fun JvmApplicationContext.configurePackagingTasks(
         }
 
         if (targetFormat.isCompatibleWith(OS.MacOS)) {
-            check(targetFormat == TargetFormat.Dmg || targetFormat == TargetFormat.Pkg) {
-                "Unexpected target format for MacOS: $targetFormat"
-            }
-
             tasks.register<AbstractNotarizationTask>(
                 taskNameAction = "notarize",
                 taskNameObject = targetFormat.name,

@@ -30,3 +30,17 @@ fun ComposableAlwaysReturnsNullUnit(): Unit? {
 fun ComposableAlwaysReturnsUnit(): Unit? {
     return Unit
 }
+
+fun interface Decorator {
+    @Composable
+    fun Decoration(innerElement: @Composable () -> Unit)
+}
+
+@Composable
+fun WithDecoration(content: @Composable () -> Unit, decorator: Decorator? = null) {
+    if (decorator != null) {
+        decorator.Decoration { content() }
+    } else {
+        content()
+    }
+}

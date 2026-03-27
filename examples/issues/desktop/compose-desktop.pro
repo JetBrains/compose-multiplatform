@@ -14,3 +14,6 @@
 -dontwarn org.openjsse.**
 
 -keep class org.ocpsoft.prettytime.i18n**
+
+-dontnote okhttp3.**
+-keep class okio.Okio__JvmOkioKt { *; }

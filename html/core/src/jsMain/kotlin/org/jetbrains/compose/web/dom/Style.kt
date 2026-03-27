@@ -54,8 +54,8 @@ private fun fillRule(
     when (cssRuleDeclaration) {
         is CSSStyledRuleDeclaration -> {
             val cssStyleRule = cssRule.unsafeCast<CSSStyleRule>()
-            cssRuleDeclaration.style.properties.forEach { (name, value) ->
-                setProperty(cssStyleRule.style, name, value)
+            cssRuleDeclaration.style.properties.forEach { (name, value, important) ->
+                setProperty(cssStyleRule.style, name, value, important)
             }
             cssRuleDeclaration.style.variables.forEach { (name, value) ->
                 setVariable(cssStyleRule.style, name, value)
@@ -86,8 +86,8 @@ fun CSSRuleDeclaration.stringPresentation(
     strings.add("$baseIndent${cssRuleDeclaration.header} {")
     when (cssRuleDeclaration) {
         is CSSStyledRuleDeclaration -> {
-            cssRuleDeclaration.style.properties.forEach { (name, value) ->
-                strings.add("$baseIndent$indent$name: $value;")
+            cssRuleDeclaration.style.properties.forEach { (name, value, important) ->
+                strings.add("$baseIndent$indent$name: $value${if (important) " !important" else ""};")
             }
             cssRuleDeclaration.style.variables.forEach { (name, value) ->
                 strings.add("$baseIndent$indent--$name: $value;")
@@ -111,9 +111,10 @@ fun CSSRuleDeclaration.stringPresentation(
 internal fun setProperty(
     style: CSSStyleDeclaration,
     name: String,
-    value: StylePropertyValue
+    value: StylePropertyValue,
+    important: Boolean
 ) {
-    style.setProperty(name, value.toString())
+    style.setProperty(name, value.toString(), if (important) "important" else "")
 }
 
 internal fun setVariable(

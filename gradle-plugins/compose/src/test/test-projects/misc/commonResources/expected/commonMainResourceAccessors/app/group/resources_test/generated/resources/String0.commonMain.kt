@@ -1,4 +1,4 @@
-@file:OptIn(org.jetbrains.compose.resources.InternalResourceApi::class)
+@file:OptIn(InternalResourceApi::class)
 
 package app.group.resources_test.generated.resources
 
@@ -6,139 +6,67 @@ import kotlin.OptIn
 import kotlin.String
 import kotlin.collections.MutableMap
 import org.jetbrains.compose.resources.InternalResourceApi
+import org.jetbrains.compose.resources.ResourceItem
 import org.jetbrains.compose.resources.StringResource
 
-private object CommonMainString0 {
-  public val PascalCase: StringResource by 
-      lazy { init_PascalCase() }
+private const val MD: String = "composeResources/app.group.resources_test.generated.resources/"
 
-  public val _1_kebab_case: StringResource by 
-      lazy { init__1_kebab_case() }
+internal val Res.string.PascalCase: StringResource by lazy {
+      StringResource("string:PascalCase", "PascalCase", setOf(
+        ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 172, 34),
+      ))
+    }
 
-  public val app_name: StringResource by 
-      lazy { init_app_name() }
+internal val Res.string._1_kebab_case: StringResource by lazy {
+      StringResource("string:_1_kebab_case", "_1_kebab_case", setOf(
+        ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 135, 36),
+      ))
+    }
 
-  public val camelCase: StringResource by 
-      lazy { init_camelCase() }
+internal val Res.string.app_name: StringResource by lazy {
+      StringResource("string:app_name", "app_name", setOf(
+        ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 207, 44),
+      ))
+    }
 
-  public val hello: StringResource by 
-      lazy { init_hello() }
+internal val Res.string.camelCase: StringResource by lazy {
+      StringResource("string:camelCase", "camelCase", setOf(
+        ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 252, 29),
+      ))
+    }
 
-  public val `info_using_release_$x`: StringResource by 
-      lazy { `init_info_using_release_$x`() }
+internal val Res.string.hello: StringResource by lazy {
+      StringResource("string:hello", "hello", setOf(
+        ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 282, 37),
+      ))
+    }
 
-  public val multi_line: StringResource by 
-      lazy { init_multi_line() }
+internal val Res.string.`info_using_release_$x`: StringResource by lazy {
+      StringResource("string:info_using_release_${'$'}x", "info_using_release_${'$'}x", setOf(
+        ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 320, 57),
+      ))
+    }
 
-  public val str_template: StringResource by 
-      lazy { init_str_template() }
-}
+internal val Res.string.multi_line: StringResource by lazy {
+      StringResource("string:multi_line", "multi_line", setOf(
+        ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 378, 178),
+      ))
+    }
+
+internal val Res.string.str_template: StringResource by lazy {
+      StringResource("string:str_template", "str_template", setOf(
+        ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 557, 76),
+      ))
+    }
 
 @InternalResourceApi
 internal fun _collectCommonMainString0Resources(map: MutableMap<String, StringResource>) {
-  map.put("PascalCase", CommonMainString0.PascalCase)
-  map.put("_1_kebab_case", CommonMainString0._1_kebab_case)
-  map.put("app_name", CommonMainString0.app_name)
-  map.put("camelCase", CommonMainString0.camelCase)
-  map.put("hello", CommonMainString0.hello)
-  map.put("info_using_release_${'$'}x", CommonMainString0.`info_using_release_$x`)
-  map.put("multi_line", CommonMainString0.multi_line)
-  map.put("str_template", CommonMainString0.str_template)
+  map.put("PascalCase", Res.string.PascalCase)
+  map.put("_1_kebab_case", Res.string._1_kebab_case)
+  map.put("app_name", Res.string.app_name)
+  map.put("camelCase", Res.string.camelCase)
+  map.put("hello", Res.string.hello)
+  map.put("info_using_release_${'$'}x", Res.string.`info_using_release_$x`)
+  map.put("multi_line", Res.string.multi_line)
+  map.put("str_template", Res.string.str_template)
 }
-
-internal val Res.string.PascalCase: StringResource
-  get() = CommonMainString0.PascalCase
-
-private fun init_PascalCase(): StringResource = org.jetbrains.compose.resources.StringResource(
-  "string:PascalCase", "PascalCase",
-    setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(),
-    "composeResources/app.group.resources_test.generated.resources/values/strings.commonMain.cvr",
-    172, 34),
-    )
-)
-
-internal val Res.string._1_kebab_case: StringResource
-  get() = CommonMainString0._1_kebab_case
-
-private fun init__1_kebab_case(): StringResource = org.jetbrains.compose.resources.StringResource(
-  "string:_1_kebab_case", "_1_kebab_case",
-    setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(),
-    "composeResources/app.group.resources_test.generated.resources/values/strings.commonMain.cvr",
-    135, 36),
-    )
-)
-
-internal val Res.string.app_name: StringResource
-  get() = CommonMainString0.app_name
-
-private fun init_app_name(): StringResource = org.jetbrains.compose.resources.StringResource(
-  "string:app_name", "app_name",
-    setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(),
-    "composeResources/app.group.resources_test.generated.resources/values/strings.commonMain.cvr",
-    207, 44),
-    )
-)
-
-internal val Res.string.camelCase: StringResource
-  get() = CommonMainString0.camelCase
-
-private fun init_camelCase(): StringResource = org.jetbrains.compose.resources.StringResource(
-  "string:camelCase", "camelCase",
-    setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(),
-    "composeResources/app.group.resources_test.generated.resources/values/strings.commonMain.cvr",
-    252, 29),
-    )
-)
-
-internal val Res.string.hello: StringResource
-  get() = CommonMainString0.hello
-
-private fun init_hello(): StringResource = org.jetbrains.compose.resources.StringResource(
-  "string:hello", "hello",
-    setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(),
-    "composeResources/app.group.resources_test.generated.resources/values/strings.commonMain.cvr",
-    282, 37),
-    )
-)
-
-internal val Res.string.`info_using_release_$x`: StringResource
-  get() = CommonMainString0.`info_using_release_$x`
-
-private fun `init_info_using_release_$x`(): StringResource =
-    org.jetbrains.compose.resources.StringResource(
-  "string:info_using_release_${'$'}x", "info_using_release_${'$'}x",
-    setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(),
-    "composeResources/app.group.resources_test.generated.resources/values/strings.commonMain.cvr",
-    320, 57),
-    )
-)
-
-internal val Res.string.multi_line: StringResource
-  get() = CommonMainString0.multi_line
-
-private fun init_multi_line(): StringResource = org.jetbrains.compose.resources.StringResource(
-  "string:multi_line", "multi_line",
-    setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(),
-    "composeResources/app.group.resources_test.generated.resources/values/strings.commonMain.cvr",
-    378, 178),
-    )
-)
-
-internal val Res.string.str_template: StringResource
-  get() = CommonMainString0.str_template
-
-private fun init_str_template(): StringResource = org.jetbrains.compose.resources.StringResource(
-  "string:str_template", "str_template",
-    setOf(
-      org.jetbrains.compose.resources.ResourceItem(setOf(),
-    "composeResources/app.group.resources_test.generated.resources/values/strings.commonMain.cvr",
-    557, 76),
-    )
-)
