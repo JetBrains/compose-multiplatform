@@ -339,7 +339,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         if (currentOS == OS.MacOS) {
             if (shouldSign) {
                 val validatedSettings =
-                    nonValidatedSettings!!.validate(nonValidatedMacBundleID, project, macAppStore)
+                    nonValidatedSettings!!.validate(nonValidatedMacBundleID, project)
                 MacSignerImpl(validatedSettings, runExternalTool)
             } else NoCertificateSigner(runExternalTool)
         } else null
@@ -503,12 +503,13 @@ abstract class AbstractJPackageTask @Inject constructor(
             cliArg("--mac-entitlements", macEntitlementsFile)
 
             macSigner?.settings?.let { signingSettings ->
+                val resolvedSigningIdentity = macSigner?.resolvedSigningIdentity
                 // jpackage only supports "Developer ID Application" and "3rd Party Mac Developer Application"
                 // certificates. For other types (Apple Development, Apple Distribution, Mac App Distribution,
                 // Mac Development), skip jpackage signing.
-                if (signingSettings.isJPackageCompatible) {
+                if (resolvedSigningIdentity?.isJPackageCompatible == true) {
                     cliArg("--mac-sign", true)
-                    cliArg("--mac-signing-key-user-name", signingSettings.fullDeveloperID)
+                    cliArg("--mac-signing-key-user-name", resolvedSigningIdentity.fullIdentity)
                     cliArg("--mac-signing-keychain", signingSettings.keychain)
                     cliArg("--mac-package-signing-prefix", signingSettings.prefix)
                 }
@@ -645,11 +646,21 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     private fun signPkgIfNeeded() {
         if (currentOS != OS.MacOS || targetFormat != TargetFormat.Pkg) return
-        val signingSettings = macSigner?.settings ?: return
-        if (signingSettings.isJPackageCompatible) return // jpackage already signed it
+        val macSigner = macSigner ?: return
+        val signingSettings = macSigner.settings ?: return
+        val resolvedSigningIdentity = macSigner.resolvedSigningIdentity ?: return
+        if (resolvedSigningIdentity.isJPackageCompatible) return // jpackage already signed it
 
-        val candidates = signingSettings.installerSigningIdentityCandidates
-        if (candidates.isEmpty()) return
+        val candidates = resolvedSigningIdentity.installerSigningIdentityCandidates
+        check(candidates.isNotEmpty()) {
+            buildString {
+                append("PKG signing is not supported with '${resolvedSigningIdentity.fullIdentity}'. ")
+                append("Development certificates can sign local app bundles, but installer packages require ")
+                append("'Developer ID Application' plus 'Developer ID Installer' for outside-App-Store distribution, ")
+                append("or 'Mac App Distribution'/'Apple Distribution' plus a matching installer certificate for ")
+                append("Mac App Store uploads.")
+            }
+        }
 
         val pkgFile = findOutputFileOrDir(destinationDir.ioFile, targetFormat)
         val tmpPkg = pkgFile.resolveSibling("${pkgFile.nameWithoutExtension}-unsigned.pkg")

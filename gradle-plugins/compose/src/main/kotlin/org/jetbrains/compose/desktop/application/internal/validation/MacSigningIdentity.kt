@@ -1,0 +1,153 @@
+/*
+ * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+package org.jetbrains.compose.desktop.application.internal.validation
+
+internal enum class MacSigningCertificateKind(
+    val prefix: String,
+    val isAppSigningCertificate: Boolean,
+    val isJPackageCompatible: Boolean = false,
+    val isDevelopmentCertificate: Boolean = false
+) {
+    DeveloperIdApplication(
+        prefix = "Developer ID Application: ",
+        isAppSigningCertificate = true,
+        isJPackageCompatible = true
+    ),
+    ThirdPartyMacDeveloperApplication(
+        prefix = "3rd Party Mac Developer Application: ",
+        isAppSigningCertificate = true,
+        isJPackageCompatible = true
+    ),
+    AppleDistribution(
+        prefix = "Apple Distribution: ",
+        isAppSigningCertificate = true
+    ),
+    MacAppDistribution(
+        prefix = "Mac App Distribution: ",
+        isAppSigningCertificate = true
+    ),
+    AppleDevelopment(
+        prefix = "Apple Development: ",
+        isAppSigningCertificate = true,
+        isDevelopmentCertificate = true
+    ),
+    MacDevelopment(
+        prefix = "Mac Development: ",
+        isAppSigningCertificate = true,
+        isDevelopmentCertificate = true
+    ),
+    MacDeveloper(
+        prefix = "Mac Developer: ",
+        isAppSigningCertificate = true,
+        isDevelopmentCertificate = true
+    ),
+    DeveloperIdInstaller(
+        prefix = "Developer ID Installer: ",
+        isAppSigningCertificate = false
+    ),
+    ThirdPartyMacDeveloperInstaller(
+        prefix = "3rd Party Mac Developer Installer: ",
+        isAppSigningCertificate = false
+    ),
+    MacInstallerDistribution(
+        prefix = "Mac Installer Distribution: ",
+        isAppSigningCertificate = false
+    );
+
+    val displayName: String
+        get() = prefix.removeSuffix(": ")
+
+    companion object {
+        val appSigningKinds = listOf(
+            DeveloperIdApplication,
+            ThirdPartyMacDeveloperApplication,
+            AppleDistribution,
+            MacAppDistribution,
+            AppleDevelopment,
+            MacDevelopment,
+            MacDeveloper,
+        )
+
+        fun fromIdentity(identity: String): MacSigningCertificateKind? =
+            entries.firstOrNull { identity.startsWith(it.prefix) }
+    }
+}
+
+internal data class MacSigningIdentityInput(
+    val rawIdentity: String,
+    val kind: MacSigningCertificateKind?,
+    val name: String
+) {
+    val isExplicitlyPrefixed: Boolean
+        get() = kind != null
+
+    val fullIdentity: String
+        get() = kind?.prefix?.plus(name) ?: rawIdentity
+
+    val isAppSigningIdentity: Boolean
+        get() = kind?.isAppSigningCertificate != false
+
+    fun appSigningSearchIdentities(): List<String> {
+        if (isExplicitlyPrefixed) {
+            return listOfNotNull(fullIdentity.takeIf { isAppSigningIdentity })
+        }
+
+        return MacSigningCertificateKind.appSigningKinds.map { it.prefix + name }
+    }
+
+    companion object {
+        fun parse(identity: String): MacSigningIdentityInput {
+            val kind = MacSigningCertificateKind.fromIdentity(identity)
+            val name = kind?.let { identity.removePrefix(it.prefix) } ?: identity
+            return MacSigningIdentityInput(
+                rawIdentity = identity,
+                kind = kind,
+                name = name
+            )
+        }
+    }
+}
+
+internal data class ResolvedMacSigningIdentity(
+    val fullIdentity: String,
+    val kind: MacSigningCertificateKind
+) {
+    val isJPackageCompatible: Boolean
+        get() = kind.isJPackageCompatible
+
+    val installerSigningIdentityCandidates: List<String>
+        get() = when (kind) {
+            MacSigningCertificateKind.DeveloperIdApplication ->
+                listOf(fullIdentity.replaceFirst(kind.prefix, MacSigningCertificateKind.DeveloperIdInstaller.prefix))
+
+            MacSigningCertificateKind.ThirdPartyMacDeveloperApplication,
+            MacSigningCertificateKind.AppleDistribution,
+            MacSigningCertificateKind.MacAppDistribution -> listOf(
+                MacSigningCertificateKind.ThirdPartyMacDeveloperInstaller.prefix + commonName,
+                MacSigningCertificateKind.MacInstallerDistribution.prefix + commonName,
+            )
+
+            MacSigningCertificateKind.AppleDevelopment,
+            MacSigningCertificateKind.MacDevelopment,
+            MacSigningCertificateKind.MacDeveloper,
+            MacSigningCertificateKind.DeveloperIdInstaller,
+            MacSigningCertificateKind.ThirdPartyMacDeveloperInstaller,
+            MacSigningCertificateKind.MacInstallerDistribution -> emptyList()
+        }
+
+    private val commonName: String
+        get() = fullIdentity.removePrefix(kind.prefix)
+
+    companion object {
+        fun fromIdentity(identity: String): ResolvedMacSigningIdentity {
+            val kind = MacSigningCertificateKind.fromIdentity(identity)
+            check(kind != null && kind.isAppSigningCertificate) {
+                "Unsupported macOS app signing identity: '$identity'"
+            }
+            return ResolvedMacSigningIdentity(identity, kind)
+        }
+    }
+}
