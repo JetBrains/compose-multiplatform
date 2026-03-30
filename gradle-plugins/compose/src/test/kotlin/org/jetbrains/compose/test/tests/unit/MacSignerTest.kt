@@ -63,6 +63,29 @@ class MacSignerTest {
     }
 
     @Test
+    fun keepsExplicitAppleDistributionIdentity() {
+        val resolved = resolveMacSigningIdentity(
+            settings(identity = "Apple Distribution: Andy Himberger (GK8V53S8Z3)")
+        ) { candidate ->
+            if (candidate == "Apple Distribution: Andy Himberger (GK8V53S8Z3)") {
+                certificateOutput(candidate)
+            } else {
+                ""
+            }
+        }
+
+        assertEquals("Apple Distribution: Andy Himberger (GK8V53S8Z3)", resolved.fullIdentity)
+        assertFalse(resolved.isJPackageCompatible)
+        assertEquals(
+            listOf(
+                "3rd Party Mac Developer Installer: Andy Himberger (GK8V53S8Z3)",
+                "Mac Installer Distribution: Andy Himberger (GK8V53S8Z3)"
+            ),
+            resolved.installerSigningIdentityCandidates
+        )
+    }
+
+    @Test
     fun resolvesPkgInstallerCandidatesForDistributionCertificates() {
         val resolved = resolveMacSigningIdentity(
             settings(identity = "Mac App Distribution: Andy Himberger (GK8V53S8Z3)")
@@ -112,6 +135,22 @@ class MacSignerTest {
         assertContains(error.message.orEmpty(), "Could not find a matching app signing certificate")
         assertContains(error.message.orEmpty(), "Developer ID Application: Andy Himberger")
         assertContains(error.message.orEmpty(), "Mac Developer: Andy Himberger")
+    }
+
+    @Test
+    fun ignoresSubstringMatchesThatDoNotMatchCandidateIdentity() {
+        val error = assertFailsWith<IllegalStateException> {
+            resolveMacSigningIdentity(settings(identity = "Andy Himberger")) { candidate ->
+                when (candidate) {
+                    "Apple Development: Andy Himberger" ->
+                        certificateOutput("Apple Development: Andy Himberger II (GK8V53S8Z3)")
+
+                    else -> ""
+                }
+            }
+        }
+
+        assertContains(error.message.orEmpty(), "Could not find a matching app signing certificate")
     }
 
     @Test

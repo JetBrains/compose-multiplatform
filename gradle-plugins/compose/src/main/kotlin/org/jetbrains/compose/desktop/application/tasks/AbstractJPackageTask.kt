@@ -32,6 +32,7 @@ import org.jetbrains.compose.desktop.application.dsl.FileAssociation
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.APP_RESOURCES_DIR
+import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.InfoPlistListValue
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.InfoPlistMapValue
@@ -76,6 +77,7 @@ import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.nio.file.LinkOption
 import java.util.*
+import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlin.io.path.isExecutable
 import kotlin.io.path.isRegularFile
@@ -661,6 +663,14 @@ abstract class AbstractJPackageTask @Inject constructor(
                 append("Mac App Store uploads.")
             }
         }
+        val existingCandidates = candidates.filter { installerCertificateExists(it, signingSettings.keychain) }
+        check(existingCandidates.isNotEmpty()) {
+            buildString {
+                appendLine("Could not find a matching installer signing certificate for '${resolvedSigningIdentity.fullIdentity}'.")
+                appendLine("Checked installer certificate names:")
+                appendLine(candidates.joinToString("\n") { "* $it" })
+            }
+        }
 
         val pkgFile = findOutputFileOrDir(destinationDir.ioFile, targetFormat)
         val tmpPkg = pkgFile.resolveSibling("${pkgFile.nameWithoutExtension}-unsigned.pkg")
@@ -669,7 +679,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
 
         var lastError: IllegalStateException? = null
-        for (installerIdentity in candidates) {
+        for (installerIdentity in existingCandidates) {
             val args = mutableListOf("--sign", installerIdentity)
             signingSettings.keychain?.let {
                 args.addAll(listOf("--keychain", it.absolutePath))
@@ -684,6 +694,12 @@ abstract class AbstractJPackageTask @Inject constructor(
                 tmpPkg.delete()
                 return
             } catch (e: IllegalStateException) {
+                if (existingCandidates.size == 1) {
+                    check(tmpPkg.renameTo(pkgFile)) {
+                        "Failed to restore unsigned PKG from ${tmpPkg.absolutePath} to ${pkgFile.absolutePath}"
+                    }
+                    throw e
+                }
                 lastError = e
                 pkgFile.delete()
             }
@@ -692,6 +708,18 @@ abstract class AbstractJPackageTask @Inject constructor(
             "Failed to restore unsigned PKG from ${tmpPkg.absolutePath} to ${pkgFile.absolutePath}"
         }
         throw lastError!!
+    }
+
+    private fun installerCertificateExists(identity: String, keychain: File?): Boolean {
+        var certificates = ""
+        runExternalTool(
+            tool = MacUtils.security,
+            args = listOfNotNull("find-certificate", "-a", "-c", identity, keychain?.absolutePath),
+            checkExitCodeIsNormal = false,
+            processStdout = { certificates = it },
+            logToConsole = ExternalToolRunner.LogToConsole.Never
+        )
+        return extractInstallerCertificateAliases(certificates).contains(identity)
     }
 
     private fun modifyRuntimeOnMacOsIfNeeded() {
@@ -799,6 +827,29 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
     }
 }
+
+private fun extractInstallerCertificateAliases(certificates: String): Set<String> {
+    val matcher = CERTIFICATE_ALIAS_REGEX.matcher(certificates)
+    val result = linkedSetOf<String>()
+    while (matcher.find()) {
+        val hexEncoded = matcher.group(1)
+        val alias = if (hexEncoded.isNullOrBlank()) {
+            matcher.group(2)
+        } else {
+            hexEncoded
+                .substring(2)
+                .chunked(2)
+                .map { it.toInt(16).toByte() }
+                .toByteArray()
+                .toString(Charsets.UTF_8)
+        }
+        result.add(alias)
+    }
+    return result
+}
+
+private val CERTIFICATE_ALIAS_REGEX: Pattern =
+    Pattern.compile("\"alis\"<blob>=(0x[0-9A-F]+)?\\s*\"([^\"]+)\"")
 
 // Serializable is only needed to avoid breaking configuration cache:
 // https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:requirements

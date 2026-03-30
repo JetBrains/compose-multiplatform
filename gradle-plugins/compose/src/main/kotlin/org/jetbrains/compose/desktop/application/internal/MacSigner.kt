@@ -6,6 +6,7 @@
 package org.jetbrains.compose.desktop.application.internal
 
 import org.jetbrains.compose.desktop.application.internal.validation.MacSigningCertificateKind
+import org.jetbrains.compose.desktop.application.internal.validation.MacSigningIdentityInput
 import org.jetbrains.compose.desktop.application.internal.validation.ResolvedMacSigningIdentity
 import org.jetbrains.compose.desktop.application.internal.validation.ValidatedMacOSSigningSettings
 import org.jetbrains.compose.internal.utils.Arch
@@ -121,6 +122,7 @@ internal fun resolveMacSigningIdentity(
     val matches = mutableListOf<String>()
     for (candidate in settings.appSigningSearchIdentities) {
         matches += extractCertificateAliases(findCertificates(candidate))
+            .filter { it.matchesCandidateIdentity(candidate) }
     }
 
     if (matches.isEmpty()) {
@@ -128,7 +130,7 @@ internal fun resolveMacSigningIdentity(
     }
 
     val distinctMatches = linkedSetOf<String>().apply { addAll(matches) }
-    if (matches.size > 1 || distinctMatches.size > 1) {
+    if (distinctMatches.size > 1) {
         error(buildAmbiguousCertificateMessage(settings, distinctMatches))
     }
 
@@ -160,13 +162,30 @@ private fun buildAmbiguousCertificateMessage(
     append("Specify the full certificate identity in 'nativeDistributions.macOS.signing.identity'.")
 }
 
+private fun String.matchesCandidateIdentity(candidate: String): Boolean {
+    val candidateIdentity = MacSigningIdentityInput.parse(candidate)
+    val aliasIdentity = MacSigningIdentityInput.parse(this)
+    if (candidateIdentity.kind == null || aliasIdentity.kind != candidateIdentity.kind) {
+        return false
+    }
+
+    val candidateName = candidateIdentity.name
+    val aliasName = aliasIdentity.name
+    if (aliasName == candidateName) {
+        return true
+    }
+    if (!aliasName.startsWith(candidateName)) {
+        return false
+    }
+    return TEAM_ID_SUFFIX_REGEX.matches(aliasName.removePrefix(candidateName))
+}
+
 private fun extractCertificateAliases(certificates: String): List<String> {
     // When the developer id contains non-ascii characters, the output of `security find-certificate` is
     // slightly different. The `alis` line first has the hex-encoded developer id, then some spaces,
     // and then the developer id with non-ascii characters encoded as octal.
     // See https://bugs.openjdk.org/browse/JDK-8308042
-    val regex = Pattern.compile("\"alis\"<blob>=(0x[0-9A-F]+)?\\s*\"([^\"]+)\"")
-    val m = regex.matcher(certificates)
+    val m = CERTIFICATE_ALIAS_REGEX.matcher(certificates)
     val result = linkedSetOf<String>()
     while (m.find()) {
         val hexEncoded = m.group(1)
@@ -214,3 +233,8 @@ private fun optionalArg(arg: String, value: String?): Array<String> =
 
 private val File.isExecutable: Boolean
     get() = toPath().isExecutable()
+
+private val CERTIFICATE_ALIAS_REGEX: Pattern =
+    Pattern.compile("\"alis\"<blob>=(0x[0-9A-F]+)?\\s*\"([^\"]+)\"")
+
+private val TEAM_ID_SUFFIX_REGEX = Regex(""" \([A-Z0-9]{10}\)$""")
