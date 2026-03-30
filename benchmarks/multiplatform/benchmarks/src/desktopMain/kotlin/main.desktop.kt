@@ -10,6 +10,17 @@ import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import java.awt.GraphicsEnvironment
+import java.lang.management.ManagementFactory
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.TimeSource
+
+actual val mainTime: TimeSource.Monotonic.ValueTimeMark = TimeSource.Monotonic.markNow()
+
+actual fun getProcessStartTime(): TimeSource.Monotonic.ValueTimeMark? {
+    val startTime = ManagementFactory.getRuntimeMXBean().startTime
+    val uptime = System.currentTimeMillis() - startTime
+    return TimeSource.Monotonic.markNow() - uptime.milliseconds
+}
 
 fun main(args: Array<String>) {
     Config.setGlobalFromArgs(args)
@@ -17,7 +28,7 @@ fun main(args: Array<String>) {
     if (Config.runServer) {
         // Start the benchmark server to receive results from browsers
         BenchmarksSaveServer.start()
-    } else if (Config.isModeEnabled(Mode.REAL)) {
+    } else if (Config.isModeEnabled(Mode.REAL) || Config.isModeEnabled(Mode.STARTUP)) {
         val device = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice
         val frameRate = device.displayMode.refreshRate.takeIf { it > 0 } ?: 120
 

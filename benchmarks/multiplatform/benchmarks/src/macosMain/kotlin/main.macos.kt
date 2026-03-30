@@ -11,12 +11,15 @@ import platform.AppKit.NSApplication
 import platform.AppKit.NSScreen
 import platform.AppKit.maximumFramesPerSecond
 import kotlin.system.exitProcess
+import kotlin.time.TimeSource
+
+actual val mainTime: TimeSource.Monotonic.ValueTimeMark = TimeSource.Monotonic.markNow()
 
 actual val isIosTarget: Boolean = true
 
 fun main(args : Array<String>) {
     Config.setGlobalFromArgs(args)
-    if (Config.isModeEnabled(Mode.REAL)) {
+    if (Config.isModeEnabled(Mode.REAL) || Config.isModeEnabled(Mode.STARTUP)) {
         NSApplication.sharedApplication()
         val frameRate = (NSScreen.mainScreen?.maximumFramesPerSecond?.toInt()) ?: 120
         Window(

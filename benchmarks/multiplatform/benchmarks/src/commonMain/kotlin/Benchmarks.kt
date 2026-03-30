@@ -131,6 +131,16 @@ data class MissedFrames(
 private val json = Json { prettyPrint = true }
 
 @Serializable
+data class StartupTimeInfo(
+    val timeToMain: Duration? = null,
+    val timeFromMainToFirstFrame: Duration? = null,
+    val timeOfFirstFrame: Duration,
+    val timeToNthFrame: Duration,
+    val nthFrameCount: Int,
+    val longestFrames: List<Duration>
+)
+
+@Serializable
 data class BenchmarkStats(
     val name: String,
     val frameBudget: Duration,
@@ -141,6 +151,7 @@ data class BenchmarkStats(
     val percentileGPUAverage: List<BenchmarkPercentileAverage>,
     val noBufferingMissedFrames: MissedFrames,
     val doubleBufferingMissedFrames: MissedFrames,
+    val startupTimeInfo: StartupTimeInfo? = null,
 ) {
     fun prettyPrint() {
         println("# $name")
@@ -150,6 +161,24 @@ data class BenchmarkStats(
         }
         conditions.prettyPrint()
         println()
+        startupTimeInfo?.let {
+            println("StartupTimeInfo:")
+            var timeToMain: Duration = Duration.ZERO
+            it.timeToMain?.let { t ->
+                timeToMain = t
+                println("    - Time to main: ${t.inWholeMilliseconds} ms")
+            }
+            it.timeFromMainToFirstFrame?.let { t ->
+                println("    - Time from main to first frame: ${t.inWholeMilliseconds} ms")
+            }
+            println("    - Time of first frame: ${it.timeOfFirstFrame.inWholeMilliseconds} ms")
+            it.timeFromMainToFirstFrame?.let { t ->
+                println("    - Total startup time: ${timeToMain.inWholeMilliseconds + t.inWholeMilliseconds + it.timeOfFirstFrame.inWholeMilliseconds} ms")
+            }
+            println("    - Time from first to ${it.nthFrameCount}th frame: ${it.timeToNthFrame.inWholeMilliseconds} ms")
+            println("    - ${it.longestFrames.size} longest frames during startup: ${it.longestFrames.joinToString { f -> "${f.inWholeMilliseconds} ms" }}")
+            println()
+        }
         if (Config.isModeEnabled(Mode.SIMPLE)) {
             val frameInfo = requireNotNull(averageFrameInfo) { "frameInfo shouldn't be null with Mode.SIMPLE" }
             frameInfo.prettyPrint()
@@ -177,6 +206,19 @@ data class BenchmarkStats(
             map.put("Version", versionInfo)
         }
         conditions.putFormattedValuesTo(map)
+        startupTimeInfo?.let {
+            it.timeToMain?.let { t ->
+                map.put("Startup: Time to main (ms)", t.formatAsMilliseconds())
+            }
+            it.timeFromMainToFirstFrame?.let { t ->
+                map.put("Startup: Time from main to first frame (ms)", t.formatAsMilliseconds())
+            }
+            map.put("Startup: Time of first frame (ms)", it.timeOfFirstFrame.formatAsMilliseconds())
+            map.put("Startup: Time from first to ${it.nthFrameCount}th frame (ms)", it.timeToNthFrame.formatAsMilliseconds())
+            it.longestFrames.forEachIndexed { index, duration ->
+                map.put("Startup: Longest frame ${index + 1} (ms)", duration.formatAsMilliseconds())
+            }
+        }
         if (Config.isModeEnabled(Mode.SIMPLE)) {
             val frameInfo = requireNotNull(averageFrameInfo) { "frameInfo shouldn't be null with Mode.SIMPLE" }
             frameInfo.putFormattedValuesTo(map)
@@ -220,6 +262,7 @@ class BenchmarkResult(
     private val averageFrameInfo: FrameInfo,
     private val averageFPSInfo: FPSInfo,
     private val frames: List<BenchmarkFrame>,
+    private val startupTimeInfo: StartupTimeInfo? = null,
 ) {
     private fun percentileAverageFrameTime(percentile: Double, kind: BenchmarkFrameTimeKind): Duration {
         require(percentile in 0.0..1.0)
@@ -259,7 +302,8 @@ class BenchmarkResult(
                 BenchmarkPercentileAverage(percentile, average)
             },
             MissedFrames(noBufferingMissedFramesCount, noBufferingMissedFramesCount / frames.size.toDouble()),
-            MissedFrames(doubleBufferingMissedFrames, doubleBufferingMissedFrames / frames.size.toDouble())
+            MissedFrames(doubleBufferingMissedFrames, doubleBufferingMissedFrames / frames.size.toDouble()),
+            startupTimeInfo = startupTimeInfo,
         )
     }
 
@@ -326,15 +370,24 @@ suspend fun runBenchmark(
             graphicsContext = graphicsContext,
             content = benchmark.content
         ).generateStats()
+        reportBenchmarkStats(stats)
+    }
+}
+
+private fun reportBenchmarkStats(stats: BenchmarkStats, results: MutableList<BenchmarkStats>? = null) {
+    if (results != null) {
+        results.add(stats)
+    }
+    if (results == null || !Config.reportAtTheEnd) {
         stats.prettyPrint()
-        if (Config.saveStatsToJSON && isIosTarget) {
-            println("JSON_START")
-            println(stats.toJsonString())
-            println("JSON_END")
-        }
-        if (Config.saveStats()) {
-            saveBenchmarkStats(name = benchmark.name, stats = stats)
-        }
+    }
+    if (Config.saveStatsToJSON && isIosTarget) {
+        println("JSON_START")
+        println(stats.toJsonString())
+        println("JSON_END")
+    }
+    if (Config.saveStats()) {
+        saveBenchmarkStats(name = stats.name, stats = stats)
     }
 }
 
@@ -360,6 +413,17 @@ suspend fun runBenchmarks(
     }
 }
 
+expect fun getProcessStartTime(): TimeSource.Monotonic.ValueTimeMark?
+
+expect val mainTime: TimeSource.Monotonic.ValueTimeMark
+
+private enum class BenchmarkPhase {
+    STARTUP,
+    EMPTY_SCREEN,
+    WARMUP,
+    MEASUREMENT
+}
+
 @Composable
 fun BenchmarkRunner(
     benchmarks: List<Benchmark>,
@@ -367,8 +431,18 @@ fun BenchmarkRunner(
     onExit: () -> Unit
 ) {
     var currentBenchmarkIndex by remember { mutableStateOf(0) }
-    var isWarmup by remember { mutableStateOf(Config.warmupCount > 0) }
-    var isEmptyScreen by remember { mutableStateOf(false) }
+    var firstBenchmarkName by remember { mutableStateOf<String?>(null) }
+    var phaseBeforeEmptyScreen by remember { mutableStateOf<BenchmarkPhase?>(null) }
+    var phase by remember {
+        mutableStateOf(
+            when {
+                Config.isModeEnabled(Mode.STARTUP) -> BenchmarkPhase.STARTUP
+                Config.warmupCount > 0 -> BenchmarkPhase.WARMUP
+                else -> BenchmarkPhase.MEASUREMENT
+            }
+        )
+    }
+    var startupTimeInfo by remember { mutableStateOf<StartupTimeInfo?>(null) }
     val results = remember { mutableListOf<BenchmarkStats>() }
     val nanosPerFrame = 1.seconds.inWholeNanoseconds / deviceFrameRate
 
@@ -380,67 +454,126 @@ fun BenchmarkRunner(
         return
     }
     val benchmark = benchmarks[currentBenchmarkIndex]
+    if (firstBenchmarkName == null && Config.isBenchmarkEnabled(benchmark.name)) {
+        firstBenchmarkName = benchmark.name
+    }
+
     if (Config.isBenchmarkEnabled(benchmark.name)) {
         Box(modifier = Modifier.fillMaxSize()) {
-            if (!isEmptyScreen) {
+            if (phase != BenchmarkPhase.EMPTY_SCREEN) {
                 benchmark.content()
             }
 
-            LaunchedEffect(benchmark.name, isWarmup, isEmptyScreen) {
-                if (isWarmup) {
-                    repeat(Config.warmupCount) {
+            LaunchedEffect(benchmark.name, phase) {
+                when (phase) {
+                    BenchmarkPhase.STARTUP -> {
+                        val processStart = getProcessStartTime()
+
+                        // Time of the first frame
+                        val firstFrameMeasureStart = TimeSource.Monotonic.markNow()
                         withFrameNanos { }
+                        val firstFrameMark = TimeSource.Monotonic.markNow()
+                        val timeOfFirstFrame = firstFrameMark - firstFrameMeasureStart
+
+                        // Nth frame
+                        val startupFramesCount = Config.startupFrameCount
+                        val startupFrames = MutableList(startupFramesCount) { Duration.ZERO }
+                        repeat(startupFramesCount) { i ->
+                            val frameStart = TimeSource.Monotonic.markNow()
+                            withFrameNanos { }
+                            startupFrames[i] = frameStart.elapsedNow()
+                        }
+                        val nthFrameMark = TimeSource.Monotonic.markNow()
+                        val timeToNthFrame = nthFrameMark - firstFrameMark
+
+                        val capturedStartupTimeInfo = StartupTimeInfo(
+                            timeToMain = processStart?.let { mainTime - it },
+                            timeFromMainToFirstFrame = if (benchmark.name == firstBenchmarkName) firstFrameMark - mainTime else null,
+                            timeOfFirstFrame = timeOfFirstFrame,
+                            timeToNthFrame = timeToNthFrame,
+                            nthFrameCount = startupFramesCount,
+                            longestFrames = startupFrames.sortedDescending().take(Config.startupLongestFramesCount)
+                        )
+                        startupTimeInfo = capturedStartupTimeInfo
+
+                        if (!Config.isModeEnabled(Mode.REAL)) {
+                            val stats = BenchmarkResult(
+                                name = benchmark.name,
+                                frameBudget = nanosPerFrame.nanoseconds,
+                                conditions = BenchmarkConditions(frameCount = startupFramesCount, warmupCount = 0),
+                                averageFrameInfo = FrameInfo(timeOfFirstFrame, Duration.ZERO),
+                                averageFPSInfo = FPSInfo(0.0),
+                                frames = startupFrames.map { BenchmarkFrame(it, Duration.ZERO) },
+                                startupTimeInfo = capturedStartupTimeInfo
+                            ).generateStats()
+
+                            reportBenchmarkStats(stats, results)
+                            currentBenchmarkIndex++
+                            startupTimeInfo = null
+                        }
+                        phaseBeforeEmptyScreen = BenchmarkPhase.STARTUP
+                        phase = BenchmarkPhase.EMPTY_SCREEN
                     }
-                    isWarmup = false
-                    isEmptyScreen = true
-                } else if (isEmptyScreen) {
-                    delay(Config.emptyScreenDelay.milliseconds)
-                    withFrameNanos {  }
-                    isEmptyScreen = false
-                } else {
-                    val frames = MutableList(benchmark.frameCount) {
-                        BenchmarkFrame(Duration.ZERO, Duration.ZERO)
+                    BenchmarkPhase.WARMUP -> {
+                        repeat(Config.warmupCount) {
+                            withFrameNanos { }
+                        }
+                        phaseBeforeEmptyScreen = BenchmarkPhase.WARMUP
+                        phase = BenchmarkPhase.EMPTY_SCREEN
                     }
-                    // skip first frame waiting
-                    withFrameNanos {  }
-                    val start = TimeSource.Monotonic.markNow()
-                    repeat(benchmark.frameCount) {
-                        val frameStart = TimeSource.Monotonic.markNow()
+                    BenchmarkPhase.EMPTY_SCREEN -> {
+                        delay(Config.emptyScreenDelay.milliseconds)
                         withFrameNanos { }
-                        val rawFrameTime = frameStart.elapsedNow()
-                        // rawFrameTime isn't reliable for missed-frame checks: small timing inaccuracies can push
-                        // it just over the frame budget even when the frame would effectively fit.
-                        // Instead, estimate how many vsync intervals the frame took by rounding the measured time to
-                        // the nearest multiple of nanosPerFrame.
-                        // Note: this is only an estimate — we can’t determine here whether a frame was truly missed.
-                        val normalizedFrameTime = ((rawFrameTime.inWholeNanoseconds + nanosPerFrame/2) / nanosPerFrame) * nanosPerFrame
-                        frames[it] = BenchmarkFrame(normalizedFrameTime.nanoseconds, Duration.ZERO)
+                        phase = when (phaseBeforeEmptyScreen) {
+                            BenchmarkPhase.STARTUP ->
+                                if (Config.isModeEnabled(Mode.REAL)) {
+                                    if (Config.warmupCount > 0) BenchmarkPhase.WARMUP
+                                    else BenchmarkPhase.MEASUREMENT
+                                } else BenchmarkPhase.STARTUP
+                            BenchmarkPhase.WARMUP ->
+                                BenchmarkPhase.MEASUREMENT
+                            BenchmarkPhase.MEASUREMENT ->
+                                if (Config.isModeEnabled(Mode.STARTUP)) BenchmarkPhase.STARTUP
+                                else if (Config.warmupCount > 0) BenchmarkPhase.WARMUP
+                                else BenchmarkPhase.MEASUREMENT
+                            else -> throw IllegalStateException("Unexpected phase: $phaseBeforeEmptyScreen")
+                        }
                     }
-                    val duration = start.elapsedNow()
-                    val stats = BenchmarkResult(
-                        name = benchmark.name,
-                        frameBudget = nanosPerFrame.nanoseconds,
-                        conditions = BenchmarkConditions(benchmark.frameCount, warmupCount = Config.warmupCount),
-                        averageFrameInfo = FrameInfo(duration / benchmark.frameCount, Duration.ZERO),
-                        averageFPSInfo = FPSInfo(benchmark.frameCount.toDouble() / duration.toDouble(DurationUnit.SECONDS)),
-                        frames = frames
-                    ).generateStats()
-                    if (!Config.reportAtTheEnd) {
-                        stats.prettyPrint()
-                    } else {
-                        results.add(stats)
+                    BenchmarkPhase.MEASUREMENT -> {
+                        val frames = MutableList(benchmark.frameCount) {
+                            BenchmarkFrame(Duration.ZERO, Duration.ZERO)
+                        }
+                        // skip first frame waiting
+                        withFrameNanos { }
+                        val start = TimeSource.Monotonic.markNow()
+                        repeat(benchmark.frameCount) {
+                            val frameStart = TimeSource.Monotonic.markNow()
+                            withFrameNanos { }
+                            val rawFrameTime = frameStart.elapsedNow()
+                            // rawFrameTime isn't reliable for missed-frame checks: small timing inaccuracies can push
+                            // it just over the frame budget even when the frame would effectively fit.
+                            // Instead, estimate how many vsync intervals the frame took by rounding the measured time to
+                            // the nearest multiple of nanosPerFrame.
+                            // Note: this is only an estimate — we can't determine here whether a frame was truly missed.
+                            val normalizedFrameTime = ((rawFrameTime.inWholeNanoseconds + nanosPerFrame/2) / nanosPerFrame) * nanosPerFrame
+                            frames[it] = BenchmarkFrame(normalizedFrameTime.nanoseconds, Duration.ZERO)
+                        }
+                        val duration = start.elapsedNow()
+                        val stats = BenchmarkResult(
+                            name = benchmark.name,
+                            frameBudget = nanosPerFrame.nanoseconds,
+                            conditions = BenchmarkConditions(benchmark.frameCount, warmupCount = Config.warmupCount),
+                            averageFrameInfo = FrameInfo(duration / benchmark.frameCount, Duration.ZERO),
+                            averageFPSInfo = FPSInfo(benchmark.frameCount.toDouble() / duration.toDouble(DurationUnit.SECONDS)),
+                            frames = frames,
+                            startupTimeInfo = startupTimeInfo
+                        ).generateStats()
+                        reportBenchmarkStats(stats, results)
+                        currentBenchmarkIndex++
+                        startupTimeInfo = null
+                        phaseBeforeEmptyScreen = BenchmarkPhase.MEASUREMENT
+                        phase = BenchmarkPhase.EMPTY_SCREEN
                     }
-                    if (Config.saveStatsToJSON && isIosTarget) {
-                        println("JSON_START")
-                        println(stats.toJsonString())
-                        println("JSON_END")
-                    }
-                    if (Config.saveStats()) {
-                        saveBenchmarkStats(name = benchmark.name, stats = stats)
-                    }
-                    currentBenchmarkIndex++
-                    isWarmup = Config.warmupCount > 0
-                    isEmptyScreen = true
                 }
             }
         }

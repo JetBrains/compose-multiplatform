@@ -6,7 +6,11 @@ import kotlinx.coroutines.*
 import org.w3c.dom.url.URLSearchParams
 import kotlin.js.ExperimentalWasmJsInterop
 import kotlin.js.toJsString
+import kotlin.time.TimeSource
 
+actual fun getProcessStartTime(): TimeSource.Monotonic.ValueTimeMark? = null
+
+actual val mainTime: TimeSource.Monotonic.ValueTimeMark = TimeSource.Monotonic.markNow()
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalWasmJsInterop::class)
 fun mainBrowser() = MainScope().launch {
@@ -19,10 +23,17 @@ fun mainBrowser() = MainScope().launch {
     Config.setGlobalFromArgs(args)
 
     val composeRoot = document.getElementById("root") ?: error("No root element found")
-    if (Config.isModeEnabled(Mode.REAL)) {
+    if (Config.isModeEnabled(Mode.REAL) || Config.isModeEnabled(Mode.STARTUP)) {
         val frameRate = 120 // can we get this from device?
         ComposeViewport("root") {
-            BenchmarkRunner(getBenchmarks(), frameRate, onExit = { composeRoot.remove() })
+            BenchmarkRunner(getBenchmarks(), frameRate, onExit = {
+                composeRoot.remove()
+                GlobalScope.launch {
+                    if (BenchmarksSaveServerClient.isServerAlive()) {
+                        BenchmarksSaveServerClient.stopServer()
+                    }
+                }
+            })
         }
     } else {
         composeRoot.remove()

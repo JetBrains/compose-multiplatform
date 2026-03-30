@@ -11,12 +11,15 @@ import platform.UIKit.UIApplication
 import platform.UIKit.UIScreen
 import platform.UIKit.UIViewController
 import kotlin.system.exitProcess
+import kotlin.time.TimeSource
+
+actual val mainTime: TimeSource.Monotonic.ValueTimeMark = TimeSource.Monotonic.markNow()
 
 fun setGlobalFromArgs(args : List<String>) {
     Config.setGlobalFromArgs(args.toTypedArray())
 }
 
-fun runReal() = Config.isModeEnabled(Mode.REAL)
+fun runReal() = Config.isModeEnabled(Mode.REAL) || Config.isModeEnabled(Mode.STARTUP)
 
 fun runBenchmarks() {
     UIApplication.sharedApplication.setIdleTimerDisabled(true)
