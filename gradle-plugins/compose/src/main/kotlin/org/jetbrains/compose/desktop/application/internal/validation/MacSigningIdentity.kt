@@ -5,56 +5,85 @@
 
 package org.jetbrains.compose.desktop.application.internal.validation
 
+/**
+ * Current Apple certificate names plus legacy aliases we still need to support.
+ *
+ * Legacy compatibility matters because:
+ * - jpackage still recognizes the older "3rd Party Mac Developer ..." names
+ * - existing user keychains may still contain legacy "Mac Developer" certificates
+ */
 internal enum class MacSigningCertificateKind(
     val prefix: String,
     val isAppSigningCertificate: Boolean,
-    val isJPackageCompatible: Boolean = false,
-    val isDevelopmentCertificate: Boolean = false
+    val isJPackageCompatible: Boolean,
+    val isDevelopmentCertificate: Boolean
 ) {
+    // Current outside-App-Store distribution certificates
     DeveloperIdApplication(
         prefix = "Developer ID Application: ",
         isAppSigningCertificate = true,
-        isJPackageCompatible = true
+        isJPackageCompatible = true,
+        isDevelopmentCertificate = false
     ),
-    ThirdPartyMacDeveloperApplication(
-        prefix = "3rd Party Mac Developer Application: ",
-        isAppSigningCertificate = true,
-        isJPackageCompatible = true
+    DeveloperIdInstaller(
+        prefix = "Developer ID Installer: ",
+        isAppSigningCertificate = false,
+        isJPackageCompatible = false,
+        isDevelopmentCertificate = false
     ),
+
+    // Current App Store / distribution certificates
     AppleDistribution(
         prefix = "Apple Distribution: ",
-        isAppSigningCertificate = true
+        isAppSigningCertificate = true,
+        isJPackageCompatible = false,
+        isDevelopmentCertificate = false
     ),
     MacAppDistribution(
         prefix = "Mac App Distribution: ",
-        isAppSigningCertificate = true
+        isAppSigningCertificate = true,
+        isJPackageCompatible = false,
+        isDevelopmentCertificate = false
     ),
+    MacInstallerDistribution(
+        prefix = "Mac Installer Distribution: ",
+        isAppSigningCertificate = false,
+        isJPackageCompatible = false,
+        isDevelopmentCertificate = false
+    ),
+
+    // Current development certificates
     AppleDevelopment(
         prefix = "Apple Development: ",
         isAppSigningCertificate = true,
+        isJPackageCompatible = false,
         isDevelopmentCertificate = true
     ),
     MacDevelopment(
         prefix = "Mac Development: ",
         isAppSigningCertificate = true,
+        isJPackageCompatible = false,
         isDevelopmentCertificate = true
     ),
     MacDeveloper(
         prefix = "Mac Developer: ",
         isAppSigningCertificate = true,
+        isJPackageCompatible = false,
         isDevelopmentCertificate = true
     ),
-    DeveloperIdInstaller(
-        prefix = "Developer ID Installer: ",
-        isAppSigningCertificate = false
+
+    // Legacy compatibility certificates
+    ThirdPartyMacDeveloperApplication(
+        prefix = "3rd Party Mac Developer Application: ",
+        isAppSigningCertificate = true,
+        isJPackageCompatible = true,
+        isDevelopmentCertificate = false
     ),
     ThirdPartyMacDeveloperInstaller(
         prefix = "3rd Party Mac Developer Installer: ",
-        isAppSigningCertificate = false
-    ),
-    MacInstallerDistribution(
-        prefix = "Mac Installer Distribution: ",
-        isAppSigningCertificate = false
+        isAppSigningCertificate = false,
+        isJPackageCompatible = false,
+        isDevelopmentCertificate = false
     );
 
     val displayName: String
