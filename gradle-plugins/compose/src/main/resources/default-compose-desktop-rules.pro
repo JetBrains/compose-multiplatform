@@ -48,7 +48,7 @@
 # https://github.com/Kotlin/kotlinx.coroutines/issues/2046
 -dontwarn android.annotation.SuppressLint
 
-# https://github.com/JetBrains/compose-jb/issues/2393
+# https://youtrack.jetbrains.com/issue/CMP-2393
 -dontnote kotlin.coroutines.jvm.internal.**
 -dontnote kotlin.internal.**
 -dontnote kotlin.jvm.internal.**

@@ -1,4 +1,4 @@
-// https://github.com/JetBrains/compose-jb/issues/774
+// https://youtrack.jetbrains.com/issue/CMP-6188
 // fixed in https://github.com/JetBrains/androidx/pull/118
 
 import androidx.compose.runtime.Composable

@@ -1,6 +1,6 @@
 // @Module:Main
 
-// https://github.com/JetBrains/compose-jb/issues/1226
+// https://youtrack.jetbrains.com/issue/CMP-6163
 
 // TODO: move this to passing cases after kotlin 1.6.0
 import kotlin.reflect.KProperty
