@@ -40,7 +40,7 @@ class NullWrapper<T> : NullableWrapper<T>() {
     override val value: T? get() = null
 }
 
-@Composable // https://github.com/JetBrains/compose-jb/issues/1226
+@Composable // https://youtrack.jetbrains.com/issue/CMP-6163
 fun <T> ComposableWithTypedDefaultValue(
     onChange: (NullableWrapper<T>) -> Unit,
     valueWrapper: NullableWrapper<T> = NullWrapper()

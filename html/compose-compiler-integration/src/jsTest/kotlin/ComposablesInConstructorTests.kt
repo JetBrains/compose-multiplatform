@@ -8,9 +8,9 @@ import kotlin.test.assertEquals
  * Classes under tests are defined in jsMain intentionally.
  * The reason is to test cross-module compilation + runtime behaviour.
  *
- * Reporeted Issues:
- * https://github.com/JetBrains/compose-jb/issues/746
- * https://github.com/JetBrains/compose-jb/issues/1052
+ * Reported Issues:
+ * https://youtrack.jetbrains.com/issue/CMP-6299
+ * https://youtrack.jetbrains.com/issue/CMP-5305
  */
 class ComposablesInConstructorTests {
 
