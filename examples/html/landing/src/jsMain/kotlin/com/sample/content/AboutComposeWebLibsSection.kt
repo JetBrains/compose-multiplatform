@@ -95,7 +95,7 @@ fun ComposeWebLibraries() {
         A(attrs = {
             classes(WtTexts.wtButton, WtTexts.wtButtonThemeLight, WtOffsets.wtTopOffset48, WtOffsets.wtTopOffsetSm24)
             target(ATarget.Blank)
-        }, href = "https://github.com/jetbrains/compose-jb#compose-for-web") {
+        }, href = "https://github.com/jetbrains/compose-multiplatform#compose-html") {
             Text("See all features")
         }
     }

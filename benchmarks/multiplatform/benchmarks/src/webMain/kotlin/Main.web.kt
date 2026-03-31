@@ -35,7 +35,7 @@ fun mainBrowser() = MainScope().launch {
 
             runBenchmarks()
             println("Completed!")
-            if (Config.saveStats()) {
+            if (BenchmarksSaveServerClient.isServerAlive()) {
                 GlobalScope.launch {
                     BenchmarksSaveServerClient.stopServer()
                 }

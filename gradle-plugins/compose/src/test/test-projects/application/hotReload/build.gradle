@@ -7,7 +7,7 @@ plugins {
 
 kotlin {
     // empty stub (no actual android app) to detect configuration conflicts
-    // like https://github.com/JetBrains/compose-jb/issues/2345
+    // like https://youtrack.jetbrains.com/issue/CMP-2345
     androidLibrary {
         namespace = "org.jetbrains.compose.testapp"
         compileSdk = 35
