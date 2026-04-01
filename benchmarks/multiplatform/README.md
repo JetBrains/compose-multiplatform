@@ -14,9 +14,17 @@ The benchmarks can be run in different modes, which determine how performance is
 - **`REAL`**: Runs the benchmark in a real-world scenario with actual VSync. This mode provides the most accurate results for user-perceived performance (FPS, actual missed frames)
               but may not catch performance regressions if a frame fits to budget. 
               Also requires a device with a real display (may have problems with headless devices). 
+- **`STARTUP`**: Measures application startup performance. This mode captures detailed timing metrics from process start to the first frame and beyond, including:
+  - Time from process start to the application entry point (`timeToMain`) - platform-dependent, available on JVM/Desktop
+  - Time from entry point to the first frame (`timeFromMainToFirstFrame`)
+  - Duration of the first frame itself (`timeOfFirstFrame`)
+  - Time from the first frame to a configurable Nth frame (`timeToNthFrame`, default N=30)
+  - The N longest frames during startup (`longestFrames`, default N=3)
 
 To enable specific modes, use the `modes` argument:
-`modes=SIMPLE,VSYNC_EMULATION,REAL`
+`modes=SIMPLE,VSYNC_EMULATION,REAL,STARTUP`
+
+Multiple modes can be combined. For example, `modes=STARTUP,REAL` will first measure startup metrics and then run real-time performance measurements, producing a unified report.
 
 ## Configuration Arguments
 
@@ -24,12 +32,14 @@ You can configure benchmark runs using arguments passed to the Gradle task (via 
 
 | Argument | Description                                                | Example |
 |----------|------------------------------------------------------------|---------|
-| `modes` | Comma-separated list of execution modes (`SIMPLE`, `VSYNC_EMULATION`, `REAL`). | `modes=REAL` |
+| `modes` | Comma-separated list of execution modes (`SIMPLE`, `VSYNC_EMULATION`, `REAL`, `STARTUP`). | `modes=REAL,STARTUP` |
 | `benchmarks` | Comma-separated list of benchmarks to run. Can optionally specify problem size in parentheses. | `benchmarks=LazyGrid(100),AnimatedVisibility` |
 | `disabledBenchmarks` | Comma-separated list of benchmarks to skip.                | `disabledBenchmarks=HeavyShader` |
 | `warmupCount` | Number of warmup frames before starting measurements.      | `warmupCount=50` |
 | `frameCount` | Number of frames to measure for each benchmark.            | `frameCount=500` |
 | `emptyScreenDelay` | Delay in milliseconds between warmup and measurement (real mode only).| `emptyScreenDelay=1000` |
+| `startupFrameCount` | Number of frames to measure after the first frame in startup mode (default: 30). | `startupFrameCount=50` |
+| `startupLongestFramesCount` | Number of longest frames to report in startup mode (default: 3). | `startupLongestFramesCount=5` |
 | `parallel` | (iOS only) Enable parallel rendering.                      | `parallel=true` |
 | `saveStatsToCSV` | Save results to CSV files.                                 | `saveStatsToCSV=true` |
 | `saveStatsToJSON` | Save results to JSON files.                                | `saveStatsToJSON=true` |
