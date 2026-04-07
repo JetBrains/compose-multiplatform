@@ -33,8 +33,9 @@ fun main(args: Array<String>) {
     val versionArg = argMap.remove("version")
     val version = versionArg ?: getCurrentComposeVersion()
     val benchmarkName = argMap["benchmarks"]
-    val separateProcess = argMap.remove("separateProcess")?.toBoolean() ?: false
-    
+    val startup = argMap["modes"]?.contains("startup", ignoreCase = true) ?: false
+    val separateProcess = argMap.remove("separateProcess")?.toBoolean() ?: startup
+
     val runServer = platform == "web"
     val isWeb = platform == "web"
     val isIos = platform == "ios"
@@ -43,6 +44,7 @@ fun main(args: Array<String>) {
     println("Compose version: $version")
     println("Number of runs: $runs")
     println("Separate process: $separateProcess")
+    println("Startup mode: $startup")
     println("Run server: $runServer")
     benchmarkName?.let { println("Filtering by benchmark: $it") }
 

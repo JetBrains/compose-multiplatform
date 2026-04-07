@@ -1,7 +1,8 @@
 enum class Mode {
     SIMPLE,
     VSYNC_EMULATION,
-    REAL
+    REAL,
+    STARTUP
 }
 
 object Args {
@@ -45,6 +46,8 @@ object Args {
         var emptyScreenDelay: Long? = null
         var reportAtTheEnd: Boolean = false
         var listBenchmarks: Boolean = false
+        var startupFrameCount: Int? = null
+        var startupLongestFramesCount: Int? = null
 
         for (arg in args) {
             if (arg.startsWith("modes=", ignoreCase = true)) {
@@ -73,11 +76,18 @@ object Args {
                 reportAtTheEnd = arg.substringAfter("=").toBoolean()
             } else if (arg.startsWith("listBenchmarks=", ignoreCase = true)) {
                 listBenchmarks = arg.substringAfter("=").toBoolean()
+            } else if (arg.startsWith("startupFrameCount=", ignoreCase = true)) {
+                startupFrameCount = arg.substringAfter("=").toInt()
+            } else if (arg.startsWith("startupLongestFramesCount=", ignoreCase = true)) {
+                startupLongestFramesCount = arg.substringAfter("=").toInt()
             } else {
                 println("WARNING: unknown argument $arg")
             }
         }
 
+        if (modes.isEmpty()) {
+            modes.addAll(listOf(Mode.SIMPLE, Mode.VSYNC_EMULATION))
+        }
         val defaultWarmupCount = if (modes.contains(Mode.REAL)) 0 else 100
 
         return Config(
@@ -93,7 +103,9 @@ object Args {
             frameCount = frameCount ?: 1000,
             emptyScreenDelay = emptyScreenDelay ?: 2000L,
             reportAtTheEnd = reportAtTheEnd,
-            listBenchmarks = listBenchmarks
+            listBenchmarks = listBenchmarks,
+            startupFrameCount = startupFrameCount ?: 30,
+            startupLongestFramesCount = startupLongestFramesCount ?: 3
         )
     }
 }
@@ -129,13 +141,15 @@ data class Config(
     val frameCount: Int = 1000,
     val emptyScreenDelay: Long = 2000L,
     val reportAtTheEnd: Boolean = false,
-    val listBenchmarks: Boolean = false
+    val listBenchmarks: Boolean = false,
+    val startupFrameCount: Int = 30,
+    val startupLongestFramesCount: Int = 3
 ) {
     /**
      * Checks if a specific mode is enabled based on the configuration.
      * A mode is considered enabled if no modes were specified (default) except `real` mode or if it's explicitly listed.
      */
-    fun isModeEnabled(mode: Mode): Boolean = (modes.isEmpty() && mode !=  Mode.REAL) || modes.contains(mode)
+    fun isModeEnabled(mode: Mode): Boolean = modes.contains(mode)
 
     /**
      * Checks if a specific benchmark is enabled
@@ -193,6 +207,12 @@ data class Config(
 
         val listBenchmarks: Boolean
             get() = global.listBenchmarks
+
+        val startupFrameCount: Int
+            get() = global.startupFrameCount
+
+        val startupLongestFramesCount: Int
+            get() = global.startupLongestFramesCount
 
         fun setGlobal(global: Config) {
             this.global = global
