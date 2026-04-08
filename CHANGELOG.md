@@ -17,14 +17,14 @@ _Changes since 1.11.0-beta01_
 ### Multiple Platforms
 
 - Support v2 Compose UI Tests APIs on non-android targets which uses `StandardTestDispatcher` by default instead of `UnconfinedTestDispatcher` [#2919](https://github.com/JetBrains/compose-multiplatform-core/pull/2919)
-- Support a customization `effectContext` in compose UI tests [#2919](https://github.com/JetBrains/compose-multiplatform-core/pull/2919)
+- Support a customization of `effectContext` in Compose UI tests [#2919](https://github.com/JetBrains/compose-multiplatform-core/pull/2919)
 
 ## Fixes
 
 ### Multiple Platforms
 
 - _(prerelease fix)_ Fixed a path regression where `PathMeasure.getSegment(..., startWithMoveTo = true)` could produce incorrect results when reusing destination paths [#2902](https://github.com/JetBrains/compose-multiplatform-core/pull/2902)
-- `Ctrl`/`Cmd + Home`/`End` shortcuts should now work correctly in text fields [#2931](https://github.com/JetBrains/compose-multiplatform-core/pull/2931)
+- `Ctrl+Home`/`Ctrl+End` or `Cmd+Home`/`Cmd+End` shortcuts should now work correctly in text fields [#2931](https://github.com/JetBrains/compose-multiplatform-core/pull/2931)
 
 ### iOS
 
@@ -68,10 +68,10 @@ _Changes since 1.11.0-beta01_
 | Material3 | `org.jetbrains.compose.material3:material3*:1.11.0-alpha06` | [Material3 1.5.0-alpha16](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha16) |
 | Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha06` | [Material3 Adaptive 1.3.0-alpha09](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha09) |
 | Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0-alpha03` | [Lifecycle 2.11.0-alpha03](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0-alpha03) |
-| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.10.0-alpha02` | [Navigation 2.10.0-alpha02](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.7) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.2` | [Navigation 2.9.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.7) |
 | Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.1.0-rc01` | [Navigation3 1.1.0-rc01](https://developer.android.com/jetpack/androidx/releases/navigation3#1.1.0-rc01) |
 | Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0-alpha01` | [Navigation Event 1.1.0-alpha01](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.0-alpha01) |
-| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.5.0-alpha02` | [Savedstate 1.5.0-alpha02](https://developer.android.com/jetpack/androidx/releases/savedstate#1.5.0-alpha02) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
 | WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
 
 ---
