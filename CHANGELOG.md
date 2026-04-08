@@ -1,3 +1,81 @@
+# 1.11.0-beta02 (April 2026)
+
+_Changes since 1.11.0-beta01_
+
+## Migration Notes
+
+### Multiple Platforms
+
+- `runComposeUiTest`, `runSkikoComposeUiTest`, `runDesktopComposeUiTest` are deprecated in favor v2 versions [#2919](https://github.com/JetBrains/compose-multiplatform-core/pull/2919)
+
+### Web
+
+- Kotlin 2.3.20 is required when using Compose Multiplatform with Kotlin/JS or Kotlin/Wasm [#2918](https://github.com/JetBrains/compose-multiplatform-core/pull/2918)
+
+## Features
+
+### Multiple Platforms
+
+- Support v2 Compose UI Tests APIs on non-android targets which uses `StandardTestDispatcher` by default instead of `UnconfinedTestDispatcher` [#2919](https://github.com/JetBrains/compose-multiplatform-core/pull/2919)
+- Support a customization `effectContext` in compose UI tests [#2919](https://github.com/JetBrains/compose-multiplatform-core/pull/2919)
+
+## Fixes
+
+### Multiple Platforms
+
+- _(prerelease fix)_ Fixed a path regression where `PathMeasure.getSegment(..., startWithMoveTo = true)` could produce incorrect results when reusing destination paths [#2902](https://github.com/JetBrains/compose-multiplatform-core/pull/2902)
+- `Ctrl`/`Cmd + Home`/`End` shortcuts should now work correctly in text fields [#2931](https://github.com/JetBrains/compose-multiplatform-core/pull/2931)
+
+### iOS
+
+- Fix an issue with scrolling when scrollable content is displayed in modal view controller [#2883](https://github.com/JetBrains/compose-multiplatform-core/pull/2883)
+- _(prerelease fix)_ Fix crash during triple tap on empty textfield with `usingNativeTextInput` flag enabled [#2910](https://github.com/JetBrains/compose-multiplatform-core/pull/2910)
+- _(prerelease fix)_ Fix crash after applying autocorrection change or keyboard suggestion in `TextField` when `usingNativeTextInput` flag is enabled [#2921](https://github.com/JetBrains/compose-multiplatform-core/pull/2921)
+- Fix crash caused by the missing symbol `UIWindowSceneGeometry` on iOS 15 [#2924](https://github.com/JetBrains/compose-multiplatform-core/pull/2924)
+- _(prerelease fix)_ Fix regression with the outdated and wrongly inserted keyboard suggestions in `BasicTextField(TextFieldValue)` and `BasicTextField(TextFieldState)` [#2925](https://github.com/JetBrains/compose-multiplatform-core/pull/2925)
+- _(prerelease fix)_ Fix missing handles and caret in `TextField` on new line at the end of the text when `usingNativeTextInput` flag is enabled [#2908](https://github.com/JetBrains/compose-multiplatform-core/pull/2908)
+- The structure of accessibility elements is now better aligned with Android semantic nodes [#2916](https://github.com/JetBrains/compose-multiplatform-core/pull/2916)
+- Fix issues with accessibility elements not focusing at runtime [#2916](https://github.com/JetBrains/compose-multiplatform-core/pull/2916)
+- _(prerelease fix)_ Fix incorrect appearance of `Autofill` context menu item in the `BasicTextField(TextFieldValue)` and `BasicTextField(TextFieldState)` [#2937](https://github.com/JetBrains/compose-multiplatform-core/pull/2937)
+- Fix `ModalBottomSheetDialog` content inset calculation [#2849](https://github.com/JetBrains/compose-multiplatform-core/pull/2849)
+
+### Desktop
+
+- Fix memory leak in dialogs with non-default `compose.layers.type` setting [#2864](https://github.com/JetBrains/compose-multiplatform-core/pull/2864)
+- [Accessibility] Improve performance of traversal groups with a large amount of children [#2900](https://github.com/JetBrains/compose-multiplatform-core/pull/2900)
+- Clear some scheduled tasks on scene closure [#2888](https://github.com/JetBrains/compose-multiplatform-core/pull/2888)
+- _(prerelease fix)_ Bump Compose Hot Reload to [1.1.0-beta02](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.1.0-beta02) [#5569](https://github.com/JetBrains/compose-multiplatform/pull/5569)
+
+### Web
+
+- Fix identity hash code not being correctly cached [#2913](https://github.com/JetBrains/compose-multiplatform-core/pull/2913)
+- [iOS] Fix 'Fast delete' not working correctly for text containing emojis [#2927](https://github.com/JetBrains/compose-multiplatform-core/pull/2927)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.11.0-beta02`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.11.0-beta02` | [Runtime 1.11.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.11.0-beta02) |
+| UI | `org.jetbrains.compose.ui:ui*:1.11.0-beta02` | [UI 1.11.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.11.0-beta02) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.11.0-beta02` | [Foundation 1.11.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.11.0-beta02) |
+| Material | `org.jetbrains.compose.material:material*:1.11.0-beta02` | [Material 1.11.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.11.0-beta02) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.11.0-alpha06` | [Material3 1.5.0-alpha16](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha16) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha06` | [Material3 Adaptive 1.3.0-alpha09](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha09) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0-alpha03` | [Lifecycle 2.11.0-alpha03](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0-alpha03) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.10.0-alpha02` | [Navigation 2.10.0-alpha02](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.7) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.1.0-rc01` | [Navigation3 1.1.0-rc01](https://developer.android.com/jetpack/androidx/releases/navigation3#1.1.0-rc01) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0-alpha01` | [Navigation Event 1.1.0-alpha01](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.0-alpha01) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.5.0-alpha02` | [Savedstate 1.5.0-alpha02](https://developer.android.com/jetpack/androidx/releases/savedstate#1.5.0-alpha02) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.11.0-beta01 (March 2026)
 
 _Changes since 1.11.0-alpha04_
