@@ -15,7 +15,7 @@ import kotlin.time.TimeSource
 
 actual val mainTime: TimeSource.Monotonic.ValueTimeMark = TimeSource.Monotonic.markNow()
 
-actual val isIosTarget: Boolean = true
+actual val isIosTarget: Boolean = false
 
 fun main(args : Array<String>) {
     Config.setGlobalFromArgs(args)
