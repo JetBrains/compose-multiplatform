@@ -80,6 +80,10 @@ subprojects {
             }
         }
     }
+
+    tasks.withType<AbstractTestTask>().configureEach {
+        outputs.upToDateWhen { false }
+    }
 }
 
 fun Project.configureMavenPublication(
