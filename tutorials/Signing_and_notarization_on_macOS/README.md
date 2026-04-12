@@ -113,21 +113,6 @@ Follow these steps to generate a new password:
 See [this Apple support page](https://support.apple.com/en-us/HT204397) for more information
 on the app-specific passwords.
 
-## Adding an app-specific password to a keychain
-
-To avoid remembering your one-time password, or writing it in scripts,
-you can add it to the keychain by running:
-```
-# Any name can be used instead of NOTARIZATION_PASSWORD
-
-xcrun altool --store-password-in-keychain-item "NOTARIZATION_PASSWORD"
-             --username <apple_id>
-             --password <password>
-```
-
-Then you'll be able to refer to the password like `@keychain:NOTARIZATION_PASSWORD`
-without the need to write the password itself.
-
 ## Configuring Gradle
 
 ### Gradle DSL
