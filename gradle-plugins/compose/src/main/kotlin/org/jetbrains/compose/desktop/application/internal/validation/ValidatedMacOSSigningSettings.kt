@@ -17,25 +17,25 @@ internal data class ValidatedMacOSSigningSettings(
     val bundleID: String,
     val identity: String,
     val keychain: File?,
-    val prefix: String,
-    private val appStore: Boolean
+    val prefix: String
 ) {
-    val fullDeveloperID: String
+    val parsedIdentity: ParsedSigningIdentity
+        get() = MacSigningCertificateKind.parseIdentity(identity)
+
+    val appSigningSearchIdentities: List<String>
         get() {
-            val developerIdPrefix = "Developer ID Application: "
-            val thirdPartyMacDeveloperPrefix = "3rd Party Mac Developer Application: "
-            return when {
-                identity.startsWith(developerIdPrefix) -> identity
-                identity.startsWith(thirdPartyMacDeveloperPrefix) -> identity
-                else -> (if (!appStore) developerIdPrefix else thirdPartyMacDeveloperPrefix) + identity
+            val (kind, name) = parsedIdentity
+            return if (kind != null) {
+                listOfNotNull(identity.takeIf { kind.isAppSigningCertificate })
+            } else {
+                MacSigningCertificateKind.appSigningKinds.map { it.prefix + name }
             }
         }
 }
 
 internal fun MacOSSigningSettings.validate(
     bundleIDProvider: Provider<String?>,
-    project: Project,
-    appStoreProvider: Provider<Boolean?>
+    project: Project
 ): ValidatedMacOSSigningSettings {
     check(currentOS == OS.MacOS) { ERR_WRONG_OS }
 
@@ -54,14 +54,11 @@ internal fun MacOSSigningSettings.validate(
         }
         keychainFile
     } else null
-    val appStore = appStoreProvider.orNull == true
-
     return ValidatedMacOSSigningSettings(
         bundleID = bundleID,
         identity = signIdentity,
         keychain = keychainFile,
-        prefix = signPrefix,
-        appStore = appStore
+        prefix = signPrefix
     )
 }
 
