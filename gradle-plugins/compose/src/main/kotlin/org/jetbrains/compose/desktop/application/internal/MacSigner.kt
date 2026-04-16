@@ -180,7 +180,7 @@ private fun String.matchesCandidateIdentity(candidate: String): Boolean {
     return TEAM_ID_SUFFIX_REGEX.matches(aliasName.removePrefix(candidateName))
 }
 
-private fun extractCertificateAliases(certificates: String): List<String> {
+internal fun extractCertificateAliases(certificates: String): List<String> {
     // When the developer id contains non-ascii characters, the output of `security find-certificate` is
     // slightly different. The `alis` line first has the hex-encoded developer id, then some spaces,
     // and then the developer id with non-ascii characters encoded as octal.

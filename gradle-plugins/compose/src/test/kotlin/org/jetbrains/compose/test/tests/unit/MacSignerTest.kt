@@ -30,17 +30,17 @@ class MacSignerTest {
     }
 
     @Test
-    fun resolvesBareIdentityToLegacyMacDeveloperCertificate() {
+    fun resolvesBareIdentityToMacDevelopmentCertificate() {
         val resolved = resolveMacSigningIdentity(settings(identity = "Andy Himberger")) { candidate ->
             when (candidate) {
-                "Mac Developer: Andy Himberger" ->
-                    certificateOutput("Mac Developer: Andy Himberger (GK8V53S8Z3)")
+                "Mac Development: Andy Himberger" ->
+                    certificateOutput("Mac Development: Andy Himberger (GK8V53S8Z3)")
 
                 else -> ""
             }
         }
 
-        assertEquals("Mac Developer: Andy Himberger (GK8V53S8Z3)", resolved.fullIdentity)
+        assertEquals("Mac Development: Andy Himberger (GK8V53S8Z3)", resolved.fullIdentity)
         assertFalse(resolved.isJPackageCompatible)
         assertTrue(resolved.installerSigningIdentityCandidates.isEmpty())
     }
@@ -134,7 +134,7 @@ class MacSignerTest {
 
         assertContains(error.message.orEmpty(), "Could not find a matching app signing certificate")
         assertContains(error.message.orEmpty(), "Developer ID Application: Andy Himberger")
-        assertContains(error.message.orEmpty(), "Mac Developer: Andy Himberger")
+        assertContains(error.message.orEmpty(), "Mac Development: Andy Himberger")
     }
 
     @Test

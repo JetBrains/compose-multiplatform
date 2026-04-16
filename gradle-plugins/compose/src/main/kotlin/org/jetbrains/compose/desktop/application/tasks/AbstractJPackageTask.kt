@@ -33,6 +33,7 @@ import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.APP_RESOURCES_DIR
 import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
+import org.jetbrains.compose.desktop.application.internal.extractCertificateAliases
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.InfoPlistListValue
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.InfoPlistMapValue
@@ -77,7 +78,6 @@ import java.io.ObjectOutputStream
 import java.io.Serializable
 import java.nio.file.LinkOption
 import java.util.*
-import java.util.regex.Pattern
 import javax.inject.Inject
 import kotlin.io.path.isExecutable
 import kotlin.io.path.isRegularFile
@@ -663,8 +663,8 @@ abstract class AbstractJPackageTask @Inject constructor(
                 append("Mac App Store uploads.")
             }
         }
-        val existingCandidates = candidates.filter { installerCertificateExists(it, signingSettings.keychain) }
-        check(existingCandidates.isNotEmpty()) {
+        val installerIdentity = candidates.firstOrNull { installerCertificateExists(it, signingSettings.keychain) }
+        check(installerIdentity != null) {
             buildString {
                 appendLine("Could not find a matching installer signing certificate for '${resolvedSigningIdentity.fullIdentity}'.")
                 appendLine("Checked installer certificate names:")
@@ -678,36 +678,24 @@ abstract class AbstractJPackageTask @Inject constructor(
             "Failed to rename ${pkgFile.absolutePath} to ${tmpPkg.absolutePath}"
         }
 
-        var lastError: IllegalStateException? = null
-        for (installerIdentity in existingCandidates) {
+        try {
             val args = mutableListOf("--sign", installerIdentity)
             signingSettings.keychain?.let {
                 args.addAll(listOf("--keychain", it.absolutePath))
             }
             args.addAll(listOf(tmpPkg.absolutePath, pkgFile.absolutePath))
 
-            try {
-                runExternalTool(
-                    tool = MacUtils.productsign,
-                    args = args
-                )
-                tmpPkg.delete()
-                return
-            } catch (e: IllegalStateException) {
-                if (existingCandidates.size == 1) {
-                    check(tmpPkg.renameTo(pkgFile)) {
-                        "Failed to restore unsigned PKG from ${tmpPkg.absolutePath} to ${pkgFile.absolutePath}"
-                    }
-                    throw e
-                }
-                lastError = e
-                pkgFile.delete()
+            runExternalTool(
+                tool = MacUtils.productsign,
+                args = args
+            )
+            tmpPkg.delete()
+        } catch (e: IllegalStateException) {
+            check(tmpPkg.renameTo(pkgFile)) {
+                "Failed to restore unsigned PKG from ${tmpPkg.absolutePath} to ${pkgFile.absolutePath}"
             }
+            throw e
         }
-        check(tmpPkg.renameTo(pkgFile)) {
-            "Failed to restore unsigned PKG from ${tmpPkg.absolutePath} to ${pkgFile.absolutePath}"
-        }
-        throw lastError!!
     }
 
     private fun installerCertificateExists(identity: String, keychain: File?): Boolean {
@@ -719,7 +707,7 @@ abstract class AbstractJPackageTask @Inject constructor(
             processStdout = { certificates = it },
             logToConsole = ExternalToolRunner.LogToConsole.Never
         )
-        return extractInstallerCertificateAliases(certificates).contains(identity)
+        return extractCertificateAliases(certificates).contains(identity)
     }
 
     private fun modifyRuntimeOnMacOsIfNeeded() {
@@ -827,29 +815,6 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
     }
 }
-
-private fun extractInstallerCertificateAliases(certificates: String): Set<String> {
-    val matcher = CERTIFICATE_ALIAS_REGEX.matcher(certificates)
-    val result = linkedSetOf<String>()
-    while (matcher.find()) {
-        val hexEncoded = matcher.group(1)
-        val alias = if (hexEncoded.isNullOrBlank()) {
-            matcher.group(2)
-        } else {
-            hexEncoded
-                .substring(2)
-                .chunked(2)
-                .map { it.toInt(16).toByte() }
-                .toByteArray()
-                .toString(Charsets.UTF_8)
-        }
-        result.add(alias)
-    }
-    return result
-}
-
-private val CERTIFICATE_ALIAS_REGEX: Pattern =
-    Pattern.compile("\"alis\"<blob>=(0x[0-9A-F]+)?\\s*\"([^\"]+)\"")
 
 // Serializable is only needed to avoid breaking configuration cache:
 // https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:requirements

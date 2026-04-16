@@ -10,80 +10,64 @@ package org.jetbrains.compose.desktop.application.internal.validation
  *
  * Legacy compatibility matters because:
  * - jpackage still recognizes the older "3rd Party Mac Developer ..." names
- * - existing user keychains may still contain legacy "Mac Developer" certificates
+ * - existing user keychains may still contain legacy certificates
  */
 internal enum class MacSigningCertificateKind(
     val prefix: String,
     val isAppSigningCertificate: Boolean,
-    val isJPackageCompatible: Boolean,
-    val isDevelopmentCertificate: Boolean
+    val isJPackageCompatible: Boolean
 ) {
     // Current outside-App-Store distribution certificates
     DeveloperIdApplication(
         prefix = "Developer ID Application: ",
         isAppSigningCertificate = true,
-        isJPackageCompatible = true,
-        isDevelopmentCertificate = false
+        isJPackageCompatible = true
     ),
     DeveloperIdInstaller(
         prefix = "Developer ID Installer: ",
         isAppSigningCertificate = false,
-        isJPackageCompatible = false,
-        isDevelopmentCertificate = false
+        isJPackageCompatible = false
     ),
 
     // Current App Store / distribution certificates
     AppleDistribution(
         prefix = "Apple Distribution: ",
         isAppSigningCertificate = true,
-        isJPackageCompatible = false,
-        isDevelopmentCertificate = false
+        isJPackageCompatible = false
     ),
     MacAppDistribution(
         prefix = "Mac App Distribution: ",
         isAppSigningCertificate = true,
-        isJPackageCompatible = false,
-        isDevelopmentCertificate = false
+        isJPackageCompatible = false
     ),
     MacInstallerDistribution(
         prefix = "Mac Installer Distribution: ",
         isAppSigningCertificate = false,
-        isJPackageCompatible = false,
-        isDevelopmentCertificate = false
+        isJPackageCompatible = false
     ),
 
     // Current development certificates
     AppleDevelopment(
         prefix = "Apple Development: ",
         isAppSigningCertificate = true,
-        isJPackageCompatible = false,
-        isDevelopmentCertificate = true
+        isJPackageCompatible = false
     ),
     MacDevelopment(
         prefix = "Mac Development: ",
         isAppSigningCertificate = true,
-        isJPackageCompatible = false,
-        isDevelopmentCertificate = true
-    ),
-    MacDeveloper(
-        prefix = "Mac Developer: ",
-        isAppSigningCertificate = true,
-        isJPackageCompatible = false,
-        isDevelopmentCertificate = true
+        isJPackageCompatible = false
     ),
 
     // Legacy compatibility certificates
     ThirdPartyMacDeveloperApplication(
         prefix = "3rd Party Mac Developer Application: ",
         isAppSigningCertificate = true,
-        isJPackageCompatible = true,
-        isDevelopmentCertificate = false
+        isJPackageCompatible = true
     ),
     ThirdPartyMacDeveloperInstaller(
         prefix = "3rd Party Mac Developer Installer: ",
         isAppSigningCertificate = false,
-        isJPackageCompatible = false,
-        isDevelopmentCertificate = false
+        isJPackageCompatible = false
     );
 
     val displayName: String
@@ -97,7 +81,6 @@ internal enum class MacSigningCertificateKind(
             MacAppDistribution,
             AppleDevelopment,
             MacDevelopment,
-            MacDeveloper,
         )
 
         fun fromIdentity(identity: String): MacSigningCertificateKind? =
@@ -110,9 +93,6 @@ internal data class MacSigningIdentityInput(
     val kind: MacSigningCertificateKind?,
     val name: String
 ) {
-    val isExplicitlyPrefixed: Boolean
-        get() = kind != null
-
     val fullIdentity: String
         get() = kind?.prefix?.plus(name) ?: rawIdentity
 
@@ -120,7 +100,7 @@ internal data class MacSigningIdentityInput(
         get() = kind?.isAppSigningCertificate != false
 
     fun appSigningSearchIdentities(): List<String> {
-        if (isExplicitlyPrefixed) {
+        if (kind != null) {
             return listOfNotNull(fullIdentity.takeIf { isAppSigningIdentity })
         }
 
@@ -161,7 +141,6 @@ internal data class ResolvedMacSigningIdentity(
 
             MacSigningCertificateKind.AppleDevelopment,
             MacSigningCertificateKind.MacDevelopment,
-            MacSigningCertificateKind.MacDeveloper,
             MacSigningCertificateKind.DeveloperIdInstaller,
             MacSigningCertificateKind.ThirdPartyMacDeveloperInstaller,
             MacSigningCertificateKind.MacInstallerDistribution -> emptyList()
