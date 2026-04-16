@@ -17,14 +17,10 @@ internal enum class MacSigningCertificateKind(
     val isAppSigningCertificate: Boolean,
     val isJPackageCompatible: Boolean
 ) {
-    // Outside-App-Store distribution
     DeveloperIdApplication(prefix = "Developer ID Application: ", isAppSigningCertificate = true, isJPackageCompatible = true),
     DeveloperIdInstaller(prefix = "Developer ID Installer: ", isAppSigningCertificate = false, isJPackageCompatible = false),
-    // App Store / distribution
     AppleDistribution(prefix = "Apple Distribution: ", isAppSigningCertificate = true, isJPackageCompatible = false),
-    // Development
     AppleDevelopment(prefix = "Apple Development: ", isAppSigningCertificate = true, isJPackageCompatible = false),
-    // Legacy (still issued by Apple under these CNs despite portal UI showing different names)
     ThirdPartyMacDeveloperApplication(prefix = "3rd Party Mac Developer Application: ", isAppSigningCertificate = true, isJPackageCompatible = true),
     ThirdPartyMacDeveloperInstaller(prefix = "3rd Party Mac Developer Installer: ", isAppSigningCertificate = false, isJPackageCompatible = false),
     MacDeveloper(prefix = "Mac Developer: ", isAppSigningCertificate = true, isJPackageCompatible = false);

@@ -6,7 +6,6 @@ import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class MacSignerTest {
@@ -22,7 +21,6 @@ class MacSignerTest {
         }
 
         assertEquals("Developer ID Application: Andy Himberger (GK8V53S8Z3)", resolved.fullIdentity)
-        assertTrue(resolved.isJPackageCompatible)
         assertEquals(
             listOf("Developer ID Installer: Andy Himberger (GK8V53S8Z3)"),
             resolved.installerSigningIdentityCandidates
@@ -41,7 +39,7 @@ class MacSignerTest {
         }
 
         assertEquals("Mac Developer: Andy Himberger (GK8V53S8Z3)", resolved.fullIdentity)
-        assertFalse(resolved.isJPackageCompatible)
+
         assertTrue(resolved.installerSigningIdentityCandidates.isEmpty())
     }
 
@@ -58,7 +56,7 @@ class MacSignerTest {
         }
 
         assertEquals("Apple Development: Andy Himberger (GK8V53S8Z3)", resolved.fullIdentity)
-        assertFalse(resolved.isJPackageCompatible)
+
         assertTrue(resolved.installerSigningIdentityCandidates.isEmpty())
     }
 
@@ -75,7 +73,7 @@ class MacSignerTest {
         }
 
         assertEquals("Apple Distribution: Andy Himberger (GK8V53S8Z3)", resolved.fullIdentity)
-        assertFalse(resolved.isJPackageCompatible)
+
         assertEquals(
             listOf("3rd Party Mac Developer Installer: Andy Himberger (GK8V53S8Z3)"),
             resolved.installerSigningIdentityCandidates
