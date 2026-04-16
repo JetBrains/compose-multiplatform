@@ -226,11 +226,10 @@ The following Gradle properties can be used instead of DSL properties:
 
 Use different certificate types depending on the task:
 
-* Local app signing and development builds: `Apple Development` or `Mac Development`.
+* Local app signing and development builds: `Apple Development` or `Mac Developer`.
 * Notarized distribution outside the App Store: `Developer ID Application`.
-* Mac App Store app bundle signing: `Mac App Distribution` or `Apple Distribution`.
-* Mac App Store PKG signing: a matching installer certificate such as
-  `Mac Installer Distribution` or `3rd Party Mac Developer Installer`.
+* Mac App Store app bundle signing: `Apple Distribution` or `3rd Party Mac Developer Application`.
+* Mac App Store PKG signing: `3rd Party Mac Developer Installer`.
 
 Development certificates can sign app bundles, but they cannot sign installer packages and are not suitable for
 notarized outside-App-Store distribution.

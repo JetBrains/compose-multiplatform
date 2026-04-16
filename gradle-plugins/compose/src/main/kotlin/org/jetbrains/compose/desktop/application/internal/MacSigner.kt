@@ -147,9 +147,9 @@ private fun buildMissingCertificateMessage(settings: ValidatedMacOSSigningSettin
         appendLine("Checked certificate names:")
         appendLine(checkedIdentities)
         append("For notarized distribution outside the App Store, use 'Developer ID Application'. ")
-        append("For Mac App Store uploads, use 'Mac App Distribution' or 'Apple Distribution' for the app ")
-        append("and a matching installer certificate for PKG. Development certificates such as ")
-        append("'Apple Development', 'Mac Development', and 'Mac Developer' are only suitable for local app signing.")
+        append("For Mac App Store uploads, use 'Apple Distribution' or '3rd Party Mac Developer Application' for the app ")
+        append("and '3rd Party Mac Developer Installer' for PKG. Development certificates such as ")
+        append("'Apple Development' and 'Mac Developer' are only suitable for local app signing.")
     }
 }
 

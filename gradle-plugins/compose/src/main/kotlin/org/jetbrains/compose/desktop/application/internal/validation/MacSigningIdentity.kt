@@ -22,14 +22,12 @@ internal enum class MacSigningCertificateKind(
     DeveloperIdInstaller(prefix = "Developer ID Installer: ", isAppSigningCertificate = false, isJPackageCompatible = false),
     // App Store / distribution
     AppleDistribution(prefix = "Apple Distribution: ", isAppSigningCertificate = true, isJPackageCompatible = false),
-    MacAppDistribution(prefix = "Mac App Distribution: ", isAppSigningCertificate = true, isJPackageCompatible = false),
-    MacInstallerDistribution(prefix = "Mac Installer Distribution: ", isAppSigningCertificate = false, isJPackageCompatible = false),
     // Development
     AppleDevelopment(prefix = "Apple Development: ", isAppSigningCertificate = true, isJPackageCompatible = false),
-    MacDevelopment(prefix = "Mac Development: ", isAppSigningCertificate = true, isJPackageCompatible = false),
-    // Legacy compatibility
+    // Legacy (still issued by Apple under these CNs despite portal UI showing different names)
     ThirdPartyMacDeveloperApplication(prefix = "3rd Party Mac Developer Application: ", isAppSigningCertificate = true, isJPackageCompatible = true),
-    ThirdPartyMacDeveloperInstaller(prefix = "3rd Party Mac Developer Installer: ", isAppSigningCertificate = false, isJPackageCompatible = false);
+    ThirdPartyMacDeveloperInstaller(prefix = "3rd Party Mac Developer Installer: ", isAppSigningCertificate = false, isJPackageCompatible = false),
+    MacDeveloper(prefix = "Mac Developer: ", isAppSigningCertificate = true, isJPackageCompatible = false);
 
     val displayName: String
         get() = prefix.removeSuffix(": ")
@@ -38,10 +36,10 @@ internal enum class MacSigningCertificateKind(
     val installerKinds: List<MacSigningCertificateKind>
         get() = when (this) {
             DeveloperIdApplication -> listOf(DeveloperIdInstaller)
-            ThirdPartyMacDeveloperApplication, AppleDistribution, MacAppDistribution ->
-                listOf(ThirdPartyMacDeveloperInstaller, MacInstallerDistribution)
-            AppleDevelopment, MacDevelopment, DeveloperIdInstaller,
-            ThirdPartyMacDeveloperInstaller, MacInstallerDistribution -> emptyList()
+            ThirdPartyMacDeveloperApplication, AppleDistribution ->
+                listOf(ThirdPartyMacDeveloperInstaller)
+            AppleDevelopment, MacDeveloper, DeveloperIdInstaller,
+            ThirdPartyMacDeveloperInstaller -> emptyList()
         }
 
     companion object {

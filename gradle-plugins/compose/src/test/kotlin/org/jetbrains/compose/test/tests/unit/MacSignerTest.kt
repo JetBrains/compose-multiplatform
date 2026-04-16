@@ -30,17 +30,17 @@ class MacSignerTest {
     }
 
     @Test
-    fun resolvesBareIdentityToMacDevelopmentCertificate() {
+    fun resolvesBareIdentityToMacDeveloperCertificate() {
         val resolved = resolveMacSigningIdentity(settings(identity = "Andy Himberger")) { candidate ->
             when (candidate) {
-                "Mac Development: Andy Himberger" ->
-                    certificateOutput("Mac Development: Andy Himberger (GK8V53S8Z3)")
+                "Mac Developer: Andy Himberger" ->
+                    certificateOutput("Mac Developer: Andy Himberger (GK8V53S8Z3)")
 
                 else -> ""
             }
         }
 
-        assertEquals("Mac Development: Andy Himberger (GK8V53S8Z3)", resolved.fullIdentity)
+        assertEquals("Mac Developer: Andy Himberger (GK8V53S8Z3)", resolved.fullIdentity)
         assertFalse(resolved.isJPackageCompatible)
         assertTrue(resolved.installerSigningIdentityCandidates.isEmpty())
     }
@@ -77,20 +77,17 @@ class MacSignerTest {
         assertEquals("Apple Distribution: Andy Himberger (GK8V53S8Z3)", resolved.fullIdentity)
         assertFalse(resolved.isJPackageCompatible)
         assertEquals(
-            listOf(
-                "3rd Party Mac Developer Installer: Andy Himberger (GK8V53S8Z3)",
-                "Mac Installer Distribution: Andy Himberger (GK8V53S8Z3)"
-            ),
+            listOf("3rd Party Mac Developer Installer: Andy Himberger (GK8V53S8Z3)"),
             resolved.installerSigningIdentityCandidates
         )
     }
 
     @Test
-    fun resolvesPkgInstallerCandidatesForDistributionCertificates() {
+    fun resolvesPkgInstallerCandidatesForLegacyDistributionCertificates() {
         val resolved = resolveMacSigningIdentity(
-            settings(identity = "Mac App Distribution: Andy Himberger (GK8V53S8Z3)")
+            settings(identity = "3rd Party Mac Developer Application: Andy Himberger (GK8V53S8Z3)")
         ) { candidate ->
-            if (candidate == "Mac App Distribution: Andy Himberger (GK8V53S8Z3)") {
+            if (candidate == "3rd Party Mac Developer Application: Andy Himberger (GK8V53S8Z3)") {
                 certificateOutput(candidate)
             } else {
                 ""
@@ -98,10 +95,7 @@ class MacSignerTest {
         }
 
         assertEquals(
-            listOf(
-                "3rd Party Mac Developer Installer: Andy Himberger (GK8V53S8Z3)",
-                "Mac Installer Distribution: Andy Himberger (GK8V53S8Z3)"
-            ),
+            listOf("3rd Party Mac Developer Installer: Andy Himberger (GK8V53S8Z3)"),
             resolved.installerSigningIdentityCandidates
         )
     }
@@ -114,8 +108,8 @@ class MacSignerTest {
                     "Apple Development: Andy Himberger" ->
                         certificateOutput("Apple Development: Andy Himberger (GK8V53S8Z3)")
 
-                    "Mac Development: Andy Himberger" ->
-                        certificateOutput("Mac Development: Andy Himberger (GK8V53S8Z3)")
+                    "Mac Developer: Andy Himberger" ->
+                        certificateOutput("Mac Developer: Andy Himberger (GK8V53S8Z3)")
 
                     else -> ""
                 }
@@ -134,7 +128,7 @@ class MacSignerTest {
 
         assertContains(error.message.orEmpty(), "Could not find a matching app signing certificate")
         assertContains(error.message.orEmpty(), "Developer ID Application: Andy Himberger")
-        assertContains(error.message.orEmpty(), "Mac Development: Andy Himberger")
+        assertContains(error.message.orEmpty(), "Mac Developer: Andy Himberger")
     }
 
     @Test

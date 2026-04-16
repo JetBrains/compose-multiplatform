@@ -506,10 +506,9 @@ abstract class AbstractJPackageTask @Inject constructor(
 
             macSigner?.settings?.let { signingSettings ->
                 val resolvedSigningIdentity = macSigner?.resolvedSigningIdentity
-                // jpackage only supports "Developer ID Application" and "3rd Party Mac Developer Application"
-                // certificates. For other types (Apple Development, Apple Distribution, Mac App Distribution,
-                // Mac Development), skip jpackage signing.
-                if (resolvedSigningIdentity?.isJPackageCompatible == true) {
+                // Never pass --mac-sign for PKG: jpackage's PKG bundler fails with pre-signed
+                // app images. PKG signing is handled by productsign in signPkgIfNeeded() instead.
+                if (resolvedSigningIdentity?.isJPackageCompatible == true && targetFormat != TargetFormat.Pkg) {
                     cliArg("--mac-sign", true)
                     cliArg("--mac-signing-key-user-name", resolvedSigningIdentity.fullIdentity)
                     cliArg("--mac-signing-keychain", signingSettings.keychain)
@@ -651,7 +650,6 @@ abstract class AbstractJPackageTask @Inject constructor(
         val macSigner = macSigner ?: return
         val signingSettings = macSigner.settings ?: return
         val resolvedSigningIdentity = macSigner.resolvedSigningIdentity ?: return
-        if (resolvedSigningIdentity.isJPackageCompatible) return // jpackage already signed it
 
         val candidates = resolvedSigningIdentity.installerSigningIdentityCandidates
         check(candidates.isNotEmpty()) {
@@ -659,8 +657,8 @@ abstract class AbstractJPackageTask @Inject constructor(
                 append("PKG signing is not supported with '${resolvedSigningIdentity.fullIdentity}'. ")
                 append("Development certificates can sign local app bundles, but installer packages require ")
                 append("'Developer ID Application' plus 'Developer ID Installer' for outside-App-Store distribution, ")
-                append("or 'Mac App Distribution'/'Apple Distribution' plus a matching installer certificate for ")
-                append("Mac App Store uploads.")
+                append("or 'Apple Distribution'/'3rd Party Mac Developer Application' plus ")
+                append("'3rd Party Mac Developer Installer' for Mac App Store uploads.")
             }
         }
         val installerIdentity = candidates.firstOrNull { installerCertificateExists(it, signingSettings.keychain) }
