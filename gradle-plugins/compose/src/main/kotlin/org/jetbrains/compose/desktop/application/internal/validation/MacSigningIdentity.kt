@@ -48,23 +48,29 @@ internal enum class MacSigningCertificateKind(
         val appSigningKinds: List<MacSigningCertificateKind>
             get() = entries.filter { it.isAppSigningCertificate }
 
-        fun fromIdentity(identity: String): MacSigningCertificateKind? =
+        private fun fromIdentity(identity: String): MacSigningCertificateKind? =
             entries.firstOrNull { identity.startsWith(it.prefix) }
+
+        fun parseIdentity(identity: String): ParsedSigningIdentity {
+            val kind = fromIdentity(identity)
+            val name = kind?.let { identity.removePrefix(it.prefix) } ?: identity
+            return ParsedSigningIdentity(kind, name)
+        }
+
+        fun resolveIdentity(identity: String): ResolvedMacSigningIdentity {
+            val kind = fromIdentity(identity)
+            check(kind != null && kind.isAppSigningCertificate) {
+                "Unsupported macOS app signing identity: '$identity'"
+            }
+            return ResolvedMacSigningIdentity(identity, kind)
+        }
     }
 }
 
 internal data class ParsedSigningIdentity(
     val kind: MacSigningCertificateKind?,
     val name: String
-) {
-    companion object {
-        fun parse(identity: String): ParsedSigningIdentity {
-            val kind = MacSigningCertificateKind.fromIdentity(identity)
-            val name = kind?.let { identity.removePrefix(it.prefix) } ?: identity
-            return ParsedSigningIdentity(kind, name)
-        }
-    }
-}
+)
 
 internal data class ResolvedMacSigningIdentity(
     val fullIdentity: String,
@@ -78,14 +84,4 @@ internal data class ResolvedMacSigningIdentity(
             val commonName = fullIdentity.removePrefix(kind.prefix)
             return kind.installerKinds.map { it.prefix + commonName }
         }
-
-    companion object {
-        fun fromIdentity(identity: String): ResolvedMacSigningIdentity {
-            val kind = MacSigningCertificateKind.fromIdentity(identity)
-            check(kind != null && kind.isAppSigningCertificate) {
-                "Unsupported macOS app signing identity: '$identity'"
-            }
-            return ResolvedMacSigningIdentity(identity, kind)
-        }
-    }
 }

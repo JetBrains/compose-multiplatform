@@ -6,7 +6,6 @@
 package org.jetbrains.compose.desktop.application.internal
 
 import org.jetbrains.compose.desktop.application.internal.validation.MacSigningCertificateKind
-import org.jetbrains.compose.desktop.application.internal.validation.ParsedSigningIdentity
 import org.jetbrains.compose.desktop.application.internal.validation.ResolvedMacSigningIdentity
 import org.jetbrains.compose.desktop.application.internal.validation.ValidatedMacOSSigningSettings
 import org.jetbrains.compose.internal.utils.Arch
@@ -136,7 +135,7 @@ internal fun resolveMacSigningIdentity(
         error(buildAmbiguousCertificateMessage(settings, distinctMatches))
     }
 
-    return ResolvedMacSigningIdentity.fromIdentity(distinctMatches.single())
+    return MacSigningCertificateKind.resolveIdentity(distinctMatches.single())
 }
 
 private fun buildMissingCertificateMessage(settings: ValidatedMacOSSigningSettings): String {
@@ -165,8 +164,8 @@ private fun buildAmbiguousCertificateMessage(
 }
 
 private fun String.matchesCandidateIdentity(candidate: String): Boolean {
-    val candidateIdentity = ParsedSigningIdentity.parse(candidate)
-    val aliasIdentity = ParsedSigningIdentity.parse(this)
+    val candidateIdentity = MacSigningCertificateKind.parseIdentity(candidate)
+    val aliasIdentity = MacSigningCertificateKind.parseIdentity(this)
     if (candidateIdentity.kind == null || aliasIdentity.kind != candidateIdentity.kind) {
         return false
     }

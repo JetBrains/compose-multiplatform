@@ -20,7 +20,7 @@ internal data class ValidatedMacOSSigningSettings(
     val prefix: String
 ) {
     val parsedIdentity: ParsedSigningIdentity
-        get() = ParsedSigningIdentity.parse(identity)
+        get() = MacSigningCertificateKind.parseIdentity(identity)
 
     val appSigningSearchIdentities: List<String>
         get() {
