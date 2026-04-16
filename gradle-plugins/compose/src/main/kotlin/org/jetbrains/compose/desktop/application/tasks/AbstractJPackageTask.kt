@@ -689,12 +689,14 @@ abstract class AbstractJPackageTask @Inject constructor(
                 tool = MacUtils.productsign,
                 args = args
             )
-            tmpPkg.delete()
-        } catch (e: IllegalStateException) {
-            check(tmpPkg.renameTo(pkgFile)) {
-                "Failed to restore unsigned PKG from ${tmpPkg.absolutePath} to ${pkgFile.absolutePath}"
+        } finally {
+            if (!pkgFile.exists() && tmpPkg.exists()) {
+                check(tmpPkg.renameTo(pkgFile)) {
+                    "Failed to restore unsigned PKG from ${tmpPkg.absolutePath} to ${pkgFile.absolutePath}"
+                }
+            } else {
+                tmpPkg.delete()
             }
-            throw e
         }
     }
 
