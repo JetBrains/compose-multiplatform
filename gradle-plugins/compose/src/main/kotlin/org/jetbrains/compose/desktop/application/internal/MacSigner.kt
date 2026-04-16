@@ -123,16 +123,16 @@ internal fun resolveMacSigningIdentity(
     val matches = mutableListOf<String>()
     for (candidate in settings.appSigningSearchIdentities) {
         matches += extractCertificateAliases(findCertificates(candidate))
-            .filter { it.matchesCandidateIdentity(candidate) }
+            .filter { matchesCandidateIdentity(it, candidate) }
     }
 
     if (matches.isEmpty()) {
         error(buildMissingCertificateMessage(settings))
     }
 
-    val distinctMatches = linkedSetOf<String>().apply { addAll(matches) }
+    val distinctMatches = matches.distinct()
     if (distinctMatches.size > 1) {
-        error(buildAmbiguousCertificateMessage(settings, distinctMatches))
+        error(buildAmbiguousCertificateMessage(settings, distinctMatches.toSet()))
     }
 
     return MacSigningCertificateKind.resolveIdentity(distinctMatches.single())
@@ -163,9 +163,9 @@ private fun buildAmbiguousCertificateMessage(
     append("Specify the full certificate identity in 'nativeDistributions.macOS.signing.identity'.")
 }
 
-private fun String.matchesCandidateIdentity(candidate: String): Boolean {
+private fun matchesCandidateIdentity(alias: String, candidate: String): Boolean {
     val candidateIdentity = MacSigningCertificateKind.parseIdentity(candidate)
-    val aliasIdentity = MacSigningCertificateKind.parseIdentity(this)
+    val aliasIdentity = MacSigningCertificateKind.parseIdentity(alias)
     if (candidateIdentity.kind == null || aliasIdentity.kind != candidateIdentity.kind) {
         return false
     }
