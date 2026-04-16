@@ -73,49 +73,34 @@ internal enum class MacSigningCertificateKind(
     val displayName: String
         get() = prefix.removeSuffix(": ")
 
+    /** Installer certificate kinds that pair with this app signing certificate. */
+    val installerKinds: List<MacSigningCertificateKind>
+        get() = when (this) {
+            DeveloperIdApplication -> listOf(DeveloperIdInstaller)
+            ThirdPartyMacDeveloperApplication, AppleDistribution, MacAppDistribution ->
+                listOf(ThirdPartyMacDeveloperInstaller, MacInstallerDistribution)
+            AppleDevelopment, MacDevelopment, DeveloperIdInstaller,
+            ThirdPartyMacDeveloperInstaller, MacInstallerDistribution -> emptyList()
+        }
+
     companion object {
-        val appSigningKinds = listOf(
-            DeveloperIdApplication,
-            ThirdPartyMacDeveloperApplication,
-            AppleDistribution,
-            MacAppDistribution,
-            AppleDevelopment,
-            MacDevelopment,
-        )
+        val appSigningKinds: List<MacSigningCertificateKind>
+            get() = entries.filter { it.isAppSigningCertificate }
 
         fun fromIdentity(identity: String): MacSigningCertificateKind? =
             entries.firstOrNull { identity.startsWith(it.prefix) }
     }
 }
 
-internal data class MacSigningIdentityInput(
-    val rawIdentity: String,
+internal data class ParsedSigningIdentity(
     val kind: MacSigningCertificateKind?,
     val name: String
 ) {
-    val fullIdentity: String
-        get() = kind?.prefix?.plus(name) ?: rawIdentity
-
-    val isAppSigningIdentity: Boolean
-        get() = kind?.isAppSigningCertificate != false
-
-    fun appSigningSearchIdentities(): List<String> {
-        if (kind != null) {
-            return listOfNotNull(fullIdentity.takeIf { isAppSigningIdentity })
-        }
-
-        return MacSigningCertificateKind.appSigningKinds.map { it.prefix + name }
-    }
-
     companion object {
-        fun parse(identity: String): MacSigningIdentityInput {
+        fun parse(identity: String): ParsedSigningIdentity {
             val kind = MacSigningCertificateKind.fromIdentity(identity)
             val name = kind?.let { identity.removePrefix(it.prefix) } ?: identity
-            return MacSigningIdentityInput(
-                rawIdentity = identity,
-                kind = kind,
-                name = name
-            )
+            return ParsedSigningIdentity(kind, name)
         }
     }
 }
@@ -128,26 +113,10 @@ internal data class ResolvedMacSigningIdentity(
         get() = kind.isJPackageCompatible
 
     val installerSigningIdentityCandidates: List<String>
-        get() = when (kind) {
-            MacSigningCertificateKind.DeveloperIdApplication ->
-                listOf(fullIdentity.replaceFirst(kind.prefix, MacSigningCertificateKind.DeveloperIdInstaller.prefix))
-
-            MacSigningCertificateKind.ThirdPartyMacDeveloperApplication,
-            MacSigningCertificateKind.AppleDistribution,
-            MacSigningCertificateKind.MacAppDistribution -> listOf(
-                MacSigningCertificateKind.ThirdPartyMacDeveloperInstaller.prefix + commonName,
-                MacSigningCertificateKind.MacInstallerDistribution.prefix + commonName,
-            )
-
-            MacSigningCertificateKind.AppleDevelopment,
-            MacSigningCertificateKind.MacDevelopment,
-            MacSigningCertificateKind.DeveloperIdInstaller,
-            MacSigningCertificateKind.ThirdPartyMacDeveloperInstaller,
-            MacSigningCertificateKind.MacInstallerDistribution -> emptyList()
+        get() {
+            val commonName = fullIdentity.removePrefix(kind.prefix)
+            return kind.installerKinds.map { it.prefix + commonName }
         }
-
-    private val commonName: String
-        get() = fullIdentity.removePrefix(kind.prefix)
 
     companion object {
         fun fromIdentity(identity: String): ResolvedMacSigningIdentity {

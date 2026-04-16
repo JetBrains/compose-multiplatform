@@ -6,7 +6,7 @@
 package org.jetbrains.compose.desktop.application.internal
 
 import org.jetbrains.compose.desktop.application.internal.validation.MacSigningCertificateKind
-import org.jetbrains.compose.desktop.application.internal.validation.MacSigningIdentityInput
+import org.jetbrains.compose.desktop.application.internal.validation.ParsedSigningIdentity
 import org.jetbrains.compose.desktop.application.internal.validation.ResolvedMacSigningIdentity
 import org.jetbrains.compose.desktop.application.internal.validation.ValidatedMacOSSigningSettings
 import org.jetbrains.compose.internal.utils.Arch
@@ -109,13 +109,15 @@ internal fun resolveMacSigningIdentity(
     settings: ValidatedMacOSSigningSettings,
     findCertificates: (String) -> String
 ): ResolvedMacSigningIdentity {
-    val requestedIdentity = settings.parsedIdentity
-    check(requestedIdentity.isAppSigningIdentity) {
-        buildString {
-            append("Signing settings error: '${settings.identity}' is not an app signing certificate. ")
-            append("Use one of: ")
-            append(MacSigningCertificateKind.appSigningKinds.joinToString { it.displayName })
-            append(".")
+    val parsedKind = settings.parsedIdentity.kind
+    if (parsedKind != null) {
+        check(parsedKind.isAppSigningCertificate) {
+            buildString {
+                append("Signing settings error: '${settings.identity}' is not an app signing certificate. ")
+                append("Use one of: ")
+                append(MacSigningCertificateKind.appSigningKinds.joinToString { it.displayName })
+                append(".")
+            }
         }
     }
 
@@ -163,8 +165,8 @@ private fun buildAmbiguousCertificateMessage(
 }
 
 private fun String.matchesCandidateIdentity(candidate: String): Boolean {
-    val candidateIdentity = MacSigningIdentityInput.parse(candidate)
-    val aliasIdentity = MacSigningIdentityInput.parse(this)
+    val candidateIdentity = ParsedSigningIdentity.parse(candidate)
+    val aliasIdentity = ParsedSigningIdentity.parse(this)
     if (candidateIdentity.kind == null || aliasIdentity.kind != candidateIdentity.kind) {
         return false
     }

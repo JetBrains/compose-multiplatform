@@ -19,11 +19,18 @@ internal data class ValidatedMacOSSigningSettings(
     val keychain: File?,
     val prefix: String
 ) {
-    val parsedIdentity: MacSigningIdentityInput
-        get() = MacSigningIdentityInput.parse(identity)
+    val parsedIdentity: ParsedSigningIdentity
+        get() = ParsedSigningIdentity.parse(identity)
 
     val appSigningSearchIdentities: List<String>
-        get() = parsedIdentity.appSigningSearchIdentities()
+        get() {
+            val (kind, name) = parsedIdentity
+            return if (kind != null) {
+                listOfNotNull(identity.takeIf { kind.isAppSigningCertificate })
+            } else {
+                MacSigningCertificateKind.appSigningKinds.map { it.prefix + name }
+            }
+        }
 }
 
 internal fun MacOSSigningSettings.validate(
