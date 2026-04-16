@@ -17,58 +17,19 @@ internal enum class MacSigningCertificateKind(
     val isAppSigningCertificate: Boolean,
     val isJPackageCompatible: Boolean
 ) {
-    // Current outside-App-Store distribution certificates
-    DeveloperIdApplication(
-        prefix = "Developer ID Application: ",
-        isAppSigningCertificate = true,
-        isJPackageCompatible = true
-    ),
-    DeveloperIdInstaller(
-        prefix = "Developer ID Installer: ",
-        isAppSigningCertificate = false,
-        isJPackageCompatible = false
-    ),
-
-    // Current App Store / distribution certificates
-    AppleDistribution(
-        prefix = "Apple Distribution: ",
-        isAppSigningCertificate = true,
-        isJPackageCompatible = false
-    ),
-    MacAppDistribution(
-        prefix = "Mac App Distribution: ",
-        isAppSigningCertificate = true,
-        isJPackageCompatible = false
-    ),
-    MacInstallerDistribution(
-        prefix = "Mac Installer Distribution: ",
-        isAppSigningCertificate = false,
-        isJPackageCompatible = false
-    ),
-
-    // Current development certificates
-    AppleDevelopment(
-        prefix = "Apple Development: ",
-        isAppSigningCertificate = true,
-        isJPackageCompatible = false
-    ),
-    MacDevelopment(
-        prefix = "Mac Development: ",
-        isAppSigningCertificate = true,
-        isJPackageCompatible = false
-    ),
-
-    // Legacy compatibility certificates
-    ThirdPartyMacDeveloperApplication(
-        prefix = "3rd Party Mac Developer Application: ",
-        isAppSigningCertificate = true,
-        isJPackageCompatible = true
-    ),
-    ThirdPartyMacDeveloperInstaller(
-        prefix = "3rd Party Mac Developer Installer: ",
-        isAppSigningCertificate = false,
-        isJPackageCompatible = false
-    );
+    // Outside-App-Store distribution
+    DeveloperIdApplication(prefix = "Developer ID Application: ", isAppSigningCertificate = true, isJPackageCompatible = true),
+    DeveloperIdInstaller(prefix = "Developer ID Installer: ", isAppSigningCertificate = false, isJPackageCompatible = false),
+    // App Store / distribution
+    AppleDistribution(prefix = "Apple Distribution: ", isAppSigningCertificate = true, isJPackageCompatible = false),
+    MacAppDistribution(prefix = "Mac App Distribution: ", isAppSigningCertificate = true, isJPackageCompatible = false),
+    MacInstallerDistribution(prefix = "Mac Installer Distribution: ", isAppSigningCertificate = false, isJPackageCompatible = false),
+    // Development
+    AppleDevelopment(prefix = "Apple Development: ", isAppSigningCertificate = true, isJPackageCompatible = false),
+    MacDevelopment(prefix = "Mac Development: ", isAppSigningCertificate = true, isJPackageCompatible = false),
+    // Legacy compatibility
+    ThirdPartyMacDeveloperApplication(prefix = "3rd Party Mac Developer Application: ", isAppSigningCertificate = true, isJPackageCompatible = true),
+    ThirdPartyMacDeveloperInstaller(prefix = "3rd Party Mac Developer Installer: ", isAppSigningCertificate = false, isJPackageCompatible = false);
 
     val displayName: String
         get() = prefix.removeSuffix(": ")
