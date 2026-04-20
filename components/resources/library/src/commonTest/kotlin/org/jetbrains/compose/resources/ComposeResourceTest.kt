@@ -81,6 +81,7 @@ class ComposeResourceTest {
             @Composable
             override fun rememberEnvironment() = ResourceEnvironment(
                 language = LanguageQualifier("en"),
+                script = ScriptQualifier(""),
                 region = RegionQualifier("US"),
                 theme = ThemeQualifier.LIGHT,
                 density = DensityQualifier.MDPI
@@ -397,6 +398,7 @@ class ComposeResourceTest {
     fun rememberResourceStateAffectedByEnvironmentChanges() = clearResourceCachesAndRunUiTest {
         val env2 = ResourceEnvironment(
             language = LanguageQualifier("en"),
+            script = ScriptQualifier(""),
             region = RegionQualifier("CA"),
             theme = ThemeQualifier.DARK,
             density = DensityQualifier.MDPI
