@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 
 internal fun getTestEnvironment() = ResourceEnvironment(
     language = LanguageQualifier("en"),
+    script = ScriptQualifier(""),
     region = RegionQualifier("US"),
     theme = ThemeQualifier.LIGHT,
     density = DensityQualifier.XHDPI

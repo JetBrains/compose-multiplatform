@@ -7,6 +7,7 @@ import androidx.compose.ui.text.intl.Locale
 
 class ResourceEnvironment internal constructor(
     internal val language: LanguageQualifier,
+    internal val script: ScriptQualifier,
     internal val region: RegionQualifier,
     internal val theme: ThemeQualifier,
     internal val density: DensityQualifier
@@ -18,6 +19,7 @@ class ResourceEnvironment internal constructor(
         other as ResourceEnvironment
 
         if (language != other.language) return false
+        if (script != other.script) return false
         if (region != other.region) return false
         if (theme != other.theme) return false
         if (density != other.density) return false
@@ -27,6 +29,7 @@ class ResourceEnvironment internal constructor(
 
     override fun hashCode(): Int {
         var result = language.hashCode()
+        result = 31 * result + script.hashCode()
         result = 31 * result + region.hashCode()
         result = 31 * result + theme.hashCode()
         result = 31 * result + density.hashCode()
@@ -50,6 +53,7 @@ internal val DefaultComposeEnvironment = object : ComposeEnvironment {
         return remember(composeLocale, composeTheme, composeDensity) {
             ResourceEnvironment(
                 LanguageQualifier(composeLocale.language),
+                ScriptQualifier(""), //androidx.compose.ui.text.intl.Locale doesn't provide script yet
                 RegionQualifier(composeLocale.region),
                 ThemeQualifier.selectByValue(composeTheme),
                 DensityQualifier.selectByDensity(composeDensity.density)
@@ -90,7 +94,7 @@ fun getSystemResourceEnvironment(): ResourceEnvironment = getResourceEnvironment
 internal fun Resource.getResourceItemByEnvironment(environment: ResourceEnvironment): ResourceItem {
     //Priority of environments: https://developer.android.com/guide/topics/resources/providing-resources#table2
     items.toList()
-        .filterByLocale(environment.language, environment.region)
+        .filterByLocale(environment.language, environment.script, environment.region)
         .also { if (it.size == 1) return it.first() }
         .filterBy(environment.theme)
         .also { if (it.size == 1) return it.first() }
@@ -166,35 +170,46 @@ private fun List<ResourceItem>.filterByDensity(density: DensityQualifier): List<
     }
 }
 
-// we need to filter by language and region together because there is slightly different logic:
-// 1) if there is the exact match language+region then use it
-// 2) if there is the language WITHOUT region match then use it
-// 3) in other cases use items WITHOUT language and region qualifiers at all
+// Filter by language, script, and region together (extended from the original lang+region logic):
+// 1) exact language + script + region -> use it
+// 2) language + script (no region) -> use it
+// 3) language + region (no script) -> use it
+// 4) language only (no script, no region) -> use it
+// 5) items with NO locale qualifiers at all (default)
+// When the environment script is empty (e.g. DefaultComposeEnvironment), prefer items without
+// a ScriptQualifier first; fall back to script-tagged items only if nothing else matches.
 // issue: https://github.com/JetBrains/compose-multiplatform/issues/4571
 private fun List<ResourceItem>.filterByLocale(
     language: LanguageQualifier,
+    script: ScriptQualifier,
     region: RegionQualifier
 ): List<ResourceItem> {
+    val noLocaleItems = filter { item ->
+        item.qualifiers.none { it is LanguageQualifier || it is ScriptQualifier || it is RegionQualifier }
+    }
+
     val withLanguage = filter { item ->
         item.qualifiers.any { it == language }
     }
+    if (withLanguage.isEmpty()) return noLocaleItems
 
-    val withExactLocale = withLanguage.filter { item ->
-        item.qualifiers.any { it == region }
+    val scriptCandidates = if (script.script.isEmpty()) {
+        val noScript = withLanguage.filter { item -> item.qualifiers.none { it is ScriptQualifier } }
+        noScript.ifEmpty { withLanguage }
+    } else {
+        val withScript = withLanguage.filter { item -> item.qualifiers.any { it == script } }
+        if (withScript.isNotEmpty()) {
+            withScript
+        } else {
+            withLanguage.filter { item -> item.qualifiers.none { it is ScriptQualifier } }
+        }
     }
 
-    //if there are the exact language + the region items
-    if (withExactLocale.isNotEmpty()) return withExactLocale
+    val withRegion = scriptCandidates.filter { item -> item.qualifiers.any { it == region } }
+    if (withRegion.isNotEmpty()) return withRegion
 
-    val withDefaultRegion = withLanguage.filter { item ->
-        item.qualifiers.none { it is RegionQualifier }
-    }
-
-    //if there are the language without a region items
+    val withDefaultRegion = scriptCandidates.filter { item -> item.qualifiers.none { it is RegionQualifier } }
     if (withDefaultRegion.isNotEmpty()) return withDefaultRegion
 
-    //items without any locale qualifiers
-    return filter { item ->
-        item.qualifiers.none { it is LanguageQualifier || it is RegionQualifier }
-    }
+    return noLocaleItems
 }

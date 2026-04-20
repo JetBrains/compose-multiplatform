@@ -108,11 +108,9 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     ): List<ResourceItem>? {
         val file = this
         val dirName = file.parentFile.name ?: return null
-        val typeAndQualifiers = dirName.split("-")
-        if (typeAndQualifiers.isEmpty()) return null
+        val qualifiers = parseAndroidFolderName(dirName) ?: return null
 
-        val typeString = typeAndQualifiers.first().lowercase()
-        val qualifiers = typeAndQualifiers.takeLast(typeAndQualifiers.size - 1)
+        val typeString = dirName.substringBefore("-").lowercase()
         val path = file.toPath().relativeTo(relativeTo)
 
 
@@ -139,6 +137,34 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
                 file.resourceContentHash()
             )
         )
+    }
+
+    /**
+     * Parses Android folder names to extract qualifiers.
+     * Handles both standard qualifiers and Android BCPF format.
+     *
+     * Examples: values-en-rUS -> ["en", "rUS"]
+     *           values-b+sr+Latn -> ["sr", "Latn"]
+     */
+    private fun parseAndroidFolderName(dirName: String): List<String>? {
+        val bcpfPattern = Regex("""^([a-z]+)-b\+([a-z]{2,3})\+([A-Za-z0-9]+)$""")
+        val bcpfMatch = bcpfPattern.matchEntire(dirName)
+        if (bcpfMatch != null) {
+            val language = bcpfMatch.groupValues[2]
+            val code = bcpfMatch.groupValues[3]
+            return if (code.first().isDigit()) {
+                listOf(language, "r$code")
+            } else {
+                listOf(language, code)
+            }
+        }
+
+        val parts = dirName.split("-")
+        if (parts.isEmpty()) return null
+        val typeString = parts.first().lowercase()
+        if (typeString.isEmpty()) return null
+
+        return if (parts.size > 1) parts.drop(1) else emptyList()
     }
 
     private fun getValueResourceItems(dataFile: File, qualifiers: List<String>, path: Path): List<ResourceItem> {
