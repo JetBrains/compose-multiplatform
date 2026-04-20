@@ -27,8 +27,8 @@ _Changes since 1.11.0-beta02_
 
 ### Web
 
-- [iOS] Fix crash when using 'Fast delete': _Cannot coerce value to an empty range: maximum -1 is less than minimum 0_ [#2964](https://github.com/JetBrains/compose-multiplatform-core/pull/2964)
-- Fix `dragAndDropSource` combined with `clickable` doesn't allow to start drag [#2974](https://github.com/JetBrains/compose-multiplatform-core/pull/2974)
+- _(prerelease fix)_ [iOS] Fix crash when using 'Fast delete': _Cannot coerce value to an empty range: maximum -1 is less than minimum 0_ [#2964](https://github.com/JetBrains/compose-multiplatform-core/pull/2964)
+- _(prerelease fix)_ Fix `dragAndDropSource` combined with `clickable` doesn't allow to start drag [#2974](https://github.com/JetBrains/compose-multiplatform-core/pull/2974)
 
 ## Components
 
