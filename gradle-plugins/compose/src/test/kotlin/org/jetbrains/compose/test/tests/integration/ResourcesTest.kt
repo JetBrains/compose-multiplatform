@@ -49,6 +49,25 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun testBcpFolderQualifiers() {
+        with(testProject("misc/commonResources")) {
+            val bcpSrLatn = file("src/commonMain/composeResources/values-b+sr+Latn")
+            bcpSrLatn.mkdirs()
+            File(bcpSrLatn, "strings.xml").writeText(
+                """
+                <resources>
+                    <string name="bcp_sr_latn">Zdravo</string>
+                </resources>
+                """.trimIndent()
+            )
+            gradle("prepareKotlinIdeaImport").checks {
+                check.logDoesntContain("unknown qualifier")
+            }
+            bcpSrLatn.deleteRecursively()
+        }
+    }
+
+    @Test
     fun testGeneratedAccessors(): Unit = with(testProject("misc/commonResources")) {
         //check generated resource's accessors
         gradle("prepareKotlinIdeaImport").checks {

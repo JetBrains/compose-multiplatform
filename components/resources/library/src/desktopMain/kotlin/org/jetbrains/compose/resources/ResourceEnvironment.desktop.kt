@@ -18,6 +18,7 @@ internal actual fun getSystemEnvironment(): ResourceEnvironment {
     }
     return ResourceEnvironment(
         language = LanguageQualifier(locale.language),
+        script = ScriptQualifier(locale.script),
         region = RegionQualifier(locale.country),
         theme = ThemeQualifier.selectByValue(isDarkTheme),
         density = DensityQualifier.selectByValue(dpi)

@@ -36,6 +36,7 @@ class ResourceTest {
         )
         fun env(lang: String, reg: String, theme: ThemeQualifier, density: DensityQualifier) = ResourceEnvironment(
             language = LanguageQualifier(lang),
+            script = ScriptQualifier(""),
             region = RegionQualifier(reg),
             theme = theme,
             density = density
@@ -110,5 +111,65 @@ class ResourceTest {
         }.message.let { msg ->
             assertEquals("Resource with ID='ImageResource:test3' has more than one file: en1, en2", msg)
         }
+    }
+
+    @Test
+    fun testGetPathByEnvironmentWithScript() {
+        val resource = DrawableResource(
+            id = "ImageResource:script_test",
+            items = setOf(
+                ResourceItem(setOf(), "default", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("sr")), "sr", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("sr"), ScriptQualifier("Latn")), "sr-Latn", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("sr"), ScriptQualifier("Cyrl")), "sr-Cyrl", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("zh"), ScriptQualifier("Hans")), "zh-Hans", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("zh"), ScriptQualifier("Hant")), "zh-Hant", -1, -1),
+            )
+        )
+        fun env(lang: String, script: String, reg: String) = ResourceEnvironment(
+            language = LanguageQualifier(lang),
+            script = ScriptQualifier(script),
+            region = RegionQualifier(reg),
+            theme = LIGHT,
+            density = XHDPI
+        )
+        assertEquals(
+            "sr-Latn",
+            resource.getResourceItemByEnvironment(env("sr", "Latn", "")).path
+        )
+        assertEquals(
+            "sr-Cyrl",
+            resource.getResourceItemByEnvironment(env("sr", "Cyrl", "")).path
+        )
+        assertEquals(
+            "sr",
+            resource.getResourceItemByEnvironment(env("sr", "", "")).path
+        )
+        assertEquals(
+            "zh-Hans",
+            resource.getResourceItemByEnvironment(env("zh", "Hans", "")).path
+        )
+        assertEquals(
+            "zh-Hant",
+            resource.getResourceItemByEnvironment(env("zh", "Hant", "")).path
+        )
+        assertEquals(
+            "default",
+            resource.getResourceItemByEnvironment(env("en", "", "US")).path
+        )
+
+        // When the environment has no script info (empty string from DefaultComposeEnvironment),
+        // script-tagged items should still be reachable — not dropped.
+        val scriptOnlyResource = DrawableResource(
+            id = "ImageResource:script_only",
+            items = setOf(
+                ResourceItem(setOf(), "default", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("sr"), ScriptQualifier("Latn")), "sr-Latn", -1, -1),
+            )
+        )
+        assertEquals(
+            "sr-Latn",
+            scriptOnlyResource.getResourceItemByEnvironment(env("sr", "", "")).path
+        )
     }
 }
