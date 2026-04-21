@@ -125,7 +125,7 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
         if (lang == null) {
             error("Script qualifier must be used only with language.\nFile: ${resourceItem.path}")
         }
-        val pathContainsScript = pathStr.contains("-$lang-$q") || pathStr.contains("b+$lang+$q")
+        val pathContainsScript = pathStr.contains("-$lang-$q") || pathContainsBcpSubtag(pathStr, lang, q)
         if (!pathContainsScript) {
             error("Script qualifier must be declared after language: '$lang-$q'.\nFile: ${resourceItem.path}")
         }
@@ -138,7 +138,7 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
         }
         val regionCode = q.removePrefix("r")
         val langAndRegion = "$lang-$q"
-        val pathContainsRegion = pathStr.contains("-$langAndRegion") || pathStr.contains("b+$lang+$regionCode")
+        val pathContainsRegion = pathStr.contains("-$langAndRegion") || pathContainsBcpSubtag(pathStr, lang, regionCode)
         if (!pathContainsRegion) {
             error("Region qualifier must be declared after language: '$langAndRegion'.\nFile: ${resourceItem.path}")
         }
@@ -147,6 +147,11 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
 
     return this
 }
+
+// Matches a subtag inside a BCP path segment: b+lang[+...]+subtag[+...] or the same with further
+// hyphen-separated folder qualifiers (e.g. values-b+zh+Hant-dark: script then theme).
+private fun pathContainsBcpSubtag(pathStr: String, lang: String, subtag: String): Boolean =
+    pathStr.contains(Regex("""b\+${Regex.escape(lang)}(\+[A-Za-z0-9]+)*\+${Regex.escape(subtag)}(\+|[/\\]|-|$)"""))
 
 internal fun getResFileSpec(
     packageName: String,

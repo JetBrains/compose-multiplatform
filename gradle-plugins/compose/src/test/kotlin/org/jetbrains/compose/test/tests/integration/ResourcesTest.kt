@@ -51,19 +51,51 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun testBcpFolderQualifiers() {
         with(testProject("misc/commonResources")) {
-            val bcpSrLatn = file("src/commonMain/composeResources/values-b+sr+Latn")
-            bcpSrLatn.mkdirs()
-            File(bcpSrLatn, "strings.xml").writeText(
-                """
-                <resources>
-                    <string name="bcp_sr_latn">Zdravo</string>
-                </resources>
-                """.trimIndent()
+            val bcpDirs = listOf(
+                "values-b+sr+Latn",
+                "values-b+zh+Hans",
+                "values-b+zh+Hans+CN",
+                "values-b+sr+Latn+RS",
+                "values-b+es+419",
+                "values-b+zh",
+                "values-dark-b+zh+Hant",
             )
+            bcpDirs.forEach { dir ->
+                val f = file("src/commonMain/composeResources/$dir")
+                f.mkdirs()
+                File(f, "strings.xml").writeText(
+                    """
+                    <resources>
+                        <string name="bcp_test">test</string>
+                    </resources>
+                    """.trimIndent()
+                )
+            }
             gradle("prepareKotlinIdeaImport").checks {
                 check.logDoesntContain("unknown qualifier")
             }
-            bcpSrLatn.deleteRecursively()
+            bcpDirs.forEach { dir ->
+                file("src/commonMain/composeResources/$dir").deleteRecursively()
+            }
+        }
+    }
+
+    @Test
+    fun testBcpFolderQualifiersInvalid() {
+        with(testProject("misc/commonResources")) {
+            val bad = file("src/commonMain/composeResources/values-b+sr+1234")
+            bad.mkdirs()
+            File(bad, "strings.xml").writeText(
+                """
+                <resources>
+                    <string name="bad">test</string>
+                </resources>
+                """.trimIndent()
+            )
+            gradleFailure("prepareKotlinIdeaImport").checks {
+                check.logContains("unknown qualifier")
+            }
+            bad.deleteRecursively()
         }
     }
 
