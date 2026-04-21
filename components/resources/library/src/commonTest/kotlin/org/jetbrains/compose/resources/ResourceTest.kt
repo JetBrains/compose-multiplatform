@@ -122,6 +122,8 @@ class ResourceTest {
                 ResourceItem(setOf(LanguageQualifier("sr")), "sr", -1, -1),
                 ResourceItem(setOf(LanguageQualifier("sr"), ScriptQualifier("Latn")), "sr-Latn", -1, -1),
                 ResourceItem(setOf(LanguageQualifier("sr"), ScriptQualifier("Cyrl")), "sr-Cyrl", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("sr"), ScriptQualifier("Latn"), RegionQualifier("RS")), "sr-Latn-RS", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("sr"), RegionQualifier("RS")), "sr-RS", -1, -1),
                 ResourceItem(setOf(LanguageQualifier("zh"), ScriptQualifier("Hans")), "zh-Hans", -1, -1),
                 ResourceItem(setOf(LanguageQualifier("zh"), ScriptQualifier("Hant")), "zh-Hant", -1, -1),
             )
@@ -133,17 +135,24 @@ class ResourceTest {
             theme = LIGHT,
             density = XHDPI
         )
+
+        // case 1: language + script + region match (exact)
+        assertEquals(
+            "sr-Latn-RS",
+            resource.getResourceItemByEnvironment(env("sr", "Latn", "RS")).path
+        )
+        // case 1: language + script match, region falls back
         assertEquals(
             "sr-Latn",
             resource.getResourceItemByEnvironment(env("sr", "Latn", "")).path
         )
         assertEquals(
-            "sr-Cyrl",
-            resource.getResourceItemByEnvironment(env("sr", "Cyrl", "")).path
+            "sr-Latn",
+            resource.getResourceItemByEnvironment(env("sr", "Latn", "BA")).path
         )
         assertEquals(
-            "sr",
-            resource.getResourceItemByEnvironment(env("sr", "", "")).path
+            "sr-Cyrl",
+            resource.getResourceItemByEnvironment(env("sr", "Cyrl", "")).path
         )
         assertEquals(
             "zh-Hans",
@@ -153,13 +162,36 @@ class ResourceTest {
             "zh-Hant",
             resource.getResourceItemByEnvironment(env("zh", "Hant", "")).path
         )
+        // case 2: language match without script, region hits
+        assertEquals(
+            "sr-RS",
+            resource.getResourceItemByEnvironment(env("sr", "", "RS")).path
+        )
+        // case 2: language match without script, no region
+        assertEquals(
+            "sr",
+            resource.getResourceItemByEnvironment(env("sr", "", "")).path
+        )
+        // case 4: no language match -> default
         assertEquals(
             "default",
             resource.getResourceItemByEnvironment(env("en", "", "US")).path
         )
 
-        // When the environment has no script info (empty string from DefaultComposeEnvironment),
-        // script-tagged items should still be reachable — not dropped.
+        // case 3: language+region match ignoring script (no language+script and no language-without-script)
+        val scriptedOnlyResource = DrawableResource(
+            id = "ImageResource:scripted_only",
+            items = setOf(
+                ResourceItem(setOf(), "default", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("sr"), ScriptQualifier("Cyrl"), RegionQualifier("RS")), "sr-Cyrl-RS", -1, -1),
+            )
+        )
+        assertEquals(
+            "sr-Cyrl-RS",
+            scriptedOnlyResource.getResourceItemByEnvironment(env("sr", "Latn", "RS")).path
+        )
+
+        // empty environment script falls through to script-tagged items when no non-script items exist
         val scriptOnlyResource = DrawableResource(
             id = "ImageResource:script_only",
             items = setOf(
