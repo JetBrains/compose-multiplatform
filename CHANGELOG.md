@@ -1,3 +1,60 @@
+# 1.11.0-beta03 (April 2026)
+
+_Changes since 1.11.0-beta02_
+
+## Features
+
+### Multiple Platforms
+
+- Implement drag-to-scroll in `SelectionContainer`. When the mouse pointer is dragged outside the element while selecting text, the text element will be scrolled accordingly. Note that this requires wrapping the content in a scrolling container/modifier, e.g. `Modifier.verticalScroll` [#2979](https://github.com/JetBrains/compose-multiplatform-core/pull/2979)
+
+## Fixes
+
+### Multiple Platforms
+
+- Fix mouse-clicks being missed occasionally (typically when using Apple's Magic Mouse) [#2975](https://github.com/JetBrains/compose-multiplatform-core/pull/2975)
+- Fix crash when pressing up/down keys in an open context menu [#2976](https://github.com/JetBrains/compose-multiplatform-core/pull/2976)
+
+### iOS
+
+- _(prerelease fix)_ Fix `UINavigationBar` safe area insets not included in `WindowInsets.safeDrawing` [#2965](https://github.com/JetBrains/compose-multiplatform-core/pull/2965)
+- _(prerelease fix)_ Fix an issue where Compose content may become stretched after screen rotation [#2968](https://github.com/JetBrains/compose-multiplatform-core/pull/2968)
+- _(prerelease fix)_ Fix `SegmentFrequentTick` and `SegmentTick` haptic feedbacks [#2969](https://github.com/JetBrains/compose-multiplatform-core/pull/2969)
+
+### Desktop
+
+- _(prerelease fix)_ Bump Compose Hot Reload to [1.1.0-rc01](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.1.0-rc01) [#5577](https://github.com/JetBrains/compose-multiplatform/pull/5577)
+
+### Web
+
+- _(prerelease fix)_ [iOS] Fix crash when using 'Fast delete': _Cannot coerce value to an empty range: maximum -1 is less than minimum 0_ [#2964](https://github.com/JetBrains/compose-multiplatform-core/pull/2964)
+- _(prerelease fix)_ Fix `dragAndDropSource` combined with `clickable` doesn't allow to start drag [#2974](https://github.com/JetBrains/compose-multiplatform-core/pull/2974)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.11.0-beta03`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.11.0-beta03` | [Runtime 1.11.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.11.0-rc01) |
+| UI | `org.jetbrains.compose.ui:ui*:1.11.0-beta03` | [UI 1.11.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.11.0-rc01) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.11.0-beta03` | [Foundation 1.11.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.11.0-rc01) |
+| Material | `org.jetbrains.compose.material:material*:1.11.0-beta03` | [Material 1.11.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.11.0-rc01) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.11.0-alpha07` | [Material3 1.5.0-alpha17](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha17) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha07` | [Material3 Adaptive 1.3.0-alpha10](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha10) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0-alpha03` | [Lifecycle 2.11.0-alpha03](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0-alpha03) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.2` | [Navigation 2.9.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.7) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.1.0` | [Navigation3 1.1.0](https://developer.android.com/jetpack/androidx/releases/navigation3#1.1.0) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0-beta01` | [Navigation Event 1.1.0-rc01](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.0-rc01) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.11.0-beta02 (April 2026)
 
 _Changes since 1.11.0-beta01_
