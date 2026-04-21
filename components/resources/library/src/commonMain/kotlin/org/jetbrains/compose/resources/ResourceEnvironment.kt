@@ -170,14 +170,11 @@ private fun List<ResourceItem>.filterByDensity(density: DensityQualifier): List<
     }
 }
 
-// Filter by language, script, and region together (extended from the original lang+region logic):
-// 1) exact language + script + region -> use it
-// 2) language + script (no region) -> use it
-// 3) language + region (no script) -> use it
-// 4) language only (no script, no region) -> use it
-// 5) items with NO locale qualifiers at all (default)
-// When the environment script is empty (e.g. DefaultComposeEnvironment), prefer items without
-// a ScriptQualifier first; fall back to script-tagged items only if nothing else matches.
+// we need to filter by language, script and region together because there is slightly different logic:
+// 1) if there is the language+script match (narrowed by region if possible) then use it
+// 2) if there is the language WITHOUT script match (narrowed by region if possible) then use it
+// 3) if there is any language+region match ignoring script then use it
+// 4) in other cases use items WITHOUT language, script and region qualifiers at all
 // issue: https://github.com/JetBrains/compose-multiplatform/issues/4571
 private fun List<ResourceItem>.filterByLocale(
     language: LanguageQualifier,
@@ -193,23 +190,34 @@ private fun List<ResourceItem>.filterByLocale(
     }
     if (withLanguage.isEmpty()) return noLocaleItems
 
-    val scriptCandidates = if (script.script.isEmpty()) {
-        val noScript = withLanguage.filter { item -> item.qualifiers.none { it is ScriptQualifier } }
-        noScript.ifEmpty { withLanguage }
-    } else {
-        val withScript = withLanguage.filter { item -> item.qualifiers.any { it == script } }
-        if (withScript.isNotEmpty()) {
-            withScript
-        } else {
-            withLanguage.filter { item -> item.qualifiers.none { it is ScriptQualifier } }
-        }
+    //language + script items, narrowed by region (e.g. sr-Latn-RS, sr-Latn)
+    val withScript = withLanguage.filter { item ->
+        item.qualifiers.any { it == script }
     }
+    val byScriptAndRegion = withScript.filterByRegion(region)
+    if (byScriptAndRegion.isNotEmpty()) return byScriptAndRegion
 
-    val withRegion = scriptCandidates.filter { item -> item.qualifiers.any { it == region } }
-    if (withRegion.isNotEmpty()) return withRegion
+    //language items without a script qualifier, narrowed by region (e.g. sr-RS, sr)
+    val withDefaultScript = withLanguage.filter { item ->
+        item.qualifiers.none { it is ScriptQualifier }
+    }
+    val byDefaultScriptAndRegion = withDefaultScript.filterByRegion(region)
+    if (byDefaultScriptAndRegion.isNotEmpty()) return byDefaultScriptAndRegion
 
-    val withDefaultRegion = scriptCandidates.filter { item -> item.qualifiers.none { it is RegionQualifier } }
-    if (withDefaultRegion.isNotEmpty()) return withDefaultRegion
+    //fall back to region match on all language items regardless of script
+    val byRegion = withLanguage.filterByRegion(region)
+    if (byRegion.isNotEmpty()) return byRegion
 
     return noLocaleItems
+}
+
+private fun List<ResourceItem>.filterByRegion(region: RegionQualifier): List<ResourceItem> {
+    val withRegion = filter { item ->
+        item.qualifiers.any { it == region }
+    }
+    if (withRegion.isNotEmpty()) return withRegion
+
+    return filter { item ->
+        item.qualifiers.none { it is RegionQualifier }
+    }
 }

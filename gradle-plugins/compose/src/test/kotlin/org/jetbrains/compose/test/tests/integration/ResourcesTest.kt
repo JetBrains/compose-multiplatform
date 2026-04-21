@@ -52,13 +52,21 @@ class ResourcesTest : GradlePluginTestBase() {
     fun testBcpFolderQualifiers() {
         with(testProject("misc/commonResources")) {
             val bcpDirs = listOf(
+                // language only
+                "values-b+zh",
+                // language + script
                 "values-b+sr+Latn",
                 "values-b+zh+Hans",
+                // language + letter region (no script)
+                "values-b+en+US",
+                // language + numeric (UN M.49) region
+                "values-b+es+419",
+                // language + script + region (multi-segment)
                 "values-b+zh+Hans+CN",
                 "values-b+sr+Latn+RS",
-                "values-b+es+419",
-                "values-b+zh",
-                "values-dark-b+zh+Hant",
+                // BCPF locale combined with trailing theme / density qualifiers
+                "values-b+zh+Hant-dark",
+                "values-b+zh+Hant-mdpi",
             )
             bcpDirs.forEach { dir ->
                 val f = file("src/commonMain/composeResources/$dir")
@@ -73,6 +81,7 @@ class ResourcesTest : GradlePluginTestBase() {
             }
             gradle("prepareKotlinIdeaImport").checks {
                 check.logDoesntContain("unknown qualifier")
+                check.logDoesntContain("repetitive qualifiers")
             }
             bcpDirs.forEach { dir ->
                 file("src/commonMain/composeResources/$dir").deleteRecursively()
@@ -82,20 +91,34 @@ class ResourcesTest : GradlePluginTestBase() {
 
     @Test
     fun testBcpFolderQualifiersInvalid() {
+        val invalidCases = listOf(
+            // malformed BCPF subtag (numeric where letters expected)
+            "values-b+sr+1234" to "unknown qualifier",
+            // junk subtag in the BCPF segment (not a lang / script / region pattern)
+            "values-b+sr+ABCD" to "unknown qualifier",
+            // BCPF segment outside the first position - theme before locale
+            "values-dark-b+zh+Hant" to "unknown qualifier",
+            // BCPF segment outside the first position - density before locale
+            "values-mdpi-b+zh" to "unknown qualifier",
+            // duplicate region inside one BCPF segment (US and RS)
+            "values-b+sr+US+RS" to "repetitive qualifiers",
+        )
         with(testProject("misc/commonResources")) {
-            val bad = file("src/commonMain/composeResources/values-b+sr+1234")
-            bad.mkdirs()
-            File(bad, "strings.xml").writeText(
-                """
-                <resources>
-                    <string name="bad">test</string>
-                </resources>
-                """.trimIndent()
-            )
-            gradleFailure("prepareKotlinIdeaImport").checks {
-                check.logContains("unknown qualifier")
+            invalidCases.forEach { (dir, errorMsg) ->
+                val bad = file("src/commonMain/composeResources/$dir")
+                bad.mkdirs()
+                File(bad, "strings.xml").writeText(
+                    """
+                    <resources>
+                        <string name="bad">test</string>
+                    </resources>
+                    """.trimIndent()
+                )
+                gradleFailure("prepareKotlinIdeaImport").checks {
+                    check.logContains(errorMsg)
+                }
+                bad.deleteRecursively()
             }
-            bad.deleteRecursively()
         }
     }
 
