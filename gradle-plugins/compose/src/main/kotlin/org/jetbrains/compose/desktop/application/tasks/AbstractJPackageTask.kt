@@ -32,6 +32,8 @@ import org.jetbrains.compose.desktop.application.dsl.FileAssociation
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.APP_RESOURCES_DIR
+import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
+import org.jetbrains.compose.desktop.application.internal.extractCertificateAliases
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.InfoPlistListValue
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.InfoPlistMapValue
@@ -56,6 +58,7 @@ import org.jetbrains.compose.desktop.application.internal.files.normalizedPath
 import org.jetbrains.compose.desktop.application.internal.files.transformJar
 import org.jetbrains.compose.desktop.application.internal.javaOption
 import org.jetbrains.compose.desktop.application.internal.validation.validate
+import org.jetbrains.compose.internal.utils.MacUtils
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.clearDirs
 import org.jetbrains.compose.internal.utils.currentArch
@@ -338,7 +341,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         if (currentOS == OS.MacOS) {
             if (shouldSign) {
                 val validatedSettings =
-                    nonValidatedSettings!!.validate(nonValidatedMacBundleID, project, macAppStore)
+                    nonValidatedSettings!!.validate(nonValidatedMacBundleID, project)
                 MacSignerImpl(validatedSettings, runExternalTool)
             } else NoCertificateSigner(runExternalTool)
         } else null
@@ -502,10 +505,15 @@ abstract class AbstractJPackageTask @Inject constructor(
             cliArg("--mac-entitlements", macEntitlementsFile)
 
             macSigner?.settings?.let { signingSettings ->
-                cliArg("--mac-sign", true)
-                cliArg("--mac-signing-key-user-name", signingSettings.identity)
-                cliArg("--mac-signing-keychain", signingSettings.keychain)
-                cliArg("--mac-package-signing-prefix", signingSettings.prefix)
+                val resolvedSigningIdentity = macSigner?.resolvedSigningIdentity
+                // Never pass --mac-sign for PKG: jpackage's PKG bundler fails with pre-signed
+                // app images. PKG signing is handled by productsign in signPkgIfNeeded() instead.
+                if (resolvedSigningIdentity?.isJPackageCompatible == true && targetFormat != TargetFormat.Pkg) {
+                    cliArg("--mac-sign", true)
+                    cliArg("--mac-signing-key-user-name", resolvedSigningIdentity.fullIdentity)
+                    cliArg("--mac-signing-keychain", signingSettings.keychain)
+                    cliArg("--mac-package-signing-prefix", signingSettings.prefix)
+                }
             }
         }
     }
@@ -632,8 +640,74 @@ abstract class AbstractJPackageTask @Inject constructor(
     override fun checkResult(result: ExecResult) {
         super.checkResult(result)
         modifyRuntimeOnMacOsIfNeeded()
+        signPkgIfNeeded()
         val outputFile = findOutputFileOrDir(destinationDir.ioFile, targetFormat)
         logger.lifecycle("The distribution is written to ${outputFile.canonicalPath}")
+    }
+
+    private fun signPkgIfNeeded() {
+        if (currentOS != OS.MacOS || targetFormat != TargetFormat.Pkg) return
+        val macSigner = macSigner ?: return
+        val signingSettings = macSigner.settings ?: return
+        val resolvedSigningIdentity = macSigner.resolvedSigningIdentity ?: return
+
+        val candidates = resolvedSigningIdentity.installerSigningIdentityCandidates
+        check(candidates.isNotEmpty()) {
+            buildString {
+                append("PKG signing is not supported with '${resolvedSigningIdentity.fullIdentity}'. ")
+                append("Development certificates can sign local app bundles, but installer packages require ")
+                append("'Developer ID Application' plus 'Developer ID Installer' for outside-App-Store distribution, ")
+                append("or 'Apple Distribution'/'3rd Party Mac Developer Application' plus ")
+                append("'3rd Party Mac Developer Installer' for Mac App Store uploads.")
+            }
+        }
+        val installerIdentity = candidates.firstOrNull { installerCertificateExists(it, signingSettings.keychain) }
+        check(installerIdentity != null) {
+            buildString {
+                appendLine("Could not find a matching installer signing certificate for '${resolvedSigningIdentity.fullIdentity}'.")
+                appendLine("Checked installer certificate names:")
+                appendLine(candidates.joinToString("\n") { "* $it" })
+            }
+        }
+
+        val pkgFile = findOutputFileOrDir(destinationDir.ioFile, targetFormat)
+        val tmpPkg = pkgFile.resolveSibling("${pkgFile.nameWithoutExtension}-unsigned.pkg")
+        check(pkgFile.renameTo(tmpPkg)) {
+            "Failed to rename ${pkgFile.absolutePath} to ${tmpPkg.absolutePath}"
+        }
+
+        try {
+            val args = mutableListOf("--sign", installerIdentity)
+            signingSettings.keychain?.let {
+                args.addAll(listOf("--keychain", it.absolutePath))
+            }
+            args.addAll(listOf(tmpPkg.absolutePath, pkgFile.absolutePath))
+
+            runExternalTool(
+                tool = MacUtils.productsign,
+                args = args
+            )
+        } finally {
+            if (!pkgFile.exists() && tmpPkg.exists()) {
+                check(tmpPkg.renameTo(pkgFile)) {
+                    "Failed to restore unsigned PKG from ${tmpPkg.absolutePath} to ${pkgFile.absolutePath}"
+                }
+            } else {
+                tmpPkg.delete()
+            }
+        }
+    }
+
+    private fun installerCertificateExists(identity: String, keychain: File?): Boolean {
+        var certificates = ""
+        runExternalTool(
+            tool = MacUtils.security,
+            args = listOfNotNull("find-certificate", "-a", "-c", identity, keychain?.absolutePath),
+            checkExitCodeIsNormal = false,
+            processStdout = { certificates = it },
+            logToConsole = ExternalToolRunner.LogToConsole.Never
+        )
+        return extractCertificateAliases(certificates).contains(identity)
     }
 
     private fun modifyRuntimeOnMacOsIfNeeded() {
