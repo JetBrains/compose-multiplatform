@@ -51,9 +51,12 @@ internal val DefaultComposeEnvironment = object : ComposeEnvironment {
 
         //cache ResourceEnvironment unless compose environment is changed
         return remember(composeLocale, composeTheme, composeDensity) {
+            // androidx.compose.ui.text.intl.Locale doesn't expose script yet,
+            // so pull it from the system resource environment
+            val systemScript = getSystemResourceEnvironment().script
             ResourceEnvironment(
                 LanguageQualifier(composeLocale.language),
-                ScriptQualifier(""), //androidx.compose.ui.text.intl.Locale doesn't provide script yet
+                systemScript,
                 RegionQualifier(composeLocale.region),
                 ThemeQualifier.selectByValue(composeTheme),
                 DensityQualifier.selectByDensity(composeDensity.density)
