@@ -439,4 +439,30 @@ class ComposeResourceTest {
         assertEquals(env2, lastEnv2)
         assertEquals(env2, lastEnv3)
     }
+
+    // DefaultComposeEnvironment must surface the system script so BCP 47 folders
+    // like values-b+zh+Hant remain reachable from stringResource().
+    @Test
+    fun testDefaultComposeEnvironmentPropagatesSystemScript() = clearResourceCachesAndRunUiTest {
+        fun zhHantSystemEnv() = ResourceEnvironment(
+            language = LanguageQualifier("zh"),
+            script = ScriptQualifier("Hant"),
+            region = RegionQualifier(""),
+            theme = ThemeQualifier.LIGHT,
+            density = DensityQualifier.XHDPI
+        )
+
+        val previous = getResourceEnvironment
+        getResourceEnvironment = ::zhHantSystemEnv
+        try {
+            var captured: ResourceEnvironment? = null
+            setContent {
+                captured = rememberResourceEnvironment()
+            }
+            waitForIdle()
+            assertEquals("Hant", captured?.script?.script)
+        } finally {
+            getResourceEnvironment = previous
+        }
+    }
 }
