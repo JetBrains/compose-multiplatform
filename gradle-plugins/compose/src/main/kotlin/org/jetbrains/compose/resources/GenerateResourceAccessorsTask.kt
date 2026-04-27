@@ -108,7 +108,7 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     ): List<ResourceItem>? {
         val file = this
         val dirName = file.parentFile.name ?: return null
-        val qualifiers = parseComposeResourceLocaleQualifiers(dirName) ?: return null
+        val qualifiers = parseComposeResourceQualifiers(dirName) ?: return null
 
         val typeString = dirName.substringBefore("-").lowercase()
         val path = file.toPath().relativeTo(relativeTo)
@@ -141,13 +141,17 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
 
     /**
      * Extracts qualifiers from a resource folder name.
-     * Handles standard Android qualifiers and BCPF (BCP 47) locale format.
+     * Handles standard Android qualifiers and the BCP 47 `b+...` locale format.
+     *
+     * A BCP 47 locale segment, if present, must come immediately after the type
+     * prefix - matching Android's locale-first ordering. Other qualifiers (theme,
+     * density, etc.) follow the locale segment.
      *
      * values-en-rUS         -> ["en", "rUS"]
      * values-b+sr+Latn      -> ["sr", "Latn"]
      * values-b+zh+Hant-dark -> ["zh", "Hant", "dark"]
      */
-    private fun parseComposeResourceLocaleQualifiers(dirName: String): List<String>? {
+    private fun parseComposeResourceQualifiers(dirName: String): List<String>? {
         val parts = dirName.split("-")
         if (parts.isEmpty()) return null
         if (parts.first().lowercase().isEmpty()) return null
@@ -165,7 +169,7 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     }
 
     /**
-     * Expands an Android BCPF `b+lang[+Script][+REGION]` segment into
+     * Expands an Android BCP 47 `b+lang[+Script][+REGION]` segment into
      * individual qualifier tokens. Returns null for malformed segments.
      *
      * b+sr+Latn+RS -> ["sr", "Latn", "rRS"]
@@ -175,11 +179,12 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
         val result = mutableListOf<String>()
         for (subtag in segment.removePrefix("b+").split("+")) {
             when {
+                // language: 2-3 letter ISO 639 code (en, sr, zh)
                 subtag.matches(Regex("[a-z]{2,3}")) -> result.add(subtag)
-                // Region codes get "r" prefix per Android convention (rUS, r419)
+                // region: 2-letter ISO 3166-1 or 3-digit UN M.49, prefixed "r" per Android
                 subtag.matches(Regex("[A-Z]{2}")) -> result.add("r$subtag")
                 subtag.matches(Regex("[0-9]{3}")) -> result.add("r$subtag")
-                // Script codes stay bare (Latn, Hans, Hant)
+                // script: 4-letter ISO 15924 code (Latn, Hans, Hant)
                 subtag.matches(Regex("[A-Z][a-z]{3}")) -> result.add(subtag)
                 else -> return null
             }

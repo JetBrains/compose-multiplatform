@@ -64,7 +64,7 @@ class ResourcesTest : GradlePluginTestBase() {
                 // language + script + region (multi-segment)
                 "values-b+zh+Hans+CN",
                 "values-b+sr+Latn+RS",
-                // BCPF locale combined with trailing theme / density qualifiers
+                // BCP 47 locale combined with trailing theme / density qualifiers
                 "values-b+zh+Hant-dark",
                 "values-b+zh+Hant-mdpi",
             )
@@ -92,15 +92,14 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun testBcpFolderQualifiersInvalid() {
         val invalidCases = listOf(
-            // malformed BCPF subtag (numeric where letters expected)
+            // malformed BCP 47 subtag (numeric where letters expected)
             "values-b+sr+1234" to "unknown qualifier",
-            // junk subtag in the BCPF segment (not a lang / script / region pattern)
+            // junk subtag (not a lang / script / region pattern)
             "values-b+sr+ABCD" to "unknown qualifier",
-            // BCPF segment outside the first position - theme before locale
+            // BCP 47 segment must be locale-first; theme/density before it is rejected
             "values-dark-b+zh+Hant" to "unknown qualifier",
-            // BCPF segment outside the first position - density before locale
             "values-mdpi-b+zh" to "unknown qualifier",
-            // duplicate region inside one BCPF segment (US and RS)
+            // two regions in one BCP 47 segment
             "values-b+sr+US+RS" to "repetitive qualifiers",
         )
         with(testProject("misc/commonResources")) {

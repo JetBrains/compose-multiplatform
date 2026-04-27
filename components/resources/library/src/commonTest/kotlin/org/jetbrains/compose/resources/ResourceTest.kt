@@ -136,12 +136,11 @@ class ResourceTest {
             density = XHDPI
         )
 
-        // case 1: language + script + region match (exact)
+        // case 1: language + script match (narrowed by region if possible)
         assertEquals(
             "sr-Latn-RS",
             resource.getResourceItemByEnvironment(env("sr", "Latn", "RS")).path
         )
-        // case 1: language + script match, region falls back
         assertEquals(
             "sr-Latn",
             resource.getResourceItemByEnvironment(env("sr", "Latn", "")).path
@@ -162,23 +161,19 @@ class ResourceTest {
             "zh-Hant",
             resource.getResourceItemByEnvironment(env("zh", "Hant", "")).path
         )
-        // case 2: language match without script, region hits
+
+        // case 2: language match without script (narrowed by region if possible)
         assertEquals(
             "sr-RS",
             resource.getResourceItemByEnvironment(env("sr", "", "RS")).path
         )
-        // case 2: language match without script, no region
         assertEquals(
             "sr",
             resource.getResourceItemByEnvironment(env("sr", "", "")).path
         )
-        // case 4: no language match -> default
-        assertEquals(
-            "default",
-            resource.getResourceItemByEnvironment(env("en", "", "US")).path
-        )
 
-        // case 3: language+region match ignoring script (no language+script and no language-without-script)
+        // case 3: language+region match ignoring script
+        // (no language+script and no language-without-script item exists)
         val scriptedOnlyResource = DrawableResource(
             id = "ImageResource:scripted_only",
             items = setOf(
@@ -191,7 +186,8 @@ class ResourceTest {
             scriptedOnlyResource.getResourceItemByEnvironment(env("sr", "Latn", "RS")).path
         )
 
-        // empty environment script falls through to script-tagged items when no non-script items exist
+        // case 3 (variant): empty environment script still falls through to a
+        // script-tagged item when no non-script-tagged language item exists
         val scriptOnlyResource = DrawableResource(
             id = "ImageResource:script_only",
             items = setOf(
@@ -202,6 +198,12 @@ class ResourceTest {
         assertEquals(
             "sr-Latn",
             scriptOnlyResource.getResourceItemByEnvironment(env("sr", "", "")).path
+        )
+
+        // case 4: no language match -> default
+        assertEquals(
+            "default",
+            resource.getResourceItemByEnvironment(env("en", "", "US")).path
         )
     }
 }
