@@ -49,6 +49,79 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun testBcpFolderQualifiers() {
+        with(testProject("misc/commonResources")) {
+            val bcpDirs = listOf(
+                // language only
+                "values-b+zh",
+                // language + script
+                "values-b+sr+Latn",
+                "values-b+zh+Hans",
+                // language + letter region (no script)
+                "values-b+en+US",
+                // language + numeric (UN M.49) region
+                "values-b+es+419",
+                // language + script + region (multi-segment)
+                "values-b+zh+Hans+CN",
+                "values-b+sr+Latn+RS",
+                // BCP 47 locale combined with trailing theme / density qualifiers
+                "values-b+zh+Hant-dark",
+                "values-b+zh+Hant-mdpi",
+            )
+            bcpDirs.forEach { dir ->
+                val f = file("src/commonMain/composeResources/$dir")
+                f.mkdirs()
+                File(f, "strings.xml").writeText(
+                    """
+                    <resources>
+                        <string name="bcp_test">test</string>
+                    </resources>
+                    """.trimIndent()
+                )
+            }
+            gradle("prepareKotlinIdeaImport").checks {
+                check.logDoesntContain("unknown qualifier")
+                check.logDoesntContain("repetitive qualifiers")
+            }
+            bcpDirs.forEach { dir ->
+                file("src/commonMain/composeResources/$dir").deleteRecursively()
+            }
+        }
+    }
+
+    @Test
+    fun testBcpFolderQualifiersInvalid() {
+        val invalidCases = listOf(
+            // malformed BCP 47 subtag (numeric where letters expected)
+            "values-b+sr+1234" to "unknown qualifier",
+            // junk subtag (not a lang / script / region pattern)
+            "values-b+sr+ABCD" to "unknown qualifier",
+            // BCP 47 segment must be locale-first; theme/density before it is rejected
+            "values-dark-b+zh+Hant" to "unknown qualifier",
+            "values-mdpi-b+zh" to "unknown qualifier",
+            // two regions in one BCP 47 segment
+            "values-b+sr+US+RS" to "repetitive qualifiers",
+        )
+        with(testProject("misc/commonResources")) {
+            invalidCases.forEach { (dir, errorMsg) ->
+                val bad = file("src/commonMain/composeResources/$dir")
+                bad.mkdirs()
+                File(bad, "strings.xml").writeText(
+                    """
+                    <resources>
+                        <string name="bad">test</string>
+                    </resources>
+                    """.trimIndent()
+                )
+                gradleFailure("prepareKotlinIdeaImport").checks {
+                    check.logContains(errorMsg)
+                }
+                bad.deleteRecursively()
+            }
+        }
+    }
+
+    @Test
     fun testGeneratedAccessors(): Unit = with(testProject("misc/commonResources")) {
         //check generated resource's accessors
         gradle("prepareKotlinIdeaImport").checks {

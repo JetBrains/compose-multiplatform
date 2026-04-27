@@ -11,6 +11,7 @@ internal actual fun getSystemEnvironment(): ResourceEnvironment {
     val dpi = configuration.densityDpi
     return ResourceEnvironment(
         language = LanguageQualifier(locale.language),
+        script = ScriptQualifier(locale.script),
         region = RegionQualifier(locale.country),
         theme = ThemeQualifier.selectByValue(isDarkTheme),
         density = DensityQualifier.selectByValue(dpi)

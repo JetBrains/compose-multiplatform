@@ -63,12 +63,14 @@ private val resourceContentHashAnnotationClass = ClassName("org.jetbrains.compos
 
 private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlock.Builder {
     val languageQualifier = ClassName("org.jetbrains.compose.resources", "LanguageQualifier")
+    val scriptQualifier = ClassName("org.jetbrains.compose.resources", "ScriptQualifier")
     val regionQualifier = ClassName("org.jetbrains.compose.resources", "RegionQualifier")
     val themeQualifier = ClassName("org.jetbrains.compose.resources", "ThemeQualifier")
     val densityQualifier = ClassName("org.jetbrains.compose.resources", "DensityQualifier")
 
     val languageRegex = Regex("[a-z]{2,3}")
-    val regionRegex = Regex("r[A-Z]{2}")
+    val regionRegex = Regex("r[A-Z]{2}|r[0-9]{3}")
+    val scriptRegex = Regex("[A-Z][a-z]{3}")
 
     val qualifiersMap = mutableMapOf<ClassName, String>()
 
@@ -104,6 +106,10 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
                     saveQualifier(regionQualifier, q)
                 }
 
+                q.matches(scriptRegex) -> {
+                    saveQualifier(scriptQualifier, q)
+                }
+
                 else -> error("${resourceItem.path} contains unknown qualifier: '$q'.")
             }
         }
@@ -111,20 +117,41 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
     qualifiersMap[themeQualifier]?.let { q -> add("%T.${q.uppercase()}, ", themeQualifier) }
     qualifiersMap[densityQualifier]?.let { q -> add("%T.${q.uppercase()}, ", densityQualifier) }
     qualifiersMap[languageQualifier]?.let { q -> add("%T(\"$q\"), ", languageQualifier) }
+
+    val pathStr = resourceItem.path.toString()
+    val lang = qualifiersMap[languageQualifier]
+
+    qualifiersMap[scriptQualifier]?.let { q ->
+        if (lang == null) {
+            error("Script qualifier must be used only with language.\nFile: ${resourceItem.path}")
+        }
+        val pathContainsScript = pathStr.contains("-$lang-$q") || pathContainsBcpSubtag(pathStr, lang, q)
+        if (!pathContainsScript) {
+            error("Script qualifier must be declared after language: '$lang-$q'.\nFile: ${resourceItem.path}")
+        }
+        add("%T(\"$q\"), ", scriptQualifier)
+    }
+
     qualifiersMap[regionQualifier]?.let { q ->
-        val lang = qualifiersMap[languageQualifier]
         if (lang == null) {
             error("Region qualifier must be used only with language.\nFile: ${resourceItem.path}")
         }
+        val regionCode = q.removePrefix("r")
         val langAndRegion = "$lang-$q"
-        if (!resourceItem.path.toString().contains("-$langAndRegion")) {
+        val pathContainsRegion = pathStr.contains("-$langAndRegion") || pathContainsBcpSubtag(pathStr, lang, regionCode)
+        if (!pathContainsRegion) {
             error("Region qualifier must be declared after language: '$langAndRegion'.\nFile: ${resourceItem.path}")
         }
-        add("%T(\"${q.takeLast(2)}\"), ", regionQualifier)
+        add("%T(\"$regionCode\"), ", regionQualifier)
     }
 
     return this
 }
+
+// Matches a subtag inside a BCP path segment: b+lang[+...]+subtag[+...] or the same with further
+// hyphen-separated folder qualifiers (e.g. values-b+zh+Hant-dark: script then theme).
+private fun pathContainsBcpSubtag(pathStr: String, lang: String, subtag: String): Boolean =
+    pathStr.contains(Regex("""b\+${Regex.escape(lang)}(\+[A-Za-z0-9]+)*\+${Regex.escape(subtag)}(\+|[/\\]|-|$)"""))
 
 internal fun getResFileSpec(
     packageName: String,

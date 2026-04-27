@@ -108,11 +108,9 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     ): List<ResourceItem>? {
         val file = this
         val dirName = file.parentFile.name ?: return null
-        val typeAndQualifiers = dirName.split("-")
-        if (typeAndQualifiers.isEmpty()) return null
+        val qualifiers = parseComposeResourceQualifiers(dirName) ?: return null
 
-        val typeString = typeAndQualifiers.first().lowercase()
-        val qualifiers = typeAndQualifiers.takeLast(typeAndQualifiers.size - 1)
+        val typeString = dirName.substringBefore("-").lowercase()
         val path = file.toPath().relativeTo(relativeTo)
 
 
@@ -139,6 +137,59 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
                 file.resourceContentHash()
             )
         )
+    }
+
+    /**
+     * Extracts qualifiers from a resource folder name.
+     * Handles standard Android qualifiers and the BCP 47 `b+...` locale format.
+     *
+     * A BCP 47 locale segment, if present, must come immediately after the type
+     * prefix - matching Android's locale-first ordering. Other qualifiers (theme,
+     * density, etc.) follow the locale segment.
+     *
+     * values-en-rUS         -> ["en", "rUS"]
+     * values-b+sr+Latn      -> ["sr", "Latn"]
+     * values-b+zh+Hant-dark -> ["zh", "Hant", "dark"]
+     */
+    private fun parseComposeResourceQualifiers(dirName: String): List<String>? {
+        val parts = dirName.split("-")
+        if (parts.isEmpty()) return null
+        if (parts.first().lowercase().isEmpty()) return null
+
+        val expanded = mutableListOf<String>()
+        for ((index, q) in parts.drop(1).withIndex()) {
+            if (q.startsWith("b+") && index == 0) {
+                // Malformed segments pass through so addQualifiers reports "unknown qualifier"
+                expanded.addAll(expandBcpQualifier(q) ?: listOf(q))
+            } else {
+                expanded.add(q)
+            }
+        }
+        return expanded
+    }
+
+    /**
+     * Expands an Android BCP 47 `b+lang[+Script][+REGION]` segment into
+     * individual qualifier tokens. Returns null for malformed segments.
+     *
+     * b+sr+Latn+RS -> ["sr", "Latn", "rRS"]
+     * b+es+419     -> ["es", "r419"]
+     */
+    private fun expandBcpQualifier(segment: String): List<String>? {
+        val result = mutableListOf<String>()
+        for (subtag in segment.removePrefix("b+").split("+")) {
+            when {
+                // language: 2-3 letter ISO 639 code (en, sr, zh)
+                subtag.matches(Regex("[a-z]{2,3}")) -> result.add(subtag)
+                // region: 2-letter ISO 3166-1 or 3-digit UN M.49, prefixed "r" per Android
+                subtag.matches(Regex("[A-Z]{2}")) -> result.add("r$subtag")
+                subtag.matches(Regex("[0-9]{3}")) -> result.add("r$subtag")
+                // script: 4-letter ISO 15924 code (Latn, Hans, Hant)
+                subtag.matches(Regex("[A-Z][a-z]{3}")) -> result.add(subtag)
+                else -> return null
+            }
+        }
+        return result
     }
 
     private fun getValueResourceItems(dataFile: File, qualifiers: List<String>, path: Path): List<ResourceItem> {
