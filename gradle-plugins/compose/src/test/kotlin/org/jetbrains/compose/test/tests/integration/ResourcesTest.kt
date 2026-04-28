@@ -57,6 +57,8 @@ class ResourcesTest : GradlePluginTestBase() {
                 // language + script
                 "values-b+sr+Latn",
                 "values-b+zh+Hans",
+                // language only inside the b+ segment
+                "values-b+sr",
                 // language + letter region (no script)
                 "values-b+en+US",
                 // language + numeric (UN M.49) region
@@ -117,11 +119,17 @@ class ResourcesTest : GradlePluginTestBase() {
             "values-b+sr+1234" to "Malformed BCP 47 subtag '1234'",
             // junk subtag (not a lang / script / region pattern)
             "values-b+sr+ABCD" to "Malformed BCP 47 subtag 'ABCD'",
+            // empty subtags inside a BCP 47 segment
+            "values-b+" to "Malformed BCP 47 subtag ''",
+            "values-b++Latn" to "Malformed BCP 47 subtag ''",
+            // BCP 47 segment must start with a language subtag
+            "values-b+EN" to "BCP 47 segment 'b+EN' must start with a language subtag",
             // BCP 47 segment must be locale-first; theme/density before it is rejected
             "values-dark-b+zh+Hant" to "BCP 47 'b+' segment must be the first qualifier",
             "values-mdpi-b+zh" to "BCP 47 'b+' segment must be the first qualifier",
             // two regions in one BCP 47 segment
             "values-b+sr+US+RS" to "repetitive qualifiers",
+            "values-b+sr+Latn+RS+US" to "repetitive qualifiers",
             // BCP 47 segment cannot be combined with trailing locale-shaped qualifiers
             "values-b+sr+Latn-rRS" to "Locale qualifier 'rRS' cannot follow a BCP 47",
             "values-b+sr-rRS" to "Locale qualifier 'rRS' cannot follow a BCP 47",
