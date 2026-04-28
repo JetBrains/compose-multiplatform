@@ -17,11 +17,11 @@ import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.relativeTo
 
-private val languageRegex = Regex("[a-z]{2,3}") // ISO 639
-private val scriptRegex = Regex("[A-Z][a-z]{3}") // ISO 15924
-private val regionAlpha2Regex = Regex("[A-Z]{2}") // ISO 3166-1 alpha-2
-private val regionNumericRegex = Regex("[0-9]{3}") // UN M.49
-private val androidRegionRegex = Regex("r[A-Z]{2}|r[0-9]{3}") // Android `r` prefix
+internal val languageRegex = Regex("[a-z]{2,3}") // ISO 639
+internal val scriptRegex = Regex("[A-Z][a-z]{3}") // ISO 15924
+internal val regionAlpha2Regex = Regex("[A-Z]{2}") // ISO 3166-1 alpha-2
+internal val regionNumericRegex = Regex("[0-9]{3}") // UN M.49
+internal val androidRegionRegex = Regex("r[A-Z]{2}|r[0-9]{3}") // Android `r` prefix
 
 @DisableCachingByDefault(because = "IDE import task — not worth caching")
 internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
@@ -149,8 +149,7 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
 
     private fun parseComposeResourceQualifiers(dirName: String): List<String>? {
         val parts = dirName.split("-")
-        if (parts.isEmpty()) return null
-        if (parts.first().lowercase().isEmpty()) return null
+        if (parts.first().isEmpty()) return null
 
         val expanded = mutableListOf<String>()
         var bcpConsumed = false
