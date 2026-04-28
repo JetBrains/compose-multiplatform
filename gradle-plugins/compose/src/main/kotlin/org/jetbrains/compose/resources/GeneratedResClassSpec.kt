@@ -118,15 +118,15 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
     qualifiersMap[densityQualifier]?.let { q -> add("%T.${q.uppercase()}, ", densityQualifier) }
     qualifiersMap[languageQualifier]?.let { q -> add("%T(\"$q\"), ", languageQualifier) }
 
-    val pathStr = resourceItem.path.toString()
+    val tokens = resourceItem.qualifiers
     val lang = qualifiersMap[languageQualifier]
+    val languageIdx = lang?.let { tokens.indexOf(it) } ?: -1
 
     qualifiersMap[scriptQualifier]?.let { q ->
         if (lang == null) {
             error("Script qualifier must be used only with language.\nFile: ${resourceItem.path}")
         }
-        val pathContainsScript = pathStr.contains("-$lang-$q") || pathContainsBcpSubtag(pathStr, lang, q)
-        if (!pathContainsScript) {
+        if (tokens.indexOf(q) <= languageIdx) {
             error("Script qualifier must be declared after language: '$lang-$q'.\nFile: ${resourceItem.path}")
         }
         add("%T(\"$q\"), ", scriptQualifier)
@@ -137,21 +137,14 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
             error("Region qualifier must be used only with language.\nFile: ${resourceItem.path}")
         }
         val regionCode = q.removePrefix("r")
-        val langAndRegion = "$lang-$q"
-        val pathContainsRegion = pathStr.contains("-$langAndRegion") || pathContainsBcpSubtag(pathStr, lang, regionCode)
-        if (!pathContainsRegion) {
-            error("Region qualifier must be declared after language: '$langAndRegion'.\nFile: ${resourceItem.path}")
+        if (tokens.indexOf(q) <= languageIdx) {
+            error("Region qualifier must be declared after language: '$lang-$q'.\nFile: ${resourceItem.path}")
         }
         add("%T(\"$regionCode\"), ", regionQualifier)
     }
 
     return this
 }
-
-// Matches a subtag inside a BCP path segment: b+lang[+...]+subtag[+...] or the same with further
-// hyphen-separated folder qualifiers (e.g. values-b+zh+Hant-dark: script then theme).
-private fun pathContainsBcpSubtag(pathStr: String, lang: String, subtag: String): Boolean =
-    pathStr.contains(Regex("""b\+${Regex.escape(lang)}(\+[A-Za-z0-9]+)*\+${Regex.escape(subtag)}(\+|[/\\]|-|$)"""))
 
 internal fun getResFileSpec(
     packageName: String,
