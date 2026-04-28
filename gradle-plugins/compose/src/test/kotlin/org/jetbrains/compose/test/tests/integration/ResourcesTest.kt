@@ -123,10 +123,13 @@ class ResourcesTest : GradlePluginTestBase() {
             // two regions in one BCP 47 segment
             "values-b+sr+US+RS" to "repetitive qualifiers",
             // BCP 47 segment cannot be combined with trailing locale-shaped qualifiers
-            "values-b+sr+Latn-rRS" to "Cannot combine BCP 47 segment",
-            "values-b+sr-rRS" to "Cannot combine BCP 47 segment",
+            "values-b+sr+Latn-rRS" to "Locale qualifier 'rRS' cannot follow a BCP 47",
+            "values-b+sr-rRS" to "Locale qualifier 'rRS' cannot follow a BCP 47",
             // BCP 47 subtags must follow language -> script -> region order
             "values-b+sr+RS+Latn" to "unknown qualifier",
+            // Standalone script qualifiers (without b+) are not supported
+            "values-sr-Latn" to "Script qualifier 'Latn' must be inside a BCP 47",
+            "values-sr-rRS-Latn" to "Script qualifier 'Latn' must be inside a BCP 47",
         )
         with(testProject("misc/commonResources")) {
             invalidCases.forEach { (dir, errorMsg) ->

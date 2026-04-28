@@ -213,7 +213,7 @@ private fun List<ResourceItem>.filterByLocale(
     if (byDefaultScriptAndRegion.isNotEmpty()) return byDefaultScriptAndRegion
 
     //don't cross scripts when one was requested (zh-Hans must not fall back to zh-Hant)
-    if (script.script.isEmpty()) {
+    if (script.isEmpty()) {
         val byRegion = withLanguage.filterByRegion(region)
         if (byRegion.isNotEmpty()) return byRegion
     }

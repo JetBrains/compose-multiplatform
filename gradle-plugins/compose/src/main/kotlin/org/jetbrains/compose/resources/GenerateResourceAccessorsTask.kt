@@ -17,6 +17,12 @@ import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.relativeTo
 
+private val languageRegex = Regex("[a-z]{2,3}") // ISO 639
+private val scriptRegex = Regex("[A-Z][a-z]{3}") // ISO 15924
+private val regionAlpha2Regex = Regex("[A-Z]{2}") // ISO 3166-1 alpha-2
+private val regionNumericRegex = Regex("[0-9]{3}") // UN M.49
+private val androidRegionRegex = Regex("r[A-Z]{2}|r[0-9]{3}") // Android `r` prefix
+
 @DisableCachingByDefault(because = "IDE import task — not worth caching")
 internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     @get:Input
@@ -144,8 +150,6 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     /**
      * Extracts qualifiers from a resource folder name.
      * Supports standard Android qualifiers and BCP 47 `b+...` locale segments.
-     * The BCP segment, if present, must be locale-first and cannot be mixed
-     * with trailing locale-shaped qualifiers.
      *
      * values-en-rUS              -> ["en", "rUS"]
      * values-b+sr+Latn           -> ["sr", "Latn"]
@@ -165,10 +169,10 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
                 bcpConsumed = true
             } else {
                 if (bcpConsumed && isLocaleShapedQualifier(q)) {
-                    error(
-                        "Cannot combine BCP 47 segment with additional locale qualifier '$q' " +
-                            "in resource folder '$dirName'. Put language/script/region inside the b+... segment."
-                    )
+                    error("Forbidden directory name '$dirName'! Locale qualifier '$q' cannot follow a BCP 47 'b+...' segment.")
+                }
+                if (!bcpConsumed && q.matches(scriptRegex)) {
+                    error("Forbidden directory name '$dirName'! Script qualifier '$q' must be inside a BCP 47 'b+...' segment.")
                 }
                 expanded.add(q)
             }
@@ -177,17 +181,11 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     }
 
     private fun isLocaleShapedQualifier(q: String): Boolean =
-        q.matches(Regex("[a-z]{2,3}")) ||           // language
-            q.matches(Regex("r[A-Z]{2}|r[0-9]{3}")) || // region (Android `r` prefix)
-            q.matches(Regex("[A-Z][a-z]{3}"))          // script
+        q.matches(languageRegex) || q.matches(scriptRegex) || q.matches(androidRegionRegex)
 
     /**
      * Expands an Android BCP 47 `b+lang[+Script][+REGION]` segment into
-     * qualifier tokens. Returns null for malformed segments or subtags out
-     * of BCP 47 order (language -> script -> region).
-     *
-     * b+sr+Latn+RS -> ["sr", "Latn", "rRS"]
-     * b+es+419     -> ["es", "r419"]
+     * qualifier tokens. Returns null for malformed segments or out-of-order subtags.
      */
     private fun expandBcpQualifier(segment: String): List<String>? {
         val subtags = segment.removePrefix("b+").split("+")
@@ -197,11 +195,11 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
         var lastKind = -1
         for ((index, subtag) in subtags.withIndex()) {
             val kind = when {
-                subtag.matches(Regex("[a-z]{2,3}"))    -> 0  // language (ISO 639)
-                subtag.matches(Regex("[A-Z][a-z]{3}")) -> 1  // script (ISO 15924)
-                subtag.matches(Regex("[A-Z]{2}"))      -> 2  // region (ISO 3166-1)
-                subtag.matches(Regex("[0-9]{3}"))      -> 2  // region (UN M.49)
-                else                                    -> return null
+                subtag.matches(languageRegex)      -> 0
+                subtag.matches(scriptRegex)        -> 1
+                subtag.matches(regionAlpha2Regex)  -> 2
+                subtag.matches(regionNumericRegex) -> 2
+                else                               -> return null
             }
             // Enforce BCP 47 order: language first, then script, then region.
             if (index == 0 && kind != 0) return null

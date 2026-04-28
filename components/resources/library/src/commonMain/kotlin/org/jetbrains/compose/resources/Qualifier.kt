@@ -50,6 +50,8 @@ class RegionQualifier(
 class ScriptQualifier(
     val script: String
 ) : Qualifier {
+    fun isEmpty(): Boolean = script.isEmpty()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
