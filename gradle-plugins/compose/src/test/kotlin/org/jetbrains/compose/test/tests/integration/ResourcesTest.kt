@@ -123,7 +123,9 @@ class ResourcesTest : GradlePluginTestBase() {
             "values-b+" to "Malformed BCP 47 subtag ''",
             "values-b++Latn" to "Malformed BCP 47 subtag ''",
             // BCP 47 segment must start with a language subtag
-            "values-b+EN" to "BCP 47 segment 'b+EN' must start with a language subtag",
+            "values-b+EN" to "BCP 47 segment must start with a language subtag",
+            // Folder name with no resource type prefix surfaces as 'Unknown resource type'
+            "-foo" to "Unknown resource type: ''",
             // BCP 47 segment must be locale-first; theme/density before it is rejected
             "values-dark-b+zh+Hant" to "BCP 47 'b+' segment must be the first qualifier",
             "values-mdpi-b+zh" to "BCP 47 'b+' segment must be the first qualifier",

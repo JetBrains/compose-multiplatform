@@ -116,7 +116,7 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     ): List<ResourceItem>? {
         val file = this
         val dirName = file.parentFile.name ?: return null
-        val qualifiers = parseComposeResourceQualifiers(dirName) ?: return null
+        val qualifiers = parseComposeResourceQualifiers(dirName)
 
         val typeString = dirName.substringBefore("-").lowercase()
         val path = file.toPath().relativeTo(relativeTo)
@@ -147,10 +147,8 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
         )
     }
 
-    private fun parseComposeResourceQualifiers(dirName: String): List<String>? {
+    private fun parseComposeResourceQualifiers(dirName: String): List<String> {
         val parts = dirName.split("-")
-        if (parts.first().isEmpty()) return null
-
         val expanded = mutableListOf<String>()
         var bcpConsumed = false
         for ((index, q) in parts.drop(1).withIndex()) {
@@ -158,7 +156,7 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
                 if (index != 0) {
                     error("BCP 47 'b+' segment must be the first qualifier in '$dirName'.")
                 }
-                expanded.addAll(expandBcpQualifier(q))
+                expanded.addAll(expandBcpQualifier(q, dirName))
                 bcpConsumed = true
             } else {
                 if (bcpConsumed && isLocaleShapedQualifier(q)) {
@@ -176,7 +174,7 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     private fun isLocaleShapedQualifier(q: String): Boolean =
         q.matches(languageRegex) || q.matches(scriptRegex) || q.matches(androidRegionRegex)
 
-    private fun expandBcpQualifier(segment: String): List<String> {
+    private fun expandBcpQualifier(segment: String, dirName: String): List<String> {
         val subtags = segment.removePrefix("b+").split("+")
         val result = mutableListOf<String>()
         var lastKind = -1
@@ -186,13 +184,13 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
                 subtag.matches(scriptRegex)        -> 1
                 subtag.matches(regionAlpha2Regex)  -> 2
                 subtag.matches(regionNumericRegex) -> 2
-                else -> error("Malformed BCP 47 subtag '$subtag' in '$segment'.")
+                else -> error("Malformed BCP 47 subtag '$subtag' in '$dirName'.")
             }
             if (index == 0 && kind != 0) {
-                error("BCP 47 segment '$segment' must start with a language subtag.")
+                error("BCP 47 segment must start with a language subtag in '$dirName'.")
             }
             if (kind < lastKind) {
-                error("BCP 47 subtags must follow language -> script -> region order in '$segment'.")
+                error("BCP 47 subtags must follow language -> script -> region order in '$dirName'.")
             }
             when (kind) {
                 0, 1 -> result.add(subtag)
