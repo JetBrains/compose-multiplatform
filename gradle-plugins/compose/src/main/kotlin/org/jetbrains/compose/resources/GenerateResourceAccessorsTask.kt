@@ -147,14 +147,6 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
         )
     }
 
-    /**
-     * Extracts qualifiers from a resource folder name.
-     * Supports standard Android qualifiers and BCP 47 `b+...` locale segments.
-     *
-     * values-en-rUS              -> ["en", "rUS"]
-     * values-b+sr+Latn           -> ["sr", "Latn"]
-     * values-b+zh+Hant-mdpi-dark -> ["zh", "Hant", "mdpi", "dark"]
-     */
     private fun parseComposeResourceQualifiers(dirName: String): List<String>? {
         val parts = dirName.split("-")
         if (parts.isEmpty()) return null
@@ -163,16 +155,18 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
         val expanded = mutableListOf<String>()
         var bcpConsumed = false
         for ((index, q) in parts.drop(1).withIndex()) {
-            if (q.startsWith("b+") && index == 0) {
-                // Malformed segments pass through so addQualifiers reports "unknown qualifier"
-                expanded.addAll(expandBcpQualifier(q) ?: listOf(q))
+            if (q.startsWith("b+")) {
+                if (index != 0) {
+                    error("BCP 47 'b+' segment must be the first qualifier in '$dirName'.")
+                }
+                expanded.addAll(expandBcpQualifier(q))
                 bcpConsumed = true
             } else {
                 if (bcpConsumed && isLocaleShapedQualifier(q)) {
-                    error("Forbidden directory name '$dirName'! Locale qualifier '$q' cannot follow a BCP 47 'b+...' segment.")
+                    error("Locale qualifier '$q' cannot follow a BCP 47 segment in '$dirName'.")
                 }
                 if (!bcpConsumed && q.matches(scriptRegex)) {
-                    error("Forbidden directory name '$dirName'! Script qualifier '$q' must be inside a BCP 47 'b+...' segment.")
+                    error("Script qualifier '$q' must be inside a BCP 47 segment in '$dirName'.")
                 }
                 expanded.add(q)
             }
@@ -183,14 +177,8 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     private fun isLocaleShapedQualifier(q: String): Boolean =
         q.matches(languageRegex) || q.matches(scriptRegex) || q.matches(androidRegionRegex)
 
-    /**
-     * Expands an Android BCP 47 `b+lang[+Script][+REGION]` segment into
-     * qualifier tokens. Returns null for malformed segments or out-of-order subtags.
-     */
-    private fun expandBcpQualifier(segment: String): List<String>? {
+    private fun expandBcpQualifier(segment: String): List<String> {
         val subtags = segment.removePrefix("b+").split("+")
-        if (subtags.isEmpty()) return null
-
         val result = mutableListOf<String>()
         var lastKind = -1
         for ((index, subtag) in subtags.withIndex()) {
@@ -199,11 +187,14 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
                 subtag.matches(scriptRegex)        -> 1
                 subtag.matches(regionAlpha2Regex)  -> 2
                 subtag.matches(regionNumericRegex) -> 2
-                else                               -> return null
+                else -> error("Malformed BCP 47 subtag '$subtag' in '$segment'.")
             }
-            // Enforce BCP 47 order: language first, then script, then region.
-            if (index == 0 && kind != 0) return null
-            if (kind < lastKind) return null
+            if (index == 0 && kind != 0) {
+                error("BCP 47 segment '$segment' must start with a language subtag.")
+            }
+            if (kind < lastKind) {
+                error("BCP 47 subtags must follow language -> script -> region order in '$segment'.")
+            }
             when (kind) {
                 0, 1 -> result.add(subtag)
                 2    -> result.add("r$subtag")

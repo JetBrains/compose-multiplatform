@@ -114,19 +114,19 @@ class ResourcesTest : GradlePluginTestBase() {
     fun testBcpFolderQualifiersInvalid() {
         val invalidCases = listOf(
             // malformed BCP 47 subtag (numeric where letters expected)
-            "values-b+sr+1234" to "unknown qualifier",
+            "values-b+sr+1234" to "Malformed BCP 47 subtag '1234'",
             // junk subtag (not a lang / script / region pattern)
-            "values-b+sr+ABCD" to "unknown qualifier",
+            "values-b+sr+ABCD" to "Malformed BCP 47 subtag 'ABCD'",
             // BCP 47 segment must be locale-first; theme/density before it is rejected
-            "values-dark-b+zh+Hant" to "unknown qualifier",
-            "values-mdpi-b+zh" to "unknown qualifier",
+            "values-dark-b+zh+Hant" to "BCP 47 'b+' segment must be the first qualifier",
+            "values-mdpi-b+zh" to "BCP 47 'b+' segment must be the first qualifier",
             // two regions in one BCP 47 segment
             "values-b+sr+US+RS" to "repetitive qualifiers",
             // BCP 47 segment cannot be combined with trailing locale-shaped qualifiers
             "values-b+sr+Latn-rRS" to "Locale qualifier 'rRS' cannot follow a BCP 47",
             "values-b+sr-rRS" to "Locale qualifier 'rRS' cannot follow a BCP 47",
             // BCP 47 subtags must follow language -> script -> region order
-            "values-b+sr+RS+Latn" to "unknown qualifier",
+            "values-b+sr+RS+Latn" to "BCP 47 subtags must follow language -> script -> region order",
             // Standalone script qualifiers (without b+) are not supported
             "values-sr-Latn" to "Script qualifier 'Latn' must be inside a BCP 47",
             "values-sr-rRS-Latn" to "Script qualifier 'Latn' must be inside a BCP 47",
