@@ -51,9 +51,14 @@ internal val DefaultComposeEnvironment = object : ComposeEnvironment {
 
         //cache ResourceEnvironment unless compose environment is changed
         return remember(composeLocale, composeTheme, composeDensity) {
-            // androidx.compose.ui.text.intl.Locale doesn't expose script yet,
-            // so pull it from the system resource environment
-            val systemScript = getSystemResourceEnvironment().script
+            // androidx.compose.ui.text.intl.Locale doesn't expose script yet; borrow it
+            // from the system only when languages match, so locale overrides don't inherit a wrong script.
+            val systemEnvironment = getSystemResourceEnvironment()
+            val systemScript = if (composeLocale.language == systemEnvironment.language.language) {
+                systemEnvironment.script
+            } else {
+                ScriptQualifier("")
+            }
             ResourceEnvironment(
                 LanguageQualifier(composeLocale.language),
                 systemScript,
@@ -176,7 +181,7 @@ private fun List<ResourceItem>.filterByDensity(density: DensityQualifier): List<
 // we need to filter by language, script and region together because there is slightly different logic:
 // 1) if there is the language+script match (narrowed by region if possible) then use it
 // 2) if there is the language WITHOUT script match (narrowed by region if possible) then use it
-// 3) if there is any language+region match ignoring script then use it
+// 3) if no script was requested, fall back to any language+region match across scripts
 // 4) in other cases use items WITHOUT language, script and region qualifiers at all
 // issue: https://github.com/JetBrains/compose-multiplatform/issues/4571
 private fun List<ResourceItem>.filterByLocale(
@@ -207,9 +212,11 @@ private fun List<ResourceItem>.filterByLocale(
     val byDefaultScriptAndRegion = withDefaultScript.filterByRegion(region)
     if (byDefaultScriptAndRegion.isNotEmpty()) return byDefaultScriptAndRegion
 
-    //fall back to region match on all language items regardless of script
-    val byRegion = withLanguage.filterByRegion(region)
-    if (byRegion.isNotEmpty()) return byRegion
+    //don't cross scripts when one was requested (zh-Hans must not fall back to zh-Hant)
+    if (script.script.isEmpty()) {
+        val byRegion = withLanguage.filterByRegion(region)
+        if (byRegion.isNotEmpty()) return byRegion
+    }
 
     return noLocaleItems
 }

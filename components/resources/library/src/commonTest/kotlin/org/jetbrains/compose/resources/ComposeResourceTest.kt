@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.text.intl.Locale
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 
@@ -440,12 +441,13 @@ class ComposeResourceTest {
         assertEquals(env2, lastEnv3)
     }
 
-    // DefaultComposeEnvironment must surface the system script so BCP 47 folders
-    // like values-b+zh+Hant remain reachable from stringResource().
+    // DefaultComposeEnvironment surfaces the system script so values-b+zh+Hant resources
+    // resolve, but only when the compose locale language matches the system.
     @Test
     fun testDefaultComposeEnvironmentPropagatesSystemScript() = clearResourceCachesAndRunUiTest {
-        fun zhHantSystemEnv() = ResourceEnvironment(
-            language = LanguageQualifier("zh"),
+        val composeLanguage = Locale.current.language
+        fun systemEnv() = ResourceEnvironment(
+            language = LanguageQualifier(composeLanguage),
             script = ScriptQualifier("Hant"),
             region = RegionQualifier(""),
             theme = ThemeQualifier.LIGHT,
@@ -453,7 +455,7 @@ class ComposeResourceTest {
         )
 
         val previous = getResourceEnvironment
-        getResourceEnvironment = ::zhHantSystemEnv
+        getResourceEnvironment = ::systemEnv
         try {
             var captured: ResourceEnvironment? = null
             setContent {
@@ -461,6 +463,31 @@ class ComposeResourceTest {
             }
             waitForIdle()
             assertEquals("Hant", captured?.script?.script)
+        } finally {
+            getResourceEnvironment = previous
+        }
+    }
+
+    @Test
+    fun testDefaultComposeEnvironmentDropsSystemScriptOnLanguageOverride() = clearResourceCachesAndRunUiTest {
+        fun systemEnv() = ResourceEnvironment(
+            // language deliberately won't match Locale.current to simulate a per-app override
+            language = LanguageQualifier("qq"),
+            script = ScriptQualifier("Cyrl"),
+            region = RegionQualifier("RU"),
+            theme = ThemeQualifier.LIGHT,
+            density = DensityQualifier.XHDPI
+        )
+
+        val previous = getResourceEnvironment
+        getResourceEnvironment = ::systemEnv
+        try {
+            var captured: ResourceEnvironment? = null
+            setContent {
+                captured = rememberResourceEnvironment()
+            }
+            waitForIdle()
+            assertEquals("", captured?.script?.script)
         } finally {
             getResourceEnvironment = previous
         }

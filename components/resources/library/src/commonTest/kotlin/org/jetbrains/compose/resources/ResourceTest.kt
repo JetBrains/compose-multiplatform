@@ -172,8 +172,7 @@ class ResourceTest {
             resource.getResourceItemByEnvironment(env("sr", "", "")).path
         )
 
-        // case 3: language+region match ignoring script
-        // (no language+script and no language-without-script item exists)
+        // case 3: env-requested script must not cross to a different one (Hans vs Hant)
         val scriptedOnlyResource = DrawableResource(
             id = "ImageResource:scripted_only",
             items = setOf(
@@ -182,12 +181,24 @@ class ResourceTest {
             )
         )
         assertEquals(
-            "sr-Cyrl-RS",
+            "default",
             scriptedOnlyResource.getResourceItemByEnvironment(env("sr", "Latn", "RS")).path
         )
 
-        // case 3 (variant): empty environment script still falls through to a
-        // script-tagged item when no non-script-tagged language item exists
+        val zhSimplifiedTraditional = DrawableResource(
+            id = "ImageResource:zh_hans_hant",
+            items = setOf(
+                ResourceItem(setOf(), "default", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("zh"), ScriptQualifier("Hans"), RegionQualifier("CN")), "zh-Hans-CN", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("zh"), ScriptQualifier("Hant"), RegionQualifier("TW")), "zh-Hant-TW", -1, -1),
+            )
+        )
+        assertEquals(
+            "default",
+            zhSimplifiedTraditional.getResourceItemByEnvironment(env("zh", "Hans", "TW")).path
+        )
+
+        // case 3 (variant): empty environment script does fall back across scripts
         val scriptOnlyResource = DrawableResource(
             id = "ImageResource:script_only",
             items = setOf(
