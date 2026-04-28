@@ -202,32 +202,21 @@ private fun List<ResourceItem>.filterByLocale(
     val withScript = withLanguage.filter { item ->
         item.qualifiers.any { it == script }
     }
-    val byScriptAndRegion = withScript.filterByRegion(region)
+    val byScriptAndRegion = withScript.filterBy(region)
     if (byScriptAndRegion.isNotEmpty()) return byScriptAndRegion
 
     //language items without a script qualifier, narrowed by region (e.g. sr-RS, sr)
     val withDefaultScript = withLanguage.filter { item ->
         item.qualifiers.none { it is ScriptQualifier }
     }
-    val byDefaultScriptAndRegion = withDefaultScript.filterByRegion(region)
+    val byDefaultScriptAndRegion = withDefaultScript.filterBy(region)
     if (byDefaultScriptAndRegion.isNotEmpty()) return byDefaultScriptAndRegion
 
     //don't cross scripts when one was requested (zh-Hans must not fall back to zh-Hant)
     if (script.isEmpty()) {
-        val byRegion = withLanguage.filterByRegion(region)
+        val byRegion = withLanguage.filterBy(region)
         if (byRegion.isNotEmpty()) return byRegion
     }
 
     return noLocaleItems
-}
-
-private fun List<ResourceItem>.filterByRegion(region: RegionQualifier): List<ResourceItem> {
-    val withRegion = filter { item ->
-        item.qualifiers.any { it == region }
-    }
-    if (withRegion.isNotEmpty()) return withRegion
-
-    return filter { item ->
-        item.qualifiers.none { it is RegionQualifier }
-    }
 }
