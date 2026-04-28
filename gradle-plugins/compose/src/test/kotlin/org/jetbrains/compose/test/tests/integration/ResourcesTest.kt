@@ -67,6 +67,7 @@ class ResourcesTest : GradlePluginTestBase() {
                 // BCP 47 locale combined with trailing theme / density qualifiers
                 "values-b+zh+Hant-dark",
                 "values-b+zh+Hant-mdpi",
+                "values-b+zh+Hant-mdpi-dark",
             )
             bcpDirs.forEach { dir ->
                 val f = file("src/commonMain/composeResources/$dir")
@@ -83,6 +84,26 @@ class ResourcesTest : GradlePluginTestBase() {
                 check.logDoesntContain("unknown qualifier")
                 check.logDoesntContain("repetitive qualifiers")
             }
+
+            // Verify the generated accessors carry the BCP 47 subtags as
+            // ScriptQualifier / RegionQualifier instances (consumed at runtime).
+            val generated = file("build/generated/compose/resourceGenerator/kotlin")
+                .walkTopDown()
+                .filter { it.isFile && it.extension == "kt" }
+                .joinToString("\n") { it.readText() }
+            listOf("Latn", "Hans", "Hant").forEach { script ->
+                assertTrue(
+                    generated.contains("ScriptQualifier(\"$script\")"),
+                    "Expected ScriptQualifier(\"$script\") in generated accessors"
+                )
+            }
+            listOf("US", "CN", "RS", "419").forEach { region ->
+                assertTrue(
+                    generated.contains("RegionQualifier(\"$region\")"),
+                    "Expected RegionQualifier(\"$region\") in generated accessors"
+                )
+            }
+
             bcpDirs.forEach { dir ->
                 file("src/commonMain/composeResources/$dir").deleteRecursively()
             }
@@ -101,6 +122,11 @@ class ResourcesTest : GradlePluginTestBase() {
             "values-mdpi-b+zh" to "unknown qualifier",
             // two regions in one BCP 47 segment
             "values-b+sr+US+RS" to "repetitive qualifiers",
+            // BCP 47 segment cannot be combined with trailing locale-shaped qualifiers
+            "values-b+sr+Latn-rRS" to "Cannot combine BCP 47 segment",
+            "values-b+sr-rRS" to "Cannot combine BCP 47 segment",
+            // BCP 47 subtags must follow language -> script -> region order
+            "values-b+sr+RS+Latn" to "unknown qualifier",
         )
         with(testProject("misc/commonResources")) {
             invalidCases.forEach { (dir, errorMsg) ->

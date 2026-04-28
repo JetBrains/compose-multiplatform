@@ -143,15 +143,13 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
 
     /**
      * Extracts qualifiers from a resource folder name.
-     * Handles standard Android qualifiers and the BCP 47 `b+...` locale format.
+     * Supports standard Android qualifiers and BCP 47 `b+...` locale segments.
+     * The BCP segment, if present, must be locale-first and cannot be mixed
+     * with trailing locale-shaped qualifiers.
      *
-     * A BCP 47 locale segment, if present, must come immediately after the type
-     * prefix - matching Android's locale-first ordering. Other qualifiers (theme,
-     * density, etc.) follow the locale segment.
-     *
-     * values-en-rUS         -> ["en", "rUS"]
-     * values-b+sr+Latn      -> ["sr", "Latn"]
-     * values-b+zh+Hant-dark -> ["zh", "Hant", "dark"]
+     * values-en-rUS              -> ["en", "rUS"]
+     * values-b+sr+Latn           -> ["sr", "Latn"]
+     * values-b+zh+Hant-mdpi-dark -> ["zh", "Hant", "mdpi", "dark"]
      */
     private fun parseComposeResourceQualifiers(dirName: String): List<String>? {
         val parts = dirName.split("-")
@@ -159,37 +157,60 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
         if (parts.first().lowercase().isEmpty()) return null
 
         val expanded = mutableListOf<String>()
+        var bcpConsumed = false
         for ((index, q) in parts.drop(1).withIndex()) {
             if (q.startsWith("b+") && index == 0) {
                 // Malformed segments pass through so addQualifiers reports "unknown qualifier"
                 expanded.addAll(expandBcpQualifier(q) ?: listOf(q))
+                bcpConsumed = true
             } else {
+                if (bcpConsumed && isLocaleShapedQualifier(q)) {
+                    error(
+                        "Cannot combine BCP 47 segment with additional locale qualifier '$q' " +
+                            "in resource folder '$dirName'. Put language/script/region inside the b+... segment."
+                    )
+                }
                 expanded.add(q)
             }
         }
         return expanded
     }
 
+    private fun isLocaleShapedQualifier(q: String): Boolean =
+        q.matches(Regex("[a-z]{2,3}")) ||           // language
+            q.matches(Regex("r[A-Z]{2}|r[0-9]{3}")) || // region (Android `r` prefix)
+            q.matches(Regex("[A-Z][a-z]{3}"))          // script
+
     /**
      * Expands an Android BCP 47 `b+lang[+Script][+REGION]` segment into
-     * individual qualifier tokens. Returns null for malformed segments.
+     * qualifier tokens. Returns null for malformed segments or subtags out
+     * of BCP 47 order (language -> script -> region).
      *
      * b+sr+Latn+RS -> ["sr", "Latn", "rRS"]
      * b+es+419     -> ["es", "r419"]
      */
     private fun expandBcpQualifier(segment: String): List<String>? {
+        val subtags = segment.removePrefix("b+").split("+")
+        if (subtags.isEmpty()) return null
+
         val result = mutableListOf<String>()
-        for (subtag in segment.removePrefix("b+").split("+")) {
-            when {
-                // language: 2-3 letter ISO 639 code (en, sr, zh)
-                subtag.matches(Regex("[a-z]{2,3}")) -> result.add(subtag)
-                // region: 2-letter ISO 3166-1 or 3-digit UN M.49, prefixed "r" per Android
-                subtag.matches(Regex("[A-Z]{2}")) -> result.add("r$subtag")
-                subtag.matches(Regex("[0-9]{3}")) -> result.add("r$subtag")
-                // script: 4-letter ISO 15924 code (Latn, Hans, Hant)
-                subtag.matches(Regex("[A-Z][a-z]{3}")) -> result.add(subtag)
-                else -> return null
+        var lastKind = -1
+        for ((index, subtag) in subtags.withIndex()) {
+            val kind = when {
+                subtag.matches(Regex("[a-z]{2,3}"))    -> 0  // language (ISO 639)
+                subtag.matches(Regex("[A-Z][a-z]{3}")) -> 1  // script (ISO 15924)
+                subtag.matches(Regex("[A-Z]{2}"))      -> 2  // region (ISO 3166-1)
+                subtag.matches(Regex("[0-9]{3}"))      -> 2  // region (UN M.49)
+                else                                    -> return null
             }
+            // Enforce BCP 47 order: language first, then script, then region.
+            if (index == 0 && kind != 0) return null
+            if (kind < lastKind) return null
+            when (kind) {
+                0, 1 -> result.add(subtag)
+                2    -> result.add("r$subtag")
+            }
+            lastKind = kind
         }
         return result
     }
