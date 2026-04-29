@@ -10,7 +10,6 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -32,9 +31,6 @@ kotlin {
         }
         val iosMain by creating {
             dependsOn(commonMain)
-        }
-        val iosX64Main by getting {
-            dependsOn(iosMain)
         }
         val iosArm64Main by getting {
             dependsOn(iosMain)

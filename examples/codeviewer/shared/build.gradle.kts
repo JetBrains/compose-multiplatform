@@ -15,7 +15,6 @@ kotlin {
     jvm("desktop")
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -50,9 +49,6 @@ kotlin {
         }
         val iosMain by creating {
             dependsOn(commonMain)
-        }
-        val iosX64Main by getting {
-            dependsOn(iosMain)
         }
         val iosArm64Main by getting {
             dependsOn(iosMain)
