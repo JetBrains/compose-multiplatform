@@ -30,13 +30,6 @@ kotlin {
         browser()
     }
 
-    macosX64 {
-        binaries {
-            executable {
-                entryPoint = "main"
-            }
-        }
-    }
     macosArm64 {
         binaries {
             executable {
@@ -85,9 +78,6 @@ kotlin {
 
         val macosMain by creating {
             dependsOn(commonMain)
-        }
-        val macosX64Main by getting {
-            dependsOn(macosMain)
         }
         val macosArm64Main by getting {
             dependsOn(macosMain)
