@@ -100,6 +100,11 @@
             <version>${kotlin.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.jetbrains.compose.runtime</groupId>
+            <artifactId>runtime-saveable-desktop</artifactId>
+            <version>${compose.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.jetbrains.compose.ui</groupId>
             <artifactId>ui-desktop</artifactId>
             <version>${compose.version}</version>

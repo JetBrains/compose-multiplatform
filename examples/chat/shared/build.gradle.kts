@@ -1,5 +1,8 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.compose")
@@ -85,6 +88,12 @@ kotlin {
     }
 }
 
+tasks.withType<KotlinCompile>() {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
+
 android {
     compileSdk = 35
     namespace = "org.jetbrains.chat"
@@ -96,8 +105,5 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlin {
-        jvmToolchain(17)
     }
 }
