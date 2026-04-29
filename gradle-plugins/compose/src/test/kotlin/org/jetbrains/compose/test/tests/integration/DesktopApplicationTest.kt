@@ -214,6 +214,29 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         testPackageJvmDistributions()
     }
 
+    @Test
+    fun packageDebRestoresMissingLibsDir() {
+        with(testProject("application/jvm")) {
+            Assumptions.assumeTrue(currentOS == OS.Linux) { "The test is only relevant for Linux Deb packaging" }
+            modifyGradleProperties {
+                setProperty("compose.preserve.working.dir", "true")
+            }
+            gradle(":packageDeb").checks {
+                check.taskSuccessful(":packageDeb")
+            }
+
+            val libsDir = file("build/compose/tmp/packageDeb/libs").checkExists()
+            file("build/compose/tmp/packageDeb/libs-mapping.txt").checkExists()
+            libsDir.deleteRecursively()
+            libsDir.checkNotExists()
+
+            gradle(":packageDeb").checks {
+                check.taskSuccessful(":packageDeb")
+            }
+            libsDir.checkExists()
+        }
+    }
+
 
     private fun TestProject.testPackageJvmDistributions() {
         val result = gradle(":packageDistributionForCurrentOS")

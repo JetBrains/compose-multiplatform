@@ -32,6 +32,7 @@ import org.jetbrains.compose.desktop.application.dsl.FileAssociation
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.APP_RESOURCES_DIR
+import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.InfoPlistListValue
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.InfoPlistMapValue
@@ -377,6 +378,29 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Internal
     private val libsMapping = FilesMapping()
 
+    init {
+        outputs.upToDateWhen {
+            !ComposeProperties.preserveWorkingDir(providers).get() || isWorkingDirStateValidForUpToDateCheck()
+        }
+    }
+
+    private fun isWorkingDirStateValidForUpToDateCheck(): Boolean {
+        if (targetFormat != TargetFormat.AppImage && appImage.orNull != null) return true
+
+        val libsDirFile = libsDir.ioFile
+        if (!libsDirFile.isDirectory) return false
+
+        val mappingFile = libsMappingFile.ioFile
+        if (!mappingFile.isFile) return false
+
+        return try {
+            !FilesMapping().apply { loadFrom(mappingFile) }.hasMissingOutputFiles()
+        } catch (e: Exception) {
+            logger.debug("Could not check jpackage libs mapping: ${e.stacktraceToString()}")
+            false
+        }
+    }
+
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
         fun appDir(vararg pathParts: String): String {
             /** For windows we need to pass '\\' to jpackage file, each '\' need to be escaped.
@@ -516,33 +540,44 @@ abstract class AbstractJPackageTask @Inject constructor(
         val outdatedLibs = HashSet<File>()
         val libsDirFile = libsDir.ioFile
 
-        fun invalidateAllLibs() {
+        fun invalidateAllLibs(reason: String) {
             outdatedLibs.addAll(files.files)
+            libsMapping.clear()
 
-            logger.debug("Clearing all files in working dir: $libsDirFile")
+            logger.debug("Clearing all files in working dir: $libsDirFile. Reason: $reason")
             fileOperations.clearDirs(libsDirFile)
         }
 
-        if (inputChanges.isIncremental) {
-            val allChanges = inputChanges.getFileChanges(files).asSequence()
-
-            try {
-                for (change in allChanges) {
-                    libsMapping.remove(change.file)?.let { files ->
-                        files.forEach { fileOperations.delete(it) }
-                    }
-                    if (change.changeType != ChangeType.REMOVED) {
-                        outdatedLibs.add(change.file)
-                    }
-                }
-            } catch (e: Exception) {
-                logger.debug("Could remove outdated libs incrementally: ${e.stacktraceToString()}")
-                invalidateAllLibs()
+        when {
+            !libsDirFile.exists() -> {
+                invalidateAllLibs("libs dir does not exist")
             }
-        } else {
-            invalidateAllLibs()
+            libsMapping.hasMissingOutputFiles() -> {
+                invalidateAllLibs("libs mapping points to missing output files")
+            }
+            inputChanges.isIncremental -> {
+                val allChanges = inputChanges.getFileChanges(files).asSequence()
+
+                try {
+                    for (change in allChanges) {
+                        libsMapping.remove(change.file)?.let { files ->
+                            files.forEach { fileOperations.delete(it) }
+                        }
+                        if (change.changeType != ChangeType.REMOVED) {
+                            outdatedLibs.add(change.file)
+                        }
+                    }
+                } catch (e: Exception) {
+                    logger.debug("Could remove outdated libs incrementally: ${e.stacktraceToString()}")
+                    invalidateAllLibs("failed to process incremental input changes")
+                }
+            }
+            else -> {
+                invalidateAllLibs("input changes are not incremental")
+            }
         }
 
+        fileOperations.mkdirs(libsDirFile)
         return outdatedLibs
     }
 
@@ -756,6 +791,15 @@ private class FilesMapping : Serializable {
 
     fun remove(key: File): List<File>? =
         mapping.remove(key)
+
+    fun clear() {
+        mapping.clear()
+    }
+
+    fun hasMissingOutputFiles(): Boolean =
+        mapping.values.asSequence()
+            .flatten()
+            .any { !it.exists() }
 
     fun loadFrom(mappingFile: File) {
         mappingFile.readLines().forEach { line ->
