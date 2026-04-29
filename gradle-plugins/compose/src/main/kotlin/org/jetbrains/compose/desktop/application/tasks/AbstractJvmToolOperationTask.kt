@@ -69,12 +69,13 @@ abstract class AbstractJvmToolOperationTask(private val toolName: String) : Abst
                 args = listOf("@${argsFile.absolutePath}"),
                 environment = jvmToolEnvironment()
             ).also { checkResult(it) }
+
+            saveStateAfterFinish()
         } finally {
             if (!ComposeProperties.preserveWorkingDir(providers).get()) {
                 fileOperations.delete(workingDir)
             }
         }
-        saveStateAfterFinish()
     }
 
     protected open fun initState() {}

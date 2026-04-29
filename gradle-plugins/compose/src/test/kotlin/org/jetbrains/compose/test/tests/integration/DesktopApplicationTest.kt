@@ -215,7 +215,20 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun packageDebRestoresMissingLibsDir() {
+    fun packageDebDoesNotKeepLibsMappingWhenWorkingDirIsNotPreserved() {
+        with(testProject("application/jvm")) {
+            Assumptions.assumeTrue(currentOS == OS.Linux) { "The test is only relevant for Linux Deb packaging" }
+            gradle(":packageDeb").checks {
+                check.taskSuccessful(":packageDeb")
+            }
+
+            file("build/compose/tmp/packageDeb/libs").checkNotExists()
+            file("build/compose/tmp/packageDeb/libs-mapping.txt").checkNotExists()
+        }
+    }
+
+    @Test
+    fun packageDebRestoresBrokenLibsState() {
         with(testProject("application/jvm")) {
             Assumptions.assumeTrue(currentOS == OS.Linux) { "The test is only relevant for Linux Deb packaging" }
             modifyGradleProperties {
@@ -226,7 +239,23 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             }
 
             val libsDir = file("build/compose/tmp/packageDeb/libs").checkExists()
-            file("build/compose/tmp/packageDeb/libs-mapping.txt").checkExists()
+            val libsMapping = file("build/compose/tmp/packageDeb/libs-mapping.txt").checkExists()
+
+            fun mappedOutputFiles() = libsMapping.readLines()
+                .asSequence()
+                .flatMap { it.split(File.pathSeparatorChar).drop(1).asSequence() }
+                .map(::File)
+                .toList()
+
+            val mappedOutputFile = mappedOutputFiles().first { it.isFile }
+            mappedOutputFile.delete()
+            mappedOutputFile.checkNotExists()
+
+            gradle(":packageDeb").checks {
+                check.taskSuccessful(":packageDeb")
+            }
+            mappedOutputFiles().forEach { it.checkExists() }
+
             libsDir.deleteRecursively()
             libsDir.checkNotExists()
 

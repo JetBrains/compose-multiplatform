@@ -549,8 +549,8 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
 
         when {
-            !libsDirFile.exists() -> {
-                invalidateAllLibs("libs dir does not exist")
+            !libsDirFile.isDirectory -> {
+                invalidateAllLibs("libs dir does not exist or is not a directory")
             }
             libsMapping.hasMissingOutputFiles() -> {
                 invalidateAllLibs("libs mapping points to missing output files")
@@ -568,7 +568,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                         }
                     }
                 } catch (e: Exception) {
-                    logger.debug("Could remove outdated libs incrementally: ${e.stacktraceToString()}")
+                    logger.debug("Could not remove outdated libs incrementally: ${e.stacktraceToString()}")
                     invalidateAllLibs("failed to process incremental input changes")
                 }
             }
@@ -820,6 +820,7 @@ private class FilesMapping : Serializable {
                 .forEach { (k, values) ->
                     (sequenceOf(k) + values.asSequence())
                         .joinTo(writer, separator = File.pathSeparator, transform = { it.absolutePath })
+                    writer.newLine()
                 }
         }
     }
