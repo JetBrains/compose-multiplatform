@@ -1,5 +1,8 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.compose")
@@ -15,7 +18,6 @@ kotlin {
     jvm("desktop")
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -31,13 +33,6 @@ kotlin {
         browser()
     }
 
-    macosX64 {
-        binaries {
-            executable {
-                entryPoint = "main"
-            }
-        }
-    }
     macosArm64 {
         binaries {
             executable {
@@ -72,9 +67,6 @@ kotlin {
         val iosMain by creating {
             dependsOn(commonMain)
         }
-        val iosX64Main by getting {
-            dependsOn(iosMain)
-        }
         val iosArm64Main by getting {
             dependsOn(iosMain)
         }
@@ -90,12 +82,15 @@ kotlin {
         val macosMain by creating {
             dependsOn(commonMain)
         }
-        val macosX64Main by getting {
-            dependsOn(macosMain)
-        }
         val macosArm64Main by getting {
             dependsOn(macosMain)
         }
+    }
+}
+
+tasks.withType<KotlinCompile>() {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }
 
@@ -110,8 +105,5 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlin {
-        jvmToolchain(17)
     }
 }
