@@ -24,6 +24,8 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.w3c.dom.Node
 import org.xml.sax.SAXParseException
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.*
 import javax.inject.Inject
 import javax.xml.parsers.DocumentBuilderFactory
@@ -82,6 +84,12 @@ internal fun Project.getPreparedComposeResourcesDir(sourceSet: KotlinSourceSet):
 private fun getPrepareComposeResourcesTaskName(sourceSet: KotlinSourceSet) =
     "prepareComposeResourcesTaskFor${sourceSet.name.uppercaseFirstChar()}"
 
+/**
+ * Task responsible for copying all resource files that can be used as-is to
+ * `preparedResources`.
+ *
+ * See [PrepareComposeResourcesTask]
+ */
 @DisableCachingByDefault(because = "IDE import task — not worth caching")
 internal abstract class CopyNonXmlValueResourcesTask : IdeaImportTask() {
     @get:Inject
@@ -115,10 +123,29 @@ internal abstract class CopyNonXmlValueResourcesTask : IdeaImportTask() {
             }
             copy.into(outputDir)
         }
+        // Remove any empty directories left after sync'ing resource files
+        outputDir.get().asFile.walkBottomUp()
+            .filter { it.isDirectory && isDirectoryEmpty(it) }
+            .forEach { it.delete() }
+    }
+
+    private fun isDirectoryEmpty(dir: File): Boolean {
+        Files.newDirectoryStream(dir.toPath()).use { dir ->
+            return !dir.iterator().hasNext()
+        }
     }
 }
 
 @DisableCachingByDefault(because = "IDE import task — not worth caching")
+/**
+ * Task responsible for preparing compose resources for packing.
+ *
+ * - Simple files are moved from user resource directories to `/generated/kotlin/preparedResources`
+ * - XML files containing resource values are converted to CVR (Compose Value Resources) files.
+ *
+ * See [XmlValuesConverterTask]
+ * See [CopyNonXmlValueResourcesTask]
+ */
 internal abstract class PrepareComposeResourcesTask : IdeaImportTask() {
     @get:InputFiles
     @get:SkipWhenEmpty
@@ -161,6 +188,12 @@ internal data class ValueResourceRecord(
 }
 
 @DisableCachingByDefault(because = "IDE import task — not worth caching")
+/**
+ * Task responsible for converting XML files containing values to a custom
+ * format used by Compose Resources.
+ *
+ * See [PrepareComposeResourcesTask]
+ */
 internal abstract class XmlValuesConverterTask : IdeaImportTask() {
     companion object {
         const val CONVERTED_RESOURCE_EXT = "cvr" //Compose Value Resource

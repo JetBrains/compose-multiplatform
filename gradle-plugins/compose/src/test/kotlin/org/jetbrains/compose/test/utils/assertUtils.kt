@@ -9,6 +9,8 @@ import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Assertions
 import java.io.File
+import kotlin.reflect.KClass
+import kotlin.test.assertFailsWith
 
 internal fun <T> Collection<T>.checkContains(vararg elements: T) {
     val expectedElements = elements.toMutableSet()
@@ -109,6 +111,75 @@ internal fun assertNotEqualTextFiles(actual: File, expected: File) {
         "Content of '$expected' is equal to content of '$actual'"
     )
 }
+
+/**
+ * Assert that a statement fails with a specific Exception type AND message. The message match is
+ * fuzzy, i.e. we only check that the provided message is contained within the whole exception
+ * message. The match is case sensitive unless otherwise specified by [ignoreCase].
+ *
+ * It is also possible to assert the [Throwable.cause] message as well.
+ */
+inline fun <T : Throwable> assertThrowsWithMessage(
+    exceptionClass: KClass<T>,
+    exceptionMessage: String,
+    causeMessage: String? = null,
+    ignoreCase: Boolean = false,
+    block: () -> Unit
+): T {
+    val exception: T = assertFailsWith(exceptionClass, null, block)
+
+    // Assertions on the cause
+    if (causeMessage != null) {
+        val cause: Throwable? = exception.cause
+        if (cause?.message == null) {
+            throw AssertionError("The exception is missing a cause or a message for the cause, expected: $causeMessage.")
+        }
+        if (cause.message?.contains(causeMessage, ignoreCase) != true) {
+            throw AssertionError(
+                """
+                The exception cause messages did not match.
+
+                Expected:
+                $causeMessage
+
+                Actual:
+                ${cause.message!!}
+                """.trimIndent()
+            )
+        }
+    }
+
+    // Assertions on the exception itself
+    if (exception.message?.contains(exceptionMessage, ignoreCase) != true) {
+        throw AssertionError(
+            """
+            The exception messages did not match.
+            
+            Expected:
+            $exceptionMessage
+            
+            Actual:
+            ${exception.message}
+            
+            """.trimIndent()
+        )
+    }
+    return exception
+}
+
+inline fun <reified T : Throwable> assertThrowsWithMessage(
+    exceptionMessage: String,
+    causeMessage: String? = null,
+    ignoreCase: Boolean = false,
+    noinline block: () -> Unit
+): T = assertThrowsWithMessage(
+    T::class,
+    exceptionMessage = exceptionMessage,
+    causeMessage = causeMessage,
+    ignoreCase = ignoreCase,
+    block
+)
+
 
 private fun File.normalizedText() =
     readLines().joinToString("\n") { it.trim() }

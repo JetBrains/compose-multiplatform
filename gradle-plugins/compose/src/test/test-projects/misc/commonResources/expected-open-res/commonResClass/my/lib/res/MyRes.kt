@@ -35,7 +35,9 @@ public object MyRes {
    */
   public fun getUri(path: String): String = getResourceUri("composeResources/my.lib.res/" + path)
 
-  public object drawable
+  public object drawable {
+    public object subdir
+  }
 
   public object string
 

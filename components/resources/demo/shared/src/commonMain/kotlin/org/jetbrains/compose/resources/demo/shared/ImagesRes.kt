@@ -31,13 +31,13 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Image(
                     modifier = Modifier.size(100.dp),
-                    painter = painterResource(Res.drawable.compose),
+                    painter = painterResource(Res.drawable.subdir.compose),
                     contentDescription = null
                 )
                 Text(
                     """
                         Image(
-                          painter = painterResource(Res.drawable.compose)
+                          painter = painterResource(Res.drawable.subdir.compose)
                         )
                     """.trimIndent()
                 )
@@ -107,7 +107,7 @@ fun ImagesRes(contentPadding: PaddingValues) {
             ) {
                 Icon(
                     modifier = Modifier.size(100.dp),
-                    painter = painterResource(Res.drawable.compose),
+                    painter = painterResource(Res.drawable.subdir.compose),
                     contentDescription = null
                 )
                 Text(

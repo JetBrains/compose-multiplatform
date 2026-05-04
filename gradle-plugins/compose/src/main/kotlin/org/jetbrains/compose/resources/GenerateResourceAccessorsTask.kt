@@ -11,11 +11,7 @@ import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
 import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.internal.IdeaImportTask
-import org.jetbrains.compose.internal.utils.OS
-import org.jetbrains.compose.internal.utils.currentOS
 import java.io.File
-import java.nio.file.Path
-import kotlin.io.path.relativeTo
 
 @DisableCachingByDefault(because = "IDE import task — not worth caching")
 internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
@@ -57,25 +53,7 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
 
         logger.info("Generate accessors for $rootResDir")
 
-        //get first level dirs
-        val dirs = rootResDir.listNotHiddenFiles()
-
-        dirs.forEach { f ->
-            if (!f.isDirectory) {
-                error("${f.name} is not directory! Raw files should be placed in '${rootResDir.name}/files' directory.")
-            }
-        }
-
-        //type -> id -> resource item
-        val resources: Map<ResourceType, Map<String, List<ResourceItem>>> = dirs
-            .flatMap { dir ->
-                dir.listNotHiddenFiles()
-                    .mapNotNull { it.fileToResourceItems(rootResDir.toPath()) }
-                    .flatten()
-            }
-            .groupBy { it.type }
-            .mapValues { (_, items) -> items.groupBy { it.name } }
-
+        val resources = ResourceHolder(rootResDir)
         val pkgName = packageName.get()
         val moduleDirectory = packagingDir.getOrNull()?.let { it.invariantSeparatorsPath + "/" } ?: ""
         val resClassName = resClassName.get()
@@ -90,96 +68,6 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
             isPublic,
             generateResourceContentHashAnnotation
         ).forEach { it.writeTo(kotlinDir) }
-    }
-
-    private fun File.isTextResourceFile(): Boolean =
-        path.endsWith(".xml", true) || path.endsWith(".svg", true)
-
-    private fun File.resourceContentHash(): Int {
-        if ((currentOS == OS.Windows) && isTextResourceFile()) {
-            // Windows has different line endings in comparison with Unixes,
-            // thus text resource files binary differ there, so we need to handle this.
-            return readText().replace("\r\n", "\n").toByteArray().contentHashCode()
-        } else {
-            return readBytes().contentHashCode()
-        }
-    }
-
-    private fun File.fileToResourceItems(
-        relativeTo: Path
-    ): List<ResourceItem>? {
-        val file = this
-        val dirName = file.parentFile.name ?: return null
-        val typeAndQualifiers = dirName.split("-")
-        if (typeAndQualifiers.isEmpty()) return null
-
-        val typeString = typeAndQualifiers.first().lowercase()
-        val qualifiers = typeAndQualifiers.takeLast(typeAndQualifiers.size - 1)
-        val path = file.toPath().relativeTo(relativeTo)
-
-
-        if (typeString == "string") {
-            error("Forbidden directory name '$dirName'! String resources should be declared in 'values/strings.xml'.")
-        }
-
-        if (typeString == "files") {
-            if (qualifiers.isNotEmpty()) error("The 'files' directory doesn't support qualifiers: '$dirName'.")
-            return null
-        }
-
-        if (typeString == "values" && file.extension.equals(XmlValuesConverterTask.CONVERTED_RESOURCE_EXT, true)) {
-            return getValueResourceItems(file, qualifiers, path)
-        }
-
-        val type = ResourceType.fromString(typeString) ?: error("Unknown resource type: '$typeString'.")
-        return listOf(
-            ResourceItem(
-                type,
-                qualifiers,
-                file.nameWithoutExtension.asUnderscoredIdentifier(),
-                path,
-                file.resourceContentHash()
-            )
-        )
-    }
-
-    private fun getValueResourceItems(dataFile: File, qualifiers: List<String>, path: Path): List<ResourceItem> {
-        val result = mutableListOf<ResourceItem>()
-        dataFile.bufferedReader().use { f ->
-            var offset = 0L
-            var line: String? = f.readLine()
-            while (line != null) {
-                val size = line.encodeToByteArray().size
-
-                //first line is meta info
-                if (offset > 0) {
-                    result.add(getValueResourceItem(line, offset, size.toLong(), qualifiers, path))
-                }
-
-                offset += size + 1 // "+1" for newline character
-                line = f.readLine()
-            }
-        }
-        return result
-    }
-
-    private fun getValueResourceItem(
-        recordString: String,
-        offset: Long,
-        size: Long,
-        qualifiers: List<String>,
-        path: Path
-    ): ResourceItem {
-        val record = ValueResourceRecord.createFromString(recordString)
-        return ResourceItem(
-            record.type,
-            qualifiers,
-            record.key.asUnderscoredIdentifier(),
-            path,
-            record.content.hashCode(),
-            offset,
-            size
-        )
     }
 }
 
