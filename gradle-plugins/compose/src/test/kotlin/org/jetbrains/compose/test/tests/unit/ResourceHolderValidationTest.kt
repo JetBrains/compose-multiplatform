@@ -48,7 +48,7 @@ class ResourceHolderValidationTest {
             .createDir("drawable") {
                 createFile("com pose.png")
             }
-        assertThrowsWithMessage<GradleException>("Whitespace not allowed in resource file names: drawable/com pose.png") {
+        assertThrowsWithMessage<GradleException>("Whitespace not allowed in resource file names: drawable${File.separator}com pose.png") {
             ResourceHolder(resourceFolder)
         }
     }
@@ -59,7 +59,7 @@ class ResourceHolderValidationTest {
             .createDir("drawable") {
                 createFile("com.pose.png")
             }
-        assertThrowsWithMessage<GradleException>("`.` not allowed in resource file names: drawable/com.pose.png") {
+        assertThrowsWithMessage<GradleException>("`.` not allowed in resource file names: drawable${File.separator}com.pose.png") {
             ResourceHolder(resourceFolder)
         }
     }
@@ -105,7 +105,7 @@ class ResourceHolderValidationTest {
             .createDir("drawable") {
                 createDir("subdir")
             }
-        assertThrowsWithMessage<GradleException>("Resource subdirectory is not allowed: drawable/subdir") {
+        assertThrowsWithMessage<GradleException>("Resource subdirectory is not allowed: drawable${File.separator}subdir") {
             ResourceHolder(resourceFolder, allowAccessorSubDirs = false)
         }
     }
@@ -117,7 +117,7 @@ class ResourceHolderValidationTest {
             .createDir("drawable") {
                 createDir("sub dir")
             }
-        assertThrowsWithMessage<GradleException>("Whitespace not allowed in resource directory names: drawable/sub dir") {
+        assertThrowsWithMessage<GradleException>("Whitespace not allowed in resource directory names: drawable${File.separator}sub dir") {
             ResourceHolder(resourceFolder)
         }
     }
@@ -128,7 +128,7 @@ class ResourceHolderValidationTest {
             .createDir("drawable") {
                 createDir("sub.dir")
             }
-        assertThrowsWithMessage<GradleException>("`.` not allowed in resource directory names: drawable/sub.dir") {
+        assertThrowsWithMessage<GradleException>("`.` not allowed in resource directory names: drawable${File.separator}sub.dir") {
             ResourceHolder(resourceFolder)
         }
     }
@@ -139,7 +139,7 @@ class ResourceHolderValidationTest {
             .createDir("drawable") {
                 createDir("1subdir")
             }
-        assertThrowsWithMessage<GradleException>("Resource directory names cannot start with a digit: drawable/1subdir") {
+        assertThrowsWithMessage<GradleException>("Resource directory names cannot start with a digit: drawable${File.separator}1subdir") {
             ResourceHolder(resourceFolder)
         }
     }
