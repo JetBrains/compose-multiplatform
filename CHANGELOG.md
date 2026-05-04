@@ -21,7 +21,7 @@ _Changes since 1.11.0-beta03_
 
 ### Desktop
 
-- [ComposePanel in Swing rendering mode] Fix Metal offscreen rendering crash when drawing to a Software renderer [#3009](https://github.com/JetBrains/compose-multiplatform-core/pull/3009)
+- [`ComposePanel` in `compose.swing.render.on.graphics` mode] Fix Metal offscreen rendering crash when drawing to a Software renderer [#3009](https://github.com/JetBrains/compose-multiplatform-core/pull/3009)
 
 ### Web
 
@@ -49,7 +49,7 @@ _Changes since 1.11.0-beta03_
 | Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.2` | [Navigation 2.9.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.7) |
 | Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.1.1` | [Navigation3 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigation3#1.1.1) |
 | Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0-rc01` | [Navigation Event 1.1.0](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.0) |
-| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.5.0-beta01](https://developer.android.com/jetpack/androidx/releases/savedstate#1.5.0-beta01) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
 | WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
 
 ---
