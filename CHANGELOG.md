@@ -1,3 +1,59 @@
+# 1.11.0-rc01 (May 2026)
+
+_Changes since 1.11.0-beta03_
+
+## Features
+
+### Multiple Platforms
+
+- _(prerelease fix)_ The `isClearFocusOnMouseDownEnabled` flag is now `false` by default [#3020](https://github.com/JetBrains/compose-multiplatform-core/pull/3020)
+
+## Fixes
+
+### Multiple Platforms
+
+- Fix crash when selecting text right-to-left and then typing a character via IME [#2983](https://github.com/JetBrains/compose-multiplatform-core/pull/2983)
+- _(prerelease fix)_ Fix memory leak during mutating `Path` after migrating to skia m144 [#2997](https://github.com/JetBrains/compose-multiplatform-core/pull/2997)
+
+### iOS
+
+- _(prerelease fix)_ Fix `WindowInsets.systemBars` add extra horizontal insets on iOS 26.0 [#3019](https://github.com/JetBrains/compose-multiplatform-core/pull/3019)
+
+### Desktop
+
+- [ComposePanel in Swing rendering mode] Fix Metal offscreen rendering crash when drawing to a Software renderer [#3009](https://github.com/JetBrains/compose-multiplatform-core/pull/3009)
+
+### Web
+
+- _(prerelease fix)_ Fix handling Fast Delete in mobile browsers [#2987](https://github.com/JetBrains/compose-multiplatform-core/pull/2987)
+- [iOS] Fix virtual keyboard jumps after each tap. iOS 26.4 only [#3013](https://github.com/JetBrains/compose-multiplatform-core/pull/3013)
+- [Safari] Fix an issue where buttons required a second click to respond after performing drag-and-drop operations [#3014](https://github.com/JetBrains/compose-multiplatform-core/pull/3014)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.11.0-rc01`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.11.0-rc01` | [Runtime 1.11.0](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.11.0) |
+| UI | `org.jetbrains.compose.ui:ui*:1.11.0-rc01` | [UI 1.11.0](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.11.0) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.11.0-rc01` | [Foundation 1.11.0](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.11.0) |
+| Material | `org.jetbrains.compose.material:material*:1.11.0-rc01` | [Material 1.11.0](https://developer.android.com/jetpack/androidx/releases/compose-material#1.11.0) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.11.0-alpha07` | [Material3 1.5.0-alpha17](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha17) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha07` | [Material3 Adaptive 1.3.0-alpha10](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha10) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0-beta01` | [Lifecycle 2.11.0-beta01](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0-beta01) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.2` | [Navigation 2.9.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.7) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.1.1` | [Navigation3 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigation3#1.1.1) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0-rc01` | [Navigation Event 1.1.0](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.0) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.5.0-beta01](https://developer.android.com/jetpack/androidx/releases/savedstate#1.5.0-beta01) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.11.0-beta03 (April 2026)
 
 _Changes since 1.11.0-beta02_
