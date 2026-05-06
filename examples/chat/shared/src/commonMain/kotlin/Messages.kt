@@ -1,6 +1,7 @@
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -23,7 +24,10 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-internal inline fun Messages(messages: List<Message>) {
+internal inline fun Messages(
+    messages: List<Message>,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+) {
     val listState = rememberLazyListState()
     if (messages.isNotEmpty()) {
         LaunchedEffect(messages.last()) {
@@ -32,6 +36,7 @@ internal inline fun Messages(messages: List<Message>) {
     }
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(start = 4.dp, end = 4.dp),
+        contentPadding = contentPadding,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         state = listState,
     ) {

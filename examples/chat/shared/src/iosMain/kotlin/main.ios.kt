@@ -1,8 +1,14 @@
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.ui.window.ComposeUIViewController
 import platform.UIKit.UIViewController
 
 fun ChatViewController(): UIViewController = ComposeUIViewController {
-    ChatApp(displayTextField = false)
+    ChatApp(
+        displayTextField = false,
+        contentPadding = WindowInsets.systemBars.asPaddingValues(),
+    )
 }
 
 fun sendMessage(text: String) {

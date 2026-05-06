@@ -14,9 +14,11 @@ struct ComposeInsideSwiftUIScreen: View {
 
 struct ComposeLayer: View {
     var body: some View {
-        GradientTemplate(title: "The Composers Chat") {
+        NavigationView {
             ComposeViewControllerToSwiftUI()
-                .ignoresSafeArea(.keyboard) // Compose have own keyboard handler
+                .ignoresSafeArea() // Extend Compose background behind nav title and tab bar; Compose handles its own keyboard
+                .navigationTitle("The Composers Chat")
+                .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
@@ -29,7 +31,7 @@ struct TextInputLayer: View {
         VStack {
             Spacer()
             HStack {
-                TextField("Type message...", text: $textState, axis: .vertical)
+                TextField("Type message…", text: $textState, axis: .vertical)
                     .focused($textFieldFocused)
                     .lineLimit(3)
                 if (!textState.isEmpty) {
