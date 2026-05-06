@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.publish.plugin)
     id("java-gradle-plugin")
     id("maven-publish")
-    alias(libs.plugins.shadow.jar)
+    alias(libs.plugins.shadow)
     alias(libs.plugins.download)
 }
 
@@ -88,7 +88,7 @@ dependencies {
 
 val packagesToRelocate = listOf("de.undercouch", "com.squareup.kotlinpoet")
 
-val shadow = tasks.named<ShadowJar>("shadowJar") {
+val shadowJar = tasks.named<ShadowJar>("shadowJar") {
     for (packageToRelocate in packagesToRelocate) {
         relocate(packageToRelocate, "org.jetbrains.compose.internal.$packageToRelocate")
     }
@@ -96,13 +96,15 @@ val shadow = tasks.named<ShadowJar>("shadowJar") {
     archiveClassifier.set("")
     archiveVersion.set("")
     configurations = listOf(embeddedDependencies)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    failOnDuplicateEntries = true
     exclude("META-INF/gradle-plugins/de.undercouch.download.properties")
     exclude("META-INF/versions/**")
 }
 
 val jar = tasks.named<Jar>("jar") {
-    dependsOn(shadow)
-    from(zipTree(shadow.get().archiveFile))
+    dependsOn(shadowJar)
+    from(zipTree(shadowJar.get().archiveFile))
     this.duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
