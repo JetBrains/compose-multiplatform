@@ -3,6 +3,9 @@ compose = "1.9.1"
 kotlinxDatetime = "0.5.0"
 
 [libraries]
+activity-compose = { module = "androidx.activity:activity-compose", version = "1.7.2" }
+appcompat = { module = "androidx.appcompat:appcompat", version = "1.6.1" }
+core-ktx = { module = "androidx.core:core-ktx", version = "1.10.1" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 compose-desktop = { module = "org.jetbrains.compose.desktop:desktop", version.ref = "compose" }

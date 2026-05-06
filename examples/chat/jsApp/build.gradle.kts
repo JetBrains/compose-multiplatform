@@ -13,8 +13,8 @@ kotlin {
         val jsMain by getting  {
             dependencies {
                 implementation(project(":shared"))
-                implementation(compose.ui)
-                implementation(compose.foundation)
+                implementation(libs.compose.ui)
+                implementation(libs.compose.foundation)
             }
         }
     }
