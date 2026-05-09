@@ -450,25 +450,21 @@ class ResourcesTest : GradlePluginTestBase() {
             }
         }
 
-        // TODO: remove skip after https://youtrack.jetbrains.com/issue/CMP-9845/
-        val skipWebCheck = currentOS == OS.Windows && defaultTestEnvironment.agpVersion.contains("8.12.3")
-        if (!skipWebCheck) {
-            gradle(":webApp:build").checks {
-                check.taskSuccessful(":sharedUI:wasmJsCopyHierarchicalMultiplatformResources")
-                check.taskSuccessful(":sharedUI:jsCopyHierarchicalMultiplatformResources")
+        gradle(":webApp:build").checks {
+            check.taskSuccessful(":sharedUI:wasmJsCopyHierarchicalMultiplatformResources")
+            check.taskSuccessful(":sharedUI:jsCopyHierarchicalMultiplatformResources")
 
-                val jsBuildDir = file("webApp/build/dist/js/productionExecutable")
-                commonResourcesFiles.forEach { res ->
-                    assertTrue(jsBuildDir.resolve(res).exists())
-                }
-                assertEquals("js", jsBuildDir.resolve("$repackDir/files/platform.txt").readText())
-
-                val wasmJsBuildDir = file("webApp/build/dist/wasmJs/productionExecutable")
-                commonResourcesFiles.forEach { res ->
-                    assertTrue(wasmJsBuildDir.resolve(res).exists())
-                }
-                assertEquals("wasm", wasmJsBuildDir.resolve("$repackDir/files/platform.txt").readText())
+            val jsBuildDir = file("webApp/build/dist/js/productionExecutable")
+            commonResourcesFiles.forEach { res ->
+                assertTrue(jsBuildDir.resolve(res).exists())
             }
+            assertEquals("js", jsBuildDir.resolve("$repackDir/files/platform.txt").readText())
+
+            val wasmJsBuildDir = file("webApp/build/dist/wasmJs/productionExecutable")
+            commonResourcesFiles.forEach { res ->
+                assertTrue(wasmJsBuildDir.resolve(res).exists())
+            }
+            assertEquals("wasm", wasmJsBuildDir.resolve("$repackDir/files/platform.txt").readText())
         }
 
 
