@@ -315,9 +315,7 @@ class ResourcesTest : GradlePluginTestBase() {
     @Test
     fun testAndroidAppWithResources() {
         //FIXME delete the filter when https://issuetracker.google.com/456657404 is fixed
-        Assumptions.assumeFalse {
-            currentOS == OS.Windows && defaultTestEnvironment.agpVersion.contains("9.0.0")
-        }
+        Assumptions.assumeFalse { currentOS == OS.Windows }
         with(testProject("misc/androidAppWithResources", defaultTestEnvironment)) {
             gradle(":appModule:assembleDebug").checks {
                 check.logContains("Configure compose resources with KotlinMultiplatformAndroidComponentsExtension")
@@ -417,7 +415,7 @@ class ResourcesTest : GradlePluginTestBase() {
             .getConvertedResources(commonResourcesDir, repackDir)
 
         //FIXME delete the filter when https://issuetracker.google.com/456657404 is fixed
-        val skipAndroidCheck = currentOS == OS.Windows && defaultTestEnvironment.agpVersion.contains("9.0.0")
+        val skipAndroidCheck = currentOS == OS.Windows
         if (!skipAndroidCheck) {
             gradle(":androidApp:assemble").checks {
                 check.taskSuccessful(":sharedUI:copyAndroidMainComposeResourcesToAndroidAssets")
@@ -451,12 +449,9 @@ class ResourcesTest : GradlePluginTestBase() {
         }
 
         // TODO: remove skip after https://youtrack.jetbrains.com/issue/CMP-9845/
-        // KGP bug: on Windows with Gradle 9.5+, kotlinWasmNpmInstall blocks on Yarn's network mutex while
+        // KGP bug: on Windows with Gradle 9.+, kotlinWasmNpmInstall blocks on Yarn's network mutex while
         // kotlinWasmStoreYarnLock starts in parallel, failing because build/wasm/yarn.lock doesn't exist yet.
-        val skipWebCheck = currentOS == OS.Windows && (
-            defaultTestEnvironment.agpVersion.contains("8.12.3") ||
-            defaultTestEnvironment.parsedGradleVersion >= GradleVersion.version("9.5.0")
-        )
+        val skipWebCheck = currentOS == OS.Windows
         if (!skipWebCheck) {
             gradle(":webApp:build").checks {
                 check.taskSuccessful(":sharedUI:wasmJsCopyHierarchicalMultiplatformResources")
