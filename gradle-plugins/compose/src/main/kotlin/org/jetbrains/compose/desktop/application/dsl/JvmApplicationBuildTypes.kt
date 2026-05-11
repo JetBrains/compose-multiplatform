@@ -8,11 +8,12 @@ package org.jetbrains.compose.desktop.application.dsl
 import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
 import org.jetbrains.compose.internal.utils.new
+import java.io.Serializable
 import javax.inject.Inject
 
 abstract class JvmApplicationBuildTypes @Inject constructor(
     objects: ObjectFactory
-) {
+): Serializable {
     /**
      * The default build type does not have a classifier
      * to preserve compatibility with tasks, existing before
@@ -29,6 +30,8 @@ abstract class JvmApplicationBuildTypes @Inject constructor(
     fun release(fn: Action<JvmApplicationBuildType>) {
         fn.execute(release)
     }
+
+    internal val all: List<JvmApplicationBuildType> = listOf(default, release)
 }
 
 abstract class JvmApplicationBuildType @Inject constructor(
@@ -42,5 +45,10 @@ abstract class JvmApplicationBuildType @Inject constructor(
     val proguard: ProguardSettings = objects.new()
     fun proguard(fn: Action<ProguardSettings>) {
         fn.execute(proguard)
+    }
+
+    val appCds: AppCdsConfiguration = objects.new()
+    fun appCds(fn: Action<AppCdsConfiguration>) {
+        fn.execute(appCds)
     }
 }

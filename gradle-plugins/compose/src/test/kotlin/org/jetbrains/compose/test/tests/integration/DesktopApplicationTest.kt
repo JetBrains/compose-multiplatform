@@ -6,6 +6,8 @@
 package org.jetbrains.compose.test.tests.integration
 
 import org.gradle.internal.impldep.org.testng.Assert
+import org.gradle.internal.jvm.inspection.JvmVendor
+import org.jetbrains.compose.desktop.application.dsl.AppCdsMode
 import org.jetbrains.compose.internal.utils.MacUtils
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentArch
@@ -606,6 +608,118 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 file("wix311").checkNotExists()
             }
         }
+    }
+
+    @Suppress("SameParameterValue")
+    private fun appCdsProject(
+        appCdsMode: AppCdsMode,
+        javaVersion: Int,
+        javaVendor: JvmVendor.KnownJvmVendor = JvmVendor.KnownJvmVendor.AMAZON
+    ) : TestProject {
+        return testProject("application/appCds").apply {
+            modifyText("build.gradle.kts") {
+                it
+                    .replace("%APP_CDS_MODE%", "AppCdsMode.$appCdsMode")
+                    .replace("%JAVA_VERSION%", "$javaVersion")
+                    .replace("%JVM_VENDOR%", javaVendor.name)
+            }
+        }
+    }
+
+    @Test
+    fun testAppCdsAutoFailsOnJdk17() = with(appCdsProject(AppCdsMode.Auto, javaVersion = 17)) {
+        fun testRunTask(runTask: String) {
+            gradleFailure(runTask).checks {
+                check.logContains("AppCdsMode 'Auto' is not supported on JDK earlier than 19; current is 17")
+            }
+        }
+
+        testRunTask(":runReleaseDistributable")
+    }
+
+    private val loggedArchivePathRegex =
+        Regex("\\[cds] Opened archive " +
+                listOf(
+                    ".*",
+                    "build",
+                    "compose",
+                    "binaries",
+                    ".*",
+                    "app",
+                    ".*",
+                    AppCdsMode.ARCHIVE_FILE_ARGUMENT
+                        .replace("\$APPDIR", "app")
+                        .replace(".", "\\.")
+                ).joinToString(File.separator.replace("\\", "\\\\"))
+        )
+
+    @Test
+    fun testAppCdsAuto() = with(appCdsProject(AppCdsMode.Auto, javaVersion = 21)) {
+        fun testRunTask(taskName: String) {
+            gradle(taskName).checks {
+                check.taskSuccessful(taskName)
+                check.logContains("[cds] Dumping shared data to file")
+            }
+            gradle(taskName).checks {
+                check.taskSuccessful(taskName)
+                check.logContainsMatch(loggedArchivePathRegex)
+                check.logDoesntContain("[cds] Specified shared archive not found")
+                check.logDoesntContain("[cds] Dumping shared data to file")
+                check.logDoesntContain("[cds] Initialize dynamic archive failed")
+                check.logDoesntContain("[cds] An error has occurred while processing the shared archive file")
+                check.logDoesntContain("[cds] Failed to initialize dynamic archive")
+            }
+            gradle(":clean")
+        }
+
+        testRunTask(":runReleaseDistributable")
+    }
+
+    @Test
+    fun testAppCdsPrebuild() = with(appCdsProject(AppCdsMode.Prebuild, javaVersion = 17)) {
+        fun testPackageAndRun(release: Boolean) {
+            val releaseTag = if (release) "Release" else ""
+            val packageTaskName = ":package${releaseTag}DistributionForCurrentOS"
+            val createAppCdsTaskName = ":create${releaseTag}AppCdsArchive"
+            val runDistributableTaskName = ":run${releaseTag}Distributable"
+            gradle(packageTaskName).checks {
+                check.taskSuccessful(packageTaskName)
+                check.taskSuccessful(createAppCdsTaskName)
+                check.logContains("[cds] Dumping shared data to file")
+                check.logContains("Running app to create archive: true")
+            }
+
+            gradle(runDistributableTaskName).checks {
+                check.taskSuccessful(runDistributableTaskName)
+                check.taskUpToDate(createAppCdsTaskName)
+                check.logContainsMatch(loggedArchivePathRegex)
+                check.logContains("Running app to create archive: false")
+                check.logDoesntContain("[cds] Specified shared archive not found")
+                check.logDoesntContain("[cds] Dumping shared data to file")
+                check.logDoesntContain("[cds] Initialize dynamic archive failed")
+                check.logDoesntContain("[cds] An error has occurred while processing the shared archive file")
+                check.logDoesntContain("[cds] Failed to initialize dynamic archive")
+            }
+        }
+
+        testPackageAndRun(release = true)
+    }
+
+    @Test
+    fun testAppCdsCreateDistributable() = with(appCdsProject(AppCdsMode.Prebuild, javaVersion = 17)) {
+        fun testPackageAndRun(release: Boolean) {
+            val releaseTag = if (release) "Release" else ""
+            val createDistributableTaskName = ":create${releaseTag}Distributable"
+            val createAppCdsTaskName = ":create${releaseTag}AppCdsArchive"
+            gradle(createDistributableTaskName).checks {
+                check.taskSuccessful(createDistributableTaskName)
+                check.taskSuccessful(createAppCdsTaskName)
+                check.logContains("[cds] Dumping shared data to file")
+                check.logContains("Running app to create archive: true")
+            }
+        }
+
+        testPackageAndRun(release = true)
     }
 
     private fun TestProject.enableJoinOutputJars() {

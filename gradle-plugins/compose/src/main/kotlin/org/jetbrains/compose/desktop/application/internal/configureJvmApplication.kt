@@ -6,6 +6,7 @@
 package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.Task
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.JavaExec
@@ -13,18 +14,12 @@ import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.desktop.application.dsl.runtimeJvmArgs
 import org.jetbrains.compose.desktop.application.internal.validation.validatePackageVersions
 import org.jetbrains.compose.desktop.application.tasks.*
 import org.jetbrains.compose.desktop.tasks.AbstractJarsFlattenTask
 import org.jetbrains.compose.desktop.tasks.AbstractUnpackDefaultComposeApplicationResourcesTask
 import org.jetbrains.compose.internal.utils.*
-import org.jetbrains.compose.internal.utils.OS
-import org.jetbrains.compose.internal.utils.currentOS
-import org.jetbrains.compose.internal.utils.currentTarget
-import org.jetbrains.compose.internal.utils.dir
-import org.jetbrains.compose.internal.utils.ioFile
-import org.jetbrains.compose.internal.utils.ioFileOrNull
-import org.jetbrains.compose.internal.utils.javaExecutable
 import org.jetbrains.compose.internal.utils.provider
 
 private val defaultJvmArgs = listOf("-D$CONFIGURE_SWING_GLOBALS=true")
@@ -52,7 +47,6 @@ internal class CommonJvmDesktopTasks(
     val checkRuntime: TaskProvider<AbstractCheckNativeDistributionRuntime>,
     val suggestRuntimeModules: TaskProvider<AbstractSuggestModulesTask>,
     val prepareAppResources: TaskProvider<Sync>,
-    val createRuntimeImage: TaskProvider<AbstractJLinkTask>
 )
 
 private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDesktopTasks {
@@ -66,6 +60,7 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         taskNameObject = "runtime"
     ) {
         jdkHome.set(app.javaHomeProvider)
+        appCdsModes.set(this@configureCommonJvmDesktopTasks.buildTypes.all.map { it.appCds.mode })
         checkJdkVendor.set(ComposeProperties.checkJdkVendor(project.providers))
         jdkVersionProbeJar.from(
             project.detachedComposeGradleDependency(
@@ -101,30 +96,30 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         into(jvmTmpDirForTask())
     }
 
-    val createRuntimeImage = tasks.register<AbstractJLinkTask>(
-        taskNameAction = "create",
-        taskNameObject = "runtimeImage"
-    ) {
-        dependsOn(checkRuntime)
-        javaHome.set(app.javaHomeProvider)
-        modules.set(provider { app.nativeDistributions.modules })
-        includeAllModules.set(provider { app.nativeDistributions.includeAllModules })
-        javaRuntimePropertiesFile.set(checkRuntime.flatMap { it.javaRuntimePropertiesFile })
-        destinationDir.set(appTmpDir.dir("runtime"))
-    }
-
     return CommonJvmDesktopTasks(
-        unpackDefaultResources,
-        checkRuntime,
-        suggestRuntimeModules,
-        prepareAppResources,
-        createRuntimeImage
+        unpackDefaultResources = unpackDefaultResources,
+        checkRuntime = checkRuntime,
+        suggestRuntimeModules = suggestRuntimeModules,
+        prepareAppResources = prepareAppResources,
     )
 }
 
 private fun JvmApplicationContext.configurePackagingTasks(
     commonTasks: CommonJvmDesktopTasks
 ) {
+    val createRuntimeImage = tasks.register<AbstractJLinkTask>(
+        taskNameAction = "create",
+        taskNameObject = "runtimeImage"
+    ) {
+        dependsOn(commonTasks.checkRuntime)
+        javaHome.set(app.javaHomeProvider)
+        modules.set(provider { app.nativeDistributions.modules })
+        includeAllModules.set(provider { app.nativeDistributions.includeAllModules })
+        javaRuntimePropertiesFile.set(commonTasks.checkRuntime.flatMap { it.javaRuntimePropertiesFile })
+        destinationDir.set(appTmpDir.dir("runtime"))
+        generateCdsArchive.set(buildType.appCds.mode.generateJreClassesArchive)
+    }
+
     val runProguard = if (buildType.proguard.isEnabled.orNull == true) {
         tasks.register<AbstractProguardTask>(
             taskNameAction = "proguard",
@@ -134,19 +129,43 @@ private fun JvmApplicationContext.configurePackagingTasks(
         }
     } else null
 
-    val createDistributable = tasks.register<AbstractJPackageTask>(
+    val createDistributableImpl = tasks.register<AbstractJPackageTask>(
         taskNameAction = "create",
-        taskNameObject = "distributable",
-        args = listOf(TargetFormat.AppImage)
+        taskNameObject = "distributableImpl",
+        args = listOf(TargetFormat.AppImage),
+        isHidden = true,
     ) {
         configurePackageTask(
             this,
-            createRuntimeImage = commonTasks.createRuntimeImage,
+            createRuntimeImage = createRuntimeImage,
             prepareAppResources = commonTasks.prepareAppResources,
             checkRuntime = commonTasks.checkRuntime,
             unpackDefaultResources = commonTasks.unpackDefaultResources,
             runProguard = runProguard
         )
+    }
+
+    val appCdsMode = buildType.appCds.mode
+    val createAppCdsArchive = if (appCdsMode.generateAppClassesArchive) {
+        tasks.register<AbstractCreateAppCdsArchiveTask>(
+            taskNameAction = "create",
+            taskNameObject = "appCdsArchive",
+            args = listOf(createDistributableImpl),
+            isHidden = true,
+        ) {
+            dependsOn(createDistributableImpl)
+            this.appCdsMode.set(appCdsMode)
+        }
+    } else null
+
+    val createDistributable = tasks.register<Task>(
+        taskNameAction = "create",
+        taskNameObject = "distributable",
+    ) {
+        dependsOn(createDistributableImpl)
+        if (createAppCdsArchive != null) {
+            dependsOn(createAppCdsArchive)
+        }
     }
 
     val packageFormats = app.nativeDistributions.targetFormats.map { targetFormat ->
@@ -155,29 +174,13 @@ private fun JvmApplicationContext.configurePackagingTasks(
             taskNameObject = targetFormat.name,
             args = listOf(targetFormat)
         ) {
-            // On Mac we want to patch bundled Info.plist file,
-            // so we create an app image, change its Info.plist,
-            // then create an installer based on the app image.
-            // We could create an installer the same way on other platforms, but
-            // in some cases there are failures with JDK 15.
-            // See [AbstractJPackageTask.patchInfoPlistIfNeeded]
-            if (currentOS != OS.MacOS) {
-                configurePackageTask(
-                    this,
-                    createRuntimeImage = commonTasks.createRuntimeImage,
-                    prepareAppResources = commonTasks.prepareAppResources,
-                    checkRuntime = commonTasks.checkRuntime,
-                    unpackDefaultResources = commonTasks.unpackDefaultResources,
-                    runProguard = runProguard
-                )
-            } else {
-                configurePackageTask(
-                    this,
-                    createAppImage = createDistributable,
-                    checkRuntime = commonTasks.checkRuntime,
-                    unpackDefaultResources = commonTasks.unpackDefaultResources
-                )
-            }
+            configurePackageTask(
+                this,
+                createAppImage = createDistributableImpl,
+                checkRuntime = commonTasks.checkRuntime,
+                unpackDefaultResources = commonTasks.unpackDefaultResources,
+                createAppCdsArchive = createAppCdsArchive
+            )
         }
 
         if (targetFormat.isCompatibleWith(OS.MacOS)) {
@@ -232,8 +235,10 @@ private fun JvmApplicationContext.configurePackagingTasks(
     val runDistributable = tasks.register<AbstractRunDistributableTask>(
         taskNameAction = "run",
         taskNameObject = "distributable",
-        args = listOf(createDistributable)
-    )
+        args = listOf(createDistributableImpl)
+    ) {
+        dependsOn(createDistributable)
+    }
 
     val run = tasks.register<JavaExec>(taskNameAction = "run") {
         configureRunTask(this, commonTasks.prepareAppResources, runProguard)
@@ -284,7 +289,8 @@ private fun JvmApplicationContext.configurePackageTask(
     prepareAppResources: TaskProvider<Sync>? = null,
     checkRuntime: TaskProvider<AbstractCheckNativeDistributionRuntime>? = null,
     unpackDefaultResources: TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>,
-    runProguard: Provider<AbstractProguardTask>? = null
+    runProguard: Provider<AbstractProguardTask>? = null,
+    createAppCdsArchive: TaskProvider<AbstractCreateAppCdsArchiveTask>? = null
 ) {
     packageTask.enabled = packageTask.targetFormat.isCompatibleWithCurrentOS
 
@@ -338,8 +344,15 @@ private fun JvmApplicationContext.configurePackageTask(
         }
     }
 
+    if (createAppCdsArchive != null) {
+        packageTask.dependsOn(createAppCdsArchive)
+        packageTask.files.from(project.file(createAppCdsArchive.flatMap { it.appCdsArchiveFile }))
+    }
+
     packageTask.launcherMainClass.set(provider { app.mainClass })
-    packageTask.launcherJvmArgs.set(provider { defaultJvmArgs + app.jvmArgs })
+    packageTask.launcherJvmArgs.set(
+        provider { defaultJvmArgs + buildType.appCds.runtimeJvmArgs() + app.jvmArgs }
+    )
     packageTask.launcherArgs.set(provider { app.args })
 }
 
