@@ -8,8 +8,8 @@ plugins {
 group = "app.group"
 
 kotlin {
-    androidLibrary {
-        compileSdk = 35
+    android {
+        compileSdk = 37
         namespace = "org.jetbrains.compose.resources.test"
         minSdk = 23
         androidResources.enable = true

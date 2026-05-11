@@ -6,8 +6,8 @@ plugins {
 }
 
 kotlin {
-    androidLibrary {
-        compileSdk = 35
+    android {
+        compileSdk = 37
         namespace = "me.sample.feature"
         minSdk = 23
         androidResources.enable = true

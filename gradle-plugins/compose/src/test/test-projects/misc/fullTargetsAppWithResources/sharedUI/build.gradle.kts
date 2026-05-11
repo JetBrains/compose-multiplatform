@@ -10,9 +10,9 @@ plugins {
 }
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = "org.company.app"
-        compileSdk = 35
+        compileSdk = 37
         minSdk = 23
         androidResources.enable = true
     }

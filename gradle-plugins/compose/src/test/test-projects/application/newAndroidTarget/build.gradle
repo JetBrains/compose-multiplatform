@@ -8,9 +8,9 @@ plugins {
 kotlin {
     targetHierarchy.default()
 
-    androidLibrary {
+    android {
         namespace = "com.google.samples.apps.diceroller.shared"
-        compileSdk = 35
+        compileSdk = 37
     }
 
     jvm()

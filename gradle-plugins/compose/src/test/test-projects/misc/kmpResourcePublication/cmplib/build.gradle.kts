@@ -17,8 +17,8 @@ publishing {
 }
 
 kotlin {
-    androidLibrary {
-        compileSdk = 35
+    android {
+        compileSdk = 37
         namespace = "me.sample.library"
         minSdk = 23
         androidResources.enable = true

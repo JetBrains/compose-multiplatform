@@ -6,9 +6,9 @@ plugins {
 }
 
 kotlin {
-    androidLibrary {
+    android {
         namespace = "org.jetbrains.compose.testapp"
-        compileSdk = 35
+        compileSdk = 37
         minSdk = 23
     }
     iosArm64()

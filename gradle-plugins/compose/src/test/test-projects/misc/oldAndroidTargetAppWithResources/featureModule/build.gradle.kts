@@ -20,7 +20,7 @@ kotlin {
 }
 android {
     namespace = "me.sample.feature"
-    compileSdk = 35
+    compileSdk = 37
 }
 
 compose.resources {
