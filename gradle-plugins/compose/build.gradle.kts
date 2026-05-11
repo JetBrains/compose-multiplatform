@@ -31,7 +31,7 @@ val buildConfig = tasks.register("buildConfig", GenerateBuildConfig::class.java)
     fieldsToGenerate.put("composeVersion", BuildProperties.composeVersion(project))
     fieldsToGenerate.put("composeMaterial3Version", BuildProperties.composeMaterial3Version(project))
     fieldsToGenerate.put("composeGradlePluginVersion", BuildProperties.deployVersion(project))
-    fieldsToGenerate.put("composeHotReloadVersion", libs.plugin.hot.reload.get().version)
+    fieldsToGenerate.put("composeHotReloadVersion", libs.plugin.hot.reload.get().version!!)
 }
 tasks.named("compileKotlin", KotlinCompilationTask::class) {
     dependsOn(buildConfig)
@@ -179,6 +179,7 @@ for (jdkVersion in jdkVersionsForTests) {
 for (gradleVersion in supportedGradleVersions) {
     for (agpVersion in supportedAgpVersions) {
         tasks.registerVerificationTask<Test>("test-Gradle(${gradleVersion})-Agp($agpVersion)") {
+            testClassesDirs = tasks.test.get().testClassesDirs
             classpath = tasks.test.get().classpath
             filter { includeTestsMatching(gradleTestsPattern) }
             dependsOn(downloadJdksForTests)

@@ -5,7 +5,7 @@
 
 package org.jetbrains.compose.test.tests.integration
 
-import org.gradle.internal.impldep.org.testng.Assert
+import org.junit.jupiter.api.Assertions
 import org.jetbrains.compose.internal.utils.MacUtils
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentArch
@@ -250,7 +250,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                         "Possible names: ${possibleNames.joinToString(", ") { "'$it'" }}"
             }
         } else {
-            Assert.assertEquals(packageFile.name, "TestPackage-1.0.0.$ext", "Unexpected package name")
+            Assertions.assertEquals("TestPackage-1.0.0.$ext", packageFile.name, "Unexpected package name")
         }
         result.checks {
             check.taskSuccessful(":package${ext.uppercaseFirstChar()}")
@@ -361,7 +361,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 val expectedInfoPlist = testWorkDir.resolve("Expected-Info.Plist")
                 val actualInfoPlistNormalized = actualInfoPlist.readText().normalized()
                 val expectedInfoPlistNormalized = expectedInfoPlist.readText().normalized()
-                Assert.assertEquals(actualInfoPlistNormalized, expectedInfoPlistNormalized)
+                Assertions.assertEquals(expectedInfoPlistNormalized, actualInfoPlistNormalized)
             }
         }
     }
@@ -434,7 +434,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                         |${appDir.absolutePath}: valid on disk
                         |${appDir.absolutePath}: satisfies its Designated Requirement
                     """.trimMargin().trim()
-                    Assert.assertEquals(expectedOutput, actualOutput)
+                    Assertions.assertEquals(actualOutput, expectedOutput)
                 }
 
                 gradle(":runDistributable").checks {

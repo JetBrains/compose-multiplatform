@@ -5,8 +5,8 @@
 
 package org.jetbrains.compose.test.tests.integration
 
-import org.gradle.internal.impldep.junit.framework.TestCase.assertEquals
-import org.gradle.internal.impldep.junit.framework.TestCase.assertTrue
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewLogger
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.RemoteConnection
