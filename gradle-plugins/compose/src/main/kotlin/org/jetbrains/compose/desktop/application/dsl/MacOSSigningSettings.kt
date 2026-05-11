@@ -12,7 +12,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.internal.utils.notNullProperty
-import org.jetbrains.compose.internal.utils.nullableProperty
 import javax.inject.Inject
 
 abstract class MacOSSigningSettings {
@@ -30,17 +29,17 @@ abstract class MacOSSigningSettings {
     }
     @get:Input
     @get:Optional
-    val identity: Property<String?> = objects.nullableProperty<String>().apply {
+    val identity: Property<String> = objects.notNullProperty<String>().apply {
         set(ComposeProperties.macSignIdentity(providers))
     }
     @get:Input
     @get:Optional
-    val keychain: Property<String?> = objects.nullableProperty<String>().apply {
+    val keychain: Property<String> = objects.notNullProperty<String>().apply {
         set(ComposeProperties.macSignKeychain(providers))
     }
     @get:Input
     @get:Optional
-    val prefix: Property<String?> = objects.nullableProperty<String>().apply {
+    val prefix: Property<String> = objects.notNullProperty<String>().apply {
         set(ComposeProperties.macSignPrefix(providers))
     }
 }

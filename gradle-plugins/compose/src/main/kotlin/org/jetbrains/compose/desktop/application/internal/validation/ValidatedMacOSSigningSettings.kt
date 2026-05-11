@@ -33,9 +33,9 @@ internal data class ValidatedMacOSSigningSettings(
 }
 
 internal fun MacOSSigningSettings.validate(
-    bundleIDProvider: Provider<String?>,
+    bundleIDProvider: Provider<String>,
     project: Project,
-    appStoreProvider: Provider<Boolean?>
+    appStoreProvider: Provider<Boolean>
 ): ValidatedMacOSSigningSettings {
     check(currentOS == OS.MacOS) { ERR_WRONG_OS }
 

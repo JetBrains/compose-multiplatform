@@ -19,7 +19,6 @@ import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.cliArg
 import org.jetbrains.compose.internal.utils.ioFile
 import org.jetbrains.compose.internal.utils.notNullProperty
-import org.jetbrains.compose.internal.utils.nullableProperty
 import java.io.File
 
 // todo: public DSL
@@ -50,7 +49,7 @@ abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
 
     @get:Input
     @get:Optional
-    internal val compressionLevel: Property<RuntimeCompressionLevel?> = objects.nullableProperty()
+    internal val compressionLevel: Property<RuntimeCompressionLevel> = objects.notNullProperty()
 
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
         val modulesToInclude =

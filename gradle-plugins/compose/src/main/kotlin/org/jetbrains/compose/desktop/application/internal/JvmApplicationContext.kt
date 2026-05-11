@@ -52,6 +52,10 @@ internal data class JvmApplicationContext(
     inline fun <reified T> provider(noinline fn: () -> T): Provider<T> =
         project.provider(fn)
 
+    @Suppress("UNCHECKED_CAST")
+    inline fun <reified T : Any> nullableProvider(noinline fn: () -> T?): Provider<T> =
+        project.provider(fn) as Provider<T>
+
     fun configureDefaultApp() {
         if (project.plugins.hasPlugin(KOTLIN_MPP_PLUGIN_ID)) {
             var isJvmTargetConfigured = false

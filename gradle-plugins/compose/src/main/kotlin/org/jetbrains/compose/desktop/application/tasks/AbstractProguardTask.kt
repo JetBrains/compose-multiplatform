@@ -41,15 +41,15 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
 
     @get:Optional
     @get:Input
-    val dontobfuscate: Property<Boolean?> = objects.nullableProperty()
+    val dontobfuscate: Property<Boolean> = objects.notNullProperty()
 
     @get:Optional
     @get:Input
-    val dontoptimize: Property<Boolean?> = objects.nullableProperty()
+    val dontoptimize: Property<Boolean> = objects.notNullProperty()
 
     @get:Optional
     @get:Input
-    val joinOutputJars: Property<Boolean?> = objects.nullableProperty()
+    val joinOutputJars: Property<Boolean> = objects.notNullProperty()
 
     // todo: DSL for excluding default rules
     // also consider pulling coroutines rules from coroutines artifact
@@ -73,7 +73,7 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
     val mainClass: Property<String> = objects.notNullProperty()
 
     @get:Internal
-    val maxHeapSize: Property<String?> = objects.nullableProperty()
+    val maxHeapSize: Property<String> = objects.notNullProperty()
 
     @get:OutputDirectory
     val destinationDir: DirectoryProperty = objects.directoryProperty()

@@ -68,7 +68,6 @@ import org.jetbrains.compose.internal.utils.ioFile
 import org.jetbrains.compose.internal.utils.ioFileOrNull
 import org.jetbrains.compose.internal.utils.mkdirs
 import org.jetbrains.compose.internal.utils.notNullProperty
-import org.jetbrains.compose.internal.utils.nullableProperty
 import org.jetbrains.compose.internal.utils.stacktraceToString
 import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import java.io.File
@@ -130,7 +129,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    val installationPath: Property<String?> = objects.nullableProperty()
+    val installationPath: Property<String> = objects.notNullProperty()
 
     @get:InputFile
     @get:Optional
@@ -162,67 +161,67 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    val packageDescription: Property<String?> = objects.nullableProperty()
+    val packageDescription: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val packageCopyright: Property<String?> = objects.nullableProperty()
+    val packageCopyright: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val packageVendor: Property<String?> = objects.nullableProperty()
+    val packageVendor: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val packageVersion: Property<String?> = objects.nullableProperty()
+    val packageVersion: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val linuxShortcut: Property<Boolean?> = objects.nullableProperty()
+    val linuxShortcut: Property<Boolean> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val linuxPackageName: Property<String?> = objects.nullableProperty()
+    val linuxPackageName: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val linuxAppRelease: Property<String?> = objects.nullableProperty()
+    val linuxAppRelease: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val linuxAppCategory: Property<String?> = objects.nullableProperty()
+    val linuxAppCategory: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val linuxDebMaintainer: Property<String?> = objects.nullableProperty()
+    val linuxDebMaintainer: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val linuxMenuGroup: Property<String?> = objects.nullableProperty()
+    val linuxMenuGroup: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val linuxRpmLicenseType: Property<String?> = objects.nullableProperty()
+    val linuxRpmLicenseType: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val macPackageName: Property<String?> = objects.nullableProperty()
+    val macPackageName: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val macDockName: Property<String?> = objects.nullableProperty()
+    val macDockName: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val macAppStore: Property<Boolean?> = objects.nullableProperty()
+    val macAppStore: Property<Boolean> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val macAppCategory: Property<String?> = objects.nullableProperty()
+    val macAppCategory: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val macMinimumSystemVersion: Property<String?> = objects.nullableProperty()
+    val macMinimumSystemVersion: Property<String> = objects.notNullProperty()
 
     @get:InputFile
     @get:Optional
@@ -236,7 +235,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    val packageBuildVersion: Property<String?> = objects.nullableProperty()
+    val packageBuildVersion: Property<String> = objects.notNullProperty()
 
     @get:InputFile
     @get:Optional
@@ -250,31 +249,31 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    val winConsole: Property<Boolean?> = objects.nullableProperty()
+    val winConsole: Property<Boolean> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val winDirChooser: Property<Boolean?> = objects.nullableProperty()
+    val winDirChooser: Property<Boolean> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val winPerUserInstall: Property<Boolean?> = objects.nullableProperty()
+    val winPerUserInstall: Property<Boolean> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val winShortcut: Property<Boolean?> = objects.nullableProperty()
+    val winShortcut: Property<Boolean> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val winMenu: Property<Boolean?> = objects.nullableProperty()
+    val winMenu: Property<Boolean> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val winMenuGroup: Property<String?> = objects.nullableProperty()
+    val winMenuGroup: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val winUpgradeUuid: Property<String?> = objects.nullableProperty()
+    val winUpgradeUuid: Property<String> = objects.notNullProperty()
 
     @get:InputDirectory
     @get:Optional
@@ -288,11 +287,11 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    internal val nonValidatedMacBundleID: Property<String?> = objects.nullableProperty()
+    internal val nonValidatedMacBundleID: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    internal val macExtraPlistKeysRawXml: Property<String?> = objects.nullableProperty()
+    internal val macExtraPlistKeysRawXml: Property<String> = objects.notNullProperty()
 
     @get:InputFile
     @get:Optional

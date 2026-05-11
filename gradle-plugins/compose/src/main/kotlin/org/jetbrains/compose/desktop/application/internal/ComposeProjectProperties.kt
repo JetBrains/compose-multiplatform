@@ -39,22 +39,22 @@ internal object ComposeProperties {
     fun macSign(providers: ProviderFactory): Provider<Boolean> =
         providers.valueOrNull(MAC_SIGN).toBooleanProvider(false)
 
-    fun macSignIdentity(providers: ProviderFactory): Provider<String?> =
+    fun macSignIdentity(providers: ProviderFactory): Provider<String> =
         providers.valueOrNull(MAC_SIGN_ID)
 
-    fun macSignKeychain(providers: ProviderFactory): Provider<String?> =
+    fun macSignKeychain(providers: ProviderFactory): Provider<String> =
         providers.valueOrNull(MAC_SIGN_KEYCHAIN)
 
-    fun macSignPrefix(providers: ProviderFactory): Provider<String?> =
+    fun macSignPrefix(providers: ProviderFactory): Provider<String> =
         providers.valueOrNull(MAC_SIGN_PREFIX)
 
-    fun macNotarizationAppleID(providers: ProviderFactory): Provider<String?> =
+    fun macNotarizationAppleID(providers: ProviderFactory): Provider<String> =
         providers.valueOrNull(MAC_NOTARIZATION_APPLE_ID)
 
-    fun macNotarizationPassword(providers: ProviderFactory): Provider<String?> =
+    fun macNotarizationPassword(providers: ProviderFactory): Provider<String> =
         providers.valueOrNull(MAC_NOTARIZATION_PASSWORD)
 
-    fun macNotarizationTeamID(providers: ProviderFactory): Provider<String?> =
+    fun macNotarizationTeamID(providers: ProviderFactory): Provider<String> =
         providers.valueOrNull(MAC_NOTARIZATION_TEAM_ID_PROVIDER)
 
     fun checkJdkVendor(providers: ProviderFactory): Provider<Boolean> =

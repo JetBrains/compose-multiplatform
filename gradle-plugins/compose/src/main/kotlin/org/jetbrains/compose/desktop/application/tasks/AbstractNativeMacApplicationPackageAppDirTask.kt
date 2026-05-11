@@ -15,7 +15,6 @@ import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder
 import org.jetbrains.compose.desktop.application.internal.PlistKeys
 import org.jetbrains.compose.internal.utils.ioFile
 import org.jetbrains.compose.internal.utils.notNullProperty
-import org.jetbrains.compose.internal.utils.nullableProperty
 import java.io.File
 
 private const val KOTLIN_NATIVE_MIN_SUPPORTED_MAC_OS = "10.13"
@@ -36,15 +35,15 @@ abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMac
 
     @get:Input
     @get:Optional
-    val appCategory: Property<String?> = objects.nullableProperty()
+    val appCategory: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val copyright: Property<String?> = objects.nullableProperty()
+    val copyright: Property<String> = objects.notNullProperty()
 
     @get:Input
     @get:Optional
-    val minimumSystemVersion: Property<String?> = objects.nullableProperty()
+    val minimumSystemVersion: Property<String> = objects.notNullProperty()
 
     @get:InputFiles
     @get:Optional
