@@ -17,8 +17,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -107,7 +107,7 @@ private fun ResizablePanel(
         }
 
         Icon(
-            if (state.isExpanded) Icons.Default.ArrowBack else Icons.Default.ArrowForward,
+            if (state.isExpanded) Icons.AutoMirrored.Filled.ArrowBack else Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = if (state.isExpanded) "Collapse" else "Expand",
             tint = LocalContentColor.current,
             modifier = Modifier

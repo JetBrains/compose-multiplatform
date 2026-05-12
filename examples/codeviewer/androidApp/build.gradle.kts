@@ -1,37 +1,28 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.compose")
-    id("com.android.application")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.composeMultiplatform)
 }
 
 kotlin {
-    androidTarget()
-    sourceSets {
-        val androidMain by getting {
-            dependencies {
-                implementation(project(":shared"))
-            }
-        }
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
     }
 }
-
-tasks.withType<KotlinCompile>() {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
-    }
+dependencies {
+    implementation(projects.shared)
+    implementation(libs.androidx.activity.compose)
 }
 
 android {
-    compileSdk = 35
+    compileSdk = 37
     namespace = "org.jetbrains.codeviewer"
     defaultConfig {
         applicationId = "org.jetbrains.Codeviewer"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
     }
