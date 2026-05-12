@@ -46,6 +46,10 @@ kotlin {
         }
     }
 
+    compilerOptions {
+        freeCompilerArgs = listOf("-Xexpect-actual-classes")
+    }
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.compose.runtime)
