@@ -1,20 +1,24 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("com.android.application")
-    kotlin("android")
-    kotlin("plugin.compose")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.composeMultiplatform)
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
+    }
 }
 
 android {
-    compileSdk = 35
+    compileSdk = 37
     namespace = "com.example.myapplication"
 
     defaultConfig {
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 37
         applicationId = "org.jetbrains.Issues"
         versionCode = 1
         versionName = "1.0"
@@ -25,12 +29,6 @@ android {
     }
 }
 
-tasks.withType<KotlinCompile>() {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
-    }
-}
-
 dependencies {
-    implementation(project(":common"))
+    implementation(projects.common)
 }

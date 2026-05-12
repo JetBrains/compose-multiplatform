@@ -1,0 +1,29 @@
+[versions]
+kotlin = "2.3.20" # overriden via gradle.properties
+compose = "1.10.1" # overriden via gradle.properties
+agp = "9.2.1" # overriden via gradle.properties
+apollographql = "2.3.0"
+prettytime = "4.0.4.Final"
+androidx-activity = "1.13.0"
+androidx-appcompat = "1.7.1"
+androidx-core = "1.18.0"
+
+[libraries]
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
+core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
+apollo-runtime = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apollographql" }
+prettytime = { module = "org.ocpsoft.prettytime:prettytime", version.ref = "prettytime" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose" }
+compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
+compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "compose" }
+material-icons-core = { module = "org.jetbrains.compose.material:material-icons-core", version = "1.6.11" }
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+apollographql = { id = "com.apollographql.apollo", version.ref = "apollographql" }
