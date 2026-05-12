@@ -71,9 +71,9 @@ RUN yes | $SDK_MANAGER --licenses && \
     ln -s $ANDROID_HOME/platforms/$ANDROID_PLATFORM_NAME $ANDROID_HOME/platforms/$ANDROID_PLATFORM
 
 # Install Google Chrome
-ARG CHROME_VERSION="141.0.7390.122-1"
+ARG CHROME_VERSION="148.0.7778.96-1"
 # https://googlechromelabs.github.io/chrome-for-testing/
-ARG CHROME_DRIVER_VERSION="140.0.7339.82"
+ARG CHROME_DRIVER_VERSION="148.0.7778.96"
 ARG CHROME_BIN=/usr/bin/google-chrome-stable
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A6DCF7707EBC211F && \
