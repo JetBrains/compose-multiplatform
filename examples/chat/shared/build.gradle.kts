@@ -1,20 +1,18 @@
 @file:Suppress("OPT_IN_IS_NOT_ENABLED")
 
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.compose")
-    id("com.android.library")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.androidMultiplatformLibrary)
+    alias(libs.plugins.composeMultiplatform)
 }
 
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    androidTarget()
-
     jvm("desktop")
 
     listOf(
@@ -29,7 +27,12 @@ kotlin {
         }
     }
 
-    js(IR) {
+    js {
+        browser()
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
         browser()
     }
 
@@ -41,69 +44,33 @@ kotlin {
         }
     }
 
-    sourceSets {
-        all {
-            languageSettings {
-                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
-            }
-        }
-        val commonMain by getting {
-            dependencies {
-                implementation(libs.compose.ui)
-                implementation(libs.compose.foundation)
-                implementation(libs.material)
-                implementation(libs.components.resources)
-                implementation(libs.material.icons.core)
-                implementation(libs.kotlinx.datetime)
-            }
-        }
-        val androidMain by getting {
-            dependencies {
-                api(libs.activity.compose)
-                api(libs.appcompat)
-                api(libs.core.ktx)
-            }
-        }
-        val iosMain by creating {
-            dependsOn(commonMain)
-        }
-        val iosArm64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
-        val desktopMain by getting {
-            dependencies {
-                implementation(libs.compose.desktop)
-            }
-        }
-
-        val macosMain by creating {
-            dependsOn(commonMain)
-        }
-        val macosArm64Main by getting {
-            dependsOn(macosMain)
-        }
-    }
-}
-
-tasks.withType<KotlinCompile>() {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
-    }
-}
-
-android {
-    compileSdk = 35
-    namespace = "org.jetbrains.chat"
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-
-    defaultConfig {
+    android {
+        namespace = "org.jetbrains.chat.shared"
+        compileSdk = 37
         minSdk = 26
+
+        androidResources {
+            enable = true
+        }
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_17
+        }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.compose.ui)
+            implementation(libs.compose.ui.tooling.preview)
+            implementation(libs.compose.foundation)
+            implementation(libs.material)
+            implementation(libs.components.resources)
+            implementation(libs.material.icons.core)
+            implementation(libs.kotlinx.datetime)
+        }
+        androidMain.dependencies {
+            api(libs.androidx.activity.compose)
+            api(libs.appcompat)
+            api(libs.core.ktx)
+        }
     }
 }

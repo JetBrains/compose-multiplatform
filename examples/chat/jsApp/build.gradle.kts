@@ -1,21 +1,19 @@
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.compose")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.composeMultiplatform)
 }
 
 kotlin {
-    js(IR) {
+    js {
         browser()
         binaries.executable()
     }
     sourceSets {
-        val jsMain by getting  {
-            dependencies {
-                implementation(project(":shared"))
-                implementation(libs.compose.ui)
-                implementation(libs.compose.foundation)
-            }
+        jsMain.dependencies {
+            implementation(projects.shared)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.foundation)
         }
     }
 }

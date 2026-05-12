@@ -1,15 +1,29 @@
 [versions]
-compose = "1.9.1"
+kotlin = "2.3.20" # overriden via gradle.properties
+compose = "1.10.1" # overriden via gradle.properties
+agp = "9.2.1" # overriden via gradle.properties
 kotlinxDatetime = "0.5.0"
+androidx-activity = "1.13.0"
+androidx-appcompat = "1.7.1"
+androidx-core = "1.18.0"
 
 [libraries]
-activity-compose = { module = "androidx.activity:activity-compose", version = "1.7.2" }
-appcompat = { module = "androidx.appcompat:appcompat", version = "1.6.1" }
-core-ktx = { module = "androidx.core:core-ktx", version = "1.10.1" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
+core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 compose-ui = { module = "org.jetbrains.compose.ui:ui", version.ref = "compose" }
+compose-ui-tooling-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 compose-desktop = { module = "org.jetbrains.compose.desktop:desktop", version.ref = "compose" }
 material = { module = "org.jetbrains.compose.material:material", version.ref = "compose" }
 material-icons-core = { module = "org.jetbrains.compose.material:material-icons-core", version = "1.7.3" }
 compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", version.ref = "compose" }
 components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose"}
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

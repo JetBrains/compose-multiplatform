@@ -24,7 +24,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-internal inline fun Messages(
+internal fun Messages(
     messages: List<Message>,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
