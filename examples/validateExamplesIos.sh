@@ -12,22 +12,11 @@ fi
 COMPOSE_VERSION=$1
 KOTLIN_VERSION=$2
 
-ARCH="$(uname -m)"
-isX86="$ARCH"=="x86_64"
-
-linkCmd=""
-
-if [ isX86 ]; then
-    linkCmd="linkIosX64"
-else
-    linkCmd="linkIosArm64"
-fi
-
 
 runGradle() {
     pushd $1
     echo "Validating $1"
-    ./gradlew clean $linkCmd -Pcompose.version=$COMPOSE_VERSION -Pkotlin.version=$KOTLIN_VERSION --rerun-tasks || (echo "Failed $1" && exit 1)
+    ./gradlew clean linkIosArm64 -Pcompose.version=$COMPOSE_VERSION -Pkotlin.version=$KOTLIN_VERSION --rerun-tasks || (echo "Failed $1" && exit 1)
     popd
 }
 
