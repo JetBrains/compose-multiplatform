@@ -1,17 +1,26 @@
+@file:Suppress("UnstableApiUsage")
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
     repositories {
         gradlePluginPortal()
         maven("https://packages.jetbrains.team/maven/p/cmp/dev")
         google()
     }
+}
 
-    plugins {
-        val kotlinVersion = extra["kotlin.version"] as String
-        val composeVersion = extra["compose.version"] as String
+dependencyResolutionManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+    }
 
-        kotlin("multiplatform").version(kotlinVersion)
-        kotlin("plugin.compose").version(kotlinVersion)
-        id("org.jetbrains.compose").version(composeVersion)
+    versionCatalogs {
+        create("libs") {
+            version("kotlin", extra["kotlin.version"].toString())
+            version("compose", extra["compose.version"].toString())
+        }
     }
 }
 

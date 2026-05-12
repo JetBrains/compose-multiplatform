@@ -1,9 +1,7 @@
-@file:Suppress("OPT_IN_IS_NOT_ENABLED")
-
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.compose")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.composeMultiplatform)
 }
 
 version = "1.0-SNAPSHOT"
@@ -22,21 +20,10 @@ kotlin {
     }
 
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                implementation(compose.ui)
-                implementation(compose.foundation)
-                implementation(compose.material)
-            }
-        }
-        val iosMain by creating {
-            dependsOn(commonMain)
-        }
-        val iosArm64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
+        commonMain.dependencies {
+            implementation(libs.compose.ui)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material)
         }
     }
 }
