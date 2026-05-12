@@ -1,27 +1,22 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.compose")
-    id("com.android.library")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.androidMultiplatformLibrary)
+    alias(libs.plugins.composeMultiplatform)
 }
 
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    androidTarget()
-
     jvm("desktop")
-    js(IR) {
+    js {
         browser()
     }
 
-    listOf(
-        macosArm64()
-    ).forEach { macosTarget ->
-        macosTarget.binaries {
+    macosArm64 {
+        binaries {
             executable {
                 entryPoint = "main"
             }
@@ -38,6 +33,19 @@ kotlin {
         }
     }
 
+    android {
+        namespace = "org.jetbrains.Graphics2D"
+        compileSdk = 37
+        minSdk = 26
+
+        androidResources {
+            enable = true
+        }
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_17
+        }
+    }
+
     sourceSets {
         all {
             languageSettings {
@@ -45,45 +53,17 @@ kotlin {
             }
         }
         commonMain.dependencies {
-            implementation(compose.ui)
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material3)
-            implementation(compose.components.resources)
-            implementation("org.jetbrains.compose.material:material-icons-core:1.6.11")
-        }
-        commonTest.dependencies {
-            implementation(kotlin("test"))
-            implementation(kotlin("test-annotations-common"))
+            implementation(libs.compose.ui)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material3)
+            implementation(libs.components.resources)
+            implementation(libs.material.icons.core)
         }
         androidMain.dependencies {
-            api("androidx.activity:activity-compose:1.7.2")
-            api("androidx.appcompat:appcompat:1.6.1")
-            api("androidx.core:core-ktx:1.10.1")
+            api(libs.androidx.activity.compose)
+            api(libs.appcompat)
+            api(libs.core.ktx)
         }
-        val desktopMain by getting
-        desktopMain.dependencies {
-            implementation(compose.desktop.common)
-        }
-    }
-}
-
-tasks.withType<KotlinCompile>() {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
-    }
-}
-
-android {
-    compileSdk = 35
-    namespace = "org.jetbrains.Graphics2D"
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-
-    defaultConfig {
-        minSdk = 26
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
 }
