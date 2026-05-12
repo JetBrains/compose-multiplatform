@@ -62,7 +62,7 @@ RUN mkdir -p $CMD_TOOLS_ROOT && \
     unzip cmd-tools.zip && \
     rm cmd-tools.zip && \
     mv cmdline-tools/* $CMD_TOOLS_ROOT/
-ARG ANDROID_PLATFORM=android-35
+ARG ANDROID_PLATFORM=android-37
 RUN yes | $SDK_MANAGER --licenses && \
     $SDK_MANAGER "platforms;$ANDROID_PLATFORM" && \
     cd $ANDROID_HOME/platforms/$ANDROID_PLATFORM && \
