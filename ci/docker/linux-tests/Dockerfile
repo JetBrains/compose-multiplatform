@@ -63,15 +63,17 @@ RUN mkdir -p $CMD_TOOLS_ROOT && \
     rm cmd-tools.zip && \
     mv cmdline-tools/* $CMD_TOOLS_ROOT/
 ARG ANDROID_PLATFORM=android-37
+ARG ANDROID_PLATFORM_NAME=android-37.0
 RUN yes | $SDK_MANAGER --licenses && \
-    $SDK_MANAGER "platforms;$ANDROID_PLATFORM" && \
-    cd $ANDROID_HOME/platforms/$ANDROID_PLATFORM && \
-    ls -1 | grep -v android.jar | xargs rm -rf
+    $SDK_MANAGER --channel=1 "platforms;$ANDROID_PLATFORM_NAME" && \
+    cd $ANDROID_HOME/platforms/$ANDROID_PLATFORM_NAME && \
+    ls -1 | grep -v android.jar | xargs rm -rf && \
+    ln -s $ANDROID_HOME/platforms/$ANDROID_PLATFORM_NAME $ANDROID_HOME/platforms/$ANDROID_PLATFORM
 
 # Install Google Chrome
-ARG CHROME_VERSION="141.0.7390.122-1"
+ARG CHROME_VERSION="148.0.7778.96-1"
 # https://googlechromelabs.github.io/chrome-for-testing/
-ARG CHROME_DRIVER_VERSION="140.0.7339.82"
+ARG CHROME_DRIVER_VERSION="148.0.7778.96"
 ARG CHROME_BIN=/usr/bin/google-chrome-stable
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A6DCF7707EBC211F && \
