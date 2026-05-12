@@ -9,6 +9,7 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.internal.IdeaImportTask
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentOS
@@ -16,6 +17,7 @@ import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.relativeTo
 
+@DisableCachingByDefault(because = "IDE import task — not worth caching")
 internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     @get:Input
     abstract val packageName: Property<String>

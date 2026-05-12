@@ -15,6 +15,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
@@ -27,6 +28,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.process.ExecResult
 import org.gradle.work.ChangeType
+import org.gradle.work.DisableCachingByDefault
 import org.gradle.work.InputChanges
 import org.jetbrains.compose.desktop.application.dsl.FileAssociation
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
@@ -79,11 +81,13 @@ import javax.inject.Inject
 import kotlin.io.path.isExecutable
 import kotlin.io.path.isRegularFile
 
+@DisableCachingByDefault(because = "Uses platform-specific JDK tools whose output depends on local JDK installation")
 abstract class AbstractJPackageTask @Inject constructor(
     @get:Input
     val targetFormat: TargetFormat,
 ) : AbstractJvmToolOperationTask("jpackage") {
     @get:InputFiles
+    @get:Classpath
     val files: ConfigurableFileCollection = objects.fileCollection()
 
     /**
@@ -120,6 +124,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:InputDirectory
     @get:Optional
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     /** @see internal/wixToolset.kt */
     val wixToolsetDir: DirectoryProperty = objects.directoryProperty()
 
@@ -273,10 +278,12 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:InputDirectory
     @get:Optional
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     val runtimeImage: DirectoryProperty = objects.directoryProperty()
 
     @get:InputDirectory
     @get:Optional
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     val appImage: DirectoryProperty = objects.directoryProperty()
 
     @get:Input
@@ -289,6 +296,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:InputFile
     @get:Optional
+    @get:PathSensitive(PathSensitivity.NONE)
     val javaRuntimePropertiesFile: RegularFileProperty = objects.fileProperty()
 
     @get:Input

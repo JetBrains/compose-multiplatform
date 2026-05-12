@@ -10,15 +10,19 @@ import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileSystemOperations
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.internal.utils.clearDirs
 import java.io.File
 import javax.inject.Inject
 
+@DisableCachingByDefault(because = "Not worth caching — fast JAR extraction")
 abstract class UnpackSkikoWasmRuntimeTask : DefaultTask() {
     @get:InputFiles
+    @get:Classpath
     lateinit var skikoRuntimeFiles: FileCollection
 
     @get:OutputDirectory

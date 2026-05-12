@@ -6,6 +6,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.*
 import org.jetbrains.compose.internal.utils.*
@@ -14,11 +15,14 @@ import org.jetbrains.compose.internal.utils.javaExecutable
 import org.jetbrains.compose.internal.utils.notNullProperty
 import java.io.File
 
+@DisableCachingByDefault(because = "Sends preview configuration to IDE — not a build artifact to cache")
 abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask() {
     @get:InputFiles
+    @get:Classpath
     internal lateinit var previewClasspath: FileCollection
 
     @get:InputFiles
+    @get:Classpath
     internal abstract val skikoRuntime: Property<FileCollection>
 
     @get:Internal
@@ -42,6 +46,7 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
         project.providers.gradleProperty("compose.desktop.preview.ide.port")
 
     @get:InputFiles
+    @get:Classpath
     internal val uiTooling: FileCollection =
         project.detachedComposeDependency(
             groupId = "org.jetbrains.compose.ui",
@@ -49,6 +54,7 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
         ).excludeTransitiveDependencies()
 
     @get:InputFiles
+    @get:Classpath
     internal val hostClasspath: FileCollection =
         project.detachedComposeGradleDependency(artifactId = "preview-rpc")
 

@@ -11,6 +11,9 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.desktop.application.internal.RuntimeCompressionLevel
 import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.cliArg
@@ -21,6 +24,7 @@ import java.io.File
 
 // todo: public DSL
 // todo: deduplicate if multiple runtimes are created
+@DisableCachingByDefault(because = "Uses platform-specific JDK tools whose output depends on local JDK installation")
 abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
     @get:Input
     val modules: ListProperty<String> = objects.listProperty(String::class.java)
@@ -29,6 +33,7 @@ abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
     val includeAllModules: Property<Boolean> = objects.notNullProperty()
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     val javaRuntimePropertiesFile: RegularFileProperty = objects.fileProperty()
 
     @get:Input

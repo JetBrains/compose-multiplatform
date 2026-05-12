@@ -7,10 +7,12 @@ package org.jetbrains.compose.desktop.tasks
 
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.desktop.application.internal.files.copyZipEntry
 import org.jetbrains.compose.desktop.application.internal.files.isJarFile
 import org.jetbrains.compose.internal.utils.delete
@@ -37,9 +39,11 @@ import java.util.zip.ZipOutputStream
  * - Windows filesystem is case-insensitive and not every jar can be unzipped without losing files
  * - it's just faster
  */
+@DisableCachingByDefault(because = "Not worth caching — fast file merging operation")
 abstract class AbstractJarsFlattenTask : AbstractComposeDesktopTask() {
 
     @get:InputFiles
+    @get:Classpath
     val inputFiles: ConfigurableFileCollection = objects.fileCollection()
 
     @get:OutputFile

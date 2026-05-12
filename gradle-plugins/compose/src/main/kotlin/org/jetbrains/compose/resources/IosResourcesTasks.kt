@@ -14,9 +14,11 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import javax.inject.Inject
 
+@DisableCachingByDefault(because = "Syncs resources to iOS Xcode build dir — not worth caching")
 internal abstract class SyncComposeResourcesForIosTask : DefaultTask() {
 
     private fun Provider<String>.orElseThrowMissingAttributeError(attribute: String): Provider<String> {
@@ -142,6 +144,7 @@ private fun getRequestedKonanTargetsByXcode(platform: String, archs: List<String
  * so we can't handle an exception when it occurs. Therefore, we make SyncComposeResourcesForIosTask
  * depend on CheckCanAccessComposeResourcesDirectory, where we check ENABLE_USER_SCRIPT_SANDBOXING.
  */
+@DisableCachingByDefault(because = "Checks environment variable — not worth caching")
 internal abstract class CheckCanAccessComposeResourcesDirectory : DefaultTask() {
     @get:Input
     val enabled = project.providers.environmentVariable("ENABLE_USER_SCRIPT_SANDBOXING")

@@ -12,12 +12,14 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.process.ExecResult
+import org.gradle.work.DisableCachingByDefault
 import org.gradle.work.InputChanges
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import org.jetbrains.compose.internal.utils.*
 import java.io.File
 
+@DisableCachingByDefault(because = "Uses platform-specific JDK tools whose output depends on local JDK installation")
 abstract class AbstractJvmToolOperationTask(private val toolName: String) : AbstractComposeDesktopTask() {
     @get:LocalState
     protected val workingDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/$name")

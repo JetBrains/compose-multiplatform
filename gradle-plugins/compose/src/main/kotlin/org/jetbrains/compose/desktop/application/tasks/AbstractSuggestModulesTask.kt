@@ -12,6 +12,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.desktop.application.dsl.DEFAULT_RUNTIME_MODULES
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
@@ -19,6 +20,7 @@ import org.jetbrains.compose.desktop.application.internal.files.normalizedPath
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import org.jetbrains.compose.internal.utils.*
 
+@DisableCachingByDefault(because = "Not worth caching — prints module suggestions to console")
 abstract class AbstractSuggestModulesTask : AbstractComposeDesktopTask() {
     @get:Input
     val javaHome: Property<String> = objects.notNullProperty<String>().apply {
@@ -26,6 +28,7 @@ abstract class AbstractSuggestModulesTask : AbstractComposeDesktopTask() {
     }
 
     @get:InputFiles
+    @get:Classpath
     val files: ConfigurableFileCollection = objects.fileCollection()
 
     @get:InputFile

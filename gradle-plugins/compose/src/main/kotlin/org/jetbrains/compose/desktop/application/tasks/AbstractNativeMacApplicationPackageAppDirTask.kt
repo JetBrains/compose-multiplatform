@@ -10,6 +10,7 @@ import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder
 import org.jetbrains.compose.desktop.application.internal.PlistKeys
 import org.jetbrains.compose.internal.utils.ioFile
@@ -19,6 +20,7 @@ import java.io.File
 
 private const val KOTLIN_NATIVE_MIN_SUPPORTED_MAC_OS = "10.13"
 
+@DisableCachingByDefault(because = "Uses platform-specific native tools whose output depends on local system")
 abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMacApplicationPackageTask() {
     @get:InputFile
     @get:PathSensitive(PathSensitivity.ABSOLUTE)

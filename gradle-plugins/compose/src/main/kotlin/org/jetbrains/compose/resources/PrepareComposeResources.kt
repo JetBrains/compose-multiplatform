@@ -13,7 +13,10 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFiles
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.SkipWhenEmpty
+import org.gradle.work.DisableCachingByDefault
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.compose.internal.IdeaImportTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
@@ -79,6 +82,7 @@ internal fun Project.getPreparedComposeResourcesDir(sourceSet: KotlinSourceSet):
 private fun getPrepareComposeResourcesTaskName(sourceSet: KotlinSourceSet) =
     "prepareComposeResourcesTaskFor${sourceSet.name.uppercaseFirstChar()}"
 
+@DisableCachingByDefault(because = "IDE import task — not worth caching")
 internal abstract class CopyNonXmlValueResourcesTask : IdeaImportTask() {
     @get:Inject
     abstract val fileSystem: FileSystemOperations
@@ -89,6 +93,7 @@ internal abstract class CopyNonXmlValueResourcesTask : IdeaImportTask() {
     @get:InputFiles
     @get:SkipWhenEmpty
     @get:IgnoreEmptyDirectories
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     val realInputFiles = originalResourcesDir.map { dir ->
         dir.asFileTree.matching { it.exclude("values*/*.xml") }
     }
@@ -113,15 +118,18 @@ internal abstract class CopyNonXmlValueResourcesTask : IdeaImportTask() {
     }
 }
 
+@DisableCachingByDefault(because = "IDE import task — not worth caching")
 internal abstract class PrepareComposeResourcesTask : IdeaImportTask() {
     @get:InputFiles
     @get:SkipWhenEmpty
     @get:IgnoreEmptyDirectories
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val convertedXmls: Property<FileTree>
 
     @get:InputFiles
     @get:SkipWhenEmpty
     @get:IgnoreEmptyDirectories
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val copiedNonXmls: Property<FileTree>
 
     @get:OutputDirectory
@@ -152,6 +160,7 @@ internal data class ValueResourceRecord(
     }
 }
 
+@DisableCachingByDefault(because = "IDE import task — not worth caching")
 internal abstract class XmlValuesConverterTask : IdeaImportTask() {
     companion object {
         const val CONVERTED_RESOURCE_EXT = "cvr" //Compose Value Resource
@@ -167,6 +176,7 @@ internal abstract class XmlValuesConverterTask : IdeaImportTask() {
     @get:InputFiles
     @get:SkipWhenEmpty
     @get:IgnoreEmptyDirectories
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     val realInputFiles = originalResourcesDir.map { dir ->
         dir.asFileTree.matching { it.include("values*/*.xml") }
     }

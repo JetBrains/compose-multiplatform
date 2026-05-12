@@ -16,6 +16,7 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
@@ -73,6 +74,7 @@ private fun KotlinTarget.configureRuntimeLibrariesCompatibilityCheck() {
     }
 }
 
+@DisableCachingByDefault(because = "Not worth caching")
 internal abstract class RuntimeLibrariesCompatibilityCheck : DefaultTask() {
     private companion object {
         val composeLibrariesForCheck = setOf(

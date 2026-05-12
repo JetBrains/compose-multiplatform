@@ -8,9 +8,11 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.internal.IdeaImportTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 
+@DisableCachingByDefault(because = "IDE import task — not worth caching")
 internal abstract class GenerateExpectResourceCollectorsTask : IdeaImportTask() {
     @get:Input
     abstract val packageName: Property<String>
@@ -46,6 +48,7 @@ internal abstract class GenerateExpectResourceCollectorsTask : IdeaImportTask() 
     }
 }
 
+@DisableCachingByDefault(because = "IDE import task — not worth caching")
 internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() {
     @get:Input
     abstract val packageName: Property<String>
