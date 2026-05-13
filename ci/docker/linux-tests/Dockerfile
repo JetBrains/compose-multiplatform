@@ -69,15 +69,16 @@ RUN yes | $SDK_MANAGER --licenses && \
     ls -1 | grep -v android.jar | xargs rm -rf
 
 # Install Google Chrome
-ARG CHROME_VERSION="148.0.7778.96-1"
+ARG CHROME_VERSION="148.0.7778.96"
 # https://googlechromelabs.github.io/chrome-for-testing/
 ARG CHROME_DRIVER_VERSION="148.0.7778.96"
 ARG CHROME_BIN=/usr/bin/google-chrome-stable
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A6DCF7707EBC211F && \
-    echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list && \
+RUN wget https://storage.googleapis.com/chrome-for-testing-public/$CHROME_VERSION/linux64/chrome-linux64.zip -P /tmp && \
+    unzip -q /tmp/chrome-linux64.zip -d /opt && \
+    rm /tmp/chrome-linux64.zip && \
     apt update -y && \
-    apt install -y google-chrome-stable=$CHROME_VERSION && \
+    while read pkg; do apt-get satisfy -y --no-install-recommends "${pkg}"; done < /opt/chrome-linux64/deb.deps && \
+    ln -sf /opt/chrome-linux64/chrome /usr/bin/google-chrome-stable && \
     wget https://storage.googleapis.com/chrome-for-testing-public/$CHROME_DRIVER_VERSION/linux64/chromedriver-linux64.zip -P ~/tmp && \
     mkdir -p /root/.gradle/selenium/chrome && unzip -d /root/.gradle/selenium/chrome ~/tmp/chromedriver-linux64.zip && rm ~/tmp/chromedriver-linux64.zip && \
     rm -rf /var/lib/apt/lists/*
