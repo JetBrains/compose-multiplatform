@@ -43,7 +43,6 @@ _Changes since 1.10.3_
 
 - Renamed `WebElementView` to `HtmlElementView` to better reflect its HTML-specific purpose [#2636](https://github.com/JetBrains/compose-multiplatform-core/pull/2636)
 - `WebElementView` has been deprecated in favor of `HtmlElementView` [#2641](https://github.com/JetBrains/compose-multiplatform-core/pull/2641)
-- Kotlin 2.3.10 or newer is required to use Compose Multiplatform with Kotlin/Wasm target [#2790](https://github.com/JetBrains/compose-multiplatform-core/pull/2790)
 - Kotlin 2.3.20 is required when using Compose Multiplatform with Kotlin/JS or Kotlin/Wasm [#2918](https://github.com/JetBrains/compose-multiplatform-core/pull/2918)
 
 ### Navigation
@@ -57,7 +56,7 @@ _Changes since 1.10.3_
 - Clicking outside of any focusable node using the mouse will now clear focus from the currently focused node, if any. This behavior can be disabled by setting `isClearFocusOnMouseDownEnabled = false` in `ComposePanel`, `ComposeWindow` or `ComposeDialog` [#2533](https://github.com/JetBrains/compose-multiplatform-core/pull/2533)
 - Migrate window insets padding modifiers from `composed` API to `InsetsPaddingModifierNode` [#2572](https://github.com/JetBrains/compose-multiplatform-core/pull/2572)
 - Add enter end exit animation for `Dialog`. It can be disabled via `DialogProperties.animateTransition` or via global feature flag `ComposeUiFlags.isDialogAnimationEnabled` [#2596](https://github.com/JetBrains/compose-multiplatform-core/pull/2596)
-- Update skia to m144 [#2779](https://github.com/JetBrains/compose-multiplatform-core/pull/2779)
+- Update Skia to m144 [#2779](https://github.com/JetBrains/compose-multiplatform-core/pull/2779)
 - Support v2 Compose UI Tests APIs on non-android targets which uses `StandardTestDispatcher` by default instead of `UnconfinedTestDispatcher` [#2919](https://github.com/JetBrains/compose-multiplatform-core/pull/2919)
 - Support a customization of `effectContext` in Compose UI tests [#2919](https://github.com/JetBrains/compose-multiplatform-core/pull/2919)
 - Implement drag-to-scroll in `SelectionContainer`. When the mouse pointer is dragged outside the element while selecting text, the text element will be scrolled accordingly. Note that this requires wrapping the content in a scrolling container/modifier, e.g. `Modifier.verticalScroll` [#2979](https://github.com/JetBrains/compose-multiplatform-core/pull/2979)
@@ -177,12 +176,11 @@ _Changes since 1.10.3_
 - [Accessibility] Improve performance of traversal groups with a large amount of children [#2900](https://github.com/JetBrains/compose-multiplatform-core/pull/2900)
 - Clear some scheduled tasks on scene closure [#2888](https://github.com/JetBrains/compose-multiplatform-core/pull/2888)
 - [`ComposePanel` in `compose.swing.render.on.graphics` mode] Fix Metal offscreen rendering crash when drawing to a Software renderer [#3009](https://github.com/JetBrains/compose-multiplatform-core/pull/3009)
-- Update bundled Compose Hot Reload version to 1.1.0 [#5590](https://github.com/JetBrains/compose-multiplatform/pull/5590)
 - Update bundled Compose Hot Reload version to 1.1.1 [#5596](https://github.com/JetBrains/compose-multiplatform/pull/5596)
 
 ### Web
 
-- `WebElementView` is now available in `webMain` source set [#2614](https://github.com/JetBrains/compose-multiplatform-core/pull/2614)
+- `HtmlElementView` is now available in `webMain` source set [#2614](https://github.com/JetBrains/compose-multiplatform-core/pull/2614)
 - Deprecated `CanvasBasedWindow` has been deleted [#2614](https://github.com/JetBrains/compose-multiplatform-core/pull/2614)
 - Adjust HTML hierarchy for proper interop container location outside the shadow DOM [#2710](https://github.com/JetBrains/compose-multiplatform-core/pull/2710)
 - Ignore duplicate mouse events following touch events on web to avoid unintended clicks [#2741](https://github.com/JetBrains/compose-multiplatform-core/pull/2741)
@@ -228,9 +226,9 @@ _Changes since 1.10.3_
 | Material | `org.jetbrains.compose.material:material*:1.11.0` | [Material 1.11.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.11.1) |
 | Material3 | `org.jetbrains.compose.material3:material3*:1.11.0-alpha07` | [Material3 1.5.0-alpha17](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha17) |
 | Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-alpha07` | [Material3 Adaptive 1.3.0-alpha10](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-alpha10) |
-| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0-beta02` | [Lifecycle 2.11.0-beta01](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0-beta01) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0-beta01` | [Lifecycle 2.11.0-beta01](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0-beta01) |
 | Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.2` | [Navigation 2.9.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.7) |
-| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.1.2` | [Navigation3 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigation3#1.1.1) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.1.1` | [Navigation3 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigation3#1.1.1) |
 | Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0` | [Navigation Event 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.1) |
 | Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
 | WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
