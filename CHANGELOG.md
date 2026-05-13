@@ -2,12 +2,6 @@
 
 _Changes since 1.10.3_
 
-## Known Issues
-
-### Desktop
-
-- [macOS] [`SwingPanel` doesn't render](https://youtrack.jetbrains.com/issue/CMP-9690) [#2669](https://github.com/JetBrains/compose-multiplatform-core/pull/2669)
-
 ## Breaking Changes
 
 ### Multiple Platforms
@@ -190,7 +184,6 @@ _Changes since 1.10.3_
 - Support cursor control using space bar sliding gesture on Android Web [#2762](https://github.com/JetBrains/compose-multiplatform-core/pull/2762)
 - Fix scrolling sudden stops or speed-ups in web apps [#2764](https://github.com/JetBrains/compose-multiplatform-core/pull/2764)
 - Improvements of the Web scroll behavior [#2766](https://github.com/JetBrains/compose-multiplatform-core/pull/2766)
-- _(pre-release)_  Make canvas focused so it receives key events (e.g. ESC) [#2796](https://github.com/JetBrains/compose-multiplatform-core/pull/2796)
 - Unified touch and pointer event handling for better consistency and performance on Web [#2799](https://github.com/JetBrains/compose-multiplatform-core/pull/2799)
 - Fix Magic mouse behaviour in Safari and Firefox [#2811](https://github.com/JetBrains/compose-multiplatform-core/pull/2811)
 - Fix incorrect mouse click detection [#2844](https://github.com/JetBrains/compose-multiplatform-core/pull/2844)
