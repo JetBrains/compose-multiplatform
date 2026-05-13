@@ -1,7 +1,9 @@
 pluginManagement {
     repositories {
         mavenLocal()
-        mavenCentral()
+        mavenCentral {
+            url = uri("https://cache-redirector.jetbrains.com/maven-central")
+        }
         gradlePluginPortal()
         maven("https://packages.jetbrains.team/maven/p/cmp/dev")
         google()
