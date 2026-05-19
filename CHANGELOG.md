@@ -47,7 +47,7 @@ _Changes since 1.11.0_
 
 ### Desktop
 
-- [ComposePanel in Swing rendering mode] Fix Metal offscreen rendering crash when drawing to a Software renderer [#3008](https://github.com/JetBrains/compose-multiplatform-core/pull/3008)
+- [`ComposePanel` in Swing rendering mode] Fix Metal offscreen rendering crash when drawing to a Software renderer [#3008](https://github.com/JetBrains/compose-multiplatform-core/pull/3008)
 - Fix `SwingPanel` size not scaling according to `LocalDensity`. Note that this doesn't scale the Swing content of the `SwingPanel` [#3033](https://github.com/JetBrains/compose-multiplatform-core/pull/3033)
 
 ## Components
