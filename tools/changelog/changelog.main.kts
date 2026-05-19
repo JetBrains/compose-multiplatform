@@ -55,8 +55,10 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.system.exitProcess
 
-val changelogFile = __FILE__.resolve("../../../CHANGELOG.md").canonicalFile
-val prFormatFile = File("PR_FORMAT.md")
+val scriptDir = getScriptPathFromArgs().parentFile
+
+val changelogFile = scriptDir.parentFile.parentFile.resolve("CHANGELOG.md")
+val prFormatFile = scriptDir.resolve("PR_FORMAT.md")
 val prFormatLink = "https://github.com/JetBrains/compose-multiplatform/blob/master/tools/changelog/PR_FORMAT.md"
 
 val argsKeyless = args
@@ -528,7 +530,7 @@ fun gitLogShas(folder: File, firstCommit: String, lastCommit: String, additional
  */
 fun githubClone(repo: String): File {
     val url = "https://github.com/$repo"
-    val folder = File("build/github/$repo")
+    val folder = scriptDir.resolve("build/github/$repo")
     val absolutePath = folder.absolutePath
     if (!folder.exists() || folder.listFiles()?.isEmpty() == true) {
         folder.mkdirs()
@@ -686,5 +688,14 @@ class Cache<K, V>(private val create: (K) -> V) {
     private val map = mutableMapOf<K,V>()
     operator fun get(key: K): V = map.getOrPut(key) { create(key) }
 }
+
+// Avoid using __FILE__ here since it has a caching bug
+// https://youtrack.jetbrains.com/issue/KT-77524/
+fun getScriptPathFromArgs(): File =
+    System.getProperty("sun.java.command")
+        ?.split(" ")
+        ?.find { it.endsWith(".kts") }
+        ?.let { File(it).canonicalFile }
+        ?: error("Can't find script path from args: ${System.getProperty("sun.java.command")}")
 
 //endregion
