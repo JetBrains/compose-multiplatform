@@ -594,6 +594,19 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun packagingResources() = with(testProject("application/packagingResources")) {
+        gradle(":createDistributable").checks {
+            check.taskSuccessful(":createDistributable")
+
+            // Files from packagingResourcesRootDir must be copied into the
+            // directory passed to jpackage via --resource-dir, for both the
+            // `common` and the current-OS subdirectories.
+            file("build/compose/tmp/resources/common-packaging-resource.txt").checkExists()
+            file("build/compose/tmp/resources/os-specific-packaging-resource.txt").checkExists()
+        }
+    }
+
+    @Test
     fun testWixUnzip() {
         Assumptions.assumeTrue(currentOS == OS.Windows) { "The test is only relevant for Windows" }
 

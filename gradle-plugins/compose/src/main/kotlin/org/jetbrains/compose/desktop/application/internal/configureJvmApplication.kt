@@ -318,6 +318,7 @@ private fun JvmApplicationContext.configurePackageTask(
         packageTask.packageVendor.set(packageTask.provider { executables.vendor })
         packageTask.packageVersion.set(packageVersionFor(packageTask.targetFormat))
         packageTask.licenseFile.set(executables.licenseFile)
+        packageTask.packagingResourcesRootDir.set(executables.packagingResourcesRootDir)
     }
 
     packageTask.destinationDir.set(app.nativeDistributions.outputBaseDir.map {

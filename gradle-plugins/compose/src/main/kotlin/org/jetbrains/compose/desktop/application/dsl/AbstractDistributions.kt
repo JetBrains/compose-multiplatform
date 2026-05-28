@@ -30,6 +30,20 @@ abstract class AbstractDistributions {
     var description: String? = null
     var vendor: String? = null
     val appResourcesRootDir: DirectoryProperty = objects.directoryProperty()
+
+    /**
+     * Root directory for files passed to the underlying packaging tool (jpackage)
+     * via `--resource-dir`, used to override the tool's own packaging resources (e.g.
+     * a `<package-name>-volume.icns` DMG volume icon, a DMG background, Linux
+     * `preinst`/`postinst` scripts, or WiX templates). See
+     * https://docs.oracle.com/en/java/javase/21/jpackage/override-jpackage-resources.html
+     *
+     * Files are resolved from `common`, `<os>` and `<os>-<arch>` subdirectories, the
+     * same layout as [appResourcesRootDir]. The generated `Info.plist` and
+     * `product-def.plist` are managed by Compose and always take precedence.
+     */
+    val packagingResourcesRootDir: DirectoryProperty = objects.directoryProperty()
+
     val licenseFile: RegularFileProperty = objects.fileProperty()
 
     var targetFormats: Set<TargetFormat> = EnumSet.noneOf(TargetFormat::class.java)
