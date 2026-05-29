@@ -44,7 +44,7 @@ ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
 ENV JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
 
 # Install JBR
-ARG JBR_DISTR=jbr_jcef-21.0.8-linux-x64-b1163.62
+ARG JBR_DISTR=jbr_jcef-25.0.3-linux-x64-b496.62
 ARG JBR_DISTR_ARCH=$JBR_DISTR.tar.gz
 RUN wget https://cache-redirector.jetbrains.com/intellij-jbr/$JBR_DISTR_ARCH && \
     tar xzf $JBR_DISTR_ARCH && \
