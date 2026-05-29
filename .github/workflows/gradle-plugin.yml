@@ -24,11 +24,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v5
 
-      - name: Setup JDK 21
+      - name: Setup JDK 25
         uses: actions/setup-java@v4
         with:
           distribution: 'jetbrains'
-          java-version: '21'
+          java-version: '25'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
