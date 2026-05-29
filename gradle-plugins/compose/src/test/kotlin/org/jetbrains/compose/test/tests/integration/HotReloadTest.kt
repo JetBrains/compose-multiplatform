@@ -124,6 +124,15 @@ class HotReloadTest : GradlePluginTestBase() {
                 """.trimIndent()
             )
         }
+        modifyText("build.gradle") {
+            //  Set JDK 25 toolchain as we use JBR 25 on CI
+            it.replace("jvm()",
+                """
+                    jvm()
+                    jvmToolchain(25)
+                """.trimIndent()
+                )
+        }
         gradle("hotRunJvm", "-Pcompose.reload.headless=true").checks {
             check.taskSuccessful(":hotRunJvm")
             check.logContains("Compose Hot Reload ($externalHotReloadVersion)")
