@@ -103,7 +103,7 @@ class HotReloadTest : GradlePluginTestBase() {
 
     @Test
     fun testExternalHotReload() = with(testProject("application/mpp")) {
-        val externalHotReloadVersion = "1.0.0-rc01"
+        val externalHotReloadVersion = "1.1.0"
         modifyText("settings.gradle") {
             //  Set the explicit version of Compose Hot Reload in the "pluginManagement {" block
             it.replace(
@@ -123,6 +123,15 @@ class HotReloadTest : GradlePluginTestBase() {
                             id "org.jetbrains.compose.hot-reload"
                 """.trimIndent()
             )
+        }
+        modifyText("build.gradle") {
+            //  Set JDK 25 toolchain as we use JBR 25 on CI
+            it.replace("jvm()",
+                """
+                    jvm()
+                    jvmToolchain(25)
+                """.trimIndent()
+                )
         }
         gradle("hotRunJvm", "-Pcompose.reload.headless=true").checks {
             check.taskSuccessful(":hotRunJvm")
