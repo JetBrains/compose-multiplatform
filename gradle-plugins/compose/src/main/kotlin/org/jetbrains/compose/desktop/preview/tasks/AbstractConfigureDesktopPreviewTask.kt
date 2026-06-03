@@ -12,7 +12,7 @@ import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.*
 import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.internal.utils.javaExecutable
-import org.jetbrains.compose.internal.utils.notNullProperty
+import org.jetbrains.compose.internal.utils.property
 import java.io.File
 
 @DisableCachingByDefault(because = "Sends preview configuration to IDE — not a build artifact to cache")
@@ -26,7 +26,7 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
     internal abstract val skikoRuntime: Property<FileCollection>
 
     @get:Internal
-    internal val javaHome: Property<String> = objects.notNullProperty<String>().apply {
+    internal val javaHome: Property<String> = objects.property<String>().apply {
         set(providers.systemProperty("java.home"))
     }
 

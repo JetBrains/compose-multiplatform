@@ -11,7 +11,7 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
-import org.jetbrains.compose.internal.utils.notNullProperty
+import org.jetbrains.compose.internal.utils.property
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import javax.inject.Inject
 
@@ -34,7 +34,7 @@ abstract class ComposeExtension @Inject constructor(
      * (see available versions here: https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility)
      */
     @Deprecated("Since Kotlin $newCompilerIsAvailableVersion Compose Compiler configuration is moved to the \"$newComposeCompilerKotlinSupportPluginId\" plugin")
-    val kotlinCompilerPlugin: Property<String> = objects.notNullProperty()
+    val kotlinCompilerPlugin: Property<String> = objects.property()
 
     /**
      * List of the arguments applied to the Compose Compiler. Example:

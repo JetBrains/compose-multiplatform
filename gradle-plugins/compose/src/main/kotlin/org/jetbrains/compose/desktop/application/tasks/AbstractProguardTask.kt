@@ -41,15 +41,15 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
 
     @get:Optional
     @get:Input
-    val dontobfuscate: Property<Boolean> = objects.notNullProperty()
+    val dontobfuscate: Property<Boolean> = objects.property()
 
     @get:Optional
     @get:Input
-    val dontoptimize: Property<Boolean> = objects.notNullProperty()
+    val dontoptimize: Property<Boolean> = objects.property()
 
     @get:Optional
     @get:Input
-    val joinOutputJars: Property<Boolean> = objects.notNullProperty()
+    val joinOutputJars: Property<Boolean> = objects.property()
 
     // todo: DSL for excluding default rules
     // also consider pulling coroutines rules from coroutines artifact
@@ -60,20 +60,20 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
     val defaultComposeRulesFile: RegularFileProperty = objects.fileProperty()
 
     @get:Input
-    val proguardVersion: Property<String> = objects.notNullProperty()
+    val proguardVersion: Property<String> = objects.property()
 
     @get:InputFiles
     @get:Classpath
     val proguardFiles: ConfigurableFileCollection = objects.fileCollection()
 
     @get:Input
-    val javaHome: Property<String> = objects.notNullProperty(System.getProperty("java.home"))
+    val javaHome: Property<String> = objects.property(System.getProperty("java.home"))
 
     @get:Input
-    val mainClass: Property<String> = objects.notNullProperty()
+    val mainClass: Property<String> = objects.property()
 
     @get:Internal
-    val maxHeapSize: Property<String> = objects.notNullProperty()
+    val maxHeapSize: Property<String> = objects.property()
 
     @get:OutputDirectory
     val destinationDir: DirectoryProperty = objects.directoryProperty()

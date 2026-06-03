@@ -19,7 +19,7 @@ import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.internal.utils.executableName
 import org.jetbrains.compose.internal.utils.ioFile
-import org.jetbrains.compose.internal.utils.notNullProperty
+import org.jetbrains.compose.internal.utils.property
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.util.*
@@ -34,7 +34,7 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
 
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
     @get:InputDirectory
-    val jdkHome: Property<String> = objects.notNullProperty()
+    val jdkHome: Property<String> = objects.property()
 
     @get:Input
     abstract val checkJdkVendor: Property<Boolean>

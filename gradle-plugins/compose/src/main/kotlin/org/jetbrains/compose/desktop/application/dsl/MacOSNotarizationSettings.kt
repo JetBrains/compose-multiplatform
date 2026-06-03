@@ -12,7 +12,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Optional
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.internal.utils.notNullProperty
+import org.jetbrains.compose.internal.utils.property
 import javax.inject.Inject
 
 abstract class MacOSNotarizationSettings {
@@ -24,25 +24,25 @@ abstract class MacOSNotarizationSettings {
 
     @get:Input
     @get:Optional
-    val appleID: Property<String> = objects.notNullProperty<String>().apply {
+    val appleID: Property<String> = objects.property<String>().apply {
         set(ComposeProperties.macNotarizationAppleID(providers))
     }
 
     @get:Input
     @get:Optional
-    val password: Property<String> = objects.notNullProperty<String>().apply {
+    val password: Property<String> = objects.property<String>().apply {
         set(ComposeProperties.macNotarizationPassword(providers))
     }
 
     @get:Input
     @get:Optional
-    val teamID: Property<String> = objects.notNullProperty<String>().apply {
+    val teamID: Property<String> = objects.property<String>().apply {
         set(ComposeProperties.macNotarizationTeamID(providers))
     }
 
     @Deprecated("This option is no longer supported and got replaced by teamID", level = DeprecationLevel.ERROR)
     @get:Internal
-    val ascProvider: Property<String> = objects.notNullProperty<String>().apply {
+    val ascProvider: Property<String> = objects.property<String>().apply {
         set(providers.provider {
             throw UnsupportedOperationException("This option is not supported by notary tool and was replaced by teamID")
         })

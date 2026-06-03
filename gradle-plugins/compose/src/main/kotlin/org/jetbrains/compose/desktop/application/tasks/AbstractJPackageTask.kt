@@ -67,7 +67,7 @@ import org.jetbrains.compose.internal.utils.delete
 import org.jetbrains.compose.internal.utils.ioFile
 import org.jetbrains.compose.internal.utils.ioFileOrNull
 import org.jetbrains.compose.internal.utils.mkdirs
-import org.jetbrains.compose.internal.utils.notNullProperty
+import org.jetbrains.compose.internal.utils.property
 import org.jetbrains.compose.internal.utils.stacktraceToString
 import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import java.io.File
@@ -113,13 +113,13 @@ abstract class AbstractJPackageTask @Inject constructor(
      *  need to mangle twice.
      */
     @get:Input
-    val mangleJarFilesNames: Property<Boolean> = objects.notNullProperty(true)
+    val mangleJarFilesNames: Property<Boolean> = objects.property(true)
 
     /**
      * Indicates that task will get the uber JAR as input.
      */
     @get:Input
-    val packageFromUberJar: Property<Boolean> = objects.notNullProperty(false)
+    val packageFromUberJar: Property<Boolean> = objects.property(false)
 
     @get:InputDirectory
     @get:Optional
@@ -129,7 +129,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    val installationPath: Property<String> = objects.notNullProperty()
+    val installationPath: Property<String> = objects.property()
 
     @get:InputFile
     @get:Optional
@@ -142,7 +142,7 @@ abstract class AbstractJPackageTask @Inject constructor(
     val iconFile: RegularFileProperty = objects.fileProperty()
 
     @get:Input
-    val launcherMainClass: Property<String> = objects.notNullProperty()
+    val launcherMainClass: Property<String> = objects.property()
 
     @get:InputFile
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
@@ -157,71 +157,71 @@ abstract class AbstractJPackageTask @Inject constructor(
     val launcherJvmArgs: ListProperty<String> = objects.listProperty(String::class.java)
 
     @get:Input
-    val packageName: Property<String> = objects.notNullProperty()
+    val packageName: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val packageDescription: Property<String> = objects.notNullProperty()
+    val packageDescription: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val packageCopyright: Property<String> = objects.notNullProperty()
+    val packageCopyright: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val packageVendor: Property<String> = objects.notNullProperty()
+    val packageVendor: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val packageVersion: Property<String> = objects.notNullProperty()
+    val packageVersion: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val linuxShortcut: Property<Boolean> = objects.notNullProperty()
+    val linuxShortcut: Property<Boolean> = objects.property()
 
     @get:Input
     @get:Optional
-    val linuxPackageName: Property<String> = objects.notNullProperty()
+    val linuxPackageName: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val linuxAppRelease: Property<String> = objects.notNullProperty()
+    val linuxAppRelease: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val linuxAppCategory: Property<String> = objects.notNullProperty()
+    val linuxAppCategory: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val linuxDebMaintainer: Property<String> = objects.notNullProperty()
+    val linuxDebMaintainer: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val linuxMenuGroup: Property<String> = objects.notNullProperty()
+    val linuxMenuGroup: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val linuxRpmLicenseType: Property<String> = objects.notNullProperty()
+    val linuxRpmLicenseType: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val macPackageName: Property<String> = objects.notNullProperty()
+    val macPackageName: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val macDockName: Property<String> = objects.notNullProperty()
+    val macDockName: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val macAppStore: Property<Boolean> = objects.notNullProperty()
+    val macAppStore: Property<Boolean> = objects.property()
 
     @get:Input
     @get:Optional
-    val macAppCategory: Property<String> = objects.notNullProperty()
+    val macAppCategory: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val macMinimumSystemVersion: Property<String> = objects.notNullProperty()
+    val macMinimumSystemVersion: Property<String> = objects.property()
 
     @get:InputFile
     @get:Optional
@@ -235,7 +235,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    val packageBuildVersion: Property<String> = objects.notNullProperty()
+    val packageBuildVersion: Property<String> = objects.property()
 
     @get:InputFile
     @get:Optional
@@ -249,31 +249,31 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    val winConsole: Property<Boolean> = objects.notNullProperty()
+    val winConsole: Property<Boolean> = objects.property()
 
     @get:Input
     @get:Optional
-    val winDirChooser: Property<Boolean> = objects.notNullProperty()
+    val winDirChooser: Property<Boolean> = objects.property()
 
     @get:Input
     @get:Optional
-    val winPerUserInstall: Property<Boolean> = objects.notNullProperty()
+    val winPerUserInstall: Property<Boolean> = objects.property()
 
     @get:Input
     @get:Optional
-    val winShortcut: Property<Boolean> = objects.notNullProperty()
+    val winShortcut: Property<Boolean> = objects.property()
 
     @get:Input
     @get:Optional
-    val winMenu: Property<Boolean> = objects.notNullProperty()
+    val winMenu: Property<Boolean> = objects.property()
 
     @get:Input
     @get:Optional
-    val winMenuGroup: Property<String> = objects.notNullProperty()
+    val winMenuGroup: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val winUpgradeUuid: Property<String> = objects.notNullProperty()
+    val winUpgradeUuid: Property<String> = objects.property()
 
     @get:InputDirectory
     @get:Optional
@@ -287,11 +287,11 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    internal val nonValidatedMacBundleID: Property<String> = objects.notNullProperty()
+    internal val nonValidatedMacBundleID: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    internal val macExtraPlistKeysRawXml: Property<String> = objects.notNullProperty()
+    internal val macExtraPlistKeysRawXml: Property<String> = objects.property()
 
     @get:InputFile
     @get:Optional
