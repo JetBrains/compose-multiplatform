@@ -61,6 +61,12 @@ private val internalAnnotation = AnnotationSpec.builder(internalAnnotationClass)
 
 private val resourceContentHashAnnotationClass = ClassName("org.jetbrains.compose.resources", "ResourceContentHash")
 
+private val languageRegex = Regex("[a-z]{2,3}") // ISO 639
+private val scriptRegex = Regex("[A-Z][a-z]{3}") // ISO 15924
+private val regionAlpha2Regex = Regex("[A-Z]{2}") // ISO 3166-1 alpha-2
+private val regionNumericRegex = Regex("[0-9]{3}") // UN M.49
+private val androidRegionRegex = Regex("r[A-Z]{2}|r[0-9]{3}") // Android `r` prefix
+
 private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlock.Builder {
     val languageQualifier = ClassName("org.jetbrains.compose.resources", "LanguageQualifier")
     val scriptQualifier = ClassName("org.jetbrains.compose.resources", "ScriptQualifier")
@@ -77,7 +83,9 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
         qualifiersMap[className] = qualifier
     }
 
-    resourceItem.qualifiers.forEach { q ->
+    val expandedQualifiers = parseComposeResourceQualifiers(resourceItem.qualifiers, resourceItem.path)
+
+    expandedQualifiers.forEach { q ->
         when (q) {
             "light",
             "dark" -> {
@@ -114,7 +122,7 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
     qualifiersMap[densityQualifier]?.let { q -> add("%T.${q.uppercase()}, ", densityQualifier) }
     qualifiersMap[languageQualifier]?.let { q -> add("%T(\"$q\"), ", languageQualifier) }
 
-    val tokens = resourceItem.qualifiers
+    val tokens = expandedQualifiers
     val lang = qualifiersMap[languageQualifier]
     val languageIdx = lang?.let { tokens.indexOf(it) } ?: -1
 
@@ -140,6 +148,59 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
     }
 
     return this
+}
+
+private fun parseComposeResourceQualifiers(qualifiers: List<String>, path: Path): List<String> {
+    val expanded = mutableListOf<String>()
+    var bcpConsumed = false
+    for ((index, q) in qualifiers.withIndex()) {
+        if (q.startsWith("b+")) {
+            if (index != 0) {
+                error("BCP 47 'b+' segment must be the first qualifier in '$path'.")
+            }
+            expanded.addAll(expandBcpQualifier(q, path))
+            bcpConsumed = true
+        } else {
+            if (bcpConsumed && isLocaleShapedQualifier(q)) {
+                error("Locale qualifier '$q' cannot follow a BCP 47 segment in '$path'.")
+            }
+            if (!bcpConsumed && q.matches(scriptRegex)) {
+                error("Script qualifier '$q' must be inside a BCP 47 segment in '$path'.")
+            }
+            expanded.add(q)
+        }
+    }
+    return expanded
+}
+
+private fun isLocaleShapedQualifier(q: String): Boolean =
+    q.matches(languageRegex) || q.matches(scriptRegex) || q.matches(androidRegionRegex)
+
+private fun expandBcpQualifier(segment: String, path: Path): List<String> {
+    val subtags = segment.removePrefix("b+").split("+")
+    val result = mutableListOf<String>()
+    var lastKind = -1
+    for ((index, subtag) in subtags.withIndex()) {
+        val kind = when {
+            subtag.matches(languageRegex)      -> 0
+            subtag.matches(scriptRegex)        -> 1
+            subtag.matches(regionAlpha2Regex)  -> 2
+            subtag.matches(regionNumericRegex) -> 2
+            else -> error("Malformed BCP 47 subtag '$subtag' in '$path'.")
+        }
+        if (index == 0 && kind != 0) {
+            error("BCP 47 segment must start with a language subtag in '$path'.")
+        }
+        if (kind <= lastKind) {
+            error("BCP 47 subtags must follow language -> script -> region order in '$path'.")
+        }
+        when (kind) {
+            0, 1 -> result.add(subtag)
+            2    -> result.add("r$subtag")
+        }
+        lastKind = kind
+    }
+    return result
 }
 
 internal fun getResFileSpec(

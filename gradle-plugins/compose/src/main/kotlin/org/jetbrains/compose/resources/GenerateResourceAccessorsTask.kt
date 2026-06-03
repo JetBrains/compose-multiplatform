@@ -17,12 +17,6 @@ import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.relativeTo
 
-internal val languageRegex = Regex("[a-z]{2,3}") // ISO 639
-internal val scriptRegex = Regex("[A-Z][a-z]{3}") // ISO 15924
-internal val regionAlpha2Regex = Regex("[A-Z]{2}") // ISO 3166-1 alpha-2
-internal val regionNumericRegex = Regex("[0-9]{3}") // UN M.49
-internal val androidRegionRegex = Regex("r[A-Z]{2}|r[0-9]{3}") // Android `r` prefix
-
 @DisableCachingByDefault(because = "IDE import task — not worth caching")
 internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     @get:Input
@@ -116,11 +110,12 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
     ): List<ResourceItem>? {
         val file = this
         val dirName = file.parentFile.name ?: return null
-        val qualifiers = parseComposeResourceQualifiers(dirName)
+        val typeAndQualifiers = dirName.split("-")
+        if (typeAndQualifiers.isEmpty()) return null
 
-        val typeString = dirName.substringBefore("-").lowercase()
+        val typeString = typeAndQualifiers.first().lowercase()
+        val qualifiers = typeAndQualifiers.drop(1)
         val path = file.toPath().relativeTo(relativeTo)
-
 
         if (typeString == "string") {
             error("Forbidden directory name '$dirName'! String resources should be declared in 'values/strings.xml'.")
@@ -145,60 +140,6 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
                 file.resourceContentHash()
             )
         )
-    }
-
-    private fun parseComposeResourceQualifiers(dirName: String): List<String> {
-        val parts = dirName.split("-")
-        val expanded = mutableListOf<String>()
-        var bcpConsumed = false
-        for ((index, q) in parts.drop(1).withIndex()) {
-            if (q.startsWith("b+")) {
-                if (index != 0) {
-                    error("BCP 47 'b+' segment must be the first qualifier in '$dirName'.")
-                }
-                expanded.addAll(expandBcpQualifier(q, dirName))
-                bcpConsumed = true
-            } else {
-                if (bcpConsumed && isLocaleShapedQualifier(q)) {
-                    error("Locale qualifier '$q' cannot follow a BCP 47 segment in '$dirName'.")
-                }
-                if (!bcpConsumed && q.matches(scriptRegex)) {
-                    error("Script qualifier '$q' must be inside a BCP 47 segment in '$dirName'.")
-                }
-                expanded.add(q)
-            }
-        }
-        return expanded
-    }
-
-    private fun isLocaleShapedQualifier(q: String): Boolean =
-        q.matches(languageRegex) || q.matches(scriptRegex) || q.matches(androidRegionRegex)
-
-    private fun expandBcpQualifier(segment: String, dirName: String): List<String> {
-        val subtags = segment.removePrefix("b+").split("+")
-        val result = mutableListOf<String>()
-        var lastKind = -1
-        for ((index, subtag) in subtags.withIndex()) {
-            val kind = when {
-                subtag.matches(languageRegex)      -> 0
-                subtag.matches(scriptRegex)        -> 1
-                subtag.matches(regionAlpha2Regex)  -> 2
-                subtag.matches(regionNumericRegex) -> 2
-                else -> error("Malformed BCP 47 subtag '$subtag' in '$dirName'.")
-            }
-            if (index == 0 && kind != 0) {
-                error("BCP 47 segment must start with a language subtag in '$dirName'.")
-            }
-            if (kind < lastKind) {
-                error("BCP 47 subtags must follow language -> script -> region order in '$dirName'.")
-            }
-            when (kind) {
-                0, 1 -> result.add(subtag)
-                2    -> result.add("r$subtag")
-            }
-            lastKind = kind
-        }
-        return result
     }
 
     private fun getValueResourceItems(dataFile: File, qualifiers: List<String>, path: Path): List<ResourceItem> {
