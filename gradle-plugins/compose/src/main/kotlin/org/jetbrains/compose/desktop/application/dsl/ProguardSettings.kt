@@ -16,11 +16,11 @@ private const val DEFAULT_PROGUARD_VERSION = "7.8.0"
 abstract class ProguardSettings @Inject constructor(
     objects: ObjectFactory,
 ) {
-    val version: Property<String> = objects.property(DEFAULT_PROGUARD_VERSION)
+    val version: Property<String> = objects.property<String>().value(DEFAULT_PROGUARD_VERSION)
     val maxHeapSize: Property<String> = objects.property()
     val configurationFiles: ConfigurableFileCollection = objects.fileCollection()
-    val isEnabled: Property<Boolean> = objects.property(false)
-    val obfuscate: Property<Boolean> = objects.property(false)
-    val optimize: Property<Boolean> = objects.property(true)
-    val joinOutputJars: Property<Boolean> = objects.property(false)
+    val isEnabled: Property<Boolean> = objects.property<Boolean>().value(false)
+    val obfuscate: Property<Boolean> = objects.property<Boolean>().value(false)
+    val optimize: Property<Boolean> = objects.property<Boolean>().value(true)
+    val joinOutputJars: Property<Boolean> = objects.property<Boolean>().value(false)
 }

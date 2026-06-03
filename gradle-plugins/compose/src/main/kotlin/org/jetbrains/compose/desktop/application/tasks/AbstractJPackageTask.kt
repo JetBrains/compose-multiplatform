@@ -113,13 +113,13 @@ abstract class AbstractJPackageTask @Inject constructor(
      *  need to mangle twice.
      */
     @get:Input
-    val mangleJarFilesNames: Property<Boolean> = objects.property(true)
+    val mangleJarFilesNames: Property<Boolean> = objects.property<Boolean>().value(true)
 
     /**
      * Indicates that task will get the uber JAR as input.
      */
     @get:Input
-    val packageFromUberJar: Property<Boolean> = objects.property(false)
+    val packageFromUberJar: Property<Boolean> = objects.property<Boolean>().value(false)
 
     @get:InputDirectory
     @get:Optional

@@ -18,9 +18,6 @@ internal inline fun <reified T : Any> ObjectFactory.new(vararg params: Any): T =
 internal inline fun <reified T : Any> ObjectFactory.property(): Property<T> =
     property(T::class.java)
 
-internal inline fun <reified T : Any> ObjectFactory.property(defaultValue: T): Property<T> =
-    property(T::class.java).value(defaultValue)
-
 internal inline fun <reified T : Any> Provider<T>.toProperty(objects: ObjectFactory): Property<T> =
     objects.property(T::class.java).value(this)
 

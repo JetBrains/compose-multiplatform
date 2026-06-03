@@ -21,7 +21,7 @@ abstract class AbstractNativeMacApplicationPackageTask : AbstractComposeDesktopT
     val packageName: Property<String> = objects.property()
 
     @get:Input
-    val packageVersion: Property<String> = objects.property("1.0.0")
+    val packageVersion: Property<String> = objects.property<String>().value("1.0.0")
 
     @get:Internal
     internal val fullPackageName: Provider<String> =

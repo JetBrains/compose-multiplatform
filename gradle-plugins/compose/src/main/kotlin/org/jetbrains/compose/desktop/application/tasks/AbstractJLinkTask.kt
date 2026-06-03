@@ -36,16 +36,16 @@ abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
     val javaRuntimePropertiesFile: RegularFileProperty = objects.fileProperty()
 
     @get:Input
-    internal val stripDebug: Property<Boolean> = objects.property(true)
+    internal val stripDebug: Property<Boolean> = objects.property<Boolean>().value(true)
 
     @get:Input
-    internal val noHeaderFiles: Property<Boolean> = objects.property(true)
+    internal val noHeaderFiles: Property<Boolean> = objects.property<Boolean>().value(true)
 
     @get:Input
-    internal val noManPages: Property<Boolean> = objects.property(true)
+    internal val noManPages: Property<Boolean> = objects.property<Boolean>().value(true)
 
     @get:Input
-    internal val stripNativeCommands: Property<Boolean> = objects.property(true)
+    internal val stripNativeCommands: Property<Boolean> = objects.property<Boolean>().value(true)
 
     @get:Input
     @get:Optional

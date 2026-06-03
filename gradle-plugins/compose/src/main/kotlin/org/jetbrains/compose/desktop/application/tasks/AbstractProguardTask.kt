@@ -67,7 +67,7 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
     val proguardFiles: ConfigurableFileCollection = objects.fileCollection()
 
     @get:Input
-    val javaHome: Property<String> = objects.property(System.getProperty("java.home"))
+    val javaHome: Property<String> = objects.property<String>().value(System.getProperty("java.home"))
 
     @get:Input
     val mainClass: Property<String> = objects.property()

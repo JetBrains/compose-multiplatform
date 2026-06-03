@@ -25,7 +25,7 @@ abstract class AbstractNativeMacApplicationPackageDmgTask : AbstractNativeMacApp
     val osascript: RegularFileProperty = objects.fileProperty().value { File("/usr/bin/osascript") }
 
     @get:Input
-    val installDir: Property<String> = objects.property("/Applications")
+    val installDir: Property<String> = objects.property<String>().value("/Applications")
 
     @get:InputDirectory
     @get:PathSensitive(PathSensitivity.RELATIVE)
