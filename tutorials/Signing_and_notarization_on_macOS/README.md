@@ -207,8 +207,11 @@ macOS {
 
 * Set the `sign` DSL property or  to `true`.
     * Alternatively, the `compose.desktop.mac.sign` Gradle property can be used.
-* Set the `identity` DSL property to the certificate's name, e.g. `"John Doe"`.
+* Set the `identity` DSL property to the certificate's full name, e.g.
+  `"Developer ID Application: John Doe (TEAMID)"`.
     *  Alternatively,  the `compose.desktop.mac.signing.identity` Gradle property can be  used.
+    * Bare names such as `"John Doe"` are also supported, but if multiple matching certificates are found,
+      you will need to use the full identity.
 * Optionally, set the `keychain` DSL property to the path to the specific keychain, containing your certificate.
     * Alternatively, the `compose.desktop.mac.signing.keychain` Gradle property can be used.
     * This step is only necessary, if multiple developer certificates of the same type are installed.
@@ -218,6 +221,18 @@ The following Gradle properties can be used instead of DSL properties:
   Possible values: `true` or `false`.
 * `compose.desktop.mac.signing.identity` overrides the `identity` DSL property.
 * `compose.desktop.mac.signing.keychain` overrides the `keychain` DSL property.
+
+### Choosing the correct certificate type
+
+Use different certificate types depending on the task:
+
+* Local app signing and development builds: `Apple Development` or `Mac Developer`.
+* Notarized distribution outside the App Store: `Developer ID Application`.
+* Mac App Store app bundle signing: `Apple Distribution` or `3rd Party Mac Developer Application`.
+* Mac App Store PKG signing: `3rd Party Mac Developer Installer`.
+
+Development certificates can sign app bundles, but they cannot sign installer packages and are not suitable for
+notarized outside-App-Store distribution.
 
 Those properties could be stored in `$HOME/.gradle/gradle.properties` to use across multiple applications.
 
