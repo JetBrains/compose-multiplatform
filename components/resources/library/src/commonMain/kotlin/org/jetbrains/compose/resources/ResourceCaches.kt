@@ -12,13 +12,13 @@ import kotlinx.coroutines.withContext
 
 internal class AsyncCache<K, V> {
     private val mutex = Mutex()
-    private val cache = mutableMapOf<K, Entry<V>>()
+    private val cache = mutableMapOf<K, SharedLoad<V>>()
 
     // The loading runs in a cache-owned scope so that cancelling one caller
     // does not directly cancel the shared Deferred stored in the cache.
     private val scope = CoroutineScope(SupervisorJob())
 
-    private class Entry<V>(val deferred: Deferred<V>) {
+    private class SharedLoad<V>(val deferred: Deferred<V>) {
         var subscribers = 0
     }
 
@@ -27,28 +27,28 @@ internal class AsyncCache<K, V> {
     }
 
     suspend fun getOrLoad(key: K, load: suspend () -> V): V {
-        val entry = mutex.withLock {
+        val sharedLoad = mutex.withLock {
             val existing = cache[key]
-            val entry = if (existing == null || existing.deferred.isCancelled) {
+            val sharedLoad = if (existing == null || existing.deferred.isCancelled) {
                 //LAZY - to free the mutex lock as fast as possible
-                Entry(scope.async(start = CoroutineStart.LAZY) { load() }).also { cache[key] = it }
+                SharedLoad(scope.async(start = CoroutineStart.LAZY) { load() }).also { cache[key] = it }
             } else {
                 existing
             }
-            entry.subscribers++
-            entry
+            sharedLoad.subscribers++
+            sharedLoad
         }
         try {
-            return entry.deferred.await()
+            return sharedLoad.deferred.await()
         } finally {
             withContext(NonCancellable) {
                 mutex.withLock {
-                    entry.subscribers--
+                    sharedLoad.subscribers--
                     // Cancel the shared load only when nobody else is waiting for it.
                     // A successfully completed deferred is kept in the cache for reuse.
-                    if (entry.subscribers == 0 && !entry.deferred.isCompleted && cache[key] === entry) {
+                    if (sharedLoad.subscribers == 0 && !sharedLoad.deferred.isCompleted && cache[key] === sharedLoad) {
                         cache.remove(key)
-                        entry.deferred.cancel()
+                        sharedLoad.deferred.cancel()
                     }
                 }
             }
