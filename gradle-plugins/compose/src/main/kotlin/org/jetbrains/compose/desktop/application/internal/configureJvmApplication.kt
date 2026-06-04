@@ -380,6 +380,7 @@ internal fun JvmApplicationContext.configurePlatformSettings(
                 packageTask.winDirChooser.set(provider { win.dirChooser })
                 packageTask.winPerUserInstall.set(provider { win.perUserInstall })
                 packageTask.winShortcut.set(provider { win.shortcut })
+                packageTask.winShortcutPrompt.set(provider { win.shortcutPrompt })
                 packageTask.winMenu.set(provider { win.menu })
                 packageTask.winMenuGroup.set(provider { win.menuGroup })
                 packageTask.winUpgradeUuid.set(provider { win.upgradeUuid })
