@@ -1,35 +1,63 @@
 package org.jetbrains.compose.resources
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 
 internal class AsyncCache<K, V> {
     private val mutex = Mutex()
-    private val cache = mutableMapOf<K, Deferred<V>>()
+    private val cache = mutableMapOf<K, Entry<V>>()
+
+    // The loading runs in a cache-owned scope so that cancelling one caller
+    // does not directly cancel the shared Deferred stored in the cache.
+    private val scope = CoroutineScope(SupervisorJob())
+
+    private class Entry<V>(val deferred: Deferred<V>) {
+        var subscribers = 0
+    }
 
     init {
         ResourceCaches.registerCache(this)
     }
 
-    suspend fun getOrLoad(key: K, load: suspend () -> V): V = coroutineScope {
-        val deferred = mutex.withLock {
-            var cached = cache[key]
-            if (cached == null || cached.isCancelled) {
+    suspend fun getOrLoad(key: K, load: suspend () -> V): V {
+        val entry = mutex.withLock {
+            val existing = cache[key]
+            val entry = if (existing == null || existing.deferred.isCancelled) {
                 //LAZY - to free the mutex lock as fast as possible
-                cached = async(start = CoroutineStart.LAZY) { load() }
-                cache[key] = cached
+                Entry(scope.async(start = CoroutineStart.LAZY) { load() }).also { cache[key] = it }
+            } else {
+                existing
             }
-            cached
+            entry.subscribers++
+            entry
         }
-        deferred.await()
+        try {
+            return entry.deferred.await()
+        } finally {
+            withContext(NonCancellable) {
+                mutex.withLock {
+                    entry.subscribers--
+                    // Cancel the shared load only when nobody else is waiting for it.
+                    // A successfully completed deferred is kept in the cache for reuse.
+                    if (entry.subscribers == 0 && !entry.deferred.isCompleted && cache[key] === entry) {
+                        cache.remove(key)
+                        entry.deferred.cancel()
+                    }
+                }
+            }
+        }
     }
 
     suspend fun clear() {
         mutex.withLock {
+            cache.values.forEach { it.deferred.cancel() }
             cache.clear()
         }
     }
