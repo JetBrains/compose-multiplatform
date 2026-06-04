@@ -10,37 +10,24 @@ import org.gradle.api.Task
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import org.gradle.api.provider.ProviderFactory
 import org.jetbrains.kotlin.gradle.plugin.extraProperties
 
-internal inline fun <reified T> ObjectFactory.new(vararg params: Any): T =
+internal inline fun <reified T : Any> ObjectFactory.new(vararg params: Any): T =
     newInstance(T::class.java, *params)
 
-@SuppressWarnings("UNCHECKED_CAST")
-internal inline fun <reified T : Any> ObjectFactory.nullableProperty(): Property<T?> =
-    property(T::class.java) as Property<T?>
-
-internal inline fun <reified T : Any> ObjectFactory.notNullProperty(): Property<T> =
+internal inline fun <reified T : Any> ObjectFactory.property(): Property<T> =
     property(T::class.java)
 
-internal inline fun <reified T : Any> ObjectFactory.notNullProperty(defaultValue: T): Property<T> =
-    property(T::class.java).value(defaultValue)
-
-internal inline fun <reified T> Provider<T>.toProperty(objects: ObjectFactory): Property<T> =
+internal inline fun <reified T : Any> Provider<T>.toProperty(objects: ObjectFactory): Property<T> =
     objects.property(T::class.java).value(this)
 
-internal inline fun <reified T> Task.provider(noinline fn: () -> T): Provider<T> =
+internal inline fun <reified T : Any> Task.provider(noinline fn: () -> T): Provider<T> =
     project.provider(fn)
 
-internal fun ProviderFactory.valueOrNull(prop: String): Provider<String?> =
-    provider {
-        gradleProperty(prop).orNull
-    }
-
-internal fun Provider<String?>.toBooleanProvider(defaultValue: Boolean): Provider<Boolean> =
+internal fun Provider<String>.toBooleanProvider(defaultValue: Boolean): Provider<Boolean> =
     orElse(defaultValue.toString()).map { "true" == it }
 
 internal fun Project.findLocalOrGlobalProperty(name: String, default: String = ""): Provider<String> = provider {
-    if (extraProperties.has(name)) extraProperties.get(name).toString()
+    if (extraProperties.has(name)) extraProperties.get(name)?.toString() ?: default
     else providers.gradleProperty(name).getOrElse(default)
 }

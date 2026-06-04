@@ -32,7 +32,7 @@ abstract class AbstractJvmToolOperationTask(private val toolName: String) : Abst
     val freeArgs: ListProperty<String> = objects.listProperty(String::class.java)
 
     @get:Internal
-    val javaHome: Property<String> = objects.notNullProperty<String>().apply {
+    val javaHome: Property<String> = objects.property<String>().apply {
         set(providers.systemProperty("java.home"))
     }
 

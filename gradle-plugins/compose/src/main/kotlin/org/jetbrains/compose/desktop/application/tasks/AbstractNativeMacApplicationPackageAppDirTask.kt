@@ -14,8 +14,7 @@ import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder
 import org.jetbrains.compose.desktop.application.internal.PlistKeys
 import org.jetbrains.compose.internal.utils.ioFile
-import org.jetbrains.compose.internal.utils.notNullProperty
-import org.jetbrains.compose.internal.utils.nullableProperty
+import org.jetbrains.compose.internal.utils.property
 import java.io.File
 
 private const val KOTLIN_NATIVE_MIN_SUPPORTED_MAC_OS = "10.13"
@@ -32,19 +31,19 @@ abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMac
     val iconFile: RegularFileProperty = objects.fileProperty()
 
     @get:Input
-    val bundleID: Property<String> = objects.notNullProperty<String>().value(packageName)
+    val bundleID: Property<String> = objects.property<String>().value(packageName)
 
     @get:Input
     @get:Optional
-    val appCategory: Property<String?> = objects.nullableProperty()
+    val appCategory: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val copyright: Property<String?> = objects.nullableProperty()
+    val copyright: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val minimumSystemVersion: Property<String?> = objects.nullableProperty()
+    val minimumSystemVersion: Property<String> = objects.property()
 
     @get:InputFiles
     @get:Optional

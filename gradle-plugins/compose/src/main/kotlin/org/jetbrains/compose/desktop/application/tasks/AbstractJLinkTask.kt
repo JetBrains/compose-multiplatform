@@ -18,8 +18,7 @@ import org.jetbrains.compose.desktop.application.internal.RuntimeCompressionLeve
 import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.cliArg
 import org.jetbrains.compose.internal.utils.ioFile
-import org.jetbrains.compose.internal.utils.notNullProperty
-import org.jetbrains.compose.internal.utils.nullableProperty
+import org.jetbrains.compose.internal.utils.property
 import java.io.File
 
 // todo: public DSL
@@ -30,27 +29,27 @@ abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
     val modules: ListProperty<String> = objects.listProperty(String::class.java)
 
     @get:Input
-    val includeAllModules: Property<Boolean> = objects.notNullProperty()
+    val includeAllModules: Property<Boolean> = objects.property()
 
     @get:InputFile
     @get:PathSensitive(PathSensitivity.NONE)
     val javaRuntimePropertiesFile: RegularFileProperty = objects.fileProperty()
 
     @get:Input
-    internal val stripDebug: Property<Boolean> = objects.notNullProperty(true)
+    internal val stripDebug: Property<Boolean> = objects.property<Boolean>().value(true)
 
     @get:Input
-    internal val noHeaderFiles: Property<Boolean> = objects.notNullProperty(true)
+    internal val noHeaderFiles: Property<Boolean> = objects.property<Boolean>().value(true)
 
     @get:Input
-    internal val noManPages: Property<Boolean> = objects.notNullProperty(true)
+    internal val noManPages: Property<Boolean> = objects.property<Boolean>().value(true)
 
     @get:Input
-    internal val stripNativeCommands: Property<Boolean> = objects.notNullProperty(true)
+    internal val stripNativeCommands: Property<Boolean> = objects.property<Boolean>().value(true)
 
     @get:Input
     @get:Optional
-    internal val compressionLevel: Property<RuntimeCompressionLevel?> = objects.nullableProperty()
+    internal val compressionLevel: Property<RuntimeCompressionLevel> = objects.property()
 
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
         val modulesToInclude =

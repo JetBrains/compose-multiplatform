@@ -7,7 +7,7 @@ package org.jetbrains.compose.desktop.application.internal.validation
 
 import org.gradle.api.provider.Provider
 
-internal fun validateBundleID(bundleIDProvider: Provider<String?>): String {
+internal fun validateBundleID(bundleIDProvider: Provider<String>): String {
     val bundleID = bundleIDProvider.orNull
     check(!bundleID.isNullOrEmpty()) { ERR_BUNDLE_ID_IS_EMPTY }
     check(bundleID.matches("[A-Za-z0-9\\-\\.]+".toRegex())) { ERR_BUNDLE_ID_WRONG_FORMAT }

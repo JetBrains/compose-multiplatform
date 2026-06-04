@@ -12,7 +12,7 @@ import org.jetbrains.compose.internal.utils.OS
 
 internal fun JvmApplicationContext.packageVersionFor(
     targetFormat: TargetFormat
-): Provider<String?> =
+): Provider<String> =
     project.provider {
         app.nativeDistributions.packageVersionFor(targetFormat)
             ?: project.version.toString().takeIf { it != "unspecified" }
@@ -43,7 +43,7 @@ private fun JvmApplicationDistributions.packageVersionFor(
 
 internal fun JvmApplicationContext.packageBuildVersionFor(
     targetFormat: TargetFormat
-): Provider<String?> =
+): Provider<String> =
     project.provider {
         app.nativeDistributions.packageBuildVersionFor(targetFormat)
             // fallback to normal version
