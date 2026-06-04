@@ -182,6 +182,10 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
+    val linuxPackageDeps: Property<String?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
     val linuxPackageName: Property<String?> = objects.nullableProperty()
 
     @get:Input
@@ -250,6 +254,10 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
+    val macDmgContents: Property<String?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
     val winConsole: Property<Boolean?> = objects.nullableProperty()
 
     @get:Input
@@ -266,11 +274,19 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
+    val winShortcutPrompt: Property<Boolean?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
     val winMenu: Property<Boolean?> = objects.nullableProperty()
 
     @get:Input
     @get:Optional
     val winMenuGroup: Property<String?> = objects.nullableProperty()
+
+    @get:Input
+    @get:Optional
+    val winUpdateUrl: Property<String?> = objects.nullableProperty()
 
     @get:Input
     @get:Optional
@@ -472,6 +488,7 @@ abstract class AbstractJPackageTask @Inject constructor(
             when (currentOS) {
                 OS.Linux -> {
                     cliArg("--linux-shortcut", linuxShortcut)
+                    cliArg("--linux-package-deps", linuxPackageDeps)
                     cliArg("--linux-package-name", linuxPackageName)
                     cliArg("--linux-app-release", linuxAppRelease)
                     cliArg("--linux-app-category", linuxAppCategory)
@@ -483,11 +500,21 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--win-dir-chooser", winDirChooser)
                     cliArg("--win-per-user-install", winPerUserInstall)
                     cliArg("--win-shortcut", winShortcut)
+                    cliArg("--win-shortcut-prompt", winShortcutPrompt)
                     cliArg("--win-menu", winMenu)
                     cliArg("--win-menu-group", winMenuGroup)
+                    cliArg("--win-update-url", winUpdateUrl)
                     cliArg("--win-upgrade-uuid", winUpgradeUuid)
                 }
-                OS.MacOS -> {}
+                OS.MacOS -> {
+                    if (macDmgContents.isPresent) {
+                        if (jvmRuntimeInfo.majorVersion >= 18) {
+                            cliArg("--mac-dmg-content", macDmgContents)
+                        } else {
+                            logger.warn("Option --mac-dmg-content is only supported from jdk 18")
+                        }
+                    }
+                }
             }
         }
 
