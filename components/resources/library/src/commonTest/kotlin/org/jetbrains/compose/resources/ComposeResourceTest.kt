@@ -347,7 +347,7 @@ class ComposeResourceTest {
                 string|app_name|Q29tcG9zZSBSZXNvdXJjZXMgQXBw
                 string|hello|8J+YiiBIZWxsbyB3b3JsZCE=
                 string|str_template|SGVsbG8sICUxJHMhIFlvdSBoYXZlICUyJGQgbmV3IG1lc3NhZ2VzLg==
-                
+
             """.trimIndent(),
             bytes.decodeToString()
         )
@@ -439,57 +439,5 @@ class ComposeResourceTest {
         assertEquals(env2, lastEnv1)
         assertEquals(env2, lastEnv2)
         assertEquals(env2, lastEnv3)
-    }
-
-    // DefaultComposeEnvironment surfaces the system script so values-b+zh+Hant resources
-    // resolve, but only when the compose locale language matches the system.
-    @Test
-    fun testDefaultComposeEnvironmentPropagatesSystemScript() = clearResourceCachesAndRunUiTest {
-        val composeLanguage = Locale.current.language
-        fun systemEnv() = ResourceEnvironment(
-            language = LanguageQualifier(composeLanguage),
-            script = ScriptQualifier("Hant"),
-            region = RegionQualifier(""),
-            theme = ThemeQualifier.LIGHT,
-            density = DensityQualifier.XHDPI
-        )
-
-        val previous = getResourceEnvironment
-        getResourceEnvironment = ::systemEnv
-        try {
-            var captured: ResourceEnvironment? = null
-            setContent {
-                captured = rememberResourceEnvironment()
-            }
-            waitForIdle()
-            assertEquals("Hant", captured?.script?.script)
-        } finally {
-            getResourceEnvironment = previous
-        }
-    }
-
-    @Test
-    fun testDefaultComposeEnvironmentDropsSystemScriptOnLanguageOverride() = clearResourceCachesAndRunUiTest {
-        fun systemEnv() = ResourceEnvironment(
-            // language deliberately won't match Locale.current to simulate a per-app override
-            language = LanguageQualifier("qq"),
-            script = ScriptQualifier("Cyrl"),
-            region = RegionQualifier("RU"),
-            theme = ThemeQualifier.LIGHT,
-            density = DensityQualifier.XHDPI
-        )
-
-        val previous = getResourceEnvironment
-        getResourceEnvironment = ::systemEnv
-        try {
-            var captured: ResourceEnvironment? = null
-            setContent {
-                captured = rememberResourceEnvironment()
-            }
-            waitForIdle()
-            assertEquals("", captured?.script?.script)
-        } finally {
-            getResourceEnvironment = previous
-        }
     }
 }

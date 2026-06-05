@@ -37,3 +37,7 @@ internal actual fun getSystemEnvironment(): ResourceEnvironment {
         density = DensityQualifier.selectByValue(dpi)
     )
 }
+
+internal actual fun androidx.compose.ui.text.intl.Locale.getScript(): String {
+    return (platformLocale as? platform.Foundation.NSLocale)?.scriptCode.orEmpty()
+}

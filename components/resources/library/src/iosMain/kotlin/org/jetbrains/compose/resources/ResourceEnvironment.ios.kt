@@ -25,3 +25,7 @@ internal actual fun getSystemEnvironment(): ResourceEnvironment {
         density = DensityQualifier.selectByDensity(density)
     )
 }
+
+internal actual fun androidx.compose.ui.text.intl.Locale.getScript(): String {
+    return (platformLocale as? platform.Foundation.NSLocale)?.scriptCode.orEmpty()
+}

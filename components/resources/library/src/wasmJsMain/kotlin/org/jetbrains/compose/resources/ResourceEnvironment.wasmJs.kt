@@ -30,3 +30,14 @@ internal actual fun getSystemEnvironment(): ResourceEnvironment {
         density = DensityQualifier.selectByValue(dpi)
     )
 }
+
+internal actual fun androidx.compose.ui.text.intl.Locale.getScript(): String {
+    val tags = toLanguageTag().split('-', '_')
+    for (tag in tags) {
+        if (tag.length == 1) break
+        if (tag.length == 4 && tag.all { it.isLetter() }) {
+            return tag
+        }
+    }
+    return ""
+}

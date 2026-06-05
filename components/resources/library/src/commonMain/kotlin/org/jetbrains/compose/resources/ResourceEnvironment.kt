@@ -43,6 +43,8 @@ internal interface ComposeEnvironment {
 }
 
 internal val DefaultComposeEnvironment = object : ComposeEnvironment {
+    private var cachedSystemEnvironment: ResourceEnvironment? = null
+
     @Composable
     override fun rememberEnvironment(): ResourceEnvironment {
         val composeLocale = Locale.current
@@ -51,17 +53,9 @@ internal val DefaultComposeEnvironment = object : ComposeEnvironment {
 
         //cache ResourceEnvironment unless compose environment is changed
         return remember(composeLocale, composeTheme, composeDensity) {
-            // androidx.compose.ui.text.intl.Locale doesn't expose script yet; borrow it
-            // from the system only when languages match, so locale overrides don't inherit a wrong script.
-            val systemEnvironment = getSystemResourceEnvironment()
-            val systemScript = if (composeLocale.language == systemEnvironment.language.language) {
-                systemEnvironment.script
-            } else {
-                ScriptQualifier("")
-            }
             ResourceEnvironment(
                 LanguageQualifier(composeLocale.language),
-                systemScript,
+                ScriptQualifier(composeLocale.getScript()),
                 RegionQualifier(composeLocale.region),
                 ThemeQualifier.selectByValue(composeTheme),
                 DensityQualifier.selectByDensity(composeDensity.density)
@@ -72,6 +66,8 @@ internal val DefaultComposeEnvironment = object : ComposeEnvironment {
 
 //ComposeEnvironment provider will be overridden for tests
 internal val LocalComposeEnvironment = staticCompositionLocalOf { DefaultComposeEnvironment }
+
+internal expect fun Locale.getScript(): String
 
 /**
  * Returns an instance of [ResourceEnvironment].

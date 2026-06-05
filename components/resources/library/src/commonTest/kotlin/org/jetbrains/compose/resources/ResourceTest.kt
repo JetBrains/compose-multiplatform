@@ -8,6 +8,7 @@ package org.jetbrains.compose.resources
 import org.jetbrains.compose.resources.DensityQualifier.*
 import org.jetbrains.compose.resources.ThemeQualifier.DARK
 import org.jetbrains.compose.resources.ThemeQualifier.LIGHT
+import androidx.compose.ui.text.intl.Locale
 import kotlin.test.*
 
 class ResourceTest {
@@ -216,5 +217,15 @@ class ResourceTest {
             "default",
             resource.getResourceItemByEnvironment(env("en", "", "US")).path
         )
+    }
+
+    @Test
+    fun testLocaleGetScript() {
+        assertEquals("", Locale("en-US").getScript())
+        assertEquals("Latn", Locale("sr-Latn-RS").getScript())
+        assertEquals("Hans", Locale("zh-Hans-CN").getScript())
+        assertEquals("Hant", Locale("zh-Hant-TW").getScript())
+        assertEquals("", Locale("es-419").getScript())
+        assertEquals("", Locale("fr").getScript())
     }
 }
