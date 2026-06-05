@@ -12,7 +12,7 @@ internal actual fun getSystemEnvironment(): ResourceEnvironment {
         ?: NSLocale.currentLocale
 
     val languageCode = locale.languageCode
-    val scriptCode = locale.scriptCode.orEmpty()
+    val scriptCode = locale.scriptCode
     val regionCode = locale.objectForKey(NSLocaleCountryCode) as? String
     val isDarkTheme = NSUserDefaults.standardUserDefaults.stringForKey("AppleInterfaceStyle") == "Dark"
 
@@ -31,7 +31,7 @@ internal actual fun getSystemEnvironment(): ResourceEnvironment {
 
     return ResourceEnvironment(
         language = LanguageQualifier(languageCode),
-        script = ScriptQualifier(scriptCode),
+        script = ScriptQualifier(scriptCode.orEmpty()),
         region = RegionQualifier(regionCode.orEmpty()),
         theme = ThemeQualifier.selectByValue(isDarkTheme),
         density = DensityQualifier.selectByValue(dpi)

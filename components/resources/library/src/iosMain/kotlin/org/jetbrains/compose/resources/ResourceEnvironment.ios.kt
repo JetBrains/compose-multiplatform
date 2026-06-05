@@ -10,7 +10,7 @@ internal actual fun getSystemEnvironment(): ResourceEnvironment {
         ?: NSLocale.currentLocale
 
     val languageCode = locale.languageCode
-    val scriptCode = locale.scriptCode.orEmpty()
+    val scriptCode = locale.scriptCode
     val regionCode = locale.objectForKey(NSLocaleCountryCode) as? String
     val mainScreen = UIScreen.mainScreen
     val isDarkTheme = mainScreen.traitCollection().userInterfaceStyle == UIUserInterfaceStyle.UIUserInterfaceStyleDark
@@ -19,7 +19,7 @@ internal actual fun getSystemEnvironment(): ResourceEnvironment {
     val density = mainScreen.scale.toFloat()
     return ResourceEnvironment(
         language = LanguageQualifier(languageCode),
-        script = ScriptQualifier(scriptCode),
+        script = ScriptQualifier(scriptCode.orEmpty()),
         region = RegionQualifier(regionCode.orEmpty()),
         theme = ThemeQualifier.selectByValue(isDarkTheme),
         density = DensityQualifier.selectByDensity(density)
