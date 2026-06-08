@@ -71,43 +71,45 @@ class ResourcesTest : GradlePluginTestBase() {
                 "values-b+zh+Hant-mdpi",
                 "values-b+zh+Hant-mdpi-dark",
             )
-            bcpDirs.forEach { dir ->
-                val f = file("src/commonMain/composeResources/$dir")
-                f.mkdirs()
-                File(f, "strings.xml").writeText(
-                    """
-                    <resources>
-                        <string name="bcp_test">test</string>
-                    </resources>
-                    """.trimIndent()
-                )
-            }
-            gradle("prepareKotlinIdeaImport").checks {
-                check.logDoesntContain("unknown qualifier")
-                check.logDoesntContain("repetitive qualifiers")
-            }
+            try {
+                bcpDirs.forEach { dir ->
+                    val f = file("src/commonMain/composeResources/$dir")
+                    f.mkdirs()
+                    File(f, "strings.xml").writeText(
+                        """
+                        <resources>
+                            <string name="bcp_test">test</string>
+                        </resources>
+                        """.trimIndent()
+                    )
+                }
+                gradle("prepareKotlinIdeaImport").checks {
+                    check.logDoesntContain("unknown qualifier")
+                    check.logDoesntContain("repetitive qualifiers")
+                }
 
-            // Verify the generated accessors carry the BCP 47 subtags as
-            // ScriptQualifier / RegionQualifier instances (consumed at runtime).
-            val generated = file("build/generated/compose/resourceGenerator/kotlin")
-                .walkTopDown()
-                .filter { it.isFile && it.extension == "kt" }
-                .joinToString("\n") { it.readText() }
-            listOf("Latn", "Hans", "Hant").forEach { script ->
-                assertTrue(
-                    generated.contains("ScriptQualifier(\"$script\")"),
-                    "Expected ScriptQualifier(\"$script\") in generated accessors"
-                )
-            }
-            listOf("US", "CN", "RS", "419").forEach { region ->
-                assertTrue(
-                    generated.contains("RegionQualifier(\"$region\")"),
-                    "Expected RegionQualifier(\"$region\") in generated accessors"
-                )
-            }
-
-            bcpDirs.forEach { dir ->
-                file("src/commonMain/composeResources/$dir").deleteRecursively()
+                // Verify the generated accessors carry the BCP 47 subtags as
+                // ScriptQualifier / RegionQualifier instances (consumed at runtime).
+                val generated = file("build/generated/compose/resourceGenerator/kotlin")
+                    .walkTopDown()
+                    .filter { it.isFile && it.extension == "kt" }
+                    .joinToString("\n") { it.readText() }
+                listOf("Latn", "Hans", "Hant").forEach { script ->
+                    assertTrue(
+                        generated.contains("ScriptQualifier(\"$script\")"),
+                        "Expected ScriptQualifier(\"$script\") in generated accessors"
+                    )
+                }
+                listOf("US", "CN", "RS", "419").forEach { region ->
+                    assertTrue(
+                        generated.contains("RegionQualifier(\"$region\")"),
+                        "Expected RegionQualifier(\"$region\") in generated accessors"
+                    )
+                }
+            } finally {
+                bcpDirs.forEach { dir ->
+                    file("src/commonMain/composeResources/$dir").deleteRecursively()
+                }
             }
         }
     }
@@ -122,19 +124,28 @@ class ResourcesTest : GradlePluginTestBase() {
             // empty subtags inside a BCP 47 segment
             "values-b+" to "Malformed BCP 47 subtag ''",
             "values-b++Latn" to "Malformed BCP 47 subtag ''",
+            "values-b+sr+Latn+" to "Malformed BCP 47 subtag ''",
+            "values-b+sr++" to "Malformed BCP 47 subtag ''",
+            "values-b+sr++RS" to "Malformed BCP 47 subtag ''",
+            "values-b+sr+RS+" to "Malformed BCP 47 subtag ''",
             // BCP 47 segment must start with a language subtag
             "values-b+EN" to "BCP 47 segment must start with a language subtag",
+            "values-b+Latn" to "BCP 47 segment must start with a language subtag",
             // Folder name with no resource type prefix surfaces as 'Unknown resource type'
             "-foo" to "Unknown resource type: ''",
             // BCP 47 segment must be locale-first; theme/density before it is rejected
             "values-dark-b+zh+Hant" to "BCP 47 'b+' segment must be the first qualifier",
             "values-mdpi-b+zh" to "BCP 47 'b+' segment must be the first qualifier",
-            // two regions in one BCP 47 segment
-            "values-b+sr+US+RS" to "repetitive qualifiers",
-            "values-b+sr+Latn+RS+US" to "repetitive qualifiers",
+            // repetitive qualifiers (duplication of same subtag kind or same tag)
+            "values-b+sr+US+RS" to "BCP 47 subtags must follow language -> script -> region order",
+            "values-b+sr+Latn+RS+US" to "BCP 47 subtags must follow language -> script -> region order",
+            "values-b+sr+sr+RS" to "BCP 47 subtags must follow language -> script -> region order",
+            "values-b+sr+Latn+Latn" to "BCP 47 subtags must follow language -> script -> region order",
             // BCP 47 segment cannot be combined with trailing locale-shaped qualifiers
             "values-b+sr+Latn-rRS" to "Locale qualifier 'rRS' cannot follow a BCP 47",
             "values-b+sr-rRS" to "Locale qualifier 'rRS' cannot follow a BCP 47",
+            "values-b+sr+RS-sr-rRS" to "Locale qualifier 'sr' cannot follow a BCP 47",
+            "values-sr-rRS-b+sr+RS" to "BCP 47 'b+' segment must be the first qualifier",
             // BCP 47 subtags must follow language -> script -> region order
             "values-b+sr+RS+Latn" to "BCP 47 subtags must follow language -> script -> region order",
             // Standalone script qualifiers (without b+) are not supported
@@ -152,10 +163,13 @@ class ResourcesTest : GradlePluginTestBase() {
                     </resources>
                     """.trimIndent()
                 )
-                gradleFailure("prepareKotlinIdeaImport").checks {
-                    check.logContains(errorMsg)
+                try {
+                    gradleFailure("prepareKotlinIdeaImport").checks {
+                        check.logContains(errorMsg)
+                    }
+                } finally {
+                    bad.deleteRecursively()
                 }
-                bad.deleteRecursively()
             }
         }
     }
