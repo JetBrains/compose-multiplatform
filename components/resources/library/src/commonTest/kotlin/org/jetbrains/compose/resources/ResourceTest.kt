@@ -218,14 +218,4 @@ class ResourceTest {
             resource.getResourceItemByEnvironment(env("en", "", "US")).path
         )
     }
-
-    @Test
-    fun testLocaleGetScript() {
-        assertEquals("", Locale("en-US").getScript())
-        assertEquals("Latn", Locale("sr-Latn-RS").getScript())
-        assertEquals("Hans", Locale("zh-Hans-CN").getScript())
-        assertEquals("Hant", Locale("zh-Hant-TW").getScript())
-        assertEquals("", Locale("es-419").getScript())
-        assertEquals("", Locale("fr").getScript())
-    }
 }

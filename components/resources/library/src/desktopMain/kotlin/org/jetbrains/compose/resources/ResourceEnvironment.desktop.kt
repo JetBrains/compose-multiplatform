@@ -24,14 +24,3 @@ internal actual fun getSystemEnvironment(): ResourceEnvironment {
         density = DensityQualifier.selectByValue(dpi)
     )
 }
-
-internal actual fun androidx.compose.ui.text.intl.Locale.getScript(): String {
-    val script = platformLocale.script
-    if (script.isNotEmpty()) return script
-
-    val defaultLocale = java.util.Locale.getDefault()
-    if (language == defaultLocale.language) {
-        return defaultLocale.script
-    }
-    return ""
-}

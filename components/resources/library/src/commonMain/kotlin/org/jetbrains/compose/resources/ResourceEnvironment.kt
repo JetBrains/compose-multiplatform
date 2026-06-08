@@ -55,7 +55,7 @@ internal val DefaultComposeEnvironment = object : ComposeEnvironment {
         return remember(composeLocale, composeTheme, composeDensity) {
             ResourceEnvironment(
                 LanguageQualifier(composeLocale.language),
-                ScriptQualifier(composeLocale.getScript()),
+                ScriptQualifier(composeLocale.script),
                 RegionQualifier(composeLocale.region),
                 ThemeQualifier.selectByValue(composeTheme),
                 DensityQualifier.selectByDensity(composeDensity.density)
@@ -66,8 +66,6 @@ internal val DefaultComposeEnvironment = object : ComposeEnvironment {
 
 //ComposeEnvironment provider will be overridden for tests
 internal val LocalComposeEnvironment = staticCompositionLocalOf { DefaultComposeEnvironment }
-
-internal expect fun Locale.getScript(): String
 
 /**
  * Returns an instance of [ResourceEnvironment].
