@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.text.intl.Locale
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 
@@ -347,7 +346,7 @@ class ComposeResourceTest {
                 string|app_name|Q29tcG9zZSBSZXNvdXJjZXMgQXBw
                 string|hello|8J+YiiBIZWxsbyB3b3JsZCE=
                 string|str_template|SGVsbG8sICUxJHMhIFlvdSBoYXZlICUyJGQgbmV3IG1lc3NhZ2VzLg==
-
+                
             """.trimIndent(),
             bytes.decodeToString()
         )

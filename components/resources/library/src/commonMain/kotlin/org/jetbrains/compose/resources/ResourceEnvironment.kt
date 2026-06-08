@@ -43,8 +43,6 @@ internal interface ComposeEnvironment {
 }
 
 internal val DefaultComposeEnvironment = object : ComposeEnvironment {
-    private var cachedSystemEnvironment: ResourceEnvironment? = null
-
     @Composable
     override fun rememberEnvironment(): ResourceEnvironment {
         val composeLocale = Locale.current
