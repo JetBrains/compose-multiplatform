@@ -2,11 +2,34 @@ package org.jetbrains.compose.resources
 
 import kotlinx.browser.window
 import kotlinx.coroutines.await
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 import org.w3c.fetch.Response
 import org.w3c.files.Blob
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.js.Promise
+
+private external interface AbortSignal
+private external class AbortController {
+    val signal: AbortSignal
+    fun abort()
+}
+
+@OptIn(ExperimentalWasmJsInterop::class)
+@JsFun("(url, signal) => window.fetch(url, { signal })")
+private external fun jsFetchWithSignal(url: String, signal: AbortSignal): Promise<Response>
+
+@Suppress("UNCHECKED_CAST")
+private suspend fun <T> cancellableFetch(url: String): T = suspendCancellableCoroutine { cont ->
+    val ac = AbortController()
+    jsFetchWithSignal(url, ac.signal).then(
+        onFulfilled = { cont.resume(it as T) },
+        onRejected = { cont.resumeWithException(it) }
+    )
+    cont.invokeOnCancellation { ac.abort() }
+}
 
 @ExperimentalResourceApi
 internal actual fun getPlatformResourceReader(): ResourceReader = DefaultJsResourceReader
@@ -30,8 +53,7 @@ internal object DefaultJsResourceReader : ResourceReader {
     private suspend fun readAsBlob(path: String): Blob {
         val resPath = WebResourcesConfiguration.getResourcePath(path)
         val response =  ResourceWebCache.load(resPath) {
-            // TODO: avoid js(...) calls here after https://github.com/Kotlin/kotlinx-browser/issues/24
-            js("window.fetch(resPath)").unsafeCast<Promise<Response>>().await()
+            cancellableFetch(resPath)
         }
         if (!response.ok) {
             throw MissingResourceException(resPath)
