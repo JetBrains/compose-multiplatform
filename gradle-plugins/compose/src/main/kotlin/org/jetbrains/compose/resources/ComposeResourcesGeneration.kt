@@ -50,6 +50,11 @@ internal fun Project.configureComposeResourcesGeneration(
     val packagingDir = config.getModuleResourcesDir(project)
 
     kotlinExtension.sourceSets.all { sourceSet ->
+
+        //common resources must be converted (XML -> CVR)
+        val preparedResourcesTask = registerPrepareComposeResourcesTask(sourceSet, config)
+        val preparedResources = preparedResourcesTask.flatMap { it.outputDir.asFile }
+
         if (sourceSet.name == resClassSourceSetName) {
             configureResClassGeneration(
                 sourceSet,
@@ -58,13 +63,11 @@ internal fun Project.configureComposeResourcesGeneration(
                 resClassName,
                 makeAccessorsPublic,
                 packagingDir,
-                generateModulePath
+                generateModulePath,
+                preparedResources
             )
         }
 
-        //common resources must be converted (XML -> CVR)
-        val preparedResourcesTask = registerPrepareComposeResourcesTask(sourceSet, config)
-        val preparedResources = preparedResourcesTask.flatMap { it.outputDir.asFile }
         configureResourceAccessorsGeneration(
             sourceSet,
             preparedResources,
@@ -100,7 +103,8 @@ private fun Project.configureResClassGeneration(
     resClassName: Provider<String>,
     makeAccessorsPublic: Provider<Boolean>,
     packagingDir: Provider<File>,
-    generateModulePath: Boolean
+    generateModulePath: Boolean,
+    preparedResources: Provider<File>
 ) {
     logger.info("Configure Res object generation for ${resClassSourceSet.name}")
 
@@ -112,6 +116,7 @@ private fun Project.configureResClassGeneration(
         task.resClassName.set(resClassName)
         task.makeAccessorsPublic.set(makeAccessorsPublic)
         task.codeDir.set(layout.buildDirectory.dir("$RES_GEN_DIR/kotlin/commonResClass"))
+        task.preparedResources.fileProvider(preparedResources)
 
         if (generateModulePath) {
             task.packagingDir.set(packagingDir)

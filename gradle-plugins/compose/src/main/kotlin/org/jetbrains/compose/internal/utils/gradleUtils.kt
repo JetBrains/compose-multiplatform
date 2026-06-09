@@ -6,6 +6,7 @@
 package org.jetbrains.compose.internal.utils
 
 import org.gradle.api.DomainObjectCollection
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.logging.Logger
@@ -72,3 +73,6 @@ internal inline fun <reified SubT> DomainObjectCollection<*>.configureEachWithTy
         }
     }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun gradleError(message: String): Nothing = throw GradleException(message)

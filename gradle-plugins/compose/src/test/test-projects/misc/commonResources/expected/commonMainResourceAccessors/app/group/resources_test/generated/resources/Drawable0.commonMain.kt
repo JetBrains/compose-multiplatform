@@ -38,6 +38,12 @@ internal val Res.drawable.raster: DrawableResource by lazy {
       ))
     }
 
+internal val Res.drawable.subdir.svg: DrawableResource by lazy {
+    DrawableResource("drawable:subdir.svg", setOf(
+        ResourceItem(setOf(), "${MD}drawable/subdir/svg.svg", -1, -1),
+    ))
+}
+
 internal val Res.drawable.svg: DrawableResource by lazy {
       DrawableResource("drawable:svg", setOf(
         ResourceItem(setOf(), "${MD}drawable/svg.svg", -1, -1),
@@ -66,6 +72,7 @@ internal fun _collectCommonMainDrawable0Resources(map: MutableMap<String, Drawab
   map.put("camelCaseName", Res.drawable.camelCaseName)
   map.put("is", Res.drawable.`is`)
   map.put("raster", Res.drawable.raster)
+  map.put("subdir.svg", Res.drawable.subdir.svg)
   map.put("svg", Res.drawable.svg)
   map.put("vector", Res.drawable.vector)
   map.put("vector_2", Res.drawable.vector_2)

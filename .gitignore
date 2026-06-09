@@ -12,6 +12,7 @@ build/
 .externalNativeBuild
 .cxx
 .kotlin
+/experimental/build_from_cli/
 
 # Ignoring the persistant lockfile until kotlin.js vulnerabilities are fixed
 # yarn.lock # but absent yarn.lock leads to inconsistent builds on CI, so let's keep it

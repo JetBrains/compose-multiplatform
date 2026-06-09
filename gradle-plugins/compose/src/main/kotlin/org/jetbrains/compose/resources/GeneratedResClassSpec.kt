@@ -14,11 +14,17 @@ import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asClassName
 import com.squareup.kotlinpoet.withIndent
+import org.jetbrains.compose.internal.utils.gradleError
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import java.nio.file.Path
 import java.util.*
+import kotlin.collections.fold
+import kotlin.collections.sortedBy
 import kotlin.io.path.invariantSeparatorsPathString
 
+/**
+ * List of resource types we can generate accessors for.
+ */
 internal enum class ResourceType(val typeName: String, val accessorName: String) {
     DRAWABLE("drawable", "drawable"),
     STRING("string", "string"),
@@ -30,19 +36,30 @@ internal enum class ResourceType(val typeName: String, val accessorName: String)
 
     companion object {
         fun fromString(str: String): ResourceType? =
-            ResourceType.values().firstOrNull { it.typeName.equals(str, true) }
+            ResourceType.entries.firstOrNull { it.typeName.equals(str, true) }
     }
 }
 
+/**
+ * Class wrapping a resource we can generate accessors for.
+ */
 internal data class ResourceItem(
     val type: ResourceType,
+    // Which qualifiers the resource has (without `-`), e.g. `en` for `-en` and `dark` for `-dark`.
     val qualifiers: List<String>,
+    // Name identifying the resource.
     val name: String,
+    // Relative path to the resource file in the generated resource package
     val path: Path,
     val contentHash: Int,
     val offset: Long = -1,
     val size: Long = -1,
-)
+) {
+    // Normalized `name` to enable correct grouping across qualifiers.
+    // This should replace `name`, but this will break backwards compatibility,
+    // so keep them separate for now.
+    val normalizedName: String = name.lowercase()
+}
 
 private fun ResourceType.getClassName(): ClassName = when (this) {
     ResourceType.DRAWABLE -> ClassName("org.jetbrains.compose.resources", "DrawableResource")
@@ -114,11 +131,11 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
     qualifiersMap[regionQualifier]?.let { q ->
         val lang = qualifiersMap[languageQualifier]
         if (lang == null) {
-            error("Region qualifier must be used only with language.\nFile: ${resourceItem.path}")
+            gradleError("Region qualifier must be used only with language.\nFile: ${resourceItem.path}")
         }
         val langAndRegion = "$lang-$q"
         if (!resourceItem.path.toString().contains("-$langAndRegion")) {
-            error("Region qualifier must be declared after language: '$langAndRegion'.\nFile: ${resourceItem.path}")
+            gradleError("Region qualifier must be declared after language: '$langAndRegion'.\nFile: ${resourceItem.path}")
         }
         add("%T(\"${q.takeLast(2)}\"), ", regionQualifier)
     }
@@ -126,11 +143,22 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
     return this
 }
 
+private fun TypeSpec.Builder.addSubdirObjects(paths: Set<List<String>>): TypeSpec.Builder {
+    paths.groupBy { it.first() }.forEach { (segment, subPaths) ->
+        val nested = TypeSpec.objectBuilder(segment).addModifiers(KModifier.PUBLIC)
+        val deeper = subPaths.filter { it.size > 1 }.map { it.drop(1) }.toSet()
+        nested.addSubdirObjects(deeper)
+        addType(nested.build())
+    }
+    return this
+}
+
 internal fun getResFileSpec(
     packageName: String,
     className: String,
     moduleDir: String,
-    isPublic: Boolean
+    isPublic: Boolean,
+    typeToSubdirPaths: Map<ResourceType, Set<List<String>>> = emptyMap()
 ): FileSpec {
     val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
     return FileSpec.builder(packageName, className).also { file ->
@@ -189,8 +217,13 @@ internal fun getResFileSpec(
                     .build()
             )
 
-            ResourceType.values().forEach { type ->
-                resObject.addType(TypeSpec.objectBuilder(type.accessorName).build())
+            ResourceType.entries.forEach { type ->
+                val subdirPaths = typeToSubdirPaths[type].orEmpty()
+                resObject.addType(
+                    TypeSpec.objectBuilder(type.accessorName)
+                        .addSubdirObjects(subdirPaths)
+                        .build()
+                )
             }
         }.build())
     }.build()
@@ -206,8 +239,7 @@ internal fun getResFileSpec(
 // then a build may fail with: org.jetbrains.org.objectweb.asm.ClassTooLargeException: Class too large: Res$drawable
 private const val ITEMS_PER_FILE_LIMIT = 100
 internal fun getAccessorsSpecs(
-    //type -> id -> items
-    resources: Map<ResourceType, Map<String, List<ResourceItem>>>,
+    resources: ResourceHolder,
     packageName: String,
     sourceSetName: String,
     moduleDir: String,
@@ -219,7 +251,7 @@ internal fun getAccessorsSpecs(
     val files = mutableListOf<FileSpec>()
 
     //we need to sort it to generate the same code on different platforms
-    sortResources(resources).forEach { (type, idToResources) ->
+    sortResources(resources.resources).forEach { (type, idToResources) ->
         val chunks = idToResources.keys.chunked(ITEMS_PER_FILE_LIMIT)
 
         chunks.forEachIndexed { index, ids ->
@@ -289,8 +321,11 @@ private fun getChunkFileSpec(
                 .endControlFlow()
                 .build()
 
-            val accessorBuilder = PropertySpec.builder(resName, type.getClassName(), resModifier)
-                .receiver(ClassName(packageName, resClassName, type.accessorName))
+            val segments = resName.split(".")
+            val propName = segments.last()
+            val receiverSegments = listOf(resClassName, type.accessorName) + segments.dropLast(1)
+            val accessorBuilder = PropertySpec.builder(propName, type.getClassName(), resModifier)
+                .receiver(ClassName(packageName, *receiverSegments.toTypedArray()))
                 .delegate(initializer)
             if (generateResourceContentHashAnnotation) {
                 accessorBuilder.addAnnotation(
@@ -314,7 +349,12 @@ private fun getChunkFileSpec(
                 )
                 .also { collectFun ->
                     idToResources.keys.forEach { resName ->
-                        collectFun.addStatement("map.put(%S, %N.%N.%N)", resName, resClassName, type.accessorName, resName)
+                        val segments = resName.split(".")
+                        val accessorChain = segments.joinToString(".") { "%N" }
+                        collectFun.addStatement(
+                            "map.put(%S, %N.%N.$accessorChain)",
+                            resName, resClassName, type.accessorName, *segments.toTypedArray()
+                        )
                     }
                 }
                 .build()

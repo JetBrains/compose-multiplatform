@@ -1,11 +1,8 @@
 package org.jetbrains.compose.test.tests.integration
 
-import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.internal.Version
-import org.jetbrains.compose.internal.utils.Arch
 import org.jetbrains.compose.internal.utils.OS
-import org.jetbrains.compose.internal.utils.currentArch
 import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.resources.XmlValuesConverterTask
 import org.jetbrains.compose.test.utils.GradlePluginTestBase

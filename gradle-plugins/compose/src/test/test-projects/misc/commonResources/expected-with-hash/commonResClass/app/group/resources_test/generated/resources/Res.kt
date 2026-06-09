@@ -35,7 +35,9 @@ internal object Res {
    */
   public fun getUri(path: String): String = getResourceUri("composeResources/app.group.resources_test.generated.resources/" + path)
 
-  public object drawable
+  public object drawable {
+    public object subdir
+  }
 
   public object string
 
