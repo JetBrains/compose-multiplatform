@@ -5,37 +5,52 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 internal class AsyncCache<K, V> {
-    private val cacheJob = SupervisorJob()
-    private val cacheScope = CoroutineScope(cacheJob)
+    private val cacheScope = CoroutineScope(SupervisorJob())
     private val mutex = Mutex()
-    private val cache = mutableMapOf<K, Deferred<V>>()
+    private val cache = mutableMapOf<K, SharedRequest<V>>()
+
+    private class SharedRequest<V>(val deferred: Deferred<V>) {
+        var listenersCount = 0
+    }
 
     init {
         ResourceCaches.registerCache(this)
     }
 
-    private val currentJobs get() = cacheJob.children.toList()
+    private suspend fun getAllActiveJobs(): List<Job> = mutex.withLock {
+        cache.values.map { it.deferred }.filter { it.isActive }
+    }
 
     suspend fun getOrLoad(key: K, load: suspend () -> V): V {
-        val deferred = mutex.withLock {
+        val request = mutex.withLock {
             var cached = cache[key]
-            if (cached == null || cached.isCancelled) {
-                cached = cacheScope.async { load() }
+            if (cached == null || cached.deferred.isCancelled) {
+                cached = SharedRequest(cacheScope.async { load() })
                 cache[key] = cached
             }
+            cached.listenersCount++
             cached
         }
-        return deferred.await()
+         return try {
+             request.deferred.await()
+         } finally {
+             mutex.withLock {
+                 request.listenersCount--
+                 if (request.listenersCount == 0 && request.deferred.isActive) {
+                     request.deferred.cancel()
+                 }
+             }
+         }
     }
 
     suspend fun waitAllJobs() {
-        currentJobs.joinAll()
+        getAllActiveJobs().joinAll()
     }
 
     suspend fun clear() {
         mutex.withLock {
+            cache.forEach { (_, v) -> v.deferred.cancel() }
             cache.clear()
-            currentJobs.forEach { it.cancelAndJoin() }
         }
     }
 }
