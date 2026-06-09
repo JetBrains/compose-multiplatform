@@ -9,6 +9,7 @@ import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.text.font.Font
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.yield
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -20,7 +21,7 @@ import kotlin.test.assertTrue
 class TestResourcePreloading {
 
     @Test
-    fun testPreloadFont() = runComposeUiTest {
+    fun testPreloadFont() = clearResourceCachesAndRunUiTest {
         var loadContinuation: CancellableContinuation<ByteArray>? = null
 
         val resLoader = object : ResourceReader {
@@ -60,8 +61,10 @@ class TestResourcePreloading {
         assertEquals(null, font)
         assertEquals(null, font2)
 
+        yield()
         assertNotEquals(null, loadContinuation)
         loadContinuation!!.resumeWith(Result.success(ByteArray(0)))
+        yield()
         loadContinuation = null
 
         waitForIdle()

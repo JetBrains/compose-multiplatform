@@ -14,6 +14,8 @@ internal class AsyncCache<K, V> {
         ResourceCaches.registerCache(this)
     }
 
+    private val currentJobs get() = cacheJob.children.toList()
+
     suspend fun getOrLoad(key: K, load: suspend () -> V): V {
         val deferred = mutex.withLock {
             var cached = cache[key]
@@ -27,15 +29,13 @@ internal class AsyncCache<K, V> {
     }
 
     suspend fun waitAllJobs() {
-        mutex.withLock {
-            cacheJob.children.forEach { it.join() }
-        }
+        currentJobs.joinAll()
     }
 
     suspend fun clear() {
         mutex.withLock {
-            cacheJob.children.forEach { it.cancel() }
             cache.clear()
+            currentJobs.forEach { it.cancelAndJoin() }
         }
     }
 }
@@ -53,7 +53,7 @@ object ResourceCaches {
      * that resources are fully loaded before further actions are taken.
      */
     internal suspend fun waitAllJobs() {
-        caches.forEach { it.waitAllJobs() }
+        caches.toList().forEach { it.waitAllJobs() }
     }
 
     /**
@@ -63,6 +63,6 @@ object ResourceCaches {
      * may be changed or no longer be required.
      */
     internal suspend fun clear() {
-        caches.forEach { it.clear() }
+        caches.toList().forEach { it.clear() }
     }
 }
