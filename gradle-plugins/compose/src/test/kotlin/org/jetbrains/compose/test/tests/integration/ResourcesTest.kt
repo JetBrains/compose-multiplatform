@@ -149,8 +149,8 @@ class ResourcesTest : GradlePluginTestBase() {
             // BCP 47 subtags must follow language -> script -> region order
             "values-b+sr+RS+Latn" to "BCP 47 subtags must follow language -> script -> region order",
             // Standalone script qualifiers (without b+) are not supported
-            "values-sr-Latn" to "Script qualifier 'Latn' must be inside a BCP 47",
-            "values-sr-rRS-Latn" to "Script qualifier 'Latn' must be inside a BCP 47",
+            "values-sr-Latn" to "contains unknown qualifier: 'Latn'",
+            "values-sr-rRS-Latn" to "contains unknown qualifier: 'Latn'",
         )
         with(testProject("misc/commonResources")) {
             invalidCases.forEach { (dir, errorMsg) ->
