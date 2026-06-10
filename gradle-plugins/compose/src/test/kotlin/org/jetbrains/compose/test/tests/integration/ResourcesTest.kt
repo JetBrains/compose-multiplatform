@@ -49,6 +49,132 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun testBcpFolderQualifiers() {
+        with(testProject("misc/commonResources")) {
+            val bcpDirs = listOf(
+                // language only
+                "values-b+zh",
+                // language + script
+                "values-b+sr+Latn",
+                "values-b+zh+Hans",
+                // language only inside the b+ segment
+                "values-b+sr",
+                // language + letter region (no script)
+                "values-b+en+US",
+                // language + numeric (UN M.49) region
+                "values-b+es+419",
+                // language + script + region (multi-segment)
+                "values-b+zh+Hans+CN",
+                "values-b+sr+Latn+RS",
+                // BCP 47 locale combined with trailing theme / density qualifiers
+                "values-b+zh+Hant-dark",
+                "values-b+zh+Hant-mdpi",
+                "values-b+zh+Hant-mdpi-dark",
+            )
+            try {
+                bcpDirs.forEach { dir ->
+                    val f = file("src/commonMain/composeResources/$dir")
+                    f.mkdirs()
+                    File(f, "strings.xml").writeText(
+                        """
+                        <resources>
+                            <string name="bcp_test">test</string>
+                        </resources>
+                        """.trimIndent()
+                    )
+                }
+                gradle("prepareKotlinIdeaImport").checks {
+                    check.logDoesntContain("unknown qualifier")
+                    check.logDoesntContain("repetitive qualifiers")
+                }
+
+                // Verify the generated accessors carry the BCP 47 subtags as
+                // ScriptQualifier / RegionQualifier instances (consumed at runtime).
+                val generated = file("build/generated/compose/resourceGenerator/kotlin")
+                    .walkTopDown()
+                    .filter { it.isFile && it.extension == "kt" }
+                    .joinToString("\n") { it.readText() }
+                listOf("Latn", "Hans", "Hant").forEach { script ->
+                    assertTrue(
+                        generated.contains("ScriptQualifier(\"$script\")"),
+                        "Expected ScriptQualifier(\"$script\") in generated accessors"
+                    )
+                }
+                listOf("US", "CN", "RS", "419").forEach { region ->
+                    assertTrue(
+                        generated.contains("RegionQualifier(\"$region\")"),
+                        "Expected RegionQualifier(\"$region\") in generated accessors"
+                    )
+                }
+            } finally {
+                bcpDirs.forEach { dir ->
+                    file("src/commonMain/composeResources/$dir").deleteRecursively()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun testBcpFolderQualifiersInvalid() {
+        val invalidCases = listOf(
+            // malformed BCP 47 subtag (numeric where letters expected)
+            "values-b+sr+1234" to "Malformed BCP 47 subtag '1234'",
+            // junk subtag (not a lang / script / region pattern)
+            "values-b+sr+ABCD" to "Malformed BCP 47 subtag 'ABCD'",
+            // empty subtags inside a BCP 47 segment
+            "values-b+" to "Malformed BCP 47 subtag ''",
+            "values-b++Latn" to "Malformed BCP 47 subtag ''",
+            "values-b+sr+Latn+" to "Malformed BCP 47 subtag ''",
+            "values-b+sr++" to "Malformed BCP 47 subtag ''",
+            "values-b+sr++RS" to "Malformed BCP 47 subtag ''",
+            "values-b+sr+RS+" to "Malformed BCP 47 subtag ''",
+            // BCP 47 segment must start with a language subtag
+            "values-b+EN" to "BCP 47 segment must start with a language subtag",
+            "values-b+Latn" to "BCP 47 segment must start with a language subtag",
+            // Folder name with no resource type prefix surfaces as 'Unknown resource type'
+            "-foo" to "Unknown resource type: ''",
+            // BCP 47 segment must be locale-first; theme/density before it is rejected
+            "values-dark-b+zh+Hant" to "BCP 47 'b+' segment must be the first qualifier",
+            "values-mdpi-b+zh" to "BCP 47 'b+' segment must be the first qualifier",
+            // repetitive qualifiers (duplication of same subtag kind or same tag)
+            "values-b+sr+US+RS" to "BCP 47 subtags must follow language -> script -> region order",
+            "values-b+sr+Latn+RS+US" to "BCP 47 subtags must follow language -> script -> region order",
+            "values-b+sr+sr+RS" to "BCP 47 subtags must follow language -> script -> region order",
+            "values-b+sr+Latn+Latn" to "BCP 47 subtags must follow language -> script -> region order",
+            // BCP 47 segment cannot be combined with trailing locale-shaped qualifiers
+            "values-b+sr+Latn-rRS" to "Locale qualifier 'rRS' cannot follow a BCP 47",
+            "values-b+sr-rRS" to "Locale qualifier 'rRS' cannot follow a BCP 47",
+            "values-b+sr+RS-sr-rRS" to "Locale qualifier 'sr' cannot follow a BCP 47",
+            "values-sr-rRS-b+sr+RS" to "BCP 47 'b+' segment must be the first qualifier",
+            // BCP 47 subtags must follow language -> script -> region order
+            "values-b+sr+RS+Latn" to "BCP 47 subtags must follow language -> script -> region order",
+            // Standalone script qualifiers (without b+) are not supported
+            "values-sr-Latn" to "Script qualifier 'Latn' must be inside a BCP 47",
+            "values-sr-rRS-Latn" to "Script qualifier 'Latn' must be inside a BCP 47",
+        )
+        with(testProject("misc/commonResources")) {
+            invalidCases.forEach { (dir, errorMsg) ->
+                val bad = file("src/commonMain/composeResources/$dir")
+                bad.mkdirs()
+                File(bad, "strings.xml").writeText(
+                    """
+                    <resources>
+                        <string name="bad">test</string>
+                    </resources>
+                    """.trimIndent()
+                )
+                try {
+                    gradleFailure("prepareKotlinIdeaImport").checks {
+                        check.logContains(errorMsg)
+                    }
+                } finally {
+                    bad.deleteRecursively()
+                }
+            }
+        }
+    }
+
+    @Test
     fun testGeneratedAccessors(): Unit = with(testProject("misc/commonResources")) {
         //check generated resource's accessors
         gradle("prepareKotlinIdeaImport").checks {

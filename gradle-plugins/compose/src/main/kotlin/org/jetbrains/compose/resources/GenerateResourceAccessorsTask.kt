@@ -114,9 +114,8 @@ internal abstract class GenerateResourceAccessorsTask : IdeaImportTask() {
         if (typeAndQualifiers.isEmpty()) return null
 
         val typeString = typeAndQualifiers.first().lowercase()
-        val qualifiers = typeAndQualifiers.takeLast(typeAndQualifiers.size - 1)
+        val qualifiers = typeAndQualifiers.drop(1)
         val path = file.toPath().relativeTo(relativeTo)
-
 
         if (typeString == "string") {
             error("Forbidden directory name '$dirName'! String resources should be declared in 'values/strings.xml'.")
