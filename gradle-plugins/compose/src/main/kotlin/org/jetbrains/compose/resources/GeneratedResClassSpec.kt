@@ -127,10 +127,6 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
                     saveQualifier(regionQualifier, q)
                 }
 
-                q.matches(scriptRegex) -> {
-                    error("Script qualifier '$q' must be inside a BCP 47 segment in '${resourceItem.path}'.")
-                }
-
                 else -> error("${resourceItem.path} contains unknown qualifier: '$q'.")
             }
         }
@@ -140,30 +136,21 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
     qualifiersMap[densityQualifier]?.let { q -> add("%T.${q.uppercase()}, ", densityQualifier) }
     qualifiersMap[languageQualifier]?.let { q -> add("%T(\"$q\"), ", languageQualifier) }
 
-    val lang = qualifiersMap[languageQualifier]
-    val languageIdx = lang?.let { resourceItem.qualifiers.indexOf(it) } ?: -1
-
-    qualifiersMap[scriptQualifier]?.let { q ->
-        if (lang == null) {
-            error("Script qualifier must be used only with language.\nFile: ${resourceItem.path}")
+    if (bcpConsumed) {
+        qualifiersMap[scriptQualifier]?.let { q -> add("%T(\"$q\"), ", scriptQualifier) }
+        qualifiersMap[regionQualifier]?.let { q -> add("%T(\"$q\"), ", regionQualifier) }
+    } else {
+        qualifiersMap[regionQualifier]?.let { q ->
+            val lang = qualifiersMap[languageQualifier]
+            if (lang == null) {
+                error("Region qualifier must be used only with language.\nFile: ${resourceItem.path}")
+            }
+            val langAndRegion = "$lang-$q"
+            if (!resourceItem.path.toString().contains("-$langAndRegion")) {
+                error("Region qualifier must be declared after language: '$langAndRegion'.\nFile: ${resourceItem.path}")
+            }
+            add("%T(\"${q.takeLast(2)}\"), ", regionQualifier)
         }
-        val scriptIdx = resourceItem.qualifiers.indexOf(q)
-        if (scriptIdx >= 0 && scriptIdx <= languageIdx) {
-            error("Script qualifier must be declared after language: '$lang-$q'.\nFile: ${resourceItem.path}")
-        }
-        add("%T(\"$q\"), ", scriptQualifier)
-    }
-
-    qualifiersMap[regionQualifier]?.let { q ->
-        if (lang == null) {
-            error("Region qualifier must be used only with language.\nFile: ${resourceItem.path}")
-        }
-        val regionCode = q.removePrefix("r")
-        val regionIdx = resourceItem.qualifiers.indexOf(q)
-        if (regionIdx >= 0 && regionIdx <= languageIdx) {
-            error("Region qualifier must be declared after language: '$lang-$q'.\nFile: ${resourceItem.path}")
-        }
-        add("%T(\"$regionCode\"), ", regionQualifier)
     }
 
     return this
@@ -192,7 +179,7 @@ private fun expandBcpQualifier(segment: String, path: Path): Triple<String?, Str
         when (kind) {
             0 -> language = subtag
             1 -> script = subtag
-            2 -> region = "r$subtag"
+            2 -> region = subtag
         }
         lastKind = kind
     }
