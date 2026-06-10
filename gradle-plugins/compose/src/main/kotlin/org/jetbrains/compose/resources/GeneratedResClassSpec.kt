@@ -83,9 +83,9 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
         qualifiersMap[className] = qualifier
     }
 
-    val expandedQualifiers = parseComposeResourceQualifiers(resourceItem.qualifiers, resourceItem.path)
+    var bcpConsumed = false
 
-    expandedQualifiers.forEach { q ->
+    resourceItem.qualifiers.forEachIndexed { index, q ->
         when (q) {
             "light",
             "dark" -> {
@@ -102,35 +102,53 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
             }
 
             else -> when {
+                q.startsWith("b+") -> {
+                    if (index != 0) {
+                        error("BCP 47 'b+' segment must be the first qualifier in '${resourceItem.path}'.")
+                    }
+                    val (language, script, region) = expandBcpQualifier(q, resourceItem.path)
+                    language?.let { saveQualifier(languageQualifier, it) }
+                    script?.let { saveQualifier(scriptQualifier, it) }
+                    region?.let { saveQualifier(regionQualifier, it) }
+                    bcpConsumed = true
+                }
+
                 q.matches(languageRegex) -> {
+                    if (bcpConsumed) {
+                        error("Locale qualifier '$q' cannot follow a BCP 47 segment in '${resourceItem.path}'.")
+                    }
                     saveQualifier(languageQualifier, q)
                 }
 
                 q.matches(androidRegionRegex) -> {
+                    if (bcpConsumed) {
+                        error("Locale qualifier '$q' cannot follow a BCP 47 segment in '${resourceItem.path}'.")
+                    }
                     saveQualifier(regionQualifier, q)
                 }
 
                 q.matches(scriptRegex) -> {
-                    saveQualifier(scriptQualifier, q)
+                    error("Script qualifier '$q' must be inside a BCP 47 segment in '${resourceItem.path}'.")
                 }
 
                 else -> error("${resourceItem.path} contains unknown qualifier: '$q'.")
             }
         }
     }
+
     qualifiersMap[themeQualifier]?.let { q -> add("%T.${q.uppercase()}, ", themeQualifier) }
     qualifiersMap[densityQualifier]?.let { q -> add("%T.${q.uppercase()}, ", densityQualifier) }
     qualifiersMap[languageQualifier]?.let { q -> add("%T(\"$q\"), ", languageQualifier) }
 
-    val tokens = expandedQualifiers
     val lang = qualifiersMap[languageQualifier]
-    val languageIdx = lang?.let { tokens.indexOf(it) } ?: -1
+    val languageIdx = lang?.let { resourceItem.qualifiers.indexOf(it) } ?: -1
 
     qualifiersMap[scriptQualifier]?.let { q ->
         if (lang == null) {
             error("Script qualifier must be used only with language.\nFile: ${resourceItem.path}")
         }
-        if (tokens.indexOf(q) <= languageIdx) {
+        val scriptIdx = resourceItem.qualifiers.indexOf(q)
+        if (scriptIdx >= 0 && scriptIdx <= languageIdx) {
             error("Script qualifier must be declared after language: '$lang-$q'.\nFile: ${resourceItem.path}")
         }
         add("%T(\"$q\"), ", scriptQualifier)
@@ -141,7 +159,8 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
             error("Region qualifier must be used only with language.\nFile: ${resourceItem.path}")
         }
         val regionCode = q.removePrefix("r")
-        if (tokens.indexOf(q) <= languageIdx) {
+        val regionIdx = resourceItem.qualifiers.indexOf(q)
+        if (regionIdx >= 0 && regionIdx <= languageIdx) {
             error("Region qualifier must be declared after language: '$lang-$q'.\nFile: ${resourceItem.path}")
         }
         add("%T(\"$regionCode\"), ", regionQualifier)
@@ -150,35 +169,11 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
     return this
 }
 
-private fun parseComposeResourceQualifiers(qualifiers: List<String>, path: Path): List<String> {
-    val expanded = mutableListOf<String>()
-    var bcpConsumed = false
-    for ((index, q) in qualifiers.withIndex()) {
-        if (q.startsWith("b+")) {
-            if (index != 0) {
-                error("BCP 47 'b+' segment must be the first qualifier in '$path'.")
-            }
-            expanded.addAll(expandBcpQualifier(q, path))
-            bcpConsumed = true
-        } else {
-            if (bcpConsumed && isLocaleShapedQualifier(q)) {
-                error("Locale qualifier '$q' cannot follow a BCP 47 segment in '$path'.")
-            }
-            if (!bcpConsumed && q.matches(scriptRegex)) {
-                error("Script qualifier '$q' must be inside a BCP 47 segment in '$path'.")
-            }
-            expanded.add(q)
-        }
-    }
-    return expanded
-}
-
-private fun isLocaleShapedQualifier(q: String): Boolean =
-    q.matches(languageRegex) || q.matches(scriptRegex) || q.matches(androidRegionRegex)
-
-private fun expandBcpQualifier(segment: String, path: Path): List<String> {
+private fun expandBcpQualifier(segment: String, path: Path): Triple<String?, String?, String?> {
     val subtags = segment.removePrefix("b+").split("+")
-    val result = mutableListOf<String>()
+    var language: String? = null
+    var script: String? = null
+    var region: String? = null
     var lastKind = -1
     for ((index, subtag) in subtags.withIndex()) {
         val kind = when {
@@ -195,12 +190,13 @@ private fun expandBcpQualifier(segment: String, path: Path): List<String> {
             error("BCP 47 subtags must follow language -> script -> region order in '$path'.")
         }
         when (kind) {
-            0, 1 -> result.add(subtag)
-            2    -> result.add("r$subtag")
+            0 -> language = subtag
+            1 -> script = subtag
+            2 -> region = "r$subtag"
         }
         lastKind = kind
     }
-    return result
+    return Triple(language, script, region)
 }
 
 internal fun getResFileSpec(
