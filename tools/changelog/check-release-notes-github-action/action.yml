@@ -6,6 +6,9 @@ inputs:
   checkout_ref:
     type: string
     default: 'master'
+  kotlin_version:
+    type: string
+    default: '2.3.10'
 
 runs:
   using: "composite"
@@ -15,12 +18,29 @@ runs:
         repository: JetBrains/compose-multiplatform
         ref: ${{ inputs.checkout_ref }}
         sparse-checkout: 'tools/changelog'
+    - name: Cache Kotlin compiler
+      id: cache-kotlin
+      uses: actions/cache@v4
+      with:
+        path: ${{ runner.tool_cache }}/kotlin/${{ inputs.kotlin_version }}
+        key: kotlin-compiler-${{ inputs.kotlin_version }}
+    - name: Download Kotlin compiler
+      if: steps.cache-kotlin.outputs.cache-hit != 'true'
+      shell: bash
+      env:
+        KOTLIN_VERSION: ${{ inputs.kotlin_version }}
+      run: |
+        mkdir -p "$RUNNER_TOOL_CACHE/kotlin/$KOTLIN_VERSION"
+        curl -fsSL "https://github.com/JetBrains/kotlin/releases/download/v${KOTLIN_VERSION}/kotlin-compiler-${KOTLIN_VERSION}.zip" -o "$RUNNER_TEMP/kotlin-compiler.zip"
+        unzip -q "$RUNNER_TEMP/kotlin-compiler.zip" -d "$RUNNER_TEMP/kotlin-compiler"
+        cp -R "$RUNNER_TEMP/kotlin-compiler/kotlinc/." "$RUNNER_TOOL_CACHE/kotlin/$KOTLIN_VERSION"
     - name: Check Release Notes in the description
       shell: bash
       env:
+        KOTLIN_VERSION: ${{ inputs.kotlin_version }}
         # To avoid injections as suggested in https://docs.github.com/en/actions/security-for-github-actions/security-guides/security-hardening-for-github-actions#using-an-intermediate-environment-variable
         PR_DESCRIPTION: ${{ github.event.pull_request.body }}
       run: |
         cd tools/changelog
         echo "$PR_DESCRIPTION" > prDescription.txt
-        kotlin changelog.main.kts action=checkPr prDescription.txt token=""
+        "$RUNNER_TOOL_CACHE/kotlin/$KOTLIN_VERSION/bin/kotlin" changelog.main.kts action=checkPr prDescription.txt token=""
