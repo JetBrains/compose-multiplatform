@@ -1,20 +1,29 @@
 package org.jetbrains.compose.videoplayer
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
+import uk.co.caprica.vlcj.factory.MediaPlayerFactory
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
-import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
-import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer
-import java.awt.Component
-import java.util.*
 import kotlin.math.roundToInt
+
+// Same as MediaPlayerComponentDefaults.EMBEDDED_MEDIA_PLAYER_ARGS
+private val PLAYER_ARGS = listOf(
+    "--video-title=vlcj video output",
+    "--no-snapshot-preview",
+    "--quiet",
+    "--intf=dummy"
+)
 
 @Composable
 internal actual fun VideoPlayerImpl(
@@ -28,14 +37,19 @@ internal actual fun VideoPlayerImpl(
     modifier: Modifier,
     onFinish: (() -> Unit)?
 ) {
-    val mediaPlayerComponent = remember { initializeMediaPlayerComponent() }
-    val mediaPlayer = remember { mediaPlayerComponent.mediaPlayer() }
+    val mediaPlayerFactory = remember { MediaPlayerFactory(PLAYER_ARGS) }
+    val mediaPlayer = remember {
+        mediaPlayerFactory
+            .mediaPlayers()
+            .newEmbeddedMediaPlayer()
+    }
+    val surface = remember {
+        SkiaBitmapVideoSurface().also {
+            mediaPlayer.videoSurface().set(it)
+        }
+    }
     mediaPlayer.emitProgressTo(progressState)
     mediaPlayer.setupVideoFinishHandler(onFinish)
-
-    val factory = remember { { mediaPlayerComponent } }
-    /* OR the following code and using SwingPanel(factory = { factory }, ...) */
-    // val factory by rememberUpdatedState(mediaPlayerComponent)
 
     LaunchedEffect(url) { mediaPlayer.media().play/*OR .start*/(url) }
     LaunchedEffect(seek) { mediaPlayer.controls().setPosition(seek) }
@@ -58,28 +72,28 @@ internal actual fun VideoPlayerImpl(
             mediaPlayer.fullScreen().toggle()
         }
     }
-    DisposableEffect(Unit) { onDispose(mediaPlayer::release) }
-    SwingPanel(
-        factory = factory,
-        background = Color.Transparent,
-        modifier = modifier
-    )
+    DisposableEffect(Unit) {
+        onDispose {
+            mediaPlayer.release()
+            mediaPlayerFactory.release()
+        }
+    }
+    Box(modifier = modifier) {
+        surface.bitmap.value?.let { bitmap ->
+            Image(
+                bitmap,
+                modifier = Modifier
+                    .background(Color.Transparent)
+                    .fillMaxSize(),
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                alignment = Alignment.Center,
+            )
+        }
+    }
 }
 
 private fun Float.toPercentage(): Int = (this * 100).roundToInt()
-
-/**
- * See https://github.com/caprica/vlcj/issues/887#issuecomment-503288294
- * for why we're using CallbackMediaPlayerComponent for macOS.
- */
-private fun initializeMediaPlayerComponent(): Component {
-    NativeDiscovery().discover()
-    return if (isMacOS()) {
-        CallbackMediaPlayerComponent()
-    } else {
-        EmbeddedMediaPlayerComponent()
-    }
-}
 
 /**
  * We play the video again on finish (so the player is kind of idempotent),
@@ -118,22 +132,4 @@ private fun MediaPlayer.emitProgressTo(state: MutableState<Progress>) {
             delay(50)
         }
     }
-}
-
-/**
- * Returns [MediaPlayer] from player components.
- * The method names are the same, but they don't share the same parent/interface.
- * That's why we need this method.
- */
-private fun Component.mediaPlayer() = when (this) {
-    is CallbackMediaPlayerComponent -> mediaPlayer()
-    is EmbeddedMediaPlayerComponent -> mediaPlayer()
-    else -> error("mediaPlayer() can only be called on vlcj player components")
-}
-
-private fun isMacOS(): Boolean {
-    val os = System
-        .getProperty("os.name", "generic")
-        .lowercase(Locale.ENGLISH)
-    return "mac" in os || "darwin" in os
 }
