@@ -155,12 +155,24 @@ private fun configureJsBrowserTestsSkikoLoading(
     val targetName = target.name.replaceFirstChar { it.titlecase() }
     val configDir = project.layout.buildDirectory.dir("compose/karma-config/$targetName")
     val configFile = configDir.map { it.file("compose-skiko-runtime.js") }
+    // KotlinKarma.useConfigDirectory() replaces the default karma.config.d directory rather than
+    // appending to it, so mirror the default user's configs into our directory to keep them working.
+    val defaultKarmaConfigDir = project.projectDir.resolve("karma.config.d")
 
     val generateConfigTask = project.registerTask<DefaultTask>("generateTestComposeSkikoKarmaConfigFor$targetName") {
-        outputs.file(configFile)
+        if (defaultKarmaConfigDir.isDirectory) {
+            inputs.dir(defaultKarmaConfigDir)
+        }
+        outputs.dir(configDir)
         doLast {
             val file = configFile.get().asFile
-            file.parentFile.mkdirs()
+            val targetDir = file.parentFile
+            targetDir.mkdirs()
+
+            defaultKarmaConfigDir.listFiles()
+                ?.filter { it.isFile && it.extension == "js" }
+                ?.forEach { it.copyTo(targetDir.resolve(it.name), overwrite = true) }
+
             file.writeText(
                 //language=JavaScript
                 """
@@ -184,12 +196,14 @@ private fun configureJsBrowserTestsSkikoLoading(
                 
                   const ensureServed = (filePath) => {
                     if (!fs.existsSync(filePath)) return;
-                    const exists = files.some((entry) =>
+                    const alreadyServed = files.some((entry) =>
                       entry === filePath ||
                       (entry && typeof entry === "object" && entry.pattern === filePath)
                     );
-                    if (!exists) {
-                      files.push({
+                    if (!alreadyServed) {
+                      // Serve Skiko dependencies before the test entry. Karma preserves the
+                      // order of `files`, and the "main" entry is already present in the array.
+                      files.unshift({
                         pattern: filePath,
                         watched: false,
                         included: false,
