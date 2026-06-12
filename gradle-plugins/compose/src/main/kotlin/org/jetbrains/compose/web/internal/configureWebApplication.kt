@@ -222,11 +222,15 @@ private fun configureJsBrowserTestsSkikoLoading(
                     let skikoReady = null;
                     window.__karma__.loaded = function() {
                       if (!skikoReady) {
-                        skikoReady = import("/base/kotlin/js-reexport-symbols.mjs")
-                          .then((mod) => mod?.api?.awaitSkiko || Promise.resolve());
+                        const servedFiles = window.__karma__.files || {};
+                        const reexportUrl = Object.keys(servedFiles)
+                          .find((url) => url.endsWith("js-reexport-symbols.mjs"));
+                        skikoReady = reexportUrl
+                          ? import(reexportUrl).then((mod) => mod?.api?.awaitSkiko ?? Promise.resolve())
+                          : Promise.resolve();
                       }
                       skikoReady.then(() => originalLoaded()).catch((error) => {
-                        const message = error && error.stack ? error.stack : String(error);
+                        const message = error?.stack ?? String(error);
                         window.__karma__.error(message);
                       });
                     };
