@@ -1,0 +1,22 @@
+plugins {
+    id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.kotlin.plugin.compose"
+    id "org.jetbrains.compose"
+}
+
+kotlin {
+    js { browser() }
+
+    sourceSets {
+        commonMain.dependencies {
+            api("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
+            api("org.jetbrains.compose.ui:ui:COMPOSE_VERSION_PLACEHOLDER")
+            api("org.jetbrains.compose.foundation:foundation:COMPOSE_VERSION_PLACEHOLDER")
+        }
+
+        commonTest.dependencies {
+            implementation(kotlin("test"))
+            implementation("org.jetbrains.compose.ui:ui-test:COMPOSE_VERSION_PLACEHOLDER")
+        }
+    }
+}
