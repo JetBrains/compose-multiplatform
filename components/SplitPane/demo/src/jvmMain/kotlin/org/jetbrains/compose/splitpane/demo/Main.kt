@@ -23,7 +23,9 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.singleWindowApplication
 import org.jetbrains.compose.splitpane.ExperimentalSplitPaneApi
 import org.jetbrains.compose.splitpane.HorizontalSplitPane
@@ -36,8 +38,12 @@ private fun Modifier.cursorForHorizontalResize(): Modifier =
 
 @OptIn(ExperimentalSplitPaneApi::class)
 fun main() = singleWindowApplication(
+    state = WindowState(
+        size  = DpSize(800.dp, 700.dp)
+    ),
     title = "SplitPane demo"
 ) {
+
     MaterialTheme {
         val splitterState = rememberSplitPaneState()
         val hSplitterState = rememberSplitPaneState()
@@ -51,6 +57,13 @@ fun main() = singleWindowApplication(
                 }
                 Button(onClick = { hSplitterState.moveEnabled = !hSplitterState.moveEnabled }) {
                     Text(if (hSplitterState.moveEnabled) "Freeze H" else "Unfreeze H")
+                }
+
+                Button(onClick = { splitterState.firstVisible = !splitterState.firstVisible }) {
+                    Text(if (splitterState.firstVisible) "Hide Left Pane" else "Show Left Pane")
+                }
+                Button(onClick = { hSplitterState.firstVisible = !hSplitterState.firstVisible }) {
+                    Text(if (hSplitterState.firstVisible) "Hide Top Pane" else "Show Top Pane")
                 }
 
                 OutlinedTextField(value = delta, onValueChange = { delta = it }, label = { Text("Delta") })

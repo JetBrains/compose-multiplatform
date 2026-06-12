@@ -20,7 +20,7 @@ interface SplitPaneScope {
      * Left part, for [VerticalSplitPane] it will be Top part
      * @param minSize a minimal size of composable item.
      * For [HorizontalSplitPane] it will be minimal width, for [VerticalSplitPane] it wil be minimal Heights.
-     * In this context minimal mean that this composable item could not be smaller than specified value.
+     * In this context, minimal means that this composable item could not be smaller than the specified value.
      * @param content composable item content.
      * */
     fun first(
@@ -33,7 +33,7 @@ interface SplitPaneScope {
      * For [HorizontalSplitPane] it will be Right part, for [VerticalSplitPane] it will be Bottom part
      * @param minSize a minimal size of composable item.
      * For [HorizontalSplitPane] it will be minimal width, for [VerticalSplitPane] it wil be minimal Heights.
-     * In this context minimal mean that this composable item could not be smaller than specified value.
+     * In this context, minimal means that this composable item could not be smaller than the specified value.
      * @param content composable item content.
      * */
     fun second(
@@ -48,7 +48,7 @@ interface SplitPaneScope {
 /** Receiver scope which is used by [SplitterScope] */
 @ExperimentalSplitPaneApi
 interface HandleScope {
-    /** allow mark composable as movable handle */
+    /** allow mark composable as a movable handle */
     fun Modifier.markAsHandle(): Modifier
 }
 
@@ -65,15 +65,15 @@ interface SplitterScope {
 
     /**
      * Set up handle part, this part of splitter would be measured and placed above [visiblePart] content.
-     * Size of handle will have no effect on split pane parts (first and second) sizes.
+     * The Size of the handle will have no effect on split pane parts (first and second) sizes.
      *
-     * @param alignment alignment of handle according to [visiblePart] could be:
+     * @param alignment alignment of the handle according to [visiblePart] could be:
      * * [SplitterHandleAlignment.BEFORE] if you place handle before [visiblePart],
      * * [SplitterHandleAlignment.ABOVE] if you place handle above [visiblePart] (will be centered)
-     * * and [SplitterHandleAlignment.AFTER] if you place handle after [visiblePart].
+     * * and [SplitterHandleAlignment.AFTER] if you place the handle after [visiblePart].
      *
-     * @param content composable item content provider. Uses [HandleScope] to allow mark any provided composable part
-     * as handle.
+     * @param content composable item content provider, Uses [HandleScope] to allow marking any provided composable part
+     * as a handle.
      * [content] will be placed only if [SplitPaneState.moveEnabled] is true
      */
     fun handle(
@@ -171,7 +171,7 @@ internal class SplitPaneScopeImpl(
 }
 
 /**
- * creates a [SplitPaneState] and remembers it across composition
+ * Creates a [SplitPaneState] and remembers it across composition
  *
  * Changes to the provided initial values will **not** result in the state being recreated or
  * changed in any way if it has already been created.
@@ -183,11 +183,13 @@ internal class SplitPaneScopeImpl(
 @Composable
 fun rememberSplitPaneState(
     initialPositionPercentage: Float = 0f,
-    moveEnabled: Boolean = true
+    moveEnabled: Boolean = true,
+    firstVisible: Boolean = true
 ): SplitPaneState {
     return remember {
         SplitPaneState(
             moveEnabled = moveEnabled,
+            firstVisible = firstVisible,
             initialPositionPercentage = initialPositionPercentage
         )
     }
