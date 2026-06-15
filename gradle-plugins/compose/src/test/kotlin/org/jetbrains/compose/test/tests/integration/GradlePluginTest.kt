@@ -114,6 +114,16 @@ class GradlePluginTest : GradlePluginTestBase() {
         }
     }
 
+    //https://youtrack.jetbrains.com/issue/CMP-4906
+    @Test
+    fun testJsNoExecutableTests() = with(
+        testProject("misc/jsNoExecutableTests")
+    ) {
+        gradle("jsBrowserTest").checks {
+            check.taskSuccessful(":jsBrowserTest")
+        }
+    }
+
     @Test
     fun testOldComposePluginError() = with(testProject("misc/oldComposePlugin")) {
         gradleFailure("tasks").checks {
