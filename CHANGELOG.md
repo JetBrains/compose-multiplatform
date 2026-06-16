@@ -46,7 +46,6 @@ _Changes since 1.12.0-alpha01_
 
 - Fix an unexected crash in A11Y: `Node $id not found` [#3057](https://github.com/JetBrains/compose-multiplatform-core/pull/3057)
 - Fixed pointer state remaining active when the browser cancels a pointer via `pointercancel` (system gestures, palm rejection, device disconnect, etc.) [#3036](https://github.com/JetBrains/compose-multiplatform-core/pull/3036)
-- Fix cursor control using spacebar sliding gesture in Firefox mobile [#3083](https://github.com/JetBrains/compose-multiplatform-core/pull/3083)
 
 ### Resources
 
