@@ -95,7 +95,7 @@ private fun CanvasDrawingItem(index: Int) {
             )
         )
 
-        repeat(200) { i ->
+        repeat(400) { i ->
             val angle = animatedValue + i * 7.2f
             val radius = size.minDimension / 4f
             val x = size.width / 2 + cos(angle * PI / 180.0).toFloat() * radius * random.nextFloat()
@@ -103,7 +103,7 @@ private fun CanvasDrawingItem(index: Int) {
 
             val path = Path().apply {
                 moveTo(x, y)
-                repeat(40) { j ->
+                repeat(50) { j ->
                     val pointAngle = angle + j * 45f + animatedValue
                     val pointRadius = 20f + random.nextFloat() * 30f
                     val px = x + cos(pointAngle * PI / 180.0).toFloat() * pointRadius
@@ -131,22 +131,53 @@ private fun CanvasDrawingItem(index: Int) {
                     center = Offset(x, y)
                 )
             )
+
+            val path2 = Path().apply {
+                moveTo(x, y)
+                repeat(50) { j ->
+                    val pointAngle = angle + j * 45f + animatedValue
+                    val pointRadius = 20f + random.nextFloat() * 30f
+                    val px = x + cos(pointAngle * PI / 180.0).toFloat() * pointRadius
+                    val py = y + sin(pointAngle * PI / 180.0).toFloat() * pointRadius
+                    if (j % 2 == 0) {
+                        lineTo(px, py)
+                    } else {
+                        quadraticBezierTo(
+                            x + random.nextFloat() * 50f - 25f,
+                            y + random.nextFloat() * 50f - 25f,
+                            px, py
+                        )
+                    }
+                }
+                close()
+            }
+
+            drawPath(
+                path = path2,
+                brush = Brush.radialGradient(
+                    colors = listOf(
+                        Color(random.nextInt(0xFFFFFF) or 0x80000000.toInt()),
+                        Color(random.nextInt(0xFFFFFF) or 0x40000000.toInt())
+                    ),
+                    center = Offset(x, y)
+                )
+            )
         }
 
-        repeat(70) { i ->
+        repeat(300) { i ->
             val lineY = i * (size.height / 30)
             drawLine(
                 color = Color(random.nextInt(0xFFFFFF) or 0xFF000000.toInt()),
                 start = Offset(0f, lineY),
                 end = Offset(size.width, lineY + sin(animatedValue * i).toFloat() * 20f),
-                strokeWidth = 2f
+                strokeWidth = 5f
             )
         }
 
-        repeat(70) { i ->
+        repeat(300) { i ->
             val circleX = (i % 8) * (size.width / 8) + (size.width / 16)
             val circleY = (i / 8) * (size.height / 5) + (size.height / 10)
-            val circleRadius = 15f + sin(animatedValue + i).toFloat() * 10f
+            val circleRadius = 35f + sin(animatedValue + i).toFloat() * 10f
 
             drawCircle(
                 color = Color(random.nextInt(0xFFFFFF) or 0xFF000000.toInt()),
