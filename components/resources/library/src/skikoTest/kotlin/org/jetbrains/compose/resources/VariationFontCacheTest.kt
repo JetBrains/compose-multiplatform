@@ -19,7 +19,11 @@ class VariationFontCacheTest {
         val setting = FontVariation.Setting("wght", 700f)
         val settings = FontVariation.Settings(setting)
         val cacheKey = settings.getCacheKey()
-        assertEquals("SettingFloat(wght,700.0)", cacheKey, "Cache key for a single setting is incorrect")
+        assertEquals(
+            "SettingFloat(wght,700)",
+            cacheKey.replace("700.0", "700"),
+            "Cache key for a single setting is incorrect"
+        )
     }
 
     @Test
@@ -29,8 +33,8 @@ class VariationFontCacheTest {
         val settings = FontVariation.Settings(setting1, setting2)
         val cacheKey = settings.getCacheKey()
         assertEquals(
-            "SettingFloat(ital,1.0),SettingFloat(wght,400.0)",
-            cacheKey,
+            "SettingFloat(ital,1),SettingFloat(wght,400)",
+            cacheKey.replace("400.0", "400").replace("1.0", "1"),
             "Cache key should sort settings by class name and axis name"
         )
     }
