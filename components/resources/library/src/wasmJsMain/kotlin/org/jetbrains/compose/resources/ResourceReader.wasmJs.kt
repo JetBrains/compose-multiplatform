@@ -3,7 +3,6 @@
 package org.jetbrains.compose.resources
 
 import kotlinx.browser.window
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.await
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.khronos.webgl.ArrayBuffer
@@ -12,7 +11,6 @@ import org.w3c.files.Blob
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.js.Promise
-import kotlin.js.unsafeCast
 
 @JsFun("(blob) => blob.arrayBuffer()")
 private external fun jsExportBlobAsArrayBuffer(blob: Blob): Promise<ArrayBuffer>
@@ -59,7 +57,11 @@ internal object DefaultWasmResourceReader : ResourceReader {
     private suspend fun readAsBlob(path: String): Blob {
         val resPath = WebResourcesConfiguration.getResourcePath(path)
         val response = ResourceWebCache.load(resPath) {
-            cancellableFetch(resPath)
+            try {
+                cancellableFetch(resPath)
+            } catch (_: Throwable) {
+                throw MissingResourceException(resPath)
+            }
         }
         if (!response.ok) {
             throw MissingResourceException(resPath)

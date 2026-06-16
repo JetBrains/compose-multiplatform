@@ -53,7 +53,11 @@ internal object DefaultJsResourceReader : ResourceReader {
     private suspend fun readAsBlob(path: String): Blob {
         val resPath = WebResourcesConfiguration.getResourcePath(path)
         val response =  ResourceWebCache.load(resPath) {
-            cancellableFetch(resPath)
+            try {
+                cancellableFetch(resPath)
+            } catch (_: Throwable) {
+                throw MissingResourceException(resPath)
+            }
         }
         if (!response.ok) {
             throw MissingResourceException(resPath)
