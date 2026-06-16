@@ -95,7 +95,7 @@ private fun CanvasDrawingItem(index: Int) {
             )
         )
 
-        repeat(400) { i ->
+        repeat(300) { i ->
             val angle = animatedValue + i * 7.2f
             val radius = size.minDimension / 4f
             val x = size.width / 2 + cos(angle * PI / 180.0).toFloat() * radius * random.nextFloat()
