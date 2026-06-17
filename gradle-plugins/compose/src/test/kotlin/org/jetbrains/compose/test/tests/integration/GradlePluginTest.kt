@@ -114,6 +114,25 @@ class GradlePluginTest : GradlePluginTestBase() {
         }
     }
 
+    //https://youtrack.jetbrains.com/issue/CMP-4906
+    @Test
+    fun testJsNoExecutableTests() = with(
+        testProject("misc/jsNoExecutableTests")
+    ) {
+        // The project depends on Compose UI (Skiko) but does not declare `binaries.executable()`,
+        // so the tests are not bundled with webpack and cannot run. The check task must fail with
+        // an actionable message instead of letting the tests fail in a confusing way.
+        gradleFailure("jsBrowserTest").checks {
+            check.taskFailed(":checkComposeUiTestConfigurationForJs")
+            check.logContains(
+                "Compose UI tests for the 'js' target are not bundled with webpack: " +
+                        "no executable binary is declared, so the Skiko runtime required by Compose UI " +
+                        "cannot be loaded and the tests may fail. Add `binaries.executable()` to the " +
+                        "'js' target. See https://youtrack.jetbrains.com/issue/CMP-4906"
+            )
+        }
+    }
+
     @Test
     fun testOldComposePluginError() = with(testProject("misc/oldComposePlugin")) {
         gradleFailure("tasks").checks {

@@ -5,14 +5,20 @@
 
 package org.jetbrains.compose.web.internal
 
+import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.artifacts.UnresolvedDependency
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.TaskAction
 import org.gradle.language.jvm.tasks.ProcessResources
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.ComposeBuildConfig
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.internal.utils.detachedComposeDependency
@@ -20,7 +26,10 @@ import org.jetbrains.compose.internal.utils.file
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.compose.web.tasks.UnpackSkikoWasmRuntimeTask
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
+import org.jetbrains.kotlin.gradle.targets.js.ir.Executable
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
+import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
 
 internal fun Project.configureWeb(
     composeExt: ComposeExtension,
@@ -112,6 +121,82 @@ internal fun configureWebApplication(
                 }
             }
         }
+
+        configureComposeUiTestExecutableCheck(project, target)
+    }
+}
+
+private fun configureComposeUiTestExecutableCheck(
+    project: Project,
+    target: KotlinJsIrTarget,
+) {
+    val titledTargetName = target.name.replaceFirstChar { it.titlecase() }
+    val checkTask = project.registerTask<CheckComposeUiTestExecutableTask>(
+        "checkComposeUiTestConfigurationFor$titledTargetName"
+    ) {
+        targetName.set(target.name)
+        // Computed lazily, after all `afterEvaluate`s: `binaries.executable()` may be declared
+        // after this plugin runs, so the binaries set can still be empty here. Reading these
+        // through providers (instead of in the task action) also keeps the task free of
+        // Project/target references, so it stays compatible with the configuration cache.
+        testDependsOnSkiko.set(project.provider { project.testCompilationDependsOnSkiko(target) })
+        hasExecutableBinary.set(
+            project.provider { target.binaries.withType(Executable::class.java).isNotEmpty() }
+        )
+    }
+
+    project.tasks.withType(KotlinJsTest::class.java).configureEach { testTask ->
+        val compilation = testTask.compilation
+        // Browser test tasks (Karma) are named "<target>BrowserTest"; node tests don't run Compose UI.
+        if (compilation.target == target &&
+            compilation.compilationName == KotlinCompilation.TEST_COMPILATION_NAME &&
+            testTask.name.endsWith("BrowserTest")
+        ) {
+            testTask.dependsOn(checkTask)
+        }
+    }
+}
+
+/**
+ * Compose UI browser tests must be bundled by webpack to load the Skiko runtime, which only
+ * happens when the target declares an executable `binaries.executable()`. When a target that
+ * depends on Skiko has no executable, this task fails with an actionable message instead of
+ * letting the tests fail in a confusing way.
+ */
+@DisableCachingByDefault(because = "Not worth caching: only validates the configuration")
+internal abstract class CheckComposeUiTestExecutableTask : DefaultTask() {
+    @get:Input
+    abstract val targetName: Property<String>
+
+    @get:Input
+    abstract val testDependsOnSkiko: Property<Boolean>
+
+    @get:Input
+    abstract val hasExecutableBinary: Property<Boolean>
+
+    @TaskAction
+    fun check() {
+        if (!hasExecutableBinary.get() && testDependsOnSkiko.get()) {
+            val target = targetName.get()
+            throw GradleException(
+                "Compose UI tests for the '$target' target are not bundled with webpack: " +
+                        "no executable binary is declared, so the Skiko runtime required by Compose UI " +
+                        "cannot be loaded and the tests may fail. Add `binaries.executable()` to the " +
+                        "'$target' target. See https://youtrack.jetbrains.com/issue/CMP-4906"
+            )
+        }
+    }
+}
+
+private fun Project.testCompilationDependsOnSkiko(target: KotlinJsIrTarget): Boolean {
+    val testCompilation = target.compilations.findByName(KotlinCompilation.TEST_COMPILATION_NAME)
+        ?: return false
+    return listOf(
+        testCompilation.compileDependencyConfigurationName, testCompilation.runtimeDependencyConfigurationName
+    ).mapNotNull { name ->
+        configurations.findByName(name)
+    }.any { configuration ->
+        configuration.allDependenciesDescriptors.any(::isSkikoDependency)
     }
 }
 
