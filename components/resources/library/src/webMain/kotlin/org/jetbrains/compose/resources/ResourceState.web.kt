@@ -1,10 +1,6 @@
 package org.jetbrains.compose.resources
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 
@@ -19,7 +15,11 @@ internal actual fun <T> rememberResourceState(
     return remember(key1, environment) {
         val mutableState = mutableStateOf(getDefault())
         scope.launch(start = CoroutineStart.UNDISPATCHED) {
-            mutableState.value = block(environment)
+            try {
+                mutableState.value = block(environment)
+            } catch (_: Exception) {
+                //resource loading failed
+            }
         }
         mutableState
     }
@@ -37,7 +37,11 @@ internal actual fun <T> rememberResourceState(
     return remember(key1, key2, environment) {
         val mutableState = mutableStateOf(getDefault())
         scope.launch(start = CoroutineStart.UNDISPATCHED) {
-            mutableState.value = block(environment)
+            try {
+                mutableState.value = block(environment)
+            } catch (_: Exception) {
+                //resource loading failed
+            }
         }
         mutableState
     }
@@ -56,7 +60,11 @@ internal actual fun <T> rememberResourceState(
     return remember(key1, key2, key3, environment) {
         val mutableState = mutableStateOf(getDefault())
         scope.launch(start = CoroutineStart.UNDISPATCHED) {
-            mutableState.value = block(environment)
+            try {
+                mutableState.value = block(environment)
+            } catch (_: Exception) {
+                //resource loading failed
+            }
         }
         mutableState
     }
@@ -76,7 +84,11 @@ internal actual fun <T> rememberResourceState(
     return remember(key1, key2, key3, key4, environment) {
         val mutableState = mutableStateOf(getDefault())
         scope.launch(start = CoroutineStart.UNDISPATCHED) {
-            mutableState.value = block(environment)
+            try {
+                mutableState.value = block(environment)
+            } catch (_: Exception) {
+                //resource loading failed
+            }
         }
         mutableState
     }

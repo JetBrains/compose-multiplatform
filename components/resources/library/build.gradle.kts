@@ -1,5 +1,4 @@
 import kotlinx.validation.ExperimentalBCVApi
-import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -28,9 +27,9 @@ kotlin {
     iosSimulatorArm64()
     js {
         browser {
-            testTask(Action {
-                enabled = false
-            })
+            testTask {
+                useKarma { useChromeHeadless() }
+            }
         }
     }
 
@@ -41,12 +40,9 @@ kotlin {
             compilerOptions.freeCompilerArgs.add("-Xwasm-enable-array-range-checks")
         }
         browser {
-            testTask(Action {
-                useKarma {
-                    useChromeHeadless()
-                    useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("wasm"))
-                }
-            })
+            testTask {
+                useKarma { useChromeHeadless() }
+            }
         }
         binaries.executable()
     }
