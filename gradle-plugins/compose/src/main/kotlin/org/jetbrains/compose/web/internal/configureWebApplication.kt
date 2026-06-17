@@ -6,14 +6,19 @@
 package org.jetbrains.compose.web.internal
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.artifacts.UnresolvedDependency
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.TaskAction
 import org.gradle.language.jvm.tasks.ProcessResources
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.ComposeBuildConfig
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.internal.utils.detachedComposeDependency
@@ -22,10 +27,9 @@ import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.compose.web.tasks.UnpackSkikoWasmRuntimeTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
+import org.jetbrains.kotlin.gradle.targets.js.ir.Executable
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
-import org.jetbrains.kotlin.gradle.targets.js.testing.karma.KotlinKarma
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 internal fun Project.configureWeb(
     composeExt: ComposeExtension,
@@ -40,7 +44,7 @@ internal fun Project.configureWeb(
             val compileConfiguration = compilation.compileDependencyConfigurationName
             val runtimeConfiguration = compilation.runtimeDependencyConfigurationName
 
-            listOf(compileConfiguration, runtimeConfiguration).mapNotNull { name ->
+            listOf(compileConfiguration, runtimeConfiguration).mapNotNull {  name ->
                 project.configurations.findByName(name)
             }.flatMap { configuration ->
                 configuration.incoming.resolutionResult.allComponents.map { it.id }
@@ -115,156 +119,84 @@ internal fun configureWebApplication(
                     it.dependsOn(unpackRuntime)
                     it.exclude("META-INF")
                 }
-
-                if (compilation.name == KotlinCompilation.TEST_COMPILATION_NAME) {
-                    configureJsBrowserTestsSkikoLoading(
-                        project = project,
-                        target = target,
-                        compilationProcessResourcesTaskName = compilation.processResourcesTaskName
-                    )
-                }
             }
+        }
+
+        configureComposeUiTestExecutableCheck(project, target)
+    }
+}
+
+private fun configureComposeUiTestExecutableCheck(
+    project: Project,
+    target: KotlinJsIrTarget,
+) {
+    val titledTargetName = target.name.replaceFirstChar { it.titlecase() }
+    val checkTask = project.registerTask<CheckComposeUiTestExecutableTask>(
+        "checkComposeUiTestConfigurationFor$titledTargetName"
+    ) {
+        targetName.set(target.name)
+        // Computed lazily, after all `afterEvaluate`s: `binaries.executable()` may be declared
+        // after this plugin runs, so the binaries set can still be empty here. Reading these
+        // through providers (instead of in the task action) also keeps the task free of
+        // Project/target references, so it stays compatible with the configuration cache.
+        testDependsOnSkiko.set(project.provider { project.testCompilationDependsOnSkiko(target) })
+        hasExecutableBinary.set(
+            project.provider { target.binaries.withType(Executable::class.java).isNotEmpty() }
+        )
+    }
+
+    project.tasks.withType(KotlinJsTest::class.java).configureEach { testTask ->
+        val compilation = testTask.compilation
+        // Browser test tasks (Karma) are named "<target>BrowserTest"; node tests don't run Compose UI.
+        if (compilation.target == target &&
+            compilation.compilationName == KotlinCompilation.TEST_COMPILATION_NAME &&
+            testTask.name.endsWith("BrowserTest")
+        ) {
+            testTask.dependsOn(checkTask)
         }
     }
 }
 
-
 /**
- * Configures Karma test runner for Kotlin/JS browser tests to properly load Skiko runtime dependencies.
- * 
- * This function generates a custom Karma configuration file that:
- * - Locates the test entry point JavaScript file in the build output
- * - Ensures Skiko runtime files (skiko.mjs, skiko.wasm, js-reexport-symbols.mjs) are served by Karma
- * - Creates a loader script that intercepts Karma's test execution to wait for Skiko initialization
- * - Hooks into the window.__karma__.loaded() function to ensure Skiko is ready before tests run
- * 
- * The generated configuration ensures that Compose UI tests that depend on Skiko can properly
- * initialize the graphics runtime before test execution begins, preventing race conditions
- * where tests might run before Skiko's WebAssembly module is fully loaded.
- *
- * @param project The Gradle project being configured
- * @param target The Kotlin/JS IR target being configured for testing
- * @param compilationProcessResourcesTaskName The name of the task that processes resources for the test compilation,
- *        used to ensure Skiko resources are available before tests run
+ * Compose UI browser tests must be bundled by webpack to load the Skiko runtime, which only
+ * happens when the target declares an executable `binaries.executable()`. When a target that
+ * depends on Skiko has no executable, this task fails with an actionable message instead of
+ * letting the tests fail in a confusing way.
  */
-private fun configureJsBrowserTestsSkikoLoading(
-    project: Project,
-    target: KotlinJsIrTarget,
-    compilationProcessResourcesTaskName: String
-) {
-    val targetName = target.name.replaceFirstChar { it.titlecase() }
-    val configDir = project.layout.buildDirectory.dir("compose/karma-config/$targetName")
-    val configFile = configDir.map { it.file("compose-skiko-runtime.js") }
-    // KotlinKarma.useConfigDirectory() replaces the default karma.config.d directory rather than
-    // appending to it, so mirror the default user's configs into our directory to keep them working.
-    val defaultKarmaConfigDir = project.projectDir.resolve("karma.config.d")
+@DisableCachingByDefault(because = "Not worth caching: only validates the configuration")
+internal abstract class CheckComposeUiTestExecutableTask : DefaultTask() {
+    @get:Input
+    abstract val targetName: Property<String>
 
-    val generateConfigTask = project.registerTask<DefaultTask>("generateTestComposeSkikoKarmaConfigFor$targetName") {
-        if (defaultKarmaConfigDir.isDirectory) {
-            inputs.dir(defaultKarmaConfigDir)
-        }
-        outputs.dir(configDir)
-        doLast {
-            val file = configFile.get().asFile
-            val targetDir = file.parentFile
-            targetDir.mkdirs()
+    @get:Input
+    abstract val testDependsOnSkiko: Property<Boolean>
 
-            defaultKarmaConfigDir.listFiles()
-                ?.filter { it.isFile && it.extension == "js" }
-                ?.forEach { it.copyTo(targetDir.resolve(it.name), overwrite = true) }
+    @get:Input
+    abstract val hasExecutableBinary: Property<Boolean>
 
-            file.writeText(
-                //language=JavaScript
-                """
-                const fs = require("fs");
-                const path = require("path");
-                
-                (function(config) {
-                  const files = config.files || [];
-                  const testEntry = files.find((entry) =>
-                    typeof entry === "string" &&
-                    entry.endsWith(".js") &&
-                    entry.includes(path.sep + "kotlin" + path.sep)
-                  );
-                  if (!testEntry) return;
-                
-                  const reexportModule = path.resolve(path.dirname(testEntry), "js-reexport-symbols.mjs");
-                  const skikoModule = path.resolve(path.dirname(testEntry), "skiko.mjs");
-                  const skikoWasm = path.resolve(path.dirname(testEntry), "skiko.wasm");
-                  const loaderFile = path.resolve(path.dirname(testEntry), "compose-skiko-loader.js");
-                  if (!fs.existsSync(reexportModule)) return;
-                
-                  const ensureServed = (filePath) => {
-                    if (!fs.existsSync(filePath)) return;
-                    const alreadyServed = files.some((entry) =>
-                      entry === filePath ||
-                      (entry && typeof entry === "object" && entry.pattern === filePath)
-                    );
-                    if (!alreadyServed) {
-                      // Serve Skiko dependencies before the test entry. Karma preserves the
-                      // order of `files`, and the "main" entry is already present in the array.
-                      files.unshift({
-                        pattern: filePath,
-                        watched: false,
-                        included: false,
-                        served: true,
-                      });
-                    }
-                  };
-                  ensureServed(reexportModule);
-                  ensureServed(skikoModule);
-                  ensureServed(skikoWasm);
-
-                  fs.writeFileSync(loaderFile, `
-                  (function() {
-                    if (!window.__karma__) return;
-                    const originalLoaded = window.__karma__.loaded.bind(window.__karma__);
-                    let skikoReady = null;
-                    window.__karma__.loaded = function() {
-                      if (!skikoReady) {
-                        const servedFiles = window.__karma__.files || {};
-                        const reexportUrl = Object.keys(servedFiles)
-                          .find((url) => url.endsWith("js-reexport-symbols.mjs"));
-                        skikoReady = reexportUrl
-                          ? import(reexportUrl).then((mod) => mod?.api?.awaitSkiko ?? Promise.resolve())
-                          : Promise.resolve();
-                      }
-                      skikoReady.then(() => originalLoaded()).catch((error) => {
-                        const message = error?.stack ?? String(error);
-                        window.__karma__.error(message);
-                      });
-                    };
-                  })();
-                  `.trim());
-
-                  const hasLoader = files.some((entry) =>
-                    entry === loaderFile ||
-                    (entry && typeof entry === "object" && entry.pattern === loaderFile)
-                  );
-                  if (!hasLoader) {
-                    files.unshift(loaderFile);
-                  }
-                })(config);
-                """.trimIndent()
+    @TaskAction
+    fun check() {
+        if (!hasExecutableBinary.get() && testDependsOnSkiko.get()) {
+            val target = targetName.get()
+            throw GradleException(
+                "Compose UI tests for the '$target' target are not bundled with webpack: " +
+                        "no executable binary is declared, so the Skiko runtime required by Compose UI " +
+                        "cannot be loaded and the tests may fail. Add `binaries.executable()` to the " +
+                        "'$target' target. See https://youtrack.jetbrains.com/issue/CMP-4906"
             )
         }
     }
+}
 
-    project.tasks.withType(KotlinJsTest::class.java).configureEach { testTask ->
-        if (testTask.compilation.target != target ||
-            testTask.compilation.compilationName != KotlinCompilation.TEST_COMPILATION_NAME
-        ) {
-            return@configureEach
-        }
-
-        testTask.dependsOn(generateConfigTask)
-        testTask.dependsOn(compilationProcessResourcesTaskName)
-
-        val configDirectoryPath = configDir.get().asFile
-        (testTask.testFramework as? KotlinKarma)?.useConfigDirectory(configDirectoryPath)
-        testTask.onTestFrameworkSet { framework ->
-            (framework as? KotlinKarma)?.useConfigDirectory(configDirectoryPath)
-        }
+private fun Project.testCompilationDependsOnSkiko(target: KotlinJsIrTarget): Boolean {
+    val testCompilation = target.compilations.findByName(KotlinCompilation.TEST_COMPILATION_NAME)
+        ?: return false
+    return listOf(
+        testCompilation.compileDependencyConfigurationName, testCompilation.runtimeDependencyConfigurationName
+    ).mapNotNull { name ->
+        configurations.findByName(name)
+    }.any { configuration ->
+        configuration.allDependenciesDescriptors.any(::isSkikoDependency)
     }
 }
 
@@ -287,7 +219,7 @@ private fun isSkikoDependency(dep: DependencyDescriptor): Boolean =
     dep.group == SKIKO_GROUP && dep.version != null
 
 private val Configuration.allDependenciesDescriptors: Sequence<DependencyDescriptor>
-    get() = with(resolvedConfiguration.lenientConfiguration) {
+    get() = with (resolvedConfiguration.lenientConfiguration) {
         allModuleDependencies.asSequence().map { ResolvedDependencyDescriptor(it) } +
                 unresolvedModuleDependencies.asSequence().map { UnresolvedDependencyDescriptor(it) }
     }

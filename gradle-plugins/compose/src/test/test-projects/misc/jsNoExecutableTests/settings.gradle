@@ -24,4 +24,4 @@ dependencyResolutionManagement {
         mavenLocal()
     }
 }
-rootProject.name = "jsNoAppTests"
+rootProject.name = "jsNoExecutableTests"
