@@ -1,9 +1,5 @@
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.graphics.asComposeCanvas
-import androidx.compose.ui.scene.CanvasLayersComposeScene
-import androidx.compose.ui.scene.ComposeScene
-import androidx.compose.ui.unit.IntSize
 import org.jetbrains.skia.Surface
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
@@ -53,7 +49,7 @@ private suspend inline fun yieldEventLoop() {
     yield()
 }
 
-@OptIn(ExperimentalTime::class, InternalComposeUiApi::class)
+@OptIn(ExperimentalTime::class)
 internal suspend fun measureComposable(
     name: String,
     warmupCount: Int,
@@ -65,7 +61,7 @@ internal suspend fun measureComposable(
     content: @Composable () -> Unit
 ): BenchmarkResult  {
     val surface = graphicsContext?.surface(width, height) ?: Surface.makeNull(width, height)
-    val scene = CanvasLayersComposeScene(size = IntSize(width, height))
+    val scene = createBenchmarkComposeScene(width, height)
     try {
         val nanosPerFrame = (1.0 / targetFps.toDouble() * nanosPerSecond).toLong()
         scene.setContent(content)
@@ -167,8 +163,7 @@ private val pictureRecorder = PictureRecorder()
  * Beware that this logic can be changed in some new version of Skiko.
  * If Skiko stops using `picture`, we need to remove it here too.
  */
-@OptIn(InternalComposeUiApi::class)
-fun ComposeScene.mimicSkikoRender(surface: Surface, time: Long, width: Int, height: Int) {
+fun BenchmarkComposeScene.mimicSkikoRender(surface: Surface, time: Long, width: Int, height: Int) {
     val pictureCanvas = pictureRecorder.beginRecording(Rect(0f, 0f, width.toFloat(), height.toFloat()))
     render(pictureCanvas.asComposeCanvas(), time)
     val picture = pictureRecorder.finishRecordingAsPicture()
