@@ -31,6 +31,51 @@ dependencyResolutionManagement {
 include(":compose-scene-api")
 
 /**
+ * Semver version parser, taken from compose-multiplatform-core:
+ * buildSrc/public/src/main/kotlin/androidx/build/Version.kt
+ *
+ * Supports format: major.minor.patch[-preRelease][+buildMetadata]
+ * Examples: "1.11.1", "1.12.0-alpha02+dev4221", "1.12.0-beta01", "1.12.0"
+ */
+data class Version(
+    val major: Int,
+    val minor: Int,
+    val patch: Int,
+    val preRelease: String? = null,
+    val buildMetadata: String? = null,
+) : Comparable<Version> {
+    override fun compareTo(other: Version) = compareValuesBy(
+        this, other,
+        { it.major },
+        { it.minor },
+        { it.patch },
+        { it.preRelease == null },  // no pre-release (stable) sorts after pre-release
+        { it.preRelease },          // lexicographic ordering (alpha < beta < rc)
+    )
+
+    companion object {
+        // Semver regex from https://semver.org
+        private val SEMVER_REGEX = Regex(
+            """^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)""" +
+            """(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?""" +
+            """(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"""
+        )
+
+        fun parse(versionString: String): Version {
+            val match = SEMVER_REGEX.matchEntire(versionString)
+                ?: error("Cannot parse version: $versionString")
+            return Version(
+                major = match.groupValues[1].toInt(),
+                minor = match.groupValues[2].toInt(),
+                patch = match.groupValues[3].toInt(),
+                preRelease = match.groupValues[4].ifEmpty { null },
+                buildMetadata = match.groupValues[5].ifEmpty { null },
+            )
+        }
+    }
+}
+
+/**
  * Selects the appropriate compose-scene-impl module based on the Compose Multiplatform version.
  *
  * - compose-scene-impl-1: for versions before compose-multiplatform-core#3012
@@ -62,60 +107,21 @@ fun resolveComposeVersion(): String {
     error("Could not find compose-multiplatform version in gradle/libs.versions.toml")
 }
 
-fun isAfterPR3012(version: String): Boolean {
-    // Version format examples:
-    //   "1.11.1"
-    //   "1.12.0-alpha01"              (before PR #3012)
-    //   "1.12.0-alpha02+dev4213"      (before PR #3012)
-    //   "1.12.0-alpha02+dev4221"      (after PR #3012)
-    //   "1.12.0-alpha02+dev4236"
-    //   "1.12.0-beta01"
-    //   "1.12.0"
+// The PR #3012 landed between dev4213 and dev4221 of 1.12.0-alpha02.
+// buildMetadata ("+devNNNN") is not part of semver comparison, so we handle it explicitly.
+val PR_3012_VERSION_BARRIER = Version.parse("1.12.0-alpha02")
+val PR_3012_MIN_DEV_BUILD = 4221
 
-    val parts = version.split(".")
-    if (parts.size < 2) return false
-    val major = parts[0].toIntOrNull() ?: return false
-    val minor = parts[1].toIntOrNull() ?: return false
-
-    // Versions before 1.12 definitely use the old API
-    if (major < 1 || (major == 1 && minor < 12)) return false
-    // Versions after 1.12.x definitely use the new API
-    if (major > 1 || (major == 1 && minor > 12)) return true
-
-    // major == 1, minor == 12: check pre-release tag and dev build number.
-    // The PR #3012 landed between dev4213 and dev4221 of 1.12.0-alpha02.
-    // 1.12.0-alpha01 still uses the old API.
-
-    // Extract pre-release tag (e.g. "alpha01", "alpha02", "beta01") if present
-    val preReleaseRegex = Regex("""-(alpha|beta|rc)(\d+)""")
-    val preReleaseMatch = preReleaseRegex.find(version)
-    if (preReleaseMatch != null) {
-        val preReleaseType = preReleaseMatch.groupValues[1]  // "alpha", "beta", or "rc"
-        val preReleaseNum = preReleaseMatch.groupValues[2].toIntOrNull() ?: 0
-
-        // alpha01 and earlier are before the PR
-        if (preReleaseType == "alpha" && preReleaseNum < 2) return false
-
-        // beta and rc are after the PR
-        if (preReleaseType != "alpha") return true
-
-        // alpha02+: check dev build number
-        val devBuildRegex = Regex("""\+dev(\d+)""")
-        val devMatch = devBuildRegex.find(version)
-        if (devMatch != null) {
-            val devBuild = devMatch.groupValues[1].toIntOrNull() ?: return true
-            return devBuild >= 4221
-        }
-
-        // alpha02 without +devNNNN suffix — released alpha02 includes PR #3012
-        return true
-    }
-
-    // No pre-release tag means a final release (e.g. "1.12.0") — includes PR #3012
-    return true
+fun isAfterPR3012(version: Version): Boolean {
+    if (version > PR_3012_VERSION_BARRIER) return true
+    if (version < PR_3012_VERSION_BARRIER) return false
+    // Exact match on 1.12.0-alpha02: check dev build number
+    val devBuild = version.buildMetadata?.removePrefix("dev")?.toIntOrNull()
+    // No +devNNNN suffix means released alpha02 which includes PR #3012
+    return devBuild == null || devBuild >= PR_3012_MIN_DEV_BUILD
 }
 
-val composeVersion = resolveComposeVersion()
+val composeVersion = Version.parse(resolveComposeVersion())
 val implDir = if (isAfterPR3012(composeVersion)) "compose-scene-impl-2" else "compose-scene-impl-1"
 
 include(":compose-scene-impl")
