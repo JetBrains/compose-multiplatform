@@ -245,10 +245,10 @@ fun prepareStarsAndSnowFlakes(
             SnowFlake(
                 (50 + (width - 50) * random()).dp,
                 (height * random()).dp,
-                0.1f + 0.2f * random().toFloat(),
+                0.1f + 0.2f * random(),
                 1.5 + 3 * random(),
                 (0.4f + 0.4 * random()).toFloat(),
-                60 * random().toFloat(),
+                60 * random(),
                 Random.nextInt(1, 5) - 3,
                 random() * 2 * PI
             )
