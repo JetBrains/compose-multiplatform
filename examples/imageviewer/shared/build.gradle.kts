@@ -81,7 +81,7 @@ kotlin {
 
         val desktopMain by getting
         desktopMain.dependencies {
-            implementation(projects.mapviewDesktop)
+            implementation(project(":mapview-desktop"))
         }
         val desktopTest by getting
         desktopTest.dependencies {

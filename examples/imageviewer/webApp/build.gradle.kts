@@ -43,7 +43,7 @@ kotlin {
         val webMain by creating {
             dependsOn(commonMain.get())
             dependencies {
-                implementation(projects.shared)
+                implementation(project(":shared"))
                 implementation(libs.compose.runtime)
                 implementation(libs.compose.ui)
                 implementation(libs.compose.foundation)
