@@ -134,7 +134,6 @@ fun generateChangelog() {
     val versionLifecycle = formatAndroidxLibVersion("LIFECYCLE")
     val versionNavigationEvent = formatAndroidxLibVersion("NAVIGATION_EVENT")
     val versionSavedstate = formatAndroidxLibVersion("SAVEDSTATE")
-    val versionWindow = formatAndroidxLibVersion("WINDOW")
     val versionNavigation3 = formatAndroidxLibVersion("NAVIGATION_3")
 
     val versionRedirectingCompose = formatAndroidxLibRedirectingVersion("compose")
@@ -143,7 +142,6 @@ fun generateChangelog() {
     val versionRedirectingLifecycle = formatAndroidxLibRedirectingVersion("lifecycle")
     val versionRedirectingNavigationEvent = formatAndroidxLibRedirectingVersion("navigationevent")
     val versionRedirectingSavedstate = formatAndroidxLibRedirectingVersion("savedstate")
-    val versionRedirectingWindow = formatAndroidxLibRedirectingVersion("window")
     val versionRedirectingNavigation3 = formatAndroidxLibRedirectingVersion("navigation3")
 
     val versionName = versionCompose
@@ -231,7 +229,7 @@ fun generateChangelog() {
                     | Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:$versionNavigation3` | [Navigation3 $versionRedirectingNavigation3](https://developer.android.com/jetpack/androidx/releases/navigation3#$versionRedirectingNavigation3) |
                     | Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:$versionNavigationEvent` | [Navigation Event $versionRedirectingNavigationEvent](https://developer.android.com/jetpack/androidx/releases/navigationevent#$versionRedirectingNavigationEvent) |
                     | Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:$versionSavedstate` | [Savedstate $versionRedirectingSavedstate](https://developer.android.com/jetpack/androidx/releases/savedstate#$versionRedirectingSavedstate) |
-                    | WindowManager Core | `org.jetbrains.androidx.window:window-core:$versionWindow` | [WindowManager $versionRedirectingWindow](https://developer.android.com/jetpack/androidx/releases/window#$versionRedirectingWindow) |
+                    | WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
 
                     ---
                 """.trimIndent()
