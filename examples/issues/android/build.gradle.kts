@@ -30,5 +30,5 @@ android {
 }
 
 dependencies {
-    implementation(projects.common)
+    implementation(project(":common"))
 }

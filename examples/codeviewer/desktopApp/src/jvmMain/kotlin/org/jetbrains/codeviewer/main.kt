@@ -7,11 +7,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.singleWindowApplication
 import MainView
+import androidx.compose.ui.graphics.toComposeImageBitmap
+import org.jetbrains.skia.Image
 
 fun main() = singleWindowApplication(
     title = "Code Viewer",
     state = WindowState(width = 1280.dp, height = 768.dp),
-    icon = BitmapPainter(useResource("ic_launcher.png", ::loadImageBitmap)),
+    icon = BitmapPainter(Image.makeFromEncoded(Thread.currentThread().contextClassLoader.getResourceAsStream("ic_launcher.png")!!.readAllBytes()).toComposeImageBitmap()),
 ) {
     MainView()
 }

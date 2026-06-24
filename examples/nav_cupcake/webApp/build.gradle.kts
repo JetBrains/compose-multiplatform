@@ -20,7 +20,7 @@ kotlin {
 
     sourceSets {
         wasmJsMain.dependencies {
-            implementation(projects.shared)
+            implementation(project(":shared"))
             implementation(libs.compose.ui)
         }
     }

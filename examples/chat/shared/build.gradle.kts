@@ -69,8 +69,8 @@ kotlin {
         }
         androidMain.dependencies {
             api(libs.androidx.activity.compose)
-            api(libs.appcompat)
-            api(libs.core.ktx)
+            api(libs.androidx.appcompat)
+            api(libs.androidx.core.ktx)
         }
     }
 }

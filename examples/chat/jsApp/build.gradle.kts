@@ -11,7 +11,7 @@ kotlin {
     }
     sourceSets {
         jsMain.dependencies {
-            implementation(projects.shared)
+            implementation(project(":shared"))
             implementation(libs.compose.ui)
             implementation(libs.compose.foundation)
         }

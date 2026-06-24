@@ -64,8 +64,8 @@ kotlin {
 
         androidMain.dependencies {
             api(libs.androidx.activity.compose)
-            api(libs.appcompat)
-            api(libs.core.ktx)
+            api(libs.androidx.appcompat)
+            api(libs.androidx.core.ktx)
             implementation(libs.androidx.camera.camera2)
             implementation(libs.androidx.camera.lifecycle)
             implementation(libs.androidx.camera.view)
@@ -81,7 +81,7 @@ kotlin {
 
         val desktopMain by getting
         desktopMain.dependencies {
-            implementation(projects.mapviewDesktop)
+            implementation(project(":mapview-desktop"))
         }
         val desktopTest by getting
         desktopTest.dependencies {
