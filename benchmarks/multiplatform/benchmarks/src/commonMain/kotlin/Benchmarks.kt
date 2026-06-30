@@ -17,6 +17,7 @@ import benchmarks.lazygrid.LazyGrid
 import benchmarks.visualeffects.NYContent
 import benchmarks.textlayout.TextLayout
 import benchmarks.canvasdrawing.CanvasDrawing
+import benchmarks.canvasdrawing.CanvasDrawingComplexity
 import benchmarks.heavyshader.HeavyShader
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
@@ -347,7 +348,8 @@ fun getBenchmarks(): List<Benchmark> = listOf(
         MultipleComponentsExample(isVectorGraphicsSupported = false)
     },
     Benchmark("TextLayout") { TextLayout() },
-    Benchmark("CanvasDrawing") { CanvasDrawing() },
+    Benchmark("CanvasDrawing") { CanvasDrawing(CanvasDrawingComplexity.easy) },
+    Benchmark("CanvasDrawing-Medium") { CanvasDrawing(CanvasDrawingComplexity.medium) },
     Benchmark("HeavyShader") { HeavyShader() }
 ).sortedBy { it.name }
 
