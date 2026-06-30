@@ -1,3 +1,86 @@
+# 1.12.0-beta01 (June 2026)
+
+_Changes since 1.12.0-alpha02_
+
+## Migration Notes
+
+### Multiple Platforms
+
+- Deprecation level of `NativeCanvas`, `NativePaint` typealiases and related methods has been changed to `ERROR` [#3127](https://github.com/JetBrains/compose-multiplatform-core/pull/3127)
+
+## Features
+
+### Multiple Platforms
+
+- Support `LayerOutsets` to `GraphicsLayer` & `Modifier.graphicsLayer` which can be used to increase the visual bounds of the layer beyond its measured size. This can be used to avoid the implicit `clipToBounds` behavior when the layer is promoted to an offscreen buffer [#3144](https://github.com/JetBrains/compose-multiplatform-core/pull/3144)
+- Support `MeshGradientPainter` in `Modifier.paint` [#3143](https://github.com/JetBrains/compose-multiplatform-core/pull/3143)
+
+### iOS
+
+- Support `VerbatimTtsAnnotation` and `LocaleList` attributes in accessibility VoiceOver [#3145](https://github.com/JetBrains/compose-multiplatform-core/pull/3145)
+
+### Desktop
+
+- _(prerelease fix)_ Bump Compose Hot Reload to [1.2.0-alpha02](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.2.0-alpha02) [#5620](https://github.com/JetBrains/compose-multiplatform/pull/5620)
+
+## Fixes
+
+### Multiple Platforms
+
+- `ComposeUiTest` idle handling (`waitForIdle`/`awaitIdle`/`runOnIdle`) now matches Android: idleness is reached once composition, measure, and layout have settled (a pending draw is still flushed before returning). As a result, `hasPendingWork()` reflects composition/measure/layout state, and with `mainClock.autoAdvance = false` waiting now settles pending measure/layout [#3108](https://github.com/JetBrains/compose-multiplatform-core/pull/3108)
+- Fix crash in method setComposingRegion when calling it with inverted or invalid region [#3112](https://github.com/JetBrains/compose-multiplatform-core/pull/3112)
+
+### iOS
+
+- `ViewModel` now receives `onCleared` call when Compose Container is deallocated [#3118](https://github.com/JetBrains/compose-multiplatform-core/pull/3118)
+- Fix incorrect frames order during high load rendering [#3122](https://github.com/JetBrains/compose-multiplatform-core/pull/3122)
+- Fix swipe-back gesture conflict with horizontally scrollable components like `HorizontalPager` [#3116](https://github.com/JetBrains/compose-multiplatform-core/pull/3116)
+
+### Desktop
+
+- _(prerelease fix)_ Fixed `getMinimumSize` and `getMaximumSize` in `ComposePanel` to not assume `UnspecifiedDimension` by default [#3114](https://github.com/JetBrains/compose-multiplatform-core/pull/3114)
+- Fixed the native keyCode for `Key.NumPadDot` to the correct `KeyEvent.VK_DECIMAL` [#3142](https://github.com/JetBrains/compose-multiplatform-core/pull/3142)
+- Fixed `LayoutCoordinates` conversion to window/screen space in popups/dialogs with `compose.layers.type=WINDOW` [#3154](https://github.com/JetBrains/compose-multiplatform-core/pull/3154)
+
+### Web
+
+- Added precise trackpad gesture detection in Chrome via heuristic methods [#3123](https://github.com/JetBrains/compose-multiplatform-core/pull/3123)
+- Deliver both scroll axes in wheel events (fix diagonal scroll) [#3147](https://github.com/JetBrains/compose-multiplatform-core/pull/3147)
+- Web: retry loading fallback fonts in case of network errors [#3152](https://github.com/JetBrains/compose-multiplatform-core/pull/3152)
+
+### Resources
+
+- Support BCP 47 script (`values-b+sr+Latn`, `values-b+zh+Hans`) and numeric region (`values-b+es+419`) qualifiers, including multi-segment locales and trailing theme/density qualifiers, in `commonMain` resource folders [#5582](https://github.com/JetBrains/compose-multiplatform/pull/5582)
+- Web: fixed a app crash when a resource fetch is failed [#5627](https://github.com/JetBrains/compose-multiplatform/pull/5627)
+
+### Gradle Plugin
+
+- Add clear error message if JS browser tests configuration for Compose UI is invalid (doesn't have declared an executable binary) [#5628](https://github.com/JetBrains/compose-multiplatform/pull/5628)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.12.0-beta01`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.12.0-beta01` | [Runtime 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.12.0-beta01) |
+| UI | `org.jetbrains.compose.ui:ui*:1.12.0-beta01` | [UI 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.12.0-beta01) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.12.0-beta01` | [Foundation 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.12.0-beta01) |
+| Material | `org.jetbrains.compose.material:material*:1.12.0-beta01` | [Material 1.12.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.12.0-beta01) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.12.0-alpha03` | [Material3 1.5.0-alpha22](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha22) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-beta02` | [Material3 Adaptive 1.3.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-beta02) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0-rc01` | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.10.0-alpha02` | [Navigation 2.10.0-alpha05](https://developer.android.com/jetpack/androidx/releases/navigation#2.10.0-alpha05) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.2.0-alpha02` | [Navigation3 1.2.0-alpha04](https://developer.android.com/jetpack/androidx/releases/navigation3#1.2.0-alpha04) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0` | [Navigation Event 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.1) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+---
+
 # 1.12.0-alpha02 (June 2026)
 
 _Changes since 1.12.0-alpha01_
