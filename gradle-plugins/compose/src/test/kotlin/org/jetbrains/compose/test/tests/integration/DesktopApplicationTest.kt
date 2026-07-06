@@ -118,14 +118,21 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             """.trimIndent()
 
         val actualMainImage = file("main-image.actual.png")
-        val expectedMainImage = file("main-image.expected.png")
+        val expectedMainImageOld = file("main-image.expected-old.png")
+        val expectedMainImageNew = file("main-image.expected-new.png")
 
         fun checkImageBeforeBuild() {
             assertFalse(actualMainImage.exists(), "'$actualMainImage' exists")
         }
         fun checkImageAfterBuild() {
-            assert(actualMainImage.readBytes().contentEquals(expectedMainImage.readBytes())) {
-                "The actual image '$actualMainImage' does not match the expected image '$expectedMainImage'"
+            val actual = actualMainImage.readBytes()
+            val expectedOld = expectedMainImageOld.readBytes()
+            val expectedNew = expectedMainImageNew.readBytes()
+            assert(
+                actual.contentEquals(expectedOld) || actual.contentEquals(expectedNew)
+            ) {
+                "The actual image '$actualMainImage' does not match either " +
+                        "'$expectedMainImageOld' or '$expectedMainImageNew'"
             }
         }
 
