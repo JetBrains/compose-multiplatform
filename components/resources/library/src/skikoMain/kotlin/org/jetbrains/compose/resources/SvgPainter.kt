@@ -1,5 +1,6 @@
 package org.jetbrains.compose.resources
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.ColorFilter
@@ -48,7 +49,10 @@ internal class SvgPainter(
         }
     }
 
-    private var previousDrawSize: Size = Size.Unspecified
+    private var cachedDrawSize: Size = Size.Unspecified
+    @VisibleForTesting
+    internal val currentDrawSize: Size get() = cachedDrawSize
+
     private var alpha: Float = 1.0f
     private var colorFilter: ColorFilter? = null
 
@@ -66,7 +70,7 @@ internal class SvgPainter(
     }
 
     override fun DrawScope.onDraw() {
-        if (previousDrawSize != size) {
+        if (cachedDrawSize != size) {
             drawCache.drawCachedImage(
                 ImageBitmapConfig.Argb8888,
                 IntSize(ceil(size.width).toInt(), ceil(size.height).toInt()),
@@ -75,6 +79,7 @@ internal class SvgPainter(
             ) {
                 drawSvg(size)
             }
+            cachedDrawSize = size
         }
 
         drawCache.drawInto(this, alpha, colorFilter)
