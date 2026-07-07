@@ -26,7 +26,7 @@ fun CameraScreen(onBack: (resetSelectedPicture: Boolean) -> Unit) {
     }
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         if (showCamera) {
-            CameraView(Modifier.fillMaxSize(), onCapture = { picture, image ->
+            CameraCaptureFrame(Modifier.fillMaxSize(), onCapture = { picture, image ->
                 imageProvider.saveImage(picture, image)
                 onBack(true)
             })
