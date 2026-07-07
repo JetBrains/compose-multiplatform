@@ -8,7 +8,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import example.imageviewer.Dependencies
-import example.imageviewer.ExternalImageViewerEvent
 import example.imageviewer.ImageViewerCommon
 import example.imageviewer.Notification
 import example.imageviewer.PopupNotification
@@ -20,17 +19,16 @@ import example.imageviewer.storage.AndroidImageStorage
 import example.imageviewer.style.ImageViewerTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
 @Composable
-fun ImageViewerAndroid(externalEvents: Flow<ExternalImageViewerEvent>) {
+fun ImageViewerAndroid() {
     val context: Context = LocalContext.current
     val ioScope = rememberCoroutineScope { ioDispatcher }
     val dependencies = remember(context, ioScope) {
-        getDependencies(context, ioScope, externalEvents)
+        getDependencies(context, ioScope)
     }
     ImageViewerTheme {
         ImageViewerCommon(dependencies)
@@ -40,7 +38,6 @@ fun ImageViewerAndroid(externalEvents: Flow<ExternalImageViewerEvent>) {
 private fun getDependencies(
     context: Context,
     ioScope: CoroutineScope,
-    externalEvents: Flow<ExternalImageViewerEvent>
 ) = object : Dependencies() {
     override val notification: Notification = object : PopupNotification(ioScope) {
         override fun showPopUpMessage(text: String) {
@@ -70,5 +67,4 @@ private fun getDependencies(
             }
         }
     }
-    override val externalEvents: Flow<ExternalImageViewerEvent> = externalEvents
 }

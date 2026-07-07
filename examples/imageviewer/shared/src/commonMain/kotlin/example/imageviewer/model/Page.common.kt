@@ -1,15 +1,19 @@
 package example.imageviewer.model
 
-interface Page
+import androidx.navigation3.runtime.NavKey
+import kotlinx.serialization.Serializable
 
-expect class MemoryPage(pictureIndex: Int) : Page {
-    val pictureIndex: Int
-}
+@Serializable
+sealed interface Page : NavKey
 
-expect class CameraPage() : Page
+@Serializable
+data object GalleryPage : Page
 
-expect class FullScreenPage(pictureIndex: Int) : Page {
-    val pictureIndex: Int
-}
+@Serializable
+data class MemoryPage(val pictureIndex: Int) : Page
 
-expect class GalleryPage() : Page
+@Serializable
+data class FullScreenPage(val pictureIndex: Int) : Page
+
+@Serializable
+data object CameraPage : Page

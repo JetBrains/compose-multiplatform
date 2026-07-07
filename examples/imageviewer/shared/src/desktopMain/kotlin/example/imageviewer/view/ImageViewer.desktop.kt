@@ -60,7 +60,6 @@ fun ApplicationScope.ImageViewerDesktop() {
             size = getPreferredWindowSize(720, 857)
         ),
         icon = painterResource(Res.drawable.ic_imageviewer_round),
-        // https://youtrack.jetbrains.com/issue/CMP-2741
         onKeyEvent = {
             if (it.type == KeyEventType.KeyUp) {
                 when (it.key) {
@@ -70,10 +69,6 @@ fun ApplicationScope.ImageViewerDesktop() {
 
                     Key.DirectionRight -> externalNavigationEventBus.produceEvent(
                         ExternalImageViewerEvent.Next
-                    )
-
-                    Key.Escape -> externalNavigationEventBus.produceEvent(
-                        ExternalImageViewerEvent.ReturnBack
                     )
                 }
             }

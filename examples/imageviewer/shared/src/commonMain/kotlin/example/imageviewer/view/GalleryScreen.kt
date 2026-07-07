@@ -107,7 +107,6 @@ fun GalleryScreen(
             when (it) {
                 ExternalImageViewerEvent.Next -> nextImage()
                 ExternalImageViewerEvent.Previous -> previousImage()
-                else -> {}
             }
         }
     }

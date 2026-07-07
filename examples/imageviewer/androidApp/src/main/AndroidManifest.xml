@@ -7,6 +7,7 @@
 
     <application
         android:allowBackup="true"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_imageviewer"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_imageviewer_round"
