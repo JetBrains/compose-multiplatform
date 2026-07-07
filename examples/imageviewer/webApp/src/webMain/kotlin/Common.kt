@@ -13,7 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 internal fun ImageViewerWeb() {
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
     val ioScope: CoroutineScope = rememberCoroutineScope { ioDispatcher }
-    val dependencies = remember(ioScope) { getDependencies(toastState) }
+    val dependencies = remember(ioScope) { getDependencies(toastState, ioScope) }
 
     ImageViewerTheme {
         Surface(
@@ -27,8 +27,8 @@ internal fun ImageViewerWeb() {
     }
 }
 
-fun getDependencies(toastState: MutableState<ToastState>) = object : Dependencies() {
+fun getDependencies(toastState: MutableState<ToastState>, ioScope: CoroutineScope) = object : Dependencies() {
     override val imageStorage: ImageStorage = WebImageStorage()
     override val sharePicture = WebSharePicture()
-    override val notification = WebPopupNotification(toastState, localization)
+    override val notification = WebPopupNotification(toastState, ioScope)
 }

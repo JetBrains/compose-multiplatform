@@ -20,7 +20,6 @@ fun ImageViewerCommon(
     dependencies: Dependencies
 ) {
     CompositionLocalProvider(
-        LocalLocalization provides dependencies.localization,
         LocalNotification provides dependencies.notification,
         LocalImageProvider provides dependencies.imageProvider,
         LocalInternalEvents provides dependencies.externalEvents,

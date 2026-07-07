@@ -16,13 +16,14 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.dp
 import example.imageviewer.LocalImageProvider
-import example.imageviewer.Localization
-import example.imageviewer.LocalLocalization
 import example.imageviewer.filter.FilterType
 import example.imageviewer.filter.getFilter
 import example.imageviewer.filter.getPlatformContext
 import example.imageviewer.model.*
 import example.imageviewer.style.*
+import imageviewer.shared.generated.resources.Res
+import imageviewer.shared.generated.resources.back
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun FullscreenImageScreen(
@@ -30,7 +31,6 @@ fun FullscreenImageScreen(
     back: () -> Unit,
 ) {
     val imageProvider = LocalImageProvider.current
-    val localization: Localization = LocalLocalization.current
     val availableFilters = FilterType.values().toList()
     var selectedFilters by remember { mutableStateOf(emptySet<FilterType>()) }
 
@@ -88,7 +88,7 @@ fun FullscreenImageScreen(
 
         TopLayout(
             alignLeftContent = {
-                Tooltip(localization.back) {
+                Tooltip(stringResource(Res.string.back)) {
                     BackButton(back)
                 }
             },

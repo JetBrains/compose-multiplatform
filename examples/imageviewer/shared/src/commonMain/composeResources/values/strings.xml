@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">My Memories</string>
+    <string name="picture">Picture:</string>
+    <string name="back">Back</string>
+    <string name="take_photo">Take a photo 📸</string>
+    <string name="add_photo">Add a photo</string>
+    <string name="kotlin_conf_name">KotlinConf 2023 🎉</string>
+    <string name="kotlin_conf_description">This photo was taken during KotlinConf 2023 using #ComposeMultiplatform running on %1$s! 🎊\nLet\'s build some stunning UIs! 🥳\nhttps://jb.gg/compose</string>
+    <string name="new_photo_name">New Memory</string>
+    <string name="new_photo_description">May amazing things happen to you! 🙂</string>
+</resources>

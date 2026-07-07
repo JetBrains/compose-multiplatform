@@ -41,7 +41,7 @@ internal fun ImageViewerIos() {
 
 fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) =
     object : Dependencies() {
-        override val notification: Notification = object : PopupNotification(localization) {
+        override val notification: Notification = object : PopupNotification(ioScope) {
             override fun showPopUpMessage(text: String) {
                 toastState.value = ToastState.Shown(text)
             }
