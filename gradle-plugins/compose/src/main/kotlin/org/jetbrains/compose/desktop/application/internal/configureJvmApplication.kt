@@ -458,6 +458,7 @@ private fun JvmApplicationContext.configureFlattenJars(
     if (runProguard != null) {
         flattenJars.dependsOn(runProguard)
         flattenJars.inputFiles.from(runProguard.flatMap { it.destinationDir })
+        flattenJars.stripSkikoNativesFromAllJars.set(runProguard.flatMap { it.joinOutputJars })
     } else {
         flattenJars.useAppRuntimeFiles { (runtimeJars, _) ->
             inputFiles.from(runtimeJars)

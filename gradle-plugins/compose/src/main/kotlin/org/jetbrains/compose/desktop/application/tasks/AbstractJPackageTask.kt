@@ -8,7 +8,6 @@ package org.jetbrains.compose.desktop.application.tasks
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
@@ -56,11 +55,13 @@ import org.jetbrains.compose.desktop.application.internal.files.isJarFile
 import org.jetbrains.compose.desktop.application.internal.files.mangledName
 import org.jetbrains.compose.desktop.application.internal.files.normalizedPath
 import org.jetbrains.compose.desktop.application.internal.files.transformJar
+import org.jetbrains.compose.desktop.application.internal.isSkikoAwtRuntimeJar
+import org.jetbrains.compose.desktop.application.internal.isSkikoNativeEntry
 import org.jetbrains.compose.desktop.application.internal.javaOption
+import org.jetbrains.compose.desktop.application.internal.shouldKeepSkikoEntry
 import org.jetbrains.compose.desktop.application.internal.validation.validate
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.clearDirs
-import org.jetbrains.compose.internal.utils.currentArch
 import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.internal.utils.delete
@@ -578,11 +579,20 @@ abstract class AbstractJPackageTask @Inject constructor(
         fun File.isMainUberJar() = packageFromUberJar.get() && name == launcherMainJar.ioFile.name
 
         val outdatedLibs = invalidateMappedLibs(inputChanges)
+        val skikoLibsToTransform = outdatedLibs.filterTo(HashSet()) { it.isSkikoAwtRuntimeJar() || it.isMainUberJar() }
+        if (skikoLibsToTransform.isNotEmpty()) {
+            fileOperations.clearDirs(skikoDir)
+        }
+
         for (sourceFile in outdatedLibs) {
             assert(sourceFile.exists()) { "Lib file does not exist: $sourceFile" }
 
-            libsMapping[sourceFile] = if (isSkikoForCurrentOS(sourceFile) || sourceFile.isMainUberJar()) {
-                val unpackedFiles = unpackSkikoForCurrentOS(sourceFile, skikoDir.ioFile, fileOperations)
+            libsMapping[sourceFile] = if (sourceFile in skikoLibsToTransform) {
+                val unpackedFiles = stripAndUnpackSkikoNatives(
+                    sourceFile,
+                    skikoDir.ioFile,
+                    bundleMacOSX64 = macAppStore.getOrElse(false)
+                )
                 unpackedFiles.map { copyFileToLibsDir(it) }
             } else {
                 listOf(copyFileToLibsDir(sourceFile))
@@ -796,30 +806,22 @@ private class FilesMapping : Serializable {
     }
 }
 
-private fun isSkikoForCurrentOS(lib: File): Boolean =
-    lib.name.startsWith("skiko-awt-runtime-${currentOS.id}-${currentArch.id}")
-            && lib.name.endsWith(".jar")
-
-private fun unpackSkikoForCurrentOS(sourceJar: File, skikoDir: File, fileOperations: FileSystemOperations): List<File> {
-    val entriesToUnpack = when (currentOS) {
-        OS.MacOS -> setOf("libskiko-macos-${currentArch.id}.dylib")
-        OS.Windows -> setOf("skiko-windows-${currentArch.id}.dll", "icudtl.dat")
-        OS.Linux -> setOf("libskiko-linux-${currentArch.id}.so")
-    }
-
-    // output files: unpacked libs, corresponding .sha256 files, and target jar
-    val outputFiles = ArrayList<File>(entriesToUnpack.size * 2 + 1)
+private fun stripAndUnpackSkikoNatives(
+    sourceJar: File,
+    skikoDir: File,
+    bundleMacOSX64: Boolean
+): List<File> {
+    val outputFiles = ArrayList<File>()
     val targetJar = skikoDir.resolve(sourceJar.name)
     outputFiles.add(targetJar)
 
-    fileOperations.clearDirs(skikoDir)
     transformJar(sourceJar, targetJar) { entry, zin, zout ->
-        // check both entry or entry.sha256
-        if (entry.name.removeSuffix(".sha256") in entriesToUnpack) {
+        val isSkikoNative = isSkikoNativeEntry(entry.name)
+        if (isSkikoNative && shouldKeepSkikoEntry(entry.name, bundleMacOSX64)) {
             val unpackedFile = skikoDir.resolve(entry.name.substringAfterLast("/"))
             zin.copyTo(unpackedFile)
             outputFiles.add(unpackedFile)
-        } else {
+        } else if (!isSkikoNative) {
             copyZipEntry(entry, zin, zout)
         }
     }

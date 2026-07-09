@@ -7,14 +7,19 @@ package org.jetbrains.compose.desktop.tasks
 
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Classpath
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
+import org.jetbrains.compose.desktop.application.internal.isSkikoAwtRuntimeJar
+import org.jetbrains.compose.desktop.application.internal.isSkikoNativeEntry
 import org.jetbrains.compose.desktop.application.internal.files.copyZipEntry
 import org.jetbrains.compose.desktop.application.internal.files.isJarFile
+import org.jetbrains.compose.desktop.application.internal.shouldKeepSkikoEntry
 import org.jetbrains.compose.internal.utils.delete
 import org.jetbrains.compose.internal.utils.ioFile
 import java.io.File
@@ -49,6 +54,9 @@ abstract class AbstractJarsFlattenTask : AbstractComposeDesktopTask() {
     @get:OutputFile
     val flattenedJar: RegularFileProperty = objects.fileProperty()
 
+    @get:Input
+    val stripSkikoNativesFromAllJars: Property<Boolean> = objects.property(Boolean::class.java).value(false)
+
     @get:Internal
     val seenEntryNames = hashSetOf<String>()
 
@@ -69,9 +77,12 @@ abstract class AbstractJarsFlattenTask : AbstractComposeDesktopTask() {
 
     private fun ZipOutputStream.writeJarContent(jarFile: File) =
         ZipInputStream(FileInputStream(jarFile)).use { inputStream ->
+            val stripSkikoEntries = stripSkikoNativesFromAllJars.get() || jarFile.isSkikoAwtRuntimeJar()
             var inputEntry: ZipEntry? = inputStream.nextEntry
             while (inputEntry != null) {
-                writeEntryIfNotSeen(inputEntry, inputStream)
+                if (!stripSkikoEntries || !isSkikoNativeEntry(inputEntry.name) || shouldKeepSkikoEntry(inputEntry.name)) {
+                    writeEntryIfNotSeen(inputEntry, inputStream)
+                }
                 inputEntry = inputStream.nextEntry
             }
         }
