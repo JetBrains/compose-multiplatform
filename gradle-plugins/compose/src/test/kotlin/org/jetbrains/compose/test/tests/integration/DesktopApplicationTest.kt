@@ -628,3 +628,4 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         file("build.gradle").modify { "$it\n$enableJoinOutputJars" }
     }
 }
+
