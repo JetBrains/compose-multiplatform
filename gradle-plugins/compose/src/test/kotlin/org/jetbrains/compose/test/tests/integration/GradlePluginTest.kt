@@ -30,15 +30,11 @@ import kotlin.test.assertFalse
 class GradlePluginTest : GradlePluginTestBase() {
     @Test
     fun skikoWasm() = with(
-        testProject(
-            "misc/skikoWasm",
-            // TODO: enable the configuration cache after moving all test projects to kotlin 2.0 or newer
-            defaultTestEnvironment.copy(useGradleConfigurationCache = false)
-        )
+        testProject("misc/skikoWasm")
     ) {
         gradle(":build").checks {
-            check.taskSuccessful(":unpackSkikoWasmRuntime")
-            check.taskSuccessful(":processSkikoRuntimeForKWasm")
+            check.taskSuccessful(":unpackSkikoRuntimeForJs")
+            check.taskSuccessful(":unpackSkikoRuntimeForWasmJs")
             check.taskSuccessful(":compileKotlinJs")
             check.taskSuccessful(":compileKotlinWasmJs")
             check.taskSuccessful(":wasmJsBrowserDistribution")
