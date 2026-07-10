@@ -653,7 +653,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                     ".*",
                     "app",
                     ".*",
-                    AppCdsMode.ARCHIVE_FILE_ARGUMENT
+                    AppCdsMode.Jdk21AppCdsMode.ARCHIVE_FILE_ARGUMENT
                         .replace("\$APPDIR", "app")
                         .replace(".", "\\.")
                 ).joinToString(File.separator.replace("\\", "\\\\"))

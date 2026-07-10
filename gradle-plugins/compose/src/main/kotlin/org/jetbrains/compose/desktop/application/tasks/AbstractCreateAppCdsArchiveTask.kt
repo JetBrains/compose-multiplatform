@@ -6,6 +6,7 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.jetbrains.compose.desktop.application.dsl.AppCdsConfiguration
 import org.jetbrains.compose.desktop.application.dsl.AppCdsMode
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import org.jetbrains.compose.internal.utils.*
@@ -32,7 +33,7 @@ abstract class AbstractCreateAppCdsArchiveTask @Inject constructor(
         val packageName = packageName.get()
         val appCdsMode = appCdsMode.get()
         val packagedAppRootDir = packagedAppRootDir(appImageRootDir, packageName)
-        appCdsMode.appClassesArchiveFile(packagedAppRootDir)
+        appCdsMode.trainingRunOutputFile(packagedAppRootDir)
     }
 
     // This is needed to correctly describe the dependencies to Gradle.
@@ -68,7 +69,7 @@ abstract class AbstractCreateAppCdsArchiveTask @Inject constructor(
             // Edit the cfg file
             cfgFile.outputStream().bufferedWriter().use { output ->
                 // Copy lines, filtering the AppCdsMode's runtime options
-                val runtimeOptionCfgLines = appCdsMode.get().runtimeJvmArgs()
+                val runtimeOptionCfgLines = appCdsMode.get().runtimeJvmArgs(configuration = null)
                     .mapTo(mutableSetOf()) { "java-options=$it" }
                 cfgFileTempCopy.useLines { lines ->
                     lines.forEach { line ->
@@ -79,7 +80,7 @@ abstract class AbstractCreateAppCdsArchiveTask @Inject constructor(
                 }
 
                 // Add the AppCdsMode's archive creation options
-                val archiveCreationOptions = appCdsMode.get().appClassesArchiveCreationJvmArgs().toSet()
+                val archiveCreationOptions = appCdsMode.get().trainingRunJvmArgs().toSet()
                 for (arg in archiveCreationOptions) {
                     output.appendLine("java-options=$arg")
                 }

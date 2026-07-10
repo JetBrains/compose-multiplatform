@@ -14,7 +14,6 @@ import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.compose.desktop.application.dsl.runtimeJvmArgs
 import org.jetbrains.compose.desktop.application.internal.validation.validatePackageVersions
 import org.jetbrains.compose.desktop.application.tasks.*
 import org.jetbrains.compose.desktop.tasks.AbstractJarsFlattenTask
@@ -146,7 +145,7 @@ private fun JvmApplicationContext.configurePackagingTasks(
     }
 
     val appCdsMode = buildType.appCds.mode
-    val createAppCdsArchive = if (appCdsMode.generateAppClassesArchive) {
+    val createAppCdsArchive = if (appCdsMode.needsTrainingRun) {
         tasks.register<AbstractCreateAppCdsArchiveTask>(
             taskNameAction = "create",
             taskNameObject = "appCdsArchive",
@@ -351,7 +350,7 @@ private fun JvmApplicationContext.configurePackageTask(
 
     packageTask.launcherMainClass.set(nullableProvider { app.mainClass })
     packageTask.launcherJvmArgs.set(
-        provider { defaultJvmArgs + buildType.appCds.runtimeJvmArgs() + app.jvmArgs }
+        provider { defaultJvmArgs + buildType.appCds.runtimeJvmArgs + app.jvmArgs }
     )
     packageTask.launcherArgs.set(provider { app.args })
 }
