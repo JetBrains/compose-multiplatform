@@ -22,12 +22,10 @@ import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.web.WebExtension
-import org.jetbrains.compose.web.tasks.UnpackSkikoWasmRuntimeTask
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.targets.js.ir.Executable
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
-import java.util.concurrent.Callable
 
 internal fun Project.configureWeb(
     composeExt: ComposeExtension,
@@ -41,7 +39,6 @@ internal fun Project.configureWeb(
     }
 }
 
-@Suppress("UnstableApiUsage")
 private fun configureSkikoWebRuntime(
     project: Project,
     target: KotlinJsIrTarget,
@@ -50,9 +47,11 @@ private fun configureSkikoWebRuntime(
     val mainCompilation = target.compilations.findByName(KotlinCompilation.MAIN_COMPILATION_NAME)!!
     val runtimeDepsConfig = project.configurations.findByName(mainCompilation.runtimeDependencyConfigurationName)!!
     val skikoWebRuntimeJarFiles = runtimeDepsConfig.incoming.artifactView { act ->
+        @Suppress("UnstableApiUsage")
         act.withVariantReselection()
         act.attributes { cont ->
             runtimeDepsConfig.attributes.keySet().forEach {
+                @Suppress("UNCHECKED_CAST")
                 cont.attribute(it as Attribute<Any>, runtimeDepsConfig.attributes.getAttribute(it) as Any)
             }
             cont.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "skiko-runtime"))
@@ -60,13 +59,14 @@ private fun configureSkikoWebRuntime(
     }.files
     val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-${target.name}-runtime")
 
-    val unpackRuntime = project.registerTask<UnpackSkikoWasmRuntimeTask>("unpackSkikoRuntimeFor$titledTargetName") {
-        skikoRuntimeFiles = skikoWebRuntimeJarFiles
-        outputDir.set(unpackedRuntimeDir)
+    val unpackRuntime = project.registerTask<Copy>("unpackSkikoRuntimeFor$titledTargetName") {
+        destinationDir = project.file(unpackedRuntimeDir)
+        from(
+            skikoWebRuntimeJarFiles.map { artifact -> project.zipTree(artifact) }
+        )
     }
 
     target.compilations.all { compilation ->
-        // `wasmTargetType` is available starting with kotlin 1.9.2x
         if (target.wasmTargetType != null) {
             // Kotlin/Wasm uses ES module system to depend on skiko through skiko.mjs.
             // Further bundler could process all files by its own (both skiko.mjs and skiko.wasm) and then emits its own version.
