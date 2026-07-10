@@ -15,11 +15,21 @@ dependencies {
     implementation(compose.desktop.currentOs)
 }
 
+val javaVersion = JavaLanguageVersion.of(%JAVA_VERSION%)
+val javaVendor = DefaultJvmVendorSpec.of(JvmVendor.KnownJvmVendor.%JVM_VENDOR%)
+
+kotlin {
+    jvmToolchain {
+        languageVersion.set(javaVersion)
+        vendor.set(javaVendor)
+    }
+}
+
 compose.desktop {
     application {
         javaHome = javaToolchains.launcherFor {
-            languageVersion.set(JavaLanguageVersion.of(%JAVA_VERSION%))
-            vendor.set(DefaultJvmVendorSpec.of(JvmVendor.KnownJvmVendor.%JVM_VENDOR%))
+            languageVersion.set(javaVersion)
+            vendor.set(javaVendor)
         }.get().metadata.installationPath.asFile.absolutePath
 
         mainClass = "MainKt"
