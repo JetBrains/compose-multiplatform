@@ -11,7 +11,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
-import org.jetbrains.compose.desktop.application.dsl.AppCdsMode
+import org.jetbrains.compose.desktop.application.dsl.AotMode
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
 import org.jetbrains.compose.desktop.application.internal.JdkVersionProbe
@@ -42,7 +42,7 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
     abstract val checkJdkVendor: Property<Boolean>
 
     @get:Input
-    val appCdsModes: ListProperty<AppCdsMode> = objects.listProperty(AppCdsMode::class.java)
+    val aotModes: ListProperty<AotMode> = objects.listProperty(AotMode::class.java)
 
     private val taskDir = project.layout.buildDirectory.dir("compose/tmp/$name")
 
@@ -114,8 +114,8 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
             }
         }
 
-        for (appCdsMode in appCdsModes.get()) {
-            appCdsMode.checkJdkCompatibility(jdkMajorVersion, vendor)
+        for (aotMode in aotModes.get()) {
+            aotMode.checkJdkCompatibility(jdkMajorVersion, vendor)
         }
 
         val modules = arrayListOf<String>()

@@ -1,6 +1,6 @@
 import org.jetbrains.compose.*
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.compose.desktop.application.dsl.AppCdsMode
+import org.jetbrains.compose.desktop.application.dsl.AotMode
 import org.gradle.internal.jvm.inspection.JvmVendor
 import org.gradle.jvm.toolchain.internal.DefaultJvmVendorSpec
 
@@ -28,10 +28,10 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
         buildTypes.release {
-            appCds {
-                mode = %APP_CDS_MODE%
+            aot {
+                mode = %AOT_MODE%
                 logging = true
-                exitAppOnCdsFailure = true
+                exitAppOnAotFailure = true
             }
         }
     }

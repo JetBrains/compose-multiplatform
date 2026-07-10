@@ -47,8 +47,8 @@ abstract class JvmApplicationBuildType @Inject constructor(
         fn.execute(proguard)
     }
 
-    val appCds: AppCdsConfiguration = objects.new()
-    fun appCds(fn: Action<AppCdsConfiguration>) {
-        fn.execute(appCds)
+    val aot: AotConfiguration = objects.new()
+    fun aot(fn: Action<AotConfiguration>) {
+        fn.execute(aot)
     }
 }

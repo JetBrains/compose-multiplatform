@@ -59,7 +59,7 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         taskNameObject = "runtime"
     ) {
         jdkHome.set(app.javaHomeProvider)
-        appCdsModes.set(this@configureCommonJvmDesktopTasks.buildTypes.all.map { it.appCds.mode })
+        aotModes.set(this@configureCommonJvmDesktopTasks.buildTypes.all.map { it.aot.mode })
         checkJdkVendor.set(ComposeProperties.checkJdkVendor(project.providers))
         jdkVersionProbeJar.from(
             project.detachedComposeGradleDependency(
@@ -116,7 +116,8 @@ private fun JvmApplicationContext.configurePackagingTasks(
         includeAllModules.set(provider { app.nativeDistributions.includeAllModules })
         javaRuntimePropertiesFile.set(commonTasks.checkRuntime.flatMap { it.javaRuntimePropertiesFile })
         destinationDir.set(appTmpDir.dir("runtime"))
-        generateCdsArchive.set(buildType.appCds.mode.generateJreClassesArchive)
+        stripNativeCommands.set(!buildType.aot.mode.generateJreClassesArchive)  // `java` is needed to generate the JRE CDS archive
+        generateJreCdsArchive.set(buildType.aot.mode.generateJreClassesArchive)
     }
 
     val runProguard = if (buildType.proguard.isEnabled.orNull == true) {
@@ -144,16 +145,16 @@ private fun JvmApplicationContext.configurePackagingTasks(
         )
     }
 
-    val appCdsMode = buildType.appCds.mode
-    val createAppCdsArchive = if (appCdsMode.needsTrainingRun) {
-        tasks.register<AbstractCreateAppCdsArchiveTask>(
+    val aotConfig = buildType.aot
+    val createAotArchive = if (aotConfig.mode.needsTrainingRun) {
+        tasks.register<AbstractCreateAotArchiveTask>(
             taskNameAction = "create",
-            taskNameObject = "appCdsArchive",
+            taskNameObject = "aotArchive",
             args = listOf(createDistributableImpl),
             isHidden = true,
         ) {
             dependsOn(createDistributableImpl)
-            this.appCdsMode.set(appCdsMode)
+            this.aotConfig.set(aotConfig)
         }
     } else null
 
@@ -162,8 +163,8 @@ private fun JvmApplicationContext.configurePackagingTasks(
         taskNameObject = "distributable",
     ) {
         dependsOn(createDistributableImpl)
-        if (createAppCdsArchive != null) {
-            dependsOn(createAppCdsArchive)
+        if (createAotArchive != null) {
+            dependsOn(createAotArchive)
         }
     }
 
@@ -178,7 +179,7 @@ private fun JvmApplicationContext.configurePackagingTasks(
                 createAppImage = createDistributableImpl,
                 checkRuntime = commonTasks.checkRuntime,
                 unpackDefaultResources = commonTasks.unpackDefaultResources,
-                createAppCdsArchive = createAppCdsArchive
+                createAotArchive = createAotArchive
             )
         }
 
@@ -289,7 +290,7 @@ private fun JvmApplicationContext.configurePackageTask(
     checkRuntime: TaskProvider<AbstractCheckNativeDistributionRuntime>? = null,
     unpackDefaultResources: TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>,
     runProguard: Provider<AbstractProguardTask>? = null,
-    createAppCdsArchive: TaskProvider<AbstractCreateAppCdsArchiveTask>? = null
+    createAotArchive: TaskProvider<AbstractCreateAotArchiveTask>? = null
 ) {
     packageTask.enabled = packageTask.targetFormat.isCompatibleWithCurrentOS
 
@@ -343,14 +344,14 @@ private fun JvmApplicationContext.configurePackageTask(
         }
     }
 
-    if (createAppCdsArchive != null) {
-        packageTask.dependsOn(createAppCdsArchive)
-        packageTask.files.from(project.file(createAppCdsArchive.flatMap { it.appCdsArchiveFile }))
+    if (createAotArchive != null) {
+        packageTask.dependsOn(createAotArchive)
+        packageTask.files.from(project.file(createAotArchive.flatMap { it.aotArchiveFile }))
     }
 
     packageTask.launcherMainClass.set(nullableProvider { app.mainClass })
     packageTask.launcherJvmArgs.set(
-        provider { defaultJvmArgs + buildType.appCds.runtimeJvmArgs + app.jvmArgs }
+        provider { defaultJvmArgs + buildType.aot.runtimeJvmArgs + app.jvmArgs }
     )
     packageTask.launcherArgs.set(provider { app.args })
 }

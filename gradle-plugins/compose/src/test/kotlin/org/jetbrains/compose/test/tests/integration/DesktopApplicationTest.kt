@@ -6,7 +6,7 @@
 package org.jetbrains.compose.test.tests.integration
 
 import org.gradle.internal.jvm.inspection.JvmVendor
-import org.jetbrains.compose.desktop.application.dsl.AppCdsMode
+import org.jetbrains.compose.desktop.application.dsl.AotMode
 import org.jetbrains.compose.internal.utils.MacUtils
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentArch
@@ -617,15 +617,15 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Suppress("SameParameterValue")
-    private fun appCdsProject(
-        appCdsMode: AppCdsMode,
+    private fun aotProject(
+        aotMode: AotMode,
         javaVersion: Int,
         javaVendor: JvmVendor.KnownJvmVendor = JvmVendor.KnownJvmVendor.AMAZON
     ) : TestProject {
-        return testProject("application/appCds").apply {
+        return testProject("application/aot").apply {
             modifyText("build.gradle.kts") {
                 it
-                    .replace("%APP_CDS_MODE%", "AppCdsMode.$appCdsMode")
+                    .replace("%AOT_MODE%", "AotMode.$aotMode")
                     .replace("%JAVA_VERSION%", "$javaVersion")
                     .replace("%JVM_VENDOR%", javaVendor.name)
             }
@@ -633,17 +633,17 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testAppCdsAutoFailsOnJdk17() = with(appCdsProject(AppCdsMode.Auto, javaVersion = 17)) {
+    fun testAppCdsAutoFailsOnJdk17() = with(aotProject(AotMode.AppCdsAuto, javaVersion = 17)) {
         fun testRunTask(runTask: String) {
             gradleFailure(runTask).checks {
-                check.logContains("AppCdsMode 'Auto' is not supported on JDK earlier than 19; current is 17")
+                check.logContains("AotMode 'AppCdsAuto' is not supported on JDK earlier than 19; current is 17")
             }
         }
 
         testRunTask(":runReleaseDistributable")
     }
 
-    private val loggedArchivePathRegex =
+    private val appCdsLoggedArchivePathRegex =
         Regex("\\[cds] Opened archive " +
                 listOf(
                     ".*",
@@ -653,14 +653,14 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                     ".*",
                     "app",
                     ".*",
-                    AppCdsMode.Jdk21AppCdsMode.ARCHIVE_FILE_ARGUMENT
+                    AotMode.AppCdsMode.ARCHIVE_FILE_ARGUMENT
                         .replace("\$APPDIR", "app")
                         .replace(".", "\\.")
                 ).joinToString(File.separator.replace("\\", "\\\\"))
         )
 
     @Test
-    fun testAppCdsAuto() = with(appCdsProject(AppCdsMode.Auto, javaVersion = 21)) {
+    fun testAppCdsAuto() = with(aotProject(AotMode.AppCdsAuto, javaVersion = 21)) {
         fun testRunTask(taskName: String) {
             gradle(taskName).checks {
                 check.taskSuccessful(taskName)
@@ -668,7 +668,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             }
             gradle(taskName).checks {
                 check.taskSuccessful(taskName)
-                check.logContainsMatch(loggedArchivePathRegex)
+                check.logContainsMatch(appCdsLoggedArchivePathRegex)
                 check.logDoesntContain("[cds] Specified shared archive not found")
                 check.logDoesntContain("[cds] Dumping shared data to file")
                 check.logDoesntContain("[cds] Initialize dynamic archive failed")
@@ -682,23 +682,23 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testAppCdsPrebuild() = with(appCdsProject(AppCdsMode.Prebuild, javaVersion = 21)) {
+    fun testAppCdsPrebuild() = with(aotProject(AotMode.AppCdsPrebuild, javaVersion = 21)) {
         fun testPackageAndRun(release: Boolean) {
             val releaseTag = if (release) "Release" else ""
             val packageTaskName = ":package${releaseTag}DistributionForCurrentOS"
-            val createAppCdsTaskName = ":create${releaseTag}AppCdsArchive"
+            val createAotArchiveTaskName = ":create${releaseTag}AotArchive"
             val runDistributableTaskName = ":run${releaseTag}Distributable"
             gradle(packageTaskName).checks {
                 check.taskSuccessful(packageTaskName)
-                check.taskSuccessful(createAppCdsTaskName)
+                check.taskSuccessful(createAotArchiveTaskName)
                 check.logContains("[cds] Dumping shared data to file")
                 check.logContains("Running app to create archive: true")
             }
 
             gradle(runDistributableTaskName).checks {
                 check.taskSuccessful(runDistributableTaskName)
-                check.taskUpToDate(createAppCdsTaskName)
-                check.logContainsMatch(loggedArchivePathRegex)
+                check.taskUpToDate(createAotArchiveTaskName)
+                check.logContainsMatch(appCdsLoggedArchivePathRegex)
                 check.logContains("Running app to create archive: false")
                 check.logDoesntContain("[cds] Specified shared archive not found")
                 check.logDoesntContain("[cds] Dumping shared data to file")
@@ -712,15 +712,60 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testAppCdsCreateDistributable() = with(appCdsProject(AppCdsMode.Prebuild, javaVersion = 17)) {
+    fun testAppCdsCreateDistributable() = with(aotProject(AotMode.AppCdsPrebuild, javaVersion = 21)) {
         fun testPackageAndRun(release: Boolean) {
             val releaseTag = if (release) "Release" else ""
             val createDistributableTaskName = ":create${releaseTag}Distributable"
-            val createAppCdsTaskName = ":create${releaseTag}AppCdsArchive"
+            val createAotArchiveTaskName = ":create${releaseTag}AotArchive"
             gradle(createDistributableTaskName).checks {
                 check.taskSuccessful(createDistributableTaskName)
-                check.taskSuccessful(createAppCdsTaskName)
+                check.taskSuccessful(createAotArchiveTaskName)
                 check.logContains("[cds] Dumping shared data to file")
+                check.logContains("Running app to create archive: true")
+            }
+        }
+
+        testPackageAndRun(release = true)
+    }
+
+    @Test
+    fun testAotPrebuild() = with(aotProject(AotMode.AotPrebuild, javaVersion = 25)) {
+        fun testPackageAndRun(release: Boolean) {
+            val releaseTag = if (release) "Release" else ""
+            val packageTaskName = ":package${releaseTag}DistributionForCurrentOS"
+            val createAotArchiveTaskName = ":create${releaseTag}AotArchive"
+            val runDistributableTaskName = ":run${releaseTag}Distributable"
+            gradle(packageTaskName).checks {
+                check.taskSuccessful(packageTaskName)
+                check.taskSuccessful(createAotArchiveTaskName)
+                check.logContains("[aot] Selected AOTMode=record because AOTCacheOutput is specified")
+                check.logContains("AOTCache creation is complete")
+                check.logContains("Running app to create archive: true")
+            }
+
+            gradle(runDistributableTaskName).checks {
+                check.taskSuccessful(runDistributableTaskName)
+                check.taskUpToDate(createAotArchiveTaskName)
+                check.logContains("[aot] Opened AOT cache")
+                check.logContains("[aot] Using AOT-linked classes: true")
+                check.logContains("Running app to create archive: false")
+            }
+        }
+
+        testPackageAndRun(release = true)
+    }
+
+    @Test
+    fun testAotCreateDistributable() = with(aotProject(AotMode.AotPrebuild, javaVersion = 25)) {
+        fun testPackageAndRun(release: Boolean) {
+            val releaseTag = if (release) "Release" else ""
+            val createDistributableTaskName = ":create${releaseTag}Distributable"
+            val createAotArchiveTaskName = ":create${releaseTag}AotArchive"
+            gradle(createDistributableTaskName).checks {
+                check.taskSuccessful(createDistributableTaskName)
+                check.taskSuccessful(createAotArchiveTaskName)
+                check.logContains("[aot] Selected AOTMode=record because AOTCacheOutput is specified")
+                check.logContains("AOTCache creation is complete")
                 check.logContains("Running app to create archive: true")
             }
         }
