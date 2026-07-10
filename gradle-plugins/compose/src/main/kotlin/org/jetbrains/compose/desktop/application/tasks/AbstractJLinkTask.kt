@@ -52,7 +52,7 @@ abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
     internal val compressionLevel: Property<RuntimeCompressionLevel> = objects.property()
 
     @get:Input
-    internal val generateCdsArchive: Property<Boolean> = objects.notNullProperty<Boolean>(false)
+    internal val generateCdsArchive: Property<Boolean> = objects.property<Boolean>().value(false)
 
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
         val modulesToInclude =
