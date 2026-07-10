@@ -201,7 +201,6 @@ abstract class AppCdsMode(val name: String) : Serializable {
             override fun appClassesArchiveCreationJvmArgs() =
                 listOf(
                     "-XX:ArchiveClassesAtExit=$ARCHIVE_FILE_ARGUMENT",
-                    "-XX:+NoClasspathInArchive",
                     "-Dcompose.appcds.create-archive=true",
                 )
             override fun appClassesArchiveFile(packagedAppRootDir: Directory): RegularFile {
@@ -211,7 +210,6 @@ abstract class AppCdsMode(val name: String) : Serializable {
             override fun runtimeJvmArgs() =
                 listOf(
                     "-XX:SharedArchiveFile=$ARCHIVE_FILE_ARGUMENT",
-                    "-XX:+NoClasspathInArchive",
                 )
         }
     }

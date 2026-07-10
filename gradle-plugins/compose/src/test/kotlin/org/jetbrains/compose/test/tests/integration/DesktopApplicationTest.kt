@@ -682,7 +682,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testAppCdsPrebuild() = with(appCdsProject(AppCdsMode.Prebuild, javaVersion = 17)) {
+    fun testAppCdsPrebuild() = with(appCdsProject(AppCdsMode.Prebuild, javaVersion = 21)) {
         fun testPackageAndRun(release: Boolean) {
             val releaseTag = if (release) "Release" else ""
             val packageTaskName = ":package${releaseTag}DistributionForCurrentOS"
