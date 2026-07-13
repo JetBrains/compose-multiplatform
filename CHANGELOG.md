@@ -31,7 +31,7 @@ _Changes since 1.12.0-beta01_
 
 - Fixed a crash when encountering a `null` accessible child in the Swing hierarchy while looking for a component to switch a11y focus to, after the currently focused a11y component has been removed [#3158](https://github.com/JetBrains/compose-multiplatform-core/pull/3158)
 - Fixed popups/dialogs staying on top of other windows with `compose.layers.type=WINDOW` [#3153](https://github.com/JetBrains/compose-multiplatform-core/pull/3153)
-- On Windows and macOS, `isSystemInDarkTheme` will now return dynamic values as the OS theme changes, causing any callers to recompose. This is done by polling the system in the background once a second. This behavior can be controlled (including on Linux) by setting `ComposeUiFlags.pollSystemTheme` [#3063](https://github.com/JetBrains/compose-multiplatform-core/pull/3063)
+- On Windows and macOS, `isSystemInDarkTheme` will now return dynamic values as the OS theme changes, causing any callers to recompose. This is done by polling the system in the background once a second. This behavior can be controlled by setting `ComposeUiFlags.pollSystemTheme` [#3063](https://github.com/JetBrains/compose-multiplatform-core/pull/3063)
 
 ### Web
 
