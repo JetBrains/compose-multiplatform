@@ -463,7 +463,7 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
  * Extract redirection versions from core repo, file redirectversions.toml
  *
  * Example
- * https://raw.githubusercontent.com/JetBrains/compose-multiplatform-core/v1.8.0%2Bdev1966/redirectversions.toml
+ * https://raw.githubusercontent.com/JetBrains/compose-multiplatform-core/refs/heads/jb-main/redirectversions.toml
  * "androidx.graphics" = "1.0.1"
  */
 fun androidxLibToRedirectionVersion(commit: String): Map<String, String> {
