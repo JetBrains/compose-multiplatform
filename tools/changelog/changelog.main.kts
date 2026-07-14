@@ -460,17 +460,16 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
 }
 
 /**
- * Extract redirection versions from core repo, file gradle.properties
+ * Extract redirection versions from core repo, file redirectversions.toml
  *
  * Example
- * https://raw.githubusercontent.com/JetBrains/compose-multiplatform-core/v1.8.0%2Bdev1966/gradle.properties
- * artifactRedirecting.androidx.graphics.version=1.0.1
+ * https://raw.githubusercontent.com/JetBrains/compose-multiplatform-core/refs/heads/jb-main/redirectversions.toml
+ * "androidx.graphics" = "1.0.1"
  */
 fun androidxLibToRedirectionVersion(commit: String): Map<String, String> {
-    val gradleProperties = githubContentOf("JetBrains/compose-multiplatform-core", "gradle.properties", commit)
-    val regexV1 = Regex("artifactRedirecting\\.androidx\\.(.*)\\.version=(.*)")
-    val regexV2 = Regex("artifactRedirection\\.version\\.androidx\\.(.*)=(.*)") // changed in https://github.com/JetBrains/compose-multiplatform-core/pull/1946/files#diff-3d103fc7c312a3e136f88e81cef592424b8af2464c468116545c4d22d6edcf19R100
-    return listOf(regexV1, regexV2).flatMap { it.findAll(gradleProperties) }.associate { result ->
+    val redirectVersions = githubContentOf("JetBrains/compose-multiplatform-core", "redirectversions.toml", commit)
+    val regex = Regex("\"androidx\\.(.+?)\"\\s*=\\s*\"(.+?)\"")
+    return regex.findAll(redirectVersions).associate { result ->
         result.groupValues[1].trim() to result.groupValues[2].trim()
     }
 }

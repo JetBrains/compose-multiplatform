@@ -1,3 +1,68 @@
+# 1.12.0-beta02 (July 2026)
+
+_Changes since 1.12.0-beta01_
+
+## Features
+
+### Multiple Platforms
+
+- _(prerelease fix)_ The `isClearFocusOnMouseDownEnabled` flag is now `false` by default [#3162](https://github.com/JetBrains/compose-multiplatform-core/pull/3162)
+- Implemented `ComposeUiTest.runWithoutImplicitWait` [#3170](https://github.com/JetBrains/compose-multiplatform-core/pull/3170)
+
+### Desktop
+
+- _(prerelease fix)_ Bump Compose Hot Reload to [#5632](https://github.com/JetBrains/compose-multiplatform/pull/5632) [1.2.0-beta01](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.2.0-beta01)
+
+## Fixes
+
+### Multiple Platforms
+
+- _(prerelease fix)_ Fix printing `GlobalSnapshotManager` concurrent registrations warning during creation of `Popup`/`Dialog` on iOS and Desktop with custom `compose.layers.type` [#3156](https://github.com/JetBrains/compose-multiplatform-core/pull/3156)
+
+### iOS
+
+- Fix an issue where `ComposeUIViewController` might fail to load its content when placed inside a SwiftUI view [#3159](https://github.com/JetBrains/compose-multiplatform-core/pull/3159)
+- Fix UIKit back gesture briefly dispatched drag input to Compose content, causing UI like navigation drawers to appear during back navigation [#3192](https://github.com/JetBrains/compose-multiplatform-core/pull/3192)
+- _(prerelease fix)_ Fix frame drops when dragging scrollable content [#3194](https://github.com/JetBrains/compose-multiplatform-core/pull/3194)
+- Fix iOS swipe-back behavior in RTL layouts [#3196](https://github.com/JetBrains/compose-multiplatform-core/pull/3196)
+- Fixed a crash that could occur when inserting text via Scribble (Apple Pencil) in TextFields with `usingNativeTextInput` set to `true` [#3201](https://github.com/JetBrains/compose-multiplatform-core/pull/3201)
+
+### Desktop
+
+- Fixed a crash when encountering a `null` accessible child in the Swing hierarchy while looking for a component to switch a11y focus to, after the currently focused a11y component has been removed [#3158](https://github.com/JetBrains/compose-multiplatform-core/pull/3158)
+- Fixed popups/dialogs staying on top of other windows with `compose.layers.type=WINDOW` [#3153](https://github.com/JetBrains/compose-multiplatform-core/pull/3153)
+- On Windows and macOS, `isSystemInDarkTheme` will now return dynamic values as the OS theme changes, causing any callers to recompose. This is done by polling the system in the background once a second. This behavior can be controlled by setting `ComposeUiFlags.pollSystemTheme` [#3063](https://github.com/JetBrains/compose-multiplatform-core/pull/3063)
+
+### Web
+
+- Fix of tofu symbols during a first draw in TextFields with unknown symbols [#3182](https://github.com/JetBrains/compose-multiplatform-core/pull/3182)
+- Fixes tofu symbols in the second, third etc texts on a page with an equal text [#3181](https://github.com/JetBrains/compose-multiplatform-core/pull/3181)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.12.0-beta02`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.12.0-beta02` | [Runtime 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.12.0-beta02) | 
+| UI | `org.jetbrains.compose.ui:ui*:1.12.0-beta02` | [UI 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.12.0-beta02) | 
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.12.0-beta02` | [Foundation 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.12.0-beta02) |
+| Material | `org.jetbrains.compose.material:material*:1.12.0-beta02` | [Material 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.12.0-beta02) | 
+| Material3 | `org.jetbrains.compose.material3:material3*:1.12.0-alpha03` | [Material3 1.5.0-alpha22](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha22) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-beta02` | [Material3 Adaptive 1.3.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-beta02) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0` | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0) | 
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.10.0-alpha02` | [Navigation 2.10.0-alpha05](https://developer.android.com/jetpack/androidx/releases/navigation#2.10.0-alpha05) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.2.0-alpha02` | [Navigation3 1.2.0-alpha04](https://developer.android.com/jetpack/androidx/releases/navigation3#1.2.0-alpha04) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0` | [Navigation Event 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.1) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.12.0-beta01 (June 2026)
 
 _Changes since 1.12.0-alpha02_
