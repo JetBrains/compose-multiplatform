@@ -13,6 +13,7 @@ import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.artifacts.UnresolvedDependency
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
+import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.Input
@@ -61,6 +62,7 @@ private fun configureSkikoWebRuntime(
 
     val unpackRuntime = project.registerTask<Copy>("unpackSkikoRuntimeFor$titledTargetName") {
         destinationDir = project.file(unpackedRuntimeDir)
+        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
         from(
             skikoWebRuntimeJarFiles.map { artifact -> project.zipTree(artifact) }
         )
