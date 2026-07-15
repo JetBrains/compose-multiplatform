@@ -64,7 +64,9 @@
 -dontwarn org.graalvm.compiler.core.aarch64.AArch64NodeMatchRules_MatchStatementSet*
 
 # Androidx
--keep,allowshrinking,allowobfuscation class androidx.compose.runtime.SnapshotStateKt__DerivedStateKt { *; }
+# Prevent ProGuard from specializing return types of @JvmMultifileClass implementation classes
+# https://github.com/Guardsquare/proguard/issues/533
+-keep,allowshrinking,allowobfuscation class **Kt__* { *; }
 -keep class androidx.compose.material3.SliderDefaults { *; }
 -dontnote androidx.**
 
