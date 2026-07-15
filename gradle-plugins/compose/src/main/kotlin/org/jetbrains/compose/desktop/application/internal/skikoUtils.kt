@@ -14,22 +14,24 @@ import java.io.File
 internal fun File.isSkikoAwtRuntimeJar(): Boolean =
     isJarFile && name.startsWith("skiko-") && "-awt-runtime" in name
 
-internal fun isSkikoNativeEntry(entryName: String): Boolean {
+internal fun isSkikoNativeEntry(entryName: String): Boolean =
+    entryName.skikoFileName().isSkikoNative()
+
+internal fun shouldKeepSkikoEntry(entryName: String): Boolean {
     val fileName = entryName.skikoFileName()
-    if (fileName == "icudtl.dat") return true
-
-    return fileName.startsWith("libskiko") && (fileName.endsWith(".so") || fileName.endsWith(".dylib")) ||
-            fileName.startsWith("skiko") && fileName.endsWith(".dll")
-}
-
-internal fun shouldKeepSkikoEntry(entryName: String, bundleMacOSX64: Boolean = false): Boolean {
-    val fileName = entryName.skikoFileName()
-    if (fileName == "icudtl.dat") return currentOS == OS.Windows
-
-    if (bundleMacOSX64 && currentOS == OS.MacOS && fileName.contains("-${currentOS.id}-x64")) return true
-
-    return fileName.contains("-${currentOS.id}-${currentArch.id}")
+    return when {
+        !fileName.isSkikoNative() -> true
+        fileName == "icudtl.dat" -> currentOS == OS.Windows
+        else -> fileName.contains("-${currentOS.id}-${currentArch.id}")
+    }
 }
 
 private fun String.skikoFileName(): String =
     removeSuffix(".sha256").substringAfterLast("/")
+
+private fun String.isSkikoNative(): Boolean = when {
+    this == "icudtl.dat" -> true
+    startsWith("libskiko") -> endsWith(".so") || endsWith(".dylib")
+    startsWith("skiko") -> endsWith(".dll")
+    else -> false
+}

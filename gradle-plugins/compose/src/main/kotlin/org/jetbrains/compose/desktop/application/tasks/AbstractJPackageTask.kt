@@ -590,8 +590,7 @@ abstract class AbstractJPackageTask @Inject constructor(
             libsMapping[sourceFile] = if (sourceFile in skikoLibsToTransform) {
                 val unpackedFiles = stripAndUnpackSkikoNatives(
                     sourceFile,
-                    skikoDir.ioFile,
-                    bundleMacOSX64 = macAppStore.getOrElse(false)
+                    skikoDir.ioFile
                 )
                 unpackedFiles.map { copyFileToLibsDir(it) }
             } else {
@@ -808,8 +807,7 @@ private class FilesMapping : Serializable {
 
 private fun stripAndUnpackSkikoNatives(
     sourceJar: File,
-    skikoDir: File,
-    bundleMacOSX64: Boolean
+    skikoDir: File
 ): List<File> {
     val outputFiles = ArrayList<File>()
     val targetJar = skikoDir.resolve(sourceJar.name)
@@ -817,7 +815,7 @@ private fun stripAndUnpackSkikoNatives(
 
     transformJar(sourceJar, targetJar) { entry, zin, zout ->
         val isSkikoNative = isSkikoNativeEntry(entry.name)
-        if (isSkikoNative && shouldKeepSkikoEntry(entry.name, bundleMacOSX64)) {
+        if (isSkikoNative && shouldKeepSkikoEntry(entry.name)) {
             val unpackedFile = skikoDir.resolve(entry.name.substringAfterLast("/"))
             zin.copyTo(unpackedFile)
             outputFiles.add(unpackedFile)
