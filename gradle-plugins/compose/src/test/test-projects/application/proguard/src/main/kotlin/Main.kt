@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.material3.Text
 import androidx.compose.ui.renderComposeScene
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.Serializable
@@ -39,6 +40,9 @@ object Main {
         workingDir.resolve("main-methods.actual.txt").writeText(mainMethods)
 
         serializer()
+
+        // https://youtrack.jetbrains.com/issue/CMP-10488/Desktop-release-build-fails-with-VerifyError-Bad-return-type
+        renderComposeScene(height = 10, width = 200) { Text("internals with JvmMultifileClass") }
     }
 
     @Composable
