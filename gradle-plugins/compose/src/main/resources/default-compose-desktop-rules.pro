@@ -64,6 +64,7 @@
 -dontwarn org.graalvm.compiler.core.aarch64.AArch64NodeMatchRules_MatchStatementSet*
 
 # Androidx
+# TODO https://youtrack.jetbrains.com/issue/CMP-10503/Revert-ProGuard-rule-for-JvmMultifileClass
 # Prevent ProGuard from specializing return types of @JvmMultifileClass implementation classes
 # https://github.com/Guardsquare/proguard/issues/533
 -keep,allowshrinking,allowobfuscation class **Kt__* { *; }
