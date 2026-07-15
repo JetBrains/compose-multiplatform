@@ -142,6 +142,14 @@ internal val cldrPluralRuleIntegerSamples = arrayOf(
         PluralCategory.ONE to "0, 1",
         PluralCategory.OTHER to "2~17, 100, 1000, 10000, 100000, 1000000, …"
     ),
+    "kok" to arrayOf(
+        PluralCategory.ONE to "0, 1",
+        PluralCategory.OTHER to "2~17, 100, 1000, 10000, 100000, 1000000, …"
+    ),
+    "kok_Latn" to arrayOf(
+        PluralCategory.ONE to "0, 1",
+        PluralCategory.OTHER to "2~17, 100, 1000, 10000, 100000, 1000000, …"
+    ),
     "pcm" to arrayOf(
         PluralCategory.ONE to "0, 1",
         PluralCategory.OTHER to "2~17, 100, 1000, 10000, 100000, 1000000, …"
@@ -194,6 +202,10 @@ internal val cldrPluralRuleIntegerSamples = arrayOf(
         PluralCategory.ONE to "1",
         PluralCategory.OTHER to "0, 2~16, 100, 1000, 10000, 100000, 1000000, …"
     ),
+    "ie" to arrayOf(
+        PluralCategory.ONE to "1",
+        PluralCategory.OTHER to "0, 2~16, 100, 1000, 10000, 100000, 1000000, …"
+    ),
     "io" to arrayOf(
         PluralCategory.ONE to "1",
         PluralCategory.OTHER to "0, 2~16, 100, 1000, 10000, 100000, 1000000, …"
@@ -211,10 +223,6 @@ internal val cldrPluralRuleIntegerSamples = arrayOf(
         PluralCategory.OTHER to "0, 2~16, 100, 1000, 10000, 100000, 1000000, …"
     ),
     "sc" to arrayOf(
-        PluralCategory.ONE to "1",
-        PluralCategory.OTHER to "0, 2~16, 100, 1000, 10000, 100000, 1000000, …"
-    ),
-    "scn" to arrayOf(
         PluralCategory.ONE to "1",
         PluralCategory.OTHER to "0, 2~16, 100, 1000, 10000, 100000, 1000000, …"
     ),
@@ -243,6 +251,10 @@ internal val cldrPluralRuleIntegerSamples = arrayOf(
         PluralCategory.OTHER to "2~17, 100, 1000, 10000, 100000, 1000000, …"
     ),
     "bho" to arrayOf(
+        PluralCategory.ONE to "0, 1",
+        PluralCategory.OTHER to "2~17, 100, 1000, 10000, 100000, 1000000, …"
+    ),
+    "csw" to arrayOf(
         PluralCategory.ONE to "0, 1",
         PluralCategory.OTHER to "2~17, 100, 1000, 10000, 100000, 1000000, …"
     ),
@@ -669,15 +681,20 @@ internal val cldrPluralRuleIntegerSamples = arrayOf(
         PluralCategory.ONE to "1",
         PluralCategory.OTHER to "2~17, 100, 1000, 10000, 100000, 1000000, …"
     ),
-    "ksh" to arrayOf(
+    "blo" to arrayOf(
         PluralCategory.ZERO to "0",
         PluralCategory.ONE to "1",
         PluralCategory.OTHER to "2~17, 100, 1000, 10000, 100000, 1000000, …"
     ),
-    "blo" to arrayOf(
+    "cv" to arrayOf(
         PluralCategory.ZERO to "0",
         PluralCategory.ONE to "1",
-        PluralCategory.OTHER to "2~16, 100, 1000, 10000, 100000, 1000000, …"
+        PluralCategory.OTHER to "2~17, 100, 1000, 10000, 100000, 1000000, …"
+    ),
+    "ksh" to arrayOf(
+        PluralCategory.ZERO to "0",
+        PluralCategory.ONE to "1",
+        PluralCategory.OTHER to "2~17, 100, 1000, 10000, 100000, 1000000, …"
     ),
     "he" to arrayOf(
         PluralCategory.ONE to "1",
@@ -789,7 +806,17 @@ internal val cldrPluralRuleIntegerSamples = arrayOf(
         PluralCategory.MANY to "1000000, 1c6, 2c6, 3c6, 4c6, 5c6, 6c6, …",
         PluralCategory.OTHER to "0, 2~16, 100, 1000, 10000, 100000, 1c3, 2c3, 3c3, 4c3, 5c3, 6c3, …"
     ),
+    "lld" to arrayOf(
+        PluralCategory.ONE to "1",
+        PluralCategory.MANY to "1000000, 1c6, 2c6, 3c6, 4c6, 5c6, 6c6, …",
+        PluralCategory.OTHER to "0, 2~16, 100, 1000, 10000, 100000, 1c3, 2c3, 3c3, 4c3, 5c3, 6c3, …"
+    ),
     "pt_PT" to arrayOf(
+        PluralCategory.ONE to "1",
+        PluralCategory.MANY to "1000000, 1c6, 2c6, 3c6, 4c6, 5c6, 6c6, …",
+        PluralCategory.OTHER to "0, 2~16, 100, 1000, 10000, 100000, 1c3, 2c3, 3c3, 4c3, 5c3, 6c3, …"
+    ),
+    "scn" to arrayOf(
         PluralCategory.ONE to "1",
         PluralCategory.MANY to "1000000, 1c6, 2c6, 3c6, 4c6, 5c6, 6c6, …",
         PluralCategory.OTHER to "0, 2~16, 100, 1000, 10000, 100000, 1c3, 2c3, 3c3, 4c3, 5c3, 6c3, …"
@@ -869,6 +896,13 @@ internal val cldrPluralRuleIntegerSamples = arrayOf(
         PluralCategory.FEW to "2~4, 22~24, 32~34, 42~44, 52~54, 62, 102, 1002, …",
         PluralCategory.MANY to "0, 5~19, 100, 1000, 10000, 100000, 1000000, …",
         PluralCategory.OTHER to ""
+    ),
+    "sgs" to arrayOf(
+        PluralCategory.ONE to "1, 21, 31, 41, 51, 61, 71, 81, 101, 1001, …",
+        PluralCategory.TWO to "2",
+        PluralCategory.FEW to "3~9, 22~29, 32, 102, 1002, …",
+        PluralCategory.MANY to "",
+        PluralCategory.OTHER to "0, 10~20, 30, 40, 50, 60, 100, 1000, 10000, 100000, 1000000, …"
     ),
     "br" to arrayOf(
         PluralCategory.ONE to "1, 21, 31, 41, 51, 61, 81, 101, 1001, …",

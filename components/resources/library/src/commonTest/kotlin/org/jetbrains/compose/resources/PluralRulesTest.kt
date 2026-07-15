@@ -105,6 +105,19 @@ class PluralRulesTest {
     }
 
     @Test
+    fun testUnknownLocaleFallback() = runTest {
+        // "ewo" (Ewondo) is not in cldrPluralRuleListIndexByLocale
+        val pluralRuleList = PluralRuleList.getInstance(
+            LanguageQualifier("ewo"),
+            RegionQualifier("CM")
+        )
+        assertEquals(PluralCategory.OTHER, pluralRuleList.getCategory(0))
+        assertEquals(PluralCategory.OTHER, pluralRuleList.getCategory(1))
+        assertEquals(PluralCategory.OTHER, pluralRuleList.getCategory(2))
+        assertEquals(PluralCategory.OTHER, pluralRuleList.getCategory(42))
+    }
+
+    @Test
     fun testOperandValues() {
         pluralRuleListOf(
             PluralCategory.ONE to "n = 1"
