@@ -17,14 +17,13 @@ internal class PluralRuleList(private val rules: Array<PluralRule>) {
 
     companion object {
         private val cache = AsyncCache<Int, PluralRuleList>()
-        private val emptyList = PluralRuleList(emptyArray())
 
         @OptIn(InternalResourceApi::class)
         suspend fun getInstance(
             languageQualifier: LanguageQualifier,
             regionQualifier: RegionQualifier,
         ): PluralRuleList {
-            val cldrLocaleName = buildCldrLocaleName(languageQualifier, regionQualifier) ?: return emptyList
+            val cldrLocaleName = buildCldrLocaleName(languageQualifier, regionQualifier)
             return getInstance(cldrLocaleName)
         }
 
@@ -37,7 +36,7 @@ internal class PluralRuleList(private val rules: Array<PluralRule>) {
         private fun buildCldrLocaleName(
             languageQualifier: LanguageQualifier,
             regionQualifier: RegionQualifier,
-        ): String? {
+        ): String {
             val localeWithRegion = languageQualifier.language + "_" + regionQualifier.region
             if (cldrPluralRuleListIndexByLocale.containsKey(localeWithRegion)) {
                 return localeWithRegion
@@ -45,7 +44,7 @@ internal class PluralRuleList(private val rules: Array<PluralRule>) {
             if (cldrPluralRuleListIndexByLocale.containsKey(languageQualifier.language)) {
                 return languageQualifier.language
             }
-            return null
+            return "root"
         }
 
         private fun createInstance(cldrPluralRuleListIndex: Int): PluralRuleList {
