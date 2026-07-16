@@ -15,6 +15,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.desktop.application.internal.files.copyZipEntry
 import org.jetbrains.compose.desktop.application.internal.files.isJarFile
+import org.jetbrains.compose.desktop.application.internal.shouldKeepSkikoEntry
 import org.jetbrains.compose.internal.utils.delete
 import org.jetbrains.compose.internal.utils.ioFile
 import java.io.File
@@ -71,7 +72,9 @@ abstract class AbstractJarsFlattenTask : AbstractComposeDesktopTask() {
         ZipInputStream(FileInputStream(jarFile)).use { inputStream ->
             var inputEntry: ZipEntry? = inputStream.nextEntry
             while (inputEntry != null) {
-                writeEntryIfNotSeen(inputEntry, inputStream)
+                if (shouldKeepSkikoEntry(inputEntry.name)) {
+                    writeEntryIfNotSeen(inputEntry, inputStream)
+                }
                 inputEntry = inputStream.nextEntry
             }
         }
