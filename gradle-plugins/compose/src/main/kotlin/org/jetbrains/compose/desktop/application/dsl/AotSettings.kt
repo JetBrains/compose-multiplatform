@@ -196,6 +196,10 @@ abstract class AotMode(val name: String) : Serializable {
      * - Requires JDK 21 or later.
      * - Requires an additional step (the training run) when building the distributable.
      * - The distributable is larger because it includes the archive of the app's classes.
+     * - On Windows, there's an
+     *   [issue](https://youtrack.jetbrains.com/issue/JBR-9098/AppCDS-writes-local-paths-into-.jsa-archive)
+     *   that causes AppCDS to work slower than it should (but still typically
+     *   faster than without AppCDS altogether).
      */
     data object AppCdsPrebuild : AppCdsMode("AppCdsPrebuild") {
         override val minJdkVersion = 21
@@ -258,6 +262,10 @@ abstract class AotMode(val name: String) : Serializable {
      *   distributable.
      * - The distributable is larger because it includes the archive of
      *   the app's classes.
+     * - On Windows, there's an
+     *   [issue](https://youtrack.jetbrains.com/issue/JBR-9098/AppCDS-writes-local-paths-into-.jsa-archive)
+     *   that causes AOT to work slower than it should (but still typically
+     *   faster than without AOT altogether).
      */
     data object AotPrebuild : AotMode("AotPrebuild") {
 
