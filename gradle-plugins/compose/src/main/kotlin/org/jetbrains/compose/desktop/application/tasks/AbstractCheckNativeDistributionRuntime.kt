@@ -7,13 +7,15 @@ package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.jetbrains.compose.desktop.application.dsl.AotMode
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
 import org.jetbrains.compose.desktop.application.internal.JdkVersionProbe
+import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentOS
@@ -38,6 +40,9 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
 
     @get:Input
     abstract val checkJdkVendor: Property<Boolean>
+
+    @get:Input
+    val aotModes: ListProperty<AotMode> = objects.listProperty(AotMode::class.java)
 
     private val taskDir = project.layout.buildDirectory.dir("compose/tmp/$name")
 
@@ -75,8 +80,8 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
         val jdkHome = jdkHomeFile
         val javaExecutable = jdkHome.getJdkTool("java")
         val jlinkExecutable = jdkHome.getJdkTool("jlink")
-        val jpackageExecutabke = jdkHome.getJdkTool("jpackage")
-        ensureToolsExist(javaExecutable, jlinkExecutable, jpackageExecutabke)
+        val jpackageExecutable = jdkHome.getJdkTool("jpackage")
+        ensureToolsExist(javaExecutable, jlinkExecutable, jpackageExecutable)
 
         val jdkRuntimeProperties = getJDKRuntimeProperties(javaExecutable)
 
@@ -91,8 +96,8 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
             )
         }
 
+        val vendor = jdkRuntimeProperties.getProperty(JdkVersionProbe.JDK_VENDOR_KEY)
         if (checkJdkVendor.get()) {
-            val vendor = jdkRuntimeProperties.getProperty(JdkVersionProbe.JDK_VENDOR_KEY)
             if (vendor == null) {
                 logger.warn("JDK vendor probe failed: $jdkHome")
             } else {
@@ -107,6 +112,10 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
                         """.trimMargin())
                 }
             }
+        }
+
+        for (aotMode in aotModes.get()) {
+            aotMode.checkJdkCompatibility(jdkMajorVersion, vendor)
         }
 
         val modules = arrayListOf<String>()

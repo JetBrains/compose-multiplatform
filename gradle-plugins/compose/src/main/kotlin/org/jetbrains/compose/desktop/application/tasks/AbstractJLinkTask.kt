@@ -51,6 +51,9 @@ abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
     @get:Optional
     internal val compressionLevel: Property<RuntimeCompressionLevel> = objects.property()
 
+    @get:Input
+    internal val generateJreCdsArchive: Property<Boolean> = objects.property<Boolean>().value(false)
+
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
         val modulesToInclude =
             if (includeAllModules.get()) {
@@ -65,6 +68,12 @@ abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
         cliArg("--no-man-pages", noManPages)
         cliArg("--strip-native-commands", stripNativeCommands)
         cliArg("--compress", compressionLevel.orNull?.id)
+        if (generateJreCdsArchive.get()) {
+            if (stripNativeCommands.get()) {
+                error("Cannot generate JRE CDS archive with stripped native commands")
+            }
+            cliArg("--generate-cds-archive", true)
+        }
 
         cliArg("--output", destinationDir)
     }
