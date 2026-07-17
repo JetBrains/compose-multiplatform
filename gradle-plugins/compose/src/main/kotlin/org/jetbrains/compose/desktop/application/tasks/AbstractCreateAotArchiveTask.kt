@@ -6,6 +6,7 @@ import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.desktop.application.dsl.AotConfiguration
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import org.jetbrains.compose.internal.utils.*
@@ -14,6 +15,7 @@ import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import javax.inject.Inject
 
+@DisableCachingByDefault(because = "Uses platform-specific JDK tools whose output depends on local JDK installation")
 abstract class AbstractCreateAotArchiveTask @Inject constructor(
     createDistributable: TaskProvider<AbstractJPackageTask>
 ) : AbstractComposeDesktopTask() {
