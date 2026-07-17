@@ -50,7 +50,7 @@ jobs:
         working-directory: gradle-plugins
         run: |
           ./gradlew assemble
-          ./gradlew --continue :preview-rpc:test :compose:test ':compose:test-Gradle(${{ matrix.gradle }})-Agp(${{ matrix.agp }})'
+          ./gradlew --continue :preview-rpc:test :compose:test ':compose:test-Gradle[${{ matrix.gradle }}]-Agp[${{ matrix.agp }}]'
 
       - name: Upload Reports
         uses: actions/upload-artifact@v4
