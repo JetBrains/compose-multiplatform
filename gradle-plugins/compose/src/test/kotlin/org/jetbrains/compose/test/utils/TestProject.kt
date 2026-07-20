@@ -61,6 +61,7 @@ class TestProject(
     private val additionalArgs = listOfNotNull(
         "--info",
         "--stacktrace",
+        "-Pkotlin.js.yarn=false",
         "-P${ComposeProperties.VERBOSE}=${testEnvironment.composeVerbose}",
         if (testEnvironment.parsedGradleVersion < GradleVersion.version("8.0")) {
             null
