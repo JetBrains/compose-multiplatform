@@ -178,7 +178,7 @@ for (jdkVersion in jdkVersionsForTests) {
 
 for (gradleVersion in supportedGradleVersions) {
     for (agpVersion in supportedAgpVersions) {
-        tasks.registerVerificationTask<Test>("test-Gradle(${gradleVersion})-Agp($agpVersion)") {
+        tasks.registerVerificationTask<Test>("test-Gradle[${gradleVersion}]-Agp[$agpVersion]") {
             testClassesDirs = tasks.test.get().testClassesDirs
             classpath = tasks.test.get().classpath
             filter { includeTestsMatching(gradleTestsPattern) }
