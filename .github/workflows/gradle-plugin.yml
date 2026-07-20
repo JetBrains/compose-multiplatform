@@ -60,9 +60,14 @@ jobs:
 
       - name: Print summary
         shell: bash
-        working-directory: gradle-plugins/compose/build/test-summary
+        working-directory: gradle-plugins
         if: always()
         run: |
+          if [[ ! -d compose/build/test-summary ]]; then
+            exit 0
+          fi
+
+          cd compose/build/test-summary
           for SUMMARY_FILE in `find . -name "*.md"`; do
             FILE_NAME=`basename $SUMMARY_FILE`
             echo "## $FILE_NAME" >> $GITHUB_STEP_SUMMARY
