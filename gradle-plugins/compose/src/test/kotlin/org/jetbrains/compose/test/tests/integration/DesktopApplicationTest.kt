@@ -137,9 +137,34 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             }
         }
 
+        fun checkNoUnexpectedProguardDiagnostics(log: String) {
+            // TODO https://youtrack.jetbrains.com/issue/CMP-7778/Fix-Proguard-note-Note-duplicate-definition-of-resource-file-META-INF-MANIFEST.MF
+            val expectedNotes = setOf(
+                "Note: duplicate definition of resource file [META-INF/MANIFEST.MF]",
+                "Note: duplicate definition of resource file [META-INF/androidx/navigationevent/navigationevent-compose/LICENSE.txt]",
+                "Note: duplicate definition of resource file [META-INF/lifecycle-runtime-compose.kotlin_module]",
+                "Note: duplicate definition of resource file [META-INF/navigationevent-compose.kotlin_module]",
+                "Note: duplicate definition of resource file [META-INF/runtime-saveable.kotlin_module]",
+                "Note: duplicate definition of resource file [META-INF/runtime.kotlin_module]",
+                "Note: duplicate definition of resource file [META-INF/savedstate-compose.kotlin_module]",
+            )
+            val expectedNotePatterns = listOf(
+                Regex("""Note: there were \d+ duplicate class definitions\."""),
+            )
+            val unexpectedDiagnostics = log.lineSequence()
+                .filter { it.startsWith("Warning:") || it.startsWith("Note:") }
+                .filterNot { diagnostic ->
+                    diagnostic in expectedNotes || expectedNotePatterns.any { it.matches(diagnostic) }
+                }
+                .toList()
+
+            assertEquals(emptyList<String>(), unexpectedDiagnostics, "Unexpected ProGuard diagnostics")
+        }
+
         checkImageBeforeBuild()
         gradle(":runReleaseDistributable").checks {
             check.taskSuccessful(":proguardReleaseJars")
+            checkNoUnexpectedProguardDiagnostics(check.log)
             checkImageAfterBuild()
             assertEqualTextFiles(file("main-methods.actual.txt"), file("main-methods.expected.txt"))
         }
@@ -149,6 +174,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         checkImageBeforeBuild()
         gradle(":runReleaseDistributable").checks {
             check.taskSuccessful(":proguardReleaseJars")
+            checkNoUnexpectedProguardDiagnostics(check.log)
             checkImageAfterBuild()
             assertNotEqualTextFiles(file("main-methods.actual.txt"), file("main-methods.expected.txt"))
         }
