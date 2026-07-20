@@ -40,6 +40,7 @@ abstract class AbstractCreateAotArchiveTask @Inject constructor(
     // Can't just use appImageRootDir because the AOT archive needs to be excluded
     @Suppress("unused")
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     internal val dependencyFiles: FileTree get() {
         // If the app image root directory doesn't exist, return an empty file tree
         appImageRootDir.get().let {
@@ -63,7 +64,7 @@ abstract class AbstractCreateAotArchiveTask @Inject constructor(
         val cfgFile = appDir.asFile.resolve("${packageName.get()}.cfg")
         val cfgFileTempCopy = File(cfgFile.parentFile, "${cfgFile.name}.tmp")
 
-        // Save the cfg file before making changes for the AppCDS archive-creating run
+        // Save the cfg file before making changes for the archive-creating run
         Files.copy(cfgFile.toPath(), cfgFileTempCopy.toPath(), StandardCopyOption.REPLACE_EXISTING)
         try {
             // Edit the cfg file
@@ -86,7 +87,7 @@ abstract class AbstractCreateAotArchiveTask @Inject constructor(
                 }
             }
 
-            // Run the app to create the AppCDS archive
+            // Run the app to create the archive
             execOperations.executePackagedApp(
                 appImageRootDir = appImageRootDir.get(),
                 packageName = packageName.get()
