@@ -18,6 +18,7 @@ import kotlin.text.lines
  *   - A connected Android device or running emulator
  *
  * Usage:  ./run_android_benchmarks.main.kts [device=<serial>] [benchmarks=...] [modes=REAL] ...
+ *         Windows: kotlin run_android_benchmarks.main.kts [device=<serial>] ...
  *
  *   If no device serial is provided, the first connected device is used.
  */
@@ -31,6 +32,10 @@ val JSON_REPORTS_DIR = File(OUTPUT_DIR, "json-reports")
 val PACKAGE_NAME = "org.jetbrains.compose.benchmarks"
 val ACTIVITY_NAME = "$PACKAGE_NAME.MainActivity"
 val APK_PATH = File(ROOT_DIR, "benchmarks/build/outputs/apk/debug/benchmarks-debug.apk")
+val isWindows = System.getProperty("os.name").startsWith("Windows", ignoreCase = true)
+
+val gradleWrapper = if (isWindows) "gradlew.bat" else "./gradlew"
+fun sdkExecutable(name: String): String = if (isWindows) "$name.exe" else name
 
 // ── Argument Parsing ──────────────────────────────────────────────────────────
 
@@ -95,16 +100,16 @@ fun findAndroidSdkPath(): String? {
 
 val androidSdkPath = findAndroidSdkPath()
 val emulatorBinary = if (androidSdkPath != null) {
-    val emulatorInSdk = File(androidSdkPath, "emulator/emulator")
-    if (emulatorInSdk.exists()) emulatorInSdk.absolutePath else "emulator"
+    val emulatorInSdk = File(androidSdkPath, "emulator/${sdkExecutable("emulator")}")
+    if (emulatorInSdk.exists()) emulatorInSdk.absolutePath else sdkExecutable("emulator")
 } else {
-    "emulator"
+    sdkExecutable("emulator")
 }
 val adbBinary = if (androidSdkPath != null) {
-    val adbInSdk = File(androidSdkPath, "platform-tools/adb")
-    if (adbInSdk.exists()) adbInSdk.absolutePath else "adb"
+    val adbInSdk = File(androidSdkPath, "platform-tools/${sdkExecutable("adb")}")
+    if (adbInSdk.exists()) adbInSdk.absolutePath else sdkExecutable("adb")
 } else {
-    "adb"
+    sdkExecutable("adb")
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -290,9 +295,9 @@ println("    Android   : $androidVersion")
 // ── 2. Build ───────────────────────────────────────────────────────────────────
 
 println("\n==> [2/4] Building APK...")
-println("  $ ./gradlew :benchmarks:assembleDebug")
+println("  $ $gradleWrapper :benchmarks:assembleDebug")
 
-execInheritIO("./gradlew", ":benchmarks:assembleDebug")
+execInheritIO(gradleWrapper, ":benchmarks:assembleDebug")
 
 if (!APK_PATH.exists()) {
     die("APK not found at expected path: ${APK_PATH.path}")
@@ -314,7 +319,7 @@ OUTPUT_DIR.mkdirs()
 
 fun fetchBenchmarks(): List<String> {
     try {
-        val output = exec("./gradlew", ":benchmarks:run", "-PrunArguments=listBenchmarks=true")
+        val output = exec(gradleWrapper, ":benchmarks:run", "-PrunArguments=listBenchmarks=true")
         val lines = output.lines()
         val startIndex = lines.indexOf("AVAILABLE_BENCHMARKS_START")
         val endIndex = lines.indexOf("AVAILABLE_BENCHMARKS_END")
