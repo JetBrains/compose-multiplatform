@@ -29,6 +29,13 @@ kotlin {
 
         withDeviceTest {
             instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+            @Suppress("UnstableApiUsage")
+            managedDevices.localDevices.create("pixel5") {
+                device = "Pixel 5"
+                apiLevel = 31
+                systemImageSource = "aosp"
+            }
         }
     }
     iosArm64()
@@ -129,15 +136,18 @@ kotlin {
             }
         }
         val androidDeviceTest by getting {
+            dependsOn(jvmAndAndroidTest)
             dependencies {
                 implementation(libs.androidx.test.core)
                 implementation(libs.androidx.compose.ui.test)
                 implementation(libs.androidx.compose.ui.test.manifest)
                 implementation(libs.androidx.compose.ui.test.junit4)
             }
+            resources.srcDir("src/commonTest/resources")
         }
         val androidHostTest by getting {
             dependsOn(jvmAndAndroidTest)
+            resources.srcDir("src/commonTest/resources")
         }
         val nativeMain by getting {
             dependsOn(skikoMain)
