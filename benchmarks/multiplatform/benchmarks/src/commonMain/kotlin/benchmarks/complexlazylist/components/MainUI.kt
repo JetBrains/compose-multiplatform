@@ -90,7 +90,7 @@ fun MainLazyColumnItemsList(noImage: Boolean, useJson: Boolean) {
                 itemsIndexed(
                     items = models,
                     key = { index, _ ->
-                        models[index]
+                        index
                     }
                 ) { _, item ->
                     when (item) {

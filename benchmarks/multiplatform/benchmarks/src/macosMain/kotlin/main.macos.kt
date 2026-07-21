@@ -15,7 +15,9 @@ import kotlin.time.TimeSource
 
 actual val mainTime: TimeSource.Monotonic.ValueTimeMark = TimeSource.Monotonic.markNow()
 
-actual val isIosTarget: Boolean = false
+actual val printJsonToOutput: Boolean = false
+
+actual val isSvgSupported: Boolean = true
 
 fun main(args : Array<String>) {
     Config.setGlobalFromArgs(args)

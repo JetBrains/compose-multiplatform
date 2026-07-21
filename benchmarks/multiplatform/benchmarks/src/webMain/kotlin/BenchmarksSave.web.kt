@@ -30,7 +30,7 @@ actual fun saveBenchmarkStats(name: String, stats: BenchmarkStats) {
     }
 }
 
-actual val isIosTarget: Boolean = false
+actual val printJsonToOutput: Boolean = false
 
 /**
  * Client for sending benchmark results to the server

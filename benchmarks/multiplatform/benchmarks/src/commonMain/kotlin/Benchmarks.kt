@@ -326,6 +326,8 @@ fun Benchmark(name: String, content: @Composable () -> Unit): Benchmark {
     return Benchmark(name, Config.getBenchmarkProblemSize(name, Config.frameCount), content)
 }
 
+expect val isSvgSupported: Boolean
+
 fun getBenchmarks(): List<Benchmark> = listOf(
     Benchmark("AnimatedVisibility") { AnimatedVisibility() },
     Benchmark("LazyGrid") { LazyGrid() },
@@ -342,14 +344,14 @@ fun getBenchmarks(): List<Benchmark> = listOf(
         NYContent(1920, 1080)
     },
     Benchmark("LazyList") { MainUiNoImageUseModel() },
-    Benchmark("MultipleComponents") { MultipleComponentsExample() },
+    if (isSvgSupported) Benchmark("MultipleComponents") { MultipleComponentsExample(isVectorGraphicsSupported = true) } else null,
     Benchmark("MultipleComponents-NoVectorGraphics") {
         MultipleComponentsExample(isVectorGraphicsSupported = false)
     },
     Benchmark("TextLayout") { TextLayout() },
     Benchmark("CanvasDrawing") { CanvasDrawing() },
     Benchmark("HeavyShader") { HeavyShader() }
-).sortedBy { it.name }
+).filterNotNull().sortedBy { it.name }
 
 suspend fun runBenchmark(
     benchmark: Benchmark,
@@ -381,7 +383,7 @@ private fun reportBenchmarkStats(stats: BenchmarkStats, results: MutableList<Ben
     if (results == null || !Config.reportAtTheEnd) {
         stats.prettyPrint()
     }
-    if (Config.saveStatsToJSON && isIosTarget) {
+    if (Config.saveStatsToJSON && printJsonToOutput) {
         println("JSON_START")
         println(stats.toJsonString())
         println("JSON_END")
