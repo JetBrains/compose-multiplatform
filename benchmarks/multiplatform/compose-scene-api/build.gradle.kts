@@ -13,9 +13,9 @@ kotlin {
     macosArm64()
 
     @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
-    wasmJs()
+    wasmJs { browser() }
 
-    js()
+    js { browser() }
 
     applyDefaultHierarchyTemplate()
 
