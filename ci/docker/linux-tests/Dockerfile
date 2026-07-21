@@ -17,6 +17,7 @@ RUN apt update -y && \
         unzip \
         wget \
         xvfb \
+        git \
         xz-utils && \
     locale-gen en_US.UTF-8 && \
     rm -rf /var/lib/apt/lists/*
