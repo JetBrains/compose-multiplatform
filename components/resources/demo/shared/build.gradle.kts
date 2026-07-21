@@ -11,7 +11,7 @@ plugins {
 kotlin {
     android {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
+            jvmTarget.set(JvmTarget.JVM_11)
         }
         androidResources.enable = true
     }

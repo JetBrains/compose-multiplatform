@@ -13,8 +13,8 @@ subprojects {
 
     plugins.withId("java") {
         configureIfExists<JavaPluginExtension> {
-            sourceCompatibility = JavaVersion.VERSION_17
-            targetCompatibility = JavaVersion.VERSION_17
+            sourceCompatibility = JavaVersion.VERSION_11
+            targetCompatibility = JavaVersion.VERSION_11
 
             withJavadocJar()
             withSourcesJar()
@@ -23,7 +23,7 @@ subprojects {
 
     tasks.withType<KotlinCompile>() {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
+            jvmTarget.set(JvmTarget.JVM_11)
         }
     }
 
