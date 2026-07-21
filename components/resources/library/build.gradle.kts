@@ -7,20 +7,28 @@ plugins {
     id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.compose")
     id("maven-publish")
-    id("com.android.library")
+    id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.kotlinx.binary-compatibility-validator")
 }
 
 kotlin {
     jvm("desktop")
-    androidTarget {
-        publishLibraryVariants("release")
-        compilations.all {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_11)
-                }
-            }
+    android {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+        namespace = "org.jetbrains.compose.components.resources"
+        compileSdk = 37
+        minSdk = 23
+
+        androidResources.enable = true
+
+        withHostTest {
+            isIncludeAndroidResources = true
+        }
+
+        withDeviceTest {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
     }
     iosArm64()
@@ -110,7 +118,7 @@ kotlin {
             dependsOn(skikoTest)
             dependsOn(jvmAndAndroidTest)
             dependencies {
-                implementation(compose.desktop.currentOs)
+                implementation(libs.compose.desktop.jvm)
             }
         }
         val androidMain by getting {
@@ -120,8 +128,7 @@ kotlin {
                 compileOnly(libs.androidx.test.monitor)
             }
         }
-        val androidInstrumentedTest by getting {
-            dependsOn(jvmAndAndroidTest)
+        val androidDeviceTest by getting {
             dependencies {
                 implementation(libs.androidx.test.core)
                 implementation(libs.androidx.compose.ui.test)
@@ -129,7 +136,7 @@ kotlin {
                 implementation(libs.androidx.compose.ui.test.junit4)
             }
         }
-        val androidUnitTest by getting {
+        val androidHostTest by getting {
             dependsOn(jvmAndAndroidTest)
         }
         val nativeMain by getting {
@@ -146,55 +153,6 @@ kotlin {
                  implementation(libs.kotlinx.browser)
             }
         }
-        val jsMain by getting {
-            dependsOn(webMain)
-        }
-        val wasmJsMain by getting {
-            dependsOn(webMain)
-        }
-        val webTest by getting {
-            dependsOn(skikoTest)
-        }
-        val jsTest by getting {
-            dependsOn(webTest)
-        }
-        val wasmJsTest by getting {
-            dependsOn(webTest)
-        }
-    }
-}
-
-android {
-    compileSdk = 35
-    namespace = "org.jetbrains.compose.components.resources"
-    defaultConfig {
-        minSdk = 23
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    @Suppress("UnstableApiUsage")
-    testOptions {
-        managedDevices {
-            devices {
-                maybeCreate<com.android.build.api.dsl.ManagedVirtualDevice>("pixel5").apply {
-                    device = "Pixel 5"
-                    apiLevel = 31
-                    systemImageSource = "aosp"
-                }
-            }
-        }
-    }
-    sourceSets {
-        val commonTestResources = "src/commonTest/resources"
-        named("androidTest") {
-            resources.srcDir(commonTestResources)
-            assets.srcDir("src/androidInstrumentedTest/assets")
-        }
-        named("test") { resources.srcDir(commonTestResources) }
-        named("main") { manifest.srcFile("src/androidMain/AndroidManifest.xml") }
     }
 }
 

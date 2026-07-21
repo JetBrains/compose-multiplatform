@@ -14,7 +14,7 @@ kotlin {
         }
 
         jvmMain.dependencies {
-            implementation(compose.desktop.currentOs)
+            implementation(libs.compose.desktop.jvm)
             implementation(project(":SplitPane:library"))
         }
     }

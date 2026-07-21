@@ -4,19 +4,14 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 plugins {
     kotlin("multiplatform")
     id("maven-publish")
-    id("com.android.library")
+    id("com.android.kotlin.multiplatform.library")
 }
 
 kotlin {
     jvm("desktop")
-    androidTarget {
-        publishLibraryVariants("release")
-        compilations.all {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_11)
-                }
-            }
+    android {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
     iosArm64()
@@ -57,18 +52,10 @@ kotlin {
         val wasmJsMain by getting
         wasmJsMain.dependsOn(nonAndroidMain)
     }
-}
-
-android {
-    compileSdk = 35
-    namespace = "org.jetbrains.compose.ui.tooling.preview"
-    defaultConfig {
+    android {
+        namespace = "org.jetbrains.compose.ui.tooling.preview"
+        compileSdk = 37
         minSdk = 23
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 

@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("multiplatform") apply false
     id("com.android.library") apply false
+    id("com.android.kotlin.multiplatform.library") apply false
     id("org.jetbrains.kotlinx.binary-compatibility-validator") apply false
 }
 
@@ -12,8 +13,8 @@ subprojects {
 
     plugins.withId("java") {
         configureIfExists<JavaPluginExtension> {
-            sourceCompatibility = JavaVersion.VERSION_11
-            targetCompatibility = JavaVersion.VERSION_11
+            sourceCompatibility = JavaVersion.VERSION_17
+            targetCompatibility = JavaVersion.VERSION_17
 
             withJavadocJar()
             withSourcesJar()
@@ -22,7 +23,7 @@ subprojects {
 
     tasks.withType<KotlinCompile>() {
         compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+            jvmTarget.set(JvmTarget.JVM_17)
         }
     }
 
