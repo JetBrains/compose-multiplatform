@@ -23,6 +23,13 @@ kotlin {
 
         androidResources.enable = true
 
+        optimization {
+            consumerKeepRules.apply {
+                publish = true
+                file("consumer-rules.pro")
+            }
+        }
+
         withHostTest {
             isIncludeAndroidResources = true
         }
