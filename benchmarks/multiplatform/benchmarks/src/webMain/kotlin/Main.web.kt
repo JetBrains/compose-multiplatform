@@ -12,6 +12,8 @@ actual fun getProcessStartTime(): TimeSource.Monotonic.ValueTimeMark? = null
 
 actual val mainTime: TimeSource.Monotonic.ValueTimeMark = TimeSource.Monotonic.markNow()
 
+actual val isSvgSupported: Boolean = true
+
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalWasmJsInterop::class)
 fun mainBrowser() = MainScope().launch {
     awaitSkikoWasm()

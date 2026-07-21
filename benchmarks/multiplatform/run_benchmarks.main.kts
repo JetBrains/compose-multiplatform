@@ -1,6 +1,20 @@
 #!/usr/bin/env kotlin
 import java.io.File
 
+enum class Platform(val platformName: String) {
+    MACOS("macos"),
+    DESKTOP("desktop"),
+    WEB("web"),
+    IOS("ios"),
+    ANDROID("android");
+
+    companion object {
+        fun fromString(name: String): Platform =
+            entries.find { it.platformName == name }
+                ?: throw IllegalArgumentException("Unsupported platform: $name. Supported: ${entries.joinToString { it.platformName }}")
+    }
+}
+
 /**
  * Usage: ./run_benchmarks.main.kts <platform> [runs=1] [benchmarks=<benchmarkName>] [version=<version>] [any other gradle args]
  *
@@ -11,7 +25,7 @@ import java.io.File
 fun main(args: Array<String>) {
     if (args.isEmpty()) {
         println("Usage: ./run_benchmarks.main.kts <platform> [runs=1] [benchmarks=<benchmarkName>] [version=<version>] [any other gradle args]")
-        println("Platforms: macos, desktop, web, ios")
+        println("Platforms: ${Platform.entries.joinToString { it.platformName }}")
         println("Arguments:")
         println("  runs=<number> (default: 1)")
         println("  benchmarks=<name1,name2,...>")
@@ -21,7 +35,7 @@ fun main(args: Array<String>) {
         return
     }
 
-    val platform = args[0]
+    val platform = Platform.fromString(args[0])
     val remainingArgs = args.drop(1)
     
     val argMap = remainingArgs.associate {
@@ -36,16 +50,12 @@ fun main(args: Array<String>) {
     val startup = argMap["modes"]?.contains("startup", ignoreCase = true) ?: false
     val separateProcess = argMap.remove("separateProcess")?.toBoolean() ?: startup
 
-    val runServer = platform == "web"
-    val isWeb = platform == "web"
-    val isIos = platform == "ios"
-
-    println("Running benchmarks for platform: $platform")
+    println("Running benchmarks for platform: ${platform.platformName}")
     println("Compose version: $version")
     println("Number of runs: $runs")
     println("Separate process: $separateProcess")
     println("Startup mode: $startup")
-    println("Run server: $runServer")
+    println("Run server: ${platform == Platform.WEB}")
     benchmarkName?.let { println("Filtering by benchmark: $it") }
 
     if (runs <= 0) {
@@ -69,8 +79,8 @@ fun main(args: Array<String>) {
                 resultsDir.listFiles { f -> f.extension == "json" }?.forEach { it.delete() }
             }
             
-            executeBenchmarks(version, i, platform, runServer, isWeb, isIos, separateProcess, benchmarkName, argMap)
-            collectResults(platform, version, i)
+            executeBenchmarks(version, i, platform, separateProcess, benchmarkName, argMap)
+            collectResults(platform.platformName, version, i)
         }
     } finally {
         if (originalTomlContent != null) {
@@ -113,36 +123,39 @@ fun updateComposeVersion(version: String) {
 fun executeBenchmarks(
     version: String, 
     runIndex: Int,
-    platform: String,
-    runServer: Boolean, 
-    isWeb: Boolean, 
-    isIos: Boolean,
+    platform: Platform,
     separateProcess: Boolean,
     benchmarkName: String?,
     extraArgs: Map<String, String>
 ) {
+    val runServer = platform == Platform.WEB
+
     val (versionedExecutable, defaultExecutable, task) = when (platform) {
-        "macos" -> Triple(
+        Platform.MACOS -> Triple(
             File("benchmarks/build/bin/macosArm64/releaseExecutable/benchmarks-$version.kexe"),
             File("benchmarks/build/bin/macosArm64/releaseExecutable/benchmarks.kexe"),
             ":benchmarks:runReleaseExecutableMacosArm64"
         )
-        "desktop" -> Triple(
+        Platform.DESKTOP -> Triple(
             null, 
             null, 
             ":benchmarks:run"
         )
-        "web" -> Triple(
+        Platform.WEB -> Triple(
             null,
             null,
             ":benchmarks:wasmJsBrowserProductionRun"
         )
-        "ios" -> Triple(
+        Platform.IOS -> Triple(
             null,
             null,
             "ios"
         )
-        else -> throw IllegalArgumentException("Unsupported platform: $platform")
+        Platform.ANDROID -> Triple(
+            null,
+            null,
+            "android"
+        )
     }
 
     val runArgs = mutableListOf(
@@ -199,7 +212,7 @@ fun executeBenchmarks(
         Thread.sleep(5000)
         
         try {
-            executeBenchmarksWithPlatform(version, platform, task, runArgs, versionedExecutable, defaultExecutable, isWeb, isIos, separateProcess,
+            executeBenchmarksWithPlatform(version, platform, task, runArgs, versionedExecutable, defaultExecutable, separateProcess,
                 serverStopped, benchmarkName)
         } finally {
             println("Stopping benchmark server...")
@@ -209,20 +222,18 @@ fun executeBenchmarks(
             monitorThread.interrupt()
         }
     } else {
-        executeBenchmarksWithPlatform(version, platform, task, runArgs, versionedExecutable, defaultExecutable, isWeb, isIos, separateProcess,
+        executeBenchmarksWithPlatform(version, platform, task, runArgs, versionedExecutable, defaultExecutable, separateProcess,
             null, benchmarkName)
     }
 }
 
 fun executeBenchmarksWithPlatform(
     version: String,
-    platform: String,
+    platform: Platform,
     task: String,
     runArgs: List<String>,
     versionedExecutable: File?,
     defaultExecutable: File?,
-    isWeb: Boolean,
-    isIos: Boolean,
     separateProcess: Boolean,
     serverStopped: java.util.concurrent.atomic.AtomicBoolean?,
     benchmarksToRun: String?
@@ -240,10 +251,10 @@ fun executeBenchmarksWithPlatform(
             // Replace or add benchmarks parameter
             benchmarkArgs.removeIf { it.startsWith("benchmarks=") }
             benchmarkArgs.add("benchmarks=$benchmark")
-            executeBenchmarksOnce(version, platform, task, benchmarkArgs, versionedExecutable, defaultExecutable, isWeb, isIos, serverStopped)
+            executeBenchmarksOnce(version, platform, task, benchmarkArgs, versionedExecutable, defaultExecutable, serverStopped)
         }
     } else {
-        executeBenchmarksOnce(version, platform, task, runArgs, versionedExecutable, defaultExecutable, isWeb, isIos, serverStopped)
+        executeBenchmarksOnce(version, platform, task, runArgs, versionedExecutable, defaultExecutable, serverStopped)
     }
 }
 
@@ -277,16 +288,28 @@ fun listBenchmarks(): List<String> {
 
 fun executeBenchmarksOnce(
     version: String, 
-    platform: String,
+    platform: Platform,
     task: String,
     runArgs: List<String>,
     versionedExecutable: File?,
     defaultExecutable: File?,
-    isWeb: Boolean,
-    isIos: Boolean,
     serverStopped: java.util.concurrent.atomic.AtomicBoolean?
 ) {
-    if (isIos) {
+    if (platform == Platform.ANDROID) {
+        println("Running version $version on Android...")
+        val processBuilder = ProcessBuilder(
+            "./run_android_benchmarks.main.kts",
+            *runArgs.toTypedArray()
+        ).inheritIO()
+        val process = processBuilder.start()
+        val exitCode = process.waitFor()
+        if (exitCode != 0) {
+            println("Warning: Android Benchmark run failed with exit code $exitCode")
+        }
+        return
+    }
+
+    if (platform == Platform.IOS) {
         println("Running version $version on iOS...")
         val processBuilder = ProcessBuilder(
             "./run_ios_benchmarks.main.kts",
@@ -324,7 +347,7 @@ fun executeBenchmarksOnce(
         
         val process = processBuilder.start()
 
-        val exitCode = if (isWeb) {
+        val exitCode = if (platform == Platform.WEB) {
             println("Waiting for benchmarks to complete (timeout 5m)...")
             // Try to find if results were already saved
             val startTime = System.currentTimeMillis()
@@ -358,7 +381,7 @@ fun executeBenchmarksOnce(
 
         if (exitCode != 0) {
             println("Warning: Benchmark run failed with exit code $exitCode")
-        } else if (platform == "macos") {
+        } else if (platform == Platform.MACOS) {
             if (defaultExecutable != null && defaultExecutable.exists()) {
                 if (defaultExecutable.renameTo(versionedExecutable!!)) {
                     println("Renamed executable to ${versionedExecutable.name}")

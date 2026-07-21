@@ -30,7 +30,9 @@ fun runBenchmarks() {
     }
 }
 
-actual val isIosTarget: Boolean = true
+actual val printJsonToOutput: Boolean = true
+
+actual val isSvgSupported: Boolean = true
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun MainViewController(): UIViewController {

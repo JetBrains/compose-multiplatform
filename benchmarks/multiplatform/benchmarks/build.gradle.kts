@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.androidApplication)
 }
 
 version = "1.0-SNAPSHOT"
@@ -23,6 +24,8 @@ repositories {
 
 kotlin {
     jvm("desktop")
+
+    androidTarget()
 
     listOf(
         iosX64(),
@@ -95,7 +98,20 @@ kotlin {
             }
         }
 
+        val androidMain by getting {
+            dependencies {
+//                implementation(libs.ktor.client.okhttp)
+                implementation("androidx.activity:activity-compose:1.9.3")
+            }
+        }
+
+        // Intermediate source set for all Skia/Skiko targets (non-Android)
+        val skikoMain by creating {
+            dependsOn(commonMain)
+        }
+
         val desktopMain by getting {
+            dependsOn(skikoMain)
             dependencies {
                 implementation(compose.desktop.currentOs)
                 runtimeOnly(libs.kotlinx.coroutines.swing)
@@ -107,8 +123,12 @@ kotlin {
             }
         }
 
+        val appleMain by getting {
+            dependsOn(skikoMain)
+        }
+
         val webMain by getting {
-            dependsOn(commonMain)
+            dependsOn(skikoMain)
             dependencies {
                 implementation(libs.ktor.client.js)
                 implementation(libs.ktor.client.content.negotiation)
@@ -116,6 +136,18 @@ kotlin {
                 implementation(libs.kotlinx.browser)
             }
         }
+    }
+}
+
+android {
+    namespace = "org.jetbrains.compose.benchmarks"
+    compileSdk = 37
+    defaultConfig {
+        applicationId = "org.jetbrains.compose.benchmarks"
+        minSdk = 24
+        targetSdk = 37
+        versionCode = 1
+        versionName = "1.0"
     }
 }
 

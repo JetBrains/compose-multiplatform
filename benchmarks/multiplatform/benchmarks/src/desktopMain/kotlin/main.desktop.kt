@@ -16,6 +16,8 @@ import kotlin.time.TimeSource
 
 actual val mainTime: TimeSource.Monotonic.ValueTimeMark = TimeSource.Monotonic.markNow()
 
+actual val isSvgSupported: Boolean = true
+
 actual fun getProcessStartTime(): TimeSource.Monotonic.ValueTimeMark? {
     val startTime = ManagementFactory.getRuntimeMXBean().startTime
     val uptime = System.currentTimeMillis() - startTime

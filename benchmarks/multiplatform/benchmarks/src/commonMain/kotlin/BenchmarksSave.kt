@@ -70,7 +70,7 @@ fun saveBenchmarkStatsOnDisk(name: String, stats: BenchmarkStats) {
  */
 expect fun saveBenchmarkStats(name: String, stats: BenchmarkStats)
 
-expect val isIosTarget: Boolean
+expect val printJsonToOutput: Boolean
 
 private fun RawSource.readText() = use {
     it.buffered().readByteArray().decodeToString()
