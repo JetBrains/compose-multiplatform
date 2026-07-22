@@ -8,7 +8,7 @@ import kotlin.test.assertFailsWith
 class StringFormatTest {
 
     @Test
-    fun `replaceWithArgs replaces placeholders with corresponding arguments`() {
+    fun testReplaceWithArgs() {
         val template = "Hello %1\$s, you have %2\$d new messages!"
         val args = listOf("Alice", "5")
 
@@ -18,7 +18,7 @@ class StringFormatTest {
     }
 
     @Test
-    fun `replaceWithArgs works with multiple placeholders referring to the same argument`() {
+    fun testReplaceWithArgsWithMultiplePlaceholders() {
         val template = "%1\$s and %1\$s are best friends!"
         val args = listOf("Alice")
 
@@ -28,7 +28,7 @@ class StringFormatTest {
     }
 
     @Test
-    fun `replaceWithArgs works when placeholders are out of order`() {
+    fun testReplaceWithArgsOutOrder() {
         val template = "Order: %2\$s comes after %1\$s"
         val args = listOf("Alice", "Bob")
 
@@ -38,7 +38,7 @@ class StringFormatTest {
     }
 
     @Test
-    fun `replaceWithArgs works when there are no placeholders`() {
+    fun testReplaceWithArgsNoPlaceholders() {
         val template = "No placeholders here!"
         val args = emptyList<String>()
 
@@ -48,7 +48,7 @@ class StringFormatTest {
     }
 
     @Test
-    fun `replaceWithArgs throws exception when placeholders index is out of bounds`() {
+    fun testReplaceWithArgsOutOfBounds() {
         val template = "Hello %1\$s, %2\$s!"
         val args = listOf("Alice")
 
@@ -58,7 +58,7 @@ class StringFormatTest {
     }
 
     @Test
-    fun `replaceWithArgs handles empty string template`() {
+    fun testReplaceWithArgsEmptyTemplate() {
         val template = ""
         val args = listOf("Alice", "5")
 
@@ -68,7 +68,7 @@ class StringFormatTest {
     }
 
     @Test
-    fun `replaceWithArgs handles templates with no matching args`() {
+    fun testReplaceWithArgsNoMatchingArgs() {
         val template = "Hello %1\$s, you have %3\$s messages"
         val args = listOf("Alice")
 
@@ -78,7 +78,7 @@ class StringFormatTest {
     }
 
     @Test
-    fun `replaceWithArgs replaces multiple placeholders of the same index`() {
+    fun testReplaceWithArgsMultiplePlaceholdersSameIndex() {
         val template = "Repeat: %1\$s, %1\$s, and again %1\$s!"
         val args = listOf("Echo")
 
@@ -88,7 +88,7 @@ class StringFormatTest {
     }
 
     @Test
-    fun `replaceWithArgs ensures _d and _s placeholders behave identically`() {
+    fun testReplaceWithArgsDAndSPlaceholders() {
         val template = "%1\$d, %1\$s, %2\$d, %2\$s"
         val args = listOf("42", "hello")
 
@@ -98,7 +98,7 @@ class StringFormatTest {
     }
 
     @Test
-    fun `replaceWithArgs handles 15 arguments correctly`() {
+    fun testReplaceWithArgs15Arguments() {
         val template = "%1\$s, %2\$s, %3\$s, %4\$s, %5\$s, %6\$s, %7\$s, %8\$s, %9\$s, %10\$s, %11\$s, %12\$s, %13\$s, %14\$s, %15\$s!"
         val args = listOf(
             "arg1", "arg2", "arg3", "arg4", "arg5",
@@ -115,7 +115,7 @@ class StringFormatTest {
     }
 
     @Test
-    fun `replaceWithArgs throws exception for template with missing argument index`() {
+    fun testReplaceWithArgsMissingIndex() {
         val template = "Hello %${'$'}s, how are you?"
         val args = listOf("Alice")
 
@@ -126,7 +126,7 @@ class StringFormatTest {
     }
 
     @Test
-    fun `replaceWithArgs does not replace invalid placeholders`() {
+    fun testReplaceWithArgsInvalidPlaceholders() {
         val template = "Hello %1\$x, how are you?"
         val args = listOf("Alice")
 
@@ -137,7 +137,7 @@ class StringFormatTest {
     }
 
     @Test
-    fun `replaceWithArgs throws exception for missing arguments`() {
+    fun testReplaceWithArgsMissingArguments() {
         val template = "Hello %1\$s, you have %2\$d messages!"
         val args = listOf("Alice")
 
@@ -149,7 +149,7 @@ class StringFormatTest {
 
     @Test
     @IgnoreWasmTest // https://youtrack.jetbrains.com/issue/KT-69014, wasm throws RuntimeError instead of IndexOutOfBounds
-    fun `replaceWithArgs throws exception for unmatched placeholders`() {
+    fun testReplaceWithArgsUnmatchedPlaceholders() {
         val template = "Hello %1\$s, your rank is %3\$s"
         val args = listOf("Alice", "1")
 
@@ -160,7 +160,7 @@ class StringFormatTest {
     }
 
     @Test
-    fun `replaceWithArgs handles templates with invalid format`() {
+    fun testReplaceWithArgsInvalidFormat() {
         val template = "This is %1\$"
         val args = listOf("test")
 
@@ -171,7 +171,7 @@ class StringFormatTest {
     }
 
     @Test
-    fun `replaceWithArgs ignores extra arguments`() {
+    fun testReplaceWithArgsIgnoreExtraArguments() {
         val template = "Hello %1\$s!"
         val args = listOf("Alice", "ExtraData1", "ExtraData2")
 

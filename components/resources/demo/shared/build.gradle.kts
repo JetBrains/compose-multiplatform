@@ -3,20 +3,17 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     kotlin("multiplatform")
-    id("com.android.library")
+    id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            compileTaskProvider.configure {
-                compilerOptions {
-                    jvmTarget.set(JvmTarget.JVM_11)
-                }
-            }
+    android {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
         }
+        androidResources.enable = true
     }
     jvm("desktop")
     listOf(
@@ -69,20 +66,10 @@ kotlin {
             jsMain.get().dependsOn(this)
         }
     }
-}
-
-android {
-    compileSdk = 35
-    namespace = "org.jetbrains.compose.resources.demo.shared"
-    defaultConfig {
+    android {
+        namespace = "org.jetbrains.compose.resources.demo.shared"
+        compileSdk = 37
         minSdk = 23
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    buildFeatures {
-        compose = true
     }
 }
 
