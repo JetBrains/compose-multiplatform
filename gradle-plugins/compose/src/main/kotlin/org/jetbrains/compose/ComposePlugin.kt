@@ -132,11 +132,7 @@ abstract class ComposePlugin : Plugin<Project> {
         @Deprecated("Specify dependency directly", replaceWith = ReplaceWith("\"org.jetbrains.compose.ui:ui-test-junit4:${ComposeBuildConfig.composeVersion}\""))
         val uiTestJUnit4 get() = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
 
-        @Deprecated(
-            "Use org.jetbrains.compose.desktop:desktop-jvm-all instead. " +
-                "It works for every desktop OS; packaging drops unrelated OS binaries.",
-            replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop-jvm-all:${ComposeBuildConfig.composeVersion}\"")
-        )
+        @Deprecated("currentOs is deprecated and will be removed in next releases.")
         val currentOs by lazy {
             composeDependency("org.jetbrains.compose.desktop:desktop-jvm-${currentTarget.id}")
         }
