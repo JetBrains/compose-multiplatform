@@ -6,7 +6,9 @@ pluginManagement {
         }
         gradlePluginPortal()
         maven("https://packages.jetbrains.team/maven/p/cmp/dev")
-        google()
+        google {
+            url = uri("https://cache-redirector.jetbrains.com/dl.google.com/dl/android/maven2")
+        }
     }
 }
 
