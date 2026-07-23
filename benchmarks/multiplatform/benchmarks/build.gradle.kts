@@ -15,7 +15,9 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenLocal()
-    google()
+    google {
+        url = uri("https://cache-redirector.jetbrains.com/dl.google.com/dl/android/maven2")
+    }
     mavenCentral {
         url = uri("https://cache-redirector.jetbrains.com/maven-central")
     }
