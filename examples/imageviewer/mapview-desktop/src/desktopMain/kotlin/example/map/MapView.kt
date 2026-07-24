@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.job
@@ -110,6 +111,8 @@ fun MapView(
             try {
                 val image: TileImage = imageRepository.loadContent(tile)
                 inMemoryCache = inMemoryCache + (tile to image)
+            } catch (c: CancellationException) {
+                throw c
             } catch (t: Throwable) {
                 println("exception in tiles loading, throwable: $t")
                 // ignore errors. Tile image loaded with retries
