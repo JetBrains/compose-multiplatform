@@ -246,7 +246,6 @@ fun BoxScope.MemoryTextOverlay(picture: PictureData) {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Collapsible(s: String, onEdit: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }

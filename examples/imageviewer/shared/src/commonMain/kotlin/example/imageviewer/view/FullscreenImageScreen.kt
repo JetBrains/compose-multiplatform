@@ -11,9 +11,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.dp
 import example.imageviewer.LocalImageProvider
 import example.imageviewer.filter.FilterType
@@ -31,7 +28,7 @@ fun FullscreenImageScreen(
     back: () -> Unit,
 ) {
     val imageProvider = LocalImageProvider.current
-    val availableFilters = FilterType.values().toList()
+    val availableFilters = FilterType.entries.toList()
     var selectedFilters by remember { mutableStateOf(emptySet<FilterType>()) }
 
     val originalImageState = remember(picture) { mutableStateOf<ImageBitmap?>(null) }

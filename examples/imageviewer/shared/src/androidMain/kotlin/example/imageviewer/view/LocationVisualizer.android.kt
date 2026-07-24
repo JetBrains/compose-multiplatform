@@ -4,7 +4,6 @@ import android.view.MotionEvent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import com.google.android.gms.maps.model.CameraPosition
@@ -13,7 +12,6 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.rememberCameraPositionState
 import example.imageviewer.model.GpsPosition
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 actual fun LocationVisualizer(
     modifier: Modifier,

@@ -14,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSize
@@ -178,7 +177,7 @@ private fun UIImage.resize(targetSize: CValue<CGSize>): UIImage {
 }
 
 private fun PictureData.Camera.toJson(): String =
-    Json.Default.encodeToString(this)
+    Json.encodeToString(this)
 
 private fun String.toCameraMetadata(): PictureData.Camera =
     Json.Default.decodeFromString(this)

@@ -1,6 +1,5 @@
 package example.imageviewer
 
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.coroutines.CoroutineDispatcher
 

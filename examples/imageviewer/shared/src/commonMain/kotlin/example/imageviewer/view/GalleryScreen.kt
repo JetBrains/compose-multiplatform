@@ -6,7 +6,6 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,7 +48,6 @@ enum class GalleryStyle {
     LIST
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GalleryScreen(
     pictures: SnapshotStateList<PictureData>,
@@ -189,7 +187,6 @@ expect fun GalleryLazyVerticalGrid(
     content: LazyGridScope.() -> Unit
 )
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SquaresGalleryView(
     images: List<PictureData>,
@@ -288,7 +285,6 @@ private fun ListGalleryView(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 private fun Modifier.animatePageChanges(pagerState: PagerState, index: Int) =
     graphicsLayer {
         val x = (pagerState.currentPage - index + pagerState.currentPageOffsetFraction) * 2

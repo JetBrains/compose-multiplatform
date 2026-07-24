@@ -106,7 +106,7 @@ private fun rememberDiscoveredCamera(): AVCaptureDevice? = remember {
     ).devices.firstOrNull() as? AVCaptureDevice
 }
 
-@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+@OptIn(ExperimentalForeignApi::class)
 @Composable
 private fun TrackCameraOrientation(
     cameraPreviewLayer: AVCaptureVideoPreviewLayer,
@@ -140,7 +140,6 @@ private class OrientationListener(
 ) : NSObject() {
     private var actualOrientation = AVCaptureVideoOrientationPortrait
 
-    @Suppress("UNUSED_PARAMETER")
     @ObjCAction
     fun orientationDidChange(arg: NSNotification) {
         val cameraConnection = cameraPreviewLayer.connection
@@ -154,7 +153,7 @@ private class OrientationListener(
     }
 }
 
-@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+@OptIn(ExperimentalForeignApi::class)
 @Composable
 private fun rememberAuthorizedCamera(camera: AVCaptureDevice): PlatformCamera {
     val capturePhotoOutput = remember { AVCapturePhotoOutput() }
@@ -193,7 +192,7 @@ private fun rememberAuthorizedCamera(camera: AVCaptureDevice): PlatformCamera {
     }
 }
 
-@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+@OptIn(ExperimentalForeignApi::class)
 private class IosPlatformCamera(
     private val camera: AVCaptureDevice,
     private val capturePhotoOutput: AVCapturePhotoOutput,
