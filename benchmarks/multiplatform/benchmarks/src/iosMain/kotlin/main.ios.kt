@@ -3,6 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeUIViewController
 import kotlinx.coroutines.MainScope
@@ -37,6 +38,9 @@ actual val isSvgSupported: Boolean = true
 @OptIn(ExperimentalComposeUiApi::class)
 fun MainViewController(): UIViewController {
     return ComposeUIViewController(configure = { parallelRendering = Config.parallelRendering }) {
+        LaunchedEffect(Unit) {
+            UIApplication.sharedApplication.setIdleTimerDisabled(true)
+        }
         BenchmarkRunner(getBenchmarks(), UIScreen.mainScreen.maximumFramesPerSecond.toInt(), { exitProcess(0) })
     }
 }
