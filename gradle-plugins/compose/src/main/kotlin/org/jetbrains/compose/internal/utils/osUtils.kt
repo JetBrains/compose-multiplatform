@@ -122,6 +122,10 @@ internal object MacUtils {
         File("/usr/bin/open").checkExistingFile()
     }
 
+    val plutil: File by lazy {
+        File("/usr/bin/plutil").checkExistingFile()
+    }
+
 }
 
 internal object UnixUtils {

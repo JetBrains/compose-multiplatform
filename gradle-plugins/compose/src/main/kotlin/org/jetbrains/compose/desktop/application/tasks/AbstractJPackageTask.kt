@@ -38,6 +38,7 @@ import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoP
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.InfoPlistMapValue
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder.InfoPlistValue.InfoPlistStringValue
 import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
+import org.jetbrains.compose.desktop.application.internal.MacAssetsTool
 import org.jetbrains.compose.desktop.application.internal.MacSigner
 import org.jetbrains.compose.desktop.application.internal.MacSignerImpl
 import org.jetbrains.compose.desktop.application.internal.NoCertificateSigner
@@ -301,7 +302,11 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     internal val fileAssociations: SetProperty<FileAssociation> = objects.setProperty(FileAssociation::class.java)
-    
+
+    @get:InputDirectory
+    @get:Optional
+    internal val macLayeredIcons: DirectoryProperty = objects.directoryProperty()
+
     private val iconMapping by lazy {
         val icons = fileAssociations.get().mapNotNull { it.iconFile }.distinct()
         if (icons.isEmpty()) return@lazy emptyMap()
@@ -351,6 +356,8 @@ abstract class AbstractJPackageTask @Inject constructor(
             } else NoCertificateSigner(runExternalTool)
         } else null
     }
+
+    private val macAssetsTool by lazy { MacAssetsTool(runExternalTool, logger) }
 
     @get:LocalState
     protected val signDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/sign")
@@ -616,12 +623,28 @@ abstract class AbstractJPackageTask @Inject constructor(
 
         fileOperations.clearDirs(jpackageResources)
         if (currentOS == OS.MacOS) {
+            val systemVersion = macMinimumSystemVersion.orNull ?: "10.13"
+
+            macLayeredIcons.ioFileOrNull?.let { layeredIcon ->
+                if (layeredIcon.exists()) {
+                    try {
+                        macAssetsTool.compileAssets(
+                            layeredIcon,
+                            workingDir.ioFile,
+                            systemVersion
+                        )
+                    } catch (e: Exception) {
+                        logger.warn("Can not compile layered icon: ${e.message}")
+                    }
+                }
+            }
+
             InfoPlistBuilder(macExtraPlistKeysRawXml.orNull)
                 .also { setInfoPlistValues(it) }
                 .writeToFile(jpackageResources.ioFile.resolve("Info.plist"))
 
             if (macAppStore.orNull == true) {
-                val systemVersion = macMinimumSystemVersion.orNull ?: "10.13"
+
                 val productDefPlistXml = """
                 <key>os</key>
                 <array>
@@ -657,6 +680,12 @@ abstract class AbstractJPackageTask @Inject constructor(
 
         val appDir = destinationDir.ioFile.resolve("${packageName.get()}.app")
         val runtimeDir = appDir.resolve("Contents/runtime")
+
+        macAssetsTool.assetsFile(workingDir.ioFile).apply {
+            if (exists()) {
+                copyTo(appDir.resolve("Contents/Resources/Assets.car"))
+            }
+        }
 
         // Add the provisioning profile
         macRuntimeProvisioningProfile.ioFileOrNull?.copyTo(
@@ -754,6 +783,10 @@ abstract class AbstractJPackageTask @Inject constructor(
                         PlistKeys.CFBundleTypeOSTypes to InfoPlistListValue(InfoPlistStringValue("****")),
                     )
                 }
+        }
+
+        if (macAssetsTool.assetsFile(workingDir.ioFile).exists()) {
+            macLayeredIcons.orNull?.let { plist[PlistKeys.CFBundleIconName] = it.asFile.name.removeSuffix(".icon") }
         }
     }
 }
