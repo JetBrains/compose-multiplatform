@@ -3,6 +3,8 @@ package example.map
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 
@@ -11,11 +13,9 @@ fun ContentRepository<Tile, ByteArray>.decorateWithDiskCache(
     cacheDir: File
 ): ContentRepository<Tile, ByteArray> {
 
-    class FileSystemLock()
-
     val origin = this
     val locksCount = 100
-    val locks = Array(locksCount) { FileSystemLock() }
+    val locks = List(locksCount) { Mutex() }
 
     fun getLock(key: Tile) = locks[key.hashCode() % locksCount]
 
@@ -40,7 +40,7 @@ fun ContentRepository<Tile, ByteArray>.decorateWithDiskCache(
             }
 
             val fromCache: ByteArray? = withContext(Dispatchers.IO) {
-                synchronized(getLock(key)) {
+                getLock(key).withLock {
                     if (file.exists()) {
                         try {
                             file.readBytes()
@@ -61,7 +61,7 @@ fun ContentRepository<Tile, ByteArray>.decorateWithDiskCache(
             } else {
                 val image = origin.loadContent(key)
                 backgroundScope.launch(Dispatchers.IO) {
-                    synchronized(getLock(key)) {
+                    getLock(key).withLock {
                         // save to cacheDir
                         try {
                             file.writeBytes(image)
