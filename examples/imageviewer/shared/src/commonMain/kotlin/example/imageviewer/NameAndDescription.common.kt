@@ -7,7 +7,7 @@ import imageviewer.shared.generated.resources.kotlin_conf_description
 import imageviewer.shared.generated.resources.kotlin_conf_name
 import imageviewer.shared.generated.resources.new_photo_description
 import imageviewer.shared.generated.resources.new_photo_name
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone

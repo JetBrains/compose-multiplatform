@@ -31,7 +31,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import java.awt.Desktop
-import java.net.URL
+import java.net.URI
 
 data class MapState(
     val latitude: Double,
@@ -253,7 +253,7 @@ private fun LinkText(text: String, link: String) {
 }
 
 private fun navigateToUrl(url: String) {
-    Desktop.getDesktop().browse(URL(url).toURI())
+    Desktop.getDesktop().browse(URI(url))
 }
 
 private var inMemoryCache: Map<Tile, TileImage> by mutableStateOf(mapOf())

@@ -10,6 +10,6 @@ fun createRealRepository(ktorClient: HttpClient) =
         override suspend fun loadContent(tile: Tile): ByteArray {
             return ktorClient.get(
                 urlString = Config.createTileUrl(tile)
-            ).readBytes()
+            ).readRawBytes()
         }
     }

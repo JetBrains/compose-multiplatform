@@ -1,8 +1,8 @@
 package example.imageviewer.model
 
 import example.imageviewer.createUUID
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
+import kotlin.time.Clock
+import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
@@ -44,7 +44,7 @@ sealed interface PictureData {
                 val monthStr = date.month.name.lowercase()
                     .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
                     .take(3)
-                val dayStr = date.dayOfMonth
+                val dayStr = date.day
                 return "$dayStr $monthStr."
             }
     }
