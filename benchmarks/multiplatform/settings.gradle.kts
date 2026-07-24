@@ -80,15 +80,17 @@ data class Version(
 /**
  * Selects the appropriate compose-scene-impl module based on the Compose Multiplatform version.
  *
- * - compose-scene-impl-1: for versions before compose-multiplatform-core#3012
+ * - compose-scene-impl-1: baseline, for versions before compose-multiplatform-core#3012.
  *   Uses CanvasLayersComposeScene and ComposeScene.render(canvas, nanoTime)
  *
- * - compose-scene-impl-2: for versions after compose-multiplatform-core#3012
+ * - compose-scene-impl-2: from compose-multiplatform-core#3012.
  *   Uses FrameRecomposer + ComposeScene.measureAndLayout() + ComposeScene.draw(canvas)
  *
- * The breaking change (PR #3012) was introduced between dev builds 4213 and 4221
- * of 1.12.0-alpha02, so dev builds before dev4221 still use the old API.
- * 1.12.0-alpha01 also uses the old API (before the PR).
+ * - compose-scene-impl-3: from compose-multiplatform-core#3126.
+ *   Same scene API as impl-2, plus registerSkikoComposeImplementation() before creating a scene
+ *
+ * A module is a self-contained copy of the previous one: the duplication is deliberate, so that
+ * adapting to a new API never touches the modules older versions still build against.
  *
  * The selected module is included as ":compose-scene-impl" so that the benchmarks module
  * always depends on ":compose-scene-impl" regardless of which actual module is used.
@@ -109,22 +111,36 @@ fun resolveComposeVersion(): String {
     error("Could not find compose-multiplatform version in gradle/libs.versions.toml")
 }
 
-// The PR #3012 landed between dev4213 and dev4221 of 1.12.0-alpha02.
-// buildMetadata ("+devNNNN") is not part of semver comparison, so we handle it explicitly.
-val PR_3012_VERSION_BARRIER = Version.parse("1.12.0-alpha02")
-val PR_3012_MIN_DEV_BUILD = 4221
+data class SceneImplBarrier(val version: Version, val minDevBuild: Int, val moduleDir: String)
 
-fun isAfterPR3012(version: Version): Boolean {
-    if (version > PR_3012_VERSION_BARRIER) return true
-    if (version < PR_3012_VERSION_BARRIER) return false
-    // Exact match on 1.12.0-alpha02: check dev build number
-    val devBuild = version.buildMetadata?.removePrefix("dev")?.toIntOrNull()
-    // No +devNNNN suffix means released alpha02 which includes PR #3012
-    return devBuild == null || devBuild >= PR_3012_MIN_DEV_BUILD
+/**
+ * Barriers ordered from oldest to newest; the newest one the resolved version has reached wins,
+ * and [BASELINE_SCENE_IMPL_DIR] is used by versions that reached none of them.
+ */
+val SCENE_IMPL_BARRIERS = listOf(
+    // ComposeScene.render(canvas, nanoTime) was split into FrameRecomposer.performFrame(),
+    // ComposeScene.measureAndLayout() and ComposeScene.draw(canvas) between dev4213 and dev4221.
+    // 1.12.0-alpha01 still uses the old API.
+    SceneImplBarrier(Version.parse("1.12.0-alpha02"), 4221, "compose-scene-impl-2"),
+    // The Skiko graphics and text implementation moved into the ui-skiko module and has to be
+    // registered at runtime via registerSkikoComposeImplementation().
+    SceneImplBarrier(Version.parse("1.12.10-alpha01"), 4534, "compose-scene-impl-3"),
+)
+
+val BASELINE_SCENE_IMPL_DIR = "compose-scene-impl-1"
+
+fun Version.hasReached(barrier: SceneImplBarrier): Boolean {
+    if (this > barrier.version) return true
+    if (this < barrier.version) return false
+    // Exact match on the barrier version: no +devNNNN suffix means the released version,
+    // which includes the change.
+    val devBuild = buildMetadata?.removePrefix("dev")?.toIntOrNull() ?: return true
+    return devBuild >= barrier.minDevBuild
 }
 
 val composeVersion = Version.parse(resolveComposeVersion())
-val implDir = if (isAfterPR3012(composeVersion)) "compose-scene-impl-2" else "compose-scene-impl-1"
+val implDir = SCENE_IMPL_BARRIERS.lastOrNull { composeVersion.hasReached(it) }?.moduleDir
+    ?: BASELINE_SCENE_IMPL_DIR
 
 include(":compose-scene-impl")
 project(":compose-scene-impl").projectDir = file(implDir)
