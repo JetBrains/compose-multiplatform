@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.job
-import kotlinx.coroutines.launch
 import java.awt.Desktop
 import java.net.URI
 
@@ -96,31 +95,26 @@ fun MapView(
             .copyAndChangeCenter(center)
     }
     val displayTiles: List<DisplayTileWithImage<TileImage>> by derivedStateOf {
-        val calcTiles: List<DisplayTileAndTile> = internalState.calcTiles()
-        val tilesToDisplay: MutableList<DisplayTileWithImage<TileImage>> = mutableListOf()
-        val tilesToLoad: MutableSet<Tile> = mutableSetOf()
-        calcTiles.forEach {
-            val cachedImage = inMemoryCache[it.tile]
-            if (cachedImage != null) {
-                tilesToDisplay.add(DisplayTileWithImage(it.display, cachedImage, it.tile))
-            } else {
-                tilesToLoad.add(it.tile)
-                val croppedImage = inMemoryCache.searchOrCrop(it.tile)
-                tilesToDisplay.add(DisplayTileWithImage(it.display, croppedImage, it.tile))
+        internalState.calcTiles().map {
+            val cachedImage = inMemoryCache[it.tile] ?: inMemoryCache.searchOrCrop(it.tile)
+            DisplayTileWithImage(it.display, cachedImage, it.tile)
+        }
+    }
+
+    LaunchedEffect(internalState) {
+        val tilesToLoad: Set<Tile> = internalState.calcTiles()
+            .map { it.tile }
+            .filterNot { it in inMemoryCache }
+            .toSet()
+        tilesToLoad.forEach { tile ->
+            try {
+                val image: TileImage = imageRepository.loadContent(tile)
+                inMemoryCache = inMemoryCache + (tile to image)
+            } catch (t: Throwable) {
+                println("exception in tiles loading, throwable: $t")
+                // ignore errors. Tile image loaded with retries
             }
         }
-        viewScope.launch {
-            tilesToLoad.forEach { tile ->
-                try {
-                    val image: TileImage = imageRepository.loadContent(tile)
-                    inMemoryCache = inMemoryCache + (tile to image)
-                } catch (t: Throwable) {
-                    println("exception in tiles loading, throwable: $t")
-                    // ignore errors. Tile image loaded with retries
-                }
-            }
-        }
-        tilesToDisplay
     }
 
     val onZoom = { pt: DisplayPoint?, change: Double ->

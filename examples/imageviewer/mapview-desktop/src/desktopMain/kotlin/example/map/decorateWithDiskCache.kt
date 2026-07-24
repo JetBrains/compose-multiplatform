@@ -1,7 +1,9 @@
 package example.map
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 fun ContentRepository<Tile, ByteArray>.decorateWithDiskCache(
@@ -37,18 +39,20 @@ fun ContentRepository<Tile, ByteArray>.decorateWithDiskCache(
                 cacheDir.resolve("tile-$zoom-$x-$y.png")
             }
 
-            val fromCache: ByteArray? = synchronized(getLock(key)) {
-                if (file.exists()) {
-                    try {
-                        file.readBytes()
-                    } catch (t: Throwable) {
-                        t.printStackTrace()
-                        println("Can't read file $file")
-                        println("Will work without disk cache")
+            val fromCache: ByteArray? = withContext(Dispatchers.IO) {
+                synchronized(getLock(key)) {
+                    if (file.exists()) {
+                        try {
+                            file.readBytes()
+                        } catch (t: Throwable) {
+                            t.printStackTrace()
+                            println("Can't read file $file")
+                            println("Will work without disk cache")
+                            null
+                        }
+                    } else {
                         null
                     }
-                } else {
-                    null
                 }
             }
 
@@ -56,7 +60,7 @@ fun ContentRepository<Tile, ByteArray>.decorateWithDiskCache(
                 fromCache
             } else {
                 val image = origin.loadContent(key)
-                backgroundScope.launch {
+                backgroundScope.launch(Dispatchers.IO) {
                     synchronized(getLock(key)) {
                         // save to cacheDir
                         try {
