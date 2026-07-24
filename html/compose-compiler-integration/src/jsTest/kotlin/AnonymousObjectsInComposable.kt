@@ -18,7 +18,7 @@ class AnonymousObjectsInComposable {
             content.Abc()
         }
 
-        assertEquals("<div>Abc</div>", document.body!!.firstElementChild!!.outerHTML)
+        assertEquals("<div>Abc</div>", document.body!!.lastElementChild!!.outerHTML)
     }
 
     @Test
@@ -30,7 +30,7 @@ class AnonymousObjectsInComposable {
             HasLocalClassWithComposable()
         }
 
-        assertEquals("<div>Abc2</div>", document.body!!.firstElementChild!!.outerHTML)
+        assertEquals("<div>Abc2</div>", document.body!!.lastElementChild!!.outerHTML)
     }
 
     @Test
@@ -41,7 +41,7 @@ class AnonymousObjectsInComposable {
             TestConstructor { return@TestConstructor 111 }.otherComposable!!.invoke()
         }
 
-        assertEquals("<div>Abc223-111</div>", document.body!!.firstElementChild!!.outerHTML)
+        assertEquals("<div>Abc223-111</div>", document.body!!.lastElementChild!!.outerHTML)
     }
 }
 
