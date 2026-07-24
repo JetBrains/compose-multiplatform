@@ -11,11 +11,11 @@ import androidx.core.content.FileProvider
 import androidx.core.graphics.scale
 import example.imageviewer.ImageStorage
 import example.imageviewer.PlatformStorableImage
+import example.imageviewer.ioDispatcher
 import example.imageviewer.model.PictureData
 import example.imageviewer.toImageBitmap
 import imageviewer.shared.generated.resources.Res
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -59,47 +59,45 @@ class AndroidImageStorage(
         }
     }
 
-    override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
+    override suspend fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
         if (image.imageBitmap.width == 0 || image.imageBitmap.height == 0) {
             return
         }
-        ioScope.launch {
+        ioScope.launch(ioDispatcher) {
             with(image.imageBitmap) {
                 picture.jpgFile.writeJpeg(fitInto(maxStorableImageSizePx))
                 picture.thumbnailJpgFile.writeJpeg(fitInto(storableThumbnailSizePx))
-
             }
-            pictures.add(0, picture)
             picture.jsonFile.writeText(picture.toJson())
-        }
+        }.join()
     }
 
-    override fun delete(picture: PictureData.Camera) {
-        ioScope.launch {
+    override suspend fun delete(picture: PictureData.Camera) {
+        ioScope.launch(ioDispatcher) {
             picture.jsonFile.delete()
             picture.jpgFile.delete()
             picture.thumbnailJpgFile.delete()
-        }
+        }.join()
     }
 
-    override fun rewrite(picture: PictureData.Camera) {
-        ioScope.launch {
+    override suspend fun rewrite(picture: PictureData.Camera) {
+        ioScope.launch(ioDispatcher) {
             picture.jsonFile.delete()
             picture.jsonFile.writeText(picture.toJson())
-        }
+        }.join()
     }
 
     override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap =
-        withContext(ioScope.coroutineContext) {
+        withContext(ioDispatcher) {
             picture.thumbnailJpgFile.readBytes().toImageBitmap()
         }
 
     override suspend fun getImage(picture: PictureData.Camera): ImageBitmap =
-        withContext(ioScope.coroutineContext) {
+        withContext(ioDispatcher) {
             picture.jpgFile.readBytes().toImageBitmap()
         }
 
-    suspend fun getUri(context: Context, picture: PictureData): Uri = withContext(Dispatchers.IO) {
+    suspend fun getUri(context: Context, picture: PictureData): Uri = withContext(ioDispatcher) {
         if (!sharedImagesDir.exists()) {
             sharedImagesDir.mkdirs()
         }

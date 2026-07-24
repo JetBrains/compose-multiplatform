@@ -44,15 +44,15 @@ private fun getDependencies(
     context: Context,
     ioScope: CoroutineScope,
 ) = object : Dependencies() {
-    override val notification: Notification = object : PopupNotification(ioScope) {
+    override val notification: Notification = object : PopupNotification() {
         override fun showPopUpMessage(text: String) {
             Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
         }
     }
     override val imageStorage: AndroidImageStorage = AndroidImageStorage(pictures, ioScope, context)
     override val sharePicture: SharePicture = object : SharePicture {
-        override fun share(context: PlatformContext, picture: PictureData) {
-            ioScope.launch {
+        override suspend fun share(context: PlatformContext, picture: PictureData) {
+            ioScope.launch(ioDispatcher) {
                 val shareIntent: Intent = Intent().apply {
                     action = Intent.ACTION_SEND
                     putExtra(
@@ -69,7 +69,7 @@ private fun getDependencies(
                 withContext(Dispatchers.Main) {
                     context.androidContext.startActivity(Intent.createChooser(shareIntent, null))
                 }
-            }
+            }.join()
         }
     }
 }

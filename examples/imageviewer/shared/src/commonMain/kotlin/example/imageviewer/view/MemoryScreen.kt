@@ -37,6 +37,7 @@ import example.imageviewer.isShareFeatureSupported
 import example.imageviewer.model.*
 import example.imageviewer.shareIcon
 import example.imageviewer.style.LocalImageviewerColors
+import kotlinx.coroutines.launch
 
 @Composable
 fun MemoryScreen(
@@ -48,6 +49,7 @@ fun MemoryScreen(
 ) {
     val imageProvider = LocalImageProvider.current
     val sharePicture = LocalSharePicture.current
+    val scope = rememberCoroutineScope()
     var edit: Boolean by remember { mutableStateOf(false) }
     val picture = pictures.getOrNull(memoryPage.pictureIndex) ?: return
     var headerImage: ImageBitmap? by remember(picture) { mutableStateOf(null) }
@@ -124,15 +126,19 @@ fun MemoryScreen(
                     Spacer(Modifier.height(50.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                         IconWithText(Icons.Default.Delete, "Delete") {
-                            imageProvider.delete(picture)
-                            onBack(true)
+                            scope.launch {
+                                imageProvider.delete(picture)
+                                onBack(true)
+                            }
                         }
                         IconWithText(Icons.Default.Edit, "Edit") {
                             edit = true
                         }
                         if (isShareFeatureSupported) {
                             IconWithText(shareIcon, "Share") {
-                                sharePicture.share(platformContext, picture)
+                                scope.launch {
+                                    sharePicture.share(platformContext, picture)
+                                }
                             }
                         }
                     }
@@ -150,8 +156,10 @@ fun MemoryScreen(
         )
         if (edit) {
             EditMemoryDialog(picture.name, picture.description) { name, description ->
-                imageProvider.edit(picture, name, description)
-                edit = false
+                scope.launch {
+                    imageProvider.edit(picture, name, description)
+                    edit = false
+                }
             }
         }
     }

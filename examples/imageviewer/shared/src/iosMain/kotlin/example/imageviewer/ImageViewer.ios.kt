@@ -41,7 +41,7 @@ internal fun ImageViewerIos() {
 
 fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) =
     object : Dependencies() {
-        override val notification: Notification = object : PopupNotification(ioScope) {
+        override val notification: Notification = object : PopupNotification() {
             override fun showPopUpMessage(text: String) {
                 toastState.value = ToastState.Shown(text)
             }
@@ -50,8 +50,8 @@ fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState
         override val imageStorage: IosImageStorage = IosImageStorage(pictures, ioScope)
 
         override val sharePicture: SharePicture = object : SharePicture {
-            override fun share(context: PlatformContext, picture: PictureData) {
-                ioScope.launch {
+            override suspend fun share(context: PlatformContext, picture: PictureData) {
+                ioScope.launch(ioDispatcher) {
                     imageStorage.getNSURLToShare(picture).path?.let { imageUrl ->
                         withContext(Dispatchers.Main) {
                             val window = UIApplication.sharedApplication.windows.last() as? UIWindow
@@ -70,7 +70,7 @@ fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState
                             )
                         }
                     }
-                }
+                }.join()
             }
         }
     }

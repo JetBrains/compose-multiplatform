@@ -8,15 +8,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import example.imageviewer.LocalImageProvider
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun CameraScreen(onBack: (resetSelectedPicture: Boolean) -> Unit) {
     val imageProvider = LocalImageProvider.current
+    val scope = rememberCoroutineScope()
     var showCamera by remember { mutableStateOf(false) }
     LaunchedEffect(onBack) {
         if (!showCamera) {
@@ -27,8 +30,10 @@ fun CameraScreen(onBack: (resetSelectedPicture: Boolean) -> Unit) {
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         if (showCamera) {
             CameraCaptureFrame(Modifier.fillMaxSize(), onCapture = { picture, image ->
-                imageProvider.saveImage(picture, image)
-                onBack(true)
+                scope.launch {
+                    imageProvider.saveImage(picture, image)
+                    onBack(true)
+                }
             })
         }
         TopLayout(

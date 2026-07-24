@@ -263,6 +263,7 @@ private fun ListGalleryView(
     onFullScreen: (index: Int) -> Unit,
 ) {
     val notification = LocalNotification.current
+    val scope = rememberCoroutineScope()
     ScrollableColumn(
         modifier = Modifier.fillMaxSize().testTag("listGalleryView")
     ) {
@@ -277,7 +278,7 @@ private fun ListGalleryView(
                     onFullScreen(p.index)
                 },
                 onClickInfo = {
-                    notification.notifyImageData(p.value)
+                    scope.launch { notification.notifyImageData(p.value) }
                 },
             )
             Spacer(modifier = Modifier.height(10.dp))
