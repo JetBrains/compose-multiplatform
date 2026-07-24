@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import example.imageviewer.icon.IconCustomArrowBack
-import example.imageviewer.style.ImageviewerColors
+import example.imageviewer.style.LocalImageviewerColors
 import imageviewer.shared.generated.resources.Res
 import imageviewer.shared.generated.resources.back
 import org.jetbrains.compose.resources.stringResource
@@ -30,7 +30,7 @@ fun CircularButton(
         modifier
             .size(60.dp)
             .clip(CircleShape)
-            .background(ImageviewerColors.uiLightBlack)
+            .background(LocalImageviewerColors.current.uiLightBlack)
             .run {
                 if (enabled) {
                     clickable { onClick() }

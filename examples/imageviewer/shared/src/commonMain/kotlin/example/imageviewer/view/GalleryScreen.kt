@@ -40,7 +40,7 @@ import example.imageviewer.LocalNotification
 import example.imageviewer.icon.IconMenu
 import example.imageviewer.icon.IconVisibility
 import example.imageviewer.model.PictureData
-import example.imageviewer.style.ImageviewerColors
+import example.imageviewer.style.LocalImageviewerColors
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
@@ -233,14 +233,14 @@ fun SquareThumbnail(
             easing = LinearOutSlowInEasing,
         )
         AnimatedVisibility(isHighlighted, enter = fadeIn(tween), exit = fadeOut(tween)) {
-            Box(Modifier.fillMaxSize().background(ImageviewerColors.uiLightBlack)) {
+            Box(Modifier.fillMaxSize().background(LocalImageviewerColors.current.uiLightBlack)) {
                 Box(
                     Modifier
                         .align(Alignment.BottomEnd)
                         .padding(end = 4.dp, bottom = 4.dp)
                         .clip(CircleShape)
                         .width(32.dp)
-                        .background(ImageviewerColors.uiLightBlack)
+                        .background(LocalImageviewerColors.current.uiLightBlack)
                         .aspectRatio(1.0f)
                         .clickable {
                             onClick()

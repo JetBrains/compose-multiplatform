@@ -36,7 +36,7 @@ import example.imageviewer.icon.IconAutoFixHigh
 import example.imageviewer.isShareFeatureSupported
 import example.imageviewer.model.*
 import example.imageviewer.shareIcon
-import example.imageviewer.style.ImageviewerColors
+import example.imageviewer.style.LocalImageviewerColors
 
 @Composable
 fun MemoryScreen(
@@ -176,7 +176,7 @@ private fun IconWithText(icon: ImageVector, text: String, onClick: () -> Unit) {
         Text(
             text = text,
             textAlign = TextAlign.Left,
-            color = ImageviewerColors.onBackground,
+            color = LocalImageviewerColors.current.onBackground,
             fontSize = 14.sp,
             fontWeight = FontWeight.Normal
         )
@@ -258,7 +258,7 @@ fun Collapsible(s: String, onEdit: () -> Unit) {
         modifier = Modifier
             .padding(10.dp, 0.dp)
             .clip(RoundedCornerShape(10.dp))
-            .background(ImageviewerColors.noteBlockBackground)
+            .background(LocalImageviewerColors.current.noteBlockBackground)
             .padding(10.dp)
             .animateContentSize(
                 animationSpec = spring(
@@ -284,7 +284,7 @@ fun Headliner(s: String) {
         text = s,
         fontWeight = FontWeight.SemiBold,
         fontSize = 20.sp,
-        color = Color.Black,
+        color = LocalImageviewerColors.current.onBackground,
         modifier = Modifier.padding(start = 12.dp, top = 32.dp, end = 12.dp, bottom = 16.dp)
     )
 }

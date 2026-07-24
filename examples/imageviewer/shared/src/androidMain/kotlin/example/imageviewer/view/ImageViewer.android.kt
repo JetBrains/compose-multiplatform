@@ -3,9 +3,12 @@ package example.imageviewer.view
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import example.imageviewer.Dependencies
 import example.imageviewer.ImageViewerCommon
@@ -31,7 +34,9 @@ fun ImageViewerAndroid() {
         getDependencies(context, ioScope)
     }
     ImageViewerTheme {
-        ImageViewerCommon(dependencies)
+        Surface(modifier = Modifier.fillMaxSize()) {
+            ImageViewerCommon(dependencies)
+        }
     }
 }
 
