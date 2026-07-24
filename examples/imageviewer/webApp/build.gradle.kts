@@ -40,22 +40,13 @@ kotlin {
     }
 
     sourceSets {
-        val webMain by creating {
-            dependsOn(commonMain.get())
-            dependencies {
-                implementation(project(":shared"))
-                implementation(libs.compose.runtime)
-                implementation(libs.compose.ui)
-                implementation(libs.compose.foundation)
-                implementation(libs.compose.material)
-                implementation(libs.components.resources)
-            }
-        }
-        val jsMain by getting {
-            dependsOn(webMain)
-        }
-        val wasmJsMain by getting {
-            dependsOn(webMain)
+        webMain.dependencies {
+            implementation(project(":shared"))
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material)
+            implementation(libs.components.resources)
         }
     }
 }
