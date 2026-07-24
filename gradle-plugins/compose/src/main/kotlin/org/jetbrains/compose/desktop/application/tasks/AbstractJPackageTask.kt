@@ -377,6 +377,11 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Internal
     val appResourcesDir: DirectoryProperty = objects.directoryProperty()
 
+    @get:InputDirectory
+    @get:Optional
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    val packagingResourcesRootDir: DirectoryProperty = objects.directoryProperty()
+
     @get:Internal
     private val libsMappingFile: Provider<RegularFile> = workingDir.map {
         it.file("libs-mapping.txt")
@@ -615,6 +620,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
 
         fileOperations.clearDirs(jpackageResources)
+        copyUserPackagingResources()
         if (currentOS == OS.MacOS) {
             InfoPlistBuilder(macExtraPlistKeysRawXml.orNull)
                 .also { setInfoPlistValues(it) }
@@ -630,6 +636,33 @@ abstract class AbstractJPackageTask @Inject constructor(
                 """.trimIndent()
                 InfoPlistBuilder(productDefPlistXml)
                     .writeToFile(jpackageResources.ioFile.resolve("product-def.plist"))
+            }
+        }
+    }
+
+    /**
+     * Copies user-supplied packaging override resources into [jpackageResources]
+     * (the `--resource-dir` passed to jpackage). Files are taken from the `common`,
+     * `<os>` and `<os>-<arch>` subdirectories of [packagingResourcesRootDir], mirroring
+     * the layout of `appResourcesRootDir`. Called after [jpackageResources] is cleared
+     * but before the generated `Info.plist`/`product-def.plist` are written, so those
+     * Compose-managed files always win over anything the user drops in.
+     */
+    private fun copyUserPackagingResources() {
+        val rootDir = packagingResourcesRootDir.ioFileOrNull ?: return
+        val destDir = jpackageResources.ioFile
+        for (subDirName in listOf("common", currentOS.id, currentTarget.id)) {
+            val sourceDir = rootDir.resolve(subDirName)
+            if (!sourceDir.isDirectory) continue
+            for (file in sourceDir.walk()) {
+                val relPath = file.relativeTo(sourceDir).path
+                if (relPath.isEmpty()) continue
+                val destFile = destDir.resolve(relPath)
+                if (file.isDirectory) {
+                    fileOperations.mkdirs(destFile)
+                } else {
+                    file.copyTo(destFile, overwrite = true)
+                }
             }
         }
     }
