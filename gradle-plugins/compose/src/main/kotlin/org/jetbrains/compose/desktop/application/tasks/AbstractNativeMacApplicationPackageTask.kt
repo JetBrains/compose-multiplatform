@@ -10,16 +10,18 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import org.jetbrains.compose.internal.utils.*
 import java.io.File
 
+@DisableCachingByDefault(because = "Uses platform-specific native tools whose output depends on local system")
 abstract class AbstractNativeMacApplicationPackageTask : AbstractComposeDesktopTask() {
     @get:Input
-    val packageName: Property<String> = objects.notNullProperty()
+    val packageName: Property<String> = objects.property()
 
     @get:Input
-    val packageVersion: Property<String> = objects.notNullProperty("1.0.0")
+    val packageVersion: Property<String> = objects.property<String>().value("1.0.0")
 
     @get:Internal
     internal val fullPackageName: Provider<String> =

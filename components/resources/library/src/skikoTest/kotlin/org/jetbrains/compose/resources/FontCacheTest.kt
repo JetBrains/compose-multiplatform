@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.platform.LoadedFont
+import androidx.compose.ui.text.platform.PlatformFont
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
@@ -33,11 +33,11 @@ class FontCacheTest {
                 )
             }
         }
-        waitForIdle()
+        waitResources()
         res = TestFontResource(font2)
-        waitForIdle()
+        waitResources()
         res = TestFontResource(font1)
-        waitForIdle()
+        waitResources()
 
         assertEquals(
             expected = listOf(font1, font2), //no second read of font_awesome.otf
@@ -47,9 +47,9 @@ class FontCacheTest {
         ResourceCaches.clear()
 
         res = TestFontResource(font2)
-        waitForIdle()
+        waitResources()
         res = TestFontResource(font1)
-        waitForIdle()
+        waitResources()
 
         assertEquals(
             expected = listOf(font1, font2, font2, font1), //read fonts again
@@ -71,18 +71,18 @@ class FontCacheTest {
                 LocalComposeEnvironment provides TestComposeEnvironment
             ) {
                 val font = Font(res)
-                fontIdentity = (font as LoadedFont).identity
+                fontIdentity = (font as PlatformFont).identity
                 Text(
                     fontFamily = FontFamily(font),
                     text = "Hello"
                 )
             }
         }
-        waitForIdle()
+        waitResources()
         val id1 = fontIdentity
 
         res = TestFontResource(font2)
-        waitForIdle()
+        waitResources()
 
         val id2 = fontIdentity
 
@@ -92,7 +92,7 @@ class FontCacheTest {
 
         testResourceReader.replaceNextReadWith(font2)
         res = TestFontResource(font1)
-        waitForIdle()
+        waitResources()
 
         val id3 = fontIdentity
         assertNotEquals(id1, id3)

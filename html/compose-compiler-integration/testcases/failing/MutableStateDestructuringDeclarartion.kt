@@ -1,6 +1,6 @@
 // @Module:Main
 
-// https://github.com/JetBrains/compose-jb/issues/1436
+// https://youtrack.jetbrains.com/issue/CMP-5176
 
 import kotlin.reflect.KProperty
 import androidx.compose.runtime.*

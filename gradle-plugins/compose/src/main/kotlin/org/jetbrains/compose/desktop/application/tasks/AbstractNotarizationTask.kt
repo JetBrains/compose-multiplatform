@@ -7,6 +7,7 @@ package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.*
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.desktop.application.dsl.MacOSNotarizationSettings
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.files.checkExistingFile
@@ -19,6 +20,7 @@ import org.jetbrains.compose.internal.utils.ioFile
 import java.io.File
 import javax.inject.Inject
 
+@DisableCachingByDefault(because = "Notarization task communicates with Apple's notarization service and cannot be cached")
 abstract class AbstractNotarizationTask @Inject constructor(
     @get:Input
     val targetFormat: TargetFormat
@@ -29,6 +31,7 @@ abstract class AbstractNotarizationTask @Inject constructor(
     internal var nonValidatedNotarizationSettings: MacOSNotarizationSettings? = null
 
     @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     val inputDir: DirectoryProperty = objects.directoryProperty()
 
     init {

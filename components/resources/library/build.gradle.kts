@@ -1,53 +1,66 @@
 import kotlinx.validation.ExperimentalBCVApi
-import org.jetbrains.compose.ExperimentalComposeLibrary
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.compose")
     id("maven-publish")
-    id("com.android.library")
+    id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.kotlinx.binary-compatibility-validator")
 }
 
 kotlin {
     jvm("desktop")
-    androidTarget {
-        publishLibraryVariants("release")
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
+    android {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
+        namespace = "org.jetbrains.compose.components.resources"
+        compileSdk = 37
+        minSdk = 23
+
+        androidResources.enable = true
+
+        withHostTest {
+            isIncludeAndroidResources = true
+        }
+
+        withDeviceTest {
+            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+            @Suppress("UnstableApiUsage")
+            managedDevices.localDevices.create("pixel5") {
+                device = "Pixel 5"
+                apiLevel = 31
+                systemImageSource = "aosp"
             }
         }
     }
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
     js {
         browser {
-            testTask(Action {
-                enabled = false
-            })
+            testTask {
+                useKarma { useChromeHeadless() }
+            }
         }
     }
 
-    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+    @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         compilations.getByName("test").compileTaskProvider.configure {
             // https://youtrack.jetbrains.com/issue/KT-69014
             compilerOptions.freeCompilerArgs.add("-Xwasm-enable-array-range-checks")
         }
         browser {
-            testTask(Action {
-                useKarma {
-                    useChromeHeadless()
-                    useConfigDirectory(project.projectDir.resolve("karma.config.d").resolve("wasm"))
-                }
-            })
+            testTask {
+                useKarma { useChromeHeadless() }
+            }
         }
         binaries.executable()
     }
-    macosX64()
     macosArm64()
 
     applyDefaultHierarchyTemplate()
@@ -73,8 +86,8 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                implementation(compose.runtime)
-                implementation(compose.foundation)
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.foundation)
                 implementation(libs.kotlinx.coroutines.core)
             }
         }
@@ -82,9 +95,8 @@ kotlin {
             dependencies {
                 implementation(kotlin("test"))
                 implementation(libs.kotlinx.coroutines.test)
-                implementation(compose.material3)
-                @OptIn(ExperimentalComposeLibrary::class)
-                implementation(compose.uiTest)
+                implementation(libs.compose.material3)
+                implementation(libs.compose.ui.test)
             }
         }
         val blockingMain by creating {
@@ -113,7 +125,7 @@ kotlin {
             dependsOn(skikoTest)
             dependsOn(jvmAndAndroidTest)
             dependencies {
-                implementation(compose.desktop.currentOs)
+                implementation(libs.compose.desktop.jvm)
             }
         }
         val androidMain by getting {
@@ -123,7 +135,7 @@ kotlin {
                 compileOnly(libs.androidx.test.monitor)
             }
         }
-        val androidInstrumentedTest by getting {
+        val androidDeviceTest by getting {
             dependsOn(jvmAndAndroidTest)
             dependencies {
                 implementation(libs.androidx.test.core)
@@ -131,9 +143,11 @@ kotlin {
                 implementation(libs.androidx.compose.ui.test.manifest)
                 implementation(libs.androidx.compose.ui.test.junit4)
             }
+            resources.srcDir("src/commonTest/resources")
         }
-        val androidUnitTest by getting {
+        val androidHostTest by getting {
             dependsOn(jvmAndAndroidTest)
+            resources.srcDir("src/commonTest/resources")
         }
         val nativeMain by getting {
             dependsOn(skikoMain)
@@ -143,58 +157,12 @@ kotlin {
             dependsOn(skikoTest)
             dependsOn(blockingTest)
         }
-        val webMain by creating {
+        val webMain by getting {
             dependsOn(skikoMain)
-        }
-        val jsMain by getting {
-            dependsOn(webMain)
-        }
-        val wasmJsMain by getting {
-            dependsOn(webMain)
-        }
-        val webTest by creating {
-            dependsOn(skikoTest)
-        }
-        val jsTest by getting {
-            dependsOn(webTest)
-        }
-        val wasmJsTest by getting {
-            dependsOn(webTest)
-        }
-    }
-}
-
-android {
-    compileSdk = 35
-    namespace = "org.jetbrains.compose.components.resources"
-    defaultConfig {
-        minSdk = 21
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    @Suppress("UnstableApiUsage")
-    testOptions {
-        managedDevices {
-            devices {
-                maybeCreate<com.android.build.api.dsl.ManagedVirtualDevice>("pixel5").apply {
-                    device = "Pixel 5"
-                    apiLevel = 31
-                    systemImageSource = "aosp"
-                }
+            dependencies {
+                 implementation(libs.kotlinx.browser)
             }
         }
-    }
-    sourceSets {
-        val commonTestResources = "src/commonTest/resources"
-        named("androidTest") {
-            resources.srcDir(commonTestResources)
-            assets.srcDir("src/androidInstrumentedTest/assets")
-        }
-        named("test") { resources.srcDir(commonTestResources) }
-        named("main") { manifest.srcFile("src/androidMain/AndroidManifest.xml") }
     }
 }
 

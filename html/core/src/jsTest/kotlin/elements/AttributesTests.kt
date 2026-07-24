@@ -485,7 +485,7 @@ class AttributesTests {
         )
     }
 
-    @Test // issue: https://github.com/JetBrains/compose-jb/issues/981
+    @Test // issue: https://youtrack.jetbrains.com/issue/CMP-6338
     fun attributesUpdateShouldNotCauseInlineStylesCleanUp() = runTest {
         var hasValue by mutableStateOf(false)
 

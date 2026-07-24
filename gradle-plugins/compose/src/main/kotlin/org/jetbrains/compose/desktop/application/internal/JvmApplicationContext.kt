@@ -10,6 +10,7 @@ import org.gradle.api.Task
 import org.gradle.api.file.Directory
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.desktop.application.dsl.JvmApplicationBuildType
+import org.jetbrains.compose.desktop.application.dsl.JvmApplicationBuildTypes
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.javaSourceSets
@@ -34,6 +35,9 @@ internal data class JvmApplicationContext(
             "compose/tmp/$appDirName"
         )
 
+    val buildTypes: JvmApplicationBuildTypes
+        get() = appInternal.buildTypes
+
     fun <T : Task> T.useAppRuntimeFiles(fn: T.(JvmApplicationRuntimeFiles) -> Unit) {
         val runtimeFiles = app.jvmApplicationRuntimeFilesProvider?.jvmApplicationRuntimeFiles(project)
             ?: JvmApplicationRuntimeFiles(
@@ -51,6 +55,10 @@ internal data class JvmApplicationContext(
 
     inline fun <reified T> provider(noinline fn: () -> T): Provider<T> =
         project.provider(fn)
+
+    @Suppress("UNCHECKED_CAST")
+    inline fun <reified T : Any> nullableProvider(noinline fn: () -> T?): Provider<T> =
+        project.provider(fn) as Provider<T>
 
     fun configureDefaultApp() {
         if (project.plugins.hasPlugin(KOTLIN_MPP_PLUGIN_ID)) {

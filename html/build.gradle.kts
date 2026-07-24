@@ -1,21 +1,24 @@
+import jetbrains.compose.web.gradle.SeleniumDriverPlugin
 import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.compose.gradle.kotlinKarmaConfig
-import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
-import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.targets
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("multiplatform") apply false
 }
 
 val COMPOSE_WEB_VERSION: String = extra["compose.version"] as String
+val COMPOSE_REPO_URL: String? by project
 val COMPOSE_REPO_USERNAME: String? by project
 val COMPOSE_REPO_KEY: String? by project
 val COMPOSE_WEB_BUILD_WITH_SAMPLES = project.property("compose.web.buildSamples")!!.toString().toBoolean()
 
 kotlinKarmaConfig.rootDir = rootProject.rootDir.toString()
 
-apply<jetbrains.compose.web.gradle.SeleniumDriverPlugin>()
+apply<SeleniumDriverPlugin>()
 
 fun Project.isSampleProject() = projectDir.parentFile.name == "examples"
 
@@ -35,12 +38,18 @@ subprojects {
     if ((project.name != "html-widgets") && (project.name != "html-integration-widgets")) {
         afterEvaluate {
             if (plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
-                project.kotlinExtension.targets.forEach { target ->
-                    target.compilations.forEach { compilation ->
-                        compilation.kotlinOptions {
-                            allWarningsAsErrors = false
-                            // see https://kotlinlang.org/docs/opt-in-requirements.html
-                            freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+                project.extensions.getByType<KotlinMultiplatformExtension>().apply {
+                    targets.configureEach {
+                        compilations.configureEach {
+                            compileTaskProvider.configure {
+                                compilerOptions {
+                                    allWarningsAsErrors.set(false)
+                                    freeCompilerArgs.addAll(
+                                        // see https://kotlinlang.org/docs/opt-in-requirements.html
+                                        "-opt-in=kotlin.RequiresOptIn"
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -48,10 +57,10 @@ subprojects {
         }
     }
 
-
-
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
-        kotlinOptions.jvmTarget = "11"
+    tasks.withType<KotlinCompile> {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
     }
 
     pluginManager.withPlugin("maven-publish") {
@@ -59,10 +68,10 @@ subprojects {
             repositories {
                 maven {
                     name = "internal"
-                    url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+                    url = uri(COMPOSE_REPO_URL ?: System.getenv("COMPOSE_REPO_URL") ?: "https://packages.jetbrains.team/maven/p/cmp/dev")
                     credentials {
-                        username = COMPOSE_REPO_USERNAME ?: ""
-                        password = COMPOSE_REPO_KEY ?: ""
+                        username = COMPOSE_REPO_USERNAME ?: System.getenv("COMPOSE_REPO_USERNAME") ?: ""
+                        password = COMPOSE_REPO_KEY ?: System.getenv("COMPOSE_REPO_KEY") ?: ""
                     }
                 }
             }
@@ -131,9 +140,9 @@ subprojects {
         val printTestBundleSize by tasks.registering {
             dependsOn(tasks.named("jsTest"))
             doLast {
-                val bundlePath = buildDir.resolve(
+                val bundlePath = layout.buildDirectory.file(
                     "compileSync/test/testDevelopmentExecutable/kotlin/${rootProject.name}-${project.name}-test.js"
-                )
+                ).get().asFile
                 if (bundlePath.exists()) {
                     val size = bundlePath.length()
                     println("##teamcity[buildStatisticValue key='testBundleSize::${project.name}' value='$size']")
@@ -151,7 +160,7 @@ subprojects {
         val printBundleSize by tasks.registering {
             dependsOn(tasks.named("jsBrowserDistribution"))
             doLast {
-                val jsFile = buildDir.resolve("distributions/${project.name}.js")
+                val jsFile = layout.buildDirectory.file("distributions/${project.name}.js").get().asFile
                 val size = jsFile.length()
                 println("##teamcity[buildStatisticValue key='bundleSize::${project.name}' value='$size']")
             }
@@ -175,18 +184,12 @@ subprojects {
 
     repositories {
         gradlePluginPortal()
-        mavenLocal()
         mavenCentral()
         maven {
-            url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        }
-        maven {
-            url = uri("https://maven.pkg.jetbrains.space/public/p/kotlinx-coroutines/maven")
-        }
-        maven {
-            url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
+            url = uri("https://packages.jetbrains.team/maven/p/cmp/dev")
         }
         google()
+        mavenLocal()
     }
 
     tasks.withType<AbstractTestTask> {

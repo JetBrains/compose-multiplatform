@@ -1,6 +1,8 @@
 enum class Mode {
     SIMPLE,
     VSYNC_EMULATION,
+    REAL,
+    STARTUP
 }
 
 object Args {
@@ -26,9 +28,9 @@ object Args {
      * @param args an array of strings representing the command line arguments.
      * Each argument can specify either of these settings:
      * modes, benchmarks, disabledBenchmarks - comma separated values,
-     * versionInfo, saveStatsToCSV, saveStatsToJSON - single values.
+     * versionInfo, saveStatsToCSV, saveStatsToJSON, parallel, warmupCount, frameCount, emptyScreenDelay, reportAtTheEnd, listBenchmarks - single values.
      *
-     * Example: benchmarks=AnimatedVisibility(100),modes=SIMPLE,versionInfo=Kotlin_2_1_20,saveStatsToCSV=true
+     * Example: benchmarks=AnimatedVisibility(100),modes=SIMPLE,versionInfo=Kotlin_2_1_20,saveStatsToCSV=true,warmupCount=50,frameCount=100,emptyScreenDelay=2000,reportAtTheEnd=true
      */
     fun parseArgs(args: Array<String>): Config {
         val modes = mutableSetOf<Mode>()
@@ -38,6 +40,14 @@ object Args {
         var saveStatsToCSV: Boolean = false
         var saveStatsToJSON: Boolean = false
         var runServer: Boolean = false
+        var parallelRendering: Boolean = false
+        var warmupCount: Int? = null
+        var frameCount: Int? = null
+        var emptyScreenDelay: Long? = null
+        var reportAtTheEnd: Boolean = false
+        var listBenchmarks: Boolean = false
+        var startupFrameCount: Int? = null
+        var startupLongestFramesCount: Int? = null
 
         for (arg in args) {
             if (arg.startsWith("modes=", ignoreCase = true)) {
@@ -54,8 +64,31 @@ object Args {
                 disabledBenchmarks += argToMap(arg.decodeArg()).keys
             } else if (arg.startsWith("runServer=", ignoreCase = true)) {
                 runServer = arg.substringAfter("=").toBoolean()
+            } else if (arg.startsWith("parallel=", ignoreCase = true)) {
+                parallelRendering = arg.substringAfter("=").toBoolean()
+            } else if (arg.startsWith("warmupCount=", ignoreCase = true)) {
+                warmupCount = arg.substringAfter("=").toInt()
+            } else if (arg.startsWith("frameCount=", ignoreCase = true)) {
+                frameCount = arg.substringAfter("=").toInt()
+            } else if (arg.startsWith("emptyScreenDelay=", ignoreCase = true)) {
+                emptyScreenDelay = arg.substringAfter("=").toLong()
+            } else if (arg.startsWith("reportAtTheEnd=", ignoreCase = true)) {
+                reportAtTheEnd = arg.substringAfter("=").toBoolean()
+            } else if (arg.startsWith("listBenchmarks=", ignoreCase = true)) {
+                listBenchmarks = arg.substringAfter("=").toBoolean()
+            } else if (arg.startsWith("startupFrameCount=", ignoreCase = true)) {
+                startupFrameCount = arg.substringAfter("=").toInt()
+            } else if (arg.startsWith("startupLongestFramesCount=", ignoreCase = true)) {
+                startupLongestFramesCount = arg.substringAfter("=").toInt()
+            } else {
+                println("WARNING: unknown argument $arg")
             }
         }
+
+        if (modes.isEmpty()) {
+            modes.addAll(listOf(Mode.SIMPLE, Mode.VSYNC_EMULATION))
+        }
+        val defaultWarmupCount = if (modes.contains(Mode.REAL)) 0 else 100
 
         return Config(
             modes = modes,
@@ -65,6 +98,14 @@ object Args {
             saveStatsToCSV = saveStatsToCSV,
             saveStatsToJSON = saveStatsToJSON,
             runServer = runServer,
+            parallelRendering = parallelRendering,
+            warmupCount = warmupCount ?: defaultWarmupCount,
+            frameCount = frameCount ?: 1000,
+            emptyScreenDelay = emptyScreenDelay ?: 2000L,
+            reportAtTheEnd = reportAtTheEnd,
+            listBenchmarks = listBenchmarks,
+            startupFrameCount = startupFrameCount ?: 30,
+            startupLongestFramesCount = startupLongestFramesCount ?: 3
         )
     }
 }
@@ -80,6 +121,12 @@ object Args {
  * @property versionInfo Optional string containing version information.
  * @property saveStatsToCSV Flag indicating whether statistics should be saved to a CSV file.
  * @property saveStatsToJSON Flag indicating whether statistics should be saved to a JSON file.
+ * @property parallelRendering Flag indicating whether we should use prallelRenderin on iOS
+ * @property warmupCount Number of warmup frames to run before starting the benchmark.
+ * @property frameCount Number of frames to run for each benchmark.
+ * @property emptyScreenDelay Delay in milliseconds between warmup and benchmark.
+ * @property reportAtTheEnd Flag indicating whether we should report results at the end of all benchmarks.
+ * @property listBenchmarks Flag indicating whether we should print available benchmarks and exit.
  */
 data class Config(
     val modes: Set<Mode> = emptySet(),
@@ -89,12 +136,20 @@ data class Config(
     val saveStatsToCSV: Boolean = false,
     val saveStatsToJSON: Boolean = false,
     val runServer: Boolean = false,
+    val parallelRendering: Boolean = false,
+    val warmupCount: Int = 100,
+    val frameCount: Int = 1000,
+    val emptyScreenDelay: Long = 2000L,
+    val reportAtTheEnd: Boolean = false,
+    val listBenchmarks: Boolean = false,
+    val startupFrameCount: Int = 30,
+    val startupLongestFramesCount: Int = 3
 ) {
     /**
      * Checks if a specific mode is enabled based on the configuration.
-     * A mode is considered enabled if no modes were specified (default) or if it's explicitly listed.
+     * A mode is considered enabled if no modes were specified (default) except `real` mode or if it's explicitly listed.
      */
-    fun isModeEnabled(mode: Mode): Boolean = modes.isEmpty() || modes.contains(mode)
+    fun isModeEnabled(mode: Mode): Boolean = modes.contains(mode)
 
     /**
      * Checks if a specific benchmark is enabled
@@ -134,6 +189,30 @@ data class Config(
 
         val runServer: Boolean
             get() = global.runServer
+
+        val parallelRendering: Boolean
+            get() = global.parallelRendering
+
+        val warmupCount: Int
+            get() = global.warmupCount
+
+        val frameCount: Int
+            get() = global.frameCount
+
+        val emptyScreenDelay: Long
+            get() = global.emptyScreenDelay
+
+        val reportAtTheEnd: Boolean
+            get() = global.reportAtTheEnd
+
+        val listBenchmarks: Boolean
+            get() = global.listBenchmarks
+
+        val startupFrameCount: Int
+            get() = global.startupFrameCount
+
+        val startupLongestFramesCount: Int
+            get() = global.startupLongestFramesCount
 
         fun setGlobal(global: Config) {
             this.global = global

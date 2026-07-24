@@ -12,6 +12,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.ComposeBuildConfig
 import org.jetbrains.compose.internal.utils.clearDirs
 import org.jetbrains.compose.internal.utils.ioFile
@@ -19,6 +20,7 @@ import org.jetbrains.compose.internal.utils.ioFile
 private const val DEFAULT_COMPOSE_PROGUARD_RULES_FILE_NAME = "default-compose-desktop-rules.pro"
 private const val DEFAULT_ENTITLEMENTS_FILE_NAME = "default-entitlements.plist"
 
+@DisableCachingByDefault(because = "Unpacks resources from plugin JAR — output depends on plugin version, not worth caching")
 abstract class AbstractUnpackDefaultComposeApplicationResourcesTask : AbstractComposeDesktopTask() {
     internal class DefaultResourcesProvider(resourcesRootDir: Provider<Directory>) {
         val macIcon: Provider<RegularFile> = resourcesRootDir.map { it.file("default-icon-mac.icns") }

@@ -1,7 +1,10 @@
+import org.gradle.api.tasks.compile.JavaCompile
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id "com.android.application"
+    id "com.android.kotlin.multiplatform.library"
     id "org.jetbrains.kotlin.multiplatform"
     id "org.jetbrains.kotlin.plugin.compose"
     id "org.jetbrains.compose"
@@ -9,8 +12,12 @@ plugins {
 
 kotlin {
     // empty stub (no actual android app) to detect configuration conflicts
-    // like https://github.com/JetBrains/compose-jb/issues/2345
-    androidTarget()
+    // like https://youtrack.jetbrains.com/issue/CMP-2345
+    android {
+        namespace = "org.jetbrains.compose.testapp"
+        compileSdk = 37
+        minSdk = 23
+    }
 
     jvm()
     sourceSets {
@@ -22,18 +29,16 @@ kotlin {
             }
         }
     }
-    jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
-    }
 }
 
-android {
-    namespace = "org.jetbrains.compose.testapp"
-    compileSdk = 31
+tasks.withType(JavaCompile).configureEach {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
 
-    defaultConfig {
-        minSdk = 21
-        targetSdk = 31
+tasks.withType(KotlinCompile).configureEach {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_11)
     }
 }
 

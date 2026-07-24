@@ -1,6 +1,6 @@
 [![official project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 [![stable](https://img.shields.io/github/v/release/JetBrains/compose-multiplatform?sort=semver&display_name=release&label=stable&color=brightgreen)](https://github.com/JetBrains/compose-multiplatform/releases/latest)
-[![prerelease](https://img.shields.io/github/v/release/JetBrains/compose-multiplatform?include_prereleases&filter=*-*&display_name=release&label=prerelease&color=blue)](https://github.com/JetBrains/compose-multiplatform/releases)
+[![prerelease](https://img.shields.io/github/v/release/JetBrains/compose-multiplatform?include_prereleases&sort=semver&filter=*-*&display_name=release&label=prerelease&color=blue)](https://github.com/JetBrains/compose-multiplatform/releases)
 [![dev](https://img.shields.io/github/v/tag/JetBrains/compose-multiplatform?include_prereleases&sort=semver&filter=v*%2Bdev*&label=dev&color=orange)](https://github.com/JetBrains/compose-multiplatform/tags)
 
 <a href="https://jb.gg/cmp">
@@ -18,7 +18,7 @@ You can choose the platforms across which to share your UI code using Compose Mu
 * [iOS](https://jb.gg/start-cmp)
 * [Android](https://jb.gg/start-cmp) 
 * [Desktop](https://jb.gg/start-cmp) (Windows, MacOS, and Linux)
-* [Web](https://jb.gg/start-cmp) (Alpha)
+* [Web](https://jb.gg/start-cmp) (Beta)
 
 For example, you can share UIs between iOS and Android or Windows and MacOS.
 
@@ -53,15 +53,15 @@ It has desktop extensions for menus, keyboard shortcuts, window manipulation, an
 
 ## Web
 
-> Web support is in Alpha. It may change incompatibly and require manual migration in the future.
+> Web support is in Beta, making it a great time to give it a try. Check out our [blog post](https://blog.jetbrains.com/kotlin/2025/09/compose-multiplatform-1-9-0-compose-for-web-beta/) to learn more about the progress made to reach this milestone.
 > We would appreciate your feedback on it in the public Slack channel [#compose-web](https://kotlinlang.slack.com/archives/C01F2HV7868/p1678887590205449). 
 > If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
 
-You can experiment with sharing your mobile or desktop UIs with the web. Compose for Web is based on [Kotlin/Wasm](https://kotl.in/wasm), 
+You can experiment with sharing your mobile or desktop UIs with the web. Compose Multiplatform for web is based on [Kotlin/Wasm](https://kotl.in/wasm), 
 the newest target for Kotlin Multiplatform projects. It allows Kotlin developers to run their code in the browser with 
 all the benefits that WebAssembly has to offer, such as good and predictable performance for your applications.
 
-**[Get started with Compose for Web](https://jb.gg/start-cmp)**
+**[Get started with Compose Multiplatform for web](https://jb.gg/start-cmp)**
 
 ## Libraries
 
@@ -79,6 +79,7 @@ for creating web user interfaces with HTML and CSS.
 * [Tutorials](tutorials/README.md)
 * [Compatibility and versioning](https://jb.gg/cmp-versioning)
 * [Changelog](CHANGELOG.md)
+* [Contibution guide](CONTRIBUTING.md)
 
 ## Get help
 

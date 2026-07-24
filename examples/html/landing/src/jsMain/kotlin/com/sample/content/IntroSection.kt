@@ -107,7 +107,7 @@ private fun IntroAboutComposeWeb() {
                     classes(WtTexts.wtButton, WtOffsets.wtTopOffset24)
                     target(ATarget.Blank)
                 },
-                href = "https://github.com/jetbrains/compose-jb"
+                href = "https://github.com/jetbrains/compose-multiplatform"
             ) {
                 Text("Explore on GitHub")
             }

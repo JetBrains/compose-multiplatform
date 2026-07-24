@@ -1,0 +1,33 @@
+name: Build-Helpers Publish to Maven Local
+on:
+  pull_request:
+    paths:
+      - 'ci/build-helpers/**'
+      - '.github/workflows/ci-build-helpers.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'ci/build-helpers/**'
+      - '.github/workflows/ci-build-helpers.yml'
+
+jobs:
+  build-helpers-publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'jetbrains'
+          java-version: '21'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to Maven Local
+        shell: bash
+        working-directory: ci/build-helpers
+        run: |
+          ./gradlew --no-daemon --stacktrace publishToMavenLocal

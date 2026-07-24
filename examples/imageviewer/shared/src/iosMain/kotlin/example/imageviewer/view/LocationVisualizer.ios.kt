@@ -5,6 +5,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitView
+import androidx.compose.ui.viewinterop.UIKitInteropProperties
+import androidx.compose.ui.viewinterop.UIKitView
 import example.imageviewer.model.GpsPosition
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.CoreLocation.CLLocationCoordinate2DMake
@@ -30,11 +32,10 @@ actual fun LocationVisualizer(
     }
     val mkMapView = remember { MKMapView().apply { addAnnotation(annotation) } }
     annotation.setTitle(title)
-    UIKitView(
-        modifier = modifier,
-        factory = {
+    UIKitView(factory = {
             mkMapView
         },
+        modifier = modifier,
         update = {
             mkMapView.setRegion(
                 MKCoordinateRegionMakeWithDistance(
@@ -43,6 +44,7 @@ actual fun LocationVisualizer(
                 ),
                 animated = false
             )
-        }
-    )
+        },
+        onRelease = { },
+        properties = UIKitInteropProperties(isInteractive = true, isNativeAccessibilityEnabled = true))
 }

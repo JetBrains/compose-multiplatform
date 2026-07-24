@@ -1,6 +1,10 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("multiplatform") apply false
     id("com.android.library") apply false
+    id("com.android.kotlin.multiplatform.library") apply false
     id("org.jetbrains.kotlinx.binary-compatibility-validator") apply false
 }
 
@@ -17,8 +21,10 @@ subprojects {
         }
     }
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>() {
-        kotlinOptions.jvmTarget = "11"
+    tasks.withType<KotlinCompile>() {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
     }
 
     plugins.withId("maven-publish") {

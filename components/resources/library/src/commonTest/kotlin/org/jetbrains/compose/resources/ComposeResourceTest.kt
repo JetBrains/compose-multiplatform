@@ -7,6 +7,8 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import kotlinx.coroutines.test.runTest
 import kotlin.test.*
 
+internal expect val RESOURCE_RECOMPOSITIONS: Int
+
 @OptIn(ExperimentalTestApi::class, InternalResourceApi::class)
 class ComposeResourceTest {
 
@@ -26,10 +28,10 @@ class ComposeResourceTest {
                 }
             }
         }
-        waitForIdle()
+        waitResources()
         res = TestDrawableResource("2.png")
-        waitForIdle()
-        assertEquals(2, recompositionsCounter.count)
+        waitResources()
+        assertEquals(2 * RESOURCE_RECOMPOSITIONS, recompositionsCounter.count)
     }
 
     @Test
@@ -44,11 +46,11 @@ class ComposeResourceTest {
                 Image(painterResource(res), null)
             }
         }
-        waitForIdle()
+        waitResources()
         res = TestDrawableResource("2.png")
-        waitForIdle()
+        waitResources()
         res = TestDrawableResource("1.png")
-        waitForIdle()
+        waitResources()
 
         assertEquals(
             expected = listOf("1.png", "2.png"), //no second read of 1.png
@@ -58,9 +60,9 @@ class ComposeResourceTest {
         ResourceCaches.clear()
 
         res = TestDrawableResource("2.png")
-        waitForIdle()
+        waitResources()
         res = TestDrawableResource("1.png")
-        waitForIdle()
+        waitResources()
 
         assertEquals(
             expected = listOf("1.png", "2.png", "2.png", "1.png"), // read images again
@@ -81,6 +83,7 @@ class ComposeResourceTest {
             @Composable
             override fun rememberEnvironment() = ResourceEnvironment(
                 language = LanguageQualifier("en"),
+                script = ScriptQualifier(""),
                 region = RegionQualifier("US"),
                 theme = ThemeQualifier.LIGHT,
                 density = DensityQualifier.MDPI
@@ -96,9 +99,9 @@ class ComposeResourceTest {
                 Image(painterResource(imgRes), null)
             }
         }
-        waitForIdle()
+        waitResources()
         environment = mdpiEnvironment
-        waitForIdle()
+        waitResources()
 
         assertEquals(
             expected = listOf("2.png", "1.png"), //XXXHDPI - fist, MDPI - next
@@ -122,25 +125,25 @@ class ComposeResourceTest {
                 Text(stringArrayResource(TestStringArrayResource("str_arr")).joinToString())
             }
         }
-        waitForIdle()
+        waitResources()
         assertEquals(str, "Compose Resources App")
         res = TestStringResource("hello")
-        waitForIdle()
+        waitResources()
         assertEquals(str, "\uD83D\uDE0A Hello world!")
         res = TestStringResource("app_name")
-        waitForIdle()
+        waitResources()
         assertEquals(str, "Compose Resources App")
         res = TestStringResource("hello")
-        waitForIdle()
+        waitResources()
         assertEquals(str, "\uD83D\uDE0A Hello world!")
         res = TestStringResource("app_name")
-        waitForIdle()
+        waitResources()
         assertEquals(str, "Compose Resources App")
         res = TestStringResource("hello")
-        waitForIdle()
+        waitResources()
         assertEquals(str, "\uD83D\uDE0A Hello world!")
         res = TestStringResource("app_name")
-        waitForIdle()
+        waitResources()
         assertEquals(str, "Compose Resources App")
 
         assertEquals(
@@ -155,7 +158,7 @@ class ComposeResourceTest {
         ResourceCaches.clear()
 
         res = TestStringResource("hello")
-        waitForIdle()
+        waitResources()
         assertEquals(str, "\uD83D\uDE0A Hello world!")
         assertEquals(
             expected = listOf(
@@ -183,7 +186,7 @@ class ComposeResourceTest {
                 str_arr = stringArrayResource(TestStringArrayResource("str_arr"))
             }
         }
-        waitForIdle()
+        waitResources()
 
         assertEquals("Compose Resources App", app_name)
         assertEquals("Créer une table", accentuated_characters)
@@ -204,12 +207,12 @@ class ComposeResourceTest {
             }
         }
 
-        waitForIdle()
+        waitResources()
         assertEquals("Hello, test1! You have 42 new messages.", str1)
         assertEquals("Hello, test2! You have 42 new messages.", str2)
 
         arg = 31415
-        waitForIdle()
+        waitResources()
         assertEquals("Hello, test1! You have 31415 new messages.", str1)
         assertEquals("Hello, test2! You have 31415 new messages.", str2)
     }
@@ -239,31 +242,31 @@ class ComposeResourceTest {
             }
         }
 
-        waitForIdle()
+        waitResources()
         assertEquals("other", str)
 
         quantity = 1
-        waitForIdle()
+        waitResources()
         assertEquals("one", str)
         assertEquals(1, quantity)
 
         quantity = 2
-        waitForIdle()
+        waitResources()
         assertEquals("other", str)
         assertEquals(2, quantity)
 
         quantity = 3
-        waitForIdle()
+        waitResources()
         assertEquals("other", str)
         assertEquals(3, quantity)
 
         res = TestPluralStringResource("another_plurals")
         quantity = 0
-        waitForIdle()
+        waitResources()
         assertEquals("another other", str)
 
         quantity = 1
-        waitForIdle()
+        waitResources()
         assertEquals("another one", str)
     }
 
@@ -277,7 +280,7 @@ class ComposeResourceTest {
                 another_plurals = pluralStringResource(TestPluralStringResource("another_plurals"), 1)
             }
         }
-        waitForIdle()
+        waitResources()
 
         assertEquals("one", plurals)
         assertEquals("another one", another_plurals)
@@ -297,17 +300,17 @@ class ComposeResourceTest {
                 str2 = pluralStringResource(TestPluralStringResource("messages"), quantity, 5, arg)
             }
         }
-        waitForIdle()
+        waitResources()
         assertEquals("3 messages for me", str1)
         assertEquals("5 messages for me", str2)
 
         arg = "you"
-        waitForIdle()
+        waitResources()
         assertEquals("3 messages for you", str1)
         assertEquals("5 messages for you", str2)
 
         quantity = 1
-        waitForIdle()
+        waitResources()
         assertEquals("3 message for you", str1)
         assertEquals("5 message for you", str2)
     }
@@ -362,7 +365,7 @@ class ComposeResourceTest {
                 uri2 = resourceReader.getUri("2.png")
             }
         }
-        waitForIdle()
+        waitResources()
 
         assertTrue(uri1.endsWith("/1.png"))
         assertTrue(uri2.endsWith("/2.png"))
@@ -387,7 +390,7 @@ class ComposeResourceTest {
                 environment = rememberResourceEnvironment()
             }
         }
-        waitForIdle()
+        waitResources()
 
         val systemEnvironment = getSystemResourceEnvironment()
         assertEquals(systemEnvironment, environment)
@@ -397,6 +400,7 @@ class ComposeResourceTest {
     fun rememberResourceStateAffectedByEnvironmentChanges() = clearResourceCachesAndRunUiTest {
         val env2 = ResourceEnvironment(
             language = LanguageQualifier("en"),
+            script = ScriptQualifier(""),
             region = RegionQualifier("CA"),
             theme = ThemeQualifier.DARK,
             density = DensityQualifier.MDPI
@@ -431,7 +435,7 @@ class ComposeResourceTest {
             override fun rememberEnvironment() = env2
         }
         envState.value = testEnv2
-        waitForIdle()
+        waitResources()
 
         assertEquals(env2, lastEnv1)
         assertEquals(env2, lastEnv2)

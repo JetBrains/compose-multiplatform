@@ -17,16 +17,15 @@ kotlin {
         }
     }
 
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
 
     sourceSets {
         commonMain {
             dependencies {
-                implementation(compose.runtime)
-                implementation(compose.material)
-                implementation(compose.components.resources)
+                implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
+                implementation("org.jetbrains.compose.material:material:COMPOSE_VERSION_PLACEHOLDER")
+                implementation("org.jetbrains.compose.components:components-resources:COMPOSE_VERSION_PLACEHOLDER")
             }
         }
     }

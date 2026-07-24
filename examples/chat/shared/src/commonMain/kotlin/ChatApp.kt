@@ -1,6 +1,7 @@
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chat_mpp.shared.generated.resources.*
 import chat_mpp.shared.generated.resources.Res
@@ -64,7 +66,10 @@ fun ChatAppWithScaffold(displayTextField: Boolean = true) {
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun ChatApp(displayTextField: Boolean = true) {
+fun ChatApp(
+    displayTextField: Boolean = true,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+) {
     val state by store.stateFlow.collectAsState()
     Theme {
         Surface {
@@ -74,7 +79,7 @@ fun ChatApp(displayTextField: Boolean = true) {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     Box(Modifier.weight(1f)) {
-                        Messages(state.messages)
+                        Messages(state.messages, contentPadding = contentPadding)
                     }
                     if (displayTextField) {
                         SendMessage { text ->

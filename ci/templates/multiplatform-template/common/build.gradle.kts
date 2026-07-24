@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
@@ -12,11 +15,11 @@ kotlin {
     sourceSets {
         named("commonMain") {
             dependencies {
-                api(compose.runtime)
-                api(compose.foundation)
-                api(compose.material)
+                api(libs.compose.runtime)
+                api(libs.compose.foundation)
+                api(libs.compose.material)
                 // Needed only for preview.
-                implementation(compose.preview)
+                implementation(libs.compose.ui.tooling.preview)
             }
         }
         named("androidMain") {
@@ -25,6 +28,12 @@ kotlin {
                 api("androidx.core:core-ktx:1.8.0")
             }
         }
+    }
+}
+
+tasks.withType<KotlinCompile>() {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
     }
 }
 
@@ -38,9 +47,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlin {
-        jvmToolchain(17)
     }
     sourceSets {
         named("main") {

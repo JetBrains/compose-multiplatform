@@ -1,6 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
-
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.compose")
@@ -9,12 +6,12 @@ plugins {
 
 repositories {
     mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://packages.jetbrains.team/maven/p/cmp/dev")
     google()
 }
 
 kotlin {
-    js(IR) {
+    js {
         browser()
         binaries.executable()
     }
@@ -24,8 +21,8 @@ kotlin {
             resources.srcDir("src/main/resources")
 
             dependencies {
-                implementation(compose.web.core)
-                implementation(compose.runtime)
+                implementation(libs.compose.html.core)
+                implementation(libs.compose.runtime)
             }
         }
     }

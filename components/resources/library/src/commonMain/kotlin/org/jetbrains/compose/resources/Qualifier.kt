@@ -47,6 +47,30 @@ class RegionQualifier(
 }
 
 @InternalResourceApi
+class ScriptQualifier(
+    val script: String
+) : Qualifier {
+    fun isEmpty(): Boolean = script.isEmpty()
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as ScriptQualifier
+
+        return script == other.script
+    }
+
+    override fun hashCode(): Int {
+        return script.hashCode()
+    }
+
+    override fun toString(): String {
+        return "ScriptQualifier(script='$script')"
+    }
+}
+
+@InternalResourceApi
 enum class ThemeQualifier : Qualifier {
     LIGHT,
     DARK;

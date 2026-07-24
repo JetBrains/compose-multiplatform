@@ -73,14 +73,14 @@ abstract class FixModulesBeforePublishingTask : DefaultTask() {
 
     private fun fixPomIfNeeded(pom: PomDocument) {
         pom.fillMissingTags(
-            projectUrl = "https://github.com/JetBrains/compose-jb",
+            projectUrl = "https://github.com/JetBrains/compose-multiplatform",
             projectInceptionYear = "2020",
             licenseName = "The Apache Software License, Version 2.0",
             licenseUrl = "https://www.apache.org/licenses/LICENSE-2.0.txt",
             licenseDistribution = "repo",
-            scmConnection = "scm:git:https://github.com/JetBrains/compose-jb.git",
-            scmDeveloperConnection = "scm:git:https://github.com/JetBrains/compose-jb.git",
-            scmUrl = "https://github.com/JetBrains/compose-jb",
+            scmConnection = "scm:git:https://github.com/JetBrains/compose-multiplatform.git",
+            scmDeveloperConnection = "scm:git:https://github.com/JetBrains/compose-multiplatform.git",
+            scmUrl = "https://github.com/JetBrains/compose-multiplatform",
             developerName = "Compose Multiplatform Team",
             developerOrganization = "JetBrains",
             developerOrganizationUrl = "https://www.jetbrains.com",

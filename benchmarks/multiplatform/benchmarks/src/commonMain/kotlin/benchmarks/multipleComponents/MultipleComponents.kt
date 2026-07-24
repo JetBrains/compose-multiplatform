@@ -23,7 +23,6 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -44,7 +43,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
@@ -111,7 +109,7 @@ import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.input.pointer.isTertiaryPressed
-import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -196,11 +194,6 @@ fun MultipleComponentsExample(isVectorGraphicsSupported: Boolean = true) {
 private fun LeftColumn(modifier: Modifier) = Box(modifier.fillMaxSize()) {
     val state = rememberScrollState()
     ScrollableContent(state)
-
-    VerticalScrollbar(
-        rememberScrollbarAdapter(state),
-        Modifier.align(Alignment.CenterEnd).fillMaxHeight()
-    )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -367,15 +360,20 @@ private fun ScrollableContent(scrollState: ScrollState) {
                 fontFamily = italicFont,
                 modifier = Modifier
                     .padding(10.dp)
-                    .onPointerEvent(PointerEventType.Move) {
-                        val position = it.changes.first().position
-                        overText = "Move position: $position"
-                    }
-                    .onPointerEvent(PointerEventType.Enter) {
-                        overText = "Over enter"
-                    }
-                    .onPointerEvent(PointerEventType.Exit) {
-                        overText = "Over exit"
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                val event = awaitPointerEvent()
+                                when (event.type) {
+                                    PointerEventType.Move -> {
+                                        val position = event.changes.first().position
+                                        overText = "Move position: $position"
+                                    }
+                                    PointerEventType.Enter -> overText = "Over enter"
+                                    PointerEventType.Exit -> overText = "Over exit"
+                                }
+                            }
+                        }
                     }
             )
         }
@@ -628,10 +626,6 @@ private fun RightColumn(modifier: Modifier) = Box(modifier) {
         }
     }
 
-    VerticalScrollbar(
-        rememberScrollbarAdapter(state),
-        Modifier.align(Alignment.CenterEnd)
-    )
 }
 
 @OptIn(ExperimentalTextApi::class)

@@ -8,9 +8,11 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.internal.IdeaImportTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 
+@DisableCachingByDefault(because = "IDE import task — not worth caching")
 internal abstract class GenerateExpectResourceCollectorsTask : IdeaImportTask() {
     @get:Input
     abstract val packageName: Property<String>
@@ -46,6 +48,7 @@ internal abstract class GenerateExpectResourceCollectorsTask : IdeaImportTask() 
     }
 }
 
+@DisableCachingByDefault(because = "IDE import task — not worth caching")
 internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() {
     @get:Input
     abstract val packageName: Property<String>
@@ -81,7 +84,7 @@ internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() 
         val funNames = inputFiles.mapNotNull { inputFile ->
             if (inputFile.nameWithoutExtension.contains('.')) {
                 val (fileName, suffix) = inputFile.nameWithoutExtension.split('.')
-                val type = ResourceType.values().firstOrNull { fileName.startsWith(it.accessorName, true) }
+                val type = ResourceType.entries.firstOrNull { fileName.startsWith(it.accessorName, true) }
                 val name = "_collect${suffix.uppercaseFirstChar()}${fileName}Resources"
 
                 if (type == null) {
@@ -98,7 +101,9 @@ internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() 
                 logger.warn("Unknown file name: `$inputFile`")
                 null
             }
-        }.groupBy({ it.first }, { it.second })
+        }
+            .groupBy({ it.first }, { it.second })
+            .mapValues { (_, values) -> values.sorted() }
 
         val pkgName = packageName.get()
         val resClassName = resClassName.get()

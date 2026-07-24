@@ -2,10 +2,12 @@ import SwiftUI
 
 struct YetAnotherSwiftUIScreen: View {
     var body: some View {
-        GradientTemplate(title: "SwiftUI") {
+        NavigationView {
             VStack {
                 Text("Yet another SwiftUI screen")
             }
         }
+        .navigationTitle("Swift UI View")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

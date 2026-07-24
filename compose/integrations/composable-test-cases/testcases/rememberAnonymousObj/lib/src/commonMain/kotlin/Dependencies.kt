@@ -7,7 +7,7 @@ interface SomeInterface {
 }
 
 // Known to fail with k/js and decoys enabled
-// https://github.com/JetBrains/compose-jb/issues/2615
+// https://youtrack.jetbrains.com/issue/CMP-2615
 @Composable
 fun CallsRememberAnonymousObject() {
     val obj = remember { object {} }

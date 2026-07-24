@@ -3,6 +3,7 @@ package org.jetbrains.compose.resources
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runComposeUiTest
+import kotlinx.coroutines.yield
 import org.jetbrains.compose.resources.plural.PluralCategory
 import org.jetbrains.compose.resources.plural.PluralRule
 import org.jetbrains.compose.resources.plural.PluralRuleList
@@ -79,6 +80,13 @@ internal fun pluralRuleListOf(vararg rules: Pair<PluralCategory, String>): Plura
 fun clearResourceCachesAndRunUiTest(block: suspend ComposeUiTest.() -> Unit) = runComposeUiTest {
     ResourceCaches.clear()
     block()
+}
+
+@OptIn(ExperimentalTestApi::class)
+internal suspend fun ComposeUiTest.waitResources() {
+    waitForIdle()
+    ResourceCaches.waitAllJobs()
+    waitForIdle()
 }
 
 

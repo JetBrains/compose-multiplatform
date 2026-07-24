@@ -1,8 +1,11 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 repositories {
     gradlePluginPortal()
     mavenCentral()
     maven {
-        url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        url = uri("https://packages.jetbrains.team/maven/p/cmp/dev")
     }
     maven {
         url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
@@ -13,10 +16,15 @@ plugins {
     id("org.jetbrains.kotlin.jvm")
 }
 
-
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
 }
 
 dependencies {

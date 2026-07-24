@@ -1,5 +1,6 @@
 package visualeffects
 
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.ui.Modifier
@@ -26,32 +27,29 @@ fun Modifier.onPointerEventMobileImpl(
 ): Modifier {
 
     return this.pointerInput(Unit) {
-        forEachGesture {
+        awaitEachGesture {
 
-            awaitPointerEventScope {
+            awaitFirstDown()
+            if (eventKind == PointerEventKind.In) {
+                Position(0, 0).onEvent()
+                return@awaitEachGesture
+            }
 
-                awaitFirstDown()
-                if (eventKind == PointerEventKind.In) {
-                    Position(0, 0).onEvent()
-                    return@awaitPointerEventScope
+            do {
+
+                val event: PointerEvent = awaitPointerEvent()
+
+                if (eventKind == PointerEventKind.Move) {
+                    Position(
+                        event.changes.first().position.x.toInt(),
+                        event.changes.first().position.y.toInt()
+                    ).onEvent()
                 }
 
-                do {
+            } while (event.changes.any { it.pressed })
 
-                    val event: PointerEvent = awaitPointerEvent()
-
-                    if (eventKind == PointerEventKind.Move) {
-                        Position(
-                            event.changes.first().position.x.toInt(),
-                            event.changes.first().position.y.toInt()
-                        ).onEvent()
-                    }
-
-                } while (event.changes.any { it.pressed })
-
-                if (eventKind == PointerEventKind.Out) {
-                    Position(0, 0).onEvent()
-                }
+            if (eventKind == PointerEventKind.Out) {
+                Position(0, 0).onEvent()
             }
         }
     }

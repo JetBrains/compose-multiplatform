@@ -17,8 +17,8 @@ import kotlin.test.assertEquals
 
 /**
  * Covers the issues:
- * - https://github.com/JetBrains/compose-jb/issues/2539
- * - https://github.com/JetBrains/compose-jb/issues/2535
+ * - https://youtrack.jetbrains.com/issue/CMP-2539
+ * - https://youtrack.jetbrains.com/issue/CMP-2535
  */
 class StabilityTests {
 
@@ -187,7 +187,7 @@ class StabilityTests {
     }
 
 
-    @Test // issue https://github.com/JetBrains/compose-jb/issues/2535
+    @Test // issue https://youtrack.jetbrains.com/issue/CMP-2535
     fun test_remembers_correct_attrs() = runBlockingTest {
         val root = document.body!!.appendElement("div") {
             id = "root"

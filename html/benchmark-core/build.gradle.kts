@@ -50,7 +50,7 @@ val BENCHMARKS_PATH = "reports/tests/jsTest/classes/org.jetbrains.compose.web.te
 
 val printBenchmarkResults by tasks.registering {
     doLast {
-        val report = buildDir.resolve(BENCHMARKS_PATH).readText()
+        val report = layout.buildDirectory.file(BENCHMARKS_PATH).get().asFile.readText()
         val stdout = "#.*;".toRegex().findAll(report).map { it.value }.firstOrNull()
 
         val benchmarks = stdout?.split(";")?.mapNotNull {

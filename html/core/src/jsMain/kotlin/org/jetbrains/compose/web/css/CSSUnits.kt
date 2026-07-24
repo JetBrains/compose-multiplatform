@@ -2,6 +2,8 @@
 
 package org.jetbrains.compose.web.css
 
+// External declarations for CSS OM - https://developer.mozilla.org/en-US/docs/Web/API/CSS_Object_Model
+
 external interface CSSNumericValue<T : CSSUnit> : StylePropertyValue, CSSVariableValueAs<CSSNumericValue<T>>
 
 external interface CSSSizeValue<T : CSSUnit> : CSSNumericValue<T> {

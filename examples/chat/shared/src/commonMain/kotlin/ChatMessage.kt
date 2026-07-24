@@ -38,7 +38,7 @@ fun Triangle(risingToTheRight: Boolean, background: Color) {
 }
 
 @Composable
-inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
+fun ChatMessage(isMyMessage: Boolean, message: Message) {
     Box(
         modifier = Modifier.fillMaxWidth(),
         contentAlignment = if (isMyMessage) Alignment.CenterEnd else Alignment.CenterStart

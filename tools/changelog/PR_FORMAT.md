@@ -86,4 +86,5 @@ https://github.com/JetBrains/compose-multiplatform-core/edit/jb-main/.github/PUL
 - Lifecycle              # specific module, prefer it over the platform ones
 - Navigation             # specific module, prefer it over the platform ones
 - SavedState             # specific module, prefer it over the platform ones
+- HTML                   # specific module, prefer it over the platform ones
 ```

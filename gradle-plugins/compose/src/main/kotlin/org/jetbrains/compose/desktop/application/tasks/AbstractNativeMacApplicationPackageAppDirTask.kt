@@ -5,19 +5,21 @@
 
 package org.jetbrains.compose.desktop.application.tasks
 
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.desktop.application.internal.InfoPlistBuilder
 import org.jetbrains.compose.desktop.application.internal.PlistKeys
 import org.jetbrains.compose.internal.utils.ioFile
-import org.jetbrains.compose.internal.utils.notNullProperty
-import org.jetbrains.compose.internal.utils.nullableProperty
+import org.jetbrains.compose.internal.utils.property
 import java.io.File
 
 private const val KOTLIN_NATIVE_MIN_SUPPORTED_MAC_OS = "10.13"
 
+@DisableCachingByDefault(because = "Uses platform-specific native tools whose output depends on local system")
 abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMacApplicationPackageTask() {
     @get:InputFile
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
@@ -29,19 +31,24 @@ abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMac
     val iconFile: RegularFileProperty = objects.fileProperty()
 
     @get:Input
-    val bundleID: Property<String> = objects.notNullProperty<String>().value(packageName)
+    val bundleID: Property<String> = objects.property<String>().value(packageName)
 
     @get:Input
     @get:Optional
-    val appCategory: Property<String?> = objects.nullableProperty()
+    val appCategory: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val copyright: Property<String?> = objects.nullableProperty()
+    val copyright: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val minimumSystemVersion: Property<String?> = objects.nullableProperty()
+    val minimumSystemVersion: Property<String> = objects.property()
+
+    @get:InputFiles
+    @get:Optional
+    @get:PathSensitive(PathSensitivity.ABSOLUTE)
+    val composeResourcesDirs: ConfigurableFileCollection = objects.fileCollection()
 
     override fun createPackage(destinationDir: File, workingDir: File) {
         val packageName = packageName.get()
@@ -60,6 +67,13 @@ abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMac
         InfoPlistBuilder().apply {
             setupInfoPlist(executableName = appExecutableFile.name)
             writeToFile(contentsDir.resolve("Info.plist"))
+        }
+
+        if (!composeResourcesDirs.isEmpty) {
+            fileOperations.copy { copySpec ->
+                copySpec.from(composeResourcesDirs)
+                copySpec.into(appResourcesDir.resolve("compose-resources").apply { mkdirs() })
+            }
         }
     }
 

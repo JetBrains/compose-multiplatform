@@ -3,7 +3,7 @@ pluginManagement {
         id 'org.jetbrains.kotlin.multiplatform' version 'KOTLIN_VERSION_PLACEHOLDER'
         id 'org.jetbrains.kotlin.plugin.compose' version 'KOTLIN_VERSION_PLACEHOLDER'
         id 'org.jetbrains.compose' version 'COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER'
-        id 'com.android.application' version 'AGP_VERSION_PLACEHOLDER'
+        id 'com.android.kotlin.multiplatform.library' version 'AGP_VERSION_PLACEHOLDER'
     }
     repositories {
         mavenLocal()
@@ -11,10 +11,10 @@ pluginManagement {
         mavenCentral()
         google()
         maven {
-            url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
+            url 'https://packages.jetbrains.team/maven/p/cmp/dev'
         }
         maven {
-            url 'https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/'
+            url 'https://redirector.kotlinlang.org/maven/dev/'
         }
     }
 }
@@ -23,10 +23,10 @@ dependencyResolutionManagement {
         mavenCentral()
         google()
         maven {
-            url 'https://maven.pkg.jetbrains.space/public/p/compose/dev'
+            url 'https://packages.jetbrains.team/maven/p/cmp/dev'
         }
         maven {
-            url 'https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/'
+            url 'https://redirector.kotlinlang.org/maven/dev/'
         }
         mavenLocal()
     }

@@ -9,8 +9,8 @@ class InheritanceTests {
 
     @Test
     // Issues:
-    // https://github.com/JetBrains/compose-jb/issues/2291
-    // https://github.com/JetBrains/compose-jb/issues/2660
+    // https://youtrack.jetbrains.com/issue/CMP-2291
+    // https://youtrack.jetbrains.com/issue/CMP-2660
     fun implementComposableCollection() {
         val collection = createComposableCollection().apply {
             add {

@@ -1,23 +1,22 @@
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     kotlin("multiplatform")
-    id("com.android.library")
+    id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
+    android {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
         }
+        androidResources.enable = true
     }
     jvm("desktop")
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -46,13 +45,13 @@ kotlin {
         val wasmJsMain by getting
 
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.material3)
-            implementation("org.jetbrains.compose.material:material-icons-core:1.6.11")
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.material3)
+            implementation(libs.compose.material.icons.core)
             implementation(project(":resources:library"))
         }
         desktopMain.dependencies {
-            implementation(compose.desktop.common)
+            implementation(libs.compose.desktop)
         }
         androidMain.dependencies {
             implementation(libs.androidx.ui.tooling)
@@ -67,25 +66,11 @@ kotlin {
             jsMain.get().dependsOn(this)
         }
     }
-}
-
-android {
-    compileSdk = 35
-    namespace = "org.jetbrains.compose.resources.demo.shared"
-    defaultConfig {
-        minSdk = 21
+    android {
+        namespace = "org.jetbrains.compose.resources.demo.shared"
+        compileSdk = 37
+        minSdk = 23
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    buildFeatures {
-        compose = true
-    }
-}
-
-compose.experimental {
-    web.application {}
 }
 
 //because the dependency on the compose library is a project dependency

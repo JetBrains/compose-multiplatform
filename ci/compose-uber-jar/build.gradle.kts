@@ -3,7 +3,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 plugins {
     java
     `maven-publish`
-    id("com.github.johnrengelman.shadow") version "6.0.0"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 val properties = ComposeUberJarProperties()
@@ -68,7 +68,7 @@ class ComposeUberJarProperties {
         get() = typedProperty<String>(COMPOSE_VERSION_FILE_PROPERTY)
 
     val composeRepoUrl: String
-        get() = System.getenv("COMPOSE_REPO_URL") ?: "https://maven.pkg.jetbrains.space/public/p/compose/dev"
+        get() = System.getenv("COMPOSE_REPO_URL") ?: "https://packages.jetbrains.team/maven/p/cmp/dev"
 
     val composeRepoUserName: String?
         get() = System.getenv("COMPOSE_REPO_USERNAME")

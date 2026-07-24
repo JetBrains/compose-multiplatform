@@ -9,17 +9,19 @@ import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.text.font.Font
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.io.encoding.Base64
+import kotlinx.coroutines.yield
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 @OptIn(ExperimentalTestApi::class, ExperimentalEncodingApi::class)
 class TestResourcePreloading {
 
     @Test
-    fun testPreloadFont() = runComposeUiTest {
+    fun testPreloadFont() = clearResourceCachesAndRunUiTest {
         var loadContinuation: CancellableContinuation<ByteArray>? = null
 
         val resLoader = object : ResourceReader {
@@ -59,8 +61,10 @@ class TestResourcePreloading {
         assertEquals(null, font)
         assertEquals(null, font2)
 
+        yield()
         assertNotEquals(null, loadContinuation)
         loadContinuation!!.resumeWith(Result.success(ByteArray(0)))
+        yield()
         loadContinuation = null
 
         waitForIdle()
@@ -72,5 +76,39 @@ class TestResourcePreloading {
         assertNotEquals(null, font)
         assertEquals(font, font2, "font2 is expected to be loaded from cache")
         assertEquals(null, loadContinuation, "expected no more ResourceReader usages")
+    }
+
+    @Test
+    fun testIsDefaultCheck() = runComposeUiTest {
+        val resLoader = object : ResourceReader {
+            override suspend fun read(path: String): ByteArray {
+                return suspendCancellableCoroutine {
+                    // suspend indefinitely for test purpose
+                }
+            }
+
+            override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
+                TODO("Not yet implemented")
+            }
+
+            override fun getUri(path: String): String {
+                TODO("Not yet implemented")
+            }
+        }
+
+        var font: Font? = null
+
+        setContent {
+            CompositionLocalProvider(
+                LocalComposeEnvironment provides TestComposeEnvironment,
+                LocalResourceReader provides resLoader
+            ) {
+                font = Font(TestFontResource("sometestfont2"))
+            }
+        }
+
+        waitForIdle()
+        assertNotNull(font)
+        assertTrue(font.isDefault)
     }
 }

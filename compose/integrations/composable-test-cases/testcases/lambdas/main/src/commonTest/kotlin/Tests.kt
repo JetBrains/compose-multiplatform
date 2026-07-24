@@ -142,6 +142,25 @@ class Tests {
         }
         assertEquals("root:{Value = Unit}", root.dump())
     }
+
+    @Composable
+    private fun SimpleDecoration(inner: @Composable () -> Unit) {
+        TextLeafNode("inside decoration")
+        inner()
+    }
+
+    // KT-84055
+    @Test
+    fun testSamConversion() {
+        val root = composeText() {
+            WithDecoration(
+                content = { TextLeafNode("Content") },
+                decorator = { inner ->
+                    SimpleDecoration(inner)
+                })
+        }
+        assertEquals("root:{inside decoration, Content}", root.dump())
+    }
 }
 
 private fun someText(): String {

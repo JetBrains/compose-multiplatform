@@ -22,7 +22,7 @@ private fun getCards(): List<GetStartedCardPresentation> {
             links = listOf(
                 LinkOnCard(
                     linkText = "View tutorial",
-                    linkUrl = "https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Getting_Started"
+                    linkUrl = "https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials/HTML/Getting_Started"
                 )
             )
         ),
@@ -32,7 +32,7 @@ private fun getCards(): List<GetStartedCardPresentation> {
             links = listOf(
                 LinkOnCard(
                     linkText = "Explore the source code",
-                    linkUrl = "https://github.com/JetBrains/compose-jb/tree/master/examples/web-landing"
+                    linkUrl = "https://github.com/JetBrains/compose-multiplatform/tree/master/examples/html/landing"
                 )
             )
         ),
@@ -42,7 +42,7 @@ private fun getCards(): List<GetStartedCardPresentation> {
             links = listOf(
                 LinkOnCard(
                     linkText = "Explore the source code",
-                    linkUrl = "https://github.com/JetBrains/compose-jb/tree/master/examples/web-compose-bird"
+                    linkUrl = "https://github.com/JetBrains/compose-multiplatform/tree/master/examples/html/compose-bird"
                 ),
                 LinkOnCard(
                     linkText = "Play",

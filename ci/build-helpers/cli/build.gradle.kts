@@ -19,7 +19,7 @@ val modulesFile = publishingDir.map { it.file("modules.txt") }
 
 val findComposeModules by tasks.registering(FindModulesInSpaceTask::class) {
     requestedCoordinates.set(mavenCentral.coordinates)
-    spaceInstanceUrl.set("https://public.jetbrains.space")
+    spaceInstanceUrl.set("https://jetbrains.team")
     spaceClientId.set(System.getenv("COMPOSE_REPO_USERNAME") ?: "")
     spaceClientSecret.set(System.getenv("COMPOSE_REPO_KEY") ?: "")
     spaceProjectId.set(System.getenv("COMPOSE_DEV_REPO_PROJECT_ID") ?: "")
@@ -35,7 +35,7 @@ val downloadArtifactsFromComposeDev by tasks.registering(DownloadFromSpaceMavenR
             originalArtifactsRoot
         )
     })
-    spaceRepoUrl.set("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    spaceRepoUrl.set("https://packages.jetbrains.team/maven/p/cmp/dev")
 }
 
 val fixModulesBeforePublishing by tasks.registering(FixModulesBeforePublishingTask::class) {

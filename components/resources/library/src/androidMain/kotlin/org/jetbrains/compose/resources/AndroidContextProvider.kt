@@ -38,6 +38,19 @@ fun PreviewContextConfigurationEffect() {
     }
 }
 
+/**
+ * Sets the android context to be used for resource read functions in cases
+ * when `org.jetbrains.compose.components.resources.resources.AndroidContextProvider` cannot be initialized.
+ *
+ * Be careful when using this function! The context will be retained for the whole application lifetime.
+ *
+ * See https://youtrack.jetbrains.com/issue/CMP-6676 for more details.
+ */
+@ExperimentalResourceApi
+fun setResourceReaderAndroidContext(context: Context) {
+    AndroidContextProvider.ANDROID_CONTEXT = context
+}
+
 //https://andretietz.com/2017/09/06/autoinitialise-android-library/
 internal class AndroidContextProvider : ContentProvider() {
     companion object {

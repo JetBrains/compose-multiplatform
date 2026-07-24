@@ -11,7 +11,10 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.utils.clearDirs
@@ -24,6 +27,7 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import java.io.File
 import javax.inject.Inject
 
+@DisableCachingByDefault(because = "Not worth caching — generates a small fallback script")
 abstract class WebCompatibilityTask : DefaultTask() {
     @get:Inject
     internal abstract val fileOperations: FileSystemOperations
@@ -32,9 +36,11 @@ abstract class WebCompatibilityTask : DefaultTask() {
     abstract val outputDir: DirectoryProperty
 
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val jsDistFiles: ConfigurableFileCollection
 
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val wasmDistFiles: ConfigurableFileCollection
 
     @get:Input
@@ -48,9 +54,9 @@ abstract class WebCompatibilityTask : DefaultTask() {
     @TaskAction
     fun run() {
         val prefix = "origin"
-        val jsAppFileName = jsOutputName.get()
+        val jsAppFileName = jsOutputName.orNull ?: return
         val jsAppRenamed = joinLowerCamelCase(prefix, "js", jsAppFileName)
-        val wasmAppFileName = wasmOutputName.get()
+        val wasmAppFileName = wasmOutputName.orNull ?: return
         val wasmAppRenamed = joinLowerCamelCase(prefix, "wasm", wasmAppFileName)
 
         fileOperations.clearDirs(outputDir)
@@ -133,25 +139,31 @@ private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformE
 
         mppPlugin.targets.withType(KotlinJsIrTarget::class.java).configureEach { target ->
             if (target.platformType == KotlinPlatformType.wasm) {
-                wasmOutputName.set(
-                    tasks.named(
-                        "${target.name}BrowserProductionWebpack",
-                        KotlinWebpack::class.java
-                    ).flatMap { it.mainOutputFileName }
-                )
-                wasmDistFiles.from(
-                    tasks.named("${target.name}BrowserDistribution").map { it.outputs.files }
-                )
+                tasks.withType(KotlinWebpack::class.java).findByName("${target.name}BrowserProductionWebpack")?.let {
+                    wasmOutputName.set(it.mainOutputFileName)
+                }
+
+                val taskDistributionName = "${target.name}BrowserDistribution"
+                wasmDistFiles.from(provider {
+                    if (tasks.names.contains(taskDistributionName)) {
+                        tasks.getByName(taskDistributionName).outputs.files
+                    } else {
+                        emptyList()
+                    }
+                })
             } else if (target.platformType == KotlinPlatformType.js) {
-                jsOutputName.set(
-                    tasks.named(
-                        "${target.name}BrowserProductionWebpack",
-                        KotlinWebpack::class.java
-                    ).flatMap { it.mainOutputFileName }
-                )
-                jsDistFiles.from(
-                    tasks.named("${target.name}BrowserDistribution").map { it.outputs.files }
-                )
+                tasks.withType(KotlinWebpack::class.java).findByName("${target.name}BrowserProductionWebpack")?.let {
+                    jsOutputName.set(it.mainOutputFileName)
+                }
+
+                val taskDistributionName = "${target.name}BrowserDistribution"
+                jsDistFiles.from(provider {
+                    if (tasks.names.contains(taskDistributionName)) {
+                        tasks.getByName(taskDistributionName).outputs.files
+                    } else {
+                        emptyList()
+                    }
+                })
             }
 
             onlyIf {

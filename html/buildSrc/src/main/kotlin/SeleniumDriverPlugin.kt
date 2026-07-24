@@ -4,8 +4,9 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import java.io.File
 import java.net.URL
 
-private val CHROME_DRIVER_VERSION = "114.0.5735.90"
-private val GECKO_DRIVER_VERSION = "0.31.0"
+// https://googlechromelabs.github.io/chrome-for-testing/
+private val CHROME_DRIVER_VERSION = "140.0.7339.82"
+private val GECKO_DRIVER_VERSION = "0.36.0"
 
 private fun download(url: String, file: File) {
     println("downloading ${url} to ${file}")
@@ -42,17 +43,18 @@ private fun resolvePath(id: String): String {
     val arch = DefaultNativePlatform.getCurrentArchitecture()
 
     val geckoRepo = "https://github.com/mozilla/geckodriver/releases/download/v$GECKO_DRIVER_VERSION/"
-    val chromeRepo = "https://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/"
+    val chromeRepo = "https://storage.googleapis.com/chrome-for-testing-public/$CHROME_DRIVER_VERSION/"
 
     return when (id) {
+        //https://googlechromelabs.github.io/chrome-for-testing/
         "chrome" -> chromeRepo + when {
-            os.isWindows -> "chromedriver_win32.zip"
+            os.isWindows -> "win32/chromedriver-win32.zip"
             os.isMacOsX -> if (arch.isArm) {
-                "chromedriver_mac64_m1.zip"
+                "mac-arm64/chromedriver-mac-arm64.zip"
             } else {
-                "chromedriver_mac64.zip"
+                "mac-x64/chromedriver-mac-x64.zip"
             }
-            else -> "chromedriver_linux64.zip"
+            else -> "linux64/chromedriver-linux64.zip"
         }
         "gecko" -> geckoRepo + when {
             os.isWindows -> "geckodriver-v$GECKO_DRIVER_VERSION-win64.zip"

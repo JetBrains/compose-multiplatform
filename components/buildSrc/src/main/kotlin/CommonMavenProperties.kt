@@ -22,7 +22,7 @@ fun Project.configureMavenPublication(
 
                 pom {
                     this.name.set(name)
-                    url.set("https://github.com/JetBrains/compose-jb")
+                    url.set("https://github.com/JetBrains/compose-multiplatform")
                     licenses {
                         license {
                             this.name.set("The Apache License, Version 2.0")

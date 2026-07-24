@@ -6,6 +6,7 @@
 package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.Task
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.JavaExec
@@ -18,13 +19,6 @@ import org.jetbrains.compose.desktop.application.tasks.*
 import org.jetbrains.compose.desktop.tasks.AbstractJarsFlattenTask
 import org.jetbrains.compose.desktop.tasks.AbstractUnpackDefaultComposeApplicationResourcesTask
 import org.jetbrains.compose.internal.utils.*
-import org.jetbrains.compose.internal.utils.OS
-import org.jetbrains.compose.internal.utils.currentOS
-import org.jetbrains.compose.internal.utils.currentTarget
-import org.jetbrains.compose.internal.utils.dir
-import org.jetbrains.compose.internal.utils.ioFile
-import org.jetbrains.compose.internal.utils.ioFileOrNull
-import org.jetbrains.compose.internal.utils.javaExecutable
 import org.jetbrains.compose.internal.utils.provider
 
 private val defaultJvmArgs = listOf("-D$CONFIGURE_SWING_GLOBALS=true")
@@ -52,7 +46,6 @@ internal class CommonJvmDesktopTasks(
     val checkRuntime: TaskProvider<AbstractCheckNativeDistributionRuntime>,
     val suggestRuntimeModules: TaskProvider<AbstractSuggestModulesTask>,
     val prepareAppResources: TaskProvider<Sync>,
-    val createRuntimeImage: TaskProvider<AbstractJLinkTask>
 )
 
 private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDesktopTasks {
@@ -66,6 +59,7 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         taskNameObject = "runtime"
     ) {
         jdkHome.set(app.javaHomeProvider)
+        aotModes.set(this@configureCommonJvmDesktopTasks.buildTypes.all.map { it.aot.mode })
         checkJdkVendor.set(ComposeProperties.checkJdkVendor(project.providers))
         jdkVersionProbeJar.from(
             project.detachedComposeGradleDependency(
@@ -101,30 +95,31 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         into(jvmTmpDirForTask())
     }
 
-    val createRuntimeImage = tasks.register<AbstractJLinkTask>(
-        taskNameAction = "create",
-        taskNameObject = "runtimeImage"
-    ) {
-        dependsOn(checkRuntime)
-        javaHome.set(app.javaHomeProvider)
-        modules.set(provider { app.nativeDistributions.modules })
-        includeAllModules.set(provider { app.nativeDistributions.includeAllModules })
-        javaRuntimePropertiesFile.set(checkRuntime.flatMap { it.javaRuntimePropertiesFile })
-        destinationDir.set(appTmpDir.dir("runtime"))
-    }
-
     return CommonJvmDesktopTasks(
-        unpackDefaultResources,
-        checkRuntime,
-        suggestRuntimeModules,
-        prepareAppResources,
-        createRuntimeImage
+        unpackDefaultResources = unpackDefaultResources,
+        checkRuntime = checkRuntime,
+        suggestRuntimeModules = suggestRuntimeModules,
+        prepareAppResources = prepareAppResources,
     )
 }
 
 private fun JvmApplicationContext.configurePackagingTasks(
     commonTasks: CommonJvmDesktopTasks
 ) {
+    val createRuntimeImage = tasks.register<AbstractJLinkTask>(
+        taskNameAction = "create",
+        taskNameObject = "runtimeImage"
+    ) {
+        dependsOn(commonTasks.checkRuntime)
+        javaHome.set(app.javaHomeProvider)
+        modules.set(provider { app.nativeDistributions.modules })
+        includeAllModules.set(provider { app.nativeDistributions.includeAllModules })
+        javaRuntimePropertiesFile.set(commonTasks.checkRuntime.flatMap { it.javaRuntimePropertiesFile })
+        destinationDir.set(appTmpDir.dir("runtime"))
+        stripNativeCommands.set(!buildType.aot.mode.generateJreClassesArchive)  // `java` is needed to generate the JRE CDS archive
+        generateJreCdsArchive.set(buildType.aot.mode.generateJreClassesArchive)
+    }
+
     val runProguard = if (buildType.proguard.isEnabled.orNull == true) {
         tasks.register<AbstractProguardTask>(
             taskNameAction = "proguard",
@@ -134,19 +129,43 @@ private fun JvmApplicationContext.configurePackagingTasks(
         }
     } else null
 
-    val createDistributable = tasks.register<AbstractJPackageTask>(
+    val createDistributableImpl = tasks.register<AbstractJPackageTask>(
         taskNameAction = "create",
-        taskNameObject = "distributable",
-        args = listOf(TargetFormat.AppImage)
+        taskNameObject = "distributableImpl",
+        args = listOf(TargetFormat.AppImage),
+        isHidden = true,
     ) {
         configurePackageTask(
             this,
-            createRuntimeImage = commonTasks.createRuntimeImage,
+            createRuntimeImage = createRuntimeImage,
             prepareAppResources = commonTasks.prepareAppResources,
             checkRuntime = commonTasks.checkRuntime,
             unpackDefaultResources = commonTasks.unpackDefaultResources,
             runProguard = runProguard
         )
+    }
+
+    val aotConfig = buildType.aot
+    val createAotArchive = if (aotConfig.mode.needsTrainingRun) {
+        tasks.register<AbstractCreateAotArchiveTask>(
+            taskNameAction = "create",
+            taskNameObject = "aotArchive",
+            args = listOf(createDistributableImpl),
+            isHidden = true,
+        ) {
+            dependsOn(createDistributableImpl)
+            this.aotConfig.set(aotConfig)
+        }
+    } else null
+
+    val createDistributable = tasks.register<Task>(
+        taskNameAction = "create",
+        taskNameObject = "distributable",
+    ) {
+        dependsOn(createDistributableImpl)
+        if (createAotArchive != null) {
+            dependsOn(createAotArchive)
+        }
     }
 
     val packageFormats = app.nativeDistributions.targetFormats.map { targetFormat ->
@@ -155,29 +174,13 @@ private fun JvmApplicationContext.configurePackagingTasks(
             taskNameObject = targetFormat.name,
             args = listOf(targetFormat)
         ) {
-            // On Mac we want to patch bundled Info.plist file,
-            // so we create an app image, change its Info.plist,
-            // then create an installer based on the app image.
-            // We could create an installer the same way on other platforms, but
-            // in some cases there are failures with JDK 15.
-            // See [AbstractJPackageTask.patchInfoPlistIfNeeded]
-            if (currentOS != OS.MacOS) {
-                configurePackageTask(
-                    this,
-                    createRuntimeImage = commonTasks.createRuntimeImage,
-                    prepareAppResources = commonTasks.prepareAppResources,
-                    checkRuntime = commonTasks.checkRuntime,
-                    unpackDefaultResources = commonTasks.unpackDefaultResources,
-                    runProguard = runProguard
-                )
-            } else {
-                configurePackageTask(
-                    this,
-                    createAppImage = createDistributable,
-                    checkRuntime = commonTasks.checkRuntime,
-                    unpackDefaultResources = commonTasks.unpackDefaultResources
-                )
-            }
+            configurePackageTask(
+                this,
+                createAppImage = createDistributableImpl,
+                checkRuntime = commonTasks.checkRuntime,
+                unpackDefaultResources = commonTasks.unpackDefaultResources,
+                createAotArchive = createAotArchive
+            )
         }
 
         if (targetFormat.isCompatibleWith(OS.MacOS)) {
@@ -232,8 +235,10 @@ private fun JvmApplicationContext.configurePackagingTasks(
     val runDistributable = tasks.register<AbstractRunDistributableTask>(
         taskNameAction = "run",
         taskNameObject = "distributable",
-        args = listOf(createDistributable)
-    )
+        args = listOf(createDistributableImpl)
+    ) {
+        dependsOn(createDistributable)
+    }
 
     val run = tasks.register<JavaExec>(taskNameAction = "run") {
         configureRunTask(this, commonTasks.prepareAppResources, runProguard)
@@ -284,7 +289,8 @@ private fun JvmApplicationContext.configurePackageTask(
     prepareAppResources: TaskProvider<Sync>? = null,
     checkRuntime: TaskProvider<AbstractCheckNativeDistributionRuntime>? = null,
     unpackDefaultResources: TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>,
-    runProguard: Provider<AbstractProguardTask>? = null
+    runProguard: Provider<AbstractProguardTask>? = null,
+    createAotArchive: TaskProvider<AbstractCreateAotArchiveTask>? = null
 ) {
     packageTask.enabled = packageTask.targetFormat.isCompatibleWithCurrentOS
 
@@ -313,9 +319,9 @@ private fun JvmApplicationContext.configurePackageTask(
 
     app.nativeDistributions.let { executables ->
         packageTask.packageName.set(packageNameProvider)
-        packageTask.packageDescription.set(packageTask.provider { executables.description })
-        packageTask.packageCopyright.set(packageTask.provider { executables.copyright })
-        packageTask.packageVendor.set(packageTask.provider { executables.vendor })
+        packageTask.packageDescription.set(nullableProvider { executables.description })
+        packageTask.packageCopyright.set(nullableProvider { executables.copyright })
+        packageTask.packageVendor.set(nullableProvider { executables.vendor })
         packageTask.packageVersion.set(packageVersionFor(packageTask.targetFormat))
         packageTask.licenseFile.set(executables.licenseFile)
     }
@@ -338,8 +344,15 @@ private fun JvmApplicationContext.configurePackageTask(
         }
     }
 
-    packageTask.launcherMainClass.set(provider { app.mainClass })
-    packageTask.launcherJvmArgs.set(provider { defaultJvmArgs + app.jvmArgs })
+    if (createAotArchive != null) {
+        packageTask.dependsOn(createAotArchive)
+        packageTask.files.from(project.file(createAotArchive.flatMap { it.aotArchiveFile }))
+    }
+
+    packageTask.launcherMainClass.set(nullableProvider { app.mainClass })
+    packageTask.launcherJvmArgs.set(
+        provider { defaultJvmArgs + buildType.aot.runtimeJvmArgs + app.jvmArgs }
+    )
     packageTask.launcherArgs.set(provider { app.args })
 }
 
@@ -349,7 +362,7 @@ internal fun JvmApplicationContext.configureCommonNotarizationSettings(
     notarizationTask.nonValidatedNotarizationSettings = app.nativeDistributions.macOS.notarization
 }
 
-private fun <T> TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>.get(
+private fun <T : Any> TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>.get(
     fn: AbstractUnpackDefaultComposeApplicationResourcesTask.DefaultResourcesProvider.() -> Provider<T>
 ) = flatMap { fn(it.resources) }
 
@@ -363,12 +376,12 @@ internal fun JvmApplicationContext.configurePlatformSettings(
         OS.Linux -> {
             app.nativeDistributions.linux.also { linux ->
                 packageTask.linuxShortcut.set(provider { linux.shortcut })
-                packageTask.linuxAppCategory.set(provider { linux.appCategory })
-                packageTask.linuxAppRelease.set(provider { linux.appRelease })
-                packageTask.linuxDebMaintainer.set(provider { linux.debMaintainer })
-                packageTask.linuxMenuGroup.set(provider { linux.menuGroup })
-                packageTask.linuxPackageName.set(provider { linux.packageName })
-                packageTask.linuxRpmLicenseType.set(provider { linux.rpmLicenseType })
+                packageTask.linuxAppCategory.set(nullableProvider { linux.appCategory })
+                packageTask.linuxAppRelease.set(nullableProvider { linux.appRelease })
+                packageTask.linuxDebMaintainer.set(nullableProvider { linux.debMaintainer })
+                packageTask.linuxMenuGroup.set(nullableProvider { linux.menuGroup })
+                packageTask.linuxPackageName.set(nullableProvider { linux.packageName })
+                packageTask.linuxRpmLicenseType.set(nullableProvider { linux.rpmLicenseType })
                 packageTask.iconFile.set(linux.iconFile.orElse(defaultResources.get { linuxIcon }))
                 packageTask.installationPath.set(linux.installationPath)
                 packageTask.fileAssociations.set(provider { linux.fileAssociations })
@@ -381,8 +394,8 @@ internal fun JvmApplicationContext.configurePlatformSettings(
                 packageTask.winPerUserInstall.set(provider { win.perUserInstall })
                 packageTask.winShortcut.set(provider { win.shortcut })
                 packageTask.winMenu.set(provider { win.menu })
-                packageTask.winMenuGroup.set(provider { win.menuGroup })
-                packageTask.winUpgradeUuid.set(provider { win.upgradeUuid })
+                packageTask.winMenuGroup.set(nullableProvider { win.menuGroup })
+                packageTask.winUpgradeUuid.set(nullableProvider { win.upgradeUuid })
                 packageTask.iconFile.set(win.iconFile.orElse(defaultResources.get { windowsIcon }))
                 packageTask.installationPath.set(win.installationPath)
                 packageTask.fileAssociations.set(provider { win.fileAssociations })
@@ -390,13 +403,13 @@ internal fun JvmApplicationContext.configurePlatformSettings(
         }
         OS.MacOS -> {
             app.nativeDistributions.macOS.also { mac ->
-                packageTask.macPackageName.set(provider { mac.packageName })
+                packageTask.macPackageName.set(nullableProvider { mac.packageName })
                 packageTask.macDockName.set(
                     if (mac.setDockNameSameAsPackageName)
-                        provider { mac.dockName }
+                        nullableProvider { mac.dockName }
                             .orElse(packageTask.macPackageName).orElse(packageTask.packageName)
                     else
-                        provider { mac.dockName }
+                        nullableProvider { mac.dockName }
                 )
                 packageTask.macAppStore.set(mac.appStore)
                 packageTask.macAppCategory.set(mac.appCategory)
@@ -405,10 +418,10 @@ internal fun JvmApplicationContext.configurePlatformSettings(
                 packageTask.macEntitlementsFile.set(mac.entitlementsFile.orElse(defaultEntitlements))
                 packageTask.macRuntimeEntitlementsFile.set(mac.runtimeEntitlementsFile.orElse(defaultEntitlements))
                 packageTask.packageBuildVersion.set(packageBuildVersionFor(packageTask.targetFormat))
-                packageTask.nonValidatedMacBundleID.set(provider { mac.bundleID })
+                packageTask.nonValidatedMacBundleID.set(nullableProvider { mac.bundleID })
                 packageTask.macProvisioningProfile.set(mac.provisioningProfile)
                 packageTask.macRuntimeProvisioningProfile.set(mac.runtimeProvisioningProfile)
-                packageTask.macExtraPlistKeysRawXml.set(provider { mac.infoPlistSettings.extraKeysRawXml })
+                packageTask.macExtraPlistKeysRawXml.set(nullableProvider { mac.infoPlistSettings.extraKeysRawXml })
                 packageTask.nonValidatedMacSigningSettings = app.nativeDistributions.macOS.signing
                 packageTask.iconFile.set(mac.iconFile.orElse(defaultResources.get { macIcon }))
                 packageTask.installationPath.set(mac.installationPath)
@@ -425,7 +438,7 @@ private fun JvmApplicationContext.configureRunTask(
 ) {
     exec.dependsOn(prepareAppResources)
 
-    exec.mainClass.set(exec.provider { app.mainClass })
+    exec.mainClass.set(nullableProvider { app.mainClass })
     exec.executable(javaExecutable(app.javaHome))
     exec.jvmArgs = arrayListOf<String>().apply {
         addAll(defaultJvmArgs)

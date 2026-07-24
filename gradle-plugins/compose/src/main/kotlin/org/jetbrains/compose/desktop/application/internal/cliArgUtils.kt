@@ -10,7 +10,7 @@ import org.gradle.api.provider.Provider
 import org.jetbrains.compose.desktop.application.internal.files.normalizedPath
 import java.io.File
 
-internal fun <T : Any?> MutableCollection<String>.cliArg(
+internal fun <T : Any> MutableCollection<String>.cliArg(
     name: String,
     value: T?,
     fn: (T) -> String = defaultToString()
@@ -23,7 +23,7 @@ internal fun <T : Any?> MutableCollection<String>.cliArg(
     }
 }
 
-internal fun <T : Any?> MutableCollection<String>.cliArg(
+internal fun <T : Any> MutableCollection<String>.cliArg(
     name: String,
     value: Provider<T>,
     fn: (T) -> String = defaultToString()
@@ -35,7 +35,7 @@ internal fun MutableCollection<String>.javaOption(value: String) {
     cliArg("--java-options", "'$value'")
 }
 
-private fun <T : Any?> defaultToString(): (T) -> String =
+private fun <T : Any> defaultToString(): (T) -> String =
     {
         val asString = when (it) {
             is FileSystemLocation -> it.asFile.normalizedPath()

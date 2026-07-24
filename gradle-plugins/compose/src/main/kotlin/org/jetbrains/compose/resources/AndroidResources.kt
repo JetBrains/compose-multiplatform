@@ -19,7 +19,10 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.internal.Version
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
@@ -189,7 +192,7 @@ private fun Project.configureGeneratedAndroidComponentAssets(
     )
     tasks.configureEach { task ->
         //fix agp task dependencies for AndroidStudio preview
-        if (task.name == "compile${camelComponentName}Sources") {
+        if (task.name == "package${camelComponentName}Resources") {
             task.dependsOn(copyComponentAssets)
         }
         //fix linter task dependencies for `build` task
@@ -200,12 +203,14 @@ private fun Project.configureGeneratedAndroidComponentAssets(
 }
 
 //Copy task doesn't work with 'variant.sources?.assets?.addGeneratedSourceDirectory' API
+@DisableCachingByDefault(because = "Not worth caching — fast file copy operation")
 internal abstract class CopyResourcesToAndroidAssetsTask : DefaultTask() {
     @get:Inject
     abstract val fileSystem: FileSystemOperations
 
     @get:InputFiles
     @get:IgnoreEmptyDirectories
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val from: Property<FileCollection>
 
     @get:Input

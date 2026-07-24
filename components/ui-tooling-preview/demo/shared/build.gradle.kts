@@ -1,21 +1,20 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     kotlin("multiplatform")
-    id("com.android.library")
+    id("com.android.kotlin.multiplatform.library")
     id("org.jetbrains.compose")
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
 kotlin {
-    androidTarget {
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
+    android {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
         }
     }
     jvm("desktop")
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64()
     ).forEach { iosTarget ->
@@ -34,7 +33,6 @@ kotlin {
     }
 
     listOf(
-        macosX64(),
         macosArm64()
     ).forEach { macosTarget ->
         macosTarget.binaries {
@@ -46,29 +44,18 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.material3)
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.material3)
             implementation(project(":ui-tooling-preview:library"))
         }
         val desktopMain by getting
         desktopMain.dependencies {
-            implementation(compose.desktop.common)
+            implementation(libs.compose.desktop)
         }
     }
-}
-
-android {
-    compileSdk = 35
-    namespace = "org.jetbrains.compose.ui.tooling.preview.demo.shared"
-    defaultConfig {
-        minSdk = 21
+    android {
+        namespace = "org.jetbrains.compose.ui.tooling.preview.demo.shared"
+        compileSdk = 37
+        minSdk = 23
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-}
-
-compose.experimental {
-    web.application {}
 }

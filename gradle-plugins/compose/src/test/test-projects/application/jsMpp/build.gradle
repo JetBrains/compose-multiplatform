@@ -15,8 +15,8 @@ kotlin {
         }
         named("jsMain") { 
             dependencies {
-                implementation(compose.html.core)
-                implementation(compose.runtime)
+                implementation("org.jetbrains.compose.html:html-core:COMPOSE_VERSION_PLACEHOLDER")
+                implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
             }
         }
         named("jvmMain") {

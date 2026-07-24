@@ -22,6 +22,11 @@ import kotlin.reflect.KClass
  * Interface to be implemented by any provider of values that you want to be injected as @[Preview]
  * parameters. This allows providing sample information for previews.
  */
+@Deprecated(
+    "Use androidx.compose.ui.tooling.preview.PreviewParameterProvider from " +
+            "org.jetbrains.compose.ui:ui-tooling-preview module instead",
+    ReplaceWith("PreviewParameterProvider", "androidx.compose.ui.tooling.preview.PreviewParameterProvider")
+)
 expect interface PreviewParameterProvider<T> {
     /**
      * [Sequence] of values of type [T] to be passed as @[Preview] parameter.
@@ -41,6 +46,11 @@ expect interface PreviewParameterProvider<T> {
  * parameter.
  * @param limit Max number of values from [provider] to inject to this parameter.
  */
+@Deprecated(
+    "Use androidx.compose.ui.tooling.preview.PreviewParameter from " +
+            "org.jetbrains.compose.ui:ui-tooling-preview module instead",
+    ReplaceWith("PreviewParameter", "androidx.compose.ui.tooling.preview.PreviewParameter")
+)
 annotation class PreviewParameter(
     val provider: KClass<out PreviewParameterProvider<*>>,
     val limit: Int = Int.MAX_VALUE

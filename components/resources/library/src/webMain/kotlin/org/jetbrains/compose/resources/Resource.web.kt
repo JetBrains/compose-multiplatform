@@ -104,7 +104,7 @@ fun preloadFont(
     variationSettings: FontVariation.Settings = FontVariation.Settings(weight, style),
 ): State<Font?> {
     val resState = remember(resource, weight, style, variationSettings) { mutableStateOf<Font?>(null) }.apply {
-        value = Font(resource, weight, style, variationSettings).takeIf { !it.isEmptyPlaceholder }
+        value = Font(resource, weight, style, variationSettings).takeIf { !it.isDefault }
     }
     return resState
 }

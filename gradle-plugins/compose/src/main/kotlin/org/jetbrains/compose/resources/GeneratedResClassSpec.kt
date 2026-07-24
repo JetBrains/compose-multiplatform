@@ -61,14 +61,18 @@ private val internalAnnotation = AnnotationSpec.builder(internalAnnotationClass)
 
 private val resourceContentHashAnnotationClass = ClassName("org.jetbrains.compose.resources", "ResourceContentHash")
 
+private val languageRegex = Regex("[a-z]{2,3}") // ISO 639
+private val scriptRegex = Regex("[A-Z][a-z]{3}") // ISO 15924
+private val regionAlpha2Regex = Regex("[A-Z]{2}") // ISO 3166-1 alpha-2
+private val regionNumericRegex = Regex("[0-9]{3}") // UN M.49
+private val androidRegionRegex = Regex("r[A-Z]{2}|r[0-9]{3}") // Android `r` prefix
+
 private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlock.Builder {
     val languageQualifier = ClassName("org.jetbrains.compose.resources", "LanguageQualifier")
+    val scriptQualifier = ClassName("org.jetbrains.compose.resources", "ScriptQualifier")
     val regionQualifier = ClassName("org.jetbrains.compose.resources", "RegionQualifier")
     val themeQualifier = ClassName("org.jetbrains.compose.resources", "ThemeQualifier")
     val densityQualifier = ClassName("org.jetbrains.compose.resources", "DensityQualifier")
-
-    val languageRegex = Regex("[a-z]{2,3}")
-    val regionRegex = Regex("r[A-Z]{2}")
 
     val qualifiersMap = mutableMapOf<ClassName, String>()
 
@@ -79,7 +83,9 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
         qualifiersMap[className] = qualifier
     }
 
-    resourceItem.qualifiers.forEach { q ->
+    var bcpConsumed = false
+
+    resourceItem.qualifiers.forEachIndexed { index, q ->
         when (q) {
             "light",
             "dark" -> {
@@ -96,11 +102,28 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
             }
 
             else -> when {
+                q.startsWith("b+") -> {
+                    if (index != 0) {
+                        error("BCP 47 'b+' segment must be the first qualifier in '${resourceItem.path}'.")
+                    }
+                    val (language, script, region) = expandBcpQualifier(q, resourceItem.path)
+                    language?.let { saveQualifier(languageQualifier, it) }
+                    script?.let { saveQualifier(scriptQualifier, it) }
+                    region?.let { saveQualifier(regionQualifier, it) }
+                    bcpConsumed = true
+                }
+
                 q.matches(languageRegex) -> {
+                    if (bcpConsumed) {
+                        error("Locale qualifier '$q' cannot follow a BCP 47 segment in '${resourceItem.path}'.")
+                    }
                     saveQualifier(languageQualifier, q)
                 }
 
-                q.matches(regionRegex) -> {
+                q.matches(androidRegionRegex) -> {
+                    if (bcpConsumed) {
+                        error("Locale qualifier '$q' cannot follow a BCP 47 segment in '${resourceItem.path}'.")
+                    }
                     saveQualifier(regionQualifier, q)
                 }
 
@@ -108,22 +131,59 @@ private fun CodeBlock.Builder.addQualifiers(resourceItem: ResourceItem): CodeBlo
             }
         }
     }
+
     qualifiersMap[themeQualifier]?.let { q -> add("%T.${q.uppercase()}, ", themeQualifier) }
     qualifiersMap[densityQualifier]?.let { q -> add("%T.${q.uppercase()}, ", densityQualifier) }
     qualifiersMap[languageQualifier]?.let { q -> add("%T(\"$q\"), ", languageQualifier) }
-    qualifiersMap[regionQualifier]?.let { q ->
-        val lang = qualifiersMap[languageQualifier]
-        if (lang == null) {
-            error("Region qualifier must be used only with language.\nFile: ${resourceItem.path}")
+
+    if (bcpConsumed) {
+        qualifiersMap[scriptQualifier]?.let { q -> add("%T(\"$q\"), ", scriptQualifier) }
+        qualifiersMap[regionQualifier]?.let { q -> add("%T(\"$q\"), ", regionQualifier) }
+    } else {
+        qualifiersMap[regionQualifier]?.let { q ->
+            val lang = qualifiersMap[languageQualifier]
+            if (lang == null) {
+                error("Region qualifier must be used only with language.\nFile: ${resourceItem.path}")
+            }
+            val langAndRegion = "$lang-$q"
+            if (!resourceItem.path.toString().contains("-$langAndRegion")) {
+                error("Region qualifier must be declared after language: '$langAndRegion'.\nFile: ${resourceItem.path}")
+            }
+            add("%T(\"${q.takeLast(2)}\"), ", regionQualifier)
         }
-        val langAndRegion = "$lang-$q"
-        if (!resourceItem.path.toString().contains("-$langAndRegion")) {
-            error("Region qualifier must be declared after language: '$langAndRegion'.\nFile: ${resourceItem.path}")
-        }
-        add("%T(\"${q.takeLast(2)}\"), ", regionQualifier)
     }
 
     return this
+}
+
+private fun expandBcpQualifier(segment: String, path: Path): Triple<String?, String?, String?> {
+    val subtags = segment.removePrefix("b+").split("+")
+    var language: String? = null
+    var script: String? = null
+    var region: String? = null
+    var lastKind = -1
+    for ((index, subtag) in subtags.withIndex()) {
+        val kind = when {
+            subtag.matches(languageRegex)      -> 0
+            subtag.matches(scriptRegex)        -> 1
+            subtag.matches(regionAlpha2Regex)  -> 2
+            subtag.matches(regionNumericRegex) -> 2
+            else -> error("Malformed BCP 47 subtag '$subtag' in '$path'.")
+        }
+        if (index == 0 && kind != 0) {
+            error("BCP 47 segment must start with a language subtag in '$path'.")
+        }
+        if (kind <= lastKind) {
+            error("BCP 47 subtags must follow language -> script -> region order in '$path'.")
+        }
+        when (kind) {
+            0 -> language = subtag
+            1 -> script = subtag
+            2 -> region = subtag
+        }
+        lastKind = kind
+    }
+    return Triple(language, script, region)
 }
 
 internal fun getResFileSpec(
@@ -212,7 +272,8 @@ internal fun getAccessorsSpecs(
     sourceSetName: String,
     moduleDir: String,
     resClassName: String,
-    isPublic: Boolean
+    isPublic: Boolean,
+    generateResourceContentHashAnnotation: Boolean
 ): List<FileSpec> {
     val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
     val files = mutableListOf<FileSpec>()
@@ -231,7 +292,8 @@ internal fun getAccessorsSpecs(
                     moduleDir,
                     resClassName,
                     resModifier,
-                    idToResources.subMap(ids.first(), true, ids.last(), true)
+                    idToResources.subMap(ids.first(), true, ids.last(), true),
+                    generateResourceContentHashAnnotation
                 )
             )
         }
@@ -248,7 +310,8 @@ private fun getChunkFileSpec(
     moduleDir: String,
     resClassName: String,
     resModifier: KModifier,
-    idToResources: Map<String, List<ResourceItem>>
+    idToResources: Map<String, List<ResourceItem>>,
+    generateResourceContentHashAnnotation: Boolean
 ): FileSpec {
     return FileSpec.builder(packageName, fileName).also { chunkFile ->
         chunkFile.addAnnotation(
@@ -289,7 +352,7 @@ private fun getChunkFileSpec(
             val accessorBuilder = PropertySpec.builder(resName, type.getClassName(), resModifier)
                 .receiver(ClassName(packageName, resClassName, type.accessorName))
                 .delegate(initializer)
-            if (System.getProperty("compose.resources.generate.ResourceContentHash.annotation") == "true") {
+            if (generateResourceContentHashAnnotation) {
                 accessorBuilder.addAnnotation(
                     AnnotationSpec.builder(resourceContentHashAnnotationClass)
                         .useSiteTarget(AnnotationSpec.UseSiteTarget.DELEGATE)

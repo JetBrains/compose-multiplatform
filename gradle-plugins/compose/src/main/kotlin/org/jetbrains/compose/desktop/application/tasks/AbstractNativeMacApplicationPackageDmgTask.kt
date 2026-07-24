@@ -9,10 +9,12 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.internal.utils.ioFile
-import org.jetbrains.compose.internal.utils.notNullProperty
+import org.jetbrains.compose.internal.utils.property
 import java.io.File
 
+@DisableCachingByDefault(because = "Uses platform-specific native tools whose output depends on local system")
 abstract class AbstractNativeMacApplicationPackageDmgTask : AbstractNativeMacApplicationPackageTask() {
     @get:InputFile
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
@@ -23,9 +25,10 @@ abstract class AbstractNativeMacApplicationPackageDmgTask : AbstractNativeMacApp
     val osascript: RegularFileProperty = objects.fileProperty().value { File("/usr/bin/osascript") }
 
     @get:Input
-    val installDir: Property<String> = objects.notNullProperty("/Applications")
+    val installDir: Property<String> = objects.property<String>().value("/Applications")
 
     @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     val appDir: DirectoryProperty = objects.directoryProperty()
 
     override fun createPackage(destinationDir: File, workingDir: File) {

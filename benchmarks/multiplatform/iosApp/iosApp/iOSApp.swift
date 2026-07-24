@@ -23,7 +23,10 @@ class MemoryWarningMonitor: ObservableObject {
 struct iOSApp: App {
 	init() {
 	    MemoryWarningMonitor()
-		Main_iosKt.main(args: ProcessInfo.processInfo.arguments)
+        Main_iosKt.setGlobalFromArgs(args: ProcessInfo.processInfo.arguments)
+        if (!Main_iosKt.runReal()) {
+            Main_iosKt.runBenchmarks()
+        }
     }
 
 	var body: some Scene {

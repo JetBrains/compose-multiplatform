@@ -8,13 +8,13 @@ package org.jetbrains.compose.desktop.application.tasks
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.Directory
 import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputDirectory
 import org.gradle.api.tasks.InputFile
@@ -27,6 +27,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.process.ExecResult
 import org.gradle.work.ChangeType
+import org.gradle.work.DisableCachingByDefault
 import org.gradle.work.InputChanges
 import org.jetbrains.compose.desktop.application.dsl.FileAssociation
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
@@ -54,19 +55,20 @@ import org.jetbrains.compose.desktop.application.internal.files.isJarFile
 import org.jetbrains.compose.desktop.application.internal.files.mangledName
 import org.jetbrains.compose.desktop.application.internal.files.normalizedPath
 import org.jetbrains.compose.desktop.application.internal.files.transformJar
+import org.jetbrains.compose.desktop.application.internal.isSkikoAwtRuntimeJar
+import org.jetbrains.compose.desktop.application.internal.isSkikoNativeEntry
 import org.jetbrains.compose.desktop.application.internal.javaOption
+import org.jetbrains.compose.desktop.application.internal.shouldKeepSkikoEntry
 import org.jetbrains.compose.desktop.application.internal.validation.validate
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.clearDirs
-import org.jetbrains.compose.internal.utils.currentArch
 import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.internal.utils.delete
 import org.jetbrains.compose.internal.utils.ioFile
 import org.jetbrains.compose.internal.utils.ioFileOrNull
 import org.jetbrains.compose.internal.utils.mkdirs
-import org.jetbrains.compose.internal.utils.notNullProperty
-import org.jetbrains.compose.internal.utils.nullableProperty
+import org.jetbrains.compose.internal.utils.property
 import org.jetbrains.compose.internal.utils.stacktraceToString
 import org.jetbrains.kotlin.gradle.internal.ensureParentDirsCreated
 import java.io.File
@@ -79,11 +81,13 @@ import javax.inject.Inject
 import kotlin.io.path.isExecutable
 import kotlin.io.path.isRegularFile
 
+@DisableCachingByDefault(because = "Uses platform-specific JDK tools whose output depends on local JDK installation")
 abstract class AbstractJPackageTask @Inject constructor(
     @get:Input
     val targetFormat: TargetFormat,
 ) : AbstractJvmToolOperationTask("jpackage") {
     @get:InputFiles
+    @get:Classpath
     val files: ConfigurableFileCollection = objects.fileCollection()
 
     /**
@@ -110,22 +114,23 @@ abstract class AbstractJPackageTask @Inject constructor(
      *  need to mangle twice.
      */
     @get:Input
-    val mangleJarFilesNames: Property<Boolean> = objects.notNullProperty(true)
+    val mangleJarFilesNames: Property<Boolean> = objects.property<Boolean>().value(true)
 
     /**
      * Indicates that task will get the uber JAR as input.
      */
     @get:Input
-    val packageFromUberJar: Property<Boolean> = objects.notNullProperty(false)
+    val packageFromUberJar: Property<Boolean> = objects.property<Boolean>().value(false)
 
     @get:InputDirectory
     @get:Optional
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     /** @see internal/wixToolset.kt */
     val wixToolsetDir: DirectoryProperty = objects.directoryProperty()
 
     @get:Input
     @get:Optional
-    val installationPath: Property<String?> = objects.nullableProperty()
+    val installationPath: Property<String> = objects.property()
 
     @get:InputFile
     @get:Optional
@@ -138,7 +143,7 @@ abstract class AbstractJPackageTask @Inject constructor(
     val iconFile: RegularFileProperty = objects.fileProperty()
 
     @get:Input
-    val launcherMainClass: Property<String> = objects.notNullProperty()
+    val launcherMainClass: Property<String> = objects.property()
 
     @get:InputFile
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
@@ -153,71 +158,71 @@ abstract class AbstractJPackageTask @Inject constructor(
     val launcherJvmArgs: ListProperty<String> = objects.listProperty(String::class.java)
 
     @get:Input
-    val packageName: Property<String> = objects.notNullProperty()
+    val packageName: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val packageDescription: Property<String?> = objects.nullableProperty()
+    val packageDescription: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val packageCopyright: Property<String?> = objects.nullableProperty()
+    val packageCopyright: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val packageVendor: Property<String?> = objects.nullableProperty()
+    val packageVendor: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val packageVersion: Property<String?> = objects.nullableProperty()
+    val packageVersion: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val linuxShortcut: Property<Boolean?> = objects.nullableProperty()
+    val linuxShortcut: Property<Boolean> = objects.property()
 
     @get:Input
     @get:Optional
-    val linuxPackageName: Property<String?> = objects.nullableProperty()
+    val linuxPackageName: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val linuxAppRelease: Property<String?> = objects.nullableProperty()
+    val linuxAppRelease: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val linuxAppCategory: Property<String?> = objects.nullableProperty()
+    val linuxAppCategory: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val linuxDebMaintainer: Property<String?> = objects.nullableProperty()
+    val linuxDebMaintainer: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val linuxMenuGroup: Property<String?> = objects.nullableProperty()
+    val linuxMenuGroup: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val linuxRpmLicenseType: Property<String?> = objects.nullableProperty()
+    val linuxRpmLicenseType: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val macPackageName: Property<String?> = objects.nullableProperty()
+    val macPackageName: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val macDockName: Property<String?> = objects.nullableProperty()
+    val macDockName: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val macAppStore: Property<Boolean?> = objects.nullableProperty()
+    val macAppStore: Property<Boolean> = objects.property()
 
     @get:Input
     @get:Optional
-    val macAppCategory: Property<String?> = objects.nullableProperty()
+    val macAppCategory: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val macMinimumSystemVersion: Property<String?> = objects.nullableProperty()
+    val macMinimumSystemVersion: Property<String> = objects.property()
 
     @get:InputFile
     @get:Optional
@@ -231,7 +236,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    val packageBuildVersion: Property<String?> = objects.nullableProperty()
+    val packageBuildVersion: Property<String> = objects.property()
 
     @get:InputFile
     @get:Optional
@@ -245,50 +250,53 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:Input
     @get:Optional
-    val winConsole: Property<Boolean?> = objects.nullableProperty()
+    val winConsole: Property<Boolean> = objects.property()
 
     @get:Input
     @get:Optional
-    val winDirChooser: Property<Boolean?> = objects.nullableProperty()
+    val winDirChooser: Property<Boolean> = objects.property()
 
     @get:Input
     @get:Optional
-    val winPerUserInstall: Property<Boolean?> = objects.nullableProperty()
+    val winPerUserInstall: Property<Boolean> = objects.property()
 
     @get:Input
     @get:Optional
-    val winShortcut: Property<Boolean?> = objects.nullableProperty()
+    val winShortcut: Property<Boolean> = objects.property()
 
     @get:Input
     @get:Optional
-    val winMenu: Property<Boolean?> = objects.nullableProperty()
+    val winMenu: Property<Boolean> = objects.property()
 
     @get:Input
     @get:Optional
-    val winMenuGroup: Property<String?> = objects.nullableProperty()
+    val winMenuGroup: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    val winUpgradeUuid: Property<String?> = objects.nullableProperty()
+    val winUpgradeUuid: Property<String> = objects.property()
 
     @get:InputDirectory
     @get:Optional
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     val runtimeImage: DirectoryProperty = objects.directoryProperty()
 
     @get:InputDirectory
     @get:Optional
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     val appImage: DirectoryProperty = objects.directoryProperty()
 
     @get:Input
     @get:Optional
-    internal val nonValidatedMacBundleID: Property<String?> = objects.nullableProperty()
+    internal val nonValidatedMacBundleID: Property<String> = objects.property()
 
     @get:Input
     @get:Optional
-    internal val macExtraPlistKeysRawXml: Property<String?> = objects.nullableProperty()
+    internal val macExtraPlistKeysRawXml: Property<String> = objects.property()
 
     @get:InputFile
     @get:Optional
+    @get:PathSensitive(PathSensitivity.NONE)
     val javaRuntimePropertiesFile: RegularFileProperty = objects.fileProperty()
 
     @get:Input
@@ -424,12 +432,12 @@ abstract class AbstractJPackageTask @Inject constructor(
 
         if (targetFormat != TargetFormat.AppImage) {
             // Args, that can only be used, when creating an installer
-            if (currentOS == OS.MacOS && jvmRuntimeInfo.majorVersion >= 18) {
-                // This is needed to prevent a directory does not exist error.
-                cliArg("--app-image", appImage.dir("${packageName.get()}.app"))
-            } else {
-                cliArg("--app-image", appImage)
+            val appImageDir = when {
+                jvmRuntimeInfo.majorVersion < 18 -> appImage
+                currentOS == OS.MacOS -> appImage.dir("${packageName.get()}.app")
+                else -> appImage.dir(packageName.get())
             }
+            cliArg("--app-image", appImageDir)
             cliArg("--install-dir", installationPath)
             cliArg("--license-file", licenseFile)
             cliArg("--resource-dir", jpackageResources)
@@ -571,11 +579,19 @@ abstract class AbstractJPackageTask @Inject constructor(
         fun File.isMainUberJar() = packageFromUberJar.get() && name == launcherMainJar.ioFile.name
 
         val outdatedLibs = invalidateMappedLibs(inputChanges)
+        val skikoLibsToTransform = outdatedLibs.filterTo(HashSet()) { it.isSkikoAwtRuntimeJar() || it.isMainUberJar() }
+        if (skikoLibsToTransform.isNotEmpty()) {
+            fileOperations.clearDirs(skikoDir)
+        }
+
         for (sourceFile in outdatedLibs) {
             assert(sourceFile.exists()) { "Lib file does not exist: $sourceFile" }
 
-            libsMapping[sourceFile] = if (isSkikoForCurrentOS(sourceFile) || sourceFile.isMainUberJar()) {
-                val unpackedFiles = unpackSkikoForCurrentOS(sourceFile, skikoDir.ioFile, fileOperations)
+            libsMapping[sourceFile] = if (sourceFile in skikoLibsToTransform) {
+                val unpackedFiles = stripAndUnpackSkikoNatives(
+                    sourceFile,
+                    skikoDir.ioFile
+                )
                 unpackedFiles.map { copyFileToLibsDir(it) }
             } else {
                 listOf(copyFileToLibsDir(sourceFile))
@@ -789,30 +805,21 @@ private class FilesMapping : Serializable {
     }
 }
 
-private fun isSkikoForCurrentOS(lib: File): Boolean =
-    lib.name.startsWith("skiko-awt-runtime-${currentOS.id}-${currentArch.id}")
-            && lib.name.endsWith(".jar")
-
-private fun unpackSkikoForCurrentOS(sourceJar: File, skikoDir: File, fileOperations: FileSystemOperations): List<File> {
-    val entriesToUnpack = when (currentOS) {
-        OS.MacOS -> setOf("libskiko-macos-${currentArch.id}.dylib")
-        OS.Windows -> setOf("skiko-windows-${currentArch.id}.dll", "icudtl.dat")
-        OS.Linux -> setOf("libskiko-linux-${currentArch.id}.so")
-    }
-
-    // output files: unpacked libs, corresponding .sha256 files, and target jar
-    val outputFiles = ArrayList<File>(entriesToUnpack.size * 2 + 1)
+private fun stripAndUnpackSkikoNatives(
+    sourceJar: File,
+    skikoDir: File
+): List<File> {
+    val outputFiles = ArrayList<File>()
     val targetJar = skikoDir.resolve(sourceJar.name)
     outputFiles.add(targetJar)
 
-    fileOperations.clearDirs(skikoDir)
     transformJar(sourceJar, targetJar) { entry, zin, zout ->
-        // check both entry or entry.sha256
-        if (entry.name.removeSuffix(".sha256") in entriesToUnpack) {
+        val isSkikoNative = isSkikoNativeEntry(entry.name)
+        if (isSkikoNative && shouldKeepSkikoEntry(entry.name)) {
             val unpackedFile = skikoDir.resolve(entry.name.substringAfterLast("/"))
             zin.copyTo(unpackedFile)
             outputFiles.add(unpackedFile)
-        } else {
+        } else if (!isSkikoNative) {
             copyZipEntry(entry, zin, zout)
         }
     }

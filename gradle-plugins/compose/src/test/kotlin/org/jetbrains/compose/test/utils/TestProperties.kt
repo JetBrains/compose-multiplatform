@@ -14,6 +14,9 @@ object TestProperties {
     val composeGradlePluginVersion: String
         get() = notNullSystemProperty("compose.tests.compose.gradle.plugin.version")
 
+    val composeVersion: String
+        get() = notNullSystemProperty("compose.tests.compose.version")
+
     val gradleVersion: String
         get() = notNullSystemProperty("compose.tests.gradle.version")
 

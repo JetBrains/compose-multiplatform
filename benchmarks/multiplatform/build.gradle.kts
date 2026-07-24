@@ -5,14 +5,19 @@ plugins {
     alias(libs.plugins.composeCompiler) apply false
     alias(libs.plugins.kotlinMultiplatform) apply false
     alias(libs.plugins.kotlinSerialization) apply false
+    alias(libs.plugins.androidApplication) apply false
+    alias(libs.plugins.androidLibrary) apply false
 }
 
 allprojects {
     repositories {
-        google()
-        mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+        google {
+            url = uri("https://cache-redirector.jetbrains.com/dl.google.com/dl/android/maven2")
+        }
+        mavenCentral {
+            url = uri("https://cache-redirector.jetbrains.com/maven-central")
+        }
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
         mavenLocal()
     }
 }

@@ -45,6 +45,11 @@ package org.jetbrains.compose.ui.tooling.preview
 @Retention(AnnotationRetention.BINARY)
 @Target(AnnotationTarget.ANNOTATION_CLASS, AnnotationTarget.FUNCTION)
 @Repeatable
+@Deprecated(
+    "Use androidx.compose.ui.tooling.preview.Preview from " +
+            "org.jetbrains.compose.ui:ui-tooling-preview module instead",
+    ReplaceWith("Preview", "androidx.compose.ui.tooling.preview.Preview")
+)
 annotation class Preview(
     val name: String = "",
     val group: String = "",

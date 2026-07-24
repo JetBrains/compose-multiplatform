@@ -43,6 +43,12 @@ internal class BuildResultChecks(private val result: BuildResult) {
         }
     }
 
+    fun logContainsMatch(regex: Regex) {
+        if (!regex.containsMatchIn(result.output)) {
+            throw AssertionError("Test output does not match expected regular expression: $regex")
+        }
+    }
+
     fun logDoesntContain(substring: String) {
         if (result.output.contains(substring)) {
             throw AssertionError("Test output contains the unexpected string: '$substring'")

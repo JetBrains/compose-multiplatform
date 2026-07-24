@@ -15,8 +15,8 @@ allprojects {
     repositories {
         google()
         mavenCentral()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/") // to test with kotlin dev builds
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+        maven("https://redirector.kotlinlang.org/maven/dev/") // to test with kotlin dev builds
 
         maven("https://packages.jetbrains.team/maven/p/kt/dev")
         maven("https://redirector.kotlinlang.org/maven/dev")
@@ -78,7 +78,7 @@ subprojects {
                 target.compilations.all {
                     compileTaskProvider.configure{
                         compilerOptions {
-                            freeCompilerArgs.add("-Xpartial-linkage=disable")
+                            freeCompilerArgs.add("-Xpartial-linkage-loglevel=ERROR")
                         }
                     }
                 }

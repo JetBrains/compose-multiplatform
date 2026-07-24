@@ -12,6 +12,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.desktop.application.dsl.DEFAULT_RUNTIME_MODULES
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
@@ -19,13 +20,15 @@ import org.jetbrains.compose.desktop.application.internal.files.normalizedPath
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import org.jetbrains.compose.internal.utils.*
 
+@DisableCachingByDefault(because = "Not worth caching — prints module suggestions to console")
 abstract class AbstractSuggestModulesTask : AbstractComposeDesktopTask() {
     @get:Input
-    val javaHome: Property<String> = objects.notNullProperty<String>().apply {
+    val javaHome: Property<String> = objects.property<String>().apply {
         set(providers.systemProperty("java.home"))
     }
 
     @get:InputFiles
+    @get:Classpath
     val files: ConfigurableFileCollection = objects.fileCollection()
 
     @get:InputFile
@@ -36,7 +39,7 @@ abstract class AbstractSuggestModulesTask : AbstractComposeDesktopTask() {
     val modules: ListProperty<String> = objects.listProperty(String::class.java)
 
     @get:Input
-    val jvmTarget: Property<String> = objects.notNullProperty(MIN_JAVA_RUNTIME_VERSION.toString())
+    val jvmTarget: Property<String> = objects.property<String>().value(MIN_JAVA_RUNTIME_VERSION.toString())
 
     @get:LocalState
     protected val workingDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/$name")

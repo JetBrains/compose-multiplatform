@@ -1,22 +1,19 @@
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
     kotlin("multiplatform")
     id("maven-publish")
-    id("com.android.library")
+    id("com.android.kotlin.multiplatform.library")
 }
 
 kotlin {
     jvm("desktop")
-    androidTarget {
-        publishLibraryVariants("release")
-        compilations.all {
-            kotlinOptions {
-                jvmTarget = "11"
-            }
+    android {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    iosX64()
     iosArm64()
     iosSimulatorArm64()
     js {
@@ -28,7 +25,6 @@ kotlin {
         browser {
         }
     }
-    macosX64()
     macosArm64()
 
     applyDefaultHierarchyTemplate()
@@ -56,18 +52,10 @@ kotlin {
         val wasmJsMain by getting
         wasmJsMain.dependsOn(nonAndroidMain)
     }
-}
-
-android {
-    compileSdk = 35
-    namespace = "org.jetbrains.compose.ui.tooling.preview"
-    defaultConfig {
-        minSdk = 21
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+    android {
+        namespace = "org.jetbrains.compose.ui.tooling.preview"
+        compileSdk = 37
+        minSdk = 23
     }
 }
 

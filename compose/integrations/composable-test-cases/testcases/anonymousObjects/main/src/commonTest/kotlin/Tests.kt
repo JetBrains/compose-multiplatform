@@ -13,7 +13,7 @@ class Tests {
 
     @Test
     // Issue: content.Abc$composable_z540rc_k$ is not a function
-    // https://github.com/JetBrains/compose-jb/issues/2549
+    // https://youtrack.jetbrains.com/issue/CMP-2549
     fun testComposableInAnonymousObject() = runTest {
         val root = composeText {
             val content: HasComposable2 = createHasComposable()

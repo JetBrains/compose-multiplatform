@@ -12,10 +12,12 @@ import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.Launch
+import androidx.compose.material.icons.automirrored.filled.TextSnippet
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -106,7 +108,7 @@ private fun FileItemIcon(modifier: Modifier, model: FileTree.Item) = Box(modifie
                 Icons.Default.KeyboardArrowDown, contentDescription = null, tint = LocalContentColor.current
             )
             else -> Icon(
-                Icons.Default.KeyboardArrowRight, contentDescription = null, tint = LocalContentColor.current
+                Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = LocalContentColor.current
             )
         }
         is FileTree.ItemType.File -> when (type.ext) {
@@ -118,8 +120,8 @@ private fun FileItemIcon(modifier: Modifier, model: FileTree.Item) = Box(modifie
             "gradle" -> Icon(Icons.Default.Build, contentDescription = null, tint = Color(0xFF87939A))
             "kts" -> Icon(Icons.Default.Build, contentDescription = null, tint = Color(0xFF3E86A0))
             "properties" -> Icon(Icons.Default.Settings, contentDescription = null, tint = Color(0xFF62B543))
-            "bat" -> Icon(Icons.Default.Launch, contentDescription = null, tint = Color(0xFF87939A))
-            else -> Icon(Icons.Default.TextSnippet, contentDescription = null, tint = Color(0xFF87939A))
+            "bat" -> Icon(Icons.AutoMirrored.Filled.Launch, contentDescription = null, tint = Color(0xFF87939A))
+            else -> Icon(Icons.AutoMirrored.Filled.TextSnippet, contentDescription = null, tint = Color(0xFF87939A))
         }
     }
 }

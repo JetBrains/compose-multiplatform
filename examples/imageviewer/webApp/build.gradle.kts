@@ -1,18 +1,16 @@
-import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
-import org.jetbrains.kotlin.gradle.targets.js.ir.DefaultIncrementalSyncTask
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.compose")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.composeMultiplatform)
 }
 
 val rootDirPath = project.rootDir.path
 
 kotlin {
     js {
-        moduleName = "imageviewer"
+        outputModuleName = "imageviewer"
         browser {
             commonWebpackConfig {
                 outputFileName = "imageviewer.js"
@@ -24,7 +22,7 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "imageviewer"
+        outputModuleName = "imageviewer"
         browser {
              // TODO: uncomment when https://youtrack.jetbrains.com/issue/KT-68614 is fixed (it doesn't work with configuration cache)
 //            commonWebpackConfig {
@@ -42,22 +40,22 @@ kotlin {
     }
 
     sourceSets {
-        val jsWasmMain by creating {
+        val webMain by creating {
+            dependsOn(commonMain.get())
             dependencies {
                 implementation(project(":shared"))
-                implementation(compose.runtime)
-                implementation(compose.ui)
-                implementation(compose.foundation)
-                implementation(compose.material)
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-                implementation(compose.components.resources)
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.ui)
+                implementation(libs.compose.foundation)
+                implementation(libs.compose.material)
+                implementation(libs.components.resources)
             }
         }
         val jsMain by getting {
-            dependsOn(jsWasmMain)
+            dependsOn(webMain)
         }
         val wasmJsMain by getting {
-            dependsOn(jsWasmMain)
+            dependsOn(webMain)
         }
     }
 }

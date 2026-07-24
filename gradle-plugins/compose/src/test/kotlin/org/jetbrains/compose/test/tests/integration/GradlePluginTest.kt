@@ -5,8 +5,8 @@
 
 package org.jetbrains.compose.test.tests.integration
 
-import org.gradle.internal.impldep.junit.framework.TestCase.assertEquals
-import org.gradle.internal.impldep.junit.framework.TestCase.assertTrue
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewLogger
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.RemoteConnection
@@ -30,15 +30,11 @@ import kotlin.test.assertFalse
 class GradlePluginTest : GradlePluginTestBase() {
     @Test
     fun skikoWasm() = with(
-        testProject(
-            "misc/skikoWasm",
-            // TODO: enable the configuration cache after moving all test projects to kotlin 2.0 or newer
-            defaultTestEnvironment.copy(useGradleConfigurationCache = false)
-        )
+        testProject("misc/skikoWasm")
     ) {
         gradle(":build").checks {
-            check.taskSuccessful(":unpackSkikoWasmRuntime")
-            check.taskSuccessful(":processSkikoRuntimeForKWasm")
+            check.taskSuccessful(":unpackSkikoRuntimeForJs")
+            check.taskSuccessful(":unpackSkikoRuntimeForWasmJs")
             check.taskSuccessful(":compileKotlinJs")
             check.taskSuccessful(":compileKotlinWasmJs")
             check.taskSuccessful(":wasmJsBrowserDistribution")
@@ -86,8 +82,8 @@ class GradlePluginTest : GradlePluginTestBase() {
             }
         }
 
-    // Note: we can't test non-jvm targets with Kotlin older than 2.1.0, because of klib abi version bump in 2.1.0
-    private val oldestSupportedKotlinVersion = "2.1.0"
+    // Note: we can't test non-jvm targets with Kotlin older than 2.3.0, because of klib abi version bump in 2.3.0
+    private val oldestSupportedKotlinVersion = "2.3.0"
     @Test
     fun testOldestKotlinMpp() = with(
         testProject(
@@ -111,6 +107,25 @@ class GradlePluginTest : GradlePluginTestBase() {
     ) {
         gradle(":compileKotlinJs").checks {
             check.taskSuccessful(":compileKotlinJs")
+        }
+    }
+
+    //https://youtrack.jetbrains.com/issue/CMP-4906
+    @Test
+    fun testJsNoExecutableTests() = with(
+        testProject("misc/jsNoExecutableTests")
+    ) {
+        // The project depends on Compose UI (Skiko) but does not declare `binaries.executable()`,
+        // so the tests are not bundled with webpack and cannot run. The check task must fail with
+        // an actionable message instead of letting the tests fail in a confusing way.
+        gradleFailure("jsBrowserTest").checks {
+            check.taskFailed(":checkComposeUiTestConfigurationForJs")
+            check.logContains(
+                "Compose UI tests for the 'js' target are not bundled with webpack: " +
+                        "no executable binary is declared, so the Skiko runtime required by Compose UI " +
+                        "cannot be loaded and the tests may fail. Add `binaries.executable()` to the " +
+                        "'js' target. See https://youtrack.jetbrains.com/issue/CMP-4906"
+            )
         }
     }
 

@@ -8,19 +8,26 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.androidApplication)
 }
 
 version = "1.0-SNAPSHOT"
 
 repositories {
     mavenLocal()
-    google()
-    mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    google {
+        url = uri("https://cache-redirector.jetbrains.com/dl.google.com/dl/android/maven2")
+    }
+    mavenCentral {
+        url = uri("https://cache-redirector.jetbrains.com/maven-central")
+    }
+    maven("https://packages.jetbrains.team/maven/p/cmp/dev")
 }
 
 kotlin {
     jvm("desktop")
+
+    androidTarget()
 
     listOf(
         iosX64(),
@@ -67,9 +74,17 @@ kotlin {
         }
     }
 
+    js {
+        browser()
+        binaries.executable()
+    }
+
+    applyDefaultHierarchyTemplate()
+
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(project(":compose-scene-impl"))
                 implementation(compose.ui)
                 implementation(compose.foundation)
                 implementation(compose.material)
@@ -85,7 +100,20 @@ kotlin {
             }
         }
 
+        val androidMain by getting {
+            dependencies {
+//                implementation(libs.ktor.client.okhttp)
+                implementation("androidx.activity:activity-compose:1.9.3")
+            }
+        }
+
+        // Intermediate source set for all Skia/Skiko targets (non-Android)
+        val skikoMain by creating {
+            dependsOn(commonMain)
+        }
+
         val desktopMain by getting {
+            dependsOn(skikoMain)
             dependencies {
                 implementation(compose.desktop.currentOs)
                 runtimeOnly(libs.kotlinx.coroutines.swing)
@@ -97,13 +125,31 @@ kotlin {
             }
         }
 
-        val wasmJsMain by getting {
+        val appleMain by getting {
+            dependsOn(skikoMain)
+        }
+
+        val webMain by getting {
+            dependsOn(skikoMain)
             dependencies {
                 implementation(libs.ktor.client.js)
                 implementation(libs.ktor.client.content.negotiation)
                 implementation(libs.ktor.serialization.kotlinx.json)
+                implementation(libs.kotlinx.browser)
             }
         }
+    }
+}
+
+android {
+    namespace = "org.jetbrains.compose.benchmarks"
+    compileSdk = 37
+    defaultConfig {
+        applicationId = "org.jetbrains.compose.benchmarks"
+        minSdk = 24
+        targetSdk = 37
+        versionCode = 1
+        versionName = "1.0"
     }
 }
 
@@ -216,6 +262,8 @@ project.the<org.jetbrains.kotlin.gradle.targets.wasm.binaryen.BinaryenEnvSpec>()
 
 val jsOrWasmRegex = Regex("js|wasm")
 
+// not needed for now
+/*
 configurations.all {
     resolutionStrategy.eachDependency {
         if (requested.group.startsWith("org.jetbrains.skiko") &&
@@ -226,3 +274,4 @@ configurations.all {
         }
     }
 }
+*/

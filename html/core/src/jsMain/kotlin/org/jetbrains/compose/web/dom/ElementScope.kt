@@ -14,7 +14,7 @@ import org.w3c.dom.Element
 
 /**
  * ElementScope allows adding effects to the Composable representing html element.
- * Also see a tutorial: https://github.com/JetBrains/compose-jb/tree/master/tutorials/Web/Using_Effects
+ * Also see a tutorial: https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials/HTML/Using_Effects
  *
  * Example:
  * ```

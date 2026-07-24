@@ -3,17 +3,20 @@ kotlin = "2.2.0"
 gradle-download-plugin = "5.5.0"
 kotlin-poet = "2.1.0"
 plugin-android = "8.10.1"
-shadow-jar = "8.1.1"
+shadow-jar = "9.1.0"
 publish-plugin = "1.2.1"
+# we use "prefer" here for the strategy: "explicitly specified hot reload plugin always wins".
+plugin-hot-reload = { prefer = "1.2.0" }
 
 [libraries]
 download-task = { module = "de.undercouch:gradle-download-task", version.ref = "gradle-download-plugin" }
 kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-poet" }
 plugin-android = { module = "com.android.tools.build:gradle", version.ref = "plugin-android" }
 plugin-android-api = { module = "com.android.tools.build:gradle-api", version.ref = "plugin-android" }
+plugin-hot-reload = { module = "org.jetbrains.compose.hot-reload:hot-reload-gradle-plugin", version.ref = "plugin-hot-reload" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 download = { id = "de.undercouch.download", version.ref = "gradle-download-plugin" }
-shadow-jar = { id = "com.github.johnrengelman.shadow", version.ref = "shadow-jar" }
+shadow-jar = { id = "com.gradleup.shadow", version.ref = "shadow-jar" }
 publish-plugin = { id = "com.gradle.plugin-publish", version.ref = "publish-plugin" }

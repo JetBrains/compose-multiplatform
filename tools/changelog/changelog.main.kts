@@ -55,8 +55,10 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.system.exitProcess
 
-val changelogFile = __FILE__.resolve("../../../CHANGELOG.md").canonicalFile
-val prFormatFile = File("PR_FORMAT.md")
+val scriptDir = getScriptPathFromArgs().parentFile
+
+val changelogFile = scriptDir.parentFile.parentFile.resolve("CHANGELOG.md")
+val prFormatFile = scriptDir.resolve("PR_FORMAT.md")
 val prFormatLink = "https://github.com/JetBrains/compose-multiplatform/blob/master/tools/changelog/PR_FORMAT.md"
 
 val argsKeyless = args
@@ -130,19 +132,17 @@ fun generateChangelog() {
     val versionComposeMaterial3 = formatAndroidxLibVersion("COMPOSE_MATERIAL3")
     val versionComposeMaterial3Adaptive = formatAndroidxLibVersion("COMPOSE_MATERIAL3_ADAPTIVE")
     val versionLifecycle = formatAndroidxLibVersion("LIFECYCLE")
-    val versionNavigation = formatAndroidxLibVersion("NAVIGATION")
+    val versionNavigationEvent = formatAndroidxLibVersion("NAVIGATION_EVENT")
     val versionSavedstate = formatAndroidxLibVersion("SAVEDSTATE")
-    val versionGraphicsShapes = formatAndroidxLibVersion("GRAPHICS_SHAPES")
-    val versionWindow = formatAndroidxLibVersion("WINDOW")
+    val versionNavigation3 = formatAndroidxLibVersion("NAVIGATION_3")
 
     val versionRedirectingCompose = formatAndroidxLibRedirectingVersion("compose")
     val versionRedirectingComposeMaterial3 = formatAndroidxLibRedirectingVersion("compose.material3")
     val versionRedirectingComposeMaterial3Adaptive = formatAndroidxLibRedirectingVersion("compose.material3.adaptive")
     val versionRedirectingLifecycle = formatAndroidxLibRedirectingVersion("lifecycle")
-    val versionRedirectingNavigation = formatAndroidxLibRedirectingVersion("navigation")
+    val versionRedirectingNavigationEvent = formatAndroidxLibRedirectingVersion("navigationevent")
     val versionRedirectingSavedstate = formatAndroidxLibRedirectingVersion("savedstate")
-    val versionRedirectingGraphicsShapes = formatAndroidxLibRedirectingVersion("graphics")
-    val versionRedirectingWindow = formatAndroidxLibRedirectingVersion("window")
+    val versionRedirectingNavigation3 = formatAndroidxLibRedirectingVersion("navigation3")
 
     val versionName = versionCompose
 
@@ -208,24 +208,28 @@ fun generateChangelog() {
 
             append(
                 """
-                    ## Dependencies
+                    ## Components
 
-                    - Gradle Plugin `org.jetbrains.compose`, version `$versionCompose`. Based on Jetpack Compose libraries:
-                      - [Runtime $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-runtime#$versionRedirectingCompose)
-                      - [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose)
-                      - [Foundation $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingCompose)
-                      - [Material $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingCompose)
-                      <To change the placeholder see https://github.com/JetBrains/compose-multiplatform/blob/COMMIT/gradle-plugins/compose/src/main/kotlin/org/jetbrains/compose/ComposePlugin.kt#L72> and find redirection in:
-                      https://github.com/JetBrains/compose-multiplatform-core/blob/VERSION/gradle.properties#L112>
-                      - [Material3 <PLACEHOLDER>](https://developer.android.com/jetpack/androidx/releases/compose-material3#<PLACEHOLDER>)
+                    ### Gradle plugin
 
-                    - Compose Material3 libraries `org.jetbrains.compose.material3:material3*:$versionComposeMaterial3`. Based on [Jetpack Compose Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3)
-                    - Compose Material3 Adaptive libraries `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive`. Based on [Jetpack Compose Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive)
-                    - Graphics-Shapes library `org.jetbrains.androidx.graphics:graphics-shapes:$versionGraphicsShapes`. Based on [Jetpack Graphics-Shapes $versionRedirectingGraphicsShapes](https://developer.android.com/jetpack/androidx/releases/graphics#graphics-shapes-$versionRedirectingGraphicsShapes)
-                    - Lifecycle libraries `org.jetbrains.androidx.lifecycle:lifecycle-*:$versionLifecycle`. Based on [Jetpack Lifecycle $versionRedirectingLifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle#$versionRedirectingLifecycle)
-                    - Navigation libraries `org.jetbrains.androidx.navigation:navigation-*:$versionNavigation`. Based on [Jetpack Navigation $versionRedirectingNavigation](https://developer.android.com/jetpack/androidx/releases/navigation#$versionRedirectingNavigation)
-                    - Savedstate library `org.jetbrains.androidx.savedstate:savedstate:$versionSavedstate`. Based on [Jetpack Savedstate $versionRedirectingSavedstate](https://developer.android.com/jetpack/androidx/releases/savedstate#$versionRedirectingSavedstate)
-                    - WindowManager Core library `org.jetbrains.androidx.window:window-core:$versionWindow`. Based on [Jetpack WindowManager $versionRedirectingWindow](https://developer.android.com/jetpack/androidx/releases/window#$versionRedirectingWindow)
+                    `org.jetbrains.compose` version `$versionCompose`
+
+                    ### Libraries
+
+                    | Library group | Coordinates | Based on Jetpack |
+                    |---------------|-------------|------------------|
+                    | Runtime | `org.jetbrains.compose.runtime:runtime*:$versionCompose` | [Runtime $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-runtime#$versionRedirectingCompose) |
+                    | UI | `org.jetbrains.compose.ui:ui*:$versionCompose` | [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose) |
+                    | Foundation | `org.jetbrains.compose.foundation:foundation*:$versionCompose` | [Foundation $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingCompose) |
+                    | Material | `org.jetbrains.compose.material:material*:$versionCompose` | [Material $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingCompose) |
+                    | Material3 | `org.jetbrains.compose.material3:material3*:$versionComposeMaterial3` | [Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3) |
+                    | Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive` | [Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive) |
+                    | Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:$versionLifecycle` | [Lifecycle $versionRedirectingLifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle#$versionRedirectingLifecycle) |
+                    | Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.2` | [Navigation 2.9.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.7) |
+                    | Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:$versionNavigation3` | [Navigation3 $versionRedirectingNavigation3](https://developer.android.com/jetpack/androidx/releases/navigation3#$versionRedirectingNavigation3) |
+                    | Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:$versionNavigationEvent` | [Navigation Event $versionRedirectingNavigationEvent](https://developer.android.com/jetpack/androidx/releases/navigationevent#$versionRedirectingNavigationEvent) |
+                    | Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:$versionSavedstate` | [Savedstate $versionRedirectingSavedstate](https://developer.android.com/jetpack/androidx/releases/savedstate#$versionRedirectingSavedstate) |
+                    | WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
 
                     ---
                 """.trimIndent()
@@ -456,17 +460,16 @@ fun entriesForRepo(repo: String, firstCommit: String, lastCommit: String): List<
 }
 
 /**
- * Extract redirection versions from core repo, file gradle.properties
+ * Extract redirection versions from core repo, file redirectversions.toml
  *
  * Example
- * https://raw.githubusercontent.com/JetBrains/compose-multiplatform-core/v1.8.0%2Bdev1966/gradle.properties
- * artifactRedirecting.androidx.graphics.version=1.0.1
+ * https://raw.githubusercontent.com/JetBrains/compose-multiplatform-core/refs/heads/jb-main/redirectversions.toml
+ * "androidx.graphics" = "1.0.1"
  */
 fun androidxLibToRedirectionVersion(commit: String): Map<String, String> {
-    val gradleProperties = githubContentOf("JetBrains/compose-multiplatform-core", "gradle.properties", commit)
-    val regexV1 = Regex("artifactRedirecting\\.androidx\\.(.*)\\.version=(.*)")
-    val regexV2 = Regex("artifactRedirection\\.version\\.androidx\\.(.*)=(.*)") // changed in https://github.com/JetBrains/compose-multiplatform-core/pull/1946/files#diff-3d103fc7c312a3e136f88e81cef592424b8af2464c468116545c4d22d6edcf19R100
-    return listOf(regexV1, regexV2).flatMap { it.findAll(gradleProperties) }.associate { result ->
+    val redirectVersions = githubContentOf("JetBrains/compose-multiplatform-core", "redirectversions.toml", commit)
+    val regex = Regex("\"androidx\\.(.+?)\"\\s*=\\s*\"(.+?)\"")
+    return regex.findAll(redirectVersions).associate { result ->
         result.groupValues[1].trim() to result.groupValues[2].trim()
     }
 }
@@ -524,15 +527,18 @@ fun gitLogShas(folder: File, firstCommit: String, lastCommit: String, additional
  */
 fun githubClone(repo: String): File {
     val url = "https://github.com/$repo"
-    val folder = File("build/github/$repo")
+    val folder = scriptDir.resolve("build/github/$repo")
     val absolutePath = folder.absolutePath
-    if (!folder.exists()) {
+    if (!folder.exists() || folder.listFiles()?.isEmpty() == true) {
         folder.mkdirs()
         println("Cloning $url into ${folder.absolutePath}")
         pipeProcess("git clone --bare $url $absolutePath").waitAndCheck()
     } else {
         println("Fetching $url into ${folder.absolutePath}")
-        pipeProcess("git -C $absolutePath fetch --tags").waitAndCheck()
+        pipeProcess("git -C $absolutePath fetch --force --tags").waitAndCheck()
+    }
+    check(folder.listFiles()?.isNotEmpty() == true) {
+        "Cloning $url failed"
     }
     return folder
 }
@@ -679,5 +685,14 @@ class Cache<K, V>(private val create: (K) -> V) {
     private val map = mutableMapOf<K,V>()
     operator fun get(key: K): V = map.getOrPut(key) { create(key) }
 }
+
+// Avoid using __FILE__ here since it has a caching bug
+// https://youtrack.jetbrains.com/issue/KT-77524/
+fun getScriptPathFromArgs(): File =
+    System.getProperty("sun.java.command")
+        ?.split(" ")
+        ?.find { it.endsWith(".kts") }
+        ?.let { File(it).canonicalFile }
+        ?: error("Can't find script path from args: ${System.getProperty("sun.java.command")}")
 
 //endregion

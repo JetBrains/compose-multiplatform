@@ -5,9 +5,11 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.internal.IdeaImportTask
 import java.io.File
 
+@DisableCachingByDefault(because = "IDE import task — not worth caching")
 internal abstract class GenerateResClassTask : IdeaImportTask() {
     @get:Input
     abstract val packageName: Property<String>

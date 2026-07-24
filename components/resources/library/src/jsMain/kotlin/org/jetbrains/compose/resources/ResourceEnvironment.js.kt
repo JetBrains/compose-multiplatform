@@ -5,7 +5,15 @@ import kotlinx.browser.window
 private external class Intl {
     class Locale(locale: String) {
         val language: String
-        val region: String
+
+        // Intl.Locale.script can be undefined.
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale/script
+        val script: String?
+
+        // Intl.Locale.region can be undefined.
+        // For example, new Int.Locale('en') instead of new Int.Locale('en-NL').
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Locale/region
+        val region: String?
     }
 }
 
@@ -16,7 +24,8 @@ internal actual fun getSystemEnvironment(): ResourceEnvironment {
     val dpi: Int = (window.devicePixelRatio * 96).toInt()
     return ResourceEnvironment(
         language = LanguageQualifier(locale.language),
-        region = RegionQualifier(locale.region),
+        script = ScriptQualifier(locale.script ?: ""),
+        region = RegionQualifier(locale.region ?: ""),
         theme = ThemeQualifier.selectByValue(isDarkTheme),
         density = DensityQualifier.selectByValue(dpi)
     )

@@ -5,7 +5,8 @@
 
 package org.jetbrains.compose.test.tests.integration
 
-import org.gradle.internal.impldep.org.testng.Assert
+import org.gradle.internal.jvm.inspection.JvmVendor
+import org.jetbrains.compose.desktop.application.dsl.AotMode
 import org.jetbrains.compose.internal.utils.MacUtils
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentArch
@@ -118,20 +119,52 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             """.trimIndent()
 
         val actualMainImage = file("main-image.actual.png")
-        val expectedMainImage = file("main-image.expected.png")
+        val expectedMainImageOld = file("main-image.expected-old.png")
+        val expectedMainImageNew = file("main-image.expected-new.png")
 
         fun checkImageBeforeBuild() {
             assertFalse(actualMainImage.exists(), "'$actualMainImage' exists")
         }
         fun checkImageAfterBuild() {
-            assert(actualMainImage.readBytes().contentEquals(expectedMainImage.readBytes())) {
-                "The actual image '$actualMainImage' does not match the expected image '$expectedMainImage'"
+            val actual = actualMainImage.readBytes()
+            val expectedOld = expectedMainImageOld.readBytes()
+            val expectedNew = expectedMainImageNew.readBytes()
+            assert(
+                actual.contentEquals(expectedOld) || actual.contentEquals(expectedNew)
+            ) {
+                "The actual image '$actualMainImage' does not match either " +
+                        "'$expectedMainImageOld' or '$expectedMainImageNew'"
             }
+        }
+
+        fun checkNoUnexpectedProguardDiagnostics(log: String) {
+            // TODO https://youtrack.jetbrains.com/issue/CMP-7778/Fix-Proguard-note-Note-duplicate-definition-of-resource-file-META-INF-MANIFEST.MF
+            val expectedNotes = setOf(
+                "Note: duplicate definition of resource file [META-INF/MANIFEST.MF]",
+                "Note: duplicate definition of resource file [META-INF/androidx/navigationevent/navigationevent-compose/LICENSE.txt]",
+                "Note: duplicate definition of resource file [META-INF/lifecycle-runtime-compose.kotlin_module]",
+                "Note: duplicate definition of resource file [META-INF/navigationevent-compose.kotlin_module]",
+                "Note: duplicate definition of resource file [META-INF/runtime-saveable.kotlin_module]",
+                "Note: duplicate definition of resource file [META-INF/runtime.kotlin_module]",
+                "Note: duplicate definition of resource file [META-INF/savedstate-compose.kotlin_module]",
+            )
+            val expectedNotePatterns = listOf(
+                Regex("""Note: there were \d+ duplicate class definitions\."""),
+            )
+            val unexpectedDiagnostics = log.lineSequence()
+                .filter { it.startsWith("Warning:") || it.startsWith("Note:") }
+                .filterNot { diagnostic ->
+                    diagnostic in expectedNotes || expectedNotePatterns.any { it.matches(diagnostic) }
+                }
+                .toList()
+
+            assertEquals(emptyList<String>(), unexpectedDiagnostics, "Unexpected ProGuard diagnostics")
         }
 
         checkImageBeforeBuild()
         gradle(":runReleaseDistributable").checks {
             check.taskSuccessful(":proguardReleaseJars")
+            checkNoUnexpectedProguardDiagnostics(check.log)
             checkImageAfterBuild()
             assertEqualTextFiles(file("main-methods.actual.txt"), file("main-methods.expected.txt"))
         }
@@ -141,6 +174,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         checkImageBeforeBuild()
         gradle(":runReleaseDistributable").checks {
             check.taskSuccessful(":proguardReleaseJars")
+            checkNoUnexpectedProguardDiagnostics(check.log)
             checkImageAfterBuild()
             assertNotEqualTextFiles(file("main-methods.actual.txt"), file("main-methods.expected.txt"))
         }
@@ -250,7 +284,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                         "Possible names: ${possibleNames.joinToString(", ") { "'$it'" }}"
             }
         } else {
-            Assert.assertEquals(packageFile.name, "TestPackage-1.0.0.$ext", "Unexpected package name")
+            assertEquals("TestPackage-1.0.0.$ext", packageFile.name, "Unexpected package name")
         }
         result.checks {
             check.taskSuccessful(":package${ext.uppercaseFirstChar()}")
@@ -361,7 +395,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 val expectedInfoPlist = testWorkDir.resolve("Expected-Info.Plist")
                 val actualInfoPlistNormalized = actualInfoPlist.readText().normalized()
                 val expectedInfoPlistNormalized = expectedInfoPlist.readText().normalized()
-                Assert.assertEquals(actualInfoPlistNormalized, expectedInfoPlistNormalized)
+                assertEquals(expectedInfoPlistNormalized, actualInfoPlistNormalized)
             }
         }
     }
@@ -434,7 +468,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                         |${appDir.absolutePath}: valid on disk
                         |${appDir.absolutePath}: satisfies its Designated Requirement
                     """.trimMargin().trim()
-                    Assert.assertEquals(expectedOutput, actualOutput)
+                    assertEquals(actualOutput, expectedOutput)
                 }
 
                 gradle(":runDistributable").checks {
@@ -606,6 +640,163 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 file("wix311").checkNotExists()
             }
         }
+    }
+
+    @Suppress("SameParameterValue")
+    private fun aotProject(
+        aotMode: AotMode,
+        javaVersion: Int,
+        javaVendor: JvmVendor.KnownJvmVendor = JvmVendor.KnownJvmVendor.AMAZON
+    ) : TestProject {
+        return testProject("application/aot").apply {
+            modifyText("build.gradle.kts") {
+                it
+                    .replace("%AOT_MODE%", "AotMode.$aotMode")
+                    .replace("%JAVA_VERSION%", "$javaVersion")
+                    .replace("%JVM_VENDOR%", javaVendor.name)
+            }
+        }
+    }
+
+    @Test
+    fun testAppCdsAutoFailsOnJdk17() = with(aotProject(AotMode.AppCdsAuto, javaVersion = 17)) {
+        fun testRunTask(runTask: String) {
+            gradleFailure(runTask).checks {
+                check.logContains("AotMode 'AppCdsAuto' is not supported on JDK earlier than 19; current is 17")
+            }
+        }
+
+        testRunTask(":runReleaseDistributable")
+    }
+
+    private val appCdsLoggedArchivePathRegex =
+        Regex("\\[cds] Opened archive " +
+                listOf(
+                    ".*",
+                    "build",
+                    "compose",
+                    "binaries",
+                    ".*",
+                    "app",
+                    ".*",
+                    AotMode.AppCdsMode.ARCHIVE_FILE_ARGUMENT
+                        .replace("\$APPDIR", "app")
+                        .replace(".", "\\.")
+                ).joinToString(File.separator.replace("\\", "\\\\"))
+        )
+
+    @Test
+    fun testAppCdsAuto() = with(aotProject(AotMode.AppCdsAuto, javaVersion = 21)) {
+        fun testRunTask(taskName: String) {
+            gradle(taskName).checks {
+                check.taskSuccessful(taskName)
+                check.logContains("[cds] Dumping shared data to file")
+            }
+            gradle(taskName).checks {
+                check.taskSuccessful(taskName)
+                check.logContainsMatch(appCdsLoggedArchivePathRegex)
+                check.logDoesntContain("[cds] Specified shared archive not found")
+                check.logDoesntContain("[cds] Dumping shared data to file")
+                check.logDoesntContain("[cds] Initialize dynamic archive failed")
+                check.logDoesntContain("[cds] An error has occurred while processing the shared archive file")
+                check.logDoesntContain("[cds] Failed to initialize dynamic archive")
+            }
+            gradle(":clean")
+        }
+
+        testRunTask(":runReleaseDistributable")
+    }
+
+    @Test
+    fun testAppCdsPrebuild() = with(aotProject(AotMode.AppCdsPrebuild, javaVersion = 21)) {
+        fun testPackageAndRun(release: Boolean) {
+            val releaseTag = if (release) "Release" else ""
+            val packageTaskName = ":package${releaseTag}DistributionForCurrentOS"
+            val createAotArchiveTaskName = ":create${releaseTag}AotArchive"
+            val runDistributableTaskName = ":run${releaseTag}Distributable"
+            gradle(packageTaskName).checks {
+                check.taskSuccessful(packageTaskName)
+                check.taskSuccessful(createAotArchiveTaskName)
+                check.logContains("[cds] Dumping shared data to file")
+                check.logContains("Running app to create archive: true")
+            }
+
+            gradle(runDistributableTaskName).checks {
+                check.taskSuccessful(runDistributableTaskName)
+                check.taskUpToDate(createAotArchiveTaskName)
+                check.logContainsMatch(appCdsLoggedArchivePathRegex)
+                check.logContains("Running app to create archive: false")
+                check.logDoesntContain("[cds] Specified shared archive not found")
+                check.logDoesntContain("[cds] Dumping shared data to file")
+                check.logDoesntContain("[cds] Initialize dynamic archive failed")
+                check.logDoesntContain("[cds] An error has occurred while processing the shared archive file")
+                check.logDoesntContain("[cds] Failed to initialize dynamic archive")
+            }
+        }
+
+        testPackageAndRun(release = true)
+    }
+
+    @Test
+    fun testAppCdsCreateDistributable() = with(aotProject(AotMode.AppCdsPrebuild, javaVersion = 21)) {
+        fun testPackageAndRun(release: Boolean) {
+            val releaseTag = if (release) "Release" else ""
+            val createDistributableTaskName = ":create${releaseTag}Distributable"
+            val createAotArchiveTaskName = ":create${releaseTag}AotArchive"
+            gradle(createDistributableTaskName).checks {
+                check.taskSuccessful(createDistributableTaskName)
+                check.taskSuccessful(createAotArchiveTaskName)
+                check.logContains("[cds] Dumping shared data to file")
+                check.logContains("Running app to create archive: true")
+            }
+        }
+
+        testPackageAndRun(release = true)
+    }
+
+    @Test
+    fun testAotPrebuild() = with(aotProject(AotMode.AotPrebuild, javaVersion = 25)) {
+        fun testPackageAndRun(release: Boolean) {
+            val releaseTag = if (release) "Release" else ""
+            val packageTaskName = ":package${releaseTag}DistributionForCurrentOS"
+            val createAotArchiveTaskName = ":create${releaseTag}AotArchive"
+            val runDistributableTaskName = ":run${releaseTag}Distributable"
+            gradle(packageTaskName).checks {
+                check.taskSuccessful(packageTaskName)
+                check.taskSuccessful(createAotArchiveTaskName)
+                check.logContains("[aot] Selected AOTMode=record because AOTCacheOutput is specified")
+                check.logContains("AOTCache creation is complete")
+                check.logContains("Running app to create archive: true")
+            }
+
+            gradle(runDistributableTaskName).checks {
+                check.taskSuccessful(runDistributableTaskName)
+                check.taskUpToDate(createAotArchiveTaskName)
+                check.logContains("[aot] Opened AOT cache")
+                check.logContains("[aot] Using AOT-linked classes: true")
+                check.logContains("Running app to create archive: false")
+            }
+        }
+
+        testPackageAndRun(release = true)
+    }
+
+    @Test
+    fun testAotCreateDistributable() = with(aotProject(AotMode.AotPrebuild, javaVersion = 25)) {
+        fun testPackageAndRun(release: Boolean) {
+            val releaseTag = if (release) "Release" else ""
+            val createDistributableTaskName = ":create${releaseTag}Distributable"
+            val createAotArchiveTaskName = ":create${releaseTag}AotArchive"
+            gradle(createDistributableTaskName).checks {
+                check.taskSuccessful(createDistributableTaskName)
+                check.taskSuccessful(createAotArchiveTaskName)
+                check.logContains("[aot] Selected AOTMode=record because AOTCacheOutput is specified")
+                check.logContains("AOTCache creation is complete")
+                check.logContains("Running app to create archive: true")
+            }
+        }
+
+        testPackageAndRun(release = true)
     }
 
     private fun TestProject.enableJoinOutputJars() {

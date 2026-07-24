@@ -3,6 +3,7 @@ package org.jetbrains.compose.resources
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.ComposePlugin
+import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.internal.IDEA_IMPORT_TASK_NAME
 import org.jetbrains.compose.internal.IdeaImportTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
@@ -101,7 +102,7 @@ private fun Project.configureResClassGeneration(
     packagingDir: Provider<File>,
     generateModulePath: Boolean
 ) {
-    logger.info("Configure '$resClassName' class generation for ${resClassSourceSet.name}")
+    logger.info("Configure Res object generation for ${resClassSourceSet.name}")
 
     val genTask = tasks.register(
         "generateComposeResClass",
@@ -148,6 +149,7 @@ private fun Project.configureResourceAccessorsGeneration(
         task.makeAccessorsPublic.set(makeAccessorsPublic)
         task.resDir.set(resourcesDir)
         task.codeDir.set(layout.buildDirectory.dir("$RES_GEN_DIR/kotlin/${sourceSet.name}ResourceAccessors"))
+        task.disableResourceContentHashGeneration.set(ComposeProperties.disableResourceContentHashGeneration(providers))
 
         if (generateModulePath) {
             task.packagingDir.set(packagingDir)

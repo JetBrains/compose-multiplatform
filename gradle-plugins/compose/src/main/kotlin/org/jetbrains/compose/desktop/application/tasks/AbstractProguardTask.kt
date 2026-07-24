@@ -10,6 +10,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
+import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.desktop.application.internal.files.mangledName
 import org.jetbrains.compose.desktop.application.internal.files.normalizedPath
@@ -19,11 +20,14 @@ import java.io.File
 import java.io.Writer
 import kotlin.collections.LinkedHashMap
 
+@DisableCachingByDefault(because = "ProGuard processing is not reliably cacheable due to platform-specific optimizations")
 abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
     @get:InputFiles
+    @get:Classpath
     val inputFiles: ConfigurableFileCollection = objects.fileCollection()
 
     @get:InputFile
+    @get:Classpath
     val mainJar: RegularFileProperty = objects.fileProperty()
 
     @get:Internal
@@ -32,41 +36,44 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
     }
 
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NONE)
     val configurationFiles: ConfigurableFileCollection = objects.fileCollection()
 
     @get:Optional
     @get:Input
-    val dontobfuscate: Property<Boolean?> = objects.nullableProperty()
+    val dontobfuscate: Property<Boolean> = objects.property()
 
     @get:Optional
     @get:Input
-    val dontoptimize: Property<Boolean?> = objects.nullableProperty()
+    val dontoptimize: Property<Boolean> = objects.property()
 
     @get:Optional
     @get:Input
-    val joinOutputJars: Property<Boolean?> = objects.nullableProperty()
+    val joinOutputJars: Property<Boolean> = objects.property()
 
     // todo: DSL for excluding default rules
     // also consider pulling coroutines rules from coroutines artifact
     // https://github.com/Kotlin/kotlinx.coroutines/blob/master/kotlinx-coroutines-core/jvm/resources/META-INF/proguard/coroutines.pro
     @get:Optional
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.NONE)
     val defaultComposeRulesFile: RegularFileProperty = objects.fileProperty()
 
     @get:Input
-    val proguardVersion: Property<String> = objects.notNullProperty()
+    val proguardVersion: Property<String> = objects.property()
 
     @get:InputFiles
+    @get:Classpath
     val proguardFiles: ConfigurableFileCollection = objects.fileCollection()
 
     @get:Input
-    val javaHome: Property<String> = objects.notNullProperty(System.getProperty("java.home"))
+    val javaHome: Property<String> = objects.property<String>().value(System.getProperty("java.home"))
 
     @get:Input
-    val mainClass: Property<String> = objects.notNullProperty()
+    val mainClass: Property<String> = objects.property()
 
     @get:Internal
-    val maxHeapSize: Property<String?> = objects.nullableProperty()
+    val maxHeapSize: Property<String> = objects.property()
 
     @get:OutputDirectory
     val destinationDir: DirectoryProperty = objects.directoryProperty()
