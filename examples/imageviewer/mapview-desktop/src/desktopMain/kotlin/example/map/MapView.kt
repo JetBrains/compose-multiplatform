@@ -67,6 +67,9 @@ data class MapState(
  * return false to disable zoom on click
  *
  * @param consumeScroll consume scroll events for disable parent scrolling
+ *
+ * @param parentScrollEnableState optional state to disable a parent scrollable container while
+ * the pointer is hovering the map, so using the mouse wheel to zoom doesn't also scroll it
  */
 @Composable
 fun MapView(
@@ -81,6 +84,7 @@ fun MapView(
     onStateChange: (MapState) -> Unit = { (state as? MutableState<MapState>)?.value = it },
     onMapViewClick: (latitude: Double, longitude: Double) -> Boolean = { _, _ -> true },
     consumeScroll: Boolean = true,
+    parentScrollEnableState: MutableState<Boolean>? = null,
 ) {
     val viewScope = rememberCoroutineScope()
     val ioScope = remember {
@@ -155,6 +159,14 @@ fun MapView(
                 }
             }
             when (event.type) {
+                PointerEventType.Enter -> {
+                    parentScrollEnableState?.value = false
+                }
+
+                PointerEventType.Exit -> {
+                    parentScrollEnableState?.value = true
+                }
+
                 PointerEventType.Move -> {
                     if (event.buttons.isPrimaryPressed) {
                         val previous = previousMoveDownPos
