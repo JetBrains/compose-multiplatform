@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.3.20" # overriden via gradle.properties
 compose = "1.10.1" # overriden via gradle.properties
-agp = "9.2.1" # overriden via gradle.properties
+agp = "9.1.0" # overriden via gradle.properties
 serialization = "1.11.0"
 coroutines = "1.8.0"
 kotlinxDatetime = "0.5.0"
