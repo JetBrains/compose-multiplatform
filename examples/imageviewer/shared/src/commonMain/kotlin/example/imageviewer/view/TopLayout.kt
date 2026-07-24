@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,8 +20,8 @@ fun TopLayout(
     Box(
         Modifier
             .fillMaxWidth()
-            .windowInsetsPadding(WindowInsets.systemBars)
-            .padding(12.dp)
+            .windowInsetsPadding(WindowInsets.safeDrawing)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
         Row(Modifier.align(Alignment.CenterStart)) {
             alignLeftContent()

@@ -1,5 +1,3 @@
 <resources>
-    <style name="Theme.ImageViewer" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowFullscreen">true</item>
-    </style>
+    <style name="Theme.ImageViewer" parent="Theme.AppCompat.Light.NoActionBar" />
 </resources>
