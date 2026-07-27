@@ -1,14 +1,20 @@
+@file:Suppress("UnstableApiUsage")
+
 pluginManagement {
     repositories {
         mavenLocal()
+        google {
+            url = uri("https://cache-redirector.jetbrains.com/dl.google.com/dl/android/maven2")
+            content {
+                includeGroupAndSubgroups("com.android")
+                includeGroupAndSubgroups("androidx")
+            }
+        }
         mavenCentral {
             url = uri("https://cache-redirector.jetbrains.com/maven-central")
         }
         gradlePluginPortal()
         maven("https://packages.jetbrains.team/maven/p/cmp/dev")
-        google {
-            url = uri("https://cache-redirector.jetbrains.com/dl.google.com/dl/android/maven2")
-        }
     }
 }
 
