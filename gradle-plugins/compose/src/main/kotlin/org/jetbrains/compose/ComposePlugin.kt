@@ -133,9 +133,10 @@ abstract class ComposePlugin : Plugin<Project> {
         val uiTestJUnit4 get() = composeDependency("org.jetbrains.compose.ui:ui-test-junit4")
 
         @Deprecated(
-            "Use org.jetbrains.compose.desktop:desktop-jvm-all instead. " +
-                "It works for every desktop OS; packaging drops unrelated OS binaries.",
-            replaceWith = ReplaceWith("\"org.jetbrains.compose.desktop:desktop-jvm-all:${ComposeBuildConfig.composeVersion}\"")
+            "currentOs is deprecated and will be removed in a future release. " +
+                    "It has no replacement and can be safely removed. " +
+                    "Compose now publishes an artifact containing binaries for all supported desktop operating systems. " +
+                    "During packaging, binaries for non-target operating systems are automatically removed."
         )
         val currentOs by lazy {
             composeDependency("org.jetbrains.compose.desktop:desktop-jvm-${currentTarget.id}")
