@@ -1,3 +1,57 @@
+# 1.12.0-beta03 (July 2026)
+
+_Changes since 1.12.0-beta02_
+
+## Features
+
+### Desktop
+
+- _(prerelease fix)_ Bump Compose Hot Reload to [1.2.0-rc01](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.2.0-rc01) [#5643](https://github.com/JetBrains/compose-multiplatform/pull/5643)
+
+## Fixes
+
+### iOS
+
+- _(prerelease fix)_ Fix crash when cancelling text input [#3208](https://github.com/JetBrains/compose-multiplatform-core/pull/3208)
+- Fix rare crash that occurs when iOS accesses a disposed AccessibilityElement [#3214](https://github.com/JetBrains/compose-multiplatform-core/pull/3214)
+- Fix crash on iOS 14 caused by referencing `CAFrameRateRangeDefault`, which is only available on iOS 15+ [#3219](https://github.com/JetBrains/compose-multiplatform-core/pull/3219)
+- _(prerelease fix)_ Fix an issue where taps near the screen edge could be missed when the back-swipe gesture recognizer was tracking touches [#3220](https://github.com/JetBrains/compose-multiplatform-core/pull/3220)
+
+### Desktop
+
+- _(prelease fix)_ Fix "Desktop release build fails with VerifyError: Bad return type" [#5652](https://github.com/JetBrains/compose-multiplatform/pull/5652)
+
+### Web
+
+- Fix a regression in scrolling when ComposeViewport is embedded in HTML scrollable container [#3221](https://github.com/JetBrains/compose-multiplatform-core/pull/3221)
+- Fix `div#cmp_a11y_root` having 0×0 dimensions on Compose for Web (Kotlin/WASM), which made Compose content invisible to hit-test-based accessibility tools such as Accessibility Inspector and Appium. The a11y container is now sized to match the canvas and stays in sync on resize [#3226](https://github.com/JetBrains/compose-multiplatform-core/pull/3226)
+- Fixed the hidden software keyboard in mobile browsers in focused text fields [#3235](https://github.com/JetBrains/compose-multiplatform-core/pull/3235)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.12.0-beta03`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.12.0-beta03` | [Runtime 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.12.0-beta02) |
+| UI | `org.jetbrains.compose.ui:ui*:1.12.0-beta03` | [UI 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.12.0-beta02) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.12.0-beta03` | [Foundation 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.12.0-beta02) |
+| Material | `org.jetbrains.compose.material:material*:1.12.0-beta03` | [Material 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.12.0-beta02) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.12.0-alpha03` | [Material3 1.5.0-alpha22](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha22) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-beta02` | [Material3 Adaptive 1.3.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-beta02) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0` | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0) | 
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.10.0-alpha02` | [Navigation 2.10.0-alpha05](https://developer.android.com/jetpack/androidx/releases/navigation#2.10.0-alpha05) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.2.0-alpha02` | [Navigation3 1.2.0-alpha04](https://developer.android.com/jetpack/androidx/releases/navigation3#1.2.0-alpha04) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0` | [Navigation Event 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.1) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.12.0-beta02 (July 2026)
 
 _Changes since 1.12.0-beta01_
