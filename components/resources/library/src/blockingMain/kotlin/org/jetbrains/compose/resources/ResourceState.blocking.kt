@@ -1,7 +1,6 @@
 package org.jetbrains.compose.resources
 
 import androidx.compose.runtime.*
-import kotlinx.coroutines.runBlocking
 
 @Composable
 internal actual fun <T> rememberResourceState(
@@ -12,7 +11,7 @@ internal actual fun <T> rememberResourceState(
     val environment = LocalComposeEnvironment.current.rememberEnvironment()
     return remember(key1, environment) {
         mutableStateOf(
-            runBlocking { block(environment) }
+            runResourceBlocking { block(environment) }
         )
     }
 }
@@ -27,7 +26,7 @@ internal actual fun <T> rememberResourceState(
     val environment = LocalComposeEnvironment.current.rememberEnvironment()
     return remember(key1, key2, environment) {
         mutableStateOf(
-            runBlocking { block(environment) }
+            runResourceBlocking { block(environment) }
         )
     }
 }
@@ -43,7 +42,7 @@ internal actual fun <T> rememberResourceState(
     val environment = LocalComposeEnvironment.current.rememberEnvironment()
     return remember(key1, key2, key3, environment) {
         mutableStateOf(
-            runBlocking { block(environment) }
+            runResourceBlocking { block(environment) }
         )
     }
 }
@@ -60,7 +59,24 @@ internal actual fun <T> rememberResourceState(
     val environment = LocalComposeEnvironment.current.rememberEnvironment()
     return remember(key1, key2, key3, key4, environment) {
         mutableStateOf(
-            runBlocking { block(environment) }
+            runResourceBlocking { block(environment) }
         )
     }
 }
+
+/**
+ * Executes the [block] on the current thread and returns its result.
+ *
+ * It is used to read a resource synchronously during a composition
+ * (see [rememberResourceState]).
+ *
+ * Unlike `kotlinx.coroutines.runBlocking` on the JVM it:
+ * - doesn't check the interruption flag of the calling thread, so a resource can be read even
+ *   when somebody has interrupted the thread which performs the composition;
+ * - executes a [block] which doesn't suspend (a cache hit, for example) without parking
+ *   the calling thread at all.
+ *
+ * The [block] must not wait for the calling thread itself: a `withContext(Dispatchers.Main)`
+ * inside a resource reader deadlocks a composition here in the same way as with `runBlocking`.
+ */
+internal expect fun <T> runResourceBlocking(block: suspend () -> T): T
