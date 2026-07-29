@@ -133,7 +133,7 @@ kotlin {
             dependsOn(skikoTest)
             dependsOn(jvmAndAndroidTest)
             dependencies {
-                implementation(compose.desktop.currentOs)
+                implementation(libs.compose.desktop.jvm)
             }
         }
         val androidMain by getting {
