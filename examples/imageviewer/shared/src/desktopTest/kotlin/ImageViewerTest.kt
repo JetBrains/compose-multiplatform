@@ -9,8 +9,6 @@ import example.imageviewer.PopupNotification
 import example.imageviewer.SharePicture
 import example.imageviewer.filter.PlatformContext
 import example.imageviewer.model.PictureData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import org.junit.Rule
 import org.junit.Test
 
@@ -18,16 +16,14 @@ class ImageViewerTest {
     @get:Rule
     val rule = createComposeRule()
 
-    private val ioScope = CoroutineScope(Dispatchers.Main)
-
     private val dependencies = object : Dependencies() {
-        override val notification: Notification = object : PopupNotification(ioScope) {
+        override val notification: Notification = object : PopupNotification() {
             override fun showPopUpMessage(text: String) {
             }
         }
-        override val imageStorage: DesktopImageStorage = DesktopImageStorage(ioScope)
+        override val imageStorage: DesktopImageStorage = DesktopImageStorage()
         override val sharePicture: SharePicture = object : SharePicture {
-            override fun share(context: PlatformContext, picture: PictureData) {}
+            override suspend fun share(context: PlatformContext, picture: PictureData) {}
         }
     }
 
