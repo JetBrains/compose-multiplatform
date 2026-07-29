@@ -13,7 +13,7 @@ kotlin {
             }
         }
         jvmMain.dependencies {
-            implementation(libs.compose.desktop.jvm)
+            implementation(libs.compose.material3)
             implementation(project(":AnimatedImage:library"))
         }
     }
