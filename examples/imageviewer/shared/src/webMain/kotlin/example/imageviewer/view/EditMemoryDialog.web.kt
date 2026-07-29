@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import example.imageviewer.style.LocalImageviewerColors
 
 @Composable
 actual fun BoxScope.EditMemoryDialog(
@@ -35,6 +36,7 @@ actual fun BoxScope.EditMemoryDialog(
 ) {
     var name by remember { mutableStateOf(previousName) }
     var description by remember { mutableStateOf(previousDescription) }
+    val colors = LocalImageviewerColors.current
     AlertDialog(
         onDismissRequest = {
             save(name, description)
@@ -45,7 +47,7 @@ actual fun BoxScope.EditMemoryDialog(
                     .align(Alignment.Center)
                     .padding(30.dp)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(Color.White),
+                    .background(colors.background),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 TextField(
@@ -53,7 +55,8 @@ actual fun BoxScope.EditMemoryDialog(
                     onValueChange = { name = it },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.White,
+                        backgroundColor = colors.background,
+                        textColor = colors.onBackground,
                     ),
                     textStyle = LocalTextStyle.current.copy(
                         textAlign = TextAlign.Center,
@@ -65,7 +68,8 @@ actual fun BoxScope.EditMemoryDialog(
                     value = description,
                     onValueChange = { description = it },
                     colors = TextFieldDefaults.textFieldColors(
-                        backgroundColor = Color.White,
+                        backgroundColor = colors.background,
+                        textColor = colors.onBackground,
                         unfocusedIndicatorColor = Color.Transparent,
                         focusedIndicatorColor = Color.Transparent,
                     )
