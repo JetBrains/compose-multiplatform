@@ -4,5 +4,4 @@
     <string name="back">Zurück</string>
     <string name="take_photo">Mach ein Foto 📸</string>
     <string name="add_photo">Füge ein Foto hinzu</string>
-    <string name="kotlin_conf_description">This photo was taken during KotlinConf 2023! 🎊\nHave a fun with Kotlin and Compose Multiplatform 🥳</string>
 </resources>
