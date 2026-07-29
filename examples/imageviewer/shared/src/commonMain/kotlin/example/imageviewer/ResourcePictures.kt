@@ -192,7 +192,7 @@ val resourcePictures = arrayOf(
         description = """
             Stockholm, Sweden
             This little restaurant caught my eye because of the color scheme they use! 🦩
-            The neon lights illuminating the dark streets of stockholm was a sight to behold, and the fact that only the first and last letter weren't lit up seems almost intentional.
+            The neon lights illuminating the dark streets of Stockholm was a sight to behold, and the fact that only the first and last letter weren't lit up seems almost intentional.
             Also, the dumplings served at that place was delightful! 🥟
             """.trimIndent(),
         dateString = "25 Jul.",
