@@ -124,9 +124,6 @@ kotlin {
         val desktopTest by getting {
             dependsOn(skikoTest)
             dependsOn(jvmAndAndroidTest)
-            dependencies {
-                implementation(libs.compose.desktop.jvm)
-            }
         }
         val androidMain by getting {
             dependsOn(jvmAndAndroidMain)
