@@ -24,6 +24,9 @@ kotlin {
     wasmJs {
         outputModuleName = "imageviewer"
         browser {
+            commonWebpackConfig {
+                outputFileName = "imageviewer.js"
+            }
              // TODO: uncomment when https://youtrack.jetbrains.com/issue/KT-68614 is fixed (it doesn't work with configuration cache)
 //            commonWebpackConfig {
 //                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
