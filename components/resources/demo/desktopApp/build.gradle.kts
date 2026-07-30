@@ -8,7 +8,7 @@ kotlin {
     jvm()
     sourceSets {
         jvmMain.dependencies {
-            implementation(libs.compose.desktop.jvm)
+            implementation(compose.desktop.currentOs)
             implementation(project(":resources:demo:shared"))
         }
     }
