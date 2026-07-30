@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Image Viewer (Kotlin/Wasm)</title>
-    <script type="application/javascript" src="imageviewer.js"></script>
+    <title>ImageViewer</title>
+    <script src="imageviewer.js"> </script>
     <style>
         html, body {
             width: 100%;
@@ -71,7 +71,7 @@
         if (error instanceof WebAssembly.CompileError) {
             document.getElementById("warning").style.display="initial";
 
-            // Hide a Scary Webpack Overlay which is less informative in this case.  
+            // Hide a Scary Webpack Overlay which is less informative in this case.
             const webpackOverlay = document.getElementById("webpack-dev-server-client-overlay");
             if (webpackOverlay != null) webpackOverlay.style.display="none";
         }
