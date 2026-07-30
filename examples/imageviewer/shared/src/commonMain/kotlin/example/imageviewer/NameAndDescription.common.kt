@@ -1,13 +1,10 @@
 package example.imageviewer
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import kotlinx.datetime.Clock
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.Month
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toInstant
-import kotlinx.datetime.toLocalDateTime
+import imageviewer.shared.generated.resources.Res
+import imageviewer.shared.generated.resources.new_photo_description
+import imageviewer.shared.generated.resources.new_photo_name
+import org.jetbrains.compose.resources.stringResource
 
 class NameAndDescription(
     val name: String,
@@ -16,23 +13,7 @@ class NameAndDescription(
 
 @Composable
 fun createNewPhotoNameAndDescription(): NameAndDescription {
-    val localization = LocalLocalization.current
-    return remember {
-
-        Clock.System.now().toLocalDateTime(TimeZone.UTC)
-        val kotlinConfEndTime =
-            LocalDateTime(2023, Month.APRIL, 14, hour = 23, minute = 59).toInstant(TimeZone.UTC)
-
-        if (Clock.System.now() < kotlinConfEndTime) {
-            NameAndDescription(
-                localization.kotlinConfName,
-                localization.kotlinConfDescription
-            )
-        } else {
-            NameAndDescription(
-                localization.newPhotoName,
-                localization.newPhotoDescription
-            )
-        }
-    }
+    val newPhotoName = stringResource(Res.string.new_photo_name)
+    val newPhotoDescription = stringResource(Res.string.new_photo_description)
+    return NameAndDescription(newPhotoName, newPhotoDescription)
 }

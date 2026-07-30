@@ -2,15 +2,17 @@ package example.imageviewer.filter
 
 import android.content.Context
 import android.graphics.*
-import android.renderscript.Allocation
-import android.renderscript.Element
-import android.renderscript.RenderScript
-import android.renderscript.ScriptIntrinsicBlur
+import android.hardware.HardwareBuffer
+import android.media.ImageReader
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.graphics.scale
+import kotlin.math.max
 
 actual fun grayScaleFilter(bitmap: ImageBitmap, context: PlatformContext): ImageBitmap {
     return applyGrayScaleFilter(bitmap.asAndroidBitmap()).asImageBitmap()
@@ -21,7 +23,7 @@ actual fun pixelFilter(bitmap: ImageBitmap, context: PlatformContext): ImageBitm
 }
 
 actual fun blurFilter(bitmap: ImageBitmap, context: PlatformContext): ImageBitmap {
-    return applyBlurFilter(bitmap.asAndroidBitmap(), context.androidContext).asImageBitmap()
+    return applyBlurFilter(bitmap.asAndroidBitmap()).asImageBitmap()
 }
 
 actual class PlatformContext(val androidContext: Context)
@@ -29,28 +31,51 @@ actual class PlatformContext(val androidContext: Context)
 @Composable
 actual fun getPlatformContext(): PlatformContext = PlatformContext(LocalContext.current)
 
+private const val BLUR_RADIUS = 20f
 
-private fun applyBlurFilter(bitmap: Bitmap, context: Context): Bitmap {
-
-    val result: Bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
-
-    val renderScript: RenderScript = RenderScript.create(context)
-
-    val tmpIn: Allocation = Allocation.createFromBitmap(renderScript, bitmap)
-    val tmpOut: Allocation = Allocation.createFromBitmap(renderScript, result)
-
-    val theIntrinsic: ScriptIntrinsicBlur =
-        ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript))
-
-    theIntrinsic.setRadius(15f)
-    theIntrinsic.setInput(tmpIn)
-    theIntrinsic.forEach(tmpOut)
-
-    tmpOut.copyTo(result)
-
-    return result
+private fun applyBlurFilter(bitmap: Bitmap): Bitmap {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        blurWithRenderEffect(bitmap, BLUR_RADIUS)
+    } else {
+        blurByDownscaling(bitmap)
+    }
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
+private fun blurWithRenderEffect(bitmap: Bitmap, radius: Float): Bitmap {
+    val renderNode = RenderNode("BlurFilter")
+    val hardwareRenderer = HardwareRenderer()
+    try {
+        val usage = HardwareBuffer.USAGE_GPU_SAMPLED_IMAGE or HardwareBuffer.USAGE_GPU_COLOR_OUTPUT
+        ImageReader.newInstance(bitmap.width, bitmap.height, PixelFormat.RGBA_8888, 1, usage).use { imageReader ->
+            hardwareRenderer.setSurface(imageReader.surface)
+            hardwareRenderer.setContentRoot(renderNode)
+            renderNode.setPosition(0, 0, bitmap.width, bitmap.height)
+            renderNode.setRenderEffect(RenderEffect.createBlurEffect(radius, radius, Shader.TileMode.CLAMP))
+
+            renderNode.beginRecording().drawBitmap(bitmap, 0f, 0f, null)
+            renderNode.endRecording()
+
+            hardwareRenderer.createRenderRequest()
+                .setWaitForPresent(true)
+                .syncAndDraw()
+
+            val image = imageReader.acquireNextImage() ?: return bitmap.copy(Bitmap.Config.ARGB_8888, true)
+            return image.use {
+                it.hardwareBuffer?.use { buffer -> Bitmap.wrapHardwareBuffer(buffer, null) }
+                    ?.copy(Bitmap.Config.ARGB_8888, false)
+                    ?: bitmap.copy(Bitmap.Config.ARGB_8888, true)
+            }
+        }
+    } finally {
+        hardwareRenderer.destroy()
+    }
+}
+
+private fun blurByDownscaling(bitmap: Bitmap): Bitmap {
+    val downscaled = bitmap.scale(max(1, bitmap.width / 20), max(1, bitmap.height / 20))
+    return downscaled.scale(bitmap.width, bitmap.height)
+}
 
 private fun applyGrayScaleFilter(bitmap: Bitmap): Bitmap {
 
@@ -96,6 +121,5 @@ private fun scaleBitmapAspectRatio(
     val resultH = (bitmap.height * ratio).toInt()
     val resultW = (bitmap.width * ratio).toInt()
 
-    return Bitmap.createScaledBitmap(bitmap, resultW, resultH, filter)
+    return bitmap.scale(resultW, resultH, filter)
 }
-

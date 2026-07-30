@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.androidMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.serialization)
-    alias(libs.plugins.parcelize)
 }
 
 version = "1.0-SNAPSHOT"
@@ -60,6 +59,7 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.navigation3.ui)
         }
 
         androidMain.dependencies {

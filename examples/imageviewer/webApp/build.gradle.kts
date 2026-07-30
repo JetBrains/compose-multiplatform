@@ -24,6 +24,9 @@ kotlin {
     wasmJs {
         outputModuleName = "imageviewer"
         browser {
+            commonWebpackConfig {
+                outputFileName = "imageviewer.js"
+            }
              // TODO: uncomment when https://youtrack.jetbrains.com/issue/KT-68614 is fixed (it doesn't work with configuration cache)
 //            commonWebpackConfig {
 //                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
@@ -40,22 +43,13 @@ kotlin {
     }
 
     sourceSets {
-        val webMain by creating {
-            dependsOn(commonMain.get())
-            dependencies {
-                implementation(project(":shared"))
-                implementation(libs.compose.runtime)
-                implementation(libs.compose.ui)
-                implementation(libs.compose.foundation)
-                implementation(libs.compose.material)
-                implementation(libs.components.resources)
-            }
-        }
-        val jsMain by getting {
-            dependsOn(webMain)
-        }
-        val wasmJsMain by getting {
-            dependsOn(webMain)
+        webMain.dependencies {
+            implementation(project(":shared"))
+            implementation(libs.compose.runtime)
+            implementation(libs.compose.ui)
+            implementation(libs.compose.foundation)
+            implementation(libs.compose.material)
+            implementation(libs.components.resources)
         }
     }
 }

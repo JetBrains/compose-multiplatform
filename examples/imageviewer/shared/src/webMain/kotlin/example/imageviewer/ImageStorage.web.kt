@@ -7,15 +7,15 @@ import example.imageviewer.model.PictureData
 class WebImageStorage : ImageStorage {
     private val pictures = HashMap<String, SavedPicture>()
 
-    override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
+    override suspend fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
         pictures[picture.id] = SavedPicture(picture, image.imageBitmap)
     }
 
-    override fun delete(picture: PictureData.Camera) {
+    override suspend fun delete(picture: PictureData.Camera) {
         pictures.remove(picture.id)
     }
 
-    override fun rewrite(picture: PictureData.Camera) {
+    override suspend fun rewrite(picture: PictureData.Camera) {
         pictures[picture.id]?.let {
             pictures[picture.id] = it.copy(data = picture)
         }

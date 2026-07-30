@@ -26,12 +26,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.job
-import kotlinx.coroutines.launch
 import java.awt.Desktop
-import java.net.URL
+import java.net.URI
 
 data class MapState(
     val latitude: Double,
@@ -67,6 +67,9 @@ data class MapState(
  * return false to disable zoom on click
  *
  * @param consumeScroll consume scroll events for disable parent scrolling
+ *
+ * @param parentScrollEnableState optional state to disable a parent scrollable container while
+ * the pointer is hovering the map, so using the mouse wheel to zoom doesn't also scroll it
  */
 @Composable
 fun MapView(
@@ -81,6 +84,7 @@ fun MapView(
     onStateChange: (MapState) -> Unit = { (state as? MutableState<MapState>)?.value = it },
     onMapViewClick: (latitude: Double, longitude: Double) -> Boolean = { _, _ -> true },
     consumeScroll: Boolean = true,
+    parentScrollEnableState: MutableState<Boolean>? = null,
 ) {
     val viewScope = rememberCoroutineScope()
     val ioScope = remember {
@@ -96,31 +100,28 @@ fun MapView(
             .copyAndChangeCenter(center)
     }
     val displayTiles: List<DisplayTileWithImage<TileImage>> by derivedStateOf {
-        val calcTiles: List<DisplayTileAndTile> = internalState.calcTiles()
-        val tilesToDisplay: MutableList<DisplayTileWithImage<TileImage>> = mutableListOf()
-        val tilesToLoad: MutableSet<Tile> = mutableSetOf()
-        calcTiles.forEach {
-            val cachedImage = inMemoryCache[it.tile]
-            if (cachedImage != null) {
-                tilesToDisplay.add(DisplayTileWithImage(it.display, cachedImage, it.tile))
-            } else {
-                tilesToLoad.add(it.tile)
-                val croppedImage = inMemoryCache.searchOrCrop(it.tile)
-                tilesToDisplay.add(DisplayTileWithImage(it.display, croppedImage, it.tile))
+        internalState.calcTiles().map {
+            val cachedImage = inMemoryCache[it.tile] ?: inMemoryCache.searchOrCrop(it.tile)
+            DisplayTileWithImage(it.display, cachedImage, it.tile)
+        }
+    }
+
+    LaunchedEffect(internalState) {
+        val tilesToLoad: Set<Tile> = internalState.calcTiles()
+            .map { it.tile }
+            .filterNot { it in inMemoryCache }
+            .toSet()
+        tilesToLoad.forEach { tile ->
+            try {
+                val image: TileImage = imageRepository.loadContent(tile)
+                inMemoryCache = inMemoryCache + (tile to image)
+            } catch (c: CancellationException) {
+                throw c
+            } catch (t: Throwable) {
+                println("exception in tiles loading, throwable: $t")
+                // ignore errors. Tile image loaded with retries
             }
         }
-        viewScope.launch {
-            tilesToLoad.forEach { tile ->
-                try {
-                    val image: TileImage = imageRepository.loadContent(tile)
-                    inMemoryCache = inMemoryCache + (tile to image)
-                } catch (t: Throwable) {
-                    println("exception in tiles loading, throwable: $t")
-                    // ignore errors. Tile image loaded with retries
-                }
-            }
-        }
-        tilesToDisplay
     }
 
     val onZoom = { pt: DisplayPoint?, change: Double ->
@@ -158,6 +159,14 @@ fun MapView(
                 }
             }
             when (event.type) {
+                PointerEventType.Enter -> {
+                    parentScrollEnableState?.value = false
+                }
+
+                PointerEventType.Exit -> {
+                    parentScrollEnableState?.value = true
+                }
+
                 PointerEventType.Move -> {
                     if (event.buttons.isPrimaryPressed) {
                         val previous = previousMoveDownPos
@@ -253,7 +262,7 @@ private fun LinkText(text: String, link: String) {
 }
 
 private fun navigateToUrl(url: String) {
-    Desktop.getDesktop().browse(URL(url).toURI())
+    Desktop.getDesktop().browse(URI(url))
 }
 
 private var inMemoryCache: Map<Tile, TileImage> by mutableStateOf(mapOf())

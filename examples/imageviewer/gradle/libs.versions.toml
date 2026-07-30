@@ -1,20 +1,21 @@
 [versions]
-kotlin = "2.3.20" # overriden via gradle.properties
-compose = "1.10.1" # overriden via gradle.properties
-agp = "9.2.1" # overriden via gradle.properties
+kotlin = "2.4.10" # overriden via gradle.properties
+compose = "1.11.1" # overriden via gradle.properties
+agp = "9.1.1" # overriden via gradle.properties
 serialization = "1.11.0"
-coroutines = "1.8.0"
-kotlinxDatetime = "0.5.0"
+coroutines = "1.11.0"
+kotlinxDatetime = "0.8.0"
 androidx-activity = "1.13.0"
 androidx-appcompat = "1.7.1"
-androidx-core = "1.18.0"
-androidx-camera = "1.3.1"
-accompanist = "0.29.2-rc"
-playServicesMaps = "18.2.0"
-playServicesLocation = "21.1.0"
-mapsCompose = "2.11.2"
-ktor = "2.2.1"
+androidx-core = "1.19.0"
+androidx-camera = "1.6.1"
+accompanist = "0.37.3"
+playServicesMaps = "20.0.0"
+playServicesLocation = "21.4.0"
+mapsCompose = "8.4.0"
+ktor = "3.5.1"
 secretsGradlePlugin = "2.0.1"
+navigation3 = "1.1.1"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
@@ -40,6 +41,7 @@ play-services-location = { module = "com.google.android.gms:play-services-locati
 maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 compose-ui-test-junit4 = { module = "org.jetbrains.compose.ui:ui-test-junit4", version.ref = "compose" }
+navigation3-ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -49,5 +51,4 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 secretsGradlePlugin = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }

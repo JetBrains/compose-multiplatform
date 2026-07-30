@@ -21,7 +21,6 @@ import example.imageviewer.model.PictureData
 import example.imageviewer.style.ImageViewerTheme
 import imageviewer.shared.generated.resources.Res
 import imageviewer.shared.generated.resources.ic_imageviewer_round
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -45,11 +44,10 @@ class ExternalNavigationEventBus {
 
 @Composable
 fun ApplicationScope.ImageViewerDesktop() {
-    val ioScope = rememberCoroutineScope { ioDispatcher }
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
     val externalNavigationEventBus = remember { ExternalNavigationEventBus() }
     val dependencies = remember {
-        getDependencies(toastState, ioScope, externalNavigationEventBus.events)
+        getDependencies(toastState, externalNavigationEventBus.events)
     }
 
     Window(
@@ -60,7 +58,6 @@ fun ApplicationScope.ImageViewerDesktop() {
             size = getPreferredWindowSize(720, 857)
         ),
         icon = painterResource(Res.drawable.ic_imageviewer_round),
-        // https://youtrack.jetbrains.com/issue/CMP-2741
         onKeyEvent = {
             if (it.type == KeyEventType.KeyUp) {
                 when (it.key) {
@@ -70,10 +67,6 @@ fun ApplicationScope.ImageViewerDesktop() {
 
                     Key.DirectionRight -> externalNavigationEventBus.produceEvent(
                         ExternalImageViewerEvent.Next
-                    )
-
-                    Key.Escape -> externalNavigationEventBus.produceEvent(
-                        ExternalImageViewerEvent.ReturnBack
                     )
                 }
             }
@@ -95,18 +88,17 @@ fun ApplicationScope.ImageViewerDesktop() {
 
 private fun getDependencies(
     toastState: MutableState<ToastState>,
-    ioScope: CoroutineScope,
     events: SharedFlow<ExternalImageViewerEvent>
 ) =
     object : Dependencies() {
-        override val notification: Notification = object : PopupNotification(localization) {
+        override val notification: Notification = object : PopupNotification() {
             override fun showPopUpMessage(text: String) {
                 toastState.value = ToastState.Shown(text)
             }
         }
-        override val imageStorage: DesktopImageStorage = DesktopImageStorage(ioScope)
+        override val imageStorage: DesktopImageStorage = DesktopImageStorage()
         override val sharePicture: SharePicture = object : SharePicture {
-            override fun share(context: PlatformContext, picture: PictureData) {
+            override suspend fun share(context: PlatformContext, picture: PictureData) {
                 // On Desktop share feature not supported
             }
         }

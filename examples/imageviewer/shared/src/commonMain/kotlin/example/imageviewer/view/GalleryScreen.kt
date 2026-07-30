@@ -6,7 +6,6 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,7 +39,7 @@ import example.imageviewer.LocalNotification
 import example.imageviewer.icon.IconMenu
 import example.imageviewer.icon.IconVisibility
 import example.imageviewer.model.PictureData
-import example.imageviewer.style.ImageviewerColors
+import example.imageviewer.style.LocalImageviewerColors
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
 
@@ -49,7 +48,6 @@ enum class GalleryStyle {
     LIST
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun GalleryScreen(
     pictures: SnapshotStateList<PictureData>,
@@ -107,7 +105,6 @@ fun GalleryScreen(
             when (it) {
                 ExternalImageViewerEvent.Next -> nextImage()
                 ExternalImageViewerEvent.Previous -> previousImage()
-                else -> {}
             }
         }
     }
@@ -190,7 +187,6 @@ expect fun GalleryLazyVerticalGrid(
     content: LazyGridScope.() -> Unit
 )
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SquaresGalleryView(
     images: List<PictureData>,
@@ -234,14 +230,14 @@ fun SquareThumbnail(
             easing = LinearOutSlowInEasing,
         )
         AnimatedVisibility(isHighlighted, enter = fadeIn(tween), exit = fadeOut(tween)) {
-            Box(Modifier.fillMaxSize().background(ImageviewerColors.uiLightBlack)) {
+            Box(Modifier.fillMaxSize().background(LocalImageviewerColors.current.uiLightBlack)) {
                 Box(
                     Modifier
                         .align(Alignment.BottomEnd)
                         .padding(end = 4.dp, bottom = 4.dp)
                         .clip(CircleShape)
                         .width(32.dp)
-                        .background(ImageviewerColors.uiLightBlack)
+                        .background(LocalImageviewerColors.current.uiLightBlack)
                         .aspectRatio(1.0f)
                         .clickable {
                             onClick()
@@ -267,6 +263,7 @@ private fun ListGalleryView(
     onFullScreen: (index: Int) -> Unit,
 ) {
     val notification = LocalNotification.current
+    val scope = rememberCoroutineScope()
     ScrollableColumn(
         modifier = Modifier.fillMaxSize().testTag("listGalleryView")
     ) {
@@ -281,7 +278,7 @@ private fun ListGalleryView(
                     onFullScreen(p.index)
                 },
                 onClickInfo = {
-                    notification.notifyImageData(p.value)
+                    scope.launch { notification.notifyImageData(p.value) }
                 },
             )
             Spacer(modifier = Modifier.height(10.dp))
@@ -289,7 +286,6 @@ private fun ListGalleryView(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 private fun Modifier.animatePageChanges(pagerState: PagerState, index: Int) =
     graphicsLayer {
         val x = (pagerState.currentPage - index + pagerState.currentPageOffsetFraction) * 2

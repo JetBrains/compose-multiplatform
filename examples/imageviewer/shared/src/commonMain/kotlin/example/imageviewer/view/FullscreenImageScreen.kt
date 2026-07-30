@@ -11,18 +11,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.dp
 import example.imageviewer.LocalImageProvider
-import example.imageviewer.Localization
-import example.imageviewer.LocalLocalization
 import example.imageviewer.filter.FilterType
 import example.imageviewer.filter.getFilter
 import example.imageviewer.filter.getPlatformContext
 import example.imageviewer.model.*
 import example.imageviewer.style.*
+import imageviewer.shared.generated.resources.Res
+import imageviewer.shared.generated.resources.back
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun FullscreenImageScreen(
@@ -30,8 +28,7 @@ fun FullscreenImageScreen(
     back: () -> Unit,
 ) {
     val imageProvider = LocalImageProvider.current
-    val localization: Localization = LocalLocalization.current
-    val availableFilters = FilterType.values().toList()
+    val availableFilters = FilterType.entries.toList()
     var selectedFilters by remember { mutableStateOf(emptySet<FilterType>()) }
 
     val originalImageState = remember(picture) { mutableStateOf<ImageBitmap?>(null) }
@@ -52,7 +49,7 @@ fun FullscreenImageScreen(
             null
         }
     }
-    Box(Modifier.fillMaxSize().background(color = ImageviewerColors.fullScreenImageBackground)) {
+    Box(Modifier.fillMaxSize().background(color = LocalImageviewerColors.current.fullScreenImageBackground)) {
         if (imageWithFilter != null) {
             val scalableState = remember { ScalableState() }
 
@@ -66,7 +63,7 @@ fun FullscreenImageScreen(
                 Modifier
                     .align(Alignment.BottomCenter)
                     .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-                    .background(ImageviewerColors.filterButtonsBackground)
+                    .background(LocalImageviewerColors.current.filterButtonsBackground)
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -88,7 +85,7 @@ fun FullscreenImageScreen(
 
         TopLayout(
             alignLeftContent = {
-                Tooltip(localization.back) {
+                Tooltip(stringResource(Res.string.back)) {
                     BackButton(back)
                 }
             },

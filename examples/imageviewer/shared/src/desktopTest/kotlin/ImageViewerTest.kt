@@ -1,4 +1,4 @@
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import example.imageviewer.Dependencies
@@ -9,8 +9,6 @@ import example.imageviewer.PopupNotification
 import example.imageviewer.SharePicture
 import example.imageviewer.filter.PlatformContext
 import example.imageviewer.model.PictureData
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import org.junit.Rule
 import org.junit.Test
 
@@ -19,14 +17,13 @@ class ImageViewerTest {
     val rule = createComposeRule()
 
     private val dependencies = object : Dependencies() {
-        override val notification: Notification = object : PopupNotification(localization) {
+        override val notification: Notification = object : PopupNotification() {
             override fun showPopUpMessage(text: String) {
             }
         }
-        override val imageStorage: DesktopImageStorage =
-            DesktopImageStorage(CoroutineScope(Dispatchers.Main))
+        override val imageStorage: DesktopImageStorage = DesktopImageStorage()
         override val sharePicture: SharePicture = object : SharePicture {
-            override fun share(context: PlatformContext, picture: PictureData) {}
+            override suspend fun share(context: PlatformContext, picture: PictureData) {}
         }
     }
 

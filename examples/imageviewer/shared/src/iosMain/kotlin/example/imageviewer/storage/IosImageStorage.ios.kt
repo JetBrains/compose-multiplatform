@@ -4,17 +4,15 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.ImageStorage
 import example.imageviewer.PlatformStorableImage
+import example.imageviewer.ioDispatcher
 import example.imageviewer.model.PictureData
 import example.imageviewer.toImageBitmap
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSize
@@ -70,42 +68,42 @@ class IosImageStorage(
         }
     }
 
-    override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
-        ioScope.launch {
+    override suspend fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
+        ioScope.launch(ioDispatcher) {
             with(image.rawValue) {
                 picture.jpgFile.writeJpeg(fitInto(maxStorableImageSizePx))
                 picture.thumbnailJpgFile.writeJpeg(fitInto(storableThumbnailSizePx))
             }
             picture.jsonFile.writeText(picture.toJson())
-        }
+        }.join()
     }
 
-    override fun delete(picture: PictureData.Camera) {
-        ioScope.launch {
+    override suspend fun delete(picture: PictureData.Camera) {
+        ioScope.launch(ioDispatcher) {
             picture.jsonFile.delete()
             picture.jpgFile.delete()
             picture.thumbnailJpgFile.delete()
-        }
+        }.join()
     }
 
-    override fun rewrite(picture: PictureData.Camera) {
-        ioScope.launch {
+    override suspend fun rewrite(picture: PictureData.Camera) {
+        ioScope.launch(ioDispatcher) {
             picture.jsonFile.delete()
             picture.jsonFile.writeText(picture.toJson())
-        }
+        }.join()
     }
 
     override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap =
-        withContext(ioScope.coroutineContext) {
+        withContext(ioDispatcher) {
             picture.thumbnailJpgFile.readBytes().toImageBitmap()
         }
 
     override suspend fun getImage(picture: PictureData.Camera): ImageBitmap =
-        withContext(ioScope.coroutineContext) {
+        withContext(ioDispatcher) {
             picture.jpgFile.readBytes().toImageBitmap()
         }
 
-    suspend fun getNSDataToShare(picture: PictureData): NSData = withContext(Dispatchers.IO) {
+    suspend fun getNSDataToShare(picture: PictureData): NSData = withContext(ioDispatcher) {
         when (picture) {
             is PictureData.Camera -> {
                 picture.jpgFile
@@ -120,7 +118,7 @@ class IosImageStorage(
         }.readData()
     }
 
-    suspend fun getNSURLToShare(picture: PictureData): NSURL = withContext(Dispatchers.IO) {
+    suspend fun getNSURLToShare(picture: PictureData): NSURL = withContext(ioDispatcher) {
         when (picture) {
             is PictureData.Camera -> {
                 picture.jpgFile
@@ -178,7 +176,7 @@ private fun UIImage.resize(targetSize: CValue<CGSize>): UIImage {
 }
 
 private fun PictureData.Camera.toJson(): String =
-    Json.Default.encodeToString(this)
+    Json.encodeToString(this)
 
 private fun String.toCameraMetadata(): PictureData.Camera =
     Json.Default.decodeFromString(this)

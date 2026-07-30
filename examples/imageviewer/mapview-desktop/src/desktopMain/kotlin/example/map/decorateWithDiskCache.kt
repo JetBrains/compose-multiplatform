@@ -1,7 +1,11 @@
 package example.map
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import java.io.File
 
 fun ContentRepository<Tile, ByteArray>.decorateWithDiskCache(
@@ -9,11 +13,9 @@ fun ContentRepository<Tile, ByteArray>.decorateWithDiskCache(
     cacheDir: File
 ): ContentRepository<Tile, ByteArray> {
 
-    class FileSystemLock()
-
     val origin = this
     val locksCount = 100
-    val locks = Array(locksCount) { FileSystemLock() }
+    val locks = List(locksCount) { Mutex() }
 
     fun getLock(key: Tile) = locks[key.hashCode() % locksCount]
 
@@ -37,18 +39,20 @@ fun ContentRepository<Tile, ByteArray>.decorateWithDiskCache(
                 cacheDir.resolve("tile-$zoom-$x-$y.png")
             }
 
-            val fromCache: ByteArray? = synchronized(getLock(key)) {
-                if (file.exists()) {
-                    try {
-                        file.readBytes()
-                    } catch (t: Throwable) {
-                        t.printStackTrace()
-                        println("Can't read file $file")
-                        println("Will work without disk cache")
+            val fromCache: ByteArray? = withContext(Dispatchers.IO) {
+                getLock(key).withLock {
+                    if (file.exists()) {
+                        try {
+                            file.readBytes()
+                        } catch (t: Throwable) {
+                            t.printStackTrace()
+                            println("Can't read file $file")
+                            println("Will work without disk cache")
+                            null
+                        }
+                    } else {
                         null
                     }
-                } else {
-                    null
                 }
             }
 
@@ -56,8 +60,8 @@ fun ContentRepository<Tile, ByteArray>.decorateWithDiskCache(
                 fromCache
             } else {
                 val image = origin.loadContent(key)
-                backgroundScope.launch {
-                    synchronized(getLock(key)) {
+                backgroundScope.launch(Dispatchers.IO) {
+                    getLock(key).withLock {
                         // save to cacheDir
                         try {
                             file.writeBytes(image)
