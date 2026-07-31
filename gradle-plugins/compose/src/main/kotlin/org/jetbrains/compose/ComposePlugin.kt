@@ -53,6 +53,7 @@ abstract class ComposePlugin : Plugin<Project> {
         project.configureWebCompatibility()
 
         project.configureRuntimeLibrariesCompatibilityCheck()
+        project.configureSwiftCompatibilityLinking()
 
         project.afterEvaluate {
             configureDesktop(project, desktopExtension)
