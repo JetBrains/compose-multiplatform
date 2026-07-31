@@ -1,12 +1,19 @@
 [versions]
-compose-multiplatform = "1.10.1" # overriden via gradle.properties
-kotlin = "2.3.20" # overriden via gradle.properties
+compose-multiplatform = "1.11.1" # overridden via gradle.properties
+kotlin = "2.4.10" # overridden via gradle.properties
+kotlin-react = "17.0.2-pre.201-kotlin-1.5.0"
+kotlin-styled = "5.3.0-pre.201-kotlin-1.5.0"
+react = "17.0.2"
+react-youtube-lite = "1.0.1"
 
 [libraries]
-compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
 compose-html-core = { module = "org.jetbrains.compose.html:html-core", version.ref = "compose-multiplatform" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
+kotlin-react = { module = "org.jetbrains.kotlin-wrappers:kotlin-react", version.ref = "kotlin-react" }
+kotlin-react-dom = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-dom", version.ref = "kotlin-react" }
+kotlin-styled = { module = "org.jetbrains.kotlin-wrappers:kotlin-styled", version.ref = "kotlin-styled" }
 
 [plugins]
-kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

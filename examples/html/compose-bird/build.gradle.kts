@@ -25,7 +25,7 @@ kotlin {
             dependencies {
                 implementation(libs.compose.html.core)
                 implementation(libs.compose.runtime)
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
     }
@@ -34,7 +34,7 @@ kotlin {
 // a temporary workaround for a bug in jsRun invocation - see https://youtrack.jetbrains.com/issue/KT-48273
 afterEvaluate {
     rootProject.extensions.configure<NodeJsRootExtension> {
-        versions.webpackDevServer.version = "4.0.0"
-        versions.webpackCli.version = "4.10.0"
+        versions.webpackDevServer.version = libs.versions.webpack.dev.server.get()
+        versions.webpackCli.version = libs.versions.webpack.cli.get()
     }
 }
