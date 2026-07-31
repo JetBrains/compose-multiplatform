@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 plugins {
-	kotlin("multiplatform")
-	kotlin("plugin.compose")
-	id("org.jetbrains.compose")
+	alias(libs.plugins.kotlinMultiplatform)
+	alias(libs.plugins.composeCompiler)
+	alias(libs.plugins.composeMultiplatform)
 }
 
 repositories {
@@ -20,8 +20,8 @@ kotlin {
 	sourceSets {
 		val jsMain by getting {
 			dependencies {
-				implementation(compose.html.core)
-				implementation(compose.runtime)
+				implementation(libs.compose.html.core)
+				implementation(libs.compose.runtime)
 				implementation("org.jetbrains.kotlin-wrappers:kotlin-react:17.0.2-pre.201-kotlin-1.5.0")
 				implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:17.0.2-pre.201-kotlin-1.5.0")
 				implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:5.3.0-pre.201-kotlin-1.5.0")

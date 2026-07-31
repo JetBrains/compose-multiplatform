@@ -1,7 +1,7 @@
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.compose")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.composeMultiplatform)
 }
 
 group = "me.user"
@@ -28,11 +28,10 @@ kotlin {
         binaries.executable()
     }
     sourceSets {
-        val composeVersion = property("compose.version") as String
         val jsMain by getting {
             dependencies {
-                implementation("org.jetbrains.compose.html:html-core:$composeVersion")
-                implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
+                implementation(libs.compose.html.core)
+                implementation(libs.compose.runtime)
             }
         }
         val jsTest by getting {
