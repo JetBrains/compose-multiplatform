@@ -21,29 +21,32 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.ComposeExtension
+import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
+import org.jetbrains.compose.internal.mppExt
+import org.jetbrains.compose.internal.utils.provider
 import org.jetbrains.compose.internal.utils.registerTask
-import org.jetbrains.compose.web.WebExtension
+import org.jetbrains.compose.reload.gradle.files
+import org.jetbrains.compose.web.tasks.registerWebCompatibilityTask
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.targets.js.ir.Executable
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
+import org.jetbrains.kotlin.org.apache.commons.compress.harmony.pack200.NewAttributeBands
 
-internal fun Project.configureWeb(
-    composeExt: ComposeExtension,
-) {
-    val webExt = composeExt.extensions.getByType(WebExtension::class.java)
-
-    val targets = webExt.targetsToConfigure(project)
-    targets.forEach { target ->
-        configureSkikoWebRuntime(project, target)
-        configureComposeUiTestExecutableCheck(project, target)
+internal fun Project.configureWeb() {
+    plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
+        mppExt.targets.withType(KotlinJsIrTarget::class.java).all { target ->
+            target.configureSkikoWebRuntime()
+            target.configureComposeUiTestExecutableCheck()
+        }
+        registerWebCompatibilityTask(mppExt)
     }
 }
 
-private fun configureSkikoWebRuntime(
-    project: Project,
-    target: KotlinJsIrTarget,
-) {
+private fun KotlinJsIrTarget.configureSkikoWebRuntime() {
+    val target = this
     val titledTargetName = target.name.replaceFirstChar { it.titlecase() }
     val mainCompilation = target.compilations.findByName(KotlinCompilation.MAIN_COMPILATION_NAME)!!
     val runtimeDepsConfig = project.configurations.findByName(mainCompilation.runtimeDependencyConfigurationName)!!
@@ -91,10 +94,8 @@ private fun configureSkikoWebRuntime(
     }
 }
 
-private fun configureComposeUiTestExecutableCheck(
-    project: Project,
-    target: KotlinJsIrTarget,
-) {
+private fun KotlinJsIrTarget.configureComposeUiTestExecutableCheck() {
+    val target = this
     val titledTargetName = target.name.replaceFirstChar { it.titlecase() }
     val checkTask = project.registerTask<CheckComposeUiTestExecutableTask>(
         "checkComposeUiTestConfigurationFor$titledTargetName"
