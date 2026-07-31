@@ -28,10 +28,11 @@ kotlin {
         binaries.executable()
     }
     sourceSets {
+        val composeVersion = property("compose.version") as String
         val jsMain by getting {
             dependencies {
-                implementation(compose.web.core)
-                implementation(compose.runtime)
+                implementation("org.jetbrains.compose.html:html-core:$composeVersion")
+                implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
             }
         }
         val jsTest by getting {
