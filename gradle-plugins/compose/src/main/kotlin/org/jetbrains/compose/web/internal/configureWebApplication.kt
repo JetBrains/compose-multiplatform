@@ -58,14 +58,15 @@ private fun configureSkikoWebRuntime(
             cont.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "skiko-runtime"))
         }
     }.files
+    val skikoWebRuntimeFiles = skikoWebRuntimeJarFiles.elements.map {
+        it.map { artifact -> project.zipTree(artifact) }
+    }
     val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-${target.name}-runtime")
 
     val unpackRuntime = project.registerTask<Copy>("unpackSkikoRuntimeFor$titledTargetName") {
         destinationDir = project.file(unpackedRuntimeDir)
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        from(
-            skikoWebRuntimeJarFiles.map { artifact -> project.zipTree(artifact) }
-        )
+        from(skikoWebRuntimeFiles)
     }
 
     target.compilations.all { compilation ->

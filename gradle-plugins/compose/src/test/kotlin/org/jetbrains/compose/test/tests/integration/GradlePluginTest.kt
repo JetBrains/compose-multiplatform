@@ -192,6 +192,17 @@ class GradlePluginTest : GradlePluginTestBase() {
         }
     }
 
+    //https://youtrack.jetbrains.com/issue/CMP-10608
+    @Test
+    fun testEarlyTaskMaterialization(): Unit = with(testProject("misc/skikoWasm")) {
+        //whenTaskAdded materialize tasks in the configuration phase
+        file("build.gradle").appendText("\ntasks.whenTaskAdded { }")
+
+        gradle("tasks").checks {
+            check.taskSuccessful(":tasks")
+        }
+    }
+
     private fun testConfigureDesktopPreviewImpl(port: Int) {
         check(port > 0) { "Invalid port: $port" }
         with(testProject("misc/jvmPreview")) {
