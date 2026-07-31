@@ -1,7 +1,5 @@
 package org.jetbrains.compose.resources
 
-import kotlinx.coroutines.runBlocking
-
 /**
  * Clears any cached resources maintained internally by the system.
  *
@@ -10,5 +8,5 @@ import kotlinx.coroutines.runBlocking
  */
 @ExperimentalResourceApi
 fun ResourceCaches.clearBlocking() {
-    runBlocking { clear() }
+    runResourceBlocking { clear() }
 }
