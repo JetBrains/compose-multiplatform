@@ -1,7 +1,7 @@
 [versions]
-kotlin = "2.3.20" # overriden via gradle.properties
-compose = "1.10.1" # overriden via gradle.properties
-agp = "9.2.1" # overriden via gradle.properties
+kotlin = "2.4.10" # overriden via gradle.properties
+compose = "1.11.1" # overriden via gradle.properties
+agp = "9.1.1" # overriden via gradle.properties
 androidx-activity = "1.13.0"
 androidx-appcompat = "1.7.1"
 androidx-core = "1.18.0"
@@ -16,6 +16,7 @@ compose-foundation = { module = "org.jetbrains.compose.foundation:foundation", v
 compose-material3 = { module = "org.jetbrains.compose.material3:material3", version = "1.10.0-alpha05" }
 components-resources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "compose" }
 material-icons-core = { module = "org.jetbrains.compose.material:material-icons-core", version = "1.7.3" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -1,7 +1,7 @@
 [versions]
-kotlin = "2.3.20" # overridden via gradle.properties
-compose = "1.10.1" # overridden via gradle.properties
-agp = "9.2.1" # overridden via gradle.properties
+kotlin = "2.4.10" # overridden via gradle.properties
+compose = "1.11.1" # overridden via gradle.properties
+agp = "9.1.1" # overridden via gradle.properties
 androidx-activity = "1.13.0"
 androidx-lifecycle = "2.10.0"
 androidx-navigation = "2.9.2"
