@@ -53,7 +53,7 @@ private val testJdks = TestProperties
     .testJdksRoot?.let { listTestJdks(it) }.orEmpty()
 
 class TestProject(
-    private val name: String,
+    val name: String,
     private val testEnvironment: TestEnvironment
 ) {
     private val testProjectsRootDir = File("src/test/test-projects")

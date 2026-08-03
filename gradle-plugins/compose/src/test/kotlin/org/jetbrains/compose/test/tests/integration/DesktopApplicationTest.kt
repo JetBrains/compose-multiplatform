@@ -9,6 +9,7 @@ import org.gradle.internal.jvm.inspection.JvmVendor
 import org.jetbrains.compose.desktop.application.dsl.AotMode
 import org.jetbrains.compose.internal.utils.MacUtils
 import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.UnixUtils
 import org.jetbrains.compose.internal.utils.currentArch
 import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.internal.utils.currentTarget
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.*
 import java.util.jar.JarFile
+import kotlin.test.assertTrue
 
 class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
@@ -282,6 +284,15 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             check(possibleNames.any { packageFile.name.equals(it, ignoreCase = true) }) {
                 "Unexpected package name '${packageFile.name}' in $packageDir\n" +
                         "Possible names: ${possibleNames.joinToString(", ") { "'$it'" }}"
+            }
+
+            // Verify the presence of a .desktop file in the .deb
+            val packagedFiles = runProcess(UnixUtils.dpkgDeb, listOf("-c", packageFile.absolutePath))
+                .out
+                .lines()
+            assertTrue("Packaged .deb did not contain .desktop file") {
+                val desktopFile = "$name.desktop"
+                packagedFiles.any { it.contains(desktopFile) }
             }
         } else {
             assertEquals("TestPackage-1.0.0.$ext", packageFile.name, "Unexpected package name")
@@ -655,6 +666,20 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                     .replace("%JAVA_VERSION%", "$javaVersion")
                     .replace("%JVM_VENDOR%", javaVendor.name)
             }
+        }
+    }
+
+    @Test
+    fun testAppCdsNoneOnJdk17() {
+        with(aotProject(AotMode.None, javaVendor = JvmVendor.KnownJvmVendor.AMAZON, javaVersion = 17)) {
+//        fun testRunTask(runTask: String) {
+//            gradleFailure(runTask).checks {
+//                check.logContains("AotMode 'AppCdsAuto' is not supported on JDK earlier than 19; current is 17")
+//            }
+//        }
+            gradle(":packageReleaseDmg")
+
+//        testRunTask(":runReleaseDistributable")
         }
     }
 

@@ -128,6 +128,9 @@ internal object UnixUtils {
     val git: File by lazy {
         File("/usr/bin/git").checkExistingFile()
     }
+    val dpkgDeb: File by lazy {
+        File("/usr/bin/dpkg-deb").checkExistingFile()
+    }
 }
 
 internal fun jvmToolFile(toolName: String, javaHome: Provider<String>): File =
