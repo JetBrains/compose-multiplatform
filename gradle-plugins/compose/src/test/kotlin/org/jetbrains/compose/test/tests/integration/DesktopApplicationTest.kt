@@ -672,14 +672,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
     fun testAppCdsNoneOnJdk17() {
         with(aotProject(AotMode.None, javaVendor = JvmVendor.KnownJvmVendor.AMAZON, javaVersion = 17)) {
-//        fun testRunTask(runTask: String) {
-//            gradleFailure(runTask).checks {
-//                check.logContains("AotMode 'AppCdsAuto' is not supported on JDK earlier than 19; current is 17")
-//            }
-//        }
             gradle(":packageReleaseDmg")
-
-//        testRunTask(":runReleaseDistributable")
         }
     }
 
@@ -687,7 +680,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     fun testAppCdsAutoFailsOnJdk17() = with(aotProject(AotMode.AppCdsAuto, javaVersion = 17)) {
         fun testRunTask(runTask: String) {
             gradleFailure(runTask).checks {
-                check.logContains("AotMode 'AppCdsAuto' is not supported on JDK earlier than 19; current is 17")
+                check.logContains("AotMode '${AotMode.AppCdsAuto.name}' is not supported on JDK earlier than 19; current is 17")
             }
         }
 
