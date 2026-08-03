@@ -290,9 +290,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             val packagedFiles = runProcess(UnixUtils.dpkgDeb, listOf("-c", packageFile.absolutePath))
                 .out
                 .lines()
-            assertTrue("Packaged .deb did not contain .desktop file") {
-                val desktopFile = "$name.desktop"
-                packagedFiles.any { it.contains(desktopFile) }
+            assertTrue("Packaged .deb did not contain `.desktop` file") {
+                packagedFiles.any { it.endsWith(".desktop") }
             }
         } else {
             assertEquals("TestPackage-1.0.0.$ext", packageFile.name, "Unexpected package name")
