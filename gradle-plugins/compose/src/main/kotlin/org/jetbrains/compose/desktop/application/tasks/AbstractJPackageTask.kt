@@ -430,7 +430,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
 
         if (targetFormat != TargetFormat.AppImage) {
-            // Args that can only be used when creating an installer
+            // Args that can only be used when creating an installer from an existing app image
             val appImageDir = when {
                 currentOS == OS.MacOS -> appImage.dir("${packageName.get()}.app")
                 else -> appImage.dir(packageName.get())
@@ -438,7 +438,6 @@ abstract class AbstractJPackageTask @Inject constructor(
             cliArg("--app-image", appImageDir)
             cliArg("--install-dir", installationPath)
             cliArg("--license-file", licenseFile)
-            cliArg("--resource-dir", jpackageResources)
 
             val propertyFilesDirJava = propertyFilesDir.ioFile
             fileOperations.clearDirs(propertyFilesDir)
