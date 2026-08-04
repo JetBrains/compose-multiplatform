@@ -128,7 +128,7 @@ abstract class WebCompatibilityTask : DefaultTask() {
     }
 }
 
-private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformExtension) =
+internal fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformExtension) =
     registerTask<WebCompatibilityTask>("composeCompatibilityBrowserDistribution") {
         group = "compose"
         description =
@@ -180,9 +180,3 @@ private fun Project.registerWebCompatibilityTask(mppPlugin: KotlinMultiplatformE
 
         }
     }
-
-internal fun Project.configureWebCompatibility() {
-    plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
-        project.registerWebCompatibilityTask(mppExt)
-    }
-}
