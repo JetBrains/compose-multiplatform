@@ -10,11 +10,11 @@ pluginManagement {
                 includeGroupAndSubgroups("androidx")
             }
         }
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
         mavenCentral {
             url = uri("https://cache-redirector.jetbrains.com/maven-central")
         }
         gradlePluginPortal()
-        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
     }
 }
 
