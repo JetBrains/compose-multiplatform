@@ -396,7 +396,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
 
         if (targetFormat == TargetFormat.AppImage || appImage.orNull == null) {
-            // Args, that can only be used, when creating an app image or an installer w/o --app-image parameter
+            // Args that can only be used when creating an app image or an installer w/o --app-image parameter
             cliArg("--input", libsDir)
             cliArg("--runtime-image", runtimeImage)
             cliArg("--resource-dir", jpackageResources)
@@ -412,7 +412,6 @@ abstract class AbstractJPackageTask @Inject constructor(
             if (currentOS == OS.Windows) {
                 cliArg("--win-console", winConsole)
             }
-            cliArg("--icon", iconFile)
             launcherArgs.orNull?.forEach {
                 cliArg("--arguments", "'$it'")
             }
@@ -431,16 +430,14 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
 
         if (targetFormat != TargetFormat.AppImage) {
-            // Args, that can only be used, when creating an installer
+            // Args that can only be used when creating an installer from an existing app image
             val appImageDir = when {
-                jvmRuntimeInfo.majorVersion < 18 -> appImage
                 currentOS == OS.MacOS -> appImage.dir("${packageName.get()}.app")
                 else -> appImage.dir(packageName.get())
             }
             cliArg("--app-image", appImageDir)
             cliArg("--install-dir", installationPath)
             cliArg("--license-file", licenseFile)
-            cliArg("--resource-dir", jpackageResources)
 
             val propertyFilesDirJava = propertyFilesDir.ioFile
             fileOperations.clearDirs(propertyFilesDir)
@@ -497,6 +494,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         cliArg("--verbose", verbose)
 
         cliArg("--name", packageName)
+        cliArg("--icon", iconFile)
         cliArg("--description", packageDescription)
         cliArg("--copyright", packageCopyright)
         cliArg("--app-version", packageVersion)
