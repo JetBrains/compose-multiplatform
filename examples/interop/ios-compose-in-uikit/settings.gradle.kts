@@ -15,8 +15,8 @@ dependencyResolutionManagement {
 
     versionCatalogs {
         create("libs") {
+            version("compose-multiplatform", extra["compose.version"].toString())
             version("kotlin", extra["kotlin.version"].toString())
-            version("compose", extra["compose.version"].toString())
         }
     }
 }

@@ -1,0 +1,13 @@
+[versions]
+compose-multiplatform = "1.11.1" # overridden via gradle.properties
+highlight-js = "10.7.2"
+kotlin = "2.4.10" # overridden via gradle.properties
+
+[libraries]
+compose-html-core = { module = "org.jetbrains.compose.html:html-core", version.ref = "compose-multiplatform" }
+compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
+
+[plugins]
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

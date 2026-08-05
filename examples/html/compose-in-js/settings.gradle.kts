@@ -3,12 +3,15 @@ pluginManagement {
         gradlePluginPortal()
         maven("https://packages.jetbrains.team/maven/p/cmp/dev")
     }
+}
 
-    plugins {
-        kotlin("multiplatform").version(extra["kotlin.version"] as String)
-        kotlin("plugin.compose").version(extra["kotlin.version"] as String)
-        id("org.jetbrains.compose").version(extra["compose.version"] as String)
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            version("compose-multiplatform", extra["compose.version"].toString())
+            version("kotlin", extra["kotlin.version"].toString())
+        }
     }
 }
-rootProject.name = "web-compose-in-js"
 
+rootProject.name = "web-compose-in-js"

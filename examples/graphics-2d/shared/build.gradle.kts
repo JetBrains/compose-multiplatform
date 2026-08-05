@@ -65,5 +65,8 @@ kotlin {
             api(libs.androidx.appcompat)
             api(libs.androidx.core.ktx)
         }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+        }
     }
 }

@@ -76,7 +76,7 @@ kotlin {
         }
 
         webMain.dependencies {
-            implementation(npm("uuid", "^9.0.1"))
+            implementation(npm("uuid", libs.versions.uuid.get()))
         }
 
         val desktopMain by getting
