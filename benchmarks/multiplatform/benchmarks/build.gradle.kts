@@ -18,10 +18,10 @@ repositories {
     google {
         url = uri("https://cache-redirector.jetbrains.com/dl.google.com/dl/android/maven2")
     }
+    maven("https://packages.jetbrains.team/maven/p/cmp/dev")
     mavenCentral {
         url = uri("https://cache-redirector.jetbrains.com/maven-central")
     }
-    maven("https://packages.jetbrains.team/maven/p/cmp/dev")
 }
 
 kotlin {
