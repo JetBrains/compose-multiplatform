@@ -1,8 +1,8 @@
 package org.jetbrains.compose.web.core.tests
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.browser.document
 import kotlinx.dom.clear
@@ -10,11 +10,10 @@ import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.testutils.runTest
+import org.w3c.dom.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import org.jetbrains.compose.web.testutils.*
-import org.w3c.dom.*
-import kotlin.test.assertContains
 import kotlin.test.assertTrue
 
 class AttributesTests {
@@ -459,7 +458,7 @@ class AttributesTests {
                     id("id$readKey")
                 }
             ) {
-            @Suppress("DEPRECATION")
+                @Suppress("DEPRECATION")
                 DisposableRefEffect(readKey) {
                     val p = document.createElement("p").also { it.innerHTML = "Key=$readKey" }
                     it.appendChild(p)
@@ -508,7 +507,7 @@ class AttributesTests {
         with(child) {
             val attrs = getAttributeNames().toList()
             assertEquals(2, attrs.size)
-            assertTrue(attrs.containsAll(listOf("style", "class",)))
+            assertTrue(attrs.containsAll(listOf("style", "class")))
 
             assertEquals("button", tagName.lowercase())
             assertEquals("a", getAttribute("class"))
@@ -577,6 +576,18 @@ class AttributesTests {
             assertEquals(2, attrsMap.size)
             assertEquals("450", attrsMap["width"])
             assertEquals("400", attrsMap["height"])
+        }
+    }
+
+    @Test
+    fun booleanAttributeTest() = runTest {
+        composition {
+            TextInput {
+                attr("required", true)
+            }
+        }
+        with(nextChild()) {
+            assertEquals("true", getAttribute("required"))
         }
     }
 }
