@@ -37,7 +37,7 @@ internal fun JvmApplicationContext.configureWix() {
     if (disableWixDownload.get()) return
 
     val root = project.rootProject
-    val wixDir = project.gradle.gradleUserHomeDir.resolve("compose-jb")
+    val wixDir = project.gradle.gradleUserHomeDir.resolve("compose-multiplatform")
     val fileName = "wix311"
     val zipFile = wixDir.resolve("$fileName.zip")
     val unzipDir = root.layout.buildDirectory.dir(fileName)
