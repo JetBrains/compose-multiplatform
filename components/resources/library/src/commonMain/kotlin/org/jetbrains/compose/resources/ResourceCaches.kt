@@ -5,7 +5,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 internal class AsyncCache<K, V> {
-    private val cacheScope = CoroutineScope(SupervisorJob())
+    private val cacheScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
     private val mutex = Mutex()
     private val cache = mutableMapOf<K, SharedRequest<V>>()
 
@@ -25,13 +25,15 @@ internal class AsyncCache<K, V> {
         val request = mutex.withLock {
             var cached = cache[key]
             if (cached == null || cached.deferred.isCancelled) {
-                cached = SharedRequest(cacheScope.async { load() })
+                //the request is created lazily to start it outside the critical mutex section
+                cached = SharedRequest(cacheScope.async(start = CoroutineStart.LAZY) { load() })
                 cache[key] = cached
             }
             cached.listenersCount++
             cached
         }
          return try {
+             request.deferred.start()
              request.deferred.await()
          } finally {
              mutex.withLock {

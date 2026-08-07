@@ -26,6 +26,15 @@ suspend fun readResourceBytes(path: String): ByteArray = DefaultResourceReader.r
 @InternalResourceApi
 fun getResourceUri(path: String): String = DefaultResourceReader.getUri(path)
 
+/**
+ * Interface for reading resource files.
+ *
+ * **Warning:**
+ * - On all platforms except Web, synchronous loading of resources is expected inside this method.
+ * - On Android and JVM, implementations must not switch to the Main dispatcher
+ *   (e.g. via `withContext(Dispatchers.Main)`) as this can cause a deadlock!
+ *   See: `DeadlockReproducer.kt`
+ */
 @ExperimentalResourceApi
 interface ResourceReader {
     suspend fun read(path: String): ByteArray
