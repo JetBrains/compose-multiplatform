@@ -16,6 +16,10 @@ _Changes since 1.12.0-beta03_
 
 ## Fixes
 
+### iOS
+
+- _(prerelease fix)_ Fix application build when using old Xcode 16 SDK: the `_OBJC_CLASS_$_UIViewLayoutRegion` symbol is now resolved at runtime [#3278](https://github.com/JetBrains/compose-multiplatform-core/pull/3278)
+
 ### Desktop
 
 - Fix crash when starting a selection beyond the last text in a SelectionContainer [#3270](https://github.com/JetBrains/compose-multiplatform-core/pull/3270)
