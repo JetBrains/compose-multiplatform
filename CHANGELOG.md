@@ -1,3 +1,54 @@
+# 1.12.0-rc01 (August 2026)
+
+_Changes since 1.12.0-beta03_
+
+## Highlights
+
+### Desktop
+
+- MCP server was introduced for Compose Hot Reload that enables AI agents to interact with a running Compose application in real time [#5671](https://github.com/JetBrains/compose-multiplatform/pull/5671)
+
+## Features
+
+### Desktop
+
+- Update bundled Compose Hot Reload version to [1.2.0](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.2.0) [#5671](https://github.com/JetBrains/compose-multiplatform/pull/5671)
+
+## Fixes
+
+### Desktop
+
+- Fix crash when starting a selection beyond the last text in a SelectionContainer [#3270](https://github.com/JetBrains/compose-multiplatform-core/pull/3270)
+
+### Web
+
+- _(prerelease fix)_ Virtual keyboard gets hidden after a long tap on the text field [#3276](https://github.com/JetBrains/compose-multiplatform-core/pull/3276)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.12.0-rc01`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.12.0-rc01` | [Runtime 1.12.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.12.0-rc01) |
+| UI | `org.jetbrains.compose.ui:ui*:1.12.0-rc01` | [UI 1.12.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.12.0-rc01) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.12.0-rc01` | [Foundation 1.12.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.12.0-rc01) |
+| Material | `org.jetbrains.compose.material:material*:1.12.0-rc01` | [Material 1.12.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.12.0-rc01) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.12.0-alpha03` | [Material3 1.5.0-alpha22](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha22) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-beta02` | [Material3 Adaptive 1.3.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0-beta02) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0` | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.10.0-alpha02` | [Navigation 2.10.0-alpha05](https://developer.android.com/jetpack/androidx/releases/navigation#2.10.0-alpha05) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.2.0-alpha02` | [Navigation3 1.2.0-alpha04](https://developer.android.com/jetpack/androidx/releases/navigation3#1.2.0-alpha04) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0` | [Navigation Event 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.1) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.12.0-beta03 (July 2026)
 
 _Changes since 1.12.0-beta02_
