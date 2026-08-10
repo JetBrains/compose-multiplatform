@@ -70,6 +70,9 @@ val argsKeyToValue = args
 
 val token = argsKeyToValue["token"]
 
+val teamcityConfigRepo = "ssh://git@git.jetbrains.team/ui/compose-teamcity-config.git"
+val libraryKtPath = ".teamcity/compose/Library.kt"
+
 // Parse sections from [PR_FORMAT.md]
 fun parseSections(title: String) = prFormatFile
     .readText()
@@ -82,6 +85,44 @@ fun parseSections(title: String) = prFormatFile
 
 val standardSections = parseSections("### Sections")
 val standardSubsections = parseSections("### Subsections")
+
+/**
+ * A row of the `### Libraries` table in CHANGELOG.md
+ */
+data class LibraryRow(
+    /** The first column, for example `Runtime` */
+    val title: String,
+    /** Maven coordinates without a version, for example `org.jetbrains.compose.runtime:runtime*` */
+    val coordinates: String,
+    /**
+     * The name in the `Library` enum of [libraryKtPath]
+     */
+    val libraryKey: String?,
+    /** The key in redirectversions.toml, without the `androidx.` prefix */
+    val redirectKey: String,
+    /** The page in https://developer.android.com/jetpack/androidx/releases/ */
+    val jetpackPage: String,
+    /** The link text before the Jetpack version */
+    val jetpackTitle: String = title,
+)
+
+/**
+ * The content of the `### Libraries` table, in the order the rows are shown
+ */
+val libraryRows = listOf(
+    LibraryRow("Runtime", "org.jetbrains.compose.runtime:runtime*", "COMPOSE", "compose", "compose-runtime"),
+    LibraryRow("UI", "org.jetbrains.compose.ui:ui*", "COMPOSE", "compose", "compose-ui"),
+    LibraryRow("Foundation", "org.jetbrains.compose.foundation:foundation*", "COMPOSE", "compose", "compose-foundation"),
+    LibraryRow("Material", "org.jetbrains.compose.material:material*", "COMPOSE", "compose", "compose-material"),
+    LibraryRow("Material3", "org.jetbrains.compose.material3:material3*", "COMPOSE_MATERIAL3", "compose.material3", "compose-material3"),
+    LibraryRow("Material3 Adaptive", "org.jetbrains.compose.material3.adaptive:adaptive*", "COMPOSE_MATERIAL3_ADAPTIVE", "compose.material3.adaptive", "compose-material3-adaptive"),
+    LibraryRow("Lifecycle", "org.jetbrains.androidx.lifecycle:lifecycle-*", "LIFECYCLE", "lifecycle", "lifecycle"),
+    LibraryRow("Navigation", "org.jetbrains.androidx.navigation:navigation-*", "NAVIGATION", "navigation", "navigation"),
+    LibraryRow("Navigation3", "org.jetbrains.androidx.navigation3:navigation3-*", "NAVIGATION_3", "navigation3", "navigation3"),
+    LibraryRow("Navigation Event", "org.jetbrains.androidx.navigationevent:navigationevent-compose", "NAVIGATION_EVENT", "navigationevent", "navigationevent"),
+    LibraryRow("Savedstate", "org.jetbrains.androidx.savedstate:savedstate*", "SAVEDSTATE", "savedstate", "savedstate"),
+    LibraryRow("WindowManager Core", "org.jetbrains.androidx.window:window-core", null, "window", "window", jetpackTitle = "WindowManager"),
+)
 
 println()
 
@@ -118,31 +159,8 @@ fun generateChangelog() {
             println("Can't find $libName previous version. Using PLACEHOLDER")
         }
 
-    fun formatAndroidxLibVersion(libName: String) =
-        androidxLibToVersion[libName] ?: "PLACEHOLDER".also {
-            println("Can't find $libName version. Using PLACEHOLDER")
-        }
-
-    fun formatAndroidxLibRedirectingVersion(libName: String) =
-        androidxLibToRedirectionVersion[libName] ?: "PLACEHOLDER".also {
-            println("Can't find $libName redirection version. Using PLACEHOLDER")
-        }
-
-    val versionCompose = formatAndroidxLibVersion("COMPOSE")
-    val versionComposeMaterial3 = formatAndroidxLibVersion("COMPOSE_MATERIAL3")
-    val versionComposeMaterial3Adaptive = formatAndroidxLibVersion("COMPOSE_MATERIAL3_ADAPTIVE")
-    val versionLifecycle = formatAndroidxLibVersion("LIFECYCLE")
-    val versionNavigationEvent = formatAndroidxLibVersion("NAVIGATION_EVENT")
-    val versionSavedstate = formatAndroidxLibVersion("SAVEDSTATE")
-    val versionNavigation3 = formatAndroidxLibVersion("NAVIGATION_3")
-
-    val versionRedirectingCompose = formatAndroidxLibRedirectingVersion("compose")
-    val versionRedirectingComposeMaterial3 = formatAndroidxLibRedirectingVersion("compose.material3")
-    val versionRedirectingComposeMaterial3Adaptive = formatAndroidxLibRedirectingVersion("compose.material3.adaptive")
-    val versionRedirectingLifecycle = formatAndroidxLibRedirectingVersion("lifecycle")
-    val versionRedirectingNavigationEvent = formatAndroidxLibRedirectingVersion("navigationevent")
-    val versionRedirectingSavedstate = formatAndroidxLibRedirectingVersion("savedstate")
-    val versionRedirectingNavigation3 = formatAndroidxLibRedirectingVersion("navigation3")
+    val versionCompose = androidxLibToVersion["COMPOSE"]
+        ?: error("Can't find the COMPOSE version in $libraryKtPath for $versionCommit")
 
     val versionName = versionCompose
 
@@ -164,6 +182,28 @@ fun generateChangelog() {
         val previousVersionInChangelog = previousChangelog.substringAfter("# ").substringBefore(" (")
         previousVersionCommit = "v$previousVersionInChangelog"
         previousVersion = previousVersionInChangelog
+    }
+
+    val previouslyPublished = parsePublishedLibraries(previousChangelog)
+
+    /**
+     * Format a single row of the `### Libraries` table.
+     */
+    fun formatLibraryRow(row: LibraryRow): String {
+        fun placeholder(what: String) = "PLACEHOLDER".also {
+            println("Can't find $what for '${row.title}'. Using PLACEHOLDER")
+        }
+
+        val publishedVersion = row.libraryKey?.let(androidxLibToVersion::get)
+        val version = publishedVersion
+            ?: previouslyPublished[row.title]?.version
+            ?: placeholder("a version")
+        val redirectVersion = publishedVersion?.let { androidxLibToRedirectionVersion[row.redirectKey] }
+            ?: previouslyPublished[row.title]?.redirectVersion
+            ?: placeholder("a redirection version")
+
+        val jetpackLink = "https://developer.android.com/jetpack/androidx/releases/${row.jetpackPage}#$redirectVersion"
+        return "| ${row.title} | `${row.coordinates}:$version` | [${row.jetpackTitle} $redirectVersion]($jetpackLink) |"
     }
 
     fun getChangelog(firstCommit: String, lastCommit: String, firstVersion: String, lastVersion: String): String {
@@ -206,36 +246,19 @@ fun generateChangelog() {
                         }
                 }
 
-            append(
-                """
-                    ## Components
-
-                    ### Gradle plugin
-
-                    `org.jetbrains.compose` version `$versionCompose`
-
-                    ### Libraries
-
-                    | Library group | Coordinates | Based on Jetpack |
-                    |---------------|-------------|------------------|
-                    | Runtime | `org.jetbrains.compose.runtime:runtime*:$versionCompose` | [Runtime $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-runtime#$versionRedirectingCompose) |
-                    | UI | `org.jetbrains.compose.ui:ui*:$versionCompose` | [UI $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-ui#$versionRedirectingCompose) |
-                    | Foundation | `org.jetbrains.compose.foundation:foundation*:$versionCompose` | [Foundation $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-foundation#$versionRedirectingCompose) |
-                    | Material | `org.jetbrains.compose.material:material*:$versionCompose` | [Material $versionRedirectingCompose](https://developer.android.com/jetpack/androidx/releases/compose-material#$versionRedirectingCompose) |
-                    | Material3 | `org.jetbrains.compose.material3:material3*:$versionComposeMaterial3` | [Material3 $versionRedirectingComposeMaterial3](https://developer.android.com/jetpack/androidx/releases/compose-material3#$versionRedirectingComposeMaterial3) |
-                    | Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:$versionComposeMaterial3Adaptive` | [Material3 Adaptive $versionRedirectingComposeMaterial3Adaptive](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#$versionRedirectingComposeMaterial3Adaptive) |
-                    | Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:$versionLifecycle` | [Lifecycle $versionRedirectingLifecycle](https://developer.android.com/jetpack/androidx/releases/lifecycle#$versionRedirectingLifecycle) |
-                    | Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.9.2` | [Navigation 2.9.7](https://developer.android.com/jetpack/androidx/releases/navigation#2.9.7) |
-                    | Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:$versionNavigation3` | [Navigation3 $versionRedirectingNavigation3](https://developer.android.com/jetpack/androidx/releases/navigation3#$versionRedirectingNavigation3) |
-                    | Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:$versionNavigationEvent` | [Navigation Event $versionRedirectingNavigationEvent](https://developer.android.com/jetpack/androidx/releases/navigationevent#$versionRedirectingNavigationEvent) |
-                    | Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:$versionSavedstate` | [Savedstate $versionRedirectingSavedstate](https://developer.android.com/jetpack/androidx/releases/savedstate#$versionRedirectingSavedstate) |
-                    | WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
-
-                    ---
-                """.trimIndent()
-            )
-
+            appendLine("## Components")
             appendLine()
+            appendLine("### Gradle plugin")
+            appendLine()
+            appendLine("`org.jetbrains.compose` version `$versionCompose`")
+            appendLine()
+            appendLine("### Libraries")
+            appendLine()
+            appendLine("| Library group | Coordinates | Based on Jetpack |")
+            appendLine("|---------------|-------------|------------------|")
+            libraryRows.forEach { appendLine(formatLibraryRow(it)) }
+            appendLine()
+            appendLine("---")
             appendLine()
 
             val nonstandardSectionEntries = entries
@@ -475,30 +498,83 @@ fun androidxLibToRedirectionVersion(commit: String): Map<String, String> {
 }
 
 /**
- * Extract versions from CI config, file .teamcity/compose/Library.kt
+ * Extract versions of the libraries that are published in [commit] from CI config, file [libraryKtPath]
+ * Libraries from `excludedLibraries` are absent in the result
  *
  * Example
  * https://jetbrains.team/p/ui/repositories/compose-teamcity-config/files/8f8408ccd05a9188895969b1fa0243050716baad/.teamcity/compose/Library.kt?tab=source&line=37&lines-count=1
  * Library.CORE_BUNDLE -> "1.1.0-alpha01"
  */
 fun androidxLibToVersion(commit: String): Map<String, String> {
-    val repo = "ssh://git@git.jetbrains.team/ui/compose-teamcity-config.git"
-    val file = ".teamcity/compose/Library.kt"
     val libraryKt = try {
-        spaceContentOf(repo, file, commit)
-    } catch (_: Exception) {
-        ""
+        spaceContentOf(teamcityConfigRepo, libraryKtPath, commit)
+    } catch (e: Exception) {
+        throw IllegalStateException(
+            "Can't read $libraryKtPath from $teamcityConfigRepo for $commit. Either $commit doesn't exist there," +
+                    " or you need to register your ssh key in https://jetbrains.team/m/me/authentication?tab=GitKeys",
+            e
+        )
+    }
+    check(libraryKt.isNotBlank()) {
+        "$libraryKtPath in $teamcityConfigRepo for $commit is empty"
     }
 
-    return if (libraryKt.isBlank()) {
-        println("Can't find library versions in $repo for $commit. Either the format is changed, or you need to register your ssh key in https://jetbrains.team/m/me/authentication?tab=GitKeys")
-        emptyMap()
-    } else {
-        val regex = Regex("Library\\.(.*)\\s*->\\s*\"(.*)\"")
-        return regex.findAll(libraryKt).associate { result ->
-            result.groupValues[1].trim() to result.groupValues[2].trim()
-        }
+    val publishingVersions = libraryKt
+        .substringAfter("val Library.publishingVersion", "")
+        .substringAfter("{", "")
+        .substringBefore("\n}")
+    check(publishingVersions.isNotBlank()) {
+        "Can't find `Library.publishingVersion` in $libraryKtPath for $commit. Probably the format is changed"
     }
+
+    val excluded = excludedLibraries(libraryKt, commit)
+    return Regex("Library\\.(\\w+)\\s*->\\s*\"(.+?)\"")
+        .findAll(publishingVersions)
+        .associate { it.groupValues[1] to it.groupValues[2].trim() }
+        .filterKeys { it !in excluded }
+}
+
+/**
+ * Names of the libraries that aren't published in [commit] - `excludedLibraries` in [libraryKtPath]
+ */
+fun excludedLibraries(libraryKt: String, commit: String): Set<String> {
+    check(libraryKt.contains("excludedLibraries")) {
+        "Can't find `excludedLibraries` in $libraryKtPath for $commit. Probably the format is changed"
+    }
+    val excluded = libraryKt.substringAfter("excludedLibraries").substringAfter("setOf(").substringBefore(")")
+    return Regex("Library\\.(\\w+)").findAll(excluded).mapTo(mutableSetOf()) { it.groupValues[1] }
+}
+
+/**
+ * The state of a library in the release it was published in, parsed from the `### Libraries` table
+ */
+data class PublishedLibrary(
+    val version: String,
+    val redirectVersion: String,
+)
+
+/**
+ * Parse the `### Libraries` table of the latest release in [changelog], keyed by the first column.
+ *
+ * A parsed line looks like:
+ * ```
+ * | Runtime | `org.jetbrains.compose.runtime:runtime*:1.12.0-beta03` | [Runtime 1.12.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.12.0-beta02) |
+ * ```
+ */
+fun parsePublishedLibraries(changelog: String): Map<String, PublishedLibrary> {
+    val versionRegex = Regex("`[^`]*:([^:`]+)`")
+    val redirectVersionRegex = Regex("#([^)#]+)\\)")
+    val result = mutableMapOf<String, PublishedLibrary>()
+
+    for (line in changelog.lineSequence()) {
+        if (!line.startsWith("| ")) continue
+        val title = line.removePrefix("|").substringBefore("|").trim()
+        val version = versionRegex.find(line)?.groupValues?.get(1) ?: continue
+        val redirectVersion = redirectVersionRegex.find(line)?.groupValues?.get(1) ?: continue
+        result.putIfAbsent(title, PublishedLibrary(version, redirectVersion))
+    }
+
+    return result
 }
 
 fun githubContentOf(repo: String, path: String, commit: String): String {
