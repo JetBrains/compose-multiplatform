@@ -68,6 +68,10 @@ dependencyResolutionManagement {
     }
 }
 
+includeBuild("kotlinx-browser-common-subset/generator") {
+    name = "kotlinx-browser-common-subset-generator"
+}
+
 fun module(name: String, path: String) {
     include(name)
     val projectDir = rootDir.resolve(path).normalize().absoluteFile
@@ -85,6 +89,7 @@ module(":compose-compiler-integration", "compose-compiler-integration")
 module(":compose-compiler-integration-lib", "compose-compiler-integration/lib")
 module(":internal-html-core-runtime", "internal-html-core-runtime")
 module(":html-test-utils", "test-utils")
+module(":kotlinx-browser-common-subset", "kotlinx-browser-common-subset")
 
 if (extra["compose.web.tests.skip.benchmarks"]!!.toString().toBoolean() != true) {
     module(":html-benchmark-core", "benchmark-core")

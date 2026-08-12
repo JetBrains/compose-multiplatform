@@ -1,0 +1,28 @@
+# Classifier selection for the generated portable DOM facade.
+#
+# Every top-level classifier in an `input` file is emitted by default. The remaining directives are
+# the complete set of exceptions to that rule:
+#
+# - `defer <reason>` leaves a classifier and its declarations for later adaptation.
+# - `signature-only-package` allows bare signature identities and normally emitted supertypes without
+#   making the whole package an input.
+#
+# A classifier can occur only once.
+
+input org.w3c.dom.events.kt
+input org.w3c.dom.css.kt
+input org.w3c.dom.kt
+
+# Packages whose referenced classifiers are emitted as bare identities.
+signature-only-package org.w3c.dom.clipboard
+signature-only-package org.w3c.dom.encryptedmedia
+signature-only-package org.w3c.dom.mediacapture
+signature-only-package org.w3c.dom.mediasource
+signature-only-package org.w3c.dom.pointerevents
+signature-only-package org.w3c.dom.svg
+signature-only-package org.w3c.fetch
+signature-only-package org.w3c.files
+signature-only-package org.w3c.performance
+signature-only-package org.w3c.workers
+signature-only-package org.w3c.xhr
+signature-only-package org.khronos.webgl
