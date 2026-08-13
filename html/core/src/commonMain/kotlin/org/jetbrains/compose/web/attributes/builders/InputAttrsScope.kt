@@ -3,6 +3,8 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+@file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+
 package org.jetbrains.compose.web.attributes.builders
 
 import androidx.compose.web.events.SyntheticEvent
@@ -13,7 +15,7 @@ import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.INVALI
 import org.jetbrains.compose.web.events.SyntheticChangeEvent
 import org.jetbrains.compose.web.events.SyntheticInputEvent
 import org.jetbrains.compose.web.events.SyntheticSelectEvent
-import org.w3c.dom.HTMLInputElement
+import kotlinx.browser.dom.HTMLInputElement
 
 @Deprecated(
     message = "Renamed to InputAttrsScope<T>",

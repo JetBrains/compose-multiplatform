@@ -6,7 +6,6 @@
 package org.jetbrains.compose.web.css
 
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
-import org.w3c.dom.css.CSS
 
 fun interface FilterFunction {
     fun apply(): String

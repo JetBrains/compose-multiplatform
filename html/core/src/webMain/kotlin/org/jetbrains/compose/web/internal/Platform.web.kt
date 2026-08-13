@@ -1,5 +1,6 @@
 package org.jetbrains.compose.web.internal
 
+import kotlinx.browser.dom.DataTransfer
 import kotlinx.browser.dom.events.Event
 import kotlinx.browser.dom.events.KeyboardEvent
 import kotlinx.browser.dom.events.MouseEvent
@@ -43,11 +44,27 @@ internal actual fun MouseEvent.movementYOrZero(): Int =
 internal actual fun KeyboardEvent.localeCompat(): String =
     asDynamic().locale.toString()
 
+internal actual fun Event.inputTypeCompat(): String? =
+    asDynamic().inputType?.jsUnsafeCast<String>()
+
+internal actual fun Event.inputDataTransferCompat(): DataTransfer? =
+    asDynamic().dataTransfer?.jsUnsafeCast<DataTransfer>()
+
 internal actual fun Event.animationEventDetails(): AnimationEventDetails {
     val event = asDynamic()
     return AnimationEventDetails(
         animationName = event.animationName.jsUnsafeCast<String>(),
         elapsedTime = event.elapsedTime.jsUnsafeCast<Number>(),
         pseudoElement = event.pseudoElement.jsUnsafeCast<String>(),
+    )
+}
+
+internal actual fun Event.selectionInfoDetails(): SelectionInfoDetails {
+    val target = target.asDynamic()
+
+    return SelectionInfoDetails(
+        selectionStart = target.selectionStart.jsUnsafeCast<Int>(),
+        selectionEnd = target.selectionEnd.jsUnsafeCast<Int>(),
+        value = target.value?.jsUnsafeCast<String>(),
     )
 }

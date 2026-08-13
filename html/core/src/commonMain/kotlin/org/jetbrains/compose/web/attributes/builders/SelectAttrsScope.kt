@@ -3,6 +3,8 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+@file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+
 package androidx.compose.web.attributes
 
 import org.jetbrains.compose.web.attributes.AttrsScope
@@ -11,8 +13,9 @@ import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.INPUT
 import org.jetbrains.compose.web.attributes.SyntheticEventListener
 import org.jetbrains.compose.web.events.SyntheticChangeEvent
 import org.jetbrains.compose.web.events.SyntheticInputEvent
-import org.w3c.dom.HTMLSelectElement
-import org.w3c.dom.events.Event
+import org.jetbrains.compose.web.internal.unsafeCast
+import kotlinx.browser.dom.HTMLSelectElement
+import kotlinx.browser.dom.events.Event
 
 @Deprecated(
     message = "Renamed to SelectAttrsScope",
@@ -42,7 +45,7 @@ private class SelectInputEventListener(
     eventName, listener
 ) {
     override fun handleEvent(event: Event) {
-        val value = event.target?.asDynamic().value?.toString()
+        val value = event.target?.unsafeCast<HTMLSelectElement>()?.value
         listener(SyntheticInputEvent(value, event))
     }
 }
@@ -53,7 +56,7 @@ private class SelectChangeEventListener(
     CHANGE, listener
 ) {
     override fun handleEvent(event: Event) {
-        val value = event.target?.asDynamic().value?.toString()
+        val value = event.target?.unsafeCast<HTMLSelectElement>()?.value
         listener(SyntheticChangeEvent(value, event))
     }
 }

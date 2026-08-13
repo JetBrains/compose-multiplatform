@@ -2,7 +2,6 @@ package org.jetbrains.compose.web.css
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
-import org.jetbrains.compose.web.ExperimentalComposeWebStyleApi
 import org.jetbrains.compose.web.css.selectors.CSSSelector
 import org.jetbrains.compose.web.dom.Style
 import kotlin.properties.ReadOnlyProperty

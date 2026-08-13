@@ -5,8 +5,6 @@
 
 package org.jetbrains.compose.web.css
 
-import org.w3c.dom.css.CSS
-
 fun StyleScope.flexDirection(flexDirection: FlexDirection) {
     property("flex-direction", flexDirection.value)
 }

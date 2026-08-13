@@ -8,6 +8,7 @@
 package org.jetbrains.compose.web.css
 
 import org.jetbrains.compose.web.attributes.HtmlAttrMarker
+import org.jetbrains.compose.web.internal.unsafeCast
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import kotlin.properties.ReadOnlyProperty
 
@@ -28,9 +29,9 @@ interface StyleScope {
     /**
      * Adds arbitrary CSS property to the inline style of the element
      * @param propertyName - the name of css property as [per spec](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)
-     * @param value - the value, it can be either String or specialized type like [CSSNumeric] or [CSSColorValue]
+     * @param value - the value, it can be either String or specialized type like [org.jetbrains.compose.web.css.CSSNumeric] or [org.jetbrains.compose.web.css.CSSColorValue]
      *
-     * Most frequent CSS property values can be set via specialized methods, like [width], [display] etc.
+     * Most frequent CSS property values can be set via specialized methods, like [org.jetbrains.compose.web.css.width], [org.jetbrains.compose.web.css.display] etc.
      *
      * Example:
      * ```
@@ -46,10 +47,10 @@ interface StyleScope {
     /**
      * Adds arbitrary CSS property to the inline style of the element. By default throws an error for backward compatibility
      * @param propertyName - the name of css property as [per spec](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)
-     * @param value - the value, it can be either String or specialized type like [CSSNumeric] or [CSSColorValue]
+     * @param value - the value, it can be either String or specialized type like [org.jetbrains.compose.web.css.CSSNumeric] or [org.jetbrains.compose.web.css.CSSColorValue]
      * @param important - the flag which will be passed to property call in CSS
      *
-     * Most frequent CSS property values can be set via specialized methods, like [width], [display] etc.
+     * Most frequent CSS property values can be set via specialized methods, like [org.jetbrains.compose.web.css.width], [org.jetbrains.compose.web.css.display] etc.
      *
      * Example:
      * ```
@@ -87,7 +88,7 @@ interface StyleScope {
 internal inline fun variableValue(variableName: String, fallback: StylePropertyValue? = null) =
     "var(--$variableName${fallback?.let { ", $it" } ?: ""})"
 
-external interface CSSVariableValueAs<out T : StylePropertyValue>
+expect interface CSSVariableValueAs<out T : StylePropertyValue>
 
 inline fun <TValue> CSSVariableValue(value: StylePropertyValue) =
     value.unsafeCast<TValue>()
@@ -130,7 +131,7 @@ fun <TValue> CSSStyleVariable<TValue>.value(fallback: TValue? = null)
     )
 
 /**
- * Introduces CSS variable that can be later referred anywhere in [StyleSheet]
+ * Introduces CSS variable that can be later referred anywhere in [org.jetbrains.compose.web.css.StyleSheet]
  *
  * Example:
  * ```
@@ -167,6 +168,7 @@ interface StyleHolder {
 typealias StyleBuilderImpl = StyleScopeBuilder
 
 @Suppress("EqualsOrHashCode")
+@OptIn(ComposeWebInternalApi::class)
 open class StyleScopeBuilder : StyleScope, StyleHolder {
     override val properties: MutableStylePropertyList = mutableListOf()
     override val variables: MutableStylePropertyList = mutableListOf()
@@ -183,7 +185,7 @@ open class StyleScopeBuilder : StyleScope, StyleHolder {
         variables.add(StylePropertyDeclaration(variableName, value))
     }
 
-    // StylePropertyValue is js native object without equals
+    // Web values can be JS-native, and the marker types do not promise structural equality.
     override fun equals(other: Any?): Boolean {
         return if (other is StyleHolder) {
             properties.nativeEquals(other.properties) &&
@@ -205,10 +207,10 @@ data class StylePropertyDeclaration(
 ) {
     constructor(name: String, value: StylePropertyValue) : this(name, value, false)
 
-    constructor(name: String, value: String, important: Boolean) : this(name, value.unsafeCast<StylePropertyValue>(), important)
+    constructor(name: String, value: String, important: Boolean) : this(name, StylePropertyValue(value), important)
     constructor(name: String, value: String) : this(name, value, false)
 
-    constructor(name: String, value: Number, important: Boolean) : this(name, value.unsafeCast<StylePropertyValue>(), important)
+    constructor(name: String, value: Number, important: Boolean) : this(name, StylePropertyValue(value), important)
     constructor(name: String, value: Number) : this(name, value, false)
 }
 typealias StylePropertyList = List<StylePropertyDeclaration>

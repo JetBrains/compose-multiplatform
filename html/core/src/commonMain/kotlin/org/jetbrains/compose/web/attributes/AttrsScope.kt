@@ -5,8 +5,8 @@ import androidx.compose.runtime.DisposableEffectScope
 import org.jetbrains.compose.web.css.StyleScope
 import org.jetbrains.compose.web.css.StyleScopeBuilder
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
-import org.w3c.dom.Element
-import org.w3c.dom.HTMLElement
+import kotlinx.browser.dom.Element
+import kotlinx.browser.dom.HTMLElement
 
 @Deprecated(
     message = "Renamed to AttrsScopeBuilder",
@@ -30,7 +30,7 @@ typealias AttrsBuilder<T> = AttrsScopeBuilder<T>
 @HtmlAttrMarker
 interface AttrsScope<out TElement : Element> : EventsListenerScope {
     /**
-     * [style] add inline CSS-style properties to the element via [StyleScope] context
+     * [style] add inline CSS-style properties to the element via [org.jetbrains.compose.web.css.StyleScope] context
      *
      * Example:
      * ```
@@ -165,7 +165,7 @@ open class AttrsScopeBuilder<TElement : Element>(
     }
 
     /**
-     * [style] add inline CSS-style properties to the element via [StyleScope] context
+     * [style] add inline CSS-style properties to the element via [org.jetbrains.compose.web.css.StyleScope] context
      *
      * Example:
      * ```

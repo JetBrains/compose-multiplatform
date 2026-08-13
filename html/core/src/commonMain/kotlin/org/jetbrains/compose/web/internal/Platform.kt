@@ -1,5 +1,6 @@
 package org.jetbrains.compose.web.internal
 
+import kotlinx.browser.dom.DataTransfer
 import kotlinx.browser.dom.events.Event
 import kotlinx.browser.dom.events.KeyboardEvent
 import kotlinx.browser.dom.events.MouseEvent
@@ -40,6 +41,15 @@ internal expect fun MouseEvent.movementYOrZero(): Int
 internal expect fun KeyboardEvent.localeCompat(): String
 
 /**
+ * Preserves InputEvent properties that are absent from the portable
+ * kotlinx-browser 0.5.0 declarations. The receiver stays Event because some
+ * input callbacks are represented by a plain browser Event.
+ */
+internal expect fun Event.inputTypeCompat(): String?
+
+internal expect fun Event.inputDataTransferCompat(): DataTransfer?
+
+/**
  * Portable snapshot of the animation fields exposed by browser animation
  * events. kotlinx-browser 0.5.0 does not declare AnimationEvent itself.
  */
@@ -50,3 +60,11 @@ internal data class AnimationEventDetails(
 )
 
 internal expect fun Event.animationEventDetails(): AnimationEventDetails
+
+internal data class SelectionInfoDetails(
+    val selectionStart: Int,
+    val selectionEnd: Int,
+    val value: String?,
+)
+
+internal expect fun Event.selectionInfoDetails(): SelectionInfoDetails

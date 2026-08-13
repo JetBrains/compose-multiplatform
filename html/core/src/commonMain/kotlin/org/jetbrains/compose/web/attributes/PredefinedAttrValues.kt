@@ -481,4 +481,7 @@ interface AutoComplete {
 }
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun AutoComplete(value: String) = value.unsafeCast<AutoComplete>()
+inline fun AutoComplete(value: String): AutoComplete = createAutoComplete(value)
+
+@PublishedApi
+internal expect fun createAutoComplete(value: String): AutoComplete

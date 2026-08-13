@@ -1,6 +1,7 @@
 package org.jetbrains.compose.web.internal
 
 import java.util.WeakHashMap
+import kotlinx.browser.dom.DataTransfer
 import kotlinx.browser.dom.events.Event
 import kotlinx.browser.dom.events.KeyboardEvent
 import kotlinx.browser.dom.events.MouseEvent
@@ -34,9 +35,20 @@ internal actual fun MouseEvent.movementYOrZero(): Int = 0
 
 internal actual fun KeyboardEvent.localeCompat(): String = ""
 
+internal actual fun Event.inputTypeCompat(): String? = null
+
+internal actual fun Event.inputDataTransferCompat(): DataTransfer? = null
+
 internal actual fun Event.animationEventDetails(): AnimationEventDetails =
     AnimationEventDetails(
         animationName = "",
         elapsedTime = 0.0,
         pseudoElement = "",
+    )
+
+internal actual fun Event.selectionInfoDetails(): SelectionInfoDetails =
+    SelectionInfoDetails(
+        selectionStart = 0,
+        selectionEnd = 0,
+        value = null,
     )

@@ -12,9 +12,9 @@ import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.dom.ElementScope
 import org.jetbrains.compose.web.internal.WeakMap
 import org.jetbrains.compose.web.internal.createWeakMap
-import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLInputElement
-import org.w3c.dom.HTMLTextAreaElement
+import kotlinx.browser.dom.HTMLElement
+import kotlinx.browser.dom.HTMLInputElement
+import kotlinx.browser.dom.HTMLTextAreaElement
 
 
 private val controlledInputsValuesWeakMap: WeakMap<HTMLElement, Any> = createWeakMap()
