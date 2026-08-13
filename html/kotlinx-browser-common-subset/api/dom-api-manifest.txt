@@ -1,14 +1,14 @@
-files=org.w3c.dom.css.kt,org.w3c.dom.events.kt,org.w3c.dom.kt
-classifiers=327
-constructors=56
-members=2545
-companions=151
-companion-members=1861
+files=org.w3c.dom.clipboard.kt,org.w3c.dom.css.kt,org.w3c.dom.events.kt,org.w3c.dom.kt
+classifiers=331
+constructors=57
+members=2552
+companions=152
+companion-members=1865
 nested-declarations=0
-factories=43
+factories=45
 operators=36
 values=73
-emitted=5088
+emitted=5107
 excluded=4
 unaccounted=0
 EMITTED|classifier|org.w3c.dom.AbstractWorker
@@ -4544,6 +4544,25 @@ EMITTED|companion-member|org.w3c.dom.XMLDocument.Companion#val ENTITY_REFERENCE_
 EMITTED|companion-member|org.w3c.dom.XMLDocument.Companion#val NOTATION_NODE: Short
 EMITTED|companion-member|org.w3c.dom.XMLDocument.Companion#val PROCESSING_INSTRUCTION_NODE: Short
 EMITTED|companion-member|org.w3c.dom.XMLDocument.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.clipboard.Clipboard
+EMITTED|member|org.w3c.dom.clipboard.Clipboard#fun read(): Promise<DataTransfer>
+EMITTED|member|org.w3c.dom.clipboard.Clipboard#fun readText(): Promise<JsString>
+EMITTED|member|org.w3c.dom.clipboard.Clipboard#fun write(data: DataTransfer): Promise<Nothing?>
+EMITTED|member|org.w3c.dom.clipboard.Clipboard#fun writeText(data: String): Promise<Nothing?>
+EMITTED|classifier|org.w3c.dom.clipboard.ClipboardEvent
+EMITTED|constructor|org.w3c.dom.clipboard.ClipboardEvent#constructor(type: String, eventInitDict: ClipboardEventInit = ...)
+EMITTED|member|org.w3c.dom.clipboard.ClipboardEvent#val clipboardData: DataTransfer?
+EMITTED|companion|org.w3c.dom.clipboard.ClipboardEvent.Companion
+EMITTED|companion-member|org.w3c.dom.clipboard.ClipboardEvent.Companion#val AT_TARGET: Short
+EMITTED|companion-member|org.w3c.dom.clipboard.ClipboardEvent.Companion#val BUBBLING_PHASE: Short
+EMITTED|companion-member|org.w3c.dom.clipboard.ClipboardEvent.Companion#val CAPTURING_PHASE: Short
+EMITTED|companion-member|org.w3c.dom.clipboard.ClipboardEvent.Companion#val NONE: Short
+EMITTED|classifier|org.w3c.dom.clipboard.ClipboardEventInit
+EMITTED|factory|org.w3c.dom.clipboard.ClipboardEventInit#fun ClipboardEventInit(clipboardData: DataTransfer? = ..., bubbles: Boolean? = ..., cancelable: Boolean? = ..., composed: Boolean? = ...): ClipboardEventInit
+EMITTED|member|org.w3c.dom.clipboard.ClipboardEventInit#var clipboardData: DataTransfer?
+EMITTED|classifier|org.w3c.dom.clipboard.ClipboardPermissionDescriptor
+EMITTED|factory|org.w3c.dom.clipboard.ClipboardPermissionDescriptor#fun ClipboardPermissionDescriptor(allowWithoutGesture: Boolean? = ...): ClipboardPermissionDescriptor
+EMITTED|member|org.w3c.dom.clipboard.ClipboardPermissionDescriptor#var allowWithoutGesture: Boolean?
 EMITTED|classifier|org.w3c.dom.css.CSS
 EMITTED|companion|org.w3c.dom.css.CSS.Companion
 EMITTED|companion-member|org.w3c.dom.css.CSS.Companion#fun escape(ident: String): String

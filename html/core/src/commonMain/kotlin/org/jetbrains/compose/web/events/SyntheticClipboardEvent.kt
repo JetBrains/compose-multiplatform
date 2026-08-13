@@ -1,9 +1,9 @@
 package org.jetbrains.compose.web.events
 
 import androidx.compose.web.events.SyntheticEvent
-import org.w3c.dom.DataTransfer
-import org.w3c.dom.clipboard.ClipboardEvent
-import org.w3c.dom.events.EventTarget
+import kotlinx.browser.dom.DataTransfer
+import kotlinx.browser.dom.clipboard.ClipboardEvent
+import kotlinx.browser.dom.events.EventTarget
 
 class SyntheticClipboardEvent internal constructor(
     nativeEvent: ClipboardEvent

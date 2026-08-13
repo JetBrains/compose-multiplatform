@@ -1,3 +1,5 @@
+@file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+
 package org.jetbrains.compose.web.attributes
 
 // if you change API for this interface, note that there is a link to this file in this tutorial: https://github.com/JetBrains/compose-multiplatform/blob/master/tutorials/HTML/Events_Handling/README.md#other-event-handlers
@@ -8,7 +10,8 @@ import androidx.compose.web.events.SyntheticMouseEvent
 import androidx.compose.web.events.SyntheticWheelEvent
 import org.jetbrains.compose.web.events.*
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
-import org.w3c.dom.events.EventTarget
+import kotlinx.browser.dom.events.EventTarget
+import kotlin.jvm.JvmName
 
 private typealias SyntheticMouseEventListener = (SyntheticMouseEvent) -> Unit
 private typealias SyntheticWheelEventListener = (SyntheticWheelEvent) -> Unit
@@ -21,7 +24,7 @@ private typealias SyntheticDragEventListener = (SyntheticDragEvent) -> Unit
 typealias EventsListenerBuilder = EventsListenerScopeBuilder
 
 /**
- * [EventsListenerScope] is used most often not directly but via [AttrsScope].
+ * [EventsListenerScope] is used most often not directly but via [org.jetbrains.compose.web.attributes.AttrsScope].
  * Its purpose is to add events to the element. For all most frequently used events there
  * exist dedicated method. In case you need to support event that doesn't have such method,
  * use [addEventListener]
@@ -202,6 +205,10 @@ interface EventsListenerScope {
      * @param options - as of now this param is always equal to Options.DEFAULT
      * @listener - event handler
      */
+    // These existing JS overloads erase to the same JVM signature. Keep both
+    // Kotlin APIs while giving the generic overload a distinct bytecode name.
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("addTypedEventListener")
     fun <T : SyntheticEvent<out EventTarget>> addEventListener(
         eventName: String,
         listener: (T) -> Unit

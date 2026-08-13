@@ -1,11 +1,12 @@
 package androidx.compose.web.events
 
-import org.w3c.dom.DataTransfer
-import org.w3c.dom.DragEvent
-import org.w3c.dom.HTMLElement
-import org.w3c.dom.events.EventTarget
-import org.w3c.dom.events.MouseEvent
-import org.w3c.dom.events.WheelEvent
+import kotlinx.browser.dom.DataTransfer
+import kotlinx.browser.dom.DragEvent
+import kotlinx.browser.dom.events.EventTarget
+import kotlinx.browser.dom.events.MouseEvent
+import kotlinx.browser.dom.events.WheelEvent
+import org.jetbrains.compose.web.internal.movementXOrZero
+import org.jetbrains.compose.web.internal.movementYOrZero
 
 /**
  * https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent
@@ -26,8 +27,8 @@ open class SyntheticMouseEvent internal constructor(
 
     // https://youtrack.jetbrains.com/issue/CMP-5304
     // movementX and movementY are undefined in SafariMobile MouseEvent
-    val movementX: Int = (nativeEvent.asDynamic().movementX as? Int) ?: 0
-    val movementY: Int = (nativeEvent.asDynamic().movementY as? Int) ?: 0
+    val movementX: Int = nativeEvent.movementXOrZero()
+    val movementY: Int = nativeEvent.movementYOrZero()
 
     val offsetX: Double = nativeEvent.offsetX
     val offsetY: Double = nativeEvent.offsetY

@@ -21,8 +21,6 @@ class GeneratedIdentityOnlyLedgerTest {
                 "org.khronos.webgl.Float32Array",
                 "org.khronos.webgl.Float64Array",
                 "org.khronos.webgl.Uint8ClampedArray",
-                "org.w3c.dom.clipboard.Clipboard",
-                "org.w3c.dom.clipboard.ClipboardEvent",
                 "org.w3c.dom.encryptedmedia.MediaKeySystemConfiguration",
                 "org.w3c.dom.encryptedmedia.MediaKeys",
                 "org.w3c.dom.mediacapture.MediaDevices",

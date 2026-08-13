@@ -10,12 +10,14 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.NonRestartableComposable
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.dom.ElementScope
+import org.jetbrains.compose.web.internal.WeakMap
+import org.jetbrains.compose.web.internal.createWeakMap
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLTextAreaElement
 
 
-private val controlledInputsValuesWeakMap: JsWeakMap = js("new WeakMap();").unsafeCast<JsWeakMap>()
+private val controlledInputsValuesWeakMap: WeakMap<HTMLElement, Any> = createWeakMap()
 
 internal fun restoreControlledInputState(inputElement: HTMLInputElement) {
     val type = InputType.fromString(inputElement.type)

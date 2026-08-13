@@ -21,6 +21,8 @@ import kotlinx.browser.dom.MutationRecord
 import kotlinx.browser.dom.Node
 import kotlinx.browser.dom.Option
 import kotlinx.browser.dom.Text
+import kotlinx.browser.dom.clipboard.ClipboardEvent
+import kotlinx.browser.dom.clipboard.ClipboardEventInit
 import kotlinx.browser.dom.events.Event
 import kotlinx.browser.dom.events.EventTarget
 import kotlinx.browser.dom.events.KeyboardEvent
@@ -36,6 +38,7 @@ private fun buildEvents(): List<Event> = listOf(
     UIEvent("ui"),
     MouseEvent("click", MouseEventInit(clientX = 10, clientY = 20)),
     KeyboardEvent("keydown", KeyboardEventInit(key = "Enter")),
+    ClipboardEvent("copy", ClipboardEventInit()),
 )
 
 private fun buildCharacterData(): List<Node> = listOf(Text(), Text("hello"), Comment(), Comment("note"))

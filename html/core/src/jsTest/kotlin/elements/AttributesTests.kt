@@ -14,7 +14,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import org.jetbrains.compose.web.testutils.*
 import org.w3c.dom.*
-import kotlin.test.assertContains
 import kotlin.test.assertTrue
 
 class AttributesTests {

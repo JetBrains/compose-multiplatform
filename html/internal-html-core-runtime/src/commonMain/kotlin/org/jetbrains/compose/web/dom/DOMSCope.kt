@@ -6,7 +6,7 @@
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.DisposableEffectScope
-import org.w3c.dom.Element
+import kotlinx.browser.dom.Element
 
 interface DOMScope<out TElement : Element> {
     val DisposableEffectScope.scopeElement: TElement

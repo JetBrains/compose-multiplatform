@@ -1,9 +1,9 @@
 package org.jetbrains.compose.web.events
 
 import androidx.compose.web.events.SyntheticEvent
-import org.w3c.dom.TouchEvent
-import org.w3c.dom.TouchList
-import org.w3c.dom.events.EventTarget
+import kotlinx.browser.dom.TouchEvent
+import kotlinx.browser.dom.TouchList
+import kotlinx.browser.dom.events.EventTarget
 
 class SyntheticTouchEvent(
     nativeEvent: TouchEvent,

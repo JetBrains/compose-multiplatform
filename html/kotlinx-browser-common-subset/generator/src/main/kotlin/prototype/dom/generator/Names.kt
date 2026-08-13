@@ -17,6 +17,7 @@ import com.squareup.kotlinpoet.UNIT
 
 // Browser packages.
 internal const val DOM_PACKAGE = "org.w3c.dom"
+internal const val DOM_CLIPBOARD_PACKAGE = "org.w3c.dom.clipboard"
 internal const val DOM_CSS_PACKAGE = "org.w3c.dom.css"
 internal const val DOM_EVENTS_PACKAGE = "org.w3c.dom.events"
 internal const val WEBGL_PACKAGE = "org.khronos.webgl"
@@ -24,6 +25,7 @@ internal const val WEBGL_PACKAGE = "org.khronos.webgl"
 // Facade packages.
 internal const val PORTABLE_JS_PACKAGE = "kotlinx.browser"
 internal const val PORTABLE_DOM_PACKAGE = "kotlinx.browser.dom"
+internal const val PORTABLE_CLIPBOARD_PACKAGE = "kotlinx.browser.dom.clipboard"
 internal const val PORTABLE_CSS_PACKAGE = "kotlinx.browser.dom.css"
 internal const val PORTABLE_EVENTS_PACKAGE = "kotlinx.browser.dom.events"
 internal const val PORTABLE_WEBGL_PACKAGE = "kotlinx.browser.webgl"
@@ -39,6 +41,7 @@ internal data class PortablePackageMapping(
 
 internal val PORTABLE_PACKAGE_BY_BROWSER_PACKAGE = linkedMapOf(
     DOM_PACKAGE to PortablePackageMapping(PORTABLE_DOM_PACKAGE, "PortableDom", "OptionDictionaries"),
+    DOM_CLIPBOARD_PACKAGE to PortablePackageMapping(PORTABLE_CLIPBOARD_PACKAGE,  "PortableClipboard", "ClipboardDictionaries"),
     DOM_CSS_PACKAGE to PortablePackageMapping(PORTABLE_CSS_PACKAGE, "PortableCss", "CssDictionaries"),
     DOM_EVENTS_PACKAGE to PortablePackageMapping(PORTABLE_EVENTS_PACKAGE, "PortableEvents", "EventDictionaries"),
 )

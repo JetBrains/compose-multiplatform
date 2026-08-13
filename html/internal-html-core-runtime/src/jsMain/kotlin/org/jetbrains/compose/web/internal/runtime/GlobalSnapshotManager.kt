@@ -2,7 +2,6 @@ package org.jetbrains.compose.web.internal.runtime
 
 import androidx.compose.runtime.snapshots.ObserverHandle
 import androidx.compose.runtime.snapshots.Snapshot
-import org.jetbrains.compose.web.internal.runtime.GlobalSnapshotManager.ensureStarted
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch

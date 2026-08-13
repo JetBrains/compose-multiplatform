@@ -11,10 +11,10 @@
 
 input org.w3c.dom.events.kt
 input org.w3c.dom.css.kt
+input org.w3c.dom.clipboard.kt
 input org.w3c.dom.kt
 
 # Packages whose referenced classifiers are emitted as bare identities.
-signature-only-package org.w3c.dom.clipboard
 signature-only-package org.w3c.dom.encryptedmedia
 signature-only-package org.w3c.dom.mediacapture
 signature-only-package org.w3c.dom.mediasource

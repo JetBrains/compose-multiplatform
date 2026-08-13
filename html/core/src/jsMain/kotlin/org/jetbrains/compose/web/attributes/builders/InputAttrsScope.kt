@@ -108,10 +108,3 @@ class InputAttrsScope<ValueType>(
         registerEventListener(SelectEventListener(listener))
     }
 }
-
-internal external interface JsWeakMap {
-    fun delete(key: Any)
-    fun get(key: Any): Any?
-    fun has(key: Any): Boolean
-    fun set(key: Any, value: Any): JsWeakMap
-}

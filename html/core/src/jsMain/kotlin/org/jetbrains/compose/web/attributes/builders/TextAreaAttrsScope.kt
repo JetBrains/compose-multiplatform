@@ -6,7 +6,6 @@
 package org.jetbrains.compose.web.attributes.builders
 
 import org.jetbrains.compose.web.attributes.AttrsScope
-import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
 import org.jetbrains.compose.web.attributes.ChangeEventListener
 import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.BEFOREINPUT
 import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.INPUT

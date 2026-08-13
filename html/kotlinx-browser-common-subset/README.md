@@ -33,6 +33,8 @@ The selection policy names these generated browser declaration files:
   CSS rules, and the inline-style `CSSStyleDeclaration` API.
 - `org.w3c.dom.events.kt` contains the event
   types, listeners, and option dictionaries.
+- `org.w3c.dom.clipboard.kt` contains clipboard events, dictionaries, and the
+  asynchronous clipboard API.
 
 KSP reads their `expect` declarations from `webMain`. The corresponding JS and Wasm/JS files are
 target implementations. Generated web typealiases must compile

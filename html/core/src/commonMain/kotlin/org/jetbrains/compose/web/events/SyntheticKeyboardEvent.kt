@@ -1,8 +1,9 @@
 package org.jetbrains.compose.web.events
 
 import androidx.compose.web.events.SyntheticEvent
-import org.w3c.dom.events.EventTarget
-import org.w3c.dom.events.KeyboardEvent
+import kotlinx.browser.dom.events.EventTarget
+import kotlinx.browser.dom.events.KeyboardEvent
+import org.jetbrains.compose.web.internal.localeCompat
 
 class SyntheticKeyboardEvent internal constructor(
     nativeEvent: KeyboardEvent
@@ -15,7 +16,7 @@ class SyntheticKeyboardEvent internal constructor(
     val ctrlKey: Boolean = nativeEvent.ctrlKey
     val isComposing: Boolean = nativeEvent.isComposing
     val key: String = nativeEvent.key
-    val locale: String = nativeEvent.asDynamic().locale.toString()
+    val locale: String = nativeEvent.localeCompat()
     val location: Int = nativeEvent.location
     val metaKey: Boolean = nativeEvent.metaKey
     val repeat: Boolean = nativeEvent.repeat

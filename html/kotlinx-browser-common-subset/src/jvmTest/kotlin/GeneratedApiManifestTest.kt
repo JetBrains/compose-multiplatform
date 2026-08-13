@@ -46,7 +46,7 @@ class GeneratedApiManifestTest {
     @Test
     fun theManifestCoversTheConfiguredInputFiles() {
         assertEquals(
-            "org.w3c.dom.css.kt,org.w3c.dom.events.kt,org.w3c.dom.kt",
+            "org.w3c.dom.clipboard.kt,org.w3c.dom.css.kt,org.w3c.dom.events.kt,org.w3c.dom.kt",
             manifest.header.getValue("files"),
         )
     }

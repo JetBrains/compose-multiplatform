@@ -1,7 +1,6 @@
 package org.jetbrains.compose.web.attributes
 
 import org.jetbrains.compose.web.attributes.builders.saveControlledInputState
-import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.events.SyntheticSubmitEvent
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLButtonElement

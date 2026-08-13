@@ -25,6 +25,8 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(libs.kotlinx.coroutines.core)
+                implementation(project(":kotlinx-browser-common-subset"))
+                implementation(project(":internal-html-core-runtime"))
             }
         }
 
