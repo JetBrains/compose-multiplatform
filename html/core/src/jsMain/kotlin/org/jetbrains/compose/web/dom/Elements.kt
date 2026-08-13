@@ -2,15 +2,12 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.*
 import androidx.compose.web.attributes.SelectAttrsScope
-import kotlinx.browser.document
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.attributes.builders.*
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleSheetBuilderImpl
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
-import org.jetbrains.compose.web.internal.runtime.DomApplier
-import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLAnchorElement
 import org.w3c.dom.HTMLAreaElement
@@ -20,7 +17,6 @@ import org.w3c.dom.HTMLButtonElement
 import org.w3c.dom.HTMLCanvasElement
 import org.w3c.dom.HTMLDataListElement
 import org.w3c.dom.HTMLDListElement
-import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLEmbedElement
 import org.w3c.dom.HTMLFieldSetElement
@@ -47,7 +43,6 @@ import org.w3c.dom.HTMLPreElement
 import org.w3c.dom.HTMLProgressElement
 import org.w3c.dom.HTMLSelectElement
 import org.w3c.dom.HTMLSourceElement
-import org.w3c.dom.HTMLSpanElement
 import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.HTMLTableCaptionElement
 import org.w3c.dom.HTMLTableCellElement
@@ -59,124 +54,95 @@ import org.w3c.dom.HTMLTextAreaElement
 import org.w3c.dom.HTMLTrackElement
 import org.w3c.dom.HTMLUListElement
 import org.w3c.dom.HTMLVideoElement
-import org.w3c.dom.Text
 import org.w3c.dom.css.CSSStyleSheet
 
-typealias AttrBuilderContext<T> = AttrsScope<T>.() -> Unit
-typealias ContentBuilder<T> = @Composable ElementScope<T>.() -> Unit
+private val Address: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("address")
+private val Article: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("article")
+private val Aside: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("aside")
+private val Header: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("header")
 
-private open class ElementBuilderImplementation<TElement : Element>(private val tagName: String) : ElementBuilder<TElement> {
-    private val el: Element by lazy { document.createElement(tagName) }
-    @Suppress("UNCHECKED_CAST")
-    override fun create(): TElement = el.cloneNode() as TElement
-}
+private val Area: ElementBuilder<HTMLAreaElement> = ElementBuilder.createBuilder("area")
+private val Audio: ElementBuilder<HTMLAudioElement> = ElementBuilder.createBuilder("audio")
+private val Map: ElementBuilder<HTMLMapElement> = ElementBuilder.createBuilder("map")
+private val Track: ElementBuilder<HTMLTrackElement> = ElementBuilder.createBuilder("track")
+private val Video: ElementBuilder<HTMLVideoElement> = ElementBuilder.createBuilder("video")
 
-private val Address: ElementBuilder<HTMLElement> = ElementBuilderImplementation("address")
-private val Article: ElementBuilder<HTMLElement> = ElementBuilderImplementation("article")
-private val Aside: ElementBuilder<HTMLElement> = ElementBuilderImplementation("aside")
-private val Header: ElementBuilder<HTMLElement> = ElementBuilderImplementation("header")
+private val Datalist: ElementBuilder<HTMLDataListElement> = ElementBuilder.createBuilder("datalist")
+private val Fieldset: ElementBuilder<HTMLFieldSetElement> = ElementBuilder.createBuilder("fieldset")
+private val Legend: ElementBuilder<HTMLLegendElement> = ElementBuilder.createBuilder("legend")
+private val Meter: ElementBuilder<HTMLMeterElement> = ElementBuilder.createBuilder("meter")
+private val Output: ElementBuilder<HTMLOutputElement> = ElementBuilder.createBuilder("output")
+private val Progress: ElementBuilder<HTMLProgressElement> = ElementBuilder.createBuilder("progress")
 
-private val Area: ElementBuilder<HTMLAreaElement> = ElementBuilderImplementation("area")
-private val Audio: ElementBuilder<HTMLAudioElement> = ElementBuilderImplementation("audio")
-private val Map: ElementBuilder<HTMLMapElement> = ElementBuilderImplementation("map")
-private val Track: ElementBuilder<HTMLTrackElement> = ElementBuilderImplementation("track")
-private val Video: ElementBuilder<HTMLVideoElement> = ElementBuilderImplementation("video")
+private val Embed: ElementBuilder<HTMLEmbedElement> = ElementBuilder.createBuilder("embed")
+private val Iframe: ElementBuilder<HTMLIFrameElement> = ElementBuilder.createBuilder("iframe")
+private val Object: ElementBuilder<HTMLObjectElement> = ElementBuilder.createBuilder("object")
+private val Param: ElementBuilder<HTMLParamElement> = ElementBuilder.createBuilder("param")
+private val Picture: ElementBuilder<HTMLPictureElement> = ElementBuilder.createBuilder("picture")
+private val Source: ElementBuilder<HTMLSourceElement> = ElementBuilder.createBuilder("source")
+private val Canvas: ElementBuilder<HTMLCanvasElement> = ElementBuilder.createBuilder("canvas")
 
-private val Datalist: ElementBuilder<HTMLDataListElement> = ElementBuilderImplementation("datalist")
-private val Fieldset: ElementBuilder<HTMLFieldSetElement> = ElementBuilderImplementation("fieldset")
-private val Legend: ElementBuilder<HTMLLegendElement> = ElementBuilderImplementation("legend")
-private val Meter: ElementBuilder<HTMLMeterElement> = ElementBuilderImplementation("meter")
-private val Output: ElementBuilder<HTMLOutputElement> = ElementBuilderImplementation("output")
-private val Progress: ElementBuilder<HTMLProgressElement> = ElementBuilderImplementation("progress")
+private val DList: ElementBuilder<HTMLDListElement> = ElementBuilder.createBuilder("dl")
+private val DTerm: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("dt")
+private val DDescription: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("dd")
 
-private val Embed: ElementBuilder<HTMLEmbedElement> = ElementBuilderImplementation("embed")
-private val Iframe: ElementBuilder<HTMLIFrameElement> = ElementBuilderImplementation("iframe")
-private val Object: ElementBuilder<HTMLObjectElement> = ElementBuilderImplementation("object")
-private val Param: ElementBuilder<HTMLParamElement> = ElementBuilderImplementation("param")
-private val Picture: ElementBuilder<HTMLPictureElement> = ElementBuilderImplementation("picture")
-private val Source: ElementBuilder<HTMLSourceElement> = ElementBuilderImplementation("source")
-private val Canvas: ElementBuilder<HTMLCanvasElement> = ElementBuilderImplementation("canvas")
+private val A: ElementBuilder<HTMLAnchorElement> = ElementBuilder.createBuilder("a")
+private val Input: ElementBuilder<HTMLInputElement> = ElementBuilder.createBuilder("input")
+private val Button: ElementBuilder<HTMLButtonElement> = ElementBuilder.createBuilder("button")
 
-private val DList: ElementBuilder<HTMLDListElement> = ElementBuilderImplementation("dl")
-private val DTerm: ElementBuilder<HTMLElement> = ElementBuilderImplementation("dt")
-private val DDescription: ElementBuilder<HTMLElement> = ElementBuilderImplementation("dd")
+private val H1: ElementBuilder<HTMLHeadingElement> = ElementBuilder.createBuilder("h1")
+private val H2: ElementBuilder<HTMLHeadingElement> = ElementBuilder.createBuilder("h2")
+private val H3: ElementBuilder<HTMLHeadingElement> = ElementBuilder.createBuilder("h3")
+private val H4: ElementBuilder<HTMLHeadingElement> = ElementBuilder.createBuilder("h4")
+private val H5: ElementBuilder<HTMLHeadingElement> = ElementBuilder.createBuilder("h5")
+private val H6: ElementBuilder<HTMLHeadingElement> = ElementBuilder.createBuilder("h6")
 
-private val Div: ElementBuilder<HTMLDivElement> = ElementBuilderImplementation("div")
-private val A: ElementBuilder<HTMLAnchorElement> = ElementBuilderImplementation("a")
-private val Input: ElementBuilder<HTMLInputElement> = ElementBuilderImplementation("input")
-private val Button: ElementBuilder<HTMLButtonElement> = ElementBuilderImplementation("button")
+private val P: ElementBuilder<HTMLParagraphElement> = ElementBuilder.createBuilder("p")
 
-private val H1: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h1")
-private val H2: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h2")
-private val H3: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h3")
-private val H4: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h4")
-private val H5: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h5")
-private val H6: ElementBuilder<HTMLHeadingElement> = ElementBuilderImplementation("h6")
+private val Em: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("em")
+private val I: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("i")
+private val B: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("b")
+private val Small: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("small")
+private val Sup: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("sup")
+private val Sub: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("sub")
+private val Blockquote: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("blockquote")
 
-private val P: ElementBuilder<HTMLParagraphElement> = ElementBuilderImplementation<HTMLParagraphElement>("p")
+private val Br: ElementBuilder<HTMLBRElement> = ElementBuilder.createBuilder("br")
 
-private val Em: ElementBuilder<HTMLElement> = ElementBuilderImplementation("em")
-private val I: ElementBuilder<HTMLElement> = ElementBuilderImplementation("i")
-private val B: ElementBuilder<HTMLElement> = ElementBuilderImplementation("b")
-private val Small: ElementBuilder<HTMLElement> = ElementBuilderImplementation("small")
-private val Sup: ElementBuilder<HTMLElement> = ElementBuilderImplementation("sup")
-private val Sub: ElementBuilder<HTMLElement> = ElementBuilderImplementation("sub")
-private val Blockquote: ElementBuilder<HTMLElement> = ElementBuilderImplementation("blockquote")
+private val Ul: ElementBuilder<HTMLUListElement> = ElementBuilder.createBuilder("ul")
+private val Ol: ElementBuilder<HTMLOListElement> = ElementBuilder.createBuilder("ol")
 
-private val Span: ElementBuilder<HTMLSpanElement> = ElementBuilderImplementation("span")
+private val Li: ElementBuilder<HTMLLIElement> = ElementBuilder.createBuilder("li")
 
-private val Br: ElementBuilder<HTMLBRElement> = ElementBuilderImplementation("br")
+private val Img: ElementBuilder<HTMLImageElement> = ElementBuilder.createBuilder("img")
+private val Form: ElementBuilder<HTMLFormElement> = ElementBuilder.createBuilder("form")
 
-private val Ul: ElementBuilder<HTMLUListElement> = ElementBuilderImplementation("ul")
-private val Ol: ElementBuilder<HTMLOListElement> = ElementBuilderImplementation("ol")
+private val Select: ElementBuilder<HTMLSelectElement> = ElementBuilder.createBuilder("select")
+private val Option: ElementBuilder<HTMLOptionElement> = ElementBuilder.createBuilder("option")
+private val OptGroup: ElementBuilder<HTMLOptGroupElement> = ElementBuilder.createBuilder("optgroup")
 
-private val Li: ElementBuilder<HTMLLIElement> = ElementBuilderImplementation("li")
+private val Section: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("section")
+private val TextArea: ElementBuilder<HTMLTextAreaElement> = ElementBuilder.createBuilder("textarea")
+private val Nav: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("nav")
+private val Pre: ElementBuilder<HTMLPreElement> = ElementBuilder.createBuilder("pre")
+private val Code: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("code")
 
-private val Img: ElementBuilder<HTMLImageElement> = ElementBuilderImplementation("img")
-private val Form: ElementBuilder<HTMLFormElement> = ElementBuilderImplementation("form")
+private val Main: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("main")
+private val Footer: ElementBuilder<HTMLElement> = ElementBuilder.createBuilder("footer")
+private val Hr: ElementBuilder<HTMLHRElement> = ElementBuilder.createBuilder("hr")
+private val Label: ElementBuilder<HTMLLabelElement> = ElementBuilder.createBuilder("label")
+private val Table: ElementBuilder<HTMLTableElement> = ElementBuilder.createBuilder("table")
+private val Caption: ElementBuilder<HTMLTableCaptionElement> = ElementBuilder.createBuilder("caption")
+private val Col: ElementBuilder<HTMLTableColElement> = ElementBuilder.createBuilder("col")
+private val Colgroup: ElementBuilder<HTMLTableColElement> = ElementBuilder.createBuilder("colgroup")
+private val Tr: ElementBuilder<HTMLTableRowElement> = ElementBuilder.createBuilder("tr")
+private val Thead: ElementBuilder<HTMLTableSectionElement> = ElementBuilder.createBuilder("thead")
+private val Th: ElementBuilder<HTMLTableCellElement> = ElementBuilder.createBuilder("th")
+private val Td: ElementBuilder<HTMLTableCellElement> = ElementBuilder.createBuilder("td")
+private val Tbody: ElementBuilder<HTMLTableSectionElement> = ElementBuilder.createBuilder("tbody")
+private val Tfoot: ElementBuilder<HTMLTableSectionElement> = ElementBuilder.createBuilder("tfoot")
 
-private val Select: ElementBuilder<HTMLSelectElement> = ElementBuilderImplementation("select")
-private val Option: ElementBuilder<HTMLOptionElement> = ElementBuilderImplementation("option")
-private val OptGroup: ElementBuilder<HTMLOptGroupElement> = ElementBuilderImplementation("optgroup")
-
-private val Section: ElementBuilder<HTMLElement> = ElementBuilderImplementation("section")
-private val TextArea: ElementBuilder<HTMLTextAreaElement> = ElementBuilderImplementation("textarea")
-private val Nav: ElementBuilder<HTMLElement> = ElementBuilderImplementation("nav")
-private val Pre: ElementBuilder<HTMLPreElement> = ElementBuilderImplementation("pre")
-private val Code: ElementBuilder<HTMLElement> = ElementBuilderImplementation("code")
-
-private val Main: ElementBuilder<HTMLElement> = ElementBuilderImplementation("main")
-private val Footer: ElementBuilder<HTMLElement> = ElementBuilderImplementation("footer")
-private val Hr: ElementBuilder<HTMLHRElement> = ElementBuilderImplementation("hr")
-private val Label: ElementBuilder<HTMLLabelElement> = ElementBuilderImplementation("label")
-private val Table: ElementBuilder<HTMLTableElement> = ElementBuilderImplementation("table")
-private val Caption: ElementBuilder<HTMLTableCaptionElement> = ElementBuilderImplementation("caption")
-private val Col: ElementBuilder<HTMLTableColElement> = ElementBuilderImplementation("col")
-private val Colgroup: ElementBuilder<HTMLTableColElement> = ElementBuilderImplementation("colgroup")
-private val Tr: ElementBuilder<HTMLTableRowElement> = ElementBuilderImplementation("tr")
-private val Thead: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImplementation("thead")
-private val Th: ElementBuilder<HTMLTableCellElement> = ElementBuilderImplementation("th")
-private val Td: ElementBuilder<HTMLTableCellElement> = ElementBuilderImplementation("td")
-private val Tbody: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImplementation("tbody")
-private val Tfoot: ElementBuilder<HTMLTableSectionElement> = ElementBuilderImplementation("tfoot")
-
-internal val Style: ElementBuilder<HTMLStyleElement> = ElementBuilderImplementation("style")
-
-fun interface ElementBuilder<TElement : Element> {
-    fun create(): TElement
-
-    companion object {
-        // it's internal only for testing purposes
-        internal val buildersCache = mutableMapOf<String, ElementBuilder<*>>()
-
-        fun <TElement : Element> createBuilder(tagName: String): ElementBuilder<TElement> {
-            val tagLowercase = tagName.lowercase()
-            return buildersCache.getOrPut(tagLowercase) {
-                ElementBuilderImplementation<TElement>(tagLowercase)
-            }.unsafeCast<ElementBuilder<TElement>>()
-        }
-    }
-}
+internal val Style: ElementBuilder<HTMLStyleElement> = ElementBuilder.createBuilder("style")
 
 @Composable
 fun Address(
@@ -478,29 +444,6 @@ fun DTerm(
     )
 }
 
-@OptIn(ComposeWebInternalApi::class)
-@Composable
-fun Text(value: String) {
-    ComposeNode<DomNodeWrapper, DomApplier>(
-        factory = { DomNodeWrapper(document.createTextNode("")) },
-        update = {
-            set(value) { value -> (node as Text).data = value }
-        },
-    )
-}
-
-@Composable
-fun Div(
-    attrs: AttrBuilderContext<HTMLDivElement>? = null,
-    content: ContentBuilder<HTMLDivElement>? = null
-) {
-    TagElement(
-        elementBuilder = Div,
-        applyAttrs = attrs,
-        content = content
-    )
-}
-
 @Composable
 fun A(
     href: String? = null,
@@ -610,12 +553,6 @@ fun Blockquote(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null
 ) = TagElement(elementBuilder = Blockquote, applyAttrs = attrs, content = content)
-
-@Composable
-fun Span(
-    attrs: AttrBuilderContext<HTMLSpanElement>? = null,
-    content: ContentBuilder<HTMLSpanElement>? = null
-) = TagElement(elementBuilder = Span, applyAttrs = attrs, content = content)
 
 @Composable
 fun Br(attrs: AttrBuilderContext<HTMLBRElement>? = null) =

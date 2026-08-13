@@ -7,6 +7,7 @@ package org.jetbrains.compose.web.core.tests.elements
 
 import androidx.compose.runtime.*
 import kotlinx.browser.document
+import kotlinx.browser.dom.Element
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.dom.*
@@ -140,18 +141,13 @@ class ElementsTests {
 
     @Test
     fun testElementBuilderCreate() {
-        val custom = ElementBuilder.createBuilder<HTMLElement>("custom")
-        val div = ElementBuilder.createBuilder<HTMLElement>("div")
-        val b = ElementBuilder.createBuilder<HTMLElement>("b")
-        val abc = ElementBuilder.createBuilder<HTMLElement>("abc")
-
-        val expectedKeys = setOf("custom", "div", "b", "abc")
-        assertEquals(expectedKeys, ElementBuilder.buildersCache.keys.intersect(expectedKeys))
+        val custom = ElementBuilder.createBuilder<HTMLElement>("CUSTOM")
+        val div = ElementBuilder.createBuilder<HTMLElement>("DIV")
+        val sameDiv = ElementBuilder.createBuilder<HTMLElement>("div")
 
         assertEquals("CUSTOM", custom.create().nodeName)
         assertEquals("DIV", div.create().nodeName)
-        assertEquals("B", b.create().nodeName)
-        assertEquals("ABC", abc.create().nodeName)
+        assertSame(div, sameDiv)
     }
 
     @Test
@@ -194,24 +190,58 @@ class ElementsTests {
         var flag by mutableStateOf(false)
 
         composition {
-            TagElement({
-                counter++
-                document.createElement("div")
-            }, null,
+            TagElement(
+                {
+                    counter++
+                    document.createElement("div")
+                },
+                null,
                 if (flag) {
-                    { Div() { Text("ON") } }
+                    { Div { Text("ON") } }
                 } else null
             )
-
         }
 
-        assertEquals(1, counter, )
+        assertEquals(1, counter)
 
         flag = true
         waitForRecompositionComplete()
 
         assertEquals(1, counter)
         assertEquals("<div><div>ON</div></div>", nextChild().outerHTML)
+    }
+
+    @Test
+    fun divAndSpanObtainTheirBuildersFromTheContext() = runTest {
+        val requestedTags = mutableListOf<String>()
+        val overridingContext = object : ComposeHtmlContext by DefaultComposeHtmlContext {
+            override fun <TElement : Element> elementBuilder(
+                tagName: String
+            ): ElementBuilder<TElement> {
+                requestedTags += tagName
+                val replacementTag = when (tagName) {
+                    "div" -> "section"
+                    "span" -> "em"
+                    else -> tagName
+                }
+                return ElementBuilder {
+                    document.createElement(replacementTag).unsafeCast<TElement>()
+                }
+            }
+        }
+
+        composition {
+            CompositionLocalProvider(LocalComposeHtmlContext provides overridingContext) {
+                Div {
+                    Span {
+                        Text("content")
+                    }
+                }
+            }
+        }
+
+        assertEquals(listOf("div", "span"), requestedTags)
+        assertEquals("<section><em>content</em></section>", nextChild().outerHTML)
     }
 
     @Test @NoLiveLiterals

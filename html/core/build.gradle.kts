@@ -55,5 +55,11 @@ kotlin {
                 implementation(compose.desktop.currentOs)
             }
         }
+
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
     }
 }
