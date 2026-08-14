@@ -1,12 +1,10 @@
 package org.jetbrains.compose.resources
 
 import kotlinx.coroutines.*
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
 internal class AsyncCache<K, V> {
     private val cacheScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
-    private val mutex = Mutex()
+    private val lock = ResourceLock()
     private val cache = mutableMapOf<K, SharedRequest<V>>()
 
     private class SharedRequest<V>(val deferred: Deferred<V>) {
@@ -17,15 +15,15 @@ internal class AsyncCache<K, V> {
         ResourceCaches.registerCache(this)
     }
 
-    private suspend fun getAllActiveJobs(): List<Job> = mutex.withLock {
+    private fun getAllActiveJobs(): List<Job> = lock.withLock {
         cache.values.map { it.deferred }.filter { it.isActive }
     }
 
     suspend fun getOrLoad(key: K, load: suspend () -> V): V {
-        val request = mutex.withLock {
+        val request = lock.withLock {
             var cached = cache[key]
             if (cached == null || cached.deferred.isCancelled) {
-                //the request is created lazily to start it outside the critical mutex section
+                //the request is created lazily to start it outside the critical section
                 cached = SharedRequest(cacheScope.async(start = CoroutineStart.LAZY) { load() })
                 cache[key] = cached
             }
@@ -36,7 +34,7 @@ internal class AsyncCache<K, V> {
              request.deferred.start()
              request.deferred.await()
          } finally {
-             mutex.withLock {
+             lock.withLock {
                  request.listenersCount--
                  if (request.listenersCount == 0 && request.deferred.isActive) {
                      request.deferred.cancel()
@@ -49,8 +47,8 @@ internal class AsyncCache<K, V> {
         getAllActiveJobs().joinAll()
     }
 
-    suspend fun clear() {
-        mutex.withLock {
+    fun clear() {
+        lock.withLock {
             cache.forEach { (_, v) -> v.deferred.cancel() }
             cache.clear()
         }

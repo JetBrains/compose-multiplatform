@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
 import kotlin.test.Test
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 //See: https://youtrack.jetbrains.com/issue/CMP-6615#focus=Comments-27-14272705.0-0
@@ -58,11 +59,13 @@ class MutexHandoffDeadlockReproducer {
         val deadlockedStackTrace = awaitTheParkedUiThread(uiThread)
         stop.set(true)
 
-        assertTrue(deadlockedStackTrace != null)
-        println(
-            "The UI thread has been parked by a resource reading for more than ${DEADLOCK_TIMEOUT_MS}ms:\n" +
-                    deadlockedStackTrace.take(10).joinToString("\n") { "\tat $it" }
-        )
+        if (deadlockedStackTrace != null) {
+            println(
+                "The UI thread has been parked by a resource reading for more than ${DEADLOCK_TIMEOUT_MS}ms:\n" +
+                        deadlockedStackTrace.take(10).joinToString("\n") { "\tat $it" }
+            )
+        }
+        assertNull(deadlockedStackTrace)
     }
 
     /**
