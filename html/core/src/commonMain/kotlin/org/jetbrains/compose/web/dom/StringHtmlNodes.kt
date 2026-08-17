@@ -35,12 +35,16 @@ internal class StringHtmlElementNode private constructor(
 
         builder.append('<').append(tagName)
         attributes.forEach { (name, value) ->
-            builder.append(' ').append(name).append("=\"")
-            builder.appendEscapedAttribute(value)
-            builder.append('"')
+            builder.append(' ').append(name)
+            if (name.lowercase() !in BooleanAttributeNames) {
+                builder.append("=\"")
+                builder.appendEscapedAttribute(value)
+                builder.append('"')
+            }
         }
         builder.append('>')
 
+        // HTML void elements have neither content nor an end tag.
         if (tagName in VoidElementNames) return
 
         children.forEach { it.appendHtmlTo(builder) }
@@ -63,6 +67,34 @@ internal class StringHtmlElementNode private constructor(
             "source",
             "track",
             "wbr",
+        )
+
+        // A boolean attribute is true when present, independently of its supplied string value.
+        private val BooleanAttributeNames = setOf(
+            "allowfullscreen",
+            "async",
+            "autofocus",
+            "autoplay",
+            "checked",
+            "controls",
+            "default",
+            "defer",
+            "disabled",
+            "formnovalidate",
+            "inert",
+            "ismap",
+            "itemscope",
+            "loop",
+            "multiple",
+            "muted",
+            "nomodule",
+            "novalidate",
+            "open",
+            "playsinline",
+            "readonly",
+            "required",
+            "reversed",
+            "selected",
         )
 
         fun root(): StringHtmlElementNode = StringHtmlElementNode(

@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import kotlinx.browser.dom.Element
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
+import org.jetbrains.compose.web.css.StylePropertyDeclaration
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 internal object StringComposeHtmlContext : ComposeHtmlContext {
@@ -94,13 +95,22 @@ private fun unavailableDomElement(): Nothing =
 private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(): Map<String, String> =
     collect().toMutableMap().apply {
         if (AttrsScope.CLASS !in this && classes.isNotEmpty()) {
-            this[AttrsScope.CLASS] = classes.joinToString(" ")
+            this[AttrsScope.CLASS] = classes
+                .filter(String::isNotEmpty)
+                .distinct()
+                .joinToString(" ")
         }
 
         if ("style" !in this) {
             val declarations = styleScope.properties + styleScope.variables
             if (declarations.isNotEmpty()) {
-                this["style"] = declarations.joinToString("; ") { declaration ->
+                //make sure that later declarations replace earlier ones
+                val declarationsByName = mutableMapOf<String, StylePropertyDeclaration>()
+                declarations.forEach { declaration ->
+                    declarationsByName[declaration.name] = declaration
+                }
+
+                this["style"] = declarationsByName.values.joinToString("; ") { declaration ->
                     buildString {
                         append(declaration.name)
                         append(": ")

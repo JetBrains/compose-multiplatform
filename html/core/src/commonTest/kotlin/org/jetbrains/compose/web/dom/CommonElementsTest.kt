@@ -1,0 +1,150 @@
+package org.jetbrains.compose.web.dom
+
+import org.jetbrains.compose.web.composeHtmlToString
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+class CommonElementsTest {
+    @Test
+    fun rendersSemanticAndTextElements() {
+        val html = composeHtmlToString {
+            Address { Text("address") }
+            Article({ id("article") }) { Text("article") }
+            Aside { Text("aside") }
+            Header { Text("header") }
+            Section { Text("section") }
+            Nav { Text("nav") }
+            Main { Text("main") }
+            Footer { Text("footer") }
+            H1 { Text("h1") }
+            H2 { Text("h2") }
+            H3 { Text("h3") }
+            H4 { Text("h4") }
+            H5 { Text("h5") }
+            H6 { Text("h6") }
+            P { Text("p") }
+            Em { Text("em") }
+            I { Text("i") }
+            B { Text("b") }
+            Small { Text("small") }
+            Sup { Text("sup") }
+            Sub { Text("sub") }
+            Blockquote { Text("blockquote") }
+            Pre { Text("pre") }
+            Code { Text("code") }
+        }
+
+        assertEquals(
+            "<address>address</address>" +
+                "<article id=\"article\">article</article>" +
+                "<aside>aside</aside>" +
+                "<header>header</header>" +
+                "<section>section</section>" +
+                "<nav>nav</nav>" +
+                "<main>main</main>" +
+                "<footer>footer</footer>" +
+                "<h1>h1</h1>" +
+                "<h2>h2</h2>" +
+                "<h3>h3</h3>" +
+                "<h4>h4</h4>" +
+                "<h5>h5</h5>" +
+                "<h6>h6</h6>" +
+                "<p>p</p>" +
+                "<em>em</em>" +
+                "<i>i</i>" +
+                "<b>b</b>" +
+                "<small>small</small>" +
+                "<sup>sup</sup>" +
+                "<sub>sub</sub>" +
+                "<blockquote>blockquote</blockquote>" +
+                "<pre>pre</pre>" +
+                "<code>code</code>",
+            html,
+        )
+    }
+
+    @Test
+    fun rendersListElements() {
+        val html = composeHtmlToString {
+            Ul { Li { Text("unordered") } }
+            Ol { Li { Text("ordered") } }
+            DList {
+                DTerm { Text("term") }
+                DDescription { Text("description") }
+            }
+        }
+
+        assertEquals(
+            "<ul><li>unordered</li></ul>" +
+                "<ol><li>ordered</li></ol>" +
+                "<dl><dt>term</dt><dd>description</dd></dl>",
+            html,
+        )
+    }
+
+    @Test
+    fun rendersMediaAndOtherContainerElements() {
+        val html = composeHtmlToString {
+            Audio { Text("audio") }
+            Video { Text("video") }
+            Picture { Text("picture") }
+            Canvas { Text("canvas") }
+            HTMLMap { Text("map") }
+            Datalist { Text("datalist") }
+            Fieldset { Legend { Text("legend") } }
+            Meter { Text("meter") }
+            Output { Text("output") }
+            Progress { Text("progress") }
+            Iframe { Text("iframe") }
+            Object { Text("object") }
+        }
+
+        assertEquals(
+            "<audio>audio</audio>" +
+                "<video>video</video>" +
+                "<picture>picture</picture>" +
+                "<canvas>canvas</canvas>" +
+                "<map>map</map>" +
+                "<datalist>datalist</datalist>" +
+                "<fieldset><legend>legend</legend></fieldset>" +
+                "<meter>meter</meter>" +
+                "<output>output</output>" +
+                "<progress>progress</progress>" +
+                "<iframe>iframe</iframe>" +
+                "<object>object</object>",
+            html,
+        )
+    }
+
+    @Test
+    fun rendersTableElementsAndButton() {
+        val html = composeHtmlToString {
+            Button { Text("button") }
+            Table {
+                Caption { Text("caption") }
+                Colgroup()
+                Thead {
+                    Tr { Th { Text("heading") } }
+                }
+                Tbody {
+                    Tr { Td { Text("body") } }
+                }
+                Tfoot {
+                    Tr { Td { Text("footer") } }
+                }
+            }
+        }
+
+        assertEquals(
+            "<button>button</button>" +
+                "<table>" +
+                "<caption>caption</caption>" +
+                "<colgroup></colgroup>" +
+                "<thead><tr><th>heading</th></tr></thead>" +
+                "<tbody><tr><td>body</td></tr></tbody>" +
+                "<tfoot><tr><td>footer</td></tr></tfoot>" +
+                "</table>",
+            html,
+        )
+    }
+}
