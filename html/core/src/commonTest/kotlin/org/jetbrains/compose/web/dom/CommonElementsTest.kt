@@ -147,4 +147,84 @@ class CommonElementsTest {
             html,
         )
     }
+
+    @Test
+    fun rendersLinkedImageAndFormElements() {
+        val html = composeHtmlToString {
+            A(href = "/docs?part=one&format=html") {
+                Text("Documentation")
+            }
+            Img(
+                src = "/images/logo.png",
+                alt = "Logo <preview>",
+            )
+            Form(action = "/submit") {
+                Label(forId = "choice") {
+                    Text("Choose")
+                }
+                Select(
+                    attrs = { id("choice") },
+                    multiple = true,
+                ) {
+                    Option(value = "one") {
+                        Text("One")
+                    }
+                    OptGroup(label = "More") {
+                        Option(value = "two") {
+                            Text("Two")
+                        }
+                    }
+                }
+            }
+        }
+
+        assertEquals(
+            "<a href=\"/docs?part=one&amp;format=html\">Documentation</a>" +
+                "<img src=\"/images/logo.png\" alt=\"Logo &lt;preview&gt;\">" +
+                "<form action=\"/submit\">" +
+                "<label for=\"choice\">Choose</label>" +
+                "<select multiple id=\"choice\">" +
+                "<option value=\"one\">One</option>" +
+                "<optgroup label=\"More\"><option value=\"two\">Two</option></optgroup>" +
+                "</select>" +
+                "</form>",
+            html,
+        )
+    }
+
+    @Test
+    fun rendersSimpleVoidElementsWithoutContentOrEndTags() {
+        val html = composeHtmlToString {
+            Area(attrs = { attr("shape", "rect") }) {
+                Text("ignored")
+            }
+            Track(attrs = { attr("kind", "captions") }) {
+                Text("ignored")
+            }
+            Embed(attrs = { attr("src", "plugin.bin") }) {
+                Text("ignored")
+            }
+            Param(attrs = { attr("name", "quality") }) {
+                Text("ignored")
+            }
+            Source(attrs = { attr("src", "movie.mp4") }) {
+                Text("ignored")
+            }
+            Br { title("break") }
+            Hr { id("rule") }
+            Col { attr("span", "2") }
+        }
+
+        assertEquals(
+            "<area shape=\"rect\">" +
+                "<track kind=\"captions\">" +
+                "<embed src=\"plugin.bin\">" +
+                "<param name=\"quality\">" +
+                "<source src=\"movie.mp4\">" +
+                "<br title=\"break\">" +
+                "<hr id=\"rule\">" +
+                "<col span=\"2\">",
+            html,
+        )
+    }
 }

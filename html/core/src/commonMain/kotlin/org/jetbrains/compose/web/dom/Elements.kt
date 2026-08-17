@@ -1,27 +1,41 @@
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
+import androidx.compose.web.attributes.SelectAttrsScope
+import kotlinx.browser.dom.HTMLAnchorElement
+import kotlinx.browser.dom.HTMLAreaElement
 import kotlinx.browser.dom.HTMLAudioElement
+import kotlinx.browser.dom.HTMLBRElement
 import kotlinx.browser.dom.HTMLButtonElement
 import kotlinx.browser.dom.HTMLCanvasElement
 import kotlinx.browser.dom.HTMLDataListElement
 import kotlinx.browser.dom.HTMLDListElement
 import kotlinx.browser.dom.HTMLDivElement
+import kotlinx.browser.dom.HTMLEmbedElement
 import kotlinx.browser.dom.HTMLElement
 import kotlinx.browser.dom.HTMLFieldSetElement
+import kotlinx.browser.dom.HTMLFormElement
+import kotlinx.browser.dom.HTMLHRElement
 import kotlinx.browser.dom.HTMLHeadingElement
 import kotlinx.browser.dom.HTMLIFrameElement
+import kotlinx.browser.dom.HTMLImageElement
 import kotlinx.browser.dom.HTMLLIElement
+import kotlinx.browser.dom.HTMLLabelElement
 import kotlinx.browser.dom.HTMLLegendElement
 import kotlinx.browser.dom.HTMLMapElement
 import kotlinx.browser.dom.HTMLMeterElement
 import kotlinx.browser.dom.HTMLOListElement
 import kotlinx.browser.dom.HTMLObjectElement
+import kotlinx.browser.dom.HTMLOptGroupElement
+import kotlinx.browser.dom.HTMLOptionElement
 import kotlinx.browser.dom.HTMLOutputElement
 import kotlinx.browser.dom.HTMLParagraphElement
 import kotlinx.browser.dom.HTMLPictureElement
 import kotlinx.browser.dom.HTMLPreElement
 import kotlinx.browser.dom.HTMLProgressElement
+import kotlinx.browser.dom.HTMLParamElement
+import kotlinx.browser.dom.HTMLSelectElement
+import kotlinx.browser.dom.HTMLSourceElement
 import kotlinx.browser.dom.HTMLSpanElement
 import kotlinx.browser.dom.HTMLTableCaptionElement
 import kotlinx.browser.dom.HTMLTableCellElement
@@ -29,9 +43,18 @@ import kotlinx.browser.dom.HTMLTableColElement
 import kotlinx.browser.dom.HTMLTableElement
 import kotlinx.browser.dom.HTMLTableRowElement
 import kotlinx.browser.dom.HTMLTableSectionElement
+import kotlinx.browser.dom.HTMLTrackElement
 import kotlinx.browser.dom.HTMLUListElement
 import kotlinx.browser.dom.HTMLVideoElement
 import org.jetbrains.compose.web.attributes.AttrsScope
+import org.jetbrains.compose.web.attributes.action
+import org.jetbrains.compose.web.attributes.alt
+import org.jetbrains.compose.web.attributes.forId
+import org.jetbrains.compose.web.attributes.href
+import org.jetbrains.compose.web.attributes.label
+import org.jetbrains.compose.web.attributes.multiple
+import org.jetbrains.compose.web.attributes.src
+import org.jetbrains.compose.web.attributes.value
 
 typealias AttrBuilderContext<T> = AttrsScope<T>.() -> Unit
 typealias ContentBuilder<T> = @Composable ElementScope<T>.() -> Unit
@@ -365,6 +388,171 @@ fun Button(
     attrs: AttrBuilderContext<HTMLButtonElement>? = null,
     content: ContentBuilder<HTMLButtonElement>? = null,
 ) = TagElement<HTMLButtonElement>("button", attrs, content)
+
+@Composable
+fun Area(
+    attrs: AttrBuilderContext<HTMLAreaElement>? = null,
+    content: ContentBuilder<HTMLAreaElement>? = null,
+) = TagElement<HTMLAreaElement>("area", attrs, content)
+
+@Composable
+fun Track(
+    attrs: AttrBuilderContext<HTMLTrackElement>? = null,
+    content: ContentBuilder<HTMLTrackElement>? = null,
+) = TagElement<HTMLTrackElement>("track", attrs, content)
+
+@Composable
+fun Embed(
+    attrs: AttrBuilderContext<HTMLEmbedElement>? = null,
+    content: ContentBuilder<HTMLEmbedElement>? = null,
+) = TagElement<HTMLEmbedElement>("embed", attrs, content)
+
+@Composable
+fun Param(
+    attrs: AttrBuilderContext<HTMLParamElement>? = null,
+    content: ContentBuilder<HTMLParamElement>? = null,
+) = TagElement<HTMLParamElement>("param", attrs, content)
+
+@Composable
+fun Source(
+    attrs: AttrBuilderContext<HTMLSourceElement>? = null,
+    content: ContentBuilder<HTMLSourceElement>? = null,
+) = TagElement<HTMLSourceElement>("source", attrs, content)
+
+@Composable
+fun Br(
+    attrs: AttrBuilderContext<HTMLBRElement>? = null,
+) = TagElement<HTMLBRElement>("br", attrs, content = null)
+
+@Composable
+fun Hr(
+    attrs: AttrBuilderContext<HTMLHRElement>? = null,
+) = TagElement<HTMLHRElement>("hr", attrs, content = null)
+
+@Composable
+fun Col(
+    attrs: AttrBuilderContext<HTMLTableColElement>? = null,
+) = TagElement<HTMLTableColElement>("col", attrs, content = null)
+
+@Composable
+fun A(
+    href: String? = null,
+    attrs: AttrBuilderContext<HTMLAnchorElement>? = null,
+    content: ContentBuilder<HTMLAnchorElement>? = null,
+) = TagElement<HTMLAnchorElement>(
+    tagName = "a",
+    applyAttrs = {
+        if (href != null) {
+            this.href(href)
+        }
+        if (attrs != null) {
+            attrs()
+        }
+    },
+    content = content,
+)
+
+@Composable
+fun Img(
+    src: String,
+    alt: String = "",
+    attrs: AttrBuilderContext<HTMLImageElement>? = null,
+) = TagElement<HTMLImageElement>(
+    tagName = "img",
+    applyAttrs = {
+        src(src).alt(alt)
+        if (attrs != null) {
+            attrs()
+        }
+    },
+    content = null,
+)
+
+@Composable
+fun Form(
+    action: String? = null,
+    attrs: AttrBuilderContext<HTMLFormElement>? = null,
+    content: ContentBuilder<HTMLFormElement>? = null,
+) = TagElement<HTMLFormElement>(
+    tagName = "form",
+    applyAttrs = {
+        if (!action.isNullOrEmpty()) {
+            action(action)
+        }
+        if (attrs != null) {
+            attrs()
+        }
+    },
+    content = content,
+)
+
+@Composable
+fun Select(
+    attrs: (SelectAttrsScope.() -> Unit)? = null,
+    multiple: Boolean = false,
+    content: ContentBuilder<HTMLSelectElement>? = null,
+) = TagElement<HTMLSelectElement>(
+    tagName = "select",
+    applyAttrs = {
+        if (multiple) {
+            multiple()
+        }
+        if (attrs != null) {
+            SelectAttrsScope(this).attrs()
+        }
+    },
+    content = content,
+)
+
+@Composable
+fun Option(
+    value: String,
+    attrs: AttrBuilderContext<HTMLOptionElement>? = null,
+    content: ContentBuilder<HTMLOptionElement>? = null,
+) = TagElement<HTMLOptionElement>(
+    tagName = "option",
+    applyAttrs = {
+        value(value)
+        if (attrs != null) {
+            attrs()
+        }
+    },
+    content = content,
+)
+
+@Composable
+fun OptGroup(
+    label: String,
+    attrs: AttrBuilderContext<HTMLOptGroupElement>? = null,
+    content: ContentBuilder<HTMLOptGroupElement>? = null,
+) = TagElement<HTMLOptGroupElement>(
+    tagName = "optgroup",
+    applyAttrs = {
+        label(label)
+        if (attrs != null) {
+            attrs()
+        }
+    },
+    content = content,
+)
+
+@Composable
+fun Label(
+    forId: String? = null,
+    attrs: AttrBuilderContext<HTMLLabelElement>? = null,
+    content: ContentBuilder<HTMLLabelElement>? = null,
+) = TagElement<HTMLLabelElement>(
+    tagName = "label",
+    applyAttrs = {
+        if (forId != null) {
+            forId(forId)
+        }
+        if (attrs != null) {
+            attrs()
+        }
+    },
+    content = content,
+)
 
 @Composable
 fun Text(value: String) {

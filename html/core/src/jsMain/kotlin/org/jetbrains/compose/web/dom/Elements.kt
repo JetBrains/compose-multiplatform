@@ -1,222 +1,22 @@
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.*
-import androidx.compose.web.attributes.SelectAttrsScope
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.attributes.builders.*
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleSheetBuilderImpl
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
-import org.w3c.dom.HTMLAnchorElement
-import org.w3c.dom.HTMLAreaElement
-import org.w3c.dom.HTMLBRElement
-import org.w3c.dom.HTMLEmbedElement
-import org.w3c.dom.HTMLFormElement
-import org.w3c.dom.HTMLHRElement
-import org.w3c.dom.HTMLImageElement
 import org.w3c.dom.HTMLInputElement
-import org.w3c.dom.HTMLLabelElement
-import org.w3c.dom.HTMLOptGroupElement
-import org.w3c.dom.HTMLOptionElement
-import org.w3c.dom.HTMLParamElement
-import org.w3c.dom.HTMLSelectElement
-import org.w3c.dom.HTMLSourceElement
 import org.w3c.dom.HTMLStyleElement
-import org.w3c.dom.HTMLTableColElement
 import org.w3c.dom.HTMLTextAreaElement
-import org.w3c.dom.HTMLTrackElement
 import org.w3c.dom.css.CSSStyleSheet
 
-private val Area: ElementBuilder<HTMLAreaElement> = ElementBuilder.createBuilder("area")
-private val Track: ElementBuilder<HTMLTrackElement> = ElementBuilder.createBuilder("track")
-
-private val Embed: ElementBuilder<HTMLEmbedElement> = ElementBuilder.createBuilder("embed")
-private val Param: ElementBuilder<HTMLParamElement> = ElementBuilder.createBuilder("param")
-private val Source: ElementBuilder<HTMLSourceElement> = ElementBuilder.createBuilder("source")
-
-private val A: ElementBuilder<HTMLAnchorElement> = ElementBuilder.createBuilder("a")
 private val Input: ElementBuilder<HTMLInputElement> = ElementBuilder.createBuilder("input")
 
-private val Br: ElementBuilder<HTMLBRElement> = ElementBuilder.createBuilder("br")
-
-private val Img: ElementBuilder<HTMLImageElement> = ElementBuilder.createBuilder("img")
-private val Form: ElementBuilder<HTMLFormElement> = ElementBuilder.createBuilder("form")
-
-private val Select: ElementBuilder<HTMLSelectElement> = ElementBuilder.createBuilder("select")
-private val Option: ElementBuilder<HTMLOptionElement> = ElementBuilder.createBuilder("option")
-private val OptGroup: ElementBuilder<HTMLOptGroupElement> = ElementBuilder.createBuilder("optgroup")
-
 private val TextArea: ElementBuilder<HTMLTextAreaElement> = ElementBuilder.createBuilder("textarea")
-private val Hr: ElementBuilder<HTMLHRElement> = ElementBuilder.createBuilder("hr")
-private val Label: ElementBuilder<HTMLLabelElement> = ElementBuilder.createBuilder("label")
-private val Col: ElementBuilder<HTMLTableColElement> = ElementBuilder.createBuilder("col")
 
 internal val Style: ElementBuilder<HTMLStyleElement> = ElementBuilder.createBuilder("style")
-
-@Composable
-fun Area(
-    attrs: AttrBuilderContext<HTMLAreaElement>? = null,
-    content: ContentBuilder<HTMLAreaElement>? = null
-) {
-    TagElement(
-        elementBuilder = Area,
-        applyAttrs = attrs,
-        content = content
-    )
-}
-
-@Composable
-fun Track(
-    attrs: AttrBuilderContext<HTMLTrackElement>? = null,
-    content: ContentBuilder<HTMLTrackElement>? = null
-) {
-    TagElement(
-        elementBuilder = Track,
-        applyAttrs = attrs,
-        content = content
-    )
-}
-
-@Composable
-fun Embed(
-    attrs: AttrBuilderContext<HTMLEmbedElement>? = null,
-    content: ContentBuilder<HTMLEmbedElement>? = null
-) {
-    TagElement(
-        elementBuilder = Embed,
-        applyAttrs = attrs,
-        content = content
-    )
-}
-
-@Composable
-fun Param(
-    attrs: AttrBuilderContext<HTMLParamElement>? = null,
-    content: ContentBuilder<HTMLParamElement>? = null
-) {
-    TagElement(
-        elementBuilder = Param,
-        applyAttrs = attrs,
-        content = content
-    )
-}
-
-@Composable
-fun Source(
-    attrs: AttrBuilderContext<HTMLSourceElement>? = null,
-    content: ContentBuilder<HTMLSourceElement>? = null
-) {
-    TagElement(
-        elementBuilder = Source,
-        applyAttrs = attrs,
-        content = content
-    )
-}
-
-@Composable
-fun A(
-    href: String? = null,
-    attrs: AttrBuilderContext<HTMLAnchorElement>? = null,
-    content: ContentBuilder<HTMLAnchorElement>? = null
-) {
-    TagElement(
-        elementBuilder = A,
-        applyAttrs = {
-            if (href != null) {
-                this.href(href)
-            }
-            if (attrs != null) {
-                attrs()
-            }
-        },
-        content = content
-    )
-}
-
-@Composable
-fun Br(attrs: AttrBuilderContext<HTMLBRElement>? = null) =
-    TagElement(elementBuilder = Br, applyAttrs = attrs, content = null)
-
-@Composable
-fun Img(
-    src: String,
-    alt: String = "",
-    attrs: AttrBuilderContext<HTMLImageElement>? = null
-) = TagElement(
-    elementBuilder = Img,
-    applyAttrs = {
-        src(src).alt(alt)
-        if (attrs != null) {
-            attrs()
-        }
-    },
-    content = null
-)
-
-@Composable
-fun Form(
-    action: String? = null,
-    attrs: AttrBuilderContext<HTMLFormElement>? = null,
-    content: ContentBuilder<HTMLFormElement>? = null
-) = TagElement(
-    elementBuilder = Form,
-    applyAttrs = {
-        if (!action.isNullOrEmpty()) action(action)
-        if (attrs != null) {
-            attrs()
-        }
-    },
-    content = content
-)
-
-@Composable
-fun Select(
-    attrs: (SelectAttrsScope.() -> Unit)? = null,
-    multiple: Boolean = false,
-    content: ContentBuilder<HTMLSelectElement>? = null
-) = TagElement(
-    elementBuilder = Select,
-    applyAttrs = {
-        if (multiple) multiple()
-        if (attrs != null) {
-            SelectAttrsScope(this).attrs()
-        }
-    },
-    content = content
-)
-
-@Composable
-fun Option(
-    value: String,
-    attrs: AttrBuilderContext<HTMLOptionElement>? = null,
-    content: ContentBuilder<HTMLOptionElement>? = null
-) = TagElement(
-    elementBuilder = Option,
-    applyAttrs = {
-        value(value)
-        if (attrs != null) {
-            attrs()
-        }
-    },
-    content = content
-)
-
-@Composable
-fun OptGroup(
-    label: String,
-    attrs: AttrBuilderContext<HTMLOptGroupElement>? = null,
-    content: ContentBuilder<HTMLOptGroupElement>? = null
-) = TagElement(
-    elementBuilder = OptGroup,
-    applyAttrs = {
-        label(label)
-        if (attrs != null) {
-            attrs()
-        }
-    },
-    content = content
-)
 
 /**
  * Adds <textarea> element.
@@ -268,48 +68,6 @@ fun TextArea(
                 onDispose { }
             }
         }
-    )
-}
-
-@Composable
-fun Hr(
-    attrs: AttrBuilderContext<HTMLHRElement>? = null
-) {
-    TagElement(
-        elementBuilder = Hr,
-        applyAttrs = attrs,
-        content = null
-    )
-}
-
-@Composable
-fun Label(
-    forId: String? = null,
-    attrs: AttrBuilderContext<HTMLLabelElement>? = null,
-    content: ContentBuilder<HTMLLabelElement>? = null
-) {
-    TagElement(
-        elementBuilder = Label,
-        applyAttrs = {
-            if (forId != null) {
-                forId(forId)
-            }
-            if (attrs != null) {
-                attrs()
-            }
-        },
-        content = content
-    )
-}
-
-@Composable
-fun Col(
-    attrs: AttrBuilderContext<HTMLTableColElement>? = null
-) {
-    TagElement(
-        elementBuilder = Col,
-        applyAttrs = attrs,
-        content = null
     )
 }
 
