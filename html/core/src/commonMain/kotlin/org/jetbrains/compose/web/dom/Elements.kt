@@ -6,6 +6,7 @@ import kotlinx.browser.dom.HTMLAnchorElement
 import kotlinx.browser.dom.HTMLAreaElement
 import kotlinx.browser.dom.HTMLAudioElement
 import kotlinx.browser.dom.HTMLBRElement
+import kotlinx.browser.dom.HTMLBodyElement
 import kotlinx.browser.dom.HTMLButtonElement
 import kotlinx.browser.dom.HTMLCanvasElement
 import kotlinx.browser.dom.HTMLDataListElement
@@ -16,14 +17,18 @@ import kotlinx.browser.dom.HTMLElement
 import kotlinx.browser.dom.HTMLFieldSetElement
 import kotlinx.browser.dom.HTMLFormElement
 import kotlinx.browser.dom.HTMLHRElement
+import kotlinx.browser.dom.HTMLHeadElement
 import kotlinx.browser.dom.HTMLHeadingElement
+import kotlinx.browser.dom.HTMLHtmlElement
 import kotlinx.browser.dom.HTMLIFrameElement
 import kotlinx.browser.dom.HTMLImageElement
 import kotlinx.browser.dom.HTMLLIElement
 import kotlinx.browser.dom.HTMLLabelElement
 import kotlinx.browser.dom.HTMLLegendElement
+import kotlinx.browser.dom.HTMLLinkElement
 import kotlinx.browser.dom.HTMLMapElement
 import kotlinx.browser.dom.HTMLMeterElement
+import kotlinx.browser.dom.HTMLMetaElement
 import kotlinx.browser.dom.HTMLOListElement
 import kotlinx.browser.dom.HTMLObjectElement
 import kotlinx.browser.dom.HTMLOptGroupElement
@@ -44,6 +49,7 @@ import kotlinx.browser.dom.HTMLTableElement
 import kotlinx.browser.dom.HTMLTableRowElement
 import kotlinx.browser.dom.HTMLTableSectionElement
 import kotlinx.browser.dom.HTMLTrackElement
+import kotlinx.browser.dom.HTMLTitleElement
 import kotlinx.browser.dom.HTMLUListElement
 import kotlinx.browser.dom.HTMLVideoElement
 import org.jetbrains.compose.web.attributes.AttrsScope
@@ -58,6 +64,40 @@ import org.jetbrains.compose.web.attributes.value
 
 typealias AttrBuilderContext<T> = AttrsScope<T>.() -> Unit
 typealias ContentBuilder<T> = @Composable ElementScope<T>.() -> Unit
+
+@Composable
+fun Html(
+    attrs: AttrBuilderContext<HTMLHtmlElement>? = null,
+    content: ContentBuilder<HTMLHtmlElement>? = null,
+) = TagElement<HTMLHtmlElement>("html", attrs, content)
+
+@Composable
+fun Head(
+    attrs: AttrBuilderContext<HTMLHeadElement>? = null,
+    content: ContentBuilder<HTMLHeadElement>? = null,
+) = TagElement<HTMLHeadElement>("head", attrs, content)
+
+@Composable
+fun Body(
+    attrs: AttrBuilderContext<HTMLBodyElement>? = null,
+    content: ContentBuilder<HTMLBodyElement>? = null,
+) = TagElement<HTMLBodyElement>("body", attrs, content)
+
+@Composable
+fun Title(
+    attrs: AttrBuilderContext<HTMLTitleElement>? = null,
+    content: ContentBuilder<HTMLTitleElement>? = null,
+) = TagElement<HTMLTitleElement>("title", attrs, content)
+
+@Composable
+fun Meta(
+    attrs: AttrBuilderContext<HTMLMetaElement>? = null,
+) = TagElement<HTMLMetaElement>("meta", attrs, content = null)
+
+@Composable
+fun Link(
+    attrs: AttrBuilderContext<HTMLLinkElement>? = null,
+) = TagElement<HTMLLinkElement>("link", attrs, content = null)
 
 @Composable
 fun Div(

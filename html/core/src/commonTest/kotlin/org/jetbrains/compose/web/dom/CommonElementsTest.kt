@@ -6,6 +6,44 @@ import kotlin.test.assertEquals
 
 class CommonElementsTest {
     @Test
+    fun rendersDocumentElements() {
+        val html = composeHtmlToString {
+            Html({ lang("en") }) {
+                Head {
+                    Meta { attr("charset", "UTF-8") }
+                    Meta {
+                        attr("name", "viewport")
+                        attr("content", "width=device-width, initial-scale=1")
+                    }
+                    Title { Text("Compose HTML") }
+                    Link {
+                        attr("rel", "stylesheet")
+                        attr("href", "styles.css")
+                    }
+                }
+                Body {
+                    Header {
+                        H1 { Text("String rendering") }
+                    }
+                }
+            }
+        }
+
+        assertEquals(
+            "<html lang=\"en\">" +
+                "<head>" +
+                "<meta charset=\"UTF-8\">" +
+                "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" +
+                "<title>Compose HTML</title>" +
+                "<link rel=\"stylesheet\" href=\"styles.css\">" +
+                "</head>" +
+                "<body><header><h1>String rendering</h1></header></body>" +
+                "</html>",
+            html,
+        )
+    }
+
+    @Test
     fun rendersSemanticAndTextElements() {
         val html = composeHtmlToString {
             Address { Text("address") }
