@@ -30,6 +30,12 @@ kotlin {
             }
         }
 
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
+
         val jsMain by getting {
             languageSettings {
                 optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")

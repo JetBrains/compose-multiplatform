@@ -6,6 +6,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.browser.dom.Element
 import org.jetbrains.compose.web.attributes.AttrsScope
 
+
 internal interface ComposeHtmlContext {
     fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement>
 
@@ -20,6 +21,7 @@ internal interface ComposeHtmlContext {
     fun TextElement(value: String)
 }
 
+// Define default per platform, e.g. [BrowserComposeHtmlContext] for web
 internal expect val DefaultComposeHtmlContext: ComposeHtmlContext
 
 internal val LocalComposeHtmlContext = staticCompositionLocalOf<ComposeHtmlContext> {

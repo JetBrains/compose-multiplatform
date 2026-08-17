@@ -43,4 +43,25 @@ class ElementBuilderJvmTest {
 
         assertSame(element, builder.create())
     }
+
+    @Test
+    fun stringBuilderCarriesNormalizedTagName() {
+        val builder = StringElementBuilder<HTMLDivElement>("DIV")
+
+        assertEquals("div", builder.tagName)
+    }
+
+    @Test
+    fun stringBuilderCannotCreateDomElements() {
+        val builder = StringElementBuilder<HTMLDivElement>("DIV")
+
+        val exception = assertFailsWith<UnsupportedOperationException> {
+            builder.create()
+        }
+
+        assertEquals(
+            "String element builder for <div> cannot create a DOM element",
+            exception.message
+        )
+    }
 }
