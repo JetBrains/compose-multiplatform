@@ -14,6 +14,10 @@ import org.jetbrains.compose.web.dom.StringHtmlNodeWrapper
 /**
  * Composes [content] once into an HTML string without creating browser DOM nodes.
  * The backing composition is disposed after the initial HTML has been serialized.
+ *
+ * Known limitations:
+ * - DOM property updates registered with `AttrsScope.prop(...)` are ignored because
+ *   string rendering has no underlying DOM element.
  */
 fun composeHtmlToString(
     content: @Composable () -> Unit

@@ -13,6 +13,8 @@ import org.jetbrains.compose.web.css.StylePropertyDeclaration
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 internal object StringComposeHtmlContext : ComposeHtmlContext {
+    override val supportsDomElementAccess: Boolean = false
+
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
         StringElementBuilder(tagName)
 

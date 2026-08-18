@@ -5,6 +5,8 @@ import kotlinx.browser.dom.Element
 import org.jetbrains.compose.web.attributes.AttrsScope
 
 internal actual val DefaultComposeHtmlContext: ComposeHtmlContext = object : ComposeHtmlContext {
+    override val supportsDomElementAccess: Boolean = false
+
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
         ElementBuilder.createBuilder(tagName)
 

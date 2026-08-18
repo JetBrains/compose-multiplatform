@@ -1,5 +1,6 @@
 package org.jetbrains.compose.web.dom
 
+import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.composeHtmlToString
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -262,6 +263,79 @@ class CommonElementsTest {
                 "<br title=\"break\">" +
                 "<hr id=\"rule\">" +
                 "<col span=\"2\">",
+            html,
+        )
+    }
+
+    @Test
+    fun rendersInputsWithSerializableState() {
+        val html = composeHtmlToString {
+            Input(InputType.Text) {
+                id("message")
+                defaultValue("Hello & welcome")
+                attr("required", "")
+            }
+            Input(InputType.Radio) {
+                attr("name", "choice")
+                value("one")
+                defaultChecked()
+            }
+        }
+
+        assertEquals(
+            "<input type=\"text\" id=\"message\" value=\"Hello &amp; welcome\" required>" +
+                "<input type=\"radio\" name=\"choice\" value=\"one\" checked>",
+            html,
+        )
+    }
+
+    @Test
+    fun skipsControlledInputPropertiesWithoutDomElementAccess() {
+        val html = composeHtmlToString {
+            Input(InputType.Text) {
+                value("controlled")
+            }
+            Input(InputType.Checkbox) {
+                checked(true)
+            }
+        }
+
+        assertEquals(
+            "<input type=\"text\"><input type=\"checkbox\">",
+            html,
+        )
+    }
+
+    @Test
+    fun rendersTextAreaAttributesWithoutDomElementAccess() {
+        val html = composeHtmlToString {
+            TextArea(
+                attrs = {
+                    id("message")
+                    attr("rows", "4")
+                    attr("placeholder", "Write <something>")
+                }
+            )
+        }
+
+        assertEquals(
+            "<textarea id=\"message\" rows=\"4\" " +
+                "placeholder=\"Write &lt;something&gt;\"></textarea>",
+            html,
+        )
+    }
+
+    @Test
+    fun skipsTextAreaValuePropertiesWithoutDomElementAccess() {
+        val html = composeHtmlToString {
+            TextArea(value = "controlled")
+            TextArea {
+                defaultValue("default")
+            }
+        }
+
+        assertEquals(
+            "<textarea></textarea><textarea></textarea>",
             html,
         )
     }

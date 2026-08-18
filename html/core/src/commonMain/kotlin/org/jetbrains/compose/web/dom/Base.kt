@@ -8,6 +8,8 @@ import org.jetbrains.compose.web.attributes.AttrsScope
 
 
 internal interface ComposeHtmlContext {
+    val supportsDomElementAccess: Boolean
+
     fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement>
 
     @Composable

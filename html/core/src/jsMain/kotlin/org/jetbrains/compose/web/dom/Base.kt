@@ -107,6 +107,8 @@ internal actual val DefaultComposeHtmlContext: ComposeHtmlContext = BrowserCompo
 
 @OptIn(ComposeWebInternalApi::class)
 private object BrowserComposeHtmlContext : ComposeHtmlContext {
+    override val supportsDomElementAccess: Boolean = true
+
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
         ElementBuilder.createBuilder(tagName)
 

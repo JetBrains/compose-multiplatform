@@ -1,6 +1,10 @@
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.web.attributes.SelectAttrsScope
 import kotlinx.browser.dom.HTMLAnchorElement
 import kotlinx.browser.dom.HTMLAreaElement
@@ -22,6 +26,7 @@ import kotlinx.browser.dom.HTMLHeadingElement
 import kotlinx.browser.dom.HTMLHtmlElement
 import kotlinx.browser.dom.HTMLIFrameElement
 import kotlinx.browser.dom.HTMLImageElement
+import kotlinx.browser.dom.HTMLInputElement
 import kotlinx.browser.dom.HTMLLIElement
 import kotlinx.browser.dom.HTMLLabelElement
 import kotlinx.browser.dom.HTMLLegendElement
@@ -48,11 +53,13 @@ import kotlinx.browser.dom.HTMLTableColElement
 import kotlinx.browser.dom.HTMLTableElement
 import kotlinx.browser.dom.HTMLTableRowElement
 import kotlinx.browser.dom.HTMLTableSectionElement
+import kotlinx.browser.dom.HTMLTextAreaElement
 import kotlinx.browser.dom.HTMLTrackElement
 import kotlinx.browser.dom.HTMLTitleElement
 import kotlinx.browser.dom.HTMLUListElement
 import kotlinx.browser.dom.HTMLVideoElement
 import org.jetbrains.compose.web.attributes.AttrsScope
+import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.action
 import org.jetbrains.compose.web.attributes.alt
 import org.jetbrains.compose.web.attributes.forId
@@ -60,7 +67,14 @@ import org.jetbrains.compose.web.attributes.href
 import org.jetbrains.compose.web.attributes.label
 import org.jetbrains.compose.web.attributes.multiple
 import org.jetbrains.compose.web.attributes.src
+import org.jetbrains.compose.web.attributes.type
 import org.jetbrains.compose.web.attributes.value
+import org.jetbrains.compose.web.attributes.builders.InputAttrsScope
+import org.jetbrains.compose.web.attributes.builders.DisposeRadioGroupEffect
+import org.jetbrains.compose.web.attributes.builders.restoreControlledInputState
+import org.jetbrains.compose.web.attributes.builders.restoreControlledTextAreaState
+import org.jetbrains.compose.web.attributes.builders.TextAreaAttrsScope
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 typealias AttrBuilderContext<T> = AttrsScope<T>.() -> Unit
 typealias ContentBuilder<T> = @Composable ElementScope<T>.() -> Unit
@@ -428,6 +442,149 @@ fun Button(
     attrs: AttrBuilderContext<HTMLButtonElement>? = null,
     content: ContentBuilder<HTMLButtonElement>? = null,
 ) = TagElement<HTMLButtonElement>("button", attrs, content)
+
+/**
+ * Adds <input> element of [type].
+ *
+ * Input has two modes: controlled and uncontrolled.
+ * Uncontrolled is a default mode. The input's state is managed by [HTMLInputElement] itself.
+ * Controlled mode means that the input's state is managed by compose state.
+ * To use Input in controlled mode, it's required to set its state by calling `value(String|Number)`.
+ *
+ * Consider using [TextInput], [CheckboxInput], [RadioInput], [NumberInput] etc. to use controlled mode.
+ *
+ * Code example of a controlled Input:
+ * ```
+ * val textInputState by remember { mutableStateOf("initial text") }
+ *
+ * Input(type = InputType.Text) {
+ *      value(textInputState)
+ *      onInput { event ->
+ *          textInputState = event.value // without updating the state, the <input> will keep showing an old value
+ *      }
+ * }
+ * ```
+ *
+ * Code example of an uncontrolled Input:
+ * ```
+ * Input(type = InputType.Text) {
+ *      defaultValue("someDefaultValue") // calling `defaultValue` is optional
+ *      // No value set explicitly.
+ *      // Whatever typed into the input will be immediately displayed in UI without handling any onInput events.
+ * }
+ * ```
+ *
+ * Controlled state restoration requires an actual DOM element and is skipped by
+ * renderers that do not provide DOM element access, such as string rendering.
+ */
+@OptIn(ComposeWebInternalApi::class)
+@Composable
+fun <K> Input(
+    type: InputType<K>,
+    attrs: InputAttrsScope<K>.() -> Unit,
+) {
+    val context = LocalComposeHtmlContext.current
+
+    // Changes to this key trigger controlled input state restoration in a DOM renderer.
+    val keyForRestoringControlledState: MutableState<Int> = remember { mutableStateOf(0) }
+
+    val domEffects: ContentBuilder<HTMLInputElement>? = if (context.supportsDomElementAccess) {
+        {
+            if (type == InputType.Radio) {
+                DisposeRadioGroupEffect()
+            }
+            DisposableEffect(keyForRestoringControlledState.value) {
+                restoreControlledInputState(inputElement = scopeElement)
+                onDispose { }
+            }
+        }
+    } else {
+        null
+    }
+
+    TagElement<HTMLInputElement>(
+        elementBuilder = context.elementBuilder("input"),
+        applyAttrs = {
+            val inputAttrsBuilder = InputAttrsScope(type, this)
+            inputAttrsBuilder.type(type)
+            inputAttrsBuilder.onInput {
+                // Controlled state needs to be restored after every input.
+                keyForRestoringControlledState.value = keyForRestoringControlledState.value + 1
+            }
+            inputAttrsBuilder.attrs()
+        },
+        content = domEffects,
+    )
+}
+
+@Composable
+fun <K> Input(type: InputType<K>) {
+    Input(type) {}
+}
+
+/**
+ * Adds <textarea> element.
+ * Same as [Input], [TextArea] has two modes: controlled and uncontrolled.
+ *
+ * Controlled mode means that <textarea> value can be changed only by passing a different [value].
+ * Uncontrolled mode means that <textarea> uses its default state management.
+ *
+ * To use controlled mode, simply pass non-null [value].
+ * By default [value] is null and [TextArea] will be in uncontrolled mode.
+ *
+ * Use `defaultValue("some default text")` in uncontrolled mode to set a default text if needed:
+ *
+ * ```
+ * TextArea {
+ *      defaultValue("Some Default Text")
+ * }
+ * ```
+ *
+ * Textarea values are DOM property updates and are therefore omitted by renderers
+ * that do not provide DOM element access, such as string rendering.
+ */
+@Composable
+fun TextArea(
+    value: String? = null,
+    attrs: (TextAreaAttrsScope.() -> Unit)? = null,
+) {
+    val context = LocalComposeHtmlContext.current
+
+    // If the first provided value was not null, TextArea behaves as a controlled input.
+    val firstProvidedValueWasNotNull = remember { value != null }
+
+    // Changes to this key trigger controlled textarea state restoration in a DOM renderer.
+    val keyForRestoringControlledState: MutableState<Int> = remember { mutableStateOf(0) }
+
+    val domEffects: ContentBuilder<HTMLTextAreaElement>? = if (context.supportsDomElementAccess) {
+        {
+            DisposableEffect(keyForRestoringControlledState.value) {
+                restoreControlledTextAreaState(element = scopeElement)
+                onDispose { }
+            }
+        }
+    } else {
+        null
+    }
+
+    TagElement<HTMLTextAreaElement>(
+        elementBuilder = context.elementBuilder("textarea"),
+        applyAttrs = {
+            val textAreaAttrsBuilder = TextAreaAttrsScope(this)
+            textAreaAttrsBuilder.onInput {
+                // Controlled state needs to be restored after every input.
+                keyForRestoringControlledState.value = keyForRestoringControlledState.value + 1
+            }
+            if (attrs != null) {
+                textAreaAttrsBuilder.attrs()
+            }
+            if (firstProvidedValueWasNotNull) {
+                textAreaAttrsBuilder.value(value ?: "")
+            }
+        },
+        content = domEffects,
+    )
+}
 
 @Composable
 fun Area(
