@@ -14,6 +14,44 @@ import org.jetbrains.compose.web.testutils.*
 class InputsGenerateCorrectHtmlTests {
 
     @Test
+    fun genericInputPropertyUpdatesAreAppliedInBrowser() = runTest {
+        composition {
+            Input(InputType.Text) {
+                value("controlled value")
+            }
+            Input(InputType.Checkbox) {
+                checked(true)
+            }
+        }
+
+        val textInput = root.firstChild as HTMLInputElement
+        val checkboxInput = root.lastChild as HTMLInputElement
+
+        assertEquals("controlled value", textInput.value)
+        assertEquals(true, checkboxInput.checked)
+    }
+
+    @Test
+    fun textAreaPropertyUpdatesAreAppliedInBrowser() = runTest {
+        composition {
+            TextArea(value = "controlled value")
+            TextArea {
+                defaultValue("default value")
+            }
+        }
+
+        val controlledTextArea = root.firstChild as HTMLTextAreaElement
+        val defaultTextArea = root.lastChild as HTMLTextAreaElement
+
+        assertEquals("controlled value", controlledTextArea.value)
+        assertEquals("default value", defaultTextArea.value)
+        assertEquals(
+            "<textarea></textarea><textarea>default value</textarea>",
+            root.innerHTML,
+        )
+    }
+
+    @Test
     fun checkBoxInput() = runTest {
         composition {
             CheckboxInput(checked = true) {
@@ -66,6 +104,21 @@ class InputsGenerateCorrectHtmlTests {
     }
 
     @Test
+    fun dateTimeLocalInput() = runTest {
+        composition {
+            DateTimeLocalInput(value = "2026-08-18T12:30") {
+                id("dateTimeLocalInputId")
+            }
+        }
+
+        val dateTimeLocalInput = root.firstChild as HTMLInputElement
+
+        assertEquals("datetime-local", dateTimeLocalInput.getAttribute("type"))
+        assertEquals("dateTimeLocalInputId", dateTimeLocalInput.getAttribute("id"))
+        assertEquals("2026-08-18T12:30", dateTimeLocalInput.value)
+    }
+
+    @Test
     fun emailInput() = runTest {
         composition {
             EmailInput(value = "user@mail.com") {
@@ -89,6 +142,37 @@ class InputsGenerateCorrectHtmlTests {
         assertEquals("email", emailInput.getAttribute("type"))
         assertEquals(null, emailInput.getAttribute("id"))
         assertEquals("", emailInput.value)
+    }
+
+    @Test
+    fun fileInputWithDefaults() = runTest {
+        composition {
+            FileInput {
+                id("fileInputId")
+            }
+        }
+
+        val fileInput = root.firstChild as HTMLInputElement
+
+        assertEquals("file", fileInput.getAttribute("type"))
+        assertEquals("fileInputId", fileInput.getAttribute("id"))
+        assertEquals("", fileInput.value)
+    }
+
+    @Test
+    fun hiddenInput() = runTest {
+        composition {
+            HiddenInput {
+                id("hiddenInputId")
+                value("hidden value")
+            }
+        }
+
+        val hiddenInput = root.firstChild as HTMLInputElement
+
+        assertEquals("hidden", hiddenInput.getAttribute("type"))
+        assertEquals("hiddenInputId", hiddenInput.getAttribute("id"))
+        assertEquals("hidden value", hiddenInput.value)
     }
 
     @Test
@@ -259,6 +343,22 @@ class InputsGenerateCorrectHtmlTests {
         assertEquals("search", searchInput.getAttribute("type"))
         assertEquals(null, searchInput.getAttribute("id"))
         assertEquals("", searchInput.value)
+    }
+
+    @Test
+    fun submitInput() = runTest {
+        composition {
+            SubmitInput {
+                id("submitInputId")
+                value("Submit")
+            }
+        }
+
+        val submitInput = root.firstChild as HTMLInputElement
+
+        assertEquals("submit", submitInput.getAttribute("type"))
+        assertEquals("submitInputId", submitInput.getAttribute("id"))
+        assertEquals("Submit", submitInput.value)
     }
 
     @Test
