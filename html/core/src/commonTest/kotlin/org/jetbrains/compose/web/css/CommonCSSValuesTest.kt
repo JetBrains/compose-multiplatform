@@ -76,4 +76,20 @@ class CommonCSSValuesTest {
             values.map { it.toString() },
         )
     }
+
+    @Test
+    fun gridAutoFlowValuesHavePortableCssText() {
+        val values = listOf(
+            GridAutoFlow.Row,
+            GridAutoFlow.Column,
+            GridAutoFlow.Dense,
+            GridAutoFlow.RowDense,
+            GridAutoFlow.ColumnDense,
+        )
+
+        assertEquals(
+            listOf("row", "column", "dense", "row dense", "column dense"),
+            values.map { it.toString() },
+        )
+    }
 }

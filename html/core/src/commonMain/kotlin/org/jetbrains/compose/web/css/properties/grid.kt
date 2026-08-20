@@ -94,6 +94,11 @@ fun StyleScope.gridAutoColumns(value: String) {
     property("grid-auto-columns", value)
 }
 
+// https://developer.mozilla.org/en-US/docs/Web/CSS/grid-auto-flow
+fun StyleScope.gridAutoFlow(value: GridAutoFlow) {
+    property("grid-auto-flow", value)
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/CSS/grid-template-rows
 fun StyleScope.gridTemplateRows(value: String) {
     property("grid-template-rows", value)
@@ -171,4 +176,3 @@ fun StyleScope.gap(value: CSSNumeric) {
 fun StyleScope.gap(rowGap: CSSNumeric, columnGap: CSSNumeric) {
     property("gap", "$rowGap $columnGap")
 }
-

@@ -120,6 +120,7 @@ class CommonCSSPropertiesTest {
 
         with(style) {
             gridColumn(2, "span 3")
+            gridAutoFlow(GridAutoFlow.RowDense)
             gridTemplateAreas("header header", "nav main")
             gap(8.px, 16.px)
         }
@@ -127,6 +128,7 @@ class CommonCSSPropertiesTest {
         assertEquals(
             listOf(
                 "grid-column" to "2 / span 3",
+                "grid-auto-flow" to "row dense",
                 "grid-template-areas" to "\"header header\" \"nav main\"",
                 "gap" to "8px 16px",
             ),

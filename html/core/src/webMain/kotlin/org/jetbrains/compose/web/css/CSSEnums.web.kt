@@ -51,4 +51,7 @@ internal actual fun createAnimationFillMode(value: String): AnimationFillMode = 
 internal actual fun createAnimationPlayState(value: String): AnimationPlayState = value.unsafeCast<AnimationPlayState>()
 
 @PublishedApi
+internal actual fun createGridAutoFlow(value: String): GridAutoFlow = value.unsafeCast<GridAutoFlow>()
+
+@PublishedApi
 internal actual fun createVisibilityStyle(value: String): VisibilityStyle = value.unsafeCast<VisibilityStyle>()

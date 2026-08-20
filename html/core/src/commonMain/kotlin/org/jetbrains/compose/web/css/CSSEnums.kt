@@ -315,6 +315,21 @@ internal expect fun createAnimationPlayState(value: String): AnimationPlayState
 
 inline fun AnimationPlayState(value: String): AnimationPlayState = createAnimationPlayState(value)
 
+interface GridAutoFlow : StylePropertyEnum {
+    companion object {
+        inline val Row get() = GridAutoFlow("row")
+        inline val Column get() = GridAutoFlow("column")
+        inline val Dense get() = GridAutoFlow("dense")
+        inline val RowDense get() = GridAutoFlow("row dense")
+        inline val ColumnDense get() = GridAutoFlow("column dense")
+    }
+}
+
+@PublishedApi
+internal expect fun createGridAutoFlow(value: String): GridAutoFlow
+
+inline fun GridAutoFlow(value: String): GridAutoFlow = createGridAutoFlow(value)
+
 interface VisibilityStyle : StylePropertyEnum {
     companion object {
         inline val Visible get() = VisibilityStyle("visible")

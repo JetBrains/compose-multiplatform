@@ -119,6 +119,14 @@ private value class JvmAnimationPlayState(private val value: String) : Animation
 internal actual fun createAnimationPlayState(value: String): AnimationPlayState = JvmAnimationPlayState(value)
 
 @JvmInline
+private value class JvmGridAutoFlow(private val value: String) : GridAutoFlow {
+    override fun toString(): String = value
+}
+
+@PublishedApi
+internal actual fun createGridAutoFlow(value: String): GridAutoFlow = JvmGridAutoFlow(value)
+
+@JvmInline
 private value class JvmVisibilityStyle(private val value: String) : VisibilityStyle {
     override fun toString(): String = value
 }
