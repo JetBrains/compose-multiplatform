@@ -3,10 +3,10 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-@file:Suppress("NOTHING_TO_INLINE")
-
 package org.jetbrains.compose.web.css
 
-external interface CSSKeywordValue : CSSStyleValue
+import kotlin.js.unsafeCast
 
-inline fun CSSKeywordValue(value: String): CSSKeywordValue = CSSStyleValue(value).unsafeCast<CSSKeywordValue>()
+actual external interface CSSColorValue : StylePropertyValue, CSSVariableValueAs<CSSColorValue>
+
+internal actual fun createCSSColorValue(value: String): CSSColorValue = value.unsafeCast<CSSColorValue>()

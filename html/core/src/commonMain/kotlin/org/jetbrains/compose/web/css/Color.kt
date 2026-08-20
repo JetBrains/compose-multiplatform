@@ -2,7 +2,7 @@
 
 package org.jetbrains.compose.web.css
 
-external interface CSSColorValue : StylePropertyValue, CSSVariableValueAs<CSSColorValue>
+expect interface CSSColorValue : StylePropertyValue, CSSVariableValueAs<CSSColorValue>
 
 object Color {
 
@@ -172,7 +172,9 @@ object Color {
     inline val currentColor get() = Color("currentColor")
 }
 
-fun Color(name: String): CSSColorValue = name.unsafeCast<CSSColorValue>()
+internal expect fun createCSSColorValue(value: String): CSSColorValue
+
+fun Color(name: String): CSSColorValue = createCSSColorValue(name)
 
 private class RGB(val r: Number, val g: Number, val b: Number): CSSColorValue {
     override fun toString(): String = "rgb($r, $g, $b)"

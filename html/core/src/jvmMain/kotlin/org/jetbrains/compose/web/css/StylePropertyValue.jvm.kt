@@ -16,19 +16,22 @@ actual interface CSSStyleValue : StylePropertyValue {
 
 actual interface CSSVariableValueAs<out T : StylePropertyValue>
 
-private class JvmStylePropertyString(
+@JvmInline
+private value class JvmStylePropertyString(
     private val value: String,
 ) : StylePropertyString {
     override fun toString(): String = value
 }
 
-private class JvmStylePropertyNumber(
+@JvmInline
+private value class JvmStylePropertyNumber(
     private val value: Number,
 ) : StylePropertyNumber {
     override fun toString(): String = value.toString()
 }
 
-private class JvmCSSStyleValue(
+@JvmInline
+private value class JvmCSSStyleValue(
     private val value: String,
 ) : CSSStyleValue {
     override fun toString(): String = value

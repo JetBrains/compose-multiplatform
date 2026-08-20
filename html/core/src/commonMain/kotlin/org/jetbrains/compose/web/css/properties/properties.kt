@@ -16,4 +16,3 @@ fun StyleScope.opacity(value: CSSSizeValue<CSSUnit.percent>) {
 fun StyleScope.display(displayStyle: DisplayStyle) {
     property("display", displayStyle.value)
 }
-

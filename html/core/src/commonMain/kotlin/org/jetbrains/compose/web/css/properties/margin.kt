@@ -31,5 +31,3 @@ fun StyleScope.marginTop(value: CSSNumeric) {
     property("margin-top", value)
 }
 
-
-

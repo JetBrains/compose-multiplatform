@@ -5,24 +5,6 @@
 
 package org.jetbrains.compose.web.css
 
-import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
-
-fun StyleScope.width(value: CSSNumeric) {
-    property("width", value)
-}
-
-fun StyleScope.width(value: CSSAutoKeyword) {
-    property("width", value)
-}
-
-fun StyleScope.height(value: CSSNumeric) {
-    property("height", value)
-}
-
-fun StyleScope.height(value: CSSAutoKeyword) {
-    property("height", value)
-}
-
 // https://developer.mozilla.org/en-US/docs/Web/CSS/box-sizing
 fun StyleScope.boxSizing(value: String) {
     property("box-sizing", value)

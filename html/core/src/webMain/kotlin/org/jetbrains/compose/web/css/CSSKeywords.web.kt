@@ -5,7 +5,9 @@
 
 package org.jetbrains.compose.web.css
 
-fun StyleScope.color(value: CSSColorValue) {
-    // color hasn't Typed OM yet
-    property("color", value)
-}
+import kotlin.js.unsafeCast
+
+actual external interface CSSKeywordValue : CSSStyleValue
+
+@PublishedApi
+internal actual fun createCSSKeywordValue(value: String): CSSKeywordValue = value.unsafeCast<CSSKeywordValue>()
