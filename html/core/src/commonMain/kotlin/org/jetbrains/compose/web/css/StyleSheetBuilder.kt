@@ -1,6 +1,8 @@
 package org.jetbrains.compose.web.css
 
 import org.jetbrains.compose.web.css.selectors.*
+import kotlin.js.JsName
+import kotlin.jvm.JvmName
 
 interface CSSRulesHolder {
     val cssRules: CSSRuleDeclarationList
@@ -21,6 +23,8 @@ interface GenericStyleSheetBuilder<TBuilder> : CSSRulesHolder, SelectorsScope {
         style(this, cssRule)
     }
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("styleSelector")
     infix fun CSSSelector.style(cssRule: TBuilder.() -> Unit) {
         style(this, cssRule)
     }

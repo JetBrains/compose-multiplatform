@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import org.jetbrains.compose.web.css.*
-import org.jetbrains.compose.web.css.selectors.CSSSelector
 import org.jetbrains.compose.web.dom.*
 
 class TestCases1 {

@@ -2,11 +2,9 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.*
 import org.jetbrains.compose.web.attributes.*
-import org.jetbrains.compose.web.attributes.builders.*
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleSheetBuilderImpl
-import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.css.CSSStyleSheet
 

@@ -10,7 +10,6 @@ import org.jetbrains.compose.web.css.utils.serializeRules
 import org.jetbrains.compose.web.testutils.runTest
 import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.css.CSSStyleSheet
-import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
