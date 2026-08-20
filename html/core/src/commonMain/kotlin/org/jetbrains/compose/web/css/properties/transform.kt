@@ -6,6 +6,7 @@
 package org.jetbrains.compose.web.css
 
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
+import kotlin.jvm.JvmName
 
 fun interface TransformFunction {
     fun apply(): String
@@ -36,19 +37,38 @@ interface TransformBuilder {
     fun skew(ax: CSSAngleValue, ay: CSSAngleValue)
     fun skewX(a: CSSAngleValue)
     fun skewY(a: CSSAngleValue)
+    // Length and percentage aliases erase to CSSSizeValue on JVM, so these overloads need distinct bytecode names.
     fun translate(tx: CSSLengthValue)
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translatePercentage")
     fun translate(tx: CSSPercentageValue)
     fun translate(tx: CSSLengthValue, ty: CSSLengthValue)
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translateLengthPercentage")
     fun translate(tx: CSSLengthValue, ty: CSSPercentageValue)
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translatePercentageLength")
     fun translate(tx: CSSPercentageValue, ty: CSSLengthValue)
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translatePercentagePercentage")
     fun translate(tx: CSSPercentageValue, ty: CSSPercentageValue)
     fun translate3d(tx: CSSLengthValue, ty: CSSLengthValue, tz: CSSLengthValue)
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translate3dLengthPercentageLength")
     fun translate3d(tx: CSSLengthValue, ty: CSSPercentageValue, tz: CSSLengthValue)
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translate3dPercentageLengthLength")
     fun translate3d(tx: CSSPercentageValue, ty: CSSLengthValue, tz: CSSLengthValue)
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translate3dPercentagePercentageLength")
     fun translate3d(tx: CSSPercentageValue, ty: CSSPercentageValue, tz: CSSLengthValue)
     fun translateX(tx: CSSLengthValue)
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translateXPercentage")
     fun translateX(tx: CSSPercentageValue)
     fun translateY(ty: CSSLengthValue)
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translateYPercentage")
     fun translateY(ty: CSSPercentageValue)
     fun translateZ(tz: CSSLengthValue)
 }
@@ -136,6 +156,8 @@ private class TransformBuilderImplementation : TransformBuilder {
         transformations.add { "translate($tx)" }
     }
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translatePercentage")
     override fun translate(tx: CSSPercentageValue) {
         transformations.add { "translate($tx)" }
     }
@@ -144,14 +166,20 @@ private class TransformBuilderImplementation : TransformBuilder {
         transformations.add { "translate($tx, $ty)" }
     }
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translateLengthPercentage")
     override fun translate(tx: CSSLengthValue, ty: CSSPercentageValue) {
         transformations.add { "translate($tx, $ty)" }
     }
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translatePercentageLength")
     override fun translate(tx: CSSPercentageValue, ty: CSSLengthValue) {
         transformations.add { "translate($tx, $ty)" }
     }
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translatePercentagePercentage")
     override fun translate(tx: CSSPercentageValue, ty: CSSPercentageValue) {
         transformations.add { "translate($tx, $ty)" }
     }
@@ -160,14 +188,20 @@ private class TransformBuilderImplementation : TransformBuilder {
         transformations.add { "translate3d($tx, $ty, $tz)" }
     }
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translate3dLengthPercentageLength")
     override fun translate3d(tx: CSSLengthValue, ty: CSSPercentageValue, tz: CSSLengthValue) {
         transformations.add { "translate3d($tx, $ty, $tz)" }
     }
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translate3dPercentageLengthLength")
     override fun translate3d(tx: CSSPercentageValue, ty: CSSLengthValue, tz: CSSLengthValue) {
         transformations.add { "translate3d($tx, $ty, $tz)" }
     }
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translate3dPercentagePercentageLength")
     override fun translate3d(tx: CSSPercentageValue, ty: CSSPercentageValue, tz: CSSLengthValue) {
         transformations.add { "translate3d($tx, $ty, $tz)" }
     }
@@ -176,6 +210,8 @@ private class TransformBuilderImplementation : TransformBuilder {
         transformations.add { "translateX($tx)" }
     }
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translateXPercentage")
     override fun translateX(tx: CSSPercentageValue) {
         transformations.add { "translateX($tx)" }
     }
@@ -184,6 +220,8 @@ private class TransformBuilderImplementation : TransformBuilder {
         transformations.add { "translateY($ty)" }
     }
 
+    @Suppress("INAPPLICABLE_JVM_NAME")
+    @JvmName("translateYPercentage")
     override fun translateY(ty: CSSPercentageValue) {
         transformations.add { "translateY($ty)" }
     }

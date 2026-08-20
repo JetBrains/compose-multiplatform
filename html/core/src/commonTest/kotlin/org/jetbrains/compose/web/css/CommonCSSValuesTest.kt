@@ -27,6 +27,15 @@ class CommonCSSValuesTest {
     }
 
     @Test
+    fun numericOperationsHavePortableCssText() {
+        val first: CSSNumericValue<CSSUnit.px> = 10.px
+        val second: CSSNumericValue<CSSUnit.px> = 5.px
+
+        assertEquals("15px", (10.px + 5.px).toString())
+        assertEquals("calc((10px + 5px) * 2)", ((first + second) * 2).toString())
+    }
+
+    @Test
     fun enumFamiliesHavePortableCssText() {
         val values = listOf<StylePropertyValue>(
             LineStyle.Dashed,

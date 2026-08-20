@@ -5,7 +5,5 @@
 
 package org.jetbrains.compose.web.css
 
-// https://developer.mozilla.org/en-US/docs/Web/CSS/grid-auto-flow
-fun StyleScope.gridAutoFlow(value: GridAutoFlow) {
-    property("grid-auto-flow", value)
-}
+actual external interface CSSCalcOperation<T : CSSUnit> : CSSNumericValue<T>
+

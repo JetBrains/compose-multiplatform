@@ -2,10 +2,6 @@
 
 package org.jetbrains.compose.web.css
 
-interface CSSNamedKeyframes {
-    val name: String
-}
-
 data class CSSKeyframesRuleDeclaration(
     override val name: String,
     val keys: CSSKeyframeRuleDeclarationList

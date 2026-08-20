@@ -114,6 +114,26 @@ class CommonCSSPropertiesTest {
         )
     }
 
+    @Test
+    fun gridPropertiesSerialize() {
+        val style = RecordingStyleScope()
+
+        with(style) {
+            gridColumn(2, "span 3")
+            gridTemplateAreas("header header", "nav main")
+            gap(8.px, 16.px)
+        }
+
+        assertEquals(
+            listOf(
+                "grid-column" to "2 / span 3",
+                "grid-template-areas" to "\"header header\" \"nav main\"",
+                "gap" to "8px 16px",
+            ),
+            style.declarations,
+        )
+    }
+
     private class RecordingStyleScope : StyleScope {
         val declarations = mutableListOf<Pair<String, String>>()
 
