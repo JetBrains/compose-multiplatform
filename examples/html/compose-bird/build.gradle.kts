@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.compose")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.composeMultiplatform)
 }
 group = "com.theapache64.composebird"
 version = "1.0.0-alpha01"
@@ -23,9 +23,9 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(compose.html.core)
-                implementation(compose.runtime)
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
+                implementation(libs.compose.html.core)
+                implementation(libs.compose.runtime)
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
     }
@@ -34,7 +34,7 @@ kotlin {
 // a temporary workaround for a bug in jsRun invocation - see https://youtrack.jetbrains.com/issue/KT-48273
 afterEvaluate {
     rootProject.extensions.configure<NodeJsRootExtension> {
-        versions.webpackDevServer.version = "4.0.0"
-        versions.webpackCli.version = "4.10.0"
+        versions.webpackDevServer.version = libs.versions.webpack.dev.server.get()
+        versions.webpackCli.version = libs.versions.webpack.cli.get()
     }
 }

@@ -15,9 +15,9 @@ dependencyResolutionManagement {
 
     versionCatalogs {
         create("libs") {
-            version("kotlin", extra["kotlin.version"].toString())
-            version("compose", extra["compose.version"].toString())
             version("agp", extra["agp.version"].toString())
+            version("compose-multiplatform", extra["compose.version"].toString())
+            version("kotlin", extra["kotlin.version"].toString())
         }
     }
 }

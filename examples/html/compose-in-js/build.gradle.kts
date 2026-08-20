@@ -1,7 +1,7 @@
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.compose")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.composeMultiplatform)
 }
 
 group = "me.user"
@@ -30,15 +30,14 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(compose.web.core)
-                implementation(compose.runtime)
+                implementation(libs.compose.html.core)
+                implementation(libs.compose.runtime)
             }
         }
         val jsTest by getting {
             dependencies {
-                implementation(kotlin("test-js"))
+                implementation(libs.kotlin.test)
             }
         }
     }
 }
-

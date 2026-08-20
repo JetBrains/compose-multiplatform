@@ -1,9 +1,9 @@
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.compose")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.composeMultiplatform)
 }
 
 repositories {
@@ -21,9 +21,9 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(npm("highlight.js", "10.7.2"))
-                implementation(compose.html.core)
-                implementation(compose.runtime)
+                implementation(npm("highlight.js", libs.versions.highlight.js.get()))
+                implementation(libs.compose.html.core)
+                implementation(libs.compose.runtime)
             }
         }
     }
