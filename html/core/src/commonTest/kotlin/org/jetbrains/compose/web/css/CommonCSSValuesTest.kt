@@ -25,4 +25,46 @@ class CommonCSSValuesTest {
         assertEquals("hsl(90deg, 50%, 25%)", hsl(90, 50, 25).toString())
         assertEquals("hsla(90deg, 50%, 25%, 0.5)", hsla(90, 50, 25, 0.5).toString())
     }
+
+    @Test
+    fun enumFamiliesHavePortableCssText() {
+        val values = listOf<StylePropertyValue>(
+            LineStyle.Dashed,
+            DisplayStyle.Flex,
+            FlexDirection.RowReverse,
+            FlexWrap.Wrap,
+            JustifyContent.SpaceBetween,
+            AlignSelf.Baseline,
+            AlignItems.Stretch,
+            AlignContent.SpaceEvenly,
+            Position.Sticky,
+            StepPosition.JumpEnd,
+            AnimationTimingFunction.EaseInOut,
+            AnimationDirection.Alternate,
+            AnimationFillMode.Forwards,
+            AnimationPlayState.Running,
+            VisibilityStyle.Collapse,
+        )
+
+        assertEquals(
+            listOf(
+                "dashed",
+                "flex",
+                "row-reverse",
+                "wrap",
+                "space-between",
+                "baseline",
+                "stretch",
+                "space-evenly",
+                "sticky",
+                "jump-end",
+                "ease-in-out",
+                "alternate",
+                "forwards",
+                "running",
+                "collapse",
+            ),
+            values.map { it.toString() },
+        )
+    }
 }
