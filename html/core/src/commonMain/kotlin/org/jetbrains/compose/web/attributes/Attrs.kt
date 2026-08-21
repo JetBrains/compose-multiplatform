@@ -9,6 +9,7 @@ import kotlinx.browser.dom.HTMLFormElement
 import kotlinx.browser.dom.HTMLImageElement
 import kotlinx.browser.dom.HTMLInputElement
 import kotlinx.browser.dom.HTMLLabelElement
+import kotlinx.browser.dom.HTMLLinkElement
 import kotlinx.browser.dom.HTMLOptGroupElement
 import kotlinx.browser.dom.HTMLOptionElement
 import kotlinx.browser.dom.HTMLSelectElement
@@ -23,8 +24,16 @@ fun AttrsScope<HTMLAnchorElement>.href(value: String) =
 fun AttrsScope<HTMLAnchorElement>.target(value: ATarget = ATarget.Self) =
     attr("target", value.targetStr)
 
-fun AttrsScope<HTMLAnchorElement>.ref(value: ARel) =
+fun AttrsScope<HTMLAnchorElement>.rel(value: ARel) =
     attr("rel", value.relStr)
+
+@Deprecated(
+    message = "Use `rel` instead.",
+    replaceWith = ReplaceWith("rel(value)", "org.jetbrains.compose.web.attributes.rel"),
+    level = DeprecationLevel.WARNING,
+)
+fun AttrsScope<HTMLAnchorElement>.ref(value: ARel) =
+    rel(value)
 
 fun AttrsScope<HTMLAnchorElement>.ping(value: String) =
     attr("ping", value)
@@ -37,6 +46,15 @@ fun AttrsScope<HTMLAnchorElement>.hreflang(value: String) =
 
 fun AttrsScope<HTMLAnchorElement>.download(value: String = "") =
     attr("download", value)
+
+/* Link attributes */
+
+@JvmName("linkHref")
+fun AttrsScope<HTMLLinkElement>.href(value: String) =
+    attr("href", value)
+
+fun AttrsScope<HTMLLinkElement>.type(value: String) =
+    attr("type", value)
 
 /* Button attributes */
 
