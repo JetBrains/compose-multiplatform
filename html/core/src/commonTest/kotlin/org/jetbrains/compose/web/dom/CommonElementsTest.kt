@@ -1,6 +1,11 @@
 package org.jetbrains.compose.web.dom
 
+import org.jetbrains.compose.web.attributes.ARel
 import org.jetbrains.compose.web.attributes.InputType
+import org.jetbrains.compose.web.attributes.LinkRel
+import org.jetbrains.compose.web.attributes.href
+import org.jetbrains.compose.web.attributes.rel
+import org.jetbrains.compose.web.attributes.type
 import org.jetbrains.compose.web.composeHtmlToString
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -18,8 +23,9 @@ class CommonElementsTest {
                     }
                     Title { Text("Compose HTML") }
                     Link {
-                        attr("rel", "stylesheet")
-                        attr("href", "styles.css")
+                        rel(LinkRel.Alternate, LinkRel.Stylesheet)
+                        href("styles.css")
+                        type("text/css")
                     }
                 }
                 Body {
@@ -36,7 +42,7 @@ class CommonElementsTest {
                 "<meta charset=\"UTF-8\">" +
                 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" +
                 "<title>Compose HTML</title>" +
-                "<link rel=\"stylesheet\" href=\"styles.css\">" +
+                "<link rel=\"alternate stylesheet\" href=\"styles.css\" type=\"text/css\">" +
                 "</head>" +
                 "<body><header><h1>String rendering</h1></header></body>" +
                 "</html>",
@@ -190,7 +196,10 @@ class CommonElementsTest {
     @Test
     fun rendersLinkedImageAndFormElements() {
         val html = composeHtmlToString {
-            A(href = "/docs?part=one&format=html") {
+            A(
+                href = "/docs?part=one&format=html",
+                attrs = { rel(ARel.NoReferrer) },
+            ) {
                 Text("Documentation")
             }
             Img(
@@ -218,7 +227,7 @@ class CommonElementsTest {
         }
 
         assertEquals(
-            "<a href=\"/docs?part=one&amp;format=html\">Documentation</a>" +
+            "<a href=\"/docs?part=one&amp;format=html\" rel=\"noreferrer\">Documentation</a>" +
                 "<img src=\"/images/logo.png\" alt=\"Logo &lt;preview&gt;\">" +
                 "<form action=\"/submit\">" +
                 "<label for=\"choice\">Choose</label>" +

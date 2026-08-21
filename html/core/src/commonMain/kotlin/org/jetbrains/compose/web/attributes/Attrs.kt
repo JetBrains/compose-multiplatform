@@ -53,6 +53,14 @@ fun AttrsScope<HTMLAnchorElement>.download(value: String = "") =
 fun AttrsScope<HTMLLinkElement>.href(value: String) =
     attr("href", value)
 
+fun AttrsScope<HTMLLinkElement>.rel(
+    value: LinkRel,
+    vararg additionalValues: LinkRel,
+) = attr(
+    "rel",
+    listOf(value, *additionalValues).joinToString(" ") { it.relStr },
+)
+
 fun AttrsScope<HTMLLinkElement>.type(value: String) =
     attr("type", value)
 
