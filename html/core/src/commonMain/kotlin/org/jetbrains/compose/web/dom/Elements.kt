@@ -44,6 +44,7 @@ import kotlinx.browser.dom.HTMLPictureElement
 import kotlinx.browser.dom.HTMLPreElement
 import kotlinx.browser.dom.HTMLProgressElement
 import kotlinx.browser.dom.HTMLParamElement
+import kotlinx.browser.dom.HTMLScriptElement
 import kotlinx.browser.dom.HTMLSelectElement
 import kotlinx.browser.dom.HTMLSourceElement
 import kotlinx.browser.dom.HTMLSpanElement
@@ -145,6 +146,20 @@ fun Meta(
 fun Link(
     attrs: AttrBuilderContext<HTMLLinkElement>? = null,
 ) = TagElement<HTMLLinkElement>("link", attrs, content = null)
+
+@Composable
+fun Script(
+    attrs: AttrBuilderContext<HTMLScriptElement>? = null,
+) = TagElement<HTMLScriptElement>("script", attrs, content = null)
+
+/*
+ * TODO: In the future for inline scripts:
+ * @Composable
+ * fun Script(
+ *     code: StringScript,
+ *     attrs: AttrBuilderContext<HTMLScriptElement>? = null,
+ * )
+ */
 
 @Composable
 fun Div(

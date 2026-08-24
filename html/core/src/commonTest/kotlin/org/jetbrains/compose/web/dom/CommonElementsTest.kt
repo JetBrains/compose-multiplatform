@@ -3,8 +3,10 @@ package org.jetbrains.compose.web.dom
 import org.jetbrains.compose.web.attributes.ARel
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.LinkRel
+import org.jetbrains.compose.web.attributes.ScriptType
 import org.jetbrains.compose.web.attributes.href
 import org.jetbrains.compose.web.attributes.rel
+import org.jetbrains.compose.web.attributes.src
 import org.jetbrains.compose.web.attributes.type
 import org.jetbrains.compose.web.composeHtmlToString
 import kotlin.test.Test
@@ -46,6 +48,21 @@ class CommonElementsTest {
                 "</head>" +
                 "<body><header><h1>String rendering</h1></header></body>" +
                 "</html>",
+            html,
+        )
+    }
+
+    @Test
+    fun rendersExternalScript() {
+        val html = composeHtmlToString {
+            Script {
+                src("/app.js")
+                type(ScriptType.Module)
+            }
+        }
+
+        assertEquals(
+            "<script src=\"/app.js\" type=\"module\"></script>",
             html,
         )
     }

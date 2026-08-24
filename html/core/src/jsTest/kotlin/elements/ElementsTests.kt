@@ -10,6 +10,7 @@ import kotlinx.browser.document
 import kotlinx.browser.dom.Element
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.attributes.AttrsScope
+import org.jetbrains.compose.web.attributes.src
 import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.testutils.runTest
 import org.w3c.dom.HTMLElement
@@ -45,6 +46,7 @@ class ElementsTests {
             Pair({ Object() }, "OBJECT"),
             Pair({ Param() }, "PARAM"),
             Pair({ Picture() }, "PICTURE"),
+            Pair({ Script { src("data:text/javascript,") } }, "SCRIPT"),
             Pair({ Source() }, "SOURCE"),
             Pair({ Canvas() }, "CANVAS"),
 

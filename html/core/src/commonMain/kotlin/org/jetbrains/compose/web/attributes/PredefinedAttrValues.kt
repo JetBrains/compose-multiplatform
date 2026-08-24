@@ -131,6 +131,14 @@ sealed class LinkRel(val relStr: String) {
     class CustomLinkRel(value: String) : LinkRel(value)
 }
 
+sealed class ScriptType(val typeStr: String) {
+    object Module : ScriptType("module")
+    object ImportMap : ScriptType("importmap")
+    object SpeculationRules : ScriptType("speculationrules")
+
+    class CustomScriptType(value: String) : ScriptType(value)
+}
+
 enum class Draggable(val str: String) {
     True("true"), False("false"), Auto("auto");
 }

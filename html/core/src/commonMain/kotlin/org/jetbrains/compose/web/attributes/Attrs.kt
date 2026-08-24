@@ -10,6 +10,7 @@ import kotlinx.browser.dom.HTMLImageElement
 import kotlinx.browser.dom.HTMLInputElement
 import kotlinx.browser.dom.HTMLLabelElement
 import kotlinx.browser.dom.HTMLLinkElement
+import kotlinx.browser.dom.HTMLScriptElement
 import kotlinx.browser.dom.HTMLOptGroupElement
 import kotlinx.browser.dom.HTMLOptionElement
 import kotlinx.browser.dom.HTMLSelectElement
@@ -63,6 +64,16 @@ fun AttrsScope<HTMLLinkElement>.rel(
 
 fun AttrsScope<HTMLLinkElement>.type(value: String) =
     attr("type", value)
+
+/* Script attributes */
+
+@JvmName("scriptSrc")
+fun AttrsScope<HTMLScriptElement>.src(value: String) =
+    attr("src", value)
+
+@JvmName("scriptType")
+fun AttrsScope<HTMLScriptElement>.type(value: ScriptType) =
+    attr("type", value.typeStr)
 
 /* Button attributes */
 
