@@ -9,13 +9,18 @@ internal class StringHtmlElementNode private constructor(
     tagName: String?,
     isRoot: Boolean,
 ) : StringHtmlNode {
-    val tagName: String? = if (isRoot) null else requireNotNull(tagName).lowercase()
+    val tagName: String? = if (isRoot) {
+        null
+    } else {
+        requireNotNull(tagName).also(::requireValidHtmlTagName).lowercase()
+    }
     internal val children: MutableList<StringHtmlNode> = mutableListOf()
     private val attributes: MutableMap<String, String> = mutableMapOf()
 
     constructor(tagName: String) : this(tagName, isRoot = false)
 
     fun updateAttributes(attributes: Map<String, String>) {
+        attributes.keys.forEach(::requireValidHtmlAttributeName)
         this.attributes.clear()
         this.attributes.putAll(attributes)
     }
@@ -25,8 +30,6 @@ internal class StringHtmlElementNode private constructor(
     }
 
     override fun appendHtmlTo(builder: StringBuilder) {
-        //TODO validate tag & attribute names
-
         val tagName = tagName
         if (tagName == null) { // root
             children.forEach { it.appendHtmlTo(builder) }
@@ -115,6 +118,30 @@ internal class StringHtmlTextNode(
         builder.appendEscapedText(text)
     }
 }
+
+private fun requireValidHtmlTagName(name: String) {
+    require(
+        name.firstOrNull()?.isAsciiLetter() == true &&
+            name.none { it in AsciiWhitespaceCharacters || it in InvalidHtmlTagNameCharacters }
+    ) {
+        "Invalid HTML tag name: \"$name\""
+    }
+}
+
+private fun requireValidHtmlAttributeName(name: String) {
+    require(
+        name.isNotEmpty() &&
+            name.none { it.isISOControl() || it in InvalidHtmlAttributeNameCharacters }
+    ) {
+        "Invalid HTML attribute name: \"$name\""
+    }
+}
+
+private const val AsciiWhitespaceCharacters = "\t\n\u000C\r "
+private const val InvalidHtmlTagNameCharacters = "\u0000/>"
+private const val InvalidHtmlAttributeNameCharacters = " \"'/>="
+
+private fun Char.isAsciiLetter(): Boolean = this in 'A'..'Z' || this in 'a'..'z'
 
 private fun StringBuilder.appendEscapedAttribute(value: String) {
     value.forEach { character ->

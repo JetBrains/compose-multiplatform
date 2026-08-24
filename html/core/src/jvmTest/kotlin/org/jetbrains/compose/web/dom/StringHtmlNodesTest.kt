@@ -2,8 +2,48 @@ package org.jetbrains.compose.web.dom
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class StringHtmlNodesTest {
+    @Test
+    fun rejectsInvalidTagNames() {
+        val invalidNames = listOf(
+            "",
+            "1div",
+            "div id",
+            "div/",
+            "div>",
+            "div\u0000",
+        )
+
+        invalidNames.forEach { name ->
+            assertFailsWith<IllegalArgumentException>(name) {
+                StringHtmlElementNode(name)
+            }
+        }
+    }
+
+    @Test
+    fun rejectsInvalidAttributeNames() {
+        val invalidNames = listOf(
+            "",
+            "data value",
+            "data\u0001value",
+            "data\"value",
+            "data'value",
+            "data/value",
+            "data=value",
+            "data>value",
+            "data\u007Fvalue",
+        )
+
+        invalidNames.forEach { name ->
+            assertFailsWith<IllegalArgumentException>(name) {
+                StringHtmlElementNode("div").updateAttributes(mapOf(name to "value"))
+            }
+        }
+    }
+
     @Test
     fun serializesNestedNodesAndRootSiblings() {
         val root = StringHtmlElementNode.root()
