@@ -2,7 +2,9 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import kotlinx.browser.dom.Element
+import kotlinx.browser.dom.HTMLStyleElement
 import org.jetbrains.compose.web.attributes.AttrsScope
+import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 
 internal actual val DefaultComposeHtmlContext: ComposeHtmlContext = object : ComposeHtmlContext {
     override val supportsDomElementAccess: Boolean = false
@@ -21,6 +23,14 @@ internal actual val DefaultComposeHtmlContext: ComposeHtmlContext = object : Com
 
     @Composable
     override fun TextElement(value: String) {
+        error("HTML rendering implementation is not provided")
+    }
+
+    @Composable
+    override fun StyleElement(
+        applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)?,
+        cssRules: CSSRuleDeclarationList,
+    ) {
         error("HTML rendering implementation is not provided")
     }
 }

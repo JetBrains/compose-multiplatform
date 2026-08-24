@@ -47,6 +47,7 @@ import kotlinx.browser.dom.HTMLParamElement
 import kotlinx.browser.dom.HTMLSelectElement
 import kotlinx.browser.dom.HTMLSourceElement
 import kotlinx.browser.dom.HTMLSpanElement
+import kotlinx.browser.dom.HTMLStyleElement
 import kotlinx.browser.dom.HTMLTableCaptionElement
 import kotlinx.browser.dom.HTMLTableCellElement
 import kotlinx.browser.dom.HTMLTableColElement
@@ -74,10 +75,42 @@ import org.jetbrains.compose.web.attributes.builders.DisposeRadioGroupEffect
 import org.jetbrains.compose.web.attributes.builders.restoreControlledInputState
 import org.jetbrains.compose.web.attributes.builders.restoreControlledTextAreaState
 import org.jetbrains.compose.web.attributes.builders.TextAreaAttrsScope
+import org.jetbrains.compose.web.css.CSSRuleDeclarationList
+import org.jetbrains.compose.web.css.StyleSheetBuilder
+import org.jetbrains.compose.web.css.StyleSheetBuilderImpl
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 typealias AttrBuilderContext<T> = AttrsScope<T>.() -> Unit
 typealias ContentBuilder<T> = @Composable ElementScope<T>.() -> Unit
+
+/**
+ * Use this function to mount the <style> tag into the rendered HTML.
+ *
+ * @param cssRules a list of style rules, usually from an
+ * [org.jetbrains.compose.web.css.StyleSheet] instance.
+ */
+@Composable
+fun Style(
+    applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)? = null,
+    cssRules: CSSRuleDeclarationList,
+) {
+    LocalComposeHtmlContext.current.StyleElement(applyAttrs, cssRules)
+}
+
+/**
+ * Use this function to mount the <style> tag into the rendered HTML.
+ *
+ * @param rulesBuild allows style rules to be defined using [StyleSheetBuilder].
+ */
+@Composable
+inline fun Style(
+    noinline applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)? = null,
+    rulesBuild: StyleSheetBuilder.() -> Unit,
+) {
+    val builder = StyleSheetBuilderImpl()
+    builder.rulesBuild()
+    Style(applyAttrs, builder.cssRules)
+}
 
 @Composable
 fun Html(

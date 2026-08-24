@@ -27,6 +27,7 @@ class StyleTest {
         }
         val element = root.firstChild
         assertTrue(element is HTMLStyleElement)
+        assertEquals(0, element.childNodes.length)
         val sheet = element.sheet
         assertTrue(sheet is CSSStyleSheet)
         assertEquals("""body { background-color: green; }""", sheet.cssRules.asList().single().cssText)

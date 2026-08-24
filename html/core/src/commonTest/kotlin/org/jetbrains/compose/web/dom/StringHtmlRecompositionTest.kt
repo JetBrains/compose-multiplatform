@@ -7,6 +7,8 @@ import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.Dispatchers
+import org.jetbrains.compose.web.css.Color
+import org.jetbrains.compose.web.css.color
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
@@ -65,6 +67,31 @@ class StringHtmlRecompositionTest {
         listOf(0, 3, 4, 1, 2).forEachIndexed { recomposedIndex, initialIndex ->
             assertSame(initialNodes[initialIndex], recomposedNodes[recomposedIndex])
         }
+    }
+
+    @Test
+    fun updatesSerializedStyleRules() = withStringComposition { composition ->
+        val ruleColor = mutableStateOf(Color.red)
+        composition.setContent {
+            Style {
+                "body" style {
+                    color(ruleColor.value)
+                }
+            }
+        }
+
+        assertEquals(
+            "<style>body { color: red;}</style>",
+            composition.toHtmlString(),
+        )
+
+        ruleColor.value = Color.green
+        composition.recomposeAfter(ruleColor)
+
+        assertEquals(
+            "<style>body { color: green;}</style>",
+            composition.toHtmlString(),
+        )
     }
 }
 

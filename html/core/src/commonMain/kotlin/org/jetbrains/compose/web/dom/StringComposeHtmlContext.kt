@@ -7,9 +7,12 @@ import androidx.compose.runtime.SkippableUpdater
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
 import kotlinx.browser.dom.Element
+import kotlinx.browser.dom.HTMLStyleElement
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
+import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StylePropertyDeclaration
+import org.jetbrains.compose.web.css.utils.serializeRules
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 internal object StringComposeHtmlContext : ComposeHtmlContext {
@@ -66,6 +69,46 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
             scope = Unit,
             content = {},
         )
+    }
+
+    @Composable
+    override fun StyleElement(
+        applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)?,
+        cssRules: CSSRuleDeclarationList,
+    ) {
+        TagElement<HTMLStyleElement>(
+            elementBuilder = elementBuilder("style"),
+            applyAttrs = applyAttrs,
+            content = {
+                StyleCssText(cssRules.serializeRules().joinToString("\n"))
+            },
+        )
+    }
+}
+
+@Composable
+private fun StyleCssText(cssText: String) {
+    ComposeStringNode(
+        factory = {
+            StringHtmlNodeWrapper(StringHtmlCssTextNode(cssText))
+        },
+        update = {
+            update {
+                set(cssText) { value ->
+                    (node as StringHtmlCssTextNode).cssText = value
+                }
+            }
+        },
+        scope = Unit,
+        content = {},
+    )
+}
+
+private class StringHtmlCssTextNode(
+    var cssText: String,
+) : StringHtmlNode {
+    override fun appendHtmlTo(builder: StringBuilder) {
+        builder.append(cssText)
     }
 }
 

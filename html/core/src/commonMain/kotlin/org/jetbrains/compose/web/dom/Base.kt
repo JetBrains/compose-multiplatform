@@ -4,7 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.browser.dom.Element
+import kotlinx.browser.dom.HTMLStyleElement
 import org.jetbrains.compose.web.attributes.AttrsScope
+import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 
 
 internal interface ComposeHtmlContext {
@@ -21,6 +23,12 @@ internal interface ComposeHtmlContext {
 
     @Composable
     fun TextElement(value: String)
+
+    @Composable
+    fun StyleElement(
+        applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)?,
+        cssRules: CSSRuleDeclarationList,
+    )
 }
 
 // Define default per platform, e.g. [BrowserComposeHtmlContext] for web

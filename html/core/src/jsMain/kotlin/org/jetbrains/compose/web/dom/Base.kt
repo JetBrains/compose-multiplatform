@@ -3,8 +3,10 @@ package org.jetbrains.compose.web.dom
 import androidx.compose.runtime.*
 import kotlinx.browser.document
 import kotlinx.browser.dom.Element
+import kotlinx.browser.dom.HTMLStyleElement
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
+import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleHolder
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.jetbrains.compose.web.internal.runtime.DomApplier
@@ -13,6 +15,7 @@ import org.jetbrains.compose.web.internal.runtime.NamedEventListener
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Text
 import org.w3c.dom.css.ElementCSSInlineStyle
+import org.w3c.dom.css.CSSStyleSheet
 import org.w3c.dom.svg.SVGElement
 
 @Composable
@@ -165,5 +168,24 @@ private object BrowserComposeHtmlContext : ComposeHtmlContext {
                 set(value) { newValue -> (node as Text).data = newValue }
             },
         )
+    }
+
+    @Composable
+    override fun StyleElement(
+        applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)?,
+        cssRules: CSSRuleDeclarationList,
+    ) {
+        TagElement(
+            elementBuilder = elementBuilder("style"),
+            applyAttrs = applyAttrs,
+        ) {
+            DisposableEffect(cssRules, cssRules.size) {
+                val cssStylesheet = scopeElement.sheet as? CSSStyleSheet
+                cssStylesheet?.setCSSRules(cssRules)
+                onDispose {
+                    cssStylesheet?.clearCSSRules()
+                }
+            }
+        }
     }
 }
