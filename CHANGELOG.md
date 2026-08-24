@@ -23,7 +23,6 @@ _Changes since 1.11.1_
 
 ### Multiple Platforms
 
-- Update Skia to m148 [#3028](https://github.com/JetBrains/compose-multiplatform-core/pull/3028)
 - Add `blockPointerInputOutside` flag to `PopupProperties` to support not-blocking pointer inputs outside of focusable `Popup`s [#2992](https://github.com/JetBrains/compose-multiplatform-core/pull/2992)
 - Support `LayerOutsets` to `GraphicsLayer` & `Modifier.graphicsLayer` which can be used to increase the visual bounds of the layer beyond its measured size. This can be used to avoid the implicit `clipToBounds` behavior when the layer is promoted to an offscreen buffer [#3144](https://github.com/JetBrains/compose-multiplatform-core/pull/3144)
 - Support `MeshGradientPainter` in `Modifier.paint` [#3143](https://github.com/JetBrains/compose-multiplatform-core/pull/3143)
