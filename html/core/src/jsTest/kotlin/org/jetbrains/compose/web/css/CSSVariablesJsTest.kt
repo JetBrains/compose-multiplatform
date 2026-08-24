@@ -5,16 +5,17 @@
 
 package org.jetbrains.compose.web.css
 
+import kotlin.js.jsTypeOf
 import kotlin.test.Test
-import kotlin.test.assertFalse
+import kotlin.test.assertEquals
 
-class CSSVariablesJvmTest {
+class CSSVariablesJsTest {
     @Test
-    fun variableReferencesUseTheJvmCarrier() {
+    fun variableReferencesUseRawJsStrings() {
         val stringValue = StylePropertyValue("text")
         val numericReference: CSSNumeric = CSSStyleVariable<CSSUnitValue>("spacing").value()
 
-        assertFalse(stringValue is CSSNumericValue<*>)
-        assertFalse(numericReference is CSSSizeValue<*>)
+        assertEquals("string", jsTypeOf(stringValue))
+        assertEquals("string", jsTypeOf(numericReference))
     }
 }
