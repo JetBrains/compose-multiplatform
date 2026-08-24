@@ -2,6 +2,7 @@
 
 package org.jetbrains.compose.web.css
 
+@Suppress("EXPECT_ACTUAL_INCOMPATIBLE_SUPERTYPES", "EXPECT_ACTUAL_IR_INCOMPATIBILITY")
 expect interface CSSColorValue : StylePropertyValue, CSSVariableValueAs<CSSColorValue>
 
 object Color {

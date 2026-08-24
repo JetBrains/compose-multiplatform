@@ -5,6 +5,8 @@
 
 package org.jetbrains.compose.web.css
 
+import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
+
 actual interface StylePropertyValue
 
 actual interface StylePropertyNumber : StylePropertyValue
@@ -37,6 +39,33 @@ private value class JvmCSSStyleValue(
     override fun toString(): String = value
 }
 
+// JVM references must actually implement every marker type they can be returned as.
+// CSSSizeValue is intentionally excluded because a var() reference has no value or unit members.
+@JvmInline
+private value class JvmCSSVariableReference(
+    private val value: String,
+) : CSSNumericValue<CSSUnit>,
+    LineStyle,
+    DisplayStyle,
+    FlexDirection,
+    FlexWrap,
+    JustifyContent,
+    AlignSelf,
+    AlignItems,
+    AlignContent,
+    Position,
+    StepPosition,
+    AnimationTimingFunction,
+    AnimationDirection,
+    AnimationFillMode,
+    AnimationPlayState,
+    GridAutoFlow,
+    VisibilityStyle,
+    StylePropertyNumber,
+    CSSAutoKeyword {
+    override fun toString(): String = value
+}
+
 @PublishedApi
 internal actual fun createStylePropertyString(value: String): StylePropertyString =
     JvmStylePropertyString(value)
@@ -44,6 +73,9 @@ internal actual fun createStylePropertyString(value: String): StylePropertyStrin
 @PublishedApi
 internal actual fun createStylePropertyNumber(value: Number): StylePropertyNumber =
     JvmStylePropertyNumber(value)
+
+internal actual fun createCSSVariableReference(cssText: String): StylePropertyValue =
+    JvmCSSVariableReference(cssText)
 
 @PublishedApi
 internal actual fun createCSSStyleValue(value: String): CSSStyleValue =

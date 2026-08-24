@@ -5,7 +5,7 @@
 
 package org.jetbrains.compose.web.css
 
-import kotlin.js.unsafeCast
+import org.jetbrains.compose.web.internal.unsafeCast
 
 actual external interface StylePropertyValue
 
@@ -25,6 +25,9 @@ internal actual fun createStylePropertyString(value: String): StylePropertyStrin
 @PublishedApi
 internal actual fun createStylePropertyNumber(value: Number): StylePropertyNumber =
     value.unsafeCast<StylePropertyNumber>()
+
+internal actual fun createCSSVariableReference(cssText: String): StylePropertyValue =
+    cssText.unsafeCast<StylePropertyValue>()
 
 @PublishedApi
 internal actual fun createCSSStyleValue(value: String): CSSStyleValue =

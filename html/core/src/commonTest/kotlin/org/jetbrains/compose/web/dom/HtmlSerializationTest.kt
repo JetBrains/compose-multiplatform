@@ -128,7 +128,7 @@ class HtmlSerializationTest {
                     property("color", "red")
                     property("display", "block", important = true)
                     property("color", "blue")
-                    variable("--accent", "orange")
+                    variable("accent", "orange")
                 }
             })
             Div({

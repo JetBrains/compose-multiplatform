@@ -5,8 +5,7 @@
 
 package org.jetbrains.compose.web.css
 
-// JVM colors reuse the existing string carrier, which also lets variable references satisfy this type.
 @Suppress("EXPECT_ACTUAL_INCOMPATIBLE_SUPERTYPES")
-actual typealias CSSColorValue = StylePropertyString
+internal actual typealias TestCSSFilterValue = StylePropertyValue
 
-internal actual fun createCSSColorValue(value: String): CSSColorValue = createStylePropertyString(value)
+internal actual fun TestCSSFilterValue(value: String): TestCSSFilterValue = StylePropertyValue(value)

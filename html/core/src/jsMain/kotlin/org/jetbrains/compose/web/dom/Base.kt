@@ -74,7 +74,7 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
                 }
 
                 styleApplier.variables.forEach { (name, value) ->
-                    style.setProperty(name, value.toString())
+                    setVariable(style, name, value)
                 }
             }
         }

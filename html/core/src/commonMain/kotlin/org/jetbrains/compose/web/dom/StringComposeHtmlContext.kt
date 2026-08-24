@@ -104,7 +104,9 @@ private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes():
         }
 
         if ("style" !in this) {
-            val declarations = styleScope.properties + styleScope.variables
+            val declarations = styleScope.properties + styleScope.variables.map { declaration ->
+                declaration.copy(name = "--${declaration.name}")
+            }
             if (declarations.isNotEmpty()) {
                 //make sure that later declarations replace earlier ones
                 val declarationsByName = mutableMapOf<String, StylePropertyDeclaration>()

@@ -114,20 +114,14 @@ class CSSStyleVariable<out TValue : StylePropertyValue>(override val name: Strin
 
 fun <TValue : StylePropertyValue> CSSStyleVariable<TValue>.value(fallback: TValue? = null) =
     CSSVariableValue<TValue>(
-        variableValue(
-            name,
-            fallback
-        )
+        createCSSVariableReference(variableValue(name, fallback))
     )
 
 fun <TValue> CSSStyleVariable<TValue>.value(fallback: TValue? = null)
         where TValue : CSSVariableValueAs<TValue>,
               TValue : StylePropertyValue =
     CSSVariableValue<TValue>(
-        variableValue(
-            name,
-            fallback
-        )
+        createCSSVariableReference(variableValue(name, fallback))
     )
 
 /**

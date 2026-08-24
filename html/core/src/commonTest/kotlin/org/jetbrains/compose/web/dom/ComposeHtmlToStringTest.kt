@@ -2,6 +2,7 @@ package org.jetbrains.compose.web.dom
 
 import org.jetbrains.compose.web.composeHtmlToString
 import org.jetbrains.compose.web.css.Color
+import org.jetbrains.compose.web.css.CSSUnitValue
 import org.jetbrains.compose.web.css.DisplayStyle
 import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.css.display
@@ -13,6 +14,8 @@ import org.jetbrains.compose.web.css.padding
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
 import org.jetbrains.compose.web.css.width
+import org.jetbrains.compose.web.css.value
+import org.jetbrains.compose.web.css.variable
 import org.jetbrains.compose.web.css.keywords.auto
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -97,5 +100,26 @@ class ComposeHtmlToStringTest {
                 "padding: 8px 16px; margin: 4px 8px 12px 16px\"></div>",
             html,
         )
+    }
+
+    @Test
+    fun rendersCssVariableAssignmentsAndReferences() {
+        val html = composeHtmlToString {
+            Div({
+                style {
+                    InlineVariables.spacing(16.px)
+                    width(InlineVariables.spacing.value(8.px))
+                }
+            })
+        }
+
+        assertEquals(
+            "<div style=\"width: var(--spacing, 8px); --spacing: 16px\"></div>",
+            html,
+        )
+    }
+
+    private object InlineVariables {
+        val spacing by variable<CSSUnitValue>()
     }
 }
