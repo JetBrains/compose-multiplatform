@@ -54,7 +54,7 @@ internal fun jvmDictionariesFile(
 
 // JVM class and member specs.
 
-/** Emits a JVM actual, applying specialized members before shared inheritance and constructors. */
+/** Emits a JVM actual with the shared stub members, inheritance, and constructors. */
 private fun PortableClass.jvmType(
     values: JvmStubValues,
     constants: JvmConstantValues,
@@ -73,10 +73,8 @@ private fun PortableClass.jvmType(
             properties.forEach { addProperty(if (isDictionary) it.jvmAbstractSpec() else it.jvmInterfaceSpec(values)) }
             functions.forEach { addFunction(it.jvmAbstractSpec(values)) }
         } else {
-            if (!addJvmCssStyleDeclarationMembers(this@jvmType, values)) {
-                properties.forEach { addProperty(it.jvmSpec(values)) }
-                functions.forEach { addFunction(it.jvmSpec(this@jvmType, values)) }
-            }
+            properties.forEach { addProperty(it.jvmSpec(values)) }
+            functions.forEach { addFunction(it.jvmSpec(this@jvmType, values)) }
             addJvmInterfaceMembers(this@jvmType, values)
             addJvmConstructors(this@jvmType, values)
         }
@@ -127,7 +125,7 @@ internal fun TypeSpec.Builder.addJvmStoredMembers(
         mixin.properties.forEach { property ->
             if (keys.add(property.key())) {
                 val inherited = property.substituteTypes(substitutions)
-                addProperty(inherited.jvmStoredSpec(owner, values))
+                addProperty(inherited.jvmOverrideSpec(values))
             }
         }
         mixin.functions.forEach { function ->
@@ -202,7 +200,7 @@ private fun PortableClass.jvmStoredParameters(
     }
 }
 
-internal fun jvmActualModifiers(overrides: Boolean, open: Boolean): List<KModifier> = when {
+private fun jvmActualModifiers(overrides: Boolean, open: Boolean): List<KModifier> = when {
     overrides -> listOf(KModifier.ACTUAL, KModifier.OVERRIDE)
     open -> listOf(KModifier.ACTUAL, KModifier.OPEN)
     else -> listOf(KModifier.ACTUAL)
