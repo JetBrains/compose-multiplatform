@@ -72,7 +72,7 @@ _Changes since 1.11.1_
 - Fix issue where `BasicTextField` reported inconsistent changes between Android and iOS [#2990](https://github.com/JetBrains/compose-multiplatform-core/pull/2990)
 - Fix issue where a `BasicTextField` with `InputTransformation` may use the incorrect internal text state [#2990](https://github.com/JetBrains/compose-multiplatform-core/pull/2990)
 - Fix elements selection with Full Keyboard Access [#3038](https://github.com/JetBrains/compose-multiplatform-core/pull/3038)
-- Fix application build when using old Xcode 16 SDK [#3054](https://github.com/JetBrains/compose-multiplatform-core/pull/3054)
+- Fix application build when using old Xcode 16 SDK [#3278](https://github.com/JetBrains/compose-multiplatform-core/pull/3278)
 - Fix an issue where the Compose does not receive key events when initially created [#3066](https://github.com/JetBrains/compose-multiplatform-core/pull/3066)
 - Fix issue when `BasicTextField` does not show context menu after long press [#3080](https://github.com/JetBrains/compose-multiplatform-core/pull/3080)
 - Fix symbols duplication on keyboard paste hotkeys [#3067](https://github.com/JetBrains/compose-multiplatform-core/pull/3067)
@@ -98,13 +98,10 @@ _Changes since 1.11.1_
 - Fixed popups/dialogs staying on top of other windows with `compose.layers.type=WINDOW` [#3153](https://github.com/JetBrains/compose-multiplatform-core/pull/3153)
 - On Windows and macOS, `isSystemInDarkTheme` will now return dynamic values as the OS theme changes, causing any callers to recompose. This is done by polling the system in the background once a second. This behavior can be controlled by setting `ComposeUiFlags.pollSystemTheme` [#3063](https://github.com/JetBrains/compose-multiplatform-core/pull/3063)
 - Fix crash when starting a selection beyond the last text in a SelectionContainer [#3270](https://github.com/JetBrains/compose-multiplatform-core/pull/3270)
-- _(prerelase fix)_ Reverted `background` parameter of `SwingPanel` to non-nullable to avoid breaking binary compatibility [#3296](https://github.com/JetBrains/compose-multiplatform-core/pull/3296)
-- _(prelease fix)_ Fix "Desktop release build fails with VerifyError: Bad return type" [#5652](https://github.com/JetBrains/compose-multiplatform/pull/5652)
 
 ### Web
 
 - Fixed pointer state remaining active when the browser cancels a pointer via `pointercancel` (system gestures, palm rejection, device disconnect, etc.) [#3036](https://github.com/JetBrains/compose-multiplatform-core/pull/3036)
-- Fix cursor control using spacebar sliding gesture in Firefox mobile [#3083](https://github.com/JetBrains/compose-multiplatform-core/pull/3083)
 - Added precise trackpad gesture detection in Chrome via heuristic methods [#3123](https://github.com/JetBrains/compose-multiplatform-core/pull/3123)
 - Deliver both scroll axes in wheel events (fix diagonal scroll) [#3147](https://github.com/JetBrains/compose-multiplatform-core/pull/3147)
 - Web: retry loading fallback fonts in case of network errors [#3152](https://github.com/JetBrains/compose-multiplatform-core/pull/3152)
@@ -117,10 +114,7 @@ _Changes since 1.11.1_
 ### Resources
 
 - Fix an issue when resource loading might be cancelled and UI became empty [#5617](https://github.com/JetBrains/compose-multiplatform/pull/5617)
--  [#5582](https://github.com/JetBrains/compose-multiplatform/pull/5582)
 - Support BCP 47 script (`values-b+sr+Latn`, `values-b+zh+Hans`) and numeric region (`values-b+es+419`) qualifiers, including multi-segment locales and trailing theme/density qualifiers, in `commonMain` resource folders [#5582](https://github.com/JetBrains/compose-multiplatform/pull/5582)
-
-  > Authored with AI assistance, reviewed and tested manually before submitting.
 - Web: fixed a app crash when a resource fetch is failed [#5627](https://github.com/JetBrains/compose-multiplatform/pull/5627)
 
 ### Gradle Plugin
