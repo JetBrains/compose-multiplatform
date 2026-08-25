@@ -91,6 +91,75 @@ class RuntimeLibrariesCompatibilityCheckTest : GradlePluginTestBase() {
         checkMainTargetsCompatibility(logMsg, warningExpected = false, disabled = true)
     }
 
+    @Test
+    fun excludedLibrariesAreNotChecked(): Unit = with(
+        testProject("misc/compatibilityLibCheck")
+    ) {
+        val logMsg = "w: Skiko dependencies' versions are incompatible."
+        file("build.gradle.kts").modify {
+            it.replace(
+                "api(\"org.jetbrains.compose.foundation:foundation:${defaultTestEnvironment.composeVersion}\")",
+                "api(\"org.jetbrains.compose.foundation:foundation:${defaultTestEnvironment.composeVersion}\")\n" +
+                        "            implementation(\"$OLD_SKIKO_DEPENDENCY\")",
+            )
+        }
+        checkJvmMainCompatibility(logMsg, warningExpected = true)
+
+        configureCompatibilityCheck(excludes = arrayOf("org.example.unrelated", "org.jetbrains.skiko:other"))
+        checkJvmMainCompatibility(logMsg, warningExpected = true)
+
+        configureCompatibilityCheck(excludes = arrayOf("org.jetbrains.skiko:skiko"))
+        checkJvmMainCompatibility(logMsg, warningExpected = false)
+
+        configureCompatibilityCheck(excludes = arrayOf("org.jetbrains.skiko"))
+        checkJvmMainCompatibility(logMsg, warningExpected = false)
+
+        configureCompatibilityCheck(enabled = false)
+        checkJvmMainCompatibility(logMsg, warningExpected = false, skipped = true)
+    }
+
+    @Test
+    fun invalidExclusionNotationFailsTheBuild(): Unit = with(
+        testProject("misc/compatibilityLibCheck")
+    ) {
+        configureCompatibilityCheck(excludes = arrayOf("org.jetbrains.skiko:skiko:0.8.4"))
+        gradleFailure("jvmMainClasses").checks {
+            check.logContains("Invalid library notation 'org.jetbrains.skiko:skiko:0.8.4'")
+        }
+    }
+
+    private fun TestProject.configureCompatibilityCheck(
+        enabled: Boolean? = null,
+        excludes: Array<String> = emptyArray(),
+    ) {
+        val marker = "// compatibility check configuration"
+        val configuration = buildString {
+            appendLine(marker)
+            appendLine("compose {")
+            appendLine("    dependencyCompatibility {")
+            if (enabled != null) appendLine("        enabled.set($enabled)")
+            excludes.forEach { appendLine("        exclude(\"$it\")") }
+            appendLine("    }")
+            appendLine("}")
+        }
+        file("build.gradle.kts").modify { it.substringBefore(marker) + configuration }
+    }
+
+    private fun TestProject.checkJvmMainCompatibility(
+        warningMessage: String,
+        warningExpected: Boolean,
+        skipped: Boolean = false,
+    ) {
+        gradle("jvmMainClasses").checks {
+            if (skipped) {
+                check.taskSkipped(":checkJvmMainComposeLibrariesCompatibility")
+            } else {
+                check.taskSuccessful(":checkJvmMainComposeLibrariesCompatibility")
+            }
+            if (warningExpected) check.logContains(warningMessage) else check.logDoesntContain(warningMessage)
+        }
+    }
+
     private fun TestProject.checkMainTargetsCompatibility(
         warningMessage: String,
         warningExpected: Boolean,
