@@ -1,1 +1,1 @@
-prototype.dom.generator.PortableDomProcessorProvider
+org.jetbrains.compose.web.browser.generator.PortableDomProcessorProvider

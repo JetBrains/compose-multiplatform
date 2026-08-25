@@ -5,10 +5,11 @@ Common code receives portable `expect` declarations, web targets keep browser id
 typealiases, and the JVM receives stubs.
 
 The generator resolves
-`org.jetbrains.kotlinx:kotlinx-browser:0.5.0:sources`, unpacks its `webMain` sources under the
+`org.jetbrains.kotlinx:kotlinx-browser:<version>:sources`, unpacks its `webMain` sources under the
 generator runner's `build/`, and feeds the source set to KSP. Fresh output is staged
 under `generator/runner/build/generated/kotlinxBrowserCommonSubset`. Reviewed source output is
-checked in under `src/` so the library's normal build does not run KSP or require the sources JAR.
+checked in under `src/`, so compiling the library does not run KSP or require the sources JAR.
+Generator checks and tests do run KSP and resolve the pinned sources artifact.
 
 ## How generation works
 
@@ -66,7 +67,6 @@ normally instead and preserves the inheritance edge.
 | `jsMain` | Browser facade typealiases and bridges, plus JS interop implementations |
 | `wasmJsMain` | Browser facade typealiases and bridges, plus Wasm/JS interop implementations |
 | `jvmMain` | Inert but type-correct stubs, stateful dictionaries, constants, and enum-like values |
-| `jsTest`, `wasmJsTest` | Hand-written leaf browser tests proving facade identity and runtime calls |
 
 The JVM output is a compatibility stub, not a DOM implementation.
 
@@ -87,7 +87,7 @@ parameters are always explicit. Browser `definedExternally` defaults cannot be c
 the common wrapper contract because common code must also compile for the JVM.
 
 Option dictionaries keep mutable properties and inheritance. Their factories use portable inert
-defaults
+defaults.
 
 KSP exposes numeric companion constant names and types but not their initializer expressions. JVM
 actuals therefore receive deterministic inert values derived only from the selected source model.
@@ -116,13 +116,12 @@ declarations or stale exclusions, and `GeneratedApiManifestTest` fails when gene
 from the checked-in baseline.
 
 [`dom-api-exclusions.txt`](generator/src/main/resources/dom-api-exclusions.txt) is reserved for
-specific declaration-level decisions that cannot be expressed by classifier selection. Prefer a
-computed coverage reason or selection-policy decision when either accurately describes the omission.
+specific declaration-level decisions that cannot be expressed by classifier selection.
 
 ## Run
 
-
-Generate staged output without changing checked-in sources:
+Run all commands in this section from the repository's `html/` directory, which contains the Gradle
+wrapper. Generate staged output without changing checked-in sources:
 
 ```shell
 ./gradlew generateKotlinxBrowserCommonSubset

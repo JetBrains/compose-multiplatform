@@ -5,7 +5,7 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
-val kotlinxBrowserVersion = "0.5.0"
+val kotlinxBrowserVersion = providers.gradleProperty("kotlinx.browser.version").get()
 val browserSources by configurations.creating {
     isCanBeConsumed = false
     isCanBeResolved = true

@@ -3,7 +3,7 @@
 # Every top-level classifier in an `input` file is emitted by default. The remaining directives are
 # the complete set of exceptions to that rule:
 #
-# - `defer <reason>` leaves a classifier and its declarations for later adaptation.
+# - `defer <reason> <classifier>` leaves a classifier and its declarations for later adaptation.
 # - `signature-only-package` allows bare signature identities and normally emitted supertypes without
 #   making the whole package an input.
 #

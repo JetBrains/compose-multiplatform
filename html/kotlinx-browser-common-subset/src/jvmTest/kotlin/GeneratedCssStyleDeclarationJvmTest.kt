@@ -1,3 +1,8 @@
+/*
+ * Copyright 2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 // Verifies the remaining CSS API behavior on the JVM facade target.
 package kotlinx.browser.dom.css.surfaces
 

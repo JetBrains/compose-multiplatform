@@ -1,7 +1,10 @@
+@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+
 plugins {
     kotlin("multiplatform")
 }
 
+val kotlinxBrowserVersion = providers.gradleProperty("kotlinx.browser.version").get()
 val generatedSubset = project(":runner").layout.buildDirectory.dir(
     "generated/kotlinxBrowserCommonSubset",
 )
@@ -33,7 +36,7 @@ kotlin {
         }
         val webMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-browser:0.5.0")
+                api("org.jetbrains.kotlinx:kotlinx-browser:$kotlinxBrowserVersion")
             }
         }
         val jsMain by getting {

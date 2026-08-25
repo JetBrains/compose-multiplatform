@@ -1,13 +1,21 @@
 @file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
+import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.testing.Test
 import org.jetbrains.compose.gradle.standardConf
+import java.util.Properties
 
 plugins {
     kotlin("multiplatform")
 }
 
 val browserIdentityTestSources = layout.projectDirectory.dir("src/browserIdentityTest/kotlin")
+val generatorProperties = Properties().apply {
+    layout.projectDirectory.file("generator/gradle.properties").asFile.inputStream().use(::load)
+}
+val kotlinxBrowserVersion = requireNotNull(generatorProperties.getProperty("kotlinx.browser.version")) {
+    "kotlinx.browser.version is missing from generator/gradle.properties"
+}
 
 kotlin {
     compilerOptions {
@@ -45,7 +53,7 @@ kotlin {
     sourceSets {
         val webMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-browser:0.5.0")
+                api("org.jetbrains.kotlinx:kotlinx-browser:$kotlinxBrowserVersion")
             }
         }
         val commonTest by getting {
@@ -92,4 +100,15 @@ tasks.withType<Test>().configureEach {
 
 tasks.named("check") {
     dependsOn(checkSubset, checkGenerator)
+}
+
+publishing {
+    publications.withType<MavenPublication>().configureEach {
+        pom {
+            name.set("Compose HTML common kotlinx-browser subset")
+            description.set(
+                "Common browser types for Compose HTML common, JavaScript, WebAssembly, and JVM source sets.",
+            )
+        }
+    }
 }
