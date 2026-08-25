@@ -1,8 +1,11 @@
 package org.jetbrains.compose.web.dom
 
+// HTML parsing merges adjacent non-empty text nodes. This comment preserves their boundary.
+internal const val HydrationTextBoundaryMarker = "c"
+
 // in-memory equivalent of DOM node
 internal sealed interface StringHtmlNode {
-    fun appendHtmlTo(builder: StringBuilder)
+    fun appendHtmlTo(builder: StringBuilder, hydratable: Boolean)
 }
 
 internal class StringHtmlElementNode private constructor(
@@ -25,14 +28,14 @@ internal class StringHtmlElementNode private constructor(
         this.attributes.putAll(attributes)
     }
 
-    fun toHtmlString(): String = buildString {
-        appendHtmlTo(this)
+    fun toHtmlString(hydratable: Boolean = true): String = buildString {
+        appendHtmlTo(this, hydratable)
     }
 
-    override fun appendHtmlTo(builder: StringBuilder) {
+    override fun appendHtmlTo(builder: StringBuilder, hydratable: Boolean) {
         val tagName = tagName
         if (tagName == null) { // root
-            children.forEach { it.appendHtmlTo(builder) }
+            appendChildrenHtmlTo(builder, hydratable)
             return
         }
 
@@ -50,8 +53,25 @@ internal class StringHtmlElementNode private constructor(
         // HTML void elements have neither content nor an end tag.
         if (tagName in VoidElementNames) return
 
-        children.forEach { it.appendHtmlTo(builder) }
+        appendChildrenHtmlTo(builder, hydratable)
         builder.append("</").append(tagName).append('>')
+    }
+
+    private fun appendChildrenHtmlTo(builder: StringBuilder, hydratable: Boolean) {
+        val rendered = children.filter { child ->
+            child !is StringHtmlTextNode || child.text.isNotEmpty()
+        }
+        // Appends boundary marker for hydration between two text nodes
+        rendered.forEachIndexed { index, child ->
+            child.appendHtmlTo(builder, hydratable)
+            if (
+                hydratable &&
+                child is StringHtmlTextNode &&
+                rendered.getOrNull(index + 1) is StringHtmlTextNode
+            ) {
+                builder.appendHydrationTextBoundaryMarker()
+            }
+        }
     }
 
     companion object {
@@ -110,13 +130,17 @@ internal class StringHtmlElementNode private constructor(
 internal class StringHtmlTextNode(
     var text: String
 ) : StringHtmlNode {
-    fun toHtmlString(): String = buildString {
-        appendHtmlTo(this)
+    fun toHtmlString(hydratable: Boolean = true): String = buildString {
+        appendHtmlTo(this, hydratable)
     }
 
-    override fun appendHtmlTo(builder: StringBuilder) {
+    override fun appendHtmlTo(builder: StringBuilder, hydratable: Boolean) {
         builder.appendEscapedText(text)
     }
+}
+
+private fun StringBuilder.appendHydrationTextBoundaryMarker() {
+    append("<!--").append(HydrationTextBoundaryMarker).append("-->")
 }
 
 private fun requireValidHtmlTagName(name: String) {

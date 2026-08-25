@@ -107,7 +107,7 @@ private fun StyleCssText(cssText: String) {
 private class StringHtmlCssTextNode(
     var cssText: String,
 ) : StringHtmlNode {
-    override fun appendHtmlTo(builder: StringBuilder) {
+    override fun appendHtmlTo(builder: StringBuilder, hydratable: Boolean) {
         builder.append(cssText)
     }
 }

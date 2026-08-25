@@ -22,6 +22,7 @@ import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertSame
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ComposeWebInternalApi::class)
 class HydrationTest {
@@ -40,6 +41,172 @@ class HydrationTest {
             assertEquals(1, root.childElementCount)
             assertSame(serverRenderedNode, root.firstChild)
             assertSame(serverRenderedText, root.firstChild?.firstChild)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun adjacentTextNodesKeepTheirLogicalBoundaries() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = composeHtmlToString {
+            Div {
+                Text("Hello, ")
+                Text("world")
+            }
+        }
+        val div = root.firstChild as HTMLElement
+        val firstText = div.firstChild
+        val secondText = div.lastChild
+
+        val composition = hydrateComposable(root) {
+            Div {
+                Text("Hello, ")
+                Text("world")
+            }
+        }
+
+        try {
+            assertEquals(2, div.childNodes.length)
+            assertSame(firstText, div.childNodes.item(0))
+            assertSame(secondText, div.childNodes.item(1))
+            assertEquals("Hello, world", div.textContent)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun emptyTextBeforeNonEmptyTextKeepsBothLogicalNodes() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = composeHtmlToString {
+            Div {
+                Text("")
+                Text("visible")
+            }
+        }
+        val div = root.firstChild as HTMLElement
+        val serverRenderedText = div.lastChild
+
+        val composition = hydrateComposable(root) {
+            Div {
+                Text("")
+                Text("visible")
+            }
+        }
+
+        try {
+            assertEquals(2, div.childNodes.length)
+            assertEquals("", div.childNodes.item(0)?.textContent)
+            assertSame(serverRenderedText, div.childNodes.item(1))
+            assertEquals("visible", div.childNodes.item(1)?.textContent)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun nonEmptyTextBeforeEmptyTextKeepsBothLogicalNodes() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = composeHtmlToString {
+            Div {
+                Text("visible")
+                Text("")
+            }
+        }
+        val div = root.firstChild as HTMLElement
+        val serverRenderedText = div.firstChild
+
+        assertEquals("<div>visible</div>", root.innerHTML)
+        val composition = hydrateComposable(root) {
+            Div {
+                Text("visible")
+                Text("")
+            }
+        }
+
+        try {
+            assertEquals(2, div.childNodes.length)
+            assertSame(serverRenderedText, div.childNodes.item(0))
+            assertEquals("", div.childNodes.item(1)?.textContent)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun textCanDisappearAndReappearAfterHydration() = MainScope().promise {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = composeHtmlToString {
+            Div {
+                Text("Before")
+                Text("Middle")
+                Text("After")
+            }
+        }
+        var showMiddle by mutableStateOf(true)
+
+        val composition = hydrateComposable(root) {
+            Div {
+                Text("Before")
+                if (showMiddle) {
+                    Text("Middle")
+                }
+                Text("After")
+            }
+        }
+
+        try {
+            val div = root.firstChild as HTMLElement
+            showMiddle = false
+            delay(100.milliseconds)
+
+            assertEquals(2, div.childNodes.length)
+            assertEquals("BeforeAfter", div.textContent)
+
+            showMiddle = true
+            delay(100.milliseconds)
+
+            assertEquals(3, div.childNodes.length)
+            assertEquals("BeforeMiddleAfter", div.textContent)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun textBoundariesArePreservedWhenMixedWithElements() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = composeHtmlToString {
+            Div {
+                Text("before")
+                Span { Text("inside") }
+                Text("after")
+                Text("tail")
+            }
+        }
+        val div = root.firstChild as HTMLElement
+        val before = div.firstChild
+        val span = div.childNodes.item(1)
+        val after = div.childNodes.item(2)
+        val tail = div.lastChild
+
+        val composition = hydrateComposable(root) {
+            Div {
+                Text("before")
+                Span { Text("inside") }
+                Text("after")
+                Text("tail")
+            }
+        }
+
+        try {
+            assertEquals(4, div.childNodes.length)
+            assertSame(before, div.childNodes.item(0))
+            assertSame(span, div.childNodes.item(1))
+            assertSame(after, div.childNodes.item(2))
+            assertSame(tail, div.childNodes.item(3))
+            assertEquals("beforeinsideaftertail", div.textContent)
         } finally {
             composition.dispose()
         }
@@ -65,7 +232,7 @@ class HydrationTest {
 
         try {
             showSecondChild = true
-            delay(100)
+            delay(100.milliseconds)
 
             assertSame(serverRenderedNode, root.firstChild)
             assertEquals("<div><span>First</span><span>Second</span></div>", root.innerHTML)
@@ -137,6 +304,46 @@ class HydrationTest {
         assertContains(failure.message.orEmpty(), "found text \"Server\"")
         assertSame(serverNode, root.firstChild)
         assertEquals(serverHtml, root.innerHTML)
+    }
+
+    @Test
+    fun textBoundaryMarkersRemainWhenHydrationFails() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = composeHtmlToString {
+            Div {
+                Text("First")
+                Text("")
+                Text("Second")
+                Span()
+            }
+        }
+        val serverHtml = root.innerHTML
+
+        assertContains(serverHtml, "<!--c-->")
+        assertFailsWith<HydrationMismatchException> {
+            hydrateComposable(root) {
+                Div {
+                    Text("First")
+                    Text("")
+                    Text("Second")
+                    Div()
+                }
+            }
+        }
+
+        assertEquals(serverHtml, root.innerHTML)
+    }
+
+    @Test
+    fun textBoundaryMarkersUseInternalDiagnostics() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = "<div><!--c--></div>"
+
+        val failure = assertFailsWith<HydrationMismatchException> {
+            hydrateComposable(root) { Div() }
+        }
+
+        assertContains(failure.message.orEmpty(), "found extra an internal text boundary")
     }
 
     @Test

@@ -14,6 +14,8 @@ import org.jetbrains.compose.web.dom.StringHtmlNodeWrapper
 /**
  * Composes [content] once into an HTML string without creating browser DOM nodes.
  * The backing composition is disposed after the initial HTML has been serialized.
+ * The result can contain internal comments that preserve ambiguous text-node boundaries for
+ * hydration. They have no effect on the rendered content.
  *
  * Known limitations:
  * - DOM property updates registered with `AttrsScope.prop(...)` are ignored because
@@ -21,6 +23,16 @@ import org.jetbrains.compose.web.dom.StringHtmlNodeWrapper
  */
 fun composeHtmlToString(
     content: @Composable () -> Unit
+): String = composeHtmlToString(hydratable = true, content = content)
+
+/**
+ * Composes [content] once into an HTML string without creating browser DOM nodes.
+ *
+ * Set [hydratable] to `false` for static output without hydration boundary comments.
+ */
+fun composeHtmlToString(
+    hydratable: Boolean,
+    content: @Composable () -> Unit,
 ): String {
     val root = StringHtmlElementNode.root()
     val recomposer = Recomposer(Dispatchers.Default)
@@ -37,7 +49,7 @@ fun composeHtmlToString(
                 content()
             }
         }
-        root.toHtmlString()
+        root.toHtmlString(hydratable)
     } finally {
         composition.dispose()
         recomposer.close()

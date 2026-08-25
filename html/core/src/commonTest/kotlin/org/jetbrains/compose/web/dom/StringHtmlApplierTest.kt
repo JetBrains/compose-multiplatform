@@ -16,7 +16,7 @@ class StringHtmlApplierTest {
         wrapper.remove(index = 3, count = 1)
         wrapper.move(from = 1, to = 4, count = 2)
 
-        assertEquals("AEBC", root.toHtmlString())
+        assertEquals("AEBC", root.toHtmlString(hydratable = false))
     }
 
     @Test
@@ -40,7 +40,7 @@ class StringHtmlApplierTest {
         // `to` is an index in the original list. Move B before the original E.
         wrapper.move(from = 1, to = 4, count = 1)
 
-        assertEquals("ACDBE", root.toHtmlString())
+        assertEquals("ACDBE", root.toHtmlString(hydratable = false))
     }
 
     @Test
@@ -49,7 +49,7 @@ class StringHtmlApplierTest {
 
         wrapper.move(from = 3, to = 1, count = 1)
 
-        assertEquals("ADBCE", root.toHtmlString())
+        assertEquals("ADBCE", root.toHtmlString(hydratable = false))
     }
 
     @Test
@@ -59,7 +59,7 @@ class StringHtmlApplierTest {
         // Move [B, C] before the original F while preserving B-before-C order.
         wrapper.move(from = 1, to = 5, count = 2)
 
-        assertEquals("ADEBCF", root.toHtmlString())
+        assertEquals("ADEBCF", root.toHtmlString(hydratable = false))
     }
 
     @Test
@@ -68,7 +68,7 @@ class StringHtmlApplierTest {
 
         wrapper.move(from = 1, to = 3, count = 0)
 
-        assertEquals("ABC", root.toHtmlString())
+        assertEquals("ABC", root.toHtmlString(hydratable = false))
     }
 
     @Test

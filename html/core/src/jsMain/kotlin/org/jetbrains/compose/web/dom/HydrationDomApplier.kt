@@ -1,9 +1,11 @@
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.AbstractApplier
+import kotlinx.browser.document
 import kotlinx.dom.clear
 import org.jetbrains.compose.web.HydrationMismatchException
 import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
+import org.w3c.dom.Comment
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.Text
@@ -27,9 +29,17 @@ internal class HydrationDomApplier(
         var nextChildIndex: Int = 0           // used for diagnostics
     }
 
+    private data class PendingEmptyText(
+        val parent: Node,
+        val anchor: Node?,
+        val text: Text,
+    )
+
     private val rootNode = root.node
     private val frames = mutableListOf(Frame(rootNode))
     private val claimedNodes = mutableSetOf<Node>()  // claimed nodes that still need to be called by insertBottomUp
+    private val boundaryMarkers = mutableListOf<Comment>()
+    private val pendingEmptyTexts = mutableListOf<PendingEmptyText>()
     private var state = State.Hydrating
 
     val isHydrating: Boolean
@@ -71,13 +81,31 @@ internal class HydrationDomApplier(
         val frame = currentFrame
         val index = frame.nextChildIndex++
         val candidate = frame.nextNode
-        frame.nextNode = candidate?.nextSibling
-        val text = candidate as? Text
-            ?: mismatchAtChild(
+        val text = when {
+            candidate is Text && (value.isNotEmpty() || candidate.data.isEmpty()) -> {
+                frame.nextNode = candidate.nextSibling
+                val boundaryMarker = frame.nextNode.asHydrationTextBoundaryMarker()
+                if (boundaryMarker != null) { //skip boundary markers
+                    frame.nextNode = boundaryMarker.nextSibling
+                    boundaryMarkers += boundaryMarker
+                }
+                candidate
+            }
+            value.isEmpty() -> { // Empty text node was not emmited on string rendering, but still needs to be created (can change later)
+                document.createTextNode("").also { emptyText ->
+                    pendingEmptyTexts += PendingEmptyText(
+                        parent = frame.node,
+                        anchor = candidate,
+                        text = emptyText,
+                    )
+                }
+            }
+            else -> mismatchAtChild(
                 "text()",
                 index,
                 "expected text ${value.quoted()}, found ${candidate.describe()}",
             )
+        }
 
         if (text.data != value) {
             mismatchAtChild(
@@ -146,6 +174,7 @@ internal class HydrationDomApplier(
             mismatchAtCurrentNode("composition ended before all claimed nodes were reconciled")
         }
 
+        applyDeferredTextChanges()
         state = State.Complete
         frames.clear()
     }
@@ -154,6 +183,8 @@ internal class HydrationDomApplier(
         if (!isHydrating) return
         state = State.Aborted
         claimedNodes.clear()
+        boundaryMarkers.clear()
+        pendingEmptyTexts.clear()
         frames.clear()
     }
 
@@ -174,6 +205,19 @@ internal class HydrationDomApplier(
 
     private fun ensureHydrating() {
         check(isHydrating) { "Hydration is no longer active" }
+    }
+
+    // Defer all DOM changes until the complete tree has matched so failed hydration leaves
+    // the server-rendered tree untouched.
+    private fun applyDeferredTextChanges() {
+        pendingEmptyTexts.forEach { pending -> //Create empty text
+            pending.parent.insertBefore(pending.text, pending.anchor)
+        }
+        boundaryMarkers.forEach { marker -> // Remove makers
+            marker.parentNode?.removeChild(marker)
+        }
+        pendingEmptyTexts.clear()
+        boundaryMarkers.clear()
     }
 
     private fun mismatchAtChild(name: String, index: Int, detail: String): Nothing {
@@ -205,10 +249,18 @@ private fun Node.pathName(): String = when (this) {
     else -> nodeName
 }
 
+private fun Node?.asHydrationTextBoundaryMarker(): Comment? =
+    (this as? Comment)?.takeIf { it.data == HydrationTextBoundaryMarker }
+
 private fun Node?.describe(): String = when (this) {
     null -> "the end of the children"
     is Element -> "<${tagName.lowercase()}>"
     is Text -> "text ${data.quoted()}"
+    is Comment -> if (data == HydrationTextBoundaryMarker) {
+        "an internal text boundary"
+    } else {
+        "<!--$data-->"
+    }
     else -> nodeName
 }
 

@@ -22,6 +22,36 @@ import kotlin.test.assertEquals
 
 class ComposeHtmlToStringTest {
     @Test
+    fun emitsCompactMarkersOnlyBetweenRenderedTextNodes() {
+        val html = composeHtmlToString {
+            Div {
+                Text("first")
+                Text("")
+                Text("second")
+                Span { Text("unambiguous") }
+            }
+        }
+
+        assertEquals(
+            "<div>first<!--c-->second<span>unambiguous</span></div>",
+            html,
+        )
+    }
+
+    @Test
+    fun staticOutputOmitsHydrationMarkers() {
+        val html = composeHtmlToString(hydratable = false) {
+            Div {
+                Text("first")
+                Text("")
+                Text("second")
+            }
+        }
+
+        assertEquals("<div>firstsecond</div>", html)
+    }
+
+    @Test
     fun rendersNestedElementsAndRootSiblings() {
         val html = composeHtmlToString {
             Div {
