@@ -35,6 +35,9 @@ abstract class ComposePlugin : Plugin<Project> {
         val composeExtension = project.extensions.create("compose", ComposeExtension::class.java, project)
         val desktopExtension = composeExtension.extensions.create("desktop", DesktopExtension::class.java)
         val resourcesExtension = composeExtension.extensions.create("resources", ResourcesExtension::class.java)
+        val dependencyCompatibilityExtension = composeExtension.extensions.create(
+            "dependencyCompatibility", DependencyCompatibilityExtension::class.java
+        )
 
         project.dependencies.extensions.add("compose", Dependencies(project))
 
@@ -51,7 +54,7 @@ abstract class ComposePlugin : Plugin<Project> {
 
         project.configureWeb()
 
-        project.configureRuntimeLibrariesCompatibilityCheck()
+        project.configureRuntimeLibrariesCompatibilityCheck(dependencyCompatibilityExtension)
 
         project.afterEvaluate {
             configureDesktop(project, desktopExtension)

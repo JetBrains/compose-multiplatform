@@ -12,12 +12,11 @@ import org.gradle.api.artifacts.component.ProjectComponentSelector
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
 import org.gradle.api.artifacts.result.ResolvedComponentResult
 import org.gradle.api.provider.Property
-import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
-import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.kotlinJvmExt
@@ -29,18 +28,17 @@ import org.jetbrains.compose.internal.utils.registerOrConfigure
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
-import javax.inject.Inject
 
-internal fun Project.configureRuntimeLibrariesCompatibilityCheck() {
+internal fun Project.configureRuntimeLibrariesCompatibilityCheck(extension: DependencyCompatibilityExtension) {
     plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
-        mppExt.targets.configureEach { target -> target.configureRuntimeLibrariesCompatibilityCheck() }
+        mppExt.targets.configureEach { target -> target.configureRuntimeLibrariesCompatibilityCheck(extension) }
     }
     plugins.withId(KOTLIN_JVM_PLUGIN_ID) {
-        kotlinJvmExt.target.configureRuntimeLibrariesCompatibilityCheck()
+        kotlinJvmExt.target.configureRuntimeLibrariesCompatibilityCheck(extension)
     }
 }
 
-private fun KotlinTarget.configureRuntimeLibrariesCompatibilityCheck() {
+private fun KotlinTarget.configureRuntimeLibrariesCompatibilityCheck(extension: DependencyCompatibilityExtension) {
     val target = this
     if (
         target.platformType == KotlinPlatformType.common ||
@@ -61,6 +59,8 @@ private fun KotlinTarget.configureRuntimeLibrariesCompatibilityCheck() {
             joinLowerCamelCase("check", target.name, compilation.name, "composeLibrariesCompatibility"),
         ) {
             expectedVersion.set(composeVersion)
+            checkEnabled.set(extension.enabled)
+            excludedModules.set(extension.excludedModules)
             projectPath.set(project.path)
             configurationName.set(runtimeDependencyConfigurationName)
             allDependencies.set(
@@ -92,9 +92,6 @@ internal abstract class RuntimeLibrariesCompatibilityCheck : DefaultTask() {
         }
     }
 
-    @get:Inject
-    protected abstract val providers: ProviderFactory
-
     @get:Input
     abstract val expectedVersion: Property<String>
 
@@ -107,16 +104,24 @@ internal abstract class RuntimeLibrariesCompatibilityCheck : DefaultTask() {
     @get:Input
     abstract val allDependencies: SetProperty<ResolvedDependencyResult>
 
+    @get:Input
+    abstract val excludedModules: SetProperty<String>
+
+    @get:Internal
+    abstract val checkEnabled: Property<Boolean>
+
     init {
         onlyIf {
-            !ComposeProperties.disableLibraryCompatibilityCheck(providers).get()
+            checkEnabled.get()
         }
     }
 
     @TaskAction
     fun run() {
         val expectedRuntimeVersion = expectedVersion.get()
-        val composeLibraries = allDependencies.get()
+        val excludes = excludedModules.get()
+        val dependencies = allDependencies.get().filterNot { it.isExcludedBy(excludes) }
+        val composeLibraries = dependencies
             .mapNotNull { it.selected.moduleVersion }
             .filter { lib -> "${lib.group}:${lib.name}" in composeLibrariesForCheck }
             .distinctBy { lib -> "${lib.group}:${lib.name}:${lib.version}" }
@@ -134,7 +139,7 @@ internal abstract class RuntimeLibrariesCompatibilityCheck : DefaultTask() {
             )
         }
 
-        val skikoIncompatibleDependencyUsages = allDependencies.get().filter { dependency ->
+        val skikoIncompatibleDependencyUsages = dependencies.filter { dependency ->
             val requested = dependency.requested as? ModuleComponentSelector ?: return@filter false
             val selected = dependency.selected.moduleVersion ?: return@filter false
             if ("${requested.group}:${requested.module}" != skikoLibraryForCheck) return@filter false
@@ -150,6 +155,20 @@ internal abstract class RuntimeLibrariesCompatibilityCheck : DefaultTask() {
                 )
             )
         }
+    }
+
+    /**
+     * Whether any module of this dependency edge - the dependent, the requested or the resolved one - is excluded
+     * from the check. Project dependencies are never excluded: exclusions match only external modules.
+     */
+    private fun ResolvedDependencyResult.isExcludedBy(excludes: Set<String>): Boolean {
+        if (excludes.isEmpty()) return false
+        val modules = listOfNotNull(
+            (from.id as? ModuleComponentIdentifier)?.let { it.group to it.module },
+            (requested as? ModuleComponentSelector)?.let { it.group to it.module },
+            (selected.id as? ModuleComponentIdentifier)?.let { it.group to it.module },
+        )
+        return modules.any { (group, name) -> group in excludes || "$group:$name" in excludes }
     }
 
     private fun getComposeMessage(
@@ -198,6 +217,8 @@ internal abstract class RuntimeLibrariesCompatibilityCheck : DefaultTask() {
         val taskName = if (projectName.isNotEmpty() && !projectName.endsWith(":")) "$projectName:dependencies" else "${projectName}dependencies"
         appendLine("You can inspect resulted dependencies tree via `./gradlew $taskName  --configuration ${configurationName}`.")
         appendLine("See more details in Gradle documentation: https://docs.gradle.org/current/userguide/viewing_debugging_dependencies.html#sec:listing-dependencies")
+        appendLine("If the mismatch is expected, you can exclude a library from this check:")
+        appendLine("    compose { dependencyCompatibility { exclude(\"<group>\") } }")
     }
 
     private fun ModuleVersionIdentifier?.toModuleString() = when (this) {
