@@ -8,6 +8,7 @@ import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleHolder
+import org.jetbrains.compose.web.HydrationMismatchException
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.jetbrains.compose.web.internal.runtime.DomApplier
 import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
@@ -187,5 +188,77 @@ private object BrowserComposeHtmlContext : ComposeHtmlContext {
                 }
             }
         }
+    }
+}
+
+internal fun hydratingComposeHtmlContext(
+    applier: HydrationDomApplier,
+): ComposeHtmlContext = HydratingComposeHtmlContext(applier)
+
+private class HydratingComposeHtmlContext(
+    private val applier: HydrationDomApplier,
+) : ComposeHtmlContext by BrowserComposeHtmlContext {
+    override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
+        HydratingElementBuilder(
+            tagName = tagName,
+            applier = applier,
+            browserBuilder = ElementBuilder.createBuilder(tagName),
+        )
+
+    @Composable
+    override fun <TElement : Element> TagElement(
+        elementBuilder: ElementBuilder<TElement>,
+        applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        content: (@Composable ElementScope<TElement>.() -> Unit)?,
+    ) {
+        if (applier.isHydrating && elementBuilder !is HydratingElementBuilder<*>) {
+            throw HydrationMismatchException(
+                "Hydration requires tag-name element builders during the initial composition",
+            )
+        }
+        BrowserComposeHtmlContext.TagElement(elementBuilder, applyAttrs, content)
+    }
+
+    @Composable
+    override fun TextElement(value: String) {
+        ComposeNode<DomNodeWrapper, HydrationDomApplier>(
+            factory = {
+                val text = if (applier.isHydrating) {
+                    applier.claimText(value)
+                } else {
+                    document.createTextNode("")
+                }
+                DomNodeWrapper(text)
+            },
+            update = {
+                set(value) { newValue -> (node as Text).data = newValue }
+            },
+        )
+    }
+
+    @Composable
+    override fun StyleElement(
+        applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)?,
+        cssRules: CSSRuleDeclarationList,
+    ) {
+        if (applier.isHydrating) {
+            throw UnsupportedOperationException(
+                "Style elements are not supported yet",
+            )
+        }
+        BrowserComposeHtmlContext.StyleElement(applyAttrs, cssRules)
+    }
+}
+
+private class HydratingElementBuilder<TElement : Element>(
+    private val tagName: String,
+    private val applier: HydrationDomApplier,
+    private val browserBuilder: ElementBuilder<TElement>,
+) : ElementBuilder<TElement> {
+    @Suppress("UNCHECKED_CAST")
+    override fun create(): TElement = if (applier.isHydrating) {
+        applier.claimElement(tagName) as TElement
+    } else {
+        browserBuilder.create()
     }
 }
