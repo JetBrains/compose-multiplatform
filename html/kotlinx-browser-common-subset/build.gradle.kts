@@ -1,7 +1,6 @@
 @file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.api.tasks.testing.Test
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
 
@@ -85,11 +84,6 @@ kotlin {
         val wasmJsTest by getting {
             kotlin.srcDir(browserIdentityTestSources)
         }
-        val jvmTest by getting {
-            dependencies {
-                implementation("org.jetbrains.compose.html.build:kotlinx-browser-common-subset-generator:1.0")
-            }
-        }
     }
 }
 
@@ -98,24 +92,6 @@ val generateSubset = generatorBuild.task(":ksp-runner:generateKotlinxBrowserComm
 val checkSubset = generatorBuild.task(":ksp-runner:checkKotlinxBrowserCommonSubset")
 val updateSubset = generatorBuild.task(":ksp-runner:updateKotlinxBrowserCommonSubset")
 val checkGenerator = generatorBuild.task(":check")
-val generatedReports = layout.projectDirectory.dir(
-    "generator/ksp-runner/build/generated/kotlinxBrowserCommonSubset",
-)
-val checkedInManifest = layout.projectDirectory.file("api/dom-api-manifest.txt")
-
-tasks.withType<Test>().configureEach {
-    dependsOn(generateSubset)
-    systemProperty("portableDomModel", generatedReports.file("model.txt").asFile.absolutePath)
-    systemProperty("portableDomCoverage", generatedReports.file("coverage.txt").asFile.absolutePath)
-    systemProperty("portableDomApiManifest", generatedReports.file("api-manifest.txt").asFile.absolutePath)
-    systemProperty("portableDomApiManifestBaseline", checkedInManifest.asFile.absolutePath)
-    inputs.files(
-        generatedReports.file("model.txt"),
-        generatedReports.file("coverage.txt"),
-        generatedReports.file("api-manifest.txt"),
-        checkedInManifest,
-    )
-}
 
 tasks.register("generateKotlinxBrowserCommonSubset") {
     group = "generation"

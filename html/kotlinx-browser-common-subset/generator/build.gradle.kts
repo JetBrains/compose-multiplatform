@@ -27,3 +27,7 @@ tasks.test {
     systemProperty("portableDomCommonSource", generatedCommonSource.get().asFile.absolutePath)
     systemProperty("portableDomCommonMetadata", generatedCommonMetadata.get().asFile.absolutePath)
 }
+
+tasks.check {
+    dependsOn(":verification:check")
+}

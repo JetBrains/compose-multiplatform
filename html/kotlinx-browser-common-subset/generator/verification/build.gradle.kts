@@ -1,5 +1,7 @@
 @file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
+import org.gradle.api.tasks.testing.Test
+
 plugins {
     kotlin("multiplatform")
 }
@@ -8,6 +10,8 @@ val kotlinxBrowserVersion = providers.gradleProperty("kotlinx.browser.version").
 val generatedSubset = project(":ksp-runner").layout.buildDirectory.dir(
     "generated/kotlinxBrowserCommonSubset",
 )
+val subsetDirectory = rootProject.layout.projectDirectory.dir("..")
+val checkedInManifest = subsetDirectory.file("api/dom-api-manifest.txt")
 
 kotlin {
     compilerOptions {
@@ -48,9 +52,28 @@ kotlin {
         val jvmMain by getting {
             kotlin.srcDir(generatedSubset.map { it.dir("jvmMain/kotlin") })
         }
+        val jvmTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation(project(":"))
+            }
+        }
     }
 }
 
 tasks.matching { it.name.startsWith("compile") && "Kotlin" in it.name }.configureEach {
     dependsOn(":ksp-runner:generateKotlinxBrowserCommonSubset")
+}
+
+tasks.withType<Test>().configureEach {
+    val model = generatedSubset.map { it.file("model.txt") }
+    val coverage = generatedSubset.map { it.file("coverage.txt") }
+    val apiManifest = generatedSubset.map { it.file("api-manifest.txt") }
+
+    dependsOn(":ksp-runner:generateKotlinxBrowserCommonSubset")
+    systemProperty("portableDomModel", model.get().asFile.absolutePath)
+    systemProperty("portableDomCoverage", coverage.get().asFile.absolutePath)
+    systemProperty("portableDomApiManifest", apiManifest.get().asFile.absolutePath)
+    systemProperty("portableDomApiManifestBaseline", checkedInManifest.asFile.absolutePath)
+    inputs.files(model, coverage, apiManifest, checkedInManifest)
 }

@@ -46,7 +46,7 @@ internal data class GeneratedCoverageReport(val entries: List<Entry>) {
     }
 }
 
-/** Exhaustive account of every declaration in the two browser input files. */
+/** Exhaustive account of every declaration in the configured browser input files. */
 internal data class GeneratedApiManifest(val header: Map<String, String>, val entries: List<Entry>) {
     data class Entry(
         val status: String,

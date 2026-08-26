@@ -32,17 +32,6 @@ class GeneratedFacadeJvmTest {
         assertIs<JsAny>(div)
     }
 
-    // Loads every ledger-selected classifier from its JVM facade name.
-    @Test
-    fun allFacadeClassifiersLoadFromTheSafePackage() {
-        val report = GeneratedModelReport.read()
-
-        assertEquals(report.counts.getValue("closure"), report.declarations.size)
-        report.declarations.forEach { declaration ->
-            assertEquals(declaration.portableName, Class.forName(declaration.portableName).name)
-        }
-    }
-
     // Verifies inert JVM members store properties and return safe stub values.
     @Test
     fun generatedMemberStubsAreUsableOnJvm() {
