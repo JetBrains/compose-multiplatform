@@ -40,6 +40,7 @@ internal class HydrationDomApplier(
     private val claimedNodes = mutableSetOf<Node>()  // claimed nodes that still need to be called by insertBottomUp
     private val boundaryMarkers = mutableListOf<Comment>()
     private val pendingEmptyTexts = mutableListOf<PendingEmptyText>()
+    private val pendingDomMutations = mutableListOf<() -> Unit>()
     private var state = State.Hydrating
 
     val isHydrating: Boolean
@@ -48,6 +49,18 @@ internal class HydrationDomApplier(
     private val currentFrame: Frame
         get() = frames.last()
 
+    /** Holds back properties and listeners, which have no complete server HTML representation. */
+    fun applyOrDeferDomMutation(mutation: () -> Unit) {
+        when (state) {
+            State.Hydrating -> pendingDomMutations += mutation
+            State.Complete -> mutation()
+            State.Aborted -> Unit
+        }
+    }
+
+    fun mismatch(detail: String): Nothing = mismatchAtCurrentNode(detail)
+
+    /** Claims the next element. A missing or differently tagged node is a mismatch. */
     fun claimElement(tagName: String): Element {
         ensureHydrating()
 
@@ -62,7 +75,6 @@ internal class HydrationDomApplier(
                 index,
                 "expected <$expectedTagName>, found ${candidate.describe()}",
             )
-
         if (element.tagName.lowercase() != expectedTagName) {
             mismatchAtChild(
                 expectedTagName,
@@ -75,6 +87,7 @@ internal class HydrationDomApplier(
         return element
     }
 
+    /** Claims the next logical text node. Boundary markers prevent browser merging. */
     fun claimText(value: String): Text {
         ensureHydrating()
 
@@ -85,13 +98,15 @@ internal class HydrationDomApplier(
             candidate is Text && (value.isNotEmpty() || candidate.data.isEmpty()) -> {
                 frame.nextNode = candidate.nextSibling
                 val boundaryMarker = frame.nextNode.asHydrationTextBoundaryMarker()
-                if (boundaryMarker != null) { //skip boundary markers
+                if (boundaryMarker != null) {
+                    // Skip boundary markers.
                     frame.nextNode = boundaryMarker.nextSibling
                     boundaryMarkers += boundaryMarker
                 }
                 candidate
             }
-            value.isEmpty() -> { // Empty text node was not emmited on string rendering, but still needs to be created (can change later)
+            value.isEmpty() -> {
+                // Empty text is omitted from string rendering but still needs a DOM node.
                 document.createTextNode("").also { emptyText ->
                     pendingEmptyTexts += PendingEmptyText(
                         parent = frame.node,
@@ -164,6 +179,12 @@ internal class HydrationDomApplier(
         if (state == State.Complete) rootNode.clear()
     }
 
+    override fun onEndChanges() {
+        if (isHydrating) {
+            finishHydration()
+        }
+    }
+
     fun finishHydration() {
         ensureHydrating()
         if (frames.size != 1) {
@@ -175,6 +196,7 @@ internal class HydrationDomApplier(
         }
 
         applyDeferredTextChanges()
+        applyPendingDomMutations()
         state = State.Complete
         frames.clear()
     }
@@ -185,6 +207,7 @@ internal class HydrationDomApplier(
         claimedNodes.clear()
         boundaryMarkers.clear()
         pendingEmptyTexts.clear()
+        pendingDomMutations.clear()
         frames.clear()
     }
 
@@ -207,17 +230,21 @@ internal class HydrationDomApplier(
         check(isHydrating) { "Hydration is no longer active" }
     }
 
-    // Defer all DOM changes until the complete tree has matched so failed hydration leaves
-    // the server-rendered tree untouched.
     private fun applyDeferredTextChanges() {
-        pendingEmptyTexts.forEach { pending -> //Create empty text
+        pendingEmptyTexts.forEach { pending ->
             pending.parent.insertBefore(pending.text, pending.anchor)
         }
-        boundaryMarkers.forEach { marker -> // Remove makers
+        boundaryMarkers.forEach { marker ->
             marker.parentNode?.removeChild(marker)
         }
         pendingEmptyTexts.clear()
         boundaryMarkers.clear()
+    }
+
+    private fun applyPendingDomMutations() {
+        val mutations = pendingDomMutations.toList()
+        pendingDomMutations.clear()
+        mutations.forEach { mutation -> mutation() }
     }
 
     private fun mismatchAtChild(name: String, index: Int, detail: String): Nothing {

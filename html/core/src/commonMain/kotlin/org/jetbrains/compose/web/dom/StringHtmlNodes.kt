@@ -3,6 +3,37 @@ package org.jetbrains.compose.web.dom
 // HTML parsing merges adjacent non-empty text nodes. This comment preserves their boundary.
 internal const val HydrationTextBoundaryMarker = "c"
 
+// A boolean attribute is true when present, independently of its supplied string value.
+internal val HtmlBooleanAttributeNames = setOf(
+    "allowfullscreen",
+    "async",
+    "autofocus",
+    "autoplay",
+    "checked",
+    "controls",
+    "default",
+    "defer",
+    "disabled",
+    "formnovalidate",
+    "inert",
+    "ismap",
+    "itemscope",
+    "loop",
+    "multiple",
+    "muted",
+    "nomodule",
+    "novalidate",
+    "open",
+    "playsinline",
+    "readonly",
+    "required",
+    "reversed",
+    "selected",
+)
+
+internal fun String.isHtmlBooleanAttributeName(): Boolean =
+    this in HtmlBooleanAttributeNames || lowercase() in HtmlBooleanAttributeNames
+
 // in-memory equivalent of DOM node
 internal sealed interface StringHtmlNode {
     fun appendHtmlTo(builder: StringBuilder, hydratable: Boolean)
@@ -42,7 +73,7 @@ internal class StringHtmlElementNode private constructor(
         builder.append('<').append(tagName)
         attributes.forEach { (name, value) ->
             builder.append(' ').append(name)
-            if (name.lowercase() !in BooleanAttributeNames) {
+            if (!name.isHtmlBooleanAttributeName()) {
                 builder.append("=\"")
                 builder.appendEscapedAttribute(value)
                 builder.append('"')
@@ -90,34 +121,6 @@ internal class StringHtmlElementNode private constructor(
             "source",
             "track",
             "wbr",
-        )
-
-        // A boolean attribute is true when present, independently of its supplied string value.
-        private val BooleanAttributeNames = setOf(
-            "allowfullscreen",
-            "async",
-            "autofocus",
-            "autoplay",
-            "checked",
-            "controls",
-            "default",
-            "defer",
-            "disabled",
-            "formnovalidate",
-            "inert",
-            "ismap",
-            "itemscope",
-            "loop",
-            "multiple",
-            "muted",
-            "nomodule",
-            "novalidate",
-            "open",
-            "playsinline",
-            "readonly",
-            "required",
-            "reversed",
-            "selected",
         )
 
         fun root(): StringHtmlElementNode = StringHtmlElementNode(

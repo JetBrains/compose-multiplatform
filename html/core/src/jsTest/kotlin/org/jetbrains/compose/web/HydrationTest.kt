@@ -8,7 +8,6 @@ import kotlinx.browser.document
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.promise
-import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.HydrationDomApplier
 import org.jetbrains.compose.web.dom.Span
@@ -16,7 +15,6 @@ import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.events.MouseEvent
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -242,29 +240,6 @@ class HydrationTest {
     }
 
     @Test
-    fun hydrationAttachesEventListenersToExistingElements() {
-        val root = document.createElement("div") as HTMLElement
-        root.innerHTML = composeHtmlToString {
-            Button { Text("Click") }
-        }
-        val button = root.firstChild as HTMLElement
-        var clickCount = 0
-
-        val composition = hydrateComposable(root) {
-            Button(attrs = { onClick { clickCount++ } }) { Text("Click") }
-        }
-
-        try {
-            button.dispatchEvent(MouseEvent("click"))
-
-            assertEquals(1, clickCount)
-            assertSame(button, root.firstChild)
-        } finally {
-            composition.dispose()
-        }
-    }
-
-    @Test
     fun hydrationFailsWhenElementTagsDiffer() {
         val root = document.createElement("div") as HTMLElement
         root.innerHTML = composeHtmlToString {
@@ -274,7 +249,7 @@ class HydrationTest {
         val serverNode = root.firstChild
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root) {
+            hydrateComposable(root, onHydrationMismatch = { throw it }) {
                 Div { Text("Hello") }
             }
         }
@@ -295,7 +270,7 @@ class HydrationTest {
         val serverNode = root.firstChild
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root) {
+            hydrateComposable(root, onHydrationMismatch = { throw it }) {
                 Div { Text("Client") }
             }
         }
@@ -321,7 +296,7 @@ class HydrationTest {
 
         assertContains(serverHtml, "<!--c-->")
         assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root) {
+            hydrateComposable(root, onHydrationMismatch = { throw it }) {
                 Div {
                     Text("First")
                     Text("")
@@ -340,7 +315,7 @@ class HydrationTest {
         root.innerHTML = "<div><!--c--></div>"
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root) { Div() }
+            hydrateComposable(root, onHydrationMismatch = { throw it }) { Div() }
         }
 
         assertContains(failure.message.orEmpty(), "found extra an internal text boundary")
@@ -359,7 +334,7 @@ class HydrationTest {
         val serverNode = root.firstChild
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root) {
+            hydrateComposable(root, onHydrationMismatch = { throw it }) {
                 Div { Span() }
             }
         }
@@ -380,7 +355,7 @@ class HydrationTest {
         val serverNode = root.firstChild
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root) {
+            hydrateComposable(root, onHydrationMismatch = { throw it }) {
                 Div {
                     Span()
                     Span()

@@ -210,6 +210,29 @@ data class StylePropertyDeclaration(
 typealias StylePropertyList = List<StylePropertyDeclaration>
 typealias MutableStylePropertyList = MutableList<StylePropertyDeclaration>
 
+@OptIn(ComposeWebInternalApi::class)
+internal fun StyleHolder.toStyleAttributeValue(): String? {
+    val declarationsByName = mutableMapOf<String, StylePropertyDeclaration>()
+    properties.forEach { declaration ->
+        declarationsByName[declaration.name] = declaration
+    }
+    variables.forEach { declaration ->
+        val cssName = "--${declaration.name}"
+        declarationsByName[cssName] = declaration.copy(name = cssName)
+    }
+
+    return declarationsByName.values
+        .takeIf { declarations -> declarations.isNotEmpty() }
+        ?.joinToString("; ") { declaration ->
+            buildString {
+                append(declaration.name)
+                append(": ")
+                append(declaration.value)
+                if (declaration.important) append(" !important")
+            }
+        }
+}
+
 internal fun StylePropertyList.nativeEquals(properties: StylePropertyList): Boolean {
     if (this.size != properties.size) return false
 

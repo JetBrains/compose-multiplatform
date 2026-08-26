@@ -52,6 +52,17 @@ class ComposeHtmlToStringTest {
     }
 
     @Test
+    fun eventListenersAreNotSerialized() {
+        val html = composeHtmlToString {
+            Button(attrs = { onClick { } }) {
+                Text("Click")
+            }
+        }
+
+        assertEquals("<button>Click</button>", html)
+    }
+
+    @Test
     fun rendersNestedElementsAndRootSiblings() {
         val html = composeHtmlToString {
             Div {

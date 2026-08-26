@@ -10,8 +10,9 @@ import kotlinx.browser.dom.Element
 import kotlinx.browser.dom.HTMLStyleElement
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
+import org.jetbrains.compose.web.attributes.toClassAttributeValue
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
-import org.jetbrains.compose.web.css.StylePropertyDeclaration
+import org.jetbrains.compose.web.css.toStyleAttributeValue
 import org.jetbrains.compose.web.css.utils.serializeRules
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
@@ -127,7 +128,8 @@ private fun unavailableDomElement(): Nothing =
 
 /*
    Only reads: ordinary HTML attributes, classes, styleScope.properties, styleScope.variables
-   TODO not supported: attrsScope.refEffect, eventsListenerScopeBuilder.collectListeners, propertyUpdates
+   Event listeners are intentionally ignored because they are client-side behavior, not string HTML behaviour.
+   TODO not supported: attrsScope.refEffect, propertyUpdates
 
    ```kotlin
    Div({
@@ -140,32 +142,11 @@ private fun unavailableDomElement(): Nothing =
 private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(): Map<String, String> =
     collect().toMutableMap().apply {
         if (AttrsScope.CLASS !in this && classes.isNotEmpty()) {
-            this[AttrsScope.CLASS] = classes
-                .filter(String::isNotEmpty)
-                .distinct()
-                .joinToString(" ")
+            classes.toClassAttributeValue()?.let { value -> this[AttrsScope.CLASS] = value }
         }
 
         if ("style" !in this) {
-            val declarations = styleScope.properties + styleScope.variables.map { declaration ->
-                declaration.copy(name = "--${declaration.name}")
-            }
-            if (declarations.isNotEmpty()) {
-                //make sure that later declarations replace earlier ones
-                val declarationsByName = mutableMapOf<String, StylePropertyDeclaration>()
-                declarations.forEach { declaration ->
-                    declarationsByName[declaration.name] = declaration
-                }
-
-                this["style"] = declarationsByName.values.joinToString("; ") { declaration ->
-                    buildString {
-                        append(declaration.name)
-                        append(": ")
-                        append(declaration.value)
-                        if (declaration.important) append(" !important")
-                    }
-                }
-            }
+            styleScope.toStyleAttributeValue()?.let { value -> this["style"] = value }
         }
     }
 

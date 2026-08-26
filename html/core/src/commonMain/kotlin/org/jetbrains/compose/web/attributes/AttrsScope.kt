@@ -246,3 +246,9 @@ open class AttrsScopeBuilder<TElement : Element>(
 private val setClassList: (HTMLElement, Array<out String>) -> Unit = { e, classList ->
     e.classList.add(*classList)
 }
+
+internal fun Collection<String>.toClassAttributeValue(): String? =
+    filter(String::isNotEmpty)
+        .distinct()
+        .takeIf { classes -> classes.isNotEmpty() }
+        ?.joinToString(" ")
