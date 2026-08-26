@@ -20,26 +20,6 @@ kotlinKarmaConfig.rootDir = rootProject.rootDir.toString()
 
 apply<SeleniumDriverPlugin>()
 
-val kotlinxBrowserSubsetGenerator = gradle.includedBuild("kotlinx-browser-common-subset-generator")
-
-tasks.register("generateKotlinxBrowserCommonSubset") {
-    group = "generation"
-    description = "Generates the portable browser subset into the generator build directory."
-    dependsOn(kotlinxBrowserSubsetGenerator.task(":runner:generateKotlinxBrowserCommonSubset"))
-}
-
-tasks.register("checkKotlinxBrowserCommonSubset") {
-    group = "verification"
-    description = "Checks checked-in portable browser subset sources against fresh generation."
-    dependsOn(kotlinxBrowserSubsetGenerator.task(":runner:checkKotlinxBrowserCommonSubset"))
-}
-
-tasks.register("updateKotlinxBrowserCommonSubset") {
-    group = "generation"
-    description = "Explicitly updates checked-in portable browser subset sources and manifest."
-    dependsOn(kotlinxBrowserSubsetGenerator.task(":runner:updateKotlinxBrowserCommonSubset"))
-}
-
 fun Project.isSampleProject() = projectDir.parentFile.name == "examples"
 
 tasks.register("printBundleSize") {

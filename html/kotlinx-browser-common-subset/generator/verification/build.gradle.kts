@@ -5,7 +5,7 @@ plugins {
 }
 
 val kotlinxBrowserVersion = providers.gradleProperty("kotlinx.browser.version").get()
-val generatedSubset = project(":runner").layout.buildDirectory.dir(
+val generatedSubset = project(":ksp-runner").layout.buildDirectory.dir(
     "generated/kotlinxBrowserCommonSubset",
 )
 
@@ -52,5 +52,5 @@ kotlin {
 }
 
 tasks.matching { it.name.startsWith("compile") && "Kotlin" in it.name }.configureEach {
-    dependsOn(":runner:generateKotlinxBrowserCommonSubset")
+    dependsOn(":ksp-runner:generateKotlinxBrowserCommonSubset")
 }

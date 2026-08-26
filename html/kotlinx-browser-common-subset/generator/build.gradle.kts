@@ -13,7 +13,7 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-val generatedCommonSource = project(":runner").layout.buildDirectory.file(
+val generatedCommonSource = project(":ksp-runner").layout.buildDirectory.file(
     "generated/kotlinxBrowserCommonSubset/commonMain/kotlin/kotlinx/browser/dom/PortableDom.kt",
 )
 val generatedCommonMetadata = project(":verification").layout.buildDirectory.file(
