@@ -71,7 +71,6 @@ internal fun signatureOnlyPackageMapping(browserPackage: String) = PortablePacka
 )
 
 internal const val STAGING_ROOT = "portableDom"
-internal const val PORTABLE_INTEROP_FILE = "PortableInterop"
 
 // Interop types require different actuals on JS, Wasm/JS, and JVM.
 internal val PORTABLE_JS_ANY = ClassName(PORTABLE_JS_PACKAGE, "JsAny")

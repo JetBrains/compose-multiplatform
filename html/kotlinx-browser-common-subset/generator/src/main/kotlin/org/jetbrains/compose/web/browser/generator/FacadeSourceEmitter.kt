@@ -51,7 +51,7 @@ internal class FacadeSourceEmitter(private val codeGenerator: CodeGenerator) {
                 p.values.ifAny { commonValuesFile(p.mapping, it) },
             )
         }
-        emitSourceSet("commonMain", dependencies, listOf(commonInteropFile(), commonCoreFile()) + commonFiles)
+        emitSourceSet("commonMain", dependencies, listOf(commonCoreFile()) + commonFiles)
 
         val browserLeafFiles = packages.flatMap { p ->
             listOfNotNull(
@@ -72,13 +72,13 @@ internal class FacadeSourceEmitter(private val codeGenerator: CodeGenerator) {
                 p.values.ifAny { targetValuesFile(p.mapping, it) },
             )
         }
-        // A facade alias can inherit portable JsAny, whose actual differs between JS and Wasm/JS.
-        // Keep every browser-facing actual in the leaf source set where that JsAny actual is known.
-        emitSourceSet("jsMain", dependencies, listOf(jsInteropFile()) + browserLeafFiles + targetFiles)
+        // A facade alias can inherit portable JsAny, whose handwritten actual differs by target.
+        // Keep every browser-facing actual in the leaf source set where that actual is known.
+        emitSourceSet("jsMain", dependencies, browserLeafFiles + targetFiles)
         emitSourceSet(
             "wasmJsMain",
             dependencies,
-            listOf(wasmJsInteropFile()) + browserLeafFiles + targetFiles,
+            browserLeafFiles + targetFiles,
         )
 
         val jvmValues = JvmStubValues(model.associateBy(PortableClass::portableName))
@@ -93,7 +93,7 @@ internal class FacadeSourceEmitter(private val codeGenerator: CodeGenerator) {
             )
         }
         // Singleton files are rendered last: emitting the JVM files above is what requests them.
-        emitSourceSet("jvmMain", dependencies, listOf(jvmInteropFile()) + jvmFiles + jvmValues.singletonFiles())
+        emitSourceSet("jvmMain", dependencies, jvmFiles + jvmValues.singletonFiles())
     }
 
     /** Writes [files] as staged KSP resources for [sourceSet]. */

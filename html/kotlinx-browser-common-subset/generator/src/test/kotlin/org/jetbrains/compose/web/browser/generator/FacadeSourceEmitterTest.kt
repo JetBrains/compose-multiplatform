@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-// Verifies that browser facade actuals are staged beside each target's interop actuals.
+// Verifies that browser facade actuals are staged in each target-specific source set.
 package org.jetbrains.compose.web.browser.generator
 
 import com.google.devtools.ksp.processing.CodeGenerator
@@ -20,7 +20,7 @@ import kotlin.test.assertFalse
 
 class FacadeSourceEmitterTest {
     @Test
-    fun browserAliasesAreEmittedAfterEachTargetActualizesJsAny() {
+    fun browserAliasesAreEmittedInEachLeafTarget() {
         val worker = portableInterface("AbstractWorker")
         val options = portableInterface("EventListenerOptions", isDictionary = true)
         val packageModel = FacadePackageModel(
@@ -41,21 +41,18 @@ class FacadeSourceEmitterTest {
         val common = generator["portableDom.commonMain.kotlin.kotlinx.browser.dom.Core.kt.txt"] +
             generator["portableDom.commonMain.kotlin.kotlinx.browser.dom.PortableDom.kt.txt"] +
             generator["portableDom.commonMain.kotlin.kotlinx.browser.dom.OptionDictionaries.kt.txt"]
-        val js = generator["portableDom.jsMain.kotlin.kotlinx.browser.PortableInterop.kt.txt"] +
-            generator["portableDom.jsMain.kotlin.kotlinx.browser.dom.PortableDom.kt.txt"] +
+        val js = generator["portableDom.jsMain.kotlin.kotlinx.browser.dom.PortableDom.kt.txt"] +
             generator["portableDom.jsMain.kotlin.kotlinx.browser.dom.OptionDictionaries.kt.txt"]
-        val wasmJs = generator["portableDom.wasmJsMain.kotlin.kotlinx.browser.PortableInterop.kt.txt"] +
-            generator["portableDom.wasmJsMain.kotlin.kotlinx.browser.dom.PortableDom.kt.txt"] +
+        val wasmJs = generator["portableDom.wasmJsMain.kotlin.kotlinx.browser.dom.PortableDom.kt.txt"] +
             generator["portableDom.wasmJsMain.kotlin.kotlinx.browser.dom.OptionDictionaries.kt.txt"]
 
         assertContains(common, "public expect interface AbstractWorker : JsAny")
         assertContains(common, "public expect interface EventListenerOptions : JsAny")
-        assertContains(js, "public actual typealias JsAny = Any")
         assertContains(js, "public actual typealias AbstractWorker = AbstractWorker")
         assertContains(js, "public actual typealias EventListenerOptions = EventListenerOptions")
-        assertContains(wasmJs, "public actual typealias JsAny = BrowserJsAny")
         assertContains(wasmJs, "public actual typealias AbstractWorker = AbstractWorker")
         assertContains(wasmJs, "public actual typealias EventListenerOptions = EventListenerOptions")
+        assertFalse(generator.paths.any { ".PortableInterop." in it }, generator.paths.joinToString())
         assertFalse(generator.paths.any { ".webMain." in it }, generator.paths.joinToString())
         assertFalse(generator.paths.any { ".jsTest." in it || ".wasmJsTest." in it }, generator.paths.joinToString())
         assertFalse(generator.paths.any { ".webTest." in it }, generator.paths.joinToString())

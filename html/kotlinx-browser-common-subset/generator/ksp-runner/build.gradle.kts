@@ -61,9 +61,12 @@ tasks.matching { it.name == "kspKotlinJs" }.configureEach {
 }
 
 val generatedSubset = layout.buildDirectory.dir("generated/kotlinxBrowserCommonSubset")
+val subsetDirectory = rootProject.layout.projectDirectory.dir("..")
+val checkedInSources = subsetDirectory.dir("src")
+val checkedInManifest = subsetDirectory.file("api/dom-api-manifest.txt")
 val generateKotlinxBrowserCommonSubset by tasks.registering(Sync::class) {
     group = "generation"
-    description = "Stages the portable browser subset generated from the resolved source artifact."
+    description = "Stages generated facade sources from the resolved source artifact."
     dependsOn("kspKotlinJs", unpackKotlinxBrowserSources)
 
     from(layout.buildDirectory.dir("generated/ksp/js/jsMain/resources")) {
@@ -77,12 +80,14 @@ val generateKotlinxBrowserCommonSubset by tasks.registering(Sync::class) {
     into(generatedSubset)
 }
 
-val subsetDirectory = rootProject.layout.projectDirectory.dir("..")
-val checkedInSources = subsetDirectory.dir("src")
-val checkedInManifest = subsetDirectory.file("api/dom-api-manifest.txt")
 val generatedSourceSets = listOf("commonMain", "jsMain", "wasmJsMain", "jvmMain")
+val handwrittenSourcePaths = setOf("kotlinx/browser/PortableInterop.kt")
 
-fun directoryDifferences(generated: File, checkedIn: File): List<String> {
+fun directoryDifferences(
+    generated: File,
+    checkedIn: File,
+    ignoredPaths: Set<String> = emptySet(),
+): List<String> {
     fun files(root: File): Map<String, File> = if (!root.isDirectory) {
         emptyMap()
     } else {
@@ -91,8 +96,8 @@ fun directoryDifferences(generated: File, checkedIn: File): List<String> {
             .associateBy { it.relativeTo(root).invariantSeparatorsPath }
     }
 
-    val expected = files(generated)
-    val actual = files(checkedIn)
+    val expected = files(generated).filterKeys { it !in ignoredPaths }
+    val actual = files(checkedIn).filterKeys { it !in ignoredPaths }
     return buildList {
         (expected.keys - actual.keys).sorted().forEach { add("missing $it") }
         (actual.keys - expected.keys).sorted().forEach { add("unexpected $it") }
@@ -117,6 +122,7 @@ val checkKotlinxBrowserCommonSubset by tasks.registering {
             directoryDifferences(
                 generated.resolve("$sourceSet/kotlin"),
                 checkedInSources.asFile.resolve("$sourceSet/kotlin"),
+                handwrittenSourcePaths,
             ).map { "$sourceSet: $it" }
         }.toMutableList()
         if (!generated.resolve("api-manifest.txt").readBytes()
@@ -146,6 +152,9 @@ val updateSourceTasks = generatedSourceSets.map { sourceSet ->
         dependsOn(generateKotlinxBrowserCommonSubset)
         from(generatedSubset.map { it.dir("$sourceSet/kotlin") })
         into(checkedInSources.dir("$sourceSet/kotlin"))
+        preserve {
+            include("kotlinx/browser/PortableInterop.kt")
+        }
     }
 }
 

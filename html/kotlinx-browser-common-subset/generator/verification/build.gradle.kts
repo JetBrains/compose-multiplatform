@@ -1,5 +1,6 @@
 @file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
+import org.gradle.api.tasks.Sync
 import org.gradle.api.tasks.testing.Test
 
 plugins {
@@ -12,6 +13,13 @@ val generatedSubset = project(":ksp-runner").layout.buildDirectory.dir(
 )
 val subsetDirectory = rootProject.layout.projectDirectory.dir("..")
 val checkedInManifest = subsetDirectory.file("api/dom-api-manifest.txt")
+val stagedInterop = layout.buildDirectory.dir("handwrittenInterop")
+val stagePortableInterop by tasks.registering(Sync::class) {
+    from(subsetDirectory.dir("src")) {
+        include("*/kotlin/kotlinx/browser/PortableInterop.kt")
+    }
+    into(stagedInterop)
+}
 
 kotlin {
     compilerOptions {
@@ -37,6 +45,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             kotlin.srcDir(generatedSubset.map { it.dir("commonMain/kotlin") })
+            kotlin.srcDir(stagedInterop.map { it.dir("commonMain/kotlin") })
         }
         val webMain by getting {
             dependencies {
@@ -45,12 +54,15 @@ kotlin {
         }
         val jsMain by getting {
             kotlin.srcDir(generatedSubset.map { it.dir("jsMain/kotlin") })
+            kotlin.srcDir(stagedInterop.map { it.dir("jsMain/kotlin") })
         }
         val wasmJsMain by getting {
             kotlin.srcDir(generatedSubset.map { it.dir("wasmJsMain/kotlin") })
+            kotlin.srcDir(stagedInterop.map { it.dir("wasmJsMain/kotlin") })
         }
         val jvmMain by getting {
             kotlin.srcDir(generatedSubset.map { it.dir("jvmMain/kotlin") })
+            kotlin.srcDir(stagedInterop.map { it.dir("jvmMain/kotlin") })
         }
         val jvmTest by getting {
             dependencies {
@@ -62,7 +74,7 @@ kotlin {
 }
 
 tasks.matching { it.name.startsWith("compile") && "Kotlin" in it.name }.configureEach {
-    dependsOn(":ksp-runner:generateKotlinxBrowserCommonSubset")
+    dependsOn(":ksp-runner:generateKotlinxBrowserCommonSubset", stagePortableInterop)
 }
 
 tasks.withType<Test>().configureEach {

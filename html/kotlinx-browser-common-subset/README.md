@@ -6,14 +6,42 @@ typealiases, and the JVM receives stubs.
 
 The generator resolves
 `org.jetbrains.kotlinx:kotlinx-browser:<version>:sources`, unpacks its `webMain` sources under the
-generator runner's `build/`, and feeds the source set to KSP. Fresh output is staged
-under `generator/runner/build/generated/kotlinxBrowserCommonSubset`. Reviewed source output is
+KSP runner's `build/`, and feeds the source set to KSP. Fresh output is staged
+under `generator/ksp-runner/build/generated/kotlinxBrowserCommonSubset`. Reviewed source output is
 checked in under `src/`, so compiling the library does not run KSP or require the sources JAR.
 Generator checks and tests do run KSP and resolve the pinned sources artifact.
 
+## Run
+
+Run all commands in this section from the repository's `html/` directory, which contains the Gradle
+wrapper. Generate staged output without changing checked-in sources:
+
+```shell
+./gradlew -p kotlinx-browser-common-subset generateKotlinxBrowserCommonSubset
+```
+
+Check that staged output matches `src/` and `api/dom-api-manifest.txt`:
+
+```shell
+./gradlew -p kotlinx-browser-common-subset checkKotlinxBrowserCommonSubset
+```
+
+After reviewing a deliberate generated API change, replace the checked-in files explicitly:
+
+```shell
+./gradlew -p kotlinx-browser-common-subset updateKotlinxBrowserCommonSubset
+```
+
+Run the generator tests and the library's multiplatform checks:
+
+```shell
+./gradlew -p kotlinx-browser-common-subset/generator :check
+./gradlew -p kotlinx-browser-common-subset check
+```
+
 ## How generation works
 
-1. Gradle resolves and unpacks the pinned Maven sources artifact into the runner's `build/`.
+1. Gradle resolves and unpacks the pinned Maven sources artifact into the KSP runner's `build/`.
 2. KSP reads the browser source files named in
    [`portable-dom-selection.txt`](generator/src/main/resources/portable-dom-selection.txt).
 3. `SelectionPolicy` chooses classifier identities, while `ClosureResolver` adds supported
@@ -22,7 +50,7 @@ Generator checks and tests do run KSP and resolve the pinned sources artifact.
    record a decision for every declaration they inspect.
 5. `FacadeSourceEmitter` renders KotlinPoet files as staged KSP resources.
 6. Gradle stages those resources for comparison with, or explicit replacement of, checked-in
-   sources.
+   generated sources. Handwritten interop files are excluded from synchronization.
 
 ## Input boundary
 
@@ -62,11 +90,11 @@ normally instead and preserves the inheritance edge.
 
 | Source set | Role |
 | --- | --- |
-| `commonMain` | Portable `expect` declarations, dictionaries, values, and interop contracts |
+| `commonMain` | Generated portable `expect` declarations, dictionaries, and values; handwritten interop contracts |
 | `webMain` | Shared browser dependency only; no generated actuals |
-| `jsMain` | Browser facade typealiases and bridges, plus JS interop implementations |
-| `wasmJsMain` | Browser facade typealiases and bridges, plus Wasm/JS interop implementations |
-| `jvmMain` | Inert but type-correct stubs, stateful dictionaries, constants, and enum-like values |
+| `jsMain` | Generated browser facade typealiases and bridges, plus handwritten JS interop implementations |
+| `wasmJsMain` | Generated browser facade typealiases and bridges, plus handwritten Wasm/JS interop implementations |
+| `jvmMain` | Generated inert stubs, dictionaries, constants, and values; handwritten JVM interop implementations |
 
 The JVM output is a compatibility stub, not a DOM implementation.
 
@@ -99,7 +127,8 @@ Portable companion functions are retained with their complete signatures. Web ty
 browser companion directly, while JVM companions provide inert, type-correct bodies.
 
 Portable interop types cover browser signatures involving `JsAny`, `JsString`, `JsNumber`,
-`JsDouble`, `JsArray`, and `Promise`.
+`JsDouble`, `JsArray`, and `Promise`. Their declarations and target implementations are handwritten
+because they do not depend on the `kotlinx-browser` source model.
 
 ## Reports and validation
 
@@ -116,32 +145,4 @@ declarations or stale exclusions, and `GeneratedApiManifestTest` fails when gene
 from the checked-in baseline.
 
 [`dom-api-exclusions.txt`](generator/src/main/resources/dom-api-exclusions.txt) is reserved for
-specific declaration-level decisions that cannot be expressed by classifier selection.ååå
-
-## Run
-
-Run all commands in this section from the repository's `html/` directory, which contains the Gradle
-wrapper. Generate staged output without changing checked-in sources:
-
-```shell
-./gradlew generateKotlinxBrowserCommonSubset
-```
-
-Check that staged output matches `src/` and `api/dom-api-manifest.txt`:
-
-```shell
-./gradlew checkKotlinxBrowserCommonSubset
-```
-
-After reviewing a deliberate generated API change, replace the checked-in files explicitly:
-
-```shell
-./gradlew updateKotlinxBrowserCommonSubset
-```
-
-Run the generator tests and the library's multiplatform checks:
-
-```shell
-./gradlew -p kotlinx-browser-common-subset/generator test
-./gradlew :kotlinx-browser-common-subset:check
-```
+specific declaration-level decisions that cannot be expressed by classifier selection.
