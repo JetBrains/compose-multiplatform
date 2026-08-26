@@ -134,6 +134,34 @@ internal class HydrationDomApplier(
         return text
     }
 
+    /**
+     * Claims text that is present in server HTML but is not represented by a Compose DOM node.
+     * Style sheets use this for their serialized CSS before switching back to CSSOM updates.
+     */
+    fun claimRawText(value: String) {
+        ensureHydrating()
+
+        val frame = currentFrame
+        val candidate = frame.nextNode
+        if (value.isEmpty() && candidate == null) return
+
+        val index = frame.nextChildIndex++
+        frame.nextNode = candidate?.nextSibling
+        val text = candidate as? Text
+            ?: mismatchAtChild(
+                "text()",
+                index,
+                "expected raw text ${value.quoted()}, found ${candidate.describe()}",
+            )
+        if (text.data != value) {
+            mismatchAtChild(
+                "text()",
+                index,
+                "expected raw text ${value.quoted()}, found text ${text.data.quoted()}",
+            )
+        }
+    }
+
     override fun down(node: DomNodeWrapper) {
         if (isHydrating) {
             if (node.node !in claimedNodes) {
@@ -168,15 +196,18 @@ internal class HydrationDomApplier(
     }
 
     override fun remove(index: Int, count: Int) {
-        if (state == State.Complete) current.remove(index, count)
+        ensureComplete()
+        current.remove(index, count)
     }
 
     override fun move(from: Int, to: Int, count: Int) {
-        if (state == State.Complete) current.move(from, to, count)
+        ensureComplete()
+        current.move(from, to, count)
     }
 
     override fun onClear() {
-        if (state == State.Complete) rootNode.clear()
+        ensureComplete()
+        rootNode.clear()
     }
 
     override fun onEndChanges() {
@@ -228,6 +259,12 @@ internal class HydrationDomApplier(
 
     private fun ensureHydrating() {
         check(isHydrating) { "Hydration is no longer active" }
+    }
+
+    private fun ensureComplete() {
+        check(state == State.Complete) {
+            "DOM mutations are only allowed after hydration completes (state: $state)"
+        }
     }
 
     private fun applyDeferredTextChanges() {

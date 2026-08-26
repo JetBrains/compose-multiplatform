@@ -1,3 +1,4 @@
 package org.jetbrains.compose.web
 
-internal class HydrationMismatchException(message: String) : IllegalStateException(message)
+/** Describes why an existing server-rendered DOM tree could not be hydrated. */
+class HydrationMismatchException(message: String) : IllegalStateException(message)

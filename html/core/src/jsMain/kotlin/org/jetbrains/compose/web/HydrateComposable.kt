@@ -29,7 +29,7 @@ import kotlin.js.console
  * fallback and leaves the server DOM untouched.
  */
 @OptIn(ComposeWebInternalApi::class)
-internal fun <TElement : Element> hydrateComposable(
+fun <TElement : Element> hydrateComposable(
     root: TElement,
     monotonicFrameClock: MonotonicFrameClock = DefaultMonotonicFrameClock,
     onHydrationMismatch: (HydrationMismatchException) -> Unit = { console.error(it) },

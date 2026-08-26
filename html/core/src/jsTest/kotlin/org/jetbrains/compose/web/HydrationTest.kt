@@ -370,19 +370,33 @@ class HydrationTest {
     }
 
     @Test
-    fun domMutationsAreIgnoredDuringAndAfterAbortedHydration() {
+    fun domMutationsFailDuringAndAfterAbortedHydration() {
         val root = document.createElement("div") as HTMLElement
         root.innerHTML = "<span>A</span><span>B</span><span>C</span>"
         val serverHtml = root.innerHTML
         val applier = HydrationDomApplier(DomNodeWrapper(root))
 
-        applier.move(from = 1, to = 0, count = 1)
-        applier.remove(index = 0, count = 1)
+        assertFailsWith<IllegalStateException> {
+            applier.move(from = 1, to = 0, count = 1)
+        }
+        assertFailsWith<IllegalStateException> {
+            applier.remove(index = 0, count = 1)
+        }
+        assertFailsWith<IllegalStateException> {
+            applier.clear()
+        }
         assertEquals(serverHtml, root.innerHTML)
 
         applier.abortHydration()
-        applier.move(from = 1, to = 0, count = 1)
-        applier.remove(index = 0, count = 1)
+        assertFailsWith<IllegalStateException> {
+            applier.move(from = 1, to = 0, count = 1)
+        }
+        assertFailsWith<IllegalStateException> {
+            applier.remove(index = 0, count = 1)
+        }
+        assertFailsWith<IllegalStateException> {
+            applier.clear()
+        }
         assertEquals(serverHtml, root.innerHTML)
     }
 
