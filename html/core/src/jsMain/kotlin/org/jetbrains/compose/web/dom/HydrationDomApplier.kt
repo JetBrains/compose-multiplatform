@@ -38,6 +38,7 @@ internal class HydrationDomApplier(
     private val rootNode = root.node
     private val frames = mutableListOf(Frame(rootNode))
     private val claimedNodes = mutableSetOf<Node>()  // claimed nodes that still need to be called by insertBottomUp
+    private val nodesWithClaimedRawChildren = mutableSetOf<Node>()
     private val boundaryMarkers = mutableListOf<Comment>()
     private val pendingEmptyTexts = mutableListOf<PendingEmptyText>()
     private val pendingDomMutations = mutableListOf<() -> Unit>()
@@ -84,6 +85,20 @@ internal class HydrationDomApplier(
         }
 
         claimedNodes += element
+        return element
+    }
+
+    /** Claims an element whose server-only text is not represented by a Compose DOM node. */
+    fun claimElementWithRawText(tagName: String, value: String): Element {
+        val element = claimElement(tagName)
+        frames += Frame(element)
+        try {
+            claimRawText(value)
+            verifyComplete(currentFrame)
+        } finally {
+            frames.removeAt(frames.lastIndex)
+        }
+        nodesWithClaimedRawChildren += element
         return element
     }
 
@@ -134,11 +149,8 @@ internal class HydrationDomApplier(
         return text
     }
 
-    /**
-     * Claims text that is present in server HTML but is not represented by a Compose DOM node.
-     * Style sheets use this for their serialized CSS before switching back to CSSOM updates.
-     */
-    fun claimRawText(value: String) {
+    /** Validates server-only text without retaining it as a Compose-managed child. */
+    private fun claimRawText(value: String) {
         ensureHydrating()
 
         val frame = currentFrame
@@ -167,7 +179,11 @@ internal class HydrationDomApplier(
             if (node.node !in claimedNodes) {
                 mismatchAtCurrentNode("entered a node that was not claimed")
             }
-            frames += Frame(node.node)
+            frames += Frame(node.node).also { frame ->
+                if (nodesWithClaimedRawChildren.remove(node.node)) {
+                    frame.nextNode = null
+                }
+            }
         }
         super.down(node)
     }
@@ -236,6 +252,7 @@ internal class HydrationDomApplier(
         if (!isHydrating) return
         state = State.Aborted
         claimedNodes.clear()
+        nodesWithClaimedRawChildren.clear()
         boundaryMarkers.clear()
         pendingEmptyTexts.clear()
         pendingDomMutations.clear()

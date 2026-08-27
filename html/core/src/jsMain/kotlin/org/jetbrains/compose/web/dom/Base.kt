@@ -10,6 +10,7 @@ import org.jetbrains.compose.web.attributes.toClassAttributeValue
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleHolder
 import org.jetbrains.compose.web.css.toStyleAttributeValue
+import org.jetbrains.compose.web.css.utils.serializeRules
 import org.jetbrains.compose.web.HydrationMismatchException
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.jetbrains.compose.web.internal.runtime.DomApplier
@@ -355,17 +356,41 @@ private class HydratingComposeHtmlContext(
         )
     }
 
+    // A detached <style> has no sheet, so keep its CSS as text until it can use CSSOM.
     @Composable
     override fun StyleElement(
         applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)?,
         cssRules: CSSRuleDeclarationList,
     ) {
-        if (applier.isHydrating) {
-            throw UnsupportedOperationException(
-                "Style elements are not supported yet",
-            )
+        TagElement<HTMLStyleElement>(
+            elementBuilder = HydratingElementBuilder(
+                tagName = "style",
+                applier = applier,
+                browserBuilder = ElementBuilder.createBuilder("style"),
+                rawText = { cssRules.serializeRules().joinToString("\n") },
+            ),
+            applyAttrs = applyAttrs,
+        ) {
+            DisposableEffect(cssRules, cssRules.size) {
+                if (scopeElement.sheet is CSSStyleSheet) {
+                    // Remove SSR or fallback text once; later updates must keep the current sheet.
+                    if (scopeElement.firstChild != null) {
+                        scopeElement.textContent = ""
+                    }
+                    // Clearing the text replaces the stylesheet, so get the new sheet afterwards.
+                    val cssStylesheet = scopeElement.sheet as? CSSStyleSheet
+                    cssStylesheet?.setCSSRules(cssRules)
+                    onDispose {
+                        cssStylesheet?.clearCSSRules()
+                    }
+                } else {
+                    scopeElement.textContent = cssRules.serializeRules().joinToString("\n")
+                    onDispose {
+                        scopeElement.textContent = ""
+                    }
+                }
+            }
         }
-        BrowserComposeHtmlContext.StyleElement(applyAttrs, cssRules)
     }
 }
 
@@ -373,10 +398,15 @@ private class HydratingElementBuilder<TElement : Element>(
     private val tagName: String,
     private val applier: HydrationDomApplier,
     private val browserBuilder: ElementBuilder<TElement>,
+    private val rawText: (() -> String)? = null,
 ) : ElementBuilder<TElement> {
     @Suppress("UNCHECKED_CAST")
     override fun create(): TElement = if (applier.isHydrating) {
-        applier.claimElement(tagName) as TElement
+        if (rawText == null) {
+            applier.claimElement(tagName)
+        } else {
+            applier.claimElementWithRawText(tagName, rawText())
+        } as TElement
     } else {
         browserBuilder.create()
     }
