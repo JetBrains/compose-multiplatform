@@ -41,7 +41,7 @@ Run the generator tests and the library's multiplatform checks:
 
 ## How generation works
 
-1. Gradle resolves and unpacks the pinned Maven sources artifact into the KSP runner's `build/`.
+1. Gradle resolves and unpacks the pinned kotlinx-browser sources artifact into the KSP runner's `build/`.
 2. KSP reads the browser source files named in
    [`common-dom-selection.txt`](generator/src/main/resources/common-dom-selection.txt).
 3. `SelectionPolicy` chooses classifier identities, while `ClosureResolver` adds supported
