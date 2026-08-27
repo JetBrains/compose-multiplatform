@@ -25,8 +25,9 @@ import kotlin.js.console
 
 /**
  * Adopts an existing server-rendered DOM tree. If it does not match the composition, reports the
- * first mismatch and falls back to a client render. A throwing [onHydrationMismatch] aborts the
- * fallback and leaves the server DOM untouched.
+ * first mismatch and falls back to a client render. Formatting-only HTML whitespace immediately
+ * inside [root], before or after the composed content, is ignored. A throwing
+ * [onHydrationMismatch] aborts the fallback and leaves the server DOM untouched.
  */
 @OptIn(ComposeWebInternalApi::class)
 fun <TElement : Element> hydrateComposable(

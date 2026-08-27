@@ -39,7 +39,8 @@ internal class HydrationDomApplier(
     private val frames = mutableListOf(Frame(rootNode))
     private val claimedNodes = mutableSetOf<Node>()  // claimed nodes that still need to be called by insertBottomUp
     private val nodesWithClaimedRawChildren = mutableSetOf<Node>()
-    private val boundaryMarkers = mutableListOf<Comment>()
+    // Boundary markers and formatting-only root text must remain in place until hydration succeeds.
+    private val nodesToRemoveAfterHydration = mutableListOf<Node>()
     private val pendingEmptyTexts = mutableListOf<PendingEmptyText>()
     private val pendingDomMutations = mutableListOf<() -> Unit>()
     private var state = State.Hydrating
@@ -67,6 +68,10 @@ internal class HydrationDomApplier(
 
         val expectedTagName = tagName.lowercase()
         val frame = currentFrame
+        // allows whitespace around root node, that won't cause a hydration mismatch
+        if (frame.node === rootNode && frame.nextChildIndex == 0) {
+            skipRootBoundaryWhitespace(frame)
+        }
         val index = frame.nextChildIndex++
         val candidate = frame.nextNode
         frame.nextNode = candidate?.nextSibling
@@ -107,6 +112,9 @@ internal class HydrationDomApplier(
         ensureHydrating()
 
         val frame = currentFrame
+        if (frame.node === rootNode && frame.nextChildIndex == 0) {
+            skipRootBoundaryWhitespace(frame, expectedText = value)
+        }
         val index = frame.nextChildIndex++
         val candidate = frame.nextNode
         val text = when {
@@ -116,7 +124,7 @@ internal class HydrationDomApplier(
                 if (boundaryMarker != null) {
                     // Skip boundary markers.
                     frame.nextNode = boundaryMarker.nextSibling
-                    boundaryMarkers += boundaryMarker
+                    nodesToRemoveAfterHydration += boundaryMarker
                 }
                 candidate
             }
@@ -237,12 +245,13 @@ internal class HydrationDomApplier(
         if (frames.size != 1) {
             mismatchAtCurrentNode("composition ended before leaving the current node")
         }
+        skipRootBoundaryWhitespace(currentFrame)
         verifyComplete(currentFrame)
         if (claimedNodes.isNotEmpty()) {
             mismatchAtCurrentNode("composition ended before all claimed nodes were reconciled")
         }
 
-        applyDeferredTextChanges()
+        finalizeHydratedNodes()
         applyPendingDomMutations()
         state = State.Complete
         frames.clear()
@@ -253,7 +262,7 @@ internal class HydrationDomApplier(
         state = State.Aborted
         claimedNodes.clear()
         nodesWithClaimedRawChildren.clear()
-        boundaryMarkers.clear()
+        nodesToRemoveAfterHydration.clear()
         pendingEmptyTexts.clear()
         pendingDomMutations.clear()
         frames.clear()
@@ -274,6 +283,20 @@ internal class HydrationDomApplier(
         mismatchAtCurrentNode("expected end of node, found extra ${extra.describe()}")
     }
 
+    private fun skipRootBoundaryWhitespace(frame: Frame, expectedText: String? = null) {
+        while (true) {
+            val whitespace = frame.nextNode as? Text ?: return
+            if (
+                whitespace.data == expectedText ||
+                whitespace.data.any { it !in AsciiWhitespaceCharacters }
+            ) {
+                return
+            }
+            nodesToRemoveAfterHydration += whitespace
+            frame.nextNode = whitespace.nextSibling
+        }
+    }
+
     private fun ensureHydrating() {
         check(isHydrating) { "Hydration is no longer active" }
     }
@@ -284,15 +307,15 @@ internal class HydrationDomApplier(
         }
     }
 
-    private fun applyDeferredTextChanges() {
+    private fun finalizeHydratedNodes() {
         pendingEmptyTexts.forEach { pending ->
             pending.parent.insertBefore(pending.text, pending.anchor)
         }
-        boundaryMarkers.forEach { marker ->
-            marker.parentNode?.removeChild(marker)
+        nodesToRemoveAfterHydration.forEach { node ->
+            node.parentNode?.removeChild(node)
         }
         pendingEmptyTexts.clear()
-        boundaryMarkers.clear()
+        nodesToRemoveAfterHydration.clear()
     }
 
     private fun applyPendingDomMutations() {

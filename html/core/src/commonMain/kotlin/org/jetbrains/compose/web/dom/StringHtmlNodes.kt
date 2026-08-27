@@ -164,7 +164,7 @@ private fun requireValidHtmlAttributeName(name: String) {
     }
 }
 
-private const val AsciiWhitespaceCharacters = "\t\n\u000C\r "
+internal const val AsciiWhitespaceCharacters = "\t\n\u000C\r "
 private const val InvalidHtmlTagNameCharacters = "\u0000/>"
 private const val InvalidHtmlAttributeNameCharacters = " \"'/>="
 

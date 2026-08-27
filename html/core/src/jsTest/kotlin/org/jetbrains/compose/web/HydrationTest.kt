@@ -19,6 +19,7 @@ import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNull
 import kotlin.test.assertSame
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -42,6 +43,84 @@ class HydrationTest {
         } finally {
             composition.dispose()
         }
+    }
+
+    @Test
+    fun rootBoundaryWhitespaceIsIgnoredAndRemoved() = MainScope().promise {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = "\n    ${composeHtmlToString { Span { Text("First") } }}\n"
+        val serverRenderedSpan = root.childNodes.item(1)
+        val leadingWhitespace = root.firstChild
+        val trailingWhitespace = root.lastChild
+        var showSecond by mutableStateOf(false)
+
+        val composition = hydrateComposable(root) {
+            Span { Text("First") }
+            if (showSecond) {
+                Span { Text("Second") }
+            }
+        }
+
+        try {
+            assertEquals(1, root.childNodes.length)
+            assertSame(serverRenderedSpan, root.firstChild)
+            assertNull(leadingWhitespace?.parentNode)
+            assertNull(trailingWhitespace?.parentNode)
+
+            showSecond = true
+            delay(100.milliseconds)
+
+            assertEquals(2, root.childNodes.length)
+            assertSame(serverRenderedSpan, root.firstChild)
+            assertEquals("<span>First</span><span>Second</span>", root.innerHTML)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun rootBoundaryWhitespaceIsPreservedWhenHydrationFails() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = "\n    <span>Server</span>\n"
+        val serverHtml = root.innerHTML
+
+        assertFailsWith<HydrationMismatchException> {
+            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                Span { Text("Client") }
+            }
+        }
+
+        assertEquals(serverHtml, root.innerHTML)
+    }
+
+    @Test
+    fun whitespaceInsideComposedElementsIsNotIgnored() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = "<div>\n    <span></span>\n</div>"
+
+        val failure = assertFailsWith<HydrationMismatchException> {
+            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                Div { Span() }
+            }
+        }
+
+        assertContains(failure.message.orEmpty(), "expected <span>")
+        assertContains(failure.message.orEmpty(), "found text")
+    }
+
+    @Test
+    fun visibleWhitespaceAtTheRootIsNotIgnored() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = "&nbsp;<span></span>"
+
+        val failure = assertFailsWith<HydrationMismatchException> {
+            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                Span()
+            }
+        }
+
+        assertContains(failure.message.orEmpty(), "expected <span>")
+        assertContains(failure.message.orEmpty(), "found text")
     }
 
     @Test
