@@ -13,44 +13,63 @@ Generator checks and tests do run KSP and resolve the pinned sources artifact.
 
 ## Run
 
-Run all commands in this section from the repository's `html/` directory, which contains the Gradle
-wrapper. Generate staged output without changing checked-in sources:
+Run all commands in this section from this directory. Generate staged output without changing 
+checked-in sources:
 
 ```shell
-./gradlew -p kotlinx-browser-common-subset generateKotlinxBrowserCommonSubset
+../gradlew generateKotlinxBrowserCommonSubset
 ```
 
 Check that staged output matches `src/` and `api/dom-api-manifest.txt`:
 
 ```shell
-./gradlew -p kotlinx-browser-common-subset checkKotlinxBrowserCommonSubset
+../gradlew checkKotlinxBrowserCommonSubset
 ```
 
 After reviewing a deliberate generated API change, replace the checked-in files explicitly:
 
 ```shell
-./gradlew -p kotlinx-browser-common-subset updateKotlinxBrowserCommonSubset
+../gradlew updateKotlinxBrowserCommonSubset
 ```
 
 Run the generator tests and the library's multiplatform checks:
 
 ```shell
-./gradlew -p kotlinx-browser-common-subset/generator :check
-./gradlew -p kotlinx-browser-common-subset check
+../gradlew check
 ```
+
+See the [verification module README](generator/verification/README.md) for focused compilation and
+ledger-test tasks.
 
 ## How generation works
 
-1. Gradle resolves and unpacks the pinned kotlinx-browser sources artifact into the KSP runner's `build/`.
-2. KSP reads the browser source files named in
+```mermaid
+flowchart TB
+    artifact["kotlinx-browser:&lt;version&gt;:sources"]
+    sources["Unpacked webMain sources"]
+    policy["common-dom-selection.txt"]
+    generator["KSP generator<br/>selection → closure → common model → emit"]
+    staged["Staged source sets + reports"]
+    checked["Checked-in src/ + API manifest"]
+
+    artifact --> sources
+    sources --> generator
+    policy --> generator
+    generator --> staged
+
+    staged -.->|check: compare| checked
+    staged -->|update: replace after review| checked
+```
+
+1. Gradle resolves and unpacks the pinned kotlinx-browser sources artifact. KSP reads the browser
+   files named in
    [`common-dom-selection.txt`](generator/src/main/resources/common-dom-selection.txt).
-3. `SelectionPolicy` chooses classifier identities, while `ClosureResolver` adds supported
-   inheritance and signature dependencies.
-4. `SignatureAnalyzer`, `CommonTypeMapper`, and `MemberScanner` build the common model and
-   record a decision for every declaration they inspect.
-5. `FacadeSourceEmitter` renders KotlinPoet files as staged KSP resources.
-6. Gradle stages those resources for comparison with, or explicit replacement of, checked-in
-   generated sources. Handwritten interop files are excluded from synchronization.
+2. `SelectionPolicy`, `ClosureResolver`, `SignatureAnalyzer`, `CommonTypeMapper`, and
+   `MemberScanner` select declarations, close their dependencies, build the common model, and
+   record every decision.
+3. `FacadeSourceEmitter` renders KotlinPoet files and reports into the staging directory.
+4. Gradle compares staged output with checked-in generated sources, or replaces those sources only
+   through the explicit update task. Handwritten interop files are never synchronized.
 
 ## Input boundary
 
@@ -87,6 +106,20 @@ only through a signature. When a mapped classifier is an actual supertype, the c
 normally instead and preserves the inheritance edge.
 
 ## Source sets
+
+```mermaid
+flowchart TB
+    common["commonMain<br/>expect API + handwritten interop"]
+    web["webMain<br/>kotlinx-browser dependency"]
+    jvm["jvmMain<br/>inert actuals"]
+    js["jsMain<br/>browser actuals"]
+    wasm["wasmJsMain<br/>browser actuals"]
+
+    common --> web
+    common --> jvm
+    web --> js
+    web --> wasm
+```
 
 | Source set | Role |
 | --- | --- |
