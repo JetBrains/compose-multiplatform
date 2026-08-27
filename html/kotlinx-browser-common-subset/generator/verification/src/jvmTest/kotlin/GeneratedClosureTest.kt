@@ -84,7 +84,7 @@ class GeneratedClosureTest {
     // Ensures signatures name only emitted facade or generated interop types.
     @Test
     fun everySignatureIsClosedOverTheEmittedClosure() {
-        val facadeNames = report.declarations.mapTo(mutableSetOf()) { it.portableName }
+        val facadeNames = report.declarations.mapTo(mutableSetOf()) { it.commonName }
 
         report.declarations.forEach { declaration ->
             report.signatureTypes(declaration).forEach { type ->
@@ -130,7 +130,7 @@ class GeneratedClosureTest {
             assertEquals("input", declaration.origin, "$name was not selected from its input file")
 
             val referrers = report.declarations
-                .filter { it.name != name && declaration.portableName in report.signatureTypes(it) }
+                .filter { it.name != name && declaration.commonName in report.signatureTypes(it) }
             assertTrue(referrers.isNotEmpty(), "$name is named by nothing, so it should not be selected")
         }
 
@@ -141,7 +141,7 @@ class GeneratedClosureTest {
         ).forEach { (referrer, referenced) ->
             assertContains(
                 report.signatureTypes(report.byName.getValue(referrer)),
-                report.byName.getValue(referenced).portableName,
+                report.byName.getValue(referenced).commonName,
             )
         }
     }
@@ -184,7 +184,7 @@ class GeneratedClosureTest {
         )
     }
 
-    /** The worker promotion also makes HTMLLinkElement's WorkerType member portable. */
+    /** The worker promotion also makes HTMLLinkElement's WorkerType member common. */
     @Test
     fun workerTypesAreSelectedAndAbstractWorkerKeepsItsIdentity() {
         assertEquals(

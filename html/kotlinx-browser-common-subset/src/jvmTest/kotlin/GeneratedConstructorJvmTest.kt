@@ -36,8 +36,8 @@ import kotlinx.browser.dom.events.UIEvent
 class GeneratedConstructorJvmTest {
     @Test
     fun browserConstructorsAreCallableWithTheirDeclaredArguments() {
-        assertIs<JsAny>(Event("portable"))
-        assertIs<Event>(Event("portable", EventInit(bubbles = true)))
+        assertIs<JsAny>(Event("common"))
+        assertIs<Event>(Event("common", EventInit(bubbles = true)))
         assertIs<Event>(UIEvent("ui"))
         assertIs<UIEvent>(MouseEvent("click"))
         assertIs<MouseEvent>(MouseEvent("click", MouseEventInit(clientX = 10, clientY = 20)))
@@ -50,7 +50,7 @@ class GeneratedConstructorJvmTest {
     // Ensures defaults resolve to JVM actual values rather than `definedExternally`.
     @Test
     fun defaultedConstructorArgumentsResolveToTheJvmValue() {
-        assertIs<Event>(Event("portable"))
+        assertIs<Event>(Event("common"))
         assertIs<Text>(Text())
         assertIs<Comment>(Comment())
         assertIs<DOMMatrix>(DOMMatrix())
@@ -65,7 +65,7 @@ class GeneratedConstructorJvmTest {
         assertEquals("hello", Text("hello").data)
         assertEquals("", Text().data)
         assertEquals("note", Comment("note").data)
-        assertEquals("", Event("portable").type)
+        assertEquals("", Event("common").type)
     }
 
     // Pins the protected no-argument constructor needed by JVM subclasses.
@@ -77,14 +77,14 @@ class GeneratedConstructorJvmTest {
         assertIs<Event>(inherited)
         assertIs<CompositionEvent>(chosen)
         assertEquals("", inherited.type)
-        // The subclass that picks its own arguments reaches the same constructor portable code does.
+        // The subclass that picks its own arguments reaches the same constructor common code does.
         assertEquals("", chosen.type)
     }
 
     /** A constructor builds a new instance every time, rather than handing back a shared stub. */
     @Test
     fun constructedStubsAreDistinctInstances() {
-        assertNotSame(Event("portable"), Event("portable"))
+        assertNotSame(Event("common"), Event("common"))
         assertNotSame(Text("hello"), Text("hello"))
 
         val text = Text("hello")

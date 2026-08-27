@@ -14,7 +14,7 @@ class GeneratedFacadeClassLoadingTest {
 
         assertEquals(report.counts.getValue("closure"), report.declarations.size)
         report.declarations.forEach { declaration ->
-            assertEquals(declaration.portableName, Class.forName(declaration.portableName).name)
+            assertEquals(declaration.commonName, Class.forName(declaration.commonName).name)
         }
     }
 }

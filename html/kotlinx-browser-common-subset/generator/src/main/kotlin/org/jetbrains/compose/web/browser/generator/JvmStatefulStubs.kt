@@ -17,12 +17,12 @@ import com.squareup.kotlinpoet.TypeSpec
 // Stateful option dictionaries.
 
 private data class JvmDictionaryProperty(
-    val property: PortableProperty,
-    val parameter: PortableParameter,
+    val property: CommonProperty,
+    val parameter: CommonParameter,
 )
 
 /** Adds the backing implementation and factory that retain dictionary arguments on JVM. */
-internal fun FileSpec.Builder.addJvmDictionaryState(dictionary: PortableClass, values: JvmStubValues) {
+internal fun FileSpec.Builder.addJvmDictionaryState(dictionary: CommonClass, values: JvmStubValues) {
     val factory = dictionary.factory ?: return
     val implementation = dictionary.jvmDictionaryImplementationName()
     val properties = dictionary.jvmDictionaryProperties(factory, values)
@@ -31,13 +31,13 @@ internal fun FileSpec.Builder.addJvmDictionaryState(dictionary: PortableClass, v
 }
 
 /** Pairs visible dictionary properties with factory parameters, including KSP keyword spellings. */
-private fun PortableClass.jvmDictionaryProperties(
-    factory: PortableFactory,
+private fun CommonClass.jvmDictionaryProperties(
+    factory: CommonFactory,
     values: JvmStubValues,
 ): List<JvmDictionaryProperty> {
     val visibleDictionaries = listOf(this) + values.mixinClosure(this).mapNotNull(values.classes::get)
     val visibleProperties = visibleDictionaries
-        .flatMap(PortableClass::properties)
+        .flatMap(CommonClass::properties)
         .distinctBy { "${it.name}:${it.type}" }
 
     return visibleProperties.map { property ->
@@ -46,14 +46,14 @@ private fun PortableClass.jvmDictionaryProperties(
             it.name in parameterNames && it.type == property.type
         }
         checkNotNull(parameter) {
-            "No factory parameter initializes ${portableName.canonicalName}.${property.name}: " +
+            "No factory parameter initializes ${commonName.canonicalName}.${property.name}: " +
                 "expected one of $parameterNames with type ${property.type}"
         }
         JvmDictionaryProperty(property, parameter)
     }.sortedBy { factory.parameters.indexOf(it.parameter) }
 }
 
-private fun PortableClass.jvmDictionaryImplementation(
+private fun CommonClass.jvmDictionaryImplementation(
     implementation: ClassName,
     properties: List<JvmDictionaryProperty>,
 ): TypeSpec = TypeSpec.classBuilder(implementation)
@@ -63,7 +63,7 @@ private fun PortableClass.jvmDictionaryImplementation(
             .apply { properties.forEach { addParameter(it.parameter.spec(null)) } }
             .build(),
     )
-    .addSuperinterface(portableName)
+    .addSuperinterface(commonName)
     .apply {
         properties.forEach { stored ->
             addProperty(
@@ -77,13 +77,13 @@ private fun PortableClass.jvmDictionaryImplementation(
     }
     .build()
 
-private fun PortableClass.jvmFactory(
-    factory: PortableFactory,
+private fun CommonClass.jvmFactory(
+    factory: CommonFactory,
     implementation: ClassName,
     properties: List<JvmDictionaryProperty>,
-): FunSpec = FunSpec.builder(portableName.simpleName)
+): FunSpec = FunSpec.builder(commonName.simpleName)
     .addModifiers(KModifier.PUBLIC, KModifier.ACTUAL)
-    .returns(portableName)
+    .returns(commonName)
     .apply { factory.parameters.forEach { addParameter(it.spec(null)) } }
     .addStatement(
         "return %T(%L)",
@@ -99,5 +99,5 @@ private fun PortableClass.jvmFactory(
     )
     .build()
 
-private fun PortableClass.jvmDictionaryImplementationName(): ClassName =
-    ClassName(portableName.packageName, "Jvm${portableName.simpleName}")
+private fun CommonClass.jvmDictionaryImplementationName(): ClassName =
+    ClassName(commonName.packageName, "Jvm${commonName.simpleName}")

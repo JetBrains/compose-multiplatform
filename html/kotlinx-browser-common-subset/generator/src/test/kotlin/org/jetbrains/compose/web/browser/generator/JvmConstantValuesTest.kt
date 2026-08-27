@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-// Verifies deterministic JVM companion constant allocation from the portable model alone.
+// Verifies deterministic JVM companion constant allocation from the common model alone.
 package org.jetbrains.compose.web.browser.generator
 
 import com.squareup.kotlinpoet.BYTE
@@ -73,5 +73,5 @@ class JvmConstantValuesTest {
     private fun JvmConstantValues.render(name: String, type: TypeName): String =
         initializer(constant(name, type)).toString()
 
-    private fun constant(name: String, type: TypeName) = PortableConstant(name, type)
+    private fun constant(name: String, type: TypeName) = CommonConstant(name, type)
 }

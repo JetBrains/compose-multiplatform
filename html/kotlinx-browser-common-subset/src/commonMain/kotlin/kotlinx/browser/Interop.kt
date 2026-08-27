@@ -12,7 +12,7 @@ import kotlin.Suppress
 import kotlin.collections.List
 
 /**
- * Portable marker actualized to each target's JavaScript root type.
+ * Common marker actualized to each target's JavaScript root type.
  *
  * ```kotlin
  * val raw: JsAny = media.getStartDate()
@@ -63,7 +63,7 @@ public expect fun Double.toJsDouble(): JsDouble
 public expect fun JsDouble.toKotlinDouble(): Double
 
 /**
- * Portable JavaScript array identity. Use [toJsArray] to create one.
+ * Common JavaScript array identity. Use [toJsArray] to create one.
  *
  * ```kotlin
  * val filter: JsArray<JsString> = listOf("class".toJsString()).toJsArray()

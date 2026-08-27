@@ -23,10 +23,10 @@ class IdentityOnlyEmissionTest {
         assertTrue("org.khronos.webgl.ArrayBuffer".browserPackage() in EXTERNAL_PACKAGE_BY_BROWSER_PACKAGE)
         assertTrue("org.khronos.webgl.ArrayBuffer".browserPackage() in packages)
         assertTrue("org.w3c.files.Blob".browserPackage() in packages)
-        assertFalse("org.khronos.webgl.ArrayBuffer".browserPackage() in PORTABLE_PACKAGE_BY_BROWSER_PACKAGE)
-        assertFalse("org.w3c.files.Blob".browserPackage() in PORTABLE_PACKAGE_BY_BROWSER_PACKAGE)
+        assertFalse("org.khronos.webgl.ArrayBuffer".browserPackage() in COMMON_PACKAGE_BY_BROWSER_PACKAGE)
+        assertFalse("org.w3c.files.Blob".browserPackage() in COMMON_PACKAGE_BY_BROWSER_PACKAGE)
         assertFalse("org.w3c.dom.Node".browserPackage() in EXTERNAL_PACKAGE_BY_BROWSER_PACKAGE)
-        assertEquals(PORTABLE_WEBGL_PACKAGE, mappings.getValue(WEBGL_PACKAGE).portablePackage)
+        assertEquals(COMMON_WEBGL_PACKAGE, mappings.getValue(WEBGL_PACKAGE).commonPackage)
         assertTrue("org.w3c.files" in mappings)
         assertFalse("org.w3c.xhr" in mappings)
     }
@@ -70,7 +70,7 @@ class IdentityOnlyEmissionTest {
             WEBGL,
             declarations,
             emptyList(),
-            JvmStubValues(declarations.associateBy(PortableClass::portableName)),
+            JvmStubValues(declarations.associateBy(CommonClass::commonName)),
             JvmConstantValues(emptyList()),
         ).toString()
 
@@ -83,11 +83,11 @@ class IdentityOnlyEmissionTest {
     /** Identity-only JVM classes retain their synthesized no-argument constructor. */
     @Test
     fun anIdentityOnlyClassifierHasAnInertValue() {
-        val classes = listOf(ARRAY_BUFFER, VIEW, FLOAT_32).associateBy(PortableClass::portableName)
+        val classes = listOf(ARRAY_BUFFER, VIEW, FLOAT_32).associateBy(CommonClass::commonName)
 
         assertEquals(
             "kotlinx.browser.webgl.Float32Array()",
-            JvmStubValues(classes).value(FLOAT_32.portableName).toString(),
+            JvmStubValues(classes).value(FLOAT_32.commonName).toString(),
         )
     }
 
@@ -103,7 +103,7 @@ class IdentityOnlyEmissionTest {
             WEBGL,
             declarations,
             emptyList(),
-            JvmStubValues(declarations.associateBy(PortableClass::portableName)),
+            JvmStubValues(declarations.associateBy(CommonClass::commonName)),
             JvmConstantValues(emptyList()),
         ).toString()
 
@@ -112,18 +112,18 @@ class IdentityOnlyEmissionTest {
     }
 }
 
-private val WEBGL = PortablePackageMapping(PORTABLE_WEBGL_PACKAGE, "PortableTypedArrays", "TypedArrayDictionaries")
+private val WEBGL = CommonPackageMapping(COMMON_WEBGL_PACKAGE, "TypedArrays", "TypedArrayDictionaries")
 
 private fun identityOnly(
     name: String,
     shape: ClassShape,
-    parent: PortableClass? = null,
-    superinterfaces: List<PortableClass> = emptyList(),
-): PortableClass = PortableClass(
+    parent: CommonClass? = null,
+    superinterfaces: List<CommonClass> = emptyList(),
+): CommonClass = CommonClass(
     browserName = ClassName(WEBGL_PACKAGE, name),
     parentBrowserName = parent?.browserName,
-    superinterfaces = superinterfaces.map(PortableClass::portableName),
-    ancestors = listOfNotNull(parent?.portableName),
+    superinterfaces = superinterfaces.map(CommonClass::commonName),
+    ancestors = listOfNotNull(parent?.commonName),
     shape = shape,
     isDictionary = false,
     isJsAny = true,

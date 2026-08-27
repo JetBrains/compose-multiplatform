@@ -43,7 +43,7 @@ class GeneratedCanvasEventsNetworkWorkerJvmTest {
     }
 
     @Test
-    fun canvasAndEventStubsKeepTheirPortableHierarchy() {
+    fun canvasAndEventStubsKeepTheirCommonHierarchy() {
         assertIs<CanvasPath>(Path2D())
         assertIs<ImageBitmapSource>(ImageData(2, 3))
         assertIs<Event>(CloseEvent("close", CloseEventInit()))

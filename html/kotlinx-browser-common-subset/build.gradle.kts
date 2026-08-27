@@ -95,19 +95,19 @@ val checkGenerator = generatorBuild.task(":check")
 
 tasks.register("generateKotlinxBrowserCommonSubset") {
     group = "generation"
-    description = "Generates the portable browser subset into the generator build directory."
+    description = "Generates the common browser subset into the generator build directory."
     dependsOn(generateSubset)
 }
 
 tasks.register("checkKotlinxBrowserCommonSubset") {
     group = "verification"
-    description = "Checks checked-in portable browser subset sources against fresh generation."
+    description = "Checks checked-in common browser subset sources against fresh generation."
     dependsOn(checkSubset)
 }
 
 tasks.register("updateKotlinxBrowserCommonSubset") {
     group = "generation"
-    description = "Explicitly updates checked-in portable browser subset sources and manifest."
+    description = "Explicitly updates checked-in common browser subset sources and manifest."
     dependsOn(updateSubset)
 }
 

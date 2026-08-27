@@ -20,13 +20,13 @@ import com.squareup.kotlinpoet.TypeName
  * inherited constants consistent, while using a separate namespace for each numeric type keeps
  * every generated literal type-correct.
  */
-internal class JvmConstantValues(constants: Iterable<PortableConstant>) {
+internal class JvmConstantValues(constants: Iterable<CommonConstant>) {
     private data class Key(val type: TypeName, val name: String)
 
     private val values: Map<Key, Int> = constants
-        .groupBy(PortableConstant::type)
+        .groupBy(CommonConstant::type)
         .flatMap { (type, constantsOfType) ->
-            val names = constantsOfType.map(PortableConstant::name).distinct().sorted()
+            val names = constantsOfType.map(CommonConstant::name).distinct().sorted()
             val capacity = type.nonNegativeConstantCapacity()
             check(names.size.toLong() <= capacity) {
                 "Cannot assign ${names.size} distinct JVM companion constants to $type; " +
@@ -36,7 +36,7 @@ internal class JvmConstantValues(constants: Iterable<PortableConstant>) {
         }
         .toMap()
 
-    fun initializer(constant: PortableConstant): CodeBlock {
+    fun initializer(constant: CommonConstant): CodeBlock {
         val value = checkNotNull(values[Key(constant.type, constant.name)]) {
             "No JVM companion constant allocation for ${constant.name}: ${constant.type}"
         }

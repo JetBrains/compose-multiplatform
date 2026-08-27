@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-// Provides portable callback fixtures for browser runtime tests.
+// Provides common callback fixtures for browser runtime tests.
 import kotlinx.browser.JsAny
 import kotlinx.browser.JsArray
 import kotlinx.browser.JsString
@@ -40,10 +40,10 @@ private fun scheduleWork(window: Window): Int = window.requestAnimationFrame { t
 
 // Exercise both the interface and callback listener overloads.
 private fun listenBothWays(target: EventTarget, listener: EventListener) {
-    target.addEventListener("portable", listener)
-    target.addEventListener("portable") { event: Event -> event.preventDefault() }
-    target.removeEventListener("portable", listener, options = false)
-    target.removeEventListener("portable", { event: Event -> event.stopPropagation() }, options = false)
+    target.addEventListener("common", listener)
+    target.addEventListener("common") { event: Event -> event.preventDefault() }
+    target.removeEventListener("common", listener, options = false)
+    target.removeEventListener("common", { event: Event -> event.stopPropagation() }, options = false)
 }
 
 private fun observeMutations(observer: MutationObserver, target: Node, filter: JsArray<JsString>) {

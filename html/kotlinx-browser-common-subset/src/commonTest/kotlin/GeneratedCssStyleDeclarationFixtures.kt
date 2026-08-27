@@ -33,5 +33,5 @@ private fun escapeCssIdentifier(identifier: String): String = CSS.escape(identif
 
 internal fun exerciseGeneratedCssStyleDeclaration(element: HTMLElement) {
     useInlineStyle(element)
-    escapeCssIdentifier("portable:id")
+    escapeCssIdentifier("common:id")
 }

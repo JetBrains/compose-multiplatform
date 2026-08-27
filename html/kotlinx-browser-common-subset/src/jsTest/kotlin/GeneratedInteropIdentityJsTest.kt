@@ -27,15 +27,15 @@ import kotlinx.browser.dom.events.EventTarget
 import kotlin.js.unsafeCast
 import kotlin.test.Test
 
-private fun portableStringIsKotlinString(value: JsString): String = value
+private fun commonStringIsKotlinString(value: JsString): String = value
 
 private fun tokenItemIsKotlinString(value: DOMTokenList): String? = value.item(0)
 
-private fun portableNumberIsKotlinNumber(value: JsNumber): Number = value
+private fun commonNumberIsKotlinNumber(value: JsNumber): Number = value
 
 private fun eventTimeStampIsKotlinNumber(value: Event): Number = value.timeStamp
 
-private fun portableDoubleIsKotlinDouble(value: JsDouble): Double = value
+private fun commonDoubleIsKotlinDouble(value: JsDouble): Double = value
 
 private fun lineDashIsKotlinDoubleArray(value: CanvasPathDrawingStyles): Array<Double> =
     value.getLineDash()
@@ -43,13 +43,13 @@ private fun lineDashIsKotlinDoubleArray(value: CanvasPathDrawingStyles): Array<D
 private fun matrixAcceptsKotlinDoubleArray(value: JsArray<JsDouble>): DOMMatrixReadOnly =
     DOMMatrixReadOnly(value)
 
-private fun portableArrayIsKotlinArray(value: JsArray<EventTarget>): Array<EventTarget> = value
+private fun commonArrayIsKotlinArray(value: JsArray<EventTarget>): Array<EventTarget> = value
 
 private fun eventPathIsKotlinArray(value: Event): Array<EventTarget> = value.composedPath()
 
 private fun attributeNamesAreKotlinStrings(value: Element): Array<String> = value.getAttributeNames()
 
-private fun portablePromiseIsBrowserPromise(
+private fun commonPromiseIsBrowserPromise(
     value: Promise<EventTarget>,
 ): kotlin.js.Promise<EventTarget> = value
 
@@ -57,24 +57,24 @@ class GeneratedInteropIdentityJsTest {
     @Test
     fun interopBridgesAreCallable() {
         val element: Element = document.createElement("div")
-        val event = Event("portable")
+        val event = Event("common")
         val context = canvasContext(document.createElement("canvas").unsafeCast<HTMLCanvasElement>())
         val numbers = listOf(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)
             .map(Double::toJsDouble)
             .toJsArray<JsDouble>()
         val targets = listOf<EventTarget>(element).toJsArray()
 
-        portableStringIsKotlinString("portable".toJsString())
+        commonStringIsKotlinString("common".toJsString())
         tokenItemIsKotlinString(element.classList)
-        portableNumberIsKotlinNumber(1.0.toJsNumber())
+        commonNumberIsKotlinNumber(1.0.toJsNumber())
         eventTimeStampIsKotlinNumber(event)
-        portableDoubleIsKotlinDouble(1.0.toJsDouble())
+        commonDoubleIsKotlinDouble(1.0.toJsDouble())
         lineDashIsKotlinDoubleArray(context)
         matrixAcceptsKotlinDoubleArray(numbers)
-        portableArrayIsKotlinArray(targets)
+        commonArrayIsKotlinArray(targets)
         eventPathIsKotlinArray(event)
         attributeNamesAreKotlinStrings(element)
-        portablePromiseIsBrowserPromise(resolvedPromise(element))
+        commonPromiseIsBrowserPromise(resolvedPromise(element))
     }
 }
 

@@ -1,34 +1,34 @@
-// Groups the portable model into facade packages and stages the generated source sets.
+// Groups the common model into facade packages and stages the generated source sets.
 package org.jetbrains.compose.web.browser.generator
 
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.squareup.kotlinpoet.FileSpec
 
-/** The declarations and extensions emitted for one portable package. */
+/** The declarations and extensions emitted for one common package. */
 internal data class FacadePackageModel(
-    val mapping: PortablePackageMapping,
-    val declarations: List<PortableClass>,
-    val dictionaries: List<PortableClass>,
-    val extensions: List<PortableExtensionFunction>,
-    val values: List<PortableExtensionValue>,
+    val mapping: CommonPackageMapping,
+    val declarations: List<CommonClass>,
+    val dictionaries: List<CommonClass>,
+    val extensions: List<CommonExtensionFunction>,
+    val values: List<CommonExtensionValue>,
 )
 
-/** Partitions the portable model by output package and declaration kind. */
+/** Partitions the common model by output package and declaration kind. */
 internal fun groupFacadePackages(
-    mappings: Collection<PortablePackageMapping>,
-    model: List<PortableClass>,
-    extensions: List<PortableExtensionFunction>,
-    values: List<PortableExtensionValue>,
+    mappings: Collection<CommonPackageMapping>,
+    model: List<CommonClass>,
+    extensions: List<CommonExtensionFunction>,
+    values: List<CommonExtensionValue>,
 ): List<FacadePackageModel> = mappings.distinct().mapNotNull { mapping ->
-    val declarations = model.filter { it.portableName.packageName == mapping.portablePackage }
+    val declarations = model.filter { it.commonName.packageName == mapping.commonPackage }
     val packageModel = FacadePackageModel(
         mapping,
-        declarations.filterNot(PortableClass::isDictionary),
-        declarations.filter(PortableClass::isDictionary),
-        extensions.filter { it.portablePackage == mapping.portablePackage },
-        values.filter { it.portablePackage == mapping.portablePackage }
-            .sortedBy { it.portableOwner.simpleName },
+        declarations.filterNot(CommonClass::isDictionary),
+        declarations.filter(CommonClass::isDictionary),
+        extensions.filter { it.commonPackage == mapping.commonPackage },
+        values.filter { it.commonPackage == mapping.commonPackage }
+            .sortedBy { it.commonOwner.simpleName },
     )
     packageModel.takeIf {
         it.declarations.isNotEmpty() || it.dictionaries.isNotEmpty() ||
@@ -42,7 +42,7 @@ internal class FacadeSourceEmitter(private val codeGenerator: CodeGenerator) {
     fun emit(
         dependencies: Dependencies,
         packages: List<FacadePackageModel>,
-        model: List<PortableClass>,
+        model: List<CommonClass>,
     ) {
         val commonFiles = packages.flatMap { p ->
             listOfNotNull(
@@ -58,13 +58,13 @@ internal class FacadeSourceEmitter(private val codeGenerator: CodeGenerator) {
                 browserLeafDeclarationsFile(
                     p.mapping,
                     p.declarations,
-                    p.extensions.filterNot(PortableExtensionFunction::usesInterop),
+                    p.extensions.filterNot(CommonExtensionFunction::usesInterop),
                 ),
                 p.dictionaries.ifAny { browserLeafDictionariesFile(p.mapping, it) },
             )
         }
         val targetFiles = packages.flatMap { p ->
-            val extensions = p.extensions.filter(PortableExtensionFunction::usesInterop)
+            val extensions = p.extensions.filter(CommonExtensionFunction::usesInterop)
             val dictionaries = p.dictionaries.filter { it.factory?.usesInterop == true }
             listOfNotNull(
                 if (extensions.isEmpty() && dictionaries.isEmpty()) null
@@ -72,7 +72,7 @@ internal class FacadeSourceEmitter(private val codeGenerator: CodeGenerator) {
                 p.values.ifAny { targetValuesFile(p.mapping, it) },
             )
         }
-        // A facade alias can inherit portable JsAny, whose handwritten actual differs by target.
+        // A facade alias can inherit common JsAny, whose handwritten actual differs by target.
         // Keep every browser-facing actual in the leaf source set where that actual is known.
         emitSourceSet("jsMain", dependencies, browserLeafFiles + targetFiles)
         emitSourceSet(
@@ -81,7 +81,7 @@ internal class FacadeSourceEmitter(private val codeGenerator: CodeGenerator) {
             browserLeafFiles + targetFiles,
         )
 
-        val jvmValues = JvmStubValues(model.associateBy(PortableClass::portableName))
+        val jvmValues = JvmStubValues(model.associateBy(CommonClass::commonName))
         val jvmConstants = JvmConstantValues(model.flatMap { it.companion?.properties.orEmpty() })
         val jvmFiles = packages.flatMap { p ->
             listOfNotNull(

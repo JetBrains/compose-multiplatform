@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-// Exercises generated portable constructors.
+// Exercises generated common constructors.
 import kotlinx.browser.JsArray
 import kotlinx.browser.JsDouble
 import kotlinx.browser.JsString
@@ -38,8 +38,8 @@ import kotlinx.browser.dom.events.UIEvent
 import kotlin.test.Test
 
 private fun buildEvents(): List<Event> = listOf(
-    Event("portable"),
-    Event("portable", EventInit(bubbles = true, cancelable = true)),
+    Event("common"),
+    Event("common", EventInit(bubbles = true, cancelable = true)),
     UIEvent("ui"),
     MouseEvent("click", MouseEventInit(clientX = 10, clientY = 20)),
     KeyboardEvent("keydown", KeyboardEventInit(key = "Enter")),
@@ -54,7 +54,7 @@ private fun buildHtmlConvenienceClasses(): List<HTMLElement> = listOf(
     Image(),
     Image(640, 480),
     Option(),
-    Option("Portable", "portable", defaultSelected = true, selected = true),
+    Option("Common", "common", defaultSelected = true, selected = true),
 )
 
 private fun buildMatrices(): List<DOMMatrix> = listOf(DOMMatrix(), DOMMatrix("scale(2)"), DOMMatrix(DOMMatrix()))

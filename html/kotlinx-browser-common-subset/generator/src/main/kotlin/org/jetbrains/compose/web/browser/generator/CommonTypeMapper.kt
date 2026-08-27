@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-// Maps browser types to portable KotlinPoet types and reports unsupported shapes.
+// Maps browser types to common KotlinPoet types and reports unsupported shapes.
 package org.jetbrains.compose.web.browser.generator
 
 import com.google.devtools.ksp.symbol.KSClassDeclaration
@@ -22,10 +22,10 @@ import com.squareup.kotlinpoet.WildcardTypeName
 
 /**
  * Maps browser types recursively while preserving nullability and projections.
- * Accepts built-ins, closure classifiers, portable interop types, and plain callbacks.
+ * Accepts built-ins, closure classifiers, common interop types, and plain callbacks.
  */
-internal class PortableTypeMapper(
-    val portableNames: Map<String, ClassName>,
+internal class CommonTypeMapper(
+    val commonNames: Map<String, ClassName>,
     private val signatureOnlyPackages: Set<String> = emptySet(),
 ) {
     fun result(type: KSType?): TypeMapping {
@@ -57,12 +57,12 @@ internal class PortableTypeMapper(
             )
         val className = classDeclaration.qualifiedName?.asString()
             ?: return TypeMapping.Skipped(SkipReason.UNRESOLVED_TYPE, type.toString())
-        val portable = BUILTIN_TYPES[className] ?: portableNames[className]
-        if (portable != null) return parameterized(type, portable)
+        val common = BUILTIN_TYPES[className] ?: commonNames[className]
+        if (common != null) return parameterized(type, common)
 
         val packageName = className.substringBeforeLast('.', missingDelimiterValue = "")
         val reason = if (
-            packageName in PORTABLE_PACKAGE_BY_BROWSER_PACKAGE ||
+            packageName in COMMON_PACKAGE_BY_BROWSER_PACKAGE ||
             packageName in signatureOnlyPackages
         ) {
             SkipReason.UNSELECTED_CLASSIFIER
@@ -74,13 +74,13 @@ internal class PortableTypeMapper(
 
     /** The mapping for one of the interop types, or `null` when [qualifiedName] names none of them. */
     private fun interop(qualifiedName: String?, type: KSType): TypeMapping? {
-        val portable = PORTABLE_INTEROP_TYPES[qualifiedName] ?: return null
-        return when (portable) {
-            // Promise results differ between JS and Wasm/JS, so the portable result remains opaque.
-            PORTABLE_PROMISE -> TypeMapping.Ported(
-                portable.parameterizedBy(STAR).copy(nullable = type.isMarkedNullable),
+        val common = COMMON_INTEROP_TYPES[qualifiedName] ?: return null
+        return when (common) {
+            // Promise results differ between JS and Wasm/JS, so the common result remains opaque.
+            COMMON_PROMISE -> TypeMapping.Ported(
+                common.parameterizedBy(STAR).copy(nullable = type.isMarkedNullable),
             )
-            else -> parameterized(type, portable)
+            else -> parameterized(type, common)
         }
     }
 
@@ -127,13 +127,13 @@ internal class PortableTypeMapper(
         val resolved = argument.type?.resolve()
             ?: return@map TypeMapping.Skipped(SkipReason.GENERIC_TYPE, "unresolved argument: $type")
         // Numeric Web IDL sequences differ only in their element classifier: Kotlin/JS exposes
-        // Array<Double>, while Kotlin/Wasm exposes JsArray<JsNumber>. A portable JsDouble actualizes
+        // Array<Double>, while Kotlin/Wasm exposes JsArray<JsNumber>. A common JsDouble actualizes
         // to precisely those two scalar types, so the surrounding invariant array stays identical.
         val mapping = if (
-            raw == PORTABLE_JS_ARRAY &&
+            raw == COMMON_JS_ARRAY &&
             resolved.declaration.qualifiedName?.asString() == BROWSER_JS_NUMBER.canonicalName
         ) {
-            TypeMapping.Ported(PORTABLE_JS_DOUBLE.copy(nullable = resolved.isMarkedNullable))
+            TypeMapping.Ported(COMMON_JS_DOUBLE.copy(nullable = resolved.isMarkedNullable))
         } else {
             result(resolved)
         }
@@ -144,7 +144,7 @@ internal class PortableTypeMapper(
     }
 }
 
-/** Marks the `FunctionN` that stands for a callback with a receiver; see [PortableTypeMapper]. */
+/** Marks the `FunctionN` that stands for a callback with a receiver; see [CommonTypeMapper]. */
 private const val EXTENSION_FUNCTION_TYPE = "ExtensionFunctionType"
 
 /** Returns the first failed nested type mapping. */

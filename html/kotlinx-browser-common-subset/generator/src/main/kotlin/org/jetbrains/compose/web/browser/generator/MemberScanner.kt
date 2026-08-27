@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-// Collects portable instance members and constructors.
+// Collects common instance members and constructors.
 package org.jetbrains.compose.web.browser.generator
 
 import com.google.devtools.ksp.getDeclaredFunctions
@@ -15,9 +15,9 @@ import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 
 internal class ScannedMembers(
-    val properties: List<PortableProperty>,
-    val functions: List<PortableFunction>,
-    val constructors: List<PortableConstructor>,
+    val properties: List<CommonProperty>,
+    val functions: List<CommonFunction>,
+    val constructors: List<CommonConstructor>,
     val keys: Set<String>,
 ) {
     companion object {
@@ -25,9 +25,9 @@ internal class ScannedMembers(
     }
 }
 
-/** Collects portable members declared by a classifier. */
+/** Collects common members declared by a classifier. */
 internal class MemberScanner(
-    types: PortableTypeMapper,
+    types: CommonTypeMapper,
     private val coverage: CoverageLedger,
     private val requestedDependencies: MutableSet<String>,
 ) {
@@ -41,15 +41,15 @@ internal class MemberScanner(
         // Star projection would erase a generic classifier's own T from its declared members.
         val ownType = declaration.takeIf { it.typeParameters.isEmpty() }?.asStarProjectedType()
         val targetName = declaration.qualifiedName?.asString().orEmpty()
-        val properties = mutableListOf<PortableProperty>()
-        val functions = mutableListOf<PortableFunction>()
+        val properties = mutableListOf<CommonProperty>()
+        val functions = mutableListOf<CommonFunction>()
         val declaredConstructors = mutableListOf<KSFunctionDeclaration>()
         val keys = mutableSetOf<String>()
 
         fun <T> accept(
             member: KSDeclaration,
             analysis: SignatureAnalysis<T>,
-            signatureOf: (T) -> PortableDeclarationSignature,
+            signatureOf: (T) -> CommonDeclarationSignature,
             asOverride: (T) -> T,
             output: MutableList<T>,
         ) {
@@ -67,7 +67,7 @@ internal class MemberScanner(
                 key in inheritedKeys -> coverage.ported(
                     CoverageKind.MEMBER,
                     subject,
-                    "provided by a portable supertype",
+                    "provided by a common supertype",
                 )
                 !keys.add(key) -> coverage.ported(CoverageKind.MEMBER, subject, "deduplicated on $targetName")
                 else -> {
@@ -82,7 +82,7 @@ internal class MemberScanner(
                 is KSPropertyDeclaration -> accept(
                     member,
                     signatures.property(member, ownType),
-                    PortableProperty::signatureKey,
+                    CommonProperty::signatureKey,
                     { it.copy(overrides = true) },
                     properties,
                 )
@@ -90,7 +90,7 @@ internal class MemberScanner(
                     accept(
                         member,
                         signatures.function(member, ownType, keepDefaults = true),
-                        PortableFunction::signatureKey,
+                        CommonFunction::signatureKey,
                         { it.copy(overrides = true) },
                         functions,
                     )
@@ -118,11 +118,11 @@ internal class MemberScanner(
         declaration: KSClassDeclaration,
         targetName: String,
         declared: List<KSFunctionDeclaration>,
-    ): List<PortableConstructor> {
+    ): List<CommonConstructor> {
         if (declared.isEmpty()) return emptyList()
         val primary = declaration.primaryConstructor
 
-        val ported = mutableListOf<Pair<KSFunctionDeclaration, PortableConstructor>>()
+        val ported = mutableListOf<Pair<KSFunctionDeclaration, CommonConstructor>>()
         declared.forEach { member ->
             val subject = member.coverageSubject(targetName)
             val analysis = signatures.constructor(member, primary)

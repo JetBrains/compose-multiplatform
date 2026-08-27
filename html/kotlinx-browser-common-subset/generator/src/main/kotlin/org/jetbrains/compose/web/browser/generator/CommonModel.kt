@@ -22,7 +22,7 @@ import com.squareup.kotlinpoet.TypeVariableName
 import com.squareup.kotlinpoet.WildcardTypeName
 
 /** Intermediate model shared by the KSP reader and KotlinPoet emitters. */
-internal data class PortableClass(
+internal data class CommonClass(
     val browserName: ClassName,
     val parentBrowserName: ClassName?,
     val superinterfaces: List<ClassName>,
@@ -31,49 +31,49 @@ internal data class PortableClass(
     val isDictionary: Boolean,
     /** Whether the browser declaration lists the interop marker. */
     val isJsAny: Boolean,
-    val properties: List<PortableProperty>,
-    val functions: List<PortableFunction>,
-    val constructors: List<PortableConstructor>,
-    val companion: PortableCompanion?,
-    val factory: PortableFactory?,
+    val properties: List<CommonProperty>,
+    val functions: List<CommonFunction>,
+    val constructors: List<CommonConstructor>,
+    val companion: CommonCompanion?,
+    val factory: CommonFactory?,
     val sourceFile: KSFile?,
     /** Classifier parameters preserved by common, web typealias, and JVM declarations. */
     val typeVariables: List<TypeVariableName> = emptyList(),
     /** Parameterized forms of [superinterfaces], in the same order. */
     val superinterfaceTypes: List<TypeName> = emptyList(),
 ) {
-    val portableName = browserName.toPortableName()
-    val portableParentName = parentBrowserName?.toPortableName()
-    val portableSuperinterfaces: List<TypeName>
+    val commonName = browserName.toCommonName()
+    val commonParentName = parentBrowserName?.toCommonName()
+    val commonSuperinterfaces: List<TypeName>
         get() = superinterfaceTypes.ifEmpty { superinterfaces }
     val instanceMemberCount = properties.size + functions.size
     val memberCount = instanceMemberCount + (companion?.memberCount ?: 0)
 
     /** Whether any emitted function or constructor parameter has a default. */
-    val hasDefaultArguments = functions.any(PortableFunction::hasDefaultArgument) ||
-        companion?.functions.orEmpty().any(PortableFunction::hasDefaultArgument) ||
-        constructors.any(PortableConstructor::hasDefaultArgument)
+    val hasDefaultArguments = functions.any(CommonFunction::hasDefaultArgument) ||
+        companion?.functions.orEmpty().any(CommonFunction::hasDefaultArgument) ||
+        constructors.any(CommonConstructor::hasDefaultArgument)
 
     /** Uses the browser primary constructor or the first constructor for JVM delegation. */
-    val jvmPrimaryConstructor = constructors.firstOrNull(PortableConstructor::primary) ?: constructors.firstOrNull()
+    val jvmPrimaryConstructor = constructors.firstOrNull(CommonConstructor::primary) ?: constructors.firstOrNull()
 
     /** Whether the JVM stub can be instantiated as `Type()`. */
     val jvmConstructibleWithoutArguments =
-        constructors.isEmpty() || constructors.any(PortableConstructor::callableWithoutArguments)
+        constructors.isEmpty() || constructors.any(CommonConstructor::callableWithoutArguments)
 
     /** Restores a protected no-argument path required by JVM subclasses. */
     val needsJvmFallbackConstructor = !jvmConstructibleWithoutArguments && shape != ClassShape.FINAL
 
     private val hasDictionaryProperties = isDictionary && properties.isNotEmpty()
     private val hasOpaquePromise = properties.any { it.type.mentionsPromise() } ||
-        functions.any(PortableFunction::mentionsPromise) ||
+        functions.any(CommonFunction::mentionsPromise) ||
         companion?.properties.orEmpty().any { it.type.mentionsPromise() } ||
-        companion?.functions.orEmpty().any(PortableFunction::mentionsPromise) ||
-        constructors.any(PortableConstructor::mentionsPromise)
+        companion?.functions.orEmpty().any(CommonFunction::mentionsPromise) ||
+        constructors.any(CommonConstructor::mentionsPromise)
     private val hasAbstractClassProperties =
-        shape != ClassShape.INTERFACE && properties.any(PortableProperty::abstractInBrowser)
+        shape != ClassShape.INTERFACE && properties.any(CommonProperty::abstractInBrowser)
     private val hasIrIncompatibleClassFunctions = shape != ClassShape.INTERFACE && functions.any {
-        it.abstractInBrowser || (it.open && it.parameters.any(PortableParameter::hasDefault))
+        it.abstractInBrowser || (it.open && it.parameters.any(CommonParameter::hasDefault))
     }
 
     /** Flags unavoidable expect/actual modality, default, dictionary, or Promise mismatches. */
@@ -81,19 +81,19 @@ internal data class PortableClass(
         hasAbstractClassProperties || hasIrIncompatibleClassFunctions
 }
 
-private fun TypeName.mentionsPromise(): Boolean = mentions { it == PORTABLE_PROMISE }
+private fun TypeName.mentionsPromise(): Boolean = mentions { it == COMMON_PROMISE }
 
-private fun PortableFunction.hasDefaultArgument(): Boolean = parameters.any(PortableParameter::hasDefault)
+private fun CommonFunction.hasDefaultArgument(): Boolean = parameters.any(CommonParameter::hasDefault)
 
-private fun PortableConstructor.hasDefaultArgument(): Boolean = parameters.any(PortableParameter::hasDefault)
+private fun CommonConstructor.hasDefaultArgument(): Boolean = parameters.any(CommonParameter::hasDefault)
 
-private fun PortableFunction.mentionsPromise(): Boolean =
+private fun CommonFunction.mentionsPromise(): Boolean =
     returnType.mentionsPromise() || parameters.any { it.type.mentionsPromise() }
 
-private fun PortableConstructor.mentionsPromise(): Boolean = parameters.any { it.type.mentionsPromise() }
+private fun CommonConstructor.mentionsPromise(): Boolean = parameters.any { it.type.mentionsPromise() }
 
-/** A portable instance property and the modality needed by generated targets. */
-internal data class PortableProperty(
+/** A common instance property and the modality needed by generated targets. */
+internal data class CommonProperty(
     val name: String,
     val type: TypeName,
     val mutable: Boolean,
@@ -102,10 +102,10 @@ internal data class PortableProperty(
     val overrides: Boolean = false,
 )
 
-/** A portable instance function and its complete signature. */
-internal data class PortableFunction(
+/** A common instance function and its complete signature. */
+internal data class CommonFunction(
     val name: String,
-    val parameters: List<PortableParameter>,
+    val parameters: List<CommonParameter>,
     val returnType: TypeName,
     val open: Boolean,
     val abstractInBrowser: Boolean,
@@ -113,8 +113,8 @@ internal data class PortableFunction(
 )
 
 /** A browser constructor reproduced in common and JVM declarations. */
-internal data class PortableConstructor(
-    val parameters: List<PortableParameter>,
+internal data class CommonConstructor(
+    val parameters: List<CommonParameter>,
     val primary: Boolean,
 ) {
     /** Whether `Type()` compiles: every parameter either defaults or is a vararg. */
@@ -124,75 +124,75 @@ internal data class PortableConstructor(
 }
 
 /** A source companion object and the members the facade can reproduce on every target. */
-internal data class PortableCompanion(
-    val properties: List<PortableConstant>,
-    val functions: List<PortableFunction>,
+internal data class CommonCompanion(
+    val properties: List<CommonConstant>,
+    val functions: List<CommonFunction>,
 ) {
     val memberCount: Int = properties.size + functions.size
 }
 
 /** A numeric companion constant whose JVM value is assigned during emission. */
-internal data class PortableConstant(
+internal data class CommonConstant(
     val name: String,
     val type: TypeName,
 )
 
-/** A browser `expect operator` extension whose receiver and complete signature are portable. */
-internal data class PortableExtensionFunction(
+/** A browser `expect operator` extension whose receiver and complete signature are common. */
+internal data class CommonExtensionFunction(
     val browserMember: MemberName,
     val receiverType: TypeName,
-    val function: PortableFunction,
+    val function: CommonFunction,
     val sourceFile: KSFile?,
 ) {
     val usesInterop = receiverType.mentionsInterop() || function.mentionsInterop()
-    val portablePackage =
-        requireNotNull(PORTABLE_PACKAGE_BY_BROWSER_PACKAGE[browserMember.packageName]).portablePackage
+    val commonPackage =
+        requireNotNull(COMMON_PACKAGE_BY_BROWSER_PACKAGE[browserMember.packageName]).commonPackage
     val browserAlias = "browser" + function.name.replaceFirstChar(Char::uppercaseChar)
     val key = "$receiverType.${function.key()}"
 }
 
 /** A browser string-enum value such as `ScrollBehavior.SMOOTH`. */
-internal data class PortableExtensionValue(
+internal data class CommonExtensionValue(
     val browserMember: MemberName,
     val browserOwner: ClassName,
     val name: String,
     val sourceFile: KSFile?,
 ) {
-    val portableOwner = browserOwner.toPortableName()
-    val portablePackage = portableOwner.packageName
+    val commonOwner = browserOwner.toCommonName()
+    val commonPackage = commonOwner.packageName
     val browserAlias = "browser$name"
 
     /** JVM singleton used where no browser value exists. */
     val jvmSingleton = ClassName(
-        portableOwner.packageName,
-        portableOwner.simpleName + name.lowercase().replaceFirstChar(Char::uppercaseChar),
+        commonOwner.packageName,
+        commonOwner.simpleName + name.lowercase().replaceFirstChar(Char::uppercaseChar),
     )
 
-    val key = "${portableOwner.simpleName}.Companion.$name"
+    val key = "${commonOwner.simpleName}.Companion.$name"
 }
 
-/** A function or constructor parameter after portable type mapping. */
-internal data class PortableParameter(
+/** A function or constructor parameter after common type mapping. */
+internal data class CommonParameter(
     val name: String,
     val type: TypeName,
     val isVararg: Boolean,
     val hasDefault: Boolean,
 )
 
-/** A portable option-dictionary factory. */
-internal data class PortableFactory(
-    val parameters: List<PortableParameter>,
+/** A common option-dictionary factory. */
+internal data class CommonFactory(
+    val parameters: List<CommonParameter>,
 ) {
     /** Whether a target-specific source file must implement this factory. */
     val usesInterop = parameters.any { it.type.mentionsInterop() }
 }
 
 /** Whether a function signature uses target-specific interop types. */
-internal fun PortableFunction.mentionsInterop(): Boolean =
+internal fun CommonFunction.mentionsInterop(): Boolean =
     returnType.mentionsInterop() || parameters.any { it.type.mentionsInterop() }
 
 /** Whether a type requires a target-specific interop actual. */
-internal fun TypeName.mentionsInterop(): Boolean = mentions { it.canonicalName in PORTABLE_INTEROP_NAMES }
+internal fun TypeName.mentionsInterop(): Boolean = mentions { it.canonicalName in COMMON_INTEROP_NAMES }
 
 /** Whether this type mentions a classifier matching [predicate], searching nested types recursively. */
 private fun TypeName.mentions(predicate: (ClassName) -> Boolean): Boolean = when (this) {
@@ -206,23 +206,23 @@ private fun TypeName.mentions(predicate: (ClassName) -> Boolean): Boolean = when
 private val LambdaTypeName.nestedTypes: List<TypeName>
     get() = listOfNotNull(receiver) + parameters.map(ParameterSpec::type) + returnType
 
-private val PORTABLE_INTEROP_NAMES: Set<String> =
-    PORTABLE_INTEROP_TYPES.values.mapTo(mutableSetOf(PORTABLE_JS_DOUBLE.canonicalName), ClassName::canonicalName)
+private val COMMON_INTEROP_NAMES: Set<String> =
+    COMMON_INTEROP_TYPES.values.mapTo(mutableSetOf(COMMON_JS_DOUBLE.canonicalName), ClassName::canonicalName)
 
 /** Maps a generic mixin's variables to the type arguments used by this class. */
-internal fun PortableClass.typeSubstitutionsFor(mixin: PortableClass): Map<String, TypeName> {
+internal fun CommonClass.typeSubstitutionsFor(mixin: CommonClass): Map<String, TypeName> {
     if (mixin.typeVariables.isEmpty()) return emptyMap()
-    val type = portableSuperinterfaces
+    val type = commonSuperinterfaces
         .filterIsInstance<ParameterizedTypeName>()
-        .firstOrNull { it.rawType == mixin.portableName }
+        .firstOrNull { it.rawType == mixin.commonName }
         ?: return emptyMap()
     return mixin.typeVariables.map(TypeVariableName::name).zip(type.typeArguments).toMap()
 }
 
-internal fun PortableProperty.substituteTypes(types: Map<String, TypeName>): PortableProperty =
+internal fun CommonProperty.substituteTypes(types: Map<String, TypeName>): CommonProperty =
     copy(type = type.substitute(types))
 
-internal fun PortableFunction.substituteTypes(types: Map<String, TypeName>): PortableFunction = copy(
+internal fun CommonFunction.substituteTypes(types: Map<String, TypeName>): CommonFunction = copy(
     parameters = parameters.map { it.copy(type = it.type.substitute(types)) },
     returnType = returnType.substitute(types),
 )
@@ -236,11 +236,11 @@ internal fun TypeName.substitute(types: Map<String, TypeName>): TypeName = when 
 }
 
 /** Maps a browser classifier to its configured facade package. */
-internal fun ClassName.toPortableName(): ClassName =
+internal fun ClassName.toCommonName(): ClassName =
     ClassName(
-        (PORTABLE_PACKAGE_BY_BROWSER_PACKAGE[packageName]
+        (COMMON_PACKAGE_BY_BROWSER_PACKAGE[packageName]
             ?: EXTERNAL_PACKAGE_BY_BROWSER_PACKAGE[packageName]
-            ?: signatureOnlyPackageMapping(packageName)).portablePackage,
+            ?: signatureOnlyPackageMapping(packageName)).commonPackage,
         simpleName,
     )
 
@@ -252,7 +252,7 @@ internal enum class ClassShape(val modifier: KModifier?) {
     FINAL(KModifier.FINAL),
 }
 
-/** Reads the source declaration's modality into the portable model. */
+/** Reads the source declaration's modality into the common model. */
 internal fun KSClassDeclaration.shape(): ClassShape = when {
     classKind == ClassKind.INTERFACE -> ClassShape.INTERFACE
     Modifier.ABSTRACT in modifiers -> ClassShape.ABSTRACT

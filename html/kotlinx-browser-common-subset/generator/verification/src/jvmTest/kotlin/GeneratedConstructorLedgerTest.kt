@@ -62,11 +62,11 @@ class GeneratedConstructorLedgerTest {
         assertEquals("input", eventInit.origin)
         assertEquals("dictionary", eventInit.kind)
 
-        val referrers = report.declarations.filter { eventInit.portableName in report.signatureTypes(it) }
+        val referrers = report.declarations.filter { eventInit.commonName in report.signatureTypes(it) }
         assertEquals(listOf("org.w3c.dom.events.Event"), referrers.map { it.name })
         report.declarations.forEach { declaration ->
             assertTrue(
-                declaration.members.none { eventInit.portableName in it },
+                declaration.members.none { eventInit.commonName in it },
                 "${declaration.name} names EventInit from a member, so it is not constructor-only",
             )
         }
@@ -75,7 +75,7 @@ class GeneratedConstructorLedgerTest {
     /** Every emitted constructor is closed over the closure, the same way every member signature is. */
     @Test
     fun everyConstructorSignatureIsClosedOverTheEmittedClosure() {
-        val facadeNames = report.declarations.mapTo(mutableSetOf()) { it.portableName }
+        val facadeNames = report.declarations.mapTo(mutableSetOf()) { it.commonName }
 
         report.declarations.forEach { declaration ->
             declaration.constructors.forEach { constructor ->
@@ -91,7 +91,7 @@ class GeneratedConstructorLedgerTest {
         }
     }
 
-    /** Numeric sequence element mapping makes both browser constructor shapes one portable API. */
+    /** Numeric sequence element mapping makes both browser constructor shapes one common API. */
     @Test
     fun numericSequenceConstructorsUseJsDoubleAndAreEmitted() {
         assertEquals(

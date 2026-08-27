@@ -1,7 +1,7 @@
 # kotlinx-browser common subset
 
 This module generates a multiplatform DOM facade from the published `kotlinx-browser` sources.
-Common code receives portable `expect` declarations, web targets keep browser identity through
+Common code receives the generated `expect` declarations, web targets keep browser identity through
 typealiases, and the JVM receives stubs.
 
 The generator resolves
@@ -43,10 +43,10 @@ Run the generator tests and the library's multiplatform checks:
 
 1. Gradle resolves and unpacks the pinned Maven sources artifact into the KSP runner's `build/`.
 2. KSP reads the browser source files named in
-   [`portable-dom-selection.txt`](generator/src/main/resources/portable-dom-selection.txt).
+   [`common-dom-selection.txt`](generator/src/main/resources/common-dom-selection.txt).
 3. `SelectionPolicy` chooses classifier identities, while `ClosureResolver` adds supported
    inheritance and signature dependencies.
-4. `SignatureAnalyzer`, `PortableTypeMapper`, and `MemberScanner` build the portable model and
+4. `SignatureAnalyzer`, `CommonTypeMapper`, and `MemberScanner` build the common model and
    record a decision for every declaration they inspect.
 5. `FacadeSourceEmitter` renders KotlinPoet files as staged KSP resources.
 6. Gradle stages those resources for comparison with, or explicit replacement of, checked-in
@@ -90,7 +90,7 @@ normally instead and preserves the inheritance edge.
 
 | Source set | Role |
 | --- | --- |
-| `commonMain` | Generated portable `expect` declarations, dictionaries, and values; handwritten interop contracts |
+| `commonMain` | Generated `expect` declarations, dictionaries, and values; handwritten interop contracts |
 | `webMain` | Shared browser dependency only; no generated actuals |
 | `jsMain` | Generated browser facade typealiases and bridges, plus handwritten JS interop implementations |
 | `wasmJsMain` | Generated browser facade typealiases and bridges, plus handwritten Wasm/JS interop implementations |
@@ -100,7 +100,7 @@ The JVM output is a compatibility stub, not a DOM implementation.
 
 ## Modeling rules
 
-Classifiers preserve their portable modality and mapped inheritance edges. Behavioral interfaces
+Classifiers preserve their source modality and mapped inheritance edges. Behavioral interfaces
 remain interfaces. If an inheritance edge cannot join the closure, generation fails.
 
 A member is emitted only when its complete signature maps recursively. Generic arguments, callback
@@ -114,8 +114,8 @@ Top-level operator extensions are emitted as wrapper functions on every target, 
 parameters are always explicit. Browser `definedExternally` defaults cannot be copied safely into
 the common wrapper contract because common code must also compile for the JVM.
 
-Option dictionaries keep mutable properties and inheritance. Their factories use portable inert
-defaults.
+Option dictionaries keep mutable properties and inheritance. Their factories use
+target-independent inert defaults.
 
 KSP exposes numeric companion constant names and types but not their initializer expressions. JVM
 actuals therefore receive deterministic inert values derived only from the selected source model.
@@ -123,10 +123,10 @@ actuals therefore receive deterministic inert values derived only from the selec
 Browser string enums are emitted as classifier identities plus companion extension values. Web
 targets forward to the browser values; JVM getters return stable private singletons.
 
-Portable companion functions are retained with their complete signatures. Web typealiases call the
+Companion functions in the common model retain their complete signatures. Web typealiases call the
 browser companion directly, while JVM companions provide inert, type-correct bodies.
 
-Portable interop types cover browser signatures involving `JsAny`, `JsString`, `JsNumber`,
+Common interop types cover browser signatures involving `JsAny`, `JsString`, `JsNumber`,
 `JsDouble`, `JsArray`, and `Promise`. Their declarations and target implementations are handwritten
 because they do not depend on the `kotlinx-browser` source model.
 

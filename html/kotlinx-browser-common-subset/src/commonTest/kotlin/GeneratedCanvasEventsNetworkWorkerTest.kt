@@ -109,7 +109,7 @@ internal fun constructCanvasTypes() {
 
 internal fun constructWorkerAndNetworkTypes(credentials: RequestCredentials) {
     val options = WorkerOptions(type = WorkerType.MODULE, credentials = credentials)
-    BroadcastChannel("portable").close()
+    BroadcastChannel("common").close()
     Worker("data:application/javascript,", options).terminate()
     SharedWorker("data:application/javascript,", options = options).port.close()
     EventSource("data:text/event-stream,").close()

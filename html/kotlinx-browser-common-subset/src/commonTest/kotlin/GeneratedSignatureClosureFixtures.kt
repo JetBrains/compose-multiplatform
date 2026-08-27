@@ -22,8 +22,8 @@ private fun useDiscoveredListenerOptions(
     add: AddEventListenerOptions,
     remove: EventListenerOptions,
 ) {
-    target.addEventListener("portable", listener, add)
-    target.removeEventListener("portable", listener, remove)
+    target.addEventListener("common", listener, add)
+    target.removeEventListener("common", listener, remove)
 }
 
 private fun reachTransitively(node: Node): MimeType? {

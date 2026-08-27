@@ -37,12 +37,12 @@ class GeneratedFacadeJvmTest {
     fun generatedMemberStubsAreUsableOnJvm() {
         val div = TestDivElement()
         div.id = "root"
-        div.title = "Portable title"
+        div.title = "Common title"
         div.align = "center"
         div.innerHTML = "content"
 
         assertEquals("root", div.id)
-        assertEquals("Portable title", div.title)
+        assertEquals("Common title", div.title)
         assertEquals("center", div.align)
         assertEquals("content", div.innerHTML)
         assertFalse(div.hasAttributes())
@@ -53,7 +53,7 @@ class GeneratedFacadeJvmTest {
         assertSame(div, div.getRootNode())
         // String inputs are usually keys or payloads, so they must not masquerade as results.
         assertNull(div.getAttribute("id"))
-        assertEquals("", TestWindow().btoa("portable"))
+        assertEquals("", TestWindow().btoa("common"))
         assertNull(div.querySelector("#root"))
         assertEquals(0, div.querySelectorAll("div").length)
 
@@ -80,7 +80,7 @@ class GeneratedFacadeJvmTest {
     @Test
     fun generatedInteropStubsAreUsableOnJvm() {
         val div = TestDivElement()
-        val event = Event("portable")
+        val event = Event("common")
 
         assertEquals(0.0, event.timeStamp.toDouble())
         assertEquals(0, event.composedPath().length)
@@ -107,11 +107,11 @@ class GeneratedFacadeJvmTest {
 
         // The five-parameter handler, the one whose interop types are nested inside a callback.
         div.onerror = { event, _, _, _, _ -> event }
-        assertSame(EMPTY, div.onerror?.invoke(EMPTY, "portable", 0, 0, null))
+        assertSame(EMPTY, div.onerror?.invoke(EMPTY, "common", 0, 0, null))
 
         // Both overloads of every listener method exist now; a lambda resolves to the callback one.
-        target.addEventListener("portable") { event -> event.preventDefault() }
-        target.removeEventListener("portable", { }, options = false)
+        target.addEventListener("common") { event -> event.preventDefault() }
+        target.removeEventListener("common", { }, options = false)
         assertEquals(0, TestWindow().requestAnimationFrame { })
     }
 
@@ -166,8 +166,8 @@ class GeneratedFacadeJvmTest {
 
         // The browser factory renames the keyword property to `param_is`; the generator maps that
         // spelling back when its JVM implementation stores the property.
-        val creation = ElementCreationOptions(param_is = "portable-element")
-        assertEquals("portable-element", creation.`is`)
+        val creation = ElementCreationOptions(param_is = "common-element")
+        assertEquals("common-element", creation.`is`)
         creation.`is` = "changed-element"
         assertEquals("changed-element", creation.`is`)
 
@@ -188,7 +188,7 @@ class GeneratedFacadeJvmTest {
 
     @Test
     fun eventHierarchyAndBehavioralInterfaceAreUsableOnJvm() {
-        val event = Event("portable")
+        val event = Event("common")
         val wheel = WheelEvent("wheel")
         val target = TestEventTarget()
         var handled: Event? = null
@@ -211,17 +211,17 @@ class GeneratedFacadeJvmTest {
         assertNull(event.target)
         assertFalse(event.defaultPrevented)
         event.preventDefault()
-        event.initEvent("portable", bubbles = true, cancelable = true)
+        event.initEvent("common", bubbles = true, cancelable = true)
 
         listener.handleEvent(event)
         assertSame(event, handled)
-        target.addEventListener("portable", listener)
-        target.addEventListener("portable", listener, false)
-        target.removeEventListener("portable", listener)
-        target.removeEventListener("portable", listener, false)
-        // The overloads discovery recovered, next to the boolean ones that were always portable.
-        target.addEventListener("portable", listener, AddEventListenerOptions(once = true))
-        target.removeEventListener("portable", listener, EventListenerOptions(capture = true))
+        target.addEventListener("common", listener)
+        target.addEventListener("common", listener, false)
+        target.removeEventListener("common", listener)
+        target.removeEventListener("common", listener, false)
+        // The overloads discovery recovered, next to the boolean ones that were always common.
+        target.addEventListener("common", listener, AddEventListenerOptions(once = true))
+        target.removeEventListener("common", listener, EventListenerOptions(capture = true))
         assertFalse(target.dispatchEvent(event))
     }
 

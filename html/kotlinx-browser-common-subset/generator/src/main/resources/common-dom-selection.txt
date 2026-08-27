@@ -1,4 +1,4 @@
-# Classifier selection for the generated portable DOM facade.
+# Classifier selection for the generated common DOM facade.
 #
 # Every top-level classifier in an `input` file is emitted by default. The remaining directives are
 # the complete set of exceptions to that rule:

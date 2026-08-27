@@ -109,7 +109,7 @@ class ConstructorEmissionTest {
         assertFalse("this.type = type" in jvm)
     }
 
-    /** The web actual is a typealias, so the browser's own constructor is the one portable code reaches. */
+    /** The web actual is a typealias, so the browser's own constructor is the one common code reaches. */
     @Test
     fun webActualsEmitNoConstructorOfTheirOwn() {
         val web = webFile(EVENT, TEXT, PATH_2D)
@@ -122,19 +122,19 @@ class ConstructorEmissionTest {
         assertContains(web, """"DEFAULT_ARGUMENTS_IN_EXPECT_WITH_ACTUAL_TYPEALIAS"""")
     }
 
-    /** Keeps concrete implementations of portable interface members explicit on common and JVM. */
+    /** Keeps concrete implementations of common interface members explicit on common and JVM. */
     @Test
     fun interfaceImplementationsAreEmittedAsOverrides() {
-        val contract = portableClass(
+        val contract = commonClass(
             DOM_EVENTS_PACKAGE,
             "PathContract",
             shape = ClassShape.INTERFACE,
             functions = listOf(function("closePath")),
         )
-        val implementation = portableClass(
+        val implementation = commonClass(
             DOM_EVENTS_PACKAGE,
             "ConcretePath",
-            superinterfaces = listOf(contract.portableName),
+            superinterfaces = listOf(contract.commonName),
             functions = listOf(function("closePath", overrides = true)),
         )
 
@@ -149,8 +149,8 @@ class ConstructorEmissionTest {
     /** Compiles the freshly generated common facade before this Gradle test task can run. */
     @Test
     fun generatedCommonFacadeCompilesInterfaceOverrides() {
-        val common = requiredGradleTestFile("portableDomCommonSource").readText()
-        val metadata = requiredGradleTestFile("portableDomCommonMetadata")
+        val common = requiredGradleTestFile("commonDomSource").readText()
+        val metadata = requiredGradleTestFile("commonDomMetadata")
 
         assertContains(
             common,
@@ -167,20 +167,20 @@ class ConstructorEmissionTest {
     /** Uses a singleton when required constructor arguments prevent direct JVM instantiation. */
     @Test
     fun inertValuesFallBackToTheSingletonWhereAConstructorDemandsArguments() {
-        val classes = listOf(EVENT, TEXT, NODE).associateBy(PortableClass::portableName)
+        val classes = listOf(EVENT, TEXT, NODE).associateBy(CommonClass::commonName)
 
-        assertNull(inertLiteral(EVENT.portableName, classes))
+        assertNull(inertLiteral(EVENT.commonName, classes))
         assertEquals(
             "kotlinx.browser.dom.events.EmptyEvent",
-            JvmStubValues(classes).value(EVENT.portableName).toString(),
+            JvmStubValues(classes).value(EVENT.commonName).toString(),
         )
         // Both of these can still be built directly.
-        assertEquals("kotlinx.browser.dom.Text()", inertLiteral(TEXT.portableName, classes).toString())
-        assertEquals("kotlinx.browser.dom.Node()", inertLiteral(NODE.portableName, classes).toString())
+        assertEquals("kotlinx.browser.dom.Text()", inertLiteral(TEXT.commonName, classes).toString())
+        assertEquals("kotlinx.browser.dom.Node()", inertLiteral(NODE.commonName, classes).toString())
     }
 }
 
-private val EVENTS = PortablePackageMapping(PORTABLE_EVENTS_PACKAGE, "PortableEvents", "EventDictionaries")
+private val EVENTS = CommonPackageMapping(COMMON_EVENTS_PACKAGE, "Events", "EventDictionaries")
 
 private fun requiredGradleTestFile(property: String): File {
     val path = System.getProperty(property)
@@ -188,25 +188,25 @@ private fun requiredGradleTestFile(property: String): File {
     return File(path).also { check(it.isFile) { "Missing test input: $it" } }
 }
 
-private fun commonFile(vararg declarations: PortableClass): String =
+private fun commonFile(vararg declarations: CommonClass): String =
     commonDeclarationsFile(EVENTS, declarations.toList(), emptyList()).toString()
 
-private fun webFile(vararg declarations: PortableClass): String =
+private fun webFile(vararg declarations: CommonClass): String =
     browserLeafDeclarationsFile(EVENTS, declarations.toList(), emptyList()).toString()
 
-private fun jvmFile(vararg declarations: PortableClass): String {
-    val values = JvmStubValues(declarations.associateBy(PortableClass::portableName))
+private fun jvmFile(vararg declarations: CommonClass): String {
+    val values = JvmStubValues(declarations.associateBy(CommonClass::commonName))
     val constants = JvmConstantValues(declarations.flatMap { it.companion?.properties.orEmpty() })
     return jvmDeclarationsFile(EVENTS, declarations.toList(), emptyList(), values, constants).toString()
 }
 
-private fun parameter(name: String, type: TypeName, hasDefault: Boolean = false): PortableParameter =
-    PortableParameter(name = name, type = type, isVararg = false, hasDefault = hasDefault)
+private fun parameter(name: String, type: TypeName, hasDefault: Boolean = false): CommonParameter =
+    CommonParameter(name = name, type = type, isVararg = false, hasDefault = hasDefault)
 
-private fun property(name: String, type: TypeName, mutable: Boolean): PortableProperty =
-    PortableProperty(name = name, type = type, mutable = mutable, open = true, abstractInBrowser = false)
+private fun property(name: String, type: TypeName, mutable: Boolean): CommonProperty =
+    CommonProperty(name = name, type = type, mutable = mutable, open = true, abstractInBrowser = false)
 
-private fun function(name: String, overrides: Boolean = false): PortableFunction = PortableFunction(
+private fun function(name: String, overrides: Boolean = false): CommonFunction = CommonFunction(
     name = name,
     parameters = emptyList(),
     returnType = UNIT,
@@ -215,22 +215,22 @@ private fun function(name: String, overrides: Boolean = false): PortableFunction
     overrides = overrides,
 )
 
-private fun portableClass(
+private fun commonClass(
     packageName: String,
     name: String,
-    parent: PortableClass? = null,
+    parent: CommonClass? = null,
     shape: ClassShape = ClassShape.OPEN,
     isDictionary: Boolean = false,
-    properties: List<PortableProperty> = emptyList(),
-    functions: List<PortableFunction> = emptyList(),
+    properties: List<CommonProperty> = emptyList(),
+    functions: List<CommonFunction> = emptyList(),
     superinterfaces: List<ClassName> = emptyList(),
-    constructors: List<PortableConstructor> = emptyList(),
-    factory: PortableFactory? = null,
-): PortableClass = PortableClass(
+    constructors: List<CommonConstructor> = emptyList(),
+    factory: CommonFactory? = null,
+): CommonClass = CommonClass(
     browserName = ClassName(packageName, name),
     parentBrowserName = parent?.browserName,
     superinterfaces = superinterfaces,
-    ancestors = parent?.let { listOf(it.portableName) + it.ancestors }.orEmpty(),
+    ancestors = parent?.let { listOf(it.commonName) + it.ancestors }.orEmpty(),
     shape = shape,
     isDictionary = isDictionary,
     isJsAny = true,
@@ -243,78 +243,78 @@ private fun portableClass(
 )
 
 /** `EventInit`, the option dictionary `Event` defaults its second parameter to. */
-private val EVENT_INIT = portableClass(
+private val EVENT_INIT = commonClass(
     DOM_EVENTS_PACKAGE,
     "EventInit",
     shape = ClassShape.INTERFACE,
     isDictionary = true,
-    factory = PortableFactory(listOf(parameter("bubbles", com.squareup.kotlinpoet.BOOLEAN, hasDefault = true))),
+    factory = CommonFactory(listOf(parameter("bubbles", com.squareup.kotlinpoet.BOOLEAN, hasDefault = true))),
 )
 
-private val EVENT = portableClass(
+private val EVENT = commonClass(
     DOM_EVENTS_PACKAGE,
     "Event",
     properties = listOf(property("type", STRING, mutable = false)),
     constructors = listOf(
-        PortableConstructor(
+        CommonConstructor(
             parameters = listOf(
                 parameter("type", STRING),
-                parameter("eventInitDict", EVENT_INIT.portableName, hasDefault = true),
+                parameter("eventInitDict", EVENT_INIT.commonName, hasDefault = true),
             ),
             primary = true,
         ),
     ),
 )
 
-private val UI_EVENT = portableClass(
+private val UI_EVENT = commonClass(
     DOM_EVENTS_PACKAGE,
     "UIEvent",
     parent = EVENT,
-    constructors = listOf(PortableConstructor(listOf(parameter("type", STRING)), primary = true)),
+    constructors = listOf(CommonConstructor(listOf(parameter("type", STRING)), primary = true)),
 )
 
-private val CHARACTER_DATA = portableClass(
+private val CHARACTER_DATA = commonClass(
     DOM_PACKAGE,
     "CharacterData",
     shape = ClassShape.ABSTRACT,
     properties = listOf(property("data", STRING, mutable = true)),
 )
 
-private val TEXT = portableClass(
+private val TEXT = commonClass(
     DOM_PACKAGE,
     "Text",
     parent = CHARACTER_DATA,
     constructors = listOf(
-        PortableConstructor(listOf(parameter("data", STRING, hasDefault = true)), primary = true),
+        CommonConstructor(listOf(parameter("data", STRING, hasDefault = true)), primary = true),
     ),
 )
 
-private val PATH_2D = portableClass(
+private val PATH_2D = commonClass(
     DOM_PACKAGE,
     "Path2D",
     constructors = listOf(
-        PortableConstructor(emptyList(), primary = true),
-        PortableConstructor(listOf(parameter("d", STRING)), primary = false),
+        CommonConstructor(emptyList(), primary = true),
+        CommonConstructor(listOf(parameter("d", STRING)), primary = false),
     ),
 )
 
-private val DOM_POINT_INIT = portableClass(
+private val DOM_POINT_INIT = commonClass(
     DOM_PACKAGE,
     "DOMPointInit",
     shape = ClassShape.INTERFACE,
     isDictionary = true,
-    factory = PortableFactory(listOf(parameter("x", DOUBLE, hasDefault = true))),
+    factory = CommonFactory(listOf(parameter("x", DOUBLE, hasDefault = true))),
 )
 
 /** `DOMPoint`, which the browser declares with two secondary constructors and no primary. */
-private val DOM_POINT = portableClass(
+private val DOM_POINT = commonClass(
     DOM_PACKAGE,
     "DOMPoint",
     constructors = listOf(
-        PortableConstructor(listOf(parameter("point", DOM_POINT_INIT.portableName)), primary = false),
-        PortableConstructor(listOf(parameter("x", DOUBLE, hasDefault = true)), primary = false),
+        CommonConstructor(listOf(parameter("point", DOM_POINT_INIT.commonName)), primary = false),
+        CommonConstructor(listOf(parameter("x", DOUBLE, hasDefault = true)), primary = false),
     ),
 )
 
 /** A classifier with no constructor at all, which keeps the one Kotlin synthesizes. */
-private val NODE = portableClass(DOM_PACKAGE, "Node")
+private val NODE = commonClass(DOM_PACKAGE, "Node")

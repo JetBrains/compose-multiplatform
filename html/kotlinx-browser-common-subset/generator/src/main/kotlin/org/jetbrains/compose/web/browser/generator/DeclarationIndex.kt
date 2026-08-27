@@ -55,7 +55,7 @@ internal class DeclarationIndex(
             .toList()
     }
     private val resolved = mutableMapOf<String, KSClassDeclaration?>()
-    private val hierarchies = mutableMapOf<String, PortableHierarchy>()
+    private val hierarchies = mutableMapOf<String, CommonHierarchy>()
 
     /** Qualified names of the expect classes [file] declares, in declaration order. */
     fun expectClassNames(file: KSFile): List<String> =
@@ -77,8 +77,8 @@ internal class DeclarationIndex(
     fun hasSourcePackage(packageName: String): Boolean =
         files.any { it.packageName.asString() == packageName }
 
-    /** Direct portable supertypes and the interop marker, resolved together and cached. */
-    fun hierarchy(declaration: KSClassDeclaration): PortableHierarchy {
+    /** Direct common supertypes and the interop marker, resolved together and cached. */
+    fun hierarchy(declaration: KSClassDeclaration): CommonHierarchy {
         val name = declaration.qualifiedName?.asString() ?: return resolveHierarchy(declaration)
         return hierarchies.getOrPut(name) { resolveHierarchy(declaration) }
     }
@@ -93,16 +93,16 @@ internal class DeclarationIndex(
     fun topLevelExtensionsFor(classifierNames: Set<String>): List<KSDeclaration> =
         topLevelExtensions.mapNotNull { (owner, declaration) -> declaration.takeIf { owner in classifierNames } }
 
-    private fun resolveHierarchy(declaration: KSClassDeclaration): PortableHierarchy {
+    private fun resolveHierarchy(declaration: KSClassDeclaration): CommonHierarchy {
         fun KSClassDeclaration.expectSide(): KSClassDeclaration =
             qualifiedName?.asString()?.let(::declarationFor) ?: this
 
         val supertypes = declaration.superTypes.map { it.resolve() }.filterNot { it.isError }.toList()
         val classifiers = supertypes.mapNotNull { type ->
-            (type.declaration as? KSClassDeclaration)?.let { PortableSupertype(it.expectSide(), type) }
+            (type.declaration as? KSClassDeclaration)?.let { CommonSupertype(it.expectSide(), type) }
         }
 
-        return PortableHierarchy(
+        return CommonHierarchy(
             classSupertypes = classifiers,
             parent = classifiers.firstOrNull { candidate ->
                 candidate.declaration.classKind == ClassKind.CLASS &&
@@ -119,15 +119,15 @@ internal class DeclarationIndex(
     }
 }
 
-internal data class PortableHierarchy(
-    val classSupertypes: List<PortableSupertype>,
-    val parent: PortableSupertype?,
-    val interfaces: List<PortableSupertype>,
+internal data class CommonHierarchy(
+    val classSupertypes: List<CommonSupertype>,
+    val parent: CommonSupertype?,
+    val interfaces: List<CommonSupertype>,
     val declaresJsAny: Boolean,
 )
 
 /** A direct browser supertype together with its concrete type arguments. */
-internal data class PortableSupertype(
+internal data class CommonSupertype(
     val declaration: KSClassDeclaration,
     val type: KSType,
 ) {

@@ -107,7 +107,7 @@ class GeneratedIdentityOnlyLedgerTest {
             .flatMapTo(mutableSetOf(), model::signatureTypes)
 
         assertTrue(identities.isNotEmpty())
-        identities.forEach { assertTrue(it.portableName in portedTypes, "${it.name} is unreferenced") }
+        identities.forEach { assertTrue(it.commonName in portedTypes, "${it.name} is unreferenced") }
         listOf(
             "org.khronos.webgl.Int8Array",
             "org.w3c.files.FileReader",
@@ -117,9 +117,9 @@ class GeneratedIdentityOnlyLedgerTest {
         }
     }
 
-    // Pins the signatures unlocked by portable typed-array names.
+    // Pins the signatures unlocked by common typed-array names.
     @Test
-    fun thePortableSignaturesTheCategoryUnlockedAreEmitted() {
+    fun theCommonSignaturesTheCategoryUnlockedAreEmitted() {
         val readOnly = model.byName.getValue("org.w3c.dom.DOMMatrixReadOnly")
         val matrix = model.byName.getValue("org.w3c.dom.DOMMatrix")
 

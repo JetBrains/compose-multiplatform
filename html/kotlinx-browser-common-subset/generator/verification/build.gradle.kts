@@ -14,9 +14,9 @@ val generatedSubset = project(":ksp-runner").layout.buildDirectory.dir(
 val subsetDirectory = rootProject.layout.projectDirectory.dir("..")
 val checkedInManifest = subsetDirectory.file("api/dom-api-manifest.txt")
 val stagedInterop = layout.buildDirectory.dir("handwrittenInterop")
-val stagePortableInterop by tasks.registering(Sync::class) {
+val stageInterop by tasks.registering(Sync::class) {
     from(subsetDirectory.dir("src")) {
-        include("*/kotlin/kotlinx/browser/PortableInterop.kt")
+        include("*/kotlin/kotlinx/browser/Interop.kt")
     }
     into(stagedInterop)
 }
@@ -74,7 +74,7 @@ kotlin {
 }
 
 tasks.matching { it.name.startsWith("compile") && "Kotlin" in it.name }.configureEach {
-    dependsOn(":ksp-runner:generateKotlinxBrowserCommonSubset", stagePortableInterop)
+    dependsOn(":ksp-runner:generateKotlinxBrowserCommonSubset", stageInterop)
 }
 
 tasks.withType<Test>().configureEach {
@@ -83,9 +83,9 @@ tasks.withType<Test>().configureEach {
     val apiManifest = generatedSubset.map { it.file("api-manifest.txt") }
 
     dependsOn(":ksp-runner:generateKotlinxBrowserCommonSubset")
-    systemProperty("portableDomModel", model.get().asFile.absolutePath)
-    systemProperty("portableDomCoverage", coverage.get().asFile.absolutePath)
-    systemProperty("portableDomApiManifest", apiManifest.get().asFile.absolutePath)
-    systemProperty("portableDomApiManifestBaseline", checkedInManifest.asFile.absolutePath)
+    systemProperty("commonDomModel", model.get().asFile.absolutePath)
+    systemProperty("commonDomCoverage", coverage.get().asFile.absolutePath)
+    systemProperty("commonDomApiManifest", apiManifest.get().asFile.absolutePath)
+    systemProperty("commonDomApiManifestBaseline", checkedInManifest.asFile.absolutePath)
     inputs.files(model, coverage, apiManifest, checkedInManifest)
 }

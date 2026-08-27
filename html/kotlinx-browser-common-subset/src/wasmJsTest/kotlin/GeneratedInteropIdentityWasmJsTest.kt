@@ -27,15 +27,15 @@ import kotlinx.browser.dom.events.EventTarget
 import kotlin.js.unsafeCast
 import kotlin.test.Test
 
-private fun portableStringIsBrowserString(value: JsString): kotlin.js.JsString = value
+private fun commonStringIsBrowserString(value: JsString): kotlin.js.JsString = value
 
 private fun tokenItemIsBrowserString(value: DOMTokenList): kotlin.js.JsString? = value.item(0)
 
-private fun portableNumberIsBrowserNumber(value: JsNumber): kotlin.js.JsNumber = value
+private fun commonNumberIsBrowserNumber(value: JsNumber): kotlin.js.JsNumber = value
 
 private fun eventTimeStampIsBrowserNumber(value: Event): kotlin.js.JsNumber = value.timeStamp
 
-private fun portableDoubleIsBrowserNumber(value: JsDouble): kotlin.js.JsNumber = value
+private fun commonDoubleIsBrowserNumber(value: JsDouble): kotlin.js.JsNumber = value
 
 private fun lineDashIsBrowserNumberArray(
     value: CanvasPathDrawingStyles,
@@ -44,7 +44,7 @@ private fun lineDashIsBrowserNumberArray(
 private fun matrixAcceptsBrowserNumberArray(value: JsArray<JsDouble>): DOMMatrixReadOnly =
     DOMMatrixReadOnly(value)
 
-private fun portableArrayIsBrowserArray(
+private fun commonArrayIsBrowserArray(
     value: JsArray<EventTarget>,
 ): kotlin.js.JsArray<EventTarget> = value
 
@@ -54,7 +54,7 @@ private fun attributeNamesAreBrowserStrings(
     value: Element,
 ): kotlin.js.JsArray<kotlin.js.JsString> = value.getAttributeNames()
 
-private fun portablePromiseIsBrowserPromise(
+private fun commonPromiseIsBrowserPromise(
     value: Promise<EventTarget>,
 ): kotlin.js.Promise<EventTarget> = value
 
@@ -62,24 +62,24 @@ class GeneratedInteropIdentityWasmJsTest {
     @Test
     fun interopBridgesAreCallable() {
         val element: Element = document.createElement("div")
-        val event = Event("portable")
+        val event = Event("common")
         val context = canvasContext(document.createElement("canvas").unsafeCast<HTMLCanvasElement>())
         val numbers = listOf(1.0, 0.0, 0.0, 1.0, 0.0, 0.0)
             .map(Double::toJsDouble)
             .toJsArray<JsDouble>()
         val targets = listOf<EventTarget>(element).toJsArray()
 
-        portableStringIsBrowserString("portable".toJsString())
+        commonStringIsBrowserString("common".toJsString())
         tokenItemIsBrowserString(element.classList)
-        portableNumberIsBrowserNumber(1.0.toJsNumber())
+        commonNumberIsBrowserNumber(1.0.toJsNumber())
         eventTimeStampIsBrowserNumber(event)
-        portableDoubleIsBrowserNumber(1.0.toJsDouble())
+        commonDoubleIsBrowserNumber(1.0.toJsDouble())
         lineDashIsBrowserNumberArray(context)
         matrixAcceptsBrowserNumberArray(numbers)
-        portableArrayIsBrowserArray(targets)
+        commonArrayIsBrowserArray(targets)
         eventPathIsBrowserArray(event)
         attributeNamesAreBrowserStrings(element)
-        portablePromiseIsBrowserPromise(resolvedPromise(element))
+        commonPromiseIsBrowserPromise(resolvedPromise(element))
     }
 }
 

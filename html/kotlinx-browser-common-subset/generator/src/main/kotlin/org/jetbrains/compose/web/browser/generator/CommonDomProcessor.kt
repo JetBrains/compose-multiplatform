@@ -16,14 +16,14 @@ import com.google.devtools.ksp.processing.SymbolProcessorProvider
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 
-public class PortableDomProcessorProvider : SymbolProcessorProvider {
+public class CommonDomProcessorProvider : SymbolProcessorProvider {
     override fun create(environment: SymbolProcessorEnvironment): SymbolProcessor =
-        PortableDomProcessor(PortableDomGenerator(environment.codeGenerator, environment.logger))
+        CommonDomProcessor(CommonDomGenerator(environment.codeGenerator, environment.logger))
 }
 
-// Main entry point, makes sure PortableDomGenerator.generate is only called once.
-private class PortableDomProcessor(
-    private val generator: PortableDomGenerator,
+// Main entry point, makes sure CommonDomGenerator.generate is only called once.
+private class CommonDomProcessor(
+    private val generator: CommonDomGenerator,
 ) : SymbolProcessor {
     private var generated = false
 
@@ -34,16 +34,16 @@ private class PortableDomProcessor(
 }
 
 // Generation orchestration.
-internal class PortableDomGenerator(
+internal class CommonDomGenerator(
     private val codeGenerator: CodeGenerator,
     private val logger: KSPLogger,
 ) {
     fun generate(resolver: Resolver): Boolean {
-        val selection = SelectionPolicy.parse(readSelectionList("/portable-dom-selection.txt"))
+        val selection = SelectionPolicy.parse(readSelectionList("/common-dom-selection.txt"))
         val mappings = facadePackageMappings(selection.signatureOnlyPackages)
         val index = DeclarationIndex(resolver, mappings.keys)
         val input = resolveInput(index, selection) ?: return false
-        val analysis = resolvePortableAnalysis(
+        val analysis = resolveCommonAnalysis(
             index,
             input.selected,
             selection.signatureOnlyPackages,
@@ -56,9 +56,9 @@ internal class PortableDomGenerator(
         val values = analysis.values
         val packages = groupFacadePackages(mappings.values, model, extensions, values)
         val sourceFiles = (
-            model.mapNotNull(PortableClass::sourceFile) +
-                extensions.mapNotNull(PortableExtensionFunction::sourceFile) +
-                values.mapNotNull(PortableExtensionValue::sourceFile)
+            model.mapNotNull(CommonClass::sourceFile) +
+                extensions.mapNotNull(CommonExtensionFunction::sourceFile) +
+                values.mapNotNull(CommonExtensionValue::sourceFile)
             ).distinct().toTypedArray()
         val dependencies = Dependencies(aggregating = true, *sourceFiles)
         emitReport(dependencies, "coverage", coverage.ledgerFile())
@@ -80,8 +80,8 @@ internal class PortableDomGenerator(
 
         FacadeSourceEmitter(codeGenerator).emit(dependencies, packages, model)
         logger.info(
-            "Generated portable DOM facade model with ${model.size} declarations, " +
-                "${model.sumOf(PortableClass::memberCount)} members and " +
+            "Generated common DOM facade model with ${model.size} declarations, " +
+                "${model.sumOf(CommonClass::memberCount)} members and " +
                 "${model.sumOf { it.constructors.size }} constructors plus ${extensions.size} operators " +
                 "from ${input.selected.size} input classifiers and " +
                 "${closure.dependencies.size + closure.identityOnly.size} discovered dependencies",
@@ -113,29 +113,29 @@ internal class PortableDomGenerator(
         selected: Set<String>,
     ): List<String> = buildList {
         (selection.inputFiles - resolvedFiles.toSet()).forEach { fileName ->
-            add("Portable DOM input file does not resolve to an expect source: $fileName")
+            add("Common DOM input file does not resolve to an expect source: $fileName")
         }
         resolvedFiles.groupingBy { it }.eachCount().filterValues { it != 1 }.forEach { (fileName, count) ->
-            add("Portable DOM input file resolves $count times: $fileName")
+            add("Common DOM input file resolves $count times: $fileName")
         }
         addAll(selection.validationErrors(classifiers))
         selection.signatureOnlyPackages.forEach { packageName ->
             when {
-                packageName in PORTABLE_PACKAGE_BY_BROWSER_PACKAGE ->
+                packageName in COMMON_PACKAGE_BY_BROWSER_PACKAGE ->
                     add("Signature-only package is already mapped: $packageName")
                 packageName !in EXTERNAL_PACKAGE_BY_BROWSER_PACKAGE &&
                     !packageName.startsWith("org.w3c.") ->
-                    add("Signature-only package has no portable naming rule: $packageName")
+                    add("Signature-only package has no common naming rule: $packageName")
                 !index.hasSourcePackage(packageName) ->
                     add("Signature-only package does not resolve to a source package: $packageName")
             }
         }
         selected.forEach { qualifiedName ->
             when {
-                qualifiedName.browserPackage() !in PORTABLE_PACKAGE_BY_BROWSER_PACKAGE ->
-                    add("Portable DOM input classifier has no package mapping: $qualifiedName")
+                qualifiedName.browserPackage() !in COMMON_PACKAGE_BY_BROWSER_PACKAGE ->
+                    add("Common DOM input classifier has no package mapping: $qualifiedName")
                 !index.isSourceDeclaration(qualifiedName) ->
-                    add("Portable DOM input classifier is not a source declaration: $qualifiedName")
+                    add("Common DOM input classifier is not a source declaration: $qualifiedName")
             }
         }
     }
@@ -143,7 +143,7 @@ internal class PortableDomGenerator(
     private fun reportManifestFailure(manifest: ApiManifest) {
         if (manifest.unaccounted.isNotEmpty()) {
             logger.error(
-                "${manifest.unaccounted.size} portable DOM declarations are neither emitted nor " +
+                "${manifest.unaccounted.size} common DOM declarations are neither emitted nor " +
                     "excluded, the first being ${manifest.unaccounted.first().key}. Every one of them " +
                     "is listed as UNACCOUNTED in api-manifest.txt; port them, or record them in " +
                     "dom-api-exclusions.txt with a reason.",
@@ -151,7 +151,7 @@ internal class PortableDomGenerator(
         }
         if (manifest.staleExclusions.isNotEmpty()) {
             logger.error(
-                "Stale portable DOM exclusions, covering nothing the generator left out: " +
+                "Stale common DOM exclusions, covering nothing the generator left out: " +
                     "${manifest.staleExclusions.joinToString()}. Remove them from dom-api-exclusions.txt.",
             )
         }

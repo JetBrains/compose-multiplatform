@@ -23,21 +23,21 @@ import com.squareup.kotlinpoet.UNIT
 
 // Shared KotlinPoet builders.
 
-internal val PortableClass.isInterface: Boolean
+internal val CommonClass.isInterface: Boolean
     get() = shape == ClassShape.INTERFACE
 
-internal fun PortableClass.typeBuilder(): TypeSpec.Builder = when (shape) {
-    ClassShape.INTERFACE -> TypeSpec.interfaceBuilder(portableName)
-    else -> TypeSpec.classBuilder(portableName)
+internal fun CommonClass.typeBuilder(): TypeSpec.Builder = when (shape) {
+    ClassShape.INTERFACE -> TypeSpec.interfaceBuilder(commonName)
+    else -> TypeSpec.classBuilder(commonName)
 }
 
-internal fun PortableParameter.spec(default: CodeBlock?): ParameterSpec =
+internal fun CommonParameter.spec(default: CodeBlock?): ParameterSpec =
     ParameterSpec.builder(name, type, *(if (isVararg) arrayOf(KModifier.VARARG) else emptyArray()))
         .apply { default?.let(::defaultValue) }
         .build()
 
-internal fun PortableFunction.specBuilder(
-    parameterSpec: (PortableParameter) -> ParameterSpec,
+internal fun CommonFunction.specBuilder(
+    parameterSpec: (CommonParameter) -> ParameterSpec,
 ): FunSpec.Builder {
     val builder = FunSpec.builder(name).addParameters(parameters.map(parameterSpec))
     if (returnType != UNIT) builder.returns(returnType)
@@ -65,7 +65,7 @@ internal fun suppression(vararg names: String): AnnotationSpec =
 
 // Common emitters.
 
-internal fun commonCoreFile(): FileSpec = facadeFile(PORTABLE_DOM_PACKAGE, "Core") {
+internal fun commonCoreFile(): FileSpec = facadeFile(COMMON_DOM_PACKAGE, "Core") {
     addProperty(
         PropertySpec.builder(DEFINED_EXTERNALLY.simpleName, NOTHING)
             .addModifiers(KModifier.PUBLIC)
@@ -84,25 +84,25 @@ internal fun commonCoreFile(): FileSpec = facadeFile(PORTABLE_DOM_PACKAGE, "Core
 }
 
 internal fun commonDeclarationsFile(
-    mapping: PortablePackageMapping,
-    declarations: List<PortableClass>,
-    extensions: List<PortableExtensionFunction>,
-): FileSpec = facadeFile(mapping.portablePackage, mapping.declarationsFile) {
+    mapping: CommonPackageMapping,
+    declarations: List<CommonClass>,
+    extensions: List<CommonExtensionFunction>,
+): FileSpec = facadeFile(mapping.commonPackage, mapping.declarationsFile) {
     declarations.forEach { addType(it.commonType()) }
     extensions.forEach { addFunction(it.webSpec(actual = false)) }
 }
 
 internal fun commonValuesFile(
-    mapping: PortablePackageMapping,
-    values: List<PortableExtensionValue>,
-): FileSpec = facadeFile(mapping.portablePackage, mapping.valuesFile) {
+    mapping: CommonPackageMapping,
+    values: List<CommonExtensionValue>,
+): FileSpec = facadeFile(mapping.commonPackage, mapping.valuesFile) {
     values.forEach { addProperty(it.webSpec(actual = false)) }
 }
 
 internal fun commonDictionariesFile(
-    mapping: PortablePackageMapping,
-    dictionaries: List<PortableClass>,
-): FileSpec = facadeFile(mapping.portablePackage, mapping.dictionariesFile) {
+    mapping: CommonPackageMapping,
+    dictionaries: List<CommonClass>,
+): FileSpec = facadeFile(mapping.commonPackage, mapping.dictionariesFile) {
     dictionaries.forEach { addType(it.commonType()) }
     dictionaries.forEach { dictionary ->
         dictionary.factory?.let { addFunction(dictionary.webFactory(it, actual = false)) }
@@ -111,33 +111,33 @@ internal fun commonDictionariesFile(
 
 // Common declaration specs.
 
-private fun PortableClass.commonType(): TypeSpec = typeBuilder()
+private fun CommonClass.commonType(): TypeSpec = typeBuilder()
     .addModifiers(KModifier.PUBLIC, KModifier.EXPECT)
     .apply {
         shape.modifier?.let { addModifiers(it) }
         this@commonType.typeVariables.forEach(::addTypeVariable)
         if (needsIrSuppression) addAnnotation(suppression(IR_SUPPRESSION))
-        portableParentName?.let(::addSuperinterface)
-        portableSuperinterfaces.forEach { addSuperinterface(it) }
-        if (isJsAny) addSuperinterface(PORTABLE_JS_ANY)
-        constructors.firstOrNull(PortableConstructor::primary)?.let { primaryConstructor(it.commonSpec()) }
-        constructors.filterNot(PortableConstructor::primary).forEach { addFunction(it.commonSpec()) }
+        commonParentName?.let(::addSuperinterface)
+        commonSuperinterfaces.forEach { addSuperinterface(it) }
+        if (isJsAny) addSuperinterface(COMMON_JS_ANY)
+        constructors.firstOrNull(CommonConstructor::primary)?.let { primaryConstructor(it.commonSpec()) }
+        constructors.filterNot(CommonConstructor::primary).forEach { addFunction(it.commonSpec()) }
         properties.forEach { addProperty(it.commonSpec(isInterface, openWhenDefault = isInterface && !isDictionary)) }
         functions.forEach { addFunction(it.commonSpec(isInterface)) }
         companion?.let { addType(it.commonSpec()) }
     }
     .build()
 
-private fun PortableCompanion.commonSpec(): TypeSpec = TypeSpec.companionObjectBuilder()
+private fun CommonCompanion.commonSpec(): TypeSpec = TypeSpec.companionObjectBuilder()
     .apply {
         properties.forEach { addProperty(it.commonSpec()) }
         functions.forEach { addFunction(it.commonSpec(abstract = false)) }
     }
     .build()
 
-private fun PortableConstant.commonSpec(): PropertySpec = PropertySpec.builder(name, type).build()
+private fun CommonConstant.commonSpec(): PropertySpec = PropertySpec.builder(name, type).build()
 
-private fun PortableConstructor.commonSpec(): FunSpec {
+private fun CommonConstructor.commonSpec(): FunSpec {
     val constructor = this
     return FunSpec.constructorBuilder()
         .apply {
@@ -146,7 +146,7 @@ private fun PortableConstructor.commonSpec(): FunSpec {
         .build()
 }
 
-private fun PortableProperty.commonSpec(abstract: Boolean, openWhenDefault: Boolean = false): PropertySpec =
+private fun CommonProperty.commonSpec(abstract: Boolean, openWhenDefault: Boolean = false): PropertySpec =
     PropertySpec.builder(name, type)
         .mutable(mutable)
         .apply {
@@ -160,8 +160,8 @@ private fun PortableProperty.commonSpec(abstract: Boolean, openWhenDefault: Bool
         }
         .build()
 
-private fun PortableFunction.commonSpec(abstract: Boolean): FunSpec =
-    specBuilder(PortableParameter::commonParameter)
+private fun CommonFunction.commonSpec(abstract: Boolean): FunSpec =
+    specBuilder(CommonParameter::commonParameter)
         .apply {
             when {
                 overrides -> addModifiers(KModifier.OVERRIDE)
@@ -170,7 +170,7 @@ private fun PortableFunction.commonSpec(abstract: Boolean): FunSpec =
         }
         .build()
 
-private fun PortableExtensionFunction.webSpec(actual: Boolean): FunSpec {
+private fun CommonExtensionFunction.webSpec(actual: Boolean): FunSpec {
     val extension = this
     val arguments = function.parameters.joinToString { it.name }
     // Actual wrappers cannot share web-only defaults; omitted defaults could evaluate the common
@@ -189,13 +189,13 @@ private fun PortableExtensionFunction.webSpec(actual: Boolean): FunSpec {
         .build()
 }
 
-private fun PortableParameter.commonParameter(): ParameterSpec =
+private fun CommonParameter.commonParameter(): ParameterSpec =
     spec(if (hasDefault) CodeBlock.of("%M", DEFINED_EXTERNALLY) else null)
 
-private fun PortableExtensionValue.webSpec(actual: Boolean): PropertySpec =
-    PropertySpec.builder(name, portableOwner)
+private fun CommonExtensionValue.webSpec(actual: Boolean): PropertySpec =
+    PropertySpec.builder(name, commonOwner)
         .addModifiers(KModifier.PUBLIC, if (actual) KModifier.ACTUAL else KModifier.EXPECT)
-        .receiver(if (actual) browserOwner.companionName() else portableOwner.companionName())
+        .receiver(if (actual) browserOwner.companionName() else commonOwner.companionName())
         .apply {
             if (actual) {
                 getter(FunSpec.getterBuilder().addStatement("return %T.%M", browserOwner, browserMember).build())
@@ -203,10 +203,10 @@ private fun PortableExtensionValue.webSpec(actual: Boolean): PropertySpec =
         }
         .build()
 
-private fun PortableClass.webFactory(factory: PortableFactory, actual: Boolean): FunSpec =
-    FunSpec.builder(portableName.simpleName)
+private fun CommonClass.webFactory(factory: CommonFactory, actual: Boolean): FunSpec =
+    FunSpec.builder(commonName.simpleName)
         .addModifiers(KModifier.PUBLIC, if (actual) KModifier.ACTUAL else KModifier.EXPECT)
-        .returns(portableName)
+        .returns(commonName)
         .apply {
             factory.parameters.forEach {
                 // Common factories use inert defaults; browser actuals leave defaults to the platform.
@@ -227,12 +227,12 @@ private fun PortableClass.webFactory(factory: PortableFactory, actual: Boolean):
 
 /** Emits browser-backed actual declarations shared by the JS and Wasm/JS leaf outputs. */
 internal fun browserLeafDeclarationsFile(
-    mapping: PortablePackageMapping,
-    declarations: List<PortableClass>,
-    extensions: List<PortableExtensionFunction>,
-): FileSpec = facadeFile(mapping.portablePackage, mapping.declarationsFile) {
+    mapping: CommonPackageMapping,
+    declarations: List<CommonClass>,
+    extensions: List<CommonExtensionFunction>,
+): FileSpec = facadeFile(mapping.commonPackage, mapping.declarationsFile) {
     webSuppressions(declarations)
-    extensions.distinctBy(PortableExtensionFunction::browserMember).forEach { extension ->
+    extensions.distinctBy(CommonExtensionFunction::browserMember).forEach { extension ->
         addAliasedImport(extension.browserMember, extension.browserAlias)
     }
     declarations.forEach { addTypeAlias(it.browserTypeAlias()) }
@@ -241,11 +241,11 @@ internal fun browserLeafDeclarationsFile(
 
 /** Emits actual wrappers with target-specific interop types into each browser leaf source set. */
 internal fun targetDeclarationsFile(
-    mapping: PortablePackageMapping,
-    extensions: List<PortableExtensionFunction>,
-    dictionaries: List<PortableClass>,
-): FileSpec = facadeFile(mapping.portablePackage, mapping.interopFile) {
-    extensions.distinctBy(PortableExtensionFunction::browserMember).forEach { extension ->
+    mapping: CommonPackageMapping,
+    extensions: List<CommonExtensionFunction>,
+    dictionaries: List<CommonClass>,
+): FileSpec = facadeFile(mapping.commonPackage, mapping.interopFile) {
+    extensions.distinctBy(CommonExtensionFunction::browserMember).forEach { extension ->
         addAliasedImport(extension.browserMember, extension.browserAlias)
     }
     extensions.forEach { addFunction(it.webSpec(actual = true)) }
@@ -256,10 +256,10 @@ internal fun targetDeclarationsFile(
 
 /** Emits browser-backed enum-like values into each browser leaf source set. */
 internal fun targetValuesFile(
-    mapping: PortablePackageMapping,
-    values: List<PortableExtensionValue>,
-): FileSpec = facadeFile(mapping.portablePackage, mapping.valuesFile) {
-    values.distinctBy(PortableExtensionValue::browserOwner).forEach { value ->
+    mapping: CommonPackageMapping,
+    values: List<CommonExtensionValue>,
+): FileSpec = facadeFile(mapping.commonPackage, mapping.valuesFile) {
+    values.distinctBy(CommonExtensionValue::browserOwner).forEach { value ->
         addAliasedImport(value.browserOwner, value.browserOwner.browserImportAlias())
     }
     values.forEach { addAliasedImport(it.browserMember, it.browserAlias) }
@@ -268,21 +268,21 @@ internal fun targetValuesFile(
 
 /** Emits dictionary aliases and factories that need no target-specific interop. */
 internal fun browserLeafDictionariesFile(
-    mapping: PortablePackageMapping,
-    dictionaries: List<PortableClass>,
-): FileSpec = facadeFile(mapping.portablePackage, mapping.dictionariesFile) {
+    mapping: CommonPackageMapping,
+    dictionaries: List<CommonClass>,
+): FileSpec = facadeFile(mapping.commonPackage, mapping.dictionariesFile) {
     webSuppressions(dictionaries)
     dictionaries.forEach { addTypeAlias(it.browserTypeAlias()) }
     dictionaries.forEach { dictionary ->
-        dictionary.factory?.takeUnless(PortableFactory::usesInterop)
+        dictionary.factory?.takeUnless(CommonFactory::usesInterop)
             ?.let { addFunction(dictionary.webFactory(it, actual = true)) }
     }
 }
 
-private fun PortableClass.browserTypeAlias(): TypeAliasSpec =
+private fun CommonClass.browserTypeAlias(): TypeAliasSpec =
     browserAliasTypeVariables().let { aliases ->
         TypeAliasSpec.builder(
-            portableName.simpleName,
+            commonName.simpleName,
             if (aliases.isEmpty()) browserName else browserName.parameterizedBy(aliases),
         )
             .addModifiers(KModifier.PUBLIC, KModifier.ACTUAL)
@@ -291,13 +291,13 @@ private fun PortableClass.browserTypeAlias(): TypeAliasSpec =
     }
 
 /** Typealias parameters are invariant even when the aliased interface declares variance. */
-private fun PortableClass.browserAliasTypeVariables() =
+private fun CommonClass.browserAliasTypeVariables() =
     typeVariables.map { variable -> TypeVariableName(variable.name) }
 
-private fun FileSpec.Builder.webSuppressions(classes: List<PortableClass>): FileSpec.Builder =
+private fun FileSpec.Builder.webSuppressions(classes: List<CommonClass>): FileSpec.Builder =
     suppressIfAny(buildList {
         // Each suppression answers a distinct declaration shape; keep their file checks independent.
-        if (classes.any(PortableClass::hasDefaultArguments)) {
+        if (classes.any(CommonClass::hasDefaultArguments)) {
             add(DEFAULT_ARGUMENTS_SUPPRESSION)
         }
         if (classes.any { it.needsIrSuppression || it.hasDefaultArguments }) {

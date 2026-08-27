@@ -12,7 +12,7 @@ class GeneratedClipboardLedgerTest {
     private val model = GeneratedModelReport.read()
 
     @Test
-    fun clipboardPackageCarriesItsPortableApi() {
+    fun clipboardPackageCarriesItsCommonApi() {
         val clipboardEvent = model.byName.getValue("org.w3c.dom.clipboard.ClipboardEvent")
         val clipboardEventInit = model.byName.getValue("org.w3c.dom.clipboard.ClipboardEventInit")
         val clipboard = model.byName.getValue("org.w3c.dom.clipboard.Clipboard")

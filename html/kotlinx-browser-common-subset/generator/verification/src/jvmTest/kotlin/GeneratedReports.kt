@@ -31,7 +31,7 @@ internal data class GeneratedCoverageReport(val entries: List<Entry>) {
 
     companion object {
         fun read(): GeneratedCoverageReport = GeneratedCoverageReport(
-            LedgerFile.read(reportFile("portableDomCoverage")).sections.map { section ->
+            LedgerFile.read(reportFile("commonDomCoverage")).sections.map { section ->
                 val fields = section.fields
                 val skipped = fields[0] == "SKIPPED"
                 Entry(
@@ -63,9 +63,9 @@ internal data class GeneratedApiManifest(val header: Map<String, String>, val en
     fun of(kind: String): List<Entry> = entries.filter { it.kind == kind }
 
     companion object {
-        fun read(): GeneratedApiManifest = parse(reportFile("portableDomApiManifest"))
-        fun lines(): List<String> = reportFile("portableDomApiManifest").readLines()
-        fun baselineLines(): List<String> = reportFile("portableDomApiManifestBaseline").readLines()
+        fun read(): GeneratedApiManifest = parse(reportFile("commonDomApiManifest"))
+        fun lines(): List<String> = reportFile("commonDomApiManifest").readLines()
+        fun baselineLines(): List<String> = reportFile("commonDomApiManifestBaseline").readLines()
 
         private fun parse(file: File): GeneratedApiManifest {
             val ledger = LedgerFile.read(file)
@@ -103,14 +103,14 @@ internal data class GeneratedModelReport(
         val values: List<String>,
     ) {
         val simpleName: String get() = name.substringAfterLast('.')
-        val portableName: String get() {
+        val commonName: String get() {
             val browserPackage = name.substringBeforeLast('.')
-            val portablePackage = if (browserPackage.startsWith("org.w3c.")) {
+            val commonPackage = if (browserPackage.startsWith("org.w3c.")) {
                 browserPackage.replaceFirst("org.w3c", "kotlinx.browser")
             } else {
-                PORTABLE_PACKAGES.getValue(browserPackage)
+                COMMON_PACKAGES.getValue(browserPackage)
             }
-            return "$portablePackage.$simpleName"
+            return "$commonPackage.$simpleName"
         }
     }
 
@@ -124,7 +124,7 @@ internal data class GeneratedModelReport(
         }
 
     companion object {
-        private val PORTABLE_PACKAGES = mapOf(
+        private val COMMON_PACKAGES = mapOf(
             "org.khronos.webgl" to "kotlinx.browser.webgl",
         )
         val INTEROP_TYPES = setOf(
@@ -140,7 +140,7 @@ internal data class GeneratedModelReport(
         private const val VALUE = "value "
 
         fun read(): GeneratedModelReport {
-            val ledger = LedgerFile.read(reportFile("portableDomModel"))
+            val ledger = LedgerFile.read(reportFile("commonDomModel"))
             val declarations = ledger.sections.map { section ->
                 val fields = section.fields
                 val lines = section.lines

@@ -76,7 +76,7 @@ private fun buildHtmlConvenienceClasses(): List<HTMLElement> = listOf(
     Image(),
     Image(width = 640, height = 480),
     Option(),
-    Option(text = "Portable", value = "portable", defaultSelected = true, selected = true),
+    Option(text = "Common", value = "common", defaultSelected = true, selected = true),
 )
 
 private fun useHtmlElementMembers(

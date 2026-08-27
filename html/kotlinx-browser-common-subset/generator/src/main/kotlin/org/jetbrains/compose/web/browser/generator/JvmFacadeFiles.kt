@@ -20,26 +20,26 @@ import com.squareup.kotlinpoet.UNIT
 // JVM file emitters.
 
 internal fun jvmDeclarationsFile(
-    mapping: PortablePackageMapping,
-    declarations: List<PortableClass>,
-    extensions: List<PortableExtensionFunction>,
+    mapping: CommonPackageMapping,
+    declarations: List<CommonClass>,
+    extensions: List<CommonExtensionFunction>,
     values: JvmStubValues,
     constants: JvmConstantValues,
-): FileSpec = facadeFile(mapping.portablePackage, mapping.declarationsFile) {
+): FileSpec = facadeFile(mapping.commonPackage, mapping.declarationsFile) {
     jvmSuppressions(declarations, values)
     declarations.forEach { addType(it.jvmType(values, constants)) }
     extensions.forEach { addFunction(it.jvmSpec(values)) }
 }
 
 internal fun jvmValuesFile(
-    mapping: PortablePackageMapping,
-    values: List<PortableExtensionValue>,
-): FileSpec = facadeFile(mapping.portablePackage, mapping.valuesFile) {
+    mapping: CommonPackageMapping,
+    values: List<CommonExtensionValue>,
+): FileSpec = facadeFile(mapping.commonPackage, mapping.valuesFile) {
     values.forEach { value ->
         addType(
             TypeSpec.objectBuilder(value.jvmSingleton)
                 .addModifiers(KModifier.PRIVATE)
-                .addSuperinterface(value.portableOwner)
+                .addSuperinterface(value.commonOwner)
                 .build(),
         )
     }
@@ -47,11 +47,11 @@ internal fun jvmValuesFile(
 }
 
 internal fun jvmDictionariesFile(
-    mapping: PortablePackageMapping,
-    dictionaries: List<PortableClass>,
+    mapping: CommonPackageMapping,
+    dictionaries: List<CommonClass>,
     values: JvmStubValues,
     constants: JvmConstantValues,
-): FileSpec = facadeFile(mapping.portablePackage, mapping.dictionariesFile) {
+): FileSpec = facadeFile(mapping.commonPackage, mapping.dictionariesFile) {
     jvmSuppressions(dictionaries, values)
     dictionaries.forEach { addType(it.jvmType(values, constants)) }
     dictionaries.forEach { addJvmDictionaryState(it, values) }
@@ -60,7 +60,7 @@ internal fun jvmDictionariesFile(
 // JVM class and member specs.
 
 /** Emits a JVM actual with the shared stub members, inheritance, and constructors. */
-private fun PortableClass.jvmType(
+private fun CommonClass.jvmType(
     values: JvmStubValues,
     constants: JvmConstantValues,
 ): TypeSpec = typeBuilder()
@@ -69,11 +69,11 @@ private fun PortableClass.jvmType(
         shape.modifier?.let { addModifiers(it) }
         this@jvmType.typeVariables.forEach(::addTypeVariable)
         when (shape) {
-            ClassShape.INTERFACE -> portableParentName?.let(::addSuperinterface)
-            else -> portableParentName?.let(::superclass)
+            ClassShape.INTERFACE -> commonParentName?.let(::addSuperinterface)
+            else -> commonParentName?.let(::superclass)
         }
-        portableSuperinterfaces.forEach { addSuperinterface(it) }
-        if (isJsAny) addSuperinterface(PORTABLE_JS_ANY)
+        commonSuperinterfaces.forEach { addSuperinterface(it) }
+        if (isJsAny) addSuperinterface(COMMON_JS_ANY)
         if (isInterface) {
             properties.forEach { addProperty(if (isDictionary) it.jvmAbstractSpec() else it.jvmInterfaceSpec(values)) }
             functions.forEach { addFunction(it.jvmAbstractSpec(values)) }
@@ -88,7 +88,7 @@ private fun PortableClass.jvmType(
     .build()
 
 /** Selects constructor delegation and adds the fallback required by generated subclasses. */
-private fun TypeSpec.Builder.addJvmConstructors(owner: PortableClass, values: JvmStubValues) {
+private fun TypeSpec.Builder.addJvmConstructors(owner: CommonClass, values: JvmStubValues) {
     val primary = owner.jvmPrimaryConstructor ?: return
     primaryConstructor(primary.jvmPrimarySpec(owner, values))
     owner.constructors
@@ -100,7 +100,7 @@ private fun TypeSpec.Builder.addJvmConstructors(owner: PortableClass, values: Jv
                 .addModifiers(KModifier.PROTECTED)
                 .addKdoc(
                     "No-argument constructor used by generated JVM subclasses of %L.",
-                    owner.portableName.simpleName,
+                    owner.commonName.simpleName,
                 )
                 .callThisConstructor(primary.jvmArguments(values))
                 .build(),
@@ -109,7 +109,7 @@ private fun TypeSpec.Builder.addJvmConstructors(owner: PortableClass, values: Jv
 }
 
 /** Adds mixin members not already declared or supplied by a class ancestor. */
-private fun TypeSpec.Builder.addJvmInterfaceMembers(owner: PortableClass, values: JvmStubValues) {
+private fun TypeSpec.Builder.addJvmInterfaceMembers(owner: CommonClass, values: JvmStubValues) {
     val emittedKeys = buildSet {
         owner.properties.forEach { add(it.key()) }
         owner.functions.forEach { add(it.key()) }
@@ -119,8 +119,8 @@ private fun TypeSpec.Builder.addJvmInterfaceMembers(owner: PortableClass, values
 
 /** Materializes inherited mixin members as deduplicated JVM overrides with substituted types. */
 internal fun TypeSpec.Builder.addJvmStoredMembers(
-    owner: PortableClass,
-    mixins: List<PortableClass>,
+    owner: CommonClass,
+    mixins: List<CommonClass>,
     values: JvmStubValues,
     emittedKeys: Set<String> = emptySet(),
 ) {
@@ -141,8 +141,8 @@ internal fun TypeSpec.Builder.addJvmStoredMembers(
     }
 }
 
-private fun PortableCompanion.jvmSpec(
-    owner: PortableClass,
+private fun CommonCompanion.jvmSpec(
+    owner: CommonClass,
     values: JvmStubValues,
     constants: JvmConstantValues,
 ): TypeSpec =
@@ -154,13 +154,13 @@ private fun PortableCompanion.jvmSpec(
     }
     .build()
 
-private fun PortableConstant.jvmSpec(constants: JvmConstantValues): PropertySpec = PropertySpec.builder(name, type)
+private fun CommonConstant.jvmSpec(constants: JvmConstantValues): PropertySpec = PropertySpec.builder(name, type)
     .addModifiers(KModifier.ACTUAL)
     .initializer(constants.initializer(this))
     .build()
 
 /** Seeds visible mutable properties from matching primary-constructor parameters. */
-private fun PortableConstructor.jvmPrimarySpec(owner: PortableClass, values: JvmStubValues): FunSpec {
+private fun CommonConstructor.jvmPrimarySpec(owner: CommonClass, values: JvmStubValues): FunSpec {
     val constructor = this
     return FunSpec.constructorBuilder()
         .addModifiers(KModifier.ACTUAL)
@@ -173,8 +173,8 @@ private fun PortableConstructor.jvmPrimarySpec(owner: PortableClass, values: Jvm
         .build()
 }
 
-private fun PortableConstructor.jvmSecondarySpec(
-    primary: PortableConstructor,
+private fun CommonConstructor.jvmSecondarySpec(
+    primary: CommonConstructor,
     values: JvmStubValues,
 ): FunSpec {
     val constructor = this
@@ -185,21 +185,21 @@ private fun PortableConstructor.jvmSecondarySpec(
         .build()
 }
 
-private fun PortableConstructor.jvmParameters(builder: FunSpec.Builder, values: JvmStubValues) {
+private fun CommonConstructor.jvmParameters(builder: FunSpec.Builder, values: JvmStubValues) {
     parameters.forEach { builder.addParameter(it.spec(if (it.hasDefault) values.value(it.type) else null)) }
 }
 
-private fun PortableConstructor.jvmArguments(values: JvmStubValues): List<CodeBlock> =
+private fun CommonConstructor.jvmArguments(values: JvmStubValues): List<CodeBlock> =
     if (callableWithoutArguments) emptyList() else parameters.map { values.value(it.type) }
 
 /** Finds constructor parameters that seed matching mutable properties visible on this class. */
-private fun PortableClass.jvmStoredParameters(
-    constructor: PortableConstructor,
+private fun CommonClass.jvmStoredParameters(
+    constructor: CommonConstructor,
     values: JvmStubValues,
-): List<PortableParameter> {
+): List<CommonParameter> {
     val chain = listOf(this) + ancestors.mapNotNull(values.classes::get)
     val visible = chain + chain.flatMap { values.mixinClosure(it).mapNotNull(values.classes::get) }
-    val mutable = visible.flatMap(PortableClass::properties).filter(PortableProperty::mutable)
+    val mutable = visible.flatMap(CommonClass::properties).filter(CommonProperty::mutable)
     return constructor.parameters.filter { parameter ->
         !parameter.isVararg && mutable.any { it.name == parameter.name && it.type == parameter.type }
     }
@@ -211,16 +211,16 @@ private fun jvmActualModifiers(overrides: Boolean, open: Boolean): List<KModifie
     else -> listOf(KModifier.ACTUAL)
 }
 
-internal fun PortableProperty.jvmSpec(values: JvmStubValues): PropertySpec =
+internal fun CommonProperty.jvmSpec(values: JvmStubValues): PropertySpec =
     jvmSpec(
         values,
         jvmActualModifiers(overrides, open),
     )
 
-private fun PortableProperty.jvmAbstractSpec(): PropertySpec = jvmSpec(values = null, listOf(KModifier.ACTUAL))
+private fun CommonProperty.jvmAbstractSpec(): PropertySpec = jvmSpec(values = null, listOf(KModifier.ACTUAL))
 
 /** Gives browser default accessors inert JVM bodies while true abstract members stay abstract. */
-private fun PortableProperty.jvmInterfaceSpec(values: JvmStubValues): PropertySpec =
+private fun CommonProperty.jvmInterfaceSpec(values: JvmStubValues): PropertySpec =
     if (abstractInBrowser) {
         jvmAbstractSpec()
     } else {
@@ -232,34 +232,34 @@ private fun PortableProperty.jvmInterfaceSpec(values: JvmStubValues): PropertySp
             .build()
     }
 
-internal fun PortableProperty.jvmOverrideSpec(values: JvmStubValues): PropertySpec =
+internal fun CommonProperty.jvmOverrideSpec(values: JvmStubValues): PropertySpec =
     jvmSpec(values, listOf(KModifier.OVERRIDE))
 
 /** The shared JVM property shape: [modifiers], and an inert initializer unless it stays abstract. */
-private fun PortableProperty.jvmSpec(values: JvmStubValues?, modifiers: List<KModifier>): PropertySpec =
+private fun CommonProperty.jvmSpec(values: JvmStubValues?, modifiers: List<KModifier>): PropertySpec =
     PropertySpec.builder(name, type)
         .mutable(mutable)
         .addModifiers(modifiers)
         .apply { values?.let { initializer(it.value(type)) } }
         .build()
 
-internal fun PortableFunction.jvmSpec(owner: PortableClass, values: JvmStubValues): FunSpec = jvmSpec(
+internal fun CommonFunction.jvmSpec(owner: CommonClass, values: JvmStubValues): FunSpec = jvmSpec(
     values,
     jvmActualModifiers(overrides, open),
     resultOwner = owner,
 )
 
-private fun PortableFunction.jvmAbstractSpec(values: JvmStubValues): FunSpec =
+private fun CommonFunction.jvmAbstractSpec(values: JvmStubValues): FunSpec =
     jvmSpec(values, listOf(KModifier.ACTUAL, KModifier.ABSTRACT), resultOwner = null)
 
-private fun PortableFunction.jvmOverrideSpec(owner: PortableClass, values: JvmStubValues): FunSpec =
+private fun CommonFunction.jvmOverrideSpec(owner: CommonClass, values: JvmStubValues): FunSpec =
     jvmSpec(values, listOf(KModifier.OVERRIDE), resultOwner = owner, keepDefaults = false)
 
 /** Builds a JVM function with optional defaults and either an inert body or abstract declaration. */
-private fun PortableFunction.jvmSpec(
+private fun CommonFunction.jvmSpec(
     values: JvmStubValues,
     modifiers: List<KModifier>,
-    resultOwner: PortableClass?,
+    resultOwner: CommonClass?,
     keepDefaults: Boolean = true,
 ): FunSpec {
     val function = this
@@ -276,7 +276,7 @@ private fun PortableFunction.jvmSpec(
 }
 
 /** Preserves matching reference identity; strings and unrelated results use inert values. */
-private fun PortableFunction.jvmResult(owner: PortableClass, values: JvmStubValues): CodeBlock {
+private fun CommonFunction.jvmResult(owner: CommonClass, values: JvmStubValues): CodeBlock {
     val bare = returnType.copy(nullable = false)
     val argument = parameters.firstOrNull { bare != STRING && !it.isVararg && it.type == bare }
     if (argument != null) return CodeBlock.of("%N", argument.name)
@@ -284,11 +284,11 @@ private fun PortableFunction.jvmResult(owner: PortableClass, values: JvmStubValu
     return values.value(returnType)
 }
 
-private fun PortableClass.isInstanceOf(type: TypeName): Boolean =
-    portableName == type || ancestors.any { it == type }
+private fun CommonClass.isInstanceOf(type: TypeName): Boolean =
+    commonName == type || ancestors.any { it == type }
 
 /** Delegates JVM operators to a matching member, or returns an inert result. */
-private fun PortableExtensionFunction.jvmSpec(values: JvmStubValues): FunSpec {
+private fun CommonExtensionFunction.jvmSpec(values: JvmStubValues): FunSpec {
     val extension = this
     val delegate = jvmDelegate(values)
     val arguments = function.parameters.joinToString { it.name }
@@ -308,9 +308,9 @@ private fun PortableExtensionFunction.jvmSpec(values: JvmStubValues): FunSpec {
 }
 
 /** Finds an exact member shape that a generated JVM `get` or `set` operator can delegate to. */
-private fun PortableExtensionFunction.jvmDelegate(
+private fun CommonExtensionFunction.jvmDelegate(
     values: JvmStubValues,
-): PortableFunction? {
+): CommonFunction? {
     val receiver = receiverType as? ClassName ?: return null
     val owner = values.classes[receiver] ?: return null
     val candidateNames = when (function.name) {
@@ -331,25 +331,25 @@ private fun PortableExtensionFunction.jvmDelegate(
         candidates.firstOrNull { candidate ->
             candidate.name == name &&
                 candidate.returnType == function.returnType &&
-                candidate.parameters.map(PortableParameter::type) == function.parameters.map(PortableParameter::type)
+                candidate.parameters.map(CommonParameter::type) == function.parameters.map(CommonParameter::type)
         }
     }
 }
 
-private fun PortableExtensionValue.jvmSpec(): PropertySpec =
-    PropertySpec.builder(name, portableOwner)
+private fun CommonExtensionValue.jvmSpec(): PropertySpec =
+    PropertySpec.builder(name, commonOwner)
         .addModifiers(KModifier.PUBLIC, KModifier.ACTUAL)
-        .receiver(portableOwner.companionName())
+        .receiver(commonOwner.companionName())
         .getter(FunSpec.getterBuilder().addStatement("return %T", jvmSingleton).build())
         .build()
 
 /** Adds only the JVM suppressions required by the emitted class shapes. */
 private fun FileSpec.Builder.jvmSuppressions(
-    classes: List<PortableClass>,
+    classes: List<CommonClass>,
     values: JvmStubValues,
 ): FileSpec.Builder {
     val names = buildList {
-        if (classes.any(PortableClass::hasDefaultArguments)) {
+        if (classes.any(CommonClass::hasDefaultArguments)) {
             add(JVM_DEFAULT_ARGUMENTS_SUPPRESSION)
         }
         if (classes.any { values.jvmStoredInterfaces(it).any { mixin -> mixin.instanceMemberCount > 0 } }) {

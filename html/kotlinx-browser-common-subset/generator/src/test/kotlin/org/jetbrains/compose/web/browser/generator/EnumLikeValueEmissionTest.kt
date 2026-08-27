@@ -95,10 +95,10 @@ class EnumLikeValueEmissionTest {
     }
 }
 
-private val DOM = PortablePackageMapping(PORTABLE_DOM_PACKAGE, "PortableDom", "OptionDictionaries")
-private val EVENTS = PortablePackageMapping(PORTABLE_EVENTS_PACKAGE, "PortableEvents", "EventDictionaries")
+private val DOM = CommonPackageMapping(COMMON_DOM_PACKAGE, "Dom", "OptionDictionaries")
+private val EVENTS = CommonPackageMapping(COMMON_EVENTS_PACKAGE, "Events", "EventDictionaries")
 
-private fun enumValue(owner: String, name: String): PortableExtensionValue = PortableExtensionValue(
+private fun enumValue(owner: String, name: String): CommonExtensionValue = CommonExtensionValue(
     browserMember = MemberName(DOM_PACKAGE, name),
     browserOwner = ClassName(DOM_PACKAGE, owner),
     name = name,
@@ -110,7 +110,7 @@ private val SMOOTH = enumValue("ScrollBehavior", "SMOOTH")
 private val EMPTY = enumValue("CanPlayTypeResult", "EMPTY")
 
 /** `ScrollToOptions`, reduced to one nullable dictionary parameter. */
-private val SCROLL_TO_OPTIONS = PortableClass(
+private val SCROLL_TO_OPTIONS = CommonClass(
     browserName = ClassName(DOM_PACKAGE, "ScrollToOptions"),
     parentBrowserName = null,
     superinterfaces = emptyList(),
@@ -122,11 +122,11 @@ private val SCROLL_TO_OPTIONS = PortableClass(
     functions = emptyList(),
     constructors = emptyList(),
     companion = null,
-    factory = PortableFactory(
+    factory = CommonFactory(
         parameters = listOf(
-            PortableParameter(
+            CommonParameter(
                 name = "behavior",
-                type = ClassName(PORTABLE_DOM_PACKAGE, "ScrollBehavior").copy(nullable = true),
+                type = ClassName(COMMON_DOM_PACKAGE, "ScrollBehavior").copy(nullable = true),
                 isVararg = false,
                 hasDefault = true,
             ),

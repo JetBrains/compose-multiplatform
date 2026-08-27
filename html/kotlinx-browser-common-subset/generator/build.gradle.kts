@@ -14,7 +14,7 @@ dependencies {
 }
 
 val generatedCommonSource = project(":ksp-runner").layout.buildDirectory.file(
-    "generated/kotlinxBrowserCommonSubset/commonMain/kotlin/kotlinx/browser/dom/PortableDom.kt",
+    "generated/kotlinxBrowserCommonSubset/commonMain/kotlin/kotlinx/browser/dom/Dom.kt",
 )
 val generatedCommonMetadata = project(":verification").layout.buildDirectory.file(
     "classes/kotlin/metadata/commonMain/default/manifest",
@@ -22,10 +22,10 @@ val generatedCommonMetadata = project(":verification").layout.buildDirectory.fil
 
 tasks.test {
     dependsOn(":verification:compileCommonMainKotlinMetadata")
-    inputs.file(generatedCommonSource).withPropertyName("generatedPortableDomCommonSource")
-    inputs.file(generatedCommonMetadata).withPropertyName("generatedPortableDomCommonMetadata")
-    systemProperty("portableDomCommonSource", generatedCommonSource.get().asFile.absolutePath)
-    systemProperty("portableDomCommonMetadata", generatedCommonMetadata.get().asFile.absolutePath)
+    inputs.file(generatedCommonSource).withPropertyName("generatedCommonDomSource")
+    inputs.file(generatedCommonMetadata).withPropertyName("generatedCommonDomMetadata")
+    systemProperty("commonDomSource", generatedCommonSource.get().asFile.absolutePath)
+    systemProperty("commonDomMetadata", generatedCommonMetadata.get().asFile.absolutePath)
 }
 
 tasks.check {

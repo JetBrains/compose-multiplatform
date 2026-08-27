@@ -24,8 +24,8 @@ class GeneratedHtmlElementJvmTest {
         val audio = Audio("track.ogg")
         val image = Image(width = 640, height = 480)
         val option = Option(
-            text = "Portable",
-            value = "portable",
+            text = "Common",
+            value = "common",
             defaultSelected = true,
             selected = true,
         )
@@ -36,8 +36,8 @@ class GeneratedHtmlElementJvmTest {
         assertEquals(640, image.width)
         assertEquals(480, image.height)
         assertIs<HTMLOptionElement>(option)
-        assertEquals("Portable", option.text)
-        assertEquals("portable", option.value)
+        assertEquals("Common", option.text)
+        assertEquals("common", option.value)
         assertEquals(true, option.defaultSelected)
         assertEquals(true, option.selected)
     }

@@ -35,10 +35,10 @@ private val EMPTY_LIST = MemberName("kotlin.collections", "emptyList")
  * Supplies JVM property initializers, factory defaults, and stub return values.
  * Requests a per-classifier singleton when no standalone value exists.
  */
-internal class JvmStubValues(val classes: Map<ClassName, PortableClass>) {
+internal class JvmStubValues(val classes: Map<ClassName, CommonClass>) {
     private val singletons = linkedMapOf<ClassName, ClassName>()
     private val mixinClosures = mutableMapOf<ClassName, Set<ClassName>>()
-    private val storedInterfaces = mutableMapOf<ClassName, List<PortableClass>>()
+    private val storedInterfaces = mutableMapOf<ClassName, List<CommonClass>>()
 
     fun value(type: TypeName): CodeBlock =
         inertLiteral(type, classes) ?: jvmInteropLiteral(type) ?: callback(type) ?: singleton(type)
@@ -62,7 +62,7 @@ internal class JvmStubValues(val classes: Map<ClassName, PortableClass>) {
     }
 
     /** Returns every mixin reachable from [owner], preserving declaration order. */
-    fun mixinClosure(owner: PortableClass): Set<ClassName> = mixinClosures.getOrPut(owner.portableName) {
+    fun mixinClosure(owner: CommonClass): Set<ClassName> = mixinClosures.getOrPut(owner.commonName) {
         val reached = linkedSetOf<ClassName>()
 
         fun walk(name: ClassName) {
@@ -74,8 +74,8 @@ internal class JvmStubValues(val classes: Map<ClassName, PortableClass>) {
     }
 
     /** Keeps only mixins whose members are not already supplied by an ancestor class. */
-    fun jvmStoredInterfaces(owner: PortableClass): List<PortableClass> =
-        storedInterfaces.getOrPut(owner.portableName) {
+    fun jvmStoredInterfaces(owner: CommonClass): List<CommonClass> =
+        storedInterfaces.getOrPut(owner.commonName) {
             val above = owner.ancestors
                 .mapNotNull(classes::get)
                 .flatMapTo(mutableSetOf(), ::mixinClosure)
@@ -101,29 +101,29 @@ internal class JvmStubValues(val classes: Map<ClassName, PortableClass>) {
 }
 
 /** Builds a requested singleton as an interface implementation or class subclass. */
-private fun PortableClass.jvmSingleton(name: ClassName, values: JvmStubValues): TypeSpec =
+private fun CommonClass.jvmSingleton(name: ClassName, values: JvmStubValues): TypeSpec =
     TypeSpec.objectBuilder(name)
         .addModifiers(KModifier.INTERNAL)
         .apply {
             if (shape == ClassShape.INTERFACE) {
-                addSuperinterface(portableName)
+                addSuperinterface(commonName)
                 val inherited = values.mixinClosure(this@jvmSingleton).mapNotNull(values.classes::get)
                 addJvmStoredMembers(this@jvmSingleton, listOf(this@jvmSingleton) + inherited, values)
             } else {
-                superclass(portableName)
+                superclass(commonName)
             }
         }
         .build()
 
 /** Returns a standalone inert value for [type], or `null` when a singleton is required. */
-internal fun inertLiteral(type: TypeName, classes: Map<ClassName, PortableClass> = emptyMap()): CodeBlock? {
+internal fun inertLiteral(type: TypeName, classes: Map<ClassName, CommonClass> = emptyMap()): CodeBlock? {
     if (type.isNullable) return CodeBlock.of("null")
     if (type is LambdaTypeName) {
         // Facade return types need singleton support unavailable to common factory defaults.
         if (type.returnType == UNIT) return type.inertLambda(null)
         return inertLiteral(type.returnType, classes)?.let(type::inertLambda)
     }
-    if (type is ParameterizedTypeName && type.rawType == PORTABLE_JS_ARRAY) {
+    if (type is ParameterizedTypeName && type.rawType == COMMON_JS_ARRAY) {
         return CodeBlock.of("%M<%T>().%M()", EMPTY_LIST, type.typeArguments.single().unprojected(), TO_JS_ARRAY)
     }
     return when (type) {
@@ -135,9 +135,9 @@ internal fun inertLiteral(type: TypeName, classes: Map<ClassName, PortableClass>
         DOUBLE -> CodeBlock.of("0.0")
         CHAR -> CodeBlock.of("' '")
         // The interop bridges are declared on every target, so these read the same in common code.
-        PORTABLE_JS_STRING -> CodeBlock.of("%S.%M()", "", TO_JS_STRING)
-        PORTABLE_JS_NUMBER -> CodeBlock.of("0.0.%M()", TO_JS_NUMBER)
-        PORTABLE_JS_DOUBLE -> CodeBlock.of("0.0.%M()", TO_JS_DOUBLE)
+        COMMON_JS_STRING -> CodeBlock.of("%S.%M()", "", TO_JS_STRING)
+        COMMON_JS_NUMBER -> CodeBlock.of("0.0.%M()", TO_JS_NUMBER)
+        COMMON_JS_DOUBLE -> CodeBlock.of("0.0.%M()", TO_JS_DOUBLE)
         else -> {
             val facade = classes[type] ?: return null
             when (facade.shape) {
@@ -166,8 +166,8 @@ private fun TypeName.unprojected(): TypeName = when (this) {
 
 /** JVM-only values for interop types that cannot be constructed in common code. */
 private fun jvmInteropLiteral(type: TypeName): CodeBlock? = when {
-    type == PORTABLE_JS_ANY -> CodeBlock.of("%T", EMPTY_JS_ANY)
-    type is ParameterizedTypeName && type.rawType == PORTABLE_PROMISE ->
-        CodeBlock.of("%T<%T>()", PORTABLE_PROMISE, NOTHING.copy(nullable = true))
+    type == COMMON_JS_ANY -> CodeBlock.of("%T", EMPTY_JS_ANY)
+    type is ParameterizedTypeName && type.rawType == COMMON_PROMISE ->
+        CodeBlock.of("%T<%T>()", COMMON_PROMISE, NOTHING.copy(nullable = true))
     else -> null
 }

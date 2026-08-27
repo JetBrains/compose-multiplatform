@@ -28,15 +28,15 @@ internal const val DOM_EVENTS_PACKAGE = "org.w3c.dom.events"
 internal const val WEBGL_PACKAGE = "org.khronos.webgl"
 
 // Facade packages.
-internal const val PORTABLE_JS_PACKAGE = "kotlinx.browser"
-internal const val PORTABLE_DOM_PACKAGE = "kotlinx.browser.dom"
-internal const val PORTABLE_CLIPBOARD_PACKAGE = "kotlinx.browser.dom.clipboard"
-internal const val PORTABLE_CSS_PACKAGE = "kotlinx.browser.dom.css"
-internal const val PORTABLE_EVENTS_PACKAGE = "kotlinx.browser.dom.events"
-internal const val PORTABLE_WEBGL_PACKAGE = "kotlinx.browser.webgl"
+internal const val COMMON_JS_PACKAGE = "kotlinx.browser"
+internal const val COMMON_DOM_PACKAGE = "kotlinx.browser.dom"
+internal const val COMMON_CLIPBOARD_PACKAGE = "kotlinx.browser.dom.clipboard"
+internal const val COMMON_CSS_PACKAGE = "kotlinx.browser.dom.css"
+internal const val COMMON_EVENTS_PACKAGE = "kotlinx.browser.dom.events"
+internal const val COMMON_WEBGL_PACKAGE = "kotlinx.browser.webgl"
 
-internal data class PortablePackageMapping(
-    val portablePackage: String,
+internal data class CommonPackageMapping(
+    val commonPackage: String,
     val declarationsFile: String,
     val dictionariesFile: String,
 ) {
@@ -44,41 +44,41 @@ internal data class PortablePackageMapping(
     val valuesFile = "EnumLikeValues"
 }
 
-internal val PORTABLE_PACKAGE_BY_BROWSER_PACKAGE = linkedMapOf(
-    DOM_PACKAGE to PortablePackageMapping(PORTABLE_DOM_PACKAGE, "PortableDom", "OptionDictionaries"),
-    DOM_CLIPBOARD_PACKAGE to PortablePackageMapping(PORTABLE_CLIPBOARD_PACKAGE,  "PortableClipboard", "ClipboardDictionaries"),
-    DOM_CSS_PACKAGE to PortablePackageMapping(PORTABLE_CSS_PACKAGE, "PortableCss", "CssDictionaries"),
-    DOM_EVENTS_PACKAGE to PortablePackageMapping(PORTABLE_EVENTS_PACKAGE, "PortableEvents", "EventDictionaries"),
+internal val COMMON_PACKAGE_BY_BROWSER_PACKAGE = linkedMapOf(
+    DOM_PACKAGE to CommonPackageMapping(COMMON_DOM_PACKAGE, "Dom", "OptionDictionaries"),
+    DOM_CLIPBOARD_PACKAGE to CommonPackageMapping(COMMON_CLIPBOARD_PACKAGE,  "Clipboard", "ClipboardDictionaries"),
+    DOM_CSS_PACKAGE to CommonPackageMapping(COMMON_CSS_PACKAGE, "Css", "CssDictionaries"),
+    DOM_EVENTS_PACKAGE to CommonPackageMapping(COMMON_EVENTS_PACKAGE, "Events", "EventDictionaries"),
 )
 
 // Explicit mappings for browser packages outside the org.w3c naming convention.
 internal val EXTERNAL_PACKAGE_BY_BROWSER_PACKAGE = linkedMapOf(
-    WEBGL_PACKAGE to PortablePackageMapping(PORTABLE_WEBGL_PACKAGE, "PortableTypedArrays", "TypedArrayDictionaries"),
+    WEBGL_PACKAGE to CommonPackageMapping(COMMON_WEBGL_PACKAGE, "TypedArrays", "TypedArrayDictionaries"),
 )
 
-internal fun facadePackageMappings(signatureOnlyPackages: Set<String>): Map<String, PortablePackageMapping> =
-    PORTABLE_PACKAGE_BY_BROWSER_PACKAGE +
+internal fun facadePackageMappings(signatureOnlyPackages: Set<String>): Map<String, CommonPackageMapping> =
+    COMMON_PACKAGE_BY_BROWSER_PACKAGE +
         EXTERNAL_PACKAGE_BY_BROWSER_PACKAGE +
         signatureOnlyPackages
             .filterNot(EXTERNAL_PACKAGE_BY_BROWSER_PACKAGE::containsKey)
             .associateWith(::signatureOnlyPackageMapping)
 
 /** Converts a policy-selected browser package without deciding whether it is selected. */
-internal fun signatureOnlyPackageMapping(browserPackage: String) = PortablePackageMapping(
+internal fun signatureOnlyPackageMapping(browserPackage: String) = CommonPackageMapping(
     browserPackage.replaceFirst("org.w3c", "kotlinx.browser"),
     "SignatureTypes",
     "SignatureDictionaries",
 )
 
-internal const val STAGING_ROOT = "portableDom"
+internal const val STAGING_ROOT = "commonDom"
 
 // Interop types require different actuals on JS, Wasm/JS, and JVM.
-internal val PORTABLE_JS_ANY = ClassName(PORTABLE_JS_PACKAGE, "JsAny")
-internal val PORTABLE_JS_STRING = ClassName(PORTABLE_JS_PACKAGE, "JsString")
-internal val PORTABLE_JS_NUMBER = ClassName(PORTABLE_JS_PACKAGE, "JsNumber")
-internal val PORTABLE_JS_DOUBLE = ClassName(PORTABLE_JS_PACKAGE, "JsDouble")
-internal val PORTABLE_JS_ARRAY = ClassName(PORTABLE_JS_PACKAGE, "JsArray")
-internal val PORTABLE_PROMISE = ClassName(PORTABLE_JS_PACKAGE, "Promise")
+internal val COMMON_JS_ANY = ClassName(COMMON_JS_PACKAGE, "JsAny")
+internal val COMMON_JS_STRING = ClassName(COMMON_JS_PACKAGE, "JsString")
+internal val COMMON_JS_NUMBER = ClassName(COMMON_JS_PACKAGE, "JsNumber")
+internal val COMMON_JS_DOUBLE = ClassName(COMMON_JS_PACKAGE, "JsDouble")
+internal val COMMON_JS_ARRAY = ClassName(COMMON_JS_PACKAGE, "JsArray")
+internal val COMMON_PROMISE = ClassName(COMMON_JS_PACKAGE, "Promise")
 
 internal val BROWSER_JS_ANY = ClassName("kotlin.js", "JsAny")
 internal val BROWSER_JS_STRING = ClassName("kotlin.js", "JsString")
@@ -86,26 +86,26 @@ internal val BROWSER_JS_NUMBER = ClassName("kotlin.js", "JsNumber")
 internal val BROWSER_JS_ARRAY = ClassName("kotlin.js", "JsArray")
 internal val BROWSER_PROMISE = ClassName("kotlin.js", "Promise")
 
-internal val PORTABLE_INTEROP_TYPES: Map<String, ClassName> = listOf(
-    BROWSER_JS_ANY to PORTABLE_JS_ANY,
-    BROWSER_JS_STRING to PORTABLE_JS_STRING,
-    BROWSER_JS_NUMBER to PORTABLE_JS_NUMBER,
-    BROWSER_JS_ARRAY to PORTABLE_JS_ARRAY,
-    BROWSER_PROMISE to PORTABLE_PROMISE,
-).associate { (browser, portable) -> browser.canonicalName to portable }
+internal val COMMON_INTEROP_TYPES: Map<String, ClassName> = listOf(
+    BROWSER_JS_ANY to COMMON_JS_ANY,
+    BROWSER_JS_STRING to COMMON_JS_STRING,
+    BROWSER_JS_NUMBER to COMMON_JS_NUMBER,
+    BROWSER_JS_ARRAY to COMMON_JS_ARRAY,
+    BROWSER_PROMISE to COMMON_PROMISE,
+).associate { (browser, common) -> browser.canonicalName to common }
 
-internal val TO_JS_STRING = MemberName(PORTABLE_JS_PACKAGE, "toJsString")
-internal val TO_JS_NUMBER = MemberName(PORTABLE_JS_PACKAGE, "toJsNumber")
-internal val TO_JS_DOUBLE = MemberName(PORTABLE_JS_PACKAGE, "toJsDouble")
-internal val TO_JS_ARRAY = MemberName(PORTABLE_JS_PACKAGE, "toJsArray")
-internal val EMPTY_JS_ANY = ClassName(PORTABLE_JS_PACKAGE, "EmptyJsAny")
+internal val TO_JS_STRING = MemberName(COMMON_JS_PACKAGE, "toJsString")
+internal val TO_JS_NUMBER = MemberName(COMMON_JS_PACKAGE, "toJsNumber")
+internal val TO_JS_DOUBLE = MemberName(COMMON_JS_PACKAGE, "toJsDouble")
+internal val TO_JS_ARRAY = MemberName(COMMON_JS_PACKAGE, "toJsArray")
+internal val EMPTY_JS_ANY = ClassName(COMMON_JS_PACKAGE, "EmptyJsAny")
 
 internal fun ClassName.browserImportAlias(): String = "Browser$simpleName"
 
 internal fun ClassName.companionName(): ClassName = nestedClass("Companion")
 
 // Common code cannot reference kotlin.js.definedExternally.
-internal val DEFINED_EXTERNALLY = MemberName(PORTABLE_DOM_PACKAGE, "definedExternally")
+internal val DEFINED_EXTERNALLY = MemberName(COMMON_DOM_PACKAGE, "definedExternally")
 
 internal val BUILTIN_TYPES: Map<String, ClassName> =
     listOf(ANY, BOOLEAN, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, CHAR, STRING, UNIT)

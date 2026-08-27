@@ -70,9 +70,9 @@ val generateKotlinxBrowserCommonSubset by tasks.registering(Sync::class) {
     dependsOn("kspKotlinJs", unpackKotlinxBrowserSources)
 
     from(layout.buildDirectory.dir("generated/ksp/js/jsMain/resources")) {
-        include("portableDom/**")
+        include("commonDom/**")
         eachFile {
-            path = path.removePrefix("portableDom/")
+            path = path.removePrefix("commonDom/")
             if (path.endsWith(".kt.txt")) path = path.removeSuffix(".txt")
         }
         includeEmptyDirs = false
@@ -81,7 +81,7 @@ val generateKotlinxBrowserCommonSubset by tasks.registering(Sync::class) {
 }
 
 val generatedSourceSets = listOf("commonMain", "jsMain", "wasmJsMain", "jvmMain")
-val handwrittenSourcePaths = setOf("kotlinx/browser/PortableInterop.kt")
+val handwrittenSourcePaths = setOf("kotlinx/browser/Interop.kt")
 
 fun directoryDifferences(
     generated: File,
@@ -148,19 +148,19 @@ val checkKotlinxBrowserCommonSubset by tasks.registering {
 val updateSourceTasks = generatedSourceSets.map { sourceSet ->
     tasks.register<Sync>("update${sourceSet.replaceFirstChar(Char::uppercaseChar)}SubsetSources") {
         group = "generation"
-        description = "Updates the checked-in $sourceSet portable browser subset sources."
+        description = "Updates the checked-in $sourceSet common browser subset sources."
         dependsOn(generateKotlinxBrowserCommonSubset)
         from(generatedSubset.map { it.dir("$sourceSet/kotlin") })
         into(checkedInSources.dir("$sourceSet/kotlin"))
         preserve {
-            include("kotlinx/browser/PortableInterop.kt")
+            include("kotlinx/browser/Interop.kt")
         }
     }
 }
 
 val updateSubsetManifest by tasks.registering(Sync::class) {
     group = "generation"
-    description = "Updates the checked-in portable browser subset API manifest."
+    description = "Updates the checked-in common browser subset API manifest."
     dependsOn(generateKotlinxBrowserCommonSubset)
     from(generatedSubset.map { it.file("api-manifest.txt") }) {
         rename { "dom-api-manifest.txt" }

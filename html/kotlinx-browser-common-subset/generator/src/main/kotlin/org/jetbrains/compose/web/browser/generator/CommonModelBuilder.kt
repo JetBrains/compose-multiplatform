@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-// Builds the portable class model from the resolved closure and renders its ledger.
+// Builds the common class model from the resolved closure and renders its ledger.
 package org.jetbrains.compose.web.browser.generator
 
 import com.google.devtools.ksp.symbol.KSClassDeclaration
@@ -37,21 +37,21 @@ internal fun inheritedMemberKeys(
     }
 }
 
-/** Converts the resolved browser closure into portable source declarations. */
-internal fun buildPortableModel(
+/** Converts the resolved browser closure into common source declarations. */
+internal fun buildCommonModel(
     index: DeclarationIndex,
     closure: Map<String, KSClassDeclaration>,
     identityOnly: Set<String>,
-    mapper: PortableTypeMapper,
+    mapper: CommonTypeMapper,
     coverage: CoverageLedger,
     requestedDependencies: MutableSet<String>,
     identitySupertypeSelection: Set<String>,
-): List<PortableClass> {
-    val portableNames = mapper.portableNames
+): List<CommonClass> {
+    val commonNames = mapper.commonNames
     val memberScanner = MemberScanner(mapper, coverage, requestedDependencies)
     val companionScanner = CompanionScanner(mapper, coverage, requestedDependencies)
     // Interface members are visible to subtypes but do not provide an implementation. Keep those
-    // facts separate so the first portable class in the hierarchy repeats the browser's fake
+    // facts separate so the first common class in the hierarchy repeats the browser's fake
     // overrides instead of incorrectly deduplicating them as concrete inherited members.
     val visibleKeys = mutableMapOf<String, Set<String>>()
     val providedKeys = mutableMapOf<String, Set<String>>()
@@ -69,7 +69,7 @@ internal fun buildPortableModel(
             coverage.ported(
                 CoverageKind.CLASSIFIER,
                 "$qualifiedName <= ${BROWSER_JS_ANY.canonicalName}",
-                "provided by the portable interop marker",
+                "provided by the common interop marker",
             )
         }
         val parentName = hierarchy.parent
@@ -111,13 +111,13 @@ internal fun buildPortableModel(
             inherited.provided + members.keys
         }
         ancestors[qualifiedName] = parentName
-            ?.let { listOf(portableNames.getValue(it)) + ancestors.getValue(it) }
+            ?.let { listOf(commonNames.getValue(it)) + ancestors.getValue(it) }
             .orEmpty()
 
-        PortableClass(
+        CommonClass(
             browserName = ClassName.bestGuess(qualifiedName),
             parentBrowserName = parentName?.let(ClassName::bestGuess),
-            superinterfaces = interfaceNames.map(portableNames::getValue),
+            superinterfaces = interfaceNames.map(commonNames::getValue),
             ancestors = ancestors.getValue(qualifiedName),
             shape = shape,
             isDictionary = isDictionary,
@@ -137,19 +137,19 @@ internal fun buildPortableModel(
                 null
             },
             sourceFile = declaration.containingFile,
-            typeVariables = declaration.portableTypeVariables(mapper),
+            typeVariables = declaration.commonTypeVariables(mapper),
             superinterfaceTypes = interfaceTypes,
         )
     }
 }
 
 /** Preserves classifier variance and bounds. Generic members remain a separate policy decision. */
-private fun KSClassDeclaration.portableTypeVariables(mapper: PortableTypeMapper): List<TypeVariableName> =
+private fun KSClassDeclaration.commonTypeVariables(mapper: CommonTypeMapper): List<TypeVariableName> =
     typeParameters.map { parameter ->
         // On the JS KSP round, JsAny? in ItemArrayLike's source bound resolves to kotlin.Any?.
         // Restore the cross-target interop bound that Wasm/JS and the browser typealias require.
         val bounds = if (qualifiedName?.asString() == "$DOM_PACKAGE.ItemArrayLike") {
-            listOf(PORTABLE_JS_ANY.copy(nullable = true))
+            listOf(COMMON_JS_ANY.copy(nullable = true))
         } else {
             parameter.bounds.map { reference ->
                 when (val mapping = mapper.result(reference.resolve())) {
@@ -172,15 +172,15 @@ private fun KSClassDeclaration.portableTypeVariables(mapper: PortableTypeMapper)
         )
     }
 
-/** Builds the portable factory paired with an option-dictionary interface. */
+/** Builds the common factory paired with an option-dictionary interface. */
 private fun DeclarationIndex.factoryFor(
     qualifiedName: String,
-    mapper: PortableTypeMapper,
+    mapper: CommonTypeMapper,
     coverage: CoverageLedger,
     requestedDependencies: MutableSet<String>,
-): PortableFactory? {
+): CommonFactory? {
     val factory = topLevelFunctionFor(qualifiedName) ?: return null
-    val parameters = mutableListOf<PortableParameter>()
+    val parameters = mutableListOf<CommonParameter>()
     factory.parameters.forEachIndexed { index, parameter ->
         val name = parameter.name?.asString()
         val subject = "$qualifiedName#factory parameter ${name ?: "#$index"}"
@@ -195,7 +195,7 @@ private fun DeclarationIndex.factoryFor(
         when (mapping) {
             is TypeMapping.Ported -> {
                 coverage.ported(CoverageKind.PARAMETER, subject)
-                parameters += PortableParameter(name, mapping.type, parameter.isVararg, hasDefault = true)
+                parameters += CommonParameter(name, mapping.type, parameter.isVararg, hasDefault = true)
             }
             is TypeMapping.Skipped -> coverage.skipped(
                 CoverageKind.PARAMETER,
@@ -209,7 +209,7 @@ private fun DeclarationIndex.factoryFor(
         coverage.skipped(
             CoverageKind.FACTORY,
             "$qualifiedName#factory",
-            SkipReason.NO_PORTABLE_PARAMETERS,
+            SkipReason.NO_COMMON_PARAMETERS,
             "none of ${factory.parameters.size} parameters can be emitted",
         )
         return null
@@ -219,22 +219,22 @@ private fun DeclarationIndex.factoryFor(
         "$qualifiedName#factory",
         "${parameters.size}/${factory.parameters.size} parameters emitted",
     )
-    return PortableFactory(parameters)
+    return CommonFactory(parameters)
 }
 
 /** Renders the reviewable model report backing `model.txt`. */
 internal fun modelLedger(
-    closure: PortableClosure,
-    model: List<PortableClass>,
-    extensions: List<PortableExtensionFunction>,
-    values: List<PortableExtensionValue>,
+    closure: CommonClosure,
+    model: List<CommonClass>,
+    extensions: List<CommonExtensionFunction>,
+    values: List<CommonExtensionValue>,
 ): LedgerFile = LedgerFile(
     linkedMapOf(
         "inputs" to closure.inputs.size.toString(),
         "dependencies" to closure.dependencies.size.toString(),
         "identityOnly" to closure.identityOnly.size.toString(),
         "closure" to model.size.toString(),
-        "members" to model.sumOf(PortableClass::memberCount).toString(),
+        "members" to model.sumOf(CommonClass::memberCount).toString(),
         "constructors" to model.sumOf { it.constructors.size }.toString(),
         "extensions" to extensions.size.toString(),
         "values" to values.size.toString(),
@@ -269,29 +269,29 @@ internal fun modelLedger(
                 declaration.companion?.functions?.forEach {
                     add("companion ${it.key()}: ${it.returnType.signature()}")
                 }
-                values.filter { it.portableOwner == declaration.portableName }.forEach { add("value ${it.key}") }
+                values.filter { it.commonOwner == declaration.commonName }.forEach { add("value ${it.key}") }
             },
         )
     },
 )
 
-/** Ports immutable companion constants and non-generic functions with portable signatures. */
+/** Ports immutable companion constants and non-generic functions with common signatures. */
 private class CompanionScanner(
-    private val types: PortableTypeMapper,
+    private val types: CommonTypeMapper,
     private val coverage: CoverageLedger,
     private val requestedDependencies: MutableSet<String>,
 ) {
     private val signatures = SignatureAnalyzer(types)
 
-    fun scan(declaration: KSClassDeclaration): PortableCompanion? {
+    fun scan(declaration: KSClassDeclaration): CommonCompanion? {
         val owner = declaration.qualifiedName?.asString().orEmpty()
         val companion = declaration.declarations
             .filterIsInstance<KSClassDeclaration>()
             .firstOrNull(KSClassDeclaration::isCompanionObject)
             ?: return null
         val companionName = companion.qualifiedName?.asString() ?: "$owner.Companion"
-        val properties = mutableListOf<PortableConstant>()
-        val functions = mutableListOf<PortableFunction>()
+        val properties = mutableListOf<CommonConstant>()
+        val functions = mutableListOf<CommonFunction>()
         val functionKeys = mutableSetOf<String>()
 
         companion.declarations.forEach { member ->
@@ -317,7 +317,7 @@ private class CompanionScanner(
                         )
                         is TypeMapping.Ported -> {
                             val name = member.simpleName.asString()
-                            properties += PortableConstant(name = name, type = mapping.type)
+                            properties += CommonConstant(name = name, type = mapping.type)
                             coverage.ported(
                                 CoverageKind.COMPANION_MEMBER,
                                 subject,
@@ -369,6 +369,6 @@ private class CompanionScanner(
             "$owner <= $companionName",
             "emitted with ${properties.size} constants and ${functions.size} functions",
         )
-        return PortableCompanion(properties, functions)
+        return CommonCompanion(properties, functions)
     }
 }
