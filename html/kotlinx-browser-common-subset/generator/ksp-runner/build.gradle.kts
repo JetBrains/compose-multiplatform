@@ -52,6 +52,12 @@ kotlin {
     }
 }
 
+// Upstream webMain sources are read by KSP only. Their actuals are not unpacked,
+// so they cannot compile on their own.
+tasks.matching { it.name == "compileKotlinJs" }.configureEach {
+    enabled = false
+}
+
 dependencies {
     add("kspJs", project(":"))
 }
