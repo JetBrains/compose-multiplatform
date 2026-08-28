@@ -1,0 +1,5 @@
+# Declaration-level omissions that classifier selection cannot express.
+#
+# Deferred classifiers live in common-dom-selection.txt, so a classifier has only one selection
+# decision. This file is reserved for narrower declarations that stay omitted even when their owner
+# participates in the facade. An entry that covers nothing fails generation.
