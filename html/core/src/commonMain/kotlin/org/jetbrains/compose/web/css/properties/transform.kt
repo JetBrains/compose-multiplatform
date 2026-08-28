@@ -37,7 +37,7 @@ interface TransformBuilder {
     fun skew(ax: CSSAngleValue, ay: CSSAngleValue)
     fun skewX(a: CSSAngleValue)
     fun skewY(a: CSSAngleValue)
-    // Length and percentage aliases erase to CSSSizeValue on JVM, so these overloads need distinct bytecode names.
+    // JVM erases length/percentage aliases to CSSSizeValue, requiring distinct bytecode names.
     fun translate(tx: CSSLengthValue)
     @Suppress("INAPPLICABLE_JVM_NAME")
     @JvmName("translatePercentage")
@@ -73,11 +73,14 @@ interface TransformBuilder {
     fun translateZ(tz: CSSLengthValue)
 }
 
+private fun cssFunction(name: String, vararg values: Number): String =
+    values.joinToString(", ", "$name(", ")") { formatCssNumber(it) }
+
 private class TransformBuilderImplementation : TransformBuilder {
     private val transformations = mutableListOf<TransformFunction>()
 
     override fun matrix(a: Number, b: Number, c: Number, d: Number, tx: Number, ty: Number) =
-        transformations.add { "matrix($a, $b, $c, $d, $tx, $ty)" }
+        transformations.add { cssFunction("matrix", a, b, c, d, tx, ty) }
 
     override fun matrix3d(
         a1: Number, b1: Number, c1: Number, d1: Number,
@@ -85,7 +88,9 @@ private class TransformBuilderImplementation : TransformBuilder {
         a3: Number, b3: Number, c3: Number, d3: Number,
         a4: Number, b4: Number, c4: Number, d4: Number
     ) {
-        transformations.add { "matrix3d($a1, $b1, $c1, $d1, $a2, $b2, $c2, $d2, $a3, $b3, $c3, $d3, $a4, $b4, $c4, $d4)" }
+        transformations.add {
+            cssFunction("matrix3d", a1, b1, c1, d1, a2, b2, c2, d2, a3, b3, c3, d3, a4, b4, c4, d4)
+        }
     }
 
     override fun perspective(d: CSSLengthValue) {
@@ -97,7 +102,7 @@ private class TransformBuilderImplementation : TransformBuilder {
     }
 
     override fun rotate3d(x: Number, y: Number, z: Number, a: CSSAngleValue) {
-        transformations.add({ "rotate3d($x, $y, $z, $a)" })
+        transformations.add({ "rotate3d(${formatCssNumber(x)}, ${formatCssNumber(y)}, ${formatCssNumber(z)}, $a)" })
     }
 
     override fun rotateX(a: CSSAngleValue) {
@@ -113,27 +118,27 @@ private class TransformBuilderImplementation : TransformBuilder {
     }
 
     override fun scale(sx: Number) {
-        transformations.add { "scale($sx)" }
+        transformations.add { cssFunction("scale", sx) }
     }
 
     override fun scale(sx: Number, sy: Number) {
-        transformations.add { "scale($sx, $sy)" }
+        transformations.add { cssFunction("scale", sx, sy) }
     }
 
     override fun scale3d(sx: Number, sy: Number, sz: Number) {
-        transformations.add { "scale3d($sx, $sy, $sz)" }
+        transformations.add { cssFunction("scale3d", sx, sy, sz) }
     }
 
     override fun scaleX(s: Number) {
-        transformations.add { "scaleX($s)" }
+        transformations.add { cssFunction("scaleX", s) }
     }
 
     override fun scaleY(s: Number) {
-        transformations.add { "scaleY($s)" }
+        transformations.add { cssFunction("scaleY", s) }
     }
 
     override fun scaleZ(s: Number) {
-        transformations.add { "scaleZ($s)" }
+        transformations.add { cssFunction("scaleZ", s) }
     }
 
     override fun skew(ax: CSSAngleValue) {

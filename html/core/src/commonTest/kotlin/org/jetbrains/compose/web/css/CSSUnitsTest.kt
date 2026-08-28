@@ -29,6 +29,9 @@ class CSSUnitsTest {
         assertEquals("0%", 0.percent.toString())
         assertEquals("0px", (-0.0).px.toString())
         assertEquals("250ms", 250.ms.toString())
+        assertEquals("33.333332%", 33.333333.percent.toString())
+        assertEquals("0.0001px", 0.0001.px.toString())
+        assertEquals("1e-7px", 0.0000001.px.toString())
     }
 
     @Test

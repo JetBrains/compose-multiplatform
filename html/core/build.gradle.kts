@@ -75,16 +75,15 @@ kotlin {
 }
 
 val jvmTestCompilation = kotlin.targets.getByName("jvm").compilations.getByName("test")
-val ssrHydrationFixture = generatedSsrHydrationFixtures.map { it.file("ssr-hydration.html") }
 val generateSsrHydrationFixture = tasks.register<JavaExec>("generateSsrHydrationFixture") {
     group = "verification"
-    description = "Generates JVM-rendered HTML for the Kotlin/JS hydration test."
+    description = "Generates JVM-rendered HTML for the Kotlin/JS hydration tests."
     dependsOn(jvmTestCompilation.compileTaskProvider)
     mainClass.set("org.jetbrains.compose.web.SsrHydrationFixtureGenerator")
     classpath(jvmTestCompilation.output.allOutputs)
     classpath(jvmTestCompilation.runtimeDependencyFiles)
-    args(ssrHydrationFixture.get().asFile.absolutePath)
-    outputs.file(ssrHydrationFixture)
+    args(generatedSsrHydrationFixtures.get().asFile.absolutePath)
+    outputs.dir(generatedSsrHydrationFixtures)
 }
 
 tasks.named("jsTestProcessResources") {

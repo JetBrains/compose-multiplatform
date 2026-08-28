@@ -22,8 +22,14 @@ class CommonCSSValuesTest {
     fun functionalColorsHavePortableCssText() {
         assertEquals("rgb(10, 20, 30)", rgb(10, 20, 30).toString())
         assertEquals("rgba(10, 20, 30, 0.5)", rgba(10, 20, 30, 0.5).toString())
+        assertEquals("rgba(0, 0, 0, 1)", rgba(0, 0, 0, 1.0).toString())
+        assertEquals("rgba(0, 0, 0, 0.1)", rgba(0, 0, 0, 0.1f).toString())
+        // Both platforms serialize CSS numbers at binary32 precision.
+        assertEquals("rgba(0, 0, 0, 0.12345679)", rgba(0, 0, 0, 0.1234567890123456).toString())
         assertEquals("hsl(90deg, 50%, 25%)", hsl(90, 50, 25).toString())
+        assertEquals("hsl(90deg, 50%, 25%)", hsl(90.0, 50.0, 25.0f).toString())
         assertEquals("hsla(90deg, 50%, 25%, 0.5)", hsla(90, 50, 25, 0.5).toString())
+        assertEquals("hsla(90deg, 50%, 25%, 1)", hsla(90.0, 50.0, 25.0f, 1.0).toString())
     }
 
     @Test
@@ -31,6 +37,7 @@ class CommonCSSValuesTest {
         val first: CSSNumericValue<CSSUnit.px> = 10.px
         val second: CSSNumericValue<CSSUnit.px> = 5.px
 
+        assertEquals("1", StylePropertyValue(1.0).toString())
         assertEquals("15px", (10.px + 5.px).toString())
         assertEquals("calc((10px + 5px) * 2)", ((first + second) * 2).toString())
     }

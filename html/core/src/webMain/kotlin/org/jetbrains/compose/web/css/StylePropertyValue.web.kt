@@ -24,7 +24,7 @@ internal actual fun createStylePropertyString(value: String): StylePropertyStrin
 
 @PublishedApi
 internal actual fun createStylePropertyNumber(value: Number): StylePropertyNumber =
-    value.unsafeCast<StylePropertyNumber>()
+    formatCssNumber(value).unsafeCast<StylePropertyNumber>()
 
 internal actual fun createCSSVariableReference(cssText: String): StylePropertyValue =
     cssText.unsafeCast<StylePropertyValue>()

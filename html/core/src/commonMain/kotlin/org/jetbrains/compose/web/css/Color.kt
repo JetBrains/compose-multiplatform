@@ -9,26 +9,26 @@ object Color {
 
     @Deprecated("use org.jetbrains.compose.web.css.rgb", ReplaceWith("rgb(r, g, b)"))
     data class RGB(val r: Number, val g: Number, val b: Number) : CSSColorValue {
-        override fun toString(): String = "rgb($r, $g, $b)"
+        override fun toString(): String = rgbString(r, g, b)
     }
 
     @Deprecated("use org.jetbrains.compose.web.css.rgba", ReplaceWith("rgba(r, g, b, a)"))
     data class RGBA(val r: Number, val g: Number, val b: Number, val a: Number) : CSSColorValue {
-        override fun toString(): String = "rgba($r, $g, $b, $a)"
+        override fun toString(): String = rgbaString(r, g, b, a)
     }
 
     @Deprecated("use org.jetbrains.compose.web.css.hsl", ReplaceWith("hsl(h, s, l)"))
     data class HSL(val h: CSSAngleValue, val s: Number, val l: Number) : CSSColorValue {
         constructor(h: Number, s: Number, l: Number) : this(h.deg, s, l)
 
-        override fun toString(): String = "hsl($h, $s%, $l%)"
+        override fun toString(): String = hslString(h, s, l)
     }
 
     @Deprecated("use org.jetbrains.compose.web.css.hsla", ReplaceWith("hsla(h, s, l, a)"))
     data class HSLA(val h: CSSAngleValue, val s: Number, val l: Number, val a: Number) : CSSColorValue {
         constructor(h: Number, s: Number, l: Number, a: Number) : this(h.deg, s, l, a)
 
-        override fun toString(): String = "hsla($h, $s%, $l%, $a)"
+        override fun toString(): String = hslaString(h, s, l, a)
     }
 
     inline val aliceblue get() = Color("aliceblue")
@@ -178,20 +178,32 @@ internal expect fun createCSSColorValue(value: String): CSSColorValue
 fun Color(name: String): CSSColorValue = createCSSColorValue(name)
 
 private class RGB(val r: Number, val g: Number, val b: Number): CSSColorValue {
-    override fun toString(): String = "rgb($r, $g, $b)"
+    override fun toString(): String = rgbString(r, g, b)
 }
 
 private class RGBA(val r: Number, val g: Number, val b: Number, val a: Number) : CSSColorValue {
-    override fun toString(): String = "rgba($r, $g, $b, $a)"
+    override fun toString(): String = rgbaString(r, g, b, a)
 }
 
 private class HSL(val h: CSSAngleValue, val s: Number, val l: Number) : CSSColorValue {
-    override fun toString(): String = "hsl($h, $s%, $l%)"
+    override fun toString(): String = hslString(h, s, l)
 }
 
 private class HSLA(val h: CSSAngleValue, val s: Number, val l: Number, val a: Number) : CSSColorValue {
-    override fun toString(): String = "hsla($h, $s%, $l%, $a)"
+    override fun toString(): String = hslaString(h, s, l, a)
 }
+
+private fun rgbString(r: Number, g: Number, b: Number): String =
+    "rgb(${formatCssNumber(r)}, ${formatCssNumber(g)}, ${formatCssNumber(b)})"
+
+private fun rgbaString(r: Number, g: Number, b: Number, a: Number): String =
+    "rgba(${formatCssNumber(r)}, ${formatCssNumber(g)}, ${formatCssNumber(b)}, ${formatCssNumber(a)})"
+
+private fun hslString(h: CSSAngleValue, s: Number, l: Number): String =
+    "hsl($h, ${formatCssNumber(s)}%, ${formatCssNumber(l)}%)"
+
+private fun hslaString(h: CSSAngleValue, s: Number, l: Number, a: Number): String =
+    "hsla($h, ${formatCssNumber(s)}%, ${formatCssNumber(l)}%, ${formatCssNumber(a)})"
 
 fun rgb(r: Number, g: Number, b: Number): CSSColorValue = RGB(r, g, b)
 fun rgba(r: Number, g: Number, b: Number, a: Number): CSSColorValue = RGBA(r, g, b, a)

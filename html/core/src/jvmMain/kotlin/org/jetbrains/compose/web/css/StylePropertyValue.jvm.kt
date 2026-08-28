@@ -29,7 +29,7 @@ private value class JvmStylePropertyString(
 private value class JvmStylePropertyNumber(
     private val value: Number,
 ) : StylePropertyNumber {
-    override fun toString(): String = value.toString()
+    override fun toString(): String = formatCssNumber(value)
 }
 
 @JvmInline
@@ -39,8 +39,7 @@ private value class JvmCSSStyleValue(
     override fun toString(): String = value
 }
 
-// JVM references must actually implement every marker type they can be returned as.
-// CSSSizeValue is intentionally excluded because a var() reference has no value or unit members.
+// JVM references implement every returnable marker except CSSSizeValue; var() has no value/unit.
 @JvmInline
 private value class JvmCSSVariableReference(
     private val value: String,

@@ -5,13 +5,13 @@
 
 package org.jetbrains.compose.web.css
 
-operator fun <T: CSSUnit> CSSSizeValue<T>.times(num: Number): CSSSizeValue<T> = CSSUnitValueTyped(value * num.toFloat(), unit)
-operator fun <T: CSSUnit> Number.times(unit: CSSSizeValue<T>): CSSSizeValue<T> = CSSUnitValueTyped(unit.value * toFloat(), unit.unit)
+operator fun <T: CSSUnit> CSSSizeValue<T>.times(num: Number): CSSSizeValue<T> = CSSUnitValueTyped(narrowToFloat(value * narrowToFloat(num)), unit)
+operator fun <T: CSSUnit> Number.times(unit: CSSSizeValue<T>): CSSSizeValue<T> = CSSUnitValueTyped(narrowToFloat(unit.value * narrowToFloat(this)), unit.unit)
 
-operator fun <T: CSSUnit> CSSSizeValue<T>.div(num: Number): CSSSizeValue<T> = CSSUnitValueTyped(value / num.toFloat(), unit)
+operator fun <T: CSSUnit> CSSSizeValue<T>.div(num: Number): CSSSizeValue<T> = CSSUnitValueTyped(narrowToFloat(value / narrowToFloat(num)), unit)
 
-operator fun <T: CSSUnit> CSSSizeValue<T>.plus(b: CSSSizeValue<T>): CSSSizeValue<T> = CSSUnitValueTyped(value + b.value, unit)
-operator fun <T: CSSUnit> CSSSizeValue<T>.minus(b: CSSSizeValue<T>): CSSSizeValue<T> = CSSUnitValueTyped(value - b.value, unit)
+operator fun <T: CSSUnit> CSSSizeValue<T>.plus(b: CSSSizeValue<T>): CSSSizeValue<T> = CSSUnitValueTyped(narrowToFloat(value + b.value), unit)
+operator fun <T: CSSUnit> CSSSizeValue<T>.minus(b: CSSSizeValue<T>): CSSSizeValue<T> = CSSUnitValueTyped(narrowToFloat(value - b.value), unit)
 operator fun <T: CSSUnit> CSSSizeValue<T>.unaryMinus(): CSSSizeValue<T> = CSSUnitValueTyped(-value, unit)
 operator fun <T: CSSUnit> CSSSizeValue<T>.unaryPlus(): CSSSizeValue<T> = CSSUnitValueTyped(value, unit)
 
@@ -42,14 +42,15 @@ private data class CSSTimes<T : CSSUnit>(
     var r: Number,
     val left: Boolean = true
 ) : CSSCalcOperation<T> {
-    override fun toString(): String = if (left) "($l * $r)" else "($r * $l)"
+    override fun toString(): String =
+        if (left) "($l * ${formatCssNumber(r)})" else "(${formatCssNumber(r)} * $l)"
 }
 
 private data class CSSDiv<T : CSSUnit>(
     var l: CSSNumericValue<out T>,
     var r: Number
 ) : CSSCalcOperation<T> {
-    override fun toString(): String = "($l / $r)"
+    override fun toString(): String = "($l / ${formatCssNumber(r)})"
 }
 
 operator fun <T: CSSUnit> CSSNumericValue<out T>.plus(b: CSSNumericValue<out T>): CSSCalcValue<T> = CSSCalcValue(CSSPlus(this, b))

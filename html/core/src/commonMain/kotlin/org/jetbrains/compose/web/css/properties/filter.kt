@@ -48,13 +48,13 @@ private class FilterBuilderImplementation : FilterBuilder {
 
     override fun blur(radius: CSSLengthValue) { transformations.add { "blur($radius)" } }
 
-    override fun brightness(amount: Number) { transformations.add { "brightness($amount)" } }
+    override fun brightness(amount: Number) { transformations.add { "brightness(${formatCssNumber(amount)})" } }
     override fun brightness(amount: CSSPercentageValue) { transformations.add { "brightness($amount)" } }
 
-    override fun contrast(amount: Number)  { transformations.add { "contrast($amount)" } }
+    override fun contrast(amount: Number)  { transformations.add { "contrast(${formatCssNumber(amount)})" } }
     override fun contrast(amount: CSSPercentageValue) { transformations.add { "contrast($amount)" } }
 
-    override fun grayscale(amount: Number) { transformations.add { "grayscale($amount)" } }
+    override fun grayscale(amount: Number) { transformations.add { "grayscale(${formatCssNumber(amount)})" } }
     override fun grayscale(amount: CSSPercentageValue) { transformations.add { "grayscale($amount)" } }
 
     override fun hueRotate(angle: CSSAngleValue) { transformations.add { "hue-rotate($angle)" } }
@@ -63,16 +63,16 @@ private class FilterBuilderImplementation : FilterBuilder {
         return transformations.joinToString(" ") { it.apply() }
     }
 
-    override fun invert(amount: Number) { transformations.add { "invert($amount)" } }
+    override fun invert(amount: Number) { transformations.add { "invert(${formatCssNumber(amount)})" } }
     override fun invert(amount: CSSPercentageValue) { transformations.add { "invert($amount)" } }
 
-    override fun opacity(amount: Number) { transformations.add { "opacity($amount)" } }
+    override fun opacity(amount: Number) { transformations.add { "opacity(${formatCssNumber(amount)})" } }
     override fun opacity(amount: CSSPercentageValue) { transformations.add { "opacity($amount)" } }
 
-    override fun saturate(amount: Number) { transformations.add { "saturate($amount)" } }
+    override fun saturate(amount: Number) { transformations.add { "saturate(${formatCssNumber(amount)})" } }
     override fun saturate(amount: CSSPercentageValue) { transformations.add { "saturate($amount)" } }
 
-    override fun sepia(amount: Number) { transformations.add { "sepia($amount)" } }
+    override fun sepia(amount: Number) { transformations.add { "sepia(${formatCssNumber(amount)})" } }
     override fun sepia(amount: CSSPercentageValue) { transformations.add { "sepia($amount)" } }
 
     override fun dropShadow(offsetX: CSSLengthValue, offsetY: CSSLengthValue) {
