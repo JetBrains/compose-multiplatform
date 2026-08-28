@@ -16,19 +16,19 @@ and stage the handwritten interop files automatically.
 Run every verification compilation and test:
 
 ```shell
-../../gradlew :verification:check
+../gradlew :verification:check
 ```
 
 Run only the JVM ledger and manifest tests:
 
 ```shell
-../../gradlew :verification:jvmTest
+../gradlew :verification:jvmTest
 ```
 
 Compile the generated facade for each implementation target without running the JVM tests:
 
 ```shell
-../../gradlew :verification:compileKotlinJs \
+../gradlew :verification:compileKotlinJs \
     :verification:compileKotlinWasmJs \
     :verification:compileKotlinJvm
 ```
@@ -36,5 +36,5 @@ Compile the generated facade for each implementation target without running the 
 Run the generator's unit tests together with the complete verification module:
 
 ```shell
-../../gradlew check
+../gradlew check
 ```

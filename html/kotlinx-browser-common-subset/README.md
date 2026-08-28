@@ -17,25 +17,25 @@ Run all commands in this section from this directory. Generate staged output wit
 checked-in sources:
 
 ```shell
-../gradlew generateKotlinxBrowserCommonSubset
+./gradlew generateKotlinxBrowserCommonSubset
 ```
 
 Check that staged output matches `src/` and `api/dom-api-manifest.txt`:
 
 ```shell
-../gradlew checkKotlinxBrowserCommonSubset
+./gradlew checkKotlinxBrowserCommonSubset
 ```
 
 After reviewing a deliberate generated API change, replace the checked-in files explicitly:
 
 ```shell
-../gradlew updateKotlinxBrowserCommonSubset
+./gradlew updateKotlinxBrowserCommonSubset
 ```
 
 Run the generator tests and the library's multiplatform checks:
 
 ```shell
-../gradlew check
+./gradlew check
 ```
 
 See the [verification module README](generator/verification/README.md) for focused compilation and
