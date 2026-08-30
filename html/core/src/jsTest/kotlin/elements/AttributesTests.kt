@@ -580,14 +580,22 @@ class AttributesTests {
     }
 
     @Test
-    fun booleanAttributeTest() = runTest {
+    fun booleanAttributeAddedOnlyWhenTrue() = runTest {
+        var required by mutableStateOf(false)
+
         composition {
             TextInput {
-                attr("required", true)
+                attr("required", required)
             }
         }
+
         with(nextChild()) {
-            assertEquals("true", getAttribute("required"))
+            assertEquals(null, getAttribute("required"))
+
+            required = true
+            waitForChanges()
+
+            assertEquals("", getAttribute("required"))
         }
     }
 }
