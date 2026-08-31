@@ -24,6 +24,49 @@ import org.w3c.dom.Element
 import kotlin.js.console
 
 /**
+ * Deserializes data emitted by the matching [composeHtmlToString] overload and uses it for the
+ * initial composition. [deserializeData] must match the server's serializer. Treat the result as
+ * an immutable snapshot.
+ *
+ * The payload is untrusted, user-editable input. Use a safely configured deserializer, and validate
+ * and authorize any values sent back to a server.
+ *
+ * The data element remains in the document after hydration. Invalid or missing data throws
+ * [HydrationDataException] before composition starts, without invoking [onHydrationMismatch] or
+ * modifying the server-rendered DOM.
+ *
+ * [hydrationDataId] must be unique in the document. Use a different id for each hydration root.
+ *
+ * @throws IllegalArgumentException if [hydrationDataId] is not a supported hydration data id.
+ */
+fun <TElement : Element, T> hydrateComposable(
+    root: TElement,
+    deserializeData: (String) -> T,
+    hydrationDataId: String = DEFAULT_HYDRATION_DATA_ID,
+    monotonicFrameClock: MonotonicFrameClock = DefaultMonotonicFrameClock,
+    onHydrationMismatch: (HydrationMismatchException) -> Unit = { console.error(it) },
+    content: @Composable DOMScope<TElement>.(T) -> Unit,
+): Composition {
+    val serializedData = findHydrationData(root, hydrationDataId)
+    val data = try {
+        deserializeData(serializedData)
+    } catch (failure: Throwable) {
+        throw HydrationDataException(
+            "Failed to deserialize hydration data from element \"$hydrationDataId\"",
+            failure,
+        )
+    }
+
+    return hydrateComposable(
+        root = root,
+        monotonicFrameClock = monotonicFrameClock,
+        onHydrationMismatch = onHydrationMismatch,
+    ) {
+        content(data)
+    }
+}
+
+/**
  * Adopts an existing server-rendered DOM tree. If it does not match the composition, reports the
  * first mismatch and falls back to a client render. Formatting-only HTML whitespace immediately
  * inside [root], before or after the composed content, is ignored. A throwing
@@ -104,4 +147,44 @@ private inline fun Throwable.suppressCleanupFailure(cleanup: () -> Unit) {
     } catch (cleanupFailure: Throwable) {
         addSuppressed(cleanupFailure)
     }
+}
+
+private fun findHydrationData(root: Element, hydrationDataId: String): String {
+    requireValidHydrationDataId(hydrationDataId)
+    fun invalid(message: String): Nothing = throw HydrationDataException(message)
+
+    val ownerDocument = root.ownerDocument
+        ?: invalid("The hydration root has no owner document")
+    val matches = ownerDocument.querySelectorAll("#$hydrationDataId")
+    val element = when (matches.length) {
+        0 -> invalid(
+            "No hydration data element with id \"$hydrationDataId\" was found",
+        )
+        1 -> matches.item(0) as? Element
+            ?: invalid(
+                "Hydration data node \"$hydrationDataId\" is not an element",
+            )
+        else -> invalid(
+            "Expected one hydration data element with id \"$hydrationDataId\", " +
+                "but found ${matches.length}",
+        )
+    }
+
+    val description = "Hydration data element \"$hydrationDataId\""
+    if (root.contains(element)) {
+        invalid("$description must be outside the hydration root")
+    }
+    if (!element.tagName.equals("script", ignoreCase = true)) {
+        invalid("$description must be a <script>")
+    }
+    val mimeType = element.getAttribute("type")?.substringBefore(';')?.trim()
+    if (!mimeType.equals(HydrationDataMimeType, ignoreCase = true)) {
+        invalid("$description must have type \"$HydrationDataMimeType\"")
+    }
+    val format = element.getAttribute(HydrationDataAttribute)
+    if (format != HydrationDataFormat) {
+        invalid("$description has unsupported format \"$format\"")
+    }
+
+    return element.textContent.orEmpty().unescapeFromHydrationDataElement()
 }

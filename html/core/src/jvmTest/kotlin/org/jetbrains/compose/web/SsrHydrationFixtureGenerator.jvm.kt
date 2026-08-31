@@ -17,9 +17,32 @@ internal object SsrHydrationFixtureGenerator {
         outputDirectory.writeFixture("ssr-number-hydration.html") {
             SsrNumberHydrationContent(count = 0, increment = {})
         }
+        outputDirectory.writeHydrationDataFixture("ssr-hydration-data.html")
     }
 
     private fun File.writeFixture(name: String, content: @Composable () -> Unit) {
-        resolve(name).writeText("\n    ${composeHtmlToString(content)}\n")
+        resolve(name).writeText("\n    ${composeHtmlToString(content = content)}\n")
+    }
+
+    private fun File.writeHydrationDataFixture(name: String) {
+        val data = SsrHydrationData(
+            label = "Loaded by JVM <backend>",
+            count = 41,
+        )
+        val rendered = composeHtmlToString(
+            data = data,
+            serializeData = SsrHydrationData::toJson,
+        ) { initialData ->
+            SsrHydrationDataContent(
+                label = initialData.label,
+                count = initialData.count,
+                increment = {},
+            )
+        }
+
+        resolve(name).writeText(
+            "\n    <div id=\"$SSR_HYDRATION_DATA_ROOT_ID\">${rendered.content}</div>\n" +
+                "    ${rendered.hydrationDataElement}\n",
+        )
     }
 }
