@@ -1,12 +1,16 @@
 package org.jetbrains.compose.web
 
 import androidx.compose.runtime.Composable
+import org.jetbrains.compose.web.attributes.ScriptType
+import org.jetbrains.compose.web.attributes.type
 import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.css.opacity
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.width
 import org.jetbrains.compose.web.dom.Button
+import org.jetbrains.compose.web.dom.InlineScript
+import org.jetbrains.compose.web.dom.Script
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Style
 import org.jetbrains.compose.web.dom.Text
@@ -15,6 +19,9 @@ internal const val SSR_HYDRATION_FIXTURE_URL = "/base/kotlin/ssr-hydration.html"
 internal const val SSR_HYDRATION_STYLE_ID = "ssr-hydration-style"
 internal const val SSR_HYDRATION_BUTTON_ID = "ssr-hydration-button"
 internal const val SSR_HYDRATION_COUNT_ID = "ssr-hydration-count"
+internal const val SSR_HYDRATION_SCRIPT_ID = "ssr-hydration-script"
+internal const val SSR_HYDRATION_SCRIPT_CONTENT = "first\r\nsecond\rthird\u0000fourth"
+internal const val SSR_HYDRATION_NORMALIZED_SCRIPT_CONTENT = "first\nsecond\nthird\uFFFDfourth"
 
 // Used by both JVM rendering and JS hydration
 @Composable
@@ -29,6 +36,10 @@ internal fun SsrHydrationContent(
             width(33.percent)
             property("flex-grow", 1)
         }
+    }
+    Script(InlineScript(SSR_HYDRATION_SCRIPT_CONTENT)) {
+        id(SSR_HYDRATION_SCRIPT_ID)
+        type(ScriptType.TextPlain)
     }
     Button(
         attrs = {

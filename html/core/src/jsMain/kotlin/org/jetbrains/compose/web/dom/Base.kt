@@ -10,7 +10,6 @@ import org.jetbrains.compose.web.attributes.toClassAttributeValue
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleHolder
 import org.jetbrains.compose.web.css.toStyleAttributeValue
-import org.jetbrains.compose.web.css.utils.serializeRules
 import org.jetbrains.compose.web.HydrationMismatchException
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.jetbrains.compose.web.internal.runtime.DomApplier
@@ -103,6 +102,12 @@ private open class DomElementWrapper(override val node: Element) : DomNodeWrappe
         }
     }
 
+    open fun updateRawText(value: String) {
+        if (node.textContent != value) {
+            node.textContent = value
+        }
+    }
+
     open fun updateClasses(classes: List<String>?) {
         if (classes == null) return
         node.removeAttribute(AttrsScope.CLASS)
@@ -162,6 +167,14 @@ private class HydratingDomElementWrapper(
         }
     }
 
+    override fun updateRawText(value: String) {
+        // HydratingElementBuilder already verified the claimed raw text. Preserve that server DOM
+        // node during the initial update; later recompositions use the normal setter.
+        if (!applier.isHydrating) {
+            super.updateRawText(value)
+        }
+    }
+
     private fun verifyAttribute(name: String, expected: String?) {
         val actual = node.getAttribute(name)
         if (
@@ -208,6 +221,8 @@ private fun <TElement : Element> TagElementImpl(
     applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
     content: (@Composable ElementScope<TElement>.() -> Unit)?,
     createWrapper: (TElement) -> DomElementWrapper,
+    validateAttrs: (Map<String, String>) -> Unit = {},
+    updateElement: Updater<DomElementWrapper>.() -> Unit = {},
 ) {
     val scope = remember { DomElementScope<TElement>() }
     var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
@@ -224,6 +239,7 @@ private fun <TElement : Element> TagElementImpl(
 
             refEffect = attrsScope.refEffect
             val attrs = attrsScope.collect()
+            validateAttrs(attrs)
 
             update {
                 set(
@@ -235,6 +251,7 @@ private fun <TElement : Element> TagElementImpl(
                     DomElementWrapper::updateStyleDeclarations,
                 )
                 set(attrs, DomElementWrapper::updateAttrs)
+                updateElement()
                 set(attrsScope.propertyUpdates, DomElementWrapper::updateProperties)
                 set(
                     attrsScope.eventsListenerScopeBuilder.collectListeners(),
@@ -276,7 +293,30 @@ private object BrowserComposeHtmlContext : ComposeHtmlContext {
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
         content: (@Composable ElementScope<TElement>.() -> Unit)?,
     ) {
-        TagElementImpl(elementBuilder, applyAttrs, content, ::DomElementWrapper)
+        TagElementImpl(
+            elementBuilder = elementBuilder,
+            applyAttrs = applyAttrs,
+            content = content,
+            createWrapper = ::DomElementWrapper,
+        )
+    }
+
+    @Composable
+    override fun <TElement : Element> RawTextElement(
+        tagName: String,
+        applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        content: RawTextContent,
+    ) {
+        TagElementImpl(
+            elementBuilder = elementBuilder(tagName),
+            applyAttrs = applyAttrs,
+            content = null,
+            createWrapper = ::DomElementWrapper,
+            validateAttrs = content::validateAttributes,
+            updateElement = {
+                set(content.text, DomElementWrapper::updateRawText)
+            },
+        )
     }
 
     @Composable
@@ -334,9 +374,40 @@ private class HydratingComposeHtmlContext(
                 "Hydration requires tag-name element builders during the initial composition",
             )
         }
-        TagElementImpl(elementBuilder, applyAttrs, content) { node ->
-            HydratingDomElementWrapper(node, applier)
-        }
+        TagElementImpl(
+            elementBuilder = elementBuilder,
+            applyAttrs = applyAttrs,
+            content = content,
+            createWrapper = { node ->
+                HydratingDomElementWrapper(node, applier)
+            },
+        )
+    }
+
+    @Composable
+    override fun <TElement : Element> RawTextElement(
+        tagName: String,
+        applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        content: RawTextContent,
+    ) {
+        val rawTextElementBuilder = HydratingElementBuilder<TElement>(
+            tagName = tagName,
+            applier = applier,
+            browserBuilder = ElementBuilder.createBuilder(tagName),
+            rawText = { content },
+        )
+        TagElementImpl(
+            elementBuilder = rawTextElementBuilder,
+            applyAttrs = applyAttrs,
+            content = null,
+            createWrapper = { node ->
+                HydratingDomElementWrapper(node, applier)
+            },
+            validateAttrs = content::validateAttributes,
+            updateElement = {
+                set(content.text, DomElementWrapper::updateRawText)
+            },
+        )
     }
 
     @Composable
@@ -362,12 +433,15 @@ private class HydratingComposeHtmlContext(
         applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)?,
         cssRules: CSSRuleDeclarationList,
     ) {
+        val content = remember(cssRules, cssRules.size) {
+            lazy { prepareStyleRawTextContent(cssRules) }
+        }
         TagElement<HTMLStyleElement>(
             elementBuilder = HydratingElementBuilder(
                 tagName = "style",
                 applier = applier,
                 browserBuilder = ElementBuilder.createBuilder("style"),
-                rawText = { cssRules.serializeRules().joinToString("\n") },
+                rawText = { content.value },
             ),
             applyAttrs = applyAttrs,
         ) {
@@ -384,7 +458,7 @@ private class HydratingComposeHtmlContext(
                         cssStylesheet?.clearCSSRules()
                     }
                 } else {
-                    scopeElement.textContent = cssRules.serializeRules().joinToString("\n")
+                    scopeElement.textContent = content.value.text
                     onDispose {
                         scopeElement.textContent = ""
                     }
@@ -398,14 +472,14 @@ private class HydratingElementBuilder<TElement : Element>(
     private val tagName: String,
     private val applier: HydrationDomApplier,
     private val browserBuilder: ElementBuilder<TElement>,
-    private val rawText: (() -> String)? = null,
+    private val rawText: (() -> RawTextContent)? = null,
 ) : ElementBuilder<TElement> {
     @Suppress("UNCHECKED_CAST")
     override fun create(): TElement = if (applier.isHydrating) {
         if (rawText == null) {
             applier.claimElement(tagName)
         } else {
-            applier.claimElementWithRawText(tagName, rawText())
+            applier.claimElementWithRawText(tagName, rawText().text)
         } as TElement
     } else {
         browserBuilder.create()

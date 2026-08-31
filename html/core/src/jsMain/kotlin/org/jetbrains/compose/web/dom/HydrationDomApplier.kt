@@ -248,7 +248,10 @@ internal class HydrationDomApplier(
         skipRootBoundaryWhitespace(currentFrame)
         verifyComplete(currentFrame)
         if (claimedNodes.isNotEmpty()) {
-            mismatchAtCurrentNode("composition ended before all claimed nodes were reconciled")
+            mismatchAtCurrentNode("composition ended before all claimed nodes were processed")
+        }
+        if (nodesWithClaimedRawChildren.isNotEmpty()) {
+            mismatchAtCurrentNode("composition ended before all raw-text claimed nodes were processed")
         }
 
         finalizeHydratedNodes()

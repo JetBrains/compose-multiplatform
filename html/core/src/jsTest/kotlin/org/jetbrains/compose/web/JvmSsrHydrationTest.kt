@@ -44,9 +44,11 @@ class JvmSsrHydrationTest {
         val leadingWhitespace = root.firstChild
         val trailingWhitespace = root.lastChild
         val serverStyle = document.getElementById(SSR_HYDRATION_STYLE_ID)
+        val serverScript = document.getElementById(SSR_HYDRATION_SCRIPT_ID)
         val serverButton = document.getElementById(SSR_HYDRATION_BUTTON_ID) as? HTMLElement
         val serverCount = document.getElementById(SSR_HYDRATION_COUNT_ID)
         assertNotNull(serverStyle)
+        assertNotNull(serverScript)
         assertNotNull(serverButton)
         assertNotNull(serverCount)
 
@@ -59,10 +61,12 @@ class JvmSsrHydrationTest {
         }
 
         try {
-            assertEquals(3, root.childNodes.length)
+            assertEquals(4, root.childNodes.length)
             assertNull(leadingWhitespace?.parentNode)
             assertNull(trailingWhitespace?.parentNode)
             assertSame(serverStyle, document.getElementById(SSR_HYDRATION_STYLE_ID))
+            assertSame(serverScript, document.getElementById(SSR_HYDRATION_SCRIPT_ID))
+            assertEquals(SSR_HYDRATION_NORMALIZED_SCRIPT_CONTENT, serverScript.textContent)
             assertSame(serverButton, document.getElementById(SSR_HYDRATION_BUTTON_ID))
             assertSame(serverCount, document.getElementById(SSR_HYDRATION_COUNT_ID))
             assertEquals("Count: 0", serverCount.textContent)
@@ -74,6 +78,7 @@ class JvmSsrHydrationTest {
             assertEquals("Count: 1", serverCount.textContent)
             assertEquals("rgb(0, 128, 0)", window.getComputedStyle(serverCount).color)
             assertSame(serverStyle, document.getElementById(SSR_HYDRATION_STYLE_ID))
+            assertSame(serverScript, document.getElementById(SSR_HYDRATION_SCRIPT_ID))
             assertSame(serverButton, document.getElementById(SSR_HYDRATION_BUTTON_ID))
             assertSame(serverCount, document.getElementById(SSR_HYDRATION_COUNT_ID))
         } finally {

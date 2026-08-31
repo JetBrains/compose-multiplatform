@@ -10,7 +10,9 @@ import org.jetbrains.compose.web.attributes.src
 import org.jetbrains.compose.web.attributes.type
 import org.jetbrains.compose.web.composeHtmlToString
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class CommonElementsTest {
     @Test
@@ -65,6 +67,79 @@ class CommonElementsTest {
             "<script src=\"/app.js\" type=\"module\"></script>",
             html,
         )
+    }
+
+    @Test
+    fun rendersInlineScriptAsRawText() {
+        val content = "const value = '<main data-value=\"a&b\">';"
+
+        val html = composeHtmlToString {
+            Script(InlineScript(content)) {
+                type(ScriptType.Module)
+            }
+        }
+
+        assertEquals(
+            "<script type=\"module\">$content</script>",
+            html,
+        )
+    }
+
+    @Test
+    fun normalizesInlineScriptHtmlInputCharacters() {
+        val html = composeHtmlToString {
+            Script(InlineScript("first\r\nsecond\rthird\u0000fourth")) {
+                type(ScriptType.TextPlain)
+            }
+        }
+
+        assertEquals(
+            "<script type=\"text/plain\">first\nsecond\nthird\uFFFDfourth</script>",
+            html,
+        )
+    }
+
+    @Test
+    fun rendersTypedJsonScriptTypes() {
+        val html = composeHtmlToString {
+            Script(InlineScript("{}")) { type(ScriptType.ApplicationJson) }
+            Script(InlineScript("{}")) { type(ScriptType.ApplicationLdJson) }
+        }
+
+        assertEquals(
+            "<script type=\"application/json\">{}</script>" +
+                "<script type=\"application/ld+json\">{}</script>",
+            html,
+        )
+    }
+
+    @Test
+    fun rejectsSrcOnInlineScript() {
+        val failure = assertFailsWith<IllegalArgumentException> {
+            composeHtmlToString {
+                Script(InlineScript("console.log('inline')")) {
+                    src("/external.js")
+                }
+            }
+        }
+
+        assertContains(failure.message.orEmpty(), "cannot be combined with a src attribute")
+    }
+
+    @Test
+    fun rejectsInlineScriptContentThatCanBreakOutOfRawText() {
+        listOf(
+            "const value = '</ScRiPt>';",
+            "<!-- const value = '<ScRiPt';",
+        ).forEach { content ->
+            val failure = assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString {
+                    Script(InlineScript(content))
+                }
+            }
+
+            assertContains(failure.message.orEmpty(), "Raw text for <script>")
+        }
     }
 
     @Test

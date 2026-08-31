@@ -36,4 +36,21 @@ class StyleTest {
         waitForRecompositionComplete()
         assertEquals("""body { background-color: red; }""", sheet.cssRules.asList().single().cssText)
     }
+
+    @Test
+    fun browserStyleUsesCssomWithoutRawTextValidation() = runTest {
+        composition {
+            Style {
+                "body" style {
+                    property("content", "\"</style>\"")
+                }
+            }
+        }
+
+        val element = root.firstChild as HTMLStyleElement
+        val sheet = element.sheet as CSSStyleSheet
+        val rule = sheet.cssRules.asList().single().unsafeCast<CSSStyleRule>()
+        assertEquals(0, element.childNodes.length)
+        assertEquals("\"</style>\"", rule.style.getPropertyValue("content"))
+    }
 }

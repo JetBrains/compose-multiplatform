@@ -135,6 +135,9 @@ sealed class ScriptType(val typeStr: String) {
     object Module : ScriptType("module")
     object ImportMap : ScriptType("importmap")
     object SpeculationRules : ScriptType("speculationrules")
+    object ApplicationJson : ScriptType("application/json")
+    object ApplicationLdJson : ScriptType("application/ld+json")
+    object TextPlain : ScriptType("text/plain")
 
     class CustomScriptType(value: String) : ScriptType(value)
 }

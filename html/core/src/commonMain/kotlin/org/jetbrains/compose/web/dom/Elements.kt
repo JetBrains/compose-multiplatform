@@ -80,6 +80,7 @@ import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleSheetBuilderImpl
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
+import kotlin.jvm.JvmInline
 
 typealias AttrBuilderContext<T> = AttrsScope<T>.() -> Unit
 typealias ContentBuilder<T> = @Composable ElementScope<T>.() -> Unit
@@ -87,8 +88,14 @@ typealias ContentBuilder<T> = @Composable ElementScope<T>.() -> Unit
 /**
  * Use this function to mount the <style> tag into the rendered HTML.
  *
+ * Browser rendering installs [cssRules] through CSSOM. When raw HTML text is required by string
+ * rendering, initial hydration, or detached hydration fallback, the serialized rules must not
+ * contain a case-insensitive `</style` sequence because it could terminate the element.
+ *
  * @param cssRules a list of style rules, usually from an
  * [org.jetbrains.compose.web.css.StyleSheet] instance.
+ * @throws IllegalArgumentException if raw-text rendering is required and [cssRules] cannot be
+ * safely embedded in a `style` element.
  */
 @Composable
 fun Style(
@@ -101,7 +108,13 @@ fun Style(
 /**
  * Use this function to mount the <style> tag into the rendered HTML.
  *
+ * Browser rendering installs the rules through CSSOM. When raw HTML text is required by string
+ * rendering, initial hydration, or detached hydration fallback, the serialized rules must not
+ * contain a case-insensitive `</style` sequence because it could terminate the element.
+ *
  * @param rulesBuild allows style rules to be defined using [StyleSheetBuilder].
+ * @throws IllegalArgumentException if raw-text rendering is required and the rules cannot be
+ * safely embedded in a `style` element.
  */
 @Composable
 inline fun Style(
@@ -152,14 +165,36 @@ fun Script(
     attrs: AttrBuilderContext<HTMLScriptElement>? = null,
 ) = TagElement<HTMLScriptElement>("script", attrs, content = null)
 
-/*
- * TODO: In the future for inline scripts:
- * @Composable
- * fun Script(
- *     code: StringScript,
- *     attrs: AttrBuilderContext<HTMLScriptElement>? = null,
- * )
+/**
+ * Trusted inline script source or data.
+ *
+ * Construction does not sanitize or validate [content]; raw-text validation occurs when [Script]
+ * is composed. Never insert untrusted values into JavaScript. For JSON or JSON-LD, escape `<` as
+ * `\u003c` so `</script` cannot end the element.
  */
+@JvmInline
+value class InlineScript(val content: String)
+
+/**
+ * Mounts an inline `script` with raw-text [content].
+ *
+ * [content] must be trusted. The `src` attribute is not allowed: use the
+ * attribute-only overload for external scripts.
+ *
+ * A browser-created script executes when inserted. Hydration requires an exact raw-text match and
+ * reuses a matching script without executing it again. Later content updates do not execute it.
+ *
+ * **Warning:** A hydration mismatch replaces the entire hydration root. Every inline script under
+ * that root is created again, so scripts that already ran can run a second time. Side-effecting
+ * scripts must tolerate this.
+ *
+ * @throws IllegalArgumentException if [content] is not safe HTML script raw text.
+ */
+@Composable
+fun Script(
+    content: InlineScript,
+    attrs: AttrBuilderContext<HTMLScriptElement>? = null,
+) = RawTextElement<HTMLScriptElement>("script", attrs, content.content)
 
 @Composable
 fun Div(

@@ -142,6 +142,14 @@ internal class StringHtmlTextNode(
     }
 }
 
+internal class StringHtmlRawTextNode(
+    var content: RawTextContent,
+) : StringHtmlNode {
+    override fun appendHtmlTo(builder: StringBuilder, hydratable: Boolean) {
+        builder.append(content.text)
+    }
+}
+
 private fun StringBuilder.appendHydrationTextBoundaryMarker() {
     append("<!--").append(HydrationTextBoundaryMarker).append("-->")
 }

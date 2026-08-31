@@ -47,6 +47,12 @@ internal class StringHtmlNodeWrapper(
             ?: error("Cannot update text on an element node")
         textNode.text = value
     }
+
+    fun updateRawText(value: RawTextContent) {
+        val rawTextNode = node as? StringHtmlRawTextNode
+            ?: error("Cannot update raw text on a non-raw-text node")
+        rawTextNode.content = value
+    }
 }
 
 internal class StringHtmlApplier(

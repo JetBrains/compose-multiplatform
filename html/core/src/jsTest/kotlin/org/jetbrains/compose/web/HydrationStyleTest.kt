@@ -14,6 +14,7 @@ import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.dom.Style
 import org.w3c.dom.HTMLStyleElement
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.css.CSSStyleRule
 import org.w3c.dom.css.CSSStyleSheet
 import kotlin.test.Test
 import kotlin.test.assertContains
@@ -164,6 +165,7 @@ class HydrationStyleTest {
                 Style {
                     "body" style {
                         color(Color.green)
+                        property("content", "\"</style>\"")
                     }
                 }
             }
@@ -174,11 +176,10 @@ class HydrationStyleTest {
             delay(100.milliseconds)
 
             val style = root.firstChild as HTMLStyleElement
+            val rule = (style.sheet as CSSStyleSheet).cssRules.item(0).unsafeCast<CSSStyleRule>()
             assertEquals(0, style.childNodes.length)
-            assertEquals(
-                "body { color: green; }",
-                (style.sheet as CSSStyleSheet).cssRules.item(0)?.cssText,
-            )
+            assertEquals("green", rule.style.getPropertyValue("color"))
+            assertEquals("\"</style>\"", rule.style.getPropertyValue("content"))
         } finally {
             composition.dispose()
             root.parentNode?.removeChild(root)

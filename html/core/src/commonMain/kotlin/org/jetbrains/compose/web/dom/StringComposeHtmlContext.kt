@@ -13,7 +13,6 @@ import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
 import org.jetbrains.compose.web.attributes.toClassAttributeValue
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.toStyleAttributeValue
-import org.jetbrains.compose.web.css.utils.serializeRules
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 internal object StringComposeHtmlContext : ComposeHtmlContext {
@@ -27,6 +26,18 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
         elementBuilder: ElementBuilder<TElement>,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
         content: (@Composable ElementScope<TElement>.() -> Unit)?,
+    ) = StringTagElement(
+        elementBuilder = elementBuilder,
+        applyAttrs = applyAttrs,
+        content = content,
+    )
+
+    @Composable
+    private fun <TElement : Element> StringTagElement(
+        elementBuilder: ElementBuilder<TElement>,
+        applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        content: (@Composable ElementScope<TElement>.() -> Unit)?,
+        rawText: RawTextContent? = null,
     ) {
         val stringElementBuilder = elementBuilder as? StringElementBuilder<*>
             ?: error(
@@ -44,15 +55,33 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
             update = {
                 val attrsScope = AttrsScopeBuilder<TElement>()
                 applyAttrs?.invoke(attrsScope)
+                val attributes = attrsScope.stringAttributes()
+                rawText?.validateAttributes(attributes)
 
                 update {
-                    set(attrsScope.stringAttributes(), StringHtmlNodeWrapper::updateAttributes)
+                    set(attributes, StringHtmlNodeWrapper::updateAttributes)
                 }
             },
             scope = elementScope,
             content = {
                 content?.invoke(this)
             },
+        )
+    }
+
+    @Composable
+    override fun <TElement : Element> RawTextElement(
+        tagName: String,
+        applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        content: RawTextContent,
+    ) {
+        StringTagElement(
+            elementBuilder = elementBuilder(tagName),
+            applyAttrs = applyAttrs,
+            content = {
+                StringRawText(content)
+            },
+            rawText = content,
         )
     }
 
@@ -77,40 +106,31 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
         applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)?,
         cssRules: CSSRuleDeclarationList,
     ) {
-        TagElement<HTMLStyleElement>(
-            elementBuilder = elementBuilder("style"),
+        val content = remember(cssRules, cssRules.size) {
+            prepareStyleRawTextContent(cssRules)
+        }
+        RawTextElement<HTMLStyleElement>(
+            tagName = "style",
             applyAttrs = applyAttrs,
-            content = {
-                StyleCssText(cssRules.serializeRules().joinToString("\n"))
-            },
+            content = content,
         )
     }
 }
 
 @Composable
-private fun StyleCssText(cssText: String) {
+private fun StringRawText(content: RawTextContent) {
     ComposeStringNode(
         factory = {
-            StringHtmlNodeWrapper(StringHtmlCssTextNode(cssText))
+            StringHtmlNodeWrapper(StringHtmlRawTextNode(content))
         },
         update = {
             update {
-                set(cssText) { value ->
-                    (node as StringHtmlCssTextNode).cssText = value
-                }
+                set(content, StringHtmlNodeWrapper::updateRawText)
             }
         },
         scope = Unit,
         content = {},
     )
-}
-
-private class StringHtmlCssTextNode(
-    var cssText: String,
-) : StringHtmlNode {
-    override fun appendHtmlTo(builder: StringBuilder, hydratable: Boolean) {
-        builder.append(cssText)
-    }
 }
 
 private class StringElementScope<TElement : Element> : ElementScopeBase<TElement>() {

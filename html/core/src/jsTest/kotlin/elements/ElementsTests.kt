@@ -7,13 +7,17 @@ package org.jetbrains.compose.web.core.tests.elements
 
 import androidx.compose.runtime.*
 import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlinx.browser.dom.Element
 import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.attributes.AttrsScope
+import org.jetbrains.compose.web.attributes.ScriptType
 import org.jetbrains.compose.web.attributes.src
+import org.jetbrains.compose.web.attributes.type
 import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.testutils.runTest
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.HTMLScriptElement
 import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -112,6 +116,51 @@ class ElementsTests {
 
         nodes.forEachIndexed { index, it ->
             assertEquals(it.second, root.children[index]?.nodeName)
+        }
+    }
+
+    @Test
+    fun inlineScriptUsesRawTextAndUpdates() = runTest {
+        var content by mutableStateOf("const value = '<first>&';")
+
+        composition {
+            Script(InlineScript(content)) {
+                type(ScriptType.TextPlain)
+            }
+        }
+
+        val script = root.firstChild as HTMLScriptElement
+        assertEquals(content, script.textContent)
+
+        content = "const value = '<second>&';"
+        waitForRecompositionComplete()
+
+        assertSame(script, root.firstChild)
+        assertEquals(content, script.textContent)
+    }
+
+    @Test
+    fun inlineScriptExecutesOnceAndUpdatesDoNotReexecuteIt() = runTest {
+        val counterName = "__compose_web_raw_text_script_counter__"
+        window.asDynamic()[counterName] = 0
+        var content by mutableStateOf(
+            "window['$counterName'] = window['$counterName'] + 1;"
+        )
+
+        try {
+            composition {
+                Script(InlineScript(content))
+            }
+            val countAfterInsertion: Int = window.asDynamic()[counterName]
+            assertEquals(1, countAfterInsertion)
+
+            content = "window['$counterName'] = window['$counterName'] + 10;"
+            waitForRecompositionComplete()
+
+            val countAfterUpdate: Int = window.asDynamic()[counterName]
+            assertEquals(1, countAfterUpdate)
+        } finally {
+            window.asDynamic()[counterName] = null
         }
     }
 
