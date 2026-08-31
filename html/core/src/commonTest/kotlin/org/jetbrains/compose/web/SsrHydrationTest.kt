@@ -22,11 +22,15 @@ internal const val SSR_HYDRATION_COUNT_ID = "ssr-hydration-count"
 internal const val SSR_HYDRATION_SCRIPT_ID = "ssr-hydration-script"
 internal const val SSR_HYDRATION_SCRIPT_CONTENT = "first\r\nsecond\rthird\u0000fourth"
 internal const val SSR_HYDRATION_NORMALIZED_SCRIPT_CONTENT = "first\nsecond\nthird\uFFFDfourth"
+internal const val SSR_HYDRATION_RENDERED_AT_ID = "ssr-hydration-rendered-at"
+internal const val SSR_HYDRATION_SERVER_RENDERED_AT = "2026-08-31T10:15:30Z"
+internal const val SSR_HYDRATION_CLIENT_RENDERED_AT = "2026-08-31T10:15:42Z"
 
 // Used by both JVM rendering and JS hydration
 @Composable
 internal fun SsrHydrationContent(
     count: Int,
+    renderedAt: String,
     increment: () -> Unit,
 ) {
     Style(applyAttrs = { id(SSR_HYDRATION_STYLE_ID) }) {
@@ -51,5 +55,13 @@ internal fun SsrHydrationContent(
     }
     Span(attrs = { id(SSR_HYDRATION_COUNT_ID) }) {
         Text("Count: $count")
+    }
+    // The server clock cannot be reproduced by the client, so its text is not hydrated strictly.
+    Span(attrs = {
+        id(SSR_HYDRATION_RENDERED_AT_ID)
+        allowHydrationMismatch()
+        attr("data-rendered-at", renderedAt)
+    }) {
+        Text("Rendered at $renderedAt")
     }
 }

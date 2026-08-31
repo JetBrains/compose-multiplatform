@@ -12,7 +12,11 @@ internal object SsrHydrationFixtureGenerator {
 
         outputDirectory.mkdirs()
         outputDirectory.writeFixture("ssr-hydration.html") {
-            SsrHydrationContent(count = 0, increment = {})
+            SsrHydrationContent(
+                count = 0,
+                renderedAt = SSR_HYDRATION_SERVER_RENDERED_AT,
+                increment = {},
+            )
         }
         outputDirectory.writeFixture("ssr-number-hydration.html") {
             SsrNumberHydrationContent(count = 0, increment = {})

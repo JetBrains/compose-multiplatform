@@ -121,14 +121,23 @@ private open class DomElementWrapper(override val node: Element) : DomNodeWrappe
 private class HydratingDomElementWrapper(
     node: Element,
     private val applier: HydrationDomApplier,
-) : DomElementWrapper(node) {
+    private val allowance: HydrationMismatchAllowance,
+) : DomElementWrapper(node), HydrationMismatchAware {
+    override val allowsHydrationMismatch: Boolean
+        get() = allowance.isAllowed
+
     override fun updateAttrs(attrs: Map<String, String>) {
         if (!applier.isHydrating) {
             super.updateAttrs(attrs)
             return
         }
 
-        attrs.forEach { (name, value) -> verifyAttribute(name, expected = value) }
+        attrs.forEach { (name, value) ->
+            verifyAttribute(name, expected = value) {
+                // Unrelated server attributes are tolerated, so only the composed one is patched.
+                node.setAttribute(name, value)
+            }
+        }
     }
 
     override fun updateClasses(classes: List<String>?) {
@@ -136,7 +145,10 @@ private class HydratingDomElementWrapper(
             super.updateClasses(classes)
         } else {
             classes?.toClassAttributeValue()?.let { value ->
-                verifyAttribute(AttrsScope.CLASS, value)
+                verifyAttribute(AttrsScope.CLASS, value) {
+                    // Extra server classes are tolerated, so only missing ones are added.
+                    node.classList.add(*value.split(' ').toTypedArray())
+                }
             }
         }
     }
@@ -146,7 +158,9 @@ private class HydratingDomElementWrapper(
             super.updateStyleDeclarations(declarations)
         } else if (declarations != null && (node is HTMLElement || node is SVGElement)) {
             declarations.toStyleAttributeValue()?.let { value ->
-                verifyAttribute("style", value)
+                verifyAttribute("style", value) {
+                    super.updateStyleDeclarations(declarations)
+                }
             }
         }
     }
@@ -172,10 +186,13 @@ private class HydratingDomElementWrapper(
         // node during the initial update; later recompositions use the normal setter.
         if (!applier.isHydrating) {
             super.updateRawText(value)
+        } else if (allowance.isAllowed) {
+            applier.applyOrDeferDomMutation { super.updateRawText(value) }
         }
     }
 
-    private fun verifyAttribute(name: String, expected: String?) {
+    /** Reports a mismatch, or applies [patch] after hydration if the element allows it. */
+    private fun verifyAttribute(name: String, expected: String?, patch: () -> Unit) {
         val actual = node.getAttribute(name)
         if (
             expected != null &&
@@ -185,6 +202,10 @@ private class HydratingDomElementWrapper(
             return
         }
         if (actual.normalizedForHydration(name) == expected.normalizedForHydration(name)) return
+        if (allowance.isAllowed) {
+            applier.applyOrDeferDomMutation(patch)
+            return
+        }
         applier.mismatch(
             "attribute \"$name\": expected ${expected.describeAttributeValue()}, " +
                 "found ${actual.describeAttributeValue()}",
@@ -222,6 +243,7 @@ private fun <TElement : Element> TagElementImpl(
     content: (@Composable ElementScope<TElement>.() -> Unit)?,
     createWrapper: (TElement) -> DomElementWrapper,
     validateAttrs: (Map<String, String>) -> Unit = {},
+    hydrationMismatchAllowance: HydrationMismatchAllowance? = null,
     updateElement: Updater<DomElementWrapper>.() -> Unit = {},
 ) {
     val scope = remember { DomElementScope<TElement>() }
@@ -240,6 +262,8 @@ private fun <TElement : Element> TagElementImpl(
             refEffect = attrsScope.refEffect
             val attrs = attrsScope.collect()
             validateAttrs(attrs)
+            // Composition completes before the DOM is claimed, which is when this is read.
+            hydrationMismatchAllowance?.isAllowed = attrsScope.allowsHydrationMismatch
 
             update {
                 set(
@@ -374,13 +398,11 @@ private class HydratingComposeHtmlContext(
                 "Hydration requires tag-name element builders during the initial composition",
             )
         }
-        TagElementImpl(
+        HydratingTagElement(
             elementBuilder = elementBuilder,
             applyAttrs = applyAttrs,
+            allowance = remember { HydrationMismatchAllowance() },
             content = content,
-            createWrapper = { node ->
-                HydratingDomElementWrapper(node, applier)
-            },
         )
     }
 
@@ -390,23 +412,46 @@ private class HydratingComposeHtmlContext(
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
         content: RawTextContent,
     ) {
+        // Raw text is claimed by the element builder, before the wrapper exists, so both share it.
+        val allowance = remember { HydrationMismatchAllowance() }
         val rawTextElementBuilder = HydratingElementBuilder<TElement>(
             tagName = tagName,
             applier = applier,
             browserBuilder = ElementBuilder.createBuilder(tagName),
             rawText = { content },
+            allowance = allowance,
         )
-        TagElementImpl(
+        HydratingTagElement(
             elementBuilder = rawTextElementBuilder,
             applyAttrs = applyAttrs,
-            content = null,
-            createWrapper = { node ->
-                HydratingDomElementWrapper(node, applier)
-            },
+            allowance = allowance,
             validateAttrs = content::validateAttributes,
             updateElement = {
                 set(content.text, DomElementWrapper::updateRawText)
             },
+            content = null,
+        )
+    }
+
+    @Composable
+    private fun <TElement : Element> HydratingTagElement(
+        elementBuilder: ElementBuilder<TElement>,
+        applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        allowance: HydrationMismatchAllowance,
+        validateAttrs: (Map<String, String>) -> Unit = {},
+        updateElement: Updater<DomElementWrapper>.() -> Unit = {},
+        content: (@Composable ElementScope<TElement>.() -> Unit)?,
+    ) {
+        TagElementImpl(
+            elementBuilder = elementBuilder,
+            applyAttrs = applyAttrs,
+            content = content,
+            createWrapper = { node ->
+                HydratingDomElementWrapper(node, applier, allowance)
+            },
+            validateAttrs = validateAttrs,
+            hydrationMismatchAllowance = allowance,
+            updateElement = updateElement,
         )
     }
 
@@ -422,7 +467,14 @@ private class HydratingComposeHtmlContext(
                 DomNodeWrapper(text)
             },
             update = {
-                set(value) { newValue -> (node as Text).data = newValue }
+                set(value) { newValue ->
+                    val text = node as Text
+                    // Claimed text already holds the server value unless its element allows
+                    // mismatches. Defer that patch, so a later mismatch can still fall back.
+                    if (text.data != newValue) {
+                        applier.applyOrDeferDomMutation { text.data = newValue }
+                    }
+                }
             },
         )
     }
@@ -436,14 +488,17 @@ private class HydratingComposeHtmlContext(
         val content = remember(cssRules, cssRules.size) {
             lazy { prepareStyleRawTextContent(cssRules) }
         }
-        TagElement<HTMLStyleElement>(
+        val allowance = remember { HydrationMismatchAllowance() }
+        HydratingTagElement<HTMLStyleElement>(
             elementBuilder = HydratingElementBuilder(
                 tagName = "style",
                 applier = applier,
                 browserBuilder = ElementBuilder.createBuilder("style"),
                 rawText = { content.value },
+                allowance = allowance,
             ),
             applyAttrs = applyAttrs,
+            allowance = allowance,
         ) {
             DisposableEffect(cssRules, cssRules.size) {
                 if (scopeElement.sheet is CSSStyleSheet) {
@@ -473,13 +528,18 @@ private class HydratingElementBuilder<TElement : Element>(
     private val applier: HydrationDomApplier,
     private val browserBuilder: ElementBuilder<TElement>,
     private val rawText: (() -> RawTextContent)? = null,
+    private val allowance: HydrationMismatchAllowance? = null,
 ) : ElementBuilder<TElement> {
     @Suppress("UNCHECKED_CAST")
     override fun create(): TElement = if (applier.isHydrating) {
         if (rawText == null) {
             applier.claimElement(tagName)
         } else {
-            applier.claimElementWithRawText(tagName, rawText().text)
+            applier.claimElementWithRawText(
+                tagName = tagName,
+                value = rawText().text,
+                allowContentMismatch = allowance?.isAllowed == true,
+            )
         } as TElement
     } else {
         browserBuilder.create()

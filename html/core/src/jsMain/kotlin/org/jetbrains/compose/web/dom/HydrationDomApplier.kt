@@ -24,12 +24,16 @@ internal class HydrationDomApplier(
     }
 
     // cursor for parent whose children are being visited
-    private class Frame(val node: Node) {
+    private class Frame(
+        val node: Node,
+        // set by AttrsScope.allowHydrationMismatch() on the element owning these children
+        val allowsContentMismatch: Boolean = false,
+    ) {
         var nextNode: Node? = node.firstChild // used for traversal
         var nextChildIndex: Int = 0           // used for diagnostics
     }
 
-    private data class PendingEmptyText(
+    private data class PendingText(
         val parent: Node,
         val anchor: Node?,
         val text: Text,
@@ -41,7 +45,7 @@ internal class HydrationDomApplier(
     private val nodesWithClaimedRawChildren = mutableSetOf<Node>()
     // Boundary markers and formatting-only root text must remain in place until hydration succeeds.
     private val nodesToRemoveAfterHydration = mutableListOf<Node>()
-    private val pendingEmptyTexts = mutableListOf<PendingEmptyText>()
+    private val pendingTextsToInsert = mutableListOf<PendingText>()
     private val pendingDomMutations = mutableListOf<() -> Unit>()
     private var state = State.Hydrating
 
@@ -94,11 +98,15 @@ internal class HydrationDomApplier(
     }
 
     /** Claims an element whose server-only text is not represented by a Compose DOM node. */
-    fun claimElementWithRawText(tagName: String, value: String): Element {
+    fun claimElementWithRawText(
+        tagName: String,
+        value: String,
+        allowContentMismatch: Boolean,
+    ): Element {
         val element = claimElement(tagName)
-        frames += Frame(element)
+        frames += Frame(element, allowsContentMismatch = allowContentMismatch)
         try {
-            claimRawText(value)
+            claimRawText(value, allowContentMismatch)
             verifyComplete(currentFrame)
         } finally {
             frames.removeAt(frames.lastIndex)
@@ -115,10 +123,11 @@ internal class HydrationDomApplier(
         if (frame.node === rootNode && frame.nextChildIndex == 0) {
             skipRootBoundaryWhitespace(frame, expectedText = value)
         }
+        val allowed = frame.allowsContentMismatch
         val index = frame.nextChildIndex++
         val candidate = frame.nextNode
         val text = when {
-            candidate is Text && (value.isNotEmpty() || candidate.data.isEmpty()) -> {
+            candidate is Text && (allowed || value.isNotEmpty() || candidate.data.isEmpty()) -> {
                 frame.nextNode = candidate.nextSibling
                 val boundaryMarker = frame.nextNode.asHydrationTextBoundaryMarker()
                 if (boundaryMarker != null) {
@@ -128,13 +137,14 @@ internal class HydrationDomApplier(
                 }
                 candidate
             }
-            value.isEmpty() -> {
-                // Empty text is omitted from string rendering but still needs a DOM node.
-                document.createTextNode("").also { emptyText ->
-                    pendingEmptyTexts += PendingEmptyText(
+            value.isEmpty() || allowed -> {
+                // Empty text is omitted from string rendering but still needs a DOM node. An
+                // allowed mismatch can also be empty on the server and present on the client.
+                document.createTextNode("").also { missingText ->
+                    pendingTextsToInsert += PendingText(
                         parent = frame.node,
                         anchor = candidate,
-                        text = emptyText,
+                        text = missingText,
                     )
                 }
             }
@@ -145,7 +155,7 @@ internal class HydrationDomApplier(
             )
         }
 
-        if (text.data != value) {
+        if (!allowed && text.data != value) {
             mismatchAtChild(
                 "text()",
                 index,
@@ -158,12 +168,13 @@ internal class HydrationDomApplier(
     }
 
     /** Validates server-only text without retaining it as a Compose-managed child. */
-    private fun claimRawText(value: String) {
+    private fun claimRawText(value: String, allowMismatch: Boolean) {
         ensureHydrating()
 
         val frame = currentFrame
         val candidate = frame.nextNode
-        if (value.isEmpty() && candidate == null) return
+        // An allowed mismatch can be empty on the server, which renders no text node at all.
+        if (candidate == null && (value.isEmpty() || allowMismatch)) return
 
         val index = frame.nextChildIndex++
         frame.nextNode = candidate?.nextSibling
@@ -173,7 +184,7 @@ internal class HydrationDomApplier(
                 index,
                 "expected raw text ${value.quoted()}, found ${candidate.describe()}",
             )
-        if (text.data != value) {
+        if (!allowMismatch && text.data != value) {
             mismatchAtChild(
                 "text()",
                 index,
@@ -187,7 +198,10 @@ internal class HydrationDomApplier(
             if (node.node !in claimedNodes) {
                 mismatchAtCurrentNode("entered a node that was not claimed")
             }
-            frames += Frame(node.node).also { frame ->
+            frames += Frame(
+                node = node.node,
+                allowsContentMismatch = node.allowsHydrationMismatch(),
+            ).also { frame ->
                 if (nodesWithClaimedRawChildren.remove(node.node)) {
                     frame.nextNode = null
                 }
@@ -266,7 +280,7 @@ internal class HydrationDomApplier(
         claimedNodes.clear()
         nodesWithClaimedRawChildren.clear()
         nodesToRemoveAfterHydration.clear()
-        pendingEmptyTexts.clear()
+        pendingTextsToInsert.clear()
         pendingDomMutations.clear()
         frames.clear()
     }
@@ -311,13 +325,13 @@ internal class HydrationDomApplier(
     }
 
     private fun finalizeHydratedNodes() {
-        pendingEmptyTexts.forEach { pending ->
+        pendingTextsToInsert.forEach { pending ->
             pending.parent.insertBefore(pending.text, pending.anchor)
         }
         nodesToRemoveAfterHydration.forEach { node ->
             node.parentNode?.removeChild(node)
         }
-        pendingEmptyTexts.clear()
+        pendingTextsToInsert.clear()
         nodesToRemoveAfterHydration.clear()
     }
 
@@ -349,6 +363,25 @@ internal class HydrationDomApplier(
         }
     }
 }
+
+/**
+ * Opt-out of hydration mismatch reporting for a single element, requested by
+ * [org.jetbrains.compose.web.attributes.AttrsScope.allowHydrationMismatch].
+ *
+ * Composition completes before the server-rendered DOM is claimed, so the flag is written while
+ * composing the element's attributes and read while its DOM is claimed and verified.
+ */
+internal class HydrationMismatchAllowance {
+    var isAllowed: Boolean = false
+}
+
+/** Implemented by node wrappers of elements that can opt out of hydration mismatch reporting. */
+internal interface HydrationMismatchAware {
+    val allowsHydrationMismatch: Boolean
+}
+
+private fun DomNodeWrapper.allowsHydrationMismatch(): Boolean =
+    (this as? HydrationMismatchAware)?.allowsHydrationMismatch == true
 
 private fun Node.pathName(): String = when (this) {
     is Element -> tagName.lowercase()

@@ -71,6 +71,10 @@ fun <TElement : Element, T> hydrateComposable(
  * first mismatch and falls back to a client render. Formatting-only HTML whitespace immediately
  * inside [root], before or after the composed content, is ignored. A throwing
  * [onHydrationMismatch] aborts the fallback and leaves the server DOM untouched.
+ *
+ * Content that the client cannot reproduce, such as a server timestamp, can keep its
+ * server-rendered element by opting out of the comparison with
+ * [org.jetbrains.compose.web.attributes.AttrsScope.allowHydrationMismatch].
  */
 @OptIn(ComposeWebInternalApi::class)
 fun <TElement : Element> hydrateComposable(

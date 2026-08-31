@@ -47,21 +47,28 @@ class JvmSsrHydrationTest {
         val serverScript = document.getElementById(SSR_HYDRATION_SCRIPT_ID)
         val serverButton = document.getElementById(SSR_HYDRATION_BUTTON_ID) as? HTMLElement
         val serverCount = document.getElementById(SSR_HYDRATION_COUNT_ID)
+        val serverRenderedAt = document.getElementById(SSR_HYDRATION_RENDERED_AT_ID)
         assertNotNull(serverStyle)
         assertNotNull(serverScript)
         assertNotNull(serverButton)
         assertNotNull(serverCount)
+        assertNotNull(serverRenderedAt)
+        assertEquals(
+            "Rendered at $SSR_HYDRATION_SERVER_RENDERED_AT",
+            serverRenderedAt.textContent,
+        )
 
         var count by mutableStateOf(0)
         val composition = hydrateComposable(root) {
             SsrHydrationContent(
                 count = count,
+                renderedAt = SSR_HYDRATION_CLIENT_RENDERED_AT,
                 increment = { count++ },
             )
         }
 
         try {
-            assertEquals(4, root.childNodes.length)
+            assertEquals(5, root.childNodes.length)
             assertNull(leadingWhitespace?.parentNode)
             assertNull(trailingWhitespace?.parentNode)
             assertSame(serverStyle, document.getElementById(SSR_HYDRATION_STYLE_ID))
@@ -71,6 +78,16 @@ class JvmSsrHydrationTest {
             assertSame(serverCount, document.getElementById(SSR_HYDRATION_COUNT_ID))
             assertEquals("Count: 0", serverCount.textContent)
             assertEquals("rgb(255, 0, 0)", window.getComputedStyle(serverCount).color)
+            // The allowed mismatch replaces the server timestamp, keeping its element.
+            assertSame(serverRenderedAt, document.getElementById(SSR_HYDRATION_RENDERED_AT_ID))
+            assertEquals(
+                "Rendered at $SSR_HYDRATION_CLIENT_RENDERED_AT",
+                serverRenderedAt.textContent,
+            )
+            assertEquals(
+                SSR_HYDRATION_CLIENT_RENDERED_AT,
+                serverRenderedAt.getAttribute("data-rendered-at"),
+            )
 
             serverButton.click()
             delay(100.milliseconds) // test fails without delau

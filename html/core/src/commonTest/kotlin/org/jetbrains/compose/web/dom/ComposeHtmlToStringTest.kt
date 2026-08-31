@@ -63,6 +63,20 @@ class ComposeHtmlToStringTest {
     }
 
     @Test
+    fun hydrationMismatchAllowanceIsNotSerialized() {
+        val html = composeHtmlToString {
+            Span(attrs = {
+                allowHydrationMismatch()
+                id("timestamp")
+            }) {
+                Text("12:00")
+            }
+        }
+
+        assertEquals("<span id=\"timestamp\">12:00</span>", html)
+    }
+
+    @Test
     fun rendersNestedElementsAndRootSiblings() {
         val html = composeHtmlToString {
             Div {
