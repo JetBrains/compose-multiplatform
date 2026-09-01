@@ -11,29 +11,24 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.artifacts.UnresolvedDependency
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.attributes.Attribute
 import org.gradle.api.attributes.Usage
-import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.file.*
 import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Copy
-import org.gradle.api.tasks.Input
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.gradle.work.DisableCachingByDefault
-import org.jetbrains.compose.ComposeExtension
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
-import org.jetbrains.compose.internal.utils.provider
+import org.jetbrains.compose.internal.utils.joinLowerCamelCase
 import org.jetbrains.compose.internal.utils.registerTask
-import org.jetbrains.compose.reload.gradle.files
 import org.jetbrains.compose.web.tasks.registerWebCompatibilityTask
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.targets.js.ir.Executable
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
-import org.jetbrains.kotlin.org.apache.commons.compress.harmony.pack200.NewAttributeBands
+import javax.inject.Inject
 
 internal fun Project.configureWeb() {
     plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
@@ -47,32 +42,22 @@ internal fun Project.configureWeb() {
 
 private fun KotlinJsIrTarget.configureSkikoWebRuntime() {
     val target = this
-    val titledTargetName = target.name.replaceFirstChar { it.titlecase() }
-    val mainCompilation = target.compilations.findByName(KotlinCompilation.MAIN_COMPILATION_NAME)!!
-    val runtimeDepsConfig = project.configurations.findByName(mainCompilation.runtimeDependencyConfigurationName)!!
-    val skikoWebRuntimeJarFiles = runtimeDepsConfig.incoming.artifactView { act ->
-        @Suppress("UnstableApiUsage")
-        act.withVariantReselection()
-        act.attributes { cont ->
-            runtimeDepsConfig.attributes.keySet().forEach {
-                @Suppress("UNCHECKED_CAST")
-                cont.attribute(it as Attribute<Any>, runtimeDepsConfig.attributes.getAttribute(it) as Any)
-            }
-            cont.attribute(Usage.USAGE_ATTRIBUTE, project.objects.named(Usage::class.java, "skiko-runtime"))
-        }
-    }.files
-    val skikoWebRuntimeFiles = skikoWebRuntimeJarFiles.elements.map {
-        it.map { artifact -> project.zipTree(artifact) }
-    }
-    val unpackedRuntimeDir = project.layout.buildDirectory.dir("compose/skiko-${target.name}-runtime")
-
-    val unpackRuntime = project.registerTask<Copy>("unpackSkikoRuntimeFor$titledTargetName") {
-        destinationDir = project.file(unpackedRuntimeDir)
-        duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        from(skikoWebRuntimeFiles)
-    }
 
     target.compilations.all { compilation ->
+        val runtimeDepsConfig = project.configurations.findByName(compilation.runtimeDependencyConfigurationName)!!
+        val skikoWebRuntimeJarFiles = project.skikoWebRuntimeJarFiles(runtimeDepsConfig)
+
+        val qualifierName = if (compilation.name == KotlinCompilation.MAIN_COMPILATION_NAME) "" else compilation.name
+        val buildDirPath = "compose/skiko-${target.name}-${if(qualifierName.isNotEmpty()) "$qualifierName-" else ""}runtime"
+        val unpackedRuntimeDir = project.layout.buildDirectory.dir(buildDirPath)
+
+        val unpackRuntime = project.registerTask<UnpackSkikoRuntimeTask>(
+            joinLowerCamelCase("unpack", qualifierName, "skikoRuntimeFor", target.name)
+        ) {
+            runtimeFiles.from(skikoWebRuntimeJarFiles)
+            outputDirectory.set(unpackedRuntimeDir)
+        }
+
         if (target.wasmTargetType != null) {
             // Kotlin/Wasm uses ES module system to depend on skiko through skiko.mjs.
             // Further bundler could process all files by its own (both skiko.mjs and skiko.wasm) and then emits its own version.
@@ -94,6 +79,55 @@ private fun KotlinJsIrTarget.configureSkikoWebRuntime() {
         }
     }
 }
+
+@CacheableTask
+internal abstract class UnpackSkikoRuntimeTask : DefaultTask() {
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.NONE)
+    abstract val runtimeFiles: ConfigurableFileCollection
+
+    @get:OutputDirectory
+    abstract val outputDirectory: DirectoryProperty
+
+    @get:Inject
+    abstract val archiveOperations: ArchiveOperations
+
+    @get:Inject
+    abstract val fileSystemOperations: FileSystemOperations
+
+    @TaskAction
+    fun unpack() {
+        fileSystemOperations.copy {
+            it.from(runtimeFiles.files.map(archiveOperations::zipTree))
+            it.into(outputDirectory)
+            it.duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        }
+    }
+}
+
+private fun Project.skikoWebRuntimeJarFiles(runtimeDepsConfig: Configuration) =
+    runtimeDepsConfig.incoming.artifactView { view ->
+        @Suppress("UnstableApiUsage")
+        view.withVariantReselection()
+
+        view.componentFilter { component ->
+            component is ModuleComponentIdentifier && component.group == SKIKO_GROUP
+        }
+
+        view.attributes { attributes ->
+            runtimeDepsConfig.attributes.keySet().forEach { key ->
+                @Suppress("UNCHECKED_CAST")
+                attributes.attribute(
+                    key as Attribute<Any>,
+                    runtimeDepsConfig.attributes.getAttribute(key) as Any
+                )
+            }
+            attributes.attribute(
+                Usage.USAGE_ATTRIBUTE,
+                objects.named(Usage::class.java, "skiko-runtime")
+            )
+        }
+    }.files
 
 private fun KotlinJsIrTarget.configureComposeUiTestExecutableCheck() {
     val target = this
