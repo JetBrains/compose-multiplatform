@@ -11,9 +11,6 @@ plugins {
 
 val browserIdentityTestSources = layout.projectDirectory.dir("src/browserIdentityTest/kotlin")
 val karmaConfigDirectory = layout.projectDirectory.dir("karma.config.d")
-val htmlProperties = Properties().apply {
-    layout.projectDirectory.file("../gradle.properties").asFile.inputStream().use(::load)
-}
 val generatorProperties = Properties().apply {
     layout.projectDirectory.file("generator/gradle.properties").asFile.inputStream().use(::load)
 }
@@ -22,11 +19,7 @@ val kotlinxBrowserVersion = requireNotNull(generatorProperties.getProperty("kotl
 }
 
 group = "org.jetbrains.compose.html"
-version = providers.gradleProperty("compose.version").orNull ?: requireNotNull(
-    htmlProperties.getProperty("compose.version"),
-) {
-    "compose.version is missing from html/gradle.properties"
-}
+version = providers.gradleProperty("deploy.version").get()
 
 kotlin {
     compilerOptions {
