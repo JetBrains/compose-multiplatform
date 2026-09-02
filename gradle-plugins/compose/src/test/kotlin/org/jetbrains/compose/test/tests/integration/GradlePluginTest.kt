@@ -29,6 +29,23 @@ import kotlin.test.assertFalse
 
 class GradlePluginTest : GradlePluginTestBase() {
     @Test
+    fun skikoRuntimeFromTestCompilation() = with(
+        testProject("misc/wasmTestSkiko")
+    ) {
+        gradle(":unpackTestSkikoRuntimeForJs").checks {
+            val jsRuntimeFiles = file("./build/compose/skiko-js-test-runtime")
+                .listFiles()!!.map { it.name }
+            assertTrue(jsRuntimeFiles.contains("skiko.wasm"), "JS runtime files: $jsRuntimeFiles")
+        }
+        gradle(":unpackTestSkikoRuntimeForWasmJs").checks {
+            val wasmRuntimeFiles = file("./build/compose/skiko-wasmJs-test-runtime")
+                .listFiles()!!.map { it.name }
+            assertTrue(wasmRuntimeFiles.contains("skiko.wasm"), "Wasm runtime files: $wasmRuntimeFiles")
+            assertTrue(wasmRuntimeFiles.contains("skiko.mjs"), "Wasm runtime files: $wasmRuntimeFiles")
+        }
+    }
+
+    @Test
     fun skikoWasm() = with(
         testProject("misc/skikoWasm")
     ) {
@@ -84,6 +101,7 @@ class GradlePluginTest : GradlePluginTestBase() {
 
     // Note: we can't test non-jvm targets with Kotlin older than 2.3.0, because of klib abi version bump in 2.3.0
     private val oldestSupportedKotlinVersion = "2.3.0"
+
     @Test
     fun testOldestKotlinMpp() = with(
         testProject(
