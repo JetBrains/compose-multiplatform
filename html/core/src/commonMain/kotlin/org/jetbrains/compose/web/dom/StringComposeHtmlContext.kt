@@ -56,7 +56,7 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
                 val attrsScope = AttrsScopeBuilder<TElement>()
                 applyAttrs?.invoke(attrsScope)
                 val attributes = attrsScope.stringAttributes()
-                rawText?.validateAttributes(attributes)
+                rawText?.validateAttributes(attributes.byName)
 
                 update {
                     set(attributes, StringHtmlNodeWrapper::updateAttributes)
@@ -159,16 +159,21 @@ private fun unavailableDomElement(): Nothing =
    ```
  */
 @OptIn(ComposeWebInternalApi::class)
-private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(): Map<String, String> =
-    collect().toMutableMap().apply {
-        if (AttrsScope.CLASS !in this && classes.isNotEmpty()) {
+private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(): StringHtmlAttributes {
+    val byName = collect().toMutableMap().apply {
+        if (keys.none { it.equals(AttrsScope.CLASS, ignoreCase = true) } && classes.isNotEmpty()) {
             classes.toClassAttributeValue()?.let { value -> this[AttrsScope.CLASS] = value }
         }
 
-        if ("style" !in this) {
+        if (keys.none { it.equals("style", ignoreCase = true) }) {
             styleScope.toStyleAttributeValue()?.let { value -> this["style"] = value }
         }
     }
+    return StringHtmlAttributes(
+        byName = byName,
+        hydrationProtocolAttributes = hydrationProtocolAttributes.toSet(),
+    )
+}
 
 @Composable
 @ExplicitGroupsComposable

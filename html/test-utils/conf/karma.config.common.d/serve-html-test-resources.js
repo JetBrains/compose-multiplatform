@@ -3,7 +3,7 @@ const fs = require("fs");
 const ssrHydrationFixtures = [
     "ssr-hydration.html",
     "ssr-number-hydration.html",
-    "ssr-hydration-data.html",
+    "ssr-hydration-state.html",
 ];
 
 ssrHydrationFixtures.forEach((fixture) => {

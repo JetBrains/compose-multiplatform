@@ -38,7 +38,7 @@ internal class StringHtmlNodeWrapper(
         requireElement("clear").children.clear()
     }
 
-    fun updateAttributes(attributes: Map<String, String>) {
+    fun updateAttributes(attributes: StringHtmlAttributes) {
         requireElement("update attributes").updateAttributes(attributes)
     }
 

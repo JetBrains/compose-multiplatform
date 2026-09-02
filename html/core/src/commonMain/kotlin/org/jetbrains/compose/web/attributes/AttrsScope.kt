@@ -162,6 +162,7 @@ open class AttrsScopeBuilder<TElement : Element>(
     internal val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
     internal var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
     internal val classes: MutableList<String> = mutableListOf()
+    internal val hydrationProtocolAttributes: MutableSet<String> = mutableSetOf()
     internal var allowsHydrationMismatch: Boolean = false
         private set
 
@@ -222,8 +223,22 @@ open class AttrsScopeBuilder<TElement : Element>(
      * For boolean attributes cast boolean value to String and pass it as value.
      */
     override fun attr(attr: String, value: String): AttrsScope<TElement> {
+        if (hydrationProtocolAttributes.isNotEmpty()) {
+            require(attr.lowercase() !in hydrationProtocolAttributes) {
+                "Attribute \"$attr\" is owned by the Compose hydration protocol"
+            }
+        }
         attributesMap[attr] = value
         return this
+    }
+
+    internal fun hydrationProtocolAttr(attr: String, value: String) {
+        val normalizedAttr = attr.lowercase()
+        require(attributesMap.keys.none { it.lowercase() == normalizedAttr }) {
+            "Attribute \"$attr\" is owned by the Compose hydration protocol"
+        }
+        attributesMap[attr] = value
+        hydrationProtocolAttributes += normalizedAttr
     }
 
     /**
@@ -265,10 +280,30 @@ open class AttrsScopeBuilder<TElement : Element>(
 
     @ComposeWebInternalApi
     internal fun copyFrom(attrsScope: AttrsScopeBuilder<TElement>) {
+        if (
+            hydrationProtocolAttributes.isNotEmpty() ||
+            attrsScope.hydrationProtocolAttributes.isNotEmpty()
+        ) {
+            attrsScope.attributesMap.keys.forEach { name ->
+                val normalizedName = name.lowercase()
+                val sourceOwnsName = normalizedName in attrsScope.hydrationProtocolAttributes
+                val destinationHasName = attributesMap.keys.any {
+                    it.lowercase() == normalizedName
+                }
+                require(
+                    normalizedName !in hydrationProtocolAttributes &&
+                        (!sourceOwnsName || !destinationHasName)
+                ) {
+                    "Attribute \"$name\" is owned by the Compose hydration protocol"
+                }
+            }
+        }
+
         refEffect = attrsScope.refEffect
         styleScope.copyFrom(attrsScope.styleScope)
         allowsHydrationMismatch = allowsHydrationMismatch || attrsScope.allowsHydrationMismatch
 
+        hydrationProtocolAttributes.addAll(attrsScope.hydrationProtocolAttributes)
         attributesMap.putAll(attrsScope.attributesMap)
         propertyUpdates.addAll(attrsScope.propertyUpdates)
 
