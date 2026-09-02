@@ -5,6 +5,7 @@ import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.builders.InputAttrsScope
 import org.jetbrains.compose.web.attributes.name
+import org.jetbrains.compose.web.internal.unsafeCast
 
 typealias RadioInputAttrsBuilder = (InputAttrsScope<Boolean>.() -> Unit)
 

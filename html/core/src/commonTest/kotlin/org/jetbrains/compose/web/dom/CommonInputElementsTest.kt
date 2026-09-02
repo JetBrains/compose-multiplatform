@@ -1,9 +1,11 @@
 package org.jetbrains.compose.web.dom
 
+import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.composeHtmlToString
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalComposeWebApi::class)
 class CommonInputElementsTest {
     @Test
     fun rendersEveryInputHelperWithExpectedSerializableState() {
@@ -55,5 +57,42 @@ class CommonInputElementsTest {
                 "<input type=\"week\">",
             html,
         )
+    }
+
+    @Test
+    fun rendersStringRadioGroup() {
+        val html = composeHtmlToString {
+            RadioGroup(checkedValue = "second", name = "string-options") {
+                RadioInput(value = "first", id = "first-option")
+                RadioInput(value = "second", id = "second-option")
+            }
+        }
+
+        assertEquals(
+            "<input type=\"radio\" id=\"first-option\" name=\"string-options\" value=\"first\">" +
+                "<input type=\"radio\" id=\"second-option\" name=\"string-options\" value=\"second\">",
+            html,
+        )
+    }
+
+    @Test
+    fun rendersEnumRadioGroup() {
+        val html = composeHtmlToString {
+            RadioGroup(checkedValue = RadioOption.Second, name = "enum-options") {
+                RadioInput(value = RadioOption.First)
+                RadioInput(value = RadioOption.Second)
+            }
+        }
+
+        assertEquals(
+            "<input type=\"radio\" name=\"enum-options\" value=\"First\">" +
+                "<input type=\"radio\" name=\"enum-options\" value=\"Second\">",
+            html,
+        )
+    }
+
+    private enum class RadioOption {
+        First,
+        Second,
     }
 }
