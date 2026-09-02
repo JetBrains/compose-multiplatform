@@ -1,0 +1,38 @@
+name: Kotlinx Browser Common Subset
+
+on:
+  pull_request:
+    paths:
+      - 'html/kotlinx-browser-common-subset/**'
+      - 'html/buildSrc/gradle.properties'
+      - '.github/workflows/kotlinx-browser-common-subset.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'html/kotlinx-browser-common-subset/**'
+      - 'html/buildSrc/gradle.properties'
+      - '.github/workflows/kotlinx-browser-common-subset.yml'
+
+jobs:
+  check-and-publish-to-maven-local:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'jetbrains'
+          java-version: '21'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Check and publish to Maven Local
+        working-directory: html/kotlinx-browser-common-subset
+        run: |
+          ./gradlew --no-daemon --stacktrace --rerun-tasks --max-workers=1 check publishToMavenLocal
