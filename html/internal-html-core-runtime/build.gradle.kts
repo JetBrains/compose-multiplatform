@@ -8,6 +8,8 @@ plugins {
 
 
 kotlin {
+    jvm()
+
     js(IR) {
         browser() {
             testTask {
@@ -23,6 +25,7 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(libs.kotlinx.coroutines.core)
+                implementation("org.jetbrains.compose.html:kotlinx-browser-common-subset:0.0.1+dev1")
             }
         }
 

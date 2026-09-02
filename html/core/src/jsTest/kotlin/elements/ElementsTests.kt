@@ -15,6 +15,7 @@ import org.w3c.dom.HTMLElement
 import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotSame
 import kotlin.test.assertSame
 
 class ElementsTests {
@@ -140,8 +141,9 @@ class ElementsTests {
 
     @Test
     fun testElementBuilderCreate() {
-        val custom = ElementBuilder.createBuilder<HTMLElement>("custom")
-        val div = ElementBuilder.createBuilder<HTMLElement>("div")
+        val custom = ElementBuilder.createBuilder<HTMLElement>("CUSTOM")
+        val div = ElementBuilder.createBuilder<HTMLElement>("DIV")
+        val sameDiv = ElementBuilder.createBuilder<HTMLElement>("div")
         val b = ElementBuilder.createBuilder<HTMLElement>("b")
         val abc = ElementBuilder.createBuilder<HTMLElement>("abc")
 
@@ -152,6 +154,9 @@ class ElementsTests {
         assertEquals("DIV", div.create().nodeName)
         assertEquals("B", b.create().nodeName)
         assertEquals("ABC", abc.create().nodeName)
+        assertSame(custom, ElementBuilder.createBuilder<HTMLElement>("custom"))
+        assertSame(div, sameDiv)
+        assertNotSame(custom, div)
     }
 
     @Test
@@ -194,18 +199,19 @@ class ElementsTests {
         var flag by mutableStateOf(false)
 
         composition {
-            TagElement({
-                counter++
-                document.createElement("div")
-            }, null,
+            TagElement(
+                {
+                    counter++
+                    document.createElement("div")
+                },
+                null,
                 if (flag) {
-                    { Div() { Text("ON") } }
+                    { Div { Text("ON") } }
                 } else null
             )
-
         }
 
-        assertEquals(1, counter, )
+        assertEquals(1, counter)
 
         flag = true
         waitForRecompositionComplete()

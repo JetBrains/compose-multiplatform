@@ -7,10 +7,9 @@ package org.jetbrains.compose.web.core.tests
 
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
-import org.w3c.dom.HTMLElement
-import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.js.unsafeCast
 import org.jetbrains.compose.web.testutils.*
 
 class CSSUnitApiTests {
@@ -53,6 +52,14 @@ class CSSUnitApiTests {
         assertEquals("4dppx", 4.dppx.toString())
 
         assertEquals("4fr", 4.fr.toString())
+    }
+
+    @Test
+    fun cssOmUnitTextMatchesDslUnit() {
+        val cssOmValue = js("({ value: 1, unit: 'px' })").unsafeCast<CSSSizeValue<CSSUnit.px>>()
+
+        val dslUnit: CSSUnit = CSSUnit.px
+        assertEquals(dslUnit.toString(), cssOmValue.unit.toString())
     }
 
     @Test
