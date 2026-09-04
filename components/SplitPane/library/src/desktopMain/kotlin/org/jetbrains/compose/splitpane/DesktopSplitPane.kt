@@ -14,8 +14,8 @@ private fun Constraints.withUnconstrainedWidth() = copy(minWidth = 0, maxWidth =
 private fun Constraints.withUnconstrainedHeight() = copy(minHeight = 0, maxHeight = Constraints.Infinity)
 
 
-@OptIn(ExperimentalSplitPaneApi::class)
 @Composable
+@OptIn(ExperimentalSplitPaneApi::class)
 internal actual fun SplitPane(
     modifier: Modifier,
     isHorizontal: Boolean,
@@ -30,7 +30,7 @@ internal actual fun SplitPane(
         second?.let { Box(modifier) { it() } }
         return
     }
-    
+
     Layout(
         {
             Box {
@@ -77,8 +77,10 @@ internal actual fun SplitPane(
                 minPosition = constrainedMin
                 maxPosition = constrainedMax
 
-                val position = (constrainedMin * (1-positionPercentage) + constrainedMax * positionPercentage)
-                    .roundToInt()
+                val position =
+                    if (firstVisible) {
+                        (constrainedMin * (1 - positionPercentage) + constrainedMax * positionPercentage).roundToInt()
+                    } else 0
 
                 val firstPlaceable = firstMeasurable.measure(
                     if (isHorizontal) {
@@ -94,7 +96,7 @@ internal actual fun SplitPane(
                     }
                 )
 
-                val secondPlaceablePosition = position + splitterSize
+                val secondPlaceablePosition = if (firstVisible) position + splitterSize else 0
                 val secondAvailableSize = (maxConstraintOnMainAxis - secondPlaceablePosition).coerceAtLeast(0)
 
                 val secondPlaceable = secondMeasurable.measure(
@@ -113,7 +115,7 @@ internal actual fun SplitPane(
 
                 val handlePlaceable = handleMeasurable.measure(splitterConstraints)
                 val handleSize = handlePlaceable.valueByDirection(isHorizontal)
-                // TODO support RTL
+
                 val handlePosition = when (splitter.alignment) {
                     SplitterHandleAlignment.BEFORE -> position + splitterSize - handleSize
                     SplitterHandleAlignment.ABOVE -> position + (splitterSize - handleSize) / 2
