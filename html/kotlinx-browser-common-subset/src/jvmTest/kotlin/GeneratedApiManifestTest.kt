@@ -51,7 +51,8 @@ class GeneratedApiManifestTest {
     @Test
     fun theManifestCoversTheConfiguredInputFiles() {
         assertEquals(
-            "org.w3c.dom.clipboard.kt,org.w3c.dom.css.kt,org.w3c.dom.events.kt,org.w3c.dom.kt",
+            "org.w3c.css.masking.kt,org.w3c.dom.clipboard.kt,org.w3c.dom.css.kt," +
+                "org.w3c.dom.events.kt,org.w3c.dom.kt,org.w3c.dom.svg.kt",
             manifest.header.getValue("files"),
         )
     }
@@ -74,6 +75,32 @@ class GeneratedApiManifestTest {
 
         assertTrue(excluded.all { it.reason.matches(Regex("[a-z0-9-]+")) }, "reasons: $reasons")
         assertEquals(emptySet(), reasons - knownReasons, "unknown exclusion reasons")
+    }
+
+    /** SVG inputs retain the complete hierarchy containing Compose Web's element surface. */
+    @Test
+    fun theSvgElementSurfaceIsEmittedInFull() {
+        val emittedElements = setOf(
+            "org.w3c.css.masking.SVGClipPathElement",
+            "org.w3c.css.masking.SVGMaskElement",
+            "org.w3c.dom.svg.SVGCircleElement",
+            "org.w3c.dom.svg.SVGElement",
+            "org.w3c.dom.svg.SVGGeometryElement",
+            "org.w3c.dom.svg.SVGGraphicsElement",
+            "org.w3c.dom.svg.SVGRectElement",
+        )
+        emittedElements.forEach { owner ->
+            assertTrue(
+                manifest.entries.single { it.owner == owner && it.kind == "classifier" }.emitted,
+                owner,
+            )
+        }
+
+        val svg = manifest.entries.filter {
+            it.owner.startsWith("org.w3c.dom.svg.") || it.owner.startsWith("org.w3c.css.masking.")
+        }
+        assertTrue(svg.isNotEmpty())
+        assertTrue(svg.all(GeneratedApiManifest.Entry::emitted))
     }
 
     /** The complete CSS input includes inline styles and its static companion function. */

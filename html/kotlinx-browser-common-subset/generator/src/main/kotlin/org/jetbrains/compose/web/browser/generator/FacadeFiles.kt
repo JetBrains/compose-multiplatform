@@ -230,8 +230,9 @@ internal fun browserLeafDeclarationsFile(
     mapping: PortablePackageMapping,
     declarations: List<PortableClass>,
     extensions: List<PortableExtensionFunction>,
+    allClasses: Map<ClassName, PortableClass> = emptyMap(),
 ): FileSpec = facadeFile(mapping.portablePackage, mapping.declarationsFile) {
-    webSuppressions(declarations)
+    webSuppressions(declarations, allClasses)
     extensions.distinctBy(PortableExtensionFunction::browserMember).forEach { extension ->
         addAliasedImport(extension.browserMember, extension.browserAlias)
     }
@@ -270,8 +271,9 @@ internal fun targetValuesFile(
 internal fun browserLeafDictionariesFile(
     mapping: PortablePackageMapping,
     dictionaries: List<PortableClass>,
+    allClasses: Map<ClassName, PortableClass> = emptyMap(),
 ): FileSpec = facadeFile(mapping.portablePackage, mapping.dictionariesFile) {
-    webSuppressions(dictionaries)
+    webSuppressions(dictionaries, allClasses)
     dictionaries.forEach { addTypeAlias(it.browserTypeAlias()) }
     dictionaries.forEach { dictionary ->
         dictionary.factory?.takeUnless(PortableFactory::usesInterop)
@@ -294,13 +296,19 @@ private fun PortableClass.browserTypeAlias(): TypeAliasSpec =
 private fun PortableClass.browserAliasTypeVariables() =
     typeVariables.map { variable -> TypeVariableName(variable.name) }
 
-private fun FileSpec.Builder.webSuppressions(classes: List<PortableClass>): FileSpec.Builder =
+private fun FileSpec.Builder.webSuppressions(
+    classes: List<PortableClass>,
+    allClasses: Map<ClassName, PortableClass>,
+): FileSpec.Builder =
     suppressIfAny(buildList {
+        val classesAndAncestors = classes + classes.flatMap { portableClass ->
+            portableClass.ancestors.mapNotNull(allClasses::get)
+        }
         // Each suppression answers a distinct declaration shape; keep their file checks independent.
-        if (classes.any(PortableClass::hasDefaultArguments)) {
+        if (classesAndAncestors.any(PortableClass::hasDefaultArguments)) {
             add(DEFAULT_ARGUMENTS_SUPPRESSION)
         }
-        if (classes.any { it.needsIrSuppression || it.hasDefaultArguments }) {
+        if (classesAndAncestors.any { it.needsIrSuppression || it.hasDefaultArguments }) {
             add(CLASS_SCOPE_SUPPRESSION)
         }
         if (classes.any { it.typeVariables.any { variable -> variable.variance != null } }) {

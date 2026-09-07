@@ -62,50 +62,6 @@ import kotlinx.browser.workers.UnionClientOrMessagePortOrServiceWorker
 import kotlinx.browser.workers.UnionMessagePortOrServiceWorker
 import kotlinx.browser.xhr.ProgressEvent
 
-public expect interface AbstractWorker : JsAny {
-  public open var onerror: ((Event) -> Unit)?
-}
-
-public expect abstract class ApplicationCache : EventTarget, JsAny {
-  public open val status: Short
-
-  public open var onchecking: ((Event) -> Unit)?
-
-  public open var onerror: ((Event) -> Unit)?
-
-  public open var onnoupdate: ((Event) -> Unit)?
-
-  public open var ondownloading: ((Event) -> Unit)?
-
-  public open var onprogress: ((ProgressEvent) -> Unit)?
-
-  public open var onupdateready: ((Event) -> Unit)?
-
-  public open var oncached: ((Event) -> Unit)?
-
-  public open var onobsolete: ((Event) -> Unit)?
-
-  public fun update()
-
-  public fun abort()
-
-  public fun swapCache()
-
-  public companion object {
-    public val UNCACHED: Short
-
-    public val IDLE: Short
-
-    public val CHECKING: Short
-
-    public val DOWNLOADING: Short
-
-    public val UPDATEREADY: Short
-
-    public val OBSOLETE: Short
-  }
-}
-
 public expect abstract class Node : EventTarget, JsAny {
   public open val nodeType: Short
 
@@ -164,60 +120,6 @@ public expect abstract class Node : EventTarget, JsAny {
   public fun replaceChild(node: Node, child: Node): Node
 
   public fun removeChild(child: Node): Node
-
-  public companion object {
-    public val ELEMENT_NODE: Short
-
-    public val ATTRIBUTE_NODE: Short
-
-    public val TEXT_NODE: Short
-
-    public val CDATA_SECTION_NODE: Short
-
-    public val ENTITY_REFERENCE_NODE: Short
-
-    public val ENTITY_NODE: Short
-
-    public val PROCESSING_INSTRUCTION_NODE: Short
-
-    public val COMMENT_NODE: Short
-
-    public val DOCUMENT_NODE: Short
-
-    public val DOCUMENT_TYPE_NODE: Short
-
-    public val DOCUMENT_FRAGMENT_NODE: Short
-
-    public val NOTATION_NODE: Short
-
-    public val DOCUMENT_POSITION_DISCONNECTED: Short
-
-    public val DOCUMENT_POSITION_PRECEDING: Short
-
-    public val DOCUMENT_POSITION_FOLLOWING: Short
-
-    public val DOCUMENT_POSITION_CONTAINS: Short
-
-    public val DOCUMENT_POSITION_CONTAINED_BY: Short
-
-    public val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
-  }
-}
-
-public expect abstract class Attr : Node, JsAny {
-  public open val namespaceURI: String?
-
-  public open val prefix: String?
-
-  public open val localName: String
-
-  public open val name: String
-
-  public open var `value`: String
-
-  public open val ownerElement: Element?
-
-  public open val specified: Boolean
 
   public companion object {
     public val ELEMENT_NODE: Short
@@ -685,6 +587,104 @@ public expect interface GlobalEventHandlers : JsAny {
   public open var onpointerenter: ((PointerEvent) -> Unit)?
 
   public open var onpointerleave: ((PointerEvent) -> Unit)?
+}
+
+public expect interface AbstractWorker : JsAny {
+  public open var onerror: ((Event) -> Unit)?
+}
+
+public expect abstract class ApplicationCache : EventTarget, JsAny {
+  public open val status: Short
+
+  public open var onchecking: ((Event) -> Unit)?
+
+  public open var onerror: ((Event) -> Unit)?
+
+  public open var onnoupdate: ((Event) -> Unit)?
+
+  public open var ondownloading: ((Event) -> Unit)?
+
+  public open var onprogress: ((ProgressEvent) -> Unit)?
+
+  public open var onupdateready: ((Event) -> Unit)?
+
+  public open var oncached: ((Event) -> Unit)?
+
+  public open var onobsolete: ((Event) -> Unit)?
+
+  public fun update()
+
+  public fun abort()
+
+  public fun swapCache()
+
+  public companion object {
+    public val UNCACHED: Short
+
+    public val IDLE: Short
+
+    public val CHECKING: Short
+
+    public val DOWNLOADING: Short
+
+    public val UPDATEREADY: Short
+
+    public val OBSOLETE: Short
+  }
+}
+
+public expect abstract class Attr : Node, JsAny {
+  public open val namespaceURI: String?
+
+  public open val prefix: String?
+
+  public open val localName: String
+
+  public open val name: String
+
+  public open var `value`: String
+
+  public open val ownerElement: Element?
+
+  public open val specified: Boolean
+
+  public companion object {
+    public val ELEMENT_NODE: Short
+
+    public val ATTRIBUTE_NODE: Short
+
+    public val TEXT_NODE: Short
+
+    public val CDATA_SECTION_NODE: Short
+
+    public val ENTITY_REFERENCE_NODE: Short
+
+    public val ENTITY_NODE: Short
+
+    public val PROCESSING_INSTRUCTION_NODE: Short
+
+    public val COMMENT_NODE: Short
+
+    public val DOCUMENT_NODE: Short
+
+    public val DOCUMENT_TYPE_NODE: Short
+
+    public val DOCUMENT_FRAGMENT_NODE: Short
+
+    public val NOTATION_NODE: Short
+
+    public val DOCUMENT_POSITION_DISCONNECTED: Short
+
+    public val DOCUMENT_POSITION_PRECEDING: Short
+
+    public val DOCUMENT_POSITION_FOLLOWING: Short
+
+    public val DOCUMENT_POSITION_CONTAINS: Short
+
+    public val DOCUMENT_POSITION_CONTAINED_BY: Short
+
+    public val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+  }
 }
 
 public expect interface DocumentAndElementEventHandlers : JsAny {

@@ -28,7 +28,7 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(libs.kotlinx.coroutines.core)
-                implementation("org.jetbrains.compose.html:kotlinx-browser-common-subset:0.0.1+dev1")
+                api(project(":kotlinx-browser-common-subset"))
                 implementation(project(":internal-html-core-runtime"))
             }
         }

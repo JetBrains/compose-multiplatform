@@ -1,16 +1,70 @@
-files=org.w3c.dom.clipboard.kt,org.w3c.dom.css.kt,org.w3c.dom.events.kt,org.w3c.dom.kt
-classifiers=331
-constructors=57
-members=2552
-companions=152
-companion-members=1865
+files=org.w3c.css.masking.kt,org.w3c.dom.clipboard.kt,org.w3c.dom.css.kt,org.w3c.dom.events.kt,org.w3c.dom.kt,org.w3c.dom.svg.kt
+classifiers=412
+constructors=58
+members=2815
+companions=206
+companion-members=2842
 nested-declarations=0
-factories=45
-operators=36
+factories=46
+operators=48
 values=73
-emitted=5107
+emitted=6496
 excluded=4
 unaccounted=0
+EMITTED|classifier|org.w3c.css.masking.SVGClipPathElement
+EMITTED|member|org.w3c.css.masking.SVGClipPathElement#val clipPathUnits: SVGAnimatedEnumeration
+EMITTED|member|org.w3c.css.masking.SVGClipPathElement#val transform: SVGAnimatedTransformList
+EMITTED|companion|org.w3c.css.masking.SVGClipPathElement.Companion
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val SVG_UNIT_TYPE_OBJECTBOUNDINGBOX: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val SVG_UNIT_TYPE_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val SVG_UNIT_TYPE_USERSPACEONUSE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGClipPathElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.css.masking.SVGMaskElement
+EMITTED|member|org.w3c.css.masking.SVGMaskElement#val height: SVGAnimatedLength
+EMITTED|member|org.w3c.css.masking.SVGMaskElement#val maskContentUnits: SVGAnimatedEnumeration
+EMITTED|member|org.w3c.css.masking.SVGMaskElement#val maskUnits: SVGAnimatedEnumeration
+EMITTED|member|org.w3c.css.masking.SVGMaskElement#val width: SVGAnimatedLength
+EMITTED|member|org.w3c.css.masking.SVGMaskElement#val x: SVGAnimatedLength
+EMITTED|member|org.w3c.css.masking.SVGMaskElement#val y: SVGAnimatedLength
+EMITTED|companion|org.w3c.css.masking.SVGMaskElement.Companion
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val SVG_UNIT_TYPE_OBJECTBOUNDINGBOX: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val SVG_UNIT_TYPE_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val SVG_UNIT_TYPE_USERSPACEONUSE: Short
+EMITTED|companion-member|org.w3c.css.masking.SVGMaskElement.Companion#val TEXT_NODE: Short
 EMITTED|classifier|org.w3c.dom.AbstractWorker
 EMITTED|member|org.w3c.dom.AbstractWorker#var onerror: Function1<Event, Unit>?
 EMITTED|classifier|org.w3c.dom.AddEventListenerOptions
@@ -5122,3 +5176,1338 @@ EMITTED|member|org.w3c.dom.events.WheelEventInit#var deltaMode: Int?
 EMITTED|member|org.w3c.dom.events.WheelEventInit#var deltaX: Double?
 EMITTED|member|org.w3c.dom.events.WheelEventInit#var deltaY: Double?
 EMITTED|member|org.w3c.dom.events.WheelEventInit#var deltaZ: Double?
+EMITTED|classifier|org.w3c.dom.svg.GetSVGDocument
+EMITTED|member|org.w3c.dom.svg.GetSVGDocument#fun getSVGDocument(): Document
+EMITTED|classifier|org.w3c.dom.svg.SVGAElement
+EMITTED|member|org.w3c.dom.svg.SVGAElement#val download: SVGAnimatedString
+EMITTED|member|org.w3c.dom.svg.SVGAElement#val hreflang: SVGAnimatedString
+EMITTED|member|org.w3c.dom.svg.SVGAElement#val rel: SVGAnimatedString
+EMITTED|member|org.w3c.dom.svg.SVGAElement#val relList: SVGAnimatedString
+EMITTED|member|org.w3c.dom.svg.SVGAElement#val target: SVGAnimatedString
+EMITTED|member|org.w3c.dom.svg.SVGAElement#val type: SVGAnimatedString
+EMITTED|companion|org.w3c.dom.svg.SVGAElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGAngle
+EMITTED|member|org.w3c.dom.svg.SVGAngle#fun convertToSpecifiedUnits(unitType: Short): Unit
+EMITTED|member|org.w3c.dom.svg.SVGAngle#fun newValueSpecifiedUnits(unitType: Short, valueInSpecifiedUnits: Float): Unit
+EMITTED|member|org.w3c.dom.svg.SVGAngle#val unitType: Short
+EMITTED|member|org.w3c.dom.svg.SVGAngle#var value: Float
+EMITTED|member|org.w3c.dom.svg.SVGAngle#var valueAsString: String
+EMITTED|member|org.w3c.dom.svg.SVGAngle#var valueInSpecifiedUnits: Float
+EMITTED|companion|org.w3c.dom.svg.SVGAngle.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGAngle.Companion#val SVG_ANGLETYPE_DEG: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAngle.Companion#val SVG_ANGLETYPE_GRAD: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAngle.Companion#val SVG_ANGLETYPE_RAD: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAngle.Companion#val SVG_ANGLETYPE_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGAngle.Companion#val SVG_ANGLETYPE_UNSPECIFIED: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGAnimatedAngle
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedAngle#val animVal: SVGAngle
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedAngle#val baseVal: SVGAngle
+EMITTED|classifier|org.w3c.dom.svg.SVGAnimatedBoolean
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedBoolean#val animVal: Boolean
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedBoolean#var baseVal: Boolean
+EMITTED|classifier|org.w3c.dom.svg.SVGAnimatedEnumeration
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedEnumeration#val animVal: Short
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedEnumeration#var baseVal: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGAnimatedInteger
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedInteger#val animVal: Int
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedInteger#var baseVal: Int
+EMITTED|classifier|org.w3c.dom.svg.SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedLength#val animVal: SVGLength
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedLength#val baseVal: SVGLength
+EMITTED|classifier|org.w3c.dom.svg.SVGAnimatedLengthList
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedLengthList#val animVal: SVGLengthList
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedLengthList#val baseVal: SVGLengthList
+EMITTED|classifier|org.w3c.dom.svg.SVGAnimatedNumber
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedNumber#val animVal: Float
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedNumber#var baseVal: Float
+EMITTED|classifier|org.w3c.dom.svg.SVGAnimatedNumberList
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedNumberList#val animVal: SVGNumberList
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedNumberList#val baseVal: SVGNumberList
+EMITTED|classifier|org.w3c.dom.svg.SVGAnimatedPoints
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedPoints#val animatedPoints: SVGPointList
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedPoints#val points: SVGPointList
+EMITTED|classifier|org.w3c.dom.svg.SVGAnimatedPreserveAspectRatio
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedPreserveAspectRatio#val animVal: SVGPreserveAspectRatio
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedPreserveAspectRatio#val baseVal: SVGPreserveAspectRatio
+EMITTED|classifier|org.w3c.dom.svg.SVGAnimatedRect
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedRect#val animVal: DOMRectReadOnly
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedRect#val baseVal: DOMRect
+EMITTED|classifier|org.w3c.dom.svg.SVGAnimatedString
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedString#val animVal: String
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedString#var baseVal: String
+EMITTED|classifier|org.w3c.dom.svg.SVGAnimatedTransformList
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedTransformList#val animVal: SVGTransformList
+EMITTED|member|org.w3c.dom.svg.SVGAnimatedTransformList#val baseVal: SVGTransformList
+EMITTED|classifier|org.w3c.dom.svg.SVGBoundingBoxOptions
+EMITTED|factory|org.w3c.dom.svg.SVGBoundingBoxOptions#fun SVGBoundingBoxOptions(fill: Boolean? = ..., stroke: Boolean? = ..., markers: Boolean? = ..., clipped: Boolean? = ...): SVGBoundingBoxOptions
+EMITTED|member|org.w3c.dom.svg.SVGBoundingBoxOptions#var clipped: Boolean?
+EMITTED|member|org.w3c.dom.svg.SVGBoundingBoxOptions#var fill: Boolean?
+EMITTED|member|org.w3c.dom.svg.SVGBoundingBoxOptions#var markers: Boolean?
+EMITTED|member|org.w3c.dom.svg.SVGBoundingBoxOptions#var stroke: Boolean?
+EMITTED|classifier|org.w3c.dom.svg.SVGCircleElement
+EMITTED|member|org.w3c.dom.svg.SVGCircleElement#val cx: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGCircleElement#val cy: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGCircleElement#val r: SVGAnimatedLength
+EMITTED|companion|org.w3c.dom.svg.SVGCircleElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCircleElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGCursorElement
+EMITTED|member|org.w3c.dom.svg.SVGCursorElement#val x: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGCursorElement#val y: SVGAnimatedLength
+EMITTED|companion|org.w3c.dom.svg.SVGCursorElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGCursorElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGDefsElement
+EMITTED|companion|org.w3c.dom.svg.SVGDefsElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDefsElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGDescElement
+EMITTED|companion|org.w3c.dom.svg.SVGDescElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGDescElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGElement
+EMITTED|member|org.w3c.dom.svg.SVGElement#fun blur(): Unit
+EMITTED|member|org.w3c.dom.svg.SVGElement#fun focus(): Unit
+EMITTED|member|org.w3c.dom.svg.SVGElement#val dataset: DOMStringMap
+EMITTED|member|org.w3c.dom.svg.SVGElement#val ownerSVGElement: SVGSVGElement?
+EMITTED|member|org.w3c.dom.svg.SVGElement#val viewportElement: SVGElement?
+EMITTED|member|org.w3c.dom.svg.SVGElement#var tabIndex: Int
+EMITTED|companion|org.w3c.dom.svg.SVGElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGElementInstance
+EMITTED|member|org.w3c.dom.svg.SVGElementInstance#val correspondingElement: SVGElement?
+EMITTED|member|org.w3c.dom.svg.SVGElementInstance#val correspondingUseElement: SVGUseElement?
+EMITTED|classifier|org.w3c.dom.svg.SVGEllipseElement
+EMITTED|member|org.w3c.dom.svg.SVGEllipseElement#val cx: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGEllipseElement#val cy: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGEllipseElement#val rx: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGEllipseElement#val ry: SVGAnimatedLength
+EMITTED|companion|org.w3c.dom.svg.SVGEllipseElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGEllipseElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGFitToViewBox
+EMITTED|member|org.w3c.dom.svg.SVGFitToViewBox#val preserveAspectRatio: SVGAnimatedPreserveAspectRatio
+EMITTED|member|org.w3c.dom.svg.SVGFitToViewBox#val viewBox: SVGAnimatedRect
+EMITTED|classifier|org.w3c.dom.svg.SVGForeignObjectElement
+EMITTED|member|org.w3c.dom.svg.SVGForeignObjectElement#val height: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGForeignObjectElement#val width: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGForeignObjectElement#val x: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGForeignObjectElement#val y: SVGAnimatedLength
+EMITTED|companion|org.w3c.dom.svg.SVGForeignObjectElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGForeignObjectElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGGElement
+EMITTED|companion|org.w3c.dom.svg.SVGGElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGGeometryElement
+EMITTED|member|org.w3c.dom.svg.SVGGeometryElement#fun getPointAtLength(distance: Float): DOMPoint
+EMITTED|member|org.w3c.dom.svg.SVGGeometryElement#fun getTotalLength(): Float
+EMITTED|member|org.w3c.dom.svg.SVGGeometryElement#fun isPointInFill(point: DOMPoint): Boolean
+EMITTED|member|org.w3c.dom.svg.SVGGeometryElement#fun isPointInStroke(point: DOMPoint): Boolean
+EMITTED|member|org.w3c.dom.svg.SVGGeometryElement#val pathLength: SVGAnimatedNumber
+EMITTED|companion|org.w3c.dom.svg.SVGGeometryElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGeometryElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGGradientElement
+EMITTED|member|org.w3c.dom.svg.SVGGradientElement#val gradientTransform: SVGAnimatedTransformList
+EMITTED|member|org.w3c.dom.svg.SVGGradientElement#val gradientUnits: SVGAnimatedEnumeration
+EMITTED|member|org.w3c.dom.svg.SVGGradientElement#val spreadMethod: SVGAnimatedEnumeration
+EMITTED|companion|org.w3c.dom.svg.SVGGradientElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val SVG_SPREADMETHOD_PAD: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val SVG_SPREADMETHOD_REFLECT: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val SVG_SPREADMETHOD_REPEAT: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val SVG_SPREADMETHOD_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val SVG_UNIT_TYPE_OBJECTBOUNDINGBOX: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val SVG_UNIT_TYPE_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val SVG_UNIT_TYPE_USERSPACEONUSE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGradientElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGGraphicsElement
+EMITTED|member|org.w3c.dom.svg.SVGGraphicsElement#fun getBBox(options: SVGBoundingBoxOptions = ...): DOMRect
+EMITTED|member|org.w3c.dom.svg.SVGGraphicsElement#fun getCTM(): DOMMatrix?
+EMITTED|member|org.w3c.dom.svg.SVGGraphicsElement#fun getScreenCTM(): DOMMatrix?
+EMITTED|member|org.w3c.dom.svg.SVGGraphicsElement#val transform: SVGAnimatedTransformList
+EMITTED|companion|org.w3c.dom.svg.SVGGraphicsElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGGraphicsElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGHatchElement
+EMITTED|companion|org.w3c.dom.svg.SVGHatchElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGHatchpathElement
+EMITTED|companion|org.w3c.dom.svg.SVGHatchpathElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGHatchpathElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGImageElement
+EMITTED|member|org.w3c.dom.svg.SVGImageElement#val height: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGImageElement#val preserveAspectRatio: SVGAnimatedPreserveAspectRatio
+EMITTED|member|org.w3c.dom.svg.SVGImageElement#val width: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGImageElement#val x: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGImageElement#val y: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGImageElement#var crossOrigin: String?
+EMITTED|companion|org.w3c.dom.svg.SVGImageElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGImageElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGLength
+EMITTED|member|org.w3c.dom.svg.SVGLength#fun convertToSpecifiedUnits(unitType: Short): Unit
+EMITTED|member|org.w3c.dom.svg.SVGLength#fun newValueSpecifiedUnits(unitType: Short, valueInSpecifiedUnits: Float): Unit
+EMITTED|member|org.w3c.dom.svg.SVGLength#val unitType: Short
+EMITTED|member|org.w3c.dom.svg.SVGLength#var value: Float
+EMITTED|member|org.w3c.dom.svg.SVGLength#var valueAsString: String
+EMITTED|member|org.w3c.dom.svg.SVGLength#var valueInSpecifiedUnits: Float
+EMITTED|companion|org.w3c.dom.svg.SVGLength.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGLength.Companion#val SVG_LENGTHTYPE_CM: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLength.Companion#val SVG_LENGTHTYPE_EMS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLength.Companion#val SVG_LENGTHTYPE_EXS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLength.Companion#val SVG_LENGTHTYPE_IN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLength.Companion#val SVG_LENGTHTYPE_MM: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLength.Companion#val SVG_LENGTHTYPE_NUMBER: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLength.Companion#val SVG_LENGTHTYPE_PC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLength.Companion#val SVG_LENGTHTYPE_PERCENTAGE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLength.Companion#val SVG_LENGTHTYPE_PT: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLength.Companion#val SVG_LENGTHTYPE_PX: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLength.Companion#val SVG_LENGTHTYPE_UNKNOWN: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGLengthList
+EMITTED|member|org.w3c.dom.svg.SVGLengthList#fun appendItem(newItem: SVGLength): SVGLength
+EMITTED|member|org.w3c.dom.svg.SVGLengthList#fun clear(): Unit
+EMITTED|operator|org.w3c.dom.svg.SVGLengthList#fun get(index: Int): SVGLength?
+EMITTED|member|org.w3c.dom.svg.SVGLengthList#fun getItem(index: Int): SVGLength
+EMITTED|member|org.w3c.dom.svg.SVGLengthList#fun initialize(newItem: SVGLength): SVGLength
+EMITTED|member|org.w3c.dom.svg.SVGLengthList#fun insertItemBefore(newItem: SVGLength, index: Int): SVGLength
+EMITTED|member|org.w3c.dom.svg.SVGLengthList#fun removeItem(index: Int): SVGLength
+EMITTED|member|org.w3c.dom.svg.SVGLengthList#fun replaceItem(newItem: SVGLength, index: Int): SVGLength
+EMITTED|operator|org.w3c.dom.svg.SVGLengthList#fun set(index: Int, newItem: SVGLength): Unit
+EMITTED|member|org.w3c.dom.svg.SVGLengthList#val length: Int
+EMITTED|member|org.w3c.dom.svg.SVGLengthList#val numberOfItems: Int
+EMITTED|classifier|org.w3c.dom.svg.SVGLineElement
+EMITTED|member|org.w3c.dom.svg.SVGLineElement#val x1: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGLineElement#val x2: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGLineElement#val y1: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGLineElement#val y2: SVGAnimatedLength
+EMITTED|companion|org.w3c.dom.svg.SVGLineElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLineElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGLinearGradientElement
+EMITTED|member|org.w3c.dom.svg.SVGLinearGradientElement#val x1: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGLinearGradientElement#val x2: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGLinearGradientElement#val y1: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGLinearGradientElement#val y2: SVGAnimatedLength
+EMITTED|companion|org.w3c.dom.svg.SVGLinearGradientElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val SVG_SPREADMETHOD_PAD: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val SVG_SPREADMETHOD_REFLECT: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val SVG_SPREADMETHOD_REPEAT: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val SVG_SPREADMETHOD_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val SVG_UNIT_TYPE_OBJECTBOUNDINGBOX: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val SVG_UNIT_TYPE_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val SVG_UNIT_TYPE_USERSPACEONUSE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGLinearGradientElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGMarkerElement
+EMITTED|member|org.w3c.dom.svg.SVGMarkerElement#fun setOrientToAngle(angle: SVGAngle): Unit
+EMITTED|member|org.w3c.dom.svg.SVGMarkerElement#fun setOrientToAuto(): Unit
+EMITTED|member|org.w3c.dom.svg.SVGMarkerElement#val markerHeight: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGMarkerElement#val markerUnits: SVGAnimatedEnumeration
+EMITTED|member|org.w3c.dom.svg.SVGMarkerElement#val markerWidth: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGMarkerElement#val orientAngle: SVGAnimatedAngle
+EMITTED|member|org.w3c.dom.svg.SVGMarkerElement#val orientType: SVGAnimatedEnumeration
+EMITTED|member|org.w3c.dom.svg.SVGMarkerElement#val refX: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGMarkerElement#val refY: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGMarkerElement#var orient: String
+EMITTED|companion|org.w3c.dom.svg.SVGMarkerElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val SVG_MARKERUNITS_STROKEWIDTH: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val SVG_MARKERUNITS_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val SVG_MARKERUNITS_USERSPACEONUSE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val SVG_MARKER_ORIENT_ANGLE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val SVG_MARKER_ORIENT_AUTO: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val SVG_MARKER_ORIENT_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMarkerElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGMeshElement
+EMITTED|companion|org.w3c.dom.svg.SVGMeshElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGMeshGradientElement
+EMITTED|companion|org.w3c.dom.svg.SVGMeshGradientElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val SVG_SPREADMETHOD_PAD: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val SVG_SPREADMETHOD_REFLECT: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val SVG_SPREADMETHOD_REPEAT: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val SVG_SPREADMETHOD_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val SVG_UNIT_TYPE_OBJECTBOUNDINGBOX: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val SVG_UNIT_TYPE_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val SVG_UNIT_TYPE_USERSPACEONUSE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshGradientElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGMeshpatchElement
+EMITTED|companion|org.w3c.dom.svg.SVGMeshpatchElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshpatchElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGMeshrowElement
+EMITTED|companion|org.w3c.dom.svg.SVGMeshrowElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMeshrowElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGMetadataElement
+EMITTED|companion|org.w3c.dom.svg.SVGMetadataElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGMetadataElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGNameList
+EMITTED|member|org.w3c.dom.svg.SVGNameList#fun appendItem(newItem: JsAny?): JsAny?
+EMITTED|member|org.w3c.dom.svg.SVGNameList#fun clear(): Unit
+EMITTED|operator|org.w3c.dom.svg.SVGNameList#fun get(index: Int): JsAny?
+EMITTED|member|org.w3c.dom.svg.SVGNameList#fun getItem(index: Int): JsAny?
+EMITTED|member|org.w3c.dom.svg.SVGNameList#fun initialize(newItem: JsAny?): JsAny?
+EMITTED|member|org.w3c.dom.svg.SVGNameList#fun insertItemBefore(newItem: JsAny?, index: Int): JsAny?
+EMITTED|member|org.w3c.dom.svg.SVGNameList#fun removeItem(index: Int): JsAny?
+EMITTED|member|org.w3c.dom.svg.SVGNameList#fun replaceItem(newItem: JsAny?, index: Int): JsAny?
+EMITTED|operator|org.w3c.dom.svg.SVGNameList#fun set(index: Int, newItem: JsAny?): Unit
+EMITTED|member|org.w3c.dom.svg.SVGNameList#val length: Int
+EMITTED|member|org.w3c.dom.svg.SVGNameList#val numberOfItems: Int
+EMITTED|classifier|org.w3c.dom.svg.SVGNumber
+EMITTED|member|org.w3c.dom.svg.SVGNumber#var value: Float
+EMITTED|classifier|org.w3c.dom.svg.SVGNumberList
+EMITTED|member|org.w3c.dom.svg.SVGNumberList#fun appendItem(newItem: SVGNumber): SVGNumber
+EMITTED|member|org.w3c.dom.svg.SVGNumberList#fun clear(): Unit
+EMITTED|operator|org.w3c.dom.svg.SVGNumberList#fun get(index: Int): SVGNumber?
+EMITTED|member|org.w3c.dom.svg.SVGNumberList#fun getItem(index: Int): SVGNumber
+EMITTED|member|org.w3c.dom.svg.SVGNumberList#fun initialize(newItem: SVGNumber): SVGNumber
+EMITTED|member|org.w3c.dom.svg.SVGNumberList#fun insertItemBefore(newItem: SVGNumber, index: Int): SVGNumber
+EMITTED|member|org.w3c.dom.svg.SVGNumberList#fun removeItem(index: Int): SVGNumber
+EMITTED|member|org.w3c.dom.svg.SVGNumberList#fun replaceItem(newItem: SVGNumber, index: Int): SVGNumber
+EMITTED|operator|org.w3c.dom.svg.SVGNumberList#fun set(index: Int, newItem: SVGNumber): Unit
+EMITTED|member|org.w3c.dom.svg.SVGNumberList#val length: Int
+EMITTED|member|org.w3c.dom.svg.SVGNumberList#val numberOfItems: Int
+EMITTED|classifier|org.w3c.dom.svg.SVGPathElement
+EMITTED|companion|org.w3c.dom.svg.SVGPathElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPathElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGPatternElement
+EMITTED|member|org.w3c.dom.svg.SVGPatternElement#val height: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGPatternElement#val patternContentUnits: SVGAnimatedEnumeration
+EMITTED|member|org.w3c.dom.svg.SVGPatternElement#val patternTransform: SVGAnimatedTransformList
+EMITTED|member|org.w3c.dom.svg.SVGPatternElement#val patternUnits: SVGAnimatedEnumeration
+EMITTED|member|org.w3c.dom.svg.SVGPatternElement#val width: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGPatternElement#val x: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGPatternElement#val y: SVGAnimatedLength
+EMITTED|companion|org.w3c.dom.svg.SVGPatternElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val SVG_UNIT_TYPE_OBJECTBOUNDINGBOX: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val SVG_UNIT_TYPE_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val SVG_UNIT_TYPE_USERSPACEONUSE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPatternElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGPointList
+EMITTED|member|org.w3c.dom.svg.SVGPointList#fun appendItem(newItem: DOMPoint): DOMPoint
+EMITTED|member|org.w3c.dom.svg.SVGPointList#fun clear(): Unit
+EMITTED|operator|org.w3c.dom.svg.SVGPointList#fun get(index: Int): DOMPoint?
+EMITTED|member|org.w3c.dom.svg.SVGPointList#fun getItem(index: Int): DOMPoint
+EMITTED|member|org.w3c.dom.svg.SVGPointList#fun initialize(newItem: DOMPoint): DOMPoint
+EMITTED|member|org.w3c.dom.svg.SVGPointList#fun insertItemBefore(newItem: DOMPoint, index: Int): DOMPoint
+EMITTED|member|org.w3c.dom.svg.SVGPointList#fun removeItem(index: Int): DOMPoint
+EMITTED|member|org.w3c.dom.svg.SVGPointList#fun replaceItem(newItem: DOMPoint, index: Int): DOMPoint
+EMITTED|operator|org.w3c.dom.svg.SVGPointList#fun set(index: Int, newItem: DOMPoint): Unit
+EMITTED|member|org.w3c.dom.svg.SVGPointList#val length: Int
+EMITTED|member|org.w3c.dom.svg.SVGPointList#val numberOfItems: Int
+EMITTED|classifier|org.w3c.dom.svg.SVGPolygonElement
+EMITTED|companion|org.w3c.dom.svg.SVGPolygonElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolygonElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGPolylineElement
+EMITTED|companion|org.w3c.dom.svg.SVGPolylineElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPolylineElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGPreserveAspectRatio
+EMITTED|member|org.w3c.dom.svg.SVGPreserveAspectRatio#var align: Short
+EMITTED|member|org.w3c.dom.svg.SVGPreserveAspectRatio#var meetOrSlice: Short
+EMITTED|companion|org.w3c.dom.svg.SVGPreserveAspectRatio.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGPreserveAspectRatio.Companion#val SVG_MEETORSLICE_MEET: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPreserveAspectRatio.Companion#val SVG_MEETORSLICE_SLICE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPreserveAspectRatio.Companion#val SVG_MEETORSLICE_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPreserveAspectRatio.Companion#val SVG_PRESERVEASPECTRATIO_NONE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPreserveAspectRatio.Companion#val SVG_PRESERVEASPECTRATIO_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPreserveAspectRatio.Companion#val SVG_PRESERVEASPECTRATIO_XMAXYMAX: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPreserveAspectRatio.Companion#val SVG_PRESERVEASPECTRATIO_XMAXYMID: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPreserveAspectRatio.Companion#val SVG_PRESERVEASPECTRATIO_XMAXYMIN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPreserveAspectRatio.Companion#val SVG_PRESERVEASPECTRATIO_XMIDYMAX: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPreserveAspectRatio.Companion#val SVG_PRESERVEASPECTRATIO_XMIDYMID: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPreserveAspectRatio.Companion#val SVG_PRESERVEASPECTRATIO_XMIDYMIN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPreserveAspectRatio.Companion#val SVG_PRESERVEASPECTRATIO_XMINYMAX: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPreserveAspectRatio.Companion#val SVG_PRESERVEASPECTRATIO_XMINYMID: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGPreserveAspectRatio.Companion#val SVG_PRESERVEASPECTRATIO_XMINYMIN: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGRadialGradientElement
+EMITTED|member|org.w3c.dom.svg.SVGRadialGradientElement#val cx: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGRadialGradientElement#val cy: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGRadialGradientElement#val fr: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGRadialGradientElement#val fx: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGRadialGradientElement#val fy: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGRadialGradientElement#val r: SVGAnimatedLength
+EMITTED|companion|org.w3c.dom.svg.SVGRadialGradientElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val SVG_SPREADMETHOD_PAD: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val SVG_SPREADMETHOD_REFLECT: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val SVG_SPREADMETHOD_REPEAT: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val SVG_SPREADMETHOD_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val SVG_UNIT_TYPE_OBJECTBOUNDINGBOX: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val SVG_UNIT_TYPE_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val SVG_UNIT_TYPE_USERSPACEONUSE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRadialGradientElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGRectElement
+EMITTED|member|org.w3c.dom.svg.SVGRectElement#val height: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGRectElement#val rx: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGRectElement#val ry: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGRectElement#val width: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGRectElement#val x: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGRectElement#val y: SVGAnimatedLength
+EMITTED|companion|org.w3c.dom.svg.SVGRectElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGRectElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGSVGElement
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun checkEnclosure(element: SVGElement, rect: DOMRectReadOnly): Boolean
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun checkIntersection(element: SVGElement, rect: DOMRectReadOnly): Boolean
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun createSVGAngle(): SVGAngle
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun createSVGLength(): SVGLength
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun createSVGMatrix(): DOMMatrix
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun createSVGNumber(): SVGNumber
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun createSVGPoint(): DOMPoint
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun createSVGRect(): DOMRect
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun createSVGTransform(): SVGTransform
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun createSVGTransformFromMatrix(matrix: DOMMatrixReadOnly): SVGTransform
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun deselectAll(): Unit
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun forceRedraw(): Unit
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun getElementById(elementId: String): Element
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun getEnclosureList(rect: DOMRectReadOnly, referenceElement: SVGElement?): NodeList
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun getIntersectionList(rect: DOMRectReadOnly, referenceElement: SVGElement?): NodeList
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun suspendRedraw(maxWaitMilliseconds: Int): Int
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun unsuspendRedraw(suspendHandleID: Int): Unit
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#fun unsuspendRedrawAll(): Unit
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#val currentTranslate: DOMPointReadOnly
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#val height: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#val width: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#val x: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#val y: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGSVGElement#var currentScale: Float
+EMITTED|companion|org.w3c.dom.svg.SVGSVGElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val SVG_ZOOMANDPAN_DISABLE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val SVG_ZOOMANDPAN_MAGNIFY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val SVG_ZOOMANDPAN_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSVGElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGScriptElement
+EMITTED|member|org.w3c.dom.svg.SVGScriptElement#var crossOrigin: String?
+EMITTED|member|org.w3c.dom.svg.SVGScriptElement#var type: String
+EMITTED|companion|org.w3c.dom.svg.SVGScriptElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGScriptElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGSolidcolorElement
+EMITTED|companion|org.w3c.dom.svg.SVGSolidcolorElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSolidcolorElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGStopElement
+EMITTED|member|org.w3c.dom.svg.SVGStopElement#val offset: SVGAnimatedNumber
+EMITTED|companion|org.w3c.dom.svg.SVGStopElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStopElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGStringList
+EMITTED|member|org.w3c.dom.svg.SVGStringList#fun appendItem(newItem: String): String
+EMITTED|member|org.w3c.dom.svg.SVGStringList#fun clear(): Unit
+EMITTED|operator|org.w3c.dom.svg.SVGStringList#fun get(index: Int): String?
+EMITTED|member|org.w3c.dom.svg.SVGStringList#fun getItem(index: Int): String
+EMITTED|member|org.w3c.dom.svg.SVGStringList#fun initialize(newItem: String): String
+EMITTED|member|org.w3c.dom.svg.SVGStringList#fun insertItemBefore(newItem: String, index: Int): String
+EMITTED|member|org.w3c.dom.svg.SVGStringList#fun removeItem(index: Int): String
+EMITTED|member|org.w3c.dom.svg.SVGStringList#fun replaceItem(newItem: String, index: Int): String
+EMITTED|operator|org.w3c.dom.svg.SVGStringList#fun set(index: Int, newItem: String): Unit
+EMITTED|member|org.w3c.dom.svg.SVGStringList#val length: Int
+EMITTED|member|org.w3c.dom.svg.SVGStringList#val numberOfItems: Int
+EMITTED|classifier|org.w3c.dom.svg.SVGStyleElement
+EMITTED|member|org.w3c.dom.svg.SVGStyleElement#var media: String
+EMITTED|member|org.w3c.dom.svg.SVGStyleElement#var title: String
+EMITTED|member|org.w3c.dom.svg.SVGStyleElement#var type: String
+EMITTED|companion|org.w3c.dom.svg.SVGStyleElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGStyleElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGSwitchElement
+EMITTED|companion|org.w3c.dom.svg.SVGSwitchElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSwitchElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGSymbolElement
+EMITTED|companion|org.w3c.dom.svg.SVGSymbolElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGSymbolElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGTSpanElement
+EMITTED|companion|org.w3c.dom.svg.SVGTSpanElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val LENGTHADJUST_SPACING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val LENGTHADJUST_SPACINGANDGLYPHS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val LENGTHADJUST_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTSpanElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGTests
+EMITTED|member|org.w3c.dom.svg.SVGTests#val requiredExtensions: SVGStringList
+EMITTED|member|org.w3c.dom.svg.SVGTests#val systemLanguage: SVGStringList
+EMITTED|classifier|org.w3c.dom.svg.SVGTextContentElement
+EMITTED|member|org.w3c.dom.svg.SVGTextContentElement#fun getCharNumAtPosition(point: DOMPoint): Int
+EMITTED|member|org.w3c.dom.svg.SVGTextContentElement#fun getComputedTextLength(): Float
+EMITTED|member|org.w3c.dom.svg.SVGTextContentElement#fun getEndPositionOfChar(charnum: Int): DOMPoint
+EMITTED|member|org.w3c.dom.svg.SVGTextContentElement#fun getExtentOfChar(charnum: Int): DOMRect
+EMITTED|member|org.w3c.dom.svg.SVGTextContentElement#fun getNumberOfChars(): Int
+EMITTED|member|org.w3c.dom.svg.SVGTextContentElement#fun getRotationOfChar(charnum: Int): Float
+EMITTED|member|org.w3c.dom.svg.SVGTextContentElement#fun getStartPositionOfChar(charnum: Int): DOMPoint
+EMITTED|member|org.w3c.dom.svg.SVGTextContentElement#fun getSubStringLength(charnum: Int, nchars: Int): Float
+EMITTED|member|org.w3c.dom.svg.SVGTextContentElement#fun selectSubString(charnum: Int, nchars: Int): Unit
+EMITTED|member|org.w3c.dom.svg.SVGTextContentElement#val lengthAdjust: SVGAnimatedEnumeration
+EMITTED|member|org.w3c.dom.svg.SVGTextContentElement#val textLength: SVGAnimatedLength
+EMITTED|companion|org.w3c.dom.svg.SVGTextContentElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val LENGTHADJUST_SPACING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val LENGTHADJUST_SPACINGANDGLYPHS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val LENGTHADJUST_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextContentElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGTextElement
+EMITTED|companion|org.w3c.dom.svg.SVGTextElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val LENGTHADJUST_SPACING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val LENGTHADJUST_SPACINGANDGLYPHS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val LENGTHADJUST_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGTextPathElement
+EMITTED|member|org.w3c.dom.svg.SVGTextPathElement#val method: SVGAnimatedEnumeration
+EMITTED|member|org.w3c.dom.svg.SVGTextPathElement#val spacing: SVGAnimatedEnumeration
+EMITTED|member|org.w3c.dom.svg.SVGTextPathElement#val startOffset: SVGAnimatedLength
+EMITTED|companion|org.w3c.dom.svg.SVGTextPathElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val LENGTHADJUST_SPACING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val LENGTHADJUST_SPACINGANDGLYPHS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val LENGTHADJUST_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val TEXTPATH_METHODTYPE_ALIGN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val TEXTPATH_METHODTYPE_STRETCH: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val TEXTPATH_METHODTYPE_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val TEXTPATH_SPACINGTYPE_AUTO: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val TEXTPATH_SPACINGTYPE_EXACT: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val TEXTPATH_SPACINGTYPE_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPathElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGTextPositioningElement
+EMITTED|member|org.w3c.dom.svg.SVGTextPositioningElement#val dx: SVGAnimatedLengthList
+EMITTED|member|org.w3c.dom.svg.SVGTextPositioningElement#val dy: SVGAnimatedLengthList
+EMITTED|member|org.w3c.dom.svg.SVGTextPositioningElement#val rotate: SVGAnimatedNumberList
+EMITTED|member|org.w3c.dom.svg.SVGTextPositioningElement#val x: SVGAnimatedLengthList
+EMITTED|member|org.w3c.dom.svg.SVGTextPositioningElement#val y: SVGAnimatedLengthList
+EMITTED|companion|org.w3c.dom.svg.SVGTextPositioningElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val LENGTHADJUST_SPACING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val LENGTHADJUST_SPACINGANDGLYPHS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val LENGTHADJUST_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTextPositioningElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGTitleElement
+EMITTED|companion|org.w3c.dom.svg.SVGTitleElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTitleElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGTransform
+EMITTED|member|org.w3c.dom.svg.SVGTransform#fun setMatrix(matrix: DOMMatrixReadOnly): Unit
+EMITTED|member|org.w3c.dom.svg.SVGTransform#fun setRotate(angle: Float, cx: Float, cy: Float): Unit
+EMITTED|member|org.w3c.dom.svg.SVGTransform#fun setScale(sx: Float, sy: Float): Unit
+EMITTED|member|org.w3c.dom.svg.SVGTransform#fun setSkewX(angle: Float): Unit
+EMITTED|member|org.w3c.dom.svg.SVGTransform#fun setSkewY(angle: Float): Unit
+EMITTED|member|org.w3c.dom.svg.SVGTransform#fun setTranslate(tx: Float, ty: Float): Unit
+EMITTED|member|org.w3c.dom.svg.SVGTransform#val angle: Float
+EMITTED|member|org.w3c.dom.svg.SVGTransform#val matrix: DOMMatrix
+EMITTED|member|org.w3c.dom.svg.SVGTransform#val type: Short
+EMITTED|companion|org.w3c.dom.svg.SVGTransform.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGTransform.Companion#val SVG_TRANSFORM_MATRIX: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTransform.Companion#val SVG_TRANSFORM_ROTATE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTransform.Companion#val SVG_TRANSFORM_SCALE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTransform.Companion#val SVG_TRANSFORM_SKEWX: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTransform.Companion#val SVG_TRANSFORM_SKEWY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTransform.Companion#val SVG_TRANSFORM_TRANSLATE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGTransform.Companion#val SVG_TRANSFORM_UNKNOWN: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGTransformList
+EMITTED|member|org.w3c.dom.svg.SVGTransformList#fun appendItem(newItem: SVGTransform): SVGTransform
+EMITTED|member|org.w3c.dom.svg.SVGTransformList#fun clear(): Unit
+EMITTED|member|org.w3c.dom.svg.SVGTransformList#fun consolidate(): SVGTransform?
+EMITTED|member|org.w3c.dom.svg.SVGTransformList#fun createSVGTransformFromMatrix(matrix: DOMMatrixReadOnly): SVGTransform
+EMITTED|operator|org.w3c.dom.svg.SVGTransformList#fun get(index: Int): SVGTransform?
+EMITTED|member|org.w3c.dom.svg.SVGTransformList#fun getItem(index: Int): SVGTransform
+EMITTED|member|org.w3c.dom.svg.SVGTransformList#fun initialize(newItem: SVGTransform): SVGTransform
+EMITTED|member|org.w3c.dom.svg.SVGTransformList#fun insertItemBefore(newItem: SVGTransform, index: Int): SVGTransform
+EMITTED|member|org.w3c.dom.svg.SVGTransformList#fun removeItem(index: Int): SVGTransform
+EMITTED|member|org.w3c.dom.svg.SVGTransformList#fun replaceItem(newItem: SVGTransform, index: Int): SVGTransform
+EMITTED|operator|org.w3c.dom.svg.SVGTransformList#fun set(index: Int, newItem: SVGTransform): Unit
+EMITTED|member|org.w3c.dom.svg.SVGTransformList#val length: Int
+EMITTED|member|org.w3c.dom.svg.SVGTransformList#val numberOfItems: Int
+EMITTED|classifier|org.w3c.dom.svg.SVGURIReference
+EMITTED|member|org.w3c.dom.svg.SVGURIReference#val href: SVGAnimatedString
+EMITTED|classifier|org.w3c.dom.svg.SVGUnitTypes
+EMITTED|companion|org.w3c.dom.svg.SVGUnitTypes.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnitTypes.Companion#val SVG_UNIT_TYPE_OBJECTBOUNDINGBOX: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnitTypes.Companion#val SVG_UNIT_TYPE_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnitTypes.Companion#val SVG_UNIT_TYPE_USERSPACEONUSE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGUnknownElement
+EMITTED|companion|org.w3c.dom.svg.SVGUnknownElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUnknownElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGUseElement
+EMITTED|member|org.w3c.dom.svg.SVGUseElement#val animatedInstanceRoot: SVGElement?
+EMITTED|member|org.w3c.dom.svg.SVGUseElement#val height: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGUseElement#val instanceRoot: SVGElement?
+EMITTED|member|org.w3c.dom.svg.SVGUseElement#val width: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGUseElement#val x: SVGAnimatedLength
+EMITTED|member|org.w3c.dom.svg.SVGUseElement#val y: SVGAnimatedLength
+EMITTED|companion|org.w3c.dom.svg.SVGUseElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGUseElementShadowRoot
+EMITTED|companion|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGUseElementShadowRoot.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGViewElement
+EMITTED|companion|org.w3c.dom.svg.SVGViewElement.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val ATTRIBUTE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val CDATA_SECTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val COMMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val DOCUMENT_FRAGMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val DOCUMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val DOCUMENT_POSITION_CONTAINED_BY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val DOCUMENT_POSITION_CONTAINS: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val DOCUMENT_POSITION_DISCONNECTED: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val DOCUMENT_POSITION_FOLLOWING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val DOCUMENT_POSITION_PRECEDING: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val DOCUMENT_TYPE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val ELEMENT_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val ENTITY_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val ENTITY_REFERENCE_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val NOTATION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val PROCESSING_INSTRUCTION_NODE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val SVG_ZOOMANDPAN_DISABLE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val SVG_ZOOMANDPAN_MAGNIFY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val SVG_ZOOMANDPAN_UNKNOWN: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGViewElement.Companion#val TEXT_NODE: Short
+EMITTED|classifier|org.w3c.dom.svg.SVGZoomAndPan
+EMITTED|member|org.w3c.dom.svg.SVGZoomAndPan#var zoomAndPan: Short
+EMITTED|companion|org.w3c.dom.svg.SVGZoomAndPan.Companion
+EMITTED|companion-member|org.w3c.dom.svg.SVGZoomAndPan.Companion#val SVG_ZOOMANDPAN_DISABLE: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGZoomAndPan.Companion#val SVG_ZOOMANDPAN_MAGNIFY: Short
+EMITTED|companion-member|org.w3c.dom.svg.SVGZoomAndPan.Companion#val SVG_ZOOMANDPAN_UNKNOWN: Short
+EMITTED|classifier|org.w3c.dom.svg.ShadowAnimation
+EMITTED|constructor|org.w3c.dom.svg.ShadowAnimation#constructor(source: JsAny?, newTarget: JsAny?)
+EMITTED|member|org.w3c.dom.svg.ShadowAnimation#val sourceAnimation: JsAny?

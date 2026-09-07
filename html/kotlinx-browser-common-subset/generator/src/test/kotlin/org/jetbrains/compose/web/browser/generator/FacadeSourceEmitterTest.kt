@@ -11,6 +11,7 @@ import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFile
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.UNIT
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.OutputStream
@@ -59,6 +60,53 @@ class FacadeSourceEmitterTest {
         assertFalse(generator.paths.any { ".webMain." in it }, generator.paths.joinToString())
         assertFalse(generator.paths.any { ".jsTest." in it || ".wasmJsTest." in it }, generator.paths.joinToString())
         assertFalse(generator.paths.any { ".webTest." in it }, generator.paths.joinToString())
+    }
+
+    @Test
+    fun browserAliasesInheritCompatibilitySuppressionsFromPortableParents() {
+        val parent = PortableClass(
+            browserName = ClassName(DOM_SVG_PACKAGE, "SVGElement"),
+            parentBrowserName = null,
+            superinterfaces = emptyList(),
+            ancestors = emptyList(),
+            shape = ClassShape.ABSTRACT,
+            isDictionary = false,
+            isJsAny = true,
+            properties = emptyList(),
+            functions = listOf(
+                PortableFunction(
+                    name = "scroll",
+                    parameters = listOf(
+                        PortableParameter(
+                            name = "options",
+                            type = ClassName(PORTABLE_DOM_PACKAGE, "ScrollToOptions"),
+                            isVararg = false,
+                            hasDefault = true,
+                        ),
+                    ),
+                    returnType = UNIT,
+                    open = true,
+                    abstractInBrowser = false,
+                ),
+            ),
+            constructors = emptyList(),
+            companion = null,
+            factory = null,
+            sourceFile = null,
+        )
+        val child = parent.copy(
+            browserName = ClassName(CSS_MASKING_PACKAGE, "SVGMaskElement"),
+            parentBrowserName = parent.browserName,
+            ancestors = listOf(parent.portableName),
+            functions = emptyList(),
+        )
+        val mapping = PortablePackageMapping(PORTABLE_CSS_MASKING_PACKAGE, "PortableMasking", "MaskingDictionaries")
+        val classes = listOf(parent, child).associateBy(PortableClass::portableName)
+
+        val web = browserLeafDeclarationsFile(mapping, listOf(child), emptyList(), classes).toString()
+
+        assertContains(web, DEFAULT_ARGUMENTS_SUPPRESSION)
+        assertContains(web, CLASS_SCOPE_SUPPRESSION)
     }
 }
 

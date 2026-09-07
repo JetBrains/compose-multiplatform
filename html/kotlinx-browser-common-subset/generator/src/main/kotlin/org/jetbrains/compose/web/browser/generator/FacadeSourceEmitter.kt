@@ -44,6 +44,7 @@ internal class FacadeSourceEmitter(private val codeGenerator: CodeGenerator) {
         packages: List<FacadePackageModel>,
         model: List<PortableClass>,
     ) {
+        val classesByPortableName = model.associateBy(PortableClass::portableName)
         val commonFiles = packages.flatMap { p ->
             listOfNotNull(
                 commonDeclarationsFile(p.mapping, p.declarations, p.extensions),
@@ -59,8 +60,9 @@ internal class FacadeSourceEmitter(private val codeGenerator: CodeGenerator) {
                     p.mapping,
                     p.declarations,
                     p.extensions.filterNot(PortableExtensionFunction::usesInterop),
+                    classesByPortableName,
                 ),
-                p.dictionaries.ifAny { browserLeafDictionariesFile(p.mapping, it) },
+                p.dictionaries.ifAny { browserLeafDictionariesFile(p.mapping, it, classesByPortableName) },
             )
         }
         val targetFiles = packages.flatMap { p ->

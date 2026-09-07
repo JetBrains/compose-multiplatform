@@ -86,56 +86,6 @@ import kotlinx.browser.workers.UnionClientOrMessagePortOrServiceWorker
 import kotlinx.browser.workers.UnionMessagePortOrServiceWorker
 import kotlinx.browser.xhr.ProgressEvent
 
-public actual interface AbstractWorker : JsAny {
-  public actual var onerror: ((Event) -> Unit)?
-    get() = null
-    set(`value`) {
-    }
-}
-
-public actual abstract class ApplicationCache : EventTarget(), JsAny {
-  public actual open val status: Short = 0
-
-  public actual open var onchecking: ((Event) -> Unit)? = null
-
-  public actual open var onerror: ((Event) -> Unit)? = null
-
-  public actual open var onnoupdate: ((Event) -> Unit)? = null
-
-  public actual open var ondownloading: ((Event) -> Unit)? = null
-
-  public actual open var onprogress: ((ProgressEvent) -> Unit)? = null
-
-  public actual open var onupdateready: ((Event) -> Unit)? = null
-
-  public actual open var oncached: ((Event) -> Unit)? = null
-
-  public actual open var onobsolete: ((Event) -> Unit)? = null
-
-  public actual fun update() {
-  }
-
-  public actual fun abort() {
-  }
-
-  public actual fun swapCache() {
-  }
-
-  public actual companion object {
-    public actual val UNCACHED: Short = 61
-
-    public actual val IDLE: Short = 36
-
-    public actual val CHECKING: Short = 6
-
-    public actual val DOWNLOADING: Short = 20
-
-    public actual val UPDATEREADY: Short = 62
-
-    public actual val OBSOLETE: Short = 53
-  }
-}
-
 public actual abstract class Node : EventTarget(), JsAny {
   public actual open val nodeType: Short = 0
 
@@ -201,7 +151,7 @@ public actual abstract class Node : EventTarget(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -209,7 +159,7 @@ public actual abstract class Node : EventTarget(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -219,61 +169,7 @@ public actual abstract class Node : EventTarget(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
-
-    public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
-
-    public actual val DOCUMENT_POSITION_PRECEDING: Short = 18
-
-    public actual val DOCUMENT_POSITION_FOLLOWING: Short = 16
-
-    public actual val DOCUMENT_POSITION_CONTAINS: Short = 14
-
-    public actual val DOCUMENT_POSITION_CONTAINED_BY: Short = 13
-
-    public actual val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short = 17
-  }
-}
-
-public actual abstract class Attr : Node(), JsAny {
-  public actual open val namespaceURI: String? = null
-
-  public actual open val prefix: String? = null
-
-  public actual open val localName: String = ""
-
-  public actual open val name: String = ""
-
-  public actual open var `value`: String = ""
-
-  public actual open val ownerElement: Element? = null
-
-  public actual open val specified: Boolean = false
-
-  public actual companion object {
-    public actual val ELEMENT_NODE: Short = 21
-
-    public actual val ATTRIBUTE_NODE: Short = 0
-
-    public actual val TEXT_NODE: Short = 60
-
-    public actual val CDATA_SECTION_NODE: Short = 4
-
-    public actual val ENTITY_REFERENCE_NODE: Short = 25
-
-    public actual val ENTITY_NODE: Short = 24
-
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
-
-    public actual val COMMENT_NODE: Short = 9
-
-    public actual val DOCUMENT_NODE: Short = 12
-
-    public actual val DOCUMENT_TYPE_NODE: Short = 19
-
-    public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
-
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -662,7 +558,7 @@ public actual abstract class Element : Node(), ParentNode, NonDocumentTypeChildN
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -670,7 +566,7 @@ public actual abstract class Element : Node(), ParentNode, NonDocumentTypeChildN
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -680,7 +576,7 @@ public actual abstract class Element : Node(), ParentNode, NonDocumentTypeChildN
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -1059,6 +955,110 @@ public actual interface GlobalEventHandlers : JsAny {
     }
 }
 
+public actual interface AbstractWorker : JsAny {
+  public actual var onerror: ((Event) -> Unit)?
+    get() = null
+    set(`value`) {
+    }
+}
+
+public actual abstract class ApplicationCache : EventTarget(), JsAny {
+  public actual open val status: Short = 0
+
+  public actual open var onchecking: ((Event) -> Unit)? = null
+
+  public actual open var onerror: ((Event) -> Unit)? = null
+
+  public actual open var onnoupdate: ((Event) -> Unit)? = null
+
+  public actual open var ondownloading: ((Event) -> Unit)? = null
+
+  public actual open var onprogress: ((ProgressEvent) -> Unit)? = null
+
+  public actual open var onupdateready: ((Event) -> Unit)? = null
+
+  public actual open var oncached: ((Event) -> Unit)? = null
+
+  public actual open var onobsolete: ((Event) -> Unit)? = null
+
+  public actual fun update() {
+  }
+
+  public actual fun abort() {
+  }
+
+  public actual fun swapCache() {
+  }
+
+  public actual companion object {
+    public actual val UNCACHED: Short = 123
+
+    public actual val IDLE: Short = 36
+
+    public actual val CHECKING: Short = 6
+
+    public actual val DOWNLOADING: Short = 20
+
+    public actual val UPDATEREADY: Short = 124
+
+    public actual val OBSOLETE: Short = 56
+  }
+}
+
+public actual abstract class Attr : Node(), JsAny {
+  public actual open val namespaceURI: String? = null
+
+  public actual open val prefix: String? = null
+
+  public actual open val localName: String = ""
+
+  public actual open val name: String = ""
+
+  public actual open var `value`: String = ""
+
+  public actual open val ownerElement: Element? = null
+
+  public actual open val specified: Boolean = false
+
+  public actual companion object {
+    public actual val ELEMENT_NODE: Short = 21
+
+    public actual val ATTRIBUTE_NODE: Short = 0
+
+    public actual val TEXT_NODE: Short = 122
+
+    public actual val CDATA_SECTION_NODE: Short = 4
+
+    public actual val ENTITY_REFERENCE_NODE: Short = 25
+
+    public actual val ENTITY_NODE: Short = 24
+
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
+
+    public actual val COMMENT_NODE: Short = 9
+
+    public actual val DOCUMENT_NODE: Short = 12
+
+    public actual val DOCUMENT_TYPE_NODE: Short = 19
+
+    public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
+
+    public actual val NOTATION_NODE: Short = 55
+
+    public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
+
+    public actual val DOCUMENT_POSITION_PRECEDING: Short = 18
+
+    public actual val DOCUMENT_POSITION_FOLLOWING: Short = 16
+
+    public actual val DOCUMENT_POSITION_CONTAINS: Short = 14
+
+    public actual val DOCUMENT_POSITION_CONTAINED_BY: Short = 13
+
+    public actual val DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: Short = 17
+  }
+}
+
 public actual interface DocumentAndElementEventHandlers : JsAny {
   public actual var oncopy: ((ClipboardEvent) -> Unit)?
     get() = null
@@ -1299,7 +1299,7 @@ public actual abstract class HTMLElement : Element(), GlobalEventHandlers,
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -1307,7 +1307,7 @@ public actual abstract class HTMLElement : Element(), GlobalEventHandlers,
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -1317,7 +1317,7 @@ public actual abstract class HTMLElement : Element(), GlobalEventHandlers,
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -1418,13 +1418,13 @@ public actual abstract class HTMLMediaElement : HTMLElement(), JsAny {
   public actual fun setMediaKeys(mediaKeys: MediaKeys?): Promise<*> = Promise<Nothing?>()
 
   public actual companion object {
-    public actual val NETWORK_EMPTY: Short = 47
+    public actual val NETWORK_EMPTY: Short = 50
 
-    public actual val NETWORK_IDLE: Short = 48
+    public actual val NETWORK_IDLE: Short = 51
 
-    public actual val NETWORK_LOADING: Short = 49
+    public actual val NETWORK_LOADING: Short = 52
 
-    public actual val NETWORK_NO_SOURCE: Short = 50
+    public actual val NETWORK_NO_SOURCE: Short = 53
 
     public actual val HAVE_NOTHING: Short = 35
 
@@ -1440,7 +1440,7 @@ public actual abstract class HTMLMediaElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -1448,7 +1448,7 @@ public actual abstract class HTMLMediaElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -1458,7 +1458,7 @@ public actual abstract class HTMLMediaElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -1476,13 +1476,13 @@ public actual abstract class HTMLMediaElement : HTMLElement(), JsAny {
 
 public actual abstract class HTMLAudioElement : HTMLMediaElement(), JsAny {
   public actual companion object {
-    public actual val NETWORK_EMPTY: Short = 47
+    public actual val NETWORK_EMPTY: Short = 50
 
-    public actual val NETWORK_IDLE: Short = 48
+    public actual val NETWORK_IDLE: Short = 51
 
-    public actual val NETWORK_LOADING: Short = 49
+    public actual val NETWORK_LOADING: Short = 52
 
-    public actual val NETWORK_NO_SOURCE: Short = 50
+    public actual val NETWORK_NO_SOURCE: Short = 53
 
     public actual val HAVE_NOTHING: Short = 35
 
@@ -1498,7 +1498,7 @@ public actual abstract class HTMLAudioElement : HTMLMediaElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -1506,7 +1506,7 @@ public actual abstract class HTMLAudioElement : HTMLMediaElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -1516,7 +1516,7 @@ public actual abstract class HTMLAudioElement : HTMLMediaElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -1807,13 +1807,13 @@ public actual open class Audio actual constructor(
   ): DOMPoint = DOMPoint()
 
   public actual companion object {
-    public actual val NETWORK_EMPTY: Short = 47
+    public actual val NETWORK_EMPTY: Short = 50
 
-    public actual val NETWORK_IDLE: Short = 48
+    public actual val NETWORK_IDLE: Short = 51
 
-    public actual val NETWORK_LOADING: Short = 49
+    public actual val NETWORK_LOADING: Short = 52
 
-    public actual val NETWORK_NO_SOURCE: Short = 50
+    public actual val NETWORK_NO_SOURCE: Short = 53
 
     public actual val HAVE_NOTHING: Short = 35
 
@@ -1829,7 +1829,7 @@ public actual open class Audio actual constructor(
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -1837,7 +1837,7 @@ public actual open class Audio actual constructor(
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -1847,7 +1847,7 @@ public actual open class Audio actual constructor(
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -1899,7 +1899,7 @@ public actual open class BeforeUnloadEvent : Event(), JsAny {
   public actual var returnValue: String = ""
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -1986,7 +1986,7 @@ public actual abstract class CharacterData : Node(), NonDocumentTypeChildNode, C
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -1994,7 +1994,7 @@ public actual abstract class CharacterData : Node(), NonDocumentTypeChildNode, C
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -2004,7 +2004,7 @@ public actual abstract class CharacterData : Node(), NonDocumentTypeChildNode, C
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -2121,7 +2121,7 @@ public actual open class Text actual constructor(
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -2129,7 +2129,7 @@ public actual open class Text actual constructor(
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -2139,7 +2139,7 @@ public actual open class Text actual constructor(
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -2161,7 +2161,7 @@ public actual open class CDATASection : Text(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -2169,7 +2169,7 @@ public actual open class CDATASection : Text(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -2179,7 +2179,7 @@ public actual open class CDATASection : Text(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -2963,7 +2963,7 @@ public actual open class CloseEvent actual constructor(
   protected constructor() : this("", CloseEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -3014,7 +3014,7 @@ public actual open class Comment actual constructor(
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -3022,7 +3022,7 @@ public actual open class Comment actual constructor(
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -3032,7 +3032,7 @@ public actual open class Comment actual constructor(
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -3082,7 +3082,7 @@ public actual open class CustomEvent actual constructor(
   }
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -4091,7 +4091,7 @@ public actual open class Document : Node(), GlobalEventHandlers, DocumentAndElem
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -4099,7 +4099,7 @@ public actual open class Document : Node(), GlobalEventHandlers, DocumentAndElem
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -4109,7 +4109,7 @@ public actual open class Document : Node(), GlobalEventHandlers, DocumentAndElem
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -4157,7 +4157,7 @@ public actual open class DocumentFragment : Node(), NonElementParentNode, Parent
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -4165,7 +4165,7 @@ public actual open class DocumentFragment : Node(), NonElementParentNode, Parent
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -4175,7 +4175,7 @@ public actual open class DocumentFragment : Node(), NonElementParentNode, Parent
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -4228,7 +4228,7 @@ public actual abstract class DocumentType : Node(), ChildNode, JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -4236,7 +4236,7 @@ public actual abstract class DocumentType : Node(), ChildNode, JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -4246,7 +4246,7 @@ public actual abstract class DocumentType : Node(), ChildNode, JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -4275,7 +4275,7 @@ public actual open class DragEvent actual constructor(
   protected constructor() : this("", DragEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -4306,7 +4306,7 @@ public actual open class ErrorEvent actual constructor(
   protected constructor() : this("", ErrorEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -4344,7 +4344,7 @@ public actual open class EventSource actual constructor(
   public actual companion object {
     public actual val CONNECTING: Short = 10
 
-    public actual val OPEN: Short = 54
+    public actual val OPEN: Short = 57
 
     public actual val CLOSED: Short = 7
   }
@@ -4444,7 +4444,7 @@ public actual abstract class HTMLAnchorElement : HTMLElement(), HTMLHyperlinkEle
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -4452,7 +4452,7 @@ public actual abstract class HTMLAnchorElement : HTMLElement(), HTMLHyperlinkEle
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -4462,7 +4462,7 @@ public actual abstract class HTMLAnchorElement : HTMLElement(), HTMLHyperlinkEle
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -4506,7 +4506,7 @@ public actual abstract class HTMLAppletElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -4514,7 +4514,7 @@ public actual abstract class HTMLAppletElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -4524,7 +4524,7 @@ public actual abstract class HTMLAppletElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -4588,7 +4588,7 @@ public actual abstract class HTMLAreaElement : HTMLElement(), HTMLHyperlinkEleme
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -4596,7 +4596,7 @@ public actual abstract class HTMLAreaElement : HTMLElement(), HTMLHyperlinkEleme
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -4606,7 +4606,7 @@ public actual abstract class HTMLAreaElement : HTMLElement(), HTMLHyperlinkEleme
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -4630,7 +4630,7 @@ public actual abstract class HTMLBRElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -4638,7 +4638,7 @@ public actual abstract class HTMLBRElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -4648,7 +4648,7 @@ public actual abstract class HTMLBRElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -4674,7 +4674,7 @@ public actual abstract class HTMLBaseElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -4682,7 +4682,7 @@ public actual abstract class HTMLBaseElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -4692,7 +4692,7 @@ public actual abstract class HTMLBaseElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -4833,7 +4833,7 @@ public actual abstract class HTMLBodyElement : HTMLElement(), WindowEventHandler
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -4841,7 +4841,7 @@ public actual abstract class HTMLBodyElement : HTMLElement(), WindowEventHandler
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -4851,7 +4851,7 @@ public actual abstract class HTMLBodyElement : HTMLElement(), WindowEventHandler
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -4912,7 +4912,7 @@ public actual abstract class HTMLButtonElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -4920,7 +4920,7 @@ public actual abstract class HTMLButtonElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -4930,7 +4930,7 @@ public actual abstract class HTMLButtonElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -4968,7 +4968,7 @@ public actual abstract class HTMLCanvasElement : HTMLElement(), CanvasImageSourc
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -4976,7 +4976,7 @@ public actual abstract class HTMLCanvasElement : HTMLElement(), CanvasImageSourc
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -4986,7 +4986,7 @@ public actual abstract class HTMLCanvasElement : HTMLElement(), CanvasImageSourc
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5019,7 +5019,7 @@ public actual abstract class HTMLDListElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5027,7 +5027,7 @@ public actual abstract class HTMLDListElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5037,7 +5037,7 @@ public actual abstract class HTMLDListElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5061,7 +5061,7 @@ public actual abstract class HTMLDataElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5069,7 +5069,7 @@ public actual abstract class HTMLDataElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5079,7 +5079,7 @@ public actual abstract class HTMLDataElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5103,7 +5103,7 @@ public actual abstract class HTMLDataListElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5111,7 +5111,7 @@ public actual abstract class HTMLDataListElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5121,7 +5121,7 @@ public actual abstract class HTMLDataListElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5145,7 +5145,7 @@ public actual abstract class HTMLDetailsElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5153,7 +5153,7 @@ public actual abstract class HTMLDetailsElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5163,7 +5163,7 @@ public actual abstract class HTMLDetailsElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5198,7 +5198,7 @@ public actual abstract class HTMLDialogElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5206,7 +5206,7 @@ public actual abstract class HTMLDialogElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5216,7 +5216,7 @@ public actual abstract class HTMLDialogElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5240,7 +5240,7 @@ public actual abstract class HTMLDirectoryElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5248,7 +5248,7 @@ public actual abstract class HTMLDirectoryElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5258,7 +5258,7 @@ public actual abstract class HTMLDirectoryElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5282,7 +5282,7 @@ public actual abstract class HTMLDivElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5290,7 +5290,7 @@ public actual abstract class HTMLDivElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5300,7 +5300,7 @@ public actual abstract class HTMLDivElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5336,7 +5336,7 @@ public actual abstract class HTMLEmbedElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5344,7 +5344,7 @@ public actual abstract class HTMLEmbedElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5354,7 +5354,7 @@ public actual abstract class HTMLEmbedElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5399,7 +5399,7 @@ public actual abstract class HTMLFieldSetElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5407,7 +5407,7 @@ public actual abstract class HTMLFieldSetElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5417,7 +5417,7 @@ public actual abstract class HTMLFieldSetElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5445,7 +5445,7 @@ public actual abstract class HTMLFontElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5453,7 +5453,7 @@ public actual abstract class HTMLFontElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5463,7 +5463,7 @@ public actual abstract class HTMLFontElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5519,7 +5519,7 @@ public actual abstract class HTMLFormElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5527,7 +5527,7 @@ public actual abstract class HTMLFormElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5537,7 +5537,7 @@ public actual abstract class HTMLFormElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5579,7 +5579,7 @@ public actual abstract class HTMLFrameElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5587,7 +5587,7 @@ public actual abstract class HTMLFrameElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5597,7 +5597,7 @@ public actual abstract class HTMLFrameElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5653,7 +5653,7 @@ public actual abstract class HTMLFrameSetElement : HTMLElement(), WindowEventHan
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5661,7 +5661,7 @@ public actual abstract class HTMLFrameSetElement : HTMLElement(), WindowEventHan
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5671,7 +5671,7 @@ public actual abstract class HTMLFrameSetElement : HTMLElement(), WindowEventHan
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5703,7 +5703,7 @@ public actual abstract class HTMLHRElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5711,7 +5711,7 @@ public actual abstract class HTMLHRElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5721,7 +5721,7 @@ public actual abstract class HTMLHRElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5743,7 +5743,7 @@ public actual abstract class HTMLHeadElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5751,7 +5751,7 @@ public actual abstract class HTMLHeadElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5761,7 +5761,7 @@ public actual abstract class HTMLHeadElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5785,7 +5785,7 @@ public actual abstract class HTMLHeadingElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5793,7 +5793,7 @@ public actual abstract class HTMLHeadingElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5803,7 +5803,7 @@ public actual abstract class HTMLHeadingElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5827,7 +5827,7 @@ public actual abstract class HTMLHtmlElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5835,7 +5835,7 @@ public actual abstract class HTMLHtmlElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5845,7 +5845,7 @@ public actual abstract class HTMLHtmlElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5903,7 +5903,7 @@ public actual abstract class HTMLIFrameElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -5911,7 +5911,7 @@ public actual abstract class HTMLIFrameElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -5921,7 +5921,7 @@ public actual abstract class HTMLIFrameElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -5992,7 +5992,7 @@ public actual abstract class HTMLImageElement : HTMLElement(), HTMLOrSVGImageEle
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6000,7 +6000,7 @@ public actual abstract class HTMLImageElement : HTMLElement(), HTMLOrSVGImageEle
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6010,7 +6010,7 @@ public actual abstract class HTMLImageElement : HTMLElement(), HTMLOrSVGImageEle
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6160,7 +6160,7 @@ public actual abstract class HTMLInputElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6168,7 +6168,7 @@ public actual abstract class HTMLInputElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6178,7 +6178,7 @@ public actual abstract class HTMLInputElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6229,7 +6229,7 @@ public actual abstract class HTMLKeygenElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6237,7 +6237,7 @@ public actual abstract class HTMLKeygenElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6247,7 +6247,7 @@ public actual abstract class HTMLKeygenElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6273,7 +6273,7 @@ public actual abstract class HTMLLIElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6281,7 +6281,7 @@ public actual abstract class HTMLLIElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6291,7 +6291,7 @@ public actual abstract class HTMLLIElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6319,7 +6319,7 @@ public actual abstract class HTMLLabelElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6327,7 +6327,7 @@ public actual abstract class HTMLLabelElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6337,7 +6337,7 @@ public actual abstract class HTMLLabelElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6363,7 +6363,7 @@ public actual abstract class HTMLLegendElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6371,7 +6371,7 @@ public actual abstract class HTMLLegendElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6381,7 +6381,7 @@ public actual abstract class HTMLLegendElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6437,7 +6437,7 @@ public actual abstract class HTMLLinkElement : HTMLElement(), LinkStyle, JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6445,7 +6445,7 @@ public actual abstract class HTMLLinkElement : HTMLElement(), LinkStyle, JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6455,7 +6455,7 @@ public actual abstract class HTMLLinkElement : HTMLElement(), LinkStyle, JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6481,7 +6481,7 @@ public actual abstract class HTMLMapElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6489,7 +6489,7 @@ public actual abstract class HTMLMapElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6499,7 +6499,7 @@ public actual abstract class HTMLMapElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6555,7 +6555,7 @@ public actual abstract class HTMLMarqueeElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6563,7 +6563,7 @@ public actual abstract class HTMLMarqueeElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6573,7 +6573,7 @@ public actual abstract class HTMLMarqueeElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6601,7 +6601,7 @@ public actual abstract class HTMLMenuElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6609,7 +6609,7 @@ public actual abstract class HTMLMenuElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6619,7 +6619,7 @@ public actual abstract class HTMLMenuElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6655,7 +6655,7 @@ public actual abstract class HTMLMenuItemElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6663,7 +6663,7 @@ public actual abstract class HTMLMenuItemElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6673,7 +6673,7 @@ public actual abstract class HTMLMenuItemElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6703,7 +6703,7 @@ public actual abstract class HTMLMetaElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6711,7 +6711,7 @@ public actual abstract class HTMLMetaElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6721,7 +6721,7 @@ public actual abstract class HTMLMetaElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6757,7 +6757,7 @@ public actual abstract class HTMLMeterElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6765,7 +6765,7 @@ public actual abstract class HTMLMeterElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6775,7 +6775,7 @@ public actual abstract class HTMLMeterElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6801,7 +6801,7 @@ public actual abstract class HTMLModElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6809,7 +6809,7 @@ public actual abstract class HTMLModElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6819,7 +6819,7 @@ public actual abstract class HTMLModElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6849,7 +6849,7 @@ public actual abstract class HTMLOListElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6857,7 +6857,7 @@ public actual abstract class HTMLOListElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6867,7 +6867,7 @@ public actual abstract class HTMLOListElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6944,7 +6944,7 @@ public actual abstract class HTMLObjectElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6952,7 +6952,7 @@ public actual abstract class HTMLObjectElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -6962,7 +6962,7 @@ public actual abstract class HTMLObjectElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -6991,7 +6991,7 @@ public actual abstract class HTMLOptGroupElement : HTMLElement(),
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -6999,7 +6999,7 @@ public actual abstract class HTMLOptGroupElement : HTMLElement(),
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7009,7 +7009,7 @@ public actual abstract class HTMLOptGroupElement : HTMLElement(),
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7048,7 +7048,7 @@ public actual abstract class HTMLOptionElement : HTMLElement(),
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7056,7 +7056,7 @@ public actual abstract class HTMLOptionElement : HTMLElement(),
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7066,7 +7066,7 @@ public actual abstract class HTMLOptionElement : HTMLElement(),
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7135,7 +7135,7 @@ public actual abstract class HTMLOutputElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7143,7 +7143,7 @@ public actual abstract class HTMLOutputElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7153,7 +7153,7 @@ public actual abstract class HTMLOutputElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7177,7 +7177,7 @@ public actual abstract class HTMLParagraphElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7185,7 +7185,7 @@ public actual abstract class HTMLParagraphElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7195,7 +7195,7 @@ public actual abstract class HTMLParagraphElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7225,7 +7225,7 @@ public actual abstract class HTMLParamElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7233,7 +7233,7 @@ public actual abstract class HTMLParamElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7243,7 +7243,7 @@ public actual abstract class HTMLParamElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7265,7 +7265,7 @@ public actual abstract class HTMLPictureElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7273,7 +7273,7 @@ public actual abstract class HTMLPictureElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7283,7 +7283,7 @@ public actual abstract class HTMLPictureElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7307,7 +7307,7 @@ public actual abstract class HTMLPreElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7315,7 +7315,7 @@ public actual abstract class HTMLPreElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7325,7 +7325,7 @@ public actual abstract class HTMLPreElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7355,7 +7355,7 @@ public actual abstract class HTMLProgressElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7363,7 +7363,7 @@ public actual abstract class HTMLProgressElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7373,7 +7373,7 @@ public actual abstract class HTMLProgressElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7397,7 +7397,7 @@ public actual abstract class HTMLQuoteElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7405,7 +7405,7 @@ public actual abstract class HTMLQuoteElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7415,7 +7415,7 @@ public actual abstract class HTMLQuoteElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7457,7 +7457,7 @@ public actual abstract class HTMLScriptElement : HTMLElement(), HTMLOrSVGScriptE
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7465,7 +7465,7 @@ public actual abstract class HTMLScriptElement : HTMLElement(), HTMLOrSVGScriptE
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7475,7 +7475,7 @@ public actual abstract class HTMLScriptElement : HTMLElement(), HTMLOrSVGScriptE
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7556,7 +7556,7 @@ public actual abstract class HTMLSelectElement : HTMLElement(), ItemArrayLike<El
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7564,7 +7564,7 @@ public actual abstract class HTMLSelectElement : HTMLElement(), ItemArrayLike<El
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7574,7 +7574,7 @@ public actual abstract class HTMLSelectElement : HTMLElement(), ItemArrayLike<El
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7600,7 +7600,7 @@ public actual abstract class HTMLSlotElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7608,7 +7608,7 @@ public actual abstract class HTMLSlotElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7618,7 +7618,7 @@ public actual abstract class HTMLSlotElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7650,7 +7650,7 @@ public actual abstract class HTMLSourceElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7658,7 +7658,7 @@ public actual abstract class HTMLSourceElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7668,7 +7668,7 @@ public actual abstract class HTMLSourceElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7690,7 +7690,7 @@ public actual abstract class HTMLSpanElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7698,7 +7698,7 @@ public actual abstract class HTMLSpanElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7708,7 +7708,7 @@ public actual abstract class HTMLSpanElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7738,7 +7738,7 @@ public actual abstract class HTMLStyleElement : HTMLElement(), LinkStyle, JsAny 
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7746,7 +7746,7 @@ public actual abstract class HTMLStyleElement : HTMLElement(), LinkStyle, JsAny 
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7756,7 +7756,7 @@ public actual abstract class HTMLStyleElement : HTMLElement(), LinkStyle, JsAny 
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7780,7 +7780,7 @@ public actual abstract class HTMLTableCaptionElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7788,7 +7788,7 @@ public actual abstract class HTMLTableCaptionElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7798,7 +7798,7 @@ public actual abstract class HTMLTableCaptionElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7850,7 +7850,7 @@ public actual abstract class HTMLTableCellElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7858,7 +7858,7 @@ public actual abstract class HTMLTableCellElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7868,7 +7868,7 @@ public actual abstract class HTMLTableCellElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7902,7 +7902,7 @@ public actual abstract class HTMLTableColElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -7910,7 +7910,7 @@ public actual abstract class HTMLTableColElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -7920,7 +7920,7 @@ public actual abstract class HTMLTableColElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -7992,7 +7992,7 @@ public actual abstract class HTMLTableElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -8000,7 +8000,7 @@ public actual abstract class HTMLTableElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -8010,7 +8010,7 @@ public actual abstract class HTMLTableElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -8053,7 +8053,7 @@ public actual abstract class HTMLTableRowElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -8061,7 +8061,7 @@ public actual abstract class HTMLTableRowElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -8071,7 +8071,7 @@ public actual abstract class HTMLTableRowElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -8108,7 +8108,7 @@ public actual abstract class HTMLTableSectionElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -8116,7 +8116,7 @@ public actual abstract class HTMLTableSectionElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -8126,7 +8126,7 @@ public actual abstract class HTMLTableSectionElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -8150,7 +8150,7 @@ public actual abstract class HTMLTemplateElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -8158,7 +8158,7 @@ public actual abstract class HTMLTemplateElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -8168,7 +8168,7 @@ public actual abstract class HTMLTemplateElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -8270,7 +8270,7 @@ public actual abstract class HTMLTextAreaElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -8278,7 +8278,7 @@ public actual abstract class HTMLTextAreaElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -8288,7 +8288,7 @@ public actual abstract class HTMLTextAreaElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -8312,7 +8312,7 @@ public actual abstract class HTMLTimeElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -8320,7 +8320,7 @@ public actual abstract class HTMLTimeElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -8330,7 +8330,7 @@ public actual abstract class HTMLTimeElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -8354,7 +8354,7 @@ public actual abstract class HTMLTitleElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -8362,7 +8362,7 @@ public actual abstract class HTMLTitleElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -8372,7 +8372,7 @@ public actual abstract class HTMLTitleElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -8404,11 +8404,11 @@ public actual abstract class HTMLTrackElement : HTMLElement(), JsAny {
   public actual open val track: TextTrack = EmptyTextTrack
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
-    public actual val LOADING: Short = 39
+    public actual val LOADING: Short = 42
 
-    public actual val LOADED: Short = 38
+    public actual val LOADED: Short = 41
 
     public actual val ERROR: Short = 26
 
@@ -8416,7 +8416,7 @@ public actual abstract class HTMLTrackElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -8424,7 +8424,7 @@ public actual abstract class HTMLTrackElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -8434,7 +8434,7 @@ public actual abstract class HTMLTrackElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -8460,7 +8460,7 @@ public actual abstract class HTMLUListElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -8468,7 +8468,7 @@ public actual abstract class HTMLUListElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -8478,7 +8478,7 @@ public actual abstract class HTMLUListElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -8500,7 +8500,7 @@ public actual abstract class HTMLUnknownElement : HTMLElement(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -8508,7 +8508,7 @@ public actual abstract class HTMLUnknownElement : HTMLElement(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -8518,7 +8518,7 @@ public actual abstract class HTMLUnknownElement : HTMLElement(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -8549,13 +8549,13 @@ public actual abstract class HTMLVideoElement : HTMLMediaElement(), CanvasImageS
   public actual open var playsInline: Boolean = false
 
   public actual companion object {
-    public actual val NETWORK_EMPTY: Short = 47
+    public actual val NETWORK_EMPTY: Short = 50
 
-    public actual val NETWORK_IDLE: Short = 48
+    public actual val NETWORK_IDLE: Short = 51
 
-    public actual val NETWORK_LOADING: Short = 49
+    public actual val NETWORK_LOADING: Short = 52
 
-    public actual val NETWORK_NO_SOURCE: Short = 50
+    public actual val NETWORK_NO_SOURCE: Short = 53
 
     public actual val HAVE_NOTHING: Short = 35
 
@@ -8571,7 +8571,7 @@ public actual abstract class HTMLVideoElement : HTMLMediaElement(), CanvasImageS
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -8579,7 +8579,7 @@ public actual abstract class HTMLVideoElement : HTMLMediaElement(), CanvasImageS
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -8589,7 +8589,7 @@ public actual abstract class HTMLVideoElement : HTMLMediaElement(), CanvasImageS
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -8620,7 +8620,7 @@ public actual open class HashChangeEvent actual constructor(
   protected constructor() : this("", HashChangeEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -8942,7 +8942,7 @@ public actual open class Image actual constructor(
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -8950,7 +8950,7 @@ public actual open class Image actual constructor(
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -8960,7 +8960,7 @@ public actual open class Image actual constructor(
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -9059,13 +9059,13 @@ public actual abstract class MediaError : JsAny {
   public actual open val code: Short = 0
 
   public actual companion object {
-    public actual val MEDIA_ERR_ABORTED: Short = 41
+    public actual val MEDIA_ERR_ABORTED: Short = 44
 
-    public actual val MEDIA_ERR_NETWORK: Short = 43
+    public actual val MEDIA_ERR_NETWORK: Short = 46
 
-    public actual val MEDIA_ERR_DECODE: Short = 42
+    public actual val MEDIA_ERR_DECODE: Short = 45
 
-    public actual val MEDIA_ERR_SRC_NOT_SUPPORTED: Short = 44
+    public actual val MEDIA_ERR_SRC_NOT_SUPPORTED: Short = 47
   }
 }
 
@@ -9106,7 +9106,7 @@ public actual open class MediaQueryListEvent actual constructor(
   protected constructor() : this("", MediaQueryListEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -9155,7 +9155,7 @@ public actual open class MessageEvent actual constructor(
   }
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -9760,7 +9760,7 @@ public actual open class Option actual constructor(
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -9768,7 +9768,7 @@ public actual open class Option actual constructor(
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -9778,7 +9778,7 @@ public actual open class Option actual constructor(
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -9807,7 +9807,7 @@ public actual open class PageTransitionEvent actual constructor(
   protected constructor() : this("", PageTransitionEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -9943,7 +9943,7 @@ public actual open class PopStateEvent actual constructor(
   protected constructor() : this("", PopStateEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -9968,7 +9968,7 @@ public actual abstract class ProcessingInstruction : CharacterData(), LinkStyle,
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -9976,7 +9976,7 @@ public actual abstract class ProcessingInstruction : CharacterData(), LinkStyle,
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -9986,7 +9986,7 @@ public actual abstract class ProcessingInstruction : CharacterData(), LinkStyle,
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -10017,7 +10017,7 @@ public actual open class PromiseRejectionEvent actual constructor(
   protected constructor() : this("", PromiseRejectionEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -10104,9 +10104,9 @@ public actual open class Range : JsAny {
   public actual fun createContextualFragment(fragment: String): DocumentFragment = DocumentFragment()
 
   public actual companion object {
-    public actual val START_TO_START: Short = 58
+    public actual val START_TO_START: Short = 61
 
-    public actual val START_TO_END: Short = 57
+    public actual val START_TO_END: Short = 60
 
     public actual val END_TO_END: Short = 22
 
@@ -10127,7 +10127,7 @@ public actual open class RelatedEvent actual constructor(
   protected constructor() : this("", RelatedEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -10183,7 +10183,7 @@ public actual open class ShadowRoot : DocumentFragment(), DocumentOrShadowRoot, 
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -10191,7 +10191,7 @@ public actual open class ShadowRoot : DocumentFragment(), DocumentOrShadowRoot, 
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -10201,7 +10201,7 @@ public actual open class ShadowRoot : DocumentFragment(), DocumentOrShadowRoot, 
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
@@ -10287,7 +10287,7 @@ public actual open class StorageEvent actual constructor(
   protected constructor() : this("", StorageEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -10438,7 +10438,7 @@ public actual open class TouchEvent : UIEvent(), JsAny {
   public actual open val shiftKey: Boolean = false
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -10467,7 +10467,7 @@ public actual open class TrackEvent actual constructor(
   protected constructor() : this("", TrackEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -10601,7 +10601,7 @@ public actual open class WebSocket actual constructor(
   public actual companion object {
     public actual val CONNECTING: Short = 10
 
-    public actual val OPEN: Short = 54
+    public actual val OPEN: Short = 57
 
     public actual val CLOSING: Short = 8
 
@@ -11100,7 +11100,7 @@ public actual open class XMLDocument : Document(), JsAny {
 
     public actual val ATTRIBUTE_NODE: Short = 0
 
-    public actual val TEXT_NODE: Short = 60
+    public actual val TEXT_NODE: Short = 122
 
     public actual val CDATA_SECTION_NODE: Short = 4
 
@@ -11108,7 +11108,7 @@ public actual open class XMLDocument : Document(), JsAny {
 
     public actual val ENTITY_NODE: Short = 24
 
-    public actual val PROCESSING_INSTRUCTION_NODE: Short = 56
+    public actual val PROCESSING_INSTRUCTION_NODE: Short = 59
 
     public actual val COMMENT_NODE: Short = 9
 
@@ -11118,7 +11118,7 @@ public actual open class XMLDocument : Document(), JsAny {
 
     public actual val DOCUMENT_FRAGMENT_NODE: Short = 11
 
-    public actual val NOTATION_NODE: Short = 52
+    public actual val NOTATION_NODE: Short = 55
 
     public actual val DOCUMENT_POSITION_DISCONNECTED: Short = 15
 
