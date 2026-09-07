@@ -3,16 +3,18 @@ package org.jetbrains.compose.web.events
 import androidx.compose.web.events.SyntheticEvent
 import kotlinx.browser.dom.events.Event
 import kotlinx.browser.dom.events.EventTarget
-import org.jetbrains.compose.web.internal.selectionInfoDetails
+import org.jetbrains.compose.web.internal.selectionEndCompat
+import org.jetbrains.compose.web.internal.selectionStartCompat
+import org.jetbrains.compose.web.internal.targetValueCompat
 
 class SyntheticSelectEvent<Element : EventTarget> internal constructor(
     nativeEvent: Event,
 ) : SyntheticEvent<Element>(nativeEvent) {
-    private val details = nativeEvent.selectionInfoDetails()
+    val selectionStart: Int = nativeEvent.selectionStartCompat()
+    val selectionEnd: Int = nativeEvent.selectionEndCompat()
 
-    val selectionStart: Int = details.selectionStart
-    val selectionEnd: Int = details.selectionEnd
-
+    // Preserve the original behavior: capture the offsets, but read the value on each
+    // call because a handler may change the input before requesting its selection.
     fun selection(): String =
-        details.value?.substring(selectionStart, selectionEnd) ?: ""
+        nativeEvent.targetValueCompat()?.substring(selectionStart, selectionEnd) ?: ""
 }

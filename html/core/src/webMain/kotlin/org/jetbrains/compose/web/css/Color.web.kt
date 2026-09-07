@@ -5,7 +5,7 @@
 
 package org.jetbrains.compose.web.css
 
-import kotlin.js.unsafeCast
+import org.jetbrains.compose.web.internal.unsafeCast
 
 actual external interface CSSColorValue : StylePropertyValue, CSSVariableValueAs<CSSColorValue>
 

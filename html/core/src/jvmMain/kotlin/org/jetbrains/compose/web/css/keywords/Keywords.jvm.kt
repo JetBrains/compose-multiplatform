@@ -5,6 +5,8 @@
 
 package org.jetbrains.compose.web.css.keywords
 
+actual interface CSSAutoKeyword : org.jetbrains.compose.web.css.CSSKeywordValue
+
 @JvmInline
 private value class JvmCSSAutoKeyword(
     private val value: String,

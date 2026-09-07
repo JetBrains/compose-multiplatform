@@ -49,22 +49,18 @@ internal expect fun Event.inputTypeCompat(): String?
 
 internal expect fun Event.inputDataTransferCompat(): DataTransfer?
 
-/**
- * Portable snapshot of the animation fields exposed by browser animation
- * events. kotlinx-browser 0.5.0 does not declare AnimationEvent itself.
- */
-internal data class AnimationEventDetails(
-    val animationName: String,
-    val elapsedTime: Number,
-    val pseudoElement: String,
-)
+internal expect fun Event.targetValueCompat(): String?
 
-internal expect fun Event.animationEventDetails(): AnimationEventDetails
+internal expect fun Event.targetCheckedCompat(): Boolean
 
-internal data class SelectionInfoDetails(
-    val selectionStart: Int,
-    val selectionEnd: Int,
-    val value: String?,
-)
+internal expect fun Event.targetValueAsNumberCompat(): Number?
 
-internal expect fun Event.selectionInfoDetails(): SelectionInfoDetails
+internal expect fun Event.animationNameCompat(): String
+
+internal expect fun Event.animationElapsedTimeCompat(): Number
+
+internal expect fun Event.animationPseudoElementCompat(): String
+
+internal expect fun Event.selectionStartCompat(): Int
+
+internal expect fun Event.selectionEndCompat(): Int

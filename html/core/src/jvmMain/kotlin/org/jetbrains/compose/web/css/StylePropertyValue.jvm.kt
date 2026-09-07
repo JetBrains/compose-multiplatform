@@ -61,6 +61,7 @@ private value class JvmCSSVariableReference(
     GridAutoFlow,
     VisibilityStyle,
     StylePropertyNumber,
+    StylePropertyString,
     CSSAutoKeyword {
     override fun toString(): String = value
 }

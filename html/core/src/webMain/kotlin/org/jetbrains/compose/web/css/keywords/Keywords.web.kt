@@ -5,7 +5,9 @@
 
 package org.jetbrains.compose.web.css.keywords
 
-import kotlin.js.unsafeCast
+import org.jetbrains.compose.web.internal.unsafeCast
+
+actual external interface CSSAutoKeyword : org.jetbrains.compose.web.css.CSSKeywordValue
 
 @PublishedApi
 internal actual fun createCSSAutoKeyword(value: String): CSSAutoKeyword = value.unsafeCast<CSSAutoKeyword>()

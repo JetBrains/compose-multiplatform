@@ -2,6 +2,7 @@ package org.jetbrains.compose.web.dom
 
 import kotlinx.browser.document
 import kotlinx.browser.dom.Element
+import org.jetbrains.compose.web.internal.unsafeCast
 
 private class BrowserElementBuilder<TElement : Element>(
     tagName: String
@@ -10,16 +11,17 @@ private class BrowserElementBuilder<TElement : Element>(
         document.createElement(tagName)
     }
 
-    @Suppress("UNCHECKED_CAST")
-    override fun create(): TElement = prototype.cloneNode() as TElement
+    override fun create(): TElement = prototype.cloneNode().unsafeCast<TElement>()
 }
 
 private val buildersCache = mutableMapOf<String, ElementBuilder<*>>()
 
-@Suppress("UNCHECKED_CAST")
+internal actual val platformElementBuildersCache: Map<String, ElementBuilder<*>>
+    get() = buildersCache
+
 internal actual fun <TElement : Element> createPlatformElementBuilder(
     tagName: String
 ): ElementBuilder<TElement> =
     buildersCache.getOrPut(tagName) {
         BrowserElementBuilder<Element>(tagName)
-    } as ElementBuilder<TElement>
+    }.unsafeCast<ElementBuilder<TElement>>()

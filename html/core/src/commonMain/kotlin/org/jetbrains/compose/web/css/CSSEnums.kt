@@ -9,8 +9,11 @@ package org.jetbrains.compose.web.css
 
 interface StylePropertyEnum : StylePropertyString
 
-inline val StylePropertyEnum.name get() = toString()
-inline val StylePropertyEnum.value get() = toString()
+@PublishedApi
+internal expect fun StylePropertyEnum.rawValue(): String
+
+inline val StylePropertyEnum.name get() = rawValue()
+inline val StylePropertyEnum.value get() = rawValue()
 
 interface LineStyle : StylePropertyEnum {
     companion object {

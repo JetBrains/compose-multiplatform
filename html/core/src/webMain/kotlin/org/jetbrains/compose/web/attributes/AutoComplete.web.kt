@@ -5,7 +5,7 @@
 
 package org.jetbrains.compose.web.attributes
 
-import kotlin.js.unsafeCast
+import org.jetbrains.compose.web.internal.unsafeCast
 
 @PublishedApi
 internal actual fun createAutoComplete(value: String): AutoComplete =

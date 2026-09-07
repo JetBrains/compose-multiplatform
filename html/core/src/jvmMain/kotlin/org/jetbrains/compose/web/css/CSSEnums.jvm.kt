@@ -5,6 +5,9 @@
 
 package org.jetbrains.compose.web.css
 
+@PublishedApi
+internal actual fun StylePropertyEnum.rawValue(): String = toString()
+
 @JvmInline
 private value class JvmLineStyle(private val value: String) : LineStyle {
     override fun toString(): String = value

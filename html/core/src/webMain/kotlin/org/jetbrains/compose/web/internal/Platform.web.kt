@@ -50,21 +50,26 @@ internal actual fun Event.inputTypeCompat(): String? =
 internal actual fun Event.inputDataTransferCompat(): DataTransfer? =
     asDynamic().dataTransfer?.jsUnsafeCast<DataTransfer>()
 
-internal actual fun Event.animationEventDetails(): AnimationEventDetails {
-    val event = asDynamic()
-    return AnimationEventDetails(
-        animationName = event.animationName.jsUnsafeCast<String>(),
-        elapsedTime = event.elapsedTime.jsUnsafeCast<Number>(),
-        pseudoElement = event.pseudoElement.jsUnsafeCast<String>(),
-    )
-}
+internal actual fun Event.targetValueCompat(): String? =
+    target.asDynamic()?.value?.jsUnsafeCast<String>()
 
-internal actual fun Event.selectionInfoDetails(): SelectionInfoDetails {
-    val target = target.asDynamic()
+internal actual fun Event.targetCheckedCompat(): Boolean =
+    target.asDynamic()?.checked?.jsUnsafeCast<Boolean>() ?: false
 
-    return SelectionInfoDetails(
-        selectionStart = target.selectionStart.jsUnsafeCast<Int>(),
-        selectionEnd = target.selectionEnd.jsUnsafeCast<Int>(),
-        value = target.value?.jsUnsafeCast<String>(),
-    )
-}
+internal actual fun Event.targetValueAsNumberCompat(): Number? =
+    target.asDynamic()?.valueAsNumber?.jsUnsafeCast<Number>()
+
+internal actual fun Event.animationNameCompat(): String =
+    asDynamic().animationName.jsUnsafeCast<String>()
+
+internal actual fun Event.animationElapsedTimeCompat(): Number =
+    asDynamic().elapsedTime.jsUnsafeCast<Number>()
+
+internal actual fun Event.animationPseudoElementCompat(): String =
+    asDynamic().pseudoElement.jsUnsafeCast<String>()
+
+internal actual fun Event.selectionStartCompat(): Int =
+    target.asDynamic().selectionStart.jsUnsafeCast<Int>()
+
+internal actual fun Event.selectionEndCompat(): Int =
+    target.asDynamic().selectionEnd.jsUnsafeCast<Int>()

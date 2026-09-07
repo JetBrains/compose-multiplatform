@@ -1,8 +1,9 @@
 package org.jetbrains.compose.web.attributes
 
-import kotlinx.browser.dom.HTMLInputElement
 import kotlinx.browser.dom.events.Event
-import org.jetbrains.compose.web.internal.unsafeCast
+import org.jetbrains.compose.web.internal.targetCheckedCompat
+import org.jetbrains.compose.web.internal.targetValueAsNumberCompat
+import org.jetbrains.compose.web.internal.targetValueCompat
 
 sealed class InputType<T>(val typeStr: String) {
 
@@ -37,20 +38,20 @@ sealed class InputType<T>(val typeStr: String) {
 
     open class InputTypeCheckedValue(name: String) : InputType<Boolean>(name) {
         override fun inputValue(event: Event): Boolean {
-            return event.target?.unsafeCast<HTMLInputElement>()?.checked ?: false
+            return event.targetCheckedCompat()
         }
     }
 
     open class InputTypeNumberValue(name: String) : InputType<kotlin.Number?>(name) {
         override fun inputValue(event: Event): kotlin.Number? {
-            return event.target?.unsafeCast<HTMLInputElement>()?.valueAsNumber
+            return event.targetValueAsNumberCompat()
         }
     }
 
     abstract fun inputValue(event: Event): T
 
     protected fun valueAsString(event: Event): String {
-        return event.target?.unsafeCast<HTMLInputElement>()?.value ?: ""
+        return event.targetValueCompat() ?: ""
     }
 
     companion object {

@@ -21,6 +21,7 @@ import org.w3c.dom.HTMLScriptElement
 import org.w3c.dom.get
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotSame
 import kotlin.test.assertSame
 
 class ElementsTests {
@@ -195,10 +196,19 @@ class ElementsTests {
         val custom = ElementBuilder.createBuilder<HTMLElement>("CUSTOM")
         val div = ElementBuilder.createBuilder<HTMLElement>("DIV")
         val sameDiv = ElementBuilder.createBuilder<HTMLElement>("div")
+        val b = ElementBuilder.createBuilder<HTMLElement>("b")
+        val abc = ElementBuilder.createBuilder<HTMLElement>("abc")
+
+        val expectedKeys = setOf("custom", "div", "b", "abc")
+        assertEquals(expectedKeys, ElementBuilder.buildersCache.keys.intersect(expectedKeys))
 
         assertEquals("CUSTOM", custom.create().nodeName)
         assertEquals("DIV", div.create().nodeName)
+        assertEquals("B", b.create().nodeName)
+        assertEquals("ABC", abc.create().nodeName)
+        assertSame(custom, ElementBuilder.createBuilder<HTMLElement>("custom"))
         assertSame(div, sameDiv)
+        assertNotSame(custom, div)
     }
 
     @Test

@@ -7,7 +7,7 @@ package org.jetbrains.compose.web.css.keywords
 
 import org.jetbrains.compose.web.css.CSSKeywordValue
 
-interface CSSAutoKeyword : CSSKeywordValue
+expect interface CSSAutoKeyword : CSSKeywordValue
 
 @PublishedApi
 internal expect fun createCSSAutoKeyword(value: String): CSSAutoKeyword

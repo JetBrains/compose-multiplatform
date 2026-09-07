@@ -8,6 +8,9 @@ package org.jetbrains.compose.web.css
 import org.jetbrains.compose.web.internal.unsafeCast
 
 @PublishedApi
+internal actual fun StylePropertyEnum.rawValue(): String = unsafeCast<String>()
+
+@PublishedApi
 internal actual fun createLineStyle(value: String): LineStyle = value.unsafeCast<LineStyle>()
 
 @PublishedApi

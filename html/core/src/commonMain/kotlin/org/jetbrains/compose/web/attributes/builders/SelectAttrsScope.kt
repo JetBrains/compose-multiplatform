@@ -13,7 +13,7 @@ import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.INPUT
 import org.jetbrains.compose.web.attributes.SyntheticEventListener
 import org.jetbrains.compose.web.events.SyntheticChangeEvent
 import org.jetbrains.compose.web.events.SyntheticInputEvent
-import org.jetbrains.compose.web.internal.unsafeCast
+import org.jetbrains.compose.web.internal.targetValueCompat
 import kotlinx.browser.dom.HTMLSelectElement
 import kotlinx.browser.dom.events.Event
 
@@ -45,7 +45,7 @@ private class SelectInputEventListener(
     eventName, listener
 ) {
     override fun handleEvent(event: Event) {
-        val value = event.target?.unsafeCast<HTMLSelectElement>()?.value
+        val value = event.targetValueCompat()
         listener(SyntheticInputEvent(value, event))
     }
 }
@@ -56,7 +56,7 @@ private class SelectChangeEventListener(
     CHANGE, listener
 ) {
     override fun handleEvent(event: Event) {
-        val value = event.target?.unsafeCast<HTMLSelectElement>()?.value
+        val value = event.targetValueCompat()
         listener(SyntheticChangeEvent(value, event))
     }
 }

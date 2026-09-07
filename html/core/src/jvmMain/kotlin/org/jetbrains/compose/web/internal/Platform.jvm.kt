@@ -39,16 +39,18 @@ internal actual fun Event.inputTypeCompat(): String? = null
 
 internal actual fun Event.inputDataTransferCompat(): DataTransfer? = null
 
-internal actual fun Event.animationEventDetails(): AnimationEventDetails =
-    AnimationEventDetails(
-        animationName = "",
-        elapsedTime = 0.0,
-        pseudoElement = "",
-    )
+internal actual fun Event.targetValueCompat(): String? = null
 
-internal actual fun Event.selectionInfoDetails(): SelectionInfoDetails =
-    SelectionInfoDetails(
-        selectionStart = 0,
-        selectionEnd = 0,
-        value = null,
-    )
+internal actual fun Event.targetCheckedCompat(): Boolean = false
+
+internal actual fun Event.targetValueAsNumberCompat(): Number? = null
+
+internal actual fun Event.animationNameCompat(): String = ""
+
+internal actual fun Event.animationElapsedTimeCompat(): Number = 0
+
+internal actual fun Event.animationPseudoElementCompat(): String = ""
+
+internal actual fun Event.selectionStartCompat(): Int = 0
+
+internal actual fun Event.selectionEndCompat(): Int = 0
