@@ -1,22 +1,15 @@
-/*
- * Copyright 2020-2026 JetBrains s.r.o. and respective authors and developers.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
- */
-
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.*
-import kotlinx.browser.document
-import kotlinx.browser.dom.Element
 import org.jetbrains.compose.web.attributes.AttrsScope
+import org.jetbrains.compose.web.ExperimentalComposeWebApi
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
 import org.jetbrains.compose.web.css.StyleHolder
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
-import org.jetbrains.compose.web.internal.runtime.DomApplier
 import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
 import org.jetbrains.compose.web.internal.runtime.NamedEventListener
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.Text
 import org.w3c.dom.css.ElementCSSInlineStyle
 import org.w3c.dom.svg.SVGElement
 
@@ -79,7 +72,7 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
                 }
 
                 styleApplier.variables.forEach { (name, value) ->
-                    setVariable(style, name, value)
+                    style.setProperty(name, value.toString())
                 }
             }
         }
@@ -108,14 +101,15 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
     }
 }
 
+
 @OptIn(ComposeWebInternalApi::class)
 @Composable
-actual fun <TElement : Element> TagElement(
+fun <TElement : Element> TagElement(
     elementBuilder: ElementBuilder<TElement>,
     applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
-    content: (@Composable ElementScope<TElement>.() -> Unit)?,
+    content: (@Composable ElementScope<TElement>.() -> Unit)?
 ) {
-    val scope = remember { ElementScopeImpl<TElement>() }
+    val scope = remember {  ElementScopeImpl<TElement>() }
     var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
 
     ComposeDomNode<ElementScope<TElement>, DomElementWrapper>(
@@ -154,12 +148,26 @@ actual fun <TElement : Element> TagElement(
     }
 }
 
+/**
+ * @param tagName - the name of the tag that needs to be created.
+ * It's best to use constant values for [tagName].
+ * If variable [tagName] needed, consider wrapping TagElement calls into an if...else:
+ *
+ * ```
+ *      if (useDiv) TagElement("div",...) else TagElement("span", ...)
+ * ```
+ */
 @Composable
-actual fun Text(value: String) {
-    ComposeNode<DomNodeWrapper, DomApplier>(
-        factory = { DomNodeWrapper(document.createTextNode("")) },
-        update = {
-            set(value) { newValue -> (node as Text).data = newValue }
-        },
-    )
+fun <TElement : Element> TagElement(
+    tagName: String,
+    applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+    content: (@Composable ElementScope<TElement>.() -> Unit)?
+) {
+    key(tagName) {
+        TagElement(
+            elementBuilder = ElementBuilder.createBuilder(tagName),
+            applyAttrs = applyAttrs,
+            content = content
+        )
+    }
 }

@@ -1,13 +1,10 @@
-/*
- * Copyright 2020-2026 JetBrains s.r.o. and respective authors and developers.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
- */
-
 package org.jetbrains.compose.web.internal.runtime
 
 import androidx.compose.runtime.AbstractApplier
 import kotlinx.dom.clear
 import org.w3c.dom.*
+import org.w3c.dom.css.CSSStyleDeclaration
+import org.w3c.dom.events.EventListener
 
 @ComposeWebInternalApi
 class DomApplier(
@@ -34,6 +31,12 @@ class DomApplier(
         // or current.node.clear()?; in all examples it calls 'clear' on the root
         root.node.clear()
     }
+}
+
+
+@ComposeWebInternalApi
+interface NamedEventListener : EventListener {
+    val name: String
 }
 
 @ComposeWebInternalApi

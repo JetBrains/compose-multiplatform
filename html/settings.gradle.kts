@@ -77,6 +77,18 @@ fun module(name: String, path: String) {
     project(name).projectDir = projectDir
 }
 
+val localProperties = java.util.Properties().apply {
+    val file = rootDir.resolve("local.properties")
+    if (file.isFile) {
+        file.inputStream().use(::load)
+    }
+}
+
+fun setting(name: String): String? =
+    localProperties.getProperty(name) ?: providers.gradleProperty(name).orNull
+
+val composeHtmlEapEnabled = setting("compose.html.eap.enabled")?.toBoolean() ?: false
+
 
 module(":html-core", "core")
 module(":html-svg", "svg")
@@ -85,6 +97,12 @@ module(":compose-compiler-integration", "compose-compiler-integration")
 module(":compose-compiler-integration-lib", "compose-compiler-integration/lib")
 module(":internal-html-core-runtime", "internal-html-core-runtime")
 module(":html-test-utils", "test-utils")
+
+if (composeHtmlEapEnabled) {
+    println("Compose HTML EAP modules enabled")
+    module(":html-core-eap", "eap/core")
+    module(":internal-html-core-runtime-eap", "eap/internal-html-core-runtime")
+}
 
 if (extra["compose.web.tests.skip.benchmarks"]!!.toString().toBoolean() != true) {
     module(":html-benchmark-core", "benchmark-core")

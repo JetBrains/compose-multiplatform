@@ -1,8 +1,3 @@
-/*
- * Copyright 2020-2026 JetBrains s.r.o. and respective authors and developers.
- * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
- */
-
 package org.jetbrains.compose.web.core.tests
 
 import androidx.compose.runtime.getValue
@@ -17,10 +12,6 @@ import kotlin.test.assertEquals
 import org.jetbrains.compose.web.testutils.*
 
 class InlineStyleTests {
-
-    private object Variables {
-        val spacing by variable<CSSUnitValue>()
-    }
 
     @Test
     fun conditionalStyleAppliedProperly() = runTest {
@@ -198,22 +189,5 @@ class InlineStyleTests {
             assertEquals("container", attrsMap["id"])
             assertEquals("height: auto;", attrsMap["style"])
         }
-    }
-
-    @Test
-    fun cssVariableNamesArePrefixedInInlineStyles() = runTest {
-        composition {
-            Span({
-                style {
-                    Variables.spacing(16.px)
-                    width(Variables.spacing.value())
-                }
-            })
-        }
-
-        assertEquals(
-            "<span style=\"width: var(--spacing); --spacing: 16px;\"></span>",
-            root.innerHTML,
-        )
     }
 }

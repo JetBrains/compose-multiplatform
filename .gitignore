@@ -5,6 +5,7 @@ out
 *.iml
 .gradle
 /local.properties
+/html/local.properties
 .idea/
 .DS_Store
 build/

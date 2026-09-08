@@ -11,6 +11,21 @@ plugins {
 }
 
 val COMPOSE_WEB_VERSION: String = extra["compose.version"] as String
+val localProperties = java.util.Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.isFile) {
+        file.inputStream().use(::load)
+    }
+}
+fun setting(name: String): String? =
+    localProperties.getProperty(name) ?: providers.gradleProperty(name).orNull
+
+val COMPOSE_HTML_EAP_VERSION: String by lazy {
+    requireNotNull(setting("compose.html.eap.version"))
+}
+val COMPOSE_HTML_EAP_KOTLINX_BROWSER_COMMON_SUBSET_VERSION: String by lazy {
+    requireNotNull(setting("compose.html.eap.kotlinx-browser-common-subset.version"))
+}
 val COMPOSE_REPO_URL: String? by project
 val COMPOSE_REPO_USERNAME: String? by project
 val COMPOSE_REPO_KEY: String? by project
@@ -32,8 +47,19 @@ subprojects {
     apply(plugin = "maven-publish")
 
     val projectName = name
-    group = "org.jetbrains.compose.html"
-    version = COMPOSE_WEB_VERSION
+    val isComposeHtmlEapProject = project.name in setOf(
+        "html-core-eap",
+        "internal-html-core-runtime-eap",
+    )
+    if (isComposeHtmlEapProject) {
+        group = "org.jetbrains.compose.html.eap"
+        version = COMPOSE_HTML_EAP_VERSION
+        rootProject.extra["composeHtmlEapKotlinxBrowserCommonSubsetVersion"] =
+            COMPOSE_HTML_EAP_KOTLINX_BROWSER_COMMON_SUBSET_VERSION
+    } else {
+        group = "org.jetbrains.compose.html"
+        version = COMPOSE_WEB_VERSION
+    }
 
     if ((project.name != "html-widgets") && (project.name != "html-integration-widgets")) {
         afterEvaluate {
@@ -78,8 +104,23 @@ subprojects {
             publications.all {
                 this as MavenPublication
                 pom {
-                    name.set("JetBrains Compose Multiplatform HTML library")
-                    description.set("JetBrains Compose Multiplatform HTML library")
+                    name.set(
+                        when (projectName) {
+                            "html-core-eap" -> "JetBrains Compose Multiplatform HTML EAP core"
+                            "internal-html-core-runtime-eap" ->
+                                "JetBrains Compose Multiplatform HTML EAP internal runtime"
+                            else -> "JetBrains Compose Multiplatform HTML library"
+                        }
+                    )
+                    description.set(
+                        when (projectName) {
+                            "html-core-eap" ->
+                                "Experimental commonized JetBrains Compose Multiplatform HTML core library"
+                            "internal-html-core-runtime-eap" ->
+                                "Experimental commonized JetBrains Compose Multiplatform HTML internal runtime"
+                            else -> "JetBrains Compose Multiplatform HTML library"
+                        }
+                    )
                     url.set("https://www.jetbrains.com/lp/compose-mpp/")
                     licenses {
                         license {
