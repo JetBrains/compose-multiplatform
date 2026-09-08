@@ -3,18 +3,25 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+@file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+
 package org.jetbrains.compose.web.svg
 
 import kotlinx.browser.dom.svg.*
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.css.*
+import org.jetbrains.compose.web.internal.formatNumber
+
+private fun AttrsScope<SVGElement>.numberAttr(name: String, value: Number) {
+    attr(name, formatNumber(value))
+}
 
 fun AttrsScope<SVGElement>.width(px: Number) {
-    attr("width", px.toString())
+    numberAttr("width", px)
 }
 
 fun AttrsScope<SVGElement>.height(px: Number) {
-    attr("height", px.toString())
+    numberAttr("height", px)
 }
 
 fun AttrsScope<SVGElement>.width(value: CSSLengthOrPercentageValue) {
@@ -42,7 +49,7 @@ fun AttrsScope<SVGElement>.fillRule(fill: String) {
 }
 
 fun AttrsScope<SVGElement>.fillOpacity(fill: Number) {
-    attr("fill-opacity", fill.toString())
+    numberAttr("fill-opacity", fill)
 }
 
 fun AttrsScope<SVGElement>.fillOpacity(fill: CSSPercentageValue) {
@@ -70,51 +77,56 @@ fun AttrsScope<SVGElement>.points(points: String) {
 }
 
 fun AttrsScope<SVGElement>.points(vararg points: Number) {
-    attr("points", points.toList().chunked(2).joinToString(" ") { it.joinToString(",") })
+    attr(
+        "points",
+        points.toList().chunked(2).joinToString(" ") {
+            it.joinToString(",", transform = ::formatNumber)
+        }
+    )
 }
 
 fun AttrsScope<SVGElement>.cx(cx: Number) {
-    attr("cx", cx.toString())
+    numberAttr("cx", cx)
 }
 
 fun AttrsScope<SVGElement>.cy(cy: Number) {
-    attr("cy", cy.toString())
+    numberAttr("cy", cy)
 }
 
 fun AttrsScope<SVGElement>.r(r: Number) {
-    attr("r", r.toString())
+    numberAttr("r", r)
 }
 
 fun AttrsScope<SVGElement>.rx(rx: Number) {
-    attr("rx", rx.toString())
+    numberAttr("rx", rx)
 }
 
 fun AttrsScope<SVGElement>.ry(ry: Number) {
-    attr("ry", ry.toString())
+    numberAttr("ry", ry)
 }
 
 fun AttrsScope<SVGElement>.x(x: Number) {
-    attr("x", x.toString())
+    numberAttr("x", x)
 }
 
 fun AttrsScope<SVGElement>.y(y: Number) {
-    attr("y", y.toString())
+    numberAttr("y", y)
 }
 
 fun AttrsScope<SVGElement>.x1(x1: Number) {
-    attr("x1", x1.toString())
+    numberAttr("x1", x1)
 }
 
 fun AttrsScope<SVGElement>.y1(y1: Number) {
-    attr("y1", y1.toString())
+    numberAttr("y1", y1)
 }
 
 fun AttrsScope<SVGElement>.x2(x2: Number) {
-    attr("x2", x2.toString())
+    numberAttr("x2", x2)
 }
 
 fun AttrsScope<SVGElement>.y2(y2: Number) {
-    attr("y2", y2.toString())
+    numberAttr("y2", y2)
 }
 
 fun AttrsScope<SVGElement>.cx(cx: CSSLengthOrPercentageValue) {
