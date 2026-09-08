@@ -31,7 +31,7 @@ kotlin {
                     "org.jetbrains.compose.html:kotlinx-browser-common-subset:" +
                         composeHtmlEapKotlinxBrowserCommonSubsetVersion
                 )
-                implementation(project(":internal-html-core-runtime-eap"))
+                api(project(":internal-html-core-runtime-eap"))
             }
         }
 
