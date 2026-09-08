@@ -3,60 +3,19 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+@file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+
 package org.jetbrains.compose.web.svg
 
 import androidx.compose.runtime.Composable
-import kotlinx.browser.document
+import kotlinx.browser.css.masking.SVGClipPathElement
+import kotlinx.browser.css.masking.SVGMaskElement
+import kotlinx.browser.dom.svg.*
 import org.jetbrains.compose.web.ExperimentalComposeWebSvgApi
 import org.jetbrains.compose.web.css.CSSLengthOrPercentageValue
 import org.jetbrains.compose.web.dom.*
-import org.w3c.css.masking.SVGClipPathElement
-import org.w3c.css.masking.SVGMaskElement
-import org.w3c.dom.Element
-import org.w3c.dom.svg.*
-
-private open class ElementBuilderNS<TElement : Element>(private val tagName: String, private val namespace: String) :
-    ElementBuilder<TElement> {
-    private val el: Element by lazy { document.createElementNS(namespace, tagName) }
-    override fun create(): TElement = el.cloneNode().unsafeCast<TElement>()
-}
 
 const val SVG_NS = "http://www.w3.org/2000/svg"
-
-private val A = ElementBuilderNS<SVGAElement>("a", SVG_NS)
-private val Animate = ElementBuilderNS<SVGElement>("animate", SVG_NS)
-private val AnimateMotion = ElementBuilderNS<SVGElement>("animateMotion", SVG_NS)
-private val AnimateTransform = ElementBuilderNS<SVGElement>("animateTransform", SVG_NS)
-private val Circle = ElementBuilderNS<SVGCircleElement>("circle", SVG_NS)
-private val ClipPath = ElementBuilderNS<SVGClipPathElement>("clipPath", SVG_NS)
-private val Defs = ElementBuilderNS<SVGDefsElement>("defs", SVG_NS)
-private val Desc = ElementBuilderNS<SVGDescElement>("desc", SVG_NS)
-private val Ellipse = ElementBuilderNS<SVGEllipseElement>("ellipse", SVG_NS)
-private val Filter = ElementBuilderNS<SVGElement>("filter", SVG_NS)
-private val G = ElementBuilderNS<SVGElement>("g", SVG_NS)
-private val Image = ElementBuilderNS<SVGImageElement>("image", SVG_NS)
-private val Line = ElementBuilderNS<SVGLineElement>("line", SVG_NS)
-private val LinearGradient = ElementBuilderNS<SVGLinearGradientElement>("linearGradient", SVG_NS)
-private val Marker = ElementBuilderNS<SVGMarkerElement>("marker", SVG_NS)
-private val Mask = ElementBuilderNS<SVGMaskElement>("mask", SVG_NS)
-private val Mpath = ElementBuilderNS<SVGElement>("mpath", SVG_NS)
-private val Path = ElementBuilderNS<SVGPathElement>("path", SVG_NS)
-private val Pattern = ElementBuilderNS<SVGPatternElement>("pattern", SVG_NS)
-private val Polygon = ElementBuilderNS<SVGPolygonElement>("polygon", SVG_NS)
-private val Polyline = ElementBuilderNS<SVGPolylineElement>("polyline", SVG_NS)
-private val RadialGradient = ElementBuilderNS<SVGRadialGradientElement>("radialGradient", SVG_NS)
-private val Rect = ElementBuilderNS<SVGRectElement>("rect", SVG_NS)
-private val Set = ElementBuilderNS<SVGElement>("set", SVG_NS)
-private val Stop = ElementBuilderNS<SVGStopElement>("stop", SVG_NS)
-private val Svg = ElementBuilderNS<SVGElement>("svg", SVG_NS)
-private val Switch = ElementBuilderNS<SVGSwitchElement>("switch", SVG_NS)
-private val Symbol = ElementBuilderNS<SVGSymbolElement>("symbol", SVG_NS)
-private val Text = ElementBuilderNS<SVGTextElement>("text", SVG_NS)
-private val TextPath = ElementBuilderNS<SVGTextPathElement>("textPath", SVG_NS)
-private val Title = ElementBuilderNS<SVGTitleElement>("title", SVG_NS)
-private val Tspan = ElementBuilderNS<SVGTSpanElement>("tspan", SVG_NS)
-private val Use = ElementBuilderNS<SVGUseElement>("use", SVG_NS)
-private val View = ElementBuilderNS<SVGViewElement>("view", SVG_NS)
 
 @Composable
 @ExperimentalComposeWebSvgApi
@@ -65,8 +24,9 @@ fun Svg(
   attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Svg,
+    TagElementNS<SVGElement>(
+        tagName = "svg",
+        namespace = SVG_NS,
         applyAttrs = {
             viewBox?.let { viewBox(it) }
             attrs?.invoke(this)
@@ -82,8 +42,9 @@ fun ElementScope<SVGElement>.SvgA(
   attrs: AttrBuilderContext<SVGAElement>? = null,
   content: ContentBuilder<SVGAElement>? = null
 ) {
-    TagElement(
-        elementBuilder = A,
+    TagElementNS<SVGAElement>(
+        tagName = "a",
+        namespace = SVG_NS,
         applyAttrs = {
             href(href)
             attrs?.invoke(this)
@@ -101,8 +62,9 @@ fun ElementScope<SVGElement>.Circle(
   attrs: AttrBuilderContext<SVGCircleElement>? = null,
   content: ContentBuilder<SVGCircleElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Circle,
+    TagElementNS<SVGCircleElement>(
+        tagName = "circle",
+        namespace = SVG_NS,
         applyAttrs = {
             cx(cx)
             cy(cy)
@@ -123,8 +85,9 @@ fun ElementScope<SVGElement>.Circle(
   attrs: AttrBuilderContext<SVGCircleElement>? = null,
   content: ContentBuilder<SVGCircleElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Circle,
+    TagElementNS<SVGCircleElement>(
+        tagName = "circle",
+        namespace = SVG_NS,
         applyAttrs = {
             cx(cx)
             cy(cy)
@@ -144,8 +107,9 @@ fun ElementScope<SVGElement>.SvgText(
   y: Number = 0,
   attrs: AttrBuilderContext<SVGTextElement>? = null,
 ) {
-    TagElement(
-        elementBuilder = Text,
+    TagElementNS<SVGTextElement>(
+        tagName = "text",
+        namespace = SVG_NS,
         applyAttrs = {
             x(x)
             y(y)
@@ -164,8 +128,9 @@ fun ElementScope<SVGElement>.View(
   viewBox: String,
   attrs: AttrBuilderContext<SVGViewElement>? = null,
 ) {
-    TagElement(
-        elementBuilder = View,
+    TagElementNS<SVGViewElement>(
+        tagName = "view",
+        namespace = SVG_NS,
         applyAttrs = {
             id(id)
             viewBox(viewBox)
@@ -185,8 +150,9 @@ fun ElementScope<SVGElement>.Rect(
   attrs: AttrBuilderContext<SVGRectElement>? = null,
   content: ContentBuilder<SVGRectElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Rect,
+    TagElementNS<SVGRectElement>(
+        tagName = "rect",
+        namespace = SVG_NS,
         applyAttrs = {
             x(x)
             y(y)
@@ -208,8 +174,9 @@ fun ElementScope<SVGElement>.Rect(
   attrs: AttrBuilderContext<SVGRectElement>? = null,
   content: ContentBuilder<SVGRectElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Rect,
+    TagElementNS<SVGRectElement>(
+        tagName = "rect",
+        namespace = SVG_NS,
         applyAttrs = {
             x(x)
             y(y)
@@ -232,8 +199,9 @@ fun ElementScope<SVGElement>.Rect(
     attrs: AttrBuilderContext<SVGRectElement>? = null,
     content: ContentBuilder<SVGRectElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Rect,
+    TagElementNS<SVGRectElement>(
+        tagName = "rect",
+        namespace = SVG_NS,
         applyAttrs = {
             width(width)
             height(height)
@@ -256,8 +224,9 @@ fun ElementScope<SVGElement>.Ellipse(
   attrs: AttrBuilderContext<SVGEllipseElement>? = null,
   content: ContentBuilder<SVGEllipseElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Ellipse,
+    TagElementNS<SVGEllipseElement>(
+        tagName = "ellipse",
+        namespace = SVG_NS,
         applyAttrs = {
             cx(cx)
             cy(cy)
@@ -279,8 +248,9 @@ fun ElementScope<SVGElement>.Ellipse(
   attrs: AttrBuilderContext<SVGEllipseElement>? = null,
   content: ContentBuilder<SVGEllipseElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Ellipse,
+    TagElementNS<SVGEllipseElement>(
+        tagName = "ellipse",
+        namespace = SVG_NS,
         applyAttrs = {
             cx(cx)
             cy(cy)
@@ -300,8 +270,9 @@ fun ElementScope<SVGElement>.Symbol(
   attrs: AttrBuilderContext<SVGSymbolElement>? = null,
   content: ContentBuilder<SVGSymbolElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Symbol,
+    TagElementNS<SVGSymbolElement>(
+        tagName = "symbol",
+        namespace = SVG_NS,
         applyAttrs = {
             id?.let { id(it) }
             attrs?.invoke(this)
@@ -317,8 +288,9 @@ fun ElementScope<SVGElement>.Use(
   attrs: AttrBuilderContext<SVGUseElement>? = null,
   content: ContentBuilder<SVGUseElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Use,
+    TagElementNS<SVGUseElement>(
+        tagName = "use",
+        namespace = SVG_NS,
         applyAttrs = {
             href(href)
             attrs?.invoke(this)
@@ -337,8 +309,9 @@ fun ElementScope<SVGElement>.Line(
   attrs: AttrBuilderContext<SVGLineElement>? = null,
   content: ContentBuilder<SVGLineElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Line,
+    TagElementNS<SVGLineElement>(
+        tagName = "line",
+        namespace = SVG_NS,
         applyAttrs = {
             x1(x1)
             y1(y1)
@@ -360,8 +333,9 @@ fun ElementScope<SVGElement>.Line(
   attrs: AttrBuilderContext<SVGLineElement>? = null,
   content: ContentBuilder<SVGLineElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Line,
+    TagElementNS<SVGLineElement>(
+        tagName = "line",
+        namespace = SVG_NS,
         applyAttrs = {
             x1(x1)
             y1(y1)
@@ -381,8 +355,9 @@ fun ElementScope<SVGElement>.ClipPath(
   attrs: AttrBuilderContext<SVGClipPathElement>? = null,
   content: ContentBuilder<SVGClipPathElement>? = null
 ) {
-    TagElement(
-        elementBuilder = ClipPath,
+    TagElementNS<SVGClipPathElement>(
+        tagName = "clipPath",
+        namespace = SVG_NS,
         applyAttrs = {
             id(id)
             attrs?.invoke(this)
@@ -398,8 +373,9 @@ fun ElementScope<SVGElement>.Path(
   attrs: AttrBuilderContext<SVGPathElement>? = null,
   content: ContentBuilder<SVGPathElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Path,
+    TagElementNS<SVGPathElement>(
+        tagName = "path",
+        namespace = SVG_NS,
         applyAttrs = {
             d(d)
             attrs?.invoke(this)
@@ -414,8 +390,9 @@ fun ElementScope<SVGElement>.G(
   attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
-    TagElement(
-        elementBuilder = G,
+    TagElementNS<SVGElement>(
+        tagName = "g",
+        namespace = SVG_NS,
         applyAttrs = attrs,
         content = content
     )
@@ -428,8 +405,9 @@ fun ElementScope<SVGElement>.Image(
   attrs: AttrBuilderContext<SVGImageElement>? = null,
   content: ContentBuilder<SVGImageElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Image,
+    TagElementNS<SVGImageElement>(
+        tagName = "image",
+        namespace = SVG_NS,
         applyAttrs = {
             href(href)
             attrs?.invoke(this)
@@ -445,8 +423,9 @@ fun ElementScope<SVGElement>.Mask(
   attrs: AttrBuilderContext<SVGMaskElement>? = null,
   content: ContentBuilder<SVGMaskElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Mask,
+    TagElementNS<SVGMaskElement>(
+        tagName = "mask",
+        namespace = SVG_NS,
         applyAttrs = {
            id?.let { id(it) }
            attrs?.invoke(this)
@@ -461,8 +440,9 @@ fun ElementScope<SVGElement>.Defs(
   attrs: AttrBuilderContext<SVGDefsElement>? = null,
   content: ContentBuilder<SVGDefsElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Defs,
+    TagElementNS<SVGDefsElement>(
+        tagName = "defs",
+        namespace = SVG_NS,
         applyAttrs = attrs,
         content = content
     )
@@ -475,8 +455,9 @@ fun ElementScope<SVGElement>.Pattern(
   attrs: AttrBuilderContext<SVGPatternElement>? = null,
   content: ContentBuilder<SVGPatternElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Pattern,
+    TagElementNS<SVGPatternElement>(
+        tagName = "pattern",
+        namespace = SVG_NS,
         applyAttrs = {
             id(id)
             attrs?.invoke(this)
@@ -492,8 +473,9 @@ fun ElementScope<SVGElement>.Polygon(
   attrs: AttrBuilderContext<SVGPolygonElement>? = null,
   content: ContentBuilder<SVGPolygonElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Polygon,
+    TagElementNS<SVGPolygonElement>(
+        tagName = "polygon",
+        namespace = SVG_NS,
         applyAttrs = {
             points(points = points)
             attrs?.invoke(this)
@@ -509,8 +491,9 @@ fun ElementScope<SVGElement>.Polyline(
   attrs: AttrBuilderContext<SVGPolylineElement>? = null,
   content: ContentBuilder<SVGPolylineElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Polyline,
+    TagElementNS<SVGPolylineElement>(
+        tagName = "polyline",
+        namespace = SVG_NS,
         applyAttrs = {
             points(points = points)
             attrs?.invoke(this)
@@ -526,8 +509,9 @@ fun ElementScope<SVGElement>.TextPath(
   text: String,
   attrs: AttrBuilderContext<SVGTextPathElement>? = null,
 ) {
-    TagElement(
-        elementBuilder = TextPath,
+    TagElementNS<SVGTextPathElement>(
+        tagName = "textPath",
+        namespace = SVG_NS,
         applyAttrs = {
             href(href)
             attrs?.invoke(this)
@@ -544,8 +528,9 @@ fun ElementScope<SVGElement>.Animate(
   attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Animate,
+    TagElementNS<SVGElement>(
+        tagName = "animate",
+        namespace = SVG_NS,
         applyAttrs = attrs,
         content = content
     )
@@ -557,8 +542,9 @@ fun ElementScope<SVGElement>.AnimateMotion(
   attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
-    TagElement(
-        elementBuilder = AnimateMotion,
+    TagElementNS<SVGElement>(
+        tagName = "animateMotion",
+        namespace = SVG_NS,
         applyAttrs = attrs,
         content = content
     )
@@ -570,8 +556,9 @@ fun ElementScope<SVGElement>.AnimateTransform(
   attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
-    TagElement(
-        elementBuilder = AnimateTransform,
+    TagElementNS<SVGElement>(
+        tagName = "animateTransform",
+        namespace = SVG_NS,
         applyAttrs = attrs,
         content = content
     )
@@ -584,8 +571,9 @@ fun ElementScope<SVGElement>.LinearGradient(
   attrs: AttrBuilderContext<SVGLinearGradientElement>? = null,
   content: ContentBuilder<SVGLinearGradientElement>? = null
 ) {
-    TagElement(
-        elementBuilder = LinearGradient,
+    TagElementNS<SVGLinearGradientElement>(
+        tagName = "linearGradient",
+        namespace = SVG_NS,
         applyAttrs = {
             id?.let { id(it) }
             attrs?.invoke(this)
@@ -602,8 +590,9 @@ fun ElementScope<SVGElement>.RadialGradient(
   attrs: AttrBuilderContext<SVGRadialGradientElement>? = null,
   content: ContentBuilder<SVGRadialGradientElement>? = null
 ) {
-    TagElement(
-        elementBuilder = RadialGradient,
+    TagElementNS<SVGRadialGradientElement>(
+        tagName = "radialGradient",
+        namespace = SVG_NS,
         applyAttrs = {
             id?.let { id(it) }
             attrs?.invoke(this)
@@ -618,8 +607,9 @@ fun ElementScope<SVGElement>.Stop(
   attrs: AttrBuilderContext<SVGStopElement>? = null,
   content: ContentBuilder<SVGStopElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Stop,
+    TagElementNS<SVGStopElement>(
+        tagName = "stop",
+        namespace = SVG_NS,
         applyAttrs = attrs,
         content = content
     )
@@ -631,8 +621,9 @@ fun ElementScope<SVGElement>.Switch(
   attrs: AttrBuilderContext<SVGSwitchElement>? = null,
   content: ContentBuilder<SVGSwitchElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Switch,
+    TagElementNS<SVGSwitchElement>(
+        tagName = "switch",
+        namespace = SVG_NS,
         applyAttrs = attrs,
         content = content
     )
@@ -644,8 +635,9 @@ fun ElementScope<SVGElement>.Title(
   text: String,
   attrs: AttrBuilderContext<SVGTitleElement>? = null,
 ) {
-    TagElement(
-        elementBuilder = Title,
+    TagElementNS<SVGTitleElement>(
+        tagName = "title",
+        namespace = SVG_NS,
         applyAttrs = attrs,
         content = {
             Text(text)
@@ -659,8 +651,9 @@ fun ElementScope<SVGElement>.Tspan(
   attrs: AttrBuilderContext<SVGTSpanElement>? = null,
   content: ContentBuilder<SVGTSpanElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Tspan,
+    TagElementNS<SVGTSpanElement>(
+        tagName = "tspan",
+        namespace = SVG_NS,
         applyAttrs = attrs,
         content = content
     )
@@ -672,8 +665,9 @@ fun ElementScope<SVGElement>.Desc(
   content: String,
   attrs: AttrBuilderContext<SVGDescElement>? = null,
 ) {
-    TagElement(
-        elementBuilder = Desc,
+    TagElementNS<SVGDescElement>(
+        tagName = "desc",
+        namespace = SVG_NS,
         applyAttrs = attrs,
         content = {
             Text(content)
@@ -687,8 +681,9 @@ fun ElementScope<SVGElement>.Marker(
   attrs: AttrBuilderContext<SVGMarkerElement>? = null,
   content: ContentBuilder<SVGMarkerElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Marker,
+    TagElementNS<SVGMarkerElement>(
+        tagName = "marker",
+        namespace = SVG_NS,
         applyAttrs = attrs,
         content = content
     )
@@ -700,8 +695,9 @@ fun ElementScope<SVGElement>.Mpath(
   attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Mpath,
+    TagElementNS<SVGElement>(
+        tagName = "mpath",
+        namespace = SVG_NS,
         applyAttrs = attrs,
         content = content
     )
@@ -713,8 +709,9 @@ fun ElementScope<SVGElement>.Filter(
   attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Filter,
+    TagElementNS<SVGElement>(
+        tagName = "filter",
+        namespace = SVG_NS,
         applyAttrs = attrs,
         content = content
     )
@@ -728,8 +725,9 @@ fun ElementScope<SVGElement>.Set(
   attrs: AttrBuilderContext<SVGElement>? = null,
   content: ContentBuilder<SVGElement>? = null
 ) {
-    TagElement(
-        elementBuilder = Set,
+    TagElementNS<SVGElement>(
+        tagName = "set",
+        namespace = SVG_NS,
         applyAttrs = {
             attributeName(attributeName)
             to(to)
@@ -746,8 +744,9 @@ fun <T : SVGElement> SvgElement(
   attrs: AttrBuilderContext<T>? = null,
   content: ContentBuilder<T>? = null
 ) {
-    TagElement(
-        elementBuilder = ElementBuilderNS(name, SVG_NS),
+    TagElementNS<T>(
+        tagName = name,
+        namespace = SVG_NS,
         applyAttrs = attrs,
         content = content
     )

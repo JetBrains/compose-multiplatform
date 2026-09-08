@@ -5,9 +5,9 @@
 
 package org.jetbrains.compose.web.svg
 
+import kotlinx.browser.dom.svg.*
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.css.*
-import org.w3c.dom.svg.*
 
 fun AttrsScope<SVGElement>.width(px: Number) {
     attr("width", px.toString())
