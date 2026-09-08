@@ -5,12 +5,19 @@ import kotlinx.browser.dom.Element
 import kotlinx.browser.dom.HTMLStyleElement
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
+@OptIn(ComposeWebInternalApi::class)
 internal actual val DefaultComposeHtmlContext: ComposeHtmlContext = object : ComposeHtmlContext {
     override val supportsDomElementAccess: Boolean = false
 
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
         ElementBuilder.createBuilder(tagName)
+
+    override fun <TElement : Element> elementBuilderNS(
+        tagName: String,
+        namespace: String,
+    ): ElementBuilder<TElement> = ElementBuilder.createBuilder(tagName, namespace)
 
     @Composable
     override fun <TElement : Element> TagElement(

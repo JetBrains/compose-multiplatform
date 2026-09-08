@@ -311,6 +311,11 @@ private object BrowserComposeHtmlContext : ComposeHtmlContext {
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
         ElementBuilder.createBuilder(tagName)
 
+    override fun <TElement : Element> elementBuilderNS(
+        tagName: String,
+        namespace: String,
+    ): ElementBuilder<TElement> = ElementBuilder.createBuilder(tagName, namespace)
+
     @Composable
     override fun <TElement : Element> TagElement(
         elementBuilder: ElementBuilder<TElement>,
@@ -383,9 +388,20 @@ private class HydratingComposeHtmlContext(
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
         HydratingElementBuilder(
             tagName = tagName,
+            namespace = HtmlNamespace,
             applier = applier,
             browserBuilder = ElementBuilder.createBuilder(tagName),
         )
+
+    override fun <TElement : Element> elementBuilderNS(
+        tagName: String,
+        namespace: String,
+    ): ElementBuilder<TElement> = HydratingElementBuilder(
+        tagName = tagName,
+        namespace = namespace,
+        applier = applier,
+        browserBuilder = ElementBuilder.createBuilder(tagName, namespace),
+    )
 
     @Composable
     override fun <TElement : Element> TagElement(
@@ -416,6 +432,7 @@ private class HydratingComposeHtmlContext(
         val allowance = remember { HydrationMismatchAllowance() }
         val rawTextElementBuilder = HydratingElementBuilder<TElement>(
             tagName = tagName,
+            namespace = HtmlNamespace,
             applier = applier,
             browserBuilder = ElementBuilder.createBuilder(tagName),
             rawText = { content },
@@ -492,6 +509,7 @@ private class HydratingComposeHtmlContext(
         HydratingTagElement<HTMLStyleElement>(
             elementBuilder = HydratingElementBuilder(
                 tagName = "style",
+                namespace = HtmlNamespace,
                 applier = applier,
                 browserBuilder = ElementBuilder.createBuilder("style"),
                 rawText = { content.value },
@@ -525,6 +543,7 @@ private class HydratingComposeHtmlContext(
 
 private class HydratingElementBuilder<TElement : Element>(
     private val tagName: String,
+    private val namespace: String,
     private val applier: HydrationDomApplier,
     private val browserBuilder: ElementBuilder<TElement>,
     private val rawText: (() -> RawTextContent)? = null,
@@ -533,10 +552,11 @@ private class HydratingElementBuilder<TElement : Element>(
     @Suppress("UNCHECKED_CAST")
     override fun create(): TElement = if (applier.isHydrating) {
         if (rawText == null) {
-            applier.claimElement(tagName)
+            applier.claimElement(tagName, namespace)
         } else {
             applier.claimElementWithRawText(
                 tagName = tagName,
+                namespace = namespace,
                 value = rawText().text,
                 allowContentMismatch = allowance?.isAllowed == true,
             )

@@ -26,6 +26,56 @@ import kotlin.test.assertSame
 
 class ElementsTests {
     @Test
+    fun createsNamespacedElementsWithCaseSensitiveLocalNames() = runTest {
+        composition {
+            TagElementNS<Element>(
+                tagName = "linearGradient",
+                namespace = TestSvgNamespace,
+                applyAttrs = null,
+                content = null,
+            )
+        }
+
+        val element = root.firstElementChild
+        assertEquals("linearGradient", element?.localName)
+        assertEquals(TestSvgNamespace, element?.namespaceURI)
+    }
+
+    @Test
+    fun parsedSvgSerializationKeepsEveryElementInTheSvgNamespace() {
+        val container = document.createElement("div")
+        container.innerHTML = org.jetbrains.compose.web.composeHtmlToString {
+            SvgSerializationFixture()
+        }
+
+        val elements = container.querySelectorAll("*")
+        assertEquals(4, elements.length)
+        repeat(elements.length) { index ->
+            val element = elements.item(index) as Element
+            assertEquals(TestSvgNamespace, element.namespaceURI, element.localName)
+        }
+        assertEquals(
+            listOf("svg", "defs", "linearGradient", "image"),
+            List(elements.length) { (elements.item(it) as Element).localName },
+        )
+    }
+
+    @Test
+    fun cachesNamespacedBuildersByNamespaceAndTagName() {
+        val first = ElementBuilder.createBuilder<Element>("linearGradient", TestSvgNamespace)
+        val same = ElementBuilder.createBuilder<Element>("linearGradient", TestSvgNamespace)
+        val differentTag = ElementBuilder.createBuilder<Element>("lineargradient", TestSvgNamespace)
+        val differentNamespace = ElementBuilder.createBuilder<Element>(
+            "linearGradient",
+            "urn:example:other",
+        )
+
+        assertSame(first, same)
+        assertNotSame(first, differentTag)
+        assertNotSame(first, differentNamespace)
+    }
+
+    @Test
     fun nodeNames() = runTest {
         val nodes = listOf<Pair<@Composable () -> Unit, String>>(
             Pair({ Address() }, "ADDRESS"),

@@ -51,17 +51,24 @@ internal data class StringHtmlAttributes(
 
 internal class StringHtmlElementNode private constructor(
     tagName: String?,
+    namespace: String?,
     isRoot: Boolean,
 ) : StringHtmlNode {
+    val namespace: String? = if (isRoot) null else requireNotNull(namespace)
     val tagName: String? = if (isRoot) {
         null
     } else {
-        requireNotNull(tagName).also(::requireValidHtmlTagName).lowercase()
+        requireNotNull(tagName)
+            .also(::requireValidHtmlTagName)
+            .let { normalizeElementTagName(it, requireNotNull(namespace)) }
     }
     internal val children: MutableList<StringHtmlNode> = mutableListOf()
     private val attributes: MutableMap<String, String> = mutableMapOf()
 
-    constructor(tagName: String) : this(tagName, isRoot = false)
+    constructor(
+        tagName: String,
+        namespace: String = HtmlNamespace,
+    ) : this(tagName, namespace, isRoot = false)
 
     fun updateAttributes(attributes: Map<String, String>) = updateAttributes(
         StringHtmlAttributes(
@@ -71,14 +78,14 @@ internal class StringHtmlElementNode private constructor(
     )
 
     fun updateAttributes(attributes: StringHtmlAttributes) {
+        val namespace = requireElementNamespace()
         val normalizedAttributes = mutableMapOf<String, String>()
         val originalNames = mutableMapOf<String, String>()
         attributes.byName.forEach { (name, value) ->
             requireValidHtmlAttributeName(name)
-            // HTML parsers ASCII-lowercase attribute names. Mirror that behavior so validation and
-            // lookup agree with the browser DOM. SVG has no string-rendering path today; revisit
-            // this normalization if the renderer gains XML/XHTML or SVG output.
-            val normalizedName = name.asciiLowercase()
+            // HTML parsers ASCII-lowercase HTML attribute names, while foreign-content names are
+            // case-sensitive.
+            val normalizedName = if (namespace == HtmlNamespace) name.asciiLowercase() else name
             val previousName = originalNames.put(normalizedName, name)
             require(previousName == null) {
                 "Duplicate HTML attribute names \"$previousName\" and \"$name\""
@@ -95,9 +102,9 @@ internal class StringHtmlElementNode private constructor(
         this.attributes.putAll(normalizedAttributes)
     }
 
-    fun hasAttribute(name: String): Boolean = attributes.containsKey(name.asciiLowercase())
+    fun hasAttribute(name: String): Boolean = attributes.containsKey(normalizeAttributeName(name))
 
-    fun attribute(name: String): String? = attributes[name.asciiLowercase()]
+    fun attribute(name: String): String? = attributes[normalizeAttributeName(name)]
 
     fun toHtmlString(hydratable: Boolean = true): String = buildString {
         appendHtmlTo(this, hydratable)
@@ -109,11 +116,12 @@ internal class StringHtmlElementNode private constructor(
             appendChildrenHtmlTo(builder, hydratable)
             return
         }
+        val namespace = requireElementNamespace()
 
         builder.append('<').append(tagName)
         attributes.forEach { (name, value) ->
             builder.append(' ').append(name)
-            if (!name.isHtmlBooleanAttributeName()) {
+            if (namespace != HtmlNamespace || !name.isHtmlBooleanAttributeName()) {
                 builder.append("=\"")
                 builder.appendEscapedAttribute(value)
                 builder.append('"')
@@ -122,7 +130,7 @@ internal class StringHtmlElementNode private constructor(
         builder.append('>')
 
         // HTML void elements have neither content nor an end tag.
-        if (tagName in VoidElementNames) return
+        if (namespace == HtmlNamespace && tagName in VoidElementNames) return
 
         appendChildrenHtmlTo(builder, hydratable)
         builder.append("</").append(tagName).append('>')
@@ -142,6 +150,12 @@ internal class StringHtmlElementNode private constructor(
             }
         }
     }
+
+    private fun normalizeAttributeName(name: String): String =
+        if (requireElementNamespace() == HtmlNamespace) name.asciiLowercase() else name
+
+    private fun requireElementNamespace(): String =
+        checkNotNull(namespace) { "The string-rendering root has no element namespace" }
 
     companion object {
         private val VoidElementNames = setOf(
@@ -163,6 +177,7 @@ internal class StringHtmlElementNode private constructor(
 
         fun root(): StringHtmlElementNode = StringHtmlElementNode(
             tagName = null,
+            namespace = null,
             isRoot = true,
         )
     }

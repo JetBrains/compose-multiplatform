@@ -9,12 +9,18 @@ import kotlinx.browser.dom.HTMLStyleElement
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.utils.serializeRules
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 
 internal interface ComposeHtmlContext {
     val supportsDomElementAccess: Boolean
 
     fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement>
+
+    fun <TElement : Element> elementBuilderNS(
+        tagName: String,
+        namespace: String,
+    ): ElementBuilder<TElement>
 
     @Composable
     fun <TElement : Element> TagElement(
@@ -58,6 +64,29 @@ fun <TElement : Element> TagElement(
         applyAttrs = applyAttrs,
         content = content,
     )
+}
+
+/**
+ * Creates an element identified by both its local [tagName] and [namespace].
+ * Unlike HTML elements, tag names in non-HTML namespaces retain their casing.
+ */
+@Composable
+@ComposeWebInternalApi
+fun <TElement : Element> TagElementNS(
+    tagName: String,
+    namespace: String,
+    applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+    content: (@Composable ElementScope<TElement>.() -> Unit)?,
+) {
+    val context = LocalComposeHtmlContext.current
+
+    key(namespace, tagName) {
+        context.TagElement(
+            elementBuilder = context.elementBuilderNS(tagName, namespace),
+            applyAttrs = applyAttrs,
+            content = content,
+        )
+    }
 }
 
 /**

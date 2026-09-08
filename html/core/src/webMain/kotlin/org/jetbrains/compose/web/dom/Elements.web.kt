@@ -5,23 +5,37 @@ import kotlinx.browser.dom.Element
 import org.jetbrains.compose.web.internal.unsafeCast
 
 private class BrowserElementBuilder<TElement : Element>(
-    tagName: String
+    tagName: String,
+    namespace: String? = null,
 ) : ElementBuilder<TElement> {
     private val prototype: Element by lazy {
-        document.createElement(tagName)
+        if (namespace == null) {
+            document.createElement(tagName)
+        } else {
+            document.createElementNS(namespace, tagName)
+        }
     }
 
     override fun create(): TElement = prototype.cloneNode().unsafeCast<TElement>()
 }
 
-private val buildersCache = mutableMapOf<String, ElementBuilder<*>>()
+private val htmlBuildersCache = mutableMapOf<String, ElementBuilder<*>>()
+private val namespacedBuildersCache = mutableMapOf<Pair<String, String>, ElementBuilder<*>>()
 
 internal actual val platformElementBuildersCache: Map<String, ElementBuilder<*>>
-    get() = buildersCache
+    get() = htmlBuildersCache
 
 internal actual fun <TElement : Element> createPlatformElementBuilder(
     tagName: String
 ): ElementBuilder<TElement> =
-    buildersCache.getOrPut(tagName) {
+    htmlBuildersCache.getOrPut(tagName) {
         BrowserElementBuilder<Element>(tagName)
+    }.unsafeCast<ElementBuilder<TElement>>()
+
+internal actual fun <TElement : Element> createPlatformElementBuilderNS(
+    tagName: String,
+    namespace: String,
+): ElementBuilder<TElement> =
+    namespacedBuildersCache.getOrPut(namespace to tagName) {
+        BrowserElementBuilder<Element>(tagName, namespace)
     }.unsafeCast<ElementBuilder<TElement>>()

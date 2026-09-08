@@ -3,9 +3,10 @@ package org.jetbrains.compose.web.dom
 import kotlinx.browser.dom.Element
 
 internal class StringElementBuilder<TElement : Element>(
-    tagName: String
+    tagName: String,
+    val namespace: String = HtmlNamespace,
 ) : ElementBuilder<TElement> {
-    val tagName: String = tagName.lowercase()
+    val tagName: String = normalizeElementTagName(tagName, namespace)
 
     override fun create(): TElement {
         throw UnsupportedOperationException(

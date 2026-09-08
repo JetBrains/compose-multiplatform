@@ -21,6 +21,11 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
         StringElementBuilder(tagName)
 
+    override fun <TElement : Element> elementBuilderNS(
+        tagName: String,
+        namespace: String,
+    ): ElementBuilder<TElement> = StringElementBuilder(tagName, namespace)
+
     @Composable
     override fun <TElement : Element> TagElement(
         elementBuilder: ElementBuilder<TElement>,
@@ -49,7 +54,10 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
         ComposeStringNode(
             factory = {
                 StringHtmlNodeWrapper(
-                    StringHtmlElementNode(stringElementBuilder.tagName)
+                    StringHtmlElementNode(
+                        tagName = stringElementBuilder.tagName,
+                        namespace = stringElementBuilder.namespace,
+                    )
                 )
             },
             update = {

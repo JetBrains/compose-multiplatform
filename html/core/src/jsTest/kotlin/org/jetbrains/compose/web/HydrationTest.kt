@@ -5,12 +5,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.browser.document
+import kotlinx.browser.dom.Element
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.promise
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.HydrationDomApplier
 import org.jetbrains.compose.web.dom.Span
+import org.jetbrains.compose.web.dom.TagElementNS
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
@@ -18,6 +20,7 @@ import org.w3c.dom.HTMLElement
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 import kotlin.test.assertSame
@@ -25,6 +28,68 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ComposeWebInternalApi::class)
 class HydrationTest {
+    private val svgNamespace = "http://www.w3.org/2000/svg"
+
+    @Test
+    fun namespacedServerRenderedDomIsReused() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = composeHtmlToString { NamespacedContent() }
+        val serverSvg = root.firstChild
+        val serverGradient = serverSvg?.firstChild
+
+        val composition = hydrateComposable(root) {
+            NamespacedContent()
+        }
+
+        try {
+            assertSame(serverSvg, root.firstChild)
+            assertSame(serverGradient, root.firstChild?.firstChild)
+            assertEquals("linearGradient", (serverGradient as Element).localName)
+            assertEquals(svgNamespace, serverGradient.namespaceURI)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun hydrationRejectsAnElementWithTheWrongNamespace() {
+        val root = document.createElement("div") as HTMLElement
+        val mathMlNamespace = "http://www.w3.org/1998/Math/MathML"
+        root.appendChild(document.createElementNS(mathMlNamespace, "circle"))
+
+        val failure = assertFailsWith<HydrationMismatchException> {
+            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                TagElementNS<Element>("circle", svgNamespace, null, null)
+            }
+        }
+
+        assertContains(failure.message.orEmpty(), svgNamespace)
+        assertContains(failure.message.orEmpty(), mathMlNamespace)
+    }
+
+    @Test
+    fun hydrationComparesNamespacedLocalNamesCaseSensitively() {
+        val root = document.createElement("div") as HTMLElement
+        root.appendChild(document.createElementNS(svgNamespace, "lineargradient"))
+
+        val failure = assertFailsWith<HydrationMismatchException> {
+            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                TagElementNS<Element>("linearGradient", svgNamespace, null, null)
+            }
+        }
+
+        assertContains(failure.message.orEmpty(), "expected <linearGradient>")
+        assertContains(failure.message.orEmpty(), "found <lineargradient>")
+        assertFalse(failure.message.orEmpty().contains("namespace"))
+    }
+
+    @Composable
+    private fun NamespacedContent() {
+        TagElementNS<Element>("svg", svgNamespace, null) {
+            TagElementNS<Element>("linearGradient", svgNamespace, null, null)
+        }
+    }
+
     @Test
     fun serverRenderedDomIsReused() {
         val root = document.createElement("div") as HTMLElement
@@ -335,6 +400,7 @@ class HydrationTest {
 
         assertContains(failure.message.orEmpty(), "expected <div>")
         assertContains(failure.message.orEmpty(), "found <span>")
+        assertFalse(failure.message.orEmpty().contains("namespace"))
         assertSame(serverNode, root.firstChild)
         assertEquals(serverHtml, root.innerHTML)
     }

@@ -66,11 +66,11 @@ internal class HydrationDomApplier(
 
     fun mismatch(detail: String): Nothing = mismatchAtCurrentNode(detail)
 
-    /** Claims the next element. A missing or differently tagged node is a mismatch. */
-    fun claimElement(tagName: String): Element {
+    /** Claims the next element. A missing node or differing local name or namespace is a mismatch. */
+    fun claimElement(tagName: String, namespace: String): Element {
         ensureHydrating()
 
-        val expectedTagName = tagName.lowercase()
+        val expectedLocalName = normalizeElementTagName(tagName, namespace)
         val frame = currentFrame
         // allows whitespace around root node, that won't cause a hydration mismatch
         if (frame.node === rootNode && frame.nextChildIndex == 0) {
@@ -81,15 +81,15 @@ internal class HydrationDomApplier(
         frame.nextNode = candidate?.nextSibling
         val element = candidate as? Element
             ?: mismatchAtChild(
-                expectedTagName,
+                expectedLocalName,
                 index,
-                "expected <$expectedTagName>, found ${candidate.describe()}",
+                elementMismatchDescription(expectedLocalName, namespace, candidate),
             )
-        if (element.tagName.lowercase() != expectedTagName) {
+        if (element.localName != expectedLocalName || element.namespaceURI != namespace) {
             mismatchAtChild(
-                expectedTagName,
+                expectedLocalName,
                 index,
-                "expected <$expectedTagName>, found ${element.describe()}",
+                elementMismatchDescription(expectedLocalName, namespace, element),
             )
         }
 
@@ -100,10 +100,11 @@ internal class HydrationDomApplier(
     /** Claims an element whose server-only text is not represented by a Compose DOM node. */
     fun claimElementWithRawText(
         tagName: String,
+        namespace: String,
         value: String,
         allowContentMismatch: Boolean,
     ): Element {
-        val element = claimElement(tagName)
+        val element = claimElement(tagName, namespace)
         frames += Frame(element, allowsContentMismatch = allowContentMismatch)
         try {
             claimRawText(value, allowContentMismatch)
@@ -384,7 +385,7 @@ private fun DomNodeWrapper.allowsHydrationMismatch(): Boolean =
     (this as? HydrationMismatchAware)?.allowsHydrationMismatch == true
 
 private fun Node.pathName(): String = when (this) {
-    is Element -> tagName.lowercase()
+    is Element -> localName
     is Text -> "text()"
     else -> nodeName
 }
@@ -392,9 +393,20 @@ private fun Node.pathName(): String = when (this) {
 private fun Node?.asHydrationTextBoundaryMarker(): Comment? =
     (this as? Comment)?.takeIf { it.data == HydrationTextBoundaryMarker }
 
+private fun elementMismatchDescription(
+    expectedLocalName: String,
+    expectedNamespace: String,
+    found: Node?,
+): String = if (found is Element && found.namespaceURI != expectedNamespace) {
+    "expected <$expectedLocalName> in namespace ${expectedNamespace.quoted()}, " +
+        "found <${found.localName}> in namespace ${found.namespaceURI?.quoted() ?: "null"}"
+} else {
+    "expected <$expectedLocalName>, found ${found.describe()}"
+}
+
 private fun Node?.describe(): String = when (this) {
     null -> "the end of the children"
-    is Element -> "<${tagName.lowercase()}>"
+    is Element -> "<$localName>"
     is Text -> "text ${data.quoted()}"
     is Comment -> if (data == HydrationTextBoundaryMarker) {
         "an internal text boundary"

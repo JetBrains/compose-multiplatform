@@ -6,6 +6,15 @@ import kotlin.test.assertFailsWith
 
 class StringHtmlApplierTest {
     @Test
+    fun namespacedElementRetainsItsMetadata() {
+        val namespace = "http://www.w3.org/2000/svg"
+        val element = StringHtmlElementNode("linearGradient", namespace)
+
+        assertEquals("linearGradient", element.tagName)
+        assertEquals(namespace, element.namespace)
+    }
+
+    @Test
     fun appliesInsertRemoveAndMoveOperations() {
         val root = StringHtmlElementNode.root()
         val wrapper = StringHtmlNodeWrapper(root)
