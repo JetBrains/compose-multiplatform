@@ -1205,11 +1205,8 @@ class ResourcesTest : GradlePluginTestBase() {
     fun iosTestResources() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
         with(testProject("misc/appleResources")) {
-            gradle(":linkDebugTestIosSimulatorArm64", "--dry-run").checks {
-                check.taskSkipped(":copyTestComposeResourcesForIosSimulatorArm64")
-                check.taskSkipped(":linkDebugTestIosSimulatorArm64")
-            }
-            gradle(":copyTestComposeResourcesForIosSimulatorArm64").checks {
+            gradle(":linkDebugTestIosSimulatorArm64").checks {
+                check.taskSuccessful(":linkDebugTestIosSimulatorArm64")
                 file("build/bin/iosSimulatorArm64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
                 file("build/bin/iosSimulatorArm64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
             }
@@ -1232,11 +1229,8 @@ class ResourcesTest : GradlePluginTestBase() {
                 )
             }
             file("src/iosMain").renameTo(file("src/macosMain"))
-            gradle(":linkDebugTestMacosArm64", "--dry-run").checks {
-                check.taskSkipped(":copyTestComposeResourcesForMacosArm64")
-                check.taskSkipped(":linkDebugTestMacosArm64")
-            }
-            gradle(":copyTestComposeResourcesForMacosArm64").checks {
+            gradle(":linkDebugTestMacosArm64").checks {
+                check.taskSuccessful(":linkDebugTestMacosArm64")
                 file("build/bin/macosArm64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/compose-multiplatform.xml").checkExists()
                 file("build/bin/macosArm64/debugTest/compose-resources/composeResources/appleresources.generated.resources/drawable/icon.xml").checkExists()
             }

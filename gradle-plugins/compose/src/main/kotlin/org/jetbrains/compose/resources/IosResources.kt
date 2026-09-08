@@ -1,10 +1,14 @@
 package org.jetbrains.compose.resources
 
+import org.gradle.api.Action
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.file.Directory
+import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.Copy
+import org.gradle.api.tasks.PathSensitivity
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.internal.utils.dependsOn
 import org.jetbrains.compose.internal.utils.joinLowerCamelCase
@@ -20,6 +24,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.StaticLibrary
 import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.io.File
+import javax.inject.Inject
 
 private const val COCOAPODS_PLUGIN_ID = "org.jetbrains.kotlin.native.cocoapods"
 private const val IOS_COMPOSE_RESOURCES_ROOT_DIR = "compose-resources"
@@ -81,17 +86,23 @@ internal fun Project.configureSyncIosComposeResources(
                 }
 
             nativeTarget.binaries.withType(TestExecutable::class.java).all { testExec ->
-                val copyTestResourcesTask = tasks.registerOrConfigure<Copy>(
-                    "copyTestComposeResourcesFor${testExec.target.targetName.uppercaseFirstChar()}"
-                ) {
-                    from({
-                        (testExec.compilation.associatedCompilations + testExec.compilation).flatMap { compilation ->
-                            compilation.allKotlinSourceSets.map { it.resources }
-                        }
-                    })
-                    into(testExec.outputDirectory.resolve(IOS_COMPOSE_RESOURCES_ROOT_DIR))
+                val testResources = files({
+                    (testExec.compilation.associatedCompilations + testExec.compilation).flatMap { compilation ->
+                        compilation.allKotlinSourceSets.map { it.resources }
+                    }
+                })
+                testExec.linkTaskProvider.configure { linkTask ->
+                    linkTask.inputs.files(testResources)
+                        .withPropertyName("composeTestResources")
+                        .withPathSensitivity(PathSensitivity.RELATIVE)
+                    linkTask.doLast(
+                        objects.newInstance(
+                            SyncTestComposeResources::class.java,
+                            testResources,
+                            testExec.outputDirectory.resolve(IOS_COMPOSE_RESOURCES_ROOT_DIR)
+                        )
+                    )
                 }
-                testExec.linkTaskProvider.dependsOn(copyTestResourcesTask)
             }
         }
     }
@@ -118,6 +129,21 @@ internal fun Project.configureSyncIosComposeResources(
                     }
                 }
             }
+        }
+    }
+}
+
+internal abstract class SyncTestComposeResources @Inject constructor(
+    private val resources: FileCollection,
+    private val outputDirectory: File,
+) : Action<Task> {
+    @get:Inject
+    protected abstract val fileSystemOperations: FileSystemOperations
+
+    override fun execute(task: Task) {
+        fileSystemOperations.sync { copySpec ->
+            copySpec.from(resources)
+            copySpec.into(outputDirectory)
         }
     }
 }
