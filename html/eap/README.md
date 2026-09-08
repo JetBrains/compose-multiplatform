@@ -12,8 +12,8 @@ compose.html.eap.enabled=true
 ```
 
 The file is ignored by Git. CI enables the projects with the equivalent Gradle property.
-Values in `html/local.properties` take precedence over values from `html/gradle.properties` and
-command-line project properties.
+The `compose.html.eap.enabled` value in `html/local.properties` takes precedence over the value in
+`html/gradle.properties` and command-line project properties.
 
 Published coordinates start at version `0.0.1`:
 

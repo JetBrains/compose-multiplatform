@@ -1,6 +1,7 @@
 import org.jetbrains.compose.gradle.standardConf
 
-val composeHtmlEapKotlinxBrowserCommonSubsetVersion: String by rootProject.extra
+val kotlinxBrowserCommonSubsetVersion: String =
+    providers.gradleProperty("compose.html.eap.kotlinx-browser-common-subset.version").get()
 
 plugins {
     kotlin("multiplatform")
@@ -29,7 +30,7 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(
                     "org.jetbrains.compose.html:kotlinx-browser-common-subset:" +
-                        composeHtmlEapKotlinxBrowserCommonSubsetVersion
+                        kotlinxBrowserCommonSubsetVersion
                 )
             }
         }

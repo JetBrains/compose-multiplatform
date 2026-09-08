@@ -23,9 +23,6 @@ fun setting(name: String): String? =
 val COMPOSE_HTML_EAP_VERSION: String by lazy {
     requireNotNull(setting("compose.html.eap.version"))
 }
-val COMPOSE_HTML_EAP_KOTLINX_BROWSER_COMMON_SUBSET_VERSION: String by lazy {
-    requireNotNull(setting("compose.html.eap.kotlinx-browser-common-subset.version"))
-}
 val COMPOSE_REPO_URL: String? by project
 val COMPOSE_REPO_USERNAME: String? by project
 val COMPOSE_REPO_KEY: String? by project
@@ -54,8 +51,6 @@ subprojects {
     if (isComposeHtmlEapProject) {
         group = "org.jetbrains.compose.html.eap"
         version = COMPOSE_HTML_EAP_VERSION
-        rootProject.extra["composeHtmlEapKotlinxBrowserCommonSubsetVersion"] =
-            COMPOSE_HTML_EAP_KOTLINX_BROWSER_COMMON_SUBSET_VERSION
     } else {
         group = "org.jetbrains.compose.html"
         version = COMPOSE_WEB_VERSION
