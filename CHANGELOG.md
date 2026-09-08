@@ -48,7 +48,7 @@ _Changes since 1.12.0_
 - Use `UIView` layout and draw phases to run corresponding operation for Compose containers [#3212](https://github.com/JetBrains/compose-multiplatform-core/pull/3212)
 - Added possibility to configure `spellCheckingType` for textfields with `usingNativeTextInput = true` via `PlatformImeOptions` [#3305](https://github.com/JetBrains/compose-multiplatform-core/pull/3305)
 - Support iOS Dynamic Type font scaling based on accessibility settings [#3306](https://github.com/JetBrains/compose-multiplatform-core/pull/3306)
-- Support preferred-size reporting for Compose hosting views (ComposeHostingView / ComposeHostingViewController) embedded in UIKit or SwiftUI through `sizeThatFits` proposals. Keep the default `ComposeContainerConfiguration.preferredSizeReportingStrategy = PreferredSizeReportingStrategy.SizeThatFits`, for UIKit and SwiftUI on iOS 16 and later. For SwiftUI on iOS < 16, use `PreferredSizeReportingStrategy.IntrinsicContentSize` [#2984](https://github.com/JetBrains/compose-multiplatform-core/pull/2984)
+- Support preferred-size reporting for Compose hosting views (`ComposeHostingView` / `ComposeHostingViewController`) embedded in UIKit or SwiftUI through `sizeThatFits` proposals. Keep the default `ComposeContainerConfiguration.preferredSizeReportingStrategy = PreferredSizeReportingStrategy.SizeThatFits`, for UIKit and SwiftUI on iOS 16 and later. For SwiftUI on iOS < 16, use `PreferredSizeReportingStrategy.IntrinsicContentSize` [#2984](https://github.com/JetBrains/compose-multiplatform-core/pull/2984)
 
 ### Desktop
 
