@@ -61,7 +61,7 @@ kotlin {
     }
 }
 
-configurations.configureEach {
+configurations.matching { it.name.contains("Test") }.configureEach {
     resolutionStrategy.dependencySubstitution {
         substitute(project(":internal-html-core-runtime"))
             .using(project(":internal-html-core-runtime-eap"))
