@@ -28,10 +28,7 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(libs.kotlinx.coroutines.core)
-                implementation(
-                    "org.jetbrains.compose.html:kotlinx-browser-common-subset:" +
-                        kotlinxBrowserCommonSubsetVersion
-                )
+                implementation( "org.jetbrains.compose.html:kotlinx-browser-common-subset:$kotlinxBrowserCommonSubsetVersion")
             }
         }
 
