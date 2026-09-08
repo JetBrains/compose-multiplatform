@@ -45,9 +45,6 @@ kotlin {
             languageSettings {
                 optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
             }
-            dependencies {
-                implementation(project(":internal-html-core-runtime-eap"))
-            }
         }
 
         val jsTest by getting {
