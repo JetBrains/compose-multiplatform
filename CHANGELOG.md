@@ -10,7 +10,7 @@ _Changes since 1.12.0_
 
 ### Web
 
-- ComposeViewportConfiguration is no longer experimental [#3297](https://github.com/JetBrains/compose-multiplatform-core/pull/3297), [#3300](https://github.com/JetBrains/compose-multiplatform-core/pull/3300)
+- `ComposeViewportConfiguration` is no longer experimental [#3297](https://github.com/JetBrains/compose-multiplatform-core/pull/3297), [#3300](https://github.com/JetBrains/compose-multiplatform-core/pull/3300)
 
 ## Breaking Changes
 
