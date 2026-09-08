@@ -41,7 +41,7 @@ _Changes since 1.12.0_
 
 ### Multiple Platforms
 
-- Add support for mediaQuery calls which allows to modify Composables depending on device characteristics [#3339](https://github.com/JetBrains/compose-multiplatform-core/pull/3339)
+- Add support for `mediaQuery` calls which allows to modify Composables depending on device characteristics [#3339](https://github.com/JetBrains/compose-multiplatform-core/pull/3339)
 
 ### iOS
 
