@@ -12,6 +12,10 @@ import org.jetbrains.compose.web.css.utils.serializeRules
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 
+// HTML attribute names are ASCII-insensitive; foreign attribute names retain their case.
+internal fun Map<String, String>.containsAttribute(name: String, namespace: String?): Boolean =
+    if (namespace == HtmlNamespace) keys.any { it.asciiLowercase() == name } else name in this
+
 internal interface ComposeHtmlContext {
     val supportsDomElementAccess: Boolean
 
@@ -155,7 +159,7 @@ internal class RawTextContent private constructor(
 
     companion object {
         fun create(tagName: String, content: String): RawTextContent {
-            val normalizedTagName = tagName.lowercase()
+            val normalizedTagName = tagName.asciiLowercase()
             val normalizedContent = content.normalizeHtmlInputCharacters()
             requireValidRawTextContent(normalizedTagName, normalizedContent)
             return RawTextContent(normalizedTagName, normalizedContent)
@@ -163,7 +167,7 @@ internal class RawTextContent private constructor(
     }
 }
 
-private fun String.normalizeHtmlInputCharacters(): String =
+internal fun String.normalizeHtmlInputCharacters(): String =
     if ('\r' in this || '\u0000' in this) {
         replace("\r\n", "\n")
             .replace('\r', '\n')
@@ -172,19 +176,32 @@ private fun String.normalizeHtmlInputCharacters(): String =
         this
     }
 
+private val RawTextEndTags = listOf(
+    "script", "style", "iframe", "xmp", "noembed", "noframes", "noscript",
+).associateWith { tagName ->
+    Regex("</$tagName(?=[\\t\\n\\u000C\\r />])", RegexOption.IGNORE_CASE)
+}
+private val ScriptStartTag = Regex("<script(?=[\\t\\n\\u000C\\r />])", RegexOption.IGNORE_CASE)
+
 private fun requireValidRawTextContent(tagName: String, content: String) {
-    require(!content.contains("</$tagName", ignoreCase = true)) {
-        "Raw text for <$tagName> must not contain a case-insensitive </$tagName sequence"
+    val endTag = requireNotNull(RawTextEndTags[tagName]) {
+        "Raw text content is not supported for <$tagName>"
+    }
+    require(!endTag.containsMatchIn(content)) {
+        "Raw text for <$tagName> must not contain a </$tagName end tag"
     }
 
-    if (tagName.equals("script", ignoreCase = true)) {
-        val escapedScriptStart = content.indexOf("<!--")
-        require(
-            escapedScriptStart < 0 ||
-                content.indexOf("<script", escapedScriptStart + 4, ignoreCase = true) < 0
-        ) {
-            "Raw text for <script> must not contain a case-insensitive <script sequence " +
-                "after <!--"
+    if (tagName == "script") {
+        var escapedStart = content.indexOf("<!--")
+        while (escapedStart >= 0) {
+            // Include the opener's dashes: <!--> also exits the escaped state.
+            val escapedEnd = content.indexOf("-->", escapedStart + 2)
+            val script = ScriptStartTag.find(content, escapedStart + 4)
+            require(script == null || (escapedEnd >= 0 && script.range.first > escapedEnd)) {
+                "Raw text for <script> must not contain a <script tag inside <!-- escaped text"
+            }
+            if (escapedEnd < 0) break
+            escapedStart = content.indexOf("<!--", escapedEnd + 3)
         }
     }
 }

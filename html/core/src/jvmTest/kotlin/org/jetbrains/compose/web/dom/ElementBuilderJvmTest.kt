@@ -9,6 +9,19 @@ import kotlin.test.assertSame
 
 class ElementBuilderJvmTest {
     @Test
+    @OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+    fun namespacedBuildersAreCachedAndCannotCreateDomElements() {
+        val namespace = "http://www.w3.org/2000/svg"
+        val builder = ElementBuilder.createBuilder<kotlinx.browser.dom.Element>("linearGradient", namespace)
+        assertSame(builder, ElementBuilder.createBuilder<kotlinx.browser.dom.Element>("linearGradient", namespace))
+        val failure = assertFailsWith<UnsupportedOperationException> { builder.create() }
+        assertEquals(
+            "DOM element creation for <linearGradient> in namespace \"$namespace\" is not available on JVM",
+            failure.message,
+        )
+    }
+
+    @Test
     fun creatingDivElementIsUnsupported() {
         val builder = ElementBuilder.createBuilder<HTMLDivElement>("DIV")
 

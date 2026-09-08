@@ -130,7 +130,13 @@ class CommonElementsTest {
     fun rejectsInlineScriptContentThatCanBreakOutOfRawText() {
         listOf(
             "const value = '</ScRiPt>';",
-            "<!-- const value = '<ScRiPt';",
+            "<!-- const value = '<ScRiPt>';",
+            "<!--> <!-- <script >",
+            "</script >",
+            "</script/>",
+            "</script\t>",
+            "</script\n>",
+            "</script\u000C>",
         ).forEach { content ->
             val failure = assertFailsWith<IllegalArgumentException> {
                 composeHtmlToString {

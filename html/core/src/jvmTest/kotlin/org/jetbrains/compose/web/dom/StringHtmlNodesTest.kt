@@ -95,6 +95,13 @@ class StringHtmlNodesTest {
     }
 
     @Test
+    fun normalizesOnlyAsciiLettersInHtmlTagNames() {
+        val element = StringHtmlElementNode("D\u0130V")
+
+        assertEquals("d\u0130v", element.tagName)
+    }
+
+    @Test
     fun rejectsAttributeNamesThatDifferOnlyByAsciiCase() {
         val failure = assertFailsWith<IllegalArgumentException> {
             StringHtmlElementNode("div").updateAttributes(

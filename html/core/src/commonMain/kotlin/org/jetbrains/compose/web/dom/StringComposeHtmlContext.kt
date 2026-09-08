@@ -63,7 +63,7 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
             update = {
                 val attrsScope = AttrsScopeBuilder<TElement>()
                 applyAttrs?.invoke(attrsScope)
-                val attributes = attrsScope.stringAttributes()
+                val attributes = attrsScope.stringAttributes(stringElementBuilder.namespace)
                 rawText?.validateAttributes(attributes.byName)
 
                 update {
@@ -167,13 +167,15 @@ private fun unavailableDomElement(): Nothing =
    ```
  */
 @OptIn(ComposeWebInternalApi::class)
-private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(): StringHtmlAttributes {
+private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(
+    namespace: String,
+): StringHtmlAttributes {
     val byName = collect().toMutableMap().apply {
-        if (keys.none { it.equals(AttrsScope.CLASS, ignoreCase = true) } && classes.isNotEmpty()) {
+        if (!containsAttribute(AttrsScope.CLASS, namespace)) {
             classes.toClassAttributeValue()?.let { value -> this[AttrsScope.CLASS] = value }
         }
 
-        if (keys.none { it.equals("style", ignoreCase = true) }) {
+        if (!containsAttribute("style", namespace)) {
             styleScope.toStyleAttributeValue()?.let { value -> this["style"] = value }
         }
     }

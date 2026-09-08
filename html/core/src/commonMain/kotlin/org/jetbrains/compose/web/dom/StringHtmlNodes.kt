@@ -5,6 +5,13 @@ import org.jetbrains.compose.web.HydrationProtocolAttributes
 // HTML parsing merges adjacent non-empty text nodes. This comment preserves their boundary.
 internal const val HydrationTextBoundaryMarker = "c"
 
+private val HtmlRawTextElementNames = setOf(
+    "script", "style", "iframe", "xmp", "noembed", "noframes", "noscript",
+)
+
+internal fun isHtmlRawTextElement(tagName: String?, namespace: String?): Boolean =
+    namespace == HtmlNamespace && tagName in HtmlRawTextElementNames
+
 // A boolean attribute is true when present, independently of its supplied string value.
 internal val HtmlBooleanAttributeNames = setOf(
     "allowfullscreen",
@@ -34,7 +41,7 @@ internal val HtmlBooleanAttributeNames = setOf(
 )
 
 internal fun String.isHtmlBooleanAttributeName(): Boolean =
-    this in HtmlBooleanAttributeNames || lowercase() in HtmlBooleanAttributeNames
+    this in HtmlBooleanAttributeNames || asciiLowercase() in HtmlBooleanAttributeNames
 
 // in-memory equivalent of DOM node
 internal sealed interface StringHtmlNode {
@@ -80,19 +87,15 @@ internal class StringHtmlElementNode private constructor(
     fun updateAttributes(attributes: StringHtmlAttributes) {
         val namespace = requireElementNamespace()
         val normalizedAttributes = mutableMapOf<String, String>()
-        val originalNames = mutableMapOf<String, String>()
+        requireDistinctHtmlParserAttributeNames(attributes.byName.keys)
         attributes.byName.forEach { (name, value) ->
             requireValidHtmlAttributeName(name)
-            // HTML parsers ASCII-lowercase HTML attribute names, while foreign-content names are
-            // case-sensitive.
-            val normalizedName = if (namespace == HtmlNamespace) name.asciiLowercase() else name
-            val previousName = originalNames.put(normalizedName, name)
-            require(previousName == null) {
-                "Duplicate HTML attribute names \"$previousName\" and \"$name\""
-            }
+            // The tokenizer lowercases all names before applying its SVG name adjustments.
+            val parserName = name.asciiLowercase()
+            val normalizedName = if (namespace == HtmlNamespace) parserName else name
             require(
-                normalizedName !in HydrationProtocolAttributes ||
-                    normalizedName in attributes.hydrationProtocolAttributes
+                parserName !in HydrationProtocolAttributes ||
+                    parserName in attributes.hydrationProtocolAttributes
             ) {
                 "Attribute \"$name\" is owned by the Compose hydration protocol"
             }
@@ -132,7 +135,23 @@ internal class StringHtmlElementNode private constructor(
         // HTML void elements have neither content nor an end tag.
         if (namespace == HtmlNamespace && tagName in VoidElementNames) return
 
-        appendChildrenHtmlTo(builder, hydratable)
+        if (isHtmlRawTextElement(tagName, namespace) && children.isNotEmpty()) {
+            // Validate together so end tags split across children cannot bypass validation.
+            val text = children.joinToString("") { child ->
+                when (child) {
+                    is StringHtmlTextNode -> child.text
+                    is StringHtmlRawTextNode -> child.content.text
+                    else -> throw IllegalArgumentException(
+                        "String rendering does not support non-text children inside <$tagName>"
+                    )
+                }
+            }
+            val content = RawTextContent.create(tagName, text)
+            content.validateAttributes(attributes)
+            builder.append(content.text)
+        } else {
+            appendChildrenHtmlTo(builder, hydratable)
+        }
         builder.append("</").append(tagName).append('>')
     }
 
@@ -140,6 +159,7 @@ internal class StringHtmlElementNode private constructor(
         val rendered = children.filterNot(StringHtmlNode::isEmptyText)
         // Appends boundary marker for hydration between two text nodes
         rendered.forEachIndexed { index, child ->
+            requireParserStableChild(child)
             child.appendHtmlTo(builder, hydratable)
             if (
                 hydratable &&
@@ -149,6 +169,17 @@ internal class StringHtmlElementNode private constructor(
                 builder.appendHydrationTextBoundaryMarker()
             }
         }
+    }
+
+    private fun requireParserStableChild(child: StringHtmlNode) {
+        val childElement = child as? StringHtmlElementNode ?: return
+        requireHtmlParserStableChild(
+            parentTagName = tagName,
+            parentNamespace = namespace,
+            childTagName = requireNotNull(childElement.tagName),
+            childNamespace = childElement.requireElementNamespace(),
+            childAttributeNames = childElement.attributes.keys,
+        )
     }
 
     private fun normalizeAttributeName(name: String): String =
@@ -230,12 +261,6 @@ private const val InvalidHtmlTagNameCharacters = "\u0000/>"
 private const val InvalidHtmlAttributeNameCharacters = " \"'/>="
 
 private fun Char.isAsciiLetter(): Boolean = this in 'A'..'Z' || this in 'a'..'z'
-
-private fun String.asciiLowercase(): String = buildString(length) {
-    this@asciiLowercase.forEach { character ->
-        append(if (character in 'A'..'Z') character.lowercaseChar() else character)
-    }
-}
 
 private fun StringBuilder.appendEscapedAttribute(value: String) {
     value.forEach { character ->

@@ -1,18 +1,7 @@
-const path = require("path");
-const fs = require("fs");
-const ssrHydrationFixtures = [
-    "ssr-hydration.html",
-    "ssr-number-hydration.html",
-    "ssr-hydration-state.html",
-];
-
-ssrHydrationFixtures.forEach((fixture) => {
-    if (fs.existsSync(path.resolve(config.basePath, "kotlin", fixture))) {
-        config.files.push({
-            pattern: "kotlin/" + fixture,
-            included: false,
-            served: true,
-            watched: false,
-        });
-    }
+// Each module's generated SSR hydration fixtures are copied into its Kotlin test resources.
+config.files.push({
+    pattern: "kotlin/*ssr*hydration*.html",
+    included: false,
+    served: true,
+    watched: false,
 });

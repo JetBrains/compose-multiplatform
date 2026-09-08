@@ -96,8 +96,8 @@ private open class DomElementWrapper(override val node: Element) : DomNodeWrappe
         }
 
         attrs.forEach { (name, value) ->
-            if (node.getAttribute(name) != value) {
-                node.setAttribute(name, value)
+            if (node.getComposedAttribute(name) != value) {
+                node.setComposedAttribute(name, value)
             }
         }
     }
@@ -135,7 +135,7 @@ private class HydratingDomElementWrapper(
         attrs.forEach { (name, value) ->
             verifyAttribute(name, expected = value) {
                 // Unrelated server attributes are tolerated, so only the composed one is patched.
-                node.setAttribute(name, value)
+                node.setComposedAttribute(name, value)
             }
         }
     }
@@ -193,15 +193,19 @@ private class HydratingDomElementWrapper(
 
     /** Reports a mismatch, or applies [patch] after hydration if the element allows it. */
     private fun verifyAttribute(name: String, expected: String?, patch: () -> Unit) {
-        val actual = node.getAttribute(name)
+        val actual = node.getComposedAttribute(name)
         if (
             expected != null &&
-            name.equals(AttrsScope.CLASS, ignoreCase = true) &&
+            (name == AttrsScope.CLASS ||
+                node.namespaceURI == HtmlNamespace && name.asciiLowercase() == AttrsScope.CLASS) &&
             node.containsExpectedClasses(expected)
         ) {
             return
         }
-        if (actual.normalizedForHydration(name) == expected.normalizedForHydration(name)) return
+        if (
+            actual.normalizedForHydration(name, node.namespaceURI) ==
+            expected.normalizedForHydration(name, node.namespaceURI)
+        ) return
         if (allowance.isAllowed) {
             applier.applyOrDeferDomMutation(patch)
             return
@@ -210,6 +214,35 @@ private class HydratingDomElementWrapper(
             "attribute \"$name\": expected ${expected.describeAttributeValue()}, " +
                 "found ${actual.describeAttributeValue()}",
         )
+    }
+}
+
+// These are the foreign attributes whose namespaces are assigned by the HTML parser.
+private fun Element.composedAttributeNamespace(name: String): String? =
+    if (namespaceURI == HtmlNamespace) null else when (name) {
+        "xlink:actuate", "xlink:arcrole", "xlink:href", "xlink:role", "xlink:show",
+        "xlink:title", "xlink:type" -> "http://www.w3.org/1999/xlink"
+        "xml:base", "xml:lang", "xml:space" -> "http://www.w3.org/XML/1998/namespace"
+        "xmlns", "xmlns:xlink" -> "http://www.w3.org/2000/xmlns/"
+        else -> null
+    }
+
+private fun Element.getComposedAttribute(name: String): String? {
+    val namespace = composedAttributeNamespace(name)
+    // A qualified-name lookup alone would also accept an attribute in the wrong namespace.
+    return if (namespace == null) getAttribute(name) else {
+        getAttributeNS(namespace, name.substringAfter(':'))
+    }
+}
+
+private fun Element.setComposedAttribute(name: String, value: String) {
+    val namespace = composedAttributeNamespace(name)
+    if (namespace == null) {
+        setAttribute(name, value)
+    } else {
+        // Also replace an incorrectly unnamespaced attribute when patching a hydration mismatch.
+        removeAttribute(name)
+        setAttributeNS(namespace, name, value)
     }
 }
 
@@ -224,8 +257,16 @@ private fun Element.containsExpectedClasses(expected: String): Boolean {
     }
 }
 
-private fun String?.normalizedForHydration(attributeName: String): String? =
-    if (this != null && attributeName.isHtmlBooleanAttributeName()) "" else this
+// Boolean attributes have presence-only semantics in HTML, but are ordinary attributes in SVG.
+private fun String?.normalizedForHydration(
+    attributeName: String,
+    elementNamespace: String?,
+): String? =
+    if (
+        this != null &&
+        elementNamespace == HtmlNamespace &&
+        attributeName.isHtmlBooleanAttributeName()
+    ) "" else this
 
 private fun String?.describeAttributeValue(): String =
     if (this == null) "no attribute" else "\"$this\""
@@ -235,6 +276,18 @@ private class DomElementScope<TElement : Element> : ElementScopeImpl<TElement>()
 }
 
 internal actual val DefaultComposeHtmlContext: ComposeHtmlContext = BrowserComposeHtmlContext
+
+// Attribute updates are prepared before the DOM node exists. Select the namespace-specific
+// fallback only when applying the update, and include both alternatives in Compose's change check.
+private data class AttributeFallback<T>(val html: T?, val foreign: T?) {
+    fun forNamespace(namespace: String?): T? = if (namespace == HtmlNamespace) html else foreign
+}
+
+private fun <T> Map<String, String>.attributeFallback(name: String, value: T): AttributeFallback<T> =
+    AttributeFallback(
+        html = value.takeUnless { containsAttribute(name, HtmlNamespace) },
+        foreign = value.takeUnless { name in this },
+    )
 
 @Composable
 private fun <TElement : Element> TagElementImpl(
@@ -266,14 +319,12 @@ private fun <TElement : Element> TagElementImpl(
             hydrationMismatchAllowance?.isAllowed = attrsScope.allowsHydrationMismatch
 
             update {
-                set(
-                    attrsScope.classes.takeUnless { AttrsScope.CLASS in attrs },
-                    DomElementWrapper::updateClasses,
-                )
-                set(
-                    attrsScope.styleScope.takeUnless { "style" in attrs },
-                    DomElementWrapper::updateStyleDeclarations,
-                )
+                set(attrs.attributeFallback(AttrsScope.CLASS, attrsScope.classes)) { fallback ->
+                    updateClasses(fallback.forNamespace(node.namespaceURI))
+                }
+                set(attrs.attributeFallback("style", attrsScope.styleScope)) { fallback ->
+                    updateStyleDeclarations(fallback.forNamespace(node.namespaceURI))
+                }
                 set(attrs, DomElementWrapper::updateAttrs)
                 updateElement()
                 set(attrsScope.propertyUpdates, DomElementWrapper::updateProperties)

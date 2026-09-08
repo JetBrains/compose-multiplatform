@@ -18,6 +18,7 @@ import org.jetbrains.compose.web.svg.r
 import org.jetbrains.compose.web.svg.rx
 import org.jetbrains.compose.web.svg.ry
 import org.jetbrains.compose.web.svg.width
+import org.jetbrains.compose.web.svg.viewBox
 import org.jetbrains.compose.web.svg.x
 import org.jetbrains.compose.web.svg.x1
 import org.jetbrains.compose.web.svg.x2
@@ -67,5 +68,16 @@ class SvgNumberFormattingTest {
         }
 
         assertEquals("<svg points=\"0,1 2.5,0.33333334\"></svg>", html)
+    }
+
+    @Test
+    fun viewBoxFormatsEveryComponentPortably() {
+        val html = composeHtmlToString {
+            Svg(attrs = {
+                viewBox(0, 1.0, 2.5f, 1.0 / 3.0)
+            })
+        }
+
+        assertEquals("<svg viewBox=\"0 1 2.5 0.33333334\"></svg>", html)
     }
 }

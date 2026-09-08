@@ -1974,9 +1974,9 @@ karma-webpack@5.0.1:
     minimatch "^9.0.3"
     webpack-merge "^4.1.5"
 
-"karma@file:../../../../../../../../Downloads/karma-239a8fc984584f0d96b1dd750e7a5e2c79da93a6.tar.gz":
+"karma@github:Kotlin/karma#6.4.5":
   version "6.4.4"
-  resolved "file:../../../../../../../../Downloads/karma-239a8fc984584f0d96b1dd750e7a5e2c79da93a6.tar.gz#8cea190ef685d460b412a820de3469a0d781a6e2"
+  resolved "https://codeload.github.com/Kotlin/karma/tar.gz/239a8fc984584f0d96b1dd750e7a5e2c79da93a6"
   dependencies:
     "@colors/colors" "1.5.0"
     body-parser "^1.19.0"

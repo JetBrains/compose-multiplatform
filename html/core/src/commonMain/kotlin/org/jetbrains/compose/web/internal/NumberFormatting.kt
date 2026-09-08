@@ -11,6 +11,8 @@ import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 /**
  * Produces identical numeric text on all platforms for internal serialization consumers.
  *
+ * Keeps `Long` values and other integers below 2^53 exact. Other values use IEEE 754 binary32
+ * (`Float`) precision, so nonintegral `Double` inputs can lose digits.
  * This is the cross-module entry point for the portable number formatting implemented by CSS.
  */
 @ComposeWebInternalApi

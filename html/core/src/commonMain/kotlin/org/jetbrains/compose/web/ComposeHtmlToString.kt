@@ -22,6 +22,8 @@ import org.jetbrains.compose.web.dom.StringHtmlNodeWrapper
  * Known limitations:
  * - DOM property updates registered with `AttrsScope.prop(...)` are ignored because
  *   string rendering has no underlying DOM element.
+ *
+ * @throws IllegalArgumentException if an HTML raw-text element contains unsafe text or element children.
  */
 fun composeHtmlToString(
     hydratable: Boolean = true,

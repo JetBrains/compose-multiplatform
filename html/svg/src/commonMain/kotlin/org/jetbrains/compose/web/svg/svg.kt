@@ -17,6 +17,15 @@ import org.jetbrains.compose.web.dom.*
 
 const val SVG_NS = "http://www.w3.org/2000/svg"
 
+/**
+ * Creates an SVG root element.
+ *
+ * String rendering produces HTML syntax and does not add an `xmlns` declaration. It is intended
+ * for embedding in HTML, rather than serializing standalone XML `.svg` documents.
+ *
+ * For numeric view-box components, prefer `attrs = { viewBox(minX, minY, width, height) }` so
+ * values are formatted consistently across platforms.
+ */
 @Composable
 @ExperimentalComposeWebSvgApi
 fun Svg(
@@ -737,6 +746,20 @@ fun ElementScope<SVGElement>.Set(
     )
 }
 
+/**
+ * Creates a custom SVG element.
+ *
+ * When the result is string-rendered and parsed as HTML, custom tag and attribute names are
+ * ASCII-lowercased unless they are part of the HTML parser's fixed SVG name-adjustment tables.
+ * String rendering rejects names whose casing would change. Use lowercase names for custom
+ * elements and custom attributes that must hydrate from HTML.
+ * To embed HTML content, use `SvgElement<SVGElement>("foreignObject") { Div { ... } }` inside [Svg].
+ * For SVG styles or scripts, use `SvgElement<SVGElement>("style") { Text(css) }` or
+ * `SvgElement<SVGElement>("script") { Text(code) }`. These emit text content; the core [Style] and
+ * [Script] composables create HTML elements, and the [Style] CSSOM API does not apply here.
+ * String-rendered SVG elements must be descendants of an [Svg] root; standalone SVG fragments do
+ * not acquire the SVG namespace when parsed as HTML.
+ */
 @Composable
 @ExperimentalComposeWebSvgApi
 fun <T : SVGElement> SvgElement(

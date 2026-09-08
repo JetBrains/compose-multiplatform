@@ -60,18 +60,34 @@ fun AttrsScope<SVGElement>.href(href: String) {
     attr("href", href)
 }
 
+/**
+ * Writes [viewBox] unchanged. When its components are numeric, prefer the number overload so JVM
+ * and JavaScript rendering use the same representation.
+ */
 fun AttrsScope<SVGElement>.viewBox(viewBox: String) {
     attr("viewBox", viewBox)
 }
 
+fun AttrsScope<SVGElement>.viewBox(
+    minX: Number,
+    minY: Number,
+    width: Number,
+    height: Number,
+) {
+    attr("viewBox", listOf(minX, minY, width, height).joinToString(" ", transform = ::formatNumber))
+}
+
+/** Writes [transform] unchanged; dynamically constructed values must be identical across targets. */
 fun AttrsScope<SVGElement>.transform(transform: String) {
     attr("transform", transform)
 }
 
+/** Writes [d] unchanged; dynamically constructed values must be identical across targets. */
 fun AttrsScope<SVGElement>.d(d: String) {
     attr("d", d)
 }
 
+/** Writes [points] unchanged; prefer the number overload for dynamically constructed point lists. */
 fun AttrsScope<SVGElement>.points(points: String) {
     attr("points", points)
 }

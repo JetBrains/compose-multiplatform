@@ -34,21 +34,23 @@ import kotlin.time.Duration.Companion.milliseconds
 class HydrationAttributesTest {
     @Test
     fun booleanAttributeValuesAreComparedByPresence() {
-        val root = document.createElement("div") as HTMLElement
-        root.innerHTML = composeHtmlToString {
-            Button(attrs = { attr("disabled", "true") })
-        }
-        val button = root.firstChild as HTMLElement
+        listOf("disabled", "DISABLED", "DisAbLeD").forEach { name ->
+            val root = document.createElement("div") as HTMLElement
+            root.innerHTML = composeHtmlToString {
+                Button(attrs = { attr(name, "true") })
+            }
+            val button = root.firstChild as HTMLElement
 
-        val composition = hydrateComposable(root) {
-            Button(attrs = { attr("disabled", "true") })
-        }
+            val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                Button(attrs = { attr(name, "true") })
+            }
 
-        try {
-            assertSame(button, root.firstChild)
-            assertEquals("", button.getAttribute("disabled"))
-        } finally {
-            composition.dispose()
+            try {
+                assertSame(button, root.firstChild)
+                assertEquals("", button.getAttribute("disabled"))
+            } finally {
+                composition.dispose()
+            }
         }
     }
 

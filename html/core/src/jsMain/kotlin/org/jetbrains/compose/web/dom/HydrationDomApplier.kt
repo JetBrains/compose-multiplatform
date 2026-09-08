@@ -31,6 +31,8 @@ internal class HydrationDomApplier(
     ) {
         var nextNode: Node? = node.firstChild // used for traversal
         var nextChildIndex: Int = 0           // used for diagnostics
+        var expectedRawText: StringBuilder? = null
+        var serverRawText: String = ""
     }
 
     private data class PendingText(
@@ -121,6 +123,10 @@ internal class HydrationDomApplier(
         ensureHydrating()
 
         val frame = currentFrame
+        val parent = frame.node as? Element
+        if (isHtmlRawTextElement(parent?.localName, parent?.namespaceURI)) {
+            return claimRawTextChild(frame, value)
+        }
         if (frame.node === rootNode && frame.nextChildIndex == 0) {
             skipRootBoundaryWhitespace(frame, expectedText = value)
         }
@@ -164,6 +170,30 @@ internal class HydrationDomApplier(
             )
         }
 
+        claimedNodes += text
+        return text
+    }
+
+    // HTML raw text cannot contain boundary comments. Claim its single parsed text node once,
+    // then restore the Compose text boundaries only after the entire hydration has succeeded.
+    private fun claimRawTextChild(frame: Frame, value: String): Text {
+        val firstChild = frame.expectedRawText == null
+        if (firstChild) frame.expectedRawText = StringBuilder()
+        frame.expectedRawText!!.append(value)
+        val index = frame.nextChildIndex++
+        val candidate = frame.nextNode
+        val text = if (firstChild && candidate != null) {
+            val serverText = candidate as? Text ?: mismatchAtChild(
+                "text()", index, "expected raw text, found ${candidate.describe()}",
+            )
+            frame.serverRawText = serverText.data
+            frame.nextNode = serverText.nextSibling
+            serverText
+        } else {
+            document.createTextNode("").also { text ->
+                pendingTextsToInsert += PendingText(frame.node, frame.nextNode, text)
+            }
+        }
         claimedNodes += text
         return text
     }
@@ -297,6 +327,14 @@ internal class HydrationDomApplier(
     }
 
     private fun verifyComplete(frame: Frame) {
+        frame.expectedRawText?.let { expected ->
+            val text = expected.toString().normalizeHtmlInputCharacters()
+            if (!frame.allowsContentMismatch && text != frame.serverRawText) {
+                mismatchAtCurrentNode(
+                    "expected raw text ${text.quoted()}, found text ${frame.serverRawText.quoted()}",
+                )
+            }
+        }
         val extra = frame.nextNode ?: return
         mismatchAtCurrentNode("expected end of node, found extra ${extra.describe()}")
     }

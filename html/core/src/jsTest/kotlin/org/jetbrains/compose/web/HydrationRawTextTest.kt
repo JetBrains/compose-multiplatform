@@ -12,16 +12,168 @@ import org.jetbrains.compose.web.attributes.ScriptType
 import org.jetbrains.compose.web.attributes.type
 import org.jetbrains.compose.web.dom.Script
 import org.jetbrains.compose.web.dom.InlineScript
+import org.jetbrains.compose.web.dom.TagElement
+import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.dom.Span
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLScriptElement
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertNotSame
+import kotlin.test.assertNotNull
 import kotlin.test.assertSame
 import kotlin.time.Duration.Companion.milliseconds
 
 class HydrationRawTextTest {
+    @Test
+    fun genericRawTextValidationDoesNotEscapeTheMismatchFallback() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = "<script>server</script>"
+        val serverScript = root.firstChild
+        var mismatch: HydrationMismatchException? = null
+        val composition = hydrateComposable(root, onHydrationMismatch = { mismatch = it }) {
+            TagElement<Element>("script", null) { Text("</script>") }
+        }
+        try {
+            assertNotNull(mismatch)
+            assertNotSame(serverScript, root.firstChild)
+            assertEquals("</script>", root.firstChild!!.textContent)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun genericRawTextHydrationOnlyNormalizesParserInput() {
+        // These values cannot be string-rendered, but can exist in a DOM built by client code.
+        listOf("</script>", "<!-- <script>", "first\r\nsecond\u0000").forEach { value ->
+            listOf(false, true).forEach { allowed ->
+                val root = document.createElement("div") as HTMLElement
+                val serverScript = document.createElement("script")
+                serverScript.textContent = if (allowed) "server" else
+                    value.replace("\r\n", "\n").replace('\u0000', '\uFFFD')
+                root.appendChild(serverScript)
+                val serverText = serverScript.firstChild
+                val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                    TagElement<Element>("script", { if (allowed) allowHydrationMismatch() }) {
+                        Text(value)
+                    }
+                }
+                try {
+                    assertSame(serverScript, root.firstChild)
+                    assertSame(serverText, serverScript.firstChild)
+                    assertEquals(value, serverScript.textContent)
+                } finally {
+                    composition.dispose()
+                }
+            }
+        }
+    }
+
+    @Test
+    fun allowedRawTextMismatchStillRejectsNonTextChildren() {
+        listOf(false, true).forEach { generic ->
+            val root = document.createElement("div") as HTMLElement
+            val serverScript = document.createElement("script")
+            val child = document.createElement("span")
+            serverScript.appendChild(child)
+            root.appendChild(serverScript)
+            assertFailsWith<HydrationMismatchException> {
+                hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                    if (generic) {
+                        TagElement<Element>("script", { allowHydrationMismatch() }) { Text("client") }
+                    } else {
+                        Script(InlineScript("client")) { allowHydrationMismatch() }
+                    }
+                }
+            }
+            assertSame(serverScript, root.firstChild)
+            assertSame(child, serverScript.firstChild)
+        }
+    }
+
+    @Test
+    fun genericRawTextHydratesWithoutBoundaryComments() {
+        listOf("script", "style", "iframe", "xmp", "noembed", "noframes", "noscript").forEach { tag ->
+            val root = document.createElement("div") as HTMLElement
+            root.innerHTML = composeHtmlToString {
+                TagElement<Element>(tag, null) {
+                    Text("A & B")
+                    Text("")
+                    Text(" < C")
+                }
+            }
+            val parent = root.firstChild!!
+            val serverText = parent.firstChild
+            assertEquals(1, parent.childNodes.length, tag)
+            assertEquals("A & B < C", parent.textContent, tag)
+            val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                TagElement<Element>(tag, null) {
+                    Text("A & B")
+                    Text("")
+                    Text(" < C")
+                }
+            }
+            try {
+                assertSame(parent, root.firstChild, tag)
+                assertSame(serverText, parent.firstChild, tag)
+                assertEquals(3, parent.childNodes.length, tag)
+                assertEquals("A & B < C", parent.textContent, tag)
+            } finally {
+                composition.dispose()
+            }
+        }
+    }
+
+    @Test
+    fun genericRawTextSplittingWaitsUntilHydrationSucceeds() {
+        listOf(false, true).forEach { mismatchInSibling ->
+            val root = document.createElement("div") as HTMLElement
+            root.innerHTML = "<script>first second</script><span>server</span>"
+            val serverText = root.firstChild!!.firstChild
+            val serverHtml = root.innerHTML
+            assertFailsWith<HydrationMismatchException> {
+                hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                    TagElement<Element>("script", null) {
+                        Text("first")
+                        Text(if (mismatchInSibling) " second" else " different")
+                    }
+                    Span { Text(if (mismatchInSibling) "client" else "server") }
+                }
+            }
+            assertSame(serverText, root.firstChild!!.firstChild)
+            assertEquals(serverHtml, root.innerHTML)
+            assertEquals(1, root.firstChild!!.childNodes.length)
+        }
+    }
+
+    @Test
+    fun genericRawTextChildrenUpdateIndependentlyAfterHydration() = MainScope().promise {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = "<script>first second</script>"
+        var suffix by mutableStateOf(" second")
+        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            TagElement<Element>("script", null) {
+                Text("first")
+                Text(suffix)
+            }
+        }
+        val first = root.firstChild!!.firstChild
+        val second = first!!.nextSibling
+        try {
+            suffix = " changed"
+            delay(100.milliseconds)
+            assertSame(first, root.firstChild!!.firstChild)
+            assertSame(second, first.nextSibling)
+            assertEquals("first changed", root.firstChild!!.textContent)
+        } finally {
+            composition.dispose()
+        }
+    }
+
     @Test
     fun serverRenderedRawTextIsReusedAndNewlinesAreNormalized() {
         val content = "const first = '<main>&';\r\nconst second = true;\r"

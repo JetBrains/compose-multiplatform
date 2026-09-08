@@ -167,6 +167,7 @@ fun Script(
 
 /**
  * Trusted inline script source or data.
+ * Pass this to [Script] to render inline content explicitly.
  *
  * Construction does not sanitize or validate [content]; raw-text validation occurs when [Script]
  * is composed. Never insert untrusted values into JavaScript. For JSON or JSON-LD, escape `<` as
@@ -183,6 +184,8 @@ value class InlineScript(val content: String)
  *
  * A browser-created script executes when inserted. Hydration requires an exact raw-text match and
  * reuses a matching script without executing it again. Later content updates do not execute it.
+ * Inline content can also be rendered with `TagElement("script", ...)` and [Text];
+ * string rendering applies the same raw-text validation to both routes.
  *
  * **Warning:** A hydration mismatch replaces the entire hydration root. Every inline script under
  * that root is created again, so scripts that already ran can run a second time. Side-effecting
@@ -454,6 +457,11 @@ fun Progress(
     content: ContentBuilder<HTMLProgressElement>? = null,
 ) = TagElement<HTMLProgressElement>("progress", attrs, content)
 
+/**
+ * String rendering emits text children as validated raw text because HTML parses iframe
+ * content as raw text. Nested element children are unsupported; use `src` or `srcdoc`
+ * attributes to supply the embedded document.
+ */
 @Composable
 fun Iframe(
     attrs: AttrBuilderContext<HTMLIFrameElement>? = null,
