@@ -8,6 +8,7 @@ package org.jetbrains.compose.web.core.tests.css
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import org.jetbrains.compose.web.testutils.*
 
@@ -160,7 +161,8 @@ class CSSBackgroundTests {
 
         assertEquals("contain", nextChild().computedStyle.backgroundSize)
         assertEquals("cover", nextChild().computedStyle.backgroundSize)
-        assertEquals("50%", nextChild().computedStyle.backgroundSize)
+        // Accept both while CI uses an older Chrome. Chrome 152 serializes the spec-default second value as `auto`.
+        assertContains(listOf("50%", "50% auto"), nextChild().computedStyle.backgroundSize)
         assertEquals("auto 50px", nextChild().computedStyle.backgroundSize)
     }
 
