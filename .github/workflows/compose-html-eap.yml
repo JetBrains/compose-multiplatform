@@ -42,10 +42,12 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Run Compose HTML EAP tests
+      - name: Test and publish Compose HTML EAP artifacts to Maven Local
         working-directory: html
         run: |
           ./gradlew --no-daemon --stacktrace --rerun-tasks --max-workers=1 \
             -Pcompose.html.eap.enabled=true \
             :html-core-eap:check \
-            :internal-html-core-runtime-eap:check
+            :internal-html-core-runtime-eap:check \
+            :html-core-eap:publishToMavenLocal \
+            :internal-html-core-runtime-eap:publishToMavenLocal

@@ -106,19 +106,19 @@ subprojects {
                 pom {
                     name.set(
                         when (projectName) {
-                            "html-core-eap" -> "JetBrains Compose Multiplatform HTML EAP core"
+                            "html-core-eap" -> "JetBrains Compose HTML EAP core"
                             "internal-html-core-runtime-eap" ->
-                                "JetBrains Compose Multiplatform HTML EAP internal runtime"
-                            else -> "JetBrains Compose Multiplatform HTML library"
+                                "JetBrains Compose HTML EAP internal runtime"
+                            else -> "JetBrains Compose HTML library"
                         }
                     )
                     description.set(
                         when (projectName) {
                             "html-core-eap" ->
-                                "Experimental commonized JetBrains Compose Multiplatform HTML core library"
+                                "Experimental commonized JetBrains Compose HTML core library"
                             "internal-html-core-runtime-eap" ->
-                                "Experimental commonized JetBrains Compose Multiplatform HTML internal runtime"
-                            else -> "JetBrains Compose Multiplatform HTML library"
+                                "Experimental commonized JetBrains Compose HTML internal runtime"
+                            else -> "JetBrains Compose HTML library"
                         }
                     )
                     url.set("https://www.jetbrains.com/lp/compose-mpp/")
