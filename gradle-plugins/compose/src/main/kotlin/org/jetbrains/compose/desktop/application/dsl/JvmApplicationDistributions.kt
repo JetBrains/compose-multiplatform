@@ -18,6 +18,7 @@ abstract class JvmApplicationDistributions : AbstractDistributions() {
         this.modules.addAll(modules.toList())
     }
     var includeAllModules: Boolean = false
+    var stripJreFonts: Boolean = true
 
     val linux: LinuxPlatformSettings = objects.newInstance(LinuxPlatformSettings::class.java)
     open fun linux(fn: Action<LinuxPlatformSettings>) {

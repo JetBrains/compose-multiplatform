@@ -303,20 +303,76 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testJdk19() = with(customJdkProject(19)) {
+    fun testJdk19() = with(customJdkProject(javaVersion = 19)) {
         testPackageJvmDistributions()
     }
 
-    private fun customJdkProject(javaVersion: Int): TestProject =
+    @Test
+    fun testFontStripping() =
+        // JBR25 comes with bundled fonts, so we can check stripping them on it
+        with(
+            customJdkProject(
+                javaVendor = "JETBRAINS",
+                javaVersion = 25,
+                extraConfig = """
+                    nativeDistributions {
+                        stripJreFonts = true
+                    }
+                """.replaceIndent("    ") + "\n"
+            )
+        ) {
+            gradle(":createRuntimeImage")
+            val runtimeDir = file("build/compose/tmp/main/runtime")
+            assertTrue(runtimeDir.isDirectory)
+            assertFalse(runtimeDir.list()!!.contains("fonts"))
+        }
+
+    private fun customJdkProject(
+        javaVendor: String? = null,
+        javaVersion: Int? = null,
+        extraConfig: String? = null,
+    ): TestProject =
         testProject("application/jvm").apply {
             appendText("build.gradle") {
-                """
-                    compose.desktop.application {
-                        javaHome = javaToolchains.launcherFor {
-                            languageVersion.set(JavaLanguageVersion.of($javaVersion))
-                        }.get().metadata.installationPath.asFile.absolutePath
+                buildString {
+                    append(
+                        """
+                        compose.desktop.application {
+                            javaHome = javaToolchains.launcherFor {
+                        """.trimIndent()
+                    )
+                    appendLine()
+                    if (javaVendor != null) {
+                        append(
+                            """
+                            vendor.set(
+                                org.gradle.jvm.toolchain.internal.DefaultJvmVendorSpec.of(
+                                    org.gradle.internal.jvm.inspection.JvmVendor.KnownJvmVendor.$javaVendor
+                                )
+                            )
+                            """.replaceIndent("        ")
+                        )
+                        appendLine()
                     }
-                """.trimIndent()
+                    if (javaVersion != null) {
+                        append(
+                            """
+                            languageVersion.set(JavaLanguageVersion.of($javaVersion))
+                            """.replaceIndent("        ")
+                        )
+                        appendLine()
+                    }
+                    append(
+                        """
+                            }.get().metadata.installationPath.asFile.absolutePath
+                        """.replaceIndent("    ")
+                    )
+                    if (extraConfig != null) {
+                        appendLine()
+                        append(extraConfig)
+                    }
+                    append("}")
+                }
             }
         }
 
