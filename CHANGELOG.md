@@ -2,6 +2,12 @@
 
 _Changes since 1.12.0_
 
+## Known issues
+
+### Web
+
+- RuntimeError: memory access out of bounds error ([YouTrack issue](https://youtrack.jetbrains.com/issue/CMP-10732)). Workaround is to disable the snapshot cache: `ComposeUiFlags.useSnapshotCache = false`
+
 ## Highlights
 
 ### Desktop
