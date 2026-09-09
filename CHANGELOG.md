@@ -125,7 +125,7 @@ _Changes since 1.12.0_
 
 - Return a default plural rule for unknown locales [#5650](https://github.com/JetBrains/compose-multiplatform/pull/5650)
 - Fixed Android ANR when `Dispatchers.Default` is overloaded [#5688](https://github.com/JetBrains/compose-multiplatform/pull/5688)
-- Fixed a deadlock when Main thread is blocked by mutex [#5691](https://github.com/JetBrains/compose-multiplatform/pull/5691)
+- Fixed a Main thread deadlock when resources are read from blocking and non blocking coroutines [#5691](https://github.com/JetBrains/compose-multiplatform/pull/5691)
 - Fix R8 release builds failing because the optional Android test instrumentation API is unavailable [#5667](https://github.com/JetBrains/compose-multiplatform/pull/5667)
 
 ### Navigation
