@@ -16,8 +16,10 @@ internal actual val platformElementBuildersCache: Map<String, ElementBuilder<*>>
 internal actual fun <TElement : Element> createPlatformElementBuilder(
     tagName: String
 ): ElementBuilder<TElement> = buildersCache.getOrPut(tagName) {
-    ElementBuilder<Element> {
-        throw UnsupportedOperationException(
+    object : ElementBuilder<Element> {
+        override val tagName: String = tagName
+
+        override fun create(): Element = throw UnsupportedOperationException(
             "DOM element creation for <$tagName> is not available on JVM"
         )
     }

@@ -10,7 +10,7 @@ import kotlinx.browser.dom.Element
 import org.jetbrains.compose.web.internal.unsafeCast
 
 private class BrowserElementBuilder<TElement : Element>(
-    tagName: String
+    override val tagName: String
 ) : ElementBuilder<TElement> {
     private val prototype: Element by lazy {
         document.createElement(tagName)

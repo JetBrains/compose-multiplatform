@@ -122,6 +122,32 @@ sealed class ARel(val relStr: String) {
     class CustomARel(value: String) : ARel(value)
 }
 
+sealed class LinkRel(val relStr: String) {
+    object Stylesheet : LinkRel("stylesheet")
+    object Icon : LinkRel("icon")
+    object Preconnect : LinkRel("preconnect")
+    object DnsPrefetch : LinkRel("dns-prefetch")
+    object Prefetch : LinkRel("prefetch")
+    object Preload : LinkRel("preload")
+    object ModulePreload : LinkRel("modulepreload")
+    object Manifest : LinkRel("manifest")
+    object Canonical : LinkRel("canonical")
+    object Alternate : LinkRel("alternate")
+
+    class CustomLinkRel(value: String) : LinkRel(value)
+}
+
+sealed class ScriptType(val typeStr: String) {
+    object Module : ScriptType("module")
+    object ImportMap : ScriptType("importmap")
+    object SpeculationRules : ScriptType("speculationrules")
+    object ApplicationJson : ScriptType("application/json")
+    object ApplicationLdJson : ScriptType("application/ld+json")
+    object TextPlain : ScriptType("text/plain")
+
+    class CustomScriptType(value: String) : ScriptType(value)
+}
+
 enum class Draggable(val str: String) {
     True("true"), False("false"), Auto("auto");
 }
