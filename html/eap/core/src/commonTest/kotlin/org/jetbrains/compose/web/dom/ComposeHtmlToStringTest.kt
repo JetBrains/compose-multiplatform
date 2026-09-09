@@ -5,6 +5,13 @@
 
 package org.jetbrains.compose.web.dom
 
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.composeHtmlToString
 import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.CSSUnitValue
@@ -24,8 +31,52 @@ import org.jetbrains.compose.web.css.variable
 import org.jetbrains.compose.web.css.keywords.auto
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 class ComposeHtmlToStringTest {
+    @Test
+    fun doesNotStartCompositionScopedCoroutines() {
+        val launchedEffectStarted = CompletableDeferred<Unit>()
+        val scopeCoroutineStarted = CompletableDeferred<Unit>()
+        var sideEffectRan = false
+
+        val html = composeHtmlToString {
+            // Unconfined makes an incorrectly active scope execute immediately,
+            // so the regression check does not depend on thread scheduling.
+            val scope = rememberCoroutineScope { Dispatchers.Unconfined }
+            LaunchedEffect(Unit) {
+                launchedEffectStarted.complete(Unit)
+            }
+            SideEffect {
+                sideEffectRan = true
+                scope.launch { scopeCoroutineStarted.complete(Unit) }
+            }
+            Div { Text("initial content") }
+        }
+
+        assertEquals("<div>initial content</div>", html)
+        assertEquals(true, sideEffectRan)
+        assertFalse(scopeCoroutineStarted.isCompleted)
+        assertFalse(launchedEffectStarted.isCompleted)
+    }
+
+    @Test
+    fun runsAndDisposesSynchronousEffects() {
+        val effects = mutableListOf<String>()
+
+        val html = composeHtmlToString {
+            DisposableEffect(Unit) {
+                effects.add("enter")
+                onDispose { effects.add("dispose") }
+            }
+            SideEffect { effects.add("side effect") }
+            Text("content")
+        }
+
+        assertEquals("content", html)
+        assertEquals(listOf("enter", "side effect", "dispose"), effects)
+    }
+
     @Test
     fun eventListenersAreNotSerialized() {
         val html = composeHtmlToString {

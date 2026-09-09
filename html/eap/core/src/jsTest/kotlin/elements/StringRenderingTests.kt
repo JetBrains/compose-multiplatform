@@ -18,6 +18,24 @@ import kotlin.test.assertFailsWith
 
 class StringRenderingTests {
     @Test
+    fun genericRawTextSurvivesHtmlParsing() {
+        listOf("script", "style", "iframe", "xmp", "noembed", "noframes", "noscript").forEach { tag ->
+            val container = document.createElement("div") as HTMLElement
+            container.innerHTML = composeHtmlToString {
+                TagElement<Element>(tag, null) {
+                    Text("A & B < C\r")
+                    Text("\nD")
+                }
+                Span { Text("after") }
+            }
+
+            assertEquals("A & B < C\nD", container.firstElementChild!!.textContent, tag)
+            assertEquals("after", container.lastElementChild!!.textContent)
+            assertEquals(2, container.children.length)
+        }
+    }
+
+    @Test
     fun repeatedCssAssignmentsMatchBrowserStyles() {
         val assignments = listOf(
             listOf("margin-top" to "10px", "margin" to "0px", "margin-top" to "20px"),

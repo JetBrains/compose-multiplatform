@@ -99,7 +99,25 @@ internal class StringHtmlElementNode private constructor(
         if (tagName in VoidElementNames) return
 
         val contentStart = builder.length
-        children.forEach { it.appendHtmlTo(builder) }
+        // The parent determines text serialization: script/style and other raw-text elements
+        // emit validated text without HTML escaping. Ordinary elements escape their text.
+        if (tagName in RawTextElementNames && children.isNotEmpty()) {
+            // Validate together so end tags split across children cannot bypass validation.
+            val text = children.joinToString("") { child ->
+                when (child) {
+                    is StringHtmlTextNode -> child.text
+                    is StringHtmlRawTextNode -> child.content.text
+                    else -> throw IllegalArgumentException(
+                        "String rendering does not support element children inside <$tagName>"
+                    )
+                }
+            }
+            val content = RawTextContent.create(tagName, text)
+            content.validateAttributes(attributes)
+            builder.append(content.text)
+        } else {
+            children.forEach { it.appendHtmlTo(builder) }
+        }
         // HTML parsing discards the first LF in these elements.
         if ((tagName == "pre" || tagName == "textarea" || tagName == "listing") &&
             builder.length > contentStart && builder[contentStart] == '\n'
@@ -110,6 +128,10 @@ internal class StringHtmlElementNode private constructor(
     }
 
     companion object {
+        private val RawTextElementNames = setOf(
+            "script", "style", "iframe", "xmp", "noembed", "noframes", "noscript",
+        )
+
         private val VoidElementNames = setOf(
             "area",
             "base",

@@ -243,7 +243,7 @@ class CommonElementsTest {
             Meter { Text("meter") }
             Output { Text("output") }
             Progress { Text("progress") }
-            Iframe { Text("iframe") }
+            Iframe(attrs = { attr("src", "/embedded.html") })
             Object { Text("object") }
         }
 
@@ -258,7 +258,7 @@ class CommonElementsTest {
                 "<meter>meter</meter>" +
                 "<output>output</output>" +
                 "<progress>progress</progress>" +
-                "<iframe>iframe</iframe>" +
+                "<iframe src=\"/embedded.html\"></iframe>" +
                 "<object>object</object>",
             html,
         )

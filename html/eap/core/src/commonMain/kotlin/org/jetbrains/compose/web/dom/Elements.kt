@@ -248,6 +248,7 @@ fun Script(
 
 /**
  * Trusted inline script source or data.
+ * Pass this to [Script] to render inline content explicitly.
  *
  * Construction does not sanitize or validate [content]; raw-text validation occurs when [Script]
  * is composed. Never insert untrusted values into JavaScript. For JSON or JSON-LD, escape `<` as
@@ -262,6 +263,8 @@ value class InlineScript(val content: String)
  * [content] must be trusted. The `src` attribute is not allowed: use the
  * attribute-only overload for external scripts.
  * In the browser, updating the content of an executed script does not execute it again.
+ * Inline content can also be rendered with `TagElement("script", ...)` and [Text];
+ * string rendering applies the same raw-text validation to both routes.
  *
  * @throws IllegalArgumentException if [content] is not safe HTML script raw text.
  */
@@ -529,6 +532,11 @@ fun Progress(
     content: ContentBuilder<HTMLProgressElement>? = null,
 ) = TagElement<HTMLProgressElement>(ProgressBuilder, attrs, content)
 
+/**
+ * String rendering emits text children as validated raw text because HTML parses iframe
+ * content as raw text. Nested element children are unsupported; use `src` or `srcdoc`
+ * attributes to supply the embedded document.
+ */
 @Composable
 fun Iframe(
     attrs: AttrBuilderContext<HTMLIFrameElement>? = null,

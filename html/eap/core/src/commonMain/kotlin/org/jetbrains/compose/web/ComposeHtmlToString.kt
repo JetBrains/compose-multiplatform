@@ -19,18 +19,25 @@ import org.jetbrains.compose.web.dom.StringHtmlNodeWrapper
 /**
  * Composes [content] once into an HTML string without creating browser DOM nodes.
  * The backing composition is disposed after the initial HTML has been serialized.
+ * Coroutine effects such as `LaunchedEffect` do not run. `SideEffect` and
+ * `DisposableEffect` still execute.
  *
  * Known limitations:
  * - DOM property updates registered with `AttrsScope.prop(...)` are ignored because
  *   string rendering has no underlying DOM element.
  * - Inline styles preserve CSS fallbacks, but do not fully emulate CSSOM validation and
  *   mutation (for example, invalid assignments that also change priority, or shorthand removal).
+ *
+ * @throws IllegalArgumentException if a raw-text element contains unsafe text or element children.
  */
 fun composeHtmlToString(
     content: @Composable () -> Unit
 ): String {
     val root = StringHtmlElementNode.root()
-    val recomposer = Recomposer(Dispatchers.Default)
+    val recomposer = Recomposer(Dispatchers.Default).apply {
+        // Render the initial composition without starting coroutine effects.
+        cancel()
+    }
     val composition = ControlledComposition(
         applier = StringHtmlApplier(StringHtmlNodeWrapper(root)),
         parent = recomposer,

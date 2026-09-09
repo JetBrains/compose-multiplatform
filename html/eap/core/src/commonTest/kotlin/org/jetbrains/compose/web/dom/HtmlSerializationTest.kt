@@ -12,6 +12,7 @@ import org.jetbrains.compose.web.attributes.readOnly
 import org.jetbrains.compose.web.attributes.required
 import org.jetbrains.compose.web.composeHtmlToString
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
@@ -52,6 +53,100 @@ class HtmlSerializationTest {
         assertEquals("<div class=\"a\u00A0b\"></div>", composeHtmlToString {
             Div({ classes("a\u00A0b") })
         })
+    }
+
+    @Test
+    fun rendersTextChildrenInRawTextElements() {
+        listOf("script", "style", "iframe", "xmp", "noembed", "noframes", "noscript").forEach { tag ->
+            val html = composeHtmlToString {
+                TagElement<Element>(tag.uppercase(), null) {
+                    Text("A & B")
+                    Text(" < C")
+                }
+            }
+
+            assertEquals("<$tag>A & B < C</$tag>", html)
+        }
+    }
+
+    @Test
+    fun rejectsRawTextEndTagsSplitAcrossChildren() {
+        listOf("script", "style", "iframe", "xmp", "noembed", "noframes", "noscript").forEach { tag ->
+            val failure = assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString {
+                    TagElement<Element>(tag, null) {
+                        Text("</${tag.take(2)}")
+                        Text("${tag.drop(2).uppercase()}>")
+                    }
+                }
+            }
+
+            assertContains(failure.message.orEmpty(), "Raw text for <$tag>")
+        }
+    }
+
+    @Test
+    fun genericScriptsUseInlineScriptValidation() {
+        val failure = assertFailsWith<IllegalArgumentException> {
+            composeHtmlToString {
+                TagElement<Element>("script", null) {
+                    Text("<!-- <scr")
+                    Text("ipt>")
+                }
+            }
+        }
+        assertContains(failure.message.orEmpty(), "inside <!-- escaped text")
+
+        val srcFailure = assertFailsWith<IllegalArgumentException> {
+            composeHtmlToString {
+                TagElement<Element>("script", { attr("src", "/app.js") }) {
+                    Text("console.log('inline')")
+                }
+            }
+        }
+        assertContains(srcFailure.message.orEmpty(), "cannot be combined with a src attribute")
+    }
+
+    @Test
+    fun rejectsElementChildrenInRawTextElements() {
+        listOf("script", "style", "iframe", "xmp", "noembed", "noframes", "noscript").forEach { tag ->
+            val failure = assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString {
+                    TagElement<Element>(tag, null) {
+                        Div { Text("nested content") }
+                    }
+                }
+            }
+
+            assertContains(failure.message.orEmpty(), "element children inside <$tag>")
+        }
+    }
+
+    @Test
+    fun rendersRawTextElementsWithoutChildren() {
+        val tags = listOf("script", "style", "iframe", "xmp", "noembed", "noframes", "noscript")
+        val html = composeHtmlToString {
+            tags.forEach { tag ->
+                TagElement<Element>(tag, { id(tag) }, null)
+            }
+        }
+
+        assertEquals(tags.joinToString("") { "<$it id=\"$it\"></$it>" }, html)
+    }
+
+    @Test
+    fun stillEscapesTextOutsideRawTextElements() {
+        val html = composeHtmlToString {
+            Title { Text("A & B < C") }
+            TagElement<Element>("textarea", null) { Text("A & B < C") }
+            Div { Text("<script>alert(1)</script>") }
+        }
+
+        assertEquals(
+            "<title>A &amp; B &lt; C</title><textarea>A &amp; B &lt; C</textarea>" +
+                "<div>&lt;script&gt;alert(1)&lt;/script&gt;</div>",
+            html,
+        )
     }
 
     @Test
