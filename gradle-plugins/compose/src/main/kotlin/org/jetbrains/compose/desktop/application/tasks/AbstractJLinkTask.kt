@@ -36,6 +36,9 @@ abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
     val javaRuntimePropertiesFile: RegularFileProperty = objects.fileProperty()
 
     @get:Input
+    val stripJreFonts: Property<Boolean> = objects.property<Boolean>().value(true)
+
+    @get:Input
     internal val stripDebug: Property<Boolean> = objects.property<Boolean>().value(true)
 
     @get:Input
@@ -67,6 +70,7 @@ abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
         cliArg("--no-header-files", noHeaderFiles)
         cliArg("--no-man-pages", noManPages)
         cliArg("--strip-native-commands", stripNativeCommands)
+        cliArg("--exclude-files=glob:/java.desktop/lib/fonts/**", stripJreFonts)
         cliArg("--compress", compressionLevel.orNull?.id)
         if (generateJreCdsArchive.get()) {
             if (stripNativeCommands.get()) {

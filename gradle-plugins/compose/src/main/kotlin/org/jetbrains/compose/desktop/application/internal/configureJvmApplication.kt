@@ -115,6 +115,7 @@ private fun JvmApplicationContext.configurePackagingTasks(
         modules.set(provider { app.nativeDistributions.modules })
         includeAllModules.set(provider { app.nativeDistributions.includeAllModules })
         javaRuntimePropertiesFile.set(commonTasks.checkRuntime.flatMap { it.javaRuntimePropertiesFile })
+        stripJreFonts.set(app.nativeDistributions.stripJreFonts)
         destinationDir.set(appTmpDir.dir("runtime"))
         stripNativeCommands.set(!buildType.aot.mode.generateJreClassesArchive)  // `java` is needed to generate the JRE CDS archive
         generateJreCdsArchive.set(buildType.aot.mode.generateJreClassesArchive)
