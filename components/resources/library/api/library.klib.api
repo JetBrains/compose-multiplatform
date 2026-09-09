@@ -1,7 +1,5 @@
 // Klib ABI Dump
-// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, macosArm64, macosX64, wasmJs]
-// Alias: ios => [iosArm64, iosSimulatorArm64, iosX64]
-// Alias: macos => [macosArm64, macosX64]
+// Targets: [iosArm64, iosSimulatorArm64, js, macosArm64, wasmJs]
 // Rendering settings:
 // - Signature version: 2
 // - Show manifest properties: true
@@ -70,17 +68,12 @@ sealed class org.jetbrains.compose.resources/Resource { // org.jetbrains.compose
 
 final object org.jetbrains.compose.resources/ResourceCaches // org.jetbrains.compose.resources/ResourceCaches|null[0]
 
-final val org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule$stableprop // org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule$stableprop|#static{}org_jetbrains_compose_resources_plural_PluralRule$stableprop[0]
-final val org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRuleList$stableprop // org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRuleList$stableprop|#static{}org_jetbrains_compose_resources_plural_PluralRuleList$stableprop[0]
-final val org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRuleParseException$stableprop // org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRuleParseException$stableprop|#static{}org_jetbrains_compose_resources_plural_PluralRuleParseException$stableprop[0]
 final val org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule_Condition_And$stableprop // org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule_Condition_And$stableprop|#static{}org_jetbrains_compose_resources_plural_PluralRule_Condition_And$stableprop[0]
 final val org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule_Condition_Or$stableprop // org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule_Condition_Or$stableprop|#static{}org_jetbrains_compose_resources_plural_PluralRule_Condition_Or$stableprop[0]
 final val org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule_Condition_Relation$stableprop // org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule_Condition_Relation$stableprop|#static{}org_jetbrains_compose_resources_plural_PluralRule_Condition_Relation$stableprop[0]
 final val org.jetbrains.compose.resources.vector.xmldom/org_jetbrains_compose_resources_vector_xmldom_MalformedXMLException$stableprop // org.jetbrains.compose.resources.vector.xmldom/org_jetbrains_compose_resources_vector_xmldom_MalformedXMLException$stableprop|#static{}org_jetbrains_compose_resources_vector_xmldom_MalformedXMLException$stableprop[0]
 final val org.jetbrains.compose.resources/LocalResourceReader // org.jetbrains.compose.resources/LocalResourceReader|{}LocalResourceReader[0]
     final fun <get-LocalResourceReader>(): androidx.compose.runtime/ProvidableCompositionLocal<org.jetbrains.compose.resources/ResourceReader> // org.jetbrains.compose.resources/LocalResourceReader.<get-LocalResourceReader>|<get-LocalResourceReader>(){}[0]
-final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_AsyncCache$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_AsyncCache$stableprop|#static{}org_jetbrains_compose_resources_AsyncCache$stableprop[0]
-final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_DrawCache$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_DrawCache$stableprop|#static{}org_jetbrains_compose_resources_DrawCache$stableprop[0]
 final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_DrawableResource$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_DrawableResource$stableprop|#static{}org_jetbrains_compose_resources_DrawableResource$stableprop[0]
 final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_FontResource$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_FontResource$stableprop|#static{}org_jetbrains_compose_resources_FontResource$stableprop[0]
 final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_ImageCache_Bitmap$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_ImageCache_Bitmap$stableprop|#static{}org_jetbrains_compose_resources_ImageCache_Bitmap$stableprop[0]
@@ -94,20 +87,16 @@ final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_Resour
 final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_ResourceCaches$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_ResourceCaches$stableprop|#static{}org_jetbrains_compose_resources_ResourceCaches$stableprop[0]
 final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_ResourceEnvironment$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_ResourceEnvironment$stableprop|#static{}org_jetbrains_compose_resources_ResourceEnvironment$stableprop[0]
 final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_ResourceItem$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_ResourceItem$stableprop|#static{}org_jetbrains_compose_resources_ResourceItem$stableprop[0]
+final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_ScriptQualifier$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_ScriptQualifier$stableprop|#static{}org_jetbrains_compose_resources_ScriptQualifier$stableprop[0]
 final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringArrayResource$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringArrayResource$stableprop|#static{}org_jetbrains_compose_resources_StringArrayResource$stableprop[0]
 final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringItem_Array$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringItem_Array$stableprop|#static{}org_jetbrains_compose_resources_StringItem_Array$stableprop[0]
 final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringItem_Plurals$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringItem_Plurals$stableprop|#static{}org_jetbrains_compose_resources_StringItem_Plurals$stableprop[0]
 final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringItem_Value$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringItem_Value$stableprop|#static{}org_jetbrains_compose_resources_StringItem_Value$stableprop[0]
 final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringResource$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringResource$stableprop|#static{}org_jetbrains_compose_resources_StringResource$stableprop[0]
-final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_SvgElement$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_SvgElement$stableprop|#static{}org_jetbrains_compose_resources_SvgElement$stableprop[0]
-final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_SvgPainter$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_SvgPainter$stableprop|#static{}org_jetbrains_compose_resources_SvgPainter$stableprop[0]
 
 final fun (kotlin/ByteArray).org.jetbrains.compose.resources/decodeToImageBitmap(): androidx.compose.ui.graphics/ImageBitmap // org.jetbrains.compose.resources/decodeToImageBitmap|decodeToImageBitmap@kotlin.ByteArray(){}[0]
 final fun (kotlin/ByteArray).org.jetbrains.compose.resources/decodeToImageVector(androidx.compose.ui.unit/Density): androidx.compose.ui.graphics.vector/ImageVector // org.jetbrains.compose.resources/decodeToImageVector|decodeToImageVector@kotlin.ByteArray(androidx.compose.ui.unit.Density){}[0]
 final fun (kotlin/ByteArray).org.jetbrains.compose.resources/decodeToSvgPainter(androidx.compose.ui.unit/Density): androidx.compose.ui.graphics.painter/Painter // org.jetbrains.compose.resources/decodeToSvgPainter|decodeToSvgPainter@kotlin.ByteArray(androidx.compose.ui.unit.Density){}[0]
-final fun org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule$stableprop_getter|org_jetbrains_compose_resources_plural_PluralRule$stableprop_getter(){}[0]
-final fun org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRuleList$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRuleList$stableprop_getter|org_jetbrains_compose_resources_plural_PluralRuleList$stableprop_getter(){}[0]
-final fun org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRuleParseException$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRuleParseException$stableprop_getter|org_jetbrains_compose_resources_plural_PluralRuleParseException$stableprop_getter(){}[0]
 final fun org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule_Condition_And$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule_Condition_And$stableprop_getter|org_jetbrains_compose_resources_plural_PluralRule_Condition_And$stableprop_getter(){}[0]
 final fun org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule_Condition_Or$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule_Condition_Or$stableprop_getter|org_jetbrains_compose_resources_plural_PluralRule_Condition_Or$stableprop_getter(){}[0]
 final fun org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule_Condition_Relation$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources.plural/org_jetbrains_compose_resources_plural_PluralRule_Condition_Relation$stableprop_getter|org_jetbrains_compose_resources_plural_PluralRule_Condition_Relation$stableprop_getter(){}[0]
@@ -116,8 +105,6 @@ final fun org.jetbrains.compose.resources/Font(org.jetbrains.compose.resources/F
 final fun org.jetbrains.compose.resources/Font(org.jetbrains.compose.resources/FontResource, androidx.compose.ui.text.font/FontWeight?, androidx.compose.ui.text.font/FontStyle, androidx.compose.ui.text.font/FontVariation.Settings?, androidx.compose.runtime/Composer?, kotlin/Int, kotlin/Int): androidx.compose.ui.text.font/Font // org.jetbrains.compose.resources/Font|Font(org.jetbrains.compose.resources.FontResource;androidx.compose.ui.text.font.FontWeight?;androidx.compose.ui.text.font.FontStyle;androidx.compose.ui.text.font.FontVariation.Settings?;androidx.compose.runtime.Composer?;kotlin.Int;kotlin.Int){}[0]
 final fun org.jetbrains.compose.resources/getSystemResourceEnvironment(): org.jetbrains.compose.resources/ResourceEnvironment // org.jetbrains.compose.resources/getSystemResourceEnvironment|getSystemResourceEnvironment(){}[0]
 final fun org.jetbrains.compose.resources/imageResource(org.jetbrains.compose.resources/DrawableResource, androidx.compose.runtime/Composer?, kotlin/Int): androidx.compose.ui.graphics/ImageBitmap // org.jetbrains.compose.resources/imageResource|imageResource(org.jetbrains.compose.resources.DrawableResource;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
-final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_AsyncCache$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_AsyncCache$stableprop_getter|org_jetbrains_compose_resources_AsyncCache$stableprop_getter(){}[0]
-final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_DrawCache$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_DrawCache$stableprop_getter|org_jetbrains_compose_resources_DrawCache$stableprop_getter(){}[0]
 final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_DrawableResource$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_DrawableResource$stableprop_getter|org_jetbrains_compose_resources_DrawableResource$stableprop_getter(){}[0]
 final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_FontResource$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_FontResource$stableprop_getter|org_jetbrains_compose_resources_FontResource$stableprop_getter(){}[0]
 final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_ImageCache_Bitmap$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_ImageCache_Bitmap$stableprop_getter|org_jetbrains_compose_resources_ImageCache_Bitmap$stableprop_getter(){}[0]
@@ -131,13 +118,12 @@ final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_Resour
 final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_ResourceCaches$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_ResourceCaches$stableprop_getter|org_jetbrains_compose_resources_ResourceCaches$stableprop_getter(){}[0]
 final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_ResourceEnvironment$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_ResourceEnvironment$stableprop_getter|org_jetbrains_compose_resources_ResourceEnvironment$stableprop_getter(){}[0]
 final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_ResourceItem$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_ResourceItem$stableprop_getter|org_jetbrains_compose_resources_ResourceItem$stableprop_getter(){}[0]
+final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_ScriptQualifier$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_ScriptQualifier$stableprop_getter|org_jetbrains_compose_resources_ScriptQualifier$stableprop_getter(){}[0]
 final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringArrayResource$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringArrayResource$stableprop_getter|org_jetbrains_compose_resources_StringArrayResource$stableprop_getter(){}[0]
 final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringItem_Array$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringItem_Array$stableprop_getter|org_jetbrains_compose_resources_StringItem_Array$stableprop_getter(){}[0]
 final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringItem_Plurals$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringItem_Plurals$stableprop_getter|org_jetbrains_compose_resources_StringItem_Plurals$stableprop_getter(){}[0]
 final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringItem_Value$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringItem_Value$stableprop_getter|org_jetbrains_compose_resources_StringItem_Value$stableprop_getter(){}[0]
 final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringResource$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_StringResource$stableprop_getter|org_jetbrains_compose_resources_StringResource$stableprop_getter(){}[0]
-final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_SvgElement$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_SvgElement$stableprop_getter|org_jetbrains_compose_resources_SvgElement$stableprop_getter(){}[0]
-final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_SvgPainter$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_SvgPainter$stableprop_getter|org_jetbrains_compose_resources_SvgPainter$stableprop_getter(){}[0]
 final fun org.jetbrains.compose.resources/painterResource(org.jetbrains.compose.resources/DrawableResource, androidx.compose.runtime/Composer?, kotlin/Int): androidx.compose.ui.graphics.painter/Painter // org.jetbrains.compose.resources/painterResource|painterResource(org.jetbrains.compose.resources.DrawableResource;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
 final fun org.jetbrains.compose.resources/pluralStringResource(org.jetbrains.compose.resources/PluralStringResource, kotlin/Int, androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // org.jetbrains.compose.resources/pluralStringResource|pluralStringResource(org.jetbrains.compose.resources.PluralStringResource;kotlin.Int;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
 final fun org.jetbrains.compose.resources/pluralStringResource(org.jetbrains.compose.resources/PluralStringResource, kotlin/Int, kotlin/Array<out kotlin/Any>..., androidx.compose.runtime/Composer?, kotlin/Int): kotlin/String // org.jetbrains.compose.resources/pluralStringResource|pluralStringResource(org.jetbrains.compose.resources.PluralStringResource;kotlin.Int;kotlin.Array<out|kotlin.Any>...;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
@@ -159,34 +145,16 @@ final suspend fun org.jetbrains.compose.resources/getString(org.jetbrains.compos
 final suspend fun org.jetbrains.compose.resources/getStringArray(org.jetbrains.compose.resources/ResourceEnvironment, org.jetbrains.compose.resources/StringArrayResource): kotlin.collections/List<kotlin/String> // org.jetbrains.compose.resources/getStringArray|getStringArray(org.jetbrains.compose.resources.ResourceEnvironment;org.jetbrains.compose.resources.StringArrayResource){}[0]
 final suspend fun org.jetbrains.compose.resources/getStringArray(org.jetbrains.compose.resources/StringArrayResource): kotlin.collections/List<kotlin/String> // org.jetbrains.compose.resources/getStringArray|getStringArray(org.jetbrains.compose.resources.StringArrayResource){}[0]
 
-// Targets: [ios]
-final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultIOsResourceReader$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultIOsResourceReader$stableprop|#static{}org_jetbrains_compose_resources_DefaultIOsResourceReader$stableprop[0]
-
-// Targets: [ios]
-final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultIOsResourceReader$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultIOsResourceReader$stableprop_getter|org_jetbrains_compose_resources_DefaultIOsResourceReader$stableprop_getter(){}[0]
-
 // Targets: [js, wasmJs]
 final object org.jetbrains.compose.resources/WebResourcesConfiguration { // org.jetbrains.compose.resources/WebResourcesConfiguration|null[0]
     final fun resourcePathMapping(kotlin/Function1<kotlin/String, kotlin/String>) // org.jetbrains.compose.resources/WebResourcesConfiguration.resourcePathMapping|resourcePathMapping(kotlin.Function1<kotlin.String,kotlin.String>){}[0]
 }
 
 // Targets: [js, wasmJs]
-final val org.jetbrains.compose.resources.vector.xmldom/org_jetbrains_compose_resources_vector_xmldom_ElementImpl$stableprop // org.jetbrains.compose.resources.vector.xmldom/org_jetbrains_compose_resources_vector_xmldom_ElementImpl$stableprop|#static{}org_jetbrains_compose_resources_vector_xmldom_ElementImpl$stableprop[0]
-
-// Targets: [js, wasmJs]
-final val org.jetbrains.compose.resources.vector.xmldom/org_jetbrains_compose_resources_vector_xmldom_NodeImpl$stableprop // org.jetbrains.compose.resources.vector.xmldom/org_jetbrains_compose_resources_vector_xmldom_NodeImpl$stableprop|#static{}org_jetbrains_compose_resources_vector_xmldom_NodeImpl$stableprop[0]
-
-// Targets: [js, wasmJs]
 final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_Intl_Locale$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_Intl_Locale$stableprop|#static{}org_jetbrains_compose_resources_Intl_Locale$stableprop[0]
 
 // Targets: [js, wasmJs]
 final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_WebResourcesConfiguration$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_WebResourcesConfiguration$stableprop|#static{}org_jetbrains_compose_resources_WebResourcesConfiguration$stableprop[0]
-
-// Targets: [js, wasmJs]
-final fun org.jetbrains.compose.resources.vector.xmldom/org_jetbrains_compose_resources_vector_xmldom_ElementImpl$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources.vector.xmldom/org_jetbrains_compose_resources_vector_xmldom_ElementImpl$stableprop_getter|org_jetbrains_compose_resources_vector_xmldom_ElementImpl$stableprop_getter(){}[0]
-
-// Targets: [js, wasmJs]
-final fun org.jetbrains.compose.resources.vector.xmldom/org_jetbrains_compose_resources_vector_xmldom_NodeImpl$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources.vector.xmldom/org_jetbrains_compose_resources_vector_xmldom_NodeImpl$stableprop_getter|org_jetbrains_compose_resources_vector_xmldom_NodeImpl$stableprop_getter(){}[0]
 
 // Targets: [js, wasmJs]
 final fun org.jetbrains.compose.resources/configureWebResources(kotlin/Function1<org.jetbrains.compose.resources/WebResourcesConfiguration, kotlin/Unit>) // org.jetbrains.compose.resources/configureWebResources|configureWebResources(kotlin.Function1<org.jetbrains.compose.resources.WebResourcesConfiguration,kotlin.Unit>){}[0]
@@ -205,21 +173,3 @@ final fun org.jetbrains.compose.resources/preloadImageBitmap(org.jetbrains.compo
 
 // Targets: [js, wasmJs]
 final fun org.jetbrains.compose.resources/preloadImageVector(org.jetbrains.compose.resources/DrawableResource, androidx.compose.runtime/Composer?, kotlin/Int): androidx.compose.runtime/State<androidx.compose.ui.graphics.vector/ImageVector?> // org.jetbrains.compose.resources/preloadImageVector|preloadImageVector(org.jetbrains.compose.resources.DrawableResource;androidx.compose.runtime.Composer?;kotlin.Int){}[0]
-
-// Targets: [macos]
-final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultMacOsResourceReader$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultMacOsResourceReader$stableprop|#static{}org_jetbrains_compose_resources_DefaultMacOsResourceReader$stableprop[0]
-
-// Targets: [macos]
-final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultMacOsResourceReader$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultMacOsResourceReader$stableprop_getter|org_jetbrains_compose_resources_DefaultMacOsResourceReader$stableprop_getter(){}[0]
-
-// Targets: [js]
-final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultJsResourceReader$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultJsResourceReader$stableprop|#static{}org_jetbrains_compose_resources_DefaultJsResourceReader$stableprop[0]
-
-// Targets: [js]
-final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultJsResourceReader$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultJsResourceReader$stableprop_getter|org_jetbrains_compose_resources_DefaultJsResourceReader$stableprop_getter(){}[0]
-
-// Targets: [wasmJs]
-final val org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultWasmResourceReader$stableprop // org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultWasmResourceReader$stableprop|#static{}org_jetbrains_compose_resources_DefaultWasmResourceReader$stableprop[0]
-
-// Targets: [wasmJs]
-final fun org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultWasmResourceReader$stableprop_getter(): kotlin/Int // org.jetbrains.compose.resources/org_jetbrains_compose_resources_DefaultWasmResourceReader$stableprop_getter|org_jetbrains_compose_resources_DefaultWasmResourceReader$stableprop_getter(){}[0]
