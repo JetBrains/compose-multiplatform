@@ -58,11 +58,11 @@ _Changes since 1.12.0_
 
 ### Web
 
-- Added prefetching of LazyLayouts items during browser idle times [#2928](https://github.com/JetBrains/compose-multiplatform-core/pull/2928)
+- Added prefetching of `LazyLayout` items during browser idle times [#2928](https://github.com/JetBrains/compose-multiplatform-core/pull/2928)
 - Added experimental support for system window insets on Web [#3202](https://github.com/JetBrains/compose-multiplatform-core/pull/3202)
-- Added support to `LazyLayout`s to run some work without blocking current frame's painting [#2929](https://github.com/JetBrains/compose-multiplatform-core/pull/2929)
+- Added support to LazyLayouts to run some work without blocking current frame's painting [#2929](https://github.com/JetBrains/compose-multiplatform-core/pull/2929)
 - Disposing Compose application automatically if parent container is destroyed [#3242](https://github.com/JetBrains/compose-multiplatform-core/pull/3242)
-- Deprecate PointerIcon.Companion.fromKeyword and introduce equivalent PointerIcon helper fun instead [#3287](https://github.com/JetBrains/compose-multiplatform-core/pull/3287)
+- Deprecate `PointerIcon.Companion.fromKeyword` and introduce equivalent `PointerIcon` helper function instead [#3287](https://github.com/JetBrains/compose-multiplatform-core/pull/3287)
 - Add experimental API to render WebGL textures [#3323](https://github.com/JetBrains/compose-multiplatform-core/pull/3323)
 
 ### Gradle Plugin
@@ -75,7 +75,7 @@ _Changes since 1.12.0_
 
 - Fixes that `GraphicsLayer` with `CompositingStrategy.ModulateAlpha` does not apply `alpha` value without extra invalidation [#3204](https://github.com/JetBrains/compose-multiplatform-core/pull/3204)
 - Fixed an issue in `runComposeUiTest` V2 when input events required `waitForIdle` to be processed [#3302](https://github.com/JetBrains/compose-multiplatform-core/pull/3302)
-- Fix crash in cases when skia returns null `ColorFilter` due to no-op parameter combination [#3319](https://github.com/JetBrains/compose-multiplatform-core/pull/3319)
+- Fix crash in cases when Skia returns null `ColorFilter` due to no-op parameter combination [#3319](https://github.com/JetBrains/compose-multiplatform-core/pull/3319)
 
 ### iOS
 
@@ -92,9 +92,9 @@ _Changes since 1.12.0_
 ### Desktop
 
 - Made window resizing smooth on macOS when using Metal (the default renderer). To enable the fix, set the system property `skiko.rendering.macos.metalSynchronousLiveResize` to `true`. This will eventually become the default [#3261](https://github.com/JetBrains/compose-multiplatform-core/pull/3261)
-- [macOS] Fixed the behavior of ctrl-f/b in text fields (it was reversed) [#3294](https://github.com/JetBrains/compose-multiplatform-core/pull/3294)
+- [macOS] Fixed the behavior of `Ctrl+f/b` in text fields (it was reversed) [#3294](https://github.com/JetBrains/compose-multiplatform-core/pull/3294)
 - Fixed an issue that caused a background flash when a window was shown for the first time [#3299](https://github.com/JetBrains/compose-multiplatform-core/pull/3299)
-- Made window resizing smooth on Windows when using Direct3D (the default renderer). To enable the fix, set the system property `sskiko.rendering.windows.direct3DSynchronousLiveResize` to `true`. This will eventually become the default [#3299](https://github.com/JetBrains/compose-multiplatform-core/pull/3299)
+- Made window resizing smooth on Windows when using Direct3D (the default renderer). To enable the fix, set the system property `skiko.rendering.windows.direct3DSynchronousLiveResize` to `true`. This will eventually become the default [#3299](https://github.com/JetBrains/compose-multiplatform-core/pull/3299)
 - Fixed potential crash when the accessibility subsystem processes `focusLost` [#3361](https://github.com/JetBrains/compose-multiplatform-core/pull/3361)
 - Fix crash when trying to set the content of an unavailable/busy clipboard [#3364](https://github.com/JetBrains/compose-multiplatform-core/pull/3364)
 - Fixed SVG rasterization caching to properly reuse cached bitmap unless size changes [#5639](https://github.com/JetBrains/compose-multiplatform/pull/5639)
@@ -110,11 +110,11 @@ _Changes since 1.12.0_
 - Fix Tab focus order with interop elements [#3249](https://github.com/JetBrains/compose-multiplatform-core/pull/3249)
 - Fixed outer `HorizontalPager` stealing the touch gesture from a nested `HorizontalPager` during a slow drag [#3293](https://github.com/JetBrains/compose-multiplatform-core/pull/3293)
 - Fix blurred UI when zooming [#3303](https://github.com/JetBrains/compose-multiplatform-core/pull/3303)
-- Support SemanticProperties.disabled in Compose web A11y [#3308](https://github.com/JetBrains/compose-multiplatform-core/pull/3308)
-- Fix incorrect A11Y tree state after opening and closing a popup or dialog [#3298](https://github.com/JetBrains/compose-multiplatform-core/pull/3298)
+- Support `SemanticProperties.disabled` in Compose Web a11y [#3308](https://github.com/JetBrains/compose-multiplatform-core/pull/3308)
+- Fix incorrect a11y tree state after opening and closing a popup or dialog [#3298](https://github.com/JetBrains/compose-multiplatform-core/pull/3298)
 - Fixed `1nMakeRasterN32Premul is not defined` when running `runComposeUiTest` with JS [#3316](https://github.com/JetBrains/compose-multiplatform-core/pull/3316)
 - Fix virtual keyboard hiding after tapping on a selection handle without moving it [#3328](https://github.com/JetBrains/compose-multiplatform-core/pull/3328)
-- Support LinkAnnotation in A11Y tree, so link nodes have role=link [#3331](https://github.com/JetBrains/compose-multiplatform-core/pull/3331)
+- Support `LinkAnnotation` in a11y tree, so link nodes have `role=link` [#3331](https://github.com/JetBrains/compose-multiplatform-core/pull/3331)
 - Fix `LocalWindowInfo.current.isWindowFocused` not updating when browser window focus changes on Web [#3347](https://github.com/JetBrains/compose-multiplatform-core/pull/3347)
 
 ### Android
