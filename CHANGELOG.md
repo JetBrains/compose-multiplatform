@@ -66,7 +66,7 @@ _Changes since 1.12.0_
 
 - Added prefetching of `LazyLayout` items during browser idle times [#2928](https://github.com/JetBrains/compose-multiplatform-core/pull/2928)
 - Added experimental support for system window insets on Web [#3202](https://github.com/JetBrains/compose-multiplatform-core/pull/3202)
-- Added support to LazyLayouts to run some work without blocking current frame's painting [#2929](https://github.com/JetBrains/compose-multiplatform-core/pull/2929)
+- Added support to `LazyLayout`s to run some work without blocking current frame's painting [#2929](https://github.com/JetBrains/compose-multiplatform-core/pull/2929)
 - Disposing Compose application automatically if parent container is destroyed [#3242](https://github.com/JetBrains/compose-multiplatform-core/pull/3242)
 - Deprecate `PointerIcon.Companion.fromKeyword` and introduce equivalent `PointerIcon` helper function instead [#3287](https://github.com/JetBrains/compose-multiplatform-core/pull/3287)
 - Add experimental API to render WebGL textures [#3323](https://github.com/JetBrains/compose-multiplatform-core/pull/3323)
