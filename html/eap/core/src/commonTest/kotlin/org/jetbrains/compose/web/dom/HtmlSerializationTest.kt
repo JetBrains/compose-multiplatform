@@ -56,8 +56,50 @@ class HtmlSerializationTest {
     }
 
     @Test
+    fun noscriptEscapesTextAndAllowsFallbackElements() {
+        assertEquals(
+            "<noscript>&lt;/noscript&gt; &amp; &lt;b&gt;<span>fallback</span></noscript>",
+            composeHtmlToString {
+                TagElement<Element>("noscript", null) {
+                    Text("</noscript> & <b>")
+                    Span { Text("fallback") }
+                }
+            },
+        )
+    }
+
+    @Test
+    fun noscriptRejectsEndTagsInSerializedDescendants() {
+        listOf(">", " ", "/", "\t", "\n", "\r", "\u000C").forEach { delimiter ->
+            val failure = assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString {
+                    TagElement<Element>("noscript", null) {
+                        TagElement<Element>("script", null) {
+                            Text("</no")
+                            Text("SCRIPT$delimiter")
+                        }
+                    }
+                }
+            }
+            assertContains(failure.message.orEmpty(), "<noscript> content")
+        }
+        assertFailsWith<IllegalArgumentException> {
+            composeHtmlToString {
+                TagElement<Element>("noscript", null) {
+                    TagElement<Element>("noscript", null) { Text("nested") }
+                }
+            }
+        }
+        assertEquals("<noscript><script></noscripture></script></noscript>", composeHtmlToString {
+            TagElement<Element>("noscript", null) {
+                Script(InlineScript("</noscripture>"))
+            }
+        })
+    }
+
+    @Test
     fun rendersTextChildrenInRawTextElements() {
-        listOf("script", "style", "iframe", "xmp", "noembed", "noframes", "noscript").forEach { tag ->
+        listOf("script", "style", "iframe", "xmp", "noembed", "noframes").forEach { tag ->
             val html = composeHtmlToString {
                 TagElement<Element>(tag.uppercase(), null) {
                     Text("A & B")
@@ -71,7 +113,7 @@ class HtmlSerializationTest {
 
     @Test
     fun rejectsRawTextEndTagsSplitAcrossChildren() {
-        listOf("script", "style", "iframe", "xmp", "noembed", "noframes", "noscript").forEach { tag ->
+        listOf("script", "style", "iframe", "xmp", "noembed", "noframes").forEach { tag ->
             val failure = assertFailsWith<IllegalArgumentException> {
                 composeHtmlToString {
                     TagElement<Element>(tag, null) {
@@ -109,7 +151,7 @@ class HtmlSerializationTest {
 
     @Test
     fun rejectsElementChildrenInRawTextElements() {
-        listOf("script", "style", "iframe", "xmp", "noembed", "noframes", "noscript").forEach { tag ->
+        listOf("script", "style", "iframe", "xmp", "noembed", "noframes").forEach { tag ->
             val failure = assertFailsWith<IllegalArgumentException> {
                 composeHtmlToString {
                     TagElement<Element>(tag, null) {
@@ -124,7 +166,7 @@ class HtmlSerializationTest {
 
     @Test
     fun rendersRawTextElementsWithoutChildren() {
-        val tags = listOf("script", "style", "iframe", "xmp", "noembed", "noframes", "noscript")
+        val tags = listOf("script", "style", "iframe", "xmp", "noembed", "noframes")
         val html = composeHtmlToString {
             tags.forEach { tag ->
                 TagElement<Element>(tag, { id(tag) }, null)

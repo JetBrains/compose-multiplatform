@@ -118,6 +118,13 @@ internal class StringHtmlElementNode private constructor(
         } else {
             children.forEach { it.appendHtmlTo(builder) }
         }
+        if (tagName == "noscript") {
+            // Render fallback HTML for scripting-disabled browsers, but keep it inside noscript
+            // when scripting is enabled and the parser treats the entire contents as raw text.
+            require(!NoscriptEndTag.containsMatchIn(builder.substring(contentStart))) {
+                "String-rendered <noscript> content must not contain a </noscript end tag"
+            }
+        }
         // HTML parsing discards the first LF in these elements.
         if ((tagName == "pre" || tagName == "textarea" || tagName == "listing") &&
             builder.length > contentStart && builder[contentStart] == '\n'
@@ -128,8 +135,10 @@ internal class StringHtmlElementNode private constructor(
     }
 
     companion object {
+        private val NoscriptEndTag = Regex("</noscript(?=[\\t\\n\\u000C\\r />])", RegexOption.IGNORE_CASE)
+
         private val RawTextElementNames = setOf(
-            "script", "style", "iframe", "xmp", "noembed", "noframes", "noscript",
+            "script", "style", "iframe", "xmp", "noembed", "noframes",
         )
 
         private val VoidElementNames = setOf(

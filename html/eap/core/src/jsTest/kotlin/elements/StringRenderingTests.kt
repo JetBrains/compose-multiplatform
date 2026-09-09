@@ -11,6 +11,7 @@ import org.jetbrains.compose.web.attributes.ScriptType
 import org.jetbrains.compose.web.attributes.type
 import org.jetbrains.compose.web.composeHtmlToString
 import org.jetbrains.compose.web.dom.*
+import org.w3c.dom.parsing.DOMParser
 import org.w3c.dom.HTMLElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -18,8 +19,34 @@ import kotlin.test.assertFailsWith
 
 class StringRenderingTests {
     @Test
+    fun noscriptFallbackParsesWithScriptingDisabledAndStaysContainedWhenEnabled() {
+        val html = composeHtmlToString {
+            TagElement<Element>("noscript", null) {
+                Text("Use <b> & </noscript>")
+                Span { Text("fallback") }
+            }
+            Span { Text("after") }
+        }
+        // DOMParser creates a document with scripting disabled.
+        val parsed = DOMParser().parseFromString("<!doctype html><body>$html</body>", "text/html")
+        val fallback = parsed.querySelector("noscript")!!
+        assertEquals("Use <b> & </noscript>", fallback.firstChild!!.textContent)
+        assertEquals("fallback", fallback.querySelector("span")!!.textContent)
+        assertEquals("after", parsed.body!!.lastElementChild!!.textContent)
+
+        // The active browser instead parses noscript's fallback markup as one raw text node.
+        val container = document.createElement("div") as HTMLElement
+        container.innerHTML = html
+        val activeNoscript = container.firstElementChild!!
+        assertEquals(0, activeNoscript.children.length)
+        assertEquals("Use &lt;b&gt; &amp; &lt;/noscript&gt;<span>fallback</span>", activeNoscript.textContent)
+        assertEquals(2, container.children.length)
+        assertEquals("after", container.lastElementChild!!.textContent)
+    }
+
+    @Test
     fun genericRawTextSurvivesHtmlParsing() {
-        listOf("script", "style", "iframe", "xmp", "noembed", "noframes", "noscript").forEach { tag ->
+        listOf("script", "style", "iframe", "xmp", "noembed", "noframes").forEach { tag ->
             val container = document.createElement("div") as HTMLElement
             container.innerHTML = composeHtmlToString {
                 TagElement<Element>(tag, null) {

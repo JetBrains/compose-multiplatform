@@ -28,7 +28,8 @@ import org.jetbrains.compose.web.dom.StringHtmlNodeWrapper
  * - Inline styles preserve CSS fallbacks, but do not fully emulate CSSOM validation and
  *   mutation (for example, invalid assignments that also change priority, or shorthand removal).
  *
- * @throws IllegalArgumentException if a raw-text element contains unsafe text or element children.
+ * @throws IllegalArgumentException if a raw-text element contains unsafe text or element children,
+ * or serialized `noscript` contents contain a `</noscript>` end tag.
  */
 fun composeHtmlToString(
     content: @Composable () -> Unit
