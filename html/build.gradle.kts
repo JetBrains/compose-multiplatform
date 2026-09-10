@@ -11,6 +11,18 @@ plugins {
 }
 
 val COMPOSE_WEB_VERSION: String = extra["compose.version"] as String
+val localProperties = java.util.Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.isFile) {
+        file.inputStream().use(::load)
+    }
+}
+fun setting(name: String): String? =
+    localProperties.getProperty(name) ?: providers.gradleProperty(name).orNull
+
+val COMPOSE_HTML_EAP_VERSION: String by lazy {
+    requireNotNull(setting("compose.html.eap.version"))
+}
 val COMPOSE_REPO_URL: String? by project
 val COMPOSE_REPO_USERNAME: String? by project
 val COMPOSE_REPO_KEY: String? by project
@@ -19,26 +31,6 @@ val COMPOSE_WEB_BUILD_WITH_SAMPLES = project.property("compose.web.buildSamples"
 kotlinKarmaConfig.rootDir = rootProject.rootDir.toString()
 
 apply<SeleniumDriverPlugin>()
-
-val kotlinxBrowserSubsetGenerator = gradle.includedBuild("kotlinx-browser-common-subset-generator")
-
-tasks.register("generateKotlinxBrowserCommonSubset") {
-    group = "generation"
-    description = "Generates the portable browser subset into the generator build directory."
-    dependsOn(kotlinxBrowserSubsetGenerator.task(":runner:generateKotlinxBrowserCommonSubset"))
-}
-
-tasks.register("checkKotlinxBrowserCommonSubset") {
-    group = "verification"
-    description = "Checks checked-in portable browser subset sources against fresh generation."
-    dependsOn(kotlinxBrowserSubsetGenerator.task(":runner:checkKotlinxBrowserCommonSubset"))
-}
-
-tasks.register("updateKotlinxBrowserCommonSubset") {
-    group = "generation"
-    description = "Explicitly updates checked-in portable browser subset sources and manifest."
-    dependsOn(kotlinxBrowserSubsetGenerator.task(":runner:updateKotlinxBrowserCommonSubset"))
-}
 
 fun Project.isSampleProject() = projectDir.parentFile.name == "examples"
 
@@ -52,8 +44,18 @@ subprojects {
     apply(plugin = "maven-publish")
 
     val projectName = name
-    group = "org.jetbrains.compose.html"
-    version = COMPOSE_WEB_VERSION
+    val isComposeHtmlEapProject = project.name in setOf(
+        "html-core-eap",
+        "html-svg-eap",
+        "internal-html-core-runtime-eap",
+    )
+    if (isComposeHtmlEapProject) {
+        group = "org.jetbrains.compose.html.eap"
+        version = COMPOSE_HTML_EAP_VERSION
+    } else {
+        group = "org.jetbrains.compose.html"
+        version = COMPOSE_WEB_VERSION
+    }
 
     if ((project.name != "html-widgets") && (project.name != "html-integration-widgets")) {
         afterEvaluate {
@@ -98,8 +100,26 @@ subprojects {
             publications.all {
                 this as MavenPublication
                 pom {
-                    name.set("JetBrains Compose Multiplatform HTML library")
-                    description.set("JetBrains Compose Multiplatform HTML library")
+                    name.set(
+                        when (projectName) {
+                            "html-core-eap" -> "JetBrains Compose HTML EAP core"
+                            "html-svg-eap" -> "JetBrains Compose HTML EAP SVG"
+                            "internal-html-core-runtime-eap" ->
+                                "JetBrains Compose HTML EAP internal runtime"
+                            else -> "JetBrains Compose HTML library"
+                        }
+                    )
+                    description.set(
+                        when (projectName) {
+                            "html-core-eap" ->
+                                "Experimental commonized JetBrains Compose HTML core library"
+                            "html-svg-eap" ->
+                                "Experimental commonized JetBrains Compose HTML SVG library"
+                            "internal-html-core-runtime-eap" ->
+                                "Experimental commonized JetBrains Compose HTML internal runtime"
+                            else -> "JetBrains Compose HTML library"
+                        }
+                    )
                     url.set("https://www.jetbrains.com/lp/compose-mpp/")
                     licenses {
                         license {

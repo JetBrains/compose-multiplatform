@@ -68,10 +68,6 @@ dependencyResolutionManagement {
     }
 }
 
-includeBuild("kotlinx-browser-common-subset/generator") {
-    name = "kotlinx-browser-common-subset-generator"
-}
-
 fun module(name: String, path: String) {
     include(name)
     val projectDir = rootDir.resolve(path).normalize().absoluteFile
@@ -81,6 +77,18 @@ fun module(name: String, path: String) {
     project(name).projectDir = projectDir
 }
 
+val localProperties = java.util.Properties().apply {
+    val file = rootDir.resolve("local.properties")
+    if (file.isFile) {
+        file.inputStream().use(::load)
+    }
+}
+
+fun setting(name: String): String? =
+    localProperties.getProperty(name) ?: providers.gradleProperty(name).orNull
+
+val composeHtmlEapEnabled = setting("compose.html.eap.enabled")?.toBoolean() ?: false
+
 
 module(":html-core", "core")
 module(":html-svg", "svg")
@@ -89,7 +97,14 @@ module(":compose-compiler-integration", "compose-compiler-integration")
 module(":compose-compiler-integration-lib", "compose-compiler-integration/lib")
 module(":internal-html-core-runtime", "internal-html-core-runtime")
 module(":html-test-utils", "test-utils")
-module(":kotlinx-browser-common-subset", "kotlinx-browser-common-subset")
+
+if (composeHtmlEapEnabled) {
+    println("Compose HTML EAP modules enabled")
+    module(":html-core-eap", "eap/core")
+    module(":html-svg-eap", "eap/svg")
+    module(":internal-html-core-runtime-eap", "eap/internal-html-core-runtime")
+    module(":html-eap-example", "eap/example")
+}
 
 if (extra["compose.web.tests.skip.benchmarks"]!!.toString().toBoolean() != true) {
     module(":html-benchmark-core", "benchmark-core")

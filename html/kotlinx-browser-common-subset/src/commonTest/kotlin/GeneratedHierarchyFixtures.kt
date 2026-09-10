@@ -124,10 +124,10 @@ private fun useEventMembers(
     mouse: MouseEvent,
     wheel: WheelEvent,
 ): Event {
-    target.addEventListener("portable", listener)
-    target.addEventListener("portable", listener, false)
-    target.removeEventListener("portable", listener)
-    target.removeEventListener("portable", listener, false)
+    target.addEventListener("common", listener)
+    target.addEventListener("common", listener, false)
+    target.removeEventListener("common", listener)
+    target.removeEventListener("common", listener, false)
     target.dispatchEvent(event)
     listener.handleEvent(event)
 
@@ -186,6 +186,6 @@ internal fun exerciseGeneratedHierarchy(
     useButtonMembers(button)
     useGeneratedCompanionsAndOperators(div.childNodes)
     useOperatorDiscoveredReturnType(form)
-    useEventMembers(div, listener, Event("portable"), composition, focus, input, keyboard, mouse, wheel)
+    useEventMembers(div, listener, Event("common"), composition, focus, input, keyboard, mouse, wheel)
     buildEventDictionaries(div)
 }

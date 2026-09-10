@@ -14,7 +14,7 @@ import kotlin.test.Test
 class GeneratedConstructorDefaultsTest {
     @Test
     fun defaultedConstructorArgumentIsCallable() {
-        Event("portable")
-        Event("portable", EventInit(bubbles = true))
+        Event("common")
+        Event("common", EventInit(bubbles = true))
     }
 }

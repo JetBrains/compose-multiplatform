@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-// Verifies that browser facade actuals are staged beside each target's interop actuals.
+// Verifies that browser facade actuals are staged in each target-specific source set.
 package org.jetbrains.compose.web.browser.generator
 
 import com.google.devtools.ksp.processing.CodeGenerator
@@ -21,9 +21,9 @@ import kotlin.test.assertFalse
 
 class FacadeSourceEmitterTest {
     @Test
-    fun browserAliasesAreEmittedAfterEachTargetActualizesJsAny() {
-        val worker = portableInterface("AbstractWorker")
-        val options = portableInterface("EventListenerOptions", isDictionary = true)
+    fun browserAliasesAreEmittedInEachLeafTarget() {
+        val worker = commonInterface("AbstractWorker")
+        val options = commonInterface("EventListenerOptions", isDictionary = true)
         val packageModel = FacadePackageModel(
             mapping = DOM,
             declarations = listOf(worker),
@@ -39,32 +39,29 @@ class FacadeSourceEmitterTest {
             model = listOf(worker, options),
         )
 
-        val common = generator["portableDom.commonMain.kotlin.kotlinx.browser.dom.Core.kt.txt"] +
-            generator["portableDom.commonMain.kotlin.kotlinx.browser.dom.PortableDom.kt.txt"] +
-            generator["portableDom.commonMain.kotlin.kotlinx.browser.dom.OptionDictionaries.kt.txt"]
-        val js = generator["portableDom.jsMain.kotlin.kotlinx.browser.PortableInterop.kt.txt"] +
-            generator["portableDom.jsMain.kotlin.kotlinx.browser.dom.PortableDom.kt.txt"] +
-            generator["portableDom.jsMain.kotlin.kotlinx.browser.dom.OptionDictionaries.kt.txt"]
-        val wasmJs = generator["portableDom.wasmJsMain.kotlin.kotlinx.browser.PortableInterop.kt.txt"] +
-            generator["portableDom.wasmJsMain.kotlin.kotlinx.browser.dom.PortableDom.kt.txt"] +
-            generator["portableDom.wasmJsMain.kotlin.kotlinx.browser.dom.OptionDictionaries.kt.txt"]
+        val common = generator["commonDom.commonMain.kotlin.kotlinx.browser.dom.Core.kt.txt"] +
+            generator["commonDom.commonMain.kotlin.kotlinx.browser.dom.Dom.kt.txt"] +
+            generator["commonDom.commonMain.kotlin.kotlinx.browser.dom.OptionDictionaries.kt.txt"]
+        val js = generator["commonDom.jsMain.kotlin.kotlinx.browser.dom.Dom.kt.txt"] +
+            generator["commonDom.jsMain.kotlin.kotlinx.browser.dom.OptionDictionaries.kt.txt"]
+        val wasmJs = generator["commonDom.wasmJsMain.kotlin.kotlinx.browser.dom.Dom.kt.txt"] +
+            generator["commonDom.wasmJsMain.kotlin.kotlinx.browser.dom.OptionDictionaries.kt.txt"]
 
         assertContains(common, "public expect interface AbstractWorker : JsAny")
         assertContains(common, "public expect interface EventListenerOptions : JsAny")
-        assertContains(js, "public actual typealias JsAny = Any")
         assertContains(js, "public actual typealias AbstractWorker = AbstractWorker")
         assertContains(js, "public actual typealias EventListenerOptions = EventListenerOptions")
-        assertContains(wasmJs, "public actual typealias JsAny = BrowserJsAny")
         assertContains(wasmJs, "public actual typealias AbstractWorker = AbstractWorker")
         assertContains(wasmJs, "public actual typealias EventListenerOptions = EventListenerOptions")
+        assertFalse(generator.paths.any { ".Interop." in it }, generator.paths.joinToString())
         assertFalse(generator.paths.any { ".webMain." in it }, generator.paths.joinToString())
         assertFalse(generator.paths.any { ".jsTest." in it || ".wasmJsTest." in it }, generator.paths.joinToString())
         assertFalse(generator.paths.any { ".webTest." in it }, generator.paths.joinToString())
     }
 
     @Test
-    fun browserAliasesInheritCompatibilitySuppressionsFromPortableParents() {
-        val parent = PortableClass(
+    fun browserAliasesInheritCompatibilitySuppressionsFromCommonParents() {
+        val parent = CommonClass(
             browserName = ClassName(DOM_SVG_PACKAGE, "SVGElement"),
             parentBrowserName = null,
             superinterfaces = emptyList(),
@@ -74,12 +71,12 @@ class FacadeSourceEmitterTest {
             isJsAny = true,
             properties = emptyList(),
             functions = listOf(
-                PortableFunction(
+                CommonFunction(
                     name = "scroll",
                     parameters = listOf(
-                        PortableParameter(
+                        CommonParameter(
                             name = "options",
-                            type = ClassName(PORTABLE_DOM_PACKAGE, "ScrollToOptions"),
+                            type = ClassName(COMMON_DOM_PACKAGE, "ScrollToOptions"),
                             isVararg = false,
                             hasDefault = true,
                         ),
@@ -97,11 +94,11 @@ class FacadeSourceEmitterTest {
         val child = parent.copy(
             browserName = ClassName(CSS_MASKING_PACKAGE, "SVGMaskElement"),
             parentBrowserName = parent.browserName,
-            ancestors = listOf(parent.portableName),
+            ancestors = listOf(parent.commonName),
             functions = emptyList(),
         )
-        val mapping = PortablePackageMapping(PORTABLE_CSS_MASKING_PACKAGE, "PortableMasking", "MaskingDictionaries")
-        val classes = listOf(parent, child).associateBy(PortableClass::portableName)
+        val mapping = CommonPackageMapping(COMMON_CSS_MASKING_PACKAGE, "Masking", "MaskingDictionaries")
+        val classes = listOf(parent, child).associateBy(CommonClass::commonName)
 
         val web = browserLeafDeclarationsFile(mapping, listOf(child), emptyList(), classes).toString()
 
@@ -110,9 +107,9 @@ class FacadeSourceEmitterTest {
     }
 }
 
-private val DOM = PortablePackageMapping(PORTABLE_DOM_PACKAGE, "PortableDom", "OptionDictionaries")
+private val DOM = CommonPackageMapping(COMMON_DOM_PACKAGE, "Dom", "OptionDictionaries")
 
-private fun portableInterface(name: String, isDictionary: Boolean = false): PortableClass = PortableClass(
+private fun commonInterface(name: String, isDictionary: Boolean = false): CommonClass = CommonClass(
     browserName = ClassName(DOM_PACKAGE, name),
     parentBrowserName = null,
     superinterfaces = emptyList(),

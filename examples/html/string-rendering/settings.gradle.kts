@@ -25,8 +25,7 @@ rootProject.name = "compose-html-string-rendering"
 
 includeBuild("../../../html") {
     dependencySubstitution {
-        substitute(module("org.jetbrains.compose.html:html-core"))
-            .using(project(":html-core"))
+        substitute(module("org.jetbrains.compose.html.eap:html-core-eap"))
+            .using(project(":html-core-eap"))
     }
 }
-

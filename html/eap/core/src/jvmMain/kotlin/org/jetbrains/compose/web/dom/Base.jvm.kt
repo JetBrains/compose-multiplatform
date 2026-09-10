@@ -1,0 +1,57 @@
+/*
+ * Copyright 2020-2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+package org.jetbrains.compose.web.dom
+
+import androidx.compose.runtime.Composable
+import kotlinx.browser.dom.Element
+import kotlinx.browser.dom.HTMLStyleElement
+import org.jetbrains.compose.web.attributes.AttrsScope
+import org.jetbrains.compose.web.css.CSSRuleDeclarationList
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
+
+@OptIn(ComposeWebInternalApi::class)
+internal actual val DefaultComposeHtmlContext: ComposeHtmlContext = object : ComposeHtmlContext {
+    override val supportsDomElementAccess: Boolean = false
+
+    override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
+        ElementBuilder.createBuilder(tagName)
+
+    override fun <TElement : Element> elementBuilderNS(
+        tagName: String,
+        namespace: String,
+    ): ElementBuilder<TElement> = ElementBuilder.createBuilder(tagName, namespace)
+
+    @Composable
+    override fun <TElement : Element> TagElement(
+        elementBuilder: ElementBuilder<TElement>,
+        applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        content: (@Composable ElementScope<TElement>.() -> Unit)?,
+    ) {
+        error("HTML rendering implementation is not provided")
+    }
+
+    @Composable
+    override fun <TElement : Element> RawTextElement(
+        tagName: String,
+        applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        content: RawTextContent,
+    ) {
+        error("HTML rendering implementation is not provided")
+    }
+
+    @Composable
+    override fun TextElement(value: String) {
+        error("HTML rendering implementation is not provided")
+    }
+
+    @Composable
+    override fun StyleElement(
+        applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)?,
+        cssRules: CSSRuleDeclarationList,
+    ) {
+        error("HTML rendering implementation is not provided")
+    }
+}

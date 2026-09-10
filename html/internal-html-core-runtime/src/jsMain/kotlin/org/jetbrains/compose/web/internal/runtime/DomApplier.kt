@@ -3,6 +3,8 @@ package org.jetbrains.compose.web.internal.runtime
 import androidx.compose.runtime.AbstractApplier
 import kotlinx.dom.clear
 import org.w3c.dom.*
+import org.w3c.dom.css.CSSStyleDeclaration
+import org.w3c.dom.events.EventListener
 
 @ComposeWebInternalApi
 class DomApplier(
@@ -29,6 +31,12 @@ class DomApplier(
         // or current.node.clear()?; in all examples it calls 'clear' on the root
         root.node.clear()
     }
+}
+
+
+@ComposeWebInternalApi
+interface NamedEventListener : EventListener {
+    val name: String
 }
 
 @ComposeWebInternalApi

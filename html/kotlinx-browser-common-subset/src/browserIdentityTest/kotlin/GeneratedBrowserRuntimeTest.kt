@@ -87,7 +87,7 @@ class GeneratedBrowserRuntimeTest {
 
         exerciseGeneratedHierarchy(
             div = div,
-            child = document.createTextNode("portable"),
+            child = document.createTextNode("common"),
             anchor = element<HTMLAnchorElement>("a"),
             button = element<HTMLButtonElement>("button"),
             form = element<HTMLFormElement>("form"),
@@ -136,7 +136,7 @@ class GeneratedBrowserRuntimeTest {
                 template = element<HTMLTemplateElement>("template"),
                 time = element<HTMLTimeElement>("time"),
                 title = element<HTMLTitleElement>("title"),
-                unknown = element<HTMLUnknownElement>("portable-unknown"),
+                unknown = element<HTMLUnknownElement>("common-unknown"),
                 image = Image(),
                 option = Option(),
                 radio = radio,
@@ -191,8 +191,8 @@ private fun radioNodeList(form: HTMLFormElement): RadioNodeList {
     repeat(2) {
         val radio = document.createElement("input")
         radio.setAttribute("type", "radio")
-        radio.setAttribute("name", "portable")
+        radio.setAttribute("name", "common")
         form.appendChild(radio)
     }
-    return form.elements.namedItem("portable")!!.unsafeCast<RadioNodeList>()
+    return form.elements.namedItem("common")!!.unsafeCast<RadioNodeList>()
 }

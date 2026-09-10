@@ -8,7 +8,7 @@ package org.jetbrains.compose.web.browser.generator
 
 /** How a browser classifier named by [SelectionPolicy] participates in the facade. */
 internal enum class ClassifierDisposition {
-    /** Emit the named classifier and every portable declaration on it. */
+    /** Emit the named classifier and every common declaration on it. */
     EMIT,
 
     /** Leave the classifier and everything declared under it for a named future expansion. */

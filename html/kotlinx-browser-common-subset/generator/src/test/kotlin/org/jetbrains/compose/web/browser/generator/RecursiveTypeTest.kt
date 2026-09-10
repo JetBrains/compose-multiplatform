@@ -62,7 +62,7 @@ class RecursiveTypeTest {
         assertTrue(MUTATION_CALLBACK.mentionsInterop(), "a generic nested in a callback parameter")
         assertTrue(ON_ERROR.mentionsInterop(), "an interop type as a callback parameter and result")
         assertTrue(
-            LambdaTypeName.get(receiver = PORTABLE_JS_STRING, returnType = UNIT).mentionsInterop(),
+            LambdaTypeName.get(receiver = COMMON_JS_STRING, returnType = UNIT).mentionsInterop(),
             "an interop type as a callback receiver",
         )
         assertFalse(EVENT_HANDLER.mentionsInterop(), "a callback over facade classifiers alone")
@@ -72,11 +72,11 @@ class RecursiveTypeTest {
     @Test
     fun anOpaquePromiseIsFoundInsideACallback() {
         val handler = LambdaTypeName
-            .get(parameters = listOf(ParameterSpec.unnamed(PORTABLE_PROMISE.parameterizedBy(STAR))), returnType = UNIT)
+            .get(parameters = listOf(ParameterSpec.unnamed(COMMON_PROMISE.parameterizedBy(STAR))), returnType = UNIT)
             .copy(nullable = true)
 
-        assertTrue(portableClass(functions = listOf(consume(handler))).needsIrSuppression)
-        assertFalse(portableClass(functions = listOf(consume(EVENT_HANDLER))).needsIrSuppression)
+        assertTrue(commonClass(functions = listOf(consume(handler))).needsIrSuppression)
+        assertFalse(commonClass(functions = listOf(consume(EVENT_HANDLER))).needsIrSuppression)
     }
 
     /** Builds inert callbacks that ignore parameters and return inert results. */
@@ -93,35 +93,35 @@ class RecursiveTypeTest {
         )
         assertEquals(
             "{ null }",
-            inertLiteral(LambdaTypeName.get(returnType = PORTABLE_JS_ANY.copy(nullable = true))).toString(),
+            inertLiteral(LambdaTypeName.get(returnType = COMMON_JS_ANY.copy(nullable = true))).toString(),
         )
     }
 
     /** Defers facade return values to [JvmStubValues] singleton support. */
     @Test
     fun aCallbackReturningAFacadeClassifierAsksForTheSingleton() {
-        val nodeList = portableClass(name = "NodeList")
-        val values = JvmStubValues(mapOf(nodeList.portableName to nodeList))
+        val nodeList = commonClass(name = "NodeList")
+        val values = JvmStubValues(mapOf(nodeList.commonName to nodeList))
         val callback = LambdaTypeName.get(
             parameters = listOf(ParameterSpec.unnamed(NODE)),
-            returnType = nodeList.portableName,
+            returnType = nodeList.commonName,
         )
 
         assertNull(inertLiteral(callback, values.classes))
         assertEquals("{ _ -> kotlinx.browser.dom.EmptyNodeList }", values.value(callback).toString())
         val singletonFile = values.singletonFiles().single()
-        assertEquals(PORTABLE_DOM_PACKAGE, singletonFile.packageName)
+        assertEquals(COMMON_DOM_PACKAGE, singletonFile.packageName)
         assertEquals("JvmStubValues", singletonFile.name)
         assertTrue("internal object EmptyNodeList : NodeList()" in singletonFile.toString())
     }
 }
 
-private val NULLABLE_JS_ANY = PORTABLE_JS_ANY.copy(nullable = true)
-private val EVENT = ClassName(PORTABLE_EVENTS_PACKAGE, "Event")
-private val EVENT_LISTENER = ClassName(PORTABLE_EVENTS_PACKAGE, "EventListener")
-private val NODE = ClassName(PORTABLE_DOM_PACKAGE, "Node")
-private val MUTATION_OBSERVER = ClassName(PORTABLE_DOM_PACKAGE, "MutationObserver")
-private val MUTATION_RECORD = ClassName(PORTABLE_DOM_PACKAGE, "MutationRecord")
+private val NULLABLE_JS_ANY = COMMON_JS_ANY.copy(nullable = true)
+private val EVENT = ClassName(COMMON_EVENTS_PACKAGE, "Event")
+private val EVENT_LISTENER = ClassName(COMMON_EVENTS_PACKAGE, "EventListener")
+private val NODE = ClassName(COMMON_DOM_PACKAGE, "Node")
+private val MUTATION_OBSERVER = ClassName(COMMON_DOM_PACKAGE, "MutationObserver")
+private val MUTATION_RECORD = ClassName(COMMON_DOM_PACKAGE, "MutationRecord")
 
 /** `((Event) -> Unit)?`, the shape of every event handler property. */
 private val EVENT_HANDLER = LambdaTypeName
@@ -131,7 +131,7 @@ private val EVENT_HANDLER = LambdaTypeName
 /** `(JsArray<MutationRecord>, MutationObserver) -> Unit`: a generic nested inside a callback. */
 private val MUTATION_CALLBACK = LambdaTypeName.get(
     parameters = listOf(
-        ParameterSpec.unnamed(PORTABLE_JS_ARRAY.parameterizedBy(MUTATION_RECORD)),
+        ParameterSpec.unnamed(COMMON_JS_ARRAY.parameterizedBy(MUTATION_RECORD)),
         ParameterSpec.unnamed(MUTATION_OBSERVER),
     ),
     returnType = UNIT,
@@ -145,7 +145,7 @@ private val ON_ERROR = LambdaTypeName
     )
     .copy(nullable = true)
 
-private fun addEventListener(callback: TypeName): PortableFunction = PortableFunction(
+private fun addEventListener(callback: TypeName): CommonFunction = CommonFunction(
     name = "addEventListener",
     parameters = listOf(parameter("type", STRING), parameter("callback", callback)),
     returnType = UNIT,
@@ -153,7 +153,7 @@ private fun addEventListener(callback: TypeName): PortableFunction = PortableFun
     abstractInBrowser = false,
 )
 
-private fun consume(type: TypeName): PortableFunction = PortableFunction(
+private fun consume(type: TypeName): CommonFunction = CommonFunction(
     name = "consume",
     parameters = listOf(parameter("value", type)),
     returnType = UNIT,
@@ -161,13 +161,13 @@ private fun consume(type: TypeName): PortableFunction = PortableFunction(
     abstractInBrowser = false,
 )
 
-private fun parameter(name: String, type: TypeName): PortableParameter =
-    PortableParameter(name = name, type = type, isVararg = false, hasDefault = false)
+private fun parameter(name: String, type: TypeName): CommonParameter =
+    CommonParameter(name = name, type = type, isVararg = false, hasDefault = false)
 
-private fun portableClass(
+private fun commonClass(
     name: String = "Probe",
-    functions: List<PortableFunction> = emptyList(),
-): PortableClass = PortableClass(
+    functions: List<CommonFunction> = emptyList(),
+): CommonClass = CommonClass(
     browserName = ClassName(DOM_PACKAGE, name),
     parentBrowserName = null,
     superinterfaces = emptyList(),

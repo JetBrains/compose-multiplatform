@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-// Converts browser declarations to portable signatures and discovers missing dependencies.
+// Converts browser declarations to common signatures and discovers missing dependencies.
 package org.jetbrains.compose.web.browser.generator
 
 import com.google.devtools.ksp.symbol.ClassKind
@@ -16,7 +16,7 @@ import com.google.devtools.ksp.symbol.Modifier
 import com.squareup.kotlinpoet.TypeName
 
 /** Canonical signature form used for matching declarations across targets. */
-internal sealed interface PortableDeclarationSignature {
+internal sealed interface CommonDeclarationSignature {
     fun render(): String
 }
 
@@ -24,7 +24,7 @@ internal sealed interface PortableDeclarationSignature {
 internal data class FunctionSignature(
     val name: String,
     val parameters: List<ParameterSignature>,
-) : PortableDeclarationSignature {
+) : CommonDeclarationSignature {
     override fun render(): String = parameters.joinToString(
         prefix = "fun $name(",
         postfix = ")",
@@ -35,7 +35,7 @@ internal data class FunctionSignature(
 /** A constructor key consisting of its parameter signatures. */
 internal data class ConstructorSignature(
     val parameters: List<ParameterSignature>,
-) : PortableDeclarationSignature {
+) : CommonDeclarationSignature {
     override fun render(): String = parameters.joinToString(
         prefix = "constructor(",
         postfix = ")",
@@ -44,7 +44,7 @@ internal data class ConstructorSignature(
 }
 
 /** A property key consisting of its name. */
-internal data class PropertySignature(val name: String) : PortableDeclarationSignature {
+internal data class PropertySignature(val name: String) : CommonDeclarationSignature {
     override fun render(): String = "val $name"
 }
 
@@ -56,21 +56,21 @@ internal data class ParameterSignature(
     fun render(): String = (if (isVararg) "vararg " else "") + type.signature()
 }
 
-internal fun PortableFunction.signatureKey(): FunctionSignature =
-    FunctionSignature(name, parameters.map(PortableParameter::signatureKey))
+internal fun CommonFunction.signatureKey(): FunctionSignature =
+    FunctionSignature(name, parameters.map(CommonParameter::signatureKey))
 
-internal fun PortableConstructor.signatureKey(): ConstructorSignature =
-    ConstructorSignature(parameters.map(PortableParameter::signatureKey))
+internal fun CommonConstructor.signatureKey(): ConstructorSignature =
+    ConstructorSignature(parameters.map(CommonParameter::signatureKey))
 
-internal fun PortableProperty.signatureKey(): PropertySignature = PropertySignature(name)
+internal fun CommonProperty.signatureKey(): PropertySignature = PropertySignature(name)
 
-private fun PortableParameter.signatureKey(): ParameterSignature = ParameterSignature(type, isVararg)
+private fun CommonParameter.signatureKey(): ParameterSignature = ParameterSignature(type, isVararg)
 
 /** Key used to deduplicate inherited functions. */
-internal fun PortableFunction.key(): String = signatureKey().render()
+internal fun CommonFunction.key(): String = signatureKey().render()
 
 /** Key used to deduplicate inherited properties. */
-internal fun PortableProperty.key(): String = signatureKey().render()
+internal fun CommonProperty.key(): String = signatureKey().render()
 
 /** A signature decision and any classifiers it can add to the closure. */
 internal class SignatureAnalysis<out T>(
@@ -80,7 +80,7 @@ internal class SignatureAnalysis<out T>(
     internal val discoveryBlocked: Boolean,
 )
 
-/** The portable result of analyzing a signature, or its structured skip reason. */
+/** The common result of analyzing a signature, or its structured skip reason. */
 internal sealed interface SignatureDecision<out T> {
     fun value(): T
 
@@ -93,16 +93,16 @@ internal sealed interface SignatureDecision<out T> {
     }
 }
 
-/** A portable top-level extension receiver and function signature. */
-internal data class PortableExtensionSignature(
+/** A common top-level extension receiver and function signature. */
+internal data class CommonExtensionSignature(
     val receiverType: TypeName,
-    val function: PortableFunction,
+    val function: CommonFunction,
 )
 
-/** Maps browser properties, functions, constructors, and extensions to portable signatures. */
-internal class SignatureAnalyzer(private val types: PortableTypeMapper) {
+/** Maps browser properties, functions, constructors, and extensions to common signatures. */
+internal class SignatureAnalyzer(private val types: CommonTypeMapper) {
     /** Analyzes a property as a member of [ownType]. */
-    fun property(declaration: KSPropertyDeclaration, ownType: KSType?): SignatureAnalysis<PortableProperty> {
+    fun property(declaration: KSPropertyDeclaration, ownType: KSType?): SignatureAnalysis<CommonProperty> {
         val mapping = firstPorted(
             types.result(ownType?.let { runCatching { declaration.asMemberOf(it) }.getOrNull() }),
             types.result(declaration.type.resolve()),
@@ -115,7 +115,7 @@ internal class SignatureAnalyzer(private val types: PortableTypeMapper) {
                 SignatureDecision.Skipped(SkipReason.TOP_LEVEL_EXTENSION, declaration.simpleName.asString())
             mapping is TypeMapping.Skipped -> SignatureDecision.Skipped(mapping.reason, mapping.detail)
             else -> SignatureDecision.Ported(
-                PortableProperty(
+                CommonProperty(
                     name = declaration.simpleName.asString(),
                     type = (mapping as TypeMapping.Ported).type,
                     mutable = declaration.isMutable,
@@ -133,7 +133,7 @@ internal class SignatureAnalyzer(private val types: PortableTypeMapper) {
         ownType: KSType?,
         keepDefaults: Boolean,
         allowExtension: Boolean = false,
-    ): SignatureAnalysis<PortableFunction> {
+    ): SignatureAnalysis<CommonFunction> {
         val resolved = ownType?.let { runCatching { declaration.asMemberOf(it) }.getOrNull() }
         val returnMapping = firstPorted(
             types.result(resolved?.returnType),
@@ -153,7 +153,7 @@ internal class SignatureAnalyzer(private val types: PortableTypeMapper) {
     }
 
     /** Analyzes a top-level extension including its receiver type. */
-    fun extensionFunction(declaration: KSFunctionDeclaration): SignatureAnalysis<PortableExtensionSignature> {
+    fun extensionFunction(declaration: KSFunctionDeclaration): SignatureAnalysis<CommonExtensionSignature> {
         val receiverMapping = types.result(declaration.extensionReceiver?.resolve())
         // Facade extensions are real wrapper actuals, so they cannot inherit a web-only
         // `definedExternally` default through a typealias. Keep their parameters explicit.
@@ -175,7 +175,7 @@ internal class SignatureAnalyzer(private val types: PortableTypeMapper) {
             )
             function.decision is SignatureDecision.Skipped -> function.decision
             else -> SignatureDecision.Ported(
-                PortableExtensionSignature(
+                CommonExtensionSignature(
                     (receiverMapping as TypeMapping.Ported).type,
                     function.decision.value(),
                 ),
@@ -188,13 +188,13 @@ internal class SignatureAnalyzer(private val types: PortableTypeMapper) {
     fun constructor(
         declaration: KSFunctionDeclaration,
         primary: KSFunctionDeclaration?,
-    ): SignatureAnalysis<PortableConstructor> {
+    ): SignatureAnalysis<CommonConstructor> {
         val mappings = declaration.parameters.map { types.result(it.type.resolve()) }
         val blocked = declaration.parameters.any { it.name == null }
         val decision = when (val parameters = mapParameters(declaration, mappings, keepDefaults = true)) {
             is SignatureDecision.Skipped -> parameters
             else -> SignatureDecision.Ported(
-                PortableConstructor(parameters.value(), primary != null && declaration.isSameAs(primary)),
+                CommonConstructor(parameters.value(), primary != null && declaration.isSameAs(primary)),
             )
         }
         return analysis(decision, mappings, blocked)
@@ -206,7 +206,7 @@ internal class SignatureAnalyzer(private val types: PortableTypeMapper) {
         parameterMappings: List<TypeMapping>,
         keepDefaults: Boolean,
         allowExtension: Boolean,
-    ): SignatureDecision<PortableFunction> {
+    ): SignatureDecision<CommonFunction> {
         if (declaration.typeParameters.isNotEmpty()) {
             return SignatureDecision.Skipped(SkipReason.GENERIC_MEMBER, declaration.simpleName.asString())
         }
@@ -220,7 +220,7 @@ internal class SignatureAnalyzer(private val types: PortableTypeMapper) {
         return when (val parameters = mapParameters(declaration, parameterMappings, keepDefaults)) {
             is SignatureDecision.Skipped -> parameters
             else -> SignatureDecision.Ported(
-                PortableFunction(
+                CommonFunction(
                     declaration.simpleName.asString(),
                     parameters.value(),
                     (returnMapping as TypeMapping.Ported).type,
@@ -235,8 +235,8 @@ internal class SignatureAnalyzer(private val types: PortableTypeMapper) {
         declaration: KSFunctionDeclaration,
         mappings: List<TypeMapping>,
         keepDefaults: Boolean,
-    ): SignatureDecision<List<PortableParameter>> {
-        val parameters = mutableListOf<PortableParameter>()
+    ): SignatureDecision<List<CommonParameter>> {
+        val parameters = mutableListOf<CommonParameter>()
         val keepDeclaredDefaults = keepDefaults && Modifier.OVERRIDE !in declaration.modifiers
         declaration.parameters.forEachIndexed { index, parameter ->
             val mapping = mappings[index]
@@ -248,7 +248,7 @@ internal class SignatureAnalyzer(private val types: PortableTypeMapper) {
             }
             val name = parameter.name?.asString()
                 ?: return SignatureDecision.Skipped(SkipReason.MISSING_NAME, "parameter #$index")
-            parameters += PortableParameter(
+            parameters += CommonParameter(
                 name,
                 (mapping as TypeMapping.Ported).type,
                 parameter.isVararg,

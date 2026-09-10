@@ -9,9 +9,9 @@
 package kotlinx.browser.dom.css.identity
 
 import kotlinx.browser.document
-import kotlinx.browser.dom.HTMLElement as PortableHTMLElement
-import kotlinx.browser.dom.css.CSS as PortableCSS
-import kotlinx.browser.dom.css.CSSStyleDeclaration as PortableCSSStyleDeclaration
+import kotlinx.browser.dom.HTMLElement as CommonHTMLElement
+import kotlinx.browser.dom.css.CSS as CommonCSS
+import kotlinx.browser.dom.css.CSSStyleDeclaration as CommonCSSStyleDeclaration
 import org.w3c.dom.HTMLElement as BrowserHTMLElement
 import org.w3c.dom.css.CSS as BrowserCSS
 import org.w3c.dom.css.CSSStyleDeclaration as BrowserCSSStyleDeclaration
@@ -19,31 +19,31 @@ import kotlin.js.unsafeCast
 import kotlin.test.Test
 import kotlin.test.assertTrue
 
-private fun browserStyleAsPortable(value: BrowserCSSStyleDeclaration): PortableCSSStyleDeclaration = value
+private fun browserStyleAsCommon(value: BrowserCSSStyleDeclaration): CommonCSSStyleDeclaration = value
 
-private fun portableStyleAsBrowser(value: PortableCSSStyleDeclaration): BrowserCSSStyleDeclaration = value
+private fun commonStyleAsBrowser(value: CommonCSSStyleDeclaration): BrowserCSSStyleDeclaration = value
 
-private fun portableElementAsBrowser(value: PortableHTMLElement): BrowserHTMLElement = value
+private fun commonElementAsBrowser(value: CommonHTMLElement): BrowserHTMLElement = value
 
-private fun usePortableInlineStyle(element: PortableHTMLElement): BrowserCSSStyleDeclaration {
+private fun useCommonInlineStyle(element: CommonHTMLElement): BrowserCSSStyleDeclaration {
     val style = element.style
     style.color = "rebeccapurple"
     style.setProperty("background-color", "black")
     return style
 }
 
-private fun portableEscapeUsesTheBrowserCompanion(identifier: String): Boolean =
-    PortableCSS.escape(identifier) == BrowserCSS.escape(identifier)
+private fun commonEscapeUsesTheBrowserCompanion(identifier: String): Boolean =
+    CommonCSS.escape(identifier) == BrowserCSS.escape(identifier)
 
 class GeneratedCssStyleDeclarationWebTest {
     @Test
     fun cssAliasesAndMembersAreCallable() {
-        val element = document.createElement("div").unsafeCast<PortableHTMLElement>()
+        val element = document.createElement("div").unsafeCast<CommonHTMLElement>()
 
-        browserStyleAsPortable(element.style)
-        portableStyleAsBrowser(element.style)
-        portableElementAsBrowser(element)
-        usePortableInlineStyle(element)
-        assertTrue(portableEscapeUsesTheBrowserCompanion("portable:id"))
+        browserStyleAsCommon(element.style)
+        commonStyleAsBrowser(element.style)
+        commonElementAsBrowser(element)
+        useCommonInlineStyle(element)
+        assertTrue(commonEscapeUsesTheBrowserCompanion("common:id"))
     }
 }

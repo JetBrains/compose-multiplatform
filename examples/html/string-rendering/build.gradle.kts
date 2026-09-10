@@ -74,7 +74,8 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
-                implementation(compose.html.core)
+                implementation("org.jetbrains.compose.html.eap:html-core-eap:0.0.1")
+                implementation("org.jetbrains.compose.html:kotlinx-browser-common-subset:0.0.1+dev1")
             }
         }
     }

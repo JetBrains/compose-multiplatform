@@ -15,7 +15,7 @@ import com.squareup.kotlinpoet.ClassName
 import com.squareup.kotlinpoet.MemberName
 
 /** The classifiers the facade emits, together with the reason each of them is in. */
-internal class PortableClosure(
+internal class CommonClosure(
     /** Classifiers selected directly from the policy's exact input files. */
     val inputs: Set<String>,
     /** The classifiers a member/operator signature or a dictionary factory parameter asked for, sorted. */
@@ -33,31 +33,31 @@ internal class PortableClosure(
 }
 
 /** The retained analysis of the final closure; provisional rounds are discarded. */
-internal data class PortableAnalysis(
-    val closure: PortableClosure,
+internal data class CommonAnalysis(
+    val closure: CommonClosure,
     val coverage: CoverageLedger,
-    val model: List<PortableClass>,
-    val extensions: List<PortableExtensionFunction>,
-    val values: List<PortableExtensionValue>,
+    val model: List<CommonClass>,
+    val extensions: List<CommonExtensionFunction>,
+    val values: List<CommonExtensionValue>,
     val requestedDependencies: Set<String>,
 )
 
 /**
- * Expands [inputs] to a fixpoint over portable signature dependencies, excluding policy omissions.
+ * Expands [inputs] to a fixpoint over common signature dependencies, excluding policy omissions.
  * Recomputing the closure each round keeps output ordering deterministic.
  */
-internal fun resolvePortableAnalysis(
+internal fun resolveCommonAnalysis(
     index: DeclarationIndex,
     inputs: Set<String>,
     signatureOnlyPackages: Set<String>,
     excluded: Set<String>,
-): PortableAnalysis {
+): CommonAnalysis {
     val dependencies = sortedSetOf<String>()
     val identityOnly = sortedSetOf<String>()
     var declarations = selectDeclarations(index, inputs, identityOnly, excluded)
     while (true) {
-        val closure = PortableClosure(inputs, dependencies.toList(), identityOnly, declarations)
-        val analysis = analyzePortableClosure(index, closure, signatureOnlyPackages)
+        val closure = CommonClosure(inputs, dependencies.toList(), identityOnly, declarations)
+        val analysis = analyzeCommonClosure(index, closure, signatureOnlyPackages)
         val discovered = analysis.requestedDependencies
             // Ignore classifiers whose source declarations cannot be inspected.
             .filter { it !in declarations && it !in excluded && index.isSourceDeclaration(it) }
@@ -90,7 +90,7 @@ private fun selectDeclarations(
                 ?.let(::visit)
             hierarchy.interfaces
                 .filter { it.qualifiedName in selected }
-                .map(PortableSupertype::declaration)
+                .map(CommonSupertype::declaration)
                 .forEach(::visit)
             closure[qualifiedName] = declaration
             return
@@ -100,10 +100,10 @@ private fun selectDeclarations(
         val retainedInterfaces = hierarchy.interfaces.filterNot { it.qualifiedName in excluded }
         requireRetainedSupertypes(
             qualifiedName,
-            hierarchy.classSupertypes.map(PortableSupertype::qualifiedName),
+            hierarchy.classSupertypes.map(CommonSupertype::qualifiedName),
             buildSet {
                 retainedParent?.qualifiedName?.let(::add)
-                retainedInterfaces.mapNotNullTo(this, PortableSupertype::qualifiedName)
+                retainedInterfaces.mapNotNullTo(this, CommonSupertype::qualifiedName)
             },
         )
 
@@ -111,7 +111,7 @@ private fun selectDeclarations(
             ?.declaration
             ?.let(::visit)
         retainedInterfaces
-            .map(PortableSupertype::declaration)
+            .map(CommonSupertype::declaration)
             .forEach(::visit)
 
         closure[qualifiedName] = declaration
@@ -142,15 +142,15 @@ internal fun requireRetainedSupertypes(
 }
 
 /** Builds one closure round while collecting every classifier its emitted signatures still require. */
-private fun analyzePortableClosure(
+private fun analyzeCommonClosure(
     index: DeclarationIndex,
-    closure: PortableClosure,
+    closure: CommonClosure,
     signatureOnlyPackages: Set<String>,
-): PortableAnalysis {
+): CommonAnalysis {
     val coverage = CoverageLedger()
     val requestedDependencies = linkedSetOf<String>()
-    val mapper = PortableTypeMapper(
-        closure.declarations.keys.associateWith { ClassName.bestGuess(it).toPortableName() },
+    val mapper = CommonTypeMapper(
+        closure.declarations.keys.associateWith { ClassName.bestGuess(it).toCommonName() },
         signatureOnlyPackages,
     )
     val signatures = SignatureAnalyzer(mapper)
@@ -161,7 +161,7 @@ private fun analyzePortableClosure(
     val values = indexed
         .filterIsInstance<KSPropertyDeclaration>()
         .mapNotNull { scanTopLevelExtensionValue(it, mapper, coverage) }
-    val model = buildPortableModel(
+    val model = buildCommonModel(
         index,
         closure.declarations,
         closure.identityOnly,
@@ -170,7 +170,7 @@ private fun analyzePortableClosure(
         requestedDependencies,
         closure.selected,
     )
-    return PortableAnalysis(
+    return CommonAnalysis(
         closure,
         coverage,
         model,
@@ -183,9 +183,9 @@ private fun analyzePortableClosure(
 /** Ports an immutable `X.Companion` extension value whose type is `X`. */
 private fun scanTopLevelExtensionValue(
     declaration: KSPropertyDeclaration,
-    types: PortableTypeMapper,
+    types: CommonTypeMapper,
     coverage: CoverageLedger,
-): PortableExtensionValue? {
+): CommonExtensionValue? {
     val subject = declaration.topLevelExtensionSubject()
     if (declaration.isMutable || declaration.typeParameters.isNotEmpty()) {
         coverage.skipped(
@@ -216,7 +216,7 @@ private fun scanTopLevelExtensionValue(
         return null
     }
     val browserOwner = ClassName.bestGuess(ownerName)
-    if ((mapping as TypeMapping.Ported).type != browserOwner.toPortableName()) {
+    if ((mapping as TypeMapping.Ported).type != browserOwner.toCommonName()) {
         coverage.skipped(
             CoverageKind.TOP_LEVEL_EXTENSION,
             subject,
@@ -225,7 +225,7 @@ private fun scanTopLevelExtensionValue(
         )
         return null
     }
-    val value = PortableExtensionValue(
+    val value = CommonExtensionValue(
         browserMember = MemberName(declaration.packageName.asString(), declaration.simpleName.asString()),
         browserOwner = browserOwner,
         name = declaration.simpleName.asString(),
@@ -241,7 +241,7 @@ private fun scanTopLevelExtension(
     signatures: SignatureAnalyzer,
     coverage: CoverageLedger,
     requestedDependencies: MutableSet<String>,
-): PortableExtensionFunction? {
+): CommonExtensionFunction? {
     val subject = declaration.topLevelExtensionSubject()
     if (declaration !is KSFunctionDeclaration || Modifier.OPERATOR !in declaration.modifiers) {
         coverage.skipped(
@@ -260,7 +260,7 @@ private fun scanTopLevelExtension(
         return null
     }
     val signature = decision.value()
-    val extension = PortableExtensionFunction(
+    val extension = CommonExtensionFunction(
         browserMember = MemberName(declaration.packageName.asString(), declaration.simpleName.asString()),
         receiverType = signature.receiverType,
         function = signature.function,

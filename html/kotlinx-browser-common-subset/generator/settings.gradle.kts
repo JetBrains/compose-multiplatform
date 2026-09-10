@@ -24,7 +24,7 @@ dependencyResolutionManagement {
     }
 }
 
-include(":runner")
+include(":ksp-runner")
 include(":verification")
 
 rootProject.name = "kotlinx-browser-common-subset-generator"

@@ -1,28 +1,75 @@
 # kotlinx-browser common subset
 
 This module generates a multiplatform DOM facade from the published `kotlinx-browser` sources.
-Common code receives portable `expect` declarations, web targets keep browser identity through
+Common code receives the generated `expect` declarations, web targets keep browser identity through
 typealiases, and the JVM receives stubs.
 
 The generator resolves
 `org.jetbrains.kotlinx:kotlinx-browser:<version>:sources`, unpacks its `webMain` sources under the
-generator runner's `build/`, and feeds the source set to KSP. Fresh output is staged
-under `generator/runner/build/generated/kotlinxBrowserCommonSubset`. Reviewed source output is
+KSP runner's `build/`, and feeds the source set to KSP. Fresh output is staged
+under `generator/ksp-runner/build/generated/kotlinxBrowserCommonSubset`. Reviewed source output is
 checked in under `src/`, so compiling the library does not run KSP or require the sources JAR.
 Generator checks and tests do run KSP and resolve the pinned sources artifact.
 
+## Run
+
+Run all commands in this section from this directory. Generate staged output without changing 
+checked-in sources:
+
+```shell
+./gradlew generateKotlinxBrowserCommonSubset
+```
+
+Check that staged output matches `src/` and `api/dom-api-manifest.txt`:
+
+```shell
+./gradlew checkKotlinxBrowserCommonSubset
+```
+
+After reviewing a deliberate generated API change, replace the checked-in files explicitly:
+
+```shell
+./gradlew updateKotlinxBrowserCommonSubset
+```
+
+Run the generator tests and the library's multiplatform checks:
+
+```shell
+./gradlew check
+```
+
+See the [verification module README](generator/verification/README.md) for focused compilation and
+ledger-test tasks.
+
 ## How generation works
 
-1. Gradle resolves and unpacks the pinned Maven sources artifact into the runner's `build/`.
-2. KSP reads the browser source files named in
-   [`portable-dom-selection.txt`](generator/src/main/resources/portable-dom-selection.txt).
-3. `SelectionPolicy` chooses classifier identities, while `ClosureResolver` adds supported
-   inheritance and signature dependencies.
-4. `SignatureAnalyzer`, `PortableTypeMapper`, and `MemberScanner` build the portable model and
-   record a decision for every declaration they inspect.
-5. `FacadeSourceEmitter` renders KotlinPoet files as staged KSP resources.
-6. Gradle stages those resources for comparison with, or explicit replacement of, checked-in
-   sources.
+```mermaid
+flowchart TB
+    artifact["kotlinx-browser:&lt;version&gt;:sources"]
+    sources["Unpacked webMain sources"]
+    policy["common-dom-selection.txt"]
+    generator["KSP generator<br/>selection → closure → common model → emit"]
+    staged["Staged source sets + reports"]
+    checked["Checked-in src/ + API manifest"]
+
+    artifact --> sources
+    sources --> generator
+    policy --> generator
+    generator --> staged
+
+    staged -.->|check: compare| checked
+    staged -->|update: replace after review| checked
+```
+
+1. Gradle resolves and unpacks the pinned kotlinx-browser sources artifact. KSP reads the browser
+   files named in
+   [`common-dom-selection.txt`](generator/src/main/resources/common-dom-selection.txt).
+2. `SelectionPolicy`, `ClosureResolver`, `SignatureAnalyzer`, `CommonTypeMapper`, and
+   `MemberScanner` select declarations, close their dependencies, build the common model, and
+   record every decision.
+3. `FacadeSourceEmitter` renders KotlinPoet files and reports into the staging directory.
+4. Gradle compares staged output with checked-in generated sources, or replaces those sources only
+   through the explicit update task. Handwritten interop files are never synchronized.
 
 ## Input boundary
 
@@ -62,19 +109,33 @@ normally instead and preserves the inheritance edge.
 
 ## Source sets
 
+```mermaid
+flowchart TB
+    common["commonMain<br/>expect API + handwritten interop"]
+    web["webMain<br/>kotlinx-browser dependency"]
+    jvm["jvmMain<br/>inert actuals"]
+    js["jsMain<br/>browser actuals"]
+    wasm["wasmJsMain<br/>browser actuals"]
+
+    common --> web
+    common --> jvm
+    web --> js
+    web --> wasm
+```
+
 | Source set | Role |
 | --- | --- |
-| `commonMain` | Portable `expect` declarations, dictionaries, values, and interop contracts |
+| `commonMain` | Generated `expect` declarations, dictionaries, and values; handwritten interop contracts |
 | `webMain` | Shared browser dependency only; no generated actuals |
-| `jsMain` | Browser facade typealiases and bridges, plus JS interop implementations |
-| `wasmJsMain` | Browser facade typealiases and bridges, plus Wasm/JS interop implementations |
-| `jvmMain` | Inert but type-correct stubs, stateful dictionaries, constants, and enum-like values |
+| `jsMain` | Generated browser facade typealiases and bridges, plus handwritten JS interop implementations |
+| `wasmJsMain` | Generated browser facade typealiases and bridges, plus handwritten Wasm/JS interop implementations |
+| `jvmMain` | Generated inert stubs, dictionaries, constants, and values; handwritten JVM interop implementations |
 
 The JVM output is a compatibility stub, not a DOM implementation.
 
 ## Modeling rules
 
-Classifiers preserve their portable modality and mapped inheritance edges. Behavioral interfaces
+Classifiers preserve their source modality and mapped inheritance edges. Behavioral interfaces
 remain interfaces. If an inheritance edge cannot join the closure, generation fails.
 
 A member is emitted only when its complete signature maps recursively. Generic arguments, callback
@@ -88,8 +149,8 @@ Top-level operator extensions are emitted as wrapper functions on every target, 
 parameters are always explicit. Browser `definedExternally` defaults cannot be copied safely into
 the common wrapper contract because common code must also compile for the JVM.
 
-Option dictionaries keep mutable properties and inheritance. Their factories use portable inert
-defaults.
+Option dictionaries keep mutable properties and inheritance. Their factories use
+target-independent inert defaults.
 
 KSP exposes numeric companion constant names and types but not their initializer expressions. JVM
 actuals therefore receive deterministic inert values derived only from the selected source model.
@@ -97,11 +158,12 @@ actuals therefore receive deterministic inert values derived only from the selec
 Browser string enums are emitted as classifier identities plus companion extension values. Web
 targets forward to the browser values; JVM getters return stable private singletons.
 
-Portable companion functions are retained with their complete signatures. Web typealiases call the
+Companion functions in the common model retain their complete signatures. Web typealiases call the
 browser companion directly, while JVM companions provide inert, type-correct bodies.
 
-Portable interop types cover browser signatures involving `JsAny`, `JsString`, `JsNumber`,
-`JsDouble`, `JsArray`, and `Promise`.
+Common interop types cover browser signatures involving `JsAny`, `JsString`, `JsNumber`,
+`JsDouble`, `JsArray`, and `Promise`. Their declarations and target implementations are handwritten
+because they do not depend on the `kotlinx-browser` source model.
 
 ## Reports and validation
 
@@ -119,31 +181,3 @@ from the checked-in baseline.
 
 [`dom-api-exclusions.txt`](generator/src/main/resources/dom-api-exclusions.txt) is reserved for
 specific declaration-level decisions that cannot be expressed by classifier selection.
-
-## Run
-
-Run all commands in this section from the repository's `html/` directory, which contains the Gradle
-wrapper. Generate staged output without changing checked-in sources:
-
-```shell
-./gradlew generateKotlinxBrowserCommonSubset
-```
-
-Check that staged output matches `src/` and `api/dom-api-manifest.txt`:
-
-```shell
-./gradlew checkKotlinxBrowserCommonSubset
-```
-
-After reviewing a deliberate generated API change, replace the checked-in files explicitly:
-
-```shell
-./gradlew updateKotlinxBrowserCommonSubset
-```
-
-Run the generator tests and the library's multiplatform checks:
-
-```shell
-./gradlew -p kotlinx-browser-common-subset/generator test
-./gradlew :kotlinx-browser-common-subset:check
-```

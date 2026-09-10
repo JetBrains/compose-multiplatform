@@ -3,7 +3,7 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-// Verifies portable declaration signatures.
+// Verifies common declaration signatures.
 package org.jetbrains.compose.web.browser.generator
 
 import com.squareup.kotlinpoet.DOUBLE
@@ -16,7 +16,7 @@ class DeclarationSignatureTest {
     fun numericSequenceDifferencesAreNormalizedByJsDouble() {
         assertEquals(
             "kotlinx.browser.JsArray<kotlinx.browser.JsDouble>",
-            PORTABLE_JS_ARRAY.parameterizedBy(PORTABLE_JS_DOUBLE).signature(),
+            COMMON_JS_ARRAY.parameterizedBy(COMMON_JS_DOUBLE).signature(),
         )
     }
 
@@ -30,7 +30,7 @@ class DeclarationSignatureTest {
     }
 }
 
-private fun property(name: String, mutable: Boolean): PortableProperty = PortableProperty(
+private fun property(name: String, mutable: Boolean): CommonProperty = CommonProperty(
     name = name,
     type = DOUBLE,
     mutable = mutable,

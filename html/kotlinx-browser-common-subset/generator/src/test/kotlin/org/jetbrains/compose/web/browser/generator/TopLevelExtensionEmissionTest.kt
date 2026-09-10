@@ -17,13 +17,13 @@ import kotlin.test.assertFalse
 class TopLevelExtensionEmissionTest {
     @Test
     fun defaultedBrowserParameterBecomesExplicitOnEveryFacadeTarget() {
-        val extension = PortableExtensionFunction(
+        val extension = CommonExtensionFunction(
             browserMember = MemberName(DOM_PACKAGE, "get"),
             receiverType = RECEIVER,
-            function = PortableFunction(
+            function = CommonFunction(
                 name = "get",
                 parameters = listOf(
-                    PortableParameter(name = "index", type = INT, isVararg = false, hasDefault = true),
+                    CommonParameter(name = "index", type = INT, isVararg = false, hasDefault = true),
                 ),
                 returnType = STRING,
                 open = false,
@@ -50,5 +50,5 @@ class TopLevelExtensionEmissionTest {
     }
 }
 
-private val DOM = PortablePackageMapping(PORTABLE_DOM_PACKAGE, "PortableDom", "OptionDictionaries")
-private val RECEIVER = ClassName(PORTABLE_DOM_PACKAGE, "DefaultedExtensionReceiver")
+private val DOM = CommonPackageMapping(COMMON_DOM_PACKAGE, "Dom", "OptionDictionaries")
+private val RECEIVER = ClassName(COMMON_DOM_PACKAGE, "DefaultedExtensionReceiver")

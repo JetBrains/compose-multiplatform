@@ -28,13 +28,13 @@ import kotlinx.browser.toList
 class GeneratedInteropTest {
     @Test
     fun scalarBridgesRoundTrip() {
-        assertEquals("portable", "portable".toJsString().toKotlinString())
+        assertEquals("common", "common".toJsString().toKotlinString())
         assertEquals(42.5, 42.5.toJsNumber().toDouble())
         assertEquals(42.5, 42.5.toJsDouble().toKotlinDouble())
     }
 
     @Test
-    fun jsArrayBridgeSupportsPortableElements() {
+    fun jsArrayBridgeSupportsCommonElements() {
         val values: JsArray<JsString> = listOf("first".toJsString(), "second".toJsString()).toJsArray()
 
         assertEquals(2, values.length)

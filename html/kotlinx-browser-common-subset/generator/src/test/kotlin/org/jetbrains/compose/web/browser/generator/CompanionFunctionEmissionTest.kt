@@ -14,7 +14,7 @@ import kotlin.test.assertFalse
 
 class CompanionFunctionEmissionTest {
     @Test
-    fun commonCompanionsDeclarePortableFunctions() {
+    fun commonCompanionsDeclareCommonFunctions() {
         val common = commonDeclarationsFile(CSS_MAPPING, listOf(CSS_CLASS), emptyList()).toString()
 
         assertContains(
@@ -39,7 +39,7 @@ class CompanionFunctionEmissionTest {
 
     @Test
     fun jvmCompanionsEmitTypeCorrectBodies() {
-        val values = JvmStubValues(mapOf(CSS_CLASS.portableName to CSS_CLASS))
+        val values = JvmStubValues(mapOf(CSS_CLASS.commonName to CSS_CLASS))
         val jvm = jvmDeclarationsFile(
             CSS_MAPPING,
             listOf(CSS_CLASS),
@@ -52,9 +52,9 @@ class CompanionFunctionEmissionTest {
     }
 }
 
-private val CSS_MAPPING = PortablePackageMapping(PORTABLE_CSS_PACKAGE, "PortableCss", "CssDictionaries")
+private val CSS_MAPPING = CommonPackageMapping(COMMON_CSS_PACKAGE, "Css", "CssDictionaries")
 
-private val CSS_CLASS = PortableClass(
+private val CSS_CLASS = CommonClass(
     browserName = ClassName(DOM_CSS_PACKAGE, "CSS"),
     parentBrowserName = null,
     superinterfaces = emptyList(),
@@ -65,13 +65,13 @@ private val CSS_CLASS = PortableClass(
     properties = emptyList(),
     functions = emptyList(),
     constructors = emptyList(),
-    companion = PortableCompanion(
+    companion = CommonCompanion(
         properties = emptyList(),
         functions = listOf(
-            PortableFunction(
+            CommonFunction(
                 name = "escape",
                 parameters = listOf(
-                    PortableParameter("ident", STRING, isVararg = false, hasDefault = false),
+                    CommonParameter("ident", STRING, isVararg = false, hasDefault = false),
                 ),
                 returnType = STRING,
                 open = false,

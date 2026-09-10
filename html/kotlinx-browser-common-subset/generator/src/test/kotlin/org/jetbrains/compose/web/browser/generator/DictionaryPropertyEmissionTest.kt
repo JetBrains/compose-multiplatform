@@ -48,7 +48,7 @@ class DictionaryPropertyEmissionTest {
 
     @Test
     fun jvmFactoryBuildsFreshStatefulClassWithOwnAndInheritedProperties() {
-        val values = JvmStubValues(listOf(EVENT_INIT, KEYWORD_INIT).associateBy(PortableClass::portableName))
+        val values = JvmStubValues(listOf(EVENT_INIT, KEYWORD_INIT).associateBy(CommonClass::commonName))
         val jvm = jvmDictionariesFile(
             EVENTS,
             listOf(KEYWORD_INIT),
@@ -72,7 +72,7 @@ class DictionaryPropertyEmissionTest {
             properties = listOf(property("missing", STRING.copy(nullable = true))),
             factoryParameters = emptyList(),
         )
-        val values = JvmStubValues(mapOf(broken.portableName to broken))
+        val values = JvmStubValues(mapOf(broken.commonName to broken))
 
         val failure = assertFailsWith<IllegalStateException> {
             jvmDictionariesFile(EVENTS, listOf(broken), values, JvmConstantValues(emptyList()))
@@ -82,21 +82,21 @@ class DictionaryPropertyEmissionTest {
     }
 }
 
-private val EVENTS = PortablePackageMapping(PORTABLE_EVENTS_PACKAGE, "PortableEvents", "EventDictionaries")
+private val EVENTS = CommonPackageMapping(COMMON_EVENTS_PACKAGE, "Events", "EventDictionaries")
 
-private fun property(name: String, type: com.squareup.kotlinpoet.TypeName): PortableProperty =
-    PortableProperty(name, type, mutable = true, open = true, abstractInBrowser = false)
+private fun property(name: String, type: com.squareup.kotlinpoet.TypeName): CommonProperty =
+    CommonProperty(name, type, mutable = true, open = true, abstractInBrowser = false)
 
-private fun parameter(name: String, type: com.squareup.kotlinpoet.TypeName): PortableParameter =
-    PortableParameter(name, type, isVararg = false, hasDefault = true)
+private fun parameter(name: String, type: com.squareup.kotlinpoet.TypeName): CommonParameter =
+    CommonParameter(name, type, isVararg = false, hasDefault = true)
 
 private fun dictionary(
     browserPackage: String,
     name: String,
-    properties: List<PortableProperty>,
-    factoryParameters: List<PortableParameter>,
+    properties: List<CommonProperty>,
+    factoryParameters: List<CommonParameter>,
     superinterfaces: List<ClassName> = emptyList(),
-): PortableClass = PortableClass(
+): CommonClass = CommonClass(
     browserName = ClassName(browserPackage, name),
     parentBrowserName = null,
     superinterfaces = superinterfaces,
@@ -108,7 +108,7 @@ private fun dictionary(
     functions = emptyList(),
     constructors = emptyList(),
     companion = null,
-    factory = PortableFactory(factoryParameters),
+    factory = CommonFactory(factoryParameters),
     sourceFile = null,
 )
 
@@ -127,5 +127,5 @@ private val KEYWORD_INIT = dictionary(
         parameter("param_is", STRING.copy(nullable = true)),
         parameter("bubbles", BOOLEAN.copy(nullable = true)),
     ),
-    superinterfaces = listOf(EVENT_INIT.portableName),
+    superinterfaces = listOf(EVENT_INIT.commonName),
 )
