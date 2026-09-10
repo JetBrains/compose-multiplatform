@@ -656,20 +656,6 @@ fun <K> Input(
     // Changes to this key trigger controlled input state restoration in a DOM renderer.
     val keyForRestoringControlledState: MutableState<Int> = remember { mutableStateOf(0) }
 
-    val domEffects: ContentBuilder<HTMLInputElement>? = if (context.supportsDomElementAccess) {
-        {
-            if (type == InputType.Radio) {
-                DisposeRadioGroupEffect()
-            }
-            DisposableEffect(keyForRestoringControlledState.value) {
-                restoreControlledInputState(inputElement = scopeElement)
-                onDispose { }
-            }
-        }
-    } else {
-        null
-    }
-
     TagElement<HTMLInputElement>(
         elementBuilder = InputBuilder,
         applyAttrs = {
@@ -681,7 +667,16 @@ fun <K> Input(
             }
             inputAttrsBuilder.attrs()
         },
-        content = domEffects,
+        content = {
+            if (!context.supportsDomElementAccess) return@TagElement
+            if (type == InputType.Radio) {
+                DisposeRadioGroupEffect()
+            }
+            DisposableEffect(keyForRestoringControlledState.value) {
+                restoreControlledInputState(inputElement = scopeElement)
+                onDispose { }
+            }
+        },
     )
 }
 
@@ -724,17 +719,6 @@ fun TextArea(
     // Changes to this key trigger controlled textarea state restoration in a DOM renderer.
     val keyForRestoringControlledState: MutableState<Int> = remember { mutableStateOf(0) }
 
-    val domEffects: ContentBuilder<HTMLTextAreaElement>? = if (context.supportsDomElementAccess) {
-        {
-            DisposableEffect(keyForRestoringControlledState.value) {
-                restoreControlledTextAreaState(element = scopeElement)
-                onDispose { }
-            }
-        }
-    } else {
-        null
-    }
-
     TagElement<HTMLTextAreaElement>(
         elementBuilder = TextareaBuilder,
         applyAttrs = {
@@ -750,7 +734,13 @@ fun TextArea(
                 textAreaAttrsBuilder.value(value ?: "")
             }
         },
-        content = domEffects,
+        content = {
+            if (!context.supportsDomElementAccess) return@TagElement
+            DisposableEffect(keyForRestoringControlledState.value) {
+                restoreControlledTextAreaState(element = scopeElement)
+                onDispose { }
+            }
+        },
     )
 }
 
