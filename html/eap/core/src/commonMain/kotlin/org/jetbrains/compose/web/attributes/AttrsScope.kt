@@ -128,6 +128,7 @@ interface AttrsScope<out TElement : Element> : EventsListenerScope {
 
     companion object {
         const val CLASS = "class"
+        const val STYLE = "style"
         const val ID = "id"
         const val HIDDEN = "hidden"
         const val TITLE = "title"
@@ -250,4 +251,14 @@ open class AttrsScopeBuilder<TElement : Element>(
 
 private val setClassList: (HTMLElement, Array<out String>) -> Unit = { e, classList ->
     e.classList.add(*classList)
+}
+
+internal fun Collection<String>.toClassAttributeValue(): String? {
+    forEach { token ->
+        require(token.isNotEmpty()) { "Class token must not be empty" }
+        require(token.none { it in "\t\n\u000C\r " }) {
+            "Class token must not contain ASCII whitespace: \"$token\""
+        }
+    }
+    return distinct().takeIf { it.isNotEmpty() }?.joinToString(" ")
 }

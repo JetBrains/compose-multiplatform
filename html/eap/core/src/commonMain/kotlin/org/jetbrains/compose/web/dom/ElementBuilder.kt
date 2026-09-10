@@ -8,6 +8,13 @@ package org.jetbrains.compose.web.dom
 import kotlinx.browser.dom.Element
 
 fun interface ElementBuilder<TElement : Element> {
+    /** The HTML tag name used for string rendering. DOM-only lambda builders may omit it. */
+    val tagName: String
+        get() = error(
+            "String rendering requires a tag name. " +
+                "Override ElementBuilder.tagName or use TagElement(tagName, ...)."
+        )
+
     fun create(): TElement
 
     companion object {
@@ -18,7 +25,7 @@ fun interface ElementBuilder<TElement : Element> {
         fun <TElement : Element> createBuilder(
             tagName: String
         ): ElementBuilder<TElement> =
-            createPlatformElementBuilder(tagName.lowercase())
+            createPlatformElementBuilder(tagName.asciiLowercase())
     }
 }
 

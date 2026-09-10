@@ -102,6 +102,7 @@ if (composeHtmlEapEnabled) {
     println("Compose HTML EAP modules enabled")
     module(":html-core-eap", "eap/core")
     module(":internal-html-core-runtime-eap", "eap/internal-html-core-runtime")
+    module(":html-eap-example", "eap/example")
 }
 
 if (extra["compose.web.tests.skip.benchmarks"]!!.toString().toBoolean() != true) {

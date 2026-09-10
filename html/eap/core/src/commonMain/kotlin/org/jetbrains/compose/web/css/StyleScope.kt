@@ -210,6 +210,38 @@ data class StylePropertyDeclaration(
 typealias StylePropertyList = List<StylePropertyDeclaration>
 typealias MutableStylePropertyList = MutableList<StylePropertyDeclaration>
 
+@OptIn(ComposeWebInternalApi::class)
+internal fun StyleHolder.toStyleAttributeValue(): String? {
+    val declarations = properties + variables.map { it.copy(name = "--${it.name}") }
+    val removedNames = mutableSetOf<String>()
+    val resetPriorityNames = mutableSetOf<String>()
+    // Walk backwards to retain fallbacks without repeatedly scanning earlier declarations.
+    // Empty assignments remove a property. Normal assignments reset its earlier priority.
+    return declarations.asReversed().filter { declaration ->
+        when {
+            declaration.name in removedNames -> false
+            declaration.value.toString().isEmpty() -> {
+                removedNames.add(declaration.name)
+                false
+            }
+            declaration.important -> declaration.name !in resetPriorityNames
+            else -> {
+                resetPriorityNames.add(declaration.name)
+                true
+            }
+        }
+    }.asReversed()
+        .takeIf { declarations -> declarations.isNotEmpty() }
+        ?.joinToString("; ") { declaration ->
+            buildString {
+                append(declaration.name)
+                append(": ")
+                append(declaration.value)
+                if (declaration.important) append(" !important")
+            }
+        }
+}
+
 internal fun StylePropertyList.nativeEquals(properties: StylePropertyList): Boolean {
     if (this.size != properties.size) return false
 

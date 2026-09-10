@@ -6,9 +6,13 @@
 package org.jetbrains.compose.web.css.utils
 
 import org.jetbrains.compose.web.css.StyleSheet
+import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.dom.stringPresentation
 
 
 fun StyleSheet.serializeRules(): List<String> {
-    return cssRules.map { it.stringPresentation(indent = " ", delimiter = "") }
+    return cssRules.serializeRules()
 }
+
+internal fun CSSRuleDeclarationList.serializeRules(): List<String> =
+    map { it.stringPresentation(indent = " ", delimiter = "") }

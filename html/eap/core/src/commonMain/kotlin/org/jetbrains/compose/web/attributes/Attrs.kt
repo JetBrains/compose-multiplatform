@@ -14,6 +14,8 @@ import kotlinx.browser.dom.HTMLFormElement
 import kotlinx.browser.dom.HTMLImageElement
 import kotlinx.browser.dom.HTMLInputElement
 import kotlinx.browser.dom.HTMLLabelElement
+import kotlinx.browser.dom.HTMLLinkElement
+import kotlinx.browser.dom.HTMLScriptElement
 import kotlinx.browser.dom.HTMLOptGroupElement
 import kotlinx.browser.dom.HTMLOptionElement
 import kotlinx.browser.dom.HTMLSelectElement
@@ -50,6 +52,33 @@ fun AttrsScope<HTMLAnchorElement>.hreflang(value: String) =
 
 fun AttrsScope<HTMLAnchorElement>.download(value: String = "") =
     attr("download", value)
+
+/* Link attributes */
+
+@JvmName("linkHref")
+fun AttrsScope<HTMLLinkElement>.href(value: String) =
+    attr("href", value)
+
+fun AttrsScope<HTMLLinkElement>.rel(
+    value: LinkRel,
+    vararg additionalValues: LinkRel,
+) = attr(
+    "rel",
+    listOf(value, *additionalValues).joinToString(" ") { it.relStr },
+)
+
+fun AttrsScope<HTMLLinkElement>.type(value: String) =
+    attr("type", value)
+
+/* Script attributes */
+
+@JvmName("scriptSrc")
+fun AttrsScope<HTMLScriptElement>.src(value: String) =
+    attr("src", value)
+
+@JvmName("scriptType")
+fun AttrsScope<HTMLScriptElement>.type(value: ScriptType) =
+    attr("type", value.typeStr)
 
 /* Button attributes */
 

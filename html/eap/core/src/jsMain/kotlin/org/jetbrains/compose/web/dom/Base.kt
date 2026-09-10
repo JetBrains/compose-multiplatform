@@ -8,8 +8,10 @@ package org.jetbrains.compose.web.dom
 import androidx.compose.runtime.*
 import kotlinx.browser.document
 import kotlinx.browser.dom.Element
+import kotlinx.browser.dom.HTMLStyleElement
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
+import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleHolder
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.jetbrains.compose.web.internal.runtime.DomApplier
@@ -18,6 +20,7 @@ import org.jetbrains.compose.web.internal.runtime.NamedEventListener
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.Text
 import org.w3c.dom.css.ElementCSSInlineStyle
+import org.w3c.dom.css.CSSStyleSheet
 import org.w3c.dom.svg.SVGElement
 
 @Composable
@@ -100,6 +103,12 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
         }
     }
 
+    fun updateRawText(value: String) {
+        if (node.textContent != value) {
+            node.textContent = value
+        }
+    }
+
     fun updateClasses(classes: List<String>) {
         node.removeAttribute("class")
         if (classes.isNotEmpty()) {
@@ -108,12 +117,15 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
     }
 }
 
-@OptIn(ComposeWebInternalApi::class)
+internal actual val DefaultComposeHtmlContext: ComposeHtmlContext = BrowserComposeHtmlContext
+
 @Composable
-actual fun <TElement : Element> TagElement(
+private fun <TElement : Element> TagElementImpl(
     elementBuilder: ElementBuilder<TElement>,
     applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
     content: (@Composable ElementScope<TElement>.() -> Unit)?,
+    validateAttrs: (Map<String, String>) -> Unit = {},
+    updateElement: Updater<DomElementWrapper>.() -> Unit = {},
 ) {
     val scope = remember { ElementScopeImpl<TElement>() }
     var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
@@ -129,11 +141,14 @@ actual fun <TElement : Element> TagElement(
             applyAttrs?.invoke(attrsScope)
 
             refEffect = attrsScope.refEffect
+            val attrs = attrsScope.collect()
+            validateAttrs(attrs)
 
             update {
                 set(attrsScope.classes, DomElementWrapper::updateClasses)
                 set(attrsScope.styleScope, DomElementWrapper::updateStyleDeclarations)
-                set(attrsScope.collect(), DomElementWrapper::updateAttrs)
+                set(attrs, DomElementWrapper::updateAttrs)
+                updateElement()
                 set(
                     attrsScope.eventsListenerScopeBuilder.collectListeners(),
                     DomElementWrapper::updateEventListeners
@@ -154,12 +169,69 @@ actual fun <TElement : Element> TagElement(
     }
 }
 
-@Composable
-actual fun Text(value: String) {
-    ComposeNode<DomNodeWrapper, DomApplier>(
-        factory = { DomNodeWrapper(document.createTextNode("")) },
-        update = {
-            set(value) { newValue -> (node as Text).data = newValue }
-        },
-    )
+@OptIn(ComposeWebInternalApi::class)
+private object BrowserComposeHtmlContext : ComposeHtmlContext {
+    override val supportsDomElementAccess: Boolean = true
+
+    override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
+        ElementBuilder.createBuilder(tagName)
+
+    @Composable
+    override fun <TElement : Element> TagElement(
+        elementBuilder: ElementBuilder<TElement>,
+        applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        content: (@Composable ElementScope<TElement>.() -> Unit)?,
+    ) {
+        TagElementImpl(
+            elementBuilder = elementBuilder,
+            applyAttrs = applyAttrs,
+            content = content,
+        )
+    }
+
+    @Composable
+    override fun <TElement : Element> RawTextElement(
+        tagName: String,
+        applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        content: RawTextContent,
+    ) {
+        TagElementImpl(
+            elementBuilder = elementBuilder(tagName),
+            applyAttrs = applyAttrs,
+            content = null,
+            validateAttrs = content::validateAttributes,
+            updateElement = {
+                set(content.text, DomElementWrapper::updateRawText)
+            },
+        )
+    }
+
+    @Composable
+    override fun TextElement(value: String) {
+        ComposeNode<DomNodeWrapper, DomApplier>(
+            factory = { DomNodeWrapper(document.createTextNode("")) },
+            update = {
+                set(value) { newValue -> (node as Text).data = newValue }
+            },
+        )
+    }
+
+    @Composable
+    override fun StyleElement(
+        applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)?,
+        cssRules: CSSRuleDeclarationList,
+    ) {
+        TagElement(
+            elementBuilder = elementBuilder("style"),
+            applyAttrs = applyAttrs,
+        ) {
+            DisposableEffect(cssRules, cssRules.size) {
+                val cssStylesheet = scopeElement.sheet as? CSSStyleSheet
+                cssStylesheet?.setCSSRules(cssRules)
+                onDispose {
+                    cssStylesheet?.clearCSSRules()
+                }
+            }
+        }
+    }
 }
