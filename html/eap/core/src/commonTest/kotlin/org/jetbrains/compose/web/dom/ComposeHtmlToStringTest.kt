@@ -35,6 +35,20 @@ import kotlin.test.assertFalse
 
 class ComposeHtmlToStringTest {
     @Test
+    fun rcdataEscapesTextWithoutHydrationBoundaryComments() {
+        for (tag in listOf("title", "textarea")) {
+            val html = composeHtmlToString {
+                TagElement<kotlinx.browser.dom.Element>(tag, null) {
+                    Text("A & B\r")
+                    Text("")
+                    Text("</$tag>")
+                }
+            }
+            assertEquals("<$tag>A &amp; B&#13;&lt;/$tag&gt;</$tag>", html)
+        }
+    }
+
+    @Test
     fun doesNotStartCompositionScopedCoroutines() {
         val launchedEffectStarted = CompletableDeferred<Unit>()
         val scopeCoroutineStarted = CompletableDeferred<Unit>()
@@ -86,6 +100,20 @@ class ComposeHtmlToStringTest {
         }
 
         assertEquals("<button>Click</button>", html)
+    }
+
+    @Test
+    fun hydrationMismatchAllowanceIsNotSerialized() {
+        val html = composeHtmlToString {
+            Span(attrs = {
+                allowHydrationMismatch()
+                id("timestamp")
+            }) {
+                Text("12:00")
+            }
+        }
+
+        assertEquals("<span id=\"timestamp\">12:00</span>", html)
     }
 
     @Test
