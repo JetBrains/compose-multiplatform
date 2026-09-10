@@ -150,9 +150,15 @@ private sealed interface ImageCache {
 
 private val imageCache = AsyncCache<String, ImageCache>()
 
+internal expect suspend fun webYield()
+
 private suspend fun loadImage(
     path: String,
     cacheKey: String,
     resourceReader: ResourceReader,
     decode: (ByteArray) -> ImageCache
-): ImageCache = imageCache.getOrLoad(cacheKey) { decode(resourceReader.read(path)) }
+): ImageCache = imageCache.getOrLoad(cacheKey) {
+    val bytes = resourceReader.read(path)
+    webYield()
+    decode(bytes)
+}

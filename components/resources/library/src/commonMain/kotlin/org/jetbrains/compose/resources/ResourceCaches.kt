@@ -2,8 +2,10 @@ package org.jetbrains.compose.resources
 
 import kotlinx.coroutines.*
 
+internal expect val asyncCacheDispatcher: CoroutineDispatcher
+
 internal class AsyncCache<K, V> {
-    private val cacheScope = CoroutineScope(SupervisorJob() + Dispatchers.Unconfined)
+    private val cacheScope = CoroutineScope(SupervisorJob() + asyncCacheDispatcher)
     private val lock = ResourceLock()
     private val cache = mutableMapOf<K, SharedRequest<V>>()
 
