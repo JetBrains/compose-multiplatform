@@ -17,7 +17,8 @@ private fun InputAttrsScope<String>.applyAttrsWithStringValue(
  * It's a controlled Input of [InputType.Checkbox].
  * Controlled input means that its state is always equal [checked] value.
  * If you need an uncontrolled behaviour, see [Input].
- * String rendering currently omits [checked].
+ * TODO: Support [checked] in string rendering.
+ * https://youtrack.jetbrains.com/issue/CMP-10774/Support-form-state-in-Compose-HTML-EAP-string-rendering
  *
  * @see [Input] for more details on controlled and uncontrolled modes.
  */
@@ -154,6 +155,8 @@ fun PasswordInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit 
  * It's a controlled Input of [InputType.Radio].
  * Controlled input means that its state is always equal [checked] value.
  * If you need an uncontrolled behaviour, see [Input].
+ * TODO: Support [checked] in string rendering.
+ * https://youtrack.jetbrains.com/issue/CMP-10774/Support-form-state-in-Compose-HTML-EAP-string-rendering
  *
  * @see [Input] for more details on controlled and uncontrolled modes.
  */
@@ -237,7 +240,6 @@ fun TelInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {})
  * It's a controlled Input of [InputType.Text].
  * Controlled input means that its state is always equal [value].
  * If you need an uncontrolled behaviour, see [Input].
- * String rendering currently omits [value].
  *
  * @see [Input] for more details on controlled and uncontrolled modes.
  */

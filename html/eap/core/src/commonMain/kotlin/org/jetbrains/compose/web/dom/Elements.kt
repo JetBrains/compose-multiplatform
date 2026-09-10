@@ -642,7 +642,8 @@ fun Button(
  *
  * Controlled state restoration requires an actual DOM element and is skipped by
  * renderers that do not provide DOM element access, such as string rendering.
- * String rendering currently omits values and checked state set through DOM properties.
+ * TODO: Support values and checked state set through DOM properties in string rendering.
+ * https://youtrack.jetbrains.com/issue/CMP-10774/Support-form-state-in-Compose-HTML-EAP-string-rendering
  */
 @OptIn(ComposeWebInternalApi::class)
 @Composable
@@ -707,7 +708,8 @@ fun <K> Input(type: InputType<K>) {
  * }
  * ```
  *
- * String rendering currently omits [value] and `defaultValue`.
+ * TODO: Support string rendering of [value] and `defaultValue` as `<textarea>` text content.
+ * https://youtrack.jetbrains.com/issue/CMP-10774/Support-form-state-in-Compose-HTML-EAP-string-rendering
  */
 @Composable
 fun TextArea(
