@@ -15,7 +15,7 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Style
 import org.jetbrains.compose.web.dom.Text
 
-internal const val SSR_HYDRATION_FIXTURE_URL = "/base/kotlin/ssr-hydration.html"
+internal const val SSR_HYDRATION_FIXTURE_URL = "./ssr-hydration.html"
 internal const val SSR_HYDRATION_STYLE_ID = "ssr-hydration-style"
 internal const val SSR_HYDRATION_BUTTON_ID = "ssr-hydration-button"
 internal const val SSR_HYDRATION_COUNT_ID = "ssr-hydration-count"

@@ -102,6 +102,7 @@ class ComposeHtmlToStringTest {
         assertEquals("<button>Click</button>", html)
     }
 
+    /* Negative test: Tests if `allowHydrationMismatch()` does not change serialization of HTML. */
     @Test
     fun hydrationMismatchAllowanceIsNotSerialized() {
         val html = composeHtmlToString {

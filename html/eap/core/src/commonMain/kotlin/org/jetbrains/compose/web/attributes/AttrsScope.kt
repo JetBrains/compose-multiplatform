@@ -141,6 +141,9 @@ interface AttrsScope<out TElement : Element> : EventsListenerScope {
      * Applies one level deep only: nested elements need their own call. Structural differences,
      * such as a different tag name or a different number of children, still fail hydration.
      *
+     * Without this call, a mismatch is reported through `onHydrationMismatch` and Compose falls
+     * back to a normal client render.
+     *
      * The call is never rendered as an attribute and has no effect outside hydration.
      */
     fun allowHydrationMismatch() = Unit

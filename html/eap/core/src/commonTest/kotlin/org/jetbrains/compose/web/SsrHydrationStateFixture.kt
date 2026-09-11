@@ -10,7 +10,7 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
 // Shared declarations for the JVM-rendered fixture and the JS hydration test.
-internal const val SSR_HYDRATION_STATE_FIXTURE_URL = "/base/kotlin/ssr-hydration-state.html"
+internal const val SSR_HYDRATION_STATE_FIXTURE_URL = "./ssr-hydration-state.html"
 internal const val SSR_HYDRATION_STATE_BUTTON_ID = "ssr-hydration-state-button"
 internal const val SSR_HYDRATION_STATE_VALUE_ID = "ssr-hydration-state-value"
 

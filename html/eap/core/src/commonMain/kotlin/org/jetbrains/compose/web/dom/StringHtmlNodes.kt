@@ -239,7 +239,7 @@ internal class StringHtmlRawTextNode(
 }
 
 private fun StringBuilder.appendHydrationTextBoundaryMarker() {
-    append("<!--").append(HydrationTextBoundaryMarker).append("-->")
+    append("<!--$HydrationTextBoundaryMarker-->")
 }
 
 private fun requireValidHtmlTagName(name: String) {

@@ -1,5 +1,9 @@
 import org.jetbrains.compose.gradle.standardConf
+import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.JavaExec
+import org.gradle.language.jvm.tasks.ProcessResources
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinJsCompilation
+import org.jetbrains.kotlin.gradle.targets.js.testing.KotlinJsTest
 
 val generatedSsrHydrationFixtures = layout.buildDirectory.dir("generated/ssrHydrationFixtures")
 
@@ -49,7 +53,6 @@ kotlin {
         }
 
         val jsTest by getting {
-            resources.srcDir(generatedSsrHydrationFixtures)
             languageSettings {
                 optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
                 optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
@@ -82,6 +85,24 @@ val generateSsrHydrationFixture = tasks.register<JavaExec>("generateSsrHydration
     outputs.dir(generatedSsrHydrationFixtures)
 }
 
-tasks.named("jsTestProcessResources") {
-    dependsOn(generateSsrHydrationFixture)
+val jsTestCompilation =
+    kotlin.targets.getByName("js").compilations.getByName("test") as KotlinJsCompilation
+val jsTestProcessResources =
+    tasks.named(jsTestCompilation.processResourcesTaskName, ProcessResources::class.java) {
+        from(generatedSsrHydrationFixtures)
+        dependsOn(generateSsrHydrationFixture)
+    }
+
+val jsBrowserTest = tasks.named<KotlinJsTest>("jsBrowserTest")
+val copySsrHydrationFixturesToKjsTestResources =
+    tasks.register<Copy>("copySsrHydrationFixturesToKjsTestResources") {
+        dependsOn(jsBrowserTest.flatMap { it.inputFileProperty })
+        from(jsTestProcessResources) {
+            include("ssr*hydration*.html")
+        }
+        into(jsBrowserTest.flatMap { requireNotNull(it.testFramework).workingDir })
+    }
+
+jsBrowserTest.configure {
+    dependsOn(copySsrHydrationFixturesToKjsTestResources)
 }
