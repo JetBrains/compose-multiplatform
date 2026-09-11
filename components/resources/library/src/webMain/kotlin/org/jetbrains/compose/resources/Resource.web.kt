@@ -95,7 +95,6 @@ internal fun getResourceUrl(windowOrigin: String, windowPathname: String, resour
  * @return A [State]<[Font]?> object that holds the loaded [Font] when available,
  * or `null` if the font is not yet ready.
  */
-@ExperimentalResourceApi
 @Composable
 fun preloadFont(
     resource: FontResource,
@@ -141,7 +140,6 @@ fun preloadFont(
  * @return A [State]<[ImageBitmap]?> object that holds the loaded [ImageBitmap] when available,
  * or `null` if the resource is not yet ready.
  */
-@ExperimentalResourceApi
 @Composable
 fun preloadImageBitmap(
     resource: DrawableResource,
@@ -185,7 +183,6 @@ fun preloadImageBitmap(
  * @return A [State]<[ImageVector]?> object that holds the loaded [ImageVector] when available,
  * or `null` if the resource is not yet ready.
  */
-@ExperimentalResourceApi
 @Composable
 fun preloadImageVector(
     resource: DrawableResource,

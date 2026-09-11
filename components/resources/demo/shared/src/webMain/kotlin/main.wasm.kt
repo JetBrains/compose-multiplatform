@@ -15,12 +15,11 @@ import components.resources.demo.shared.generated.resources.NotoColorEmoji
 import components.resources.demo.shared.generated.resources.Res
 import components.resources.demo.shared.generated.resources.Workbench_Regular
 import components.resources.demo.shared.generated.resources.font_awesome
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.configureWebResources
 import org.jetbrains.compose.resources.demo.shared.UseResources
 import org.jetbrains.compose.resources.preloadFont
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalResourceApi::class, InternalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, InternalComposeUiApi::class)
 fun main() {
     configureWebResources {
         // Not necessary - It's the same as the default. We add it here just to present this feature.
