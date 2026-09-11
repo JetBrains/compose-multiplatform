@@ -49,19 +49,19 @@ var lastCompilationTime = output("git", "show", "-s", "--format=%ct", "HEAD").to
 
 commits.forEachIndexed { index, (commit, timestamp) ->
     println("Merge $commit")
-    if (!run("git", "merge", "--no-commit", "--no-ff", commit)) {
+    val hasConflict = !run("git", "merge", "--no-commit", "--no-ff", commit)
+    if (hasConflict) {
         val conflictingFiles = output("git", "diff", "--name-only", "--diff-filter=U")
             .lineSequence()
             .filter(String::isNotBlank)
             .toList()
         check(conflictingFiles.isNotEmpty()) { "Merge failed without conflicts: $commit" }
         check(run("git", "add", "-A", "--", *conflictingFiles.toTypedArray()))
-        check(run("git", "commit", "--no-edit")) { "Could not commit merge conflict: $commit" }
-        saveLastMerged()
-        error("Conflict committed: $commit")
     }
+    setMergeTitle(commit)
     check(run("git", "commit", "--no-edit")) { "Could not commit merge: $commit" }
     saveLastMerged()
+    if (hasConflict) error("Conflict committed: $commit")
 
     if (timestamp - lastCompilationTime >= day || index == commits.lastIndex) {
         if (!compile()) bisect(lastKnownGood)
@@ -71,6 +71,13 @@ commits.forEachIndexed { index, (commit, timestamp) ->
 }
 
 fun saveLastMerged() = lastMergedFile.writeText("${output("git", "rev-parse", "HEAD")}\n")
+
+fun setMergeTitle(commit: String) {
+    val message = File(output("git", "rev-parse", "--git-path", "MERGE_MSG"))
+    val title = "(AOSP ${commit.take(8)}) " +
+        output("git", "show", "-s", "--format=%s", commit)
+    message.writeText("$title\n${message.readText().substringAfter('\n')}")
+}
 
 fun compile() = if (System.getProperty("os.name").startsWith("Windows")) {
     run("cmd", "/c", "gradlew", "assemble", "compileTest")
