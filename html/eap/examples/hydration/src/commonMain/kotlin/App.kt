@@ -104,7 +104,7 @@ private fun Counter(initialCount: Int) {
     }) {
         Div(attrs = { classes(PageStyles.counter) }) {
             Div {
-                B(attrs = { classes(PageStyles.number) }) { Text(count.toString()) }
+                B(attrs = { classes(PageStyles.number) }) { Text("$count")) }
                 Span(attrs = { classes(PageStyles.counterLabel) }) {
                     Text("The answer to life, the universe, and everything")
                 }
