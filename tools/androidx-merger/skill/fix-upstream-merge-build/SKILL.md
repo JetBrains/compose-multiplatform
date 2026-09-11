@@ -46,7 +46,7 @@ During merges, there is:
 - Avoid comments unless they are absolutely needed
 - Don't implement new features. Choose what is more acceptable until it is implemented in this priority:
   - no-op
-  - printing a warning in format "Function name, feature: $warning"
+  - printing a warning in format "Public class or function name: $warning"
   - exception
 - For the new features that need to be implemented, add TODO:
   - add `// TODO(Merge) <Priority>, Implement after merging <clCommit>`.
