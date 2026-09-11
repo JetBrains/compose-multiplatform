@@ -32,7 +32,7 @@ private val codeExample = """
         Article {
             Div(attrs = { classes(PageStyles.counter) }) {
                 Div {
-                    Text(count.toString())
+                    Text("${'$'}count")
                 }
                 Button(attrs = {
                     type(ButtonType.Button)
