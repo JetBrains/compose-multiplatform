@@ -2,6 +2,20 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
+        Group {
+            if #available(iOS 18.0, *) {
+                tabView
+                    .toolbarBackground(.ultraThinMaterial, for: .tabBar)
+                    .toolbarBackgroundVisibility(.visible, for: .tabBar)
+            } else {
+                tabView
+                    .toolbarBackground(.ultraThinMaterial, for: .tabBar)
+            }
+        }
+            .accentColor(Color(red: 0.671, green: 0.365, blue: 0.792)).preferredColorScheme(.light)
+    }
+
+    private var tabView: some View {
         TabView {
             ComposeInsideSwiftUIScreen()
                 .tabItem {
@@ -14,7 +28,6 @@ struct ContentView: View {
                 }
 
         }
-            .accentColor(Color(red: 0.671, green: 0.365, blue: 0.792)).preferredColorScheme(.light)
     }
 }
 
