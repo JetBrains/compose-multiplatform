@@ -34,14 +34,11 @@ private fun KotlinNativeTarget.configureSwiftCompatibilityLinking() {
         }
     val swiftCompatibilityLibraryDir =
         project.providers
-            .exec { spec -> spec.commandLine("xcrun", "--find", "swiftc") }
+            .exec { spec -> spec.commandLine("xcrun", "--sdk", sdkName, "--show-toolchain-path") }
             .standardOutput
             .asText
-            .map { swiftcPath ->
-                File(swiftcPath.trim())
-                    .parentFile
-                    .parentFile
-                    .parentFile
+            .map { toolchainPath ->
+                File(toolchainPath.trim())
                     .resolve("usr/lib/swift/$sdkName")
                     .absolutePath
             }
