@@ -79,6 +79,8 @@ upstreamCommits.forEachIndexed { index, commit ->
     }
 }
 
+check(run("git", "push"))
+
 fun needsMergeSolver(commit: String) =
     hasMergeScriptNote(commit) &&
         !hasMergeSolverNote(commit) &&
