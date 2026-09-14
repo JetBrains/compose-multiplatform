@@ -57,7 +57,7 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
                 val attrsScope = AttrsScopeBuilder<TElement>()
                 applyAttrs?.invoke(attrsScope)
                 val attributes = attrsScope.stringAttributes()
-                rawText?.validateAttributes(attributes)
+                rawText?.validateAttributes(attributes.byName)
 
                 update {
                     set(attributes, StringHtmlNodeWrapper::updateAttributes)
@@ -110,7 +110,7 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
         val content = remember(cssRules, cssRules.size) {
             prepareStyleRawTextContent(cssRules)
         }
-        this.RawTextElement<HTMLStyleElement>(
+        RawTextElement<HTMLStyleElement>(
             tagName = "style",
             applyAttrs = applyAttrs,
             content = content,
@@ -160,17 +160,22 @@ private fun unavailableDomElement(): Nothing =
    ```
  */
 @OptIn(ComposeWebInternalApi::class)
-private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(): Map<String, String> =
-    collect().toMutableMap().apply {
+private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(): StringHtmlAttributes {
+    val byName = collect().toMutableMap().apply {
         val classValue = classes.toClassAttributeValue()
-        if (keys.none { it.equals(AttrsScope.CLASS, ignoreCase = true) }) {
+        if (!containsAttribute(AttrsScope.CLASS)) {
             classValue?.let { value -> this[AttrsScope.CLASS] = value }
         }
 
-        if (keys.none { it.equals(AttrsScope.STYLE, ignoreCase = true) }) {
+        if (!containsAttribute(AttrsScope.STYLE)) {
             styleScope.toStyleAttributeValue()?.let { value -> this[AttrsScope.STYLE] = value }
         }
     }
+    return StringHtmlAttributes(
+        byName = byName,
+        hydrationProtocolAttributes = hydrationProtocolAttributes.toSet(),
+    )
+}
 
 @Composable
 @ExplicitGroupsComposable

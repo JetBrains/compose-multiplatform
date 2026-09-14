@@ -35,11 +35,24 @@ dependencies {
 Do not put the regular and EAP Compose HTML artifacts on the same compilation classpath because
 they intentionally expose the same Kotlin packages and declarations.
 
-## String rendering example
+## Examples
 
-The example renders a complete page to `html/eap/example/build/index.html` and opens it in your
-default browser. From the repository root, run:
+### String Rendering
+
+The example renders a complete page to
+`html/eap/examples/string-rendering/build/index.html` and opens it in your default browser. From
+the repository root, run:
 
 ```shell
 html/gradlew -p html -Pcompose.html.eap.enabled=true :html-eap-example:run
+```
+
+### Hydration example
+
+Renders its initial HTML on the JVM, bundles the browser entry point, and opens
+the interactive result in a development server. From the repository root, run:
+
+```shell
+html/gradlew -p html -Pcompose.html.eap.enabled=true \
+    :html-eap-hydration-example:jsBrowserDevelopmentRun
 ```

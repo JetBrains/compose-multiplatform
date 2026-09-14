@@ -18,6 +18,76 @@ import kotlin.test.assertFailsWith
 
 class HtmlSerializationTest {
     @Test
+    fun rejectsNulInTextAndAttributes() {
+        for (hydratable in listOf(false, true)) {
+            for (tag in listOf("div", "title", "textarea")) {
+                val failure = assertFailsWith<IllegalArgumentException> {
+                    composeHtmlToString(hydratable) {
+                        TagElement<Element>(tag, null) { Text("a\u0000b") }
+                    }
+                }
+                assertContains(failure.message.orEmpty(), "NUL")
+            }
+            val failure = assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString(hydratable) { Div({ attr("title", "a\u0000b") }) }
+            }
+            assertContains(failure.message.orEmpty(), "NUL")
+        }
+    }
+
+    @Test
+    fun rejectsTableChildrenThatRequireParserRepair() {
+        val invalidChildren = mapOf(
+            "table" to listOf("tr", "td", "th", "col", "div"),
+            "tbody" to listOf("td", "th", "div"),
+            "thead" to listOf("td", "th", "div"),
+            "tfoot" to listOf("td", "th", "div"),
+            "tr" to listOf("div"),
+            "colgroup" to listOf("div", "script", "style"),
+        )
+        listOf(false, true).forEach { hydratable ->
+            invalidChildren.forEach { (parent, children) ->
+                children.forEach { child ->
+                    val failure = assertFailsWith<IllegalArgumentException>("$parent > $child") {
+                        composeHtmlToString(hydratable) {
+                            TagElement<Element>(parent.uppercase(), null) {
+                                TagElement<Element>(child.uppercase(), null, null)
+                            }
+                        }
+                    }
+                    assertContains(failure.message.orEmpty(), "inside <$parent>")
+                    val suggestion = when (child) {
+                        "col" -> "Colgroup { }"
+                        "tr", "td", "th" -> if (parent == "table") "Tbody { }" else "Tr { }"
+                        else -> "outside the table"
+                    }
+                    assertContains(failure.message.orEmpty(), suggestion)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun tableContainersAllowOnlyAsciiWhitespaceText() {
+        listOf(false, true).forEach { hydratable ->
+            listOf("table", "tbody", "thead", "tfoot", "tr", "colgroup").forEach { parent ->
+                listOf("x", " x ", "\u00A0", "\u000B").forEach { text ->
+                    val failure = assertFailsWith<IllegalArgumentException> {
+                        composeHtmlToString(hydratable) {
+                            TagElement<Element>(parent, null) { Text(text) }
+                        }
+                    }
+                    assertContains(failure.message.orEmpty(), "Non-whitespace text")
+                    assertContains(failure.message.orEmpty(), "inside <$parent>")
+                }
+                assertEquals("<$parent>\t\n\u000C </$parent>", composeHtmlToString(hydratable) {
+                    TagElement<Element>(parent, null) { Text("\t\n\u000C ") }
+                })
+            }
+        }
+    }
+
+    @Test
     fun rendersNamedCustomAndPlatformBuildersWithoutCreatingDomElements() {
         val customBuilder = object : ElementBuilder<Element> {
             override val tagName = "MY-WIDGET"

@@ -16,6 +16,10 @@ import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.utils.serializeRules
 
 
+// Match the HTML parser's ASCII-only attribute-name normalization in both render paths.
+internal fun Map<String, String>.containsAttribute(name: String): Boolean =
+    keys.any { it.asciiLowercase() == name }
+
 internal interface ComposeHtmlContext {
     val supportsDomElementAccess: Boolean
 
@@ -139,7 +143,7 @@ internal class RawTextContent private constructor(
     }
 }
 
-private fun String.normalizeHtmlInputCharacters(): String =
+internal fun String.normalizeHtmlInputCharacters(): String =
     if ('\r' in this || '\u0000' in this) {
         replace("\r\n", "\n")
             .replace('\r', '\n')

@@ -80,12 +80,14 @@ class StringHtmlNodesTest {
     }
 
     @Test
-    fun normalizesHtmlAttributeNames() {
+    fun normalizesHtmlAttributeNamesAndLooksThemUpCaseInsensitively() {
         val element = StringHtmlElementNode("div").apply {
             updateAttributes(mapOf("DATA-VALUE" to "content"))
         }
 
         assertEquals("<div data-value=\"content\"></div>", element.toHtmlString())
+        assertEquals(true, element.hasAttribute("Data-Value"))
+        assertEquals("content", element.attribute("DATA-VALUE"))
     }
 
     @Test

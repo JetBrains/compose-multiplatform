@@ -28,12 +28,23 @@ import org.jetbrains.compose.web.dom.StringHtmlNodeWrapper
  * - Inline styles preserve CSS fallbacks, but do not fully emulate CSSOM validation and
  *   mutation (for example, invalid assignments that also change priority, or shorthand removal).
  *
+ * @param hydratable whether to emit text-boundary markers required to hydrate adjacent `Text`
+ * nodes. Set to `false` when the output will not be hydrated.
  * @throws IllegalArgumentException if a raw-text element contains unsafe text or element children,
- * or serialized `noscript` contents contain a `</noscript>` end tag.
+ * serialized `noscript` contents contain a `</noscript>` end tag, or ordinary text, RCDATA,
+ * or attribute values contain NUL (U+0000), which HTML parsing cannot preserve.
  */
 fun composeHtmlToString(
-    content: @Composable () -> Unit
-): String {
+    hydratable: Boolean = true,
+    content: @Composable () -> Unit,
+): String = composeHtmlTree(content) { tree ->
+    tree.toHtmlString(hydratable)
+}
+
+internal fun <T> composeHtmlTree(
+    content: @Composable () -> Unit,
+    readTree: (StringHtmlElementNode) -> T,
+): T {
     val root = StringHtmlElementNode.root()
     val recomposer = Recomposer(Dispatchers.Default).apply {
         // Render the initial composition without starting coroutine effects.
@@ -52,7 +63,7 @@ fun composeHtmlToString(
                 content()
             }
         }
-        root.toHtmlString()
+        readTree(root)
     } finally {
         composition.dispose()
         recomposer.close()

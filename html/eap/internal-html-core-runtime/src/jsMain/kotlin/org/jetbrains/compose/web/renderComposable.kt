@@ -57,10 +57,32 @@ fun <TElement : Element> renderComposable(
         override val DisposableEffectScope.scopeElement: TElement
             get() = root
     }
-    composition.setContent @Composable {
-        content(scope)
+    try {
+        composition.setContent @Composable {
+            content(scope)
+        }
+    } catch (failure: Throwable) {
+        try {
+            composition.dispose()
+        } catch (cleanupFailure: Throwable) {
+            failure.addSuppressed(cleanupFailure)
+        }
+        try {
+            recomposer.cancel()
+        } catch (cleanupFailure: Throwable) {
+            failure.addSuppressed(cleanupFailure)
+        }
+        throw failure
     }
-    return composition
+    return object : Composition by composition {
+        override fun dispose() {
+            try {
+                composition.dispose()
+            } finally {
+                recomposer.cancel()
+            }
+        }
+    }
 }
 
 /**

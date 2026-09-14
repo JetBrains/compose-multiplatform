@@ -173,12 +173,14 @@ private val TextareaBuilder = ElementBuilder.createBuilder<HTMLTextAreaElement>(
 /**
  * Use this function to mount the <style> tag into the rendered HTML.
  *
- * String rendering serializes [cssRules] as raw text, which must not contain a `</style>` end tag.
+ * Browser rendering installs [cssRules] through CSSOM. When raw HTML text is required by string
+ * rendering, initial hydration, or detached hydration fallback, the serialized rules must not
+ * contain a case-insensitive `</style` sequence because it could terminate the element.
  *
  * @param cssRules a list of style rules, usually from an
  * [org.jetbrains.compose.web.css.StyleSheet] instance.
- * @throws IllegalArgumentException if string rendering is used and [cssRules] cannot be safely
- * embedded in a `style` element.
+ * @throws IllegalArgumentException if raw-text rendering is required and [cssRules] cannot be
+ * safely embedded in a `style` element.
  */
 @Composable
 fun Style(
@@ -191,11 +193,13 @@ fun Style(
 /**
  * Use this function to mount the <style> tag into the rendered HTML.
  *
- * String rendering serializes the rules as raw text, which must not contain a `</style>` end tag.
+ * Browser rendering installs the rules through CSSOM. When raw HTML text is required by string
+ * rendering, initial hydration, or detached hydration fallback, the serialized rules must not
+ * contain a case-insensitive `</style` sequence because it could terminate the element.
  *
  * @param rulesBuild allows style rules to be defined using [StyleSheetBuilder].
- * @throws IllegalArgumentException if string rendering is used and the rules cannot be safely
- * embedded in a `style` element.
+ * @throws IllegalArgumentException if raw-text rendering is required and the rules cannot be
+ * safely embedded in a `style` element.
  */
 @Composable
 inline fun Style(
