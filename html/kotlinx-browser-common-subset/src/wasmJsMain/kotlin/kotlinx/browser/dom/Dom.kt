@@ -241,13 +241,7 @@ import org.w3c.dom.XMLDocument
 import org.w3c.dom.`get` as browserGet
 import org.w3c.dom.`set` as browserSet
 
-public actual typealias AbstractWorker = AbstractWorker
-
-public actual typealias ApplicationCache = ApplicationCache
-
 public actual typealias Node = org.w3c.dom.Node
-
-public actual typealias Attr = org.w3c.dom.Attr
 
 public actual typealias ParentNode = ParentNode
 
@@ -268,6 +262,12 @@ public actual typealias UnionElementOrMouseEvent = UnionElementOrMouseEvent
 public actual typealias Element = org.w3c.dom.Element
 
 public actual typealias GlobalEventHandlers = GlobalEventHandlers
+
+public actual typealias AbstractWorker = AbstractWorker
+
+public actual typealias ApplicationCache = ApplicationCache
+
+public actual typealias Attr = org.w3c.dom.Attr
 
 public actual typealias DocumentAndElementEventHandlers = DocumentAndElementEventHandlers
 

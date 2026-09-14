@@ -25,6 +25,8 @@ internal const val DOM_PACKAGE = "org.w3c.dom"
 internal const val DOM_CLIPBOARD_PACKAGE = "org.w3c.dom.clipboard"
 internal const val DOM_CSS_PACKAGE = "org.w3c.dom.css"
 internal const val DOM_EVENTS_PACKAGE = "org.w3c.dom.events"
+internal const val DOM_SVG_PACKAGE = "org.w3c.dom.svg"
+internal const val CSS_MASKING_PACKAGE = "org.w3c.css.masking"
 internal const val WEBGL_PACKAGE = "org.khronos.webgl"
 
 // Facade packages.
@@ -33,6 +35,8 @@ internal const val COMMON_DOM_PACKAGE = "kotlinx.browser.dom"
 internal const val COMMON_CLIPBOARD_PACKAGE = "kotlinx.browser.dom.clipboard"
 internal const val COMMON_CSS_PACKAGE = "kotlinx.browser.dom.css"
 internal const val COMMON_EVENTS_PACKAGE = "kotlinx.browser.dom.events"
+internal const val COMMON_SVG_PACKAGE = "kotlinx.browser.dom.svg"
+internal const val COMMON_CSS_MASKING_PACKAGE = "kotlinx.browser.css.masking"
 internal const val COMMON_WEBGL_PACKAGE = "kotlinx.browser.webgl"
 
 internal data class CommonPackageMapping(
@@ -49,6 +53,8 @@ internal val COMMON_PACKAGE_BY_BROWSER_PACKAGE = linkedMapOf(
     DOM_CLIPBOARD_PACKAGE to CommonPackageMapping(COMMON_CLIPBOARD_PACKAGE,  "Clipboard", "ClipboardDictionaries"),
     DOM_CSS_PACKAGE to CommonPackageMapping(COMMON_CSS_PACKAGE, "Css", "CssDictionaries"),
     DOM_EVENTS_PACKAGE to CommonPackageMapping(COMMON_EVENTS_PACKAGE, "Events", "EventDictionaries"),
+    DOM_SVG_PACKAGE to CommonPackageMapping(COMMON_SVG_PACKAGE, "Svg", "SvgDictionaries"),
+    CSS_MASKING_PACKAGE to CommonPackageMapping(COMMON_CSS_MASKING_PACKAGE, "Masking", "MaskingDictionaries"),
 )
 
 // Explicit mappings for browser packages outside the org.w3c naming convention.

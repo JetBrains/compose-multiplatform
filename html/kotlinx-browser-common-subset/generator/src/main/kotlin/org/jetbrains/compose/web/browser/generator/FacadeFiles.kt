@@ -230,8 +230,9 @@ internal fun browserLeafDeclarationsFile(
     mapping: CommonPackageMapping,
     declarations: List<CommonClass>,
     extensions: List<CommonExtensionFunction>,
+    allClasses: Map<ClassName, CommonClass> = emptyMap(),
 ): FileSpec = facadeFile(mapping.commonPackage, mapping.declarationsFile) {
-    webSuppressions(declarations)
+    webSuppressions(declarations, allClasses)
     extensions.distinctBy(CommonExtensionFunction::browserMember).forEach { extension ->
         addAliasedImport(extension.browserMember, extension.browserAlias)
     }
@@ -270,8 +271,9 @@ internal fun targetValuesFile(
 internal fun browserLeafDictionariesFile(
     mapping: CommonPackageMapping,
     dictionaries: List<CommonClass>,
+    allClasses: Map<ClassName, CommonClass> = emptyMap(),
 ): FileSpec = facadeFile(mapping.commonPackage, mapping.dictionariesFile) {
-    webSuppressions(dictionaries)
+    webSuppressions(dictionaries, allClasses)
     dictionaries.forEach { addTypeAlias(it.browserTypeAlias()) }
     dictionaries.forEach { dictionary ->
         dictionary.factory?.takeUnless(CommonFactory::usesInterop)
@@ -294,13 +296,19 @@ private fun CommonClass.browserTypeAlias(): TypeAliasSpec =
 private fun CommonClass.browserAliasTypeVariables() =
     typeVariables.map { variable -> TypeVariableName(variable.name) }
 
-private fun FileSpec.Builder.webSuppressions(classes: List<CommonClass>): FileSpec.Builder =
+private fun FileSpec.Builder.webSuppressions(
+    classes: List<CommonClass>,
+    allClasses: Map<ClassName, CommonClass>,
+): FileSpec.Builder =
     suppressIfAny(buildList {
+        val classesAndAncestors = classes + classes.flatMap { commonClass ->
+            commonClass.ancestors.mapNotNull(allClasses::get)
+        }
         // Each suppression answers a distinct declaration shape; keep their file checks independent.
-        if (classes.any(CommonClass::hasDefaultArguments)) {
+        if (classesAndAncestors.any(CommonClass::hasDefaultArguments)) {
             add(DEFAULT_ARGUMENTS_SUPPRESSION)
         }
-        if (classes.any { it.needsIrSuppression || it.hasDefaultArguments }) {
+        if (classesAndAncestors.any { it.needsIrSuppression || it.hasDefaultArguments }) {
             add(CLASS_SCOPE_SUPPRESSION)
         }
         if (classes.any { it.typeVariables.any { variable -> variable.variance != null } }) {

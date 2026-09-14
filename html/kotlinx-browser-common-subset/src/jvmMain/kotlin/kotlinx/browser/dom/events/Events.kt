@@ -147,7 +147,7 @@ public actual open class Event actual constructor(
   }
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -172,7 +172,7 @@ public actual open class UIEvent actual constructor(
   protected constructor() : this("", UIEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -232,7 +232,7 @@ public actual open class MouseEvent actual constructor(
   public actual fun getModifierState(keyArg: String): Boolean = false
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -255,7 +255,7 @@ public actual open class CompositionEvent actual constructor(
   protected constructor() : this("", CompositionEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -282,7 +282,7 @@ public actual open class FocusEvent actual constructor(
   protected constructor() : this("", FocusEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -307,7 +307,7 @@ public actual open class InputEvent actual constructor(
   protected constructor() : this("", InputEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -362,7 +362,7 @@ public actual open class KeyboardEvent actual constructor(
 
     public actual val DOM_KEY_LOCATION_NUMPAD: Int = 4
 
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 
@@ -397,7 +397,7 @@ public actual open class WheelEvent actual constructor(
 
     public actual val DOM_DELTA_PAGE: Int = 1
 
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 

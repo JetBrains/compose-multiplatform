@@ -9,9 +9,12 @@
   "EXPECT_ACTUAL_INCOMPATIBLE_CLASS_SCOPE",
 )
 
-package kotlinx.browser.dom.pointerevents
+package kotlinx.browser.css.masking
 
 import kotlin.Suppress
-import org.w3c.dom.pointerevents.PointerEvent
+import org.w3c.css.masking.SVGClipPathElement
+import org.w3c.css.masking.SVGMaskElement
 
-public actual typealias PointerEvent = PointerEvent
+public actual typealias SVGClipPathElement = SVGClipPathElement
+
+public actual typealias SVGMaskElement = SVGMaskElement

@@ -41,7 +41,7 @@ public actual open class ClipboardEvent actual constructor(
   protected constructor() : this("", ClipboardEventInit())
 
   public actual companion object {
-    public actual val NONE: Short = 51
+    public actual val NONE: Short = 54
 
     public actual val CAPTURING_PHASE: Short = 3
 

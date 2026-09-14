@@ -48,21 +48,21 @@ public actual abstract class CSSRule : JsAny {
   public actual open val parentStyleSheet: CSSStyleSheet? = null
 
   public actual companion object {
-    public actual val STYLE_RULE: Short = 59
+    public actual val STYLE_RULE: Short = 62
 
     public actual val CHARSET_RULE: Short = 5
 
     public actual val IMPORT_RULE: Short = 37
 
-    public actual val MEDIA_RULE: Short = 45
+    public actual val MEDIA_RULE: Short = 48
 
     public actual val FONT_FACE_RULE: Short = 30
 
-    public actual val PAGE_RULE: Short = 55
+    public actual val PAGE_RULE: Short = 58
 
-    public actual val MARGIN_RULE: Short = 40
+    public actual val MARGIN_RULE: Short = 43
 
-    public actual val NAMESPACE_RULE: Short = 46
+    public actual val NAMESPACE_RULE: Short = 49
   }
 }
 
@@ -75,21 +75,21 @@ public actual abstract class CSSGroupingRule : CSSRule(), JsAny {
   }
 
   public actual companion object {
-    public actual val STYLE_RULE: Short = 59
+    public actual val STYLE_RULE: Short = 62
 
     public actual val CHARSET_RULE: Short = 5
 
     public actual val IMPORT_RULE: Short = 37
 
-    public actual val MEDIA_RULE: Short = 45
+    public actual val MEDIA_RULE: Short = 48
 
     public actual val FONT_FACE_RULE: Short = 30
 
-    public actual val PAGE_RULE: Short = 55
+    public actual val PAGE_RULE: Short = 58
 
-    public actual val MARGIN_RULE: Short = 40
+    public actual val MARGIN_RULE: Short = 43
 
-    public actual val NAMESPACE_RULE: Short = 46
+    public actual val NAMESPACE_RULE: Short = 49
   }
 }
 
@@ -101,21 +101,21 @@ public actual abstract class CSSImportRule : CSSRule(), JsAny {
   public actual open val styleSheet: CSSStyleSheet = EmptyCSSStyleSheet
 
   public actual companion object {
-    public actual val STYLE_RULE: Short = 59
+    public actual val STYLE_RULE: Short = 62
 
     public actual val CHARSET_RULE: Short = 5
 
     public actual val IMPORT_RULE: Short = 37
 
-    public actual val MEDIA_RULE: Short = 45
+    public actual val MEDIA_RULE: Short = 48
 
     public actual val FONT_FACE_RULE: Short = 30
 
-    public actual val PAGE_RULE: Short = 55
+    public actual val PAGE_RULE: Short = 58
 
-    public actual val MARGIN_RULE: Short = 40
+    public actual val MARGIN_RULE: Short = 43
 
-    public actual val NAMESPACE_RULE: Short = 46
+    public actual val NAMESPACE_RULE: Short = 49
   }
 }
 
@@ -125,21 +125,21 @@ public actual abstract class CSSMarginRule : CSSRule(), JsAny {
   public actual open val style: CSSStyleDeclaration = EmptyCSSStyleDeclaration
 
   public actual companion object {
-    public actual val STYLE_RULE: Short = 59
+    public actual val STYLE_RULE: Short = 62
 
     public actual val CHARSET_RULE: Short = 5
 
     public actual val IMPORT_RULE: Short = 37
 
-    public actual val MEDIA_RULE: Short = 45
+    public actual val MEDIA_RULE: Short = 48
 
     public actual val FONT_FACE_RULE: Short = 30
 
-    public actual val PAGE_RULE: Short = 55
+    public actual val PAGE_RULE: Short = 58
 
-    public actual val MARGIN_RULE: Short = 40
+    public actual val MARGIN_RULE: Short = 43
 
-    public actual val NAMESPACE_RULE: Short = 46
+    public actual val NAMESPACE_RULE: Short = 49
   }
 }
 
@@ -147,21 +147,21 @@ public actual abstract class CSSMediaRule : CSSGroupingRule(), JsAny {
   public actual open val media: MediaList = EmptyMediaList
 
   public actual companion object {
-    public actual val STYLE_RULE: Short = 59
+    public actual val STYLE_RULE: Short = 62
 
     public actual val CHARSET_RULE: Short = 5
 
     public actual val IMPORT_RULE: Short = 37
 
-    public actual val MEDIA_RULE: Short = 45
+    public actual val MEDIA_RULE: Short = 48
 
     public actual val FONT_FACE_RULE: Short = 30
 
-    public actual val PAGE_RULE: Short = 55
+    public actual val PAGE_RULE: Short = 58
 
-    public actual val MARGIN_RULE: Short = 40
+    public actual val MARGIN_RULE: Short = 43
 
-    public actual val NAMESPACE_RULE: Short = 46
+    public actual val NAMESPACE_RULE: Short = 49
   }
 }
 
@@ -171,21 +171,21 @@ public actual abstract class CSSNamespaceRule : CSSRule(), JsAny {
   public actual open val prefix: String = ""
 
   public actual companion object {
-    public actual val STYLE_RULE: Short = 59
+    public actual val STYLE_RULE: Short = 62
 
     public actual val CHARSET_RULE: Short = 5
 
     public actual val IMPORT_RULE: Short = 37
 
-    public actual val MEDIA_RULE: Short = 45
+    public actual val MEDIA_RULE: Short = 48
 
     public actual val FONT_FACE_RULE: Short = 30
 
-    public actual val PAGE_RULE: Short = 55
+    public actual val PAGE_RULE: Short = 58
 
-    public actual val MARGIN_RULE: Short = 40
+    public actual val MARGIN_RULE: Short = 43
 
-    public actual val NAMESPACE_RULE: Short = 46
+    public actual val NAMESPACE_RULE: Short = 49
   }
 }
 
@@ -195,21 +195,21 @@ public actual abstract class CSSPageRule : CSSGroupingRule(), JsAny {
   public actual open val style: CSSStyleDeclaration = EmptyCSSStyleDeclaration
 
   public actual companion object {
-    public actual val STYLE_RULE: Short = 59
+    public actual val STYLE_RULE: Short = 62
 
     public actual val CHARSET_RULE: Short = 5
 
     public actual val IMPORT_RULE: Short = 37
 
-    public actual val MEDIA_RULE: Short = 45
+    public actual val MEDIA_RULE: Short = 48
 
     public actual val FONT_FACE_RULE: Short = 30
 
-    public actual val PAGE_RULE: Short = 55
+    public actual val PAGE_RULE: Short = 58
 
-    public actual val MARGIN_RULE: Short = 40
+    public actual val MARGIN_RULE: Short = 43
 
-    public actual val NAMESPACE_RULE: Short = 46
+    public actual val NAMESPACE_RULE: Short = 49
   }
 }
 
@@ -708,21 +708,21 @@ public actual abstract class CSSStyleRule : CSSRule(), JsAny {
   public actual open val style: CSSStyleDeclaration = EmptyCSSStyleDeclaration
 
   public actual companion object {
-    public actual val STYLE_RULE: Short = 59
+    public actual val STYLE_RULE: Short = 62
 
     public actual val CHARSET_RULE: Short = 5
 
     public actual val IMPORT_RULE: Short = 37
 
-    public actual val MEDIA_RULE: Short = 45
+    public actual val MEDIA_RULE: Short = 48
 
     public actual val FONT_FACE_RULE: Short = 30
 
-    public actual val PAGE_RULE: Short = 55
+    public actual val PAGE_RULE: Short = 58
 
-    public actual val MARGIN_RULE: Short = 40
+    public actual val MARGIN_RULE: Short = 43
 
-    public actual val NAMESPACE_RULE: Short = 46
+    public actual val NAMESPACE_RULE: Short = 49
   }
 }
 
