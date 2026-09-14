@@ -1,6 +1,7 @@
 @file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
 import org.jetbrains.compose.gradle.standardConf
+import org.jetbrains.compose.gradle.standardWasmConf
 
 val kotlinxBrowserCommonSubsetVersion: String =
     providers.gradleProperty("compose.html.eap.kotlinx-browser-common-subset.version").get()
@@ -25,8 +26,16 @@ kotlin {
         }
     }
     wasmJs {
-        browser()
+        browser() {
+            testTask {
+                useKarma {
+                    standardWasmConf()
+                }
+            }
+        }
     }
+
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
         val commonMain by getting {

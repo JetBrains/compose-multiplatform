@@ -5,9 +5,9 @@
 
 package org.jetbrains.compose.web.dom
 
-import kotlinx.browser.document
 import kotlinx.browser.dom.Element
 import org.jetbrains.compose.web.internal.unsafeCast
+import org.jetbrains.compose.web.internal.runtime.browserDocument as document
 
 private class BrowserElementBuilder<TElement : Element>(
     override val tagName: String,

@@ -6,6 +6,7 @@
 package org.jetbrains.compose.web.internal
 
 import java.util.WeakHashMap
+import kotlinx.browser.JsAny
 import kotlinx.browser.dom.DataTransfer
 import kotlinx.browser.dom.events.Event
 import kotlinx.browser.dom.events.KeyboardEvent
@@ -15,7 +16,7 @@ import kotlinx.browser.dom.events.MouseEvent
 @PublishedApi
 internal actual fun <T> Any?.unsafeCast(): T = this as T
 
-private class JvmWeakMap<K : Any, V : Any> : WeakMap<K, V> {
+private class JvmWeakMap<K : JsAny, V : Any> : WeakMap<K, V> {
     private val delegate = WeakHashMap<K, V>()
 
     override fun delete(key: K) {
@@ -31,7 +32,7 @@ private class JvmWeakMap<K : Any, V : Any> : WeakMap<K, V> {
     }
 }
 
-internal actual fun <K : Any, V : Any> createWeakMap(): WeakMap<K, V> =
+internal actual fun <K : JsAny, V : Any> createWeakMap(): WeakMap<K, V> =
     JvmWeakMap()
 
 internal actual fun MouseEvent.movementXOrZero(): Int = 0

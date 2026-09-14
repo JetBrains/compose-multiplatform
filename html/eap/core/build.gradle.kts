@@ -1,6 +1,7 @@
 @file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
 import org.jetbrains.compose.gradle.standardConf
+import org.jetbrains.compose.gradle.standardWasmConf
 import org.gradle.api.tasks.JavaExec
 
 val generatedSsrHydrationFixtures = layout.buildDirectory.dir("generated/ssrHydrationFixtures")
@@ -28,7 +29,13 @@ kotlin {
         binaries.executable()
     }
     wasmJs {
-        browser()
+        browser() {
+            testTask {
+                useKarma {
+                    standardWasmConf()
+                }
+            }
+        }
     }
 
     applyDefaultHierarchyTemplate()
@@ -57,8 +64,17 @@ kotlin {
             dependsOn(nonJsMain)
         }
 
+        val webMain by getting {
+            languageSettings {
+                optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
+            }
+        }
+
         val wasmJsMain by getting {
             dependsOn(nonJsMain)
+            languageSettings {
+                optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
+            }
         }
 
         val jsMain by getting {
@@ -67,8 +83,21 @@ kotlin {
             }
         }
 
-        val jsTest by getting {
+        val webTest by getting {
             resources.srcDir(generatedSsrHydrationFixtures)
+            languageSettings {
+                optIn("kotlin.js.ExperimentalWasmJsInterop")
+                optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
+                optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
+            }
+            dependencies {
+                implementation(project(":html-test-utils"))
+                implementation(kotlin("test"))
+                implementation(libs.kotlinx.coroutines.core)
+            }
+        }
+
+        val jsTest by getting {
             languageSettings {
                 optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
                 optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
@@ -92,7 +121,7 @@ configurations.matching { it.name.contains("Test") }.configureEach {
 val jvmTestCompilation = kotlin.targets.getByName("jvm").compilations.getByName("test")
 val generateSsrHydrationFixture = tasks.register<JavaExec>("generateSsrHydrationFixture") {
     group = "verification"
-    description = "Generates JVM-rendered HTML for the Kotlin/JS hydration tests."
+    description = "Generates JVM-rendered HTML for the browser hydration tests."
     dependsOn(jvmTestCompilation.compileTaskProvider)
     mainClass.set("org.jetbrains.compose.web.SsrHydrationFixtureGenerator")
     classpath(jvmTestCompilation.output.allOutputs)
@@ -102,5 +131,9 @@ val generateSsrHydrationFixture = tasks.register<JavaExec>("generateSsrHydration
 }
 
 tasks.named("jsTestProcessResources") {
+    dependsOn(generateSsrHydrationFixture)
+}
+
+tasks.named("wasmJsTestProcessResources") {
     dependsOn(generateSsrHydrationFixture)
 }

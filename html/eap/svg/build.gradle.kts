@@ -1,4 +1,7 @@
+@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+
 import org.jetbrains.compose.gradle.standardConf
+import org.jetbrains.compose.gradle.standardWasmConf
 import org.gradle.api.tasks.JavaExec
 
 val generatedSsrHydrationFixtures = layout.buildDirectory.dir("generated/ssrHydrationFixtures")
@@ -26,6 +29,17 @@ kotlin {
         }
         binaries.executable()
     }
+    wasmJs {
+        browser() {
+            testTask {
+                useKarma {
+                    standardWasmConf()
+                }
+            }
+        }
+    }
+
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
         val commonMain by getting {
@@ -50,14 +64,14 @@ kotlin {
             }
         }
 
-        val jsTest by getting {
+        val webTest by getting {
             resources.srcDir(generatedSsrHydrationFixtures)
             languageSettings {
                 optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
             }
             dependencies {
                 implementation(project(":html-test-utils"))
-                implementation(kotlin("test-js"))
+                implementation(kotlin("test"))
                 implementation(libs.kotlinx.coroutines.core)
             }
         }
@@ -85,5 +99,9 @@ val generateSsrHydrationFixture = tasks.register<JavaExec>("generateSsrHydration
 }
 
 tasks.named("jsTestProcessResources") {
+    dependsOn(generateSsrHydrationFixture)
+}
+
+tasks.named("wasmJsTestProcessResources") {
     dependsOn(generateSsrHydrationFixture)
 }

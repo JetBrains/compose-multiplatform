@@ -15,3 +15,12 @@ fun KotlinKarma.standardConf() {
     useChromeHeadless()
     useFirefoxHeadless()
 }
+
+fun KotlinKarma.standardWasmConf() {
+    if (kotlinKarmaConfig.rootDir == null) {
+        throw Exception("kotlinKarmaConfig.rootDir should be set somewhere")
+    }
+    useConfigDirectory("${kotlinKarmaConfig.rootDir}/test-utils/conf/karma.config.wasm.d")
+    useChromeHeadless()
+    useFirefoxHeadless()
+}

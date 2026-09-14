@@ -1,4 +1,12 @@
+@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+
 import org.jetbrains.compose.gradle.standardConf
+import org.jetbrains.compose.gradle.standardWasmConf
+
+val kotlinxBrowserCommonSubsetVersion: String =
+    providers.gradleProperty("compose.html.eap.kotlinx-browser-common-subset.version").get()
+val composeHtmlEapVersion: String =
+    providers.gradleProperty("compose.html.eap.version").get()
 
 plugins {
     kotlin("multiplatform")
@@ -21,19 +29,52 @@ kotlin {
             }
         }
     }
+    wasmJs {
+        browser() {
+            testTask {
+                useKarma {
+                    standardWasmConf()
+                }
+            }
+        }
+    }
+
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
                 implementation(kotlin("stdlib-common"))
-                implementation(project(":internal-html-core-runtime"))
                 implementation(libs.kotlinx.coroutines.core)
             }
         }
-        val jsTest by getting {
+        val webMain by getting {
             dependencies {
-                implementation(kotlin("test-js"))
+                api(
+                    "org.jetbrains.compose.html:" +
+                        "kotlinx-browser-common-subset:$kotlinxBrowserCommonSubsetVersion"
+                )
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+                implementation(project(":internal-html-core-runtime"))
+            }
+        }
+        val wasmJsMain by getting {
+            dependencies {
+                val localEapRuntime = project.findProject(":internal-html-core-runtime-eap")
+                implementation(
+                    localEapRuntime
+                        ?: "org.jetbrains.compose.html.eap:" +
+                            "internal-html-core-runtime-eap:$composeHtmlEapVersion"
+                )
+            }
+        }
+        val webTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
             }
         }
     }
