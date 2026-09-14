@@ -36,10 +36,10 @@ check(run("git", "pull", "--ff-only"))
 fetchNotes()
 
 val head = output("git", "rev-parse", "HEAD")
-if (needsMergeSolver(head)) {
-    check(solveWithMergeSolver()) { "Merge Solver did not review $head" }
-} else {
-    check(compile()) { "Compilation failed" }
+when {
+    hasMergeSolverNote(head) -> Unit
+    needsMergeSolver(head) -> check(solveWithMergeSolver()) { "Merge Solver did not review $head" }
+    else -> check(compile()) { "Compilation failed" }
 }
 
 if (!run("git", "remote", "get-url", "aosp")) {
