@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.web.css
 
+import kotlin.jvm.JvmInline
 import org.jetbrains.compose.web.css.keywords.CSSAutoKeyword
 
 actual interface StylePropertyValue
@@ -19,21 +20,21 @@ actual interface CSSStyleValue : StylePropertyValue {
 actual interface CSSVariableValueAs<out T : StylePropertyValue>
 
 @JvmInline
-private value class JvmStylePropertyString(
+private value class StylePropertyStringImpl(
     private val value: String,
 ) : StylePropertyString {
     override fun toString(): String = value
 }
 
 @JvmInline
-private value class JvmStylePropertyNumber(
+private value class StylePropertyNumberImpl(
     private val value: Number,
 ) : StylePropertyNumber {
     override fun toString(): String = formatCssNumber(value)
 }
 
 @JvmInline
-private value class JvmCSSStyleValue(
+private value class CSSStyleValueImpl(
     private val value: String,
 ) : CSSStyleValue {
     override fun toString(): String = value
@@ -42,7 +43,7 @@ private value class JvmCSSStyleValue(
 // References implement the marker types they can represent without pretending
 // to be a CSSSizeValue, whose value and unit members do not exist for var().
 @JvmInline
-private value class JvmCSSVariableReference(
+private value class CSSVariableReferenceImpl(
     private val value: String,
 ) : CSSNumericValue<CSSUnit>,
     LineStyle,
@@ -69,15 +70,15 @@ private value class JvmCSSVariableReference(
 
 @PublishedApi
 internal actual fun createStylePropertyString(value: String): StylePropertyString =
-    JvmStylePropertyString(value)
+    StylePropertyStringImpl(value)
 
 @PublishedApi
 internal actual fun createStylePropertyNumber(value: Number): StylePropertyNumber =
-    JvmStylePropertyNumber(value)
+    StylePropertyNumberImpl(value)
 
 internal actual fun createCSSVariableReference(cssText: String): StylePropertyValue =
-    JvmCSSVariableReference(cssText)
+    CSSVariableReferenceImpl(cssText)
 
 @PublishedApi
 internal actual fun createCSSStyleValue(value: String): CSSStyleValue =
-    JvmCSSStyleValue(value)
+    CSSStyleValueImpl(value)

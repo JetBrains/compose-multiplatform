@@ -5,7 +5,6 @@
 
 package org.jetbrains.compose.web.css
 
-// JVM colors reuse the existing string carrier.
 @Suppress("EXPECT_ACTUAL_INCOMPATIBLE_SUPERTYPES")
 actual typealias CSSColorValue = StylePropertyString
 

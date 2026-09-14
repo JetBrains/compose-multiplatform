@@ -62,13 +62,13 @@ private open class DomElementWrapper(override val node: Element) : DomNodeWrappe
         if (eventListenersMatch(list)) return
 
         currentListeners.forEach { listener ->
-            node.removeEventListener(listener.name, listener)
+            node.removeEventListener(listener.name, listener.callback)
         }
 
         currentListeners = list
 
         currentListeners.forEach { listener ->
-            node.addEventListener(listener.name, listener)
+            node.addEventListener(listener.name, listener.callback)
         }
     }
 

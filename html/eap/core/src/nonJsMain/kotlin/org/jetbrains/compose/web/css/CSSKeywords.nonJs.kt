@@ -5,14 +5,15 @@
 
 package org.jetbrains.compose.web.css
 
+import kotlin.jvm.JvmInline
 actual interface CSSKeywordValue : CSSStyleValue
 
 @JvmInline
-private value class JvmCSSKeywordValue(
+private value class CSSKeywordValueImpl(
     private val value: String,
 ) : CSSKeywordValue {
     override fun toString(): String = value
 }
 
 @PublishedApi
-internal actual fun createCSSKeywordValue(value: String): CSSKeywordValue = JvmCSSKeywordValue(value)
+internal actual fun createCSSKeywordValue(value: String): CSSKeywordValue = CSSKeywordValueImpl(value)

@@ -1,3 +1,5 @@
+@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+
 import org.jetbrains.compose.gradle.standardConf
 
 val kotlinxBrowserCommonSubsetVersion: String =
@@ -21,6 +23,9 @@ kotlin {
                 }
             }
         }
+    }
+    wasmJs {
+        browser()
     }
 
     sourceSets {

@@ -5,14 +5,15 @@
 
 package org.jetbrains.compose.web.css.keywords
 
+import kotlin.jvm.JvmInline
 actual interface CSSAutoKeyword : org.jetbrains.compose.web.css.CSSKeywordValue
 
 @JvmInline
-private value class JvmCSSAutoKeyword(
+private value class CSSAutoKeywordImpl(
     private val value: String,
 ) : CSSAutoKeyword {
     override fun toString(): String = value
 }
 
 @PublishedApi
-internal actual fun createCSSAutoKeyword(value: String): CSSAutoKeyword = JvmCSSAutoKeyword(value)
+internal actual fun createCSSAutoKeyword(value: String): CSSAutoKeyword = CSSAutoKeywordImpl(value)

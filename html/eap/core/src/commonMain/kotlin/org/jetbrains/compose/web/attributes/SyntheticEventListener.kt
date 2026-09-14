@@ -13,7 +13,6 @@ import kotlinx.browser.dom.DragEvent
 import kotlinx.browser.dom.TouchEvent
 import kotlinx.browser.dom.clipboard.ClipboardEvent
 import kotlinx.browser.dom.events.Event
-import kotlinx.browser.dom.events.EventListener
 import kotlinx.browser.dom.events.EventTarget
 import kotlinx.browser.dom.events.FocusEvent
 import kotlinx.browser.dom.events.KeyboardEvent
@@ -35,11 +34,12 @@ import org.jetbrains.compose.web.internal.unsafeCast
 open class SyntheticEventListener<T : SyntheticEvent<*>> internal constructor(
     val event: String,
     val listener: (T) -> Unit
-) : EventListener, NamedEventListener {
+) : NamedEventListener {
 
     override val name: String = event
+    override val callback: (Event) -> Unit = { handleEvent(it) }
 
-    override fun handleEvent(event: Event) {
+    open fun handleEvent(event: Event) {
         listener(SyntheticEvent<EventTarget>(event).unsafeCast<T>())
     }
 }

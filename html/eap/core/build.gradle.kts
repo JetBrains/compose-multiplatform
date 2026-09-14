@@ -1,3 +1,5 @@
+@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+
 import org.jetbrains.compose.gradle.standardConf
 import org.gradle.api.tasks.JavaExec
 
@@ -25,6 +27,11 @@ kotlin {
         }
         binaries.executable()
     }
+    wasmJs {
+        browser()
+    }
+
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
         val commonMain by getting {
@@ -40,6 +47,18 @@ kotlin {
             dependencies {
                 implementation(kotlin("test"))
             }
+        }
+
+        val nonJsMain by creating {
+            dependsOn(commonMain)
+        }
+
+        val jvmMain by getting {
+            dependsOn(nonJsMain)
+        }
+
+        val wasmJsMain by getting {
+            dependsOn(nonJsMain)
         }
 
         val jsMain by getting {
