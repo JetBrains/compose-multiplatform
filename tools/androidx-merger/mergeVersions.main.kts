@@ -68,6 +68,7 @@ upstreamCommits.forEachIndexed { index, commit ->
         commit.timestamp - lastCompilationTime >= compilationInterval
     ) {
         if (!compile()) {
+            println("Compilation failed. Bisecting.")
             bisect(lastKnownGood)
             markCompilationFailure()
             println("Build regression found.")
@@ -168,6 +169,7 @@ fun hasNote(commit: String, prefix: String): Boolean =
 fun bisect(lastKnownGood: String) {
     check(run("git", "bisect", "start", "--first-parent", "HEAD", lastKnownGood))
     while (true) {
+        println("Bisect ${output("git", "rev-parse", "HEAD")}")
         val result = if (compile()) "good" else "bad"
         val (code, text) = execute("git", "bisect", result)
         check(code == 0) { text }
