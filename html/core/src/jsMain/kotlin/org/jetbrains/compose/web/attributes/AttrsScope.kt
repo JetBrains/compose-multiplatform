@@ -97,9 +97,16 @@ interface AttrsScope<out TElement : Element> : EventsListenerScope {
      * @param attr - the name of the attribute
      * @param value - the value of the attribute
      *
-     * For boolean attributes cast boolean value to String and pass it as value.
+     * For boolean attributes, use the other overload with a boolean [condition].
      */
     fun attr(attr: String, value: String): AttrsScope<TElement>
+
+    /**
+     * Adds a boolean attribute if [condition] is `true` (empty value); omits it if `false`.
+     * @see AttrsScope.attr
+     */
+    fun attr(attr: String, condition: Boolean): AttrsScope<TElement> =
+        if (condition) attr(attr, "") else this
 
     /**
      * [prop] allows setting values of element's properties which can't be set using [attr].
@@ -198,7 +205,7 @@ open class AttrsScopeBuilder<TElement : Element>(
      * @param attr - the name of the attribute
      * @param value - the value of the attribute
      *
-     * For boolean attributes cast boolean value to String and pass it as value.
+     * For boolean attributes, use the other overload with a boolean [condition].
      */
     override fun attr(attr: String, value: String): AttrsScope<TElement> {
         attributesMap[attr] = value
