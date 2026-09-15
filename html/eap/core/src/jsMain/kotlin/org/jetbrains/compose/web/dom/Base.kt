@@ -101,8 +101,8 @@ private open class DomElementWrapper(override val node: Element) : DomNodeWrappe
         }
 
         attrs.forEach { (name, value) ->
-            if (node.getAttribute(name) != value) {
-                node.setAttribute(name, value)
+            if (node.getComposedAttribute(name) != value) {
+                node.setComposedAttribute(name, value)
             }
         }
     }
@@ -140,7 +140,7 @@ private class HydratingDomElementWrapper(
         attrs.forEach { (name, value) ->
             verifyAttribute(name, expected = value) {
                 // Unrelated server attributes are tolerated, so only the composed one is patched.
-                node.setAttribute(name, value)
+                node.setComposedAttribute(name, value)
             }
         }
     }
@@ -199,23 +199,28 @@ private class HydratingDomElementWrapper(
 
     /** Reports a mismatch, or applies [patch] after hydration if the element allows it. */
     private fun verifyAttribute(name: String, expected: String?, patch: () -> Unit) {
-        val attribute = node.getAttribute(name)
+        val attribute = node.getComposedAttribute(name)
         // CSP hides the nonce attribute; older browsers may only expose the attribute.
-        val actual = if (attribute != null && name.asciiLowercase() == "nonce") {
+        val actual = if (
+            attribute != null &&
+            node.namespaceURI == HtmlNamespace &&
+            name.asciiLowercase() == "nonce"
+        ) {
             (node.asDynamic().nonce as? String) ?: attribute
         } else {
             attribute
         }
         if (
             expected != null &&
-            name.asciiLowercase() == AttrsScope.CLASS &&
+            (name == AttrsScope.CLASS ||
+                node.namespaceURI == HtmlNamespace && name.asciiLowercase() == AttrsScope.CLASS) &&
             node.containsExpectedClasses(expected)
         ) {
             return
         }
         if (
-            actual.normalizedForHydration(name, node.localName) ==
-            expected.normalizedForHydration(name, node.localName)
+            actual.normalizedForHydration(name, node.namespaceURI, node.localName) ==
+            expected.normalizedForHydration(name, node.namespaceURI, node.localName)
         ) return
         if (allowance.isAllowed) {
             applier.applyOrDeferDomMutation(patch)
@@ -225,6 +230,35 @@ private class HydratingDomElementWrapper(
             "attribute \"$name\": expected ${expected.describeAttributeValue()}, " +
                 "found ${actual.describeAttributeValue()}",
         )
+    }
+}
+
+// These are the foreign attributes whose namespaces are assigned by the HTML parser.
+private fun Element.composedAttributeNamespace(name: String): String? =
+    if (namespaceURI == HtmlNamespace) null else when (name) {
+        "xlink:actuate", "xlink:arcrole", "xlink:href", "xlink:role", "xlink:show",
+        "xlink:title", "xlink:type" -> "http://www.w3.org/1999/xlink"
+        "xml:base", "xml:lang", "xml:space" -> "http://www.w3.org/XML/1998/namespace"
+        "xmlns", "xmlns:xlink" -> "http://www.w3.org/2000/xmlns/"
+        else -> null
+    }
+
+private fun Element.getComposedAttribute(name: String): String? {
+    val namespace = composedAttributeNamespace(name)
+    // A qualified-name lookup alone would also accept an attribute in the wrong namespace.
+    return if (namespace == null) getAttribute(name) else {
+        getAttributeNS(namespace, name.substringAfter(':'))
+    }
+}
+
+private fun Element.setComposedAttribute(name: String, value: String) {
+    val namespace = composedAttributeNamespace(name)
+    if (namespace == null) {
+        setAttribute(name, value)
+    } else {
+        // Also replace an incorrectly unnamespaced attribute when patching a hydration mismatch.
+        removeAttribute(name)
+        setAttributeNS(namespace, name, value)
     }
 }
 
@@ -243,12 +277,14 @@ private fun Element.containsExpectedClasses(expected: String): Boolean {
 // attributes keep their values even when their names match an HTML boolean attribute.
 private fun String?.normalizedForHydration(
     attributeName: String,
+    elementNamespace: String?,
     elementTagName: String,
 ): String? =
     if (
         this != null &&
+        elementNamespace == HtmlNamespace &&
         '-' !in elementTagName &&
-        attributeName.asciiLowercase().isHtmlBooleanAttributeName()
+        attributeName.isHtmlBooleanAttributeName()
     ) "" else this
 
 private fun String?.describeAttributeValue(): String =
@@ -259,6 +295,18 @@ private class DomElementScope<TElement : Element> : ElementScopeImpl<TElement>()
 }
 
 internal actual val DefaultComposeHtmlContext: ComposeHtmlContext = BrowserComposeHtmlContext
+
+// Attribute updates are prepared before the DOM node exists. Select the namespace-specific
+// fallback only when applying the update, and include both alternatives in Compose's change check.
+private data class AttributeFallback<T>(val html: T?, val foreign: T?) {
+    fun forNamespace(namespace: String?): T? = if (namespace == HtmlNamespace) html else foreign
+}
+
+private fun <T> Map<String, String>.attributeFallback(name: String, value: T): AttributeFallback<T> =
+    AttributeFallback(
+        html = value.takeUnless { containsAttribute(name, HtmlNamespace) },
+        foreign = value.takeUnless { name in this },
+    )
 
 @Composable
 private fun <TElement : Element> TagElementImpl(
@@ -290,14 +338,12 @@ private fun <TElement : Element> TagElementImpl(
             hydrationMismatchAllowance?.isAllowed = attrsScope.allowsHydrationMismatch
 
             update {
-                set(
-                    attrsScope.classes.takeUnless { attrs.containsAttribute(AttrsScope.CLASS) },
-                    DomElementWrapper::updateClasses,
-                )
-                set(
-                    attrsScope.styleScope.takeUnless { attrs.containsAttribute(AttrsScope.STYLE) },
-                    DomElementWrapper::updateStyleDeclarations,
-                )
+                set(attrs.attributeFallback(AttrsScope.CLASS, attrsScope.classes)) { fallback ->
+                    updateClasses(fallback.forNamespace(node.namespaceURI))
+                }
+                set(attrs.attributeFallback("style", attrsScope.styleScope)) { fallback ->
+                    updateStyleDeclarations(fallback.forNamespace(node.namespaceURI))
+                }
                 set(attrs, DomElementWrapper::updateAttrs)
                 updateElement()
                 set(attrsScope.propertyUpdates, DomElementWrapper::updateProperties)
@@ -334,6 +380,11 @@ private object BrowserComposeHtmlContext : ComposeHtmlContext {
 
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
         ElementBuilder.createBuilder(tagName)
+
+    override fun <TElement : Element> elementBuilderNS(
+        tagName: String,
+        namespace: String,
+    ): ElementBuilder<TElement> = ElementBuilder.createBuilder(tagName, namespace)
 
     @Composable
     override fun <TElement : Element> TagElement(
@@ -401,9 +452,20 @@ private class HydratingComposeHtmlContext(
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
         HydratingElementBuilder(
             tagName = tagName,
+            namespace = HtmlNamespace,
             applier = applier,
             browserBuilder = ElementBuilder.createBuilder(tagName),
         )
+
+    override fun <TElement : Element> elementBuilderNS(
+        tagName: String,
+        namespace: String,
+    ): ElementBuilder<TElement> = HydratingElementBuilder(
+        tagName = tagName,
+        namespace = namespace,
+        applier = applier,
+        browserBuilder = ElementBuilder.createBuilder(tagName, namespace),
+    )
 
     @Composable
     override fun <TElement : Element> TagElement(
@@ -423,6 +485,7 @@ private class HydratingComposeHtmlContext(
             }
             HydratingElementBuilder(
                 tagName = tagName,
+                namespace = HtmlNamespace,
                 applier = applier,
                 browserBuilder = elementBuilder,
             )
@@ -447,6 +510,7 @@ private class HydratingComposeHtmlContext(
         val allowance = remember { HydrationMismatchAllowance() }
         val rawTextElementBuilder = HydratingElementBuilder<TElement>(
             tagName = tagName,
+            namespace = HtmlNamespace,
             applier = applier,
             browserBuilder = ElementBuilder.createBuilder(tagName),
             rawText = { content },
@@ -528,6 +592,7 @@ private class HydratingComposeHtmlContext(
         HydratingTagElement<HTMLStyleElement>(
             elementBuilder = HydratingElementBuilder(
                 tagName = "style",
+                namespace = HtmlNamespace,
                 applier = applier,
                 browserBuilder = ElementBuilder.createBuilder("style"),
                 rawText = { content.value },
@@ -570,6 +635,7 @@ private fun ElementScope<HTMLStyleElement>.StyleSheetEffect(
 
 private class HydratingElementBuilder<TElement : Element>(
     override val tagName: String,
+    private val namespace: String,
     private val applier: HydrationDomApplier,
     private val browserBuilder: ElementBuilder<TElement>,
     private val rawText: (() -> RawTextContent)? = null,
@@ -581,10 +647,11 @@ private class HydratingElementBuilder<TElement : Element>(
     @Suppress("UNCHECKED_CAST")
     override fun create(): TElement = if (applier.isHydrating) {
         if (rawText == null) {
-            applier.claimElement(tagName)
+            applier.claimElement(tagName, namespace)
         } else {
             applier.claimElementWithRawText(
                 tagName = tagName,
+                namespace = namespace,
                 value = rawText().text,
                 allowContentMismatch = allowance?.isAllowed == true,
             )

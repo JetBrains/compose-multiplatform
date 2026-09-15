@@ -101,6 +101,7 @@ module(":html-test-utils", "test-utils")
 if (composeHtmlEapEnabled) {
     println("Compose HTML EAP modules enabled")
     module(":html-core-eap", "eap/core")
+    module(":html-svg-eap", "eap/svg")
     module(":internal-html-core-runtime-eap", "eap/internal-html-core-runtime")
     module(":html-eap-example", "eap/examples/string-rendering")
     module(":html-eap-hydration-example", "eap/examples/hydration")

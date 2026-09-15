@@ -67,6 +67,15 @@ class StringHtmlNodesTest {
     }
 
     @Test
+    fun rejectsAttributesOnTheSyntheticRoot() {
+        val failure = assertFailsWith<IllegalStateException> {
+            StringHtmlElementNode.root().updateAttributes(mapOf("lang" to "en"))
+        }
+
+        assertEquals("The string-rendering root has no element namespace", failure.message)
+    }
+
+    @Test
     fun escapesTextAndAttributeValues() {
         val element = StringHtmlElementNode("div").apply {
             updateAttributes(mapOf("title" to "Tom & \"Jerry\" <3"))
@@ -88,6 +97,13 @@ class StringHtmlNodesTest {
         assertEquals("<div data-value=\"content\"></div>", element.toHtmlString())
         assertEquals(true, element.hasAttribute("Data-Value"))
         assertEquals("content", element.attribute("DATA-VALUE"))
+    }
+
+    @Test
+    fun normalizesOnlyAsciiLettersInHtmlTagNames() {
+        val element = StringHtmlElementNode("D\u0130V")
+
+        assertEquals("d\u0130v", element.tagName)
     }
 
     @Test

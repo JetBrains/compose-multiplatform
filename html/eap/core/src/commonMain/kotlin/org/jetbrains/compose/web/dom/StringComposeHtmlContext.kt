@@ -26,6 +26,11 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
         StringElementBuilder(tagName)
 
+    override fun <TElement : Element> elementBuilderNS(
+        tagName: String,
+        namespace: String,
+    ): ElementBuilder<TElement> = StringElementBuilder(tagName, namespace)
+
     @Composable
     override fun <TElement : Element> TagElement(
         elementBuilder: ElementBuilder<TElement>,
@@ -44,19 +49,23 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
         content: (@Composable ElementScope<TElement>.() -> Unit)?,
         rawText: RawTextContent? = null,
     ) {
-        val tagName = elementBuilder.tagName
+        val namespace = (elementBuilder as? StringElementBuilder<*>)?.namespace ?: HtmlNamespace
+        val tagName = normalizeElementTagName(elementBuilder.tagName, namespace)
         val elementScope = remember { StringElementScope<TElement>() }
 
         ComposeStringNode(
             factory = {
                 StringHtmlNodeWrapper(
-                    StringHtmlElementNode(tagName)
+                    StringHtmlElementNode(
+                        tagName = tagName,
+                        namespace = namespace,
+                    )
                 )
             },
             update = {
                 val attrsScope = AttrsScopeBuilder<TElement>()
                 applyAttrs?.invoke(attrsScope)
-                val attributes = attrsScope.stringAttributes()
+                val attributes = attrsScope.stringAttributes(namespace)
                 rawText?.validateAttributes(attributes.byName)
 
                 update {
@@ -160,14 +169,16 @@ private fun unavailableDomElement(): Nothing =
    ```
  */
 @OptIn(ComposeWebInternalApi::class)
-private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(): StringHtmlAttributes {
+private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(
+    namespace: String,
+): StringHtmlAttributes {
     val byName = collect().toMutableMap().apply {
         val classValue = classes.toClassAttributeValue()
-        if (!containsAttribute(AttrsScope.CLASS)) {
+        if (!containsAttribute(AttrsScope.CLASS, namespace)) {
             classValue?.let { value -> this[AttrsScope.CLASS] = value }
         }
 
-        if (!containsAttribute(AttrsScope.STYLE)) {
+        if (!containsAttribute(AttrsScope.STYLE, namespace)) {
             styleScope.toStyleAttributeValue()?.let { value -> this[AttrsScope.STYLE] = value }
         }
     }

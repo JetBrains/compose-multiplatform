@@ -48,6 +48,8 @@ jobs:
           ./gradlew --no-daemon --stacktrace --rerun-tasks --max-workers=1 \
             -Pcompose.html.eap.enabled=true \
             :html-core-eap:check \
+            :html-svg-eap:check \
             :internal-html-core-runtime-eap:check \
             :html-core-eap:publishToMavenLocal \
+            :html-svg-eap:publishToMavenLocal \
             :internal-html-core-runtime-eap:publishToMavenLocal

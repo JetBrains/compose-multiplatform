@@ -14,16 +14,22 @@ import kotlinx.browser.dom.HTMLStyleElement
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.utils.serializeRules
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 
-// Match the HTML parser's ASCII-only attribute-name normalization in both render paths.
-internal fun Map<String, String>.containsAttribute(name: String): Boolean =
-    keys.any { it.asciiLowercase() == name }
+// HTML attribute names are ASCII-insensitive; foreign attribute names retain their case.
+internal fun Map<String, String>.containsAttribute(name: String, namespace: String?): Boolean =
+    if (namespace == HtmlNamespace) keys.any { it.asciiLowercase() == name } else name in this
 
 internal interface ComposeHtmlContext {
     val supportsDomElementAccess: Boolean
 
     fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement>
+
+    fun <TElement : Element> elementBuilderNS(
+        tagName: String,
+        namespace: String,
+    ): ElementBuilder<TElement>
 
     @Composable
     fun <TElement : Element> TagElement(
@@ -67,6 +73,29 @@ fun <TElement : Element> TagElement(
         applyAttrs = applyAttrs,
         content = content,
     )
+}
+
+/**
+ * Creates an element identified by both its local [tagName] and [namespace].
+ * Unlike HTML elements, tag names in non-HTML namespaces retain their casing.
+ */
+@Composable
+@ComposeWebInternalApi
+fun <TElement : Element> TagElementNS(
+    tagName: String,
+    namespace: String,
+    applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+    content: (@Composable ElementScope<TElement>.() -> Unit)?,
+) {
+    val context = LocalComposeHtmlContext.current
+
+    key(namespace, tagName) {
+        context.TagElement(
+            elementBuilder = context.elementBuilderNS(tagName, namespace),
+            applyAttrs = applyAttrs,
+            content = content,
+        )
+    }
 }
 
 /**
@@ -152,19 +181,27 @@ internal fun String.normalizeHtmlInputCharacters(): String =
         this
     }
 
+private val RawTextEndTags = listOf(
+    "script", "style", "iframe", "xmp", "noembed", "noframes",
+).associateWith { tagName ->
+    Regex("</$tagName(?=[\\t\\n\\u000C\\r />])", RegexOption.IGNORE_CASE)
+}
+private val ScriptStartTag = Regex("<script(?=[\\t\\n\\u000C\\r />])", RegexOption.IGNORE_CASE)
+
 private fun requireValidRawTextContent(tagName: String, content: String) {
-    val endTag = Regex("</$tagName(?=[\\t\\n\\u000C\\r />])", RegexOption.IGNORE_CASE)
+    val endTag = requireNotNull(RawTextEndTags[tagName]) {
+        "Raw text content is not supported for <$tagName>"
+    }
     require(!endTag.containsMatchIn(content)) {
         "Raw text for <$tagName> must not contain a </$tagName end tag"
     }
 
     if (tagName == "script") {
-        val scriptStart = Regex("<script(?=[\\t\\n\\u000C\\r />])", RegexOption.IGNORE_CASE)
         var escapedStart = content.indexOf("<!--")
         while (escapedStart >= 0) {
             // Include the opener's dashes: <!--> also exits the escaped state.
             val escapedEnd = content.indexOf("-->", escapedStart + 2)
-            val script = scriptStart.find(content, escapedStart + 4)
+            val script = ScriptStartTag.find(content, escapedStart + 4)
             require(script == null || (escapedEnd >= 0 && script.range.first > escapedEnd)) {
                 "Raw text for <script> must not contain a <script tag inside <!-- escaped text"
             }

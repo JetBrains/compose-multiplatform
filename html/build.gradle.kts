@@ -46,6 +46,7 @@ subprojects {
     val projectName = name
     val isComposeHtmlEapProject = project.name in setOf(
         "html-core-eap",
+        "html-svg-eap",
         "internal-html-core-runtime-eap",
     )
     if (isComposeHtmlEapProject) {
@@ -102,6 +103,7 @@ subprojects {
                     name.set(
                         when (projectName) {
                             "html-core-eap" -> "JetBrains Compose HTML EAP core"
+                            "html-svg-eap" -> "JetBrains Compose HTML EAP SVG"
                             "internal-html-core-runtime-eap" ->
                                 "JetBrains Compose HTML EAP internal runtime"
                             else -> "JetBrains Compose HTML library"
@@ -111,6 +113,8 @@ subprojects {
                         when (projectName) {
                             "html-core-eap" ->
                                 "Experimental commonized JetBrains Compose HTML core library"
+                            "html-svg-eap" ->
+                                "Experimental commonized JetBrains Compose HTML SVG library"
                             "internal-html-core-runtime-eap" ->
                                 "Experimental commonized JetBrains Compose HTML internal runtime"
                             else -> "JetBrains Compose HTML library"

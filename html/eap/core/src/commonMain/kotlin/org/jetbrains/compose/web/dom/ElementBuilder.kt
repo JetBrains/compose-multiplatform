@@ -6,6 +6,12 @@
 package org.jetbrains.compose.web.dom
 
 import kotlinx.browser.dom.Element
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
+
+internal const val HtmlNamespace = "http://www.w3.org/1999/xhtml"
+
+internal fun normalizeElementTagName(tagName: String, namespace: String): String =
+    if (namespace == HtmlNamespace) tagName.asciiLowercase() else tagName
 
 fun interface ElementBuilder<TElement : Element> {
     /** The HTML tag name used for string rendering. DOM-only lambda builders may omit it. */
@@ -26,6 +32,17 @@ fun interface ElementBuilder<TElement : Element> {
             tagName: String
         ): ElementBuilder<TElement> =
             createPlatformElementBuilder(tagName.asciiLowercase())
+
+        @ComposeWebInternalApi
+        fun <TElement : Element> createBuilder(
+            tagName: String,
+            namespace: String,
+        ): ElementBuilder<TElement> =
+            if (namespace == HtmlNamespace) {
+                createBuilder(tagName)
+            } else {
+                createPlatformElementBuilderNS(tagName, namespace)
+            }
     }
 }
 
@@ -33,4 +50,9 @@ internal expect val platformElementBuildersCache: Map<String, ElementBuilder<*>>
 
 internal expect fun <TElement : Element> createPlatformElementBuilder(
     tagName: String
+): ElementBuilder<TElement>
+
+internal expect fun <TElement : Element> createPlatformElementBuilderNS(
+    tagName: String,
+    namespace: String,
 ): ElementBuilder<TElement>

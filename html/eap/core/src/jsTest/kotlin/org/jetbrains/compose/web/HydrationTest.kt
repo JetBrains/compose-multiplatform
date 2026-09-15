@@ -6,12 +6,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.browser.document
+import kotlinx.browser.dom.Element
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.promise
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.HydrationDomApplier
 import org.jetbrains.compose.web.dom.Span
+import org.jetbrains.compose.web.dom.TagElementNS
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.dom.TagElement
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
@@ -20,6 +22,7 @@ import org.w3c.dom.HTMLElement
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 import kotlin.test.assertSame
@@ -28,6 +31,238 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ComposeWebInternalApi::class)
 class HydrationTest {
+    private val svgNamespace = "http://www.w3.org/2000/svg"
+
+    @Test
+    fun namespacedAttributesSurviveHydrationAndReaddition() = MainScope().promise {
+        val xlinkNamespace = "http://www.w3.org/1999/xlink"
+        var href by mutableStateOf<String?>("#first")
+        val content: @Composable () -> Unit = {
+            TagElementNS<Element>("svg", svgNamespace, null) {
+                TagElementNS<Element>("use", svgNamespace, {
+                    href?.let { attr("xlink:href", it) }
+                }, null)
+            }
+        }
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = composeHtmlToString(content = content)
+        val use = root.firstElementChild!!.firstElementChild!!
+        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) { content() }
+        try {
+            assertEquals("#first", use.getAttributeNS(xlinkNamespace, "href"))
+            href = null
+            delay(100.milliseconds)
+            assertNull(use.getAttributeNS(xlinkNamespace, "href"))
+            href = "#second"
+            delay(100.milliseconds)
+            assertEquals("#second", use.getAttributeNS(xlinkNamespace, "href"))
+            assertSame(use, root.firstElementChild!!.firstElementChild)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun hydrationChecksAndCanRepairAttributeNamespaces() {
+        val xlinkNamespace = "http://www.w3.org/1999/xlink"
+        listOf(false, true).forEach { allowMismatch ->
+            val root = document.createElement("div") as HTMLElement
+            val svg = document.createElementNS(svgNamespace, "svg")
+            svg.setAttribute("xlink:href", "#target")
+            root.appendChild(svg)
+            val hydrate = {
+                hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                    TagElementNS<Element>("svg", svgNamespace, {
+                        if (allowMismatch) allowHydrationMismatch()
+                        attr("xlink:href", "#target")
+                    }, null)
+                }
+            }
+            if (allowMismatch) {
+                val composition = hydrate()
+                try {
+                    assertSame(svg, root.firstChild)
+                    assertEquals("#target", svg.getAttributeNS(xlinkNamespace, "href"))
+                    assertEquals(1, svg.attributes.length)
+                } finally {
+                    composition.dispose()
+                }
+            } else {
+                assertFailsWith<HydrationMismatchException> { hydrate() }
+                assertEquals("#target", svg.getAttribute("xlink:href"))
+                assertNull(svg.getAttributeNS(xlinkNamespace, "href"))
+            }
+        }
+    }
+
+    @Test
+    fun namespacedServerRenderedDomIsReused() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = composeHtmlToString { NamespacedContent() }
+        val serverSvg = root.firstChild
+        val serverGradient = serverSvg?.firstChild
+
+        val composition = hydrateComposable(root) {
+            NamespacedContent()
+        }
+
+        try {
+            assertSame(serverSvg, root.firstChild)
+            assertSame(serverGradient, root.firstChild?.firstChild)
+            assertEquals("linearGradient", (serverGradient as Element).localName)
+            assertEquals(svgNamespace, serverGradient.namespaceURI)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun svgIntegrationPointChildrenRoundTripAndHydrateInTheirParserNamespaces() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = composeHtmlToString { SvgIntegrationPointContent() }
+        val serverSvg = root.firstChild as Element
+        val serverForeignObject = serverSvg.childNodes.item(0) as Element
+        val serverHtmlDiv = serverForeignObject.firstChild as Element
+        val serverNestedSvg = serverForeignObject.childNodes.item(1) as Element
+        val serverNestedCircle = serverNestedSvg.firstChild as Element
+        val serverTitle = serverSvg.childNodes.item(1) as Element
+        val serverTitleDiv = serverTitle.firstChild as Element
+        val serverDesc = serverSvg.childNodes.item(2) as Element
+        val serverDescDiv = serverDesc.firstChild as Element
+
+        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            SvgIntegrationPointContent()
+        }
+
+        try {
+            assertSame(serverSvg, root.firstChild)
+            assertSame(serverHtmlDiv, serverForeignObject.firstChild)
+            assertSame(serverNestedSvg, serverForeignObject.childNodes.item(1))
+            assertSame(serverNestedCircle, serverNestedSvg.firstChild)
+            assertSame(serverTitleDiv, serverTitle.firstChild)
+            assertSame(serverDescDiv, serverDesc.firstChild)
+            assertEquals("http://www.w3.org/1999/xhtml", serverHtmlDiv.namespaceURI)
+            assertEquals("http://www.w3.org/1999/xhtml", serverTitleDiv.namespaceURI)
+            assertEquals("http://www.w3.org/1999/xhtml", serverDescDiv.namespaceURI)
+            assertEquals(svgNamespace, serverNestedSvg.namespaceURI)
+            assertEquals(svgNamespace, serverNestedCircle.namespaceURI)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun svgInsideMathMlIntegrationPointsRoundTripsAndHydrates() {
+        val mathMlNamespace = "http://www.w3.org/1998/Math/MathML"
+        listOf("mi", "mo", "mn", "ms", "mtext", "annotation-xml").forEach { parent ->
+            val content: @Composable () -> Unit = {
+                TagElementNS<Element>("math", mathMlNamespace, null) {
+                    TagElementNS<Element>(parent, mathMlNamespace, null) {
+                        TagElementNS<Element>("svg", svgNamespace, null) {
+                            TagElementNS<Element>("circle", svgNamespace, null, null)
+                        }
+                    }
+                }
+            }
+            val root = document.createElement("div") as HTMLElement
+            root.innerHTML = composeHtmlToString(content = content)
+            val serverSvg = root.querySelector("svg") as Element
+            val serverCircle = serverSvg.firstChild as Element
+            assertEquals(svgNamespace, serverSvg.namespaceURI, parent)
+            assertEquals(svgNamespace, serverCircle.namespaceURI, parent)
+
+            val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                content()
+            }
+            try {
+                assertSame(serverSvg, root.querySelector("svg"), parent)
+                assertSame(serverCircle, serverSvg.firstChild, parent)
+            } finally {
+                composition.dispose()
+            }
+        }
+    }
+
+    @Test
+    fun hydrationRejectsAnElementWithTheWrongNamespace() {
+        val root = document.createElement("div") as HTMLElement
+        val mathMlNamespace = "http://www.w3.org/1998/Math/MathML"
+        root.appendChild(document.createElementNS(mathMlNamespace, "circle"))
+
+        val failure = assertFailsWith<HydrationMismatchException> {
+            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                TagElementNS<Element>("circle", svgNamespace, null, null)
+            }
+        }
+
+        assertContains(failure.message.orEmpty(), svgNamespace)
+        assertContains(failure.message.orEmpty(), mathMlNamespace)
+    }
+
+    @Test
+    fun hydrationComparesNamespacedLocalNamesCaseSensitively() {
+        val root = document.createElement("div") as HTMLElement
+        root.appendChild(document.createElementNS(svgNamespace, "lineargradient"))
+
+        val failure = assertFailsWith<HydrationMismatchException> {
+            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                TagElementNS<Element>("linearGradient", svgNamespace, null, null)
+            }
+        }
+
+        assertContains(failure.message.orEmpty(), "expected <linearGradient>")
+        assertContains(failure.message.orEmpty(), "found <lineargradient>")
+        assertFalse(failure.message.orEmpty().contains("namespace"))
+    }
+
+    @Test
+    fun hydrationDoesNotApplyHtmlBooleanRulesToSvgAttributes() {
+        val root = document.createElement("div") as HTMLElement
+        val serverElement = document.createElementNS(svgNamespace, "sparkline")
+        serverElement.setAttribute("open", "server")
+        root.appendChild(serverElement)
+
+        val failure = assertFailsWith<HydrationMismatchException> {
+            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                TagElementNS<Element>(
+                    tagName = "sparkline",
+                    namespace = svgNamespace,
+                    applyAttrs = { attr("open", "client") },
+                    content = null,
+                )
+            }
+        }
+
+        assertContains(failure.message.orEmpty(), "attribute \"open\"")
+        assertContains(failure.message.orEmpty(), "expected \"client\", found \"server\"")
+        assertSame(serverElement, root.firstChild)
+    }
+
+    @Composable
+    private fun NamespacedContent() {
+        TagElementNS<Element>("svg", svgNamespace, null) {
+            TagElementNS<Element>("linearGradient", svgNamespace, null, null)
+        }
+    }
+
+    @Composable
+    private fun SvgIntegrationPointContent() {
+        TagElementNS<Element>("svg", svgNamespace, null) {
+            TagElementNS<Element>("foreignObject", svgNamespace, null) {
+                Div { Text("HTML") }
+                TagElementNS<Element>("svg", svgNamespace, null) {
+                    TagElementNS<Element>("circle", svgNamespace, null, null)
+                }
+            }
+            TagElementNS<Element>("title", svgNamespace, null) {
+                Div { Text("Title") }
+            }
+            TagElementNS<Element>("desc", svgNamespace, null) {
+                Div { Text("Description") }
+            }
+        }
+    }
+
     @Test
     fun failedInitializationStopsItsRecomposer() = MainScope().promise {
         for (mode in listOf("hydration", "fallback", "render")) {
@@ -450,6 +685,7 @@ class HydrationTest {
 
         assertContains(failure.message.orEmpty(), "expected <div>")
         assertContains(failure.message.orEmpty(), "found <span>")
+        assertFalse(failure.message.orEmpty().contains("namespace"))
         assertSame(serverNode, root.firstChild)
         assertEquals(serverHtml, root.innerHTML)
     }
