@@ -33,7 +33,6 @@ class GeneratedIdentityOnlyLedgerTest {
                 "org.w3c.dom.mediacapture.MediaStreamConstraints",
                 "org.w3c.dom.mediasource.SourceBuffer",
                 "org.w3c.dom.pointerevents.PointerEvent",
-                "org.w3c.dom.svg.SVGSVGElement",
                 "org.w3c.fetch.Request",
                 "org.w3c.fetch.RequestCredentials",
                 "org.w3c.fetch.RequestDestination",

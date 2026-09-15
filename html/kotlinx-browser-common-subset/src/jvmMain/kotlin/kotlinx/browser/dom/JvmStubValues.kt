@@ -147,3 +147,5 @@ internal object EmptyScreen : Screen()
 internal object EmptyMediaQueryList : MediaQueryList()
 
 internal object EmptyStorage : Storage()
+
+internal object EmptyDOMPointReadOnly : DOMPointReadOnly()
