@@ -1,19 +1,30 @@
 package org.jetbrains.compose.resources
 
 import org.khronos.webgl.ArrayBuffer
+import org.khronos.webgl.Int8Array
+import org.khronos.webgl.toByteArray
 import kotlin.wasm.unsafe.Pointer
 import kotlin.wasm.unsafe.UnsafeWasmMemoryApi
 import kotlin.wasm.unsafe.withScopedMemoryAllocator
 
-@OptIn(UnsafeWasmMemoryApi::class, ExperimentalWasmJsInterop::class)
+@OptIn(UnsafeWasmMemoryApi::class)
 internal fun fastArrayBufferToByteArray(arrayBuffer: ArrayBuffer): ByteArray {
-    val size = arrayBuffer.byteLength
-    return withScopedMemoryAllocator { allocator ->
-        val bufferPtr = allocator.allocate(size)
-        copyArrayBufferToWasmMemory(arrayBuffer, bufferPtr.address.toInt())
-        readFromLinearMemory(bufferPtr, 0, size)
+    if (isWasmExportsAvailable()) {
+        val size = arrayBuffer.byteLength
+        return withScopedMemoryAllocator { allocator ->
+            val bufferPtr = allocator.allocate(size)
+            copyArrayBufferToWasmMemory(arrayBuffer, bufferPtr.address.toInt())
+            readFromLinearMemory(bufferPtr, 0, size)
+        }
+    } else {
+        // slow fallback. use WebAssembly.Memory when CMP is migrated to Kotlin 2.4.20
+        // see https://youtrack.jetbrains.com/issue/CMP-10801
+        return Int8Array(arrayBuffer).toByteArray()
     }
 }
+
+@OptIn(ExperimentalWasmJsInterop::class)
+private fun isWasmExportsAvailable(): Boolean = js("typeof wasmExports !== 'undefined'")
 
 //language=js
 @OptIn(ExperimentalWasmJsInterop::class)
