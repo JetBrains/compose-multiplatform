@@ -35,7 +35,7 @@ private class JvmWeakMap<K : JsAny, V : Any> : WeakMap<K, V> {
 internal actual fun <K : JsAny, V : Any> createWeakMap(): WeakMap<K, V> =
     JvmWeakMap()
 
-internal actual fun scheduleTask(block: () -> Unit) {
+internal actual fun scheduleMicrotask(block: () -> Unit) {
     block()
 }
 

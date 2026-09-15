@@ -1,5 +1,6 @@
 package org.jetbrains.compose.web
 
+import kotlinx.browser.window
 import kotlinx.coroutines.await
 import kotlin.js.JSON
 import kotlin.js.Promise
@@ -28,3 +29,10 @@ internal actual fun decodeHydrationTestState(json: String): HydrationTestState {
     val state = JSON.parse<JsHydrationTestState>(json)
     return HydrationTestState(state.label, state.count)
 }
+
+internal actual fun setWindowIntProperty(name: String, value: Int?) {
+    window.asDynamic()[name] = value
+}
+
+internal actual fun getWindowIntProperty(name: String): Int =
+    window.asDynamic()[name]

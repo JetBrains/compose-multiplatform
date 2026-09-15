@@ -85,7 +85,7 @@ import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleSheetBuilderImpl
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
-import org.jetbrains.compose.web.internal.scheduleTask
+import org.jetbrains.compose.web.internal.scheduleMicrotask
 import kotlin.jvm.JvmInline
 
 typealias AttrBuilderContext<T> = AttrsScope<T>.() -> Unit
@@ -668,7 +668,7 @@ fun <K> Input(
             inputAttrsBuilder.type(type)
             inputAttrsBuilder.onInput {
                 // Let every listener observe the browser value before Compose restores it.
-                scheduleTask {
+                scheduleMicrotask {
                     keyForRestoringControlledState.value = keyForRestoringControlledState.value + 1
                 }
             }
@@ -732,7 +732,7 @@ fun TextArea(
             val textAreaAttrsBuilder = TextAreaAttrsScope(this)
             textAreaAttrsBuilder.onInput {
                 // Let every listener observe the browser value before Compose restores it.
-                scheduleTask {
+                scheduleMicrotask {
                     keyForRestoringControlledState.value = keyForRestoringControlledState.value + 1
                 }
             }

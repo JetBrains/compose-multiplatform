@@ -12,9 +12,10 @@ import kotlinx.browser.dom.events.KeyboardEvent
 import kotlinx.browser.dom.events.MouseEvent
 
 /**
- * Performs the unchecked cast used by the browser implementation while keeping
- * the call available to common code. JVM uses a regular Kotlin cast because its
- * browser declarations are stubs rather than JavaScript values.
+ * Performs the cast used by each platform while keeping the call available to
+ * common code. Kotlin/JS delegates to its unchecked JavaScript cast. Wasm and
+ * JVM use a regular Kotlin cast because this contract also accepts Kotlin values;
+ * the Wasm JavaScript cast is limited to JavaScript values.
  */
 @PublishedApi
 internal expect fun <T> Any?.unsafeCast(): T
@@ -32,8 +33,12 @@ internal interface WeakMap<K : JsAny, V : Any> {
 
 internal expect fun <K : JsAny, V : Any> createWeakMap(): WeakMap<K, V>
 
-/** Schedules [block] in a new browser event-loop task. */
-internal expect fun scheduleTask(block: () -> Unit)
+/**
+ * Schedules [block] on the browser microtask queue, after the current event
+ * dispatch and before the browser can paint. JVM runs it synchronously because
+ * its browser declarations are non-functional stubs.
+ */
+internal expect fun scheduleMicrotask(block: () -> Unit)
 
 /**
  * Reads browser-only mouse movement fields while preserving the existing

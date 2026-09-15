@@ -8,12 +8,14 @@
 package org.jetbrains.compose.web.internal
 
 import kotlinx.browser.JsAny
+import kotlinx.browser.JsNumber
 import kotlinx.browser.dom.DataTransfer
 import kotlinx.browser.dom.events.Event
 import kotlinx.browser.dom.events.KeyboardEvent
 import kotlinx.browser.dom.events.MouseEvent
-import kotlinx.browser.window
+import kotlinx.browser.toDouble
 import kotlin.js.JsReference
+import kotlin.js.Promise
 import kotlin.js.get
 import kotlin.js.js
 import kotlin.js.toJsReference
@@ -52,19 +54,16 @@ private class WasmWeakMap<K : JsAny, V : Any> : WeakMap<K, V> {
 internal actual fun <K : JsAny, V : Any> createWeakMap(): WeakMap<K, V> =
     WasmWeakMap()
 
-internal actual fun scheduleTask(block: () -> Unit) {
-    window.setTimeout(
-        handler = {
-            block()
-            null
-        },
-        timeout = 0,
-    )
+internal actual fun scheduleMicrotask(block: () -> Unit) {
+    Promise.resolve<JsAny?>(null).then {
+        block()
+        null
+    }
 }
 
 private external interface MouseEventFields : JsAny {
-    val movementX: Int?
-    val movementY: Int?
+    val movementX: JsNumber?
+    val movementY: JsNumber?
 }
 
 private external interface KeyboardEventFields : JsAny {
@@ -93,10 +92,17 @@ private external interface AnimationEventFields : JsAny {
 }
 
 internal actual fun MouseEvent.movementXOrZero(): Int =
-    jsUnsafeCast<MouseEventFields>().movementX ?: 0
+    jsUnsafeCast<MouseEventFields>().movementX.toLegacyIntOrZero()
 
 internal actual fun MouseEvent.movementYOrZero(): Int =
-    jsUnsafeCast<MouseEventFields>().movementY ?: 0
+    jsUnsafeCast<MouseEventFields>().movementY.toLegacyIntOrZero()
+
+private fun JsNumber?.toLegacyIntOrZero(): Int {
+    val value = this?.toDouble() ?: return 0
+    if (value < Int.MIN_VALUE || value > Int.MAX_VALUE) return 0
+    val intValue = value.toInt()
+    return if (intValue.toDouble() == value) intValue else 0
+}
 
 internal actual fun KeyboardEvent.localeCompat(): String =
     jsUnsafeCast<KeyboardEventFields>().locale

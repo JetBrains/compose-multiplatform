@@ -2,6 +2,11 @@ config.plugins = config.plugins || [];
 config.plugins = config.plugins.filter(it => it !== "kotlin-test-js-runner/karma-kotlin-reporter.js");
 config.plugins.push("../../../../../test-utils/conf/karma-kotlin-runner-decorator/karma-kotlin-reporter-decorated.js");
 
+require(require("path").resolve(
+    config.basePath,
+    "../../../../test-utils/conf/serve-html-test-resources.js"
+))(config);
+
 config.client.mocha = config.client.mocha || {};
 config.client.mocha.timeout = 10000;
 
@@ -18,4 +23,4 @@ config.customLaunchers = {
     }
 }
 
-config.browsers = ["ChromeForComposeTests"]
+config.browsers = ["ChromeForComposeTests"];

@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlinx.browser.dom.HTMLFormElement
 import kotlinx.browser.dom.HTMLInputElement
 import kotlinx.browser.dom.HTMLTextAreaElement
@@ -21,11 +22,21 @@ import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.dom.TextArea
 import org.w3c.dom.HTMLElement
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertSame
 import kotlin.time.Duration.Companion.milliseconds
+
+private suspend fun awaitAnimationFrame() {
+    suspendCoroutine<Unit> { continuation ->
+        window.requestAnimationFrame {
+            continuation.resume(Unit)
+        }
+    }
+}
 
 class HydrationEventListenerTest {
     @Test
@@ -115,7 +126,11 @@ class HydrationEventListenerTest {
 
             assertEquals("typed input", observedInputValue)
             assertEquals("typed textarea", observedTextAreaValue)
-            delay(50.milliseconds)
+            assertEquals("typed input", input.value)
+            assertEquals("typed textarea", textArea.value)
+            // The first callback can precede Compose's callback in the same frame.
+            awaitAnimationFrame()
+            awaitAnimationFrame()
             assertEquals("controlled input", input.value)
             assertEquals("controlled textarea", textArea.value)
         } finally {

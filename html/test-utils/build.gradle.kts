@@ -5,8 +5,7 @@ import org.jetbrains.compose.gradle.standardWasmConf
 
 val kotlinxBrowserCommonSubsetVersion: String =
     providers.gradleProperty("compose.html.eap.kotlinx-browser-common-subset.version").get()
-val composeHtmlEapVersion: String =
-    providers.gradleProperty("compose.html.eap.version").get()
+val composeHtmlEapEnabled = project.findProject(":internal-html-core-runtime-eap") != null
 
 plugins {
     kotlin("multiplatform")
@@ -21,7 +20,7 @@ repositories {
 
 kotlin {
     js(IR) {
-        browser() {
+        browser {
             testTask {
                 useKarma {
                     standardConf()
@@ -29,11 +28,13 @@ kotlin {
             }
         }
     }
-    wasmJs {
-        browser() {
-            testTask {
-                useKarma {
-                    standardWasmConf()
+    if (composeHtmlEapEnabled) {
+        wasmJs {
+            browser {
+                testTask {
+                    useKarma {
+                        standardWasmConf()
+                    }
                 }
             }
         }
@@ -59,17 +60,16 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
+                // Stable Compose HTML tests must keep using the stable runtime.
                 implementation(project(":internal-html-core-runtime"))
             }
         }
-        val wasmJsMain by getting {
-            dependencies {
-                val localEapRuntime = project.findProject(":internal-html-core-runtime-eap")
-                implementation(
-                    localEapRuntime
-                        ?: "org.jetbrains.compose.html.eap:" +
-                            "internal-html-core-runtime-eap:$composeHtmlEapVersion"
-                )
+        if (composeHtmlEapEnabled) {
+            val wasmJsMain by getting {
+                dependencies {
+                    // The Wasm target exists only for EAP tests and uses their browser runtime.
+                    implementation(project(":internal-html-core-runtime-eap"))
+                }
             }
         }
         val webTest by getting {

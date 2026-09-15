@@ -1,3 +1,9 @@
+// Wasm uses Kotlin's standard test reporter and needs more time to start and disconnect.
+require(require("path").resolve(
+    config.basePath,
+    "../../../../test-utils/conf/serve-html-test-resources.js"
+))(config);
+
 config.client.mocha = config.client.mocha || {};
 config.client.mocha.timeout = 10000;
 

@@ -97,10 +97,10 @@ module(":compose-compiler-integration", "compose-compiler-integration")
 module(":compose-compiler-integration-lib", "compose-compiler-integration/lib")
 module(":internal-html-core-runtime", "internal-html-core-runtime")
 module(":html-test-utils", "test-utils")
+includeBuild("kotlinx-browser-common-subset")
 
 if (composeHtmlEapEnabled) {
     println("Compose HTML EAP modules enabled")
-    includeBuild("kotlinx-browser-common-subset")
     module(":html-core-eap", "eap/core")
     module(":html-svg-eap", "eap/svg")
     module(":internal-html-core-runtime-eap", "eap/internal-html-core-runtime")

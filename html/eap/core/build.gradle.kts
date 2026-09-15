@@ -19,7 +19,7 @@ plugins {
 kotlin {
     jvm()
     js(IR) {
-        browser() {
+        browser {
             testTask {
                 useKarma {
                     standardConf()
@@ -29,7 +29,7 @@ kotlin {
         binaries.executable()
     }
     wasmJs {
-        browser() {
+        browser {
             testTask {
                 useKarma {
                     standardWasmConf()
@@ -45,7 +45,7 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(libs.kotlinx.coroutines.core)
-                implementation( "org.jetbrains.compose.html:kotlinx-browser-common-subset:$kotlinxBrowserCommonSubsetVersion")
+                implementation("org.jetbrains.compose.html:kotlinx-browser-common-subset:$kotlinxBrowserCommonSubsetVersion")
                 api(project(":internal-html-core-runtime-eap"))
             }
         }
@@ -57,6 +57,7 @@ kotlin {
         }
 
         val nonJsMain by creating {
+            // JVM and Wasm share typed implementations; Kotlin/JS uses dynamic interop.
             dependsOn(commonMain)
         }
 
@@ -93,7 +94,6 @@ kotlin {
             dependencies {
                 implementation(project(":html-test-utils"))
                 implementation(kotlin("test"))
-                implementation(libs.kotlinx.coroutines.core)
             }
         }
 
@@ -101,10 +101,6 @@ kotlin {
             languageSettings {
                 optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
                 optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
-            }
-            dependencies {
-                implementation(project(":html-test-utils"))
-                implementation(kotlin("test-js"))
             }
         }
     }

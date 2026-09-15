@@ -174,6 +174,8 @@ open class AttrsScopeBuilder<TElement : Element>(
 
     @ComposeWebInternalApi
     override fun registerEventListener(listener: SyntheticEventListener<*>) {
+        // AttrsScope already inherits EventsListenerScope. Forward its single operation
+        // explicitly because the inherited-interface delegation shape is not portable to Wasm.
         eventsListenerScopeBuilder.registerEventListener(listener)
     }
 

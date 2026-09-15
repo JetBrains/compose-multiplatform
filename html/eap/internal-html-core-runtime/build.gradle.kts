@@ -17,7 +17,7 @@ kotlin {
     jvm()
 
     js(IR) {
-        browser() {
+        browser {
             testTask {
                 useKarma {
                     standardConf()
@@ -26,7 +26,7 @@ kotlin {
         }
     }
     wasmJs {
-        browser() {
+        browser {
             testTask {
                 useKarma {
                     standardWasmConf()
@@ -42,13 +42,13 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(libs.kotlinx.coroutines.core)
-                implementation( "org.jetbrains.compose.html:kotlinx-browser-common-subset:$kotlinxBrowserCommonSubsetVersion")
+                implementation("org.jetbrains.compose.html:kotlinx-browser-common-subset:$kotlinxBrowserCommonSubsetVersion")
             }
         }
 
-        val jsTest by getting {
+        val webTest by getting {
             dependencies {
-                implementation(kotlin("test-js"))
+                implementation(kotlin("test"))
             }
         }
     }
