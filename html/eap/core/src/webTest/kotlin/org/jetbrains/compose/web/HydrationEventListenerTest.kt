@@ -4,10 +4,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.browser.document
+import kotlinx.browser.dom.HTMLFormElement
+import kotlinx.browser.dom.events.Event
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.promise
+import org.jetbrains.compose.web.attributes.onReset
+import org.jetbrains.compose.web.attributes.onSubmit
 import org.jetbrains.compose.web.dom.Button
+import org.jetbrains.compose.web.dom.Form
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 import org.w3c.dom.HTMLElement
@@ -15,7 +20,6 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertSame
-import kotlin.time.Duration.Companion.milliseconds
 
 class HydrationEventListenerTest {
     @Test
@@ -36,6 +40,39 @@ class HydrationEventListenerTest {
 
             assertEquals(1, clickCount)
             assertSame(button, root.firstChild)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun formEventAdaptersCreateSubmitEvents() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = composeHtmlToString {
+            Form(action = "/")
+        }
+        val form = root.firstChild as HTMLFormElement
+        val submitEvent = Event("submit")
+        val resetEvent = Event("reset")
+        var observedSubmitEvent: Event? = null
+        var observedResetEvent: Event? = null
+
+        val composition = hydrateComposable(root) {
+            Form(
+                action = "/",
+                attrs = {
+                    onSubmit { observedSubmitEvent = it.nativeEvent }
+                    onReset { observedResetEvent = it.nativeEvent }
+                },
+            )
+        }
+
+        try {
+            form.dispatchEvent(submitEvent)
+            form.dispatchEvent(resetEvent)
+
+            assertSame(submitEvent, observedSubmitEvent)
+            assertSame(resetEvent, observedResetEvent)
         } finally {
             composition.dispose()
         }

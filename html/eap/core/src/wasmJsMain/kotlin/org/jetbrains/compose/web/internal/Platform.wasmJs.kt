@@ -63,6 +63,8 @@ private external interface KeyboardEventFields : JsAny {
 private external interface InputEventFields : JsAny {
     val inputType: String?
     val dataTransfer: DataTransfer?
+    val data: String?
+    val isComposing: Boolean?
 }
 
 private external interface FormControlFields : JsAny {
@@ -93,6 +95,12 @@ internal actual fun Event.inputTypeCompat(): String? =
 
 internal actual fun Event.inputDataTransferCompat(): DataTransfer? =
     jsUnsafeCast<InputEventFields>().dataTransfer
+
+internal actual fun Event.inputDataCompat(): String? =
+    jsUnsafeCast<InputEventFields>().data
+
+internal actual fun Event.inputIsComposingCompat(): Boolean =
+    jsUnsafeCast<InputEventFields>().isComposing ?: false
 
 internal actual fun Event.targetValueCompat(): String? =
     target?.jsUnsafeCast<FormControlFields>()?.value

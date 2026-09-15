@@ -56,6 +56,12 @@ internal actual fun Event.inputTypeCompat(): String? =
 internal actual fun Event.inputDataTransferCompat(): DataTransfer? =
     asDynamic().dataTransfer?.jsUnsafeCast<DataTransfer>()
 
+internal actual fun Event.inputDataCompat(): String? =
+    asDynamic().data?.jsUnsafeCast<String>()
+
+internal actual fun Event.inputIsComposingCompat(): Boolean =
+    asDynamic().isComposing?.jsUnsafeCast<Boolean>() ?: false
+
 internal actual fun Event.targetValueCompat(): String? =
     target.asDynamic()?.value?.jsUnsafeCast<String>()
 

@@ -25,6 +25,7 @@ import org.jetbrains.compose.web.events.SyntheticFocusEvent
 import org.jetbrains.compose.web.events.SyntheticInputEvent
 import org.jetbrains.compose.web.events.SyntheticKeyboardEvent
 import org.jetbrains.compose.web.events.SyntheticSelectEvent
+import org.jetbrains.compose.web.events.SyntheticSubmitEvent
 import org.jetbrains.compose.web.events.SyntheticTouchEvent
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.jetbrains.compose.web.internal.runtime.NamedEventListener
@@ -115,6 +116,15 @@ internal class ClipboardEventListener(
 ) : SyntheticEventListener<SyntheticClipboardEvent>(event, listener) {
     override fun handleEvent(event: Event) {
         listener(SyntheticClipboardEvent(event.unsafeCast<ClipboardEvent>()))
+    }
+}
+
+internal class SubmitEventListener(
+    event: String,
+    listener: (SyntheticSubmitEvent) -> Unit
+) : SyntheticEventListener<SyntheticSubmitEvent>(event, listener) {
+    override fun handleEvent(event: Event) {
+        listener(SyntheticSubmitEvent(event))
     }
 }
 

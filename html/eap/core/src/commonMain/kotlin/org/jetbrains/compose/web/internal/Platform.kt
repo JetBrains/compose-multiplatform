@@ -55,6 +55,10 @@ internal expect fun Event.inputTypeCompat(): String?
 
 internal expect fun Event.inputDataTransferCompat(): DataTransfer?
 
+internal expect fun Event.inputDataCompat(): String?
+
+internal expect fun Event.inputIsComposingCompat(): Boolean
+
 internal expect fun Event.targetValueCompat(): String?
 
 internal expect fun Event.targetCheckedCompat(): Boolean

@@ -45,6 +45,10 @@ internal actual fun Event.inputTypeCompat(): String? = null
 
 internal actual fun Event.inputDataTransferCompat(): DataTransfer? = null
 
+internal actual fun Event.inputDataCompat(): String? = null
+
+internal actual fun Event.inputIsComposingCompat(): Boolean = false
+
 internal actual fun Event.targetValueCompat(): String? = null
 
 internal actual fun Event.targetCheckedCompat(): Boolean = false
