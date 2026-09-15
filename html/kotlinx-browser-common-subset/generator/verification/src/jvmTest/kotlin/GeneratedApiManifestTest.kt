@@ -77,7 +77,7 @@ class GeneratedApiManifestTest {
         assertEquals(emptySet(), reasons - knownReasons, "unknown exclusion reasons")
     }
 
-    /** SVG inputs retain the complete hierarchy containing Compose Web's element surface. */
+    /** SVG inputs retain the complete hierarchy containing Compose HTML's element surface. */
     @Test
     fun theSvgElementSurfaceIsEmittedInFull() {
         val emittedElements = setOf(
