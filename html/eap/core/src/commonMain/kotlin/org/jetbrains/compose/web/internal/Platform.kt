@@ -32,6 +32,9 @@ internal interface WeakMap<K : JsAny, V : Any> {
 
 internal expect fun <K : JsAny, V : Any> createWeakMap(): WeakMap<K, V>
 
+/** Schedules [block] in a new browser event-loop task. */
+internal expect fun scheduleTask(block: () -> Unit)
+
 /**
  * Reads browser-only mouse movement fields while preserving the existing
  * zero fallback for browsers where the fields are absent.

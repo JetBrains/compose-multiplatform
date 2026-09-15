@@ -10,6 +10,7 @@ import kotlinx.browser.dom.DataTransfer
 import kotlinx.browser.dom.events.Event
 import kotlinx.browser.dom.events.KeyboardEvent
 import kotlinx.browser.dom.events.MouseEvent
+import kotlinx.browser.window
 import kotlin.js.unsafeCast as jsUnsafeCast
 
 @PublishedApi
@@ -40,6 +41,16 @@ private class JsWeakMapAdapter<K : JsAny, V : Any> : WeakMap<K, V> {
 
 internal actual fun <K : JsAny, V : Any> createWeakMap(): WeakMap<K, V> =
     JsWeakMapAdapter()
+
+internal actual fun scheduleTask(block: () -> Unit) {
+    window.setTimeout(
+        handler = {
+            block()
+            null
+        },
+        timeout = 0,
+    )
+}
 
 internal actual fun MouseEvent.movementXOrZero(): Int =
     (asDynamic().movementX as? Int) ?: 0

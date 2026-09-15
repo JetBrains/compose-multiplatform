@@ -12,6 +12,7 @@ import kotlinx.browser.dom.DataTransfer
 import kotlinx.browser.dom.events.Event
 import kotlinx.browser.dom.events.KeyboardEvent
 import kotlinx.browser.dom.events.MouseEvent
+import kotlinx.browser.window
 import kotlin.js.JsReference
 import kotlin.js.get
 import kotlin.js.js
@@ -50,6 +51,16 @@ private class WasmWeakMap<K : JsAny, V : Any> : WeakMap<K, V> {
 
 internal actual fun <K : JsAny, V : Any> createWeakMap(): WeakMap<K, V> =
     WasmWeakMap()
+
+internal actual fun scheduleTask(block: () -> Unit) {
+    window.setTimeout(
+        handler = {
+            block()
+            null
+        },
+        timeout = 0,
+    )
+}
 
 private external interface MouseEventFields : JsAny {
     val movementX: Int?

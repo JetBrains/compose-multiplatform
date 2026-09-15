@@ -5,21 +5,27 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.browser.document
 import kotlinx.browser.dom.HTMLFormElement
+import kotlinx.browser.dom.HTMLInputElement
+import kotlinx.browser.dom.HTMLTextAreaElement
 import kotlinx.browser.dom.events.Event
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.promise
+import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.onReset
 import org.jetbrains.compose.web.attributes.onSubmit
 import org.jetbrains.compose.web.dom.Button
 import org.jetbrains.compose.web.dom.Form
+import org.jetbrains.compose.web.dom.Input
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
+import org.jetbrains.compose.web.dom.TextArea
 import org.w3c.dom.HTMLElement
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertSame
+import kotlin.time.Duration.Companion.milliseconds
 
 class HydrationEventListenerTest {
     @Test
@@ -73,6 +79,45 @@ class HydrationEventListenerTest {
 
             assertSame(submitEvent, observedSubmitEvent)
             assertSame(resetEvent, observedResetEvent)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun controlledFormElementsRestoreAfterAllInputListeners() = MainScope().promise {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = composeHtmlToString {
+            Input(InputType.Text) { value("controlled input") }
+            TextArea(value = "controlled textarea")
+        }
+        val input = root.childNodes.item(0) as HTMLInputElement
+        val textArea = root.childNodes.item(1) as HTMLTextAreaElement
+        var observedInputValue = ""
+        var observedTextAreaValue = ""
+
+        val composition = hydrateComposable(root) {
+            Input(InputType.Text) {
+                value("controlled input")
+                onInput { observedInputValue = it.value }
+            }
+            TextArea(
+                value = "controlled textarea",
+                attrs = { onInput { observedTextAreaValue = it.value } },
+            )
+        }
+
+        try {
+            input.value = "typed input"
+            textArea.value = "typed textarea"
+            input.dispatchEvent(Event("input"))
+            textArea.dispatchEvent(Event("input"))
+
+            assertEquals("typed input", observedInputValue)
+            assertEquals("typed textarea", observedTextAreaValue)
+            delay(50.milliseconds)
+            assertEquals("controlled input", input.value)
+            assertEquals("controlled textarea", textArea.value)
         } finally {
             composition.dispose()
         }

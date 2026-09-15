@@ -35,6 +35,10 @@ private class JvmWeakMap<K : JsAny, V : Any> : WeakMap<K, V> {
 internal actual fun <K : JsAny, V : Any> createWeakMap(): WeakMap<K, V> =
     JvmWeakMap()
 
+internal actual fun scheduleTask(block: () -> Unit) {
+    block()
+}
+
 internal actual fun MouseEvent.movementXOrZero(): Int = 0
 
 internal actual fun MouseEvent.movementYOrZero(): Int = 0
