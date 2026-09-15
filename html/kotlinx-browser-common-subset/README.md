@@ -84,7 +84,7 @@ The selection policy names these generated browser declaration files:
 - `org.w3c.dom.clipboard.kt` contains clipboard events, dictionaries, and the
   asynchronous clipboard API.
 - `org.w3c.dom.svg.kt` and `org.w3c.css.masking.kt` contain the SVG element hierarchy used by
-  Compose Web.
+  Compose HTML EAP.
 
 KSP reads their `expect` declarations from `webMain`. The corresponding JS and Wasm/JS files are
 target implementations. Generated web typealiases must compile
