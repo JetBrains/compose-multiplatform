@@ -6,7 +6,7 @@
 set -euo pipefail
 
 if [ "$#" -gt 2 ]; then
-    echo "Optionally specify Compose and Kotlin versions. For example: ./validateExamplesWeb.sh 1.13.0-alpha03 2.3.20"
+    echo "Optionally specify Compose and Kotlin versions. For example: ./validateExamplesWithJs.sh 1.13.0-alpha03 2.3.20"
     exit 1
 fi
 

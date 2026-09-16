@@ -27,7 +27,7 @@ jobs:
 
       - name: Validate desktop examples
         working-directory: examples
-        run: ./validateExamplesDesktop.sh
+        run: ./validateExamples.sh
 
   web:
     runs-on: ubuntu-24.04
@@ -40,7 +40,7 @@ jobs:
 
       - name: Validate web examples
         working-directory: examples
-        run: ./validateExamplesWeb.sh
+        run: ./validateExamplesWithJs.sh
 
   android:
     runs-on: ubuntu-24.04
