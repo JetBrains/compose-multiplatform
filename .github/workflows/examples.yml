@@ -51,14 +51,8 @@ jobs:
       - name: Setup Prerequisites
         uses: ./.github/actions/setup-prerequisites
 
-      - name: Install Android API 37.1
-        run: sdkmanager --channel=3 "platforms;android-37.1"
-
-      - name: Enable KVM
-        run: |
-          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-          sudo udevadm control --reload-rules
-          sudo udevadm trigger --name-match=kvm
+      - name: Setup Android
+        uses: ./.github/actions/setup-android
 
       - name: Validate Android examples
         uses: reactivecircus/android-emulator-runner@v2
