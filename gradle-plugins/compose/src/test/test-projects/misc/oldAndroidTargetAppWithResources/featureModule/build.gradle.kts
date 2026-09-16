@@ -20,8 +20,9 @@ kotlin {
 }
 android {
     namespace = "me.sample.feature"
-    compileSdk = 37
-    compileSdkMinor = 1
+    compileSdk {
+        version = release(37) { minorApiLevel = 1 }
+    }
 }
 
 compose.resources {

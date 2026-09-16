@@ -10,8 +10,9 @@ kotlin {
     // like https://youtrack.jetbrains.com/issue/CMP-2345
     android {
         namespace = "org.jetbrains.compose.testapp"
-        compileSdk = 37
-        compileSdkMinor = 1
+        compileSdk {
+            version = release(37) { minorApiLevel = 1 }
+        }
         minSdk = 23
     }
 

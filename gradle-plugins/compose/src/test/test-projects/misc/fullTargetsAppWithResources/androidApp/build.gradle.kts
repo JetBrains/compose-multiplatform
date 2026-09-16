@@ -4,8 +4,9 @@ plugins {
 
 android {
     namespace = "org.company.app.androidApp"
-    compileSdk = 37
-    compileSdkMinor = 1
+    compileSdk {
+        version = release(37) { minorApiLevel = 1 }
+    }
 
     defaultConfig {
         minSdk = 24

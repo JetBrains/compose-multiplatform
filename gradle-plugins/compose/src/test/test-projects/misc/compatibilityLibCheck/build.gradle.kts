@@ -8,8 +8,9 @@ plugins {
 kotlin {
     android {
         namespace = "org.company.app"
-        compileSdk = 37
-        compileSdkMinor = 1
+        compileSdk {
+            version = release(37) { minorApiLevel = 1 }
+        }
         minSdk = 23
         androidResources.enable = true
     }

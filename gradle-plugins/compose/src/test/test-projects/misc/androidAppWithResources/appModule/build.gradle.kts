@@ -6,8 +6,9 @@ plugins {
 
 android {
     namespace = "me.sample.app"
-    compileSdk = 37
-    compileSdkMinor = 1
+    compileSdk {
+        version = release(37) { minorApiLevel = 1 }
+    }
     defaultConfig {
         applicationId = "org.example.project"
         minSdk = 24
