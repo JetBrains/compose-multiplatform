@@ -1,0 +1,24 @@
+name: 'Setup Prerequisites'
+runs:
+  using: "composite"
+  steps:
+    - name: Setup JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'jetbrains'
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v4
+      with:
+        packages: platform-tools
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        cache-read-only: ${{ github.ref != 'refs/heads/master' }}
+        gradle-home-cache-excludes: |
+          caches/jars-9
+          caches/transforms-3

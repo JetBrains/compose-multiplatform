@@ -5,23 +5,35 @@
 
 set -euo pipefail
 
-if [ "$#" -ne 2 ]; then
-echo "Specify Compose and Kotlin version. For example: ./validateExamplesAndroid.sh 1.1.1 1.6.10"
-exit 1
+if [ "$#" -gt 2 ]; then
+    echo "Optionally specify Compose and Kotlin versions. For example: ./validateExamplesAndroid.sh 1.13.0-alpha03 2.3.20"
+    exit 1
 fi
-COMPOSE_VERSION=$1
-KOTLIN_VERSION=$2
+
+version_args=()
+if [ "$#" -eq 1 ]; then
+    version_args=("-Pcompose.version=$1")
+fi
+
+if [ "$#" -eq 2 ]; then
+    version_args=("-Pcompose.version=$1" "-Pkotlin.version=$2")
+fi
 
 
 runGradle() {
-    pushd $1
-    ./gradlew $2 -Pcompose.version=$COMPOSE_VERSION -Pkotlin.version=$KOTLIN_VERSION --rerun-tasks
+    local example="$1"
+    local task="$2"
+    pushd "$example"
+    if [ "${#version_args[@]}" -gt 0 ]; then
+        ./gradlew "$task" "${version_args[@]}" --rerun-tasks
+    else
+        ./gradlew "$task" --rerun-tasks
+    fi
     popd
 }
 
-# requires an emulator running or an Android device to be connected
-runGradle chat installDebug
-runGradle codeviewer installDebug
-runGradle imageviewer installDebug
-runGradle issues installDebug
-runGradle graphics-2d installDebug
+runGradle chat assembleDebug
+runGradle codeviewer assembleDebug
+runGradle imageviewer assembleDebug
+runGradle issues assembleDebug
+runGradle graphics-2d assembleDebug

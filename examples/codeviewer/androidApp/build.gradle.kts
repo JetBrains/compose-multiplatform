@@ -17,7 +17,9 @@ dependencies {
 }
 
 android {
-    compileSdk = 37
+    compileSdk {
+        version = release(37) { minorApiLevel = 1 }
+    }
     namespace = "org.jetbrains.codeviewer"
     defaultConfig {
         applicationId = "org.jetbrains.Codeviewer"

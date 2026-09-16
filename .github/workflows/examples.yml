@@ -1,0 +1,72 @@
+name: Validate examples
+
+on:
+  pull_request:
+    paths:
+      - 'examples/**'
+      - '.github/actions/**'
+      - '.github/workflows/examples.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'examples/**'
+      - '.github/actions/**'
+      - '.github/workflows/examples.yml'
+  workflow_dispatch:
+
+jobs:
+  desktop:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Prerequisites
+        uses: ./.github/actions/setup-prerequisites
+
+      - name: Validate desktop examples
+        working-directory: examples
+        run: ./validateExamples.sh
+
+  web:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Prerequisites
+        uses: ./.github/actions/setup-prerequisites
+
+      - name: Validate web examples
+        working-directory: examples
+        run: ./validateExamplesWithJs.sh
+
+  android:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Prerequisites
+        uses: ./.github/actions/setup-prerequisites
+
+      - name: Validate Android examples
+        working-directory: examples
+        run: ./validateExamplesAndroid.sh
+
+  ios:
+    runs-on: macos-26-xlarge
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup Prerequisites
+        uses: ./.github/actions/setup-prerequisites
+
+      - name: Setup Xcode
+        uses: ./.github/actions/setup-xcode
+
+      - name: Validate iOS examples
+        working-directory: examples
+        run: ./validateExamplesIos.sh

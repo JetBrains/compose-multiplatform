@@ -34,7 +34,9 @@ kotlin {
 
     android {
         namespace = "example.imageviewer.shared"
-        compileSdk = 37
+        compileSdk {
+            version = release(37) { minorApiLevel = 1 }
+        }
         minSdk = 26
 
         androidResources {

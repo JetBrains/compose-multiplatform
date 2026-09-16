@@ -5,18 +5,30 @@
 
 set -euo pipefail
 
-if [ "$#" -ne 2 ]; then
-echo "Specify Compose and Kotlin version. For example: ./validateExamplesIos.sh 1.1.1 1.6.10"
-exit 1
+if [ "$#" -gt 2 ]; then
+    echo "Optionally specify Compose and Kotlin versions. For example: ./validateExamplesIos.sh 1.13.0-alpha03 2.3.20"
+    exit 1
 fi
-COMPOSE_VERSION=$1
-KOTLIN_VERSION=$2
+
+version_args=()
+if [ "$#" -eq 1 ]; then
+    version_args=("-Pcompose.version=$1")
+fi
+
+if [ "$#" -eq 2 ]; then
+    version_args=("-Pcompose.version=$1" "-Pkotlin.version=$2")
+fi
 
 
 runGradle() {
-    pushd $1
-    echo "Validating $1"
-    ./gradlew clean linkIosArm64 -Pcompose.version=$COMPOSE_VERSION -Pkotlin.version=$KOTLIN_VERSION --rerun-tasks || (echo "Failed $1" && exit 1)
+    local example="$1"
+    pushd "$example"
+    echo "Validating $example"
+    if [ "${#version_args[@]}" -gt 0 ]; then
+        ./gradlew clean linkIosArm64 "${version_args[@]}" --rerun-tasks || (echo "Failed $example" && exit 1)
+    else
+        ./gradlew clean linkIosArm64 --rerun-tasks || (echo "Failed $example" && exit 1)
+    fi
     popd
 }
 
