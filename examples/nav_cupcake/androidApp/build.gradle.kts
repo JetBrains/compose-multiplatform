@@ -21,7 +21,9 @@ dependencies {
 }
 
 android {
-    compileSdk = 37
+    compileSdk {
+        version = release(37) { minorApiLevel = 1 }
+    }
     namespace = "org.jetbrains.nav_cupcake"
     defaultConfig {
         applicationId = "org.jetbrains.nav_cupcake"

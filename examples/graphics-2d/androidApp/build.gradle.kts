@@ -18,7 +18,9 @@ dependencies {
 }
 
 android {
-    compileSdk = 37
+    compileSdk {
+        version = release(37) { minorApiLevel = 1 }
+    }
     namespace = "org.jetbrains.graphics2d"
     defaultConfig {
         applicationId = "org.jetbrains.Graphics2D"

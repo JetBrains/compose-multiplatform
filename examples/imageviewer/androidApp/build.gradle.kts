@@ -19,7 +19,9 @@ dependencies {
 }
 
 android {
-    compileSdk = 37
+    compileSdk {
+        version = release(37) { minorApiLevel = 1 }
+    }
     namespace = "example.imageviewer"
     defaultConfig {
         applicationId = "org.jetbrains.Imageviewer"

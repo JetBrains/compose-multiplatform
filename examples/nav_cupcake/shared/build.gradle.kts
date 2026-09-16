@@ -26,7 +26,9 @@ kotlin {
 
     android {
         namespace = "org.jetbrains.nav_cupcake.shared"
-        compileSdk = 37
+        compileSdk {
+            version = release(37) { minorApiLevel = 1 }
+        }
         minSdk = 26
 
         androidResources {

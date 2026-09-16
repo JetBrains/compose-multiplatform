@@ -35,7 +35,9 @@ kotlin {
 
     android {
         namespace = "org.jetbrains.Graphics2D"
-        compileSdk = 37
+        compileSdk {
+            version = release(37) { minorApiLevel = 1 }
+        }
         minSdk = 26
 
         androidResources {
