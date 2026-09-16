@@ -1,9 +1,4 @@
 name: 'Setup Prerequisites'
-inputs:
-  android-api:
-    description: 'Optional Android API platform version to install.'
-    required: false
-    default: ''
 runs:
   using: "composite"
   steps:
@@ -19,27 +14,6 @@ runs:
       uses: android-actions/setup-android@v4
       with:
         packages: platform-tools
-
-    - name: Restore Android API platform
-      if: ${{ inputs.android-api != '' }}
-      id: cache-android-platform
-      uses: actions/cache@v4
-      with:
-        path: ${{ env.ANDROID_HOME }}/platforms/android-${{ inputs.android-api }}
-        key: android-platform-${{ runner.os }}-${{ inputs.android-api }}
-
-    - name: Install Android API platform
-      if: ${{ inputs.android-api != '' && steps.cache-android-platform.outputs.cache-hit != 'true' }}
-      shell: bash
-      run: sdkmanager --channel=3 "platforms;android-${{ inputs.android-api }}"
-
-    - name: Enable KVM
-      if: ${{ inputs.android-api != '' && runner.os == 'Linux' }}
-      shell: bash
-      run: |
-        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-        sudo udevadm control --reload-rules
-        sudo udevadm trigger --name-match=kvm
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4

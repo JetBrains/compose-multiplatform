@@ -50,16 +50,10 @@ jobs:
 
       - name: Setup Prerequisites
         uses: ./.github/actions/setup-prerequisites
-        with:
-          android-api: '37.1'
 
       - name: Validate Android examples
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 36
-          target: google_apis
-          arch: x86_64
-          script: cd ${{ github.workspace }}/examples && ./validateExamplesAndroid.sh
+        working-directory: examples
+        run: ./validateExamplesAndroid.sh
 
   ios:
     runs-on: macos-26-xlarge

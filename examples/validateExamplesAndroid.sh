@@ -32,9 +32,8 @@ runGradle() {
     popd
 }
 
-# requires an emulator running or an Android device to be connected
-runGradle chat installDebug
-runGradle codeviewer installDebug
-runGradle imageviewer installDebug
-runGradle issues installDebug
-runGradle graphics-2d installDebug
+runGradle chat assembleDebug
+runGradle codeviewer assembleDebug
+runGradle imageviewer assembleDebug
+runGradle issues assembleDebug
+runGradle graphics-2d assembleDebug
