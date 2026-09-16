@@ -24,7 +24,11 @@ runGradle() {
     local example="$1"
     pushd "$example"
     echo "Validating $example"
-    ./gradlew clean linkIosArm64 "${version_args[@]}" --rerun-tasks || (echo "Failed $example" && exit 1)
+    if [ "${#version_args[@]}" -gt 0 ]; then
+        ./gradlew clean linkIosArm64 "${version_args[@]}" --rerun-tasks || (echo "Failed $example" && exit 1)
+    else
+        ./gradlew clean linkIosArm64 --rerun-tasks || (echo "Failed $example" && exit 1)
+    fi
     popd
 }
 

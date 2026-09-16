@@ -24,7 +24,11 @@ runGradle() {
     local example="$1"
     local task="$2"
     pushd "$example"
-    ./gradlew "$task" "${version_args[@]}" --rerun-tasks
+    if [ "${#version_args[@]}" -gt 0 ]; then
+        ./gradlew "$task" "${version_args[@]}" --rerun-tasks
+    else
+        ./gradlew "$task" --rerun-tasks
+    fi
     popd
 }
 
