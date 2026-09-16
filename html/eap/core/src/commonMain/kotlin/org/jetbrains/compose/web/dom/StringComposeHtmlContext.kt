@@ -50,14 +50,13 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
         rawText: RawTextContent? = null,
     ) {
         val namespace = (elementBuilder as? StringElementBuilder<*>)?.namespace ?: HtmlNamespace
-        val tagName = normalizeElementTagName(elementBuilder.tagName, namespace)
         val elementScope = remember { StringElementScope<TElement>() }
 
         ComposeStringNode(
             factory = {
                 StringHtmlNodeWrapper(
                     StringHtmlElementNode(
-                        tagName = tagName,
+                        tagName = elementBuilder.tagName,
                         namespace = namespace,
                     )
                 )
@@ -172,19 +171,13 @@ private fun unavailableDomElement(): Nothing =
 private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(
     namespace: String,
 ): StringHtmlAttributes {
-    val byName = collect().toMutableMap().apply {
-        val classValue = classes.toClassAttributeValue()
-        if (!containsAttribute(AttrsScope.CLASS, namespace)) {
-            classValue?.let { value -> this[AttrsScope.CLASS] = value }
-        }
-
-        if (!containsAttribute(AttrsScope.STYLE, namespace)) {
-            styleScope.toStyleAttributeValue()?.let { value -> this[AttrsScope.STYLE] = value }
-        }
-    }
-    return StringHtmlAttributes(
-        byName = byName,
-        hydrationProtocolAttributes = hydrationProtocolAttributes.toSet(),
+    val classAttributeValue = classes.toClassAttributeValue()
+    return StringHtmlAttributes.from(
+        attributes = collect(),
+        namespace = namespace,
+        hydrationProtocolAttributes = hydrationProtocolAttributes,
+        classAttributeValue = classAttributeValue,
+        styleAttributeValue = styleScope::toStyleAttributeValue,
     )
 }
 

@@ -284,7 +284,8 @@ private fun String?.normalizedForHydration(
         this != null &&
         elementNamespace == HtmlNamespace &&
         '-' !in elementTagName &&
-        attributeName.isHtmlBooleanAttributeName()
+        (attributeName.isHtmlBooleanAttributeName() ||
+            attributeName.asciiLowercase().isHtmlBooleanAttributeName())
     ) "" else this
 
 private fun String?.describeAttributeValue(): String =
@@ -302,9 +303,13 @@ private data class AttributeFallback<T>(val html: T?, val foreign: T?) {
     fun forNamespace(namespace: String?): T? = if (namespace == HtmlNamespace) html else foreign
 }
 
+// HTML attribute names are ASCII-insensitive; the browser attribute map still contains raw names.
+private fun Map<String, String>.containsHtmlAttribute(name: String): Boolean =
+    keys.any { it.asciiLowercase() == name }
+
 private fun <T> Map<String, String>.attributeFallback(name: String, value: T): AttributeFallback<T> =
     AttributeFallback(
-        html = value.takeUnless { containsAttribute(name, HtmlNamespace) },
+        html = value.takeUnless { containsHtmlAttribute(name) },
         foreign = value.takeUnless { name in this },
     )
 

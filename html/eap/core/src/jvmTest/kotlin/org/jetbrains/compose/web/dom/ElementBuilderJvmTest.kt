@@ -63,10 +63,10 @@ class ElementBuilderJvmTest {
     }
 
     @Test
-    fun stringBuilderCarriesNormalizedTagName() {
+    fun stringBuilderCarriesRawTagName() {
         val builder = StringElementBuilder<HTMLDivElement>("DIV")
 
-        assertEquals("div", builder.tagName)
+        assertEquals("DIV", builder.tagName)
     }
 
     @Test
@@ -78,7 +78,7 @@ class ElementBuilderJvmTest {
         }
 
         assertEquals(
-            "String element builder for <div> cannot create a DOM element",
+            "String element builder for <DIV> cannot create a DOM element",
             exception.message
         )
     }

@@ -68,19 +68,6 @@ private fun requireHtmlParserStableTableText(parentTagName: String?, text: Strin
 }
 
 /**
- * Rejects names that the HTML tokenizer would collapse before SVG/MathML case adjustments.
- */
-internal fun requireDistinctHtmlParserAttributeNames(attributeNames: Iterable<String>) {
-    val sourceNamesByParserName = mutableMapOf<String, String>()
-    attributeNames.forEach { sourceName ->
-        val previousSourceName = sourceNamesByParserName.put(sourceName.asciiLowercase(), sourceName)
-        require(previousSourceName == null) {
-            "Duplicate HTML attribute names \"$previousSourceName\" and \"$sourceName\""
-        }
-    }
-}
-
-/**
  * Namespace declarations in the in-memory tree are not present in HTML syntax. Validates the
  * namespace that an HTML parser will infer from the parent and tag before serialization.
  */
