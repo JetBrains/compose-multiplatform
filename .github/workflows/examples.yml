@@ -50,9 +50,8 @@ jobs:
 
       - name: Setup Prerequisites
         uses: ./.github/actions/setup-prerequisites
-
-      - name: Setup Android
-        uses: ./.github/actions/setup-android
+        with:
+          android-api: '37.1'
 
       - name: Validate Android examples
         uses: reactivecircus/android-emulator-runner@v2
