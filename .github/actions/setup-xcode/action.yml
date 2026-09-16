@@ -1,0 +1,26 @@
+name: 'Setup Xcode'
+inputs:
+  xcode-path:
+    description: 'Path to the Xcode app bundle to select.'
+    required: false
+    default: /Applications/Xcode_26.5.app
+  cache-key-suffix:
+    description: 'Suffix appended to the DerivedData cache key.'
+    required: false
+    default: 26.5
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Xcode version
+      shell: bash
+      run: |
+        sudo xcode-select -s "${{ inputs.xcode-path }}"
+        /usr/bin/xcodebuild -version
+
+    - name: Cache Xcode DerivedData
+      uses: irgaly/xcode-cache@v1
+      with:
+        key: xcode-cache-deriveddata-${{ inputs.cache-key-suffix }}-${{ github.sha }}
+        restore-keys: |
+          xcode-cache-deriveddata-${{ inputs.cache-key-suffix }}-
+        cache-read-only: ${{ github.ref != 'refs/heads/master' }}
