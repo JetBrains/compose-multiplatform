@@ -46,7 +46,7 @@ internal val HtmlBooleanAttributeNames = setOf(
 )
 
 internal fun String.isHtmlBooleanAttributeName(): Boolean =
-    this in HtmlBooleanAttributeNames || asciiLowercase() in HtmlBooleanAttributeNames
+    this in HtmlBooleanAttributeNames
 
 // in-memory equivalent of DOM node
 internal sealed interface StringHtmlNode {
@@ -56,10 +56,85 @@ internal sealed interface StringHtmlNode {
 internal fun StringHtmlNode.isEmptyText(): Boolean =
     this is StringHtmlTextNode && text.isEmpty()
 
-internal data class StringHtmlAttributes(
+internal class StringHtmlAttributes private constructor(
     val byName: Map<String, String>,
-    val hydrationProtocolAttributes: Set<String>,
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other || other is StringHtmlAttributes && byName == other.byName
+
+    override fun hashCode(): Int = byName.hashCode()
+
+    companion object {
+        fun from(
+            attributes: Map<String, String>,
+            namespace: String,
+            hydrationProtocolAttributes: Set<String>,
+            classAttributeValue: String? = null,
+            styleAttributeValue: (() -> String?)? = null,
+        ): StringHtmlAttributes {
+            val normalizedAttributes = linkedMapOf<String, String>()
+            val sourceNamesByParserName =
+                if (namespace == HtmlNamespace) null else mutableMapOf<String, String>()
+            var containsClass = false
+            var containsStyle = false
+
+            fun duplicateAttributeNames(previousSourceName: String, sourceName: String): Nothing {
+                throw IllegalArgumentException(
+                    "Duplicate HTML attribute names \"$previousSourceName\" and \"$sourceName\""
+                )
+            }
+
+            fun addAttribute(
+                sourceName: String,
+                parserName: String,
+                storedName: String,
+                value: String,
+            ) {
+                if (namespace == HtmlNamespace) {
+                    if (normalizedAttributes.put(storedName, value) != null) {
+                        val previousSourceName = attributes.keys.first {
+                            it != sourceName && it.asciiLowercase() == parserName
+                        }
+                        duplicateAttributeNames(previousSourceName, sourceName)
+                    }
+                } else {
+                    val previousSourceName = requireNotNull(sourceNamesByParserName)
+                        .put(parserName, sourceName)
+                    if (previousSourceName != null) {
+                        duplicateAttributeNames(previousSourceName, sourceName)
+                    }
+                    normalizedAttributes[storedName] = value
+                }
+            }
+
+            attributes.forEach { (name, value) ->
+                requireValidHtmlAttributeName(name)
+                val parserName = name.asciiLowercase()
+                val storedName = if (namespace == HtmlNamespace) parserName else name
+                addAttribute(name, parserName, storedName, value)
+                require(
+                    parserName !in HydrationProtocolAttributes ||
+                        parserName in hydrationProtocolAttributes
+                ) {
+                    "Attribute \"$name\" is owned by the Compose hydration protocol"
+                }
+                containsClass = containsClass || storedName == "class"
+                containsStyle = containsStyle || storedName == "style"
+            }
+
+            if (!containsClass && classAttributeValue != null) {
+                addAttribute("class", "class", "class", classAttributeValue)
+            }
+            if (!containsStyle) {
+                styleAttributeValue?.invoke()?.let { value ->
+                    addAttribute("style", "style", "style", value)
+                }
+            }
+
+            return StringHtmlAttributes(normalizedAttributes)
+        }
+    }
+}
 
 internal class StringHtmlElementNode private constructor(
     tagName: String?,
@@ -83,31 +158,17 @@ internal class StringHtmlElementNode private constructor(
     ) : this(tagName, namespace, isRoot = false)
 
     fun updateAttributes(attributes: Map<String, String>) = updateAttributes(
-        StringHtmlAttributes(
-            byName = attributes,
+        StringHtmlAttributes.from(
+            attributes = attributes,
+            namespace = requireElementNamespace(),
             hydrationProtocolAttributes = emptySet(),
         )
     )
 
     fun updateAttributes(attributes: StringHtmlAttributes) {
-        val namespace = requireElementNamespace()
-        val normalizedAttributes = mutableMapOf<String, String>()
-        requireDistinctHtmlParserAttributeNames(attributes.byName.keys)
-        attributes.byName.forEach { (name, value) ->
-            requireValidHtmlAttributeName(name)
-            // The tokenizer lowercases all names before applying its SVG name adjustments.
-            val parserName = name.asciiLowercase()
-            val normalizedName = if (namespace == HtmlNamespace) parserName else name
-            require(
-                parserName !in HydrationProtocolAttributes ||
-                    parserName in attributes.hydrationProtocolAttributes
-            ) {
-                "Attribute \"$name\" is owned by the Compose hydration protocol"
-            }
-            normalizedAttributes[normalizedName] = value
-        }
+        requireElementNamespace()
         this.attributes.clear()
-        this.attributes.putAll(normalizedAttributes)
+        this.attributes.putAll(attributes.byName)
     }
 
     fun hasAttribute(name: String): Boolean = attributes.containsKey(normalizeAttributeName(name))
@@ -285,11 +346,18 @@ private const val InvalidHtmlAttributeNameCharacters = " \"'/>="
 private fun Char.isAsciiLetter(): Boolean = this in 'A'..'Z' || this in 'a'..'z'
 
 internal fun String.asciiLowercase(): String {
-    // DSL tag and attribute names are overwhelmingly already lowercase. Preserve the original
-    // string in that case instead of allocating a same-valued copy on every element.
-    if (none { it in 'A'..'Z' }) return this
+    var firstUppercaseIndex = 0
+    while (firstUppercaseIndex < length && this[firstUppercaseIndex] !in 'A'..'Z') {
+        firstUppercaseIndex++
+    }
+    if (firstUppercaseIndex == length) return this
+
     return buildString(length) {
-        this@asciiLowercase.forEach { character ->
+        for (index in 0 until firstUppercaseIndex) {
+            append(this@asciiLowercase[index])
+        }
+        for (index in firstUppercaseIndex..this@asciiLowercase.lastIndex) {
+            val character = this@asciiLowercase[index]
             append(if (character in 'A'..'Z') character.lowercaseChar() else character)
         }
     }

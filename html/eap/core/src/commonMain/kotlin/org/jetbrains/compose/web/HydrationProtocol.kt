@@ -36,8 +36,4 @@ internal fun String.escapeForHydrationStateElement(): String = buildString {
     }
 }
 
-internal fun String.unescapeFromHydrationStateElement(): String =
-    replace("&lt;", "<")
-        .replace("&#13;", "\r")
-        .replace("&#0;", "\u0000")
-        .replace("&amp;", "&")
+internal expect fun String.unescapeFromHydrationStateElement(): String

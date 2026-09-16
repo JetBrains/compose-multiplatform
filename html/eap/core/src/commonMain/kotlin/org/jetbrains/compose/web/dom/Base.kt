@@ -19,10 +19,6 @@ import org.jetbrains.compose.web.css.utils.serializeRules
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 
-// HTML attribute names are ASCII-insensitive; foreign attribute names retain their case.
-internal fun Map<String, String>.containsAttribute(name: String, namespace: String?): Boolean =
-    if (namespace == HtmlNamespace) keys.any { it.asciiLowercase() == name } else name in this
-
 internal interface ComposeHtmlContext {
     val supportsDomElementAccess: Boolean
 

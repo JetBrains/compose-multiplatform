@@ -76,6 +76,10 @@ private class ElementAttrs(val builder: AttrsScopeBuilder<*>) {
     override fun hashCode(): Int = builder.collect().hashCode()
 }
 
+// HTML attribute names are ASCII-insensitive; foreign attribute names retain their case.
+private fun Map<String, String>.containsAttribute(name: String, namespace: String?): Boolean =
+    if (namespace == HtmlNamespace) keys.any { it.asciiLowercase() == name } else name in this
+
 // Hydration commonly repeats the same small class lists across many elements. Cache their already
 // validated strings, copying keys so a retained attrs receiver cannot mutate the cache. The bound
 // prevents applications with arbitrary generated class names from growing it indefinitely.
@@ -361,7 +365,8 @@ private fun String?.normalizedForHydration(
         this != null &&
         elementNamespace == HtmlNamespace &&
         '-' !in elementTagName &&
-        attributeName.isHtmlBooleanAttributeName()
+        (attributeName.isHtmlBooleanAttributeName() ||
+            attributeName.asciiLowercase().isHtmlBooleanAttributeName())
     ) "" else this
 
 private fun String?.describeAttributeValue(): String =
