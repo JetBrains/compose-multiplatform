@@ -16,7 +16,7 @@ kotlin {
     android {
         namespace = "org.jetbrains.compose.testapp"
         compileSdk = 37
-        compileSdkExtension = 1
+        compileSdkMinor = 1
         minSdk = 23
     }
 

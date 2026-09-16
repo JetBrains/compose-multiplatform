@@ -10,7 +10,7 @@ group = "app.group"
 kotlin {
     android {
         compileSdk = 37
-        compileSdkExtension = 1
+        compileSdkMinor = 1
         namespace = "org.jetbrains.compose.resources.test"
         minSdk = 23
         androidResources.enable = true
