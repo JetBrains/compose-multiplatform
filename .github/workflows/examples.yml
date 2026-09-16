@@ -60,9 +60,7 @@ jobs:
           api-level: 36
           target: google_apis
           arch: x86_64
-          script: |
-            cd examples
-            ./validateExamplesAndroid.sh
+          script: ${{ github.workspace }}/examples/validateExamplesAndroid.sh
 
   ios:
     runs-on: macos-26-xlarge
