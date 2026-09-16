@@ -425,6 +425,7 @@ class ComposeResourceTest {
             }
         }
 
+        waitResources()
         assertNotEquals(null, lastEnv1)
         assertNotEquals(env2, lastEnv1)
         assertEquals(lastEnv1, lastEnv2)

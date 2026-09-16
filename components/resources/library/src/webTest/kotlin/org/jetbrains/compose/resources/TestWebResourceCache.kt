@@ -77,7 +77,7 @@ class TestWebResourceCache {
 
         testResourceReader.provideData("Compose Resources App")
 
-        waitForIdle()
+        waitResources()
         assertFalse(resourceLoadingWasCancelled, "Resource loading should not be cancelled")
         assertEquals("Compose Resources App", branchBText)
     }

@@ -57,3 +57,15 @@ internal expect fun <T> rememberResourceState(
     getDefault: () -> T,
     block: suspend (ResourceEnvironment) -> T
 ): State<T>
+
+/**
+ * Suspends until all currently pending asynchronous resource state loads complete.
+ *
+ * This function waits until resource values are written to their Compose states. It does not
+ * wait for Compose to process those state changes or perform recomposition. In Compose UI tests,
+ * call [ComposeUiTest.waitForIdle] after this function when observing the rendered state.
+ *
+ * If a resource load fails or is cancelled, it is still considered complete.
+ */
+@ExperimentalResourceApi
+expect suspend fun awaitPendingResourceStateLoads()

@@ -64,10 +64,9 @@ class TestResourcePreloading {
         yield()
         assertNotEquals(null, loadContinuation)
         loadContinuation!!.resumeWith(Result.success(ByteArray(0)))
-        yield()
         loadContinuation = null
 
-        waitForIdle()
+        waitResources()
         assertNotEquals(null, font)
         assertEquals(null, font2) // condition was false for now, so font2 should be not initialized
 

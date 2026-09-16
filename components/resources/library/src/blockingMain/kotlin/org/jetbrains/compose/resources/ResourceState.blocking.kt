@@ -80,3 +80,6 @@ internal actual fun <T> rememberResourceState(
  * inside a resource reader deadlocks a composition here in the same way as with `runBlocking`.
  */
 internal expect fun <T> runResourceBlocking(block: suspend () -> T): T
+
+@ExperimentalResourceApi
+actual suspend fun awaitPendingResourceStateLoads() = Unit
