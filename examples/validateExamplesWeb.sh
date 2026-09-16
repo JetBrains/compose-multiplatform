@@ -10,19 +10,21 @@ if [ "$#" -gt 2 ]; then
     exit 1
 fi
 
-compose_args=()
+version_args=()
 if [ "$#" -eq 1 ]; then
-    compose_args=("-Pcompose.version=$1")
+    version_args=("-Pcompose.version=$1")
 fi
 
 if [ "$#" -eq 2 ]; then
-    compose_args=("-Pcompose.version=$1" "-Pkotlin.version=$2")
+    version_args=("-Pcompose.version=$1" "-Pkotlin.version=$2")
 fi
 
 
 runGradle() {
-    pushd "$1"
-    ./gradlew "$2" "${compose_args[@]}"
+    local example="$1"
+    local task="$2"
+    pushd "$example"
+    ./gradlew "$task" "${version_args[@]}"
     popd
 }
 

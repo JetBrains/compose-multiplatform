@@ -10,20 +10,21 @@ if [ "$#" -gt 2 ]; then
     exit 1
 fi
 
-compose_args=()
+version_args=()
 if [ "$#" -eq 1 ]; then
-    compose_args=("-Pcompose.version=$1")
+    version_args=("-Pcompose.version=$1")
 fi
 
 if [ "$#" -eq 2 ]; then
-    compose_args=("-Pcompose.version=$1" "-Pkotlin.version=$2")
+    version_args=("-Pcompose.version=$1" "-Pkotlin.version=$2")
 fi
 
 
 runGradle() {
-    pushd "$1"
-    echo "Validating $1"
-    ./gradlew clean linkIosArm64 "${compose_args[@]}" --rerun-tasks || (echo "Failed $1" && exit 1)
+    local example="$1"
+    pushd "$example"
+    echo "Validating $example"
+    ./gradlew clean linkIosArm64 "${version_args[@]}" --rerun-tasks || (echo "Failed $example" && exit 1)
     popd
 }
 

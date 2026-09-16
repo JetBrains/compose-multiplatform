@@ -25,13 +25,10 @@ on:
 jobs:
   validate-inputs:
     runs-on: ubuntu-24.04
-    env:
-      COMPOSE_VERSION: ${{ inputs.compose_version }}
-      KOTLIN_VERSION: ${{ inputs.kotlin_version }}
     steps:
       - name: Validate version inputs
         run: |
-          if [[ -n "$KOTLIN_VERSION" && -z "$COMPOSE_VERSION" ]]; then
+          if [[ -n "${{ inputs.kotlin_version }}" && -z "${{ inputs.compose_version }}" ]]; then
             echo "kotlin_version requires compose_version."
             exit 1
           fi
@@ -39,9 +36,6 @@ jobs:
   desktop:
     needs: validate-inputs
     runs-on: ubuntu-24.04
-    env:
-      COMPOSE_VERSION: ${{ inputs.compose_version }}
-      KOTLIN_VERSION: ${{ inputs.kotlin_version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -59,14 +53,18 @@ jobs:
 
       - name: Validate desktop examples
         working-directory: examples
-        run: ./validateExamplesDesktop.sh ${COMPOSE_VERSION:+"$COMPOSE_VERSION"} ${KOTLIN_VERSION:+"$KOTLIN_VERSION"}
+        run: |
+          if [[ -n "${{ inputs.kotlin_version }}" ]]; then
+            ./validateExamplesDesktop.sh "${{ inputs.compose_version }}" "${{ inputs.kotlin_version }}"
+          elif [[ -n "${{ inputs.compose_version }}" ]]; then
+            ./validateExamplesDesktop.sh "${{ inputs.compose_version }}"
+          else
+            ./validateExamplesDesktop.sh
+          fi
 
   web:
     needs: validate-inputs
     runs-on: ubuntu-24.04
-    env:
-      COMPOSE_VERSION: ${{ inputs.compose_version }}
-      KOTLIN_VERSION: ${{ inputs.kotlin_version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -82,14 +80,18 @@ jobs:
 
       - name: Validate web examples
         working-directory: examples
-        run: ./validateExamplesWeb.sh ${COMPOSE_VERSION:+"$COMPOSE_VERSION"} ${KOTLIN_VERSION:+"$KOTLIN_VERSION"}
+        run: |
+          if [[ -n "${{ inputs.kotlin_version }}" ]]; then
+            ./validateExamplesWeb.sh "${{ inputs.compose_version }}" "${{ inputs.kotlin_version }}"
+          elif [[ -n "${{ inputs.compose_version }}" ]]; then
+            ./validateExamplesWeb.sh "${{ inputs.compose_version }}"
+          else
+            ./validateExamplesWeb.sh
+          fi
 
   android:
     needs: validate-inputs
     runs-on: ubuntu-24.04
-    env:
-      COMPOSE_VERSION: ${{ inputs.compose_version }}
-      KOTLIN_VERSION: ${{ inputs.kotlin_version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -116,14 +118,17 @@ jobs:
           arch: x86_64
           script: |
             cd examples
-            ./validateExamplesAndroid.sh ${COMPOSE_VERSION:+"$COMPOSE_VERSION"} ${KOTLIN_VERSION:+"$KOTLIN_VERSION"}
+            if [[ -n "${{ inputs.kotlin_version }}" ]]; then
+              ./validateExamplesAndroid.sh "${{ inputs.compose_version }}" "${{ inputs.kotlin_version }}"
+            elif [[ -n "${{ inputs.compose_version }}" ]]; then
+              ./validateExamplesAndroid.sh "${{ inputs.compose_version }}"
+            else
+              ./validateExamplesAndroid.sh
+            fi
 
   ios:
     needs: validate-inputs
     runs-on: macos-15
-    env:
-      COMPOSE_VERSION: ${{ inputs.compose_version }}
-      KOTLIN_VERSION: ${{ inputs.kotlin_version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -139,4 +144,11 @@ jobs:
 
       - name: Validate iOS examples
         working-directory: examples
-        run: ./validateExamplesIos.sh ${COMPOSE_VERSION:+"$COMPOSE_VERSION"} ${KOTLIN_VERSION:+"$KOTLIN_VERSION"}
+        run: |
+          if [[ -n "${{ inputs.kotlin_version }}" ]]; then
+            ./validateExamplesIos.sh "${{ inputs.compose_version }}" "${{ inputs.kotlin_version }}"
+          elif [[ -n "${{ inputs.compose_version }}" ]]; then
+            ./validateExamplesIos.sh "${{ inputs.compose_version }}"
+          else
+            ./validateExamplesIos.sh
+          fi
