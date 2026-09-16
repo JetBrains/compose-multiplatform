@@ -32,12 +32,13 @@ import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
 import org.jetbrains.compose.web.internal.runtime.NamedEventListener
 
 @Composable
+@NonRestartableComposable
 @ExplicitGroupsComposable
 private inline fun <TScope, T> ComposeDomNode(
     crossinline factory: () -> T,
     elementScope: TScope,
-    attrsSkippableUpdate: @Composable SkippableUpdater<T>.() -> Unit,
-    content: (@Composable TScope.() -> Unit)
+    attrsUpdate: Updater<T>.() -> Unit,
+    noinline content: (@Composable TScope.() -> Unit)?,
 ) {
     currentComposer.startNode()
     if (currentComposer.inserting) {
@@ -48,17 +49,82 @@ private inline fun <TScope, T> ComposeDomNode(
         currentComposer.useNode()
     }
 
-    attrsSkippableUpdate.invoke(SkippableUpdater(currentComposer))
+    attrsUpdate.invoke(Updater(currentComposer))
 
-    currentComposer.startReplaceableGroup(0x7ab4aae9)
-    content.invoke(elementScope)
-    currentComposer.endReplaceableGroup()
+    // The node itself bounds the child composition. The content lambda already owns its group,
+    // so another replaceable group here only increases slot-table work for every DOM element.
+    content?.invoke(elementScope)
     currentComposer.endNode()
+}
+
+// This snapshot is private to the DOM updater; AttrsScopeBuilder deliberately retains its public
+// identity equality. Structural equality lets Compose skip the sole update record for an element
+// when none of its independent attribute channels changed.
+private class ElementAttrs(val builder: AttrsScopeBuilder<*>) {
+    override fun equals(other: Any?): Boolean {
+        if (other !is ElementAttrs) return false
+        val a = builder
+        val b = other.builder
+        return a.collect() == b.collect() &&
+            a.classes == b.classes &&
+            a.styleScopeOrNull == b.styleScopeOrNull &&
+            a.propertyUpdatesOrEmpty == b.propertyUpdatesOrEmpty &&
+            a.eventsListenerScopeBuilder.collectListeners() ==
+            b.eventsListenerScopeBuilder.collectListeners()
+    }
+
+    override fun hashCode(): Int = builder.collect().hashCode()
+}
+
+// Hydration commonly repeats the same small class lists across many elements. Cache their already
+// validated strings, copying keys so a retained attrs receiver cannot mutate the cache. The bound
+// prevents applications with arbitrary generated class names from growing it indefinitely.
+private val validatedClassValues = mutableMapOf<List<String>, String>()
+
+private fun classAttributeValue(classes: List<String>): String? {
+    if (classes.isEmpty()) return null
+    validatedClassValues[classes]?.let { return it }
+    val value = classes.toClassAttributeValue()!!
+    if (validatedClassValues.size >= 256) validatedClassValues.clear()
+    validatedClassValues[classes.toList()] = value
+    return value
 }
 
 @ComposeWebInternalApi
 private open class DomElementWrapper(override val node: Element) : DomNodeWrapper(node) {
+    // An element's namespace cannot change. Cache it along with the previous channel values so a
+    // changed snapshot updates only the DOM channels whose values actually changed.
+    private val namespace = if (node.hasHtmlNamespace()) HtmlNamespace else node.namespaceURI
     private var currentListeners = emptyList<NamedEventListener>()
+    private var previousAttrs: AttrsScopeBuilder<*>? = null
+    private var previousClasses: List<String>? = null
+    private var previousStyle: StyleHolder? = null
+
+    // Collapse the former per-channel Compose records into one record per element while retaining
+    // independent comparisons here. This reduces slot bookkeeping without causing extra DOM writes.
+    fun updateElementAttrs(value: ElementAttrs) {
+        val next = value.builder
+        val previous = previousAttrs
+        val attrs = next.collect()
+        val classes = if (attrs.containsAttribute(AttrsScope.CLASS, namespace)) null else next.classes
+        val style = if (attrs.containsAttribute("style", namespace)) {
+            null
+        } else {
+            next.styleScopeOrNull ?: EmptyStyleScope
+        }
+
+        if (previous == null || previousClasses != classes) updateClasses(classes)
+        if (previous == null || previousStyle != style) updateStyleDeclarations(style)
+        if (previous == null || previous.collect() != attrs) updateAttrs(attrs)
+        if (previous == null || previous.propertyUpdatesOrEmpty != next.propertyUpdatesOrEmpty) {
+            updateProperties(next.propertyUpdatesOrEmpty)
+        }
+        updateEventListeners(next.eventsListenerScopeBuilder.collectListeners())
+
+        previousAttrs = next
+        previousClasses = classes
+        previousStyle = style
+    }
 
     protected fun eventListenersMatch(list: List<NamedEventListener>): Boolean =
         currentListeners == list
@@ -115,7 +181,14 @@ private open class DomElementWrapper(override val node: Element) : DomNodeWrappe
 
     open fun updateRawText(value: String) {
         if (node.textContent != value) {
-            node.textContent = value
+            // Raw-text elements normally contain exactly one Text node. Updating its data avoids
+            // replacing that node; retain textContent as the safe fallback for an unusual DOM shape.
+            val text = node.firstChild as? Text
+            if (text != null && text.nextSibling == null) {
+                text.data = value
+            } else {
+                node.textContent = value
+            }
         }
     }
 
@@ -127,6 +200,10 @@ private open class DomElementWrapper(override val node: Element) : DomNodeWrappe
         }
     }
 }
+
+// DOM updates need an empty value to clear a style removed during recomposition. Reuse one
+// immutable-in-practice builder instead of allocating an empty builder for every unstyled element.
+private val EmptyStyleScope = org.jetbrains.compose.web.css.StyleScopeBuilder()
 
 @ComposeWebInternalApi
 private class HydratingDomElementWrapper(
@@ -155,7 +232,7 @@ private class HydratingDomElementWrapper(
         if (!applier.isHydrating) {
             super.updateClasses(classes)
         } else {
-            classes?.toClassAttributeValue()?.let { value ->
+            classes?.let(::classAttributeValue)?.let { value ->
                 verifyAttribute(AttrsScope.CLASS, value) {
                     // Extra server classes are tolerated, so only missing ones are added.
                     node.classList.add(*value.split(' ').toTypedArray())
@@ -204,7 +281,13 @@ private class HydratingDomElementWrapper(
 
     /** Reports a mismatch, or applies [patch] after hydration if the element allows it. */
     private fun verifyAttribute(name: String, expected: String?, patch: () -> Unit) {
+        // Keep the common HTML equality check inside JavaScript on Wasm instead of converting
+        // the browser string to a Kotlin String only to compare it with the expected value.
+        if (node.matchesHtmlAttribute(name, expected)) return
         val actual = node.getComposedAttribute(name)
+        // Foreign/custom attributes do not use HTML normalization. Preserve their cheap exact
+        // comparison before entering the normalization paths needed for HTML hydration.
+        if (actual == expected) return
         if (
             expected != null &&
             (name == AttrsScope.CLASS ||
@@ -284,36 +367,37 @@ private fun String?.normalizedForHydration(
 private fun String?.describeAttributeValue(): String =
     if (this == null) "no attribute" else "\"$this\""
 
-private class DomElementScope<TElement : Element> : ElementScopeImpl<TElement>() {
+private class DomElementScope<TElement : Element>(
+    val hydrationAllowance: HydrationMismatchAllowance? = null,
+) : ElementScopeImpl<TElement>() {
     lateinit var wrapper: DomElementWrapper
+    var hasEventListeners: Boolean = false
 }
 
 internal actual val DefaultComposeHtmlContext: ComposeHtmlContext = BrowserComposeHtmlContext
 
-// Attribute updates are prepared before the DOM node exists. Select the namespace-specific
-// fallback only when applying the update, and include both alternatives in Compose's change check.
-private data class AttributeFallback<T>(val html: T?, val foreign: T?) {
-    fun forNamespace(namespace: String?): T? = if (namespace == HtmlNamespace) html else foreign
-}
-
-private fun <T> Map<String, String>.attributeFallback(name: String, value: T): AttributeFallback<T> =
-    AttributeFallback(
-        html = value.takeUnless { containsAttribute(name, HtmlNamespace) },
-        foreign = value.takeUnless { name in this },
-    )
-
 @Composable
-private fun <TElement : Element> TagElementImpl(
+@NonRestartableComposable
+private inline fun <TElement : Element> TagElementImpl(
     elementBuilder: ElementBuilder<TElement>,
-    applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
-    content: (@Composable ElementScope<TElement>.() -> Unit)?,
-    createWrapper: (TElement) -> DomElementWrapper,
+    noinline applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+    noinline content: (@Composable ElementScope<TElement>.() -> Unit)?,
+    crossinline createWrapper: (TElement) -> DomElementWrapper,
     validateAttrs: (Map<String, String>) -> Unit = {},
     hydrationMismatchAllowance: HydrationMismatchAllowance? = null,
     updateElement: Updater<DomElementWrapper>.() -> Unit = {},
+    providedScope: DomElementScope<TElement>? = null,
 ) {
-    val scope = remember { DomElementScope<TElement>() }
-    var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
+    val scope = providedScope ?: remember { DomElementScope<TElement>() }
+
+    // Build one immutable-in-practice snapshot for this invocation, outside the node updater.
+    // Compose compares the combined snapshot once; the wrapper performs channel-level diffs.
+    val attrsScope = AttrsScopeBuilder<TElement>()
+    applyAttrs?.invoke(attrsScope)
+    val refEffect = attrsScope.refEffect
+    validateAttrs(attrsScope.collect())
+    hydrationMismatchAllowance?.isAllowed = attrsScope.allowsHydrationMismatch
+    scope.hasEventListeners = attrsScope.eventsListenerScopeBuilder.collectListeners().isNotEmpty()
 
     ComposeDomNode<ElementScope<TElement>, DomElementWrapper>(
         factory = {
@@ -321,39 +405,17 @@ private fun <TElement : Element> TagElementImpl(
             scope.element = node
             createWrapper(node).also { wrapper -> scope.wrapper = wrapper }
         },
-        attrsSkippableUpdate = {
-            val attrsScope = AttrsScopeBuilder<TElement>()
-            applyAttrs?.invoke(attrsScope)
-
-            refEffect = attrsScope.refEffect
-            val attrs = attrsScope.collect()
-            validateAttrs(attrs)
-            // Composition completes before the DOM is claimed, which is when this is read.
-            hydrationMismatchAllowance?.isAllowed = attrsScope.allowsHydrationMismatch
-
-            update {
-                set(attrs.attributeFallback(AttrsScope.CLASS, attrsScope.classes)) { fallback ->
-                    updateClasses(fallback.forNamespace(node.namespaceURI))
-                }
-                set(attrs.attributeFallback("style", attrsScope.styleScope)) { fallback ->
-                    updateStyleDeclarations(fallback.forNamespace(node.namespaceURI))
-                }
-                set(attrs, DomElementWrapper::updateAttrs)
-                updateElement()
-                set(attrsScope.propertyUpdates, DomElementWrapper::updateProperties)
-                set(
-                    attrsScope.eventsListenerScopeBuilder.collectListeners(),
-                    DomElementWrapper::updateEventListeners,
-                )
-            }
+        attrsUpdate = {
+            set(ElementAttrs(attrsScope), DomElementWrapper::updateElementAttrs)
+            updateElement()
         },
         elementScope = scope,
-        content = {
-            content?.invoke(this)
-        },
+        content = content,
     )
 
-    if (applyAttrs != null) {
+    // Listener cleanup is only useful for elements that installed listeners. Avoid creating a
+    // DisposableEffect for an attrs block that contains only classes, styles, or properties.
+    if (scope.hasEventListeners) {
         DisposableEffect(Unit) {
             onDispose {
                 scope.wrapper.updateEventListeners(emptyList())
@@ -368,6 +430,8 @@ private fun <TElement : Element> TagElementImpl(
     }
 }
 
+internal expect fun Element.matchesHtmlAttribute(name: String, expected: String?): Boolean
+
 @OptIn(ComposeWebInternalApi::class)
 private object BrowserComposeHtmlContext : ComposeHtmlContext {
     override val supportsDomElementAccess: Boolean = true
@@ -381,6 +445,7 @@ private object BrowserComposeHtmlContext : ComposeHtmlContext {
     ): ElementBuilder<TElement> = ElementBuilder.createBuilder(tagName, namespace)
 
     @Composable
+    @NonRestartableComposable
     override fun <TElement : Element> TagElement(
         elementBuilder: ElementBuilder<TElement>,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
@@ -395,6 +460,7 @@ private object BrowserComposeHtmlContext : ComposeHtmlContext {
     }
 
     @Composable
+    @NonRestartableComposable
     override fun <TElement : Element> RawTextElement(
         tagName: String,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
@@ -413,6 +479,7 @@ private object BrowserComposeHtmlContext : ComposeHtmlContext {
     }
 
     @Composable
+    @NonRestartableComposable
     override fun TextElement(value: String) {
         ComposeNode<DomNodeWrapper, DomApplier>(
             factory = { DomNodeWrapper(document.createTextNode("")) },
@@ -423,6 +490,7 @@ private object BrowserComposeHtmlContext : ComposeHtmlContext {
     }
 
     @Composable
+    @NonRestartableComposable
     override fun StyleElement(
         applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)?,
         cssRules: CSSRuleDeclarationList,
@@ -468,6 +536,7 @@ private class HydratingComposeHtmlContext(
     )
 
     @Composable
+    @NonRestartableComposable
     override fun <TElement : Element> TagElement(
         elementBuilder: ElementBuilder<TElement>,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
@@ -492,15 +561,22 @@ private class HydratingComposeHtmlContext(
         } else {
             elementBuilder
         }
-        HydratingTagElement(
+        // Reuse the element scope as the lifetime owner for hydration allowance. Calling the
+        // implementation directly removes a forwarding group and a second remembered object.
+        val scope = remember { DomElementScope<TElement>(HydrationMismatchAllowance()) }
+        val allowance = scope.hydrationAllowance!!
+        TagElementImpl(
             elementBuilder = hydrationAwareBuilder,
             applyAttrs = applyAttrs,
-            allowance = remember { HydrationMismatchAllowance() },
             content = content,
+            createWrapper = { node -> HydratingDomElementWrapper(node, applier, allowance) },
+            hydrationMismatchAllowance = allowance,
+            providedScope = scope,
         )
     }
 
     @Composable
+    @NonRestartableComposable
     override fun <TElement : Element> RawTextElement(
         tagName: String,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
@@ -529,6 +605,7 @@ private class HydratingComposeHtmlContext(
     }
 
     @Composable
+    @NonRestartableComposable
     private fun <TElement : Element> HydratingTagElement(
         elementBuilder: ElementBuilder<TElement>,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
@@ -551,6 +628,7 @@ private class HydratingComposeHtmlContext(
     }
 
     @Composable
+    @NonRestartableComposable
     override fun TextElement(value: String) {
         ComposeNode<DomNodeWrapper, HydrationDomApplier>(
             factory = {
@@ -566,7 +644,7 @@ private class HydratingComposeHtmlContext(
                     val text = node as Text
                     // Claimed text already holds the server value unless its element allows
                     // mismatches. Defer that patch, so a later mismatch can still fall back.
-                    if (text.data != newValue) {
+                    if (!text.matchesText(newValue)) {
                         applier.applyOrDeferDomMutation { text.data = newValue }
                     }
                 }
@@ -576,6 +654,7 @@ private class HydratingComposeHtmlContext(
 
     // A detached <style> has no sheet, so keep its CSS as text until it can use CSSOM.
     @Composable
+    @NonRestartableComposable
     override fun StyleElement(
         applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)?,
         cssRules: CSSRuleDeclarationList,

@@ -6,6 +6,8 @@
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ExplicitGroupsComposable
+import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -31,7 +33,10 @@ internal interface ComposeHtmlContext {
         namespace: String,
     ): ElementBuilder<TElement>
 
+    // These entry points only forward work to the platform DOM implementation. Keeping them
+    // non-restartable lets the caller own invalidation and avoids a restart group per element.
     @Composable
+    @NonRestartableComposable
     fun <TElement : Element> TagElement(
         elementBuilder: ElementBuilder<TElement>,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
@@ -39,6 +44,7 @@ internal interface ComposeHtmlContext {
     )
 
     @Composable
+    @NonRestartableComposable
     fun <TElement : Element> RawTextElement(
         tagName: String,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
@@ -46,9 +52,11 @@ internal interface ComposeHtmlContext {
     )
 
     @Composable
+    @NonRestartableComposable
     fun TextElement(value: String)
 
     @Composable
+    @NonRestartableComposable
     fun StyleElement(
         applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)?,
         cssRules: CSSRuleDeclarationList,
@@ -63,6 +71,8 @@ internal val LocalComposeHtmlContext = staticCompositionLocalOf<ComposeHtmlConte
 }
 
 @Composable
+@NonRestartableComposable
+@ExplicitGroupsComposable
 fun <TElement : Element> TagElement(
     elementBuilder: ElementBuilder<TElement>,
     applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
@@ -80,6 +90,8 @@ fun <TElement : Element> TagElement(
  * Unlike HTML elements, tag names in non-HTML namespaces retain their casing.
  */
 @Composable
+@NonRestartableComposable
+@ExplicitGroupsComposable
 @ComposeWebInternalApi
 fun <TElement : Element> TagElementNS(
     tagName: String,
@@ -108,6 +120,8 @@ fun <TElement : Element> TagElementNS(
  * ```
  */
 @Composable
+@NonRestartableComposable
+@ExplicitGroupsComposable
 fun <TElement : Element> TagElement(
     tagName: String,
     applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
@@ -125,6 +139,7 @@ fun <TElement : Element> TagElement(
 }
 
 @Composable
+@NonRestartableComposable
 internal fun <TElement : Element> RawTextElement(
     tagName: String,
     applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
@@ -181,18 +196,32 @@ internal fun String.normalizeHtmlInputCharacters(): String =
         this
     }
 
-private val RawTextEndTags = listOf(
-    "script", "style", "iframe", "xmp", "noembed", "noframes",
-).associateWith { tagName ->
-    Regex("</$tagName(?=[\\t\\n\\u000C\\r />])", RegexOption.IGNORE_CASE)
+// Validation only needs to locate a tag prefix followed by one HTML delimiter. A small scanner
+// avoids retaining the regular-expression engine in browser binaries while preserving the exact
+// case-folding and boundary behavior of the previous expressions.
+internal fun String.rawTextTagIndex(tagName: String, closing: Boolean, startIndex: Int = 0): Int {
+    var index = indexOf('<', startIndex)
+    while (index >= 0) {
+        val nameStart = index + if (closing) 2 else 1
+        val delimiterIndex = nameStart + tagName.length
+        if (
+            delimiterIndex < length &&
+            (!closing || this[index + 1] == '/') &&
+            matchesRawTextTagName(nameStart, tagName) &&
+            this[delimiterIndex] in "\t\n\u000C\r />"
+        ) {
+            return index
+        }
+        index = indexOf('<', index + 1)
+    }
+    return -1
 }
-private val ScriptStartTag = Regex("<script(?=[\\t\\n\\u000C\\r />])", RegexOption.IGNORE_CASE)
 
 private fun requireValidRawTextContent(tagName: String, content: String) {
-    val endTag = requireNotNull(RawTextEndTags[tagName]) {
+    require(tagName in listOf("script", "style", "iframe", "xmp", "noembed", "noframes")) {
         "Raw text content is not supported for <$tagName>"
     }
-    require(!endTag.containsMatchIn(content)) {
+    require(content.rawTextTagIndex(tagName, closing = true) < 0) {
         "Raw text for <$tagName> must not contain a </$tagName end tag"
     }
 
@@ -201,8 +230,12 @@ private fun requireValidRawTextContent(tagName: String, content: String) {
         while (escapedStart >= 0) {
             // Include the opener's dashes: <!--> also exits the escaped state.
             val escapedEnd = content.indexOf("-->", escapedStart + 2)
-            val script = ScriptStartTag.find(content, escapedStart + 4)
-            require(script == null || (escapedEnd >= 0 && script.range.first > escapedEnd)) {
+            val script = content.rawTextTagIndex(
+                tagName = "script",
+                closing = false,
+                startIndex = escapedStart + 4,
+            )
+            require(script < 0 || (escapedEnd >= 0 && script > escapedEnd)) {
                 "Raw text for <script> must not contain a <script tag inside <!-- escaped text"
             }
             if (escapedEnd < 0) break
@@ -210,3 +243,5 @@ private fun requireValidRawTextContent(tagName: String, content: String) {
         }
     }
 }
+
+internal expect fun String.matchesRawTextTagName(start: Int, tagName: String): Boolean

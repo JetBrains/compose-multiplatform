@@ -179,7 +179,9 @@ private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(
         }
 
         if (!containsAttribute("style", namespace)) {
-            styleScope.toStyleAttributeValue()?.let { value -> this["style"] = value }
+            // Do not instantiate an empty StyleScopeBuilder merely to discover that SSR has no
+            // style attribute to emit; an explicitly used style channel still follows this path.
+            styleScopeOrNull?.toStyleAttributeValue()?.let { value -> this["style"] = value }
         }
     }
     return StringHtmlAttributes(
