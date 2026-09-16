@@ -1,0 +1,117 @@
+name: Validate examples
+
+on:
+  pull_request:
+    paths:
+      - 'examples/**'
+      - '.github/workflows/examples.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'examples/**'
+      - '.github/workflows/examples.yml'
+  workflow_dispatch:
+    inputs:
+      compose_version:
+        description: 'Optional Compose Multiplatform version to validate'
+        required: false
+        type: string
+
+jobs:
+  desktop:
+    runs-on: ubuntu-24.04
+    env:
+      COMPOSE_VERSION: ${{ inputs.compose_version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: jetbrains
+          java-version: '17'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Validate desktop examples
+        working-directory: examples
+        run: ./validateExamplesDesktop.sh ${COMPOSE_VERSION:+"$COMPOSE_VERSION"}
+
+  web:
+    runs-on: ubuntu-24.04
+    env:
+      COMPOSE_VERSION: ${{ inputs.compose_version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: jetbrains
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Validate web examples
+        working-directory: examples
+        run: ./validateExamplesWeb.sh ${COMPOSE_VERSION:+"$COMPOSE_VERSION"}
+
+  android:
+    runs-on: ubuntu-24.04
+    env:
+      COMPOSE_VERSION: ${{ inputs.compose_version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: jetbrains
+          java-version: '17'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Install Android API 37.1
+        run: sdkmanager "platforms;android-37-ext1"
+
+      - name: Validate Android examples
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 37
+          target: google_apis
+          arch: x86_64
+          script: |
+            cd examples
+            ./validateExamplesAndroid.sh ${COMPOSE_VERSION:+"$COMPOSE_VERSION"}
+
+  ios:
+    runs-on: macos-15
+    env:
+      COMPOSE_VERSION: ${{ inputs.compose_version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: jetbrains
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Validate iOS examples
+        working-directory: examples
+        run: ./validateExamplesIos.sh ${COMPOSE_VERSION:+"$COMPOSE_VERSION"}
