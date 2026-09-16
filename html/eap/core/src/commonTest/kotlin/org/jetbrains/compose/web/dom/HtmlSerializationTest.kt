@@ -450,21 +450,6 @@ class HtmlSerializationTest {
     }
 
     @Test
-    fun htmlStyleAndScriptInsideSvgSuggestSvgElements() {
-        listOf("style", "script").forEach { tag ->
-            val failure = assertFailsWith<IllegalArgumentException> {
-                composeHtmlToString {
-                    TagElementNS<Element>("svg", TestSvgNamespace, null) {
-                        if (tag == "style") Style {} else Script(InlineScript("text"))
-                    }
-                }
-            }
-            assertContains(failure.message.orEmpty(), "the HTML parser creates an SVG <$tag>")
-            assertContains(failure.message.orEmpty(), "SvgElement<SVGElement>(\"$tag\")")
-        }
-    }
-
-    @Test
     fun explicitHtmlClassAndStyleOverrideDslValuesRegardlessOfCase() {
         assertEquals("<div class=\"literal\" style=\"color: green\"></div>", composeHtmlToString {
             Div({
@@ -474,37 +459,6 @@ class HtmlSerializationTest {
                 attr("STYLE", "color: green")
             })
         })
-    }
-
-    @Test
-    fun rejectsForeignNamesWhoseCasingChangesInHtml() {
-        listOf(
-            "myCustomTag" to "mycustomtag",
-            "foreignobject" to "foreignObject",
-            "lineargradient" to "linearGradient",
-        ).forEach { (name, parserName) ->
-            val failure = assertFailsWith<IllegalArgumentException> {
-                composeHtmlToString {
-                    TagElementNS<Element>("svg", TestSvgNamespace, null) {
-                        TagElementNS<Element>(name, TestSvgNamespace, null, null)
-                    }
-                }
-            }
-            assertContains(failure.message.orEmpty(), "Use <$parserName> instead")
-        }
-        listOf(
-            "dataPoints" to "datapoints",
-            "viewbox" to "viewBox",
-            "xlink:Href" to "xlink:href",
-            "XML:LANG" to "xml:lang",
-        ).forEach { (name, parserName) ->
-            val failure = assertFailsWith<IllegalArgumentException> {
-                composeHtmlToString {
-                    TagElementNS<Element>("svg", TestSvgNamespace, { attr(name, "value") }, null)
-                }
-            }
-            assertContains(failure.message.orEmpty(), "Use \"$parserName\" instead")
-        }
     }
 
     @Test
@@ -523,27 +477,6 @@ class HtmlSerializationTest {
                 }
             },
         )
-    }
-
-    @Test
-    fun validatesMathMlNameAdjustments() {
-        val namespace = "http://www.w3.org/1998/Math/MathML"
-        assertEquals("<math definitionURL=\"url\"></math>", composeHtmlToString {
-            TagElementNS<Element>("math", namespace, { attr("definitionURL", "url") }, null)
-        })
-        val failure = assertFailsWith<IllegalArgumentException> {
-            composeHtmlToString {
-                TagElementNS<Element>("math", namespace, { attr("definitionurl", "url") }, null)
-            }
-        }
-        assertContains(failure.message.orEmpty(), "Use \"definitionURL\" instead")
-        assertFailsWith<IllegalArgumentException> {
-            composeHtmlToString {
-                TagElementNS<Element>("math", namespace, null) {
-                    TagElementNS<Element>("Mi", namespace, null, null)
-                }
-            }
-        }
     }
 
     @Test
@@ -688,19 +621,6 @@ class HtmlSerializationTest {
     }
 
     @Test
-    fun rejectsSvgFragmentsWithoutAnSvgRoot() {
-        val failure = assertFailsWith<IllegalArgumentException> {
-            composeHtmlToString {
-                TagElementNS<Element>("animate", TestSvgNamespace, null, null)
-            }
-        }
-
-        assertContains(failure.message.orEmpty(), "<animate>")
-        assertContains(failure.message.orEmpty(), "string-rendering root")
-        assertContains(failure.message.orEmpty(), "SVG <svg> root")
-    }
-
-    @Test
     fun rejectsSvgAttributesThatCollapseDuringHtmlParsing() {
         val failure = assertFailsWith<IllegalArgumentException> {
             composeHtmlToString {
@@ -719,21 +639,6 @@ class HtmlSerializationTest {
         assertContains(failure.message.orEmpty(), "Duplicate HTML attribute names")
         assertContains(failure.message.orEmpty(), "dataValue")
         assertContains(failure.message.orEmpty(), "datavalue")
-    }
-
-    @Test
-    fun rejectsHtmlElementsDirectlyInsideSvg() {
-        val failure = assertFailsWith<IllegalArgumentException> {
-            composeHtmlToString {
-                TagElementNS<Element>("svg", TestSvgNamespace, null) {
-                    Div { Text("HTML") }
-                }
-            }
-        }
-
-        assertContains(failure.message.orEmpty(), "HTML element <div>")
-        assertContains(failure.message.orEmpty(), "SVG <svg>")
-        assertContains(failure.message.orEmpty(), "<foreignObject>")
     }
 
     @Test
@@ -763,49 +668,6 @@ class HtmlSerializationTest {
     }
 
     @Test
-    fun rejectsSvgFragmentsDirectlyInsideSvgIntegrationPoints() {
-        val failure = assertFailsWith<IllegalArgumentException> {
-            composeHtmlToString {
-                TagElementNS<Element>("svg", TestSvgNamespace, null) {
-                    TagElementNS<Element>("foreignObject", TestSvgNamespace, null) {
-                        TagElementNS<Element>("rect", TestSvgNamespace, null, null)
-                    }
-                }
-            }
-        }
-
-        assertContains(failure.message.orEmpty(), "<rect>")
-        assertContains(failure.message.orEmpty(), "inside <foreignObject>")
-        assertContains(failure.message.orEmpty(), "SVG <svg> root")
-    }
-
-    @Test
-    fun rejectsSvgElementNamesThatBreakOutOfForeignContent() {
-        listOf(
-            "div" to emptyMap(),
-            "font" to mapOf("color" to "red"),
-        ).forEach { (tagName, attributes) ->
-            val failure = assertFailsWith<IllegalArgumentException> {
-                composeHtmlToString {
-                    TagElementNS<Element>("svg", TestSvgNamespace, null) {
-                        TagElementNS<Element>(
-                            tagName = tagName,
-                            namespace = TestSvgNamespace,
-                            applyAttrs = {
-                                attributes.forEach { (name, value) -> attr(name, value) }
-                            },
-                            content = null,
-                        )
-                    }
-                }
-            }
-
-            assertContains(failure.message.orEmpty(), "<$tagName>")
-            assertContains(failure.message.orEmpty(), "moves it out of SVG foreign content")
-        }
-    }
-
-    @Test
     fun permitsNestedSvgRootsInsideSvgIntegrationPoints() {
         val html = composeHtmlToString {
             TagElementNS<Element>("svg", TestSvgNamespace, null) {
@@ -821,40 +683,6 @@ class HtmlSerializationTest {
             "<svg><foreignObject><svg><rect></rect></svg></foreignObject></svg>",
             html,
         )
-    }
-
-    @Test
-    fun mathMlIntegrationPointsPreserveNamespaceBoundaries() {
-        val mathMlNamespace = "http://www.w3.org/1998/Math/MathML"
-        listOf("mi", "mo", "mn", "ms", "mtext", "annotation-xml").forEach { parent ->
-            assertEquals("<math><$parent><svg></svg></$parent></math>", composeHtmlToString {
-                TagElementNS<Element>("math", mathMlNamespace, null) {
-                    TagElementNS<Element>(parent, mathMlNamespace, null) {
-                        TagElementNS<Element>("svg", TestSvgNamespace, null, null)
-                    }
-                }
-            })
-        }
-        listOf("mglyph", "malignmark").forEach { child ->
-            assertEquals("<math><mtext><$child></$child></mtext></math>", composeHtmlToString {
-                TagElementNS<Element>("math", mathMlNamespace, null) {
-                    TagElementNS<Element>("mtext", mathMlNamespace, null) {
-                        TagElementNS<Element>(child, mathMlNamespace, null, null)
-                    }
-                }
-            })
-        }
-        listOf("math", "mrow").forEach { parent ->
-            assertFailsWith<IllegalArgumentException> {
-                composeHtmlToString {
-                    TagElementNS<Element>("math", mathMlNamespace, null) {
-                        TagElementNS<Element>(parent, mathMlNamespace, null) {
-                            TagElementNS<Element>("svg", TestSvgNamespace, null, null)
-                        }
-                    }
-                }
-            }
-        }
     }
 
     @Test

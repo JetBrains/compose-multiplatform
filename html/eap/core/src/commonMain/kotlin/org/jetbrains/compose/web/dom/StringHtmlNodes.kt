@@ -250,9 +250,12 @@ internal class StringHtmlElementNode private constructor(
 
     private fun appendChildrenHtmlTo(builder: StringBuilder, hydratable: Boolean) {
         val rendered = children.filterNot(StringHtmlNode::isEmptyText)
+        val validateTableChildren = namespace == HtmlNamespace
         // Appends boundary marker for hydration between two text nodes
         rendered.forEachIndexed { index, child ->
-            requireParserStableChild(child)
+            if (validateTableChildren) {
+                requireHtmlParserStableTableChild(tagName, child)
+            }
             child.appendHtmlTo(builder, hydratable)
             if (
                 hydratable &&
@@ -262,20 +265,6 @@ internal class StringHtmlElementNode private constructor(
                 builder.appendHydrationTextBoundaryMarker()
             }
         }
-    }
-
-    private fun requireParserStableChild(child: StringHtmlNode) {
-        if (namespace == HtmlNamespace) {
-            requireHtmlParserStableTableChild(tagName, child)
-        }
-        val childElement = child as? StringHtmlElementNode ?: return
-        requireHtmlParserStableChild(
-            parentTagName = tagName,
-            parentNamespace = namespace,
-            childTagName = requireNotNull(childElement.tagName),
-            childNamespace = childElement.requireElementNamespace(),
-            childAttributeNames = childElement.attributes.keys,
-        )
     }
 
     private fun normalizeAttributeName(name: String): String =

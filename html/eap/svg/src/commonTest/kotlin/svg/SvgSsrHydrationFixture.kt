@@ -22,9 +22,7 @@ import org.jetbrains.compose.web.svg.SvgText
 import org.jetbrains.compose.web.svg.attributeName
 import org.jetbrains.compose.web.svg.fill
 import kotlin.test.Test
-import kotlin.test.assertContains
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 
 internal const val SVG_SSR_HYDRATION_FIXTURE_URL = "./svg-ssr-hydration.html"
 internal const val SVG_SSR_ROOT_ID = "svg-ssr-root"
@@ -157,17 +155,5 @@ class SvgSsrRenderingTest {
             "<svg><sparkline data-series=\"1,2,3\"></sparkline></svg>",
             html,
         )
-    }
-
-    @Test
-    fun rejectsStringRenderedCustomSvgElementWithoutSvgRoot() {
-        val failure = assertFailsWith<IllegalArgumentException> {
-            composeHtmlToString {
-                SvgElement<SVGElement>(name = "sparkline")
-            }
-        }
-
-        assertContains(failure.message.orEmpty(), "<sparkline>")
-        assertContains(failure.message.orEmpty(), "SVG <svg> root")
     }
 }

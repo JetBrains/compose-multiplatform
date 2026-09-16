@@ -724,16 +724,12 @@ fun ElementScope<SVGElement>.Set(
 /**
  * Creates a custom SVG element.
  *
- * When the result is string-rendered and parsed as HTML, custom tag and attribute names are
- * ASCII-lowercased unless they are part of the HTML parser's fixed SVG name-adjustment tables.
- * String rendering rejects names whose casing would change. Use lowercase names for custom
- * elements and custom attributes that must hydrate from HTML.
+ * For string rendering, place custom elements inside [Svg] and use lowercase custom element and
+ * attribute names to avoid hydration mismatches.
+ *
  * To embed HTML content, use `SvgElement<SVGElement>("foreignObject") { Div { ... } }` inside [Svg].
- * For SVG styles or scripts, use `SvgElement<SVGElement>("style") { Text(css) }` or
- * `SvgElement<SVGElement>("script") { Text(code) }`. These emit text content; the core [Style] and
- * [Script] composables create HTML elements, and the [Style] CSSOM API does not apply here.
- * String-rendered SVG elements must be descendants of an [Svg] root; standalone SVG fragments do
- * not acquire the SVG namespace when parsed as HTML.
+ * For SVG styles and scripts, use `SvgElement` with `Text`. [Style] and [Script] create HTML
+ * elements instead.
  */
 @Composable
 @ExperimentalComposeWebSvgApi
