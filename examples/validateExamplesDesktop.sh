@@ -5,14 +5,18 @@
 
 set -euo pipefail
 
-if [ "$#" -gt 1 ]; then
-    echo "Optionally specify a Compose version. For example: ./validateExamplesDesktop.sh 1.13.0-alpha03"
+if [ "$#" -gt 2 ]; then
+    echo "Optionally specify Compose and Kotlin versions. For example: ./validateExamplesDesktop.sh 1.13.0-alpha03 2.3.20"
     exit 1
 fi
 
 compose_args=()
 if [ "$#" -eq 1 ]; then
     compose_args=("-Pcompose.version=$1")
+fi
+
+if [ "$#" -eq 2 ]; then
+    compose_args=("-Pcompose.version=$1" "-Pkotlin.version=$2")
 fi
 
 
