@@ -51,13 +51,13 @@ jobs:
       - name: Setup Prerequisites
         uses: ./.github/actions/setup-prerequisites
 
-      - name: Install Android API 37
-        run: sdkmanager "platforms;android-37"
+      - name: Install Android API 37.1
+        run: sdkmanager --channel=3 "platforms;android-37.1"
 
       - name: Validate Android examples
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 37
+          api-level: 36
           target: google_apis
           arch: x86_64
           script: |
