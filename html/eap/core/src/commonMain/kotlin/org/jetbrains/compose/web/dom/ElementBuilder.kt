@@ -10,9 +10,6 @@ import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 internal const val HtmlNamespace = "http://www.w3.org/1999/xhtml"
 
-internal fun normalizeElementTagName(tagName: String, namespace: String): String =
-    if (namespace == HtmlNamespace) tagName.asciiLowercase() else tagName
-
 fun interface ElementBuilder<TElement : Element> {
     /** The HTML tag name used for string rendering. DOM-only lambda builders may omit it. */
     val tagName: String
@@ -30,8 +27,7 @@ fun interface ElementBuilder<TElement : Element> {
 
         fun <TElement : Element> createBuilder(
             tagName: String
-        ): ElementBuilder<TElement> =
-            createPlatformElementBuilder(tagName.asciiLowercase())
+        ): ElementBuilder<TElement> = createPlatformElementBuilder(tagName)
 
         @ComposeWebInternalApi
         fun <TElement : Element> createBuilder(

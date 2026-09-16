@@ -204,7 +204,7 @@ private class HydratingDomElementWrapper(
         val actual = if (
             attribute != null &&
             node.namespaceURI == HtmlNamespace &&
-            name.asciiLowercase() == "nonce"
+            name == "nonce"
         ) {
             (node.asDynamic().nonce as? String) ?: attribute
         } else {
@@ -212,8 +212,7 @@ private class HydratingDomElementWrapper(
         }
         if (
             expected != null &&
-            (name == AttrsScope.CLASS ||
-                node.namespaceURI == HtmlNamespace && name.asciiLowercase() == AttrsScope.CLASS) &&
+            name == AttrsScope.CLASS &&
             node.containsExpectedClasses(expected)
         ) {
             return
@@ -284,8 +283,7 @@ private fun String?.normalizedForHydration(
         this != null &&
         elementNamespace == HtmlNamespace &&
         '-' !in elementTagName &&
-        (attributeName.isHtmlBooleanAttributeName() ||
-            attributeName.asciiLowercase().isHtmlBooleanAttributeName())
+        attributeName.isHtmlBooleanAttributeName()
     ) "" else this
 
 private fun String?.describeAttributeValue(): String =
@@ -296,22 +294,6 @@ private class DomElementScope<TElement : Element> : ElementScopeImpl<TElement>()
 }
 
 internal actual val DefaultComposeHtmlContext: ComposeHtmlContext = BrowserComposeHtmlContext
-
-// Attribute updates are prepared before the DOM node exists. Select the namespace-specific
-// fallback only when applying the update, and include both alternatives in Compose's change check.
-private data class AttributeFallback<T>(val html: T?, val foreign: T?) {
-    fun forNamespace(namespace: String?): T? = if (namespace == HtmlNamespace) html else foreign
-}
-
-// HTML attribute names are ASCII-insensitive; the browser attribute map still contains raw names.
-private fun Map<String, String>.containsHtmlAttribute(name: String): Boolean =
-    keys.any { it.asciiLowercase() == name }
-
-private fun <T> Map<String, String>.attributeFallback(name: String, value: T): AttributeFallback<T> =
-    AttributeFallback(
-        html = value.takeUnless { containsHtmlAttribute(name) },
-        foreign = value.takeUnless { name in this },
-    )
 
 @Composable
 private fun <TElement : Element> TagElementImpl(
@@ -343,12 +325,14 @@ private fun <TElement : Element> TagElementImpl(
             hydrationMismatchAllowance?.isAllowed = attrsScope.allowsHydrationMismatch
 
             update {
-                set(attrs.attributeFallback(AttrsScope.CLASS, attrsScope.classes)) { fallback ->
-                    updateClasses(fallback.forNamespace(node.namespaceURI))
-                }
-                set(attrs.attributeFallback("style", attrsScope.styleScope)) { fallback ->
-                    updateStyleDeclarations(fallback.forNamespace(node.namespaceURI))
-                }
+                set(
+                    attrsScope.classes.takeUnless { AttrsScope.CLASS in attrs },
+                    DomElementWrapper::updateClasses,
+                )
+                set(
+                    attrsScope.styleScope.takeUnless { AttrsScope.STYLE in attrs },
+                    DomElementWrapper::updateStyleDeclarations,
+                )
                 set(attrs, DomElementWrapper::updateAttrs)
                 updateElement()
                 set(attrsScope.propertyUpdates, DomElementWrapper::updateProperties)

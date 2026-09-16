@@ -36,8 +36,8 @@ class ElementsTests {
                 classes(cssClass)
                 style { color(if (cssClass == "first") Color.red else Color.blue) }
                 if (explicit) {
-                    attr("CLASS", "literal")
-                    attr("STYLE", "color: green")
+                    attr("class", "literal")
+                    attr("style", "color: green")
                 }
             })
         }
@@ -353,8 +353,8 @@ class ElementsTests {
 
     @Test
     fun testElementBuilderCreate() {
-        val custom = ElementBuilder.createBuilder<HTMLElement>("CUSTOM")
-        val div = ElementBuilder.createBuilder<HTMLElement>("DIV")
+        val custom = ElementBuilder.createBuilder<HTMLElement>("custom")
+        val div = ElementBuilder.createBuilder<HTMLElement>("div")
         val sameDiv = ElementBuilder.createBuilder<HTMLElement>("div")
         val b = ElementBuilder.createBuilder<HTMLElement>("b")
         val abc = ElementBuilder.createBuilder<HTMLElement>("abc")
@@ -366,7 +366,7 @@ class ElementsTests {
         assertEquals("DIV", div.create().nodeName)
         assertEquals("B", b.create().nodeName)
         assertEquals("ABC", abc.create().nodeName)
-        assertSame(custom, ElementBuilder.createBuilder<HTMLElement>("custom"))
+        assertNotSame(custom, ElementBuilder.createBuilder<HTMLElement>("CUSTOM"))
         assertSame(div, sameDiv)
         assertNotSame(custom, div)
     }

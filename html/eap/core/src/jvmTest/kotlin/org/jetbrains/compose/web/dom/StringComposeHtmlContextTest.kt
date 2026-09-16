@@ -41,7 +41,7 @@ class StringComposeHtmlContextTest {
     fun rendersDynamicTagNames() {
         val html = composeHtmlToString {
             TagElement<Element>(
-                tagName = "CUSTOM-ELEMENT",
+                tagName = "custom-element",
                 applyAttrs = null,
                 content = { Text("content") },
             )

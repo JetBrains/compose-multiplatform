@@ -75,67 +75,38 @@ internal class StringHtmlAttributes private constructor(
             classAttributeValue: String? = null,
             styleAttributeValue: (() -> String?)? = null,
         ): StringHtmlAttributes {
-            val normalizedAttributes = linkedMapOf<String, String>()
-            val sourceNamesByParserName =
-                if (namespace == HtmlNamespace) null else mutableMapOf<String, String>()
-            var containsClass = false
-            var containsStyle = false
-
-            fun duplicateAttributeNames(previousSourceName: String, sourceName: String): Nothing {
-                throw IllegalArgumentException(
-                    "Duplicate HTML attribute names \"$previousSourceName\" and \"$sourceName\""
-                )
-            }
-
-            fun addAttribute(
-                sourceName: String,
-                parserName: String,
-                storedName: String,
-                value: String,
-            ) {
-                if (namespace == HtmlNamespace) {
-                    if (normalizedAttributes.put(storedName, value) != null) {
-                        val previousSourceName = attributes.keys.first {
-                            it != sourceName && it.asciiLowercase() == parserName
-                        }
-                        duplicateAttributeNames(previousSourceName, sourceName)
-                    }
-                } else {
-                    val previousSourceName = requireNotNull(sourceNamesByParserName)
-                        .put(parserName, sourceName)
-                    if (previousSourceName != null) {
-                        duplicateAttributeNames(previousSourceName, sourceName)
-                    }
-                    normalizedAttributes[storedName] = value
-                }
-            }
-
+            val serializedAttributes = linkedMapOf<String, String>()
             attributes.forEach { (name, value) ->
                 requireValidHtmlAttributeName(name)
-                // The tokenizer lowercases all names before applying its SVG name adjustments.
-                val parserName = name.asciiLowercase()
-                val storedName = if (namespace == HtmlNamespace) parserName else name
-                addAttribute(name, parserName, storedName, value)
+                if (namespace != HtmlNamespace) {
+                    val duplicateName = serializedAttributes.keys.firstOrNull {
+                        it.hasSameHtmlParserAttributeName(name)
+                    }
+                    require(duplicateName == null) {
+                        "Duplicate HTML attribute names \"$duplicateName\" and \"$name\""
+                    }
+                }
+                val protocolName = HydrationProtocolAttributes.firstOrNull {
+                    it.equals(name, ignoreCase = true)
+                }
                 require(
-                    parserName !in HydrationProtocolAttributes ||
-                        parserName in hydrationProtocolAttributes
+                    protocolName == null || protocolName in hydrationProtocolAttributes
                 ) {
                     "Attribute \"$name\" is owned by the Compose hydration protocol"
                 }
-                containsClass = containsClass || storedName == "class"
-                containsStyle = containsStyle || storedName == "style"
+                serializedAttributes[name] = value
             }
 
-            if (!containsClass && classAttributeValue != null) {
-                addAttribute("class", "class", "class", classAttributeValue)
+            if ("class" !in serializedAttributes && classAttributeValue != null) {
+                serializedAttributes["class"] = classAttributeValue
             }
-            if (!containsStyle) {
+            if ("style" !in serializedAttributes) {
                 styleAttributeValue?.invoke()?.let { value ->
-                    addAttribute("style", "style", "style", value)
+                    serializedAttributes["style"] = value
                 }
             }
 
-            return StringHtmlAttributes(normalizedAttributes)
+            return StringHtmlAttributes(serializedAttributes)
         }
     }
 }
@@ -151,7 +122,6 @@ internal class StringHtmlElementNode private constructor(
     } else {
         requireNotNull(tagName)
             .also(::requireValidHtmlTagName)
-            .let { normalizeElementTagName(it, requireNotNull(namespace)) }
     }
     internal val children: MutableList<StringHtmlNode> = mutableListOf()
     private val attributes: MutableMap<String, String> = mutableMapOf()
@@ -175,9 +145,9 @@ internal class StringHtmlElementNode private constructor(
         this.attributes.putAll(attributes.byName)
     }
 
-    fun hasAttribute(name: String): Boolean = attributes.containsKey(normalizeAttributeName(name))
+    fun hasAttribute(name: String): Boolean = attributes.containsKey(name)
 
-    fun attribute(name: String): String? = attributes[normalizeAttributeName(name)]
+    fun attribute(name: String): String? = attributes[name]
 
     fun toHtmlString(hydratable: Boolean = true): String = buildString {
         appendHtmlTo(this, hydratable)
@@ -267,9 +237,6 @@ internal class StringHtmlElementNode private constructor(
         }
     }
 
-    private fun normalizeAttributeName(name: String): String =
-        if (requireElementNamespace() == HtmlNamespace) name.asciiLowercase() else name
-
     private fun requireElementNamespace(): String =
         checkNotNull(namespace) { "The string-rendering root has no element namespace" }
 
@@ -349,29 +316,20 @@ private const val InvalidHtmlAttributeNameCharacters = " \"'/>="
 
 private fun Char.isAsciiLetter(): Boolean = this in 'A'..'Z' || this in 'a'..'z'
 
-/**
- * Lowercases ASCII A–Z while preserving all other characters.
- * Returns the original string without allocating a replacement if no ASCII uppercase letters exist.
- */
-internal fun String.asciiLowercase(): String {
-    var firstUppercaseIndex = 0
-    while (
-        firstUppercaseIndex < length &&
-        this[firstUppercaseIndex] !in 'A'..'Z'
-    ) {
-        firstUppercaseIndex++
-    }
-    if (firstUppercaseIndex == length) return this
-
-    return buildString(length) {
-        for (index in 0 until firstUppercaseIndex) {
-            append(this@asciiLowercase[index])
-        }
-        for (index in firstUppercaseIndex..this@asciiLowercase.lastIndex) {
-            val character = this@asciiLowercase[index]
-            append(if (character in 'A'..'Z') character.lowercaseChar() else character)
+private fun String.hasSameHtmlParserAttributeName(other: String): Boolean {
+    if (length != other.length) return false
+    for (index in indices) {
+        val first = this[index]
+        val second = other[index]
+        if (first == second) continue
+        if (
+            !(first in 'A'..'Z' && second.code == first.code + ('a'.code - 'A'.code)) &&
+            !(second in 'A'..'Z' && first.code == second.code + ('a'.code - 'A'.code))
+        ) {
+            return false
         }
     }
+    return true
 }
 
 private fun StringBuilder.appendEscapedAttribute(value: String) {

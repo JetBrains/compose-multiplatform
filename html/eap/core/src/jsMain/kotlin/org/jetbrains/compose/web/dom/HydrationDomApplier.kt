@@ -78,7 +78,6 @@ internal class HydrationDomApplier(
     fun claimElement(tagName: String, namespace: String): Element {
         ensureHydrating()
 
-        val expectedLocalName = normalizeElementTagName(tagName, namespace)
         val frame = currentFrame
         // allows whitespace around root node, that won't cause a hydration mismatch
         if (frame.node === rootNode && !hasClaimedRootNode) {
@@ -89,15 +88,15 @@ internal class HydrationDomApplier(
         frame.nextNode = candidate?.nextSibling
         val element = candidate as? Element
             ?: mismatchAtChild(
-                expectedLocalName,
+                tagName,
                 index,
-                elementMismatchDescription(expectedLocalName, namespace, candidate),
+                elementMismatchDescription(tagName, namespace, candidate),
             )
-        if (element.localName != expectedLocalName || element.namespaceURI != namespace) {
+        if (element.localName != tagName || element.namespaceURI != namespace) {
             mismatchAtChild(
-                expectedLocalName,
+                tagName,
                 index,
-                elementMismatchDescription(expectedLocalName, namespace, element),
+                elementMismatchDescription(tagName, namespace, element),
             )
         }
 

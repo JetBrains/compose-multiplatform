@@ -72,7 +72,7 @@ fun <TElement : Element> TagElement(
 
 /**
  * Creates an element identified by both its local [tagName] and [namespace].
- * Unlike HTML elements, tag names in non-HTML namespaces retain their casing.
+ * The tag name is used exactly as supplied.
  */
 @Composable
 @ComposeWebInternalApi
@@ -95,6 +95,7 @@ fun <TElement : Element> TagElementNS(
 
 /**
  * @param tagName - the name of the tag that needs to be created.
+ * Use canonical lowercase spelling for HTML tags. Others can produce mismatches.
  * It's best to use constant values for [tagName].
  * If variable [tagName] needed, consider wrapping TagElement calls into an if...else:
  *
@@ -159,10 +160,9 @@ internal class RawTextContent private constructor(
 
     companion object {
         fun create(tagName: String, content: String): RawTextContent {
-            val normalizedTagName = tagName.asciiLowercase()
             val normalizedContent = content.normalizeHtmlInputCharacters()
-            requireValidRawTextContent(normalizedTagName, normalizedContent)
-            return RawTextContent(normalizedTagName, normalizedContent)
+            requireValidRawTextContent(tagName, normalizedContent)
+            return RawTextContent(tagName, normalizedContent)
         }
     }
 }

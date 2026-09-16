@@ -54,7 +54,7 @@ class HydrationAttributesTest {
                 }
             }
             val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
-                Div({ attr("NONCE", "server-nonce") })
+                Div({ attr("nonce", "server-nonce") })
             }
             try {
                 assertSame(serverNode, root.firstChild)
@@ -77,24 +77,22 @@ class HydrationAttributesTest {
 
     @Test
     fun booleanAttributeValuesAreComparedByPresence() {
-        listOf("disabled", "DISABLED", "DisAbLeD").forEach { name ->
-            val root = document.createElement("div") as HTMLElement
-            root.innerHTML = composeHtmlToString {
-                Button(attrs = { attr(name, "true") })
-            }
-            val button = root.firstChild as HTMLElement
-            button.setAttribute("disabled", "")
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = composeHtmlToString {
+            Button(attrs = { attr("disabled", "true") })
+        }
+        val button = root.firstChild as HTMLElement
+        button.setAttribute("disabled", "")
 
-            val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
-                Button(attrs = { attr(name, "true") })
-            }
+        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            Button(attrs = { attr("disabled", "true") })
+        }
 
-            try {
-                assertSame(button, root.firstChild)
-                assertEquals("", button.getAttribute("disabled"))
-            } finally {
-                composition.dispose()
-            }
+        try {
+            assertSame(button, root.firstChild)
+            assertEquals("", button.getAttribute("disabled"))
+        } finally {
+            composition.dispose()
         }
     }
 
@@ -582,24 +580,16 @@ class HydrationAttributesTest {
 
     @Test
     fun rawClassAndStyleAttributesKeepPrecedenceAfterHydration() =
-        checkRawClassAndStylePrecedence("class", "style")
+        checkRawClassAndStylePrecedence()
 
-    @Test
-    fun uppercaseRawClassAndStyleAttributesKeepPrecedenceAfterHydration() =
-        checkRawClassAndStylePrecedence("CLASS", "STYLE")
-
-    @Test
-    fun mixedCaseRawClassAndStyleAttributesKeepPrecedenceAfterHydration() =
-        checkRawClassAndStylePrecedence("ClAsS", "StYlE")
-
-    private fun checkRawClassAndStylePrecedence(className: String, styleName: String) = MainScope().promise {
+    private fun checkRawClassAndStylePrecedence() = MainScope().promise {
         val root = document.createElement("div") as HTMLElement
         root.innerHTML = composeHtmlToString {
             Div(attrs = {
                 classes("ignored-before")
                 style { property("color", "red") }
-                attr(className, "manual")
-                attr(styleName, "display:none")
+                attr("class", "manual")
+                attr("style", "display:none")
             })
         }
         val div = root.firstChild as HTMLElement
@@ -611,8 +601,8 @@ class HydrationAttributesTest {
                 style {
                     property("color", if (useOtherBuilderValues) "blue" else "red")
                 }
-                attr(className, "manual")
-                attr(styleName, "display:none")
+                attr("class", "manual")
+                attr("style", "display:none")
             })
         }
 

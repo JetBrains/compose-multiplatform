@@ -82,8 +82,8 @@ class HtmlSerializationTest {
                 children.forEach { child ->
                     val failure = assertFailsWith<IllegalArgumentException>("$parent > $child") {
                         composeHtmlToString(hydratable) {
-                            TagElement<Element>(parent.uppercase(), null) {
-                                TagElement<Element>(child.uppercase(), null, null)
+                            TagElement<Element>(parent, null) {
+                                TagElement<Element>(child, null, null)
                             }
                         }
                     }
@@ -122,18 +122,18 @@ class HtmlSerializationTest {
     @Test
     fun rendersNamedCustomAndPlatformBuildersWithoutCreatingDomElements() {
         val customBuilder = object : ElementBuilder<Element> {
-            override val tagName = "MY-WIDGET"
+            override val tagName = "my-widget"
             override fun create(): Element = error("Must not create a DOM element")
         }
         assertEquals("<my-widget>custom</my-widget><div>built-in</div>", composeHtmlToString {
             TagElement(customBuilder, null) { Text("custom") }
-            TagElement(ElementBuilder.createBuilder<Element>("DIV"), null) { Text("built-in") }
+            TagElement(ElementBuilder.createBuilder<Element>("div"), null) { Text("built-in") }
         })
     }
 
     @Test
-    fun normalizesOnlyAsciiLettersInTagNames() {
-        assertEquals("<my-Él></my-Él>", composeHtmlToString {
+    fun preservesTagNameCase() {
+        assertEquals("<MY-ÉL></MY-ÉL>", composeHtmlToString {
             TagElement<Element>("MY-ÉL", null, null)
         })
     }
@@ -203,7 +203,7 @@ class HtmlSerializationTest {
     fun rendersTextChildrenInRawTextElements() {
         listOf("script", "style", "iframe", "xmp", "noembed", "noframes").forEach { tag ->
             val html = composeHtmlToString {
-                TagElement<Element>(tag.uppercase(), null) {
+                TagElement<Element>(tag, null) {
                     Text("A & B")
                     Text(" < C")
                 }
@@ -397,17 +397,12 @@ class HtmlSerializationTest {
             Div({
                 classes(emptyList())
             })
-            Div({
-                classes("ignored")
-                attr("CLASS", "manual upper")
-            })
         }
 
         assertEquals(
             "<div class=\"first second third\"></div>" +
                 "<div class=\"manual  value\"></div>" +
-                "<div></div>" +
-                "<div class=\"manual upper\"></div>",
+                "<div></div>",
             html,
         )
     }
@@ -427,16 +422,11 @@ class HtmlSerializationTest {
                 style { property("color", "red") }
                 attr("style", "display:none")
             })
-            Div({
-                style { property("color", "red") }
-                attr("STYLE", "display:block")
-            })
         }
 
         assertEquals(
             "<div style=\"color: red; display: block !important; color: blue; --accent: orange\"></div>" +
-                "<div style=\"display:none\"></div>" +
-                "<div style=\"display:block\"></div>",
+                "<div style=\"display:none\"></div>",
             html,
         )
     }
@@ -450,13 +440,13 @@ class HtmlSerializationTest {
     }
 
     @Test
-    fun explicitHtmlClassAndStyleOverrideDslValuesRegardlessOfCase() {
+    fun explicitHtmlClassAndStyleOverrideDslValues() {
         assertEquals("<div class=\"literal\" style=\"color: green\"></div>", composeHtmlToString {
             Div({
                 classes("dsl")
                 style { property("color", "red") }
-                attr("CLASS", "literal")
-                attr("STYLE", "color: green")
+                attr("class", "literal")
+                attr("style", "color: green")
             })
         })
     }
@@ -481,7 +471,7 @@ class HtmlSerializationTest {
 
     @Test
     fun htmlNamespaceUsesTheSameCachedBuilder() {
-        val builder = ElementBuilder.createBuilder<Element>("DIV")
+        val builder = ElementBuilder.createBuilder<Element>("div")
         assertSame(builder, ElementBuilder.createBuilder<Element>("div", HtmlNamespace))
         val svgBuilder = ElementBuilder.createBuilder<Element>("div", TestSvgNamespace)
         assertNotSame(builder, svgBuilder)
@@ -505,7 +495,7 @@ class HtmlSerializationTest {
     fun rawTextSerializationIsDrivenByTheHtmlParent() {
         listOf("script", "style", "iframe", "xmp", "noembed", "noframes").forEach { tag ->
             assertEquals("<$tag>A & B < C\nD</$tag>", composeHtmlToString {
-                TagElement<Element>(tag.uppercase(), null) {
+                TagElement<Element>(tag, null) {
                     Text("A & B < C\r")
                     Text("\nD")
                 }
@@ -686,7 +676,7 @@ class HtmlSerializationTest {
     }
 
     @Test
-    fun continuesLowercasingElementsInTheHtmlNamespace() {
+    fun preservesNamesInTheHtmlNamespace() {
         val html = composeHtmlToString {
             TagElementNS<Element>(
                 tagName = "CUSTOM-ELEMENT",
@@ -697,7 +687,7 @@ class HtmlSerializationTest {
         }
 
         assertEquals(
-            "<custom-element data-value=\"value\"></custom-element>",
+            "<CUSTOM-ELEMENT DATA-VALUE=\"value\"></CUSTOM-ELEMENT>",
             html,
         )
     }

@@ -28,7 +28,7 @@ class ElementBuilderJvmTest {
 
     @Test
     fun creatingDivElementIsUnsupported() {
-        val builder = ElementBuilder.createBuilder<HTMLDivElement>("DIV")
+        val builder = ElementBuilder.createBuilder<HTMLDivElement>("div")
 
         val exception = assertFailsWith<UnsupportedOperationException> {
             builder.create()
@@ -42,7 +42,7 @@ class ElementBuilderJvmTest {
 
     @Test
     fun creatingSpanElementIsUnsupported() {
-        val builder = ElementBuilder.createBuilder<HTMLSpanElement>("SPAN")
+        val builder = ElementBuilder.createBuilder<HTMLSpanElement>("span")
 
         val exception = assertFailsWith<UnsupportedOperationException> {
             builder.create()
