@@ -8,6 +8,7 @@ plugins {
 kotlin {
     android {
         compileSdk = 37
+        compileSdkExtension = 1
         namespace = "me.sample.app"
         minSdk = 23
         androidResources.enable = true
