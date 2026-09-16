@@ -11,6 +11,7 @@ kotlin {
     android {
         namespace = "com.google.samples.apps.diceroller.shared"
         compileSdk = 37
+        compileSdkExtension = 1
     }
 
     jvm()

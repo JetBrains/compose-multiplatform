@@ -13,6 +13,7 @@ kotlin {
     android {
         namespace = "org.company.app"
         compileSdk = 37
+        compileSdkExtension = 1
         minSdk = 24
         androidResources.enable = true
     }

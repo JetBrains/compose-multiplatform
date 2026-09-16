@@ -21,6 +21,7 @@ kotlin {
 android {
     namespace = "me.sample.feature"
     compileSdk = 37
+    compileSdkExtension = 1
 }
 
 compose.resources {

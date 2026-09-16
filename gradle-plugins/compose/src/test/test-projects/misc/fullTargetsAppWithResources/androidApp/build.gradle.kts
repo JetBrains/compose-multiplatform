@@ -5,6 +5,7 @@ plugins {
 android {
     namespace = "org.company.app.androidApp"
     compileSdk = 37
+    compileSdkExtension = 1
 
     defaultConfig {
         minSdk = 24
