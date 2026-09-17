@@ -10,7 +10,7 @@ import kotlin.test.*
 internal expect val RESOURCE_RECOMPOSITIONS: Int
 
 @OptIn(ExperimentalTestApi::class, InternalResourceApi::class)
-class ComposeResourceTest {
+class ComposeResourceTest : KmpUiTest() {
 
     init {
         getResourceEnvironment = ::getTestEnvironment
