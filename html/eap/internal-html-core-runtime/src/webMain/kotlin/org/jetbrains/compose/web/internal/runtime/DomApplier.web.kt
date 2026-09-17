@@ -8,7 +8,6 @@ package org.jetbrains.compose.web.internal.runtime
 import androidx.compose.runtime.AbstractApplier
 import kotlinx.browser.dom.Node
 import kotlinx.browser.dom.get
-import kotlinx.dom.clear
 
 @ComposeWebInternalApi
 class DomApplier(
@@ -32,7 +31,9 @@ class DomApplier(
     }
 
     override fun onClear() {
-        root.node.clear()
+        while (root.node.firstChild != null) {
+            root.node.removeChild(root.node.firstChild!!)
+        }
     }
 }
 

@@ -14,12 +14,12 @@ import kotlinx.browser.dom.ParentNode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
-import kotlinx.dom.clear
 import org.jetbrains.compose.web.dom.DOMScope
 import org.jetbrains.compose.web.dom.ElementScope
 import org.jetbrains.compose.web.dom.ElementScopeImpl
 import org.jetbrains.compose.web.dom.HydrationDomApplier
 import org.jetbrains.compose.web.dom.LocalComposeHtmlContext
+import org.jetbrains.compose.web.dom.clearChildren
 import org.jetbrains.compose.web.dom.hydratingComposeHtmlContext
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
@@ -114,7 +114,7 @@ fun <TElement : Element> hydrateComposable(
     )
 } catch (mismatch: HydrationMismatchException) {
     onHydrationMismatch(mismatch)
-    root.clear()
+    root.clearChildren()
     renderComposable(
         root = root,
         monotonicFrameClock = monotonicFrameClock,

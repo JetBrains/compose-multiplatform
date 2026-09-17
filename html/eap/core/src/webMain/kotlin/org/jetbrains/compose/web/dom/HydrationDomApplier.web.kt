@@ -5,7 +5,6 @@ import kotlinx.browser.dom.Comment
 import kotlinx.browser.dom.Element
 import kotlinx.browser.dom.Node
 import kotlinx.browser.dom.Text
-import kotlinx.dom.clear
 import org.jetbrains.compose.web.HydrationMismatchException
 import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
 import org.jetbrains.compose.web.internal.runtime.browserDocument
@@ -292,7 +291,7 @@ internal class HydrationDomApplier(
         // already applied if initialization failed during the commit phase.
         if (state == State.Aborted) return
         ensureComplete()
-        rootNode.clear()
+        rootNode.clearChildren()
     }
 
     override fun onEndChanges() {
@@ -430,6 +429,12 @@ internal class HydrationDomApplier(
             append(frames[frameIndex - 1].nextChildIndex - 1)
             append(']')
         }
+    }
+}
+
+internal fun Node.clearChildren() {
+    while (firstChild != null) {
+        removeChild(firstChild!!)
     }
 }
 
