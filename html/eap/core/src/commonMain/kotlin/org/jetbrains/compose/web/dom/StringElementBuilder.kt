@@ -8,10 +8,9 @@ package org.jetbrains.compose.web.dom
 import kotlinx.browser.dom.Element
 
 internal class StringElementBuilder<TElement : Element>(
-    tagName: String
+    override val tagName: String,
+    val namespace: String = HtmlNamespace,
 ) : ElementBuilder<TElement> {
-    override val tagName: String = tagName.asciiLowercase()
-
     override fun create(): TElement {
         throw UnsupportedOperationException(
             "String element builder for <$tagName> cannot create a DOM element"

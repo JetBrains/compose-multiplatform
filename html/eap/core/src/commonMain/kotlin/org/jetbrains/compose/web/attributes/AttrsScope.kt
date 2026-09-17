@@ -98,6 +98,8 @@ interface AttrsScope<out TElement : Element> : EventsListenerScope {
     /**
      * [attr] adds arbitrary attribute to the Element.
      * If it called twice for the same attribute name, attribute value will be resolved to the last call.
+     * Attribute names are matched exactly by Compose. Use canonical lowercase spelling for HTML
+     * attributes, others can cause a hydration mismatch.
      *
      * @param attr - the name of the attribute
      * @param value - the value of the attribute

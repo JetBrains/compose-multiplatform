@@ -52,7 +52,7 @@ class StringHtmlNodesTest {
     @Test
     fun serializesNestedNodesAndRootSiblings() {
         val root = StringHtmlElementNode.root()
-        val div = StringHtmlElementNode("DIV")
+        val div = StringHtmlElementNode("div")
         div.children += StringHtmlTextNode("before")
         div.children += StringHtmlElementNode("span").apply {
             children += StringHtmlTextNode("inside")
@@ -64,6 +64,15 @@ class StringHtmlNodesTest {
             "<div>before<span>inside</span></div>after",
             root.toHtmlString()
         )
+    }
+
+    @Test
+    fun rejectsAttributesOnTheSyntheticRoot() {
+        val failure = assertFailsWith<IllegalStateException> {
+            StringHtmlElementNode.root().updateAttributes(mapOf("lang" to "en"))
+        }
+
+        assertEquals("The string-rendering root has no element namespace", failure.message)
     }
 
     @Test
@@ -80,33 +89,40 @@ class StringHtmlNodesTest {
     }
 
     @Test
-    fun normalizesHtmlAttributeNamesAndLooksThemUpCaseInsensitively() {
+    fun preservesAttributeNamesAndUsesExactLookup() {
         val element = StringHtmlElementNode("div").apply {
             updateAttributes(mapOf("DATA-VALUE" to "content"))
         }
 
-        assertEquals("<div data-value=\"content\"></div>", element.toHtmlString())
-        assertEquals(true, element.hasAttribute("Data-Value"))
+        assertEquals("<div DATA-VALUE=\"content\"></div>", element.toHtmlString())
+        assertEquals(false, element.hasAttribute("Data-Value"))
         assertEquals("content", element.attribute("DATA-VALUE"))
     }
 
     @Test
-    fun rejectsAttributeNamesThatDifferOnlyByAsciiCase() {
-        val failure = assertFailsWith<IllegalArgumentException> {
-            StringHtmlElementNode("div").updateAttributes(
+    fun preservesHtmlTagNames() {
+        val element = StringHtmlElementNode("D\u0130V")
+
+        assertEquals("D\u0130V", element.tagName)
+    }
+
+    @Test
+    fun preservesAttributeNamesThatDifferOnlyByCase() {
+        val element = StringHtmlElementNode("div").apply {
+            updateAttributes(
                 linkedMapOf("CLASS" to "first", "class" to "second")
             )
         }
 
         assertEquals(
-            "Duplicate HTML attribute names \"CLASS\" and \"class\"",
-            failure.message,
+            "<div CLASS=\"first\" class=\"second\"></div>",
+            element.toHtmlString(),
         )
     }
 
     @Test
     fun serializesVoidElementsWithoutClosingTags() {
-        val element = StringHtmlElementNode("BR")
+        val element = StringHtmlElementNode("br")
 
         assertEquals("<br>", element.toHtmlString())
     }

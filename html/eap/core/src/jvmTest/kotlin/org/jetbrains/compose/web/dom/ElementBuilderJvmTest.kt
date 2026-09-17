@@ -14,8 +14,21 @@ import kotlin.test.assertSame
 
 class ElementBuilderJvmTest {
     @Test
+    @OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+    fun namespacedBuildersAreCachedAndCannotCreateDomElements() {
+        val namespace = "http://www.w3.org/2000/svg"
+        val builder = ElementBuilder.createBuilder<kotlinx.browser.dom.Element>("linearGradient", namespace)
+        assertSame(builder, ElementBuilder.createBuilder<kotlinx.browser.dom.Element>("linearGradient", namespace))
+        val failure = assertFailsWith<UnsupportedOperationException> { builder.create() }
+        assertEquals(
+            "DOM element creation for <linearGradient> in namespace \"$namespace\" is not available on JVM",
+            failure.message,
+        )
+    }
+
+    @Test
     fun creatingDivElementIsUnsupported() {
-        val builder = ElementBuilder.createBuilder<HTMLDivElement>("DIV")
+        val builder = ElementBuilder.createBuilder<HTMLDivElement>("div")
 
         val exception = assertFailsWith<UnsupportedOperationException> {
             builder.create()
@@ -29,7 +42,7 @@ class ElementBuilderJvmTest {
 
     @Test
     fun creatingSpanElementIsUnsupported() {
-        val builder = ElementBuilder.createBuilder<HTMLSpanElement>("SPAN")
+        val builder = ElementBuilder.createBuilder<HTMLSpanElement>("span")
 
         val exception = assertFailsWith<UnsupportedOperationException> {
             builder.create()
@@ -50,10 +63,10 @@ class ElementBuilderJvmTest {
     }
 
     @Test
-    fun stringBuilderCarriesNormalizedTagName() {
+    fun stringBuilderCarriesRawTagName() {
         val builder = StringElementBuilder<HTMLDivElement>("DIV")
 
-        assertEquals("div", builder.tagName)
+        assertEquals("DIV", builder.tagName)
     }
 
     @Test
@@ -65,7 +78,7 @@ class ElementBuilderJvmTest {
         }
 
         assertEquals(
-            "String element builder for <div> cannot create a DOM element",
+            "String element builder for <DIV> cannot create a DOM element",
             exception.message
         )
     }

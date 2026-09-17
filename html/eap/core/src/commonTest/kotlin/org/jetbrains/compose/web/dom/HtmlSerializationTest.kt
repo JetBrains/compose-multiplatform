@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.web.dom
 
+import androidx.compose.runtime.Composable
 import kotlinx.browser.dom.Element
 import kotlinx.browser.dom.HTMLInputElement
 import org.jetbrains.compose.web.attributes.disabled
@@ -15,7 +16,38 @@ import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
+import kotlin.test.assertNotSame
+import kotlin.test.assertSame
 
+internal const val TestSvgNamespace = "http://www.w3.org/2000/svg"
+
+@Composable
+@OptIn(ComposeWebInternalApi::class)
+internal fun SvgSerializationFixture() {
+    TagElementNS<Element>(
+        tagName = "svg",
+        namespace = TestSvgNamespace,
+        applyAttrs = { attr("viewBox", "0 0 10 10") },
+    ) {
+        TagElementNS<Element>("defs", TestSvgNamespace, null) {
+            TagElementNS<Element>(
+                tagName = "linearGradient",
+                namespace = TestSvgNamespace,
+                applyAttrs = { attr("id", "gradient") },
+                content = null,
+            )
+        }
+        TagElementNS<Element>(
+            tagName = "image",
+            namespace = TestSvgNamespace,
+            applyAttrs = { attr("width", "10") },
+            content = null,
+        )
+    }
+}
+
+@OptIn(ComposeWebInternalApi::class)
 class HtmlSerializationTest {
     @Test
     fun rejectsNulInTextAndAttributes() {
@@ -50,8 +82,8 @@ class HtmlSerializationTest {
                 children.forEach { child ->
                     val failure = assertFailsWith<IllegalArgumentException>("$parent > $child") {
                         composeHtmlToString(hydratable) {
-                            TagElement<Element>(parent.uppercase(), null) {
-                                TagElement<Element>(child.uppercase(), null, null)
+                            TagElement<Element>(parent, null) {
+                                TagElement<Element>(child, null, null)
                             }
                         }
                     }
@@ -90,18 +122,18 @@ class HtmlSerializationTest {
     @Test
     fun rendersNamedCustomAndPlatformBuildersWithoutCreatingDomElements() {
         val customBuilder = object : ElementBuilder<Element> {
-            override val tagName = "MY-WIDGET"
+            override val tagName = "my-widget"
             override fun create(): Element = error("Must not create a DOM element")
         }
         assertEquals("<my-widget>custom</my-widget><div>built-in</div>", composeHtmlToString {
             TagElement(customBuilder, null) { Text("custom") }
-            TagElement(ElementBuilder.createBuilder<Element>("DIV"), null) { Text("built-in") }
+            TagElement(ElementBuilder.createBuilder<Element>("div"), null) { Text("built-in") }
         })
     }
 
     @Test
-    fun normalizesOnlyAsciiLettersInTagNames() {
-        assertEquals("<my-Él></my-Él>", composeHtmlToString {
+    fun preservesTagNameCase() {
+        assertEquals("<MY-ÉL></MY-ÉL>", composeHtmlToString {
             TagElement<Element>("MY-ÉL", null, null)
         })
     }
@@ -171,7 +203,7 @@ class HtmlSerializationTest {
     fun rendersTextChildrenInRawTextElements() {
         listOf("script", "style", "iframe", "xmp", "noembed", "noframes").forEach { tag ->
             val html = composeHtmlToString {
-                TagElement<Element>(tag.uppercase(), null) {
+                TagElement<Element>(tag, null) {
                     Text("A & B")
                     Text(" < C")
                 }
@@ -365,17 +397,12 @@ class HtmlSerializationTest {
             Div({
                 classes(emptyList())
             })
-            Div({
-                classes("ignored")
-                attr("CLASS", "manual upper")
-            })
         }
 
         assertEquals(
             "<div class=\"first second third\"></div>" +
                 "<div class=\"manual  value\"></div>" +
-                "<div></div>" +
-                "<div class=\"manual upper\"></div>",
+                "<div></div>",
             html,
         )
     }
@@ -395,16 +422,291 @@ class HtmlSerializationTest {
                 style { property("color", "red") }
                 attr("style", "display:none")
             })
-            Div({
-                style { property("color", "red") }
-                attr("STYLE", "display:block")
-            })
         }
 
         assertEquals(
             "<div style=\"color: red; display: block !important; color: blue; --accent: orange\"></div>" +
-                "<div style=\"display:none\"></div>" +
-                "<div style=\"display:block\"></div>",
+                "<div style=\"display:none\"></div>",
+            html,
+        )
+    }
+
+    @Test
+    fun unsupportedRawTextTagHasAnExplicitDiagnostic() {
+        val failure = assertFailsWith<IllegalArgumentException> {
+            RawTextContent.create("div", "text")
+        }
+        assertEquals("Raw text content is not supported for <div>", failure.message)
+    }
+
+    @Test
+    fun explicitHtmlClassAndStyleOverrideDslValues() {
+        assertEquals("<div class=\"literal\" style=\"color: green\"></div>", composeHtmlToString {
+            Div({
+                classes("dsl")
+                style { property("color", "red") }
+                attr("class", "literal")
+                attr("style", "color: green")
+            })
+        })
+    }
+
+    @Test
+    fun acceptsAdjustedSvgNamesAndLowercaseCustomNames() {
+        assertEquals(
+            "<svg viewBox=\"0 0 10 10\"><linearGradient gradientUnits=\"userSpaceOnUse\">" +
+                "</linearGradient><sparkline datapoints=\"0,1\" xlink:href=\"#line\"></sparkline></svg>",
+            composeHtmlToString {
+                TagElementNS<Element>("svg", TestSvgNamespace, { attr("viewBox", "0 0 10 10") }) {
+                    TagElementNS<Element>("linearGradient", TestSvgNamespace,
+                        { attr("gradientUnits", "userSpaceOnUse") }, null)
+                    TagElementNS<Element>("sparkline", TestSvgNamespace, {
+                        attr("datapoints", "0,1")
+                        attr("xlink:href", "#line")
+                    }, null)
+                }
+            },
+        )
+    }
+
+    @Test
+    fun htmlNamespaceUsesTheSameCachedBuilder() {
+        val builder = ElementBuilder.createBuilder<Element>("div")
+        assertSame(builder, ElementBuilder.createBuilder<Element>("div", HtmlNamespace))
+        val svgBuilder = ElementBuilder.createBuilder<Element>("div", TestSvgNamespace)
+        assertNotSame(builder, svgBuilder)
+        assertSame(svgBuilder, ElementBuilder.createBuilder<Element>("div", TestSvgNamespace))
+        assertNotSame(svgBuilder, ElementBuilder.createBuilder<Element>("DIV", TestSvgNamespace))
+    }
+
+    @Test
+    fun rejectsReservedSvgAttributesRegardlessOfCasing() {
+        listOf("DATA-COMPOSE-HYDRATION-ROOT", "Data-Compose-Hydration-State").forEach { name ->
+            val failure = assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString {
+                    TagElementNS<Element>("svg", TestSvgNamespace, { attr(name, "") }, null)
+                }
+            }
+            assertContains(failure.message.orEmpty(), "owned by the Compose hydration protocol")
+        }
+    }
+
+    @Test
+    fun rawTextSerializationIsDrivenByTheHtmlParent() {
+        listOf("script", "style", "iframe", "xmp", "noembed", "noframes").forEach { tag ->
+            assertEquals("<$tag>A & B < C\nD</$tag>", composeHtmlToString {
+                TagElement<Element>(tag, null) {
+                    Text("A & B < C\r")
+                    Text("\nD")
+                }
+            })
+            val failure = assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString {
+                    TagElement<Element>(tag, null) {
+                        Text("</${tag.take(2)}")
+                        Text("${tag.drop(2).uppercase()}>")
+                    }
+                }
+            }
+            assertContains(failure.message.orEmpty(), "Raw text for <$tag>")
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString { TagElement<Element>(tag, null) { Div {} } }
+            }
+        }
+    }
+
+    @Test
+    fun genericScriptUsesInlineScriptValidation() {
+        assertFailsWith<IllegalArgumentException> {
+            composeHtmlToString {
+                TagElement<Element>("script", { attr("src", "/app.js") }) { Text("inline") }
+            }
+        }
+        assertFailsWith<IllegalArgumentException> {
+            composeHtmlToString {
+                TagElement<Element>("script", null) {
+                    Text("<!-- <scr")
+                    Text("ipt>")
+                }
+            }
+        }
+    }
+
+    @Test
+    fun permitsHarmlessRawTextTagPrefixesAndClosedScriptComments() {
+        listOf("</scripture>", "<!-- <scripture>", "<!-- closed --> <script>", "<!--> <script>").forEach { text ->
+            assertEquals("<script>$text</script>", composeHtmlToString {
+                Script(InlineScript(text))
+            })
+        }
+    }
+
+    @Test
+    fun svgScriptAndStyleStillEscapeText() {
+        assertEquals(
+            "<svg><script>A &amp; B &lt; C</script><style>A &amp; B &lt; C</style></svg>",
+            composeHtmlToString {
+                TagElementNS<Element>("svg", TestSvgNamespace, null) {
+                    listOf("script", "style").forEach { tag ->
+                        TagElementNS<Element>(tag, TestSvgNamespace, null) { Text("A & B < C") }
+                    }
+                }
+            },
+        )
+    }
+
+    @Test
+    fun serializesSvgUsingNamespaceAwareRules() {
+        val html = composeHtmlToString { SvgSerializationFixture() }
+
+        assertEquals(
+            "<svg viewBox=\"0 0 10 10\">" +
+                "<defs><linearGradient id=\"gradient\"></linearGradient></defs>" +
+                "<image width=\"10\"></image>" +
+                "</svg>",
+            html,
+        )
+    }
+
+    @Test
+    fun preservesSvgAttributeCasingAndDoesNotMinimizeBooleanNamedAttributes() {
+        val html = composeHtmlToString {
+            TagElementNS<Element>("svg", TestSvgNamespace, null) {
+                TagElementNS<Element>(
+                    tagName = "animate",
+                    namespace = TestSvgNamespace,
+                    applyAttrs = {
+                        attr("attributeName", "viewBox")
+                        attr("required", "false")
+                    },
+                    content = null,
+                )
+            }
+        }
+
+        assertEquals(
+            "<svg><animate attributeName=\"viewBox\" required=\"false\"></animate></svg>",
+            html,
+        )
+    }
+
+    @Test
+    fun usesHtmlSafeEscapingForSvgContent() {
+        val html = composeHtmlToString {
+            TagElementNS<Element>("svg", TestSvgNamespace, null) {
+                TagElementNS<Element>(
+                    tagName = "text",
+                    namespace = TestSvgNamespace,
+                    applyAttrs = { attr("data", "\"<&>") },
+                ) {
+                    Text("<&>")
+                }
+            }
+        }
+
+        assertEquals(
+            "<svg><text data=\"&quot;&lt;&amp;&gt;\">&lt;&amp;&gt;</text></svg>",
+            html,
+        )
+    }
+
+    @Test
+    fun rejectsSvgAttributesThatCollapseDuringHtmlParsing() {
+        val failure = assertFailsWith<IllegalArgumentException> {
+            composeHtmlToString {
+                TagElementNS<Element>(
+                    tagName = "svg",
+                    namespace = TestSvgNamespace,
+                    applyAttrs = {
+                        attr("dataValue", "first")
+                        attr("datavalue", "second")
+                    },
+                    content = null,
+                )
+            }
+        }
+
+        assertContains(failure.message.orEmpty(), "Duplicate HTML attribute names")
+        assertContains(failure.message.orEmpty(), "dataValue")
+        assertContains(failure.message.orEmpty(), "datavalue")
+    }
+
+    @Test
+    fun permitsHtmlElementsInsideSvgIntegrationPoints() {
+        val html = composeHtmlToString {
+            TagElementNS<Element>("svg", TestSvgNamespace, null) {
+                TagElementNS<Element>("foreignObject", TestSvgNamespace, null) {
+                    Div { Text("foreignObject") }
+                }
+                TagElementNS<Element>("title", TestSvgNamespace, null) {
+                    Div { Text("title") }
+                }
+                TagElementNS<Element>("desc", TestSvgNamespace, null) {
+                    Div { Text("desc") }
+                }
+            }
+        }
+
+        assertEquals(
+            "<svg>" +
+                "<foreignObject><div>foreignObject</div></foreignObject>" +
+                "<title><div>title</div></title>" +
+                "<desc><div>desc</div></desc>" +
+                "</svg>",
+            html,
+        )
+    }
+
+    @Test
+    fun permitsNestedSvgRootsInsideSvgIntegrationPoints() {
+        val html = composeHtmlToString {
+            TagElementNS<Element>("svg", TestSvgNamespace, null) {
+                TagElementNS<Element>("foreignObject", TestSvgNamespace, null) {
+                    TagElementNS<Element>("svg", TestSvgNamespace, null) {
+                        TagElementNS<Element>("rect", TestSvgNamespace, null, null)
+                    }
+                }
+            }
+        }
+
+        assertEquals(
+            "<svg><foreignObject><svg><rect></rect></svg></foreignObject></svg>",
+            html,
+        )
+    }
+
+    @Test
+    fun preservesNamesInTheHtmlNamespace() {
+        val html = composeHtmlToString {
+            TagElementNS<Element>(
+                tagName = "CUSTOM-ELEMENT",
+                namespace = HtmlNamespace,
+                applyAttrs = { attr("DATA-VALUE", "value") },
+                content = null,
+            )
+        }
+
+        assertEquals(
+            "<CUSTOM-ELEMENT DATA-VALUE=\"value\"></CUSTOM-ELEMENT>",
+            html,
+        )
+    }
+
+    @Test
+    fun customElementBooleanNamedAttributesAreNeverMinimized() {
+        val html = composeHtmlToString {
+            TagElement<Element>(
+                tagName = "my-widget",
+                applyAttrs = {
+                    attr("open", "")
+                    attr("checked", "false")
+                },
+                content = null,
+            )
+        }
+
+        assertEquals(
+            "<my-widget open=\"\" checked=\"false\"></my-widget>",
             html,
         )
     }

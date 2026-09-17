@@ -14,11 +14,11 @@ private val HtmlRawTextElementNames = setOf(
     "script", "style", "iframe", "xmp", "noembed", "noframes",
 )
 
-internal fun isHtmlRawTextElement(tagName: String?): Boolean =
-    tagName in HtmlRawTextElementNames
+internal fun isHtmlRawTextElement(tagName: String?, namespace: String?): Boolean =
+    namespace == HtmlNamespace && tagName in HtmlRawTextElementNames
 
-internal fun isHtmlRcdataElement(tagName: String?): Boolean =
-    tagName == "title" || tagName == "textarea"
+internal fun isHtmlRcdataElement(tagName: String?, namespace: String?): Boolean =
+    namespace == HtmlNamespace && (tagName == "title" || tagName == "textarea")
 
 // Only empty boolean attribute values may be minimized without losing their value.
 internal val HtmlBooleanAttributeNames = setOf(
@@ -59,59 +59,95 @@ internal sealed interface StringHtmlNode {
 internal fun StringHtmlNode.isEmptyText(): Boolean =
     this is StringHtmlTextNode && text.isEmpty()
 
-internal data class StringHtmlAttributes(
+internal class StringHtmlAttributes private constructor(
     val byName: Map<String, String>,
-    val hydrationProtocolAttributes: Set<String>,
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other || other is StringHtmlAttributes && byName == other.byName
+
+    override fun hashCode(): Int = byName.hashCode()
+
+    companion object {
+        fun from(
+            attributes: Map<String, String>,
+            namespace: String,
+            hydrationProtocolAttributes: Set<String>,
+            classAttributeValue: String? = null,
+            styleAttributeValue: (() -> String?)? = null,
+        ): StringHtmlAttributes {
+            val serializedAttributes = linkedMapOf<String, String>()
+            attributes.forEach { (name, value) ->
+                requireValidHtmlAttributeName(name)
+                if (namespace != HtmlNamespace) {
+                    val duplicateName = serializedAttributes.keys.firstOrNull {
+                        it.hasSameHtmlParserAttributeName(name)
+                    }
+                    require(duplicateName == null) {
+                        "Duplicate HTML attribute names \"$duplicateName\" and \"$name\""
+                    }
+                }
+                val protocolName = HydrationProtocolAttributes.firstOrNull {
+                    it.equals(name, ignoreCase = true)
+                }
+                require(
+                    protocolName == null || protocolName in hydrationProtocolAttributes
+                ) {
+                    "Attribute \"$name\" is owned by the Compose hydration protocol"
+                }
+                serializedAttributes[name] = value
+            }
+
+            if ("class" !in serializedAttributes && classAttributeValue != null) {
+                serializedAttributes["class"] = classAttributeValue
+            }
+            if ("style" !in serializedAttributes) {
+                styleAttributeValue?.invoke()?.let { value ->
+                    serializedAttributes["style"] = value
+                }
+            }
+
+            return StringHtmlAttributes(serializedAttributes)
+        }
+    }
+}
 
 internal class StringHtmlElementNode private constructor(
     tagName: String?,
+    namespace: String?,
     isRoot: Boolean,
 ) : StringHtmlNode {
+    val namespace: String? = if (isRoot) null else requireNotNull(namespace)
     val tagName: String? = if (isRoot) {
         null
     } else {
-        requireNotNull(tagName).also(::requireValidHtmlTagName).asciiLowercase()
+        requireNotNull(tagName)
+            .also(::requireValidHtmlTagName)
     }
     internal val children: MutableList<StringHtmlNode> = mutableListOf()
     private val attributes: MutableMap<String, String> = mutableMapOf()
 
-    constructor(tagName: String) : this(tagName, isRoot = false)
+    constructor(
+        tagName: String,
+        namespace: String = HtmlNamespace,
+    ) : this(tagName, namespace, isRoot = false)
 
     fun updateAttributes(attributes: Map<String, String>) = updateAttributes(
-        StringHtmlAttributes(
-            byName = attributes,
+        StringHtmlAttributes.from(
+            attributes = attributes,
+            namespace = requireElementNamespace(),
             hydrationProtocolAttributes = emptySet(),
         )
     )
 
     fun updateAttributes(attributes: StringHtmlAttributes) {
-        val normalizedAttributes = mutableMapOf<String, String>()
-        val originalNames = mutableMapOf<String, String>()
-        attributes.byName.forEach { (name, value) ->
-            requireValidHtmlAttributeName(name)
-            // HTML parsers ASCII-lowercase attribute names. Mirror that behavior so serialized
-            // output and browser DOM lookup agree.
-            val normalizedName = name.asciiLowercase()
-            val previousName = originalNames.put(normalizedName, name)
-            require(previousName == null) {
-                "Duplicate HTML attribute names \"$previousName\" and \"$name\""
-            }
-            require(
-                normalizedName !in HydrationProtocolAttributes ||
-                    normalizedName in attributes.hydrationProtocolAttributes
-            ) {
-                "Attribute \"$name\" is owned by the Compose hydration protocol"
-            }
-            normalizedAttributes[normalizedName] = value
-        }
+        requireElementNamespace()
         this.attributes.clear()
-        this.attributes.putAll(normalizedAttributes)
+        this.attributes.putAll(attributes.byName)
     }
 
-    fun hasAttribute(name: String): Boolean = attributes.containsKey(name.asciiLowercase())
+    fun hasAttribute(name: String): Boolean = attributes.containsKey(name)
 
-    fun attribute(name: String): String? = attributes[name.asciiLowercase()]
+    fun attribute(name: String): String? = attributes[name]
 
     fun toHtmlString(hydratable: Boolean = true): String = buildString {
         appendHtmlTo(this, hydratable)
@@ -123,11 +159,17 @@ internal class StringHtmlElementNode private constructor(
             appendChildrenHtmlTo(builder, hydratable)
             return
         }
+        val namespace = requireElementNamespace()
 
         builder.append('<').append(tagName)
         attributes.forEach { (name, value) ->
             builder.append(' ').append(name)
-            if (value.isNotEmpty() || '-' in tagName || !name.isHtmlBooleanAttributeName()) {
+            if (
+                namespace != HtmlNamespace ||
+                value.isNotEmpty() ||
+                '-' in tagName ||
+                !name.isHtmlBooleanAttributeName()
+            ) {
                 builder.append("=\"")
                 builder.appendEscapedAttribute(value)
                 builder.append('"')
@@ -136,12 +178,12 @@ internal class StringHtmlElementNode private constructor(
         builder.append('>')
 
         // HTML void elements have neither content nor an end tag.
-        if (tagName in VoidElementNames) return
+        if (namespace == HtmlNamespace && tagName in VoidElementNames) return
 
         val contentStart = builder.length
         // The parent determines text serialization: script/style and other raw-text elements
         // emit validated text without HTML escaping. Ordinary elements escape their text.
-        if (isHtmlRawTextElement(tagName) && children.isNotEmpty()) {
+        if (isHtmlRawTextElement(tagName, namespace) && children.isNotEmpty()) {
             // Validate together so end tags split across children cannot bypass validation.
             val text = children.joinToString("") { child ->
                 when (child) {
@@ -157,9 +199,9 @@ internal class StringHtmlElementNode private constructor(
             builder.append(content.text)
         } else {
             // RCDATA decodes escaped text, but treats boundary comments as literal content.
-            appendChildrenHtmlTo(builder, hydratable && !isHtmlRcdataElement(tagName))
+            appendChildrenHtmlTo(builder, hydratable && !isHtmlRcdataElement(tagName, namespace))
         }
-        if (tagName == "noscript") {
+        if (namespace == HtmlNamespace && tagName == "noscript") {
             // Render fallback HTML for scripting-disabled browsers, but keep it inside noscript
             // when scripting is enabled and the parser treats the entire contents as raw text.
             require(!NoscriptEndTag.containsMatchIn(builder.substring(contentStart))) {
@@ -167,7 +209,8 @@ internal class StringHtmlElementNode private constructor(
             }
         }
         // HTML parsing discards the first LF in these elements.
-        if ((tagName == "pre" || tagName == "textarea" || tagName == "listing") &&
+        if (namespace == HtmlNamespace &&
+            (tagName == "pre" || tagName == "textarea" || tagName == "listing") &&
             builder.length > contentStart && builder[contentStart] == '\n'
         ) {
             builder.insert(contentStart, '\n')
@@ -177,9 +220,12 @@ internal class StringHtmlElementNode private constructor(
 
     private fun appendChildrenHtmlTo(builder: StringBuilder, hydratable: Boolean) {
         val rendered = children.filterNot(StringHtmlNode::isEmptyText)
+        val validateTableChildren = namespace == HtmlNamespace
         // Appends boundary marker for hydration between two text nodes
         rendered.forEachIndexed { index, child ->
-            requireHtmlParserStableTableChild(tagName, child)
+            if (validateTableChildren) {
+                requireHtmlParserStableTableChild(tagName, child)
+            }
             child.appendHtmlTo(builder, hydratable)
             if (
                 hydratable &&
@@ -190,6 +236,9 @@ internal class StringHtmlElementNode private constructor(
             }
         }
     }
+
+    private fun requireElementNamespace(): String =
+        checkNotNull(namespace) { "The string-rendering root has no element namespace" }
 
     companion object {
         private val NoscriptEndTag = Regex("</noscript(?=[\\t\\n\\u000C\\r />])", RegexOption.IGNORE_CASE)
@@ -213,6 +262,7 @@ internal class StringHtmlElementNode private constructor(
 
         fun root(): StringHtmlElementNode = StringHtmlElementNode(
             tagName = null,
+            namespace = null,
             isRoot = true,
         )
     }
@@ -239,7 +289,7 @@ internal class StringHtmlRawTextNode(
 }
 
 private fun StringBuilder.appendHydrationTextBoundaryMarker() {
-    append("<!--$HydrationTextBoundaryMarker-->")
+    append("<!--").append(HydrationTextBoundaryMarker).append("-->")
 }
 
 private fun requireValidHtmlTagName(name: String) {
@@ -266,10 +316,20 @@ private const val InvalidHtmlAttributeNameCharacters = " \"'/>="
 
 private fun Char.isAsciiLetter(): Boolean = this in 'A'..'Z' || this in 'a'..'z'
 
-internal fun String.asciiLowercase(): String = buildString(length) {
-    this@asciiLowercase.forEach { character ->
-        append(if (character in 'A'..'Z') character.lowercaseChar() else character)
+private fun String.hasSameHtmlParserAttributeName(other: String): Boolean {
+    if (length != other.length) return false
+    for (index in indices) {
+        val first = this[index]
+        val second = other[index]
+        if (first == second) continue
+        if (
+            !(first in 'A'..'Z' && second.code == first.code + ('a'.code - 'A'.code)) &&
+            !(second in 'A'..'Z' && first.code == second.code + ('a'.code - 'A'.code))
+        ) {
+            return false
+        }
     }
+    return true
 }
 
 private fun StringBuilder.appendEscapedAttribute(value: String) {

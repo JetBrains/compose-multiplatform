@@ -1,8 +1,8 @@
 # Compose HTML EAP
 
-This directory contains the experimental commonized Compose HTML core and its internal runtime.
-They retain the regular Compose HTML Kotlin package names, but use distinct Gradle project names and
-the `org.jetbrains.compose.html.eap` Maven group.
+This directory contains the experimental commonized Compose HTML core, SVG library, and internal
+runtime. They retain the regular Compose HTML Kotlin package names, but use distinct Gradle project
+names and the `org.jetbrains.compose.html.eap` Maven group.
 
 The projects are excluded from the Gradle build by default. Enable them locally by creating
 `html/local.properties` with:
@@ -18,6 +18,7 @@ The `compose.html.eap.enabled` value in `html/local.properties` takes precedence
 Published coordinates start at version `0.0.1`:
 
 - `org.jetbrains.compose.html.eap:html-core-eap:0.0.1`
+- `org.jetbrains.compose.html.eap:html-svg-eap:0.0.1`
 - `org.jetbrains.compose.html.eap:internal-html-core-runtime-eap:0.0.1`
 
 Consumers must add `https://packages.jetbrains.team/maven/p/cmp/dev` as a Maven repository. The EAP
@@ -27,8 +28,9 @@ evaluated.
 ```kotlin
 dependencies {
     implementation("org.jetbrains.compose.html.eap:html-core-eap:0.0.1")
+    implementation("org.jetbrains.compose.html.eap:html-svg-eap:0.0.1")
     implementation("org.jetbrains.compose.html.eap:internal-html-core-runtime-eap:0.0.1")
-    implementation("org.jetbrains.compose.html:kotlinx-browser-common-subset:0.0.1+dev1")
+    implementation("org.jetbrains.compose.html:kotlinx-browser-common-subset:0.0.1+dev2")
 }
 ```
 

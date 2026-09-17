@@ -15,6 +15,8 @@ import org.jetbrains.compose.web.attributes.ScriptType
 import org.jetbrains.compose.web.attributes.src
 import org.jetbrains.compose.web.attributes.type
 import org.jetbrains.compose.web.dom.*
+import org.jetbrains.compose.web.css.Color
+import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.testutils.runTest
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLScriptElement
@@ -25,6 +27,164 @@ import kotlin.test.assertNotSame
 import kotlin.test.assertSame
 
 class ElementsTests {
+    @Test
+    fun explicitHtmlClassAndStyleKeepPrecedenceDuringRecomposition() = runTest {
+        var cssClass by mutableStateOf("first")
+        var explicit by mutableStateOf(true)
+        composition {
+            Div({
+                classes(cssClass)
+                style { color(if (cssClass == "first") Color.red else Color.blue) }
+                if (explicit) {
+                    attr("class", "literal")
+                    attr("style", "color: green")
+                }
+            })
+        }
+        val element = nextChild<HTMLElement>()
+        assertEquals("literal", element.getAttribute("class"))
+        assertEquals("color: green", element.getAttribute("style"))
+
+        cssClass = "second"
+        waitForRecompositionComplete()
+        assertEquals("literal", element.getAttribute("class"))
+        assertEquals("color: green", element.getAttribute("style"))
+
+        explicit = false
+        waitForRecompositionComplete()
+        assertEquals("second", element.getAttribute("class"))
+        assertEquals("blue", element.style.color)
+    }
+
+    @Test
+    fun namespacedBuildersCloneIndependentElements() {
+        val builder = ElementBuilder.createBuilder<Element>("linearGradient", TestSvgNamespace)
+        assertSame(builder, ElementBuilder.createBuilder<Element>("linearGradient", TestSvgNamespace))
+        val first = builder.create()
+        first.setAttribute("id", "first")
+        val second = builder.create()
+        assertNotSame(first, second)
+        assertEquals("linearGradient", second.localName)
+        assertEquals(TestSvgNamespace, second.namespaceURI)
+        assertEquals(null, second.getAttribute("id"))
+    }
+
+    @Test
+    fun createsForeignAttributesInTheirParserNamespaces() = runTest {
+        composition {
+            TagElementNS<Element>("svg", TestSvgNamespace, {
+                attr("xlink:href", "#target")
+                attr("xml:lang", "en")
+                attr("xmlns", TestSvgNamespace)
+                attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
+            }, null)
+        }
+        val svg = nextChild<Element>()
+        assertEquals("#target", svg.getAttributeNS("http://www.w3.org/1999/xlink", "href"))
+        assertEquals("en", svg.getAttributeNS("http://www.w3.org/XML/1998/namespace", "lang"))
+        assertEquals(TestSvgNamespace, svg.getAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns"))
+        assertEquals("http://www.w3.org/1999/xlink", svg.getAttributeNS("http://www.w3.org/2000/xmlns/", "xlink"))
+    }
+
+    @Test
+    fun createsNamespacedElementsWithCaseSensitiveLocalNames() = runTest {
+        composition {
+            TagElementNS<Element>(
+                tagName = "linearGradient",
+                namespace = TestSvgNamespace,
+                applyAttrs = null,
+                content = null,
+            )
+        }
+
+        val element = root.firstElementChild
+        assertEquals("linearGradient", element?.localName)
+        assertEquals(TestSvgNamespace, element?.namespaceURI)
+    }
+
+    @Test
+    fun parsedSvgSerializationKeepsEveryElementInTheSvgNamespace() {
+        val container = document.createElement("div")
+        container.innerHTML = org.jetbrains.compose.web.composeHtmlToString {
+            SvgSerializationFixture()
+        }
+
+        val elements = container.querySelectorAll("*")
+        assertEquals(4, elements.length)
+        repeat(elements.length) { index ->
+            val element = elements.item(index) as Element
+            assertEquals(TestSvgNamespace, element.namespaceURI, element.localName)
+        }
+        assertEquals(
+            listOf("svg", "defs", "linearGradient", "image"),
+            List(elements.length) { (elements.item(it) as Element).localName },
+        )
+    }
+
+    @Test
+    fun parsedSvgIntegrationPointsSwitchTheirHtmlChildrenBackToHtml() {
+        val container = document.createElement("div")
+        container.innerHTML = org.jetbrains.compose.web.composeHtmlToString {
+            TagElementNS<Element>("svg", TestSvgNamespace, null) {
+                TagElementNS<Element>("foreignObject", TestSvgNamespace, null) {
+                    Div { Text("foreignObject") }
+                }
+                TagElementNS<Element>("title", TestSvgNamespace, null) {
+                    Div { Text("title") }
+                }
+                TagElementNS<Element>("desc", TestSvgNamespace, null) {
+                    Div { Text("desc") }
+                }
+            }
+        }
+
+        val svg = container.firstElementChild as Element
+        assertEquals(TestSvgNamespace, svg.namespaceURI)
+        listOf("foreignObject", "title", "desc").forEach { name ->
+            val integrationPoint = svg.querySelector(name) as Element
+            val div = integrationPoint.firstElementChild as Element
+            assertEquals(TestSvgNamespace, integrationPoint.namespaceURI, name)
+            assertEquals("http://www.w3.org/1999/xhtml", div.namespaceURI, name)
+            assertEquals(name, div.textContent)
+        }
+    }
+
+    @Test
+    fun parsedNestedSvgRootSwitchesBackToSvgInsideForeignObject() {
+        val container = document.createElement("div")
+        container.innerHTML = org.jetbrains.compose.web.composeHtmlToString {
+            TagElementNS<Element>("svg", TestSvgNamespace, null) {
+                TagElementNS<Element>("foreignObject", TestSvgNamespace, null) {
+                    TagElementNS<Element>("svg", TestSvgNamespace, null) {
+                        TagElementNS<Element>("rect", TestSvgNamespace, null, null)
+                    }
+                }
+            }
+        }
+
+        val outerSvg = container.firstElementChild as Element
+        val foreignObject = outerSvg.firstElementChild as Element
+        val nestedSvg = foreignObject.firstElementChild as Element
+        val rect = nestedSvg.firstElementChild as Element
+        assertEquals(TestSvgNamespace, nestedSvg.namespaceURI)
+        assertEquals(TestSvgNamespace, rect.namespaceURI)
+    }
+
+    @Test
+    fun cachesNamespacedBuildersByNamespaceAndTagName() {
+        val first = ElementBuilder.createBuilder<Element>("linearGradient", TestSvgNamespace)
+        val same = ElementBuilder.createBuilder<Element>("linearGradient", TestSvgNamespace)
+        val differentTag = ElementBuilder.createBuilder<Element>("lineargradient", TestSvgNamespace)
+        val differentNamespace = ElementBuilder.createBuilder<Element>(
+            "linearGradient",
+            "urn:example:other",
+        )
+
+        assertSame(first, same)
+        assertNotSame(first, differentTag)
+        assertNotSame(first, differentNamespace)
+    }
+
     @Test
     fun nodeNames() = runTest {
         val nodes = listOf<Pair<@Composable () -> Unit, String>>(
@@ -193,8 +353,8 @@ class ElementsTests {
 
     @Test
     fun testElementBuilderCreate() {
-        val custom = ElementBuilder.createBuilder<HTMLElement>("CUSTOM")
-        val div = ElementBuilder.createBuilder<HTMLElement>("DIV")
+        val custom = ElementBuilder.createBuilder<HTMLElement>("custom")
+        val div = ElementBuilder.createBuilder<HTMLElement>("div")
         val sameDiv = ElementBuilder.createBuilder<HTMLElement>("div")
         val b = ElementBuilder.createBuilder<HTMLElement>("b")
         val abc = ElementBuilder.createBuilder<HTMLElement>("abc")
@@ -206,7 +366,7 @@ class ElementsTests {
         assertEquals("DIV", div.create().nodeName)
         assertEquals("B", b.create().nodeName)
         assertEquals("ABC", abc.create().nodeName)
-        assertSame(custom, ElementBuilder.createBuilder<HTMLElement>("custom"))
+        assertNotSame(custom, ElementBuilder.createBuilder<HTMLElement>("CUSTOM"))
         assertSame(div, sameDiv)
         assertNotSame(custom, div)
     }
