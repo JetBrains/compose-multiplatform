@@ -22,6 +22,7 @@ import kotlinx.browser.dom.HTMLSelectElement
 import kotlinx.browser.dom.HTMLTableCellElement
 import kotlinx.browser.dom.HTMLTableColElement
 import kotlinx.browser.dom.HTMLTextAreaElement
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import kotlin.jvm.JvmName
 
 fun AttrsScope<HTMLAnchorElement>.href(value: String) =
@@ -145,16 +146,18 @@ fun AttrsScope<HTMLFormElement>.noValidate() =
 fun AttrsScope<HTMLFormElement>.target(value: FormTarget) =
     attr("target", value.targetStr)
 
+@OptIn(ComposeWebInternalApi::class)
 fun AttrsScope<HTMLFormElement>.onSubmit(
     listener: (SyntheticSubmitEvent) -> Unit
 ) {
-    addEventListener(eventName = EventsListenerScope.SUBMIT, listener = listener)
+    registerEventListener(SubmitEventListener(EventsListenerScope.SUBMIT, listener))
 }
 
+@OptIn(ComposeWebInternalApi::class)
 fun AttrsScope<HTMLFormElement>.onReset(
     listener: (SyntheticSubmitEvent) -> Unit
 ) {
-    addEventListener(eventName = EventsListenerScope.RESET, listener = listener)
+    registerEventListener(SubmitEventListener(EventsListenerScope.RESET, listener))
 }
 
 /* Input attributes */
@@ -409,6 +412,13 @@ fun AttrsScope<HTMLImageElement>.alt(value: String): AttrsScope<HTMLImageElement
 
 
 internal val setInputValue: (HTMLInputElement, String) -> Unit = { e, v ->
+    if (v != e.value) {
+        e.value = v
+    }
+    saveControlledInputState(e, v)
+}
+
+internal val setTextAreaValue: (HTMLTextAreaElement, String) -> Unit = { e, v ->
     if (v != e.value) {
         e.value = v
     }

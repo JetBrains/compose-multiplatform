@@ -5,8 +5,8 @@
 
 package org.jetbrains.compose.web.dom
 
-import kotlinx.browser.document
 import kotlinx.browser.dom.Element
+import org.jetbrains.compose.web.internal.runtime.browserDocument
 import org.jetbrains.compose.web.internal.unsafeCast
 
 private class BrowserElementBuilder<TElement : Element>(
@@ -15,9 +15,9 @@ private class BrowserElementBuilder<TElement : Element>(
 ) : ElementBuilder<TElement> {
     private val prototype: Element by lazy {
         if (namespace == null) {
-            document.createElement(tagName)
+            browserDocument.createElement(tagName)
         } else {
-            document.createElementNS(namespace, tagName)
+            browserDocument.createElementNS(namespace, tagName)
         }
     }
 
