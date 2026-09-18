@@ -99,7 +99,7 @@ class GradlePluginTest : GradlePluginTestBase() {
             }
         }
 
-    // Note: we can't test non-jvm targets with Kotlin older than 2.3.0, because of klib abi version bump in 2.3.0
+    // Note: older version is fine for k/jvm, k/android projects
     private val oldestSupportedKotlinVersion = "2.3.0"
 
     @Test
@@ -116,11 +116,14 @@ class GradlePluginTest : GradlePluginTestBase() {
         }
     }
 
+    // Note: we can't test non-jvm targets with Kotlin older than 2.4.0, because of klib abi version bump in 2.4.0
+    private val oldestSupportedKotlinMultiplatformVersion = "2.4.0"
+
     @Test
     fun testOldestKotlinJsMpp() = with(
         testProject(
             "application/jsMpp",
-            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = oldestSupportedKotlinVersion)
+            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = oldestSupportedKotlinMultiplatformVersion)
         )
     ) {
         gradle(":compileKotlinJs").checks {
