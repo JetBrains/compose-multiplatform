@@ -2,8 +2,7 @@ package org.jetbrains.compose.resources
 
 import androidx.compose.ui.test.ComposeUiTest
 import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.runComposeUiTest
-import kotlinx.coroutines.yield
+import androidx.compose.ui.test.v2.runComposeUiTest
 import org.jetbrains.compose.resources.plural.PluralCategory
 import org.jetbrains.compose.resources.plural.PluralRule
 import org.jetbrains.compose.resources.plural.PluralRuleList
@@ -84,9 +83,9 @@ fun clearResourceCachesAndRunUiTest(block: suspend ComposeUiTest.() -> Unit) = r
 
 @OptIn(ExperimentalTestApi::class)
 internal suspend fun ComposeUiTest.waitResources() {
-    waitForIdle()
-    ResourceCaches.waitAllJobs()
-    waitForIdle()
+    waitForIdle() // resources' states were placed
+    awaitPendingResourceStateLoads() // resources were saved into states
+    waitForIdle() // compose updated UI
 }
 
 

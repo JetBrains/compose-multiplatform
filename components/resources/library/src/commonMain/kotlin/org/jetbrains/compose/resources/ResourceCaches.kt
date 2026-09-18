@@ -45,10 +45,6 @@ internal class AsyncCache<K, V> {
          }
     }
 
-    suspend fun waitAllJobs() {
-        getAllActiveJobs().joinAll()
-    }
-
     fun clear() {
         lock.withLock {
             cache.forEach { (_, v) -> v.deferred.cancel() }
@@ -62,24 +58,7 @@ object ResourceCaches {
 
     internal fun registerCache(cache: AsyncCache<*, *>) = caches.add(cache)
 
-    /**
-     * Waits for all ongoing resource loading jobs to complete.
-     *
-     * This method ensures that all asynchronous resource loading operations
-     * have finished before proceeding. It is useful for testing and ensuring
-     * that resources are fully loaded before further actions are taken.
-     */
-    internal suspend fun waitAllJobs() {
-        caches.toList().forEach { it.waitAllJobs() }
-    }
-
-    /**
-     * Clears any cached resources maintained internally by the system.
-     *
-     * It can be useful to release memory or reset cached resources that
-     * may be changed or no longer be required.
-     */
-    internal suspend fun clear() {
+    internal fun clear() {
         caches.toList().forEach { it.clear() }
     }
 }
