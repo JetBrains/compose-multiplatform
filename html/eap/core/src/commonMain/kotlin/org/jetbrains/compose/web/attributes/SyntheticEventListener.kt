@@ -13,7 +13,6 @@ import kotlinx.browser.dom.DragEvent
 import kotlinx.browser.dom.TouchEvent
 import kotlinx.browser.dom.clipboard.ClipboardEvent
 import kotlinx.browser.dom.events.Event
-import kotlinx.browser.dom.events.EventListener
 import kotlinx.browser.dom.events.EventTarget
 import kotlinx.browser.dom.events.FocusEvent
 import kotlinx.browser.dom.events.KeyboardEvent
@@ -26,6 +25,7 @@ import org.jetbrains.compose.web.events.SyntheticFocusEvent
 import org.jetbrains.compose.web.events.SyntheticInputEvent
 import org.jetbrains.compose.web.events.SyntheticKeyboardEvent
 import org.jetbrains.compose.web.events.SyntheticSelectEvent
+import org.jetbrains.compose.web.events.SyntheticSubmitEvent
 import org.jetbrains.compose.web.events.SyntheticTouchEvent
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.jetbrains.compose.web.internal.runtime.NamedEventListener
@@ -35,11 +35,12 @@ import org.jetbrains.compose.web.internal.unsafeCast
 open class SyntheticEventListener<T : SyntheticEvent<*>> internal constructor(
     val event: String,
     val listener: (T) -> Unit
-) : EventListener, NamedEventListener {
+) : NamedEventListener {
 
     override val name: String = event
+    override val callback: (Event) -> Unit = { handleEvent(it) }
 
-    override fun handleEvent(event: Event) {
+    open fun handleEvent(event: Event) {
         listener(SyntheticEvent<EventTarget>(event).unsafeCast<T>())
     }
 }
@@ -115,6 +116,15 @@ internal class ClipboardEventListener(
 ) : SyntheticEventListener<SyntheticClipboardEvent>(event, listener) {
     override fun handleEvent(event: Event) {
         listener(SyntheticClipboardEvent(event.unsafeCast<ClipboardEvent>()))
+    }
+}
+
+internal class SubmitEventListener(
+    event: String,
+    listener: (SyntheticSubmitEvent) -> Unit
+) : SyntheticEventListener<SyntheticSubmitEvent>(event, listener) {
+    override fun handleEvent(event: Event) {
+        listener(SyntheticSubmitEvent(event))
     }
 }
 

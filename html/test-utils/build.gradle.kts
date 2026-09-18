@@ -1,4 +1,8 @@
+@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+
 import org.jetbrains.compose.gradle.standardConf
+
+val composeHtmlEapEnabled = project.findProject(":internal-html-core-runtime-eap") != null
 
 plugins {
     kotlin("multiplatform")
@@ -13,7 +17,7 @@ repositories {
 
 kotlin {
     js(IR) {
-        browser() {
+        browser {
             testTask {
                 useKarma {
                     standardConf()
@@ -21,19 +25,50 @@ kotlin {
             }
         }
     }
+    if (composeHtmlEapEnabled) {
+        wasmJs {
+            browser {
+                testTask {
+                    useKarma {
+                        standardConf()
+                    }
+                }
+            }
+        }
+    }
+
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
                 implementation(kotlin("stdlib-common"))
-                implementation(project(":internal-html-core-runtime"))
                 implementation(libs.kotlinx.coroutines.core)
             }
         }
-        val jsTest by getting {
+        val webMain by getting {
             dependencies {
-                implementation(kotlin("test-js"))
+                implementation(libs.kotlinx.browser)
+            }
+        }
+        val jsMain by getting {
+            dependencies {
+                // Stable Compose HTML tests must keep using the stable runtime.
+                implementation(project(":internal-html-core-runtime"))
+            }
+        }
+        if (composeHtmlEapEnabled) {
+            val wasmJsMain by getting {
+                dependencies {
+                    // The Wasm target exists only for EAP tests and uses their browser runtime.
+                    implementation(project(":internal-html-core-runtime-eap"))
+                }
+            }
+        }
+        val webTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
             }
         }
     }

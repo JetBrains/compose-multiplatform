@@ -5,7 +5,7 @@
 
 package org.jetbrains.compose.web.internal.runtime
 
-import kotlinx.browser.dom.events.EventListener
+import kotlinx.browser.dom.events.Event
 
 /**
  * An event listener that retains the DOM event name used to register it.
@@ -15,6 +15,7 @@ import kotlinx.browser.dom.events.EventListener
  * registration remains in the JS DOM implementation.
  */
 @ComposeWebInternalApi
-interface NamedEventListener : EventListener {
+interface NamedEventListener {
     val name: String
+    val callback: (Event) -> Unit
 }

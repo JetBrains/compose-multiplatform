@@ -167,7 +167,7 @@ interface AttrsScope<out TElement : Element> : EventsListenerScope {
 
 open class AttrsScopeBuilder<TElement : Element>(
     internal val eventsListenerScopeBuilder: EventsListenerScopeBuilder = EventsListenerScopeBuilder()
-) : AttrsScope<TElement>, EventsListenerScope by eventsListenerScopeBuilder {
+) : AttrsScope<TElement> {
     internal val attributesMap = mutableMapOf<String, String>()
     internal val styleScope: StyleScopeBuilder = StyleScopeBuilder()
     internal val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
@@ -176,6 +176,11 @@ open class AttrsScopeBuilder<TElement : Element>(
     internal val hydrationProtocolAttributes: MutableSet<String> = mutableSetOf()
     internal var allowsHydrationMismatch: Boolean = false
         private set
+
+    @ComposeWebInternalApi
+    override fun registerEventListener(listener: SyntheticEventListener<*>) {
+        eventsListenerScopeBuilder.registerEventListener(listener)
+    }
 
     /**
      * [classes] adds all values passed as params to the element's classList.

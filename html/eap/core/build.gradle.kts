@@ -1,3 +1,5 @@
+@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+
 import org.jetbrains.compose.gradle.standardConf
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.JavaExec
@@ -20,7 +22,7 @@ plugins {
 kotlin {
     jvm()
     js(IR) {
-        browser() {
+        browser {
             testTask {
                 useKarma {
                     standardConf()
@@ -29,13 +31,24 @@ kotlin {
         }
         binaries.executable()
     }
+    wasmJs {
+        browser {
+            testTask {
+                useKarma {
+                    standardConf()
+                }
+            }
+        }
+    }
+
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
                 implementation(libs.kotlinx.coroutines.core)
-                implementation( "org.jetbrains.compose.html:kotlinx-browser-common-subset:$kotlinxBrowserCommonSubsetVersion")
+                implementation("org.jetbrains.compose.html:kotlinx-browser-common-subset:$kotlinxBrowserCommonSubsetVersion")
                 api(project(":internal-html-core-runtime-eap"))
             }
         }
@@ -46,20 +59,41 @@ kotlin {
             }
         }
 
-        val jsMain by getting {
-            languageSettings {
-                optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
-            }
+        val nonJsMain by creating {
+            dependsOn(commonMain)
         }
 
-        val jsTest by getting {
-            languageSettings {
-                optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
-                optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
-            }
+        val jvmMain by getting {
+            dependsOn(nonJsMain)
+        }
+
+        val webMain by getting
+
+        val wasmJsMain by getting {
+            dependsOn(nonJsMain)
+        }
+        val jsMain by getting
+
+        listOf(webMain, jsMain, wasmJsMain).forEach {
+            it.languageSettings.optIn(
+                "org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi"
+            )
+        }
+
+        val webTest by getting {
             dependencies {
                 implementation(project(":html-test-utils"))
-                implementation(kotlin("test-js"))
+                implementation(kotlin("test"))
+            }
+        }
+        val jsTest by getting
+        val wasmJsTest by getting
+
+        listOf(webTest, jsTest, wasmJsTest).forEach {
+            it.languageSettings {
+                optIn("kotlin.js.ExperimentalWasmJsInterop")
+                optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
+                optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
             }
         }
     }
@@ -76,7 +110,7 @@ configurations.matching { it.name.contains("Test") }.configureEach {
 val jvmTestCompilation = kotlin.targets.getByName("jvm").compilations.getByName("test")
 val generateSsrHydrationFixture = tasks.register<JavaExec>("generateSsrHydrationFixture") {
     group = "verification"
-    description = "Generates JVM-rendered HTML for the Kotlin/JS hydration tests."
+    description = "Generates JVM-rendered HTML for the browser hydration tests."
     dependsOn(jvmTestCompilation.compileTaskProvider)
     mainClass.set("org.jetbrains.compose.web.SsrHydrationFixtureGenerator")
     classpath(jvmTestCompilation.output.allOutputs)
@@ -85,24 +119,26 @@ val generateSsrHydrationFixture = tasks.register<JavaExec>("generateSsrHydration
     outputs.dir(generatedSsrHydrationFixtures)
 }
 
-val jsTestCompilation =
-    kotlin.targets.getByName("js").compilations.getByName("test") as KotlinJsCompilation
-val jsTestProcessResources =
-    tasks.named(jsTestCompilation.processResourcesTaskName, ProcessResources::class.java) {
-        from(generatedSsrHydrationFixtures)
-        dependsOn(generateSsrHydrationFixture)
-    }
-
-val jsBrowserTest = tasks.named<KotlinJsTest>("jsBrowserTest")
-val copySsrHydrationFixturesToKjsTestResources =
-    tasks.register<Copy>("copySsrHydrationFixturesToKjsTestResources") {
-        dependsOn(jsBrowserTest.flatMap { it.inputFileProperty })
-        from(jsTestProcessResources) {
+listOf("js", "wasmJs").forEach { targetName ->
+    val testCompilation =
+        kotlin.targets.getByName(targetName).compilations.getByName("test") as KotlinJsCompilation
+    val processResources =
+        tasks.named(testCompilation.processResourcesTaskName, ProcessResources::class.java) {
+            from(generatedSsrHydrationFixtures)
+            dependsOn(generateSsrHydrationFixture)
+        }
+    val browserTest = tasks.named<KotlinJsTest>("${targetName}BrowserTest")
+    val copyFixtures = tasks.register<Copy>(
+        "copySsrHydrationFixturesTo${targetName.replaceFirstChar(Char::uppercaseChar)}TestResources"
+    ) {
+        dependsOn(browserTest.flatMap { it.inputFileProperty })
+        from(processResources) {
             include("ssr*hydration*.html")
         }
-        into(jsBrowserTest.flatMap { requireNotNull(it.testFramework).workingDir })
+        into(browserTest.flatMap { requireNotNull(it.testFramework).workingDir })
     }
 
-jsBrowserTest.configure {
-    dependsOn(copySsrHydrationFixturesToKjsTestResources)
+    browserTest.configure {
+        dependsOn(copyFixtures)
+    }
 }

@@ -1,3 +1,5 @@
+@file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+
 import org.gradle.api.tasks.JavaExec
 
 val renderedSite = layout.buildDirectory.dir("generated/site")
@@ -20,6 +22,14 @@ kotlin {
         }
         binaries.executable()
     }
+    wasmJs {
+        browser {
+            commonWebpackConfig { outputFileName = "app.js" }
+        }
+        binaries.executable()
+    }
+
+    applyDefaultHierarchyTemplate()
 
     sourceSets {
         val commonMain by getting {
@@ -32,7 +42,7 @@ kotlin {
                 )
             }
         }
-        val jsMain by getting {
+        val webMain by getting {
             resources.srcDir(renderedSite)
         }
     }
@@ -50,6 +60,8 @@ val renderHydrationExample = tasks.register<JavaExec>("renderHydrationExample") 
     outputs.file(renderedIndex)
 }
 
-tasks.named("jsProcessResources") {
-    dependsOn(renderHydrationExample)
+listOf("js", "wasmJs").forEach { targetName ->
+    tasks.named("${targetName}ProcessResources") {
+        dependsOn(renderHydrationExample)
+    }
 }

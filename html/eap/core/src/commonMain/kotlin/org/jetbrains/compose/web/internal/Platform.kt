@@ -5,31 +5,40 @@
 
 package org.jetbrains.compose.web.internal
 
+import kotlinx.browser.dom.Element
 import kotlinx.browser.dom.DataTransfer
 import kotlinx.browser.dom.events.Event
 import kotlinx.browser.dom.events.KeyboardEvent
 import kotlinx.browser.dom.events.MouseEvent
 
 /**
- * Performs the unchecked cast used by the browser implementation while keeping
- * the call available to common code. JVM uses a regular Kotlin cast because its
- * browser declarations are stubs rather than JavaScript values.
+ * Performs an unchecked cast on every platform while keeping the operation
+ * available to common code. The implementation uses the platform's native
+ * unchecked cast. No runtime type validation is guaranteed.
  */
 @PublishedApi
 internal expect fun <T> Any?.unsafeCast(): T
 
 /**
- * Small common contract for state that must not keep DOM elements alive.
- *
+ * Stores state without keeping DOM elements alive. Browser implementations use
+ * JavaScript WeakMap keys, so arbitrary Kotlin objects are not supported.
  */
-internal interface WeakMap<K : Any, V : Any> {
+internal interface WeakElementMap<K : Element, V : Any> {
     fun delete(key: K)
     fun get(key: K): V?
     fun has(key: K): Boolean
     fun set(key: K, value: V)
 }
 
-internal expect fun <K : Any, V : Any> createWeakMap(): WeakMap<K, V>
+internal expect fun <K : Element, V : Any> createWeakElementMap(): WeakElementMap<K, V>
+
+/**
+ * Schedules [block] in a later browser task, after the current event dispatch
+ * finishes. Microtasks can run between native event listeners and are not
+ * sufficient for this guarantee. JVM runs it synchronously because its browser
+ * declarations are non-functional stubs.
+ */
+internal expect fun scheduleAfterEvent(block: () -> Unit)
 
 /**
  * Reads browser-only mouse movement fields while preserving the existing
@@ -53,6 +62,10 @@ internal expect fun KeyboardEvent.localeCompat(): String
 internal expect fun Event.inputTypeCompat(): String?
 
 internal expect fun Event.inputDataTransferCompat(): DataTransfer?
+
+internal expect fun Event.inputDataCompat(): String?
+
+internal expect fun Event.inputIsComposingCompat(): Boolean
 
 internal expect fun Event.targetValueCompat(): String?
 
