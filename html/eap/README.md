@@ -52,9 +52,12 @@ html/gradlew -p html -Pcompose.html.eap.enabled=true :html-eap-example:run
 ### Hydration example
 
 Renders its initial HTML on the JVM, bundles the browser entry point, and opens
-the interactive result in a development server. From the repository root, run:
+the interactive result in a development server. From the repository root, run either target:
 
 ```shell
 html/gradlew -p html -Pcompose.html.eap.enabled=true \
     :html-eap-hydration-example:jsBrowserDevelopmentRun
+
+html/gradlew -p html -Pcompose.html.eap.enabled=true \
+    :html-eap-hydration-example:wasmJsBrowserDevelopmentRun
 ```

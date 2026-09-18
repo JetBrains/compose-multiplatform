@@ -4,9 +4,9 @@ package org.jetbrains.compose.web.testutils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MonotonicFrameClock
-import kotlinx.browser.dom.HTMLElement
-import kotlinx.browser.dom.MutationObserverInit
 import org.jetbrains.compose.web.renderComposable
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.MutationObserverInit
 import kotlin.js.js
 
 internal actual fun renderTestComposable(

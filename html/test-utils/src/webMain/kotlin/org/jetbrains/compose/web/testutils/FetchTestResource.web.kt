@@ -2,10 +2,9 @@
 
 package org.jetbrains.compose.web.testutils
 
-import kotlinx.browser.JsAny
-import kotlinx.browser.JsString
-import kotlinx.browser.toKotlinString
 import kotlinx.coroutines.await
+import kotlin.js.JsAny
+import kotlin.js.JsString
 import kotlin.js.Promise
 
 private external interface TestResourceResponse : JsAny {
@@ -18,8 +17,9 @@ private external interface TestResourceResponse : JsAny {
 private external fun fetchTestResource(input: String): Promise<TestResourceResponse>
 
 @ComposeWebExperimentalTestsApi
+@Suppress("REDUNDANT_CALL_OF_CONVERSION_METHOD") // JsString is distinct from String on Wasm.
 suspend fun fetchTestResourceText(input: String): String {
     val response = fetchTestResource(input).await<TestResourceResponse>()
     check(response.ok) { "Fetching $input failed with HTTP ${response.status}" }
-    return response.text().await<JsString>().toKotlinString()
+    return response.text().await<JsString>().toString()
 }

@@ -2,8 +2,6 @@
 
 import org.jetbrains.compose.gradle.standardConf
 
-val kotlinxBrowserCommonSubsetVersion: String =
-    providers.gradleProperty("compose.html.eap.kotlinx-browser-common-subset.version").get()
 val composeHtmlEapEnabled = project.findProject(":internal-html-core-runtime-eap") != null
 
 plugins {
@@ -51,10 +49,7 @@ kotlin {
         }
         val webMain by getting {
             dependencies {
-                implementation(
-                    "org.jetbrains.compose.html:" +
-                        "kotlinx-browser-common-subset:$kotlinxBrowserCommonSubsetVersion"
-                )
+                implementation(libs.kotlinx.browser)
             }
         }
         val jsMain by getting {

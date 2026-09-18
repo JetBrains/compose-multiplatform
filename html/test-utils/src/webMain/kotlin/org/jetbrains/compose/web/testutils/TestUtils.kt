@@ -4,12 +4,6 @@ package org.jetbrains.compose.web.testutils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MonotonicFrameClock
-import kotlinx.browser.dom.Document
-import kotlinx.browser.dom.HTMLElement
-import kotlinx.browser.dom.MutationObserver
-import kotlinx.browser.dom.MutationObserverInit
-import kotlinx.browser.dom.Window
-import kotlinx.browser.dom.css.CSSStyleDeclaration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.promise
@@ -24,6 +18,12 @@ import kotlin.js.Promise
 import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
+import org.w3c.dom.Document
+import org.w3c.dom.HTMLElement
+import org.w3c.dom.MutationObserver
+import org.w3c.dom.MutationObserverInit
+import org.w3c.dom.Window
+import org.w3c.dom.css.CSSStyleDeclaration
 
 @JsName("document")
 private external val browserDocument: Document
