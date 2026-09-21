@@ -5,6 +5,12 @@
 
 set -euo pipefail
 
+skip_imageviewer_wasm=false
+if [ "$#" -eq 3 ] && [ "$3" = "--skip-imageviewer-wasm" ]; then
+    skip_imageviewer_wasm=true
+    set -- "$1" "$2"
+fi
+
 if [ "$#" -gt 2 ]; then
     echo "Optionally specify Compose and Kotlin versions. For example: ./validateExamplesWithJs.sh 1.13.0-alpha03 2.3.20"
     exit 1
@@ -35,4 +41,6 @@ runGradle() {
 runGradle html/compose-bird build
 runGradle html/landing build
 runGradle html/with-react build
-runGradle imageviewer :webApp:wasmJsBrowserDistribution
+if [ "$skip_imageviewer_wasm" = false ]; then
+    runGradle imageviewer :webApp:wasmJsBrowserDistribution
+fi
