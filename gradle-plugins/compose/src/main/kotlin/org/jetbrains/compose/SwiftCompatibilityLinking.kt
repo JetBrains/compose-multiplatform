@@ -6,6 +6,7 @@
 package org.jetbrains.compose
 
 import org.gradle.api.Project
+import org.gradle.internal.os.OperatingSystem
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
@@ -24,7 +25,7 @@ internal fun Project.configureSwiftCompatibilityLinking() {
 }
 
 private fun KotlinNativeTarget.configureSwiftCompatibilityLinking() {
-    if (System.getProperty("os.name") != "Mac OS X") return
+    if (!OperatingSystem.current().isMacOsX) return
 
     val sdkName =
         when (konanTarget) {
