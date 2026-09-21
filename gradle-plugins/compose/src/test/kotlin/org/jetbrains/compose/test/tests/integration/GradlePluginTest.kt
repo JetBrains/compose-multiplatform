@@ -24,7 +24,6 @@ import java.net.SocketTimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
-import kotlin.test.assertContentEquals
 import kotlin.test.assertFalse
 
 class GradlePluginTest : GradlePluginTestBase() {
@@ -99,14 +98,14 @@ class GradlePluginTest : GradlePluginTestBase() {
             }
         }
 
-    // Note: we can't test non-jvm targets with Kotlin older than 2.3.0, because of klib abi version bump in 2.3.0
-    private val oldestSupportedKotlinVersion = "2.3.0"
+    // Note: older version is fine for k/jvm, k/android projects
+    private val oldestSupportedKotlinJvmVersion = "2.3.0"
 
     @Test
     fun testOldestKotlinMpp() = with(
         testProject(
             "application/mpp",
-            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = oldestSupportedKotlinVersion)
+            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = oldestSupportedKotlinJvmVersion)
         )
     ) {
         val logLine = "Kotlin MPP app is running!"
@@ -116,11 +115,14 @@ class GradlePluginTest : GradlePluginTestBase() {
         }
     }
 
+    // Note: we can't test non-jvm targets with Kotlin older than 2.4.0, because of klib abi version bump in 2.4.0
+    private val oldestSupportedKotlinMultiplatformVersion = "2.4.0"
+
     @Test
     fun testOldestKotlinJsMpp() = with(
         testProject(
             "application/jsMpp",
-            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = oldestSupportedKotlinVersion)
+            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = oldestSupportedKotlinMultiplatformVersion)
         )
     ) {
         gradle(":compileKotlinJs").checks {
