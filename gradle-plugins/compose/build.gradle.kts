@@ -68,6 +68,7 @@ dependencies {
     }
 
     compileOnly(gradleApi())
+    compileOnly(gradleKotlinDsl())
     compileOnly(localGroovy())
     compileOnly(kotlin("gradle-plugin"))
     compileOnly(kotlin("native-utils"))

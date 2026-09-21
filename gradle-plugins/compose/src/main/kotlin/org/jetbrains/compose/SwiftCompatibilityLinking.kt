@@ -6,6 +6,7 @@
 package org.jetbrains.compose
 
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.withType
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
@@ -16,7 +17,7 @@ import java.io.File
 /** Configures iOS linker tasks to resolve the active Xcode's Swift compatibility-library path at link time. */
 internal fun Project.configureSwiftCompatibilityLinking() {
     plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
-        mppExt.targets.withType(KotlinNativeTarget::class.java).all { target ->
+        mppExt.targets.withType<KotlinNativeTarget>().all { target ->
             target.configureSwiftCompatibilityLinking()
         }
     }
@@ -43,7 +44,7 @@ private fun KotlinNativeTarget.configureSwiftCompatibilityLinking() {
                     .absolutePath
             }
 
-    binaries.withType(NativeBinary::class.java).all { binary ->
+    binaries.withType<NativeBinary>().all { binary ->
         binary.linkTaskProvider.configure { linkTask ->
             linkTask.toolOptions.freeCompilerArgs.addAll(
                 swiftCompatibilityLibraryDir.map { libraryDir ->
