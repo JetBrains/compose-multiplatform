@@ -24,7 +24,6 @@ import java.net.SocketTimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
-import kotlin.test.assertContentEquals
 import kotlin.test.assertFalse
 
 class GradlePluginTest : GradlePluginTestBase() {
@@ -100,13 +99,13 @@ class GradlePluginTest : GradlePluginTestBase() {
         }
 
     // Note: older version is fine for k/jvm, k/android projects
-    private val oldestSupportedKotlinVersion = "2.3.0"
+    private val oldestSupportedKotlinJvmVersion = "2.3.0"
 
     @Test
     fun testOldestKotlinMpp() = with(
         testProject(
             "application/mpp",
-            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = oldestSupportedKotlinVersion)
+            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = oldestSupportedKotlinJvmVersion)
         )
     ) {
         val logLine = "Kotlin MPP app is running!"
