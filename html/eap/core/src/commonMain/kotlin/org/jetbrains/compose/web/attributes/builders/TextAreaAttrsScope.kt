@@ -14,8 +14,8 @@ import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.INPUT
 import org.jetbrains.compose.web.attributes.InputEventListener
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.attributes.SelectEventListener
-import org.jetbrains.compose.web.attributes.setInputValue
 import org.jetbrains.compose.web.attributes.setTextAreaDefaultValue
+import org.jetbrains.compose.web.attributes.setTextAreaValue
 import org.jetbrains.compose.web.events.SyntheticChangeEvent
 import org.jetbrains.compose.web.events.SyntheticInputEvent
 import org.jetbrains.compose.web.events.SyntheticSelectEvent
@@ -30,7 +30,7 @@ typealias TextAreaAttrsBuilder = TextAreaAttrsScope
 class TextAreaAttrsScope(attrsScope: AttrsScope<HTMLTextAreaElement>) : AttrsScope<HTMLTextAreaElement> by attrsScope {
 
     fun value(value: String): AttrsScope<HTMLTextAreaElement> {
-        prop(setInputValue, value)
+        prop(setTextAreaValue, value)
         return this
     }
 

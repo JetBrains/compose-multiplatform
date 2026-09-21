@@ -85,6 +85,7 @@ import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleSheetBuilder
 import org.jetbrains.compose.web.css.StyleSheetBuilderImpl
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
+import org.jetbrains.compose.web.internal.scheduleAfterEvent
 import kotlin.jvm.JvmInline
 
 typealias AttrBuilderContext<T> = AttrsScope<T>.() -> Unit
@@ -666,8 +667,10 @@ fun <K> Input(
             val inputAttrsBuilder = InputAttrsScope(type, this)
             inputAttrsBuilder.type(type)
             inputAttrsBuilder.onInput {
-                // Controlled state needs to be restored after every input.
-                keyForRestoringControlledState.value = keyForRestoringControlledState.value + 1
+                // Let every listener observe the browser value before Compose restores it.
+                scheduleAfterEvent {
+                    keyForRestoringControlledState.value = keyForRestoringControlledState.value + 1
+                }
             }
             inputAttrsBuilder.attrs()
         },
@@ -728,8 +731,10 @@ fun TextArea(
         applyAttrs = {
             val textAreaAttrsBuilder = TextAreaAttrsScope(this)
             textAreaAttrsBuilder.onInput {
-                // Controlled state needs to be restored after every input.
-                keyForRestoringControlledState.value = keyForRestoringControlledState.value + 1
+                // Let every listener observe the browser value before Compose restores it.
+                scheduleAfterEvent {
+                    keyForRestoringControlledState.value = keyForRestoringControlledState.value + 1
+                }
             }
             if (attrs != null) {
                 textAreaAttrsBuilder.attrs()

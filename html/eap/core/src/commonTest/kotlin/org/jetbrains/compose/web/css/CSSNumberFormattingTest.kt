@@ -10,7 +10,7 @@ import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-// The same expectations run on JVM and JavaScript.
+// The same expectations run on JVM, JavaScript, and Wasm.
 class CSSNumberFormattingTest {
     @Test
     fun integersKeepTheirExactDigits() {

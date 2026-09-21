@@ -10,43 +10,43 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.NonRestartableComposable
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.dom.ElementScope
-import org.jetbrains.compose.web.internal.WeakMap
-import org.jetbrains.compose.web.internal.createWeakMap
+import org.jetbrains.compose.web.internal.WeakElementMap
+import org.jetbrains.compose.web.internal.createWeakElementMap
 import kotlinx.browser.dom.HTMLElement
 import kotlinx.browser.dom.HTMLInputElement
 import kotlinx.browser.dom.HTMLTextAreaElement
 
 
-private val controlledInputsValuesWeakMap: WeakMap<HTMLElement, Any> = createWeakMap()
+private val controlledInputsValues: WeakElementMap<HTMLElement, Any> = createWeakElementMap()
 
 internal fun restoreControlledInputState(inputElement: HTMLInputElement) {
     val type = InputType.fromString(inputElement.type)
 
-    if (controlledInputsValuesWeakMap.has(inputElement)) {
+    if (controlledInputsValues.has(inputElement)) {
         if (type == InputType.Radio) {
             controlledRadioGroups[inputElement.name]?.forEach { radio ->
-                radio.checked = controlledInputsValuesWeakMap.get(radio).toString().toBoolean()
+                radio.checked = controlledInputsValues.get(radio).toString().toBoolean()
             }
-            inputElement.checked = controlledInputsValuesWeakMap.get(inputElement).toString().toBoolean()
+            inputElement.checked = controlledInputsValues.get(inputElement).toString().toBoolean()
             return
         }
 
         if (type == InputType.Checkbox) {
-            inputElement.checked = controlledInputsValuesWeakMap.get(inputElement).toString().toBoolean()
+            inputElement.checked = controlledInputsValues.get(inputElement).toString().toBoolean()
         } else {
-            inputElement.value = controlledInputsValuesWeakMap.get(inputElement).toString()
+            inputElement.value = controlledInputsValues.get(inputElement).toString()
         }
     }
 }
 
 internal fun restoreControlledTextAreaState(element: HTMLTextAreaElement) {
-    if (controlledInputsValuesWeakMap.has(element)) {
-        element.value = controlledInputsValuesWeakMap.get(element).toString()
+    if (controlledInputsValues.has(element)) {
+        element.value = controlledInputsValues.get(element).toString()
     }
 }
 
 internal fun <V : Any> saveControlledInputState(element: HTMLElement, value: V) {
-    controlledInputsValuesWeakMap.set(element, value)
+    controlledInputsValues.set(element, value)
 
     if (element is HTMLInputElement) {
         updateRadioGroupIfNeeded(element)
