@@ -164,12 +164,7 @@ internal class StringHtmlElementNode private constructor(
         builder.append('<').append(tagName)
         attributes.forEach { (name, value) ->
             builder.append(' ').append(name)
-            if (
-                namespace != HtmlNamespace ||
-                value.isNotEmpty() ||
-                '-' in tagName ||
-                !name.isHtmlBooleanAttributeName()
-            ) {
+            if (namespace != HtmlNamespace || value.isNotEmpty() || '-' in tagName || !name.isHtmlBooleanAttributeName()) {
                 builder.append("=\"")
                 builder.appendEscapedAttribute(value)
                 builder.append('"')
@@ -204,7 +199,7 @@ internal class StringHtmlElementNode private constructor(
         if (namespace == HtmlNamespace && tagName == "noscript") {
             // Render fallback HTML for scripting-disabled browsers, but keep it inside noscript
             // when scripting is enabled and the parser treats the entire contents as raw text.
-            require(!NoscriptEndTag.containsMatchIn(builder.substring(contentStart))) {
+            require(builder.substring(contentStart).rawTextTagIndex("noscript", closing = true) < 0) {
                 "String-rendered <noscript> content must not contain a </noscript end tag"
             }
         }
@@ -241,8 +236,6 @@ internal class StringHtmlElementNode private constructor(
         checkNotNull(namespace) { "The string-rendering root has no element namespace" }
 
     companion object {
-        private val NoscriptEndTag = Regex("</noscript(?=[\\t\\n\\u000C\\r />])", RegexOption.IGNORE_CASE)
-
         private val VoidElementNames = setOf(
             "area",
             "base",

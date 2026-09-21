@@ -283,15 +283,20 @@ interface EventsListenerScope {
 }
 
 open class EventsListenerScopeBuilder : EventsListenerScope {
-    private val listeners: MutableList<SyntheticEventListener<*>> = mutableListOf()
+    // Allocate listener storage only when an element registers one.
+    private var listeners: MutableList<SyntheticEventListener<*>>? = null
 
     override fun registerEventListener(listener: SyntheticEventListener<*>) {
-        listeners.add(listener)
+        mutableListeners().add(listener)
     }
 
     internal fun copyListenersFrom(from: EventsListenerScopeBuilder) {
-        listeners.addAll(from.listeners)
+        val source = from.listeners ?: return
+        mutableListeners().addAll(source)
     }
 
-    internal fun collectListeners(): List<SyntheticEventListener<*>> = listeners
+    internal fun collectListeners(): List<SyntheticEventListener<*>> = listeners ?: emptyList()
+
+    private fun mutableListeners(): MutableList<SyntheticEventListener<*>> =
+        listeners ?: mutableListOf<SyntheticEventListener<*>>().also { listeners = it }
 }

@@ -172,12 +172,13 @@ private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(
     namespace: String,
 ): StringHtmlAttributes {
     val classAttributeValue = classes.toClassAttributeValue()
+    val existingStyleScope = styleScopeOrNull
     return StringHtmlAttributes.from(
         attributes = collect(),
         namespace = namespace,
         hydrationProtocolAttributes = hydrationProtocolAttributes,
         classAttributeValue = classAttributeValue,
-        styleAttributeValue = styleScope::toStyleAttributeValue,
+        styleAttributeValue = existingStyleScope?.let { scope -> scope::toStyleAttributeValue },
     )
 }
 
