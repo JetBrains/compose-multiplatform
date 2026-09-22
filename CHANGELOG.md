@@ -13,11 +13,11 @@ _Changes since 1.12.0_
 ### Multiple Platforms
 
 - Fix crash in cases when skia returns null `ColorFilter` due to no-op parameter combination [#3324](https://github.com/JetBrains/compose-multiplatform-core/pull/3324)
-- Fixed crashes when in certain scenarios when selecting text in a `SelectionContainer` [#3420](https://github.com/JetBrains/compose-multiplatform-core/pull/3420)
+- Fixed crashes in certain scenarios when selecting text in a `SelectionContainer` [#3420](https://github.com/JetBrains/compose-multiplatform-core/pull/3420)
 
 ### iOS
 
-- Fix issue where Toolbar is not visible on iOS < 16 [#3404](https://github.com/JetBrains/compose-multiplatform-core/pull/3404)
+- Fix issue where Toolbar is not visible on iOS 16 or older [#3404](https://github.com/JetBrains/compose-multiplatform-core/pull/3404)
 - Fix issue where Toolbar is not appears when `SelectionContainer` has at least one `TextField` inside [#3404](https://github.com/JetBrains/compose-multiplatform-core/pull/3404)
 - Fix crash when iOS reads `AccessibilityElement`'s properties after disposal [#3403](https://github.com/JetBrains/compose-multiplatform-core/pull/3403)
 
@@ -27,7 +27,7 @@ _Changes since 1.12.0_
 
 ### Resources
 
-- Fix a compatibility with Kotlin 2.5 [#5717](https://github.com/JetBrains/compose-multiplatform/pull/5717)
+- Fix compatibility with Kotlin 2.5 [#5717](https://github.com/JetBrains/compose-multiplatform/pull/5717)
 
 ## Components
 
