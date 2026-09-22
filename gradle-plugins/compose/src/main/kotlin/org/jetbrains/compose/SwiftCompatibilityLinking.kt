@@ -15,7 +15,13 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBinary
 import org.jetbrains.kotlin.konan.target.KonanTarget
 import java.io.File
 
-/** Configures iOS linker tasks to resolve the active Xcode's Swift compatibility-library path at link time. */
+/**
+ * Adds the active Xcode toolchain's Swift library directory to iOS native links.
+ *
+ * Kotlin/Native does not currently add this directory itself (KT-69793). Resolving it at final link time
+ * avoids publishing an absolute Xcode path in klib metadata; Swift auto-link metadata selects the needed
+ * runtime and compatibility libraries.
+ */
 internal fun Project.configureSwiftCompatibilityLinking() {
     plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
         mppExt.targets.withType<KotlinNativeTarget>().all { target ->
