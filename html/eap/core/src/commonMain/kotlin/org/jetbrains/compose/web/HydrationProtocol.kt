@@ -36,4 +36,5 @@ internal fun String.escapeForHydrationStateElement(): String = buildString {
     }
 }
 
+// Decode &amp; last so literal entity text in the payload is not decoded a second time.
 internal expect fun String.unescapeFromHydrationStateElement(): String

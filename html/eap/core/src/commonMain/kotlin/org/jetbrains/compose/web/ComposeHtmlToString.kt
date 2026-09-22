@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ControlledComposition
 import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.compose.web.dom.LocalComposeHtmlContext
 import org.jetbrains.compose.web.dom.StringComposeHtmlContext
@@ -19,6 +20,7 @@ import org.jetbrains.compose.web.dom.StringHtmlNodeWrapper
 /**
  * Composes [content] once into an HTML string without creating browser DOM nodes.
  * The backing composition is disposed after the initial HTML has been serialized.
+ * Snapshot state changes made while rendering are discarded afterwards.
  * Coroutine effects such as `LaunchedEffect` do not run. `SideEffect` and
  * `DisposableEffect` still execute.
  *
@@ -46,26 +48,34 @@ internal fun <T> composeHtmlTree(
     readTree: (StringHtmlElementNode) -> T,
 ): T {
     val root = StringHtmlElementNode.root()
-    val recomposer = Recomposer(Dispatchers.Default).apply {
-        // Render the initial composition without starting coroutine effects.
-        cancel()
-    }
-    val composition = ControlledComposition(
-        applier = StringHtmlApplier(StringHtmlNodeWrapper(root)),
-        parent = recomposer,
-    )
+    val snapshot = Snapshot.takeMutableSnapshot()
 
     return try {
-        composition.setContent {
-            CompositionLocalProvider(
-                LocalComposeHtmlContext provides StringComposeHtmlContext
-            ) {
-                content()
+        snapshot.enter {
+            val recomposer = Recomposer(Dispatchers.Default).apply {
+                // Render the initial composition without starting coroutine effects.
+                cancel()
+            }
+            val composition = ControlledComposition(
+                applier = StringHtmlApplier(StringHtmlNodeWrapper(root)),
+                parent = recomposer,
+            )
+
+            try {
+                composition.setContent {
+                    CompositionLocalProvider(
+                        LocalComposeHtmlContext provides StringComposeHtmlContext
+                    ) {
+                        content()
+                    }
+                }
+                readTree(root)
+            } finally {
+                composition.dispose()
+                recomposer.close()
             }
         }
-        readTree(root)
     } finally {
-        composition.dispose()
-        recomposer.close()
+        snapshot.dispose()
     }
 }

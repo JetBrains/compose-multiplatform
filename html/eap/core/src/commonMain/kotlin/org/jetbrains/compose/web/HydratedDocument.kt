@@ -23,6 +23,7 @@ private const val HtmlDoctype = "<!doctype html>"
  * [content] must produce exactly one `html` element. The returned string always starts with an
  * HTML doctype. Static documents emit no hydration state. The application is responsible for
  * loading the client code that calls `hydrateRoot`.
+ * Snapshot state changes made while rendering are discarded afterwards.
  *
  * That client code must run only after the [HydrationRoot] and its state element have been parsed.
  * Place its script after [HydrationRoot], defer an external classic script, or use a module script.
