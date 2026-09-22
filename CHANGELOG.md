@@ -12,7 +12,7 @@ _Changes since 1.12.0_
 
 ### Multiple Platforms
 
-- Fix crash in cases when skia returns null `ColorFilter` due to no-op parameter combination [#3324](https://github.com/JetBrains/compose-multiplatform-core/pull/3324)
+- Fix crash in cases when Skia returns null `ColorFilter` due to no-op parameter combination [#3324](https://github.com/JetBrains/compose-multiplatform-core/pull/3324)
 - Fixed crashes in certain scenarios when selecting text in a `SelectionContainer` [#3420](https://github.com/JetBrains/compose-multiplatform-core/pull/3420)
 
 ### iOS
