@@ -1,3 +1,59 @@
+# 1.12.1 (September 2026)
+
+_Changes since 1.12.0_
+
+## Migration Notes
+
+### Multiple Platforms
+
+- Temporarily re-exposed `LocalSystemTheme` (as `@InternalComposeUiApi`) and deprecated it. It will be removed in a future release [#3393](https://github.com/JetBrains/compose-multiplatform-core/pull/3393)
+
+## Fixes
+
+### Multiple Platforms
+
+- Fix crash in cases when skia returns null `ColorFilter` due to no-op parameter combination [#3324](https://github.com/JetBrains/compose-multiplatform-core/pull/3324)
+- Fixed crashes when in certain scenarios when selecting text in a `SelectionContainer` [#3420](https://github.com/JetBrains/compose-multiplatform-core/pull/3420)
+
+### iOS
+
+- Fix issue where Toolbar is not visible on iOS < 16 [#3404](https://github.com/JetBrains/compose-multiplatform-core/pull/3404)
+- Fix issue where Toolbar is not appears when `SelectionContainer` has at least one `TextField` inside [#3404](https://github.com/JetBrains/compose-multiplatform-core/pull/3404)
+- Fix crash when iOS reads `AccessibilityElement`'s properties after disposal [#3403](https://github.com/JetBrains/compose-multiplatform-core/pull/3403)
+
+### Web
+
+- Fix virtual keyboard hiding after tapping on a selection handle without moving it [#3329](https://github.com/JetBrains/compose-multiplatform-core/pull/3329)
+
+### Resources
+
+- Fix a compatibility with Kotlin 2.5 [#5717](https://github.com/JetBrains/compose-multiplatform/pull/5717)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.12.1`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.12.1` | [Runtime 1.12.1](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.12.1) |
+| UI | `org.jetbrains.compose.ui:ui*:1.12.1` | [UI 1.12.1](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.12.1) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.12.1` | [Foundation 1.12.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.12.1) |
+| Material | `org.jetbrains.compose.material:material*:1.12.1` | [Material 1.12.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.12.1) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.13.0-alpha01` | [Material3 1.5.0-alpha27](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha27) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-rc01` | [Material3 Adaptive 1.3.0](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0` | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.10.0-beta01` | [Navigation 2.10.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.10.0) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.1.2` | [Navigation3 1.1.7](https://developer.android.com/jetpack/androidx/releases/navigation3#1.1.7) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0` | [Navigation Event 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.1) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.13.0-alpha01 (September 2026)
 
 _Changes since 1.12.0_
