@@ -18,7 +18,7 @@ _Changes since 1.12.0_
 ### iOS
 
 - Fix issue where Toolbar is not visible on iOS 16 or older [#3404](https://github.com/JetBrains/compose-multiplatform-core/pull/3404)
-- Fix issue where Toolbar is not appears when `SelectionContainer` has at least one `TextField` inside [#3404](https://github.com/JetBrains/compose-multiplatform-core/pull/3404)
+- Fix issue where Toolbar does not appear when `SelectionContainer` has at least one `TextField` inside [#3404](https://github.com/JetBrains/compose-multiplatform-core/pull/3404)
 - Fix crash when iOS reads `AccessibilityElement`'s properties after disposal [#3403](https://github.com/JetBrains/compose-multiplatform-core/pull/3403)
 
 ### Web
