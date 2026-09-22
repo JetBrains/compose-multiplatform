@@ -18,9 +18,8 @@ import java.io.File
 /**
  * Adds the active Xcode toolchain's Swift library directory to iOS native links.
  *
- * Kotlin/Native does not currently add this directory itself (KT-69793). Resolving it at final link time
- * avoids publishing an absolute Xcode path in klib metadata; Swift auto-link metadata selects the needed
- * runtime and compatibility libraries.
+ * Kotlin/Native does not currently add this directory itself (KT-69793). It is resolved from the active
+ * toolchain at final link time; Swift auto-link metadata selects the needed runtime and compatibility libraries.
  */
 internal fun Project.configureSwiftCompatibilityLinking() {
     plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
