@@ -135,7 +135,10 @@ abstract class ComposePlugin : Plugin<Project> {
 
         @Deprecated(
             "currentOs is deprecated and will be removed in a future release. " +
-                    "If you relied on currentOs providing Compose modules transitively (for example, org.jetbrains.compose.ui:ui), add those dependencies explicitly. " +
+                    "You might need to replace currentOs with these explicit dependencies:\n" +
+                    "implementation(\"org.jetbrains.compose.ui:ui:<composeVersion>\")\n" +
+                    "implementation(\"org.jetbrains.compose.foundation:foundation:<composeVersion>\")\n" +
+                    "implementation(\"org.jetbrains.compose.material:material:<composeVersion>\")\n" +
                     "Compose now publishes an artifact containing binaries for all supported desktop operating systems. " +
                     "During packaging, binaries for non-target operating systems are automatically removed."
         )
