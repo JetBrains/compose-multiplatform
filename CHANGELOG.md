@@ -43,7 +43,7 @@ _Changes since 1.12.0_
 | UI | `org.jetbrains.compose.ui:ui*:1.12.1` | [UI 1.12.1](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.12.1) |
 | Foundation | `org.jetbrains.compose.foundation:foundation*:1.12.1` | [Foundation 1.12.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.12.1) |
 | Material | `org.jetbrains.compose.material:material*:1.12.1` | [Material 1.12.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.12.1) |
-| Material3 | `org.jetbrains.compose.material3:material3*:1.13.0-alpha01` | [Material3 1.5.0-alpha27](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha27) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.12.0-alpha03` | [Material3 1.5.0-alpha22](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha22) |
 | Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0-rc01` | [Material3 Adaptive 1.3.0](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0) |
 | Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0` | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0) |
 | Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.10.0-beta01` | [Navigation 2.10.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.10.0) |
