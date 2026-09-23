@@ -37,8 +37,4 @@ internal fun String.escapeForHydrationStateElement(): String = buildString {
 }
 
 // Decode &amp; last so literal entity text in the payload is not decoded a second time.
-internal fun String.unescapeFromHydrationStateElement(): String =
-    replace("&lt;", "<")
-        .replace("&#13;", "\r")
-        .replace("&#0;", "\u0000")
-        .replace("&amp;", "&")
+internal expect fun String.unescapeFromHydrationStateElement(): String

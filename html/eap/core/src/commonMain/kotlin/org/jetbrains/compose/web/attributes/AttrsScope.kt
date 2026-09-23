@@ -168,12 +168,29 @@ interface AttrsScope<out TElement : Element> : EventsListenerScope {
 open class AttrsScopeBuilder<TElement : Element>(
     internal val eventsListenerScopeBuilder: EventsListenerScopeBuilder = EventsListenerScopeBuilder()
 ) : AttrsScope<TElement> {
-    internal val attributesMap = mutableMapOf<String, String>()
-    internal val styleScope: StyleScopeBuilder = StyleScopeBuilder()
-    internal val propertyUpdates = mutableListOf<Pair<(Element, Any) -> Unit, Any>>()
+    // Allocate each attribute channel only when used.
+    private var attributesStorage: MutableMap<String, String>? = null
+    internal val attributesMap: MutableMap<String, String>
+        get() = attributesStorage ?: mutableMapOf<String, String>().also { attributesStorage = it }
+    private var styleStorage: StyleScopeBuilder? = null
+    internal val styleScope: StyleScopeBuilder
+        get() = styleStorage ?: StyleScopeBuilder().also { styleStorage = it }
+    internal val styleScopeOrNull: StyleScopeBuilder?
+        get() = styleStorage
+    private var propertiesStorage: MutableList<Pair<(Element, Any) -> Unit, Any>>? = null
+    internal val propertyUpdates: MutableList<Pair<(Element, Any) -> Unit, Any>>
+        get() = propertiesStorage ?: mutableListOf<Pair<(Element, Any) -> Unit, Any>>().also {
+            propertiesStorage = it
+        }
+    internal val propertyUpdatesOrEmpty: List<Pair<(Element, Any) -> Unit, Any>>
+        get() = propertiesStorage ?: emptyList()
     internal var refEffect: (DisposableEffectScope.(TElement) -> DisposableEffectResult)? = null
-    internal val classes: MutableList<String> = mutableListOf()
-    internal val hydrationProtocolAttributes: MutableSet<String> = mutableSetOf()
+    private var classesStorage: MutableList<String>? = null
+    internal val classes: List<String>
+        get() = classesStorage ?: emptyList()
+    private var hydrationProtocolAttributesStorage: MutableSet<String>? = null
+    internal val hydrationProtocolAttributes: Set<String>
+        get() = hydrationProtocolAttributesStorage ?: emptySet()
     internal var allowsHydrationMismatch: Boolean = false
         private set
 
@@ -189,7 +206,7 @@ open class AttrsScopeBuilder<TElement : Element>(
      *  since if your classList is, for instance, condition-dependent, you can always just call this method conditionally.
      */
     override fun classes(classes: Collection<String>) {
-        this.classes.addAll(classes)
+        if (classes.isNotEmpty()) mutableClasses().addAll(classes)
     }
 
     /**
@@ -199,7 +216,7 @@ open class AttrsScopeBuilder<TElement : Element>(
      *  since if your classList is, for instance, condition-dependent, you can always just call this method conditionally.
      */
     override fun classes(vararg classes: String) {
-        this.classes.addAll(classes)
+        if (classes.isNotEmpty()) mutableClasses().addAll(classes)
     }
 
     /**
@@ -254,7 +271,7 @@ open class AttrsScopeBuilder<TElement : Element>(
             "Attribute \"$attr\" is owned by the Compose hydration protocol"
         }
         attributesMap[attr] = value
-        hydrationProtocolAttributes += normalizedAttr
+        mutableHydrationProtocolAttributes() += normalizedAttr
     }
 
     /**
@@ -291,7 +308,7 @@ open class AttrsScopeBuilder<TElement : Element>(
     }
 
     internal fun collect(): Map<String, String> {
-        return attributesMap
+        return attributesStorage ?: emptyMap()
     }
 
     @ComposeWebInternalApi
@@ -300,10 +317,10 @@ open class AttrsScopeBuilder<TElement : Element>(
             hydrationProtocolAttributes.isNotEmpty() ||
             attrsScope.hydrationProtocolAttributes.isNotEmpty()
         ) {
-            attrsScope.attributesMap.keys.forEach { name ->
+            attrsScope.collect().keys.forEach { name ->
                 val normalizedName = name.lowercase()
                 val sourceOwnsName = normalizedName in attrsScope.hydrationProtocolAttributes
-                val destinationHasName = attributesMap.keys.any {
+                val destinationHasName = collect().keys.any {
                     it.lowercase() == normalizedName
                 }
                 require(
@@ -316,15 +333,28 @@ open class AttrsScopeBuilder<TElement : Element>(
         }
 
         refEffect = attrsScope.refEffect
-        styleScope.copyFrom(attrsScope.styleScope)
+        // Copy only populated channels to avoid materializing empty storage.
+        attrsScope.styleScopeOrNull?.let { styleScope.copyFrom(it) }
         allowsHydrationMismatch = allowsHydrationMismatch || attrsScope.allowsHydrationMismatch
 
-        hydrationProtocolAttributes.addAll(attrsScope.hydrationProtocolAttributes)
-        attributesMap.putAll(attrsScope.attributesMap)
-        propertyUpdates.addAll(attrsScope.propertyUpdates)
+        if (attrsScope.hydrationProtocolAttributes.isNotEmpty()) {
+            mutableHydrationProtocolAttributes().addAll(attrsScope.hydrationProtocolAttributes)
+        }
+        if (attrsScope.collect().isNotEmpty()) attributesMap.putAll(attrsScope.collect())
+        if (attrsScope.propertyUpdatesOrEmpty.isNotEmpty()) {
+            propertyUpdates.addAll(attrsScope.propertyUpdatesOrEmpty)
+        }
 
         eventsListenerScopeBuilder.copyListenersFrom(attrsScope.eventsListenerScopeBuilder)
     }
+
+    private fun mutableClasses(): MutableList<String> =
+        classesStorage ?: mutableListOf<String>().also { classesStorage = it }
+
+    private fun mutableHydrationProtocolAttributes(): MutableSet<String> =
+        hydrationProtocolAttributesStorage ?: mutableSetOf<String>().also {
+            hydrationProtocolAttributesStorage = it
+        }
 }
 
 private val setClassList: (HTMLElement, Array<out String>) -> Unit = { e, classList ->

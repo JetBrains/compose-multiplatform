@@ -8,6 +8,7 @@ package org.jetbrains.compose.web.dom
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
@@ -89,6 +90,23 @@ class ComposeHtmlToStringTest {
 
         assertEquals("content", html)
         assertEquals(listOf("enter", "side effect", "dispose"), effects)
+    }
+
+    @Test
+    fun discardsSnapshotStateChangesMadeWhileRendering() {
+        val sharedState = mutableStateOf("initial")
+
+        val html = composeHtmlToString {
+            sharedState.value = "render"
+            Text(sharedState.value)
+            SideEffect { sharedState.value = "side effect" }
+            DisposableEffect(Unit) {
+                onDispose { sharedState.value = "dispose" }
+            }
+        }
+
+        assertEquals("render", html)
+        assertEquals("initial", sharedState.value)
     }
 
     @Test

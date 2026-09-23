@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)
+
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.AbstractApplier
@@ -42,8 +44,8 @@ internal class HydrationDomApplier(
 
     private val rootNode = root.node
     private val frames = mutableListOf(Frame(rootNode))
-    private val claimedNodes = mutableSetOf<Node>()  // claimed nodes that still need to be called by insertBottomUp
-    private val nodesWithClaimedRawChildren = mutableSetOf<Node>()
+    private val claimedNodes = NativeNodeSet()  // claimed nodes that still need to be called by insertBottomUp
+    private val nodesWithClaimedRawChildren = NativeNodeSet()
     // Boundary markers and formatting-only root text must remain in place until hydration succeeds.
     private val nodesToRemoveAfterHydration = mutableListOf<Node>()
     private val pendingTextsToInsert = mutableListOf<PendingText>()
@@ -91,7 +93,7 @@ internal class HydrationDomApplier(
                 index,
                 elementMismatchDescription(tagName, namespace, candidate),
             )
-        if (element.localName != tagName || element.namespaceURI != namespace) {
+        if (!element.matchesElement(tagName, namespace)) {
             mismatchAtChild(
                 tagName,
                 index,
@@ -172,7 +174,7 @@ internal class HydrationDomApplier(
             )
         }
 
-        if (!allowed && text.data != value) {
+        if (!allowed && !text.matchesText(value)) {
             mismatchAtChild(
                 "text()",
                 index,
@@ -225,7 +227,7 @@ internal class HydrationDomApplier(
                 index,
                 "expected raw text ${value.quoted()}, found ${candidate.describe()}",
             )
-        if (!allowMismatch && text.data != value) {
+        if (!allowMismatch && !text.matchesText(value)) {
             mismatchAtChild(
                 "text()",
                 index,
@@ -501,4 +503,38 @@ private fun String.quoted(): String = buildString {
         }
     }
     append('"')
+}
+
+// Use a JavaScript Set to preserve DOM identity and avoid Wasm wrapper overhead.
+private class NativeNodeSet {
+    private val set = BrowserIdentitySet()
+
+    operator fun plusAssign(node: Node) {
+        set.add(node)
+    }
+
+    operator fun contains(node: Node): Boolean = set.has(node)
+
+    fun remove(node: Node): Boolean = set.delete(node)
+
+    fun isNotEmpty(): Boolean = set.size != 0
+
+    fun clear() {
+        set.clear()
+    }
+}
+
+@kotlin.js.JsName("Set")
+private external class BrowserIdentitySet : kotlinx.browser.JsAny {
+    constructor()
+
+    val size: Int
+
+    fun add(node: Node): BrowserIdentitySet
+
+    fun has(node: Node): Boolean
+
+    fun delete(node: Node): Boolean
+
+    fun clear()
 }

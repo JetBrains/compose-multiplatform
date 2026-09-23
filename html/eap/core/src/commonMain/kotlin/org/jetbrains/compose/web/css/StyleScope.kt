@@ -212,6 +212,7 @@ typealias MutableStylePropertyList = MutableList<StylePropertyDeclaration>
 
 @OptIn(ComposeWebInternalApi::class)
 internal fun StyleHolder.toStyleAttributeValue(): String? {
+    if (properties.isEmpty() && variables.isEmpty()) return null
     val declarations = properties + variables.map { it.copy(name = "--${it.name}") }
     val removedNames = mutableSetOf<String>()
     val resetPriorityNames = mutableSetOf<String>()
