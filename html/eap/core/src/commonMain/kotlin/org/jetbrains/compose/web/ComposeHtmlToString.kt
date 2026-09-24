@@ -22,6 +22,7 @@ import org.jetbrains.compose.web.dom.StringHtmlNodeWrapper
  * Composes [content] once into an HTML string without creating browser DOM nodes.
  * With no [key], the backing composition is disposed after the initial HTML is serialized.
  * With a key, the root, composition, and recomposer are retained for later calls with that key.
+ * Keyed calls are not thread-safe, even with different keys. Callers must synchronize them.
  * Snapshot state changes made while rendering are discarded afterwards.
  * Coroutine effects such as `LaunchedEffect` do not run. `SideEffect` and
  * `DisposableEffect` still execute.
