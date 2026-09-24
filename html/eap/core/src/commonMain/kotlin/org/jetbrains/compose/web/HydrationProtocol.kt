@@ -7,11 +7,14 @@ import org.jetbrains.compose.web.attributes.ScriptType
 
 internal const val HydrationRootAttribute = "data-compose-hydration-root"
 internal const val HydrationStateAttribute = "data-compose-hydration-state"
+internal const val HydrationValidationAttribute = "data-compose-hydration-validation"
+internal const val HydrationValidationEnabled = "on"
 internal const val HydrationStateFormat = "escaped-text-v1"
 internal val HydrationStateMimeType: String = ScriptType.TextPlain.typeStr
 internal val HydrationProtocolAttributes = setOf(
     HydrationRootAttribute,
     HydrationStateAttribute,
+    HydrationValidationAttribute,
 )
 
 internal fun <TElement : Element> AttrsScope<TElement>.hydrationProtocolAttr(

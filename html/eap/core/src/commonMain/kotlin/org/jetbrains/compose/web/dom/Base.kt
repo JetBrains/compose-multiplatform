@@ -190,10 +190,14 @@ internal fun String.normalizeHtmlInputCharacters(): String =
         this
     }
 
-// Scan raw-text tags without retaining the regex engine in browser binaries.
-internal fun String.rawTextTagIndex(tagName: String, closing: Boolean, startIndex: Int = 0): Int {
+internal fun String.rawTextTagIndex(
+    tagName: String,
+    closing: Boolean,
+    startIndex: Int = 0,
+    endIndex: Int = length,
+): Int {
     var index = indexOf('<', startIndex)
-    while (index >= 0) {
+    while (index >= 0 && index < endIndex) {
         val nameStart = index + if (closing) 2 else 1
         val delimiterIndex = nameStart + tagName.length
         if (
@@ -222,12 +226,14 @@ private fun requireValidRawTextContent(tagName: String, content: String) {
         while (escapedStart >= 0) {
             // Include the opener's dashes: <!--> also exits the escaped state.
             val escapedEnd = content.indexOf("-->", escapedStart + 2)
+            // Limit the tag scan to this segment so each character is checked at most once.
             val script = content.rawTextTagIndex(
                 tagName = "script",
                 closing = false,
                 startIndex = escapedStart + 4,
+                endIndex = if (escapedEnd < 0) content.length else escapedEnd + 1,
             )
-            require(script < 0 || (escapedEnd >= 0 && script > escapedEnd)) {
+            require(script < 0) {
                 "Raw text for <script> must not contain a <script tag inside <!-- escaped text"
             }
             if (escapedEnd < 0) break

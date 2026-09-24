@@ -24,6 +24,7 @@ import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.StyleHolder
 import org.jetbrains.compose.web.css.toStyleAttributeValue
 import org.jetbrains.compose.web.HydrationMismatchException
+import org.jetbrains.compose.web.HtmlValidationMode
 import org.jetbrains.compose.web.internal.noncePropertyOrNull
 import org.jetbrains.compose.web.internal.unsafeCast
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
@@ -80,8 +81,9 @@ private fun Map<String, String>.containsAttribute(name: String): Boolean =
 // Cache validated class strings with copied keys and bounded growth.
 private val validatedClassValues = mutableMapOf<List<String>, String>()
 
-private fun classAttributeValue(classes: List<String>): String? {
+private fun classAttributeValue(classes: List<String>, validate: Boolean): String? {
     if (classes.isEmpty()) return null
+    if (!validate) return classes.toClassAttributeValue(validate = false)
     validatedClassValues[classes]?.let { return it }
     val value = classes.toClassAttributeValue()!!
     if (validatedClassValues.size >= 256) validatedClassValues.clear()
@@ -213,6 +215,7 @@ private class HydratingDomElementWrapper(
             super.updateAttrs(attrs)
             return
         }
+        if (applier.validationMode == HtmlValidationMode.Fast && !allowance.isAllowed) return
 
         attrs.forEach { (name, value) ->
             verifyAttribute(name, expected = value) {
@@ -225,12 +228,16 @@ private class HydratingDomElementWrapper(
     override fun updateClasses(classes: List<String>?) {
         if (!applier.isHydrating) {
             super.updateClasses(classes)
-        } else {
-            classes?.let(::classAttributeValue)?.let { value ->
-                verifyAttribute(AttrsScope.CLASS, value) {
-                    // Extra server classes are tolerated, so only missing ones are added.
-                    node.classList.add(*value.split(' ').toTypedArray())
-                }
+            return
+        }
+        if (applier.validationMode == HtmlValidationMode.Fast && !allowance.isAllowed) return
+
+        classes?.let {
+            classAttributeValue(it, validate = applier.validationMode == HtmlValidationMode.Strict)
+        }?.let { value ->
+            verifyAttribute(AttrsScope.CLASS, value) {
+                // Extra server classes are tolerated, so only missing ones are added.
+                node.classList.add(*value.split(' ').toTypedArray())
             }
         }
     }
@@ -238,11 +245,14 @@ private class HydratingDomElementWrapper(
     override fun updateStyleDeclarations(declarations: StyleHolder?) {
         if (!applier.isHydrating) {
             super.updateStyleDeclarations(declarations)
-        } else if (declarations != null && (node is HTMLElement || node is SVGElement)) {
-            declarations.toStyleAttributeValue()?.let { value ->
-                verifyAttribute("style", value) {
-                    super.updateStyleDeclarations(declarations)
-                }
+            return
+        }
+        if ((applier.validationMode == HtmlValidationMode.Fast && !allowance.isAllowed) || declarations == null) return
+        if (node !is HTMLElement && node !is SVGElement) return
+
+        declarations.toStyleAttributeValue()?.let { value ->
+            verifyAttribute("style", value) {
+                super.updateStyleDeclarations(declarations)
             }
         }
     }
@@ -265,8 +275,8 @@ private class HydratingDomElementWrapper(
     }
 
     override fun updateRawText(value: String) {
-        // HydratingElementBuilder already verified the claimed raw text. Preserve that server DOM
-        // node during the initial update; later recompositions use the normal setter.
+        // Allowed raw text uses the client value in both modes. Other initial server text
+        // is retained in fast mode; later recompositions use the normal setter.
         if (!applier.isHydrating) {
             super.updateRawText(value)
         } else if (allowance.isAllowed) {
@@ -645,12 +655,7 @@ private class HydratingComposeHtmlContext(
             },
             update = {
                 set(value) { newValue ->
-                    val text = node as Text
-                    // Claimed text already holds the server value unless its element allows
-                    // mismatches. Defer that patch, so a later mismatch can still fall back.
-                    if (!text.matchesText(newValue)) {
-                        applier.applyOrDeferDomMutation { text.data = newValue }
-                    }
+                    applier.initializeText(node as Text, newValue)
                 }
             },
         )
@@ -724,13 +729,14 @@ private class HydratingElementBuilder<TElement : Element>(
 
     @Suppress("UNCHECKED_CAST")
     override fun create(): TElement = if (applier.isHydrating) {
-        if (rawText == null) {
+        val rawTextProvider = rawText
+        if (rawTextProvider == null) {
             applier.claimElement(tagName, namespace)
         } else {
             applier.claimElementWithRawText(
                 tagName = tagName,
                 namespace = namespace,
-                value = rawText().text,
+                rawText = rawTextProvider,
                 allowContentMismatch = allowance?.isAllowed == true,
             )
         } as TElement

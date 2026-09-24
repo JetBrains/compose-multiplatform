@@ -33,10 +33,14 @@ import org.jetbrains.compose.web.dom.StringHtmlNodeWrapper
  * - Inline styles preserve CSS fallbacks, but do not fully emulate CSSOM validation and
  *   mutation (for example, invalid assignments that also change priority, or shorthand removal).
  *
+ * On the JVM or Node, set `COMPOSE_HTML_VALIDATE_STRICTLY=true` to enable additional class and
+ * duplicate foreign-attribute checks by default.
+ *
  * @param hydratable whether to emit text-boundary markers required to hydrate adjacent `Text`
  * nodes. Set to `false` when the output will not be hydrated.
  * @param key when non-null, reuses a renderer across calls. Each render clears remembered
  * state and effects but keeps matching HTML nodes. Keys and trees persist until process exit.
+ * @param validateStrictly overrides the default strict-validation setting for this render.
  * @throws IllegalArgumentException if a raw-text element contains unsafe text or element children,
  * serialized `noscript` contents contain a `</noscript>` end tag, or ordinary text, RCDATA,
  * or attribute values contain NUL (U+0000), which HTML parsing cannot preserve.
@@ -45,11 +49,23 @@ import org.jetbrains.compose.web.dom.StringHtmlNodeWrapper
 fun composeHtmlToString(
     hydratable: Boolean = true,
     key: String? = null,
+    validateStrictly: Boolean = defaultHtmlValidationMode() == HtmlValidationMode.Strict,
     content: @Composable () -> Unit,
-): String = if (key == null) {
-    composeHtmlTree(content) { tree -> tree.toHtmlString(hydratable) }
-} else {
-    composeReusableHtmlTree(key, content) { tree -> tree.toHtmlString(hydratable) }
+): String {
+    val contentWithValidation: @Composable () -> Unit = {
+        CompositionLocalProvider(
+            LocalHtmlValidationMode provides if (validateStrictly) {
+                HtmlValidationMode.Strict
+            } else {
+                HtmlValidationMode.Fast
+            }
+        ) { content() }
+    }
+    return if (key == null) {
+        composeHtmlTree(contentWithValidation) { tree -> tree.toHtmlString(hydratable) }
+    } else {
+        composeReusableHtmlTree(key, contentWithValidation) { tree -> tree.toHtmlString(hydratable) }
+    }
 }
 
 private val reusableHtmlCompositions = mutableMapOf<String, ReusableHtmlComposition>()

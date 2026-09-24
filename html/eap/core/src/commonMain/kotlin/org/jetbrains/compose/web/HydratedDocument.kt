@@ -24,15 +24,26 @@ private const val HtmlDoctype = "<!doctype html>"
  * HTML doctype. Static documents emit no hydration state. The application is responsible for
  * loading the client code that calls `hydrateRoot`.
  * Snapshot state changes made while rendering are discarded afterwards.
+ * On the JVM or JS/Node, `COMPOSE_HTML_VALIDATE_STRICTLY=true` enables strict validation and records that
+ * choice in each hydration state element. Pass `validateStrictly` to override the default.
+ * Without strict validation, browser hydration trusts initial server values.
  *
  * That client code must run only after the [HydrationRoot] and its state element have been parsed.
  * Place its script after [HydrationRoot], defer an external classic script, or use a module script.
  */
 fun renderHydratedDocument(
+    validateStrictly: Boolean = defaultHtmlValidationMode() == HtmlValidationMode.Strict,
     content: @Composable () -> Unit,
 ): String = composeHtmlTree(
     content = {
-        CompositionLocalProvider(LocalHydratedDocumentContext provides true) {
+        CompositionLocalProvider(
+            LocalHydratedDocumentContext provides true,
+            LocalHtmlValidationMode provides if (validateStrictly) {
+                HtmlValidationMode.Strict
+            } else {
+                HtmlValidationMode.Fast
+            },
+        ) {
             content()
         }
     },
@@ -69,6 +80,7 @@ fun <T> HydrationRoot(
     check(LocalHydratedDocumentContext.current) {
         "HydrationRoot must be called inside renderHydratedDocument"
     }
+    val validationMode = LocalHtmlValidationMode.current
     val serializedState = serializeState(initialState)
 
     Div(attrs = {
@@ -81,6 +93,9 @@ fun <T> HydrationRoot(
         content = InlineScript(serializedState.escapeForHydrationStateElement()),
         attrs = {
             hydrationProtocolAttr(HydrationStateAttribute, HydrationStateFormat)
+            if (validationMode == HtmlValidationMode.Strict) {
+                hydrationProtocolAttr(HydrationValidationAttribute, HydrationValidationEnabled)
+            }
             type(ScriptType.TextPlain)
         },
     )

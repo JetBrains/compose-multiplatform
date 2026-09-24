@@ -47,7 +47,7 @@ class JvmSsrNumberHydrationTest {
 
         // JS contract: hydration compares raw stylesheet and style-attribute strings; different
         // number spelling throws HydrationMismatchException.
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             SsrNumberHydrationContent(
                 count = count,
                 increment = { count++ },

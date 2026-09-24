@@ -7,7 +7,9 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import kotlinx.browser.dom.Element
+import kotlinx.browser.dom.HTMLDivElement
 import kotlinx.browser.dom.HTMLInputElement
+import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.attributes.readOnly
 import org.jetbrains.compose.web.attributes.required
@@ -143,7 +145,7 @@ class HtmlSerializationTest {
         listOf("", "a b", "a\tb", "a\nb", "a\rb", "a\u000Cb").forEach { token ->
             listOf(false, true).forEach { overrideClass ->
                 assertFailsWith<IllegalArgumentException>(token) {
-                    composeHtmlToString {
+                    composeHtmlToString(validateStrictly = true) {
                         Div({
                             classes(token)
                             if (overrideClass) attr("class", "valid")
@@ -155,6 +157,40 @@ class HtmlSerializationTest {
         assertEquals("<div class=\"a\u00A0b\"></div>", composeHtmlToString {
             Div({ classes("a\u00A0b") })
         })
+    }
+
+    @Test
+    fun strictModeRejectsRepeatedClassTokens() {
+        listOf<AttrsScope<HTMLDivElement>.() -> Unit>(
+            { classes("first", "second", "first") },
+            { classes("first"); classes("second", "first") },
+        ).forEach { applyAttrs ->
+            val failure = assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString(validateStrictly = true) {
+                    Div(applyAttrs)
+                }
+            }
+            assertEquals("Class token must not be repeated: \"first\"", failure.message)
+        }
+    }
+
+    @Test
+    fun fastModeSkipsOptionalClassAndForeignAttributeChecks() {
+        assertEquals(
+            "<div class=\"two words\"></div>",
+            composeHtmlToString(validateStrictly = false) {
+                Div({ classes("two words") })
+            },
+        )
+        assertEquals(
+            "<svg dataValue=\"first\" datavalue=\"second\"></svg>",
+            composeHtmlToString(validateStrictly = false) {
+                TagElementNS<Element>("svg", TestSvgNamespace, {
+                    attr("dataValue", "first")
+                    attr("datavalue", "second")
+                }, null)
+            },
+        )
     }
 
     @Test
@@ -384,7 +420,7 @@ class HtmlSerializationTest {
     }
 
     @Test
-    fun formatsClassesAsOrderedUniqueTokens() {
+    fun preservesClassTokenOrderInFastMode() {
         val html = composeHtmlToString {
             Div({
                 classes("first", "second", "first")
@@ -400,7 +436,7 @@ class HtmlSerializationTest {
         }
 
         assertEquals(
-            "<div class=\"first second third\"></div>" +
+            "<div class=\"first second first third\"></div>" +
                 "<div class=\"manual  value\"></div>" +
                 "<div></div>",
             html,
@@ -613,7 +649,7 @@ class HtmlSerializationTest {
     @Test
     fun rejectsSvgAttributesThatCollapseDuringHtmlParsing() {
         val failure = assertFailsWith<IllegalArgumentException> {
-            composeHtmlToString {
+            composeHtmlToString(validateStrictly = true) {
                 TagElementNS<Element>(
                     tagName = "svg",
                     namespace = TestSvgNamespace,

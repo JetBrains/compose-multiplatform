@@ -87,7 +87,7 @@ class HydrationEventListenerTest {
         var clickCount = 0
 
         val thrown = assertFailsWith<IllegalStateException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Button(attrs = { onClick { clickCount++ } }) { Text("Click") }
                 Span(attrs = {
                     prop({ _: HTMLElement, _: Unit ->
@@ -115,7 +115,7 @@ class HydrationEventListenerTest {
         val button = root.firstChild as HTMLElement
         var clickCount = 0
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Button(attrs = { onClick { clickCount++ } }) { Text("Click") }
         }
 
@@ -141,7 +141,7 @@ class HydrationEventListenerTest {
         var observedSubmitEvent: Event? = null
         var observedResetEvent: Event? = null
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Form(
                 action = "/",
                 attrs = {
@@ -174,7 +174,7 @@ class HydrationEventListenerTest {
         var observedInputValue = ""
         var observedTextAreaValue = ""
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Input(InputType.Text) {
                 value("controlled input")
                 onInput { observedInputValue = it.value }
@@ -217,7 +217,7 @@ class HydrationEventListenerTest {
         var firstHandlerCount = 0
         var secondHandlerCount = 0
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Button(attrs = {
                 if (useSecondHandler) {
                     onClick { secondHandlerCount++ }
@@ -250,7 +250,7 @@ class HydrationEventListenerTest {
         var enabled by mutableStateOf(true)
         var clickCount = 0
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Button(attrs = {
                 if (enabled) {
                     onClick { clickCount++ }
@@ -282,7 +282,7 @@ class HydrationEventListenerTest {
         val button = root.firstChild as HTMLElement
         var clickCount = 0
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Button(attrs = { onClick { clickCount++ } }) { Text("Click") }
         }
 
@@ -303,7 +303,7 @@ class HydrationEventListenerTest {
         var showButton by mutableStateOf(true)
         var clickCount = 0
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             if (showButton) {
                 Button(attrs = { onClick { clickCount++ } }) { Text("Click") }
             }
@@ -333,7 +333,7 @@ class HydrationEventListenerTest {
         var clickCount = 0
 
         assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Button(attrs = {
                     onClick { clickCount++ }
                     ref { element ->

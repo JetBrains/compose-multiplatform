@@ -48,7 +48,7 @@ class HydrationRawTextTest {
             val fallback = noscript.textContent
             fallbackCompositions = 0
 
-            val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 content()
             }
             try {
@@ -84,7 +84,7 @@ class HydrationRawTextTest {
             assertEquals(prefix + suffix, parent.textContent)
             assertEquals(1, parent.childNodes.length)
 
-            val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 TagElement<Element>(tag, null) { Text(prefix); Text(""); Text(suffix) }
             }
             try {
@@ -111,7 +111,7 @@ class HydrationRawTextTest {
             val serverText = root.firstChild!!.firstChild
             val serverHtml = root.innerHTML
             assertFailsWith<HydrationMismatchException> {
-                hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                     TagElement<Element>(tag, null) { Text("first"); Text(" second") }
                     Span { Text("client") }
                 }
@@ -127,7 +127,7 @@ class HydrationRawTextTest {
         root.innerHTML = "<script>server</script>"
         val serverScript = root.firstChild
         var mismatch: HydrationMismatchException? = null
-        val composition = hydrateComposable(root, onHydrationMismatch = { mismatch = it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { mismatch = it }) {
             TagElement<Element>("script", null) { Text("</script>") }
         }
         try {
@@ -150,7 +150,7 @@ class HydrationRawTextTest {
                     value.replace("\r\n", "\n").replace('\u0000', '\uFFFD')
                 root.appendChild(serverScript)
                 val serverText = serverScript.firstChild
-                val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                     TagElement<Element>("script", { if (allowed) allowHydrationMismatch() }) {
                         Text(value)
                     }
@@ -175,7 +175,7 @@ class HydrationRawTextTest {
             serverScript.appendChild(child)
             root.appendChild(serverScript)
             assertFailsWith<HydrationMismatchException> {
-                hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                     if (generic) {
                         TagElement<Element>("script", { allowHydrationMismatch() }) { Text("client") }
                     } else {
@@ -203,7 +203,7 @@ class HydrationRawTextTest {
             val serverText = parent.firstChild
             assertEquals(1, parent.childNodes.length, tag)
             assertEquals("A & B < C", parent.textContent, tag)
-            val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 TagElement<Element>(tag, null) {
                     Text("A & B")
                     Text("")
@@ -229,7 +229,7 @@ class HydrationRawTextTest {
             val serverText = root.firstChild!!.firstChild
             val serverHtml = root.innerHTML
             assertFailsWith<HydrationMismatchException> {
-                hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                     TagElement<Element>("script", null) {
                         Text("first")
                         Text(if (mismatchInSibling) " second" else " different")
@@ -248,7 +248,7 @@ class HydrationRawTextTest {
         val root = browserDocument.createElement("div") as HTMLElement
         root.innerHTML = "<script>first second</script>"
         var suffix by mutableStateOf(" second")
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             TagElement<Element>("script", null) {
                 Text("first")
                 Text(suffix)
@@ -280,7 +280,7 @@ class HydrationRawTextTest {
         val serverScript = root.firstChild as HTMLScriptElement
         val serverText = serverScript.firstChild
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Script(InlineScript(content)) {
                 type(ScriptType.TextPlain)
             }
@@ -308,7 +308,7 @@ class HydrationRawTextTest {
         val serverText = serverScript?.firstChild
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Script(InlineScript("client")) {
                     type(ScriptType.TextPlain)
                 }
@@ -331,7 +331,7 @@ class HydrationRawTextTest {
         }
         val serverScript = root.firstChild
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Script(InlineScript("")) {
                 type(ScriptType.TextPlain)
             }
@@ -357,7 +357,7 @@ class HydrationRawTextTest {
         serverScript.appendChild(browserDocument.createComment("extra"))
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Script(InlineScript("content")) {
                     type(ScriptType.TextPlain)
                 }
@@ -384,7 +384,7 @@ class HydrationRawTextTest {
             root.appendChild(browserDocument.createElement("span"))
             assertEquals(1, getWindowIntProperty(counterName))
 
-            val composition = hydrateComposable(root) {
+            val composition = hydrateComposable(root, validateStrictly = true) {
                 Script(InlineScript(scriptContent))
             }
             try {
@@ -409,7 +409,7 @@ class HydrationRawTextTest {
         }
         val serverScript = root.firstChild as HTMLScriptElement
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Script(InlineScript(content)) {
                 type(ScriptType.TextPlain)
             }

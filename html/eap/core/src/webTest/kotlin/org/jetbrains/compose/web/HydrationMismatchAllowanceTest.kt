@@ -22,9 +22,11 @@ import org.jetbrains.compose.web.dom.Script
 import org.jetbrains.compose.web.dom.Select
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Style
+import org.jetbrains.compose.web.dom.TagElement
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.dom.TextArea
 import org.w3c.dom.Comment
+import org.w3c.dom.Element
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLScriptElement
 import org.w3c.dom.HTMLStyleElement
@@ -41,26 +43,104 @@ import kotlin.time.Duration.Companion.milliseconds
 class HydrationMismatchAllowanceTest {
     @Test
     fun allowedTextMismatchReusesServerNodeWithClientValue() {
+        for (validateStrictly in listOf(false, true)) {
+            val root = document.createElement("div") as HTMLElement
+            root.innerHTML = composeHtmlToString {
+                Span(attrs = { allowHydrationMismatch() }) { Text("12:00") }
+            }
+            val serverSpan = root.firstChild as HTMLElement
+            val serverText = serverSpan.firstChild
+            var mismatch: HydrationMismatchException? = null
+
+            val composition = hydrateComposable(
+                validateStrictly = validateStrictly,
+                root = root,
+                onHydrationMismatch = { mismatch = it },
+            ) {
+                Span(attrs = { allowHydrationMismatch() }) { Text("12:05") }
+            }
+
+            try {
+                assertNull(mismatch)
+                assertSame(serverSpan, root.firstChild)
+                assertSame(serverText, serverSpan.firstChild)
+                assertEquals("12:05", serverSpan.textContent)
+            } finally {
+                composition.dispose()
+            }
+        }
+    }
+
+    @Test
+    fun fastHydrationInsertsAllowedTextMissingFromServer() {
         val root = document.createElement("div") as HTMLElement
         root.innerHTML = composeHtmlToString {
-            Span(attrs = { allowHydrationMismatch() }) { Text("12:00") }
+            Span(attrs = { allowHydrationMismatch() }) { Text("") }
         }
         val serverSpan = root.firstChild as HTMLElement
-        val serverText = serverSpan.firstChild
-        var mismatch: HydrationMismatchException? = null
+        assertNull(serverSpan.firstChild)
 
-        val composition = hydrateComposable(
-            root = root,
-            onHydrationMismatch = { mismatch = it },
-        ) {
+        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
             Span(attrs = { allowHydrationMismatch() }) { Text("12:05") }
         }
 
         try {
-            assertNull(mismatch)
             assertSame(serverSpan, root.firstChild)
-            assertSame(serverText, serverSpan.firstChild)
             assertEquals("12:05", serverSpan.textContent)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun fastHydrationPatchesAllowedParserMergedText() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = "<textarea>server</textarea>"
+        val serverTextArea = root.firstChild as HTMLElement
+        val serverText = serverTextArea.firstChild
+
+        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            TagElement<Element>("textarea", { allowHydrationMismatch() }) {
+                Text("client")
+            }
+        }
+
+        try {
+            assertSame(serverTextArea, root.firstChild)
+            assertSame(serverText, serverTextArea.firstChild)
+            assertEquals("client", serverTextArea.textContent)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun fastHydrationPatchesAllowedAttributesClassesAndStyle() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = composeHtmlToString {
+            Span(attrs = {
+                allowHydrationMismatch()
+                attr("data-rendered-at", "12:00")
+                classes("server")
+                style { width(10.px) }
+            })
+        }
+        val serverSpan = root.firstChild as HTMLElement
+
+        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            Span(attrs = {
+                allowHydrationMismatch()
+                attr("data-rendered-at", "12:05")
+                classes("client")
+                style { width(20.px) }
+            })
+        }
+
+        try {
+            assertSame(serverSpan, root.firstChild)
+            assertEquals("12:05", serverSpan.getAttribute("data-rendered-at"))
+            assertTrue(serverSpan.classList.contains("client"))
+            assertEquals("20px", serverSpan.style.getPropertyValue("width"))
         } finally {
             composition.dispose()
         }
@@ -81,7 +161,7 @@ class HydrationMismatchAllowanceTest {
         val serverSecondText = serverSpan.childNodes.item(2) as DomText
         assertEquals(HydrationTextBoundaryMarker, boundaryMarker.data)
 
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             Span(attrs = { allowHydrationMismatch() }) {
                 Text("client first")
                 Text("client second")
@@ -110,7 +190,7 @@ class HydrationMismatchAllowanceTest {
         var label by mutableStateOf("12:05")
         var clickCount = 0
 
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             Span(attrs = {
                 allowHydrationMismatch()
                 onClick { clickCount++ }
@@ -142,7 +222,7 @@ class HydrationMismatchAllowanceTest {
         val serverSpan = root.firstChild as HTMLElement
         assertNull(serverSpan.firstChild)
 
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             Span(attrs = { allowHydrationMismatch() }) { Text("12:05") }
         }
 
@@ -163,7 +243,7 @@ class HydrationMismatchAllowanceTest {
         val serverSpan = root.firstChild as HTMLElement
         val serverText = serverSpan.firstChild
 
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             Span(attrs = { allowHydrationMismatch() }) { Text("") }
         }
 
@@ -192,7 +272,7 @@ class HydrationMismatchAllowanceTest {
         serverDiv.setAttribute("data-extension", "injected")
         serverDiv.classList.add("ext-injected")
 
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             Div(attrs = {
                 allowHydrationMismatch()
                 attr("data-rendered-at", "12:05")
@@ -218,28 +298,62 @@ class HydrationMismatchAllowanceTest {
     }
 
     @Test
-    fun allowedRawTextMismatchUsesClientValue() {
+    fun fastAllowedClassHydrationAcceptsRepeatedTokens() {
         val root = document.createElement("div") as HTMLElement
         root.innerHTML = composeHtmlToString {
-            Script(InlineScript("const renderedAt = '12:00';")) {
+            Div(attrs = {
                 allowHydrationMismatch()
-                type(ScriptType.TextPlain)
-            }
+                classes("server")
+            })
         }
-        val serverScript = root.firstChild as HTMLScriptElement
+        val serverDiv = root.firstChild as HTMLElement
+        var mismatch: HydrationMismatchException? = null
 
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
-            Script(InlineScript("const renderedAt = '12:05';")) {
+        val composition = hydrateComposable(
+            root = root,
+            validateStrictly = false,
+            onHydrationMismatch = { mismatch = it },
+        ) {
+            Div(attrs = {
                 allowHydrationMismatch()
-                type(ScriptType.TextPlain)
-            }
+                classes("client", "client")
+            })
         }
 
         try {
-            assertSame(serverScript, root.firstChild)
-            assertEquals("const renderedAt = '12:05';", serverScript.textContent)
+            assertNull(mismatch)
+            assertSame(serverDiv, root.firstChild)
+            assertTrue(serverDiv.classList.contains("client"))
         } finally {
             composition.dispose()
+        }
+    }
+
+    @Test
+    fun allowedRawTextMismatchUsesClientValue() {
+        for (validateStrictly in listOf(false, true)) {
+            val root = document.createElement("div") as HTMLElement
+            root.innerHTML = composeHtmlToString {
+                Script(InlineScript("const renderedAt = '12:00';")) {
+                    allowHydrationMismatch()
+                    type(ScriptType.TextPlain)
+                }
+            }
+            val serverScript = root.firstChild as HTMLScriptElement
+
+            val composition = hydrateComposable(root, validateStrictly = validateStrictly, onHydrationMismatch = { throw it }) {
+                Script(InlineScript("const renderedAt = '12:05';")) {
+                    allowHydrationMismatch()
+                    type(ScriptType.TextPlain)
+                }
+            }
+
+            try {
+                assertSame(serverScript, root.firstChild)
+                assertEquals("const renderedAt = '12:05';", serverScript.textContent)
+            } finally {
+                composition.dispose()
+            }
         }
     }
 
@@ -255,7 +369,7 @@ class HydrationMismatchAllowanceTest {
         val serverScript = root.firstChild as HTMLScriptElement
         assertNull(serverScript.firstChild)
 
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             Script(InlineScript("const renderedAt = '12:05';")) {
                 allowHydrationMismatch()
                 type(ScriptType.TextPlain)
@@ -272,26 +386,28 @@ class HydrationMismatchAllowanceTest {
 
     @Test
     fun allowedStyleTextMismatchUsesClientCss() {
-        val root = document.createElement("div") as HTMLElement
-        root.innerHTML = composeHtmlToString {
-            Style(applyAttrs = { allowHydrationMismatch() }) {
-                "body" style { color(Color.red) }
+        for (validateStrictly in listOf(false, true)) {
+            val root = document.createElement("div") as HTMLElement
+            root.innerHTML = composeHtmlToString {
+                Style(applyAttrs = { allowHydrationMismatch() }) {
+                    "body" style { color(Color.red) }
+                }
             }
-        }
-        val serverStyle = root.firstChild as HTMLStyleElement
+            val serverStyle = root.firstChild as HTMLStyleElement
 
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
-            Style(applyAttrs = { allowHydrationMismatch() }) {
-                "body" style { color(Color.blue) }
+            val composition = hydrateComposable(root, validateStrictly = validateStrictly, onHydrationMismatch = { throw it }) {
+                Style(applyAttrs = { allowHydrationMismatch() }) {
+                    "body" style { color(Color.blue) }
+                }
             }
-        }
 
-        try {
-            assertSame(serverStyle, root.firstChild)
-            // The root is detached, so the CSS stays serialized instead of moving to CSSOM.
-            assertEquals("body { color: blue;}", serverStyle.textContent)
-        } finally {
-            composition.dispose()
+            try {
+                assertSame(serverStyle, root.firstChild)
+                // The root is detached, so the CSS stays serialized instead of moving to CSSOM.
+                assertEquals("body { color: blue;}", serverStyle.textContent)
+            } finally {
+                composition.dispose()
+            }
         }
     }
 
@@ -305,7 +421,7 @@ class HydrationMismatchAllowanceTest {
         }
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Div(attrs = { allowHydrationMismatch() }) {
                     Span { Text("12:05") }
                 }
@@ -326,7 +442,7 @@ class HydrationMismatchAllowanceTest {
         }
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Div(attrs = { allowHydrationMismatch() }) {
                     Text("12:05")
                 }
@@ -338,34 +454,36 @@ class HydrationMismatchAllowanceTest {
 
     @Test
     fun allowedValuesAreNotAppliedWhenHydrationFailsLater() {
-        val root = document.createElement("div") as HTMLElement
-        root.innerHTML = composeHtmlToString {
-            Span(attrs = {
-                allowHydrationMismatch()
-                attr("data-rendered-at", "12:00")
-            }) {
-                Text("12:00")
-            }
-            Span()
-        }
-        val serverHtml = root.innerHTML
-        val serverSpan = root.firstChild
-        val serverText = serverSpan?.firstChild
-
-        assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        for (validateStrictly in listOf(false, true)) {
+            val root = document.createElement("div") as HTMLElement
+            root.innerHTML = composeHtmlToString {
                 Span(attrs = {
                     allowHydrationMismatch()
-                    attr("data-rendered-at", "12:05")
+                    attr("data-rendered-at", "12:00")
                 }) {
-                    Text("12:05")
+                    Text("12:00")
+                }
+                Span()
+            }
+            val serverHtml = root.innerHTML
+            val serverSpan = root.firstChild
+            val serverText = serverSpan?.firstChild
+
+            assertFailsWith<HydrationMismatchException> {
+                hydrateComposable(root, validateStrictly = validateStrictly, onHydrationMismatch = { throw it }) {
+                    Span(attrs = {
+                        allowHydrationMismatch()
+                        attr("data-rendered-at", "12:05")
+                    }) {
+                        Text("12:05")
+                    }
                 }
             }
-        }
 
-        assertSame(serverSpan, root.firstChild)
-        assertSame(serverText, serverSpan?.firstChild)
-        assertEquals(serverHtml, root.innerHTML)
+            assertSame(serverSpan, root.firstChild)
+            assertSame(serverText, serverSpan?.firstChild)
+            assertEquals(serverHtml, root.innerHTML)
+        }
     }
 
     @Test
@@ -377,7 +495,7 @@ class HydrationMismatchAllowanceTest {
         }
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Span(attrs = { allowHydrationMismatch() }) { Text("12:05") }
                 Span { Text("changed") }
             }
@@ -407,7 +525,7 @@ class HydrationMismatchAllowanceTest {
         val serverTextArea = root.childNodes.item(1) as HTMLElement
         val serverInput = root.childNodes.item(2) as HTMLElement
 
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             Select(attrs = {
                 allowHydrationMismatch()
                 attr("data-rendered-at", "12:05")

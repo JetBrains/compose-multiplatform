@@ -7,8 +7,19 @@ package org.jetbrains.compose.web.dom
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 class RawTextScannerTest {
+    @Test
+    fun repeatedClosedCommentsOnlyRejectScriptInAnOpenSegment() {
+        val comments = "<!-- -->".repeat(1000)
+        RawTextContent.create("script", "$comments<script>")
+
+        assertFailsWith<IllegalArgumentException> {
+            RawTextContent.create("script", "$comments<!-- <script>")
+        }
+    }
+
     @Test
     fun scannerMatchesPreviousValidatorAtEveryDelimiterAndCaseBoundary() {
         val delimiters = listOf(

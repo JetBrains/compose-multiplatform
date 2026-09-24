@@ -15,24 +15,38 @@ The file is ignored by Git. CI enables the projects with the equivalent Gradle p
 The `compose.html.eap.enabled` value in `html/local.properties` takes precedence over the value in
 `html/gradle.properties` and command-line project properties.
 
-Published coordinates start at version `0.0.1`:
+## HTML validation
 
-- `org.jetbrains.compose.html.eap:html-core-eap:0.0.1`
-- `org.jetbrains.compose.html.eap:html-svg-eap:0.0.1`
-- `org.jetbrains.compose.html.eap:internal-html-core-runtime-eap:0.0.1`
+Fast validation is the default. Set `COMPOSE_HTML_VALIDATE_STRICTLY=true` on the JVM or in Node to render
+with strict validation. Browser hydration follows the server's mode. Direct callers can pass
+`validateStrictly = true` to `hydrateComposable`.
 
-Consumers must add `https://packages.jetbrains.team/maven/p/cmp/dev` as a Maven repository. The EAP
-dependencies intentionally use Gradle's `implementation` scope while the commonized API is being
-evaluated.
+| During hydration | Fast (default) | Strict |
+| --- | --- | --- |
+| Text, attributes, or styles differ | Keeps server values until a Compose update | Reports a mismatch and renders on the client |
+| `allowHydrationMismatch()` | Applies client values | Applies client values |
+| Structure differs | Renders on the client | Renders on the client |
+
+Strict mode also checks class tokens and foreign-attribute collisions.
+
+## Published artifacts
+
+The [JetBrains development repository](https://packages.jetbrains.team/maven/p/cmp/dev/org/jetbrains/compose/html/eap/)
+lists the available EAP modules and versions. Replace `<version>` below.
 
 ```kotlin
+repositories {
+    maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+}
+
 dependencies {
-    implementation("org.jetbrains.compose.html.eap:html-core-eap:0.0.1")
-    implementation("org.jetbrains.compose.html.eap:html-svg-eap:0.0.1")
-    implementation("org.jetbrains.compose.html.eap:internal-html-core-runtime-eap:0.0.1")
-    implementation("org.jetbrains.compose.html:kotlinx-browser-common-subset:0.0.1+dev2")
+    implementation("org.jetbrains.compose.html.eap:html-core-eap:<version>")
+    implementation("org.jetbrains.compose.html.eap:html-svg-eap:<version>")
+    implementation("org.jetbrains.compose.html.eap:internal-html-core-runtime-eap:<version>")
+    implementation("org.jetbrains.compose.html:kotlinx-browser-common-subset:<version>")
 }
 ```
+Local build versions are configured in `html/gradle.properties`.
 
 Do not put the regular and EAP Compose HTML artifacts on the same compilation classpath because
 they intentionally expose the same Kotlin packages and declarations.
