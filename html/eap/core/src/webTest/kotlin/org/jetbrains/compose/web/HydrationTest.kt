@@ -47,7 +47,7 @@ class HydrationTest {
         val root = browserDocument.createElement("div") as HTMLElement
         root.innerHTML = composeHtmlToString(content = content)
         val use = root.firstElementChild!!.firstElementChild!!
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) { content() }
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) { content() }
         try {
             assertEquals("#first", use.getAttributeNS(xlinkNamespace, "href"))
             href = null
@@ -71,7 +71,7 @@ class HydrationTest {
             svg.setAttribute("xlink:href", "#target")
             root.appendChild(svg)
             val hydrate = {
-                hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                     TagElementNS<Element>("svg", svgNamespace, {
                         if (allowMismatch) allowHydrationMismatch()
                         attr("xlink:href", "#target")
@@ -102,7 +102,7 @@ class HydrationTest {
         val serverSvg = root.firstChild
         val serverGradient = serverSvg?.firstChild
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             NamespacedContent()
         }
 
@@ -130,7 +130,7 @@ class HydrationTest {
         val serverDesc = serverSvg.childNodes.item(2) as Element
         val serverDescDiv = serverDesc.firstChild as Element
 
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             SvgIntegrationPointContent()
         }
 
@@ -171,7 +171,7 @@ class HydrationTest {
             assertEquals(svgNamespace, serverSvg.namespaceURI, parent)
             assertEquals(svgNamespace, serverCircle.namespaceURI, parent)
 
-            val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 content()
             }
             try {
@@ -190,7 +190,7 @@ class HydrationTest {
         root.appendChild(browserDocument.createElementNS(mathMlNamespace, "circle"))
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 TagElementNS<Element>("circle", svgNamespace, null, null)
             }
         }
@@ -205,7 +205,7 @@ class HydrationTest {
         root.appendChild(browserDocument.createElementNS(svgNamespace, "lineargradient"))
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 TagElementNS<Element>("linearGradient", svgNamespace, null, null)
             }
         }
@@ -223,7 +223,7 @@ class HydrationTest {
         root.appendChild(serverElement)
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 TagElementNS<Element>(
                     tagName = "sparkline",
                     namespace = svgNamespace,
@@ -277,7 +277,7 @@ class HydrationTest {
                     renderComposable(root) { content() }
                 } else {
                     root.innerHTML = if (mode == "fallback") "<span></span>" else "<div></div>"
-                    hydrateComposable(root, onHydrationMismatch = {}) { content() }
+                    hydrateComposable(root, validateStrictly = true, onHydrationMismatch = {}) { content() }
                 }
             }
             assertSame(failure, thrown, mode)
@@ -292,14 +292,14 @@ class HydrationTest {
         root.innerHTML = composeHtmlToString { TagElement<HTMLElement>("X-Ä", null, null) }
         val serverElement = root.firstChild
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 TagElement<HTMLElement>("x-ä", null, null)
             }
         }
         assertContains(failure.message.orEmpty(), "expected <x-ä>, found <x-Ä>")
         assertSame(serverElement, root.firstChild)
 
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             TagElement<HTMLElement>("x-Ä", null, null)
         }
         try {
@@ -318,7 +318,7 @@ class HydrationTest {
                 renderComposable(root) { Div() }
             } else {
                 root.innerHTML = if (mode == "fallback") "<span></span>" else "<div></div>"
-                hydrateComposable(root, onHydrationMismatch = {}) { Div() }
+                hydrateComposable(root, validateStrictly = true, onHydrationMismatch = {}) { Div() }
             }
             val owned = Recomposer.runningRecomposers.value - before
             try {
@@ -339,7 +339,7 @@ class HydrationTest {
         val serverRenderedNode = root.firstChild
         val serverRenderedText = serverRenderedNode?.firstChild
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             TestContent()
         }
 
@@ -361,7 +361,7 @@ class HydrationTest {
         val trailingWhitespace = root.lastChild
         var showSecond by mutableStateOf(false)
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Span { Text("First") }
             if (showSecond) {
                 Span { Text("Second") }
@@ -392,7 +392,7 @@ class HydrationTest {
         val serverHtml = root.innerHTML
 
         assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Span { Text("Client") }
             }
         }
@@ -406,7 +406,7 @@ class HydrationTest {
         root.innerHTML = "<div>\n    <span></span>\n</div>"
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Div { Span() }
             }
         }
@@ -421,7 +421,7 @@ class HydrationTest {
         root.innerHTML = "&nbsp;<span></span>"
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Span()
             }
         }
@@ -443,7 +443,7 @@ class HydrationTest {
         val firstText = div.firstChild
         val secondText = div.lastChild
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Div {
                 Text("Hello, ")
                 Text("world")
@@ -472,7 +472,7 @@ class HydrationTest {
         val div = root.firstChild as HTMLElement
         val serverRenderedText = div.lastChild
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Div {
                 Text("")
                 Text("visible")
@@ -500,7 +500,7 @@ class HydrationTest {
             }
             root.innerHTML = composeHtmlToString(content = content)
             val whitespace = root.firstChild
-            val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 content()
             }
             try {
@@ -519,7 +519,7 @@ class HydrationTest {
         val root = browserDocument.createElement("div") as HTMLElement
         root.innerHTML = "\n <span>end</span>\n"
         val span = root.firstElementChild
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             Text("")
             Span { Text("end") }
         }
@@ -545,7 +545,7 @@ class HydrationTest {
         val serverRenderedText = div.firstChild
 
         assertEquals("<div>visible</div>", root.innerHTML)
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Div {
                 Text("visible")
                 Text("")
@@ -573,7 +573,7 @@ class HydrationTest {
         }
         var showMiddle by mutableStateOf(true)
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Div {
                 Text("Before")
                 if (showMiddle) {
@@ -618,7 +618,7 @@ class HydrationTest {
         val after = div.childNodes.item(2)
         val tail = div.lastChild
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Div {
                 Text("before")
                 Span { Text("inside") }
@@ -648,7 +648,7 @@ class HydrationTest {
         val serverRenderedNode = root.firstChild
         var showSecondChild by mutableStateOf(false)
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Div {
                 Span { Text("First") }
                 if (showSecondChild) {
@@ -678,7 +678,7 @@ class HydrationTest {
         val serverNode = root.firstChild
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Div { Text("Hello") }
             }
         }
@@ -700,7 +700,7 @@ class HydrationTest {
         val serverNode = root.firstChild
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Div { Text("Client") }
             }
         }
@@ -726,7 +726,7 @@ class HydrationTest {
 
         assertContains(serverHtml, "<!--c-->")
         assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Div {
                     Text("First")
                     Text("")
@@ -745,7 +745,7 @@ class HydrationTest {
         root.innerHTML = "<div><!--c--></div>"
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) { Div() }
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) { Div() }
         }
 
         assertContains(failure.message.orEmpty(), "found extra an internal text boundary")
@@ -764,7 +764,7 @@ class HydrationTest {
         val serverNode = root.firstChild
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Div { Span() }
             }
         }
@@ -785,7 +785,7 @@ class HydrationTest {
         val serverNode = root.firstChild
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Div {
                     Span()
                     Span()
@@ -804,7 +804,7 @@ class HydrationTest {
         val root = browserDocument.createElement("div") as HTMLElement
         root.innerHTML = "<span>A</span><span>B</span><span>C</span>"
         val serverHtml = root.innerHTML
-        val applier = HydrationDomApplier(DomNodeWrapper(root))
+        val applier = HydrationDomApplier(DomNodeWrapper(root), HtmlValidationMode.Strict)
 
         assertFailsWith<IllegalStateException> {
             applier.move(from = 1, to = 0, count = 1)
@@ -831,7 +831,7 @@ class HydrationTest {
     @Test
     fun domMutationsAreForwardedAfterHydrationCompletes() {
         val root = browserDocument.createElement("div") as HTMLElement
-        val applier = HydrationDomApplier(DomNodeWrapper(root))
+        val applier = HydrationDomApplier(DomNodeWrapper(root), HtmlValidationMode.Strict)
         applier.finishHydration()
         root.innerHTML = "<span>A</span><span>B</span><span>C</span>"
 

@@ -25,11 +25,11 @@ class HydrationNonceTest {
             }
 
             assertFailsWith<HydrationMismatchException> {
-                hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                     Div({ attr("nonce", "different-nonce") })
                 }
             }
-            val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Div({ attr("nonce", "server-nonce") })
             }
             try {
@@ -45,7 +45,7 @@ class HydrationNonceTest {
         val root = browserDocument.createElement("div") as HTMLElement
         root.innerHTML = "<div></div>"
         assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Div({ attr("nonce", "") })
             }
         }

@@ -42,7 +42,7 @@ class JvmSsrHydrationTest {
         )
 
         var count by mutableStateOf(0)
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             SsrHydrationContent(
                 count = count,
                 renderedAt = SSR_HYDRATION_CLIENT_RENDERED_AT,

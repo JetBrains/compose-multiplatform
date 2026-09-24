@@ -132,12 +132,12 @@ class StringRenderingTests {
     }
 
     @Test
-    fun invalidClassTokensAreRejectedByBothRenderers() {
+    fun invalidClassTokensAreRejectedByBrowserAndStrictStringRenderer() {
         listOf("", "a b", "a\tb", "a\nb", "a\rb", "a\u000Cb").forEach { token ->
             val browserElement = document.createElement("div")
             assertFailsWith<Throwable> { browserElement.classList.add(token) }
             assertFailsWith<IllegalArgumentException> {
-                composeHtmlToString { Div({ classes(token) }) }
+                composeHtmlToString(validateStrictly = true) { Div({ classes(token) }) }
             }
         }
     }

@@ -143,9 +143,6 @@ interface AttrsScope<out TElement : Element> : EventsListenerScope {
      * Applies one level deep only: nested elements need their own call. Structural differences,
      * such as a different tag name or a different number of children, still fail hydration.
      *
-     * Without this call, a mismatch is reported through `onHydrationMismatch` and Compose falls
-     * back to a normal client render.
-     *
      * The call is never rendered as an attribute and has no effect outside hydration.
      */
     fun allowHydrationMismatch() = Unit
@@ -361,11 +358,13 @@ private val setClassList: (HTMLElement, Array<out String>) -> Unit = { e, classL
     e.classList.add(*classList)
 }
 
-internal fun Collection<String>.toClassAttributeValue(): String? {
-    forEach { token ->
-        require(token.isNotEmpty()) { "Class token must not be empty" }
-        require(token.none { it in "\t\n\u000C\r " }) {
-            "Class token must not contain ASCII whitespace: \"$token\""
+internal fun Collection<String>.toClassAttributeValue(validate: Boolean = true): String? {
+    if (validate) {
+        forEach { token ->
+            require(token.isNotEmpty()) { "Class token must not be empty" }
+            require(token.none { it in "\t\n\u000C\r " }) {
+                "Class token must not contain ASCII whitespace: \"$token\""
+            }
         }
     }
     return distinct().takeIf { it.isNotEmpty() }?.joinToString(" ")

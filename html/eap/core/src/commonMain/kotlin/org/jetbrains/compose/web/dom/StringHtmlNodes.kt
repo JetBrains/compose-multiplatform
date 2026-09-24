@@ -71,6 +71,7 @@ internal class StringHtmlAttributes private constructor(
         fun from(
             attributes: Map<String, String>,
             namespace: String,
+            validate: Boolean,
             hydrationProtocolAttributes: Set<String>,
             classAttributeValue: String? = null,
             styleAttributeValue: (() -> String?)? = null,
@@ -78,7 +79,7 @@ internal class StringHtmlAttributes private constructor(
             val serializedAttributes = linkedMapOf<String, String>()
             attributes.forEach { (name, value) ->
                 requireValidHtmlAttributeName(name)
-                if (namespace != HtmlNamespace) {
+                if (validate && namespace != HtmlNamespace) {
                     val duplicateName = serializedAttributes.keys.firstOrNull {
                         it.hasSameHtmlParserAttributeName(name)
                     }
@@ -132,9 +133,11 @@ internal class StringHtmlElementNode private constructor(
     ) : this(tagName, namespace, isRoot = false)
 
     fun updateAttributes(attributes: Map<String, String>) = updateAttributes(
+        // Direct node updates have no rendering mode; retain the full validation contract.
         StringHtmlAttributes.from(
             attributes = attributes,
             namespace = requireElementNamespace(),
+            validate = true,
             hydrationProtocolAttributes = emptySet(),
         )
     )

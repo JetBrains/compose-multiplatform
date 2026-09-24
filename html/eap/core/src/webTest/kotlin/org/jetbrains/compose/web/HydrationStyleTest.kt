@@ -33,7 +33,7 @@ class HydrationStyleTest {
         root.appendChild(target)
         var textColor by mutableStateOf(Color.green)
         var mismatches = 0
-        val composition = hydrateComposable(root, onHydrationMismatch = { mismatches++ }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { mismatches++ }) {
             Style { "#${target.id}" style { color(textColor) } }
         }
         try {
@@ -64,7 +64,7 @@ class HydrationStyleTest {
         root.innerHTML = composeHtmlToString { Style {} }
         val serverStyle = root.firstChild
 
-        val composition = hydrateComposable(root) { Style {} }
+        val composition = hydrateComposable(root, validateStrictly = true) { Style {} }
 
         try {
             assertSame(serverStyle, root.firstChild)
@@ -94,7 +94,7 @@ class HydrationStyleTest {
 
         assertEquals("rgb(0, 128, 0)", window.getComputedStyle(target).backgroundColor)
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Style {
                 "#${target.id}" style {
                     backgroundColor(background)
@@ -145,7 +145,7 @@ class HydrationStyleTest {
         }
         val serverStyle = root.firstChild as HTMLStyleElement
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Style {
                 "body" style {
                     color(textColor)
@@ -193,7 +193,7 @@ class HydrationStyleTest {
         var showStyle by mutableStateOf(false)
         document.body!!.appendChild(root)
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             if (showStyle) {
                 Style {
                     "body" style {
@@ -234,7 +234,7 @@ class HydrationStyleTest {
         val serverCssText = serverStyle?.firstChild
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Style {
                     "body" style {
                         color(Color.blue)

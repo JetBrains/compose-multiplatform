@@ -17,6 +17,8 @@ import kotlinx.browser.dom.HTMLStyleElement
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
 import org.jetbrains.compose.web.attributes.toClassAttributeValue
+import org.jetbrains.compose.web.HtmlValidationMode
+import org.jetbrains.compose.web.LocalHtmlValidationMode
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
 import org.jetbrains.compose.web.css.toStyleAttributeValue
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
@@ -51,6 +53,7 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
         rawText: RawTextContent? = null,
     ) {
         val namespace = (elementBuilder as? StringElementBuilder<*>)?.namespace ?: HtmlNamespace
+        val validate = LocalHtmlValidationMode.current == HtmlValidationMode.Strict
         val elementScope = remember { StringElementScope<TElement>() }
 
         // Tag and namespace cannot be changed. Key both so Compose creates a new node when either one changed.
@@ -67,7 +70,7 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
                 update = {
                     val attrsScope = AttrsScopeBuilder<TElement>()
                     applyAttrs?.invoke(attrsScope)
-                    val attributes = attrsScope.stringAttributes(namespace)
+                    val attributes = attrsScope.stringAttributes(namespace, validate)
                     rawText?.validateAttributes(attributes.byName)
 
                     update {
@@ -174,12 +177,14 @@ private fun unavailableDomElement(): Nothing =
 @OptIn(ComposeWebInternalApi::class)
 private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(
     namespace: String,
+    validate: Boolean,
 ): StringHtmlAttributes {
-    val classAttributeValue = classes.toClassAttributeValue()
+    val classAttributeValue = classes.toClassAttributeValue(validate)
     val existingStyleScope = styleScopeOrNull
     return StringHtmlAttributes.from(
         attributes = collect(),
         namespace = namespace,
+        validate = validate,
         hydrationProtocolAttributes = hydrationProtocolAttributes,
         classAttributeValue = classAttributeValue,
         styleAttributeValue = existingStyleScope?.let { scope -> scope::toStyleAttributeValue },

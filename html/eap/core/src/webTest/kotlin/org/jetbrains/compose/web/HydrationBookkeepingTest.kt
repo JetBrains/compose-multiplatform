@@ -35,7 +35,7 @@ class HydrationBookkeepingTest {
         root.innerHTML = "<div title=\"before\">one</div><span>tail</span>"
         val div = root.firstChild as HTMLElement
         val tail = root.lastChild
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             Div(attrs = {
                 attr("title", title)
                 ref {
@@ -78,7 +78,7 @@ class HydrationBookkeepingTest {
         val root = document.createElement("div") as HTMLElement
         root.innerHTML = "<button>first</button>"
         val button = root.firstChild as HTMLElement
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             Button(attrs = { if (enabled) onClick { clicks++ } }) { Text(label) }
         }
         try {
@@ -114,7 +114,7 @@ class HydrationBookkeepingTest {
         val root = document.createElement("div") as HTMLElement
         root.innerHTML = "<div class=\"old\" title=\"before\" style=\"color: red\"></div>"
         val element = root.firstChild as HTMLElement
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             Div({
                 // Verify invalidation after removing restart scopes from DOM forwarding functions.
                 classes(if (version == 0) "old" else "new")

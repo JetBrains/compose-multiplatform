@@ -127,7 +127,7 @@ class SvgSsrHydrationTest {
         root.appendChild(wrongNamespaceSvg)
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, onHydrationMismatch = { throw it }, validateStrictly = true) {
                 Svg()
             }
         }
@@ -164,7 +164,7 @@ class SvgSsrHydrationTest {
         root.appendChild(serverSvg)
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, onHydrationMismatch = { throw it }, validateStrictly = true) {
                 Svg(viewBox = "0 0 10 10")
             }
         }
@@ -204,7 +204,7 @@ class SvgSsrHydrationTest {
         assertEquals(null, reparsedCustomElement.getAttribute("dataPoints"))
 
         val failure = assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, onHydrationMismatch = { throw it }, validateStrictly = true) {
                 Svg {
                     SvgElement<SVGElement>("sparkline", attrs = {
                         attr("dataPoints", "0,1")

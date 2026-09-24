@@ -47,7 +47,7 @@ class HydrationAttributesTest {
         }
         val input = root.firstChild as HTMLInputElement
 
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             Input(InputType.Text) {
                 autoComplete(AutoComplete("search"))
             }
@@ -70,7 +70,7 @@ class HydrationAttributesTest {
         val button = root.firstChild as HTMLElement
         button.setAttribute("disabled", "")
 
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             Button(attrs = { attr("disabled", "true") })
         }
 
@@ -92,7 +92,7 @@ class HydrationAttributesTest {
             }, null)
         }
         val widget = root.firstChild as HTMLElement
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             TagElement<HTMLElement>("my-widget", {
                 attr("open", "details")
                 attr("checked", "false")
@@ -114,7 +114,7 @@ class HydrationAttributesTest {
             root.innerHTML = "<my-widget $name=\"\"></my-widget>"
             val widget = root.firstChild as HTMLElement
             assertFailsWith<HydrationMismatchException> {
-                hydrateComposable(root, onHydrationMismatch = { throw it }) {
+                hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                     TagElement<HTMLElement>("my-widget", { attr(name, "details") }, null)
                 }
             }
@@ -135,7 +135,7 @@ class HydrationAttributesTest {
         div.style.setProperty("outline", "1px solid red")
         val injectedOutline = div.style.getPropertyValue("outline")
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Div(attrs = { attr("data-owned", "value") })
         }
 
@@ -161,7 +161,7 @@ class HydrationAttributesTest {
         structuredDiv.classList.add("injected")
         rawDiv.classList.add("injected")
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Div(attrs = { classes("compose-owned") })
             Div(attrs = { attr("class", "raw-owned") })
         }
@@ -193,7 +193,7 @@ class HydrationAttributesTest {
         var propertyUpdateCount = 0
 
         assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Div(attrs = {
                     attr("data-kind", "client")
                     classes("client")
@@ -230,6 +230,7 @@ class HydrationAttributesTest {
         var refObservedProperty: String? = null
 
         val composition = hydrateComposable(
+            validateStrictly = true,
             root = root,
             onHydrationMismatch = {},
         ) {
@@ -279,7 +280,7 @@ class HydrationAttributesTest {
         val input = root.firstChild as HTMLInputElement
         input.value = "typed before hydration"
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Input(InputType.Text) {
                 defaultValue("default")
                 value("controlled")
@@ -305,7 +306,7 @@ class HydrationAttributesTest {
         val input = root.firstChild as HTMLInputElement
         input.value = "typed before hydration"
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Input(InputType.Text) {
                 defaultValue("default")
             }
@@ -329,7 +330,7 @@ class HydrationAttributesTest {
         }
         val input = root.firstChild as HTMLInputElement
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Input(InputType.Text)
         }
 
@@ -350,7 +351,7 @@ class HydrationAttributesTest {
         }
         val input = root.firstChild as HTMLInputElement
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Input(InputType.Checkbox) {
                 checked(true)
             }
@@ -374,7 +375,7 @@ class HydrationAttributesTest {
         }
         val input = root.firstChild as HTMLInputElement
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Input(InputType.Checkbox)
         }
 
@@ -399,7 +400,7 @@ class HydrationAttributesTest {
         val select = root.firstChild as HTMLSelectElement
         select.value = "second"
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Select {
                 Option("first", attrs = { attr("selected", "") }) { Text("First") }
                 Option("second") { Text("Second") }
@@ -425,7 +426,7 @@ class HydrationAttributesTest {
         val select = root.firstChild as HTMLSelectElement
         val firstOption = select.firstChild as HTMLElement
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Select {
                 Option("first") { Text("First") }
                 Option("second") { Text("Second") }
@@ -455,7 +456,7 @@ class HydrationAttributesTest {
         val serverHtml = root.innerHTML
 
         assertFailsWith<HydrationMismatchException> {
-            hydrateComposable(root, onHydrationMismatch = { throw it }) {
+            hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
                 Select {
                     Option("first") { Text("First") }
                     Option("second", attrs = { attr("selected", "") }) { Text("Second") }
@@ -476,7 +477,7 @@ class HydrationAttributesTest {
         val textArea = root.firstChild as HTMLTextAreaElement
         textArea.value = "typed before hydration"
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             TextArea(value = "controlled")
         }
 
@@ -514,7 +515,7 @@ class HydrationAttributesTest {
             ),
         )
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Div(attrs = {
                 attr("data-kind", "matching")
                 classes("first", "second")
@@ -546,7 +547,7 @@ class HydrationAttributesTest {
         input.value = "typed before hydration"
         var defaultValue by mutableStateOf("server default")
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Input(InputType.Text) {
                 defaultValue(defaultValue)
             }
@@ -583,7 +584,7 @@ class HydrationAttributesTest {
         val div = root.firstChild as HTMLElement
         var useOtherBuilderValues by mutableStateOf(false)
 
-        val composition = hydrateComposable(root, onHydrationMismatch = { throw it }) {
+        val composition = hydrateComposable(root, validateStrictly = true, onHydrationMismatch = { throw it }) {
             Div(attrs = {
                 classes(if (useOtherBuilderValues) "ignored-after" else "ignored-before")
                 style {
@@ -618,7 +619,7 @@ class HydrationAttributesTest {
         }
         var observedChildren = emptyList<org.w3c.dom.Node>()
 
-        val composition = hydrateComposable(root) {
+        val composition = hydrateComposable(root, validateStrictly = true) {
             Div(attrs = {
                 prop(
                     update = { element: HTMLElement, _: Unit ->

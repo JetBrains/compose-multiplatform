@@ -33,6 +33,7 @@ class HydrationRecoveryTest {
         val mismatches = mutableListOf<HydrationMismatchException>()
 
         val composition = hydrateComposable(
+            validateStrictly = true,
             root = root,
             onHydrationMismatch = mismatches::add,
         ) {
@@ -65,6 +66,7 @@ class HydrationRecoveryTest {
         var clickCount = 0
 
         val composition = hydrateComposable(
+            validateStrictly = true,
             root = root,
             onHydrationMismatch = { mismatch = it },
         ) {
@@ -111,6 +113,7 @@ class HydrationRecoveryTest {
 
         val failure = assertFailsWith<IllegalStateException> {
             hydrateComposable(
+                validateStrictly = true,
                 root = root,
                 onHydrationMismatch = { mismatchCount++ },
             ) {

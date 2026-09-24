@@ -55,6 +55,8 @@ internal expect fun reportHydrationMismatch(mismatch: HydrationMismatchException
  *
  * The returned [Composition] owns the hydrated application and can be disposed when the
  * application is no longer needed.
+ * The state element also selects strict validation when the server used
+ * `COMPOSE_HTML_VALIDATE_STRICTLY=true`; otherwise hydration retains initial server values.
  *
  * @throws HydrationStateException if the protocol elements or serialized state are invalid.
  */
@@ -78,38 +80,57 @@ fun <T> hydrateRoot(
         element = protocol.root
     }
 
-    return hydrateComposable(
+    return hydrateComposableWithMode(
         root = protocol.root,
         monotonicFrameClock = monotonicFrameClock,
         onHydrationMismatch = onHydrationMismatch,
+        validationMode = protocol.validationMode,
     ) {
         content(scope, initialState)
     }
 }
 
 /**
- * Adopts an existing server-rendered DOM tree. If it does not match the composition, reports the
- * first mismatch and falls back to a client render. Formatting-only HTML whitespace immediately
- * inside [root], before or after the composed content, is ignored. A throwing
+ * Adopts an existing server-rendered DOM tree. Structural mismatches are reported and fall back
+ * to a client render. Initial server text and attributes are retained until a subsequent client
+ * update, except when parser-merged text nodes must be split back into Compose nodes.
+ * Pass `validateStrictly = true` to compare them during initial hydration.
+ * Formatting-only HTML whitespace immediately inside [root], before or after the composed
+ * content, is ignored. A throwing
  * [onHydrationMismatch] aborts the fallback and leaves the server DOM untouched.
- * After validation succeeds, hydration commits DOM changes and runs properties and effects.
+ * After node claiming succeeds, hydration commits DOM changes and runs properties and effects.
  * An application failure during this phase is propagated; already-applied mutations are not
  * rolled back.
  *
  * Content that the client cannot reproduce, such as a server timestamp, can keep its
- * server-rendered element by opting out of the comparison with
+ * server-rendered element and use the client value by opting out of comparison with
  * [org.jetbrains.compose.web.attributes.AttrsScope.allowHydrationMismatch].
  */
-@OptIn(ComposeWebInternalApi::class)
 fun <TElement : Element> hydrateComposable(
     root: TElement,
     monotonicFrameClock: MonotonicFrameClock = DefaultMonotonicFrameClock,
     onHydrationMismatch: (HydrationMismatchException) -> Unit = ::reportHydrationMismatch,
+    validateStrictly: Boolean = false,
+    content: @Composable DOMScope<TElement>.() -> Unit,
+): Composition = hydrateComposableWithMode(
+    root = root,
+    monotonicFrameClock = monotonicFrameClock,
+    onHydrationMismatch = onHydrationMismatch,
+    validationMode = if (validateStrictly) HtmlValidationMode.Strict else HtmlValidationMode.Fast,
+    content = content,
+)
+
+private fun <TElement : Element> hydrateComposableWithMode(
+    root: TElement,
+    monotonicFrameClock: MonotonicFrameClock,
+    onHydrationMismatch: (HydrationMismatchException) -> Unit,
+    validationMode: HtmlValidationMode,
     content: @Composable DOMScope<TElement>.() -> Unit,
 ): Composition = try {
     hydrateOnce(
         root = root,
         monotonicFrameClock = monotonicFrameClock,
+        validationMode = validationMode,
         content = content,
     )
 } catch (mismatch: HydrationMismatchException) {
@@ -126,6 +147,7 @@ fun <TElement : Element> hydrateComposable(
 private fun <TElement : Element> hydrateOnce(
     root: TElement,
     monotonicFrameClock: MonotonicFrameClock,
+    validationMode: HtmlValidationMode,
     content: @Composable DOMScope<TElement>.() -> Unit,
 ): Composition {
     GlobalSnapshotManager.ensureStarted()
@@ -136,7 +158,7 @@ private fun <TElement : Element> hydrateOnce(
         recomposer.runRecomposeAndApplyChanges()
     }
 
-    val applier = HydrationDomApplier(DomNodeWrapper(root))
+    val applier = HydrationDomApplier(DomNodeWrapper(root), validationMode)
     val composition = ControlledComposition(
         applier = applier,
         parent = recomposer,
@@ -219,10 +241,16 @@ private fun findHydrationProtocol(within: ParentNode): HydrationBootstrapData {
     if (format != HydrationStateFormat) {
         invalidHydrationState("The Compose hydration state has unsupported format \"$format\"")
     }
+    val validationMode = when (val setting = state.getAttribute(HydrationValidationAttribute)) {
+        null -> HtmlValidationMode.Fast
+        HydrationValidationEnabled -> HtmlValidationMode.Strict
+        else -> invalidHydrationState("The Compose hydration validation mode is unsupported: \"$setting\"")
+    }
 
     return HydrationBootstrapData(
         root = root,
         serializedState = state.textContent.orEmpty().unescapeFromHydrationStateElement(),
+        validationMode = validationMode,
     )
 }
 
@@ -253,4 +281,5 @@ private fun invalidHydrationState(message: String, cause: Throwable? = null): No
 private class HydrationBootstrapData(
     val root: HTMLDivElement,
     val serializedState: String,
+    val validationMode: HtmlValidationMode,
 )

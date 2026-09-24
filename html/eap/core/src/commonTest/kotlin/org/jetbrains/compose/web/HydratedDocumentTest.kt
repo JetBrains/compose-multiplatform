@@ -86,6 +86,19 @@ class HydratedDocumentTest {
         )
     }
 
+    @Test
+    fun strictValidationIsTransportedOnlyWhenEnabled() {
+        val strict = renderHydratedDocument(validateStrictly = true) {
+            Html { Body { HydrationRoot(Unit, { "null" }) {} } }
+        }
+        val fast = renderHydratedDocument(validateStrictly = false) {
+            Html { Body { HydrationRoot(Unit, { "null" }) {} } }
+        }
+
+        assertContains(strict, "data-compose-hydration-validation=\"on\"")
+        assertFalse(HydrationValidationAttribute in fast)
+    }
+
     // Records serializer and content calls to verify serialization happens once and first.
     @Test
     fun serializesExactlyOnceBeforeComposingContent() {

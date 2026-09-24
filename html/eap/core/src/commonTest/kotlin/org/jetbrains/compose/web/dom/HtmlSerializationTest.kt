@@ -143,7 +143,7 @@ class HtmlSerializationTest {
         listOf("", "a b", "a\tb", "a\nb", "a\rb", "a\u000Cb").forEach { token ->
             listOf(false, true).forEach { overrideClass ->
                 assertFailsWith<IllegalArgumentException>(token) {
-                    composeHtmlToString {
+                    composeHtmlToString(validateStrictly = true) {
                         Div({
                             classes(token)
                             if (overrideClass) attr("class", "valid")
@@ -155,6 +155,25 @@ class HtmlSerializationTest {
         assertEquals("<div class=\"a\u00A0b\"></div>", composeHtmlToString {
             Div({ classes("a\u00A0b") })
         })
+    }
+
+    @Test
+    fun fastModeSkipsOptionalClassAndForeignAttributeChecks() {
+        assertEquals(
+            "<div class=\"two words\"></div>",
+            composeHtmlToString(validateStrictly = false) {
+                Div({ classes("two words") })
+            },
+        )
+        assertEquals(
+            "<svg dataValue=\"first\" datavalue=\"second\"></svg>",
+            composeHtmlToString(validateStrictly = false) {
+                TagElementNS<Element>("svg", TestSvgNamespace, {
+                    attr("dataValue", "first")
+                    attr("datavalue", "second")
+                }, null)
+            },
+        )
     }
 
     @Test
@@ -613,7 +632,7 @@ class HtmlSerializationTest {
     @Test
     fun rejectsSvgAttributesThatCollapseDuringHtmlParsing() {
         val failure = assertFailsWith<IllegalArgumentException> {
-            composeHtmlToString {
+            composeHtmlToString(validateStrictly = true) {
                 TagElementNS<Element>(
                     tagName = "svg",
                     namespace = TestSvgNamespace,

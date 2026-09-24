@@ -7,6 +7,7 @@ import kotlinx.browser.dom.Comment
 import kotlinx.browser.dom.Element
 import kotlinx.browser.dom.Node
 import kotlinx.browser.dom.Text
+import org.jetbrains.compose.web.HtmlValidationMode
 import org.jetbrains.compose.web.HydrationMismatchException
 import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
 import org.jetbrains.compose.web.internal.runtime.browserDocument
@@ -17,6 +18,7 @@ import org.jetbrains.compose.web.internal.runtime.browserDocument
  */
 internal class HydrationDomApplier(
     root: DomNodeWrapper,
+    val validationMode: HtmlValidationMode,
 ) : AbstractApplier<DomNodeWrapper>(root) {
     private enum class State {
         Hydrating,
@@ -32,6 +34,7 @@ internal class HydrationDomApplier(
     ) {
         var nextNode: Node? = node.firstChild // used for traversal
         var nextChildIndex: Int = 0           // used for diagnostics
+        var mergedTextChildCount: Int = 0
         var expectedMergedText: StringBuilder? = null
         var serverMergedText: String = ""
     }
@@ -46,6 +49,8 @@ internal class HydrationDomApplier(
     private val frames = mutableListOf(Frame(rootNode))
     private val claimedNodes = NativeNodeSet()  // claimed nodes that still need to be called by insertBottomUp
     private val nodesWithClaimedRawChildren = NativeNodeSet()
+    private val mergedTextsToInitialize = NativeNodeSet()
+    private val allowedTextsToInitialize = NativeNodeSet()
     // Boundary markers and formatting-only root text must remain in place until hydration succeeds.
     private val nodesToRemoveAfterHydration = mutableListOf<Node>()
     private val pendingTextsToInsert = mutableListOf<PendingText>()
@@ -75,7 +80,24 @@ internal class HydrationDomApplier(
 
     fun mismatch(detail: String): Nothing = mismatchAtCurrentNode(detail)
 
-    /** Claims the next element. A missing node or differing local name or namespace is a mismatch. */
+    /** Initializes split or allowed text. Fast hydration retains other server values. */
+    fun initializeText(text: Text, value: String) {
+        when (state) {
+            State.Hydrating -> {
+                val mergedText = mergedTextsToInitialize.remove(text)
+                val allowedText = allowedTextsToInitialize.remove(text)
+                if ((mergedText || allowedText || validationMode == HtmlValidationMode.Strict) &&
+                    !text.matchesText(value)
+                ) {
+                    pendingDomMutations += { text.data = value }
+                }
+            }
+            State.Complete -> if (!text.matchesText(value)) text.data = value
+            State.Aborted -> Unit
+        }
+    }
+
+    /** Claims the next element by local name and namespace in both modes. */
     fun claimElement(tagName: String, namespace: String): Element {
         ensureHydrating()
 
@@ -110,13 +132,13 @@ internal class HydrationDomApplier(
     fun claimElementWithRawText(
         tagName: String,
         namespace: String,
-        value: String,
+        rawText: () -> RawTextContent,
         allowContentMismatch: Boolean,
     ): Element {
         val element = claimElement(tagName, namespace)
         frames += Frame(element, allowsContentMismatch = allowContentMismatch)
         try {
-            claimRawText(value, allowContentMismatch)
+            claimRawText(rawText, allowContentMismatch)
             verifyComplete(currentFrame)
         } finally {
             frames.removeAt(frames.lastIndex)
@@ -174,7 +196,7 @@ internal class HydrationDomApplier(
             )
         }
 
-        if (!allowed && !text.matchesText(value)) {
+        if (validationMode == HtmlValidationMode.Strict && !allowed && !text.matchesText(value)) {
             mismatchAtChild(
                 "text()",
                 index,
@@ -182,6 +204,7 @@ internal class HydrationDomApplier(
             )
         }
 
+        if (allowed) allowedTextsToInitialize += text
         claimedNodes += text
         return text
     }
@@ -189,16 +212,27 @@ internal class HydrationDomApplier(
     // HTML raw text and RCDATA cannot contain boundary comments. Claim the parsed text node once,
     // then restore the Compose text boundaries only after the entire hydration has succeeded.
     private fun claimMergedTextChild(frame: Frame, value: String): Text {
-        val firstChild = frame.expectedMergedText == null
-        if (firstChild) frame.expectedMergedText = StringBuilder()
-        frame.expectedMergedText!!.append(value)
+        val isFirstTextChild = frame.mergedTextChildCount == 0
+        frame.mergedTextChildCount++
+        if (validationMode == HtmlValidationMode.Strict) {
+            val expected = frame.expectedMergedText ?: StringBuilder().also {
+                frame.expectedMergedText = it
+            }
+            expected.append(value)
+        }
+
         val index = frame.nextChildIndex++
-        val candidate = frame.nextNode
-        val text = if (firstChild && candidate != null) {
-            val serverText = candidate as? Text ?: mismatchAtChild(
-                "text()", index, "expected text, found ${candidate.describe()}",
-            )
-            frame.serverMergedText = serverText.data
+        val serverText = if (isFirstTextChild) {
+            frame.nextNode?.let { candidate ->
+                candidate as? Text ?: mismatchAtChild(
+                    "text()", index, "expected text, found ${candidate.describe()}",
+                )
+            }
+        } else null
+        val text = if (serverText != null) {
+            if (validationMode == HtmlValidationMode.Strict) {
+                frame.serverMergedText = serverText.data
+            }
             frame.nextNode = serverText.nextSibling
             serverText
         } else {
@@ -207,17 +241,29 @@ internal class HydrationDomApplier(
             }
         }
         claimedNodes += text
+
+        if (serverText != null && validationMode == HtmlValidationMode.Fast && !frame.allowsContentMismatch) {
+            // Preserve a single server text node. Multiple Compose nodes need their original
+            // boundaries restored before later updates can target them independently. The
+            // deferred mutation reads the final count after this parent frame has been popped.
+            pendingDomMutations += {
+                if (frame.mergedTextChildCount > 1) serverText.data = value
+            }
+        } else {
+            mergedTextsToInitialize += text
+        }
         return text
     }
 
     /** Validates server-only text without retaining it as a Compose-managed child. */
-    private fun claimRawText(value: String, allowMismatch: Boolean) {
+    private fun claimRawText(rawText: () -> RawTextContent, allowMismatch: Boolean) {
         ensureHydrating()
 
         val frame = currentFrame
         val candidate = frame.nextNode
+        val expectedValue = if (validationMode == HtmlValidationMode.Strict) rawText().text else null
         // An allowed mismatch can be empty on the server, which renders no text node at all.
-        if (candidate == null && (value.isEmpty() || allowMismatch)) return
+        if (candidate == null && (expectedValue == null || expectedValue.isEmpty() || allowMismatch)) return
 
         val index = frame.nextChildIndex++
         frame.nextNode = candidate?.nextSibling
@@ -225,13 +271,17 @@ internal class HydrationDomApplier(
             ?: mismatchAtChild(
                 "text()",
                 index,
-                "expected raw text ${value.quoted()}, found ${candidate.describe()}",
+                if (expectedValue == null) {
+                    "expected raw text, found ${candidate.describe()}"
+                } else {
+                    "expected raw text ${expectedValue.quoted()}, found ${candidate.describe()}"
+                },
             )
-        if (!allowMismatch && !text.matchesText(value)) {
+        if (expectedValue != null && !allowMismatch && !text.matchesText(expectedValue)) {
             mismatchAtChild(
                 "text()",
                 index,
-                "expected raw text ${value.quoted()}, found text ${text.data.quoted()}",
+                "expected raw text ${expectedValue.quoted()}, found text ${text.data.quoted()}",
             )
         }
     }
@@ -322,6 +372,8 @@ internal class HydrationDomApplier(
         applyPendingDomMutations()
         state = State.Complete
         hydrationAbortActions.clear()
+        mergedTextsToInitialize.clear()
+        allowedTextsToInitialize.clear()
         frames.clear()
     }
 
@@ -331,6 +383,8 @@ internal class HydrationDomApplier(
         state = State.Aborted
         claimedNodes.clear()
         nodesWithClaimedRawChildren.clear()
+        mergedTextsToInitialize.clear()
+        allowedTextsToInitialize.clear()
         nodesToRemoveAfterHydration.clear()
         pendingTextsToInsert.clear()
         pendingDomMutations.clear()

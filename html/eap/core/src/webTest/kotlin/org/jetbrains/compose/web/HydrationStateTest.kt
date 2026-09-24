@@ -336,7 +336,7 @@ class HydrationStateTest {
         serializeState: (T) -> String,
         content: @Composable ElementScope<HTMLDivElement>.(T) -> Unit,
     ): Fixture {
-        val rendered = renderHydratedDocument {
+        val rendered = renderHydratedDocument(validateStrictly = true) {
             Html {
                 Head { Title { Text("Hydration test") } }
                 Body {
