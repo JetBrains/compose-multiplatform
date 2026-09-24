@@ -111,6 +111,11 @@ The `versionsFile` should be a plain text file with one version per line, sorted
 ## Run Desktop
 - `./gradlew :benchmarks:run`
 
+## Run Android
+
+- `./gradlew :benchmarks:androidApp:assembleDebug` builds the APK.
+- `./run_android_benchmarks.main.kts` installs it and runs the benchmarks on a connected device or emulator.
+
 ## Run native on iOS
 Open the project in Fleet or Android Studio with KMM plugin installed and
 choose `iosApp` run configuration. Make sure that you build the app in `Release` configuration.

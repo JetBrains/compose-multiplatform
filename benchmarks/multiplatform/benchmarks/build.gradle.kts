@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.ApplicationExtension
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.targets.wasm.d8.D8Exec
@@ -9,13 +8,17 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
-    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.androidMultiplatformLibrary)
 }
 
 version = "1.0-SNAPSHOT"
 
 repositories {
-    mavenLocal()
+    mavenLocal {
+        metadataSources {
+            gradleMetadata()
+        }
+    }
     google {
         url = uri("https://cache-redirector.jetbrains.com/dl.google.com/dl/android/maven2")
     }
@@ -28,7 +31,12 @@ repositories {
 kotlin {
     jvm("desktop")
 
-    androidTarget()
+    android {
+        namespace = "org.jetbrains.compose.benchmarks.shared"
+        compileSdk = 37
+        minSdk = 24
+        androidResources.enable = true
+    }
 
     listOf(
         iosArm64(),
@@ -81,12 +89,11 @@ kotlin {
             dependencies {
                 implementation(project(":compose-scene-impl"))
 
-                val composeVersion = libs.versions.compose.multiplatform.get()
-                implementation("org.jetbrains.compose.ui:ui:$composeVersion")
-                implementation("org.jetbrains.compose.foundation:foundation:$composeVersion")
-                implementation("org.jetbrains.compose.material:material:$composeVersion")
-                implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
-                implementation("org.jetbrains.compose.components:components-resources:$composeVersion")
+                implementation(libs.compose.ui)
+                implementation(libs.compose.foundation)
+                implementation(libs.compose.material)
+                implementation(libs.compose.runtime)
+                implementation(libs.compose.components.resources)
 
                 implementation(libs.material.icons.core)
                 implementation(libs.kotlinx.serialization.json)
@@ -98,13 +105,6 @@ kotlin {
             }
         }
 
-        val androidMain by getting {
-            dependencies {
-//                implementation(libs.ktor.client.okhttp)
-                implementation(libs.activity.compose)
-            }
-        }
-
         // Intermediate source set for all Skia/Skiko targets (non-Android)
         val skikoMain by creating {
             dependsOn(commonMain)
@@ -113,6 +113,7 @@ kotlin {
         val desktopMain by getting {
             dependsOn(skikoMain)
             dependencies {
+                implementation(compose.desktop.currentOs)
                 runtimeOnly(libs.kotlinx.coroutines.swing)
                 implementation(libs.ktor.server.core)
                 implementation(libs.ktor.server.netty)
@@ -135,18 +136,6 @@ kotlin {
                 implementation(libs.kotlinx.browser)
             }
         }
-    }
-}
-
-extensions.configure<ApplicationExtension> {
-    namespace = "org.jetbrains.compose.benchmarks"
-    compileSdk = 37
-    defaultConfig {
-        applicationId = "org.jetbrains.compose.benchmarks"
-        minSdk = 24
-        targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
     }
 }
 

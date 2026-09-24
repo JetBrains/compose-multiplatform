@@ -152,3 +152,4 @@ include(":compose-scene-impl")
 project(":compose-scene-impl").projectDir = file(implDir)
 
 include(":benchmarks")
+include(":benchmarks:androidApp")

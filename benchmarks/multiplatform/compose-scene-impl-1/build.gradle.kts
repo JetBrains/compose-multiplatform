@@ -2,13 +2,17 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidMultiplatformLibrary)
 }
 
 kotlin {
     jvm("desktop")
 
-    androidTarget()
+    android {
+        namespace = "org.jetbrains.compose.benchmarks.scene.impl1"
+        compileSdk = 37
+        minSdk = 24
+    }
 
     iosArm64()
     iosSimulatorArm64()
@@ -41,13 +45,5 @@ kotlin {
         val desktopMain by getting { dependsOn(skikoMain) }
         val appleMain by getting { dependsOn(skikoMain) }
         val webMain by getting { dependsOn(skikoMain) }
-    }
-}
-
-android {
-    namespace = "org.jetbrains.compose.benchmarks.scene.impl1"
-    compileSdk = 37
-    defaultConfig {
-        minSdk = 24
     }
 }

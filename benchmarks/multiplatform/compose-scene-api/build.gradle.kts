@@ -2,13 +2,17 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.androidMultiplatformLibrary)
 }
 
 kotlin {
     jvm("desktop")
 
-    androidTarget()
+    android {
+        namespace = "org.jetbrains.compose.benchmarks.scene.api"
+        compileSdk = 37
+        minSdk = 24
+    }
 
     iosArm64()
     iosSimulatorArm64()
@@ -25,17 +29,9 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(compose.ui)
-                implementation(compose.runtime)
+                implementation(libs.compose.ui)
+                implementation(libs.compose.runtime)
             }
         }
-    }
-}
-
-android {
-    namespace = "org.jetbrains.compose.benchmarks.scene.api"
-    compileSdk = 37
-    defaultConfig {
-        minSdk = 24
     }
 }
