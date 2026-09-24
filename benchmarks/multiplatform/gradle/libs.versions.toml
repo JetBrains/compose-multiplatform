@@ -1,15 +1,18 @@
 [versions]
-agp = "9.1.0"
-compose-multiplatform = "1.11.1"
-kotlin = "2.3.10"
-kotlinx-coroutines = "1.10.2"
-kotlinx-serialization = "1.9.0"
-kotlinx-io = "0.8.2"
-kotlinx-datetime = "0.6.2"
-ktor = "3.3.3"
+activity-compose = "1.9.3"
+agp = "9.1.1"
+compose-multiplatform = "1.12.1"
+kotlin = "2.4.20"
+kotlinx-coroutines = "1.11.0"
+kotlinx-serialization = "1.11.0"
+kotlinx-io = "0.9.1"
+kotlinx-datetime = "0.8.0"
+ktor = "3.6.0"
 kotlinx-browser = "0.5.0"
+material-icons-core = "1.7.3"
 
 [libraries]
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity-compose" }
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
@@ -24,6 +27,7 @@ ktor-client-java = { module = "io.ktor:ktor-client-java", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-server-cors = { module= "io.ktor:ktor-server-cors", version.ref = "ktor" }
 kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
+material-icons-core = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "material-icons-core" }
 
 [plugins]
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }

@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.ApplicationExtension
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
 import org.jetbrains.kotlin.gradle.targets.wasm.d8.D8Exec
@@ -62,9 +63,7 @@ kotlin {
         binaries.configureEach {
             compilation.compileTaskProvider.configure {
                 compilerOptions {
-                    freeCompilerArgs.apply {
-                        add("-Xwasm-use-new-exception-proposal")
-                    }
+                    freeCompilerArgs.add("-Xwasm-use-new-exception-proposal")
                 }
             }
         }
@@ -81,12 +80,15 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":compose-scene-impl"))
-                implementation(compose.ui)
-                implementation(compose.foundation)
-                implementation(compose.material)
-                implementation(compose.runtime)
-                implementation(compose.components.resources)
-                implementation("org.jetbrains.compose.material:material-icons-core:1.6.11")
+
+                val composeVersion = libs.versions.compose.multiplatform.get()
+                implementation("org.jetbrains.compose.ui:ui:$composeVersion")
+                implementation("org.jetbrains.compose.foundation:foundation:$composeVersion")
+                implementation("org.jetbrains.compose.material:material:$composeVersion")
+                implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
+                implementation("org.jetbrains.compose.components:components-resources:$composeVersion")
+
+                implementation(libs.material.icons.core)
                 implementation(libs.kotlinx.serialization.json)
                 implementation(libs.kotlinx.io)
                 implementation(libs.kotlinx.datetime)
@@ -99,7 +101,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
 //                implementation(libs.ktor.client.okhttp)
-                implementation("androidx.activity:activity-compose:1.9.3")
+                implementation(libs.activity.compose)
             }
         }
 
@@ -111,7 +113,6 @@ kotlin {
         val desktopMain by getting {
             dependsOn(skikoMain)
             dependencies {
-                implementation(compose.desktop.currentOs)
                 runtimeOnly(libs.kotlinx.coroutines.swing)
                 implementation(libs.ktor.server.core)
                 implementation(libs.ktor.server.netty)
@@ -137,7 +138,7 @@ kotlin {
     }
 }
 
-android {
+extensions.configure<ApplicationExtension> {
     namespace = "org.jetbrains.compose.benchmarks"
     compileSdk = 37
     defaultConfig {
@@ -248,7 +249,7 @@ tasks.register("runBrowserAndSaveStats") {
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.targets.wasm.binaryen.BinaryenExec>().configureEach {
-    binaryenArgs.add("-g") // keep the readable names
+    binaryenArguments.add("-g") // keep the readable names
 }
 
 @OptIn(ExperimentalWasmDsl::class)
