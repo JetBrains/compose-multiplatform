@@ -9,11 +9,13 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.composeHtmlToString
+import org.jetbrains.compose.web.composeReusableHtmlTree
 import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.CSSUnitValue
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -33,8 +35,100 @@ import org.jetbrains.compose.web.css.keywords.auto
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNotSame
+import kotlin.test.assertSame
 
 class ComposeHtmlToStringTest {
+    @Test
+    fun keyedRendersReuseMatchingHtmlNodes() {
+        fun render(value: String) = composeReusableHtmlTree(
+            key = "keyed-node-identity",
+            content = { Div { Text(value) } },
+            readTree = { root -> root.children.single() as StringHtmlElementNode },
+        )
+
+        val first = render("first")
+        val second = render("second")
+        val otherKey = composeReusableHtmlTree(
+            key = "another-keyed-node-identity",
+            content = { Div { Text("other") } },
+            readTree = { root -> root.children.single() as StringHtmlElementNode },
+        )
+
+        assertSame(first, second)
+        assertNotSame(first, otherKey)
+        assertEquals("<div>second</div>", second.toHtmlString())
+    }
+
+    @Test
+    fun keyedRendersUpdateContentAndClearRememberedValues() {
+        var rememberedCount = 0
+        val effects = mutableListOf<String>()
+
+        fun render(value: String) = composeHtmlToString(key = "keyed-content-and-effects") {
+            val remembered = remember { ++rememberedCount }
+            DisposableEffect(Unit) {
+                effects.add("enter $value")
+                onDispose { effects.add("dispose $value") }
+            }
+            Div(attrs = { id(value) }) {
+                Text("$value:$remembered")
+            }
+        }
+
+        assertEquals("<div id=\"first\">first:1</div>", render("first"))
+        assertEquals("<div id=\"second\">second:2</div>", render("second"))
+        assertEquals(
+            listOf("enter first", "dispose first", "enter second", "dispose second"),
+            effects,
+        )
+    }
+
+    @Test
+    fun keyedRendersHandleChangingElementIdentityAndShape() {
+        fun render(tag: String, includeChild: Boolean) =
+            composeHtmlToString(key = "keyed-element-identity") {
+                TagElement(StringElementBuilder<kotlinx.browser.dom.Element>(tag), null) {
+                    if (includeChild) Span { Text("child") }
+                }
+            }
+
+        assertEquals("<div><span>child</span></div>", render("div", true))
+        assertEquals("<section></section>", render("section", false))
+        assertEquals("<div><span>child</span></div>", render("div", true))
+    }
+
+    @Test
+    fun keyedRendersRecoverAfterSerializationFailure() {
+        assertFailsWith<IllegalArgumentException> {
+            composeHtmlToString(key = "keyed-failure") {
+                Div { Text("invalid\u0000text") }
+            }
+        }
+
+        assertEquals(
+            "<div>valid text</div>",
+            composeHtmlToString(key = "keyed-failure") { Div { Text("valid text") } },
+        )
+    }
+
+    @Test
+    fun keyedRendersDiscardSnapshotWritesAndHonorHydrationMode() {
+        val state = mutableStateOf("initial")
+        fun render(value: String, hydratable: Boolean) =
+            composeHtmlToString(hydratable = hydratable, key = "keyed-snapshot") {
+                state.value = value
+                Text(state.value)
+                Text("tail")
+            }
+
+        assertEquals("firsttail", render("first", hydratable = false))
+        assertEquals("initial", state.value)
+        assertEquals("second<!--c-->tail", render("second", hydratable = true))
+        assertEquals("initial", state.value)
+    }
+
     @Test
     fun rcdataEscapesTextWithoutHydrationBoundaryComments() {
         for (tag in listOf("title", "textarea")) {

@@ -10,6 +10,7 @@ import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.ExplicitGroupsComposable
 import androidx.compose.runtime.SkippableUpdater
 import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import kotlinx.browser.dom.Element
 import kotlinx.browser.dom.HTMLStyleElement
@@ -52,30 +53,33 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
         val namespace = (elementBuilder as? StringElementBuilder<*>)?.namespace ?: HtmlNamespace
         val elementScope = remember { StringElementScope<TElement>() }
 
-        ComposeStringNode(
-            factory = {
-                StringHtmlNodeWrapper(
-                    StringHtmlElementNode(
-                        tagName = elementBuilder.tagName,
-                        namespace = namespace,
+        // Tag and namespace cannot be changed. Key both so Compose creates a new node when either one changed.
+        key(elementBuilder.tagName, namespace) {
+            ComposeStringNode(
+                factory = {
+                    StringHtmlNodeWrapper(
+                        StringHtmlElementNode(
+                            tagName = elementBuilder.tagName,
+                            namespace = namespace,
+                        )
                     )
-                )
-            },
-            update = {
-                val attrsScope = AttrsScopeBuilder<TElement>()
-                applyAttrs?.invoke(attrsScope)
-                val attributes = attrsScope.stringAttributes(namespace)
-                rawText?.validateAttributes(attributes.byName)
+                },
+                update = {
+                    val attrsScope = AttrsScopeBuilder<TElement>()
+                    applyAttrs?.invoke(attrsScope)
+                    val attributes = attrsScope.stringAttributes(namespace)
+                    rawText?.validateAttributes(attributes.byName)
 
-                update {
-                    set(attributes, StringHtmlNodeWrapper::updateAttributes)
-                }
-            },
-            scope = elementScope,
-            content = {
-                content?.invoke(this)
-            },
-        )
+                    update {
+                        set(attributes, StringHtmlNodeWrapper::updateAttributes)
+                    }
+                },
+                scope = elementScope,
+                content = {
+                    content?.invoke(this)
+                },
+            )
+        }
     }
 
     @Composable
@@ -190,7 +194,7 @@ private inline fun <TScope> ComposeStringNode(
     scope: TScope,
     content: @Composable TScope.() -> Unit,
 ) {
-    currentComposer.startNode()
+    currentComposer.startReusableNode()
     if (currentComposer.inserting) {
         currentComposer.createNode { factory() }
     } else {
