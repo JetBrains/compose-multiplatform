@@ -13,6 +13,35 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Check Release Notes for YouTrack links
+      shell: python
+      env:
+        PR_DESCRIPTION: ${{ github.event.pull_request.body }}
+      run: |
+        import os
+        import re
+        import sys
+
+        body = os.environ.get("PR_DESCRIPTION", "")
+        heading = re.compile(r"^(#{1,6})\s*(.*?)\s*#*\s*$")
+        youtrack = re.compile(
+            r"\byoutrack\.jetbrains\.com(?![a-z0-9.-])",
+            re.IGNORECASE,
+        )
+        release_notes_level = None
+        for line in body.splitlines():
+            match = heading.match(line)
+            if match:
+                level = len(match[1])
+                if release_notes_level is not None and level <= release_notes_level:
+                    release_notes_level = None
+                if match[2].lower() in ("release notes", "relnote"):
+                    release_notes_level = level
+            if release_notes_level is not None and youtrack.search(line):
+                print("::error::Release Notes must not contain links to youtrack.jetbrains.com. "
+                      "Move the link to the PR description to the Fixes section outside Release Notes.")
+                sys.exit(1)
+
     - uses: actions/checkout@v4
       with:
         repository: JetBrains/compose-multiplatform
