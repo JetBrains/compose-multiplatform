@@ -298,6 +298,38 @@ class HydrationMismatchAllowanceTest {
     }
 
     @Test
+    fun fastAllowedClassHydrationAcceptsRepeatedTokens() {
+        val root = document.createElement("div") as HTMLElement
+        root.innerHTML = composeHtmlToString {
+            Div(attrs = {
+                allowHydrationMismatch()
+                classes("server")
+            })
+        }
+        val serverDiv = root.firstChild as HTMLElement
+        var mismatch: HydrationMismatchException? = null
+
+        val composition = hydrateComposable(
+            root = root,
+            validateStrictly = false,
+            onHydrationMismatch = { mismatch = it },
+        ) {
+            Div(attrs = {
+                allowHydrationMismatch()
+                classes("client", "client")
+            })
+        }
+
+        try {
+            assertNull(mismatch)
+            assertSame(serverDiv, root.firstChild)
+            assertTrue(serverDiv.classList.contains("client"))
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
     fun allowedRawTextMismatchUsesClientValue() {
         for (validateStrictly in listOf(false, true)) {
             val root = document.createElement("div") as HTMLElement

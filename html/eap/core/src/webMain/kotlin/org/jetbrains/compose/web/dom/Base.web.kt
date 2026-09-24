@@ -81,8 +81,9 @@ private fun Map<String, String>.containsAttribute(name: String): Boolean =
 // Cache validated class strings with copied keys and bounded growth.
 private val validatedClassValues = mutableMapOf<List<String>, String>()
 
-private fun classAttributeValue(classes: List<String>): String? {
+private fun classAttributeValue(classes: List<String>, validate: Boolean): String? {
     if (classes.isEmpty()) return null
+    if (!validate) return classes.toClassAttributeValue(validate = false)
     validatedClassValues[classes]?.let { return it }
     val value = classes.toClassAttributeValue()!!
     if (validatedClassValues.size >= 256) validatedClassValues.clear()
@@ -231,7 +232,9 @@ private class HydratingDomElementWrapper(
         }
         if (applier.validationMode == HtmlValidationMode.Fast && !allowance.isAllowed) return
 
-        classes?.let(::classAttributeValue)?.let { value ->
+        classes?.let {
+            classAttributeValue(it, validate = applier.validationMode == HtmlValidationMode.Strict)
+        }?.let { value ->
             verifyAttribute(AttrsScope.CLASS, value) {
                 // Extra server classes are tolerated, so only missing ones are added.
                 node.classList.add(*value.split(' ').toTypedArray())

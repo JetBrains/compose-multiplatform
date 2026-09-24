@@ -7,7 +7,9 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import kotlinx.browser.dom.Element
+import kotlinx.browser.dom.HTMLDivElement
 import kotlinx.browser.dom.HTMLInputElement
+import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.attributes.readOnly
 import org.jetbrains.compose.web.attributes.required
@@ -155,6 +157,21 @@ class HtmlSerializationTest {
         assertEquals("<div class=\"a\u00A0b\"></div>", composeHtmlToString {
             Div({ classes("a\u00A0b") })
         })
+    }
+
+    @Test
+    fun strictModeRejectsRepeatedClassTokens() {
+        listOf<AttrsScope<HTMLDivElement>.() -> Unit>(
+            { classes("first", "second", "first") },
+            { classes("first"); classes("second", "first") },
+        ).forEach { applyAttrs ->
+            val failure = assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString(validateStrictly = true) {
+                    Div(applyAttrs)
+                }
+            }
+            assertEquals("Class token must not be repeated: \"first\"", failure.message)
+        }
     }
 
     @Test
@@ -403,7 +420,7 @@ class HtmlSerializationTest {
     }
 
     @Test
-    fun formatsClassesAsOrderedUniqueTokens() {
+    fun preservesClassTokenOrderInFastMode() {
         val html = composeHtmlToString {
             Div({
                 classes("first", "second", "first")
@@ -419,7 +436,7 @@ class HtmlSerializationTest {
         }
 
         assertEquals(
-            "<div class=\"first second third\"></div>" +
+            "<div class=\"first second first third\"></div>" +
                 "<div class=\"manual  value\"></div>" +
                 "<div></div>",
             html,
