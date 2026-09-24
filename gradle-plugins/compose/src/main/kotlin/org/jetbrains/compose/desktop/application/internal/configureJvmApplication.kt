@@ -6,7 +6,6 @@
 package org.jetbrains.compose.desktop.application.internal
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.Task
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.JavaExec
@@ -137,7 +136,7 @@ private fun JvmApplicationContext.configurePackagingTasks(
         isHidden = true,
     ) {
         configurePackageTask(
-            this,
+            packageTask = this,
             createRuntimeImage = createRuntimeImage,
             prepareAppResources = commonTasks.prepareAppResources,
             checkRuntime = commonTasks.checkRuntime,
@@ -159,7 +158,7 @@ private fun JvmApplicationContext.configurePackagingTasks(
         }
     } else null
 
-    val createDistributable = tasks.register<Task>(
+    val createDistributable = tasks.register<AbstractCreateDistributableTask>(
         taskNameAction = "create",
         taskNameObject = "distributable",
     ) {
@@ -167,6 +166,7 @@ private fun JvmApplicationContext.configurePackagingTasks(
         if (createAotArchive != null) {
             dependsOn(createAotArchive)
         }
+        destinationDir.set(createDistributableImpl.flatMap { it.destinationDir })
     }
 
     val packageFormats = app.nativeDistributions.targetFormats.map { targetFormat ->
@@ -176,11 +176,10 @@ private fun JvmApplicationContext.configurePackagingTasks(
             args = listOf(targetFormat)
         ) {
             configurePackageTask(
-                this,
-                createAppImage = createDistributableImpl,
+                packageTask = this,
+                createAppImage = createDistributable,
                 checkRuntime = commonTasks.checkRuntime,
-                unpackDefaultResources = commonTasks.unpackDefaultResources,
-                createAotArchive = createAotArchive
+                unpackDefaultResources = commonTasks.unpackDefaultResources
             )
         }
 
@@ -285,13 +284,12 @@ private fun JvmApplicationContext.configureProguardTask(
 
 private fun JvmApplicationContext.configurePackageTask(
     packageTask: AbstractJPackageTask,
-    createAppImage: TaskProvider<AbstractJPackageTask>? = null,
+    createAppImage: TaskProvider<AbstractCreateDistributableTask>? = null,
     createRuntimeImage: TaskProvider<AbstractJLinkTask>? = null,
     prepareAppResources: TaskProvider<Sync>? = null,
     checkRuntime: TaskProvider<AbstractCheckNativeDistributionRuntime>? = null,
     unpackDefaultResources: TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>,
-    runProguard: Provider<AbstractProguardTask>? = null,
-    createAotArchive: TaskProvider<AbstractCreateAotArchiveTask>? = null
+    runProguard: Provider<AbstractProguardTask>? = null
 ) {
     packageTask.enabled = packageTask.targetFormat.isCompatibleWithCurrentOS
 
@@ -343,11 +341,6 @@ private fun JvmApplicationContext.configurePackageTask(
             files.from(runtimeJars)
             launcherMainJar.set(mainJar)
         }
-    }
-
-    if (createAotArchive != null) {
-        packageTask.dependsOn(createAotArchive)
-        packageTask.files.from(project.file(createAotArchive.flatMap { it.aotArchiveFile }))
     }
 
     packageTask.launcherMainClass.set(nullableProvider { app.mainClass })

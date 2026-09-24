@@ -13,6 +13,10 @@ fun File.modify(fn: (String) -> String) {
     writeText(newContent)
 }
 
+fun File.appendOnNewLine(text: String) {
+    appendText("\n$text")
+}
+
 fun File.checkExists(): File = apply {
     check(exists()) {
         buildString {
