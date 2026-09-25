@@ -31,8 +31,18 @@
         {pattern: path.resolve(basePath, "kotlin", "**/*.txt"), included: false, served: true, watched: false},
         {pattern: path.resolve(basePath, "kotlin", "**/*.json"), included: false, served: true, watched: false},
         {pattern: path.resolve(basePath, "kotlin", "**/*.xml"), included: false, served: true, watched: false},
-        path.resolve(basePath, "kotlin", "test_setup.js"),
+        // The Skiko runtime (Kotlin/JS loads it from the global scope, see `test_setup.js`).
+        {pattern: path.resolve(basePath, "kotlin", "**/*.mjs"), included: false, served: true, watched: false},
+        {pattern: path.resolve(basePath, "kotlin", "**/*.wasm"), included: false, served: true, watched: false},
     ].concat(config.files);
+
+    // `test_setup.js` must be the last included script: it wraps `__karma__.loaded` to postpone the
+    // test run until the Skiko runtime is ready, so it has to be evaluated after the Kotlin test
+    // runner has installed its own hooks.
+    const testSetup = path.resolve(basePath, "kotlin", "test_setup.js");
+    if (require("fs").existsSync(testSetup)) {
+        config.files.push(testSetup);
+    }
 
     function KarmaWebpackOutputFramework(config) {
         // This controller is instantiated and set during the preprocessor phase.
