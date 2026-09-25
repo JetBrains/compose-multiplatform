@@ -6,3 +6,4 @@ set -euo pipefail # Fail fast
 ./gradlew :resources:library:pixel5AndroidDeviceTest
 ./gradlew :resources:library:iosSimulatorArm64Test
 ./gradlew :resources:library:wasmJsBrowserTest
+./gradlew :resources:library:jsBrowserTest
