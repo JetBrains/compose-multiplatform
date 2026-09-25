@@ -23,8 +23,6 @@ import java.io.File
  */
 internal fun Project.configureSwiftCompatibilityLinking() {
     plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
-        // KMP target configuration may query native freeCompilerArgs. Register the xcrun-backed provider
-        // afterwards so configuring an unrelated target, such as Wasm, does not resolve the Xcode toolchain.
         afterEvaluate {
             mppExt.targets.withType<KotlinNativeTarget>().all { target ->
                 target.configureSwiftCompatibilityLinking()
