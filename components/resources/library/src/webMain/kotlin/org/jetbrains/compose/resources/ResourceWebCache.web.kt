@@ -1,17 +1,13 @@
 package org.jetbrains.compose.resources
 
 import kotlinx.browser.window
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.w3c.fetch.Response
 import org.w3c.workers.Cache
 import org.w3c.workers.CacheQueryOptions
-import kotlin.coroutines.resumeWithException
 import kotlin.js.ExperimentalWasmJsInterop
-import kotlin.js.JsAny
 import kotlin.js.Promise
-import kotlin.js.asJsException
 import kotlin.js.js
 
 /**
@@ -91,13 +87,3 @@ private fun supportsCacheApi(): Boolean = js("Boolean(window.caches)")
 // https://developer.mozilla.org/en-US/docs/Web/API/Cache/put
 // Ensure the protocol of the request is http / https - edge cases like "vscode-webview:" are not supported by CacheStorage
 private fun isCacheableProtocol(): Boolean = window.location.protocol.startsWith("http")
-
-// Promise.await is not yet available in webMain: https://github.com/Kotlin/kotlinx.coroutines/issues/4544
-// TODO(o.karpovich): get rid of this function, when kotlinx-coroutines provide Promise.await in webMain out of a box
-@OptIn(ExperimentalWasmJsInterop::class)
-private suspend fun <R : JsAny?> Promise<R>.await(): R = suspendCancellableCoroutine { continuation ->
-    this.then(
-        onFulfilled = { continuation.resumeWith(Result.success(it)); null },
-        onRejected = { continuation.resumeWithException(it.asJsException()); null }
-    )
-}

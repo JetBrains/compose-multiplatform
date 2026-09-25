@@ -17,7 +17,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @OptIn(ExperimentalTestApi::class)
 class DefaultWebResourceReaderTest {
 
-    private val reader = DefaultWebResourceReader()
+    private val reader = DefaultWebResourceReader
 
     private val appNameStringRes = TestStringResource("app_name")
 
@@ -57,6 +57,3 @@ class DefaultWebResourceReaderTest {
         }
     }
 }
-
-// Until we have common w3c api between k/js and k/wasm we need to have this expect/actual
-internal expect fun DefaultWebResourceReader(): ResourceReader
