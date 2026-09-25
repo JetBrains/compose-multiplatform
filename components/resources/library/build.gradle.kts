@@ -33,17 +33,6 @@ kotlin {
         withHostTest {
             isIncludeAndroidResources = true
         }
-
-        withDeviceTest {
-            instrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
-            @Suppress("UnstableApiUsage")
-            managedDevices.localDevices.create("pixel5") {
-                device = "Pixel 5"
-                apiLevel = 31
-                systemImageSource = "aosp"
-            }
-        }
     }
     iosArm64()
     iosSimulatorArm64()
@@ -143,19 +132,13 @@ kotlin {
                 compileOnly(libs.androidx.test.monitor)
             }
         }
-        val androidDeviceTest by getting {
+        val androidHostTest by getting {
             dependsOn(jvmAndAndroidTest)
             dependencies {
-                implementation(libs.androidx.test.core)
-                implementation(libs.androidx.compose.ui.test)
+                implementation(libs.robolectric)
                 implementation(libs.androidx.compose.ui.test.manifest)
                 implementation(libs.androidx.compose.ui.test.junit4)
             }
-            resources.srcDir("src/commonTest/resources")
-        }
-        val androidHostTest by getting {
-            dependsOn(jvmAndAndroidTest)
-            resources.srcDir("src/commonTest/resources")
         }
         val nativeMain by getting {
             dependsOn(skikoMain)
@@ -170,6 +153,9 @@ kotlin {
             dependencies {
                  implementation(libs.kotlinx.browser)
             }
+        }
+        val webTest by getting {
+            dependsOn(skikoTest)
         }
     }
 }
@@ -201,5 +187,10 @@ tasks {
     withType<Test> {
         dependsOn(desktopTestProcessResources)
         environment("RESOURCES_PATH", desktopTestProcessResources.map { it.destinationDir.absolutePath }.get())
+    }
+
+    withType<Test>().matching { it.name == "testAndroidHostTest" }.configureEach {
+        // Required by Robolectric on JDK 25+ to initialize Android's FileDescriptor internals.
+        jvmArgs("--add-exports=java.base/jdk.internal.access=ALL-UNNAMED")
     }
 }
