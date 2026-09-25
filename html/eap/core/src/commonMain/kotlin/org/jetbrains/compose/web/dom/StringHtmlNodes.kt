@@ -68,6 +68,8 @@ internal class StringHtmlAttributes private constructor(
     override fun hashCode(): Int = byName.hashCode()
 
     companion object {
+        private val Empty = StringHtmlAttributes(emptyMap())
+
         fun from(
             attributes: Map<String, String>,
             namespace: String,
@@ -76,6 +78,8 @@ internal class StringHtmlAttributes private constructor(
             classAttributeValue: String? = null,
             styleAttributeValue: (() -> String?)? = null,
         ): StringHtmlAttributes {
+            if (attributes.isEmpty() && classAttributeValue == null && styleAttributeValue == null) return Empty
+
             val serializedAttributes = linkedMapOf<String, String>()
             attributes.forEach { (name, value) ->
                 requireValidHtmlAttributeName(name)
@@ -125,7 +129,7 @@ internal class StringHtmlElementNode private constructor(
             .also(::requireValidHtmlTagName)
     }
     internal val children: MutableList<StringHtmlNode> = mutableListOf()
-    private val attributes: MutableMap<String, String> = mutableMapOf()
+    private var attributes: Map<String, String> = emptyMap()
 
     constructor(
         tagName: String,
@@ -144,8 +148,8 @@ internal class StringHtmlElementNode private constructor(
 
     fun updateAttributes(attributes: StringHtmlAttributes) {
         requireElementNamespace()
-        this.attributes.clear()
-        this.attributes.putAll(attributes.byName)
+        // StringHtmlAttributes owns a validated copy; it is immutable after construction.
+        this.attributes = attributes.byName
     }
 
     fun hasAttribute(name: String): Boolean = attributes.containsKey(name)
@@ -217,21 +221,16 @@ internal class StringHtmlElementNode private constructor(
     }
 
     private fun appendChildrenHtmlTo(builder: StringBuilder, hydratable: Boolean) {
-        val rendered = children.filterNot(StringHtmlNode::isEmptyText)
         val validateTableChildren = namespace == HtmlNamespace
-        // Appends boundary marker for hydration between two text nodes
-        rendered.forEachIndexed { index, child ->
-            if (validateTableChildren) {
-                requireHtmlParserStableTableChild(tagName, child)
-            }
+        var previousWasText = false
+        for (index in children.indices) {
+            val child = children[index]
+            if (child.isEmptyText()) continue
+            if (validateTableChildren) requireHtmlParserStableTableChild(tagName, child)
+            val isText = child is StringHtmlTextNode
+            if (hydratable && previousWasText && isText) builder.appendHydrationTextBoundaryMarker()
             child.appendHtmlTo(builder, hydratable)
-            if (
-                hydratable &&
-                child is StringHtmlTextNode &&
-                rendered.getOrNull(index + 1) is StringHtmlTextNode
-            ) {
-                builder.appendHydrationTextBoundaryMarker()
-            }
+            previousWasText = isText
         }
     }
 
@@ -329,30 +328,37 @@ private fun String.hasSameHtmlParserAttributeName(other: String): Boolean {
 }
 
 private fun StringBuilder.appendEscapedAttribute(value: String) {
-    require('\u0000' !in value) { "HTML attribute values must not contain NUL (U+0000)" }
-    value.forEach { character ->
-        when (character) {
-            '&' -> append("&amp;")
-            '"' -> append("&quot;")
-            '<' -> append("&lt;")
-            '>' -> append("&gt;")
-            '\n' -> append("&#10;")
-            '\r' -> append("&#13;")
-            '\t' -> append("&#9;")
-            else -> append(character)
-        }
-    }
+    appendEscaped(value, attribute = true)
 }
 
 private fun StringBuilder.appendEscapedText(value: String) {
-    require('\u0000' !in value) { "HTML text must not contain NUL (U+0000)" }
-    value.forEach { character ->
-        when (character) {
-            '&' -> append("&amp;")
-            '<' -> append("&lt;")
-            '>' -> append("&gt;")
-            '\r' -> append("&#13;")
-            else -> append(character)
+    appendEscaped(value, attribute = false)
+}
+
+// Append ordinary runs in bulk. Besides avoiding an append per character, this lets the
+// JVM copy Latin-1 and UTF-16 runs with its native StringBuilder implementation.
+private fun StringBuilder.appendEscaped(value: String, attribute: Boolean) {
+    var start = 0
+    for (index in value.indices) {
+        val replacement = when (value[index]) {
+            '\u0000' -> throw IllegalArgumentException(
+                if (attribute) "HTML attribute values must not contain NUL (U+0000)"
+                else "HTML text must not contain NUL (U+0000)"
+            )
+            '&' -> "&amp;"
+            '<' -> "&lt;"
+            '>' -> "&gt;"
+            '\r' -> "&#13;"
+            '"' -> if (attribute) "&quot;" else null
+            '\n' -> if (attribute) "&#10;" else null
+            '\t' -> if (attribute) "&#9;" else null
+            else -> null
+        }
+        if (replacement != null) {
+            append(value, start, index)
+            append(replacement)
+            start = index + 1
         }
     }
+    append(value, start, value.length)
 }

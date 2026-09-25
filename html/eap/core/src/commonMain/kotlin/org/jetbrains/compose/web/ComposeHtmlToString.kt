@@ -13,7 +13,7 @@ import androidx.compose.runtime.ReusableComposition
 import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.compose.web.dom.LocalComposeHtmlContext
-import org.jetbrains.compose.web.dom.StringComposeHtmlContext
+import org.jetbrains.compose.web.dom.LinearStringComposeHtmlContext
 import org.jetbrains.compose.web.dom.StringHtmlApplier
 import org.jetbrains.compose.web.dom.StringHtmlElementNode
 import org.jetbrains.compose.web.dom.StringHtmlNodeWrapper
@@ -101,14 +101,16 @@ internal fun <T> composeReusableHtmlTree(
     val snapshot = Snapshot.takeMutableSnapshot()
     renderer.rendering = true
     renderer.content = content
+    val context = LinearStringComposeHtmlContext(renderer.root)
     try {
         return snapshot.enter {
             try {
                 renderer.composition.setContentWithReuse {
                     CompositionLocalProvider(
-                        LocalComposeHtmlContext provides StringComposeHtmlContext
+                        LocalComposeHtmlContext provides context
                     ) {
                         checkNotNull(renderer.content).invoke()
+                        context.finish()
                     }
                 }
                 readTree(renderer.root)
@@ -133,6 +135,7 @@ internal fun <T> composeHtmlTree(
     readTree: (StringHtmlElementNode) -> T,
 ): T {
     val root = StringHtmlElementNode.root()
+    val context = LinearStringComposeHtmlContext(root)
     val snapshot = Snapshot.takeMutableSnapshot()
 
     return try {
@@ -149,9 +152,10 @@ internal fun <T> composeHtmlTree(
             try {
                 composition.setContent {
                     CompositionLocalProvider(
-                        LocalComposeHtmlContext provides StringComposeHtmlContext
+                        LocalComposeHtmlContext provides context
                     ) {
                         content()
+                        context.finish()
                     }
                 }
                 readTree(root)
