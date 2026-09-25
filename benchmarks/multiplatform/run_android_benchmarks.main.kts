@@ -31,7 +31,7 @@ val TEXT_REPORTS_DIR = File(OUTPUT_DIR, "text-reports")
 val JSON_REPORTS_DIR = File(OUTPUT_DIR, "json-reports")
 val PACKAGE_NAME = "org.jetbrains.compose.benchmarks"
 val ACTIVITY_NAME = "$PACKAGE_NAME.MainActivity"
-val APK_PATH = File(ROOT_DIR, "benchmarks/build/outputs/apk/debug/benchmarks-debug.apk")
+val APK_PATH = File(ROOT_DIR, "benchmarks/androidApp/build/outputs/apk/debug/androidApp-debug.apk")
 val isWindows = System.getProperty("os.name").startsWith("Windows", ignoreCase = true)
 
 val gradleWrapper = if (isWindows) "gradlew.bat" else "./gradlew"
@@ -295,9 +295,9 @@ println("    Android   : $androidVersion")
 // ── 2. Build ───────────────────────────────────────────────────────────────────
 
 println("\n==> [2/4] Building APK...")
-println("  $ $gradleWrapper :benchmarks:assembleDebug")
+println("  $ $gradleWrapper :benchmarks:androidApp:assembleDebug")
 
-execInheritIO(gradleWrapper, ":benchmarks:assembleDebug")
+execInheritIO(gradleWrapper, ":benchmarks:androidApp:assembleDebug")
 
 if (!APK_PATH.exists()) {
     die("APK not found at expected path: ${APK_PATH.path}")
