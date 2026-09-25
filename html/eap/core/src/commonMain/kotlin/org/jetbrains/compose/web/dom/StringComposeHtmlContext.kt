@@ -149,7 +149,7 @@ private fun StringRawText(content: RawTextContent) {
     )
 }
 
-private class StringElementScope<TElement : Element> : ElementScopeBase<TElement>() {
+internal class StringElementScope<TElement : Element> : ElementScopeBase<TElement>() {
     override val element: TElement
         get() = unavailableDomElement()
 
@@ -175,7 +175,7 @@ private fun unavailableDomElement(): Nothing =
    ```
  */
 @OptIn(ComposeWebInternalApi::class)
-private fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(
+internal fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(
     namespace: String,
     validate: Boolean,
 ): StringHtmlAttributes {
