@@ -18,6 +18,7 @@ import org.jetbrains.compose.test.utils.GradlePluginTestBase
 import org.jetbrains.compose.test.utils.JDK_11_BYTECODE_VERSION
 import org.jetbrains.compose.test.utils.ProcessRunResult
 import org.jetbrains.compose.test.utils.TestProject
+import org.jetbrains.compose.test.utils.appendOnNewLine
 import org.jetbrains.compose.test.utils.assertEqualTextFiles
 import org.jetbrains.compose.test.utils.assertNotEqualTextFiles
 import org.jetbrains.compose.test.utils.checkContains
@@ -40,8 +41,8 @@ import kotlin.test.assertTrue
 class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
     fun smokeTestRunTask() = with(testProject("application/jvm")) {
-        file("build.gradle").modify {
-            it + """
+        file("build.gradle").appendOnNewLine(
+            """
                 afterEvaluate {
                     tasks.getByName("run").doFirst {
                         throw new StopExecutionException("Skip run task")
@@ -58,7 +59,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                     }
                 }
             """.trimIndent()
-        }
+        )
         gradle("run").checks {
             check.taskSuccessful(":run")
         }
@@ -171,7 +172,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             assertEqualTextFiles(file("main-methods.actual.txt"), file("main-methods.expected.txt"))
         }
 
-        file("build.gradle").modify { "$it\n$enableObfuscation" }
+        file("build.gradle").appendOnNewLine("\n$enableObfuscation")
         actualMainImage.delete()
         checkImageBeforeBuild()
         gradle(":runReleaseDistributable").checks {
@@ -203,14 +204,59 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             if (distributionDir == null || !distributionDir.exists()) {
                 error("Invalid distribution path: $distributionDir")
             }
-            val appDirSubPath = when (currentOS) {
-                OS.Linux -> "TestPackage/lib/app"
-                OS.Windows -> "TestPackage/app"
-                OS.MacOS -> "TestPackage.app/Contents/app"
-            }
-            val appDir = distributionDir.resolve(appDirSubPath)
+            val appDir = distributionDir.resolve(testPackageAppDirSubPath)
             val jarsCount = appDir.listFiles()?.count { it.name.endsWith(".jar", ignoreCase = true) } ?: 0
             assert(jarsCount == 1)
+        }
+    }
+
+    private val testPackageAppDirSubPath: String
+        get() = when (currentOS) {
+            OS.Linux -> "TestPackage/lib/app"
+            OS.Windows -> "TestPackage/app"
+            OS.MacOS -> "TestPackage.app/Contents/app"
+        }
+
+    @Test
+    fun createDistributableOutputs() = with(testProject("application/jvm")) {
+        file("build.gradle").appendOnNewLine(
+            """
+                tasks.register("syncReleaseDistributable", Sync) {
+                    from(tasks.named("createReleaseDistributable"))
+                    into(layout.buildDirectory.dir("syncedReleaseDistributable"))
+                }
+                tasks.register("syncReleaseDistributableDir", Sync) {
+                    from(
+                        tasks.named(
+                            "createReleaseDistributable",
+                            org.jetbrains.compose.desktop.application.tasks.AbstractCreateDistributableTask
+                        ).flatMap { it.destinationDir }
+                    )
+                    into(layout.buildDirectory.dir("syncedReleaseDistributableDir"))
+                }
+            """.trimIndent()
+        )
+
+        gradle(":syncReleaseDistributable", ":syncReleaseDistributableDir").checks {
+            check.taskSuccessful(":createReleaseDistributable")
+            check.taskSuccessful(":syncReleaseDistributable")
+            check.taskSuccessful(":syncReleaseDistributableDir")
+
+            for (syncedDir in listOf("syncedReleaseDistributable", "syncedReleaseDistributableDir")) {
+                val appDir = file("build/$syncedDir/$testPackageAppDirSubPath")
+                val jars = appDir.listFiles()?.filter { it.name.endsWith(".jar", ignoreCase = true) }.orEmpty()
+                assertTrue(jars.isNotEmpty(), "No jars in the synced distributable at $appDir")
+            }
+        }
+
+        // Check that there are no problems in Gradle's validation of task outputs (e.g. implicit dependencies)
+        gradle(":clean", ":createReleaseDistributable", ":packageReleaseDistributionForCurrentOS").checks {
+            check.taskSuccessful(":createReleaseDistributable")
+            check.taskSuccessful(":packageReleaseDistributionForCurrentOS")
+        }
+        gradle(":clean", ":packageReleaseDistributionForCurrentOS", ":syncReleaseDistributable").checks {
+            check.taskSuccessful(":packageReleaseDistributionForCurrentOS")
+            check.taskSuccessful(":syncReleaseDistributable")
         }
     }
 
@@ -219,15 +265,15 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         modifyGradleProperties {
             setProperty("org.gradle.caching", "true")
         }
-        modifyText("settings.gradle") {
-            it + "\n" + """
+        file("settings.gradle").appendOnNewLine(
+            """
                 buildCache {
                     local {
                         directory = new File(rootDir, 'build-cache')
                     }
                 }
             """.trimIndent()
-        }
+        )
 
         val packagingTask = ":packageDistributionForCurrentOS"
         gradle(packagingTask).checks {
@@ -333,7 +379,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         extraConfig: String? = null,
     ): TestProject =
         testProject("application/jvm").apply {
-            appendText("build.gradle") {
+            file("build.gradle").appendOnNewLine(
                 buildString {
                     append(
                         """
@@ -373,7 +419,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                     }
                     append("}")
                 }
-            }
+            )
         }
 
     @Test
@@ -471,7 +517,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         keychainFilename: String,
         javaVersion: String = "17"
     ) = testProject("application/macSign").apply {
-        modifyText("build.gradle") {
+        file("build.gradle").modify {
             it
                 .replace("%IDENTITY%", identity)
                 .replace("%KEYCHAIN%", keychainFilename)
@@ -715,7 +761,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         javaVendor: JvmVendor.KnownJvmVendor = JvmVendor.KnownJvmVendor.AMAZON
     ) : TestProject {
         return testProject("application/aot").apply {
-            modifyText("build.gradle.kts") {
+            file("build.gradle.kts").modify {
                 it
                     .replace("%AOT_MODE%", "AotMode.$aotMode")
                     .replace("%JAVA_VERSION%", "$javaVersion")
@@ -825,6 +871,36 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         }
 
         testPackageAndRun(release = true)
+    }
+
+    @Test
+    fun testAppCdsCreateDistributableOutputs() = with(aotProject(AotMode.AppCdsPrebuild, javaVersion = 21)) {
+        file("build.gradle.kts").appendOnNewLine(
+            """
+                tasks.register<Sync>("syncReleaseDistributable") {
+                    from(tasks.named("createReleaseDistributable"))
+                    into(layout.buildDirectory.dir("syncedReleaseDistributable"))
+                }
+            """.trimIndent()
+        )
+
+        gradle(":syncReleaseDistributable").checks {
+            check.taskSuccessful(":createReleaseDistributable")
+            check.taskSuccessful(":createReleaseAotArchive")
+            check.taskSuccessful(":syncReleaseDistributable")
+
+            val syncedDir = file("build/syncedReleaseDistributable")
+            assertTrue(
+                syncedDir.walk().any { it.name == AotMode.AppCdsMode.ARCHIVE_NAME },
+                "No AppCDS archive in the synced distributable at $syncedDir"
+            )
+        }
+
+        // Check that there are no problems in Gradle's validation of task outputs (e.g. implicit dependencies)
+        gradle(":clean", ":createReleaseDistributable", ":packageReleaseDistributionForCurrentOS").checks {
+            check.taskSuccessful(":createReleaseDistributable")
+            check.taskSuccessful(":packageReleaseDistributionForCurrentOS")
+        }
     }
 
     @Test

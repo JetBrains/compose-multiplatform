@@ -144,17 +144,7 @@ class TestProject(
         testEnvironment.workingDir.resolve(path)
 
     fun modifyText(path: String, fn: (String) -> String) {
-        val file = file(path)
-        val oldContent = file.readText()
-        val newContent = fn(oldContent)
-        file.writeText(newContent)
-    }
-
-    fun appendText(path: String, fn: () -> String) {
-        val file = file(path)
-        val oldContent = file.readText()
-        val newContent = oldContent + "\n" + fn()
-        file.writeText(newContent)
+        file(path).modify(fn)
     }
 
     fun modifyGradleProperties(fn: Properties.() -> Unit) {
