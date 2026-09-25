@@ -28,6 +28,8 @@ repositories {
     }
 }
 
+val composeVersion = libs.versions.compose.multiplatform
+
 kotlin {
     jvm("desktop")
 
@@ -113,7 +115,12 @@ kotlin {
         val desktopMain by getting {
             dependsOn(skikoMain)
             dependencies {
+                // To be able to build both for the 1.12 and 1.13+ versions
+                // we have to suppress deprecation. Otherwise, the execution of
+                // benchmarks on the desktop target fail loading the dependencies.
+                @Suppress("DEPRECATION")
                 implementation(compose.desktop.currentOs)
+
                 runtimeOnly(libs.kotlinx.coroutines.swing)
                 implementation(libs.ktor.server.core)
                 implementation(libs.ktor.server.netty)
@@ -147,7 +154,6 @@ compose.desktop {
 
 val runArguments: String? by project
 
-val composeVersion = libs.versions.compose.multiplatform
 val kotlinVersion = libs.versions.kotlin
 
 // Handle runArguments property
