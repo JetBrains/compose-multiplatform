@@ -303,9 +303,21 @@ fun checkPr() {
         .map { "${it.section} - ${it.subsection}" }
         .toSet()
 
+    val hasYouTrackLinks = extractReleaseNotesBody(body)
+        ?.contains(Regex("""\byoutrack\.jetbrains\.com(?![a-z0-9.-])""", RegexOption.IGNORE_CASE)) == true
+
     println()
 
     when {
+        hasYouTrackLinks -> {
+            err.println("""
+                "## Release Notes" must not contain links to youtrack.jetbrains.com
+                Move the link to the PR description outside "## Release Notes"
+
+                See the format in $prFormatLink
+            """.trimIndent())
+            exitProcess(1)
+        }
         releaseNotes is ReleaseNotes.Specified && releaseNotes.entries.isEmpty() -> {
             err.println("""
                 "## Release Notes" doesn't contain any items, or "### Section - Subsection" isn't specified
@@ -351,28 +363,34 @@ fun GitHubPullEntry.unknownChangelogEntries() =
     listOf(ChangelogEntry("- $title", null, null, null, number, htmlUrl, false))
 
 /**
- * Extract by format [PR_FORMAT.md]
+ * Extract the body inside "# Release Notes"
  */
-fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNotes? {
+fun extractReleaseNotesBody(body: String?): String? {
     fun String?.substringBetween(begin: String, end: String): String? {
         val after = this?.substringAfter(begin, "")?.ifBlank { null }
         return after?.substringBefore(end, "")?.ifBlank { null } ?: after
     }
 
-    // extract body inside "# Release Notes"
-    val relNoteBody = body
-            ?.replace("# Release notes", "# Release Notes", ignoreCase = true)
-            ?.replace("#Release notes", "# Release Notes", ignoreCase = true)
-            ?.replace("# RelNote", "# Release Notes", ignoreCase = true)
-            ?.run {
-                substringBetween("# Release Notes", "\n# ")
-                    ?: substringBetween("## Release Notes", "\n## ")
-                    ?: substringBetween("### Release Notes", "\n### ")
-                    ?: substringBetween("## Release Notes", "\n# ")
-                    ?: substringBetween("### Release Notes", "\n## ")
-                    ?: substringBetween("### Release Notes", "\n# ")
-            }
-            ?.trim()
+    return body
+        ?.replace("# Release notes", "# Release Notes", ignoreCase = true)
+        ?.replace("#Release notes", "# Release Notes", ignoreCase = true)
+        ?.replace("# RelNote", "# Release Notes", ignoreCase = true)
+        ?.run {
+            substringBetween("# Release Notes", "\n# ")
+                ?: substringBetween("## Release Notes", "\n## ")
+                ?: substringBetween("### Release Notes", "\n### ")
+                ?: substringBetween("## Release Notes", "\n# ")
+                ?: substringBetween("### Release Notes", "\n## ")
+                ?: substringBetween("### Release Notes", "\n# ")
+        }
+        ?.trim()
+}
+
+/**
+ * Extract by format [PR_FORMAT.md]
+ */
+fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNotes? {
+    val relNoteBody = extractReleaseNotesBody(body)
 
     if (relNoteBody == null) return null
     if (relNoteBody.trim().lowercase() == "n/a") return ReleaseNotes.NA
