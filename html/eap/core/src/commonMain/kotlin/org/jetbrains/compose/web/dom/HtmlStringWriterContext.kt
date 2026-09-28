@@ -27,8 +27,8 @@ import org.jetbrains.compose.web.internal.unsafeCast
 internal class HtmlStringWriterContext(
     private val hydratable: Boolean,
     private val attrsBuilders: AttrsBuilderPool? = null,
+    private val output: StringBuilder = StringBuilder(),
 ) : ComposeHtmlContext {
-    private val output = StringBuilder()
     private val elementScope = StringElementScope<Element>()
     private var finished = false
 

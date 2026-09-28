@@ -68,6 +68,7 @@ private class ReusableHtmlComposition {
     val recomposer = cancelledRecomposer()
     val composition = ReusableComposition(UnitApplier(), recomposer)
     val attrsBuilders = AttrsBuilderPool()
+    val output = StringBuilder()
     var content: (@Composable () -> Unit)? = null
     var rendering = false
 
@@ -85,7 +86,8 @@ private fun composeReusableHtmlString(
     val renderer = reusableHtmlCompositions.getOrPut(key, ::ReusableHtmlComposition)
     check(!renderer.rendering) { "composeHtmlToString key \"$key\" is already rendering" }
 
-    val context = HtmlStringWriterContext(hydratable, renderer.attrsBuilders)
+    renderer.output.setLength(0) // empty string output before next render
+    val context = HtmlStringWriterContext(hydratable, renderer.attrsBuilders, renderer.output)
     val snapshot = Snapshot.takeMutableSnapshot()
     renderer.rendering = true
     renderer.content = content
