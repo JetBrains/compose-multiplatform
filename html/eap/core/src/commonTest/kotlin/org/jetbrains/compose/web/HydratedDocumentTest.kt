@@ -87,6 +87,62 @@ class HydratedDocumentTest {
     }
 
     @Test
+    fun rendersMultipleNamedRootsWithTheirOwnStates() {
+        val rendered = renderHydratedDocument(validateStrictly = true) {
+            Html {
+                Body {
+                    Text("Header")
+                    HydrationRoot(
+                        initialState = "article-state",
+                        serializeState = { it },
+                        hydrationId = "article",
+                    ) { Text(it) }
+                    Text("Between")
+                    HydrationRoot(
+                        initialState = "comments-state",
+                        serializeState = { it },
+                        hydrationId = "comments",
+                    ) { Text(it) }
+                    Text("Footer")
+                }
+            }
+        }
+
+        assertEquals(
+            "<!doctype html><html><body>Header" +
+                "<div data-compose-hydration-root=\"article\">article-state</div>" +
+                "<script data-compose-hydration-state=\"escaped-text-v1\" " +
+                "data-compose-hydration-for=\"article\" data-compose-hydration-validation=\"on\" " +
+                "type=\"text/plain\">article-state</script>" +
+                "Between" +
+                "<div data-compose-hydration-root=\"comments\">comments-state</div>" +
+                "<script data-compose-hydration-state=\"escaped-text-v1\" " +
+                "data-compose-hydration-for=\"comments\" data-compose-hydration-validation=\"on\" " +
+                "type=\"text/plain\">comments-state</script>" +
+                "Footer</body></html>",
+            rendered,
+        )
+    }
+
+    @Test
+    fun duplicateNamedRootsFailOnlyInStrictMode() {
+        fun render(validateStrictly: Boolean): String = renderHydratedDocument(
+            validateStrictly = validateStrictly,
+        ) {
+            Html {
+                Body {
+                    HydrationRoot(Unit, { "first" }, hydrationId = "cart") {}
+                    HydrationRoot(Unit, { "second" }, hydrationId = "cart") {}
+                }
+            }
+        }
+
+        val failure = assertFailsWith<IllegalArgumentException> { render(validateStrictly = true) }
+        assertContains(failure.message.orEmpty(), "Duplicate Compose hydrationId \"cart\"")
+        assertContains(render(validateStrictly = false), "data-compose-hydration-for=\"cart\"")
+    }
+
+    @Test
     fun strictValidationIsTransportedOnlyWhenEnabled() {
         val strict = renderHydratedDocument(validateStrictly = true) {
             Html { Body { HydrationRoot(Unit, { "null" }) {} } }

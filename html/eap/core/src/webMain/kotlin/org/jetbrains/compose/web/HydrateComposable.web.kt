@@ -65,6 +65,7 @@ fun <T> hydrateRoot(
     monotonicFrameClock: MonotonicFrameClock = DefaultMonotonicFrameClock,
     onHydrationMismatch: (HydrationMismatchException) -> Unit = ::reportHydrationMismatch,
     within: ParentNode = browserDocument,
+    hydrationId: String? = null,
     content: @Composable ElementScope<HTMLDivElement>.(T) -> Unit,
 ): Composition {
     val protocol = findHydrationProtocol(within)

@@ -31,12 +31,16 @@ private const val HtmlDoctype = "<!doctype html>"
 fun renderHydratedDocument(
     validateStrictly: Boolean = defaultHtmlValidationMode() == HtmlValidationMode.Strict,
     content: @Composable () -> Unit,
-): String = HtmlDoctype + composeHtmlString(requireHtmlDocumentRoot = true) {
-    CompositionLocalProvider(
-        LocalHydratedDocumentContext provides true,
-        LocalHtmlValidationMode provides htmlValidationMode(validateStrictly),
-    ) {
-        content()
+): String {
+    val seenHydrationIds = if (validateStrictly) mutableSetOf<String>() else null
+    return HtmlDoctype + composeHtmlString(requireHtmlDocumentRoot = true) {
+        CompositionLocalProvider(
+            LocalHydratedDocumentContext provides true,
+            LocalHydrationIds provides seenHydrationIds,
+            LocalHtmlValidationMode provides htmlValidationMode(validateStrictly),
+        ) {
+            content()
+        }
     }
 }
 
@@ -62,17 +66,28 @@ fun <T> HydrationRoot(
     initialState: T,
     serializeState: (T) -> String,
     rootAttrs: AttrBuilderContext<HTMLDivElement>? = null,
+    hydrationId: String? = null,
     content: @Composable ElementScope<HTMLDivElement>.(T) -> Unit,
 ) {
     check(LocalHydratedDocumentContext.current) {
         "HydrationRoot must be called inside renderHydratedDocument"
     }
+    require(hydrationId == null || hydrationId.isNotBlank()) {
+        "hydrationId must not be blank"
+    }
     val validationMode = LocalHtmlValidationMode.current
     val serializedState = serializeState(initialState)
+    val seenHydrationIds = LocalHydrationIds.current
 
     Div(attrs = {
         rootAttrs?.invoke(this)
-        hydrationProtocolAttr(HydrationRootAttribute, "")
+        hydrationProtocolAttr(HydrationRootAttribute, hydrationId.orEmpty())
+
+        if (hydrationId != null && seenHydrationIds != null) { // only in strict mode
+            require(seenHydrationIds.add(hydrationId)) {
+                "Duplicate Compose hydrationId \"$hydrationId\""
+            }
+        }
     }) {
         content(initialState)
     }
@@ -80,6 +95,9 @@ fun <T> HydrationRoot(
         content = InlineScript(serializedState.escapeForHydrationStateElement()),
         attrs = {
             hydrationProtocolAttr(HydrationStateAttribute, HydrationStateFormat)
+            if (hydrationId != null) {
+                hydrationProtocolAttr(HydrationForAttribute, hydrationId)
+            }
             if (validationMode == HtmlValidationMode.Strict) {
                 hydrationProtocolAttr(HydrationValidationAttribute, HydrationValidationEnabled)
             }
@@ -89,3 +107,4 @@ fun <T> HydrationRoot(
 }
 
 private val LocalHydratedDocumentContext = staticCompositionLocalOf { false }
+private val LocalHydrationIds = staticCompositionLocalOf<MutableSet<String>?> { null }
