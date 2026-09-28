@@ -55,7 +55,8 @@ abstract class ComposePlugin : Plugin<Project> {
         project.configureWeb()
 
         project.configureRuntimeLibrariesCompatibilityCheck(dependencyCompatibilityExtension)
-        project.configureSwiftCompatibilityLinking()
+        // TODO: https://youtrack.jetbrains.com/issue/CMP-10868
+        // project.configureSwiftCompatibilityLinking()
 
         project.afterEvaluate {
             configureDesktop(project, desktopExtension)
