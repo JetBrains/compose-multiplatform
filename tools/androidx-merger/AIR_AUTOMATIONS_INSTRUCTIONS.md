@@ -1,6 +1,6 @@
 Perform the skill below and push.
 
-(Temporary) If `./gradlew assemble compileTests` fails with a network failure, retry twice.
+(Temporary) If `./gradlew assemble compileTests` fails with a network failure, retry 3 times more.
 
 ---
 name: fix-upstream-merge-build
@@ -100,11 +100,12 @@ During merges, there is:
 - Run the build and fix it until green.
 - When `./gradlew assemble compileTests` fails, inspect only the last 300 lines of `log.txt` with `tail -n 300 log.txt`. Increase the limit only if the failure summary or relevant stack trace is missing.
 - If changes are needed, create one commit with a message starting `(AI) Fix `.
+- If you can't verify `./gradlew assemble compileTests`, don't create a commit and treat it as fixed
 
 ## Report review
 
 - Always add a Git note to the original `mergeCommit` after completing the assessment.
 - If no changes were needed, use `Merge solver: no changes required`.
 - If a fix was committed, use `Merge solver: fixed in <fixCommit>`.
-- If the issue could not be fixed, use `Merge solver: unresolved - <reason>`.
+- If the issue could not be fixed or there were no changes at all, use `Merge solver: unresolved - <reason>`.
 - Push the branch first. Then push the note with `git push origin refs/notes/commits`.

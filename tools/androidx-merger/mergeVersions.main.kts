@@ -32,12 +32,14 @@ if (run("git", "rev-parse", "-q", "--verify", "refs/bisect/bad")) {
 }
 
 // --ff-only should fail if the AI agent overwrote the last pushed commit
-check(run("git", "pull", "--ff-only"))
+check(pull())
 fetchNotes()
 
 val head = output("git", "rev-parse", "HEAD")
+
 when {
-    hasMergeSolverNote(head) -> Unit
+    hasMergeSolverNoteFixed(head) ->
+        check(compile()) { "Build still fails after Merge Resolver." }
     needsMergeSolver(head) -> check(solveWithMergeSolver()) { "Merge Solver did not review $head" }
     else -> check(compile()) { "Compilation failed" }
 }
@@ -59,32 +61,37 @@ val upstreamCommits = output("git", "rev-list", "--timestamp", "--first-parent",
     .toList()
 
 var lastKnownGood = output("git", "rev-parse", "HEAD")
-var lastCompilationTime = commitTime("HEAD")
+var lastCompilationTime = commitTime(merged)
 
-upstreamCommits.forEachIndexed { index, commit ->
-    mergeUpstreamCommit(commit.hash)
-
-    if (index == upstreamCommits.lastIndex ||
-        commit.timestamp - lastCompilationTime >= compilationInterval
-    ) {
-        if (!compile()) {
-            println("Compilation failed. Bisecting.")
-            bisect(lastKnownGood)
-            markCompilationFailure()
-            println("Build regression found.")
-            check(solveWithMergeSolver())
-        }
-        lastKnownGood = output("git", "rev-parse", "HEAD")
-        lastCompilationTime = commit.timestamp
+upstreamCommits.forEach { commit ->
+    // Compile before a conflict, so Merge Solver doesn't have to fix unrelated build failures as well
+    val hasConflict = !run("git", "merge-tree", "--write-tree", "HEAD", commit.hash)
+    if (hasConflict || commit.timestamp - lastCompilationTime >= compilationInterval) {
+        ensureCompiles()
     }
+    mergeUpstreamCommit(commit.hash)
 }
+ensureCompiles()
 
 check(run("git", "push"))
 
 fun needsMergeSolver(commit: String) =
     hasMergeScriptNote(commit) &&
-        !hasMergeSolverNote(commit) &&
+        !hasMergeSolverNoteFixed(commit) &&
         Clock.System.now() - commitTime(commit) < 1.hours
+
+fun ensureCompiles() {
+    if (output("git", "rev-parse", "HEAD") == lastKnownGood) return
+    if (!compile()) {
+        println("Compilation failed. Bisecting.")
+        bisect(lastKnownGood)
+        markCompilationFailure()
+        println("Build regression found.")
+        check(solveWithMergeSolver())
+    }
+    lastKnownGood = output("git", "rev-parse", "HEAD")
+    lastCompilationTime = commitTime(output("git", "merge-base", "HEAD", upstream))
+}
 
 fun mergeUpstreamCommit(commit: String) {
     println("Merge $commit")
@@ -138,17 +145,24 @@ fun solveWithMergeSolver(): Boolean {
 }
 
 fun waitForMergeSolver(pushedCommit: String): Boolean {
-    val timeout = 45.minutes
-    val interval = 30.seconds
+    val timeout = 80.minutes
+    val interval = 60.seconds
     repeat((timeout / interval).toInt()) {
         Thread.sleep(interval.inWholeMilliseconds)
-        output("git", "pull", "--ff-only", "--quiet")
         fetchNotes()
-        if (hasMergeSolverNote(pushedCommit)) return true
+        if (hasMergeSolverNoteFixed(pushedCommit)) {
+            check(pull()) { "Could not fast-forward to the Merge Solver result." }
+            return true
+        }
     }
     println("Timed out waiting for Merge Solver.")
     return false
 }
+
+// Not `git pull`: it merges FETCH_HEAD, which a concurrent fetch can fill with multiple branches,
+// resulting in "Cannot fast-forward to multiple branches" (happened once)
+fun pull() =
+    run("git", "fetch", "origin", "--quiet") && run("git", "merge", "--ff-only", "--quiet", "@{u}")
 
 fun fetchNotes() =
     run("git", "fetch", "origin", "+refs/notes/commits:refs/notes/commits", "--quiet",)
@@ -160,7 +174,7 @@ fun markCompilationFailure() = addMergeScriptNote("compilation failure")
 
 fun hasMergeScriptNote(commit: String) = hasNote(commit, "Merge script:")
 
-fun hasMergeSolverNote(commit: String) = hasNote(commit, "Merge solver:")
+fun hasMergeSolverNoteFixed(commit: String) = hasNote(commit, "Merge solver: fixed")
 
 fun hasNote(commit: String, prefix: String): Boolean =
     execute("git", "notes", "show", commit)
@@ -217,7 +231,7 @@ fun logTimestamp() = Clock.System.now().toString()
 
 fun println(message: Any?) = kotlin.io.println("${logTimestamp()} $message")
 
-inline fun check(value: Boolean, lazyMessage: () -> Any = { "Check failed." }) =
+fun check(value: Boolean, lazyMessage: () -> Any = { "Check failed." }) =
     kotlin.check(value) { "${logTimestamp()} ${lazyMessage()}" }
 
 fun error(message: Any): Nothing = kotlin.error("${logTimestamp()} $message")
