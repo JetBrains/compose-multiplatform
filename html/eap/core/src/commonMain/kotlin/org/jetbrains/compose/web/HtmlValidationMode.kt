@@ -9,6 +9,9 @@ internal enum class HtmlValidationMode {
 
 internal val LocalHtmlValidationMode = staticCompositionLocalOf { HtmlValidationMode.Fast }
 
+internal fun htmlValidationMode(validateStrictly: Boolean): HtmlValidationMode =
+    if (validateStrictly) HtmlValidationMode.Strict else HtmlValidationMode.Fast
+
 internal fun parseHtmlValidationMode(value: String?): HtmlValidationMode =
     when (value?.trim()?.lowercase()) {
         null, "", "false", "0" -> HtmlValidationMode.Fast

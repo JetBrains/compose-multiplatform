@@ -16,18 +16,19 @@ private val HtmlTableChildNames = mapOf(
 
 /** Rejects implied table wrappers and foster parenting before HTML leaves the string renderer. */
 internal fun requireHtmlParserStableTableChild(parentTagName: String?, child: StringHtmlNode) {
-    val allowedChildren = HtmlTableChildNames[parentTagName] ?: return
-    val childTagName = when (child) {
-        is StringHtmlElementNode -> child.tagName
+    when (child) {
+        is StringHtmlElementNode -> requireHtmlParserStableTableElement(parentTagName, child.tagName)
         is StringHtmlTextNode -> {
             requireHtmlParserStableTableText(parentTagName, child.text)
-            return
         }
         is StringHtmlRawTextNode -> {
             requireHtmlParserStableTableText(parentTagName, child.content.text)
-            return
         }
     }
+}
+
+internal fun requireHtmlParserStableTableElement(parentTagName: String?, childTagName: String?) {
+    val allowedChildren = HtmlTableChildNames[parentTagName] ?: return
     if (childTagName in allowedChildren) return
 
     val suggestion = when {
@@ -45,7 +46,8 @@ internal fun requireHtmlParserStableTableChild(parentTagName: String?, child: St
     )
 }
 
-private fun requireHtmlParserStableTableText(parentTagName: String?, text: String) {
+internal fun requireHtmlParserStableTableText(parentTagName: String?, text: String) {
+    if (parentTagName !in HtmlTableChildNames) return
     require(text.all { it in AsciiWhitespaceCharacters }) {
         "Non-whitespace text cannot be serialized directly inside <$parentTagName>; " +
             "the HTML parser would move it outside the table. " +

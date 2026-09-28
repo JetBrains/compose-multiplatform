@@ -286,6 +286,10 @@ open class EventsListenerScopeBuilder : EventsListenerScope {
     // Allocate listener storage only when an element registers one.
     private var listeners: MutableList<SyntheticEventListener<*>>? = null
 
+    internal fun reset() {
+        listeners?.clear()
+    }
+
     override fun registerEventListener(listener: SyntheticEventListener<*>) {
         mutableListeners().add(listener)
     }

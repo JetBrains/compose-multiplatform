@@ -191,6 +191,20 @@ open class AttrsScopeBuilder<TElement : Element>(
     internal var allowsHydrationMismatch: Boolean = false
         private set
 
+    internal fun reset() {
+        attributesStorage?.clear()
+        styleStorage?.let {
+            it.properties.clear()
+            it.variables.clear()
+        }
+        propertiesStorage?.clear()
+        classesStorage?.clear()
+        hydrationProtocolAttributesStorage?.clear()
+        eventsListenerScopeBuilder.reset()
+        refEffect = null
+        allowsHydrationMismatch = false
+    }
+
     @ComposeWebInternalApi
     override fun registerEventListener(listener: SyntheticEventListener<*>) {
         eventsListenerScopeBuilder.registerEventListener(listener)

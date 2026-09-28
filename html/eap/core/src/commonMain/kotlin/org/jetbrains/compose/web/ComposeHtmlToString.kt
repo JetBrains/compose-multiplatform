@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.web
 
+import androidx.compose.runtime.AbstractApplier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ControlledComposition
@@ -12,17 +13,15 @@ import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.ReusableComposition
 import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.Dispatchers
+import org.jetbrains.compose.web.dom.AttrsBuilderPool
+import org.jetbrains.compose.web.dom.HtmlStringWriterContext
 import org.jetbrains.compose.web.dom.LocalComposeHtmlContext
-import org.jetbrains.compose.web.dom.LinearStringComposeHtmlContext
-import org.jetbrains.compose.web.dom.StringHtmlApplier
-import org.jetbrains.compose.web.dom.StringHtmlElementNode
-import org.jetbrains.compose.web.dom.StringHtmlNodeWrapper
 
 /**
  * Composes [content] once into an HTML string without creating browser DOM nodes.
- * With no [key], the backing composition is disposed after the initial HTML is serialized.
- * With a key, the root, composition, and recomposer are retained for later calls with that key.
- * Keyed calls are not thread-safe, even with different keys. Callers must synchronize them.
+ * With no [key], the backing composition is disposed after the HTML has been written.
+ * With a key, the composition and attribute-builder storage are retained for later calls with
+ * that key. Keyed calls are not thread-safe, even with different keys.
  * Snapshot state changes made while rendering are discarded afterwards.
  * Coroutine effects such as `LaunchedEffect` do not run. `SideEffect` and
  * `DisposableEffect` still execute.
@@ -38,8 +37,7 @@ import org.jetbrains.compose.web.dom.StringHtmlNodeWrapper
  *
  * @param hydratable whether to emit text-boundary markers required to hydrate adjacent `Text`
  * nodes. Set to `false` when the output will not be hydrated.
- * @param key when non-null, reuses a renderer across calls. Each render clears remembered
- * state and effects but keeps matching HTML nodes. Keys and trees persist until process exit.
+ * @param key when non-null, reuses a composition across calls.
  * @param validateStrictly overrides the default strict-validation setting for this render.
  * @throws IllegalArgumentException if a raw-text element contains unsafe text or element children,
  * serialized `noscript` contents contain a `</noscript>` end tag, or ordinary text, RCDATA,
@@ -52,34 +50,24 @@ fun composeHtmlToString(
     validateStrictly: Boolean = defaultHtmlValidationMode() == HtmlValidationMode.Strict,
     content: @Composable () -> Unit,
 ): String {
-    val contentWithValidation: @Composable () -> Unit = {
-        CompositionLocalProvider(
-            LocalHtmlValidationMode provides if (validateStrictly) {
-                HtmlValidationMode.Strict
-            } else {
-                HtmlValidationMode.Fast
-            }
-        ) { content() }
+    val validatedContent: @Composable () -> Unit = {
+        CompositionLocalProvider(LocalHtmlValidationMode provides htmlValidationMode(validateStrictly)) {
+            content()
+        }
     }
     return if (key == null) {
-        composeHtmlTree(contentWithValidation) { tree -> tree.toHtmlString(hydratable) }
+        composeHtmlString(hydratable = hydratable, content = validatedContent)
     } else {
-        composeReusableHtmlTree(key, contentWithValidation) { tree -> tree.toHtmlString(hydratable) }
+        composeReusableHtmlString(key, hydratable, validatedContent)
     }
 }
 
 private val reusableHtmlCompositions = mutableMapOf<String, ReusableHtmlComposition>()
 
 private class ReusableHtmlComposition {
-    val root = StringHtmlElementNode.root()
-    val recomposer = Recomposer(Dispatchers.Default).apply {
-        // Keep coroutine effects disabled for every render, as in the unkeyed path.
-        cancel()
-    }
-    val composition = ReusableComposition(
-        applier = StringHtmlApplier(StringHtmlNodeWrapper(root)),
-        parent = recomposer,
-    )
+    val recomposer = cancelledRecomposer()
+    val composition = ReusableComposition(UnitApplier(), recomposer)
+    val attrsBuilders = AttrsBuilderPool()
     var content: (@Composable () -> Unit)? = null
     var rendering = false
 
@@ -89,31 +77,27 @@ private class ReusableHtmlComposition {
     }
 }
 
-/** Renders with a keyed composition that remains available for later calls. */
-internal fun <T> composeReusableHtmlTree(
+private fun composeReusableHtmlString(
     key: String,
+    hydratable: Boolean,
     content: @Composable () -> Unit,
-    readTree: (StringHtmlElementNode) -> T,
-): T {
+): String {
     val renderer = reusableHtmlCompositions.getOrPut(key, ::ReusableHtmlComposition)
     check(!renderer.rendering) { "composeHtmlToString key \"$key\" is already rendering" }
 
+    val context = HtmlStringWriterContext(hydratable, renderer.attrsBuilders)
     val snapshot = Snapshot.takeMutableSnapshot()
     renderer.rendering = true
     renderer.content = content
-    val context = LinearStringComposeHtmlContext(renderer.root)
     try {
         return snapshot.enter {
             try {
                 renderer.composition.setContentWithReuse {
-                    CompositionLocalProvider(
-                        LocalComposeHtmlContext provides context
-                    ) {
+                    CompositionLocalProvider(LocalComposeHtmlContext provides context) {
                         checkNotNull(renderer.content).invoke()
-                        context.finish()
                     }
                 }
-                readTree(renderer.root)
+                context.finish(requireHtmlDocumentRoot = false)
             } finally {
                 renderer.composition.deactivate()
             }
@@ -129,36 +113,27 @@ internal fun <T> composeReusableHtmlTree(
     }
 }
 
-/** Renders with a fresh composition that is disposed after this call. */
-internal fun <T> composeHtmlTree(
+/** Runs a fresh composition while the context writes markup directly to its output buffer. */
+internal fun composeHtmlString(
+    hydratable: Boolean = true,
+    requireHtmlDocumentRoot: Boolean = false,
     content: @Composable () -> Unit,
-    readTree: (StringHtmlElementNode) -> T,
-): T {
-    val root = StringHtmlElementNode.root()
-    val context = LinearStringComposeHtmlContext(root)
+): String {
+    val context = HtmlStringWriterContext(hydratable)
     val snapshot = Snapshot.takeMutableSnapshot()
 
     return try {
         snapshot.enter {
-            val recomposer = Recomposer(Dispatchers.Default).apply {
-                // Render the initial composition without starting coroutine effects.
-                cancel()
-            }
-            val composition = ControlledComposition(
-                applier = StringHtmlApplier(StringHtmlNodeWrapper(root)),
-                parent = recomposer,
-            )
+            val recomposer = cancelledRecomposer()
+            val composition = ControlledComposition(applier = UnitApplier(), parent = recomposer)
 
             try {
                 composition.setContent {
-                    CompositionLocalProvider(
-                        LocalComposeHtmlContext provides context
-                    ) {
+                    CompositionLocalProvider(LocalComposeHtmlContext provides context) {
                         content()
-                        context.finish()
                     }
                 }
-                readTree(root)
+                context.finish(requireHtmlDocumentRoot)
             } finally {
                 composition.dispose()
                 recomposer.close()
@@ -167,4 +142,16 @@ internal fun <T> composeHtmlTree(
     } finally {
         snapshot.dispose()
     }
+}
+
+/** Composes the initial content without starting coroutine effects. */
+private fun cancelledRecomposer() = Recomposer(Dispatchers.Default).apply { cancel() }
+
+/** [HtmlStringWriterContext] emits no Compose nodes, but Composition still requires an applier. */
+private class UnitApplier : AbstractApplier<Unit>(Unit) {
+    override fun insertTopDown(index: Int, instance: Unit) = Unit
+    override fun insertBottomUp(index: Int, instance: Unit) = Unit
+    override fun remove(index: Int, count: Int) = Unit
+    override fun move(from: Int, to: Int, count: Int) = Unit
+    override fun onClear() = Unit
 }
