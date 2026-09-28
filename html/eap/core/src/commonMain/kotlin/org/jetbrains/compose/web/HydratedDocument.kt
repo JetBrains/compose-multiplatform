@@ -11,9 +11,6 @@ import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.ElementScope
 import org.jetbrains.compose.web.dom.InlineScript
 import org.jetbrains.compose.web.dom.Script
-import org.jetbrains.compose.web.dom.StringHtmlElementNode
-import org.jetbrains.compose.web.dom.StringHtmlNode
-import org.jetbrains.compose.web.dom.isEmptyText
 
 private const val HtmlDoctype = "<!doctype html>"
 
@@ -34,24 +31,14 @@ private const val HtmlDoctype = "<!doctype html>"
 fun renderHydratedDocument(
     validateStrictly: Boolean = defaultHtmlValidationMode() == HtmlValidationMode.Strict,
     content: @Composable () -> Unit,
-): String = composeHtmlTree(
-    content = {
-        CompositionLocalProvider(
-            LocalHydratedDocumentContext provides true,
-            LocalHtmlValidationMode provides if (validateStrictly) {
-                HtmlValidationMode.Strict
-            } else {
-                HtmlValidationMode.Fast
-            },
-        ) {
-            content()
-        }
-    },
-    readTree = { tree ->
-        validateHydratedDocument(tree)
-        HtmlDoctype + tree.toHtmlString(hydratable = true)
-    },
-)
+): String = HtmlDoctype + composeHtmlString(requireHtmlDocumentRoot = true) {
+    CompositionLocalProvider(
+        LocalHydratedDocumentContext provides true,
+        LocalHtmlValidationMode provides htmlValidationMode(validateStrictly),
+    ) {
+        content()
+    }
+}
 
 /**
  * Emits one browser-hydrated region of a document and its public initial state.
@@ -102,11 +89,3 @@ fun <T> HydrationRoot(
 }
 
 private val LocalHydratedDocumentContext = staticCompositionLocalOf { false }
-
-private fun validateHydratedDocument(tree: StringHtmlElementNode) {
-    val documentChildren = tree.children.filterNot(StringHtmlNode::isEmptyText)
-    val html = documentChildren.singleOrNull() as? StringHtmlElementNode
-    require(html?.tagName == "html") {
-        "renderHydratedDocument content must produce exactly one html element"
-    }
-}

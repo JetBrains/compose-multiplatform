@@ -15,7 +15,6 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.composeHtmlToString
-import org.jetbrains.compose.web.composeReusableHtmlTree
 import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.CSSUnitValue
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -36,29 +35,24 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertFailsWith
-import kotlin.test.assertNotSame
-import kotlin.test.assertSame
 
 class ComposeHtmlToStringTest {
     @Test
-    fun keyedRendersReuseMatchingHtmlNodes() {
-        fun render(value: String) = composeReusableHtmlTree(
-            key = "keyed-node-identity",
-            content = { Div { Text(value) } },
-            readTree = { root -> root.children.single() as StringHtmlElementNode },
-        )
+    fun keyedRendersClearAttributeValuesBetweenRequests() {
+        fun render(decorated: Boolean) = composeHtmlToString(key = "keyed-attribute-reset") {
+            Div(attrs = {
+                if (decorated) {
+                    id("first")
+                    classes("one")
+                    style { color(Color.red) }
+                    allowHydrationMismatch()
+                }
+            }) {}
+        }
 
-        val first = render("first")
-        val second = render("second")
-        val otherKey = composeReusableHtmlTree(
-            key = "another-keyed-node-identity",
-            content = { Div { Text("other") } },
-            readTree = { root -> root.children.single() as StringHtmlElementNode },
-        )
-
-        assertSame(first, second)
-        assertNotSame(first, otherKey)
-        assertEquals("<div>second</div>", second.toHtmlString())
+        assertEquals("<div id=\"first\" class=\"one\" style=\"color: red\"></div>", render(true))
+        assertEquals("<div></div>", render(false))
+        assertEquals("<div id=\"first\" class=\"one\" style=\"color: red\"></div>", render(true))
     }
 
     @Test
