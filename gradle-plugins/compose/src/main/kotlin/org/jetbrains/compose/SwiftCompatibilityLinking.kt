@@ -23,10 +23,8 @@ import java.io.File
  */
 internal fun Project.configureSwiftCompatibilityLinking() {
     plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
-        afterEvaluate {
-            mppExt.targets.withType<KotlinNativeTarget>().all { target ->
-                target.configureSwiftCompatibilityLinking()
-            }
+        mppExt.targets.withType<KotlinNativeTarget>().all { target ->
+            target.configureSwiftCompatibilityLinking()
         }
     }
 }
