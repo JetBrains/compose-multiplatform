@@ -25,12 +25,16 @@ internal fun SsrHydrationState.toJson(): String =
 @Composable
 internal fun SsrHydrationStateApplication(
     initialState: SsrHydrationState,
+    buttonId: String = SSR_HYDRATION_STATE_BUTTON_ID,
+    valueId: String = SSR_HYDRATION_STATE_VALUE_ID,
 ) {
     var count by remember(initialState) { mutableStateOf(initialState.count) }
     SsrHydrationStateContent(
         label = initialState.label,
         count = count,
         increment = { count++ },
+        buttonId = buttonId,
+        valueId = valueId,
     )
 }
 
@@ -39,16 +43,18 @@ internal fun SsrHydrationStateContent(
     label: String,
     count: Int,
     increment: () -> Unit,
+    buttonId: String = SSR_HYDRATION_STATE_BUTTON_ID,
+    valueId: String = SSR_HYDRATION_STATE_VALUE_ID,
 ) {
     Button(
         attrs = {
-            id(SSR_HYDRATION_STATE_BUTTON_ID)
+            id(buttonId)
             onClick { increment() }
         }
     ) {
         Text("Increment")
     }
-    Span(attrs = { id(SSR_HYDRATION_STATE_VALUE_ID) }) {
+    Span(attrs = { id(valueId) }) {
         Text("$label: $count")
     }
 }

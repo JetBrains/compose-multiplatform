@@ -75,3 +75,12 @@ html/gradlew -p html -Pcompose.html.eap.enabled=true \
 html/gradlew -p html -Pcompose.html.eap.enabled=true \
     :html-eap-hydration-example:wasmJsBrowserDevelopmentRun
 ```
+
+### Hydration islands type playground
+
+The page stays static except for three hydration roots. From the repository root, run:
+
+```shell
+html/gradlew -p html -Pcompose.html.eap.enabled=true \
+    :html-eap-hydration-islands-example:wasmJsBrowserDevelopmentRun
+```

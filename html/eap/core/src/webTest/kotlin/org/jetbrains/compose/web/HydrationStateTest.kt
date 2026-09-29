@@ -76,6 +76,138 @@ class HydrationStateTest {
         }
     }
 
+    @Test
+    fun namedIslandsHydrateInDocumentOrderAndAdoptTheirOwnNodes() {
+        val fixture = installNamedDocument()
+        val header = fixture.header
+        val footer = fixture.footer
+        val cartNode = fixture.cartRoot.firstChild
+        val accountNode = fixture.accountRoot.firstChild
+        val cartState = fixture.cartState
+        val accountState = fixture.accountState
+        val decoded = mutableListOf<String>()
+
+        val accountComposition = hydrateRoot(
+            deserializeState = { it.also { value -> decoded += "account:$value" } },
+            within = fixture.host,
+            hydrationId = "account",
+            onHydrationMismatch = { throw it },
+        ) { state -> Span { Text("account: $state") } }
+
+        try {
+            assertEquals(listOf("account:account state"), decoded)
+            assertSame(accountNode, fixture.accountRoot.firstChild)
+            assertSame(cartNode, fixture.cartRoot.firstChild)
+
+            val cartComposition = hydrateRoot(
+                deserializeState = { it.also { value -> decoded += "cart:$value" } },
+                within = fixture.host,
+                hydrationId = "cart",
+                onHydrationMismatch = { throw it },
+            ) { state -> Span { Text("cart: $state") } }
+
+            try {
+                assertEquals(listOf("account:account state", "cart:cart state"), decoded)
+                assertSame(cartNode, fixture.cartRoot.firstChild)
+                assertSame(accountNode, fixture.accountRoot.firstChild)
+                assertEquals("cart: cart state", fixture.cartRoot.textContent)
+                assertEquals("account: account state", fixture.accountRoot.textContent)
+                assertSame(header, fixture.host.firstChild)
+                assertSame(footer, fixture.host.lastChild)
+                val states = fixture.host.querySelectorAll("[$HydrationStateAttribute]")
+                assertSame(cartState, states.item(0))
+                assertSame(accountState, states.item(1))
+            } finally {
+                cartComposition.dispose()
+            }
+        } finally {
+            accountComposition.dispose()
+        }
+    }
+
+    @Test
+    fun missingMismatchedOrDuplicateNamedPairFailsBeforeDecodingOrDomChanges() {
+        val mutations: List<Pair<String, (NamedFixture) -> Unit>> = listOf(
+            "missing root" to { it.cartRoot.parentNode?.removeChild(it.cartRoot) },
+            "missing state" to { it.cartState.parentNode?.removeChild(it.cartState) },
+            "mismatched state ID" to {
+                it.cartState.setAttribute(HydrationForAttribute, "other")
+            },
+            "duplicate root" to {
+                it.host.appendChild(it.cartRoot.cloneNode(deep = true))
+            },
+            "duplicate state" to {
+                it.host.appendChild(it.cartState.cloneNode(deep = true))
+            },
+        )
+
+        mutations.forEach { (case, mutate) ->
+            val fixture = installNamedDocument()
+            val cartNode = fixture.cartRoot.firstChild
+            val accountNode = fixture.accountRoot.firstChild
+            mutate(fixture)
+            var decoded = false
+            var mismatchCalled = false
+
+            assertFailsWith<HydrationStateException>(case) {
+                hydrateRoot(
+                    deserializeState = { decoded = true; it },
+                    within = fixture.host,
+                    hydrationId = "cart",
+                    onHydrationMismatch = { mismatchCalled = true },
+                ) { Span { Text("client") } }
+            }
+
+            assertFalse(decoded, case)
+            assertFalse(mismatchCalled, case)
+            assertSame(cartNode, fixture.cartRoot.firstChild, case)
+            assertSame(accountNode, fixture.accountRoot.firstChild, case)
+        }
+    }
+
+    @Test
+    // Special characters in IDs are treated as ordinary text when finding its root and state.
+    fun namedHydrationIdIsComparedAsAnAttributeValue() {
+        val hydrationId = "cart:items[0]"
+        val fixture = installNamedDocument(cartId = hydrationId)
+        val serverNode = fixture.cartRoot.firstChild
+        var decoded: String? = null
+
+        val composition = hydrateRoot(
+            deserializeState = { it.also { value -> decoded = value } },
+            within = fixture.host,
+            hydrationId = hydrationId,
+            onHydrationMismatch = { throw it },
+        ) { state -> Span { Text("cart: $state") } }
+
+        try {
+            assertEquals("cart state", decoded)
+            assertSame(serverNode, fixture.cartRoot.firstChild)
+        } finally {
+            composition.dispose()
+        }
+    }
+
+    @Test
+    fun blankClientHydrationIdFailsBeforeDecodingOrDomChanges() {
+        val fixture = installNamedDocument()
+        val serverNode = fixture.cartRoot.firstChild
+        var decoded = false
+
+        listOf("", " \t ").forEach { hydrationId ->
+            val failure = assertFailsWith<HydrationStateException> {
+                hydrateRoot(
+                    deserializeState = { decoded = true; it },
+                    within = fixture.host,
+                    hydrationId = hydrationId,
+                ) { Span { Text("client") } }
+            }
+            assertContains(failure.message.orEmpty(), "hydrationId must not be blank")
+            assertFalse(decoded)
+            assertSame(serverNode, fixture.cartRoot.firstChild)
+        }
+    }
+
     // Reads scopeElement in a client effect to verify that the receiver is the discovered root.
     @Test
     fun clientContentReceivesTheHydrationRootElementScope() {
@@ -197,7 +329,7 @@ class HydrationStateTest {
                 within = missing.host,
             ) {}
         }
-        assertContains(failure.message.orEmpty(), "defer its bootstrap script")
+        assertContains(failure.message.orEmpty(), "bootstrap script")
         assertFalse(missingDecoded)
 
         val duplicate = installDocument("state", { it }) {}
@@ -360,10 +492,50 @@ class HydrationStateTest {
         )
     }
 
+    private fun installNamedDocument(cartId: String = "cart"): NamedFixture {
+        val rendered = renderHydratedDocument(validateStrictly = true) {
+            Html {
+                Body {
+                    Span(attrs = { attr("id", "island-header") }) { Text("Header") }
+                    HydrationRoot("cart state", { it }, hydrationId = cartId) { state ->
+                        Span { Text("cart: $state") }
+                    }
+                    HydrationRoot("account state", { it }, hydrationId = "account") { state ->
+                        Span { Text("account: $state") }
+                    }
+                    Span(attrs = { attr("id", "island-footer") }) { Text("Footer") }
+                }
+            }
+        }
+        val parsed = DOMParser().parseFromString(rendered, "text/html".toJsString())
+        val host = assertNotNull(parsed.body)
+        val roots = host.querySelectorAll("[$HydrationRootAttribute]")
+        val states = host.querySelectorAll("[$HydrationStateAttribute]")
+        return NamedFixture(
+            host = host,
+            header = assertNotNull(host.querySelector("#island-header")),
+            footer = assertNotNull(host.querySelector("#island-footer")),
+            cartRoot = assertNotNull(roots.item(0) as? HTMLDivElement),
+            cartState = assertNotNull(states.item(0) as? Element),
+            accountRoot = assertNotNull(roots.item(1) as? HTMLDivElement),
+            accountState = assertNotNull(states.item(1) as? Element),
+        )
+    }
+
     private data class Fixture(
         val host: HTMLElement,
         val root: HTMLDivElement,
         val state: Element,
+    )
+
+    private data class NamedFixture(
+        val host: HTMLElement,
+        val header: Element,
+        val footer: Element,
+        val cartRoot: HTMLDivElement,
+        val cartState: Element,
+        val accountRoot: HTMLDivElement,
+        val accountState: Element,
     )
 
     private data class TestState(

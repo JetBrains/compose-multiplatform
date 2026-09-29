@@ -8,7 +8,9 @@ import org.jetbrains.compose.web.css.color
 import org.jetbrains.compose.web.css.opacity
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.width
+import org.jetbrains.compose.web.dom.Body
 import org.jetbrains.compose.web.dom.Button
+import org.jetbrains.compose.web.dom.Html
 import org.jetbrains.compose.web.dom.InlineScript
 import org.jetbrains.compose.web.dom.Script
 import org.jetbrains.compose.web.dom.Span
@@ -25,6 +27,17 @@ internal const val SSR_HYDRATION_NORMALIZED_SCRIPT_CONTENT = "first\nsecond\nthi
 internal const val SSR_HYDRATION_RENDERED_AT_ID = "ssr-hydration-rendered-at"
 internal const val SSR_HYDRATION_SERVER_RENDERED_AT = "2026-08-31T10:15:30Z"
 internal const val SSR_HYDRATION_CLIENT_RENDERED_AT = "2026-08-31T10:15:42Z"
+internal const val SSR_HYDRATION_ISLANDS_FIXTURE_URL = "./ssr-hydration-islands.html"
+internal const val SSR_HYDRATION_CART_ID = "cart"
+internal const val SSR_HYDRATION_ACCOUNT_ID = "account"
+internal const val SSR_HYDRATION_ISLANDS_HEADER_ID = "ssr-hydration-islands-header"
+internal const val SSR_HYDRATION_ISLANDS_FOOTER_ID = "ssr-hydration-islands-footer"
+
+internal fun ssrHydrationIslandButtonId(hydrationId: String): String =
+    "ssr-hydration-$hydrationId-button"
+
+internal fun ssrHydrationIslandValueId(hydrationId: String): String =
+    "ssr-hydration-$hydrationId-value"
 
 // Used by both JVM rendering and JS hydration
 @Composable
@@ -63,5 +76,44 @@ internal fun SsrHydrationContent(
         attr("data-rendered-at", renderedAt)
     }) {
         Text("Rendered at $renderedAt")
+    }
+}
+
+@Composable
+internal fun SsrHydrationIsland(
+    hydrationId: String,
+    initialState: SsrHydrationState,
+) {
+    SsrHydrationStateApplication(
+        initialState = initialState,
+        buttonId = ssrHydrationIslandButtonId(hydrationId),
+        valueId = ssrHydrationIslandValueId(hydrationId),
+    )
+}
+
+@Composable
+internal fun SsrHydrationIslandsDocument(
+    cartState: SsrHydrationState,
+    accountState: SsrHydrationState,
+) {
+    Html {
+        Body {
+            Span(attrs = { id(SSR_HYDRATION_ISLANDS_HEADER_ID) }) { Text("Header") }
+            HydrationRoot(
+                initialState = cartState,
+                serializeState = SsrHydrationState::toJson,
+                hydrationId = SSR_HYDRATION_CART_ID,
+            ) { initialState ->
+                SsrHydrationIsland(SSR_HYDRATION_CART_ID, initialState)
+            }
+            HydrationRoot(
+                initialState = accountState,
+                serializeState = SsrHydrationState::toJson,
+                hydrationId = SSR_HYDRATION_ACCOUNT_ID,
+            ) { initialState ->
+                SsrHydrationIsland(SSR_HYDRATION_ACCOUNT_ID, initialState)
+            }
+            Span(attrs = { id(SSR_HYDRATION_ISLANDS_FOOTER_ID) }) { Text("Footer") }
+        }
     }
 }

@@ -24,6 +24,7 @@ internal object SsrHydrationFixtureGenerator {
             SsrNumberHydrationContent(count = 0, increment = {})
         }
         outputDirectory.writeHydrationStateFixture("ssr-hydration-state.html")
+        outputDirectory.writeHydrationIslandsFixture("ssr-hydration-islands.html")
     }
 
     private fun File.writeFixture(name: String, content: @Composable () -> Unit) {
@@ -47,6 +48,16 @@ internal object SsrHydrationFixtureGenerator {
                     )
                 }
             }
+        }
+
+        resolve(name).writeText(rendered)
+    }
+
+    private fun File.writeHydrationIslandsFixture(name: String) {
+        val cartState = SsrHydrationState(label = "Cart loaded by JVM", count = 41)
+        val accountState = SsrHydrationState(label = "Account loaded by JVM", count = 7)
+        val rendered = renderHydratedDocument {
+            SsrHydrationIslandsDocument(cartState, accountState)
         }
 
         resolve(name).writeText(rendered)

@@ -68,7 +68,7 @@ fun <T> hydrateRoot(
     hydrationId: String? = null,
     content: @Composable ElementScope<HTMLDivElement>.(T) -> Unit,
 ): Composition {
-    val protocol = findHydrationProtocol(within)
+    val protocol = findHydrationProtocol(within, hydrationId)
     val initialState = try {
         deserializeState(protocol.serializedState)
     } catch (failure: Throwable) {
@@ -208,22 +208,41 @@ private inline fun Throwable.suppressCleanupFailure(cleanup: () -> Unit) {
     }
 }
 
-private fun findHydrationProtocol(within: ParentNode): HydrationBootstrapData {
-    val rootElement = findUniqueProtocolElement(
-        within = within,
-        selector = "[$HydrationRootAttribute]",
-        description = "hydration root",
-    )
+private fun findHydrationProtocol(within: ParentNode, hydrationId: String?): HydrationBootstrapData {
+    if (hydrationId != null && hydrationId.isBlank()) {
+        invalidHydrationState("hydrationId must not be blank")
+    }
+
+    val rootId = hydrationId.orEmpty()
+    val candidates = within.querySelectorAll("[$HydrationRootAttribute],[$HydrationStateAttribute]")
+    var matchingRoot: Element? = null
+    var matchingState: Element? = null
+    var rootCount = 0
+    var stateCount = 0
+
+    for (index in 0 until candidates.length) {
+        val element = candidates.item(index) as Element
+        if (element.getAttribute(HydrationRootAttribute) == rootId) {
+            matchingRoot = element
+            rootCount++
+        }
+
+        // For unnamed roots, the state must have no hydration-for attribute
+        if (element.hasAttribute(HydrationStateAttribute) &&
+            element.getAttribute(HydrationForAttribute) == hydrationId
+        ) {
+            matchingState = element
+            stateCount++
+        }
+    }
+
+    val rootElement = requireUniqueProtocolElement(matchingRoot, rootCount, "hydration root")
     if (!rootElement.tagName.equals("div", ignoreCase = true)) {
         invalidHydrationState("The Compose hydration root must be a <div>")
     }
     val root = rootElement.unsafeCast<HTMLDivElement>()
 
-    val state = findUniqueProtocolElement(
-        within = within,
-        selector = "[$HydrationStateAttribute]",
-        description = "hydration state element",
-    )
+    val state = requireUniqueProtocolElement(matchingState, stateCount, "hydration state element")
     if (root.contains(state)) {
         invalidHydrationState(
             "The Compose hydration state element must be outside the hydration root"
@@ -255,24 +274,23 @@ private fun findHydrationProtocol(within: ParentNode): HydrationBootstrapData {
     )
 }
 
-private fun findUniqueProtocolElement(
-    within: ParentNode,
-    selector: String,
+private fun requireUniqueProtocolElement(
+    element: Element?,
+    count: Int,
     description: String,
 ): Element {
-    val matches = within.querySelectorAll(selector)
-    if (matches.length != 1) {
-        val timingHint = if (matches.length == 0) {
-            " Make sure hydrateRoot runs after the hydration root and state have been parsed; " +
-                "defer its bootstrap script or move it to the end of <body>."
+    if (count != 1) {
+        val timingHint = if (count == 0) {
+            " Make sure hydrateRoot runs after the hydration root and state have been parsed. " +
+                "Defer its bootstrap script or move it to the end of <body>."
         } else {
             ""
         }
         invalidHydrationState(
-            "Expected exactly one Compose $description, but found ${matches.length}." + timingHint,
+            "Expected exactly one Compose $description, but found $count." + timingHint,
         )
     }
-    return matches.item(0) as? Element
+    return element
         ?: invalidHydrationState("The Compose $description is not an element")
 }
 

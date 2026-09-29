@@ -143,6 +143,23 @@ class HydratedDocumentTest {
     }
 
     @Test
+    fun rejectsBlankHydrationIds() {
+        listOf("", " \t ").forEach { hydrationId ->
+            val failure = assertFailsWith<IllegalArgumentException> {
+                renderHydratedDocument {
+                    Html {
+                        Body {
+                            HydrationRoot(Unit, { "null" }, hydrationId = hydrationId) {}
+                        }
+                    }
+                }
+            }
+
+            assertContains(failure.message.orEmpty(), "hydrationId must not be blank")
+        }
+    }
+
+    @Test
     fun strictValidationIsTransportedOnlyWhenEnabled() {
         val strict = renderHydratedDocument(validateStrictly = true) {
             Html { Body { HydrationRoot(Unit, { "null" }) {} } }
