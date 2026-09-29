@@ -14,11 +14,7 @@ plugins {
 version = "1.0-SNAPSHOT"
 
 repositories {
-    mavenLocal {
-        metadataSources {
-            gradleMetadata()
-        }
-    }
+    mavenLocal()
     google {
         url = uri("https://cache-redirector.jetbrains.com/dl.google.com/dl/android/maven2")
     }
