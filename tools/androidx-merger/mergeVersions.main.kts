@@ -32,7 +32,7 @@ if (run("git", "rev-parse", "-q", "--verify", "refs/bisect/bad")) {
 }
 
 // --ff-only should fail if the AI agent overwrote the last pushed commit
-check(pull())
+check(pull()) { "Pull error" }
 fetchNotes()
 
 val head = output("git", "rev-parse", "HEAD")
@@ -45,9 +45,11 @@ when {
 }
 
 if (!run("git", "remote", "get-url", "aosp")) {
-    check(run("git", "remote", "add", "aosp", "https://android.googlesource.com/platform/frameworks/support"))
+    check(run("git", "remote", "add", "aosp", "https://android.googlesource.com/platform/frameworks/support")) {
+        "git remote add aosp error"
+    }
 }
-check(run("git", "fetch", "aosp"))
+check(run("git", "fetch", "aosp")) { "git fetch error" }
 
 val upstream = "aosp/androidx-main"
 val merged = output("git", "merge-base", "HEAD", upstream)
@@ -73,7 +75,7 @@ upstreamCommits.forEach { commit ->
 }
 ensureCompiles()
 
-check(run("git", "push"))
+check(run("git", "push")) { "git push error" }
 
 fun needsMergeSolver(commit: String) =
     hasMergeScriptNote(commit) &&
