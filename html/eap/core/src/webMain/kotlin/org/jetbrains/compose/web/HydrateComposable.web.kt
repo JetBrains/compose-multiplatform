@@ -37,28 +37,29 @@ class HydrationStateException internal constructor(
 internal expect fun reportHydrationMismatch(mismatch: HydrationMismatchException)
 
 /**
- * Finds the root and initial state emitted by [HydrationRoot], deserializes the state, and adopts
- * the server-rendered DOM. [deserializeState] must match the serializer used on the server. Treat
- * the result as an immutable snapshot.
+ * Hydrates one [HydrationRoot] in a server-rendered document.
  *
- * The payload is untrusted, user-editable input. Use a safely configured deserializer, and validate
- * and authorize any values sent back to a server.
+ * Pass the same [hydrationId] used by [HydrationRoot] to select a named root and its state element.
+ * A null [hydrationId] selects the unnamed pair. The selected root and state element must each be
+ * unique within [within], which defaults to the browser document. Pass a narrower [within] to
+ * limit the search to one subtree.
  *
- * The state element remains in the document after hydration. Invalid or missing state throws
- * [HydrationStateException] before composition starts, without invoking [onHydrationMismatch] or
- * modifying the server-rendered DOM.
+ * Run this after both elements have been parsed. Place the bootstrap script after them, defer an
+ * external classic script or use a module script.
  *
- * This function must run only after [HydrationRoot] and its state element have been parsed. Place
- * the bootstrap script after [HydrationRoot], defer an external classic script, or use a module
- * script. By default [within] is the browser document. Pass a narrower container to restrict
- * protocol-element discovery to that subtree.
+ * [deserializeState] must match the serializer used on the server. The embedded state is public,
+ * user-editable input. Use a safely configured deserializer, and validate and authorize any values
+ * sent back to a server. Treat the deserialized state as an immutable snapshot.
  *
- * The returned [Composition] owns the hydrated application and can be disposed when the
- * application is no longer needed.
- * The state element also selects strict validation when the server used
- * `COMPOSE_HTML_VALIDATE_STRICTLY=true`; otherwise hydration retains initial server values.
+ * Hydration adopts the root's server-rendered children and leaves the state element in the document.
+ * The state element records the server's validation mode. In fast mode, hydration retains initial
+ * server values until a Compose update.
  *
- * @throws HydrationStateException if the protocol elements or serialized state are invalid.
+ * A blank [hydrationId], a missing or duplicate pair, malformed protocol elements, or invalid
+ * serialized state throw [HydrationStateException] before composition starts.
+ *
+ * @throws HydrationStateException if [hydrationId] is blank, the selected pair is invalid or
+ * deserialization fails.
  */
 fun <T> hydrateRoot(
     deserializeState: (String) -> T,
