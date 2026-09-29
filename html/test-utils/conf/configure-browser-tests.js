@@ -28,6 +28,7 @@ module.exports = function configureBrowserTests(config) {
     for (const fixture of [
         "ssr-hydration.html",
         "ssr-hydration-state.html",
+        "ssr-hydration-islands.html",
         "ssr-number-hydration.html",
         "svg-ssr-hydration.html",
     ]) {
