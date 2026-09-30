@@ -1,13 +1,5 @@
-globalThis.isD8 = true;
+import './polyfills.mjs';
+import { d8BenchmarksRunner } from './compose-benchmarks-benchmarks.mjs';
 
-import * as skiko from './skikod8.mjs';
-import { instantiate } from './compose-benchmarks-benchmarks.uninstantiated.mjs';
-
-const exports = (await instantiate({
-    './skiko.mjs': skiko
-})).exports;
-
-await import('./polyfills.mjs');
-
-await exports.d8BenchmarksRunner(Array.from(arguments).join(' '));
+await d8BenchmarksRunner(Array.from(arguments).join(' '));
 console.log('Finished');
