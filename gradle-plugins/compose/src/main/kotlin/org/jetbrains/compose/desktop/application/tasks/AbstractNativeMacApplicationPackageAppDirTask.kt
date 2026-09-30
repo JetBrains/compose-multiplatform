@@ -54,7 +54,7 @@ abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMac
 
     @get:InputDirectory
     @get:Optional
-    internal val macLayeredIcons: DirectoryProperty = objects.directoryProperty()
+    internal val layeredIconDir: DirectoryProperty = objects.directoryProperty()
 
     private val macAssetsTool by lazy { MacAssetsTool(runExternalTool, logger) }
 
@@ -69,12 +69,12 @@ abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMac
         executable.ioFile.copyTo(appExecutableFile)
         appExecutableFile.setExecutable(true)
 
-        macLayeredIcons.orNull?.let {
+        layeredIconDir.orNull?.let {
             try {
                 macAssetsTool.compileAssets(
                     iconDir = it.asFile,
                     workingDir = workingDir,
-                    minimumSystemVersion = minimumSystemVersion.getOrElse(KOTLIN_NATIVE_MIN_SUPPORTED_MAC_OS)
+                    minimumSystemVersion = minimumSystemVersion.getOrElse(KOTLIN_NATIVE_MIN_SUPPORTED_MAC_OS)!!
                 )
             } catch (e: Exception) {
                 logger.warn("Can not compile layered icon: ${e.message}")
@@ -122,7 +122,7 @@ abstract class AbstractNativeMacApplicationPackageAppDirTask : AbstractNativeMac
         this[PlistKeys.NSHighResolutionCapable] = "true"
 
         if (macAssetsTool.assetsFile(workingDir.ioFile).exists()) {
-            macLayeredIcons.orNull?.let { this[PlistKeys.CFBundleIconName] = it.asFile.name.removeSuffix(".icon") }
+            layeredIconDir.orNull?.let { this[PlistKeys.CFBundleIconName] = it.asFile.name.removeSuffix(".icon") }
         }
     }
 }

@@ -6,9 +6,9 @@ import java.io.File
 
 internal class MacAssetsTool(private val runTool: ExternalToolRunner, private val logger: Logger) {
 
-    fun compileAssets(iconDir: File, workingDir: File, minimumSystemVersion: String?): File {
+    fun compileAssets(iconDir: File, workingDir: File, minimumSystemVersion: String): File {
         val toolVersion = checkAssetsToolVersion()
-        logger.info("compile mac assets is starting, supported actool version:$toolVersion")
+        logger.info("Compilation of mac assets is starting, actool version: $toolVersion")
 
         val result = runTool(
             tool = MacUtils.xcrun,
@@ -23,7 +23,7 @@ internal class MacAssetsTool(private val runTool: ExternalToolRunner, private va
                 "--platform", "macosx",
                 "--enable-icon-stack-fallback-generation=disabled",
                 "--include-all-app-icons",
-                "--minimum-deployment-target", minimumSystemVersion ?: "10.13",
+                "--minimum-deployment-target", minimumSystemVersion,
                 "--output-partial-info-plist", "/dev/null"
             ),
         )

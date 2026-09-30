@@ -297,7 +297,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     @get:InputDirectory
     @get:Optional
-    internal val macLayeredIcons: DirectoryProperty = objects.directoryProperty()
+    internal val layeredIconDir: DirectoryProperty = objects.directoryProperty()
 
     private val iconMapping by lazy {
         val icons = fileAssociations.get().mapNotNull { it.iconFile }.distinct()
@@ -609,7 +609,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         if (currentOS == OS.MacOS) {
             val systemVersion = macMinimumSystemVersion.orNull ?: "10.13"
 
-            macLayeredIcons.ioFileOrNull?.let { layeredIcon ->
+            layeredIconDir.ioFileOrNull?.let { layeredIcon ->
                 if (layeredIcon.exists()) {
                     try {
                         macAssetsTool.compileAssets(
@@ -628,7 +628,6 @@ abstract class AbstractJPackageTask @Inject constructor(
                 .writeToFile(jpackageResources.ioFile.resolve("Info.plist"))
 
             if (macAppStore.orNull == true) {
-
                 val productDefPlistXml = """
                 <key>os</key>
                 <array>
@@ -770,7 +769,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
 
         if (macAssetsTool.assetsFile(workingDir.ioFile).exists()) {
-            macLayeredIcons.orNull?.let { plist[PlistKeys.CFBundleIconName] = it.asFile.name.removeSuffix(".icon") }
+            layeredIconDir.orNull?.let { plist[PlistKeys.CFBundleIconName] = it.asFile.name.removeSuffix(".icon") }
         }
     }
 }

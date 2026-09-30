@@ -372,7 +372,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         Assumptions.assumeTrue(currentOS == OS.MacOS && (getActoolMajorVersion() ?: 0) >= 26)
 
         with(testProject("application/macLayeredIcon")) {
-            val supportedString = "compile mac assets is starting, supported actool version:"
+            val supportedString = "Compilation of mac assets is starting, actool version:"
 
             fun ChecksWrapper.checkContent(buildDir: String) {
                 if (check.log.contains(supportedString)) {
@@ -397,7 +397,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         Assumptions.assumeTrue(currentOS == OS.MacOS && (getActoolMajorVersion() ?: 0) >= 26)
 
         with(testProject("application/macLayeredIcon")) {
-            val supportedString = "compile mac assets is starting, supported actool version:"
+            val supportedString = "Compilation of mac assets is starting, actool version:"
             val unSupportedString = "Can not compile layered icon:"
 
             fun ChecksWrapper.checkContent(buildDir: String, hasLayeredIcon: Boolean = true) {

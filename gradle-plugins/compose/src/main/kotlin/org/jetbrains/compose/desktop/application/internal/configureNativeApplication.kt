@@ -76,7 +76,7 @@ private fun configureNativeApplication(
             }
             composeResourcesDirs.setFrom(binaryResources)
         }
-        macLayeredIcons.set(app.distributions.macOS.layeredIconDir)
+        layeredIconDir.set(app.distributions.macOS.layeredIconDir)
     }
 
     if (TargetFormat.Dmg in app.distributions.targetFormats) {
