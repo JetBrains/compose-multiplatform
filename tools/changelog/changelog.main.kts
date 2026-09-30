@@ -60,6 +60,7 @@ val scriptDir = getScriptPathFromArgs().parentFile
 val changelogFile = scriptDir.parentFile.parentFile.resolve("CHANGELOG.md")
 val prFormatFile = scriptDir.resolve("PR_FORMAT.md")
 val prFormatLink = "https://github.com/JetBrains/compose-multiplatform/blob/master/tools/changelog/PR_FORMAT.md"
+val youTrackLinkRegex = Regex("""\byoutrack\.jetbrains\.com(?![a-z0-9.-])""", RegexOption.IGNORE_CASE)
 
 val argsKeyless = args
     .filter { !it.contains("=") }
@@ -303,13 +304,10 @@ fun checkPr() {
         .map { "${it.section} - ${it.subsection}" }
         .toSet()
 
-    val hasYouTrackLinks = extractReleaseNotesBody(body)
-        ?.contains(Regex("""\byoutrack\.jetbrains\.com(?![a-z0-9.-])""", RegexOption.IGNORE_CASE)) == true
-
     println()
 
     when {
-        hasYouTrackLinks -> {
+        releaseNotes is ReleaseNotes.Specified && releaseNotes.hasYouTrackLinks -> {
             err.println("""
                 "## Release Notes" must not contain links to youtrack.jetbrains.com
                 Move the link to the PR description outside "## Release Notes"
@@ -363,34 +361,28 @@ fun GitHubPullEntry.unknownChangelogEntries() =
     listOf(ChangelogEntry("- $title", null, null, null, number, htmlUrl, false))
 
 /**
- * Extract the body inside "# Release Notes"
+ * Extract by format [PR_FORMAT.md]
  */
-fun extractReleaseNotesBody(body: String?): String? {
+fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNotes? {
     fun String?.substringBetween(begin: String, end: String): String? {
         val after = this?.substringAfter(begin, "")?.ifBlank { null }
         return after?.substringBefore(end, "")?.ifBlank { null } ?: after
     }
 
-    return body
-        ?.replace("# Release notes", "# Release Notes", ignoreCase = true)
-        ?.replace("#Release notes", "# Release Notes", ignoreCase = true)
-        ?.replace("# RelNote", "# Release Notes", ignoreCase = true)
-        ?.run {
-            substringBetween("# Release Notes", "\n# ")
-                ?: substringBetween("## Release Notes", "\n## ")
-                ?: substringBetween("### Release Notes", "\n### ")
-                ?: substringBetween("## Release Notes", "\n# ")
-                ?: substringBetween("### Release Notes", "\n## ")
-                ?: substringBetween("### Release Notes", "\n# ")
-        }
-        ?.trim()
-}
-
-/**
- * Extract by format [PR_FORMAT.md]
- */
-fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNotes? {
-    val relNoteBody = extractReleaseNotesBody(body)
+    // extract body inside "# Release Notes"
+    val relNoteBody = body
+            ?.replace("# Release notes", "# Release Notes", ignoreCase = true)
+            ?.replace("#Release notes", "# Release Notes", ignoreCase = true)
+            ?.replace("# RelNote", "# Release Notes", ignoreCase = true)
+            ?.run {
+                substringBetween("# Release Notes", "\n# ")
+                    ?: substringBetween("## Release Notes", "\n## ")
+                    ?: substringBetween("### Release Notes", "\n### ")
+                    ?: substringBetween("## Release Notes", "\n# ")
+                    ?: substringBetween("### Release Notes", "\n## ")
+                    ?: substringBetween("### Release Notes", "\n# ")
+            }
+            ?.trim()
 
     if (relNoteBody == null) return null
     if (relNoteBody.trim().lowercase() == "n/a") return ReleaseNotes.NA
@@ -438,10 +430,11 @@ fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNo
     }
 
     return ReleaseNotes.Specified(
-        relNoteBody
+        entries = relNoteBody
             .split("\n")
             .split { it.trim().startsWith("#") }
-            .flatMap(::parseChangelogEntries)
+            .flatMap(::parseChangelogEntries),
+        hasYouTrackLinks = youTrackLinkRegex.containsMatchIn(relNoteBody)
     )
 }
 
@@ -660,7 +653,10 @@ sealed interface ReleaseNotes {
         override val entries: List<ChangelogEntry> get() = emptyList()
     }
 
-    class Specified(override val entries: List<ChangelogEntry>): ReleaseNotes
+    class Specified(
+        override val entries: List<ChangelogEntry>,
+        val hasYouTrackLinks: Boolean
+    ): ReleaseNotes
 }
 
 /**
