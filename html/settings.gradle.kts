@@ -106,6 +106,7 @@ if (composeHtmlEapEnabled) {
     module(":internal-html-core-runtime-eap", "eap/internal-html-core-runtime")
     module(":html-eap-example", "eap/examples/string-rendering")
     module(":html-eap-hydration-example", "eap/examples/hydration")
+    module(":html-eap-hydration-islands-example", "eap/examples/hydration-islands")
 }
 
 if (extra["compose.web.tests.skip.benchmarks"]!!.toString().toBoolean() != true) {
