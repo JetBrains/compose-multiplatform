@@ -60,6 +60,7 @@ val scriptDir = getScriptPathFromArgs().parentFile
 val changelogFile = scriptDir.parentFile.parentFile.resolve("CHANGELOG.md")
 val prFormatFile = scriptDir.resolve("PR_FORMAT.md")
 val prFormatLink = "https://github.com/JetBrains/compose-multiplatform/blob/master/tools/changelog/PR_FORMAT.md"
+val youTrackLinkRegex = Regex("""\byoutrack\.jetbrains\.com(?![a-z0-9.-])""", RegexOption.IGNORE_CASE)
 
 val argsKeyless = args
     .filter { !it.contains("=") }
@@ -306,6 +307,15 @@ fun checkPr() {
     println()
 
     when {
+        releaseNotes is ReleaseNotes.Specified && releaseNotes.hasYouTrackLinks -> {
+            err.println("""
+                "## Release Notes" must not contain links to youtrack.jetbrains.com
+                Move the link to the PR description outside "## Release Notes"
+
+                See the format in $prFormatLink
+            """.trimIndent())
+            exitProcess(1)
+        }
         releaseNotes is ReleaseNotes.Specified && releaseNotes.entries.isEmpty() -> {
             err.println("""
                 "## Release Notes" doesn't contain any items, or "### Section - Subsection" isn't specified
@@ -420,10 +430,11 @@ fun extractReleaseNotes(body: String?, prNumber: Int, prLink: String): ReleaseNo
     }
 
     return ReleaseNotes.Specified(
-        relNoteBody
+        entries = relNoteBody
             .split("\n")
             .split { it.trim().startsWith("#") }
-            .flatMap(::parseChangelogEntries)
+            .flatMap(::parseChangelogEntries),
+        hasYouTrackLinks = youTrackLinkRegex.containsMatchIn(relNoteBody)
     )
 }
 
@@ -642,7 +653,10 @@ sealed interface ReleaseNotes {
         override val entries: List<ChangelogEntry> get() = emptyList()
     }
 
-    class Specified(override val entries: List<ChangelogEntry>): ReleaseNotes
+    class Specified(
+        override val entries: List<ChangelogEntry>,
+        val hasYouTrackLinks: Boolean
+    ): ReleaseNotes
 }
 
 /**

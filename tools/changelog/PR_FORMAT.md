@@ -3,6 +3,8 @@ Each Pull Request should contain "## Release Notes" section that describes chang
 Each release, changes from all PRs are combined into a list and added to CHANGELOG.md
 (by [changelog.main.kts](changelog.main.kts) script).
 
+"## Release Notes" must not contain links to YouTrack (youtrack.jetbrains.com).
+
 ## Possible Release Notes
 
 ### No Release Notes
