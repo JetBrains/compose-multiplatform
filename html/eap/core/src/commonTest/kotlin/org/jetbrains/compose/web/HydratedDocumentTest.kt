@@ -74,14 +74,13 @@ class HydratedDocumentTest {
         }
 
         assertEquals(
-            "<!doctype html><html><head><title>Hydrated page</title></head><body>" +
-                "<div class=\"application\" data-compose-hydration-root=\"\">" +
-                "JVM state: 42</div>" +
-                "<script data-compose-hydration-state=\"escaped-text-v1\" type=\"text/plain\">" +
-                "{\"label\":\"JVM state\",\"count\":42}</script>" +
-                "<script nonce=\"request-nonce\" integrity=\"sha384-test\" " +
-                "crossorigin=\"anonymous\" type=\"module\" " +
-                "src=\"/application.js\"></script></body></html>",
+            """<!doctype html><html><head><title>Hydrated page</title></head><body>""" +
+                """<div class="application" data-compose-hydration-root="">JVM state: 42</div>""" +
+                """<script data-compose-hydration-state="escaped-text-v1" type="text/plain">""" +
+                """{"label":"JVM state","count":42}</script>""" +
+                """<script nonce="request-nonce" integrity="sha384-test" """ +
+                """crossorigin="anonymous" type="module" """ +
+                """src="/application.js"></script></body></html>""",
             rendered,
         )
     }
@@ -96,30 +95,30 @@ class HydratedDocumentTest {
                         initialState = "article-state",
                         serializeState = { it },
                         hydrationId = "article",
-                    ) { Text(it) }
+                    ) { Text("Article: $it") }
                     Text("Between")
                     HydrationRoot(
                         initialState = "comments-state",
                         serializeState = { it },
                         hydrationId = "comments",
-                    ) { Text(it) }
+                    ) { Text("Comments: $it") }
                     Text("Footer")
                 }
             }
         }
 
         assertEquals(
-            "<!doctype html><html><body>Header" +
-                "<div data-compose-hydration-root=\"article\">article-state</div>" +
-                "<script data-compose-hydration-state=\"escaped-text-v1\" " +
-                "data-compose-hydration-for=\"article\" data-compose-hydration-validation=\"on\" " +
-                "type=\"text/plain\">article-state</script>" +
-                "Between" +
-                "<div data-compose-hydration-root=\"comments\">comments-state</div>" +
-                "<script data-compose-hydration-state=\"escaped-text-v1\" " +
-                "data-compose-hydration-for=\"comments\" data-compose-hydration-validation=\"on\" " +
-                "type=\"text/plain\">comments-state</script>" +
-                "Footer</body></html>",
+            """<!doctype html><html><body>Header""" +
+                """<div data-compose-hydration-root="article">Article: article-state</div>""" +
+                """<script data-compose-hydration-state="escaped-text-v1" """ +
+                """data-compose-hydration-for="article" data-compose-hydration-validation="on" """ +
+                """type="text/plain">article-state</script>""" +
+                """Between""" +
+                """<div data-compose-hydration-root="comments">Comments: comments-state</div>""" +
+                """<script data-compose-hydration-state="escaped-text-v1" """ +
+                """data-compose-hydration-for="comments" data-compose-hydration-validation="on" """ +
+                """type="text/plain">comments-state</script>""" +
+                """Footer</body></html>""",
             rendered,
         )
     }
@@ -138,8 +137,8 @@ class HydratedDocumentTest {
         }
 
         val failure = assertFailsWith<IllegalArgumentException> { render(validateStrictly = true) }
-        assertContains(failure.message.orEmpty(), "Duplicate Compose hydrationId \"cart\"")
-        assertContains(render(validateStrictly = false), "data-compose-hydration-for=\"cart\"")
+        assertContains(failure.message.orEmpty(), """Duplicate Compose hydrationId "cart"""")
+        assertContains(render(validateStrictly = false), """data-compose-hydration-for="cart"""")
     }
 
     @Test
@@ -168,7 +167,7 @@ class HydratedDocumentTest {
             Html { Body { HydrationRoot(Unit, { "null" }) {} } }
         }
 
-        assertContains(strict, "data-compose-hydration-validation=\"on\"")
+        assertContains(strict, """data-compose-hydration-validation="on"""")
         assertFalse(HydrationValidationAttribute in fast)
     }
 
@@ -222,8 +221,8 @@ class HydratedDocumentTest {
         }
 
         assertEquals(
-            "<!doctype html><html><head><title>Static page</title></head>" +
-                "<body>Nothing to hydrate</body></html>",
+            """<!doctype html><html><head><title>Static page</title></head>""" +
+                """<body>Nothing to hydrate</body></html>""",
             rendered,
         )
         assertFalse("data-compose-hydration-state" in rendered)
