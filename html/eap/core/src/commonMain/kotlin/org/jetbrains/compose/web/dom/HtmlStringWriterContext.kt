@@ -28,9 +28,13 @@ internal class HtmlStringWriterContext(
     private val hydratable: Boolean,
     private val attrsBuilders: AttrsBuilderPool? = null,
     private val output: StringBuilder = StringBuilder(),
+    private val sink: ((String) -> Unit)? = null,
+    private val chunkSize: Int = 4096,
 ) : ComposeHtmlContext {
     private val elementScope = StringElementScope<Element>()
     private var finished = false
+    // These elements must keep their content in the shared buffer until their end tag is written.
+    private var bufferedElementDepth = 0
 
     // Attribute builders are reused by element position across keyed renders.
     private var attrsBuilderIndex = 0
@@ -78,16 +82,22 @@ internal class HtmlStringWriterContext(
 
         val tagName = elementBuilder.tagName
         val namespace = (elementBuilder as? StringElementBuilder<*>)?.namespace ?: HtmlNamespace
+
+        // Emit any completed chunk before writing this start tag.
+        flushChunk()
+        val bufferElement = sink != null && namespace == HtmlNamespace &&
+            (isHtmlRawTextElement(tagName, namespace) || tagName == "noscript" ||
+                isHtmlLeadingNewlineElement(tagName, namespace))
+        if (bufferElement) bufferedElementDepth++
+
         val attributes = writeStartTag(
             tagName = tagName,
             namespace = namespace,
             applyAttrs = applyAttrs,
             validate = LocalHtmlValidationMode.current == HtmlValidationMode.Strict,
         )
-        val contentStart = output.length
-
         // A raw-text parent rejects child tags, and a void parent returned above.
-        //  Only the parent's tag and namespace need saving.
+        // Only the parent's tag and namespace need saving.
         val parentTagName = currentTagName
         val parentNamespace = currentNamespace
         val isVoid = isHtmlVoidElement(tagName, namespace)
@@ -97,6 +107,9 @@ internal class HtmlStringWriterContext(
         discardingVoidContent = isVoid
         collectingRawText = isHtmlRawTextElement(tagName, namespace)
 
+        flushChunk()
+        // For buffered elements this index stays valid until appendEndTag inspects the content.
+        val contentStart = output.length
         content?.invoke(elementScope())
 
         if (!isVoid) writeEndTag(tagName, namespace, attributes, contentStart)
@@ -105,6 +118,8 @@ internal class HtmlStringWriterContext(
         previousSiblingWasText = false
         discardingVoidContent = false
         collectingRawText = false
+        if (bufferElement) bufferedElementDepth--
+        flushChunk()
     }
 
     @Composable
@@ -132,7 +147,10 @@ internal class HtmlStringWriterContext(
                 hasRawTextCall = true
                 rawText.append(value)
             }
-            value.isNotEmpty() -> writeText(value)
+            value.isNotEmpty() -> {
+                writeText(value)
+                flushChunk()
+            }
         }
     }
 
@@ -146,7 +164,7 @@ internal class HtmlStringWriterContext(
         RawTextElement("style", applyAttrs, prepareStyleRawTextContent(cssRules))
     }
 
-    /** Returns the written HTML. The context rejects further output afterwards. */
+    /** Emits the final chunk or returns the complete HTML string, then rejects further writes. */
     fun finish(requireHtmlDocumentRoot: Boolean): String {
         check(currentTagName == null) { "String rendering finished inside <$currentTagName>" }
         finished = true
@@ -156,7 +174,10 @@ internal class HtmlStringWriterContext(
             }
         }
         attrsBuilders?.trim(attrsBuilderIndex)
-        return output.toString()
+        if (sink == null) return output.toString()
+
+        flushChunk(force = true)
+        return ""
     }
 
     private fun <TElement : Element> writeStartTag(
@@ -207,6 +228,17 @@ internal class HtmlStringWriterContext(
         }
         output.appendEscapedText(value)
         previousSiblingWasText = true
+    }
+
+    /** Emits the shared buffer at a safe boundary once it reaches the target size. */
+    private fun flushChunk(force: Boolean = false) {
+        val write = sink ?: return
+        // A buffered element may inspect or insert into its content when its end tag is written.
+        if (bufferedElementDepth != 0 || output.isEmpty() || (!force && output.length < chunkSize)) return
+
+        val chunk = output.toString()
+        output.setLength(0)
+        write(chunk)
     }
 
     private fun recordRootChild(isHtml: Boolean) {

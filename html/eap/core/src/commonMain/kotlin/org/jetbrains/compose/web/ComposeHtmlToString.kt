@@ -58,7 +58,7 @@ fun composeHtmlToString(
     return if (key == null) {
         composeHtmlString(hydratable = hydratable, content = validatedContent)
     } else {
-        composeReusableHtmlString(key, hydratable, validatedContent)
+        composeReusableHtmlString(key, hydratable, content = validatedContent)
     }
 }
 
@@ -78,16 +78,19 @@ private class ReusableHtmlComposition {
     }
 }
 
-private fun composeReusableHtmlString(
+/** Reuses a keyed composition and its attribute builders across string and streaming renders. */
+internal fun composeReusableHtmlString(
     key: String,
     hydratable: Boolean,
+    sink: ((String) -> Unit)? = null,
+    chunkSize: Int = 4096,
     content: @Composable () -> Unit,
 ): String {
     val renderer = reusableHtmlCompositions.getOrPut(key, ::ReusableHtmlComposition)
-    check(!renderer.rendering) { "composeHtmlToString key \"$key\" is already rendering" }
+    check(!renderer.rendering) { "HTML render key \"$key\" is already rendering" }
 
-    renderer.output.setLength(0) // empty string output before next render
-    val context = HtmlStringWriterContext(hydratable, renderer.attrsBuilders, renderer.output)
+    renderer.output.setLength(0) // Discard output left by the previous render.
+    val context = HtmlStringWriterContext(hydratable, renderer.attrsBuilders, renderer.output, sink, chunkSize)
     val snapshot = Snapshot.takeMutableSnapshot()
     renderer.rendering = true
     renderer.content = content
@@ -115,13 +118,15 @@ private fun composeReusableHtmlString(
     }
 }
 
-/** Runs a fresh composition while the context writes markup directly to its output buffer. */
+/** Runs a fresh composition with a buffer shared by string and streaming output. */
 internal fun composeHtmlString(
     hydratable: Boolean = true,
     requireHtmlDocumentRoot: Boolean = false,
+    sink: ((String) -> Unit)? = null,
+    chunkSize: Int = 4096,
     content: @Composable () -> Unit,
 ): String {
-    val context = HtmlStringWriterContext(hydratable)
+    val context = HtmlStringWriterContext(hydratable, sink = sink, chunkSize = chunkSize)
     val snapshot = Snapshot.takeMutableSnapshot()
 
     return try {

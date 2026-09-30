@@ -31,6 +31,9 @@ internal fun isHtmlVoidElement(tagName: String, namespace: String): Boolean =
 // HTML parsing discards the first LF in these elements.
 private val HtmlLeadingNewlineElementNames = setOf("pre", "textarea", "listing")
 
+internal fun isHtmlLeadingNewlineElement(tagName: String, namespace: String): Boolean =
+    namespace == HtmlNamespace && tagName in HtmlLeadingNewlineElementNames
+
 // Only empty boolean attribute values may be minimized without losing their value.
 internal val HtmlBooleanAttributeNames = setOf(
     "allowfullscreen",
@@ -142,7 +145,7 @@ internal fun StringBuilder.appendEndTag(tagName: String, namespace: String, cont
                 "String-rendered <noscript> content must not contain a </noscript end tag"
             }
         }
-        if (tagName in HtmlLeadingNewlineElementNames && length > contentStart && this[contentStart] == '\n') {
+        if (isHtmlLeadingNewlineElement(tagName, namespace) && length > contentStart && this[contentStart] == '\n') {
             insert(contentStart, '\n')
         }
     }
