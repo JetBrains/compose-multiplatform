@@ -165,6 +165,10 @@ interface AttrsScope<out TElement : Element> : EventsListenerScope {
 open class AttrsScopeBuilder<TElement : Element>(
     internal val eventsListenerScopeBuilder: EventsListenerScopeBuilder = EventsListenerScopeBuilder()
 ) : AttrsScope<TElement> {
+    internal constructor(attributes: MutableMap<String, String>) : this() {
+        attributesStorage = attributes
+    }
+
     // Allocate each attribute channel only when used.
     private var attributesStorage: MutableMap<String, String>? = null
     internal val attributesMap: MutableMap<String, String>
@@ -374,15 +378,18 @@ private val setClassList: (HTMLElement, Array<out String>) -> Unit = { e, classL
 
 internal fun Collection<String>.toClassAttributeValue(validate: Boolean = true): String? {
     if (isEmpty()) return null
-    if (validate) {
-        val seen = mutableSetOf<String>()
-        forEach { token ->
-            require(token.isNotEmpty()) { "Class token must not be empty" }
-            require(token.none { it in "\t\n\u000C\r " }) {
-                "Class token must not contain ASCII whitespace: \"$token\""
-            }
-            require(seen.add(token)) { "Class token must not be repeated: \"$token\"" }
-        }
-    }
+    if (validate) requireValidClassTokens()
     return joinToString(" ")
+}
+
+internal fun Collection<String>.requireValidClassTokens() {
+    if (isEmpty()) return
+    val seen = mutableSetOf<String>()
+    forEach { token ->
+        require(token.isNotEmpty()) { "Class token must not be empty" }
+        require(token.none { it in "\t\n\u000C\r " }) {
+            "Class token must not contain ASCII whitespace: \"$token\""
+        }
+        require(seen.add(token)) { "Class token must not be repeated: \"$token\"" }
+    }
 }

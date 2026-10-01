@@ -7,7 +7,7 @@ package org.jetbrains.compose.web.dom
 
 import org.jetbrains.compose.web.HydrationProtocolAttributes
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
-import org.jetbrains.compose.web.attributes.toClassAttributeValue
+import org.jetbrains.compose.web.attributes.requireValidClassTokens
 import org.jetbrains.compose.web.css.toStyleAttributeValue
 
 // HTML parsing merges adjacent non-empty text nodes. This comment preserves their boundary.
@@ -108,7 +108,7 @@ internal class StringHtmlAttributes private constructor(
 
 internal fun StringBuilder.appendStartTag(tagName: String, namespace: String, attributes: Map<String, String>) {
     append('<').append(tagName)
-    attributes.forEach { (name, value) ->
+    attributes.forEachHtmlAttribute { name, value ->
         appendAttribute(tagName, namespace, name, value)
     }
     append('>')
@@ -122,13 +122,24 @@ internal fun StringBuilder.appendStartTag(
     validate: Boolean,
 ): Boolean {
     // Class validation runs even when an explicit class attribute overrides the class list.
-    val classValue = builder.classes.toClassAttributeValue(validate)
+    val classes = builder.classes
+    if (validate) classes.requireValidClassTokens()
     val attributes = builder.collect()
     validateStringHtmlAttributes(attributes, namespace, validate, builder.hydrationProtocolAttributes)
-    val hasScriptSource = tagName == "script" && attributes.keys.any { it.equals("src", ignoreCase = true) }
+    var hasScriptSource = false
+    if (tagName == "script") attributes.forEachHtmlAttribute { name, _ ->
+        if (name.equals("src", ignoreCase = true)) hasScriptSource = true
+    }
     append('<').append(tagName)
-    attributes.forEach { (name, value) -> appendAttribute(tagName, namespace, name, value) }
-    if ("class" !in attributes && classValue != null) appendAttribute(tagName, namespace, "class", classValue)
+    attributes.forEachHtmlAttribute { name, value -> appendAttribute(tagName, namespace, name, value) }
+    if ("class" !in attributes && classes.isNotEmpty()) {
+        append(" class=\"")
+        for (index in classes.indices) {
+            if (index != 0) append(' ')
+            appendEscapedAttribute(classes[index])
+        }
+        append('"')
+    }
     if ("style" !in attributes) {
         builder.styleScopeOrNull?.toStyleAttributeValue()?.let { value ->
             appendAttribute(tagName, namespace, "style", value)
@@ -145,7 +156,7 @@ private fun validateStringHtmlAttributes(
     validate: Boolean,
     hydrationProtocolAttributes: Set<String>,
 ) {
-    for (name in attributes.keys) {
+    attributes.forEachHtmlAttribute { name, _ ->
         requireValidHtmlAttributeName(name)
         if (validate && namespace != HtmlNamespace) {
             for (previous in attributes.keys) {

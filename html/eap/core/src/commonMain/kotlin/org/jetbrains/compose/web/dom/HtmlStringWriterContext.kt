@@ -204,7 +204,7 @@ internal class HtmlStringWriterContext(
         if (currentTagName == null) recordRootChild(isHtml = tagName == "html")
         if (currentNamespace == HtmlNamespace) requireHtmlParserStableTableElement(currentTagName, tagName)
 
-        val attrsBuilder = attrsBuilders?.builder<TElement>(attrsBuilderIndex++) ?: AttrsScopeBuilder()
+        val attrsBuilder = attrsBuilders?.builder<TElement>(attrsBuilderIndex++) ?: AttrsScopeBuilder(SsrAttributeMap())
         applyAttrs?.invoke(attrsBuilder)
         val hasScriptSource = output.appendStartTag(tagName, namespace, attrsBuilder, validate)
         if (attrsBuilders != null) attrsBuilder.reset()
@@ -271,7 +271,7 @@ internal class AttrsBuilderPool {
     private val builders = mutableListOf<AttrsScopeBuilder<*>>()
 
     fun <TElement : Element> builder(index: Int): AttrsScopeBuilder<TElement> {
-        if (index == builders.size) builders.add(AttrsScopeBuilder<Element>())
+        if (index == builders.size) builders.add(AttrsScopeBuilder<Element>(SsrAttributeMap()))
         return builders[index].unsafeCast()
     }
 
