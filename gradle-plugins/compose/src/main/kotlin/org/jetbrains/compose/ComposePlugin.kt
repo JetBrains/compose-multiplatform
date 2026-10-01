@@ -19,6 +19,7 @@ import org.jetbrains.compose.desktop.application.internal.configureDesktop
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.internal.configureExperimentalTargetsFlagsCheck
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
+import org.jetbrains.compose.internal.configureIos
 import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.resources.ResourcesExtension
@@ -34,6 +35,7 @@ abstract class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val composeExtension = project.extensions.create("compose", ComposeExtension::class.java, project)
         val desktopExtension = composeExtension.extensions.create("desktop", DesktopExtension::class.java)
+        val iosExtension = composeExtension.extensions.create("ios", IosExtension::class.java)
         val resourcesExtension = composeExtension.extensions.create("resources", ResourcesExtension::class.java)
         val dependencyCompatibilityExtension = composeExtension.extensions.create(
             "dependencyCompatibility", DependencyCompatibilityExtension::class.java
@@ -53,6 +55,8 @@ abstract class ComposePlugin : Plugin<Project> {
         project.configureComposeResources(resourcesExtension)
 
         project.configureWeb()
+
+        project.configureIos(iosExtension)
 
         project.configureRuntimeLibrariesCompatibilityCheck(dependencyCompatibilityExtension)
 
