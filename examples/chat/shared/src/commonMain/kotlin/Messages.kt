@@ -12,7 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
@@ -29,24 +29,18 @@ internal fun Messages(
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     val listState = rememberLazyListState()
-    if (messages.isNotEmpty()) {
-        LaunchedEffect(messages.last()) {
-            listState.animateScrollToItem(messages.lastIndex, scrollOffset = 2)
-        }
-    }
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(start = 4.dp, end = 4.dp),
         contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.Bottom),
         state = listState,
+        reverseLayout = true,
     ) {
-        item { Spacer(Modifier.size(20.dp)) }
-        items(messages, key = { it.id }) {
+        item { Box(Modifier.height(70.dp)) }
+        items(messages.asReversed(), key = { it.id }) {
             ChatMessage(isMyMessage = it.user == myUser, it)
         }
-        item {
-            Box(Modifier.height(70.dp))
-        }
+        item { Spacer(Modifier.size(20.dp)) }
     }
 }
 
