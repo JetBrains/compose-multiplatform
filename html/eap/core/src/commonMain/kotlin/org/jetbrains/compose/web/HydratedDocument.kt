@@ -27,13 +27,51 @@ private const val HtmlDoctype = "<!doctype html>"
  *
  * That client code must run only after the [HydrationRoot] and its state element have been parsed.
  * Place its script after [HydrationRoot], defer an external classic script, or use a module script.
+ * Use [renderHydratedDocumentToStream] to emit the document incrementally.
  */
 fun renderHydratedDocument(
     validateStrictly: Boolean = defaultHtmlValidationMode() == HtmlValidationMode.Strict,
     content: @Composable () -> Unit,
+): String = composeHydratedDocument(validateStrictly = validateStrictly, content = content)
+
+/**
+ * Streams the same HTML as [renderHydratedDocument], including its doctype and hydration state.
+ * [content] must produce exactly one `html` element; client loading requirements follow
+ * [renderHydratedDocument].
+ *
+ * [chunkSize] defaults to 2048 UTF-16 code units. Tags and `Text` calls stay intact, so chunks
+ * may exceed the target. [sink] runs synchronously, may block, and receives no empty chunks.
+ * Emitted output cannot be retracted on failure, including document validation after composition.
+ *
+ * Each call disposes its composition. Effects, snapshots, and buffering follow [composeHtmlToStream].
+ *
+ * @param validateStrictly overrides validation and records the choice in hydration state.
+ * @throws IllegalArgumentException if [chunkSize] is not positive or [content] is not a valid document.
+ */
+fun renderHydratedDocumentToStream(
+    sink: (String) -> Unit,
+    chunkSize: Int = 2048,
+    validateStrictly: Boolean = defaultHtmlValidationMode() == HtmlValidationMode.Strict,
+    content: @Composable () -> Unit,
+) {
+    require(chunkSize > 0) { "chunkSize must be positive" }
+    composeHydratedDocument(validateStrictly, chunkSink = { sink(it.toString()) }, chunkSize = chunkSize, content = content)
+}
+
+/** Shared document context and protocol for complete-string and streaming output. */
+internal fun composeHydratedDocument(
+    validateStrictly: Boolean,
+    chunkSink: ((StringBuilder) -> Unit)? = null,
+    chunkSize: Int = 2048,
+    content: @Composable () -> Unit,
 ): String {
     val seenHydrationIds = if (validateStrictly) mutableSetOf<String>() else null
-    return HtmlDoctype + composeHtmlString(requireHtmlDocumentRoot = true) {
+    return composeHtmlString(
+        requireHtmlDocumentRoot = true,
+        chunkSink = chunkSink,
+        chunkSize = chunkSize,
+        prefix = HtmlDoctype,
+    ) {
         CompositionLocalProvider(
             LocalHydratedDocumentContext provides true,
             LocalHydrationIds provides seenHydrationIds,
@@ -59,7 +97,7 @@ fun renderHydratedDocument(
  * that do not need client-side reconciliation.
  *
  * DOM references and element effects used through the content receiver are available after
- * browser hydration, but throw during server string rendering.
+ * browser hydration, but throw during server rendering.
  */
 @Composable
 fun <T> HydrationRoot(
@@ -70,7 +108,7 @@ fun <T> HydrationRoot(
     content: @Composable ElementScope<HTMLDivElement>.(T) -> Unit,
 ) {
     check(LocalHydratedDocumentContext.current) {
-        "HydrationRoot must be called inside renderHydratedDocument"
+        "HydrationRoot must be called inside renderHydratedDocument or renderHydratedDocumentToStream"
     }
     require(hydrationId == null || hydrationId.isNotBlank()) {
         "hydrationId must not be blank"

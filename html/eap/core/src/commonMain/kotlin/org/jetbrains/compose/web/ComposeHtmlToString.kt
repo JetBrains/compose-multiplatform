@@ -58,9 +58,12 @@ fun composeHtmlToString(
     return if (key == null) {
         composeHtmlString(hydratable = hydratable, content = validatedContent)
     } else {
-        composeReusableHtmlString(key, hydratable, validatedContent)
+        composeReusableHtmlString(key, hydratable, content = validatedContent)
     }
 }
+
+private const val LARGE_BUFFER_THRESHOLD = 64 * 1024
+private const val BUFFER_SHRINK_FACTOR = 4
 
 private val reusableHtmlCompositions = mutableMapOf<String, ReusableHtmlComposition>()
 
@@ -78,16 +81,19 @@ private class ReusableHtmlComposition {
     }
 }
 
-private fun composeReusableHtmlString(
+/** Reuses a keyed composition and its attribute builders across string and streaming renders. */
+internal fun composeReusableHtmlString(
     key: String,
     hydratable: Boolean,
+    chunkSink: ((StringBuilder) -> Unit)? = null,
+    chunkSize: Int = 2048,
     content: @Composable () -> Unit,
 ): String {
     val renderer = reusableHtmlCompositions.getOrPut(key, ::ReusableHtmlComposition)
-    check(!renderer.rendering) { "composeHtmlToString key \"$key\" is already rendering" }
+    check(!renderer.rendering) { "HTML render key \"$key\" is already rendering" }
 
-    renderer.output.setLength(0) // empty string output before next render
-    val context = HtmlStringWriterContext(hydratable, renderer.attrsBuilders, renderer.output)
+    renderer.output.setLength(0) // Discard output left by the previous render.
+    val context = HtmlStringWriterContext(hydratable, renderer.attrsBuilders, renderer.output, chunkSink, chunkSize)
     val snapshot = Snapshot.takeMutableSnapshot()
     renderer.rendering = true
     renderer.content = content
@@ -99,7 +105,12 @@ private fun composeReusableHtmlString(
                         checkNotNull(renderer.content).invoke()
                     }
                 }
-                context.finish(requireHtmlDocumentRoot = false)
+                context.finish(requireHtmlDocumentRoot = false).also {
+                    // Keep capacity for large renders. Trim after much smaller ones.
+                    if (isOversized(renderer.output.capacity(), context.peakBufferSize)) {
+                        renderer.output.trimToSize()
+                    }
+                }
             } finally {
                 renderer.composition.deactivate()
             }
@@ -115,13 +126,21 @@ private fun composeReusableHtmlString(
     }
 }
 
-/** Runs a fresh composition while the context writes markup directly to its output buffer. */
+private fun isOversized(capacity: Int, used: Int): Boolean =
+    capacity > LARGE_BUFFER_THRESHOLD && used.toLong() * BUFFER_SHRINK_FACTOR < capacity
+
+/** Runs a fresh composition with a buffer shared by string and streaming output. */
 internal fun composeHtmlString(
     hydratable: Boolean = true,
     requireHtmlDocumentRoot: Boolean = false,
+    chunkSink: ((StringBuilder) -> Unit)? = null,
+    chunkSize: Int = 2048,
+    prefix: String = "",
     content: @Composable () -> Unit,
 ): String {
-    val context = HtmlStringWriterContext(hydratable)
+    val context = HtmlStringWriterContext(
+        hydratable, output = StringBuilder(prefix), chunkSink = chunkSink, chunkSize = chunkSize,
+    )
     val snapshot = Snapshot.takeMutableSnapshot()
 
     return try {

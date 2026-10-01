@@ -25,18 +25,20 @@ internal object SsrHydrationFixtureGenerator {
         }
         outputDirectory.writeHydrationStateFixture("ssr-hydration-state.html")
         outputDirectory.writeHydrationIslandsFixture("ssr-hydration-islands.html")
+        outputDirectory.writeHydrationStateFixture("ssr-hydration-state-stream-fast.html", streamedStrictMode = false)
+        outputDirectory.writeHydrationStateFixture("ssr-hydration-state-stream-strict.html", streamedStrictMode = true)
     }
 
     private fun File.writeFixture(name: String, content: @Composable () -> Unit) {
         resolve(name).writeText("\n    ${composeHtmlToString(content = content)}\n")
     }
 
-    private fun File.writeHydrationStateFixture(name: String) {
+    private fun File.writeHydrationStateFixture(name: String, streamedStrictMode: Boolean? = null) {
         val state = SsrHydrationState(
             label = "Loaded by JVM <backend>",
             count = 41,
         )
-        val rendered = renderHydratedDocument {
+        val content: @Composable () -> Unit = {
             Html {
                 Body {
                     HydrationRoot(
@@ -50,7 +52,13 @@ internal object SsrHydrationFixtureGenerator {
             }
         }
 
-        resolve(name).writeText(rendered)
+        if (streamedStrictMode == null) {
+            resolve(name).writeText(renderHydratedDocument(content = content))
+        } else {
+            resolve(name).bufferedWriter().use { writer ->
+                renderHydratedDocumentToStream(writer, chunkSize = 1, validateStrictly = streamedStrictMode, content = content)
+            }
+        }
     }
 
     private fun File.writeHydrationIslandsFixture(name: String) {

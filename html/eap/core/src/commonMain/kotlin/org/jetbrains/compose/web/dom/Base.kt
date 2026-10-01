@@ -166,9 +166,13 @@ internal class RawTextContent private constructor(
 ) {
     fun validateAttributes(attributes: Map<String, String>) {
         if (tagName == "script") {
-            require(attributes.keys.none { it.equals("src", ignoreCase = true) }) {
-                "Inline <script> content cannot be combined with a src attribute"
-            }
+            validateScriptSource(attributes.keys.any { it.equals("src", ignoreCase = true) })
+        }
+    }
+
+    fun validateScriptSource(hasSource: Boolean) {
+        require(tagName != "script" || !hasSource) {
+            "Inline <script> content cannot be combined with a src attribute"
         }
     }
 
