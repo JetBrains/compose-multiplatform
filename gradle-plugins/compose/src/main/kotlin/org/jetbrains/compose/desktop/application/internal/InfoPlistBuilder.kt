@@ -101,6 +101,7 @@ internal object PlistKeys {
     val CFBundleTypeOSTypes by this
     val CFBundleExecutable by this
     val CFBundleIconFile by this
+    val CFBundleIconName by this
     val CFBundleIdentifier by this
     val CFBundleInfoDictionaryVersion by this
     val CFBundleName by this
