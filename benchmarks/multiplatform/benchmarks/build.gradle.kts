@@ -152,6 +152,21 @@ val runArguments: String? by project
 
 val kotlinVersion = libs.versions.kotlin
 
+// Prepare the standalone D8 runtime in a separate script to keep this build file focused.
+apply(from = rootProject.file("gradle/wasm-d8-runtime.gradle.kts"))
+
+@OptIn(ExperimentalWasmDsl::class)
+tasks.named<D8Exec>("wasmJsD8DevelopmentRun") {
+    dependsOn("prepareWasmJsD8DevelopmentRuntime")
+    inputFileProperty.set(layout.buildDirectory.file("d8/development/launcher.mjs"))
+}
+
+@OptIn(ExperimentalWasmDsl::class)
+tasks.named<D8Exec>("wasmJsD8ProductionRun") {
+    dependsOn("prepareWasmJsD8ProductionRuntime")
+    inputFileProperty.set(layout.buildDirectory.file("d8/production/launcher.mjs"))
+}
+
 // Handle runArguments property
 gradle.taskGraph.whenReady {
     var appArgs = runArguments
@@ -185,20 +200,8 @@ gradle.taskGraph.whenReady {
 
     @OptIn(ExperimentalWasmDsl::class)
     tasks.withType<D8Exec>().configureEach {
-        inputFileProperty.set(rootProject.layout.buildDirectory.file(
-            "wasm/packages/compose-benchmarks-benchmarks/kotlin/launcher.mjs")
-        )
-
         args(appArgs)
     }
-}
-
-
-tasks.register("buildD8Distribution", Zip::class.java) {
-    dependsOn("wasmJsProductionExecutableCompileSync")
-    from(rootProject.layout.buildDirectory.file("wasm/packages/compose-benchmarks-benchmarks/kotlin"))
-    archiveFileName.set("d8-distribution.zip")
-    destinationDirectory.set(rootProject.layout.buildDirectory.dir("distributions"))
 }
 
 tasks.register("runBrowserAndSaveStats") {

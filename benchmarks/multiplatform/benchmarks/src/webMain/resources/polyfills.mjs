@@ -1,4 +1,6 @@
 // polyfills.mjs
+globalThis.isD8 = true;
+
 if (typeof globalThis.window === 'undefined') {
     globalThis.window = globalThis;
 }
@@ -21,6 +23,15 @@ if (!globalThis.gc) {
     };
 }
 
+if (typeof globalThis.AbortController === 'undefined') {
+    globalThis.AbortController = class {
+        constructor() {
+            this.signal = {};
+        }
+        abort() {}
+    };
+}
+
 // Minimal Blob polyfill
 class BlobPolyfill {
     constructor(uint8, type = '') {
@@ -35,16 +46,29 @@ class BlobPolyfill {
         console.log('arrayBuffer called');
         return this._uint8.buffer;
     }
+    slice(start = 0, end = this.size, type = this.type) {
+        return new BlobPolyfill(this._uint8.slice(start, end), type);
+    }
 }
 
-globalThis.fetch = async (p) => {
+const runtimeDirectory = String(import.meta.url)
+    .replace(/^file:\/\//, '')
+    .replace(/\/[^/]+$/, '');
+
+globalThis.fetch = async (request) => {
+    const resourcePath = String(request)
+        .replace(/^file:\/\//, '')
+        .replace(/^\.\//, '');
+    const filePath = resourcePath.startsWith('/')
+        ? resourcePath
+        : `${runtimeDirectory}/${resourcePath}`;
+    console.log('fetch', resourcePath);
     let data;
     try {
-        let path = p.replace(/^\.\//, '');
-        console.log('fetch', path);
-        data = read(path, 'binary');
-    } catch (err) {
-        console.log('error', err);
+        data = read(filePath, 'binary');
+    } catch (error) {
+        console.error(`Failed to read D8 resource ${filePath}:`, error);
+        throw error;
     }
 
     const uint8 = new Uint8Array(data);
