@@ -6,6 +6,9 @@
 package org.jetbrains.compose.web.dom
 
 import org.jetbrains.compose.web.HydrationProtocolAttributes
+import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
+import org.jetbrains.compose.web.attributes.toClassAttributeValue
+import org.jetbrains.compose.web.css.toStyleAttributeValue
 
 // HTML parsing merges adjacent non-empty text nodes. This comment preserves their boundary.
 internal const val HydrationTextBoundaryMarker = "c"
@@ -86,27 +89,8 @@ internal class StringHtmlAttributes private constructor(
         ): StringHtmlAttributes {
             if (attributes.isEmpty() && classAttributeValue == null && styleAttributeValue == null) return Empty
 
-            val serializedAttributes = linkedMapOf<String, String>()
-            attributes.forEach { (name, value) ->
-                requireValidHtmlAttributeName(name)
-                if (validate && namespace != HtmlNamespace) {
-                    val duplicateName = serializedAttributes.keys.firstOrNull {
-                        it.hasSameHtmlParserAttributeName(name)
-                    }
-                    require(duplicateName == null) {
-                        "Duplicate HTML attribute names \"$duplicateName\" and \"$name\""
-                    }
-                }
-                val protocolName = HydrationProtocolAttributes.firstOrNull {
-                    it.equals(name, ignoreCase = true)
-                }
-                require(
-                    protocolName == null || protocolName in hydrationProtocolAttributes
-                ) {
-                    "Attribute \"$name\" is owned by the Compose hydration protocol"
-                }
-                serializedAttributes[name] = value
-            }
+            validateStringHtmlAttributes(attributes, namespace, validate, hydrationProtocolAttributes)
+            val serializedAttributes = linkedMapOf<String, String>().apply { putAll(attributes) }
 
             if ("class" !in serializedAttributes && classAttributeValue != null) {
                 serializedAttributes["class"] = classAttributeValue
@@ -125,28 +109,79 @@ internal class StringHtmlAttributes private constructor(
 internal fun StringBuilder.appendStartTag(tagName: String, namespace: String, attributes: Map<String, String>) {
     append('<').append(tagName)
     attributes.forEach { (name, value) ->
-        append(' ').append(name)
-        if (namespace != HtmlNamespace || value.isNotEmpty() || '-' in tagName || !name.isHtmlBooleanAttributeName()) {
-            append("=\"")
-            appendEscapedAttribute(value)
-            append('"')
-        }
+        appendAttribute(tagName, namespace, name, value)
     }
     append('>')
 }
 
-/** Closes an element whose content was appended after [contentStart]. */
-internal fun StringBuilder.appendEndTag(tagName: String, namespace: String, contentStart: Int) {
-    if (namespace == HtmlNamespace) {
-        if (tagName == "noscript") {
-            // Render fallback HTML for scripting-disabled browsers, but keep it inside noscript
-            // when scripting is enabled and the parser treats the entire contents as raw text.
-            require(substring(contentStart).rawTextTagIndex("noscript", closing = true) < 0) {
-                "String-rendered <noscript> content must not contain a </noscript end tag"
+/** Consumes a builder synchronously, preserving attribute order without making a map snapshot. */
+internal fun StringBuilder.appendStartTag(
+    tagName: String,
+    namespace: String,
+    builder: AttrsScopeBuilder<*>,
+    validate: Boolean,
+): Boolean {
+    // Class validation runs even when an explicit class attribute overrides the class list.
+    val classValue = builder.classes.toClassAttributeValue(validate)
+    val attributes = builder.collect()
+    validateStringHtmlAttributes(attributes, namespace, validate, builder.hydrationProtocolAttributes)
+    val hasScriptSource = tagName == "script" && attributes.keys.any { it.equals("src", ignoreCase = true) }
+    append('<').append(tagName)
+    attributes.forEach { (name, value) -> appendAttribute(tagName, namespace, name, value) }
+    if ("class" !in attributes && classValue != null) appendAttribute(tagName, namespace, "class", classValue)
+    if ("style" !in attributes) {
+        builder.styleScopeOrNull?.toStyleAttributeValue()?.let { value ->
+            appendAttribute(tagName, namespace, "style", value)
+        }
+    }
+    append('>')
+    // Only inline script validation needs attribute information after the builder is reset.
+    return hasScriptSource
+}
+
+private fun validateStringHtmlAttributes(
+    attributes: Map<String, String>,
+    namespace: String,
+    validate: Boolean,
+    hydrationProtocolAttributes: Set<String>,
+) {
+    for (name in attributes.keys) {
+        requireValidHtmlAttributeName(name)
+        if (validate && namespace != HtmlNamespace) {
+            for (previous in attributes.keys) {
+                if (previous == name) break
+                require(!previous.hasSameHtmlParserAttributeName(name)) {
+                    "Duplicate HTML attribute names \"$previous\" and \"$name\""
+                }
             }
         }
-        if (isHtmlLeadingNewlineElement(tagName, namespace) && length > contentStart && this[contentStart] == '\n') {
-            insert(contentStart, '\n')
+        val protocolName = HydrationProtocolAttributes.firstOrNull { it.equals(name, ignoreCase = true) }
+        require(protocolName == null || protocolName in hydrationProtocolAttributes) {
+            "Attribute \"$name\" is owned by the Compose hydration protocol"
+        }
+    }
+}
+
+private fun StringBuilder.appendAttribute(tagName: String, namespace: String, name: String, value: String) {
+    append(' ').append(name)
+    if (namespace != HtmlNamespace || value.isNotEmpty() || '-' in tagName || !name.isHtmlBooleanAttributeName()) {
+        append("=\"")
+        appendEscapedAttribute(value)
+        append('"')
+    }
+}
+
+/** Closes an element whose content was appended after [contentStart]. */
+internal fun StringBuilder.appendEndTag(
+    tagName: String,
+    namespace: String,
+    contentStart: Int,
+) {
+    if (namespace == HtmlNamespace && tagName == "noscript") {
+        // Render fallback HTML for scripting-disabled browsers, but keep it inside noscript
+        // when scripting is enabled and the parser treats the entire contents as raw text.
+        require(substring(contentStart).rawTextTagIndex("noscript", closing = true) < 0) {
+            "String-rendered <noscript> content must not contain a </noscript end tag"
         }
     }
     append("</").append(tagName).append('>')

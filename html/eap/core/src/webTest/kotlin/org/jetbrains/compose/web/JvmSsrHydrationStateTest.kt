@@ -18,7 +18,23 @@ class JvmSsrHydrationStateTest {
     // Fetches a JVM-rendered document, hydrates it, and verifies node adoption and client updates.
     @Test
     fun jvmStateHydratesWithoutClientAccessToItsSource() = MainScope().promise {
-        val fixtureHtml = fetchTestResourceText(SSR_HYDRATION_STATE_FIXTURE_URL)
+        hydrateFixture(SSR_HYDRATION_STATE_FIXTURE_URL)
+    }
+
+    @Test
+    fun jvmStreamedStateHydratesInFastMode() = MainScope().promise {
+        hydrateFixture(SSR_HYDRATION_STATE_STREAM_FAST_FIXTURE_URL, strict = false)
+    }
+
+    @Test
+    fun jvmStreamedStateHydratesInStrictMode() = MainScope().promise {
+        hydrateFixture(SSR_HYDRATION_STATE_STREAM_STRICT_FIXTURE_URL, strict = true)
+    }
+
+    private suspend fun hydrateFixture(url: String, strict: Boolean? = null) {
+        val fixtureHtml = fetchTestResourceText(url)
+        assertEquals("<!doctype html>", fixtureHtml.take(15))
+        if (strict != null) assertEquals(strict, HydrationValidationAttribute in fixtureHtml)
         assertContains(fixtureHtml, "Loaded by JVM &lt;backend&gt;: 41")
         assertContains(fixtureHtml, "\"label\":\"Loaded by JVM &lt;backend>\"")
 

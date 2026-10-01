@@ -89,6 +89,12 @@ internal class StringHtmlElementNode private constructor(
             // RCDATA decodes escaped text, but treats boundary comments as literal content.
             appendChildrenHtmlTo(builder, hydratable && !isHtmlRcdataElement(tagName, namespace))
         }
+        // The HTML parser drops the first LF in pre, textarea, and listing.
+        if (isHtmlLeadingNewlineElement(tagName, namespace) &&
+            builder.length > contentStart && builder[contentStart] == '\n'
+        ) {
+            builder.insert(contentStart, '\n')
+        }
         builder.appendEndTag(tagName, namespace, contentStart)
     }
 

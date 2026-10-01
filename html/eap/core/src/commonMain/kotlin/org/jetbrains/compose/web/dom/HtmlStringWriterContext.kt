@@ -28,9 +28,13 @@ internal class HtmlStringWriterContext(
     private val hydratable: Boolean,
     private val attrsBuilders: AttrsBuilderPool? = null,
     private val output: StringBuilder = StringBuilder(),
-    private val sink: ((String) -> Unit)? = null,
-    private val chunkSize: Int = 4096,
+    private val chunkSink: ((StringBuilder) -> Unit)? = null,
+    private val chunkSize: Int = 2048,
 ) : ComposeHtmlContext {
+    private val streaming = chunkSink != null
+    // Used to trim retained output storage.
+    var peakBufferSize: Int = 0
+        private set
     private val elementScope = StringElementScope<Element>()
     private var finished = false
     // These elements must keep their content in the shared buffer until their end tag is written.
@@ -43,6 +47,9 @@ internal class HtmlStringWriterContext(
     private var currentTagName: String? = null
     private var currentNamespace = HtmlNamespace
     private var previousSiblingWasText = false
+    // The HTML parser drops the first LF in pre, textarea, and listing. Repair it when the
+    // first content is written, so these elements can stream without retaining their children.
+    private var pendingLeadingNewline = false
 
     // Children of a void element still compose, but must not produce output.
     private var discardingVoidContent = false
@@ -52,7 +59,7 @@ internal class HtmlStringWriterContext(
     private var hasRawTextCall = false
     private val rawText = StringBuilder()
 
-    // renderHydratedDocument requires exactly one html root element.
+    // Hydrated document renderers require exactly one html root element.
     private var rootChildCount = 0
     private var firstRootChildIsHtml = false
 
@@ -85,12 +92,11 @@ internal class HtmlStringWriterContext(
 
         // Emit any completed chunk before writing this start tag.
         flushChunk()
-        val bufferElement = sink != null && namespace == HtmlNamespace &&
-            (isHtmlRawTextElement(tagName, namespace) || tagName == "noscript" ||
-                isHtmlLeadingNewlineElement(tagName, namespace))
+        val bufferElement = streaming &&
+            (isHtmlRawTextElement(tagName, namespace) || (namespace == HtmlNamespace && tagName == "noscript"))
         if (bufferElement) bufferedElementDepth++
 
-        val attributes = writeStartTag(
+        val hasScriptSource = writeStartTag(
             tagName = tagName,
             namespace = namespace,
             applyAttrs = applyAttrs,
@@ -104,6 +110,7 @@ internal class HtmlStringWriterContext(
         currentTagName = tagName
         currentNamespace = namespace
         previousSiblingWasText = false
+        pendingLeadingNewline = isHtmlLeadingNewlineElement(tagName, namespace)
         discardingVoidContent = isVoid
         collectingRawText = isHtmlRawTextElement(tagName, namespace)
 
@@ -112,10 +119,11 @@ internal class HtmlStringWriterContext(
         val contentStart = output.length
         content?.invoke(elementScope())
 
-        if (!isVoid) writeEndTag(tagName, namespace, attributes, contentStart)
+        if (!isVoid) writeEndTag(tagName, namespace, hasScriptSource, contentStart)
         currentTagName = parentTagName
         currentNamespace = parentNamespace
         previousSiblingWasText = false
+        pendingLeadingNewline = false // This element's start tag consumed its parent's first content.
         discardingVoidContent = false
         collectingRawText = false
         if (bufferElement) bufferedElementDepth--
@@ -170,11 +178,14 @@ internal class HtmlStringWriterContext(
         finished = true
         if (requireHtmlDocumentRoot) {
             require(rootChildCount == 1 && firstRootChildIsHtml) {
-                "renderHydratedDocument content must produce exactly one html element"
+                "Hydrated document content must produce exactly one html element"
             }
         }
         attrsBuilders?.trim(attrsBuilderIndex)
-        if (sink == null) return output.toString()
+        if (!streaming) {
+            peakBufferSize = output.length
+            return output.toString()
+        }
 
         flushChunk(force = true)
         return ""
@@ -185,7 +196,7 @@ internal class HtmlStringWriterContext(
         namespace: String,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
         validate: Boolean,
-    ): Map<String, String> {
+    ): Boolean {
         requireValidHtmlTagName(tagName)
         require(!collectingRawText) {
             "String rendering does not support element children inside <$currentTagName>"
@@ -195,23 +206,22 @@ internal class HtmlStringWriterContext(
 
         val attrsBuilder = attrsBuilders?.builder<TElement>(attrsBuilderIndex++) ?: AttrsScopeBuilder()
         applyAttrs?.invoke(attrsBuilder)
-        // The serialized attributes are a copy, so a pooled builder can be reset right away.
-        val attributes = attrsBuilder.stringAttributes(namespace, validate).byName
+        val hasScriptSource = output.appendStartTag(tagName, namespace, attrsBuilder, validate)
         if (attrsBuilders != null) attrsBuilder.reset()
 
-        output.appendStartTag(tagName, namespace, attributes)
-        return attributes
+        pendingLeadingNewline = false // A child tag starts with '<', which needs no LF repair.
+        return hasScriptSource
     }
 
     private fun writeEndTag(
         tagName: String,
         namespace: String,
-        attributes: Map<String, String>,
+        hasScriptSource: Boolean,
         contentStart: Int,
     ) {
         if (hasRawTextCall) {
             val content = RawTextContent.create(tagName, rawText.toString())
-            content.validateAttributes(attributes)
+            content.validateScriptSource(hasScriptSource)
             output.append(content.text)
             hasRawTextCall = false
             rawText.setLength(0)
@@ -222,6 +232,10 @@ internal class HtmlStringWriterContext(
     private fun writeText(value: String) {
         if (currentTagName == null) recordRootChild(isHtml = false)
         if (currentNamespace == HtmlNamespace) requireHtmlParserStableTableText(currentTagName, value)
+        if (pendingLeadingNewline) {
+            if (value.first() == '\n') output.append('\n')
+            pendingLeadingNewline = false
+        }
         // RCDATA decodes escaped text, but treats boundary comments as literal content.
         if (hydratable && previousSiblingWasText && !isHtmlRcdataElement(currentTagName, currentNamespace)) {
             output.appendHydrationTextBoundaryMarker()
@@ -232,13 +246,13 @@ internal class HtmlStringWriterContext(
 
     /** Emits the shared buffer at a safe boundary once it reaches the target size. */
     private fun flushChunk(force: Boolean = false) {
-        val write = sink ?: return
-        // A buffered element may inspect or insert into its content when its end tag is written.
+        val chunkSink = chunkSink ?: return
+        // A buffered element validates its content when its end tag is written.
         if (bufferedElementDepth != 0 || output.isEmpty() || (!force && output.length < chunkSize)) return
 
-        val chunk = output.toString()
+        peakBufferSize = maxOf(peakBufferSize, output.length)
+        chunkSink(output)
         output.setLength(0)
-        write(chunk)
     }
 
     private fun recordRootChild(isHtml: Boolean) {

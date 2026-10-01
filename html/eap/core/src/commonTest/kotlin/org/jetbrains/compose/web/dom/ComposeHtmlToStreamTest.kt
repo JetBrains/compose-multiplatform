@@ -12,10 +12,23 @@ import org.jetbrains.compose.web.composeHtmlToString
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ComposeHtmlToStreamTest {
+    @Test
+    fun defaultChunkSizeEmitsAt2048CodeUnitsDuringComposition() {
+        val text = "x".repeat(2048)
+        for (key in listOf(null, "stream-default-chunk-size")) {
+            val chunks = mutableListOf<String>()
+            composeHtmlToStream(sink = chunks::add, hydratable = false, key = key) {
+                Text(text)
+                assertEquals(listOf(text), chunks)
+                Text("tail")
+            }
+            assertEquals(listOf(text, "tail"), chunks)
+        }
+    }
+
     @Test
     fun emitsTextDuringCompositionWithoutSplittingTextCalls() {
         val chunks = mutableListOf<String>()
@@ -41,14 +54,14 @@ class ComposeHtmlToStreamTest {
     }
 
     @Test
-    fun keepsElementsThatInspectTheirContentsInTheSharedBuffer() {
+    fun streamsLeadingNewlineElementsAndBuffersElementsRequiringValidation() {
         val chunks = mutableListOf<String>()
         var streaming = true
         val content: @Composable () -> Unit = {
             Text("prefix")
             TagElement<Element>("pre", null) {
                 Text("\nline")
-                if (streaming) assertFalse(chunks.any { "<pre" in it })
+                if (streaming) assertTrue(chunks.joinToString("").endsWith("<pre>\n\nline"))
                 Span { Text("child") }
             }
             TagElement<Element>("textarea", null) { Text("\nA & B") }
@@ -62,6 +75,55 @@ class ComposeHtmlToStreamTest {
 
         assertEquals(composeHtmlToString(content = content), chunks.joinToString(""))
         assertTrue(chunks.all { it.isNotEmpty() })
+    }
+
+    @Test
+    fun repairsOnlyTheFirstSerializedNewlineAcrossEmptyTextAndNestedElements() {
+        for (tag in listOf("pre", "textarea", "listing")) {
+            val chunks = mutableListOf<String>()
+            composeHtmlToStream(sink = chunks::add, chunkSize = 1) {
+                TagElement<Element>(tag, null) {
+                    Text("")
+                    Text("\n")
+                    Text("tail")
+                }
+            }
+            val boundary = if (tag == "textarea") "" else "<!--c-->"
+            assertEquals("<$tag>\n\n${boundary}tail</$tag>", chunks.joinToString(""))
+            assertTrue(chunks.size > 1)
+        }
+
+        val chunks = mutableListOf<String>()
+        composeHtmlToStream(sink = chunks::add, chunkSize = 1) {
+            TagElement<Element>("pre", null) {
+                TagElement<Element>("pre", null) { Text("\ninner") }
+                Text("\nouter")
+            }
+            TagElement<Element>("pre", null) { Span { Text("\nchild") } }
+            TagElement<Element>("pre", null) { Text("\r\nline") }
+            TagElement<Element>("textarea", null) { Text("") }
+        }
+        assertEquals(
+            "<pre><pre>\n\ninner</pre>\nouter</pre>" +
+                "<pre><span>\nchild</span></pre><pre>&#13;\nline</pre><textarea></textarea>",
+            chunks.joinToString(""),
+        )
+    }
+
+    @Test
+    fun largeLeadingNewlineElementsEmitBeforeTheirChildrenFinish() {
+        for (tag in listOf("pre", "textarea", "listing")) {
+            val chunks = mutableListOf<String>()
+            composeHtmlToStream(sink = chunks::add, chunkSize = 32) {
+                TagElement<Element>(tag, null) {
+                    Text("\n" + "😀&".repeat(100))
+                    assertTrue(chunks.isNotEmpty())
+                    assertTrue(chunks.joinToString("").startsWith("<$tag>\n\n"))
+                    Text("last")
+                }
+            }
+            assertTrue(chunks.joinToString("").endsWith("last</$tag>"))
+        }
     }
 
     @Test

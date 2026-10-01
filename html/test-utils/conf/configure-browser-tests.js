@@ -29,6 +29,8 @@ module.exports = function configureBrowserTests(config) {
         "ssr-hydration.html",
         "ssr-hydration-state.html",
         "ssr-hydration-islands.html",
+        "ssr-hydration-state-stream-fast.html",
+        "ssr-hydration-state-stream-strict.html",
         "ssr-number-hydration.html",
         "svg-ssr-hydration.html",
     ]) {
