@@ -17,18 +17,20 @@ import androidx.compose.runtime.CompositionLocalProvider
  * for `pre`, `textarea`, and `listing` happens before their first content is emitted.
  * A chunk can exceed [chunkSize], and no empty chunks are sent.
  *
- * With no [key], the composition is disposed after rendering. A key retains the composition and
- * attribute-builder storage for later calls to either rendering function. Keyed calls are not
- * thread-safe, even with different keys. Snapshot state changes are discarded; coroutine effects
- * such as `LaunchedEffect` do not run, while `SideEffect` and `DisposableEffect` still execute.
+ * Rendering behavior and limitations follow [composeHtmlToString].
+ * Each render has fresh remembered state; a non-null [key] reuses string and streaming storage.
+ * Keyed calls are not thread-safe, even with different keys. Snapshot state changes are discarded.
+ * Coroutine effects such as `LaunchedEffect` do not run, while `SideEffect` and `DisposableEffect` still execute.
  *
  * [sink] runs synchronously while rendering and may block. Output already sent cannot be retracted
- * if rendering or the sink throws. A failed keyed render is disposed before the exception is rethrown.
+ * if rendering or the sink throws. Failed rendering storage is reset before the exception is rethrown.
  *
  * @param hydratable whether to emit text-boundary markers needed to hydrate adjacent `Text` calls.
  * @param validateStrictly overrides the default strict-validation setting for this render.
  * @throws IllegalArgumentException if [chunkSize] is not positive or content cannot be serialized.
- * @throws IllegalStateException if another render with the same non-null [key] is in progress.
+ * @throws IllegalStateException if rendering reenters with the same non-null [key], or [content]
+ * accesses `currentRecomposeScope`.
+ * @throws UnsupportedOperationException if [content] uses an unsupported composition operation.
  */
 fun composeHtmlToStream(
     sink: (String) -> Unit,
@@ -45,9 +47,7 @@ fun composeHtmlToStream(
             content()
         }
     }
-    if (key == null) {
-        composeHtmlString(hydratable = hydratable, content = validatedContent, chunkSink = chunkSink, chunkSize = chunkSize)
-    } else {
-        composeReusableHtmlString(key, hydratable, content = validatedContent, chunkSink = chunkSink, chunkSize = chunkSize)
-    }
+    composeHtmlString(
+        hydratable = hydratable, key = key, chunkSink = chunkSink, chunkSize = chunkSize, content = validatedContent,
+    )
 }

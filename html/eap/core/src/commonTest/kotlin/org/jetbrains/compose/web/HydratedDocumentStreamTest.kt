@@ -7,7 +7,9 @@ package org.jetbrains.compose.web
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import org.jetbrains.compose.web.dom.Body
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Head
@@ -23,6 +25,25 @@ import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class HydratedDocumentStreamTest {
+    @Test
+    fun documentRenderersUseSinglePassMovableContentWithFreshRememberedState() {
+        var remembered = 0
+        val content: @Composable () -> Unit = {
+            val movable = remember {
+                movableContentOf { Div { Text("render ${remember { ++remembered }}") } }
+            }
+            Html { Body { movable() } }
+        }
+        assertEquals(
+            "<!doctype html><html><body><div>render 1</div></body></html>",
+            renderHydratedDocument(content = content),
+        )
+        val chunks = mutableListOf<String>()
+        renderHydratedDocumentToStream(chunks::add, chunkSize = 1, content = content)
+        assertEquals("<!doctype html><html><body><div>render 2</div></body></html>", chunks.joinToString(""))
+        assertEquals(2, remembered)
+    }
+
     @Test
     fun defaultChunkSizeEmitsAt2048CodeUnitsDuringComposition() {
         val text = "x".repeat(2048)
