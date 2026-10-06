@@ -6,14 +6,14 @@ _Changes since 1.13.0-alpha01_
 
 ### Web
 
-- preloadFont, preloadImageBitmap, preloadImageVector are no longer experimental [#5711](https://github.com/JetBrains/compose-multiplatform/pull/5711)
+- `preloadFont`, `preloadImageBitmap`, `preloadImageVector` are no longer experimental [#5711](https://github.com/JetBrains/compose-multiplatform/pull/5711)
 
 ## Migration Notes
 
 ### Multiple Platforms
 
 - Temporarily re-exposed `LocalSystemTheme` (as `@InternalComposeUiApi`) and deprecated it. It will be removed in a future release [#3387](https://github.com/JetBrains/compose-multiplatform-core/pull/3387)
-- Kotlin version has been upgraded to 2.4.20. The minimal supported Kotlin version for k/native, k/js and k/wasm is 2.4.0 [#3426](https://github.com/JetBrains/compose-multiplatform-core/pull/3426)
+- Kotlin version has been upgraded to 2.4.20. The minimal supported Kotlin version for k/native, k/js and k/wasm is 2.4.20 [#3426](https://github.com/JetBrains/compose-multiplatform-core/pull/3426)
 
 ### Desktop
 
@@ -21,7 +21,7 @@ _Changes since 1.13.0-alpha01_
 
 ### Android
 
-- compileSdk 37.1 is required [#5719](https://github.com/JetBrains/compose-multiplatform/pull/5719)
+- `compileSdk` 37.1 is required [#5719](https://github.com/JetBrains/compose-multiplatform/pull/5719)
 
   ```
   compileSdk {
@@ -54,17 +54,17 @@ _Changes since 1.13.0-alpha01_
 ### Multiple Platforms
 
 - Dragging to select text will now automatically scroll the contents of a `SelectionContainer` when dragging to outside the container, without the need to jiggle the mouse/pointer [#3390](https://github.com/JetBrains/compose-multiplatform-core/pull/3390)
-- Perfomance improvement: removed stack trace allocation when internal coroutines are cancelled on a hot path [#3411](https://github.com/JetBrains/compose-multiplatform-core/pull/3411)
-- Fixed crashes when in certain scenarios when selecting text in a `SelectionContainer` [#3416](https://github.com/JetBrains/compose-multiplatform-core/pull/3416)
+- Performance improvement: removed stack trace allocation when internal coroutines are cancelled on a hot path [#3411](https://github.com/JetBrains/compose-multiplatform-core/pull/3411)
+- Fixed crashes in certain scenarios when selecting text in a `SelectionContainer` [#3416](https://github.com/JetBrains/compose-multiplatform-core/pull/3416)
 
 ### iOS
 
-- Fixed the TextField caret jumping to a later whitespace when tapping CJK punctuation.[#3342](https://github.com/JetBrains/compose-multiplatform-core/pull/3342)
+- Fixed the `TextField` caret jumping to a later whitespace when tapping CJK punctuation [#3342](https://github.com/JetBrains/compose-multiplatform-core/pull/3342)
 - A focused text field now applies changed IME options without refocusing it [#3304](https://github.com/JetBrains/compose-multiplatform-core/pull/3304)
 - _(prerelease fix)_ Fix an issue where text-selection handles could briefly appear in the wrong position when selecting text [#3321](https://github.com/JetBrains/compose-multiplatform-core/pull/3321)
 - Fix position of Numeric popup-like keyboard on iPad [#3372](https://github.com/JetBrains/compose-multiplatform-core/pull/3372)
 - Fix issue where Toolbar is not visible on iOS < 16 [#3378](https://github.com/JetBrains/compose-multiplatform-core/pull/3378)
-- Fix issue where Toolbar is not appears when `SelectionContainer` has at least one `TextField` inside [#3378](https://github.com/JetBrains/compose-multiplatform-core/pull/3378)
+- Fix issue where Toolbar does not appear when `SelectionContainer` has at least one `TextField` inside [#3378](https://github.com/JetBrains/compose-multiplatform-core/pull/3378)
 - _(prerelease fix)_ Fix frame drops during back gesture [#3392](https://github.com/JetBrains/compose-multiplatform-core/pull/3392)
 - Fix the issue where the context menu remains visible when the corresponding SelectionContainer hides [#3379](https://github.com/JetBrains/compose-multiplatform-core/pull/3379)
 - Fix crash when iOS reads `AccessibilityElement`'s properties after disposal [#3385](https://github.com/JetBrains/compose-multiplatform-core/pull/3385)
@@ -74,7 +74,7 @@ _Changes since 1.13.0-alpha01_
 - Fix the focused text field being covered by the keyboard after device rotation [#3407](https://github.com/JetBrains/compose-multiplatform-core/pull/3407)
 - Fix incorrect keyboard insets after Compose view geometry changes [#3407](https://github.com/JetBrains/compose-multiplatform-core/pull/3407)
 - Fixed a crash when a TextField lost focus due to a Dialog being displayed [#3458](https://github.com/JetBrains/compose-multiplatform-core/pull/3458)
-- Align oberscroll snapping animation with iOS animation [#3432](https://github.com/JetBrains/compose-multiplatform-core/pull/3432)
+- Align overscroll snapping animation with iOS animation [#3432](https://github.com/JetBrains/compose-multiplatform-core/pull/3432)
 - Fix toggleable state announcement and match it with the native `UISwitch` / `Toggle` [#3445](https://github.com/JetBrains/compose-multiplatform-core/pull/3445)
 
 ### Desktop
@@ -85,7 +85,7 @@ _Changes since 1.13.0-alpha01_
 
 - Fix scrolling via A11Y Tools in web browsers [#3366](https://github.com/JetBrains/compose-multiplatform-core/pull/3366)
 - Fixed nested scroll issue on a web when a collapsible app bar blocks a lazy list scrolling [#3376](https://github.com/JetBrains/compose-multiplatform-core/pull/3376)
-- _(prerelease fix)_ Fix a crash when resizing a ComposeViewport [#3384](https://github.com/JetBrains/compose-multiplatform-core/pull/3384)
+- _(prerelease fix)_ Fix a crash when resizing a `ComposeViewport` [#3384](https://github.com/JetBrains/compose-multiplatform-core/pull/3384)
 - Fix missing aria attributes for `Slider`, `RangeSlider` and `ProgressIndicator` components [#3382](https://github.com/JetBrains/compose-multiplatform-core/pull/3382)
 - Fix repeated web locale parsing during composition [#3397](https://github.com/JetBrains/compose-multiplatform-core/pull/3397)
 - _(prerelease fix)_ Fix stale editable text value in A11Y tree [#3401](https://github.com/JetBrains/compose-multiplatform-core/pull/3401)
@@ -93,9 +93,9 @@ _Changes since 1.13.0-alpha01_
 - Fix missing aria attributes for textfields (read only and max text length) and selection status state [#3381](https://github.com/JetBrains/compose-multiplatform-core/pull/3381)
 - Support LiveRegion mapping to aria-live attribute [#3428](https://github.com/JetBrains/compose-multiplatform-core/pull/3428)
 - Let browser handle pinch-to-zoom gestures when Compose doesn't consume the touch events [#3436](https://github.com/JetBrains/compose-multiplatform-core/pull/3436)
-- _(pre-release)_ Fix browser interferens with scroll and text selection gesture in a multiline TextField [#3453](https://github.com/JetBrains/compose-multiplatform-core/pull/3453)
+- _(prerelease fix)_ Fix browser interference with scroll and text selection gesture in a multiline TextField [#3453](https://github.com/JetBrains/compose-multiplatform-core/pull/3453)
 - Adapt backing text input focus behaviour for iOS Safari 27.0 [#3446](https://github.com/JetBrains/compose-multiplatform-core/pull/3446)
-- Fix autosuggestion in iOS [#3467](https://github.com/JetBrains/compose-multiplatform-core/pull/3467)
+- _(prerelease fix)_ Fix autosuggestion in iOS [#3467](https://github.com/JetBrains/compose-multiplatform-core/pull/3467)
 - Fix a skiko runtime when a skiko dependency is added in a test source set only [#5701](https://github.com/JetBrains/compose-multiplatform/pull/5701)
 
 ### Resources
