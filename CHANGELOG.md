@@ -13,7 +13,7 @@ _Changes since 1.13.0-alpha01_
 ### Multiple Platforms
 
 - Temporarily re-exposed `LocalSystemTheme` (as `@InternalComposeUiApi`) and deprecated it. It will be removed in a future release [#3387](https://github.com/JetBrains/compose-multiplatform-core/pull/3387)
-- Kotlin version has been upgraded to 2.4.20. The minimal supported Kotlin version for k/native, k/js and k/wasm is 2.4.20 [#3426](https://github.com/JetBrains/compose-multiplatform-core/pull/3426)
+- Kotlin version has been upgraded to 2.4.20. The minimal supported Kotlin version for k/native is 2.4.0, for k/js and k/wasm is 2.4.20 [#3426](https://github.com/JetBrains/compose-multiplatform-core/pull/3426)
 
 ### Desktop
 
