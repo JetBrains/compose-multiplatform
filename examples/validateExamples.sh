@@ -19,6 +19,8 @@ if [ "$#" -eq 2 ]; then
     version_args=("-Pcompose.version=$1" "-Pkotlin.version=$2")
 fi
 
+compose_version="${1:-}"
+kotlin_version="${2:-}"
 
 runGradle() {
     local example="$1"
@@ -32,13 +34,10 @@ runGradle() {
     popd
 }
 
-# Examples built with the Kotlin Toolchain use the Compose and Kotlin versions from their configuration
 runKotlin() {
     local example="$1"
     local platform="$2"
-    pushd "$example"
-    ./kotlin build -p "$platform"
-    popd
+    ./buildWithKotlinToolchain.sh "$example" "$platform" "$compose_version" "$kotlin_version"
 }
 
 runGradle chat packageDistributionForCurrentOS

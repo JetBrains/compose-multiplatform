@@ -10,5 +10,8 @@ settings:
     namespace: org.jetbrains.codeviewer
     applicationId: org.jetbrains.Codeviewer
     minSdk: 26
+    compileSdk:
+      apiLevel: 37
+      minorApiLevel: 1
     versionCode: 1
     versionName: "1.0"
