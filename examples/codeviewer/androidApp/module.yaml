@@ -1,0 +1,14 @@
+product: android/app
+
+dependencies:
+  - //shared
+  - $libs.androidx.activity.compose
+
+settings:
+  compose: enabled
+  android:
+    namespace: org.jetbrains.codeviewer
+    applicationId: org.jetbrains.Codeviewer
+    minSdk: 26
+    versionCode: 1
+    versionName: "1.0"

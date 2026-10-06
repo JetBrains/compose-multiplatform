@@ -32,8 +32,17 @@ runGradle() {
     popd
 }
 
+# Examples built with the Kotlin Toolchain use the Compose and Kotlin versions from their configuration
+runKotlin() {
+    local example="$1"
+    local platform="$2"
+    pushd "$example"
+    ./kotlin build -p "$platform"
+    popd
+}
+
 runGradle chat packageDistributionForCurrentOS
-runGradle codeviewer packageDistributionForCurrentOS
+runKotlin codeviewer jvm
 runGradle imageviewer packageDistributionForCurrentOS
 runGradle issues packageDistributionForCurrentOS
 runGradle graphics-2d packageDistributionForCurrentOS

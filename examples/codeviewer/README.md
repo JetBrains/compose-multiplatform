@@ -1,24 +1,27 @@
 # Code Viewer
 Code Viewer example for Desktop, Android and iOS written in Compose Multiplatform.
 
+The project is built with the [Kotlin Toolchain](https://github.com/JetBrains/kotlin-toolchain).
+
 ## Setting up your development environment
 
-To setup the environment, please consult these [instructions](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-multiplatform-setup.html).
+To set up the environment, please consult these [instructions](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-multiplatform-setup.html).
 
-## How to run
+Open the project in IntelliJ IDEA with the Kotlin Toolchain plugin and use the run gutter icons or run configurations
+to launch the app on the target of your choice.
 
-Choose a run configuration for an appropriate target in Android Studio and run it.
+## Run desktop app
 
-![run-configurations.png](run-configurations.png)
+`./kotlin run -m desktopApp`
 
-## Run desktop via Gradle
+## Run Android app
 
-`./gradlew desktopApp:run`
+`./kotlin run -m androidApp`
 
-### Building native desktop distribution
-```
-./gradlew :desktop:packageDistributionForCurrentOS
-# outputs are written to desktop/build/compose/binaries
-```
+## Run iOS app
+
+`./kotlin run -m iosApp`
+
+or open `iosApp/module.xcodeproj` in Xcode.
 
 ![Desktop](screenshots/codeviewer.png)
