@@ -1,7 +1,5 @@
 package org.jetbrains.compose.resources
 
-import kotlinx.cinterop.addressOf
-import kotlinx.cinterop.usePinned
 import platform.Foundation.NSBundle
 import platform.Foundation.NSData
 import platform.Foundation.NSFileHandle
@@ -10,7 +8,6 @@ import platform.Foundation.NSURL
 import platform.Foundation.closeFile
 import platform.Foundation.fileHandleForReadingAtPath
 import platform.Foundation.readDataOfLength
-import platform.posix.memcpy
 
 @ExperimentalResourceApi
 internal actual fun getPlatformResourceReader(): ResourceReader = DefaultMacOsResourceReader
@@ -19,16 +16,12 @@ internal actual fun getPlatformResourceReader(): ResourceReader = DefaultMacOsRe
 internal object DefaultMacOsResourceReader : ResourceReader {
     override suspend fun read(path: String): ByteArray {
         val data = readData(getPathOnDisk(path))
-        return ByteArray(data.length.toInt()).apply {
-            usePinned { memcpy(it.addressOf(0), data.bytes, data.length) }
-        }
+        return data.toByteArray()
     }
 
     override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
         val data = readData(getPathOnDisk(path), offset, size)
-        return ByteArray(data.length.toInt()).apply {
-            usePinned { memcpy(it.addressOf(0), data.bytes, data.length) }
-        }
+        return data.toByteArray()
     }
 
     override fun getUri(path: String): String {
