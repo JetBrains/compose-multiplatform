@@ -114,16 +114,17 @@ internal fun StringBuilder.appendStartTag(tagName: String, namespace: String, at
     append('>')
 }
 
-/** Consumes a builder synchronously, preserving attribute order without making a map snapshot. */
+/** Consumes a builder synchronously, preserving attribute order. */
 internal fun StringBuilder.appendStartTag(
     tagName: String,
     namespace: String,
     builder: AttrsScopeBuilder<*>,
     validate: Boolean,
+    formState: FormControlState? = null,
 ): Boolean {
     // Class validation runs even when an explicit class attribute overrides the class list.
     val classValue = builder.classes.toClassAttributeValue(validate)
-    val attributes = builder.collect()
+    val attributes = builder.collect().withFormState(formState)
     validateStringHtmlAttributes(attributes, namespace, validate, builder.hydrationProtocolAttributes)
     val hasScriptSource = tagName == "script" && attributes.keys.any { it.equals("src", ignoreCase = true) }
     append('<').append(tagName)

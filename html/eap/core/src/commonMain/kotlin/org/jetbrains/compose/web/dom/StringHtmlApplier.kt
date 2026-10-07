@@ -47,6 +47,10 @@ internal class StringHtmlNodeWrapper(
         requireElement("update attributes").updateAttributes(attributes)
     }
 
+    fun updateTextContent(value: String?) {
+        requireElement("update text content").textContent = value
+    }
+
     fun updateText(value: String) {
         val textNode = node as? StringHtmlTextNode
             ?: error("Cannot update text on an element node")

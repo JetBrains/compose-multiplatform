@@ -11,7 +11,9 @@ import androidx.compose.runtime.ControlledComposition
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.Dispatchers
+import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.Color
 import org.jetbrains.compose.web.css.color
 import kotlin.test.Test
@@ -72,6 +74,33 @@ class StringHtmlRecompositionTest {
         listOf(0, 3, 4, 1, 2).forEachIndexed { recomposedIndex, initialIndex ->
             assertSame(initialNodes[initialIndex], recomposedNodes[recomposedIndex])
         }
+    }
+
+    @Test
+    fun updatesAndRemovesFormControlProperties() = withStringComposition { composition ->
+        val formState = mutableStateOf<Pair<String?, Boolean>>("first" to true)
+        composition.setContent {
+            val (value, checked) = formState.value
+            Input(InputType.Text) { value?.let { value(it) } }
+            CheckboxInput(checked)
+            TextArea { value?.let { value(it) } }
+        }
+        assertEquals(
+            "<input type=\"text\" value=\"first\"><input type=\"checkbox\" checked><textarea>first</textarea>",
+            composition.toHtmlString(),
+        )
+
+        formState.value = "second & <value>" to false
+        composition.recomposeAfter(formState)
+        assertEquals(
+            "<input type=\"text\" value=\"second &amp; &lt;value&gt;\"><input type=\"checkbox\">" +
+                "<textarea>second &amp; &lt;value&gt;</textarea>",
+            composition.toHtmlString(),
+        )
+
+        formState.value = null to false
+        composition.recomposeAfter(formState)
+        assertEquals("<input type=\"text\"><input type=\"checkbox\"><textarea></textarea>", composition.toHtmlString())
     }
 
     @Test
@@ -140,7 +169,15 @@ private class TestStringComposition {
 
     fun recomposeAfter(changed: Any) {
         composition.recordModificationsOf(setOf(changed))
-        if (composition.recompose()) {
+        // Match the recomposer's snapshot observers so later updates retain their read tracking.
+        val snapshot = Snapshot.takeMutableSnapshot(composition::recordReadOf, composition::recordWriteOf)
+        val recomposed = try {
+            snapshot.enter { composition.recompose() }
+        } finally {
+            snapshot.apply()
+            snapshot.dispose()
+        }
+        if (recomposed) {
             composition.applyChanges()
             composition.applyLateChanges()
         }

@@ -426,7 +426,9 @@ internal val setTextAreaValue: (HTMLTextAreaElement, String) -> Unit = { e, v ->
 }
 
 internal val setTextAreaDefaultValue: (HTMLTextAreaElement, String) -> Unit = { e, v ->
-    e.innerText = v
+    if (v != e.defaultValue) {
+        e.defaultValue = v
+    }
 }
 
 internal val setCheckedValue: (HTMLInputElement, Boolean) -> Unit = { e, v ->

@@ -113,7 +113,7 @@ private open class DomElementWrapper(override val node: Element) : DomNodeWrappe
 
         if (previous == null || previousClasses != classes) updateClasses(classes)
         if (previous == null || previousStyle != style) updateStyleDeclarations(style)
-        if (previous == null || previous.collect() != attrs) updateAttrs(attrs)
+        if (previous == null || previous.collect() != attrs) updateAttrs(attrs, next.propertyUpdatesOrEmpty)
         if (previous == null || previous.propertyUpdatesOrEmpty != next.propertyUpdatesOrEmpty) {
             updateProperties(next.propertyUpdatesOrEmpty)
         }
@@ -162,7 +162,10 @@ private open class DomElementWrapper(override val node: Element) : DomNodeWrappe
         }
     }
 
-    open fun updateAttrs(attrs: Map<String, String>) {
+    open fun updateAttrs(
+        attrs: Map<String, String>,
+        properties: List<Pair<(Element, Any) -> Unit, Any>>,
+    ) {
         node.getAttributeNames().toList().forEach { jsName ->
             val name = jsName.toKotlinString()
             if (name != "style" && name != AttrsScope.CLASS && name !in attrs) {
@@ -210,14 +213,24 @@ private class HydratingDomElementWrapper(
     override val allowsHydrationMismatch: Boolean
         get() = allowance.isAllowed
 
-    override fun updateAttrs(attrs: Map<String, String>) {
+    override fun updateAttrs(
+        attrs: Map<String, String>,
+        properties: List<Pair<(Element, Any) -> Unit, Any>>,
+    ) {
         if (!applier.isHydrating) {
-            super.updateAttrs(attrs)
+            super.updateAttrs(attrs, properties)
             return
         }
         if (applier.validationMode == HtmlValidationMode.Fast && !allowance.isAllowed) return
 
+        val formState = properties.formControlState(node.localName, node.namespaceURI)
         attrs.forEach { (name, value) ->
+            // SSR encodes controlled properties in these attributes. Apply the client state after hydration.
+            if ((name == "value" && formState?.value != null) ||
+                (name == "checked" && formState?.checked != null)
+            ) {
+                return@forEach
+            }
             verifyAttribute(name, expected = value) {
                 // Unrelated server attributes are tolerated, so only the composed one is patched.
                 node.setComposedAttribute(name, value)
@@ -259,6 +272,11 @@ private class HydratingDomElementWrapper(
 
     override fun updateProperties(applicators: List<Pair<(Element, Any) -> Unit, Any>>) {
         if (applicators.isEmpty()) return
+        if (applier.isHydrating &&
+            applicators.formControlState(node.localName, node.namespaceURI)?.textContent != null
+        ) {
+            applier.claimTextAreaValueContent(node)
+        }
         applier.applyOrDeferDomMutation {
             super.updateProperties(applicators)
         }

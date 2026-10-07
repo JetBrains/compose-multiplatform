@@ -51,8 +51,8 @@ internal class HtmlStringWriterContext(
     // first content is written, so these elements can stream without retaining their children.
     private var pendingLeadingNewline = false
 
-    // Children of a void element still compose, but must not produce output.
-    private var discardingVoidContent = false
+    // Don't produce children's HTML, but still execute their composables.
+    private var discardingContent = false
 
     // Raw text is validated at the end tag. Raw-text elements cannot nest, so one buffer suffices.
     private var collectingRawText = false
@@ -82,7 +82,7 @@ internal class HtmlStringWriterContext(
         content: (@Composable ElementScope<TElement>.() -> Unit)?,
     ) {
         checkNotFinished()
-        if (discardingVoidContent) {
+        if (discardingContent) {
             content?.invoke(elementScope())
             return
         }
@@ -96,7 +96,7 @@ internal class HtmlStringWriterContext(
             (isHtmlRawTextElement(tagName, namespace) || (namespace == HtmlNamespace && tagName == "noscript"))
         if (bufferElement) bufferedElementDepth++
 
-        val hasScriptSource = writeStartTag(
+        val (hasScriptSource, contentOverride) = writeStartTag(
             tagName = tagName,
             namespace = namespace,
             applyAttrs = applyAttrs,
@@ -111,12 +111,13 @@ internal class HtmlStringWriterContext(
         currentNamespace = namespace
         previousSiblingWasText = false
         pendingLeadingNewline = isHtmlLeadingNewlineElement(tagName, namespace)
-        discardingVoidContent = isVoid
         collectingRawText = isHtmlRawTextElement(tagName, namespace)
 
         flushChunk()
         // For buffered elements this index stays valid until appendEndTag inspects the content.
         val contentStart = output.length
+        if (!contentOverride.isNullOrEmpty()) writeText(contentOverride)
+        discardingContent = isVoid || contentOverride != null
         content?.invoke(elementScope())
 
         if (!isVoid) writeEndTag(tagName, namespace, hasScriptSource, contentStart)
@@ -124,7 +125,7 @@ internal class HtmlStringWriterContext(
         currentNamespace = parentNamespace
         previousSiblingWasText = false
         pendingLeadingNewline = false // This element's start tag consumed its parent's first content.
-        discardingVoidContent = false
+        discardingContent = false
         collectingRawText = false
         if (bufferElement) bufferedElementDepth--
         flushChunk()
@@ -149,7 +150,7 @@ internal class HtmlStringWriterContext(
     override fun TextElement(value: String) {
         checkNotFinished()
         when {
-            discardingVoidContent -> Unit
+            discardingContent -> Unit
             collectingRawText -> {
                 // Even an empty text call must go through raw-text validation at the end tag.
                 hasRawTextCall = true
@@ -196,7 +197,7 @@ internal class HtmlStringWriterContext(
         namespace: String,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
         validate: Boolean,
-    ): Boolean {
+    ): Pair<Boolean, String?> {
         requireValidHtmlTagName(tagName)
         require(!collectingRawText) {
             "String rendering does not support element children inside <$currentTagName>"
@@ -206,11 +207,12 @@ internal class HtmlStringWriterContext(
 
         val attrsBuilder = attrsBuilders?.builder<TElement>(attrsBuilderIndex++) ?: AttrsScopeBuilder()
         applyAttrs?.invoke(attrsBuilder)
-        val hasScriptSource = output.appendStartTag(tagName, namespace, attrsBuilder, validate)
+        val formState = attrsBuilder.propertyUpdatesOrEmpty.formControlState(tagName, namespace)
+        val hasScriptSource = output.appendStartTag(tagName, namespace, attrsBuilder, validate, formState)
         if (attrsBuilders != null) attrsBuilder.reset()
 
         pendingLeadingNewline = false // A child tag starts with '<', which needs no LF repair.
-        return hasScriptSource
+        return hasScriptSource to formState?.textContent
     }
 
     private fun writeEndTag(

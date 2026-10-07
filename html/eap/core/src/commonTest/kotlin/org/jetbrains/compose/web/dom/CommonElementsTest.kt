@@ -402,7 +402,7 @@ class CommonElementsTest {
     }
 
     @Test
-    fun skipsControlledInputPropertiesWithoutDomElementAccess() {
+    fun rendersControlledInputProperties() {
         val html = composeHtmlToString {
             Input(InputType.Text) {
                 value("controlled")
@@ -413,13 +413,13 @@ class CommonElementsTest {
         }
 
         assertEquals(
-            "<input type=\"text\"><input type=\"checkbox\">",
+            "<input type=\"text\" value=\"controlled\"><input type=\"checkbox\" checked>",
             html,
         )
     }
 
     @Test
-    fun rendersTextAreaAttributesWithoutDomElementAccess() {
+    fun rendersTextAreaAttributes() {
         val html = composeHtmlToString {
             TextArea(
                 attrs = {
@@ -438,7 +438,7 @@ class CommonElementsTest {
     }
 
     @Test
-    fun skipsTextAreaValuePropertiesWithoutDomElementAccess() {
+    fun rendersTextAreaValueProperties() {
         val html = composeHtmlToString {
             TextArea(value = "controlled")
             TextArea {
@@ -447,7 +447,7 @@ class CommonElementsTest {
         }
 
         assertEquals(
-            "<textarea></textarea><textarea></textarea>",
+            "<textarea>controlled</textarea><textarea>default</textarea>",
             html,
         )
     }

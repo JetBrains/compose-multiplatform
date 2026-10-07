@@ -40,24 +40,24 @@ class CommonInputElementsTest {
         }
 
         assertEquals(
-            "<input type=\"checkbox\">" +
-                "<input type=\"date\">" +
-                "<input type=\"datetime-local\">" +
-                "<input type=\"email\">" +
-                "<input type=\"file\">" +
+            "<input type=\"checkbox\" checked>" +
+                "<input type=\"date\" value=\"2026-08-18\">" +
+                "<input type=\"datetime-local\" value=\"2026-08-18T12:30\">" +
+                "<input type=\"email\" value=\"user@example.com\">" +
+                "<input type=\"file\" value=\"ignored.txt\">" +
                 "<input type=\"hidden\" value=\"token\">" +
-                "<input type=\"month\">" +
-                "<input type=\"number\" min=\"1\" max=\"20\">" +
-                "<input type=\"password\">" +
-                "<input type=\"radio\" value=\"choice\">" +
-                "<input type=\"range\" min=\"0\" max=\"10\" step=\"2\">" +
-                "<input type=\"search\">" +
+                "<input type=\"month\" value=\"2026-08\">" +
+                "<input type=\"number\" min=\"1\" max=\"20\" value=\"10\">" +
+                "<input type=\"password\" value=\"secret\">" +
+                "<input type=\"radio\" value=\"choice\" checked>" +
+                "<input type=\"range\" min=\"0\" max=\"10\" step=\"2\" value=\"5\">" +
+                "<input type=\"search\" value=\"query\">" +
                 "<input type=\"submit\" value=\"Send\">" +
-                "<input type=\"tel\">" +
-                "<input type=\"text\">" +
-                "<input type=\"time\">" +
-                "<input type=\"url\">" +
-                "<input type=\"week\">",
+                "<input type=\"tel\" value=\"+41 12 345 67 89\">" +
+                "<input type=\"text\" value=\"text\">" +
+                "<input type=\"time\" value=\"12:30\">" +
+                "<input type=\"url\" value=\"https://example.com\">" +
+                "<input type=\"week\" value=\"2026-W34\">",
             html,
         )
     }
