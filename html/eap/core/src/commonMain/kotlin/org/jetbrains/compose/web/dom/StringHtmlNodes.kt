@@ -27,6 +27,7 @@ internal class StringHtmlElementNode private constructor(
     }
     internal val children: MutableList<StringHtmlNode> = mutableListOf()
     private var attributes: Map<String, String> = emptyMap()
+    internal var textContent: String? = null
 
     constructor(
         tagName: String,
@@ -71,7 +72,10 @@ internal class StringHtmlElementNode private constructor(
         val contentStart = builder.length
         // The parent determines text serialization: script/style and other raw-text elements
         // emit validated text without HTML escaping. Ordinary elements escape their text.
-        if (isHtmlRawTextElement(tagName, namespace) && children.isNotEmpty()) {
+        val textContent = textContent
+        if (textContent != null) {
+            builder.appendEscapedText(textContent)
+        } else if (isHtmlRawTextElement(tagName, namespace) && children.isNotEmpty()) {
             // Validate together so end tags split across children cannot bypass validation.
             val text = children.joinToString("") { child ->
                 when (child) {

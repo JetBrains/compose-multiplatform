@@ -70,11 +70,13 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
                 update = {
                     val attrsScope = AttrsScopeBuilder<TElement>()
                     applyAttrs?.invoke(attrsScope)
-                    val attributes = attrsScope.stringAttributes(namespace, validate)
+                    val formState = attrsScope.propertyUpdatesOrEmpty.formControlState(elementBuilder.tagName, namespace)
+                    val attributes = attrsScope.stringAttributes(namespace, validate, formState)
                     rawText?.validateAttributes(attributes.byName)
 
                     update {
                         set(attributes, StringHtmlNodeWrapper::updateAttributes)
+                        set(formState?.textContent, StringHtmlNodeWrapper::updateTextContent)
                     }
                 },
                 scope = elementScope,
@@ -165,7 +167,8 @@ private fun unavailableDomElement(): Nothing =
 /*
    Only reads: ordinary HTML attributes, classes, styleScope.properties, styleScope.variables
    Event listeners are intentionally ignored because they are client-side behavior, not string HTML behaviour.
-   TODO not supported: attrsScope.refEffect, propertyUpdates
+   Known form-control property setters override the serialized attributes and textarea text.
+   DOM refs and arbitrary property callbacks are not executed.
 
    ```kotlin
    Div({
@@ -178,11 +181,12 @@ private fun unavailableDomElement(): Nothing =
 internal fun <TElement : Element> AttrsScopeBuilder<TElement>.stringAttributes(
     namespace: String,
     validate: Boolean,
+    formState: FormControlState? = null,
 ): StringHtmlAttributes {
     val classAttributeValue = classes.toClassAttributeValue(validate)
     val existingStyleScope = styleScopeOrNull
     return StringHtmlAttributes.from(
-        attributes = collect(),
+        attributes = collect().withFormState(formState),
         namespace = namespace,
         validate = validate,
         hydrationProtocolAttributes = hydrationProtocolAttributes,

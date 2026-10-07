@@ -1,3 +1,8 @@
+/*
+ * Copyright 2020-2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 @file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)
 
 package org.jetbrains.compose.web.dom
@@ -145,6 +150,23 @@ internal class HydrationDomApplier(
         }
         nodesWithClaimedRawChildren += element
         return element
+    }
+
+    /** Textarea value setters own its serialized text, which is not a Compose-managed child. */
+    fun claimTextAreaValueContent(element: Element) {
+        ensureHydrating()
+        var child = element.firstChild
+        while (child != null) {
+            if (child !is Text) {
+                mismatchAtCurrentNode("expected textarea value text, found ${child.describe()}")
+            }
+            child = child.nextSibling
+        }
+        if (currentFrame.node === element) {
+            currentFrame.nextNode = null
+        } else {
+            nodesWithClaimedRawChildren += element
+        }
     }
 
     /** Claims the next logical text node. Boundary markers prevent browser merging. */

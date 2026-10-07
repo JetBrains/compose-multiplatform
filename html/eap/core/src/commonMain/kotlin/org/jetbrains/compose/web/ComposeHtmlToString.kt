@@ -26,11 +26,8 @@ import org.jetbrains.compose.web.dom.LocalComposeHtmlContext
  * Coroutine effects such as `LaunchedEffect` do not run. `SideEffect` and
  * `DisposableEffect` still execute.
  *
- * Known limitations:
- * - DOM property updates registered with `AttrsScope.prop(...)` are ignored because
- *   string rendering has no underlying DOM element.
- * - Inline styles preserve CSS fallbacks, but do not fully emulate CSSOM validation and
- *   mutation (for example, invalid assignments that also change priority, or shorthand removal).
+ * Inline styles preserve CSS fallbacks but do not fully emulate CSSOM validation and mutation.
+ * Custom callbacks passed to `AttrsScope.prop(...)` are ignored during string rendering.
  *
  * On the JVM or Node, set `COMPOSE_HTML_VALIDATE_STRICTLY=true` to enable additional class and
  * duplicate foreign-attribute checks by default.

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2020-2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
@@ -17,8 +22,6 @@ private fun InputAttrsScope<String>.applyAttrsWithStringValue(
  * It's a controlled Input of [InputType.Checkbox].
  * Controlled input means that its state is always equal [checked] value.
  * If you need an uncontrolled behaviour, see [Input].
- * TODO: Support [checked] in string rendering.
- * https://youtrack.jetbrains.com/issue/CMP-10774/Support-form-state-in-Compose-HTML-EAP-string-rendering
  *
  * @see [Input] for more details on controlled and uncontrolled modes.
  */
@@ -155,8 +158,6 @@ fun PasswordInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit 
  * It's a controlled Input of [InputType.Radio].
  * Controlled input means that its state is always equal [checked] value.
  * If you need an uncontrolled behaviour, see [Input].
- * TODO: Support [checked] in string rendering.
- * https://youtrack.jetbrains.com/issue/CMP-10774/Support-form-state-in-Compose-HTML-EAP-string-rendering
  *
  * @see [Input] for more details on controlled and uncontrolled modes.
  */
