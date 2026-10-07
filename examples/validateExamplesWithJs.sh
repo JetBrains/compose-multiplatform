@@ -41,7 +41,11 @@ runKotlin() {
 }
 
 runGradle html/compose-bird build
+runGradle html/compose-in-js build
 runGradle html/landing build
 runGradle html/with-react build
+runGradle chat :jsApp:jsBrowserDistribution
+runGradle graphics-2d :jsApp:jsBrowserDistribution
 runGradle imageviewer :webApp:wasmJsBrowserDistribution
+runGradle nav_cupcake :webApp:wasmJsBrowserDistribution
 runKotlin codeviewer wasmJs
