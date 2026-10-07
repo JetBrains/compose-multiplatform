@@ -754,6 +754,21 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         }
     }
 
+    @Test
+    fun testWixUnzipInSubprojectWithIsolatedProjects() {
+        Assumptions.assumeTrue(currentOS == OS.Windows) { "The test is only relevant for Windows" }
+
+        // https://youtrack.jetbrains.com/issue/CMP-8375
+        with(testProject("application/moduleClashCli")) {
+            gradle(":app:unzipWix", "-Dorg.gradle.unsafe.isolated-projects=true").checks {
+                check.taskSuccessful(":app:unzipWix")
+
+                file("app/build/wix311/light.exe").checkExists()
+                file("build/wix311").checkNotExists()
+            }
+        }
+    }
+
     @Suppress("SameParameterValue")
     private fun aotProject(
         aotMode: AotMode,
