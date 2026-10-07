@@ -1,5 +1,5 @@
 # Code Viewer
-Code Viewer example for Desktop, Android and iOS written in Compose Multiplatform.
+Code Viewer example for Desktop, Android, iOS, and Web written in Compose Multiplatform.
 
 The project is built with the [Kotlin Toolchain](https://github.com/JetBrains/kotlin-toolchain).
 
@@ -23,5 +23,11 @@ to launch the app on the target of your choice.
 `./kotlin run -m iosApp`
 
 or open `iosApp/module.xcodeproj` in Xcode.
+
+## Run web app
+
+`./kotlin run -m webApp`
+
+and open the printed URL in a browser that supports [Wasm GC](https://kotl.in/wasm-help).
 
 ![Desktop](screenshots/codeviewer.png)
