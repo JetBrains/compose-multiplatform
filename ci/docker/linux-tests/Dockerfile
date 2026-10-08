@@ -56,6 +56,7 @@ RUN wget https://cache-redirector.jetbrains.com/intellij-jbr/$JBR_DISTR_ARCH && 
 # Every directory in compose-jb-jdks is passed to tests as org.gradle.java.installations.paths,
 # so tests don't depend on toolchain auto-provisioning (foojay).
 # Corretto 11 and 19 are downloaded by the downloadJdksForTests task.
+# Used in gradle-plugins/compose/src/test/kotlin/org/jetbrains/compose/test/tests/integration/{DesktopApplicationTest,HotReloadTest}.kt
 ARG TEST_JDKS_ROOT=/root/.gradle/compose-jb-jdks
 RUN for jdk in \
         "jbrsdk-25 https://cache-redirector.jetbrains.com/intellij-jbr/jbrsdk-25.0.3-linux-x64-b496.62.tar.gz" \
