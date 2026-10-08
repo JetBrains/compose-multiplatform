@@ -52,6 +52,22 @@ RUN wget https://cache-redirector.jetbrains.com/intellij-jbr/$JBR_DISTR_ARCH && 
     rm $JBR_DISTR_ARCH && \
     mv $JBR_DISTR /usr/lib/jvm
 
+# Install JDKs requested by Gradle plugin tests via toolchains.
+# Every directory in compose-jb-jdks is passed to tests as org.gradle.java.installations.paths,
+# so tests don't depend on toolchain auto-provisioning (foojay).
+# Corretto 11 and 19 are downloaded by the downloadJdksForTests task.
+ARG TEST_JDKS_ROOT=/root/.gradle/compose-jb-jdks
+RUN for jdk in \
+        "jbrsdk-25 https://cache-redirector.jetbrains.com/intellij-jbr/jbrsdk-25.0.3-linux-x64-b496.62.tar.gz" \
+        "corretto-17 https://corretto.aws/downloads/latest/amazon-corretto-17-x64-linux-jdk.tar.gz" \
+        "corretto-21 https://corretto.aws/downloads/latest/amazon-corretto-21-x64-linux-jdk.tar.gz" \
+        "corretto-25 https://corretto.aws/downloads/latest/amazon-corretto-25-x64-linux-jdk.tar.gz"; \
+    do \
+        set -- $jdk && \
+        mkdir -p $TEST_JDKS_ROOT/$1 && \
+        wget -qO- $2 | tar xz -C $TEST_JDKS_ROOT/$1 || exit 1; \
+    done
+
 # Install Android SDK
 ENV ANDROID_HOME=/android/sdk
 ARG CMD_TOOLS_VERSION=13114758
