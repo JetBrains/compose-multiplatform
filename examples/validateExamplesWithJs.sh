@@ -19,6 +19,8 @@ if [ "$#" -eq 2 ]; then
     version_args=("-Pcompose.version=$1" "-Pkotlin.version=$2")
 fi
 
+compose_version="${1:-}"
+kotlin_version="${2:-}"
 
 runGradle() {
     local example="$1"
@@ -32,7 +34,18 @@ runGradle() {
     popd
 }
 
+runKotlin() {
+    local example="$1"
+    local platform="$2"
+    ./buildWithKotlinToolchain.sh "$example" "$platform" "$compose_version" "$kotlin_version"
+}
+
 runGradle html/compose-bird build
+runGradle html/compose-in-js build
 runGradle html/landing build
 runGradle html/with-react build
+runGradle chat :jsApp:jsBrowserDistribution
+runGradle graphics-2d :jsApp:jsBrowserDistribution
 runGradle imageviewer :webApp:wasmJsBrowserDistribution
+runGradle nav_cupcake :webApp:wasmJsBrowserDistribution
+runKotlin codeviewer wasmJs
