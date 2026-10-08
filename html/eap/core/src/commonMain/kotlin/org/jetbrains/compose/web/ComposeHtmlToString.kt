@@ -3,25 +3,23 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+@file:OptIn(androidx.compose.runtime.InternalComposeApi::class)
+
 package org.jetbrains.compose.web
 
-import androidx.compose.runtime.AbstractApplier
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Composer
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.ControlledComposition
-import androidx.compose.runtime.Recomposer
-import androidx.compose.runtime.ReusableComposition
 import androidx.compose.runtime.snapshots.Snapshot
-import kotlinx.coroutines.Dispatchers
 import org.jetbrains.compose.web.dom.AttrsBuilderPool
 import org.jetbrains.compose.web.dom.HtmlStringWriterContext
 import org.jetbrains.compose.web.dom.LocalComposeHtmlContext
 
 /**
  * Composes [content] once into an HTML string without creating browser DOM nodes.
- * With no [key], the backing composition is disposed after the HTML has been written.
- * With a key, the composition and attribute-builder storage are retained for later calls with
- * that key. Keyed calls are not thread-safe, even with different keys.
+ * With no [key], rendering storage is discarded after the HTML has been written.
+ * With a key, storage is retained for later string and streaming calls.
+ * Keyed calls are not thread-safe, even with different keys.
  * Snapshot state changes made while rendering are discarded afterwards.
  * Coroutine effects such as `LaunchedEffect` do not run. `SideEffect` and
  * `DisposableEffect` still execute.
@@ -34,12 +32,14 @@ import org.jetbrains.compose.web.dom.LocalComposeHtmlContext
  *
  * @param hydratable whether to emit text-boundary markers required to hydrate adjacent `Text`
  * nodes. Set to `false` when the output will not be hydrated.
- * @param key when non-null, reuses a composition across calls.
+ * @param key when non-null, reuses rendering storage across calls.
  * @param validateStrictly overrides the default strict-validation setting for this render.
  * @throws IllegalArgumentException if a raw-text element contains unsafe text or element children,
  * serialized `noscript` contents contain a `</noscript>` end tag, or ordinary text, RCDATA,
  * or attribute values contain NUL (U+0000), which HTML parsing cannot preserve.
- * @throws IllegalStateException if another render with the same non-null [key] is in progress.
+ * @throws IllegalStateException if rendering reenters with the same non-null [key], or [content]
+ * accesses `currentRecomposeScope`.
+ * @throws UnsupportedOperationException if [content] uses an unsupported composition operation.
  */
 fun composeHtmlToString(
     hydratable: Boolean = true,
@@ -52,124 +52,87 @@ fun composeHtmlToString(
             content()
         }
     }
-    return if (key == null) {
-        composeHtmlString(hydratable = hydratable, content = validatedContent)
-    } else {
-        composeReusableHtmlString(key, hydratable, content = validatedContent)
-    }
+    return composeHtmlString(hydratable = hydratable, key = key, content = validatedContent)
 }
 
-private const val LARGE_BUFFER_THRESHOLD = 64 * 1024
-private const val BUFFER_SHRINK_FACTOR = 4
-
-private val reusableHtmlCompositions = mutableMapOf<String, ReusableHtmlComposition>()
-
-private class ReusableHtmlComposition {
-    val recomposer = cancelledRecomposer()
-    val composition = ReusableComposition(UnitApplier(), recomposer)
-    val attrsBuilders = AttrsBuilderPool()
-    val output = StringBuilder()
-    var content: (@Composable () -> Unit)? = null
-    var rendering = false
-
-    fun dispose() {
-        composition.dispose()
-        recomposer.close()
-    }
-}
-
-/** Reuses a keyed composition and its attribute builders across string and streaming renders. */
-internal fun composeReusableHtmlString(
-    key: String,
-    hydratable: Boolean,
-    chunkSink: ((StringBuilder) -> Unit)? = null,
-    chunkSize: Int = 2048,
-    content: @Composable () -> Unit,
-): String {
-    val renderer = reusableHtmlCompositions.getOrPut(key, ::ReusableHtmlComposition)
-    check(!renderer.rendering) { "HTML render key \"$key\" is already rendering" }
-
-    renderer.output.setLength(0) // Discard output left by the previous render.
-    val context = HtmlStringWriterContext(hydratable, renderer.attrsBuilders, renderer.output, chunkSink, chunkSize)
-    val snapshot = Snapshot.takeMutableSnapshot()
-    renderer.rendering = true
-    renderer.content = content
-    try {
-        return snapshot.enter {
-            try {
-                renderer.composition.setContentWithReuse {
-                    CompositionLocalProvider(LocalComposeHtmlContext provides context) {
-                        checkNotNull(renderer.content).invoke()
-                    }
-                }
-                context.finish(requireHtmlDocumentRoot = false).also {
-                    // Keep capacity for large renders. Trim after much smaller ones.
-                    if (isOversized(renderer.output.capacity(), context.peakBufferSize)) {
-                        renderer.output.trimToSize()
-                    }
-                }
-            } finally {
-                renderer.composition.deactivate()
-            }
-        }
-    } catch (failure: Throwable) {
-        reusableHtmlCompositions.remove(key)
-        renderer.dispose()
-        throw failure
-    } finally {
-        renderer.content = null
-        renderer.rendering = false
-        snapshot.dispose()
-    }
-}
-
-private fun isOversized(capacity: Int, used: Int): Boolean =
-    capacity > LARGE_BUFFER_THRESHOLD && used.toLong() * BUFFER_SHRINK_FACTOR < capacity
-
-/** Runs a fresh composition with a buffer shared by string and streaming output. */
+/** Shared single-pass composition and writer for fragments, documents, and streaming output. */
 internal fun composeHtmlString(
     hydratable: Boolean = true,
     requireHtmlDocumentRoot: Boolean = false,
     chunkSink: ((StringBuilder) -> Unit)? = null,
     chunkSize: Int = 2048,
     prefix: String = "",
+    key: String? = null,
     content: @Composable () -> Unit,
 ): String {
-    val context = HtmlStringWriterContext(
-        hydratable, output = StringBuilder(prefix), chunkSink = chunkSink, chunkSize = chunkSize,
-    )
-    val snapshot = Snapshot.takeMutableSnapshot()
+    val renderer = if (key == null) HtmlRenderer(reusable = false) else renderers.getOrPut(key) { HtmlRenderer() }
+    return renderer.render(hydratable, requireHtmlDocumentRoot, chunkSink, chunkSize, prefix, content)
+}
 
-    return try {
-        snapshot.enter {
-            val recomposer = cancelledRecomposer()
-            val composition = ControlledComposition(applier = UnitApplier(), parent = recomposer)
+private const val LARGE_BUFFER_THRESHOLD = 64 * 1024
+private const val BUFFER_SHRINK_FACTOR = 4
+private val renderers = mutableMapOf<String, HtmlRenderer>()
 
-            try {
-                composition.setContent {
-                    CompositionLocalProvider(LocalComposeHtmlContext provides context) {
-                        content()
+/** Owns reusable rendering storage for a key, or for a single unkeyed render. */
+internal class HtmlRenderer(private val reusable: Boolean = true) {
+    private var attrsBuilders = AttrsBuilderPool()
+    private var output = StringBuilder()
+    private var composer = SinglePassComposer()
+    private var rendering = false
+
+    internal val bufferCapacity: Int get() = output.capacity()
+
+    fun render(
+        hydratable: Boolean,
+        requireHtmlDocumentRoot: Boolean,
+        chunkSink: ((StringBuilder) -> Unit)?,
+        chunkSize: Int,
+        prefix: String,
+        content: @Composable () -> Unit,
+    ): String {
+        check(!rendering) { "Reentrant HTML rendering with the same key is not supported" }
+        val snapshot = Snapshot.takeMutableSnapshot()
+        rendering = true
+        try {
+            output.setLength(0)
+            output.append(prefix)
+            composer.reset()
+            val context = HtmlStringWriterContext(hydratable, attrsBuilders, output, chunkSink, chunkSize)
+            return snapshot.enter {
+                var failure: Throwable? = null
+                try {
+                    val wrapped: @Composable () -> Unit = {
+                        CompositionLocalProvider(LocalComposeHtmlContext provides context) { content() }
                     }
+                    @Suppress("UNCHECKED_CAST")
+                    (wrapped as (Composer, Int) -> Unit)(composer, 1)
+                    composer.applyEffects()
+                    context.finish(requireHtmlDocumentRoot).also {
+                        if (isOversized(output.capacity(), context.peakBufferSize)) {
+                            output.trimToSize()
+                        }
+                    }
+                } catch (cause: Throwable) {
+                    failure = cause
+                    throw cause
+                } finally {
+                    composer.dispose(failure)
                 }
-                context.finish(requireHtmlDocumentRoot)
-            } finally {
-                composition.dispose()
-                recomposer.close()
             }
+        } catch (failure: Throwable) {
+            // Only retained renderers need replacement storage after a failed request.
+            if (reusable) {
+                attrsBuilders = AttrsBuilderPool()
+                output = StringBuilder()
+                composer = SinglePassComposer()
+            }
+            throw failure
+        } finally {
+            rendering = false
+            snapshot.dispose()
         }
-    } finally {
-        snapshot.dispose()
     }
 }
 
-/** Composes the initial content without starting coroutine effects. */
-private fun cancelledRecomposer() = Recomposer(Dispatchers.Default).apply { cancel() }
-
-/** [HtmlStringWriterContext] emits no Compose nodes, but Composition still requires an applier. */
-private class UnitApplier : AbstractApplier<Unit>(Unit) {
-    override fun insertTopDown(index: Int, instance: Unit) = Unit
-    override fun insertBottomUp(index: Int, instance: Unit) = Unit
-    override fun remove(index: Int, count: Int) = Unit
-    override fun move(from: Int, to: Int, count: Int) = Unit
-    override fun onClear() = Unit
-}
+private fun isOversized(capacity: Int, used: Int): Boolean =
+    capacity > LARGE_BUFFER_THRESHOLD && used.toLong() * BUFFER_SHRINK_FACTOR < capacity

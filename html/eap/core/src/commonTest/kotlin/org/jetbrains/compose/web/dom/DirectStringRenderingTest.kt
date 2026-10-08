@@ -110,12 +110,11 @@ class DirectStringRenderingTest {
     }
 
     @Test
-    fun movableContentHasTheExistingOneShotRendererLimitation() {
+    fun movableContentRendersInline() {
         val movable = movableContentOf { Span { Text("moved") } }
         val content: @Composable () -> Unit = { Div { movable() }; P { Text("after") } }
-        // The cancelled SSR recomposer has never inserted deferred movable content.
-        assertEquals("<div></div><p>after</p>", composeHtmlToString(content = content))
-        assertEquals("<div></div><p>after</p>", composeHtmlToString(key = "movable", content = content))
+        assertEquals("<div><span>moved</span></div><p>after</p>", composeHtmlToString(content = content))
+        assertEquals("<div><span>moved</span></div><p>after</p>", composeHtmlToString(key = "movable", content = content))
     }
 
     @Test
@@ -135,22 +134,15 @@ class DirectStringRenderingTest {
     }
 
     @Test
-    fun capturedCompositionLocalsAndCompositionContextsRemainSupported() {
-        val language = staticCompositionLocalOf { "en" }
-        val content: @Composable () -> Unit = {
-            CompositionLocalProvider(language provides "de") {
-                val captured = currentCompositionLocalContext
-                rememberCompositionContext()
-                CompositionLocalProvider(language provides "fr") {
-                    CompositionLocalProvider(captured) {
-                        P { Text(language.current) }
-                    }
-                }
+    fun compositionContextCaptureFailsExplicitly() {
+        for (renderKey in listOf(null, "captured-locals")) {
+            assertFailsWith<UnsupportedOperationException> {
+                composeHtmlToString(key = renderKey) { currentCompositionLocalContext }
             }
-        }
-        assertEquals("<p>de</p>", composeHtmlToString(content = content))
-        repeat(2) {
-            assertEquals("<p>de</p>", composeHtmlToString(key = "captured-locals", content = content))
+            assertFailsWith<UnsupportedOperationException> {
+                composeHtmlToString(key = renderKey) { rememberCompositionContext() }
+            }
+            assertEquals("<p>recovered</p>", composeHtmlToString(key = renderKey) { P { Text("recovered") } })
         }
     }
 

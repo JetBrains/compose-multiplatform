@@ -1,3 +1,8 @@
+/*
+ * Copyright 2020-2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.compose.web
 
 import androidx.compose.runtime.Composable
@@ -43,7 +48,7 @@ fun renderHydratedDocument(
  * may exceed the target. [sink] runs synchronously, may block, and receives no empty chunks.
  * Emitted output cannot be retracted on failure, including document validation after composition.
  *
- * Each call disposes its composition. Effects, snapshots, and buffering follow [composeHtmlToStream].
+ * Each call releases its remembered state. Effects, snapshots, and buffering follow [composeHtmlToStream].
  *
  * @param validateStrictly overrides validation and records the choice in hydration state.
  * @throws IllegalArgumentException if [chunkSize] is not positive or [content] is not a valid document.

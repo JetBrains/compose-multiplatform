@@ -19,9 +19,9 @@ import java.io.Writer
  * intact. Elements requiring content validation are emitted only after validation succeeds.
  * A write can exceed [chunkSize]. No empty writes are made.
  *
- * Composition reuse, effects, validation, and failure handling follow [composeHtmlToStream]
- * with a String sink. Keyed renders are not thread-safe. Output already written cannot be
- * retracted on failure, and a failed keyed composition is disposed.
+ * Storage reuse, effects, validation, and failure handling follow [composeHtmlToStream]
+ * with a String sink. Keyed renders are not thread-safe, even with different keys.
+ * Output already written cannot be retracted on failure, and failed rendering storage is reset.
  */
 fun composeHtmlToStream(
     writer: Writer,
@@ -38,11 +38,9 @@ fun composeHtmlToStream(
             content()
         }
     }
-    if (key == null) {
-        composeHtmlString(hydratable = hydratable, chunkSize = chunkSize, chunkSink = chunkSink, content = validatedContent)
-    } else {
-        composeReusableHtmlString(key, hydratable, chunkSize = chunkSize, chunkSink = chunkSink, content = validatedContent)
-    }
+    composeHtmlString(
+        hydratable = hydratable, key = key, chunkSink = chunkSink, chunkSize = chunkSize, content = validatedContent,
+    )
 }
 
 /** Creates a Writer sink that reuses character storage across chunks within one render. */
