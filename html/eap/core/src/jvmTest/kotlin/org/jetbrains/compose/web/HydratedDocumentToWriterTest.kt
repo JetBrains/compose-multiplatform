@@ -16,6 +16,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNotSame
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
@@ -73,16 +75,22 @@ class HydratedDocumentToWriterTest {
                 }
             }
         }
+        val key = "document-writer-reuse"
+        val pool = assertNotNull(getHtmlRendererPool(key))
+        val renderer = pool.borrow()
+        pool.recycle(renderer)
         for (strict in listOf(false, true)) {
             for (size in listOf(1, 4, 32, 2048, 4096, Int.MAX_VALUE)) {
                 val writer = RecordingWriter()
                 val strings = mutableListOf<String>()
-                renderHydratedDocumentToStream(strings::add, size, strict, content)
-                renderHydratedDocumentToStream(writer, size, strict, content)
+                renderHydratedDocumentToStream(strings::add, size, strict, key = key, content = content)
+                renderHydratedDocumentToStream(writer, size, strict, key = key, content = content)
                 assertEquals(strings, writer.chunks)
                 assertEquals(renderHydratedDocument(strict, content), writer.chunks.joinToString(""))
                 assertEquals(0, writer.flushes)
                 assertEquals(0, writer.closes)
+                assertSame(renderer, pool.borrow())
+                pool.recycle(renderer)
             }
         }
     }
@@ -108,6 +116,10 @@ class HydratedDocumentToWriterTest {
 
     @Test
     fun propagatesWriterFailuresDuringCompositionAndCanRenderAgain() {
+        val key = "document-writer-failure"
+        val pool = assertNotNull(getHtmlRendererPool(key))
+        val renderer = pool.borrow()
+        pool.recycle(renderer)
         val failure = IOException("write failed")
         val writer = object : Writer() {
             override fun write(chars: CharArray, offset: Int, length: Int) { throw failure }
@@ -116,13 +128,16 @@ class HydratedDocumentToWriterTest {
         }
         var childrenComposed = false
         assertSame(failure, assertFailsWith<IOException> {
-            renderHydratedDocumentToStream(writer, chunkSize = 1) {
+            renderHydratedDocumentToStream(writer, chunkSize = 1, key = key) {
                 Html { childrenComposed = true }
             }
         })
         assertFalse(childrenComposed)
+        val replacement = pool.borrow()
+        assertNotSame(renderer, replacement)
+        pool.recycle(replacement)
         val nextWriter = RecordingWriter()
-        renderHydratedDocumentToStream(nextWriter) { Html { Body { Text("next") } } }
+        renderHydratedDocumentToStream(nextWriter, key = key) { Html { Body { Text("next") } } }
         assertEquals("<!doctype html><html><body>next</body></html>", nextWriter.chunks.single())
     }
 }
