@@ -45,7 +45,7 @@ internal interface ComposeEnvironment {
 internal val DefaultComposeEnvironment = object : ComposeEnvironment {
     @Composable
     override fun rememberEnvironment(): ResourceEnvironment {
-        val composeLocale = Locale.current
+        val composeLocale = rememberResourceLocale()
         val composeTheme = isSystemInDarkTheme()
         val composeDensity = LocalDensity.current
 
@@ -61,6 +61,9 @@ internal val DefaultComposeEnvironment = object : ComposeEnvironment {
         }
     }
 }
+
+@Composable
+internal expect fun rememberResourceLocale(): Locale
 
 //ComposeEnvironment provider will be overridden for tests
 internal val LocalComposeEnvironment = staticCompositionLocalOf { DefaultComposeEnvironment }
