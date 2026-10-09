@@ -26,7 +26,7 @@ import org.jetbrains.compose.web.internal.unsafeCast
  */
 internal class HtmlStringWriterContext(
     private val hydratable: Boolean,
-    private val attrsBuilders: AttrsBuilderPool? = null,
+    private val attrsBuilders: AttrsBuilderPool = AttrsBuilderPool(),
     private val output: StringBuilder = StringBuilder(),
     private val chunkSink: ((StringBuilder) -> Unit)? = null,
     private val chunkSize: Int = 2048,
@@ -40,7 +40,7 @@ internal class HtmlStringWriterContext(
     // These elements must keep their content in the shared buffer until their end tag is written.
     private var bufferedElementDepth = 0
 
-    // Attribute builders are reused by element position across keyed renders.
+    // Reuse attribute channels initialized for each element position across keyed renders.
     private var attrsBuilderIndex = 0
 
     // A null tag name means that output is being written at the root.
@@ -182,7 +182,7 @@ internal class HtmlStringWriterContext(
                 "Hydrated document content must produce exactly one html element"
             }
         }
-        attrsBuilders?.trim(attrsBuilderIndex)
+        attrsBuilders.trim(attrsBuilderIndex)
         if (!streaming) {
             peakBufferSize = output.length
             return output.toString()
@@ -205,14 +205,16 @@ internal class HtmlStringWriterContext(
         if (currentTagName == null) recordRootChild(isHtml = tagName == "html")
         if (currentNamespace == HtmlNamespace) requireHtmlParserStableTableElement(currentTagName, tagName)
 
-        val attrsBuilder = attrsBuilders?.builder<TElement>(attrsBuilderIndex++) ?: AttrsScopeBuilder()
-        applyAttrs?.invoke(attrsBuilder)
-        val formState = attrsBuilder.propertyUpdatesOrEmpty.formControlState(tagName, namespace)
-        val hasScriptSource = output.appendStartTag(tagName, namespace, attrsBuilder, validate, formState)
-        if (attrsBuilders != null) attrsBuilder.reset()
-
-        pendingLeadingNewline = false // A child tag starts with '<', which needs no LF repair.
-        return hasScriptSource to formState?.textContent
+        val builder = attrsBuilders.builder<TElement>(attrsBuilderIndex++)
+        try {
+            applyAttrs?.invoke(builder)
+            val formState = builder.propertyUpdatesOrEmpty.formControlState(tagName, namespace)
+            val hasScriptSource = output.appendStartTag(tagName, namespace, builder, validate, formState)
+            pendingLeadingNewline = false // A child tag starts with '<', which needs no LF repair.
+            return hasScriptSource to formState?.textContent
+        } finally {
+            builder.reset()
+        }
     }
 
     private fun writeEndTag(
@@ -268,7 +270,7 @@ internal class HtmlStringWriterContext(
     private fun <TElement : Element> elementScope(): ElementScope<TElement> = elementScope.unsafeCast()
 }
 
-/** Reuses attribute builders across keyed renders, indexed by element order, without retaining their values. */
+/** Reuses attribute builders by element order without retaining their values between elements. */
 internal class AttrsBuilderPool {
     private val builders = mutableListOf<AttrsScopeBuilder<*>>()
 
@@ -277,7 +279,7 @@ internal class AttrsBuilderPool {
         return builders[index].unsafeCast()
     }
 
-    /** Drops builders beyond [size] that the last render no longer needed. */
+    /** Drops builders beyond [size] when the last successful render used fewer elements. */
     fun trim(size: Int) {
         if (size < builders.size) builders.subList(size, builders.size).clear()
     }

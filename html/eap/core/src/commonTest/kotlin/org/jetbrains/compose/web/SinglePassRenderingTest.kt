@@ -50,6 +50,15 @@ class SinglePassRenderingTest {
     }
 
     @Test
+    fun stringRenderingDoesNotRequireAPositiveChunkSize() {
+        for (size in listOf(0, -1)) {
+            assertEquals("<div>complete</div>", composeHtmlString(chunkSize = size) {
+                Div { Text("complete") }
+            })
+        }
+    }
+
+    @Test
     fun nestedComputedDefaultAndNullableLocalsRestoreTheirScopes() {
         val number = compositionLocalOf { 2 }
         val twice = compositionLocalWithComputedDefaultOf { number.currentValue * 2 }
@@ -375,20 +384,18 @@ class SinglePassRenderingTest {
     }
 
     @Test
-    fun nestedRenderRestoresContextAndSameKeyReentryIsRejected() {
-        assertEquals("<div>outer<!--c-->&lt;span&gt;inner&lt;/span&gt;<!--c-->tail</div>", composeHtmlToString(key = "outer") {
-            Div {
-                Text("outer")
-                Text(composeHtmlToString(key = "inner") { Span { Text("inner") } })
-                Text("tail")
-            }
-        })
-        assertFailsWith<IllegalStateException> {
-            composeHtmlToString(key = "reentrant") {
-                composeHtmlToString(key = "reentrant") { Text("bad") }
-            }
+    fun nestedRenderRestoresContextWithTheSameOrDifferentKey() {
+        for (innerKey in listOf("inner", "outer")) {
+            assertEquals("<div>outer<!--c-->&lt;span&gt;inner&lt;/span&gt;<!--c-->tail</div>",
+                composeHtmlToString(key = "outer") {
+                    Div {
+                        Text("outer")
+                        Text(composeHtmlToString(key = innerKey) { Span { Text("inner") } })
+                        Text("tail")
+                    }
+                })
         }
-        assertEquals("ok", composeHtmlToString(key = "reentrant") { Text("ok") })
+        assertEquals("ok", composeHtmlToString(key = "outer") { Text("ok") })
     }
 
     private enum class HashKey { First, Second }

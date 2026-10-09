@@ -124,9 +124,10 @@ internal fun StringBuilder.appendStartTag(
 ): Boolean {
     // Class validation runs even when an explicit class attribute overrides the class list.
     val classValue = builder.classes.toClassAttributeValue(validate)
-    val attributes = builder.collect().withFormState(formState)
+    val attributes = builder.collect().withFormState(formState).ifEmpty { emptyMap() }
     validateStringHtmlAttributes(attributes, namespace, validate, builder.hydrationProtocolAttributes)
     val hasScriptSource = tagName == "script" && attributes.keys.any { it.equals("src", ignoreCase = true) }
+
     append('<').append(tagName)
     attributes.forEach { (name, value) -> appendAttribute(tagName, namespace, name, value) }
     if ("class" !in attributes && classValue != null) appendAttribute(tagName, namespace, "class", classValue)

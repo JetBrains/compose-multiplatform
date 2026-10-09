@@ -17,28 +17,26 @@ import org.jetbrains.compose.web.dom.LocalComposeHtmlContext
 
 /**
  * Composes [content] once into an HTML string without creating browser DOM nodes.
- * With no [key], rendering storage is discarded after the HTML has been written.
- * With a key, storage is retained for later string and streaming calls.
- * Keyed calls are not thread-safe, even with different keys.
- * Snapshot state changes made while rendering are discarded afterwards.
- * Coroutine effects such as `LaunchedEffect` do not run. `SideEffect` and
- * `DisposableEffect` still execute.
+ *
+ * Snapshot state changes are discarded after rendering. Coroutine effects such as
+ * `LaunchedEffect` do not run. `SideEffect` and `DisposableEffect` still execute.
+ *
+ * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
+ * See [composeHtmlToStream] for validation and failure handling.
  *
  * Inline styles preserve CSS fallbacks but do not fully emulate CSSOM validation and mutation.
  * Custom callbacks passed to `AttrsScope.prop(...)` are ignored during string rendering.
  *
- * On the JVM or Node, set `COMPOSE_HTML_VALIDATE_STRICTLY=true` to enable additional class and
- * duplicate foreign-attribute checks by default.
+ * On the JVM or Node.js, set `COMPOSE_HTML_VALIDATE_STRICTLY=true` to enable additional class and
+ * duplicate foreign-attribute checks.
  *
- * @param hydratable whether to emit text-boundary markers required to hydrate adjacent `Text`
+ * @param hydratable whether to emit text-boundary markers needed to hydrate adjacent `Text`
  * nodes. Set to `false` when the output will not be hydrated.
- * @param key when non-null, reuses rendering storage across calls.
+ * @param key optional key for reusing rendering storage across calls.
+ * Use a stable key per template. Reuse is best-effort. `null` disables pooling.
  * @param validateStrictly overrides the default strict-validation setting for this render.
- * @throws IllegalArgumentException if a raw-text element contains unsafe text or element children,
- * serialized `noscript` contents contain a `</noscript>` end tag, or ordinary text, RCDATA,
- * or attribute values contain NUL (U+0000), which HTML parsing cannot preserve.
- * @throws IllegalStateException if rendering reenters with the same non-null [key], or [content]
- * accesses `currentRecomposeScope`.
+ * @throws IllegalArgumentException if [content] cannot be safely serialized as HTML.
+ * @throws IllegalStateException if [content] accesses `currentRecomposeScope`.
  * @throws UnsupportedOperationException if [content] uses an unsupported composition operation.
  */
 fun composeHtmlToString(
@@ -47,12 +45,7 @@ fun composeHtmlToString(
     validateStrictly: Boolean = defaultHtmlValidationMode() == HtmlValidationMode.Strict,
     content: @Composable () -> Unit,
 ): String {
-    val validatedContent: @Composable () -> Unit = {
-        CompositionLocalProvider(LocalHtmlValidationMode provides htmlValidationMode(validateStrictly)) {
-            content()
-        }
-    }
-    return composeHtmlString(hydratable = hydratable, key = key, content = validatedContent)
+    return composeHtmlString(hydratable = hydratable, key = key, content = htmlValidatedContent(validateStrictly, content))
 }
 
 /** Shared single-pass composition and writer for fragments, documents, and streaming output. */
@@ -65,22 +58,29 @@ internal fun composeHtmlString(
     key: String? = null,
     content: @Composable () -> Unit,
 ): String {
-    val renderer = if (key == null) HtmlRenderer(reusable = false) else renderers.getOrPut(key) { HtmlRenderer() }
-    return renderer.render(hydratable, requireHtmlDocumentRoot, chunkSink, chunkSize, prefix, content)
+    if (chunkSink != null) require(chunkSize > 0) { "chunkSize must be positive" }
+
+    val pool = getHtmlRendererPool(key)
+    val renderer = pool?.borrow() ?: HtmlRenderer()
+
+    // Return storage to the pool only after rendering, effect cleanup and snapshot disposal succeed.
+    val result = renderer.render(hydratable, requireHtmlDocumentRoot, chunkSink, chunkSize, prefix, content)
+    pool?.recycle(renderer)
+    return result
 }
 
-private const val LARGE_BUFFER_THRESHOLD = 64 * 1024
-private const val BUFFER_SHRINK_FACTOR = 4
-private val renderers = mutableMapOf<String, HtmlRenderer>()
+private val renderers = HtmlRendererPools(maxKeys = 64, maxIdleRenderers = 8)
 
-/** Owns reusable rendering storage for a key, or for a single unkeyed render. */
-internal class HtmlRenderer(private val reusable: Boolean = true) {
-    private var attrsBuilders = AttrsBuilderPool()
+internal fun getHtmlRendererPool(key: String?): HtmlRendererPool? = if (key == null) null else renderers[key]
+
+/** Storage exclusively owned by one active render, then optionally returned to a pool. */
+internal class HtmlRenderer {
+    private val attrsBuilders = AttrsBuilderPool()
     private var output = StringBuilder()
-    private var composer = SinglePassComposer()
-    private var rendering = false
+    private val composer = SinglePassComposer()
 
     internal val bufferCapacity: Int get() = output.capacity()
+    internal val bufferLength: Int get() = output.length
 
     fun render(
         hydratable: Boolean,
@@ -90,13 +90,9 @@ internal class HtmlRenderer(private val reusable: Boolean = true) {
         prefix: String,
         content: @Composable () -> Unit,
     ): String {
-        check(!rendering) { "Reentrant HTML rendering with the same key is not supported" }
         val snapshot = Snapshot.takeMutableSnapshot()
-        rendering = true
         try {
-            output.setLength(0)
             output.append(prefix)
-            composer.reset()
             val context = HtmlStringWriterContext(hydratable, attrsBuilders, output, chunkSink, chunkSize)
             return snapshot.enter {
                 var failure: Throwable? = null
@@ -109,7 +105,8 @@ internal class HtmlRenderer(private val reusable: Boolean = true) {
                     composer.applyEffects()
                     context.finish(requireHtmlDocumentRoot).also {
                         if (isOversized(output.capacity(), context.peakBufferSize)) {
-                            output.trimToSize()
+                            if (chunkSink == null) output.trimToSize()
+                            else output = StringBuilder(context.peakBufferSize)
                         }
                     }
                 } catch (cause: Throwable) {
@@ -119,18 +116,23 @@ internal class HtmlRenderer(private val reusable: Boolean = true) {
                     composer.dispose(failure)
                 }
             }
-        } catch (failure: Throwable) {
-            // Only retained renderers need replacement storage after a failed request.
-            if (reusable) {
-                attrsBuilders = AttrsBuilderPool()
-                output = StringBuilder()
-                composer = SinglePassComposer()
-            }
-            throw failure
         } finally {
-            rendering = false
-            snapshot.dispose()
+            try {
+                snapshot.dispose()
+            } finally {
+                // Clear the output before reuse. The underlying buffer is not erased.
+                output.setLength(0)
+            }
         }
+    }
+}
+
+internal fun htmlValidatedContent(
+    validateStrictly: Boolean,
+    content: @Composable () -> Unit,
+): @Composable () -> Unit = {
+    CompositionLocalProvider(LocalHtmlValidationMode provides htmlValidationMode(validateStrictly)) {
+        content()
     }
 }
 

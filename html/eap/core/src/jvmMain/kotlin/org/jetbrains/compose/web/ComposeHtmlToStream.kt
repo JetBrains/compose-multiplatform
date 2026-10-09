@@ -8,7 +8,6 @@
 package org.jetbrains.compose.web
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import java.io.Writer
 
 /**
@@ -19,9 +18,19 @@ import java.io.Writer
  * intact. Elements requiring content validation are emitted only after validation succeeds.
  * A write can exceed [chunkSize]. No empty writes are made.
  *
- * Storage reuse, effects, validation, and failure handling follow [composeHtmlToStream]
- * with a String sink. Keyed renders are not thread-safe, even with different keys.
- * Output already written cannot be retracted on failure, and failed rendering storage is reset.
+ * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
+ * See [composeHtmlToStream] for validation and failure handling.
+ *
+ * Output already written cannot be retracted on failure, and failed rendering storage is discarded.
+ *
+ * @param writer receives the HTML chunks. It is not flushed or closed.
+ * @param chunkSize target minimum chunk size in UTF-16 code units. Defaults to 2048.
+ * @param hydratable whether to emit text-boundary markers needed to hydrate adjacent `Text` calls.
+ * Set to `false` when the output will not be hydrated.
+ * @param key optional key for reusing rendering storage across calls.
+ * Use a stable key per template. Reuse is best-effort. `null` disables pooling.
+ * @param validateStrictly overrides the default strict-validation setting for this render.
+ * @param content the composable content to render once.
  */
 fun composeHtmlToStream(
     writer: Writer,
@@ -31,15 +40,10 @@ fun composeHtmlToStream(
     validateStrictly: Boolean = defaultHtmlValidationMode() == HtmlValidationMode.Strict,
     content: @Composable () -> Unit,
 ) {
-    require(chunkSize > 0) { "chunkSize must be positive" }
     val chunkSink = htmlWriterSink(writer)
-    val validatedContent: @Composable () -> Unit = {
-        CompositionLocalProvider(LocalHtmlValidationMode provides htmlValidationMode(validateStrictly)) {
-            content()
-        }
-    }
     composeHtmlString(
-        hydratable = hydratable, key = key, chunkSink = chunkSink, chunkSize = chunkSize, content = validatedContent,
+        hydratable = hydratable, key = key, chunkSink = chunkSink, chunkSize = chunkSize,
+        content = htmlValidatedContent(validateStrictly, content),
     )
 }
 
