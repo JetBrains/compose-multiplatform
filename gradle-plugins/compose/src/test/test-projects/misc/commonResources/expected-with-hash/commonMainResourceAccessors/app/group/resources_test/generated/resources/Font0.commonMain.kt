@@ -18,7 +18,7 @@ internal val Res.font.emptyFont: FontResource by lazy {
       FontResource("font:emptyFont", setOf(
         ResourceItem(setOf(LanguageQualifier("en"), ), "${MD}font-en/emptyFont.otf", -1, -1),
         ResourceItem(setOf(), "${MD}font/emptyFont.otf", -1, -1),
-      ))
+      ), Res.supportedLocales)
     }
 
 @InternalResourceApi

@@ -5,22 +5,14 @@ import platform.UIKit.UIScreen
 import platform.UIKit.UIUserInterfaceStyle
 
 internal actual fun getSystemEnvironment(): ResourceEnvironment {
-    val locale = NSLocale.preferredLanguages.firstOrNull()
-        ?.let { NSLocale(it as String) }
-        ?: NSLocale.currentLocale
-
-    val languageCode = locale.languageCode
-    val scriptCode = locale.scriptCode
-    val regionCode = locale.objectForKey(NSLocaleCountryCode) as? String
+    val locales = getSystemResourceLocales()
     val mainScreen = UIScreen.mainScreen
     val isDarkTheme = mainScreen.traitCollection().userInterfaceStyle == UIUserInterfaceStyle.UIUserInterfaceStyleDark
 
     //there is no an API to get a physical screen size and calculate a real DPI
     val density = mainScreen.scale.toFloat()
     return ResourceEnvironment(
-        language = LanguageQualifier(languageCode),
-        script = ScriptQualifier(scriptCode.orEmpty()),
-        region = RegionQualifier(regionCode.orEmpty()),
+        locales = locales,
         theme = ThemeQualifier.selectByValue(isDarkTheme),
         density = DensityQualifier.selectByDensity(density)
     )

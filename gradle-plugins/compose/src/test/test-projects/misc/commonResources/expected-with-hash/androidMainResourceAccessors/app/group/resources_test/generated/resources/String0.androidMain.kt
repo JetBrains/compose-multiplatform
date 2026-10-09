@@ -16,7 +16,7 @@ private const val MD: String = "composeResources/app.group.resources_test.genera
 internal val Res.string.android_str: StringResource by lazy {
       StringResource("string:android_str", "android_str", setOf(
         ResourceItem(setOf(), "${MD}values/strings.androidMain.cvr", 10, 39),
-      ))
+      ), Res.supportedLocales)
     }
 
 @InternalResourceApi

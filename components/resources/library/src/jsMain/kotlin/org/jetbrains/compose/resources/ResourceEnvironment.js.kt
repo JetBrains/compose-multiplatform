@@ -18,15 +18,24 @@ private external class Intl {
 }
 
 internal actual fun getSystemEnvironment(): ResourceEnvironment {
-    val locale = Intl.Locale(window.navigator.language)
+    val locales = getSystemResourceLocales()
     val isDarkTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
     //96 - standard browser DPI https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio
     val dpi: Int = (window.devicePixelRatio * 96).toInt()
     return ResourceEnvironment(
-        language = LanguageQualifier(locale.language),
-        script = ScriptQualifier(locale.script ?: ""),
-        region = RegionQualifier(locale.region ?: ""),
+        locales = locales,
         theme = ThemeQualifier.selectByValue(isDarkTheme),
         density = DensityQualifier.selectByValue(dpi)
     )
 }
+
+
+internal actual fun getSystemResourceLocales(): List<ResourceLocale> =
+    window.navigator.languages.asList().ifEmpty { listOf(window.navigator.language) }.map { tag ->
+        val locale = Intl.Locale(tag)
+        ResourceLocale(
+            LanguageQualifier(locale.language),
+            ScriptQualifier(locale.script.orEmpty()),
+            RegionQualifier(locale.region.orEmpty())
+        )
+    }

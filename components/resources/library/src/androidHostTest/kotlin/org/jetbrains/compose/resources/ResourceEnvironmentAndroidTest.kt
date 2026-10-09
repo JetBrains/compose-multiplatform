@@ -45,7 +45,25 @@ class ResourceEnvironmentAndroidTest {
         assertEquals("fr", LocaleList.getDefault()[0].language)
         assertEquals("es", Locale.getDefault().language)
         assertEquals("es", getSystemEnvironment().language.language)
+        assertEquals(listOf("es", "fr"), getSystemResourceLocales().map { it.language.language })
         assertMatchesAndroid(context, translatedResource, "cmp6840_translated", "es")
+    }
+
+    @Test
+    fun preservesConfigurationPreferencesAndSelectsSupportedLanguage() {
+        val configuration = Configuration().apply {
+            setLocales(LocaleList(Locale.forLanguageTag("ca-ES"), Locale.forLanguageTag("es-ES")))
+        }
+        var environment: ResourceEnvironment? = null
+        composeRule.setContent {
+            CompositionLocalProvider(LocalConfiguration provides configuration) {
+                environment = rememberResourceEnvironment()
+            }
+        }
+        composeRule.runOnIdle {
+            assertEquals(listOf("ca", "es"), environment!!.locales.map { it.language.language })
+            assertEquals("cmp6840/es", translatedResource.getResourceItemByEnvironment(environment!!).path)
+        }
     }
 
     @Test

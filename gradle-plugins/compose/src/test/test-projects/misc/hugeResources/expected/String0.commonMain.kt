@@ -96,7 +96,7 @@ internal val Res.string.str_0: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 10, 21),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 10, 21),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 10, 21),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_1: StringResource by lazy {
@@ -182,7 +182,7 @@ internal val Res.string.str_1: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 332062, 21),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 332062, 21),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 332062, 21),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10: StringResource by lazy {
@@ -268,7 +268,7 @@ internal val Res.string.str_10: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 33212, 22),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 33212, 22),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 33212, 22),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_100: StringResource by lazy {
@@ -354,7 +354,7 @@ internal val Res.string.str_100: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 3322, 27),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 3322, 27),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 3322, 27),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_1000: StringResource by lazy {
@@ -440,7 +440,7 @@ internal val Res.string.str_1000: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 332, 28),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 332, 28),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 332, 28),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10000: StringResource by lazy {
@@ -526,7 +526,7 @@ internal val Res.string.str_10000: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 32, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 32, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 32, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10001: StringResource by lazy {
@@ -612,7 +612,7 @@ internal val Res.string.str_10001: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 62, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 62, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 62, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10002: StringResource by lazy {
@@ -698,7 +698,7 @@ internal val Res.string.str_10002: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 92, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 92, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 92, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10003: StringResource by lazy {
@@ -784,7 +784,7 @@ internal val Res.string.str_10003: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 122, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 122, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 122, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10004: StringResource by lazy {
@@ -870,7 +870,7 @@ internal val Res.string.str_10004: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 152, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 152, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 152, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10005: StringResource by lazy {
@@ -956,7 +956,7 @@ internal val Res.string.str_10005: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 182, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 182, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 182, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10006: StringResource by lazy {
@@ -1042,7 +1042,7 @@ internal val Res.string.str_10006: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 212, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 212, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 212, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10007: StringResource by lazy {
@@ -1128,7 +1128,7 @@ internal val Res.string.str_10007: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 242, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 242, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 242, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10008: StringResource by lazy {
@@ -1214,7 +1214,7 @@ internal val Res.string.str_10008: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 272, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 272, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 272, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10009: StringResource by lazy {
@@ -1300,7 +1300,7 @@ internal val Res.string.str_10009: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 302, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 302, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 302, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_1001: StringResource by lazy {
@@ -1386,7 +1386,7 @@ internal val Res.string.str_1001: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 661, 28),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 661, 28),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 661, 28),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10010: StringResource by lazy {
@@ -1472,7 +1472,7 @@ internal val Res.string.str_10010: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 361, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 361, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 361, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10011: StringResource by lazy {
@@ -1558,7 +1558,7 @@ internal val Res.string.str_10011: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 391, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 391, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 391, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10012: StringResource by lazy {
@@ -1644,7 +1644,7 @@ internal val Res.string.str_10012: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 421, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 421, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 421, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10013: StringResource by lazy {
@@ -1730,7 +1730,7 @@ internal val Res.string.str_10013: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 451, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 451, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 451, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10014: StringResource by lazy {
@@ -1816,7 +1816,7 @@ internal val Res.string.str_10014: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 481, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 481, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 481, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10015: StringResource by lazy {
@@ -1902,7 +1902,7 @@ internal val Res.string.str_10015: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 511, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 511, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 511, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10016: StringResource by lazy {
@@ -1988,7 +1988,7 @@ internal val Res.string.str_10016: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 541, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 541, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 541, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10017: StringResource by lazy {
@@ -2074,7 +2074,7 @@ internal val Res.string.str_10017: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 571, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 571, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 571, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10018: StringResource by lazy {
@@ -2160,7 +2160,7 @@ internal val Res.string.str_10018: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 601, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 601, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 601, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10019: StringResource by lazy {
@@ -2246,7 +2246,7 @@ internal val Res.string.str_10019: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 631, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 631, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 631, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_1002: StringResource by lazy {
@@ -2332,7 +2332,7 @@ internal val Res.string.str_1002: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 990, 28),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 990, 28),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 990, 28),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10020: StringResource by lazy {
@@ -2418,7 +2418,7 @@ internal val Res.string.str_10020: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 690, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 690, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 690, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10021: StringResource by lazy {
@@ -2504,7 +2504,7 @@ internal val Res.string.str_10021: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 720, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 720, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 720, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10022: StringResource by lazy {
@@ -2590,7 +2590,7 @@ internal val Res.string.str_10022: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 750, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 750, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 750, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10023: StringResource by lazy {
@@ -2676,7 +2676,7 @@ internal val Res.string.str_10023: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 780, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 780, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 780, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10024: StringResource by lazy {
@@ -2762,7 +2762,7 @@ internal val Res.string.str_10024: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 810, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 810, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 810, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10025: StringResource by lazy {
@@ -2848,7 +2848,7 @@ internal val Res.string.str_10025: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 840, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 840, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 840, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10026: StringResource by lazy {
@@ -2934,7 +2934,7 @@ internal val Res.string.str_10026: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 870, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 870, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 870, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10027: StringResource by lazy {
@@ -3020,7 +3020,7 @@ internal val Res.string.str_10027: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 900, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 900, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 900, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10028: StringResource by lazy {
@@ -3106,7 +3106,7 @@ internal val Res.string.str_10028: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 930, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 930, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 930, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10029: StringResource by lazy {
@@ -3192,7 +3192,7 @@ internal val Res.string.str_10029: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 960, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 960, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 960, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_1003: StringResource by lazy {
@@ -3278,7 +3278,7 @@ internal val Res.string.str_1003: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1319, 28),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1319, 28),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1319, 28),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10030: StringResource by lazy {
@@ -3364,7 +3364,7 @@ internal val Res.string.str_10030: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1019, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1019, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1019, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10031: StringResource by lazy {
@@ -3450,7 +3450,7 @@ internal val Res.string.str_10031: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1049, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1049, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1049, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10032: StringResource by lazy {
@@ -3536,7 +3536,7 @@ internal val Res.string.str_10032: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1079, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1079, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1079, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10033: StringResource by lazy {
@@ -3622,7 +3622,7 @@ internal val Res.string.str_10033: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1109, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1109, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1109, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10034: StringResource by lazy {
@@ -3708,7 +3708,7 @@ internal val Res.string.str_10034: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1139, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1139, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1139, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10035: StringResource by lazy {
@@ -3794,7 +3794,7 @@ internal val Res.string.str_10035: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1169, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1169, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1169, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10036: StringResource by lazy {
@@ -3880,7 +3880,7 @@ internal val Res.string.str_10036: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1199, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1199, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1199, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10037: StringResource by lazy {
@@ -3966,7 +3966,7 @@ internal val Res.string.str_10037: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1229, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1229, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1229, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10038: StringResource by lazy {
@@ -4052,7 +4052,7 @@ internal val Res.string.str_10038: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1259, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1259, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1259, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10039: StringResource by lazy {
@@ -4138,7 +4138,7 @@ internal val Res.string.str_10039: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1289, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1289, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1289, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_1004: StringResource by lazy {
@@ -4224,7 +4224,7 @@ internal val Res.string.str_1004: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1648, 28),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1648, 28),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1648, 28),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10040: StringResource by lazy {
@@ -4310,7 +4310,7 @@ internal val Res.string.str_10040: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1348, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1348, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1348, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10041: StringResource by lazy {
@@ -4396,7 +4396,7 @@ internal val Res.string.str_10041: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1378, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1378, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1378, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10042: StringResource by lazy {
@@ -4482,7 +4482,7 @@ internal val Res.string.str_10042: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1408, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1408, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1408, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10043: StringResource by lazy {
@@ -4568,7 +4568,7 @@ internal val Res.string.str_10043: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1438, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1438, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1438, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10044: StringResource by lazy {
@@ -4654,7 +4654,7 @@ internal val Res.string.str_10044: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1468, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1468, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1468, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10045: StringResource by lazy {
@@ -4740,7 +4740,7 @@ internal val Res.string.str_10045: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1498, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1498, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1498, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10046: StringResource by lazy {
@@ -4826,7 +4826,7 @@ internal val Res.string.str_10046: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1528, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1528, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1528, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10047: StringResource by lazy {
@@ -4912,7 +4912,7 @@ internal val Res.string.str_10047: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1558, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1558, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1558, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10048: StringResource by lazy {
@@ -4998,7 +4998,7 @@ internal val Res.string.str_10048: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1588, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1588, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1588, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10049: StringResource by lazy {
@@ -5084,7 +5084,7 @@ internal val Res.string.str_10049: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1618, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1618, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1618, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_1005: StringResource by lazy {
@@ -5170,7 +5170,7 @@ internal val Res.string.str_1005: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1977, 28),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1977, 28),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1977, 28),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10050: StringResource by lazy {
@@ -5256,7 +5256,7 @@ internal val Res.string.str_10050: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1677, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1677, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1677, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10051: StringResource by lazy {
@@ -5342,7 +5342,7 @@ internal val Res.string.str_10051: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1707, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1707, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1707, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10052: StringResource by lazy {
@@ -5428,7 +5428,7 @@ internal val Res.string.str_10052: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1737, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1737, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1737, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10053: StringResource by lazy {
@@ -5514,7 +5514,7 @@ internal val Res.string.str_10053: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1767, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1767, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1767, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10054: StringResource by lazy {
@@ -5600,7 +5600,7 @@ internal val Res.string.str_10054: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1797, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1797, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1797, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10055: StringResource by lazy {
@@ -5686,7 +5686,7 @@ internal val Res.string.str_10055: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1827, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1827, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1827, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10056: StringResource by lazy {
@@ -5772,7 +5772,7 @@ internal val Res.string.str_10056: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1857, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1857, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1857, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10057: StringResource by lazy {
@@ -5858,7 +5858,7 @@ internal val Res.string.str_10057: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1887, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1887, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1887, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10058: StringResource by lazy {
@@ -5944,7 +5944,7 @@ internal val Res.string.str_10058: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1917, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1917, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1917, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10059: StringResource by lazy {
@@ -6030,7 +6030,7 @@ internal val Res.string.str_10059: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 1947, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 1947, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 1947, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_1006: StringResource by lazy {
@@ -6116,7 +6116,7 @@ internal val Res.string.str_1006: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2306, 28),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2306, 28),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2306, 28),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10060: StringResource by lazy {
@@ -6202,7 +6202,7 @@ internal val Res.string.str_10060: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2006, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2006, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2006, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10061: StringResource by lazy {
@@ -6288,7 +6288,7 @@ internal val Res.string.str_10061: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2036, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2036, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2036, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10062: StringResource by lazy {
@@ -6374,7 +6374,7 @@ internal val Res.string.str_10062: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2066, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2066, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2066, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10063: StringResource by lazy {
@@ -6460,7 +6460,7 @@ internal val Res.string.str_10063: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2096, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2096, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2096, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10064: StringResource by lazy {
@@ -6546,7 +6546,7 @@ internal val Res.string.str_10064: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2126, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2126, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2126, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10065: StringResource by lazy {
@@ -6632,7 +6632,7 @@ internal val Res.string.str_10065: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2156, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2156, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2156, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10066: StringResource by lazy {
@@ -6718,7 +6718,7 @@ internal val Res.string.str_10066: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2186, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2186, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2186, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10067: StringResource by lazy {
@@ -6804,7 +6804,7 @@ internal val Res.string.str_10067: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2216, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2216, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2216, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10068: StringResource by lazy {
@@ -6890,7 +6890,7 @@ internal val Res.string.str_10068: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2246, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2246, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2246, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10069: StringResource by lazy {
@@ -6976,7 +6976,7 @@ internal val Res.string.str_10069: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2276, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2276, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2276, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_1007: StringResource by lazy {
@@ -7062,7 +7062,7 @@ internal val Res.string.str_1007: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2635, 28),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2635, 28),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2635, 28),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10070: StringResource by lazy {
@@ -7148,7 +7148,7 @@ internal val Res.string.str_10070: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2335, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2335, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2335, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10071: StringResource by lazy {
@@ -7234,7 +7234,7 @@ internal val Res.string.str_10071: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2365, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2365, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2365, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10072: StringResource by lazy {
@@ -7320,7 +7320,7 @@ internal val Res.string.str_10072: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2395, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2395, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2395, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10073: StringResource by lazy {
@@ -7406,7 +7406,7 @@ internal val Res.string.str_10073: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2425, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2425, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2425, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10074: StringResource by lazy {
@@ -7492,7 +7492,7 @@ internal val Res.string.str_10074: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2455, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2455, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2455, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10075: StringResource by lazy {
@@ -7578,7 +7578,7 @@ internal val Res.string.str_10075: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2485, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2485, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2485, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10076: StringResource by lazy {
@@ -7664,7 +7664,7 @@ internal val Res.string.str_10076: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2515, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2515, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2515, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10077: StringResource by lazy {
@@ -7750,7 +7750,7 @@ internal val Res.string.str_10077: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2545, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2545, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2545, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10078: StringResource by lazy {
@@ -7836,7 +7836,7 @@ internal val Res.string.str_10078: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2575, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2575, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2575, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10079: StringResource by lazy {
@@ -7922,7 +7922,7 @@ internal val Res.string.str_10079: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2605, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2605, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2605, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_1008: StringResource by lazy {
@@ -8008,7 +8008,7 @@ internal val Res.string.str_1008: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2964, 28),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2964, 28),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2964, 28),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10080: StringResource by lazy {
@@ -8094,7 +8094,7 @@ internal val Res.string.str_10080: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2664, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2664, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2664, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10081: StringResource by lazy {
@@ -8180,7 +8180,7 @@ internal val Res.string.str_10081: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2694, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2694, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2694, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10082: StringResource by lazy {
@@ -8266,7 +8266,7 @@ internal val Res.string.str_10082: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2724, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2724, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2724, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10083: StringResource by lazy {
@@ -8352,7 +8352,7 @@ internal val Res.string.str_10083: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2754, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2754, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2754, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10084: StringResource by lazy {
@@ -8438,7 +8438,7 @@ internal val Res.string.str_10084: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2784, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2784, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2784, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10085: StringResource by lazy {
@@ -8524,7 +8524,7 @@ internal val Res.string.str_10085: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2814, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2814, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2814, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_10086: StringResource by lazy {
@@ -8610,7 +8610,7 @@ internal val Res.string.str_10086: StringResource by lazy {
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("HK"), ), "${MD}values-zh-rHK/strings.commonMain.cvr", 2844, 29),
         ResourceItem(setOf(LanguageQualifier("zh"), RegionQualifier("TW"), ), "${MD}values-zh-rTW/strings.commonMain.cvr", 2844, 29),
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 2844, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 @InternalResourceApi

@@ -13,7 +13,10 @@ import org.jetbrains.compose.resources.plural.PluralRuleList
  */
 @Immutable
 class PluralStringResource
-@InternalResourceApi constructor(id: String, val key: String, items: Set<ResourceItem>) : Resource(id, items)
+@InternalResourceApi constructor(id: String, val key: String, items: Set<ResourceItem>, internal override val supportedLocales: Set<String>?) : Resource(id, items) {
+    @InternalResourceApi
+    constructor(id: String, key: String, items: Set<ResourceItem>) : this(id, key, items, null)
+}
 
 /**
  * Retrieves the string for the pluralization for the given quantity using the specified quantity string resource.
@@ -69,10 +72,8 @@ private suspend fun loadPluralString(
 ): String {
     val resourceItem = resource.getResourceItemByEnvironment(environment)
     val item = getStringItem(resourceItem, resourceReader) as StringItem.Plurals
-    val pluralRuleList = PluralRuleList.getInstance(
-        environment.language,
-        environment.region,
-    )
+    val locale = resource.getResourceLocale(environment)
+    val pluralRuleList = PluralRuleList.getInstance(locale.language, locale.region)
     val pluralCategory = pluralRuleList.getCategory(quantity)
     val str = item.items[pluralCategory]
         ?: item.items[PluralCategory.OTHER]
