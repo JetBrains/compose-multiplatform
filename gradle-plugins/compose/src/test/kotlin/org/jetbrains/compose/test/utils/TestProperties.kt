@@ -17,6 +17,9 @@ object TestProperties {
     val composeVersion: String
         get() = notNullSystemProperty("compose.tests.compose.version")
 
+    val resourcesRepositoryInitScript: String?
+        get() = System.getProperty("compose.tests.resources.repository.init.script")
+
     val gradleVersion: String
         get() = notNullSystemProperty("compose.tests.gradle.version")
 
