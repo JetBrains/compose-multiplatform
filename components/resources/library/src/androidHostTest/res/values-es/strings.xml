@@ -1,0 +1,7 @@
+<resources>
+    <string name="cmp6840_translated">es</string>
+    <plurals name="cmp6840_plurals">
+        <item quantity="one">es-one</item>
+        <item quantity="other">es-other</item>
+    </plurals>
+</resources>

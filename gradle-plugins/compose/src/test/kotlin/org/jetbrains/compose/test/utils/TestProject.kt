@@ -61,6 +61,7 @@ class TestProject(
     private val additionalArgs = listOfNotNull(
         "--info",
         "--stacktrace",
+        TestProperties.resourcesRepositoryInitScript?.let { "--init-script=$it" },
         "-Pkotlin.js.yarn=false",
         "-P${ComposeProperties.VERBOSE}=${testEnvironment.composeVerbose}",
         if (testEnvironment.parsedGradleVersion < GradleVersion.version("8.0")) {

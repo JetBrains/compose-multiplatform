@@ -100,6 +100,7 @@ _Changes since 1.13.0-alpha01_
 
 ### Resources
 
+- Select resource languages from platform locale preferences in priority order, with Android-style fallback for partial translations [#5750](https://github.com/JetBrains/compose-multiplatform/pull/5750)
 - Optimise resource library on web to let a browser to draw frames between icons decoding [#5708](https://github.com/JetBrains/compose-multiplatform/pull/5708)
 - Fix compatibility with Kotlin 2.5 [#5716](https://github.com/JetBrains/compose-multiplatform/pull/5716)
 

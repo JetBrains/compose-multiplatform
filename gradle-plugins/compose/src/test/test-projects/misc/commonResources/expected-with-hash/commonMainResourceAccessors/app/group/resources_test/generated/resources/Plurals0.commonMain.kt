@@ -16,7 +16,7 @@ private const val MD: String = "composeResources/app.group.resources_test.genera
 internal val Res.plurals.numberOfSongsAvailable: PluralStringResource by lazy {
       PluralStringResource("plurals:numberOfSongsAvailable", "numberOfSongsAvailable", setOf(
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 10, 124),
-      ))
+      ), Res.supportedLocales)
     }
 
 @InternalResourceApi

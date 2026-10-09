@@ -5,22 +5,44 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.intl.Locale
 
+internal data class ResourceLocale(
+    val language: LanguageQualifier,
+    val script: ScriptQualifier,
+    val region: RegionQualifier
+) {
+    constructor(locale: Locale) : this(
+        LanguageQualifier(locale.language), ScriptQualifier(locale.script), RegionQualifier(locale.region)
+    )
+}
+
 class ResourceEnvironment internal constructor(
-    internal val language: LanguageQualifier,
-    internal val script: ScriptQualifier,
-    internal val region: RegionQualifier,
+    internal val locales: List<ResourceLocale>,
     internal val theme: ThemeQualifier,
     internal val density: DensityQualifier
 ) {
+    internal val language: LanguageQualifier get() = locales.first().language
+    internal val script: ScriptQualifier get() = locales.first().script
+    internal val region: RegionQualifier get() = locales.first().region
+
+    init {
+        require(locales.isNotEmpty())
+    }
+
+    internal constructor(
+        language: LanguageQualifier,
+        script: ScriptQualifier,
+        region: RegionQualifier,
+        theme: ThemeQualifier,
+        density: DensityQualifier
+    ) : this(listOf(ResourceLocale(language, script, region)), theme, density)
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
 
         other as ResourceEnvironment
 
-        if (language != other.language) return false
-        if (script != other.script) return false
-        if (region != other.region) return false
+        if (locales != other.locales) return false
         if (theme != other.theme) return false
         if (density != other.density) return false
 
@@ -28,9 +50,7 @@ class ResourceEnvironment internal constructor(
     }
 
     override fun hashCode(): Int {
-        var result = language.hashCode()
-        result = 31 * result + script.hashCode()
-        result = 31 * result + region.hashCode()
+        var result = locales.hashCode()
         result = 31 * result + theme.hashCode()
         result = 31 * result + density.hashCode()
         return result
@@ -45,22 +65,25 @@ internal interface ComposeEnvironment {
 internal val DefaultComposeEnvironment = object : ComposeEnvironment {
     @Composable
     override fun rememberEnvironment(): ResourceEnvironment {
-        val composeLocale = Locale.current
+        val locales = rememberResourceLocales()
         val composeTheme = isSystemInDarkTheme()
         val composeDensity = LocalDensity.current
 
         //cache ResourceEnvironment unless compose environment is changed
-        return remember(composeLocale, composeTheme, composeDensity) {
+        return remember(locales, composeTheme, composeDensity) {
             ResourceEnvironment(
-                LanguageQualifier(composeLocale.language),
-                ScriptQualifier(composeLocale.script),
-                RegionQualifier(composeLocale.region),
+                locales,
                 ThemeQualifier.selectByValue(composeTheme),
                 DensityQualifier.selectByDensity(composeDensity.density)
             )
         }
     }
 }
+
+@Composable
+internal expect fun rememberResourceLocales(): List<ResourceLocale>
+
+internal expect fun getSystemResourceLocales(): List<ResourceLocale>
 
 //ComposeEnvironment provider will be overridden for tests
 internal val LocalComposeEnvironment = staticCompositionLocalOf { DefaultComposeEnvironment }
@@ -93,8 +116,9 @@ fun getSystemResourceEnvironment(): ResourceEnvironment = getResourceEnvironment
 @OptIn(InternalResourceApi::class)
 internal fun Resource.getResourceItemByEnvironment(environment: ResourceEnvironment): ResourceItem {
     //Priority of environments: https://developer.android.com/guide/topics/resources/providing-resources#table2
+    val locale = getResourceLocale(environment)
     items.toList()
-        .filterByLocale(environment.language, environment.script, environment.region)
+        .filterByLocale(locale.language, locale.script, locale.region)
         .also { if (it.size == 1) return it.first() }
         .filterBy(environment.theme)
         .also { if (it.size == 1) return it.first() }
@@ -107,6 +131,28 @@ internal fun Resource.getResourceItemByEnvironment(environment: ResourceEnvironm
                 error("Resource with ID='$id' has more than one file: ${items.joinToString { it.path }}")
             }
         }
+}
+
+// Resolve one language for the resource module, including entries absent from this resource.
+// This keeps partial translations on the selected language and then the default resources.
+internal fun Resource.getResourceLocale(environment: ResourceEnvironment): ResourceLocale {
+    val supported = supportedLocales?.map { ResourceLocale(Locale(it)) }
+        ?: items.mapNotNull { item ->
+            val language = item.qualifiers.filterIsInstance<LanguageQualifier>().firstOrNull()
+                ?: return@mapNotNull null
+            ResourceLocale(
+                language,
+                item.qualifiers.filterIsInstance<ScriptQualifier>().firstOrNull() ?: ScriptQualifier(""),
+                item.qualifiers.filterIsInstance<RegionQualifier>().firstOrNull() ?: RegionQualifier("")
+            )
+        }
+    return environment.locales.firstOrNull { requested ->
+        // Android treats unqualified resources as supporting English when selecting the app locale.
+        requested.language.language == "en" || supported.any { available ->
+            requested.language == available.language &&
+                (requested.script.isEmpty() || available.script.isEmpty() || requested.script == available.script)
+        }
+    } ?: environment.locales.first()
 }
 
 private fun List<ResourceItem>.filterBy(qualifier: Qualifier): List<ResourceItem> {

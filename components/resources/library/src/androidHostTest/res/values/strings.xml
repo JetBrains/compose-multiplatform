@@ -1,0 +1,8 @@
+<resources>
+    <string name="cmp6840_translated">default</string>
+    <string name="cmp6840_untranslated">default</string>
+    <plurals name="cmp6840_plurals">
+        <item quantity="one">default-one</item>
+        <item quantity="other">default-other</item>
+    </plurals>
+</resources>

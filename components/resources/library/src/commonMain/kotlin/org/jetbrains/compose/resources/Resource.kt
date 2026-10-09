@@ -20,6 +20,8 @@ sealed class Resource
     internal val id: String,
     internal val items: Set<ResourceItem>
 ) {
+    internal open val supportedLocales: Set<String>? get() = null
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class != other::class) return false
