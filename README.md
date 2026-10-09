@@ -72,6 +72,43 @@ for creating web user interfaces with HTML and CSS.
 
 > Note that Compose HTML is not a multiplatform library. It can be used only with Kotlin/JS.
 
+## Versions (stable)
+
+Gradle plugin: `org.jetbrains.compose` version `1.12.0-`
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | org.jetbrains.compose.runtime:runtime*:1.13.0-alpha02 | [Runtime 1.13.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.13.0-alpha03) |
+| UI | org.jetbrains.compose.ui:ui*:1.13.0-alpha02 | [UI 1.13.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.13.0-alpha03) |
+| Foundation | org.jetbrains.compose.foundation:foundation*:1.13.0-alpha02 | [Foundation 1.13.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.13.0-alpha03) |
+| Material | org.jetbrains.compose.material:material*:1.13.0-alpha02 | [Material 1.13.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material#1.13.0-alpha03) |
+| Material3 | org.jetbrains.compose.material3:material3*:1.13.0-alpha02 | [Material3 1.5.0-alpha28](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha28) |
+| Material3 Adaptive | org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0 | [Material3 Adaptive 1.3.0](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0) |
+| Lifecycle | org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0 | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0) |
+| Navigation | org.jetbrains.androidx.navigation:navigation-*:2.10.0-rc01 | [Navigation 2.10.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.10.0) |
+| Navigation3 | org.jetbrains.androidx.navigation3:navigation3-*:1.2.0-rc01 | [Navigation3 1.2.0](https://developer.android.com/jetpack/androidx/releases/navigation3#1.2.0) |
+| Navigation Event | org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0 | [Navigation Event 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.1) |
+| Savedstate | org.jetbrains.androidx.savedstate:savedstate*:1.4.0 | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | org.jetbrains.androidx.window:window-core:1.5.1 | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+### Versions (latest)
+
+Gradle plugin: org.jetbrains.compose version 1.13.0-alpha02
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | org.jetbrains.compose.runtime:runtime*:1.13.0-alpha02 | [Runtime 1.13.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.13.0-alpha03) |
+| UI | org.jetbrains.compose.ui:ui*:1.13.0-alpha02 | [UI 1.13.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.13.0-alpha03) |
+| Foundation | org.jetbrains.compose.foundation:foundation*:1.13.0-alpha02 | [Foundation 1.13.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.13.0-alpha03) |
+| Material | org.jetbrains.compose.material:material*:1.13.0-alpha02 | [Material 1.13.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material#1.13.0-alpha03) |
+| Material3 | org.jetbrains.compose.material3:material3*:1.13.0-alpha02 | [Material3 1.5.0-alpha28](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-alpha28) |
+| Material3 Adaptive | org.jetbrains.compose.material3.adaptive:adaptive*:1.3.0 | [Material3 Adaptive 1.3.0](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.3.0) |
+| Lifecycle | org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0 | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0) |
+| Navigation | org.jetbrains.androidx.navigation:navigation-*:2.10.0-rc01 | [Navigation 2.10.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.10.0) |
+| Navigation3 | org.jetbrains.androidx.navigation3:navigation3-*:1.2.0-rc01 | [Navigation3 1.2.0](https://developer.android.com/jetpack/androidx/releases/navigation3#1.2.0) |
+| Navigation Event | org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0 | [Navigation Event 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.1) |
+| Savedstate | org.jetbrains.androidx.savedstate:savedstate*:1.4.0 | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | org.jetbrains.androidx.window:window-core:1.5.1 | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
 ## Learn more
 
 * [FAQ](https://jb.gg/cmp-faq)
