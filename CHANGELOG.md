@@ -1,25 +1,27 @@
-# 1.13.0-alpha02 (October 2026)
+# 13 October 2026
+
+## Compose 1.13.0-alpha02
 
 _Changes since 1.13.0-alpha01_
 
-## Highlights
+### Highlights
 
-### Web
+#### Web
 
 - `preloadFont`, `preloadImageBitmap`, `preloadImageVector` are no longer experimental [#5711](https://github.com/JetBrains/compose-multiplatform/pull/5711)
 
-## Migration Notes
+### Migration Notes
 
-### Multiple Platforms
+#### Multiple Platforms
 
 - Temporarily re-exposed `LocalSystemTheme` (as `@InternalComposeUiApi`) and deprecated it. It will be removed in a future release [#3387](https://github.com/JetBrains/compose-multiplatform-core/pull/3387)
 - Kotlin version has been upgraded to 2.4.20. The minimal supported Kotlin version for k/native is 2.4.0, for k/js and k/wasm is 2.4.20 [#3426](https://github.com/JetBrains/compose-multiplatform-core/pull/3426)
 
-### Desktop
+#### Desktop
 
 - JRE fonts are now stripped from the distributable by default. If you need them, use `stripJreFonts = false` in the `nativeDistributions` section of your Gradle build file [#5706](https://github.com/JetBrains/compose-multiplatform/pull/5706)
 
-### Android
+#### Android
 
 - `compileSdk` 37.1 is required [#5719](https://github.com/JetBrains/compose-multiplatform/pull/5719)
 
@@ -29,9 +31,9 @@ _Changes since 1.13.0-alpha01_
   }
   ```
 
-## Features
+### Features
 
-### Multiple Platforms
+#### Multiple Platforms
 
 - Remove `ComposeUiFlags.areWindowInsetsRulersEnabled` in favor of `WindowInsetsRulers.disable()` [#3211](https://github.com/JetBrains/compose-multiplatform-core/pull/3211)
 
@@ -41,23 +43,23 @@ _Changes since 1.13.0-alpha01_
 - Promote the `ComposeUIView()` factory functions and their `ComposeUIViewConfiguration` to stable API [#3373](https://github.com/JetBrains/compose-multiplatform-core/pull/3373)
 - Support auto-safe and auto-fill login and password for text fields [#3335](https://github.com/JetBrains/compose-multiplatform-core/pull/3335)
 
-### Desktop
+#### Desktop
 
 - _(prerelease fix)_ Bump Compose Hot Reload to [1.3.0-alpha02](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.3.0-alpha02) [#5713](https://github.com/JetBrains/compose-multiplatform/pull/5713)
 
-### Resources
+#### Resources
 
 - New API for awaiting asynchronous Compose resource loads: `awaitPendingResourceStateLoads()` [#5720](https://github.com/JetBrains/compose-multiplatform/pull/5720)
 
-## Fixes
+### Fixes
 
-### Multiple Platforms
+#### Multiple Platforms
 
 - Dragging to select text will now automatically scroll the contents of a `SelectionContainer` when dragging to outside the container, without the need to jiggle the mouse/pointer [#3390](https://github.com/JetBrains/compose-multiplatform-core/pull/3390)
 - Performance improvement: removed stack trace allocation when internal coroutines are cancelled on a hot path [#3411](https://github.com/JetBrains/compose-multiplatform-core/pull/3411)
 - Fixed crashes in certain scenarios when selecting text in a `SelectionContainer` [#3416](https://github.com/JetBrains/compose-multiplatform-core/pull/3416)
 
-### iOS
+#### iOS
 
 - Fixed the `TextField` caret jumping to a later whitespace when tapping CJK punctuation [#3342](https://github.com/JetBrains/compose-multiplatform-core/pull/3342)
 - A focused text field now applies changed IME options without refocusing it [#3304](https://github.com/JetBrains/compose-multiplatform-core/pull/3304)
@@ -77,11 +79,11 @@ _Changes since 1.13.0-alpha01_
 - Align overscroll snapping animation with iOS animation [#3432](https://github.com/JetBrains/compose-multiplatform-core/pull/3432)
 - Fix toggleable state announcement and match it with the native `UISwitch` / `Toggle` [#3445](https://github.com/JetBrains/compose-multiplatform-core/pull/3445)
 
-### Desktop
+#### Desktop
 
 - _(prerelease fix)_ Restore output of `create*Distributable` desktop native distribution Gradle tasks [#5730](https://github.com/JetBrains/compose-multiplatform/pull/5730)
 
-### Web
+#### Web
 
 - Fix scrolling via A11Y Tools in web browsers [#3366](https://github.com/JetBrains/compose-multiplatform-core/pull/3366)
 - Fixed nested scroll issue on a web when a collapsible app bar blocks a lazy list scrolling [#3376](https://github.com/JetBrains/compose-multiplatform-core/pull/3376)
@@ -98,16 +100,75 @@ _Changes since 1.13.0-alpha01_
 - _(prerelease fix)_ Fix autosuggestion in iOS [#3467](https://github.com/JetBrains/compose-multiplatform-core/pull/3467)
 - Fix a skiko runtime when a skiko dependency is added in a test source set only [#5701](https://github.com/JetBrains/compose-multiplatform/pull/5701)
 
-### Resources
+#### Resources
 
 - Optimise resource library on web to let a browser to draw frames between icons decoding [#5708](https://github.com/JetBrains/compose-multiplatform/pull/5708)
 - Fix compatibility with Kotlin 2.5 [#5716](https://github.com/JetBrains/compose-multiplatform/pull/5716)
 
-## Components
+### Components
 
-### Gradle plugin
+#### Gradle plugin
 
 `org.jetbrains.compose` version `1.13.0-alpha02`
+
+## Navigation3 1.1.0-alpha02
+
+_Changes since 1.1.0-alpha01_
+### Highlights
+
+#### Web
+
+- `preloadFont`, `preloadImageBitmap`, `preloadImageVector` are no longer experimental [#5711](https://github.com/JetBrains/compose-multiplatform/pull/5711)
+
+### Migration Notes
+
+#### Multiple Platforms
+
+- Temporarily re-exposed `LocalSystemTheme` (as `@InternalComposeUiApi`) and deprecated it. It will be removed in a future release [#3387](https://github.com/JetBrains/compose-multiplatform-core/pull/3387)
+- Kotlin version has been upgraded to 2.4.20. The minimal supported Kotlin version for k/native is 2.4.0, for k/js and k/wasm is 2.4.20 [#3426](https://github.com/JetBrains/compose-multiplatform-core/pull/3426)
+
+#### Desktop
+
+- JRE fonts are now stripped from the distributable by default. If you need them, use `stripJreFonts = false` in the `nativeDistributions` section of your Gradle build file [#5706](https://github.com/JetBrains/compose-multiplatform/pull/5706)
+
+#### Android
+
+- `compileSdk` 37.1 is required [#5719](https://github.com/JetBrains/compose-multiplatform/pull/5719)
+
+  ```
+  compileSdk {
+      version = release(37) { minorApiLevel = 1 }
+  }
+  ```
+
+### Features
+
+#### Multiple Platforms
+
+- Remove `ComposeUiFlags.areWindowInsetsRulersEnabled` in favor of `WindowInsetsRulers.disable()` [#3211](https://github.com/JetBrains/compose-multiplatform-core/pull/3211)
+
+### iOS
+
+- Added trackpad pan and pinch gesture support [#3015](https://github.com/JetBrains/compose-multiplatform-core/pull/3015)
+- Promote the `ComposeUIView()` factory functions and their `ComposeUIViewConfiguration` to stable API [#3373](https://github.com/JetBrains/compose-multiplatform-core/pull/3373)
+- Support auto-safe and auto-fill login and password for text fields [#3335](https://github.com/JetBrains/compose-multiplatform-core/pull/3335)
+
+#### Desktop
+
+- _(prerelease fix)_ Bump Compose Hot Reload to [1.3.0-alpha02](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.3.0-alpha02) [#5713](https://github.com/JetBrains/compose-multiplatform/pull/5713)
+
+#### Resources
+
+- New API for awaiting asynchronous Compose resource loads: `awaitPendingResourceStateLoads()` [#5720](https://github.com/JetBrains/compose-multiplatform/pull/5720)
+
+### Fixes
+
+#### Multiple Platforms
+
+- Dragging to select text will now automatically scroll the contents of a `SelectionContainer` when dragging to outside the container, without the need to jiggle the mouse/pointer [#3390](https://github.com/JetBrains/compose-multiplatform-core/pull/3390)
+- Performance improvement: removed stack trace allocation when internal coroutines are cancelled on a hot path [#3411](https://github.com/JetBrains/compose-multiplatform-core/pull/3411)
+- Fixed crashes in certain scenarios when selecting text in a `SelectionContainer` [#3416](https://github.com/JetBrains/compose-multiplatform-core/pull/3416)
+
 
 ### Libraries
 
