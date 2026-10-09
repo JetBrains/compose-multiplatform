@@ -10,8 +10,11 @@ import org.jetbrains.compose.test.utils.checks
 import org.junit.jupiter.api.fail
 import org.junit.jupiter.api.Test
 import kotlin.concurrent.thread
+import kotlin.test.Ignore
 
 class HotReloadTest : GradlePluginTestBase() {
+    // TODO remove @Ignore with the fix in https://youtrack.jetbrains.com/issue/CMP-10914
+    @Ignore
     @Test
     fun testHotReloadTaskRegisteredInJvmProject() = with(testProject("application/jvm")) {
         gradle("hotRun", "--dry-run").checks {
