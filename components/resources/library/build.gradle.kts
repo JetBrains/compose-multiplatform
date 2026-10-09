@@ -1,6 +1,7 @@
 import kotlinx.validation.ExperimentalBCVApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 
 plugins {
     kotlin("multiplatform")
@@ -12,6 +13,14 @@ plugins {
 }
 
 kotlin {
+    // Keep the minimum Kotlin dependency version independent of the compiler version.
+    // more info: https://youtrack.jetbrains.com/issue/CMP-10881
+    coreLibrariesVersion = "2.2.20"
+    compilerOptions {
+        languageVersion.set(KotlinVersion.KOTLIN_2_2)
+        apiVersion.set(KotlinVersion.KOTLIN_2_2)
+    }
+
     jvm("desktop")
     android {
         compilerOptions {
@@ -47,6 +56,11 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
+        compilerOptions {
+            // for the new wasm memory API
+            languageVersion.set(KotlinVersion.KOTLIN_2_4)
+            apiVersion.set(KotlinVersion.KOTLIN_2_4)
+        }
         compilations.getByName("test").compileTaskProvider.configure {
             // https://youtrack.jetbrains.com/issue/KT-69014
             compilerOptions.freeCompilerArgs.add("-Xwasm-enable-array-range-checks")
@@ -151,7 +165,9 @@ kotlin {
         val webMain by getting {
             dependsOn(skikoMain)
             dependencies {
-                 implementation(libs.kotlinx.browser)
+                // web targets require a compatible stdlib for the compiler's ABI
+                api("org.jetbrains.kotlin:kotlin-stdlib:${properties["kotlin.version"]}")
+                implementation(libs.kotlinx.browser)
             }
         }
         val webTest by getting {
