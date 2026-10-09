@@ -5,22 +5,23 @@
 
 package org.jetbrains.compose.web
 
-// Buffer policy uses the platform's reported capacity in UTF-16 code units.
-// JVM reports backing capacity. JS and Wasm/JS report logical length, so after clearing
-// the output their capacity is zero and the retention ceiling does not constrain backing storage.
+// Buffer limits use UTF-16 code units. JVM capacity measures allocated buffer space;
+// JS and Wasm/JS report text length, so the limit cannot bound retained buffer memory there.
 internal const val LARGE_BUFFER_THRESHOLD = 64 * 1024
 internal const val BUFFER_SHRINK_FACTOR = 4
 internal const val MAX_RETAINED_BUFFER_CAPACITY = 2 * 1024 * 1024
 
-/** Bounded registry without eviction. Empty pools retain their key slots; unregistered keys render uncached. */
+/**
+ * Stores a limited number of keys and does not remove them.
+ * Once full, new keys render without pooling.
+ */
 internal expect class HtmlRendererPools(maxKeys: Int, maxIdleRenderers: Int) {
     operator fun get(key: String): HtmlRendererPool?
 }
 
 /**
- * Borrowers own their storage exclusively and recycle it only after successful rendering.
- * Output buffers with reported capacity above [MAX_RETAINED_BUFFER_CAPACITY] are not retained.
- * On JS and Wasm/JS, capacity is logical length, which is zero when recycling a cleared renderer.
+ * Each active render owns its storage. Only successful renders return it to the pool.
+ * Keeps at most [maxIdleRenderers] idle renderers; oversized JVM buffers are discarded.
  */
 internal expect class HtmlRendererPool(maxIdleRenderers: Int) {
     fun borrow(): HtmlRenderer

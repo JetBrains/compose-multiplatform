@@ -15,28 +15,35 @@ internal actual class HtmlRendererPools actual constructor(
     private val maxIdleRenderers: Int,
 ) {
     private val pools = ConcurrentHashMap<String, HtmlRendererPool>()
+
+    // Includes registrations in progress, not just pools already in the map.
     private val keyCount = AtomicInteger()
 
     actual operator fun get(key: String): HtmlRendererPool? = pools[key] ?: register(key)
 
     private fun register(key: String): HtmlRendererPool? {
-        // Avoid counter writes when capacity is already reserved; a racing insert may have published this key.
+        // Avoid updating the counter when all slots are already reserved.
         if (keyCount.get() >= maxKeys) return pools[key]
-        // Reserve capacity before insertion: ConcurrentHashMap.size cannot enforce a concurrent cap.
+
+        // Reserve a slot before insertion to enforce the limit under concurrency.
         if (keyCount.incrementAndGet() > maxKeys) {
             keyCount.decrementAndGet()
             return pools[key]
         }
+
         val pool = HtmlRendererPool(maxIdleRenderers)
         val existing = pools.putIfAbsent(key, pool)
+
+        // Another thread registered the same key, so release our reservation.
         if (existing != null) keyCount.decrementAndGet()
+
         return existing ?: pool
     }
 }
 
 internal actual class HtmlRendererPool actual constructor(private val maxIdleRenderers: Int) {
-    // The first slot keeps the usual single-renderer path short. Overflow slots bound total
-    // retention without queue nodes or an idle counter. All publication transfers ownership.
+    // Optimize for a single idle renderer. Additional slots bound retention
+    // without queue allocations or a separate idle counter.
     private val first = AtomicReference<HtmlRenderer>()
     private val overflow = AtomicReferenceArray<HtmlRenderer>((maxIdleRenderers - 1).coerceAtLeast(0))
 
@@ -45,6 +52,8 @@ internal actual class HtmlRendererPool actual constructor(private val maxIdleRen
     private fun borrowOverflow(): HtmlRenderer {
         for (index in 0 until overflow.length()) {
             val renderer = overflow.get(index)
+
+            // Claim the renderer only if another thread hasn't taken it.
             if (renderer != null && overflow.compareAndSet(index, renderer, null)) return renderer
         }
         return HtmlRenderer()
@@ -59,5 +68,6 @@ internal actual class HtmlRendererPool actual constructor(private val maxIdleRen
         for (index in 0 until overflow.length()) {
             if (overflow.compareAndSet(index, null, renderer)) return
         }
+        // All slots are occupied; let the renderer be garbage-collected.
     }
 }
