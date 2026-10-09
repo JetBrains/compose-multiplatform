@@ -15,7 +15,7 @@ import androidx.compose.runtime.Composable
  * calls stay intact, as do elements whose contents require validation. A chunk can exceed [chunkSize],
  * and no empty chunks are sent.
  *
- * Calls are thread-safe. Callers must Synchronize shared mutable data accessed by [content].
+ * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
  *
  * [sink] runs synchronously while rendering and may block. Output already sent cannot be retracted
  * if rendering or the sink throws. Failed rendering storage is discarded.

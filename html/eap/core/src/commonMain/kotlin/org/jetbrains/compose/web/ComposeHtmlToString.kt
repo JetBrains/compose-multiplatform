@@ -21,7 +21,7 @@ import org.jetbrains.compose.web.dom.LocalComposeHtmlContext
  * Snapshot state changes are discarded after rendering. Coroutine effects such as
  * `LaunchedEffect` do not run. `SideEffect` and `DisposableEffect` still execute.
  *
- * Calls are thread-safe. Callers must Synchronize shared mutable data accessed by [content].
+ * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
  * See [composeHtmlToStream] for validation and failure handling.
  *
  * Inline styles preserve CSS fallbacks but do not fully emulate CSSOM validation and mutation.
@@ -59,8 +59,8 @@ internal fun composeHtmlString(
     content: @Composable () -> Unit,
 ): String {
     if (chunkSink != null) require(chunkSize > 0) { "chunkSize must be positive" }
-    
-    val pool = key?.let(::getHtmlRendererPool)
+
+    val pool = getHtmlRendererPool(key)
     val renderer = pool?.borrow() ?: HtmlRenderer()
 
     // Return storage to the pool only after rendering, effect cleanup and snapshot disposal succeed.
@@ -71,7 +71,7 @@ internal fun composeHtmlString(
 
 private val renderers = HtmlRendererPools(maxKeys = 64, maxIdleRenderers = 8)
 
-internal fun getHtmlRendererPool(key: String): HtmlRendererPool? = renderers[key]
+internal fun getHtmlRendererPool(key: String?): HtmlRendererPool? = if (key == null) null else renderers[key]
 
 /** Storage exclusively owned by one active render, then optionally returned to a pool. */
 internal class HtmlRenderer {

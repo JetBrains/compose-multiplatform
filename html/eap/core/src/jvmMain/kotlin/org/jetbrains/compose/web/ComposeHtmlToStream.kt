@@ -18,7 +18,7 @@ import java.io.Writer
  * intact. Elements requiring content validation are emitted only after validation succeeds.
  * A write can exceed [chunkSize]. No empty writes are made.
  *
- * Calls are thread-safe. Callers must Synchronize shared mutable data accessed by [content].
+ * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
  * See [composeHtmlToStream] for validation and failure handling.
  *
  * Output already written cannot be retracted on failure, and failed rendering storage is discarded.

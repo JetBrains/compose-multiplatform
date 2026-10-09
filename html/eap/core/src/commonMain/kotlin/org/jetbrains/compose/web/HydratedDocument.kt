@@ -50,7 +50,7 @@ fun renderHydratedDocument(
 /**
  * Renders a complete document with fresh storage.
  *
- * Calls are thread-safe. Callers must Synchronize shared mutable data accessed by [content].
+ * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
  * See [composeHtmlToStream] for validation and failure handling.
  */
 fun renderHydratedDocument(
@@ -67,7 +67,7 @@ fun renderHydratedDocument(
  * may exceed the target. [sink] runs synchronously, may block, and receives no empty chunks.
  * Emitted output cannot be retracted on failure, including document validation after composition.
  *
- * Calls are thread-safe. Callers must Synchronize shared mutable data accessed by [content].
+ * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
  * See [composeHtmlToStream] for validation and failure handling.
  *
  * @param key when non-null, enables pooled rendering storage across calls and threads.
@@ -89,7 +89,7 @@ fun renderHydratedDocumentToStream(
 /**
  * Streams a complete document with fresh storage.
  *
- * Calls are thread-safe. Callers must Synchronize shared mutable data accessed by [content].
+ * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
  * See [composeHtmlToStream] for validation and failure handling.
  */
 fun renderHydratedDocumentToStream(

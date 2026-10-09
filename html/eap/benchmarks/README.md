@@ -14,20 +14,20 @@ From the repository root, run (default 4 workers):
 
 ```shell
 html/gradlew -p html -Pcompose.html.eap.enabled=true \
-    :html-eap-benchmarks:run
-```
-
-For a single-worker baseline:
-
-```shell
-html/gradlew -p html -Pcompose.html.eap.enabled=true \
-    :html-eap-benchmarks:run --args='-prof gc -t 1'
+    :html-eap-benchmarks:benchmark
 ```
 
 Defaults: 1 or 64 rows, two JVM forks, two one-second warmups, and three one-second measurements.
-GC profiling reports allocation.
+Results are saved under `html/eap/benchmarks/build/reports/benchmarks`.
+
+For a short smoke test of all strategies and row counts:
+
+```shell
+html/gradlew -p html -Pcompose.html.eap.enabled=true \
+    :html-eap-benchmarks:smokeBenchmark
+```
 
 ## Add a benchmark
 
-Add a Java class under `src/main/java` with JMH `@Benchmark` methods.
-Gradle discovers it automatically.
+Add an `open` Kotlin class under `src/main/kotlin` with `kotlinx.benchmark` annotations.
+Use `@JvmField` on `@Param` properties so JMH can populate them.
