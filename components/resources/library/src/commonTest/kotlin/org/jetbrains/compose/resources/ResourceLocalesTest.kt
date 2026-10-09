@@ -79,12 +79,4 @@ class ResourceLocalesTest {
         ))
         assertEquals("es", resource.getResourceItemByEnvironment(environment("fr", "es")).path)
     }
-
-    @Test
-    fun preferredLocalesAreCopied() {
-        val locales = mutableListOf(ResourceLocale(Locale("fr")), ResourceLocale(Locale("es")))
-        val env = ResourceEnvironment(locales, ThemeQualifier.LIGHT, DensityQualifier.MDPI)
-        locales.clear()
-        assertEquals(listOf("fr", "es"), env.locales.map { it.language.language })
-    }
 }

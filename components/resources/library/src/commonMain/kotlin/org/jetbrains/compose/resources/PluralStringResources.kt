@@ -13,7 +13,12 @@ import org.jetbrains.compose.resources.plural.PluralRuleList
  */
 @Immutable
 class PluralStringResource
-@InternalResourceApi constructor(id: String, val key: String, items: Set<ResourceItem>, internal override val supportedLocales: Set<String>?) : Resource(id, items) {
+@InternalResourceApi constructor(
+    id: String,
+    val key: String,
+    items: Set<ResourceItem>,
+    internal override val supportedLocales: Set<String>?
+) : Resource(id, items) {
     @InternalResourceApi
     constructor(id: String, key: String, items: Set<ResourceItem>) : this(id, key, items, null)
 }

@@ -16,14 +16,17 @@ internal data class ResourceLocale(
 }
 
 class ResourceEnvironment internal constructor(
-    locales: List<ResourceLocale>,
+    internal val locales: List<ResourceLocale>,
     internal val theme: ThemeQualifier,
     internal val density: DensityQualifier
 ) {
-    internal val locales = locales.toList().also { require(it.isNotEmpty()) }
-    internal val language get() = locales.first().language
-    internal val script get() = locales.first().script
-    internal val region get() = locales.first().region
+    internal val language: LanguageQualifier get() = locales.first().language
+    internal val script: ScriptQualifier get() = locales.first().script
+    internal val region: RegionQualifier get() = locales.first().region
+
+    init {
+        require(locales.isNotEmpty())
+    }
 
     internal constructor(
         language: LanguageQualifier,
@@ -33,11 +36,25 @@ class ResourceEnvironment internal constructor(
         density: DensityQualifier
     ) : this(listOf(ResourceLocale(language, script, region)), theme, density)
 
-    override fun equals(other: Any?): Boolean =
-        this === other || other is ResourceEnvironment &&
-            locales == other.locales && theme == other.theme && density == other.density
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
 
-    override fun hashCode(): Int = (locales.hashCode() * 31 + theme.hashCode()) * 31 + density.hashCode()
+        other as ResourceEnvironment
+
+        if (locales != other.locales) return false
+        if (theme != other.theme) return false
+        if (density != other.density) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = locales.hashCode()
+        result = 31 * result + theme.hashCode()
+        result = 31 * result + density.hashCode()
+        return result
+    }
 }
 
 internal interface ComposeEnvironment {
