@@ -324,6 +324,44 @@ class ComposeResourceTest : KmpUiTest() {
     }
 
     @Test
+    fun testPluralRulesFollowMatchedResourceLanguage() = runTest {
+        // In French, 0 is ONE ("i = 0,1"). In English, 0 is OTHER ("i = 1 and v = 0").
+        // When user prefers [fr, en] but only English strings exist, English plural rules must be used.
+        val resource = PluralStringResource(
+            id = "PLURALS:plural_fallback_rules",
+            key = "plurals",
+            items = setOf(
+                ResourceItem(setOf(LanguageQualifier("en")), "strings.cvr", 171, 39)
+            )
+        )
+        val env = ResourceEnvironment(
+            locales = listOf(LocaleQualifiers("fr"), LocaleQualifiers("en")),
+            theme = ThemeQualifier.LIGHT,
+            density = DensityQualifier.MDPI
+        )
+        assertEquals("other", getPluralString(env, resource, 0))
+    }
+
+    @Test
+    fun testPluralRulesOfAnUnqualifiedResourceFollowTheFirstPreferredLocale() = runTest {
+        // values/ carries no language qualifier, so there is nothing to read the rules from
+        // and the first preferred locale decides, as it did before this environment held a list
+        val resource = PluralStringResource(
+            id = "PLURALS:plural_default_rules",
+            key = "plurals",
+            items = setOf(
+                ResourceItem(setOf(), "strings.cvr", 171, 39)
+            )
+        )
+        val env = ResourceEnvironment(
+            locales = listOf(LocaleQualifiers("fr"), LocaleQualifiers("en")),
+            theme = ThemeQualifier.LIGHT,
+            density = DensityQualifier.MDPI
+        )
+        assertEquals("one", getPluralString(env, resource, 0))
+    }
+
+    @Test
     fun testMissingResource() = runTest {
         assertFailsWith<MissingResourceException> {
             readResourceBytes("missing.png")
