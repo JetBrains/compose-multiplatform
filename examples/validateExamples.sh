@@ -22,14 +22,17 @@ fi
 compose_version="${1:-}"
 kotlin_version="${2:-}"
 
+# Resolves Maven Central through cache-redirector, to avoid its rate limits on CI
+init_script="$(cd "$(dirname "$0")" && pwd)/cache-redirector.init.gradle"
+
 runGradle() {
     local example="$1"
     local task="$2"
     pushd "$example"
     if [ "${#version_args[@]}" -gt 0 ]; then
-        ./gradlew "$task" "${version_args[@]}"
+        ./gradlew "$task" --init-script "$init_script" "${version_args[@]}"
     else
-        ./gradlew "$task"
+        ./gradlew "$task" --init-script "$init_script"
     fi
     popd
 }

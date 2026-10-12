@@ -1,9 +1,11 @@
 pluginManagement {
     repositories {
         google()
-        gradlePluginPortal()
-        mavenCentral()
+        mavenCentral {
+            url = uri("https://cache-redirector.jetbrains.com/maven-central")
+        }
         maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+        gradlePluginPortal()
         if (extra["compose.useMavenLocal"] == "true") {
             mavenLocal()
         }
@@ -31,7 +33,9 @@ dependencyResolutionManagement {
             mavenLocal() // mavenLocal should be the first to get the correct version of skiko during a local build.
         }
         google()
-        mavenCentral()
+        mavenCentral {
+            url = uri("https://cache-redirector.jetbrains.com/maven-central")
+        }
         maven("https://packages.jetbrains.team/maven/p/cmp/dev")
     }
 

@@ -24,8 +24,9 @@ pluginManagement {
     val kotlinVersion = buildSrcProperties["kotlin.version"] as String
 
     repositories {
-        gradlePluginPortal()
-        mavenCentral()
+        mavenCentral {
+            url = uri("https://cache-redirector.jetbrains.com/maven-central")
+        }
         repos?.forEach { urlPath ->
             maven {
                 url = uri(urlPath)
@@ -37,6 +38,7 @@ pluginManagement {
         maven {
             url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
         }
+        gradlePluginPortal()
         google()
         mavenLocal()
     }
@@ -56,7 +58,9 @@ pluginManagement {
 dependencyResolutionManagement {
     repositories {
         google()
-        mavenCentral()
+        mavenCentral {
+            url = uri("https://cache-redirector.jetbrains.com/maven-central")
+        }
         maven {
             url = uri("https://packages.jetbrains.team/maven/p/cmp/dev")
         }

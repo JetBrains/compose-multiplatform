@@ -25,6 +25,10 @@ if [ -n "$compose_version" ]; then
     tar -C "$example" --exclude=./build -cf - . | tar -C "$temp_dir" -xf -
     echo "Building a copy of $example in $temp_dir with Compose $compose_version${kotlin_version:+ and Kotlin $kotlin_version}"
 
+    # Replaces the default Maven Central (for both dependencies and Kotlin compiler artifacts) with cache-redirector,
+    # to avoid its rate limits on CI
+    export KOTLIN_DEFAULT_MAVEN_CENTRAL_URL="https://cache-redirector.jetbrains.com/maven-central"
+
     template="validation-versions.module-template.yaml"
     {
         echo "repositories:"
