@@ -10,7 +10,7 @@ _Changes since 1.12.1_
 
 ### iOS
 
-- Fixed a crash when a TextField lost focus due to a Dialog being displayed [#3459](https://github.com/JetBrains/compose-multiplatform-core/pull/3459)
+- Fixed a crash when a `TextField` lost focus due to a `Dialog` being displayed [#3459](https://github.com/JetBrains/compose-multiplatform-core/pull/3459)
 
 ### Web
 
