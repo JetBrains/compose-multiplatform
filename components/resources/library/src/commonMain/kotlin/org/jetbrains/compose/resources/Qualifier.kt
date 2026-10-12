@@ -110,3 +110,19 @@ enum class DensityQualifier(val dpi: Int) : Qualifier {
         }
     }
 }
+
+/**
+ * One locale in a preference list used for resource matching.
+ */
+@InternalResourceApi
+data class LocaleQualifiers(
+    val language: LanguageQualifier,
+    val script: ScriptQualifier = ScriptQualifier(""),
+    val region: RegionQualifier = RegionQualifier("")
+) {
+    constructor(language: String, script: String = "", region: String = "") : this(
+        LanguageQualifier(language),
+        ScriptQualifier(script),
+        RegionQualifier(region)
+    )
+}
