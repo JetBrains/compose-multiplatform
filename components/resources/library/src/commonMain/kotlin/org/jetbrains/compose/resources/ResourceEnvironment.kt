@@ -109,12 +109,12 @@ fun rememberResourceEnvironment(): ResourceEnvironment {
  * Chooses the locale list used for resource matching.
  *
  * [androidx.compose.ui.text.intl.LocaleList] is used as-is when it already contains a
- * fallback chain, which is the case on Android API 24+ and on the web.
+ * fallback chain, which is the case on Android API 24+.
  *
- * On JVM desktop it holds a single platform-default locale even when the OS has a preference
- * list, so the OS list supplies the missing fallback chain. The Compose locale stays in front
- * of it: an app that calls `Locale.setDefault` to pick its language is indistinguishable here
- * from a platform default, and dropping it would ignore the app.
+ * Where it holds a single platform-default locale, as on JVM desktop, the OS list supplies the
+ * missing fallback chain. The Compose locale stays in front of it: an app that calls
+ * `Locale.setDefault` to pick its language is indistinguishable here from a platform default,
+ * and dropping it would ignore the app.
  */
 internal fun selectResourceLocales(
     composeLocales: List<LocaleQualifiers>,

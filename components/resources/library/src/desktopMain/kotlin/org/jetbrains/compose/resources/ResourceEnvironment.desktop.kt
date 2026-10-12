@@ -6,8 +6,11 @@ import java.awt.GraphicsEnvironment
 import java.awt.Toolkit
 import java.util.*
 
+// Locale.getDefault() holds a single locale and cannot express a fallback chain.
+internal actual fun systemPreferredLocales(): List<LocaleQualifiers> =
+    listOf(localeQualifiersOf(Locale.getDefault()))
+
 internal actual fun getSystemEnvironment(): ResourceEnvironment {
-    val locale = Locale.getDefault()
     //FIXME: don't use skiko internals
     val isDarkTheme = currentSystemTheme == SystemTheme.DARK
     val dpi = if (GraphicsEnvironment.isHeadless()) {
@@ -17,10 +20,14 @@ internal actual fun getSystemEnvironment(): ResourceEnvironment {
         Toolkit.getDefaultToolkit().screenResolution
     }
     return ResourceEnvironment(
-        language = LanguageQualifier(locale.language),
-        script = ScriptQualifier(locale.script),
-        region = RegionQualifier(locale.country),
+        locales = systemPreferredLocales(),
         theme = ThemeQualifier.selectByValue(isDarkTheme),
         density = DensityQualifier.selectByValue(dpi)
     )
 }
+
+private fun localeQualifiersOf(locale: Locale) = LocaleQualifiers(
+    language = LanguageQualifier(locale.language),
+    script = ScriptQualifier(locale.script.orEmpty()),
+    region = RegionQualifier(locale.country.orEmpty())
+)
