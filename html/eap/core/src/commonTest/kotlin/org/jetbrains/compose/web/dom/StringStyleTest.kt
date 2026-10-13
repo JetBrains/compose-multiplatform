@@ -112,6 +112,23 @@ class StringStyleTest {
         )
     }
 
+    @Test
+    fun wholeStylesheetReadsChangingRulesAndKeepsRuleBoundaries() {
+        repeat(3) { i ->
+            val rules = listOf(".a", ".b").map { selector ->
+                object : CSSRuleDeclaration, CSSStyledRuleDeclaration {
+                    override fun equals(other: Any?) = this === other
+                    override fun hashCode() = selector.hashCode()
+                    override val header = selector
+                    override val style = StyleScopeBuilder().apply { property("content", "'$i'") }
+                }
+            }
+            val expected = rules.joinToString("\n") { it.stringPresentation(indent = " ", delimiter = "") }
+            assertEquals(
+                "<style>$expected</style>",
+                composeHtmlToString(key = "stylesheet-rule-reuse") { Style(cssRules = rules) })
+        }
+    }
 
     @Test
     fun emptyAssignmentsAndPriorityResetKeepTheirOrder() {

@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.web.dom
 
+import org.jetbrains.compose.web.HydrationAttributePrefix
 import org.jetbrains.compose.web.HydrationProtocolAttributes
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
 import org.jetbrains.compose.web.attributes.validateClassTokens
@@ -122,10 +123,21 @@ internal fun StringBuilder.appendStartTag(
     validate: Boolean,
     formState: FormControlState? = null,
 ): Boolean {
+    return appendStartTag(tagName, namespace, builder, validate, formState, null)
+}
+
+internal fun StringBuilder.appendStartTag(
+    tagName: String,
+    namespace: String,
+    builder: AttrsScopeBuilder<*>,
+    validate: Boolean,
+    formState: FormControlState?,
+    nameCache: HtmlAttributeNameCache?,
+): Boolean {
     // Class validation runs even when an explicit class attribute overrides the class list.
     if (validate) builder.classes.validateClassTokens()
     val attributes = builder.collect().withFormState(formState).ifEmpty { emptyMap() }
-    validateStringHtmlAttributes(attributes, namespace, validate, builder.hydrationProtocolAttributes)
+    validateStringHtmlAttributes(attributes, namespace, validate, builder.hydrationProtocolAttributes, nameCache)
     val hasScriptSource = tagName == "script" && attributes.keys.any { it.equals("src", ignoreCase = true) }
 
     append('<').append(tagName)
@@ -153,9 +165,17 @@ private fun validateStringHtmlAttributes(
     namespace: String,
     validate: Boolean,
     hydrationProtocolAttributes: Set<String>,
+) = validateStringHtmlAttributes(attributes, namespace, validate, hydrationProtocolAttributes, null)
+
+private fun validateStringHtmlAttributes(
+    attributes: Map<String, String>,
+    namespace: String,
+    validate: Boolean,
+    hydrationProtocolAttributes: Set<String>,
+    nameCache: HtmlAttributeNameCache?,
 ) {
     for (name in attributes.keys) {
-        requireValidHtmlAttributeName(name)
+        if (nameCache == null) requireValidHtmlAttributeName(name) else nameCache.requireValid(name)
         if (validate && namespace != HtmlNamespace) {
             for (previous in attributes.keys) {
                 if (previous == name) break
@@ -164,7 +184,7 @@ private fun validateStringHtmlAttributes(
                 }
             }
         }
-        val protocolName = if (name.startsWith("data-compose-hydration-", ignoreCase = true))
+        val protocolName = if (name.startsWith(HydrationAttributePrefix, ignoreCase = true))
             HydrationProtocolAttributes.firstOrNull { it.equals(name, ignoreCase = true) } else null
         require(protocolName == null || protocolName in hydrationProtocolAttributes) {
             "Attribute \"$name\" is owned by the Compose hydration protocol"
@@ -286,3 +306,16 @@ private fun StringBuilder.appendEscaped(value: String, attribute: Boolean) {
 
 /** A native search fast path where the platform supports it. */
 internal expect fun isUnescapedHtmlString(value: String, attribute: Boolean): Boolean
+
+/** Per renderer, bounded, and independent of attribute values or protocol ownership. */
+internal class HtmlAttributeNameCache {
+    // Keep the first 128 short names without eviction bookkeeping.
+    // Later names still validate on every use if dynamic names fill the cache.
+    private val names = HashSet<String>()
+    internal val size: Int get() = names.size
+    fun requireValid(name: String) {
+        if (name in names) return
+        requireValidHtmlAttributeName(name)
+        if (name.length <= 128 && names.size < 128) names.add(name)
+    }
+}

@@ -405,4 +405,46 @@ class SinglePassRenderingTest {
         override fun onForgotten() { events.add("forget $name") }
         override fun onAbandoned() { events.add("abandon $name") }
     }
+
+    @Test
+    fun internalValidationLocalOverridesAndRestoresInNestedProviders() {
+        repeat(3) {
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString(key = "validation-provider-reuse", validateStrictly = false) {
+                    CompositionLocalProvider(LocalHtmlValidationMode provides HtmlValidationMode.Strict) {
+                        Div({ classes("bad token") })
+                    }
+                }
+            }
+            assertEquals("<span></span><div class=\"bad token\"></div><span>ok</span>", composeHtmlToString(key = "validation-provider-reuse", validateStrictly = false) {
+                CompositionLocalProvider(LocalHtmlValidationMode provides HtmlValidationMode.Strict) { Span {} }
+                CompositionLocalProvider(LocalHtmlValidationMode provides HtmlValidationMode.Fast) { Div({ classes("bad token") }) }
+                Span { Text("ok") }
+            })
+        }
+    }
+
+    @Test
+    fun computedValidationProvidersReadChangingValues() {
+        var strict = false
+        assertFailsWith<IllegalArgumentException> {
+            composeHtmlToString {
+                CompositionLocalProvider(LocalHtmlValidationMode providesComputed {
+                    if (strict) HtmlValidationMode.Strict else HtmlValidationMode.Fast
+                }) {
+                    Div({ classes("allowed in fast mode") })
+                    strict = true
+                    Div({ classes("rejected in strict mode") })
+                }
+            }
+        }
+    }
+
+    @Test
+    fun unusedComputedContextProvidersRemainLazy() {
+        assertEquals("", composeHtmlToString {
+            CompositionLocalProvider(LocalComposeHtmlContext providesComputed { error("Unused context") }) {}
+        })
+    }
+
 }

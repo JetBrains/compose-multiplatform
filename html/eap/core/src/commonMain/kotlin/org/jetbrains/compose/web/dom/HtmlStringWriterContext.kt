@@ -225,7 +225,7 @@ internal class HtmlStringWriterContext(
             applyAttrs?.invoke(builder)
             val formState = builder.propertyUpdatesOrEmpty.formControlState(tagName, namespace)
             val hasScriptSource =
-                output.appendStartTag(tagName, namespace, builder, validate, formState)
+                output.appendStartTag(tagName, namespace, builder, validate, formState, attrsBuilders.nameCache)
             pendingLeadingNewline = false // A child tag starts with '<', which needs no LF repair.
             return if (formState?.textContent == null && !hasScriptSource) StartTagResult.Ordinary
             else StartTagResult(formState?.textContent, hasScriptSource)
@@ -298,6 +298,7 @@ internal class HtmlStringWriterContext(
 
 /** Reuses attribute builders by element order without retaining their values between elements. */
 internal class AttrsBuilderPool {
+    val nameCache = HtmlAttributeNameCache()
     private val builders = mutableListOf<AttrsScopeBuilder<*>>()
     // Reuse immutable metadata for SVG elements and keyed renders. Bound both the number
     // and length of retained dynamic names. Only one active renderer owns this storage.
