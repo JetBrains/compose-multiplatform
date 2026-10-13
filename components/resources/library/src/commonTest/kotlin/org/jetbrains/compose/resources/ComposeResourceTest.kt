@@ -343,14 +343,53 @@ class ComposeResourceTest : KmpUiTest() {
     }
 
     @Test
-    fun testPluralRulesOfAnUnqualifiedResourceFollowTheFirstPreferredLocale() = runTest {
-        // values/ carries no language qualifier, so there is nothing to read the rules from
-        // and the first preferred locale decides, as it did before this environment held a list
+    fun testPluralRulesOfAnUnqualifiedResourceFollowDefaultLanguage() = runTest {
+        // values/ carries no language qualifier, so it represents the base development language
+        // (DEFAULT_LANGUAGE = "en"). When user prefers [fr, en], English plural rules are used
+        // rather than the first preferred locale (French), so 0 evaluates to OTHER.
         val resource = PluralStringResource(
             id = "PLURALS:plural_default_rules",
             key = "plurals",
             items = setOf(
                 ResourceItem(setOf(), "strings.cvr", 171, 39)
+            )
+        )
+        val env = ResourceEnvironment(
+            locales = listOf(LocaleQualifiers("fr"), LocaleQualifiers("en")),
+            theme = ThemeQualifier.LIGHT,
+            density = DensityQualifier.MDPI
+        )
+        assertEquals("other", getPluralString(env, resource, 0))
+    }
+
+    @Test
+    fun testPluralRulesOfAnUnqualifiedResourceWithNonEnglishUserLocale() = runTest {
+        // Even when the user's preferred locales contain no English, unqualified resources
+        // from values/ are written in the base development language (English), so English
+        // plural rules apply and 0 evaluates to OTHER.
+        val resource = PluralStringResource(
+            id = "PLURALS:plural_default_rules_fr_only",
+            key = "plurals",
+            items = setOf(
+                ResourceItem(setOf(), "strings.cvr", 171, 39)
+            )
+        )
+        val env = ResourceEnvironment(
+            locales = listOf(LocaleQualifiers("fr")),
+            theme = ThemeQualifier.LIGHT,
+            density = DensityQualifier.MDPI
+        )
+        assertEquals("other", getPluralString(env, resource, 0))
+    }
+
+    @Test
+    fun testPluralRulesFollowExplicitMatchedLanguage() = runTest {
+        // When French resources match, French plural rules must be used: 0 evaluates to ONE.
+        val resource = PluralStringResource(
+            id = "PLURALS:plural_french_rules",
+            key = "plurals",
+            items = setOf(
+                ResourceItem(setOf(LanguageQualifier("fr")), "strings.cvr", 171, 39)
             )
         )
         val env = ResourceEnvironment(

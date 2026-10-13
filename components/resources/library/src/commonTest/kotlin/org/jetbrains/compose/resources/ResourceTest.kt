@@ -322,7 +322,7 @@ class ResourceTest {
     }
 
     @Test
-    fun testUnqualifiedValuesIsLastResortNotEnglish() {
+    fun testUnqualifiedValuesMatchesEnglishOrDefaultFallback() {
         val resourceDefaultAndEs = DrawableResource(
             id = "ImageResource:default_es_test",
             items = setOf(
@@ -330,8 +330,19 @@ class ResourceTest {
                 ResourceItem(setOf(LanguageQualifier("es")), "es", -1, -1),
             )
         )
+        // Non-English locale without match advances to next preferred locale
         assertEquals(
             "es",
+            resourceDefaultAndEs.getResourceItemByEnvironment(
+                multiLocaleEnv(
+                    LocaleQualifiers("fr", "", "CA"),
+                    LocaleQualifiers("es", "", "US")
+                )
+            ).path
+        )
+        // English preferred locale matches default (unqualified) values
+        assertEquals(
+            "default",
             resourceDefaultAndEs.getResourceItemByEnvironment(
                 multiLocaleEnv(
                     LocaleQualifiers("en", "", "IN"),
@@ -339,6 +350,88 @@ class ResourceTest {
                 )
             ).path
         )
+    }
+
+    @Test
+    fun testDefaultEnglishTakesPrecedenceOverLaterPreferredLocales() {
+        val resourceWithDefaultHiEs = DrawableResource(
+            id = "ImageResource:notey_locale_test",
+            items = setOf(
+                ResourceItem(setOf(), "default", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("hi")), "hi", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("es")), "es", -1, -1),
+            )
+        )
+        // User with [en-US, hi-US, es-US] resolves to English (default) instead of Hindi
+        assertEquals(
+            "default",
+            resourceWithDefaultHiEs.getResourceItemByEnvironment(
+                multiLocaleEnv(
+                    LocaleQualifiers("en", "", "US"),
+                    LocaleQualifiers("hi", "", "US"),
+                    LocaleQualifiers("es", "", "US")
+                )
+            ).path
+        )
+        // But if user's first preference is Hindi [hi-IN, en-US], it resolves to Hindi
+        assertEquals(
+            "hi",
+            resourceWithDefaultHiEs.getResourceItemByEnvironment(
+                multiLocaleEnv(
+                    LocaleQualifiers("hi", "", "IN"),
+                    LocaleQualifiers("en", "", "US")
+                )
+            ).path
+        )
+    }
+
+    @Test
+    fun testEnglishWithDifferentRegions() {
+        val resourceDefaultAndHi = DrawableResource(
+            id = "ImageResource:en_regions_default_test",
+            items = setOf(
+                ResourceItem(setOf(), "default", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("hi")), "hi", -1, -1),
+            )
+        )
+        // Different English regions resolve to default when no regional folders exist
+        assertEquals("default", resourceDefaultAndHi.getResourceItemByEnvironment(
+            multiLocaleEnv(LocaleQualifiers("en", "", "GB"), LocaleQualifiers("hi", "", "IN"))
+        ).path)
+        assertEquals("default", resourceDefaultAndHi.getResourceItemByEnvironment(
+            multiLocaleEnv(LocaleQualifiers("en", "", "AU"), LocaleQualifiers("hi", "", "IN"))
+        ).path)
+        assertEquals("default", resourceDefaultAndHi.getResourceItemByEnvironment(
+            multiLocaleEnv(LocaleQualifiers("en", "", "CA"), LocaleQualifiers("hi", "", "IN"))
+        ).path)
+
+        // When explicit regional English exists, it is preferred for that region
+        val resourceWithGbAndDefault = DrawableResource(
+            id = "ImageResource:en_gb_test",
+            items = setOf(
+                ResourceItem(setOf(), "default", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("en"), RegionQualifier("GB")), "en-GB", -1, -1),
+            )
+        )
+        assertEquals("en-GB", resourceWithGbAndDefault.getResourceItemByEnvironment(
+            multiLocaleEnv(LocaleQualifiers("en", "", "GB"))
+        ).path)
+        // For en-US, default (generic English) is preferred over other-region en-GB
+        assertEquals("default", resourceWithGbAndDefault.getResourceItemByEnvironment(
+            multiLocaleEnv(LocaleQualifiers("en", "", "US"))
+        ).path)
+
+        // Explicit LanguageQualifier("en") beats unqualified default
+        val resourceWithExplicitEnAndDefault = DrawableResource(
+            id = "ImageResource:en_explicit_test",
+            items = setOf(
+                ResourceItem(setOf(), "default", -1, -1),
+                ResourceItem(setOf(LanguageQualifier("en")), "en", -1, -1),
+            )
+        )
+        assertEquals("en", resourceWithExplicitEnAndDefault.getResourceItemByEnvironment(
+            multiLocaleEnv(LocaleQualifiers("en", "", "US"))
+        ).path)
     }
 
     @Test

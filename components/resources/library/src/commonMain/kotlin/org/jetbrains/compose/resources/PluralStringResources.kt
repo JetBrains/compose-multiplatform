@@ -69,11 +69,12 @@ private suspend fun loadPluralString(
 ): String {
     val resourceItem = resource.getResourceItemByEnvironment(environment)
     val item = getStringItem(resourceItem, resourceReader) as StringItem.Plurals
-    val itemLanguage = resourceItem.qualifiers.filterIsInstance<LanguageQualifier>().firstOrNull() ?: environment.language
+    val itemLanguage = resourceItem.qualifiers.filterIsInstance<LanguageQualifier>().firstOrNull()
+        ?: LanguageQualifier(DEFAULT_LANGUAGE)
     val matchedLocale = environment.locales.firstOrNull { it.language == itemLanguage }
     val itemRegion = resourceItem.qualifiers.filterIsInstance<RegionQualifier>().firstOrNull()
         ?: matchedLocale?.region
-        ?: environment.region
+        ?: RegionQualifier("")
     val pluralRuleList = PluralRuleList.getInstance(
         itemLanguage,
         itemRegion,

@@ -267,6 +267,8 @@ private fun ResourceItem.scriptQualifier(): ScriptQualifier? =
 private fun ResourceItem.regionQualifier(): RegionQualifier? =
     qualifiers.filterIsInstance<RegionQualifier>().firstOrNull()
 
+internal const val DEFAULT_LANGUAGE = "en"
+
 private val TRADITIONAL_CHINESE_REGIONS = setOf("TW", "HK", "MO")
 
 // Android computes a script for a locale that does not name one and never matches across
@@ -314,16 +316,23 @@ private fun List<ResourceItem>.filterBySingleLocale(
     val withLanguage = filter { item ->
         item.qualifiers.any { it == language }
     }
-    if (withLanguage.isEmpty()) return emptyList()
+    val defaultItems = if (language.language == DEFAULT_LANGUAGE && script.isEmpty() && withLanguage.none { it.regionQualifier() == null }) {
+        filter { item ->
+            item.qualifiers.none { it is LanguageQualifier || it is ScriptQualifier || it is RegionQualifier }
+        }
+    } else emptyList()
+
+    val candidates = withLanguage + defaultItems
+    if (candidates.isEmpty()) return emptyList()
 
     val wantedScript = script.script.ifEmpty { likelyScript(language.language, region.region).orEmpty() }
     val scriptCompatible = if (wantedScript.isNotEmpty()) {
-        withLanguage.filter {
+        candidates.filter {
             val itemScript = it.effectiveScript(language.language)
             itemScript == null || itemScript == wantedScript
         }
     } else {
-        withLanguage
+        candidates
     }
     if (scriptCompatible.isEmpty()) return emptyList()
 
@@ -345,9 +354,9 @@ private fun List<ResourceItem>.filterBySingleLocale(
         return withoutScript.narrowByRegion(language, region, allowOtherRegions = true)
     }
 
-    val withDefaultScript = withLanguage.filter { it.scriptQualifier() == null }
+    val withDefaultScript = candidates.filter { it.scriptQualifier() == null }
     val defaultScriptMatch = withDefaultScript.narrowByRegion(language, region, allowOtherRegions = true)
     if (defaultScriptMatch.isNotEmpty()) return defaultScriptMatch
 
-    return withLanguage.narrowByRegion(language, region, allowOtherRegions = true)
+    return candidates.narrowByRegion(language, region, allowOtherRegions = true)
 }
