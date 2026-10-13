@@ -12,10 +12,12 @@ fi
 COMPOSE_VERSION=$1
 KOTLIN_VERSION=$2
 
+# Resolves Maven Central through cache-redirector, to avoid its rate limits on CI
+INIT_SCRIPT="$(cd "$(dirname "$0")" && pwd)/cache-redirector.init.gradle"
 
 runGradle() {
     pushd $1
-    ./gradlew $2 -Pcompose.version=$COMPOSE_VERSION -Pkotlin.version=$KOTLIN_VERSION
+    ./gradlew $2 --init-script "$INIT_SCRIPT" -Pcompose.version=$COMPOSE_VERSION -Pkotlin.version=$KOTLIN_VERSION
     popd
 }
 

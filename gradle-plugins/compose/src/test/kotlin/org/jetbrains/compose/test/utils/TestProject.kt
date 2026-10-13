@@ -62,6 +62,7 @@ class TestProject(
         "--info",
         "--stacktrace",
         "-P${ComposeProperties.VERBOSE}=${testEnvironment.composeVerbose}",
+        "--init-script", testProjectsRootDir.resolve("cache-redirector.init.gradle").absolutePath,
         if (testEnvironment.parsedGradleVersion < GradleVersion.version("8.0")) {
             null
         } else {
