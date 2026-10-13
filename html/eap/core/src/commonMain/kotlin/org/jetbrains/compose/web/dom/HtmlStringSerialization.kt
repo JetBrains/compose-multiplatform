@@ -121,16 +121,6 @@ internal fun StringBuilder.appendStartTag(
     namespace: String,
     builder: AttrsScopeBuilder<*>,
     validate: Boolean,
-    formState: FormControlState? = null,
-): Boolean {
-    return appendStartTag(tagName, namespace, builder, validate, formState, null)
-}
-
-internal fun StringBuilder.appendStartTag(
-    tagName: String,
-    namespace: String,
-    builder: AttrsScopeBuilder<*>,
-    validate: Boolean,
     formState: FormControlState?,
     nameCache: HtmlAttributeNameCache?,
 ): Boolean {
@@ -159,13 +149,6 @@ internal fun StringBuilder.appendStartTag(
     // Only inline script validation needs attribute information after the builder is reset.
     return hasScriptSource
 }
-
-private fun validateStringHtmlAttributes(
-    attributes: Map<String, String>,
-    namespace: String,
-    validate: Boolean,
-    hydrationProtocolAttributes: Set<String>,
-) = validateStringHtmlAttributes(attributes, namespace, validate, hydrationProtocolAttributes, null)
 
 private fun validateStringHtmlAttributes(
     attributes: Map<String, String>,
