@@ -90,7 +90,7 @@ internal class StringHtmlAttributes private constructor(
         ): StringHtmlAttributes {
             if (attributes.isEmpty() && classAttributeValue == null && styleAttributeValue == null) return Empty
 
-            validateStringHtmlAttributes(attributes, namespace, validate, hydrationProtocolAttributes)
+            validateStringHtmlAttributes(attributes, namespace, validate, hydrationProtocolAttributes, null)
             val serializedAttributes = linkedMapOf<String, String>().apply { putAll(attributes) }
 
             if ("class" !in serializedAttributes && classAttributeValue != null) {
@@ -275,7 +275,7 @@ internal fun StringBuilder.appendEscapedText(value: String) {
 // Append ordinary runs in bulk. Besides avoiding an append per character, this lets the
 // JVM copy Latin-1 and UTF-16 runs with its native StringBuilder implementation.
 private fun StringBuilder.appendEscaped(value: String, attribute: Boolean) {
-    if (value.length >= 32 && isUnescapedHtmlString(value, attribute)) {
+    if (canAppendUnescapedHtmlString(value, attribute)) {
         append(value)
         return
     }
@@ -296,16 +296,16 @@ private fun StringBuilder.appendEscaped(value: String, attribute: Boolean) {
             else -> null
         }
         if (replacement != null) {
-            append(value, start, index)
+            appendHtmlRun(value, start, index)
             append(replacement)
             start = index + 1
         }
     }
-    append(value, start, value.length)
+    if (start == 0) append(value) else appendHtmlRun(value, start, value.length)
 }
 
 /** A native search fast path where the platform supports it. */
-internal expect fun isUnescapedHtmlString(value: String, attribute: Boolean): Boolean
+internal expect fun canAppendUnescapedHtmlString(value: String, attribute: Boolean): Boolean
 
 /** Per renderer, bounded, and independent of attribute values or protocol ownership. */
 internal class HtmlAttributeNameCache {
@@ -319,3 +319,6 @@ internal class HtmlAttributeNameCache {
         if (name.length <= 128 && names.size < 128) names.add(name)
     }
 }
+
+/** Copies a range using the platform's string representation. */
+internal expect fun StringBuilder.appendHtmlRun(value: String, start: Int, end: Int)
