@@ -117,6 +117,10 @@ public final class org/jetbrains/compose/resources/ResourceReaderKt {
 	public static final fun getLocalResourceReader ()Landroidx/compose/runtime/ProvidableCompositionLocal;
 }
 
+public final class org/jetbrains/compose/resources/ResourceState_blockingKt {
+	public static final fun awaitPendingResourceStateLoads (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
 public final class org/jetbrains/compose/resources/StringArrayResource : org/jetbrains/compose/resources/Resource {
 	public static final field $stable I
 	public final fun getKey ()Ljava/lang/String;
