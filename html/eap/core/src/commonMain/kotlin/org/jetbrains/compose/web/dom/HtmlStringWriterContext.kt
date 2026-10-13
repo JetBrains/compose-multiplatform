@@ -32,11 +32,13 @@ internal class HtmlStringWriterContext(
     private val chunkSize: Int = 2048,
 ) : ComposeHtmlContext {
     private val streaming = chunkSink != null
+
     // Used to trim retained output storage.
     var peakBufferSize: Int = 0
         private set
     private val elementScope = StringElementScope<Element>()
     private var finished = false
+
     // These elements must keep their content in the shared buffer until their end tag is written.
     private var bufferedElementDepth = 0
 
@@ -47,6 +49,7 @@ internal class HtmlStringWriterContext(
     private var currentTagName: String? = null
     private var currentNamespace = HtmlNamespace
     private var previousSiblingWasText = false
+
     // The HTML parser drops the first LF in pre, textarea, and listing. Repair it when the
     // first content is written, so these elements can stream without retaining their children.
     private var pendingLeadingNewline = false
@@ -79,6 +82,7 @@ internal class HtmlStringWriterContext(
     override fun <TElement : Element> TagElement(
         elementBuilder: ElementBuilder<TElement>,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        rawTextContent: RawTextContent?,
         content: (@Composable ElementScope<TElement>.() -> Unit)?,
     ) {
         checkNotFinished()
@@ -92,12 +96,12 @@ internal class HtmlStringWriterContext(
         val namespace = metadata?.namespace ?: HtmlNamespace
         val flags = metadata?.serializationFlags
         val rawTextElement = if (flags == null) isHtmlRawTextElement(tagName, namespace)
-            else flags and RawTextTagFlag != 0
+        else flags and RawTextTagFlag != 0
 
         // Emit any completed chunk before writing this start tag.
         flushChunk()
         val bufferElement = streaming &&
-            (rawTextElement || (namespace == HtmlNamespace && tagName == "noscript"))
+                (rawTextElement || (namespace == HtmlNamespace && tagName == "noscript"))
         if (bufferElement) bufferedElementDepth++
 
         val startTag = writeStartTag(
@@ -108,7 +112,6 @@ internal class HtmlStringWriterContext(
             tagNameIsValid = flags != null && flags and ValidTagFlag != 0,
         )
         val contentOverride = startTag.textContent
-        val hasScriptSource = startTag.hasScriptSource
         // A raw-text parent rejects child tags, and a void parent returned above.
         // Only the parent's tag and namespace need saving.
         val parentTagName = currentTagName
@@ -118,7 +121,7 @@ internal class HtmlStringWriterContext(
         currentNamespace = namespace
         previousSiblingWasText = false
         pendingLeadingNewline = if (flags == null) isHtmlLeadingNewlineElement(tagName, namespace)
-            else flags and LeadingNewlineTagFlag != 0
+        else flags and LeadingNewlineTagFlag != 0
         collectingRawText = rawTextElement
 
         flushChunk()
@@ -126,9 +129,13 @@ internal class HtmlStringWriterContext(
         val contentStart = output.length
         if (!contentOverride.isNullOrEmpty()) writeText(contentOverride)
         discardingContent = isVoid || contentOverride != null
+        if (rawTextContent != null && !discardingContent) {
+            rawTextContent.validateScriptSource(startTag.hasScriptSource)
+            output.append(rawTextContent.text)
+        }
         content?.invoke(elementScope())
 
-        if (!isVoid) writeEndTag(tagName, namespace, hasScriptSource, contentStart)
+        if (!isVoid) writeEndTag(tagName, namespace, startTag.hasScriptSource, contentStart)
         currentTagName = parentTagName
         currentNamespace = parentNamespace
         previousSiblingWasText = false
@@ -147,9 +154,7 @@ internal class HtmlStringWriterContext(
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
         content: RawTextContent,
     ) {
-        TagElement(elementBuilder<TElement>(tagName), applyAttrs) {
-            TextElement(content.text)
-        }
+        TagElement(elementBuilder<TElement>(tagName), applyAttrs, rawTextContent = content, content = null)
     }
 
     @Composable
@@ -164,6 +169,7 @@ internal class HtmlStringWriterContext(
                 hasRawTextCall = true
                 rawText.append(value)
             }
+
             value.isNotEmpty() -> {
                 writeText(value)
                 flushChunk()
@@ -218,7 +224,8 @@ internal class HtmlStringWriterContext(
         try {
             applyAttrs?.invoke(builder)
             val formState = builder.propertyUpdatesOrEmpty.formControlState(tagName, namespace)
-            val hasScriptSource = output.appendStartTag(tagName, namespace, builder, validate, formState)
+            val hasScriptSource =
+                output.appendStartTag(tagName, namespace, builder, validate, formState)
             pendingLeadingNewline = false // A child tag starts with '<', which needs no LF repair.
             return if (formState?.textContent == null && !hasScriptSource) StartTagResult.Ordinary
             else StartTagResult(formState?.textContent, hasScriptSource)
@@ -306,8 +313,6 @@ internal class AttrsBuilderPool {
         }
         return builder
     }
-
-
 
     fun <TElement : Element> builder(index: Int): AttrsScopeBuilder<TElement> {
         if (index == builders.size) builders.add(AttrsScopeBuilder<Element>())

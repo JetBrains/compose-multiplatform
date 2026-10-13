@@ -815,4 +815,23 @@ class HtmlSerializationTest {
         assertSame(svg, pool.elementBuilder<Element>("script", TestSvgNamespace))
     }
 
+
+    @Test
+    fun attributeNameChecksRejectAllControlsAndProtocolSpoofing() {
+        for (character in (0..31).map(Int::toChar) + (127..159).map(Int::toChar) + " \"'/>=".toList()) {
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString { Div(attrs = { attr("prefix${character}suffix", "value") }) }
+            }
+        }
+        for (name in listOf("data-compose-hydration-root", "DATA-COMPOSE-HYDRATION-STATE",
+                            "Data-Compose-Hydration-For", "data-compose-hydration-validation")) {
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString { Div(attrs = { attr(name, "value") }) }
+            }
+        }
+        assertEquals("<div data-compose-hydration-other=\"allowed\"></div>", composeHtmlToString {
+            Div(attrs = { attr("data-compose-hydration-other", "allowed") })
+        })
+    }
+
 }
