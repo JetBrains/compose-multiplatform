@@ -80,7 +80,7 @@ class DirectStringRenderingTest {
     }
 
     @Test
-    fun preservesLocalsSnapshotsAndEffectLifecycle() {
+    fun preservesLocalsStateWritesAndEffectLifecycle() {
         val local = staticCompositionLocalOf { "default" }
         val state = mutableStateOf("outside")
         var remembered = 0
@@ -103,7 +103,7 @@ class DirectStringRenderingTest {
                 }
             }
             assertEquals("<div>local-$request:$request:${request + 1}</div>", html)
-            assertEquals("outside", state.value)
+            assertEquals("$request", state.value)
         }
         assertEquals((0..2).flatMap { listOf("enter $it", "side $it", "dispose $it") }, effects)
         assertFalse(launched)

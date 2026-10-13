@@ -11,6 +11,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -108,7 +109,7 @@ class ComposeHtmlToStringTest {
     }
 
     @Test
-    fun keyedRendersDiscardSnapshotWritesAndHonorHydrationMode() {
+    fun keyedRendersRetainSnapshotWritesAndHonorHydrationMode() {
         val state = mutableStateOf("initial")
         fun render(value: String, hydratable: Boolean) =
             composeHtmlToString(hydratable = hydratable, key = "keyed-snapshot") {
@@ -118,9 +119,9 @@ class ComposeHtmlToStringTest {
             }
 
         assertEquals("firsttail", render("first", hydratable = false))
-        assertEquals("initial", state.value)
+        assertEquals("first", state.value)
         assertEquals("second<!--c-->tail", render("second", hydratable = true))
-        assertEquals("initial", state.value)
+        assertEquals("second", state.value)
     }
 
     @Test
@@ -181,7 +182,7 @@ class ComposeHtmlToStringTest {
     }
 
     @Test
-    fun discardsSnapshotStateChangesMadeWhileRendering() {
+    fun retainsSnapshotStateChangesMadeWhileRenderingAndDisposing() {
         val sharedState = mutableStateOf("initial")
 
         val html = composeHtmlToString {
@@ -194,7 +195,56 @@ class ComposeHtmlToStringTest {
         }
 
         assertEquals("render", html)
-        assertEquals("initial", sharedState.value)
+        assertEquals("dispose", sharedState.value)
+    }
+
+    @Test
+    fun callerSnapshotControlsIsolationAndIncludesEffectCleanup() {
+        for (renderKey in listOf(null, "caller-snapshot")) {
+            val state = mutableStateOf("outside")
+            val snapshot = Snapshot.takeMutableSnapshot()
+            try {
+                snapshot.enter {
+                    state.value = "caller"
+                    assertEquals("caller", composeHtmlToString(key = renderKey) {
+                        Text(state.value)
+                        SideEffect { state.value = "side effect" }
+                        DisposableEffect(Unit) {
+                            onDispose { state.value = "dispose" }
+                        }
+                    })
+                    assertEquals("dispose", state.value)
+                }
+                assertEquals("outside", state.value)
+            } finally {
+                snapshot.dispose()
+            }
+            assertEquals("outside", state.value)
+        }
+    }
+
+    @Test
+    fun callerSnapshotIsNotDisposedWhenRenderingFails() {
+        val state = mutableStateOf("outside")
+        val snapshot = Snapshot.takeMutableSnapshot()
+        try {
+            snapshot.enter {
+                assertFailsWith<IllegalStateException> {
+                    composeHtmlToString(key = "caller-snapshot-failure") {
+                        state.value = "failed render"
+                        error("content failed")
+                    }
+                }
+                assertEquals("failed render", state.value)
+                state.value = "recovered"
+                assertEquals("recovered", composeHtmlToString(key = "caller-snapshot-failure") {
+                    Text(state.value)
+                })
+            }
+            assertEquals("outside", state.value)
+        } finally {
+            snapshot.dispose()
+        }
     }
 
     @Test

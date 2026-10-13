@@ -206,7 +206,7 @@ class HydratedDocumentStreamTest {
     }
 
     @Test
-    fun discardsSnapshotChangesAndDisposesTheCompositionEvenWhenTheSinkFails() {
+    fun retainsSnapshotChangesAndDisposesTheCompositionEvenWhenTheSinkFails() {
         for (fail in listOf(false, true)) {
             val sharedState = mutableStateOf("initial")
             var disposals = 0
@@ -224,7 +224,7 @@ class HydratedDocumentStreamTest {
             }
             if (fail) assertSame(sinkFailure, assertFailsWith<IllegalStateException> { render() })
             else render()
-            assertEquals("initial", sharedState.value)
+            assertEquals("rendered", sharedState.value)
             assertEquals(1, disposals)
             if (!fail) assertContains(chunks.single(), "rendered</script>")
         }

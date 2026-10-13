@@ -7,6 +7,7 @@
 package org.jetbrains.compose.web
 
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.browser.dom.Element
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.compose.web.dom.*
@@ -82,7 +83,7 @@ class SinglePassRenderingTest {
     }
 
     @Test
-    fun sameLambdaFreshRememberAndSnapshotIsolation() {
+    fun sameLambdaFreshRememberAndStateWrites() {
         val state = mutableStateOf("outside")
         var value = ""
         var calls = 0
@@ -95,9 +96,47 @@ class SinglePassRenderingTest {
             value = next
             val expected = composeHtmlToString { Div { Text("$value:${i + 1}") } }
             assertEquals(expected, composeHtmlToString(key = "same-lambda", content = content))
-            assertEquals("outside", state.value)
+            assertEquals(value, state.value)
         }
         assertEquals(4, calls)
+    }
+
+    @Test
+    fun readOnlySnapshotRejectsWritesToExistingStateFromContentAndEffects() {
+        val state = mutableStateOf("before")
+        for (writeInEffect in listOf(false, true)) {
+            val snapshot = Snapshot.takeSnapshot()
+            try {
+                assertFailsWith<IllegalStateException> {
+                    snapshot.enter {
+                        composeHtmlToString {
+                            if (writeInEffect) SideEffect { state.value = "after" }
+                            else state.value = "after"
+                        }
+                    }
+                }
+            } finally {
+                snapshot.dispose()
+            }
+            assertEquals("before", state.value)
+        }
+    }
+
+    @Test
+    fun readOnlySnapshotRejectsWritesToStateCreatedDuringRendering() {
+        val snapshot = Snapshot.takeSnapshot()
+        try {
+            assertFailsWith<IllegalStateException> {
+                snapshot.enter {
+                    composeHtmlToString {
+                        val state = remember { mutableStateOf("before") }
+                        state.value = "after"
+                    }
+                }
+            }
+        } finally {
+            snapshot.dispose()
+        }
     }
 
     @Test
@@ -398,14 +437,6 @@ class SinglePassRenderingTest {
         assertEquals("ok", composeHtmlToString(key = "outer") { Text("ok") })
     }
 
-    private enum class HashKey { First, Second }
-
-    private class Observer(val name: String, val events: MutableList<String>) : RememberObserver {
-        override fun onRemembered() { events.add("remember $name") }
-        override fun onForgotten() { events.add("forget $name") }
-        override fun onAbandoned() { events.add("abandon $name") }
-    }
-
     @Test
     fun internalValidationLocalOverridesAndRestoresInNestedProviders() {
         repeat(3) {
@@ -445,6 +476,14 @@ class SinglePassRenderingTest {
         assertEquals("", composeHtmlToString {
             CompositionLocalProvider(LocalComposeHtmlContext providesComputed { error("Unused context") }) {}
         })
+    }
+
+    private enum class HashKey { First, Second }
+
+    private class Observer(val name: String, val events: MutableList<String>) : RememberObserver {
+        override fun onRemembered() { events.add("remember $name") }
+        override fun onForgotten() { events.add("forget $name") }
+        override fun onAbandoned() { events.add("abandon $name") }
     }
 
 }
