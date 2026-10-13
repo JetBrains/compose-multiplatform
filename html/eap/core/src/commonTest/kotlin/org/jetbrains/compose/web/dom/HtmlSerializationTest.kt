@@ -746,4 +746,73 @@ class HtmlSerializationTest {
             html,
         )
     }
+
+    @Test
+    fun escapingPreservesEntitiesAndUnicodeAcrossFastPathLengths() {
+        for (length in listOf(0, 1, 30, 31, 32, 33, 63, 64, 65, 1024)) {
+            val prefix = "é😀a".repeat(length)
+            val suffix = "<&>\r\"\n\t&amp;"
+            val html = composeHtmlToString {
+                Div(attrs = { attr("title", prefix + suffix) }) { Text(prefix + suffix) }
+            }
+            assertEquals(
+                "<div title=\"${prefix}&lt;&amp;&gt;&#13;&quot;&#10;&#9;&amp;amp;\">" +
+                    "${prefix}&lt;&amp;&gt;&#13;\"\n\t&amp;amp;</div>",
+                html,
+            )
+        }
+    }
+
+    @Test
+    fun longUnescapedStringsStillRejectNul() {
+        for (position in listOf(0, 31, 32, 1000)) {
+            val value = "x".repeat(position) + '\u0000' + "y".repeat(1000)
+            assertFailsWith<IllegalArgumentException> { composeHtmlToString { Text(value) } }
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString { Div(attrs = { attr("title", value) }) }
+            }
+        }
+    }
+
+    @Test
+    fun classTokensEscapeOnceAndExplicitClassStillOverrides() {
+        for (strict in listOf(false, true)) {
+            assertEquals("<div class=\"a&amp; b&quot;\"></div>", composeHtmlToString(validateStrictly = strict) {
+                Div(attrs = { classes("a&", "b\"") })
+            })
+            assertEquals("<div class=\"explicit\"></div>", composeHtmlToString(validateStrictly = strict) {
+                Div(attrs = {
+                    classes("a&", "b\"")
+                    attr("class", "explicit")
+                })
+            })
+        }
+        assertFailsWith<IllegalArgumentException> {
+            composeHtmlToString(validateStrictly = true) {
+                Div(attrs = {
+                    classes("invalid token")
+                    attr("class", "explicit")
+                })
+            }
+        }
+    }
+
+    @Test
+    fun rendererBuilderCacheSeparatesNamespacesAndStopsAtItsBound() {
+        val pool = AttrsBuilderPool()
+        val html = pool.elementBuilder<Element>("script", HtmlNamespace)
+        val svg = pool.elementBuilder<Element>("script", TestSvgNamespace)
+        assertSame(html, pool.elementBuilder<Element>("script", HtmlNamespace))
+        assertSame(svg, pool.elementBuilder<Element>("script", TestSvgNamespace))
+        assertNotSame(html, svg)
+        assertEquals(RawTextTagFlag or ValidTagFlag, (html as HtmlTagMetadata).serializationFlags)
+        assertEquals(ValidTagFlag, (svg as HtmlTagMetadata).serializationFlags)
+        repeat(126) { pool.elementBuilder<Element>("tag-$it", TestSvgNamespace) }
+        assertNotSame(
+            pool.elementBuilder<Element>("uncached", TestSvgNamespace),
+            pool.elementBuilder<Element>("uncached", TestSvgNamespace),
+        )
+        assertSame(svg, pool.elementBuilder<Element>("script", TestSvgNamespace))
+    }
+
 }

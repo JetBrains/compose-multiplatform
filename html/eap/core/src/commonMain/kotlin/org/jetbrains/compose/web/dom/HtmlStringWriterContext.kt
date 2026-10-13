@@ -66,12 +66,12 @@ internal class HtmlStringWriterContext(
     override val supportsDomElementAccess: Boolean = false
 
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
-        StringElementBuilder(tagName)
+        attrsBuilders.elementBuilder(tagName, HtmlNamespace)
 
     override fun <TElement : Element> elementBuilderNS(
         tagName: String,
         namespace: String,
-    ): ElementBuilder<TElement> = StringElementBuilder(tagName, namespace)
+    ): ElementBuilder<TElement> = attrsBuilders.elementBuilder(tagName, namespace)
 
     @Composable
     @NonRestartableComposable
@@ -88,30 +88,38 @@ internal class HtmlStringWriterContext(
         }
 
         val tagName = elementBuilder.tagName
-        val namespace = (elementBuilder as? StringElementBuilder<*>)?.namespace ?: HtmlNamespace
+        val metadata = elementBuilder as? HtmlTagMetadata
+        val namespace = metadata?.namespace ?: HtmlNamespace
+        val flags = metadata?.serializationFlags
+        val rawTextElement = if (flags == null) isHtmlRawTextElement(tagName, namespace)
+            else flags and RawTextTagFlag != 0
 
         // Emit any completed chunk before writing this start tag.
         flushChunk()
         val bufferElement = streaming &&
-            (isHtmlRawTextElement(tagName, namespace) || (namespace == HtmlNamespace && tagName == "noscript"))
+            (rawTextElement || (namespace == HtmlNamespace && tagName == "noscript"))
         if (bufferElement) bufferedElementDepth++
 
-        val (hasScriptSource, contentOverride) = writeStartTag(
+        val startTag = writeStartTag(
             tagName = tagName,
             namespace = namespace,
             applyAttrs = applyAttrs,
             validate = LocalHtmlValidationMode.current == HtmlValidationMode.Strict,
+            tagNameIsValid = flags != null && flags and ValidTagFlag != 0,
         )
+        val contentOverride = startTag.textContent
+        val hasScriptSource = startTag.hasScriptSource
         // A raw-text parent rejects child tags, and a void parent returned above.
         // Only the parent's tag and namespace need saving.
         val parentTagName = currentTagName
         val parentNamespace = currentNamespace
-        val isVoid = isHtmlVoidElement(tagName, namespace)
+        val isVoid = if (flags == null) isHtmlVoidElement(tagName, namespace) else flags and VoidTagFlag != 0
         currentTagName = tagName
         currentNamespace = namespace
         previousSiblingWasText = false
-        pendingLeadingNewline = isHtmlLeadingNewlineElement(tagName, namespace)
-        collectingRawText = isHtmlRawTextElement(tagName, namespace)
+        pendingLeadingNewline = if (flags == null) isHtmlLeadingNewlineElement(tagName, namespace)
+            else flags and LeadingNewlineTagFlag != 0
+        collectingRawText = rawTextElement
 
         flushChunk()
         // For buffered elements this index stays valid until appendEndTag inspects the content.
@@ -197,8 +205,9 @@ internal class HtmlStringWriterContext(
         namespace: String,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
         validate: Boolean,
-    ): Pair<Boolean, String?> {
-        requireValidHtmlTagName(tagName)
+        tagNameIsValid: Boolean,
+    ): StartTagResult {
+        if (!tagNameIsValid) requireValidHtmlTagName(tagName)
         require(!collectingRawText) {
             "String rendering does not support element children inside <$currentTagName>"
         }
@@ -211,9 +220,19 @@ internal class HtmlStringWriterContext(
             val formState = builder.propertyUpdatesOrEmpty.formControlState(tagName, namespace)
             val hasScriptSource = output.appendStartTag(tagName, namespace, builder, validate, formState)
             pendingLeadingNewline = false // A child tag starts with '<', which needs no LF repair.
-            return hasScriptSource to formState?.textContent
+            return if (formState?.textContent == null && !hasScriptSource) StartTagResult.Ordinary
+            else StartTagResult(formState?.textContent, hasScriptSource)
         } finally {
             builder.reset()
+        }
+    }
+
+    // Reuse the ordinary result instead of creating a Pair for every tag.
+    // Allocation stays predictable when the JVM cannot eliminate temporary objects.
+    private class StartTagResult(val textContent: String?, val hasScriptSource: Boolean) {
+        companion object {
+            // Ordinary tags need neither a text override nor script-source validation.
+            val Ordinary = StartTagResult(null, false)
         }
     }
 
@@ -273,6 +292,22 @@ internal class HtmlStringWriterContext(
 /** Reuses attribute builders by element order without retaining their values between elements. */
 internal class AttrsBuilderPool {
     private val builders = mutableListOf<AttrsScopeBuilder<*>>()
+    // Reuse immutable metadata for SVG elements and keyed renders. Bound both the number
+    // and length of retained dynamic names. Only one active renderer owns this storage.
+    private val elementBuilders = HashMap<String, MutableMap<String, StringElementBuilder<*>>>()
+    private var elementBuilderCount = 0
+
+    fun <TElement : Element> elementBuilder(tagName: String, namespace: String): ElementBuilder<TElement> {
+        elementBuilders[namespace]?.get(tagName)?.let { return it.unsafeCast() }
+        val builder = StringElementBuilder<TElement>(tagName, namespace)
+        if (elementBuilderCount < 128 && tagName.length <= 128 && namespace.length <= 256) {
+            elementBuilders.getOrPut(namespace) { HashMap() }[tagName] = builder
+            elementBuilderCount++
+        }
+        return builder
+    }
+
+
 
     fun <TElement : Element> builder(index: Int): AttrsScopeBuilder<TElement> {
         if (index == builders.size) builders.add(AttrsScopeBuilder<Element>())

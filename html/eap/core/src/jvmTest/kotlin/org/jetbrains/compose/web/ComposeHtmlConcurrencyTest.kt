@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.web
 
+import org.jetbrains.compose.web.dom.Br
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -387,6 +388,32 @@ class ComposeHtmlConcurrencyTest {
             assertTrue(executor.awaitTermination(10, TimeUnit.SECONDS))
         }
     }
+
+    @Test
+    fun cachedTagMetadataAndNativeSearchPreserveConcurrentRequests() {
+        val prefix = "ordinary native-search content é😀".repeat(32)
+        runConcurrently(8) { worker ->
+            repeat(100) { iteration ->
+                val request = "$worker-$iteration"
+                val html = composeHtmlToString(key = "cached-serialization-concurrent-requests") {
+                    Div(attrs = {
+                        attr("data-request", request)
+                        classes("one", "two")
+                    }) {
+                        Text(prefix)
+                        Span(attrs = { attr("title", "$prefix<&") }) { Text(request) }
+                        Br()
+                    }
+                }
+                assertEquals(
+                    "<div data-request=\"$request\" class=\"one two\">$prefix" +
+                            "<span title=\"$prefix&lt;&amp;\">$request</span><br></div>",
+                    html,
+                )
+            }
+        }
+    }
+
 }
 
 private val LocalRequest = staticCompositionLocalOf { "outside" }
