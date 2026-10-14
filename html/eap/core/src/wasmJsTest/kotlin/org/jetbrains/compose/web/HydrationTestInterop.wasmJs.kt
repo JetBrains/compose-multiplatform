@@ -4,6 +4,7 @@ package org.jetbrains.compose.web
 
 import kotlinx.browser.JsAny
 import kotlinx.browser.dom.Element
+import kotlinx.browser.dom.events.Event
 
 private external interface WasmHydrationTestState : JsAny {
     val label: String
@@ -51,3 +52,6 @@ internal actual fun setNoncePropertyForTest(element: Element, value: String) {
 internal actual fun hideNoncePropertyForTest(element: Element) {
     hideNoncePropertyInJavaScript(element)
 }
+
+@JsFun("event => event.detail.identifierPrefix")
+internal actual external fun streamEventIdentifierPrefix(event: Event): String

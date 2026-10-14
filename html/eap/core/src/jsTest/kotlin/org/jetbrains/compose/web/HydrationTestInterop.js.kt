@@ -1,6 +1,7 @@
 package org.jetbrains.compose.web
 
 import kotlinx.browser.dom.Element
+import kotlinx.browser.dom.events.Event
 import kotlinx.browser.window
 import kotlin.js.JSON
 
@@ -32,3 +33,6 @@ internal actual fun setNoncePropertyForTest(element: Element, value: String) {
 internal actual fun hideNoncePropertyForTest(element: Element) {
     js("Object").defineProperty(element, "nonce", js("({value: undefined})"))
 }
+
+internal actual fun streamEventIdentifierPrefix(event: Event): String =
+    event.asDynamic().detail.identifierPrefix

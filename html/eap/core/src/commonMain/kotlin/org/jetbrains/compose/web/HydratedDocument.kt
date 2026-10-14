@@ -108,7 +108,7 @@ fun <T> HydrationRoot(
     content: @Composable ElementScope<HTMLDivElement>.(T) -> Unit,
 ) {
     check(LocalHydratedDocumentContext.current) {
-        "HydrationRoot must be called inside renderHydratedDocument or renderHydratedDocumentToStream"
+        "HydrationRoot must be called inside renderHydratedDocument, renderHydratedDocumentToStream, or an async HTML renderer"
     }
     require(hydrationId == null || hydrationId.isNotBlank()) {
         "hydrationId must not be blank"
@@ -144,5 +144,5 @@ fun <T> HydrationRoot(
     )
 }
 
-private val LocalHydratedDocumentContext = staticCompositionLocalOf { false }
+internal val LocalHydratedDocumentContext = staticCompositionLocalOf { false }
 private val LocalHydrationIds = staticCompositionLocalOf<MutableSet<String>?> { null }

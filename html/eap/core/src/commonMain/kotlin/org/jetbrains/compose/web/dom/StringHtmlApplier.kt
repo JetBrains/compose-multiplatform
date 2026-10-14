@@ -61,8 +61,11 @@ internal class StringHtmlNodeWrapper(
 }
 
 internal class StringHtmlApplier(
-    root: StringHtmlNodeWrapper
+    root: StringHtmlNodeWrapper,
+    private val onChanges: () -> Unit = {},
 ) : AbstractApplier<StringHtmlNodeWrapper>(root) {
+    override fun onEndChanges() = onChanges()
+
     override fun insertTopDown(index: Int, instance: StringHtmlNodeWrapper) {
         // The string tree is assembled bottom-up.
     }

@@ -5,6 +5,8 @@
 
 package org.jetbrains.compose.web.dom
 
+import org.jetbrains.compose.web.StreamPendingAttribute
+
 // in-memory equivalent of DOM node
 internal sealed interface StringHtmlNode {
     fun appendHtmlTo(builder: StringBuilder, hydratable: Boolean)
@@ -26,7 +28,8 @@ internal class StringHtmlElementNode private constructor(
             .also(::requireValidHtmlTagName)
     }
     internal val children: MutableList<StringHtmlNode> = mutableListOf()
-    private var attributes: Map<String, String> = emptyMap()
+    internal var attributes: Map<String, String> = emptyMap()
+        private set
 
     constructor(
         tagName: String,
@@ -57,6 +60,9 @@ internal class StringHtmlElementNode private constructor(
         appendHtmlTo(this, hydratable)
     }
 
+    // Block hydration until all streamed HTML and state have arrived.
+    var streamOwner: String? = null
+
     override fun appendHtmlTo(builder: StringBuilder, hydratable: Boolean) {
         val tagName = tagName
         if (tagName == null) { // root
@@ -65,7 +71,9 @@ internal class StringHtmlElementNode private constructor(
         }
         val namespace = requireElementNamespace()
 
-        builder.appendStartTag(tagName, namespace, attributes)
+        builder.appendStartTag(tagName, namespace, streamOwner?.let {
+            attributes + (StreamPendingAttribute to it)
+        } ?: attributes)
         if (isHtmlVoidElement(tagName, namespace)) return
 
         val contentStart = builder.length
@@ -101,15 +109,31 @@ internal class StringHtmlElementNode private constructor(
     private fun appendChildrenHtmlTo(builder: StringBuilder, hydratable: Boolean) {
         val validateTableChildren = namespace == HtmlNamespace
         var previousWasText = false
-        for (index in children.indices) {
-            val child = children[index]
-            if (child.isEmptyText()) continue
-            if (validateTableChildren) requireHtmlParserStableTableChild(tagName, child)
-            val isText = child is StringHtmlTextNode
-            if (hydratable && previousWasText && isText) builder.appendHydrationTextBoundaryMarker()
-            child.appendHtmlTo(builder, hydratable)
-            previousWasText = isText
+        fun appendMarker(id: String?, end: Boolean = false) {
+            builder.appendSuspenseMarker(hydratable, id, end)
+            if (hydratable) previousWasText = false
         }
+        fun appendChildren(nodes: List<StringHtmlNode>) {
+            for (child in nodes) {
+                if (child.isEmptyText()) continue
+                if (child is StringHtmlSuspenseNode) {
+                    require(!isHtmlRcdataElement(tagName, namespace)) {
+                        "Suspense cannot be serialized inside raw-text or RCDATA elements"
+                    }
+                    val id = child.streamId
+                    appendMarker(id)
+                    appendChildren(child.visible.children)
+                    appendMarker(id, end = true)
+                    continue
+                }
+                if (validateTableChildren) requireHtmlParserStableTableChild(tagName, child)
+                val isText = child is StringHtmlTextNode
+                if (hydratable && previousWasText && isText) builder.appendHydrationTextBoundaryMarker()
+                child.appendHtmlTo(builder, hydratable)
+                previousWasText = isText
+            }
+        }
+        appendChildren(children)
     }
 
     private fun requireElementNamespace(): String =

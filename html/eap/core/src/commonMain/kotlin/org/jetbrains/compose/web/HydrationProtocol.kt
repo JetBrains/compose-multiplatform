@@ -5,6 +5,8 @@ import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
 import org.jetbrains.compose.web.attributes.ScriptType
 
+internal const val StreamPendingAttribute = "data-compose-stream-pending"
+internal const val StreamErrorAttribute = "data-compose-stream-error"
 internal const val HydrationRootAttribute = "data-compose-hydration-root"
 internal const val HydrationStateAttribute = "data-compose-hydration-state"
 internal const val HydrationForAttribute = "data-compose-hydration-for"
@@ -13,6 +15,8 @@ internal const val HydrationValidationEnabled = "on"
 internal const val HydrationStateFormat = "escaped-text-v1"
 internal val HydrationStateMimeType: String = ScriptType.TextPlain.typeStr
 internal val HydrationProtocolAttributes = setOf(
+    StreamPendingAttribute,
+    StreamErrorAttribute,
     HydrationRootAttribute,
     HydrationStateAttribute,
     HydrationForAttribute,

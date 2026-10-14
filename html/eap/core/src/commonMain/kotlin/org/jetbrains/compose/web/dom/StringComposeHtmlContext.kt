@@ -24,6 +24,11 @@ import org.jetbrains.compose.web.css.toStyleAttributeValue
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 internal object StringComposeHtmlContext : ComposeHtmlContext {
+    @Composable
+    override fun Suspense(fallback: @Composable () -> Unit, content: @Composable () -> Unit) {
+        stringSuspense(fallback = fallback, content = content)
+    }
+
     override val supportsDomElementAccess: Boolean = false
 
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =

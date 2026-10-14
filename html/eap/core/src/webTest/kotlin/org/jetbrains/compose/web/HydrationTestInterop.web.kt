@@ -1,6 +1,7 @@
 package org.jetbrains.compose.web
 
 import kotlinx.browser.dom.Element
+import kotlinx.browser.dom.events.Event
 
 internal data class HydrationTestState(
     val label: String,
@@ -18,3 +19,5 @@ internal expect fun getWindowIntProperty(name: String): Int
 internal expect fun setNoncePropertyForTest(element: Element, value: String)
 
 internal expect fun hideNoncePropertyForTest(element: Element)
+
+internal expect fun streamEventIdentifierPrefix(event: Event): String

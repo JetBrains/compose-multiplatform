@@ -31,16 +31,44 @@ class DomApplier(
     }
 
     override fun onClear() {
-        while (root.node.firstChild != null) {
-            root.node.removeChild(root.node.firstChild!!)
-        }
+        root.clear()
     }
 }
 
 @ComposeWebInternalApi
 open class DomNodeWrapper(open val node: Node) {
 
-    fun insert(index: Int, nodeWrapper: DomNodeWrapper) {
+    private var adoptedChildren: MutableList<DomNodeWrapper>? = null
+    protected open val logicalChildren: MutableList<DomNodeWrapper>? get() = adoptedChildren
+    protected open val childrenParent: Node get() = node
+    protected open val childrenEnd: Node? get() = null
+
+    open val isRange: Boolean get() = this is DomRangeNodeWrapper
+    open fun domNodes(): List<Node> = listOf(node)
+    open fun detach() { node.parentNode?.removeChild(node) }
+
+    fun initializeLogicalChildren(children: List<DomNodeWrapper>) {
+        if (children.any { it.isRange }) adoptedChildren = children.toMutableList()
+    }
+
+    open fun clear() {
+        logicalChildren?.forEach { it.detach() }
+        logicalChildren?.clear()
+        while (node.firstChild != null) node.removeChild(node.firstChild!!)
+    }
+
+    open fun insert(index: Int, nodeWrapper: DomNodeWrapper) {
+        if (logicalChildren == null && nodeWrapper.isRange) {
+            adoptedChildren = MutableList(node.childNodes.length) { DomNodeWrapper(node.childNodes[it]!!) }
+        }
+        val children = logicalChildren
+        if (children != null) {
+            val anchor = children.getOrNull(index)?.domNodes()?.firstOrNull() ?: childrenEnd
+            val parent = childrenParent
+            nodeWrapper.domNodes().forEach { parent.insertBefore(it, anchor) }
+            children.add(index, nodeWrapper)
+            return
+        }
         val length = node.childNodes.length
         if (index < length) {
             node.insertBefore(nodeWrapper.node, node.childNodes[index]!!)
@@ -49,13 +77,28 @@ open class DomNodeWrapper(open val node: Node) {
         }
     }
 
-    fun remove(index: Int, count: Int) {
+    open fun remove(index: Int, count: Int) {
+        logicalChildren?.let { children ->
+            repeat(count) { children.removeAt(index).detach() }
+            return
+        }
         repeat(count) {
             node.removeChild(node.childNodes[index]!!)
         }
     }
 
-    fun move(from: Int, to: Int, count: Int) {
+    open fun move(from: Int, to: Int, count: Int) {
+        logicalChildren?.let { children ->
+            if (from == to || count == 0) return
+            val moved = children.subList(from, from + count).toList()
+            repeat(count) { children.removeAt(from) }
+            val destination = if (from < to) to - count else to
+            val anchor = children.getOrNull(destination)?.domNodes()?.firstOrNull() ?: childrenEnd
+            val parent = childrenParent
+            moved.forEach { child -> child.domNodes().forEach { parent.insertBefore(it, anchor) } }
+            children.addAll(destination, moved)
+            return
+        }
         if (from == to) {
             return // nothing to do
         }

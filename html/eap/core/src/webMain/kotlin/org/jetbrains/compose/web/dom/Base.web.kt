@@ -385,6 +385,14 @@ private class DomElementScope<TElement : Element>(
 ) : ElementScopeImpl<TElement>() {
     lateinit var wrapper: DomElementWrapper
     var hasEventListeners: Boolean = false
+    var effectApplier: HydrationDomApplier? = null
+    var suspenseDomEffects: SuspenseDomEffects? = null
+    override fun dispatchDomEffect(effect: () -> Unit) {
+        val applier = effectApplier
+        val suspense = suspenseDomEffects
+        val dispatch = { if (suspense == null) effect() else suspense.dispatch(effect) }
+        if (applier == null) dispatch() else applier.applyOrDeferDomMutation(dispatch)
+    }
 }
 
 internal actual val DefaultComposeHtmlContext: ComposeHtmlContext = BrowserComposeHtmlContext
@@ -400,8 +408,11 @@ private inline fun <TElement : Element> TagElementImpl(
     hydrationMismatchAllowance: HydrationMismatchAllowance? = null,
     updateElement: Updater<DomElementWrapper>.() -> Unit = {},
     providedScope: DomElementScope<TElement>? = null,
+    effectApplier: HydrationDomApplier? = null,
 ) {
     val scope = providedScope ?: remember { DomElementScope<TElement>() }
+    scope.effectApplier = effectApplier
+    scope.suspenseDomEffects = LocalSuspenseDomEffects.current
 
     // Compose compares one snapshot; the wrapper diffs its DOM channels.
     val attrsScope = AttrsScopeBuilder<TElement>()
@@ -436,7 +447,7 @@ private inline fun <TElement : Element> TagElementImpl(
 
     refEffect?.let { effect ->
         DisposableEffect(null) {
-            effect.invoke(this, scope.element)
+            scope.disposableDomEffect(this, effect)
         }
     }
 }
@@ -513,6 +524,11 @@ private object BrowserComposeHtmlContext : ComposeHtmlContext {
             StyleSheetEffect(cssRules) { prepareStyleRawTextContent(cssRules) }
         }
     }
+
+    @Composable
+    override fun Suspense(fallback: @Composable () -> Unit, content: @Composable () -> Unit) {
+        browserSuspense(fallback = fallback, content = content)
+    }
 }
 
 internal fun hydratingComposeHtmlContext(
@@ -522,6 +538,11 @@ internal fun hydratingComposeHtmlContext(
 private class HydratingComposeHtmlContext(
     private val applier: HydrationDomApplier,
 ) : ComposeHtmlContext by BrowserComposeHtmlContext {
+    @Composable
+    override fun Suspense(fallback: @Composable () -> Unit, content: @Composable () -> Unit) {
+        browserSuspense(applier = applier, fallback = fallback, content = content)
+    }
+
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
         HydratingElementBuilder(
             tagName = tagName,
@@ -579,6 +600,7 @@ private class HydratingComposeHtmlContext(
             applyAttrs = applyAttrs,
             content = if (preserveServerContent) null else content,
             createWrapper = { node -> HydratingDomElementWrapper(node, applier, allowance) },
+            effectApplier = applier,
             hydrationMismatchAllowance = allowance,
             providedScope = scope,
         )
@@ -635,6 +657,7 @@ private class HydratingComposeHtmlContext(
             createWrapper = { node ->
                 HydratingDomElementWrapper(node, applier, allowance)
             },
+            effectApplier = applier,
             validateAttrs = validateAttrs,
             hydrationMismatchAllowance = allowance,
             updateElement = updateElement,

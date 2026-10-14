@@ -14,6 +14,11 @@ import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 @OptIn(ComposeWebInternalApi::class)
 internal actual val DefaultComposeHtmlContext: ComposeHtmlContext = object : ComposeHtmlContext {
+    @Composable
+    override fun Suspense(fallback: @Composable () -> Unit, content: @Composable () -> Unit) {
+        error("HTML rendering implementation is not provided")
+    }
+
     override val supportsDomElementAccess: Boolean = false
 
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =

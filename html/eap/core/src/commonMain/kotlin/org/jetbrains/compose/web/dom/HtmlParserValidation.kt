@@ -17,6 +17,9 @@ private val HtmlTableChildNames = mapOf(
 /** Rejects implied table wrappers and foster parenting before HTML leaves the string renderer. */
 internal fun requireHtmlParserStableTableChild(parentTagName: String?, child: StringHtmlNode) {
     when (child) {
+        is StringHtmlSuspenseNode -> child.visible.children.forEach {
+            requireHtmlParserStableTableChild(parentTagName, it)
+        }
         is StringHtmlElementNode -> requireHtmlParserStableTableElement(parentTagName, child.tagName)
         is StringHtmlTextNode -> {
             requireHtmlParserStableTableText(parentTagName, child.text)

@@ -63,6 +63,48 @@ internal class HtmlStringWriterContext(
     private var rootChildCount = 0
     private var firstRootChildIsHtml = false
 
+    @Composable
+    override fun Suspense(fallback: @Composable () -> Unit, content: @Composable () -> Unit) {
+        stringSuspense(writer = this, fallback = fallback, content = content)
+    }
+
+    internal fun writeSuspense(root: StringHtmlElementNode) {
+        checkNotFinished()
+        if (discardingVoidContent) return
+        require(!collectingRawText && !isHtmlRcdataElement(currentTagName, currentNamespace)) {
+            "Suspense cannot be serialized inside raw-text or RCDATA elements"
+        }
+        fun writeMarker(end: Boolean = false) {
+            output.appendSuspenseMarker(hydratable, end = end)
+            if (hydratable) previousSiblingWasText = false
+        }
+        fun write(nodes: List<StringHtmlNode>) {
+            for (node in nodes) {
+                when (node) {
+                    is StringHtmlSuspenseNode -> {
+                        writeMarker()
+                        write(node.visible.children)
+                        writeMarker(end = true)
+                    }
+                    is StringHtmlTextNode -> if (node.text.isNotEmpty()) writeText(node.text)
+                    else -> {
+                        if (currentNamespace == HtmlNamespace) requireHtmlParserStableTableChild(currentTagName, node)
+                        if (currentTagName == null) recordRootChild(
+                            isHtml = node is StringHtmlElementNode && node.tagName == "html",
+                        )
+                        node.appendHtmlTo(output, hydratable)
+                        pendingLeadingNewline = false
+                        previousSiblingWasText = false
+                    }
+                }
+                flushChunk()
+            }
+        }
+        writeMarker()
+        write(root.children)
+        writeMarker(end = true)
+    }
+
     override val supportsDomElementAccess: Boolean = false
 
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =

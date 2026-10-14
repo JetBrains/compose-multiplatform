@@ -231,7 +231,7 @@ private fun String.hasSameHtmlParserAttributeName(other: String): Boolean {
     return true
 }
 
-private fun StringBuilder.appendEscapedAttribute(value: String) {
+internal fun StringBuilder.appendEscapedAttribute(value: String) {
     appendEscaped(value, attribute = true)
 }
 

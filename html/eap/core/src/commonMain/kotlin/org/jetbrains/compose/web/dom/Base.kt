@@ -55,6 +55,9 @@ internal interface ComposeHtmlContext {
         applyAttrs: (AttrsScope<HTMLStyleElement>.() -> Unit)?,
         cssRules: CSSRuleDeclarationList,
     )
+
+    @Composable
+    fun Suspense(fallback: @Composable () -> Unit, content: @Composable () -> Unit)
 }
 
 // Define default per platform, e.g. [BrowserComposeHtmlContext] for web

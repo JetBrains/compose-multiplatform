@@ -8,8 +8,10 @@ import androidx.compose.runtime.DefaultMonotonicFrameClock
 import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.Recomposer
+import kotlinx.browser.dom.Comment
 import kotlinx.browser.dom.Element
 import kotlinx.browser.dom.HTMLDivElement
+import kotlinx.browser.dom.Node
 import kotlinx.browser.dom.ParentNode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -25,6 +27,7 @@ import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
 import org.jetbrains.compose.web.internal.runtime.GlobalSnapshotManager
 import org.jetbrains.compose.web.internal.runtime.JsMicrotasksDispatcher
+import org.jetbrains.compose.web.internal.runtime.SuspenseMarker
 import org.jetbrains.compose.web.internal.runtime.browserDocument
 import org.jetbrains.compose.web.internal.unsafeCast
 
@@ -114,13 +117,16 @@ fun <TElement : Element> hydrateComposable(
     onHydrationMismatch: (HydrationMismatchException) -> Unit = ::reportHydrationMismatch,
     validateStrictly: Boolean = false,
     content: @Composable DOMScope<TElement>.() -> Unit,
-): Composition = hydrateComposableWithMode(
-    root = root,
-    monotonicFrameClock = monotonicFrameClock,
-    onHydrationMismatch = onHydrationMismatch,
-    validationMode = if (validateStrictly) HtmlValidationMode.Strict else HtmlValidationMode.Fast,
-    content = content,
-)
+): Composition {
+    requireCompletedHtmlStream(root)
+    return hydrateComposableWithMode(
+        root = root,
+        monotonicFrameClock = monotonicFrameClock,
+        onHydrationMismatch = onHydrationMismatch,
+        validationMode = if (validateStrictly) HtmlValidationMode.Strict else HtmlValidationMode.Fast,
+        content = content,
+    )
+}
 
 private fun <TElement : Element> hydrateComposableWithMode(
     root: TElement,
@@ -244,6 +250,8 @@ private fun findHydrationProtocol(within: ParentNode, hydrationId: String?): Hyd
     val root = rootElement.unsafeCast<HTMLDivElement>()
 
     val state = requireUniqueProtocolElement(matchingState, stateCount, "hydration state element")
+    requireCompletedHtmlStream(root)
+    requireCompletedHtmlStream(state)
     if (root.contains(state)) {
         invalidHydrationState(
             "The Compose hydration state element must be outside the hydration root"
@@ -303,3 +311,38 @@ private class HydrationBootstrapData(
     val serializedState: String,
     val validationMode: HtmlValidationMode,
 )
+
+/** Rejects hydration if the root or its descendants are still streaming. */
+private fun requireCompletedHtmlStream(root: Element) {
+    fun failed(): Nothing = invalidHydrationState(
+        "Compose HTML streaming failed; render fresh client content or retry before hydrating",
+    )
+    fun incomplete(): Nothing = invalidHydrationState(
+        "Compose HTML streaming is incomplete; wait for compose-stream-complete before hydrating",
+    )
+    var ancestor: Element? = root
+    while (ancestor != null) {
+        if (ancestor.hasAttribute(StreamErrorAttribute)) {
+            failed()
+        }
+        if (ancestor.hasAttribute(StreamPendingAttribute)) {
+            incomplete()
+        }
+        ancestor = ancestor.parentElement
+    }
+    fun visit(node: Node) {
+        if (node is Element && node.hasAttribute(StreamErrorAttribute)) {
+            failed()
+        }
+        if (node is Element && node.hasAttribute(StreamPendingAttribute) ||
+            node is Comment && node.data.startsWith("$SuspenseMarker:")) {
+            incomplete()
+        }
+        var child = node.firstChild
+        while (child != null) {
+            visit(child)
+            child = child.nextSibling
+        }
+    }
+    visit(root)
+}

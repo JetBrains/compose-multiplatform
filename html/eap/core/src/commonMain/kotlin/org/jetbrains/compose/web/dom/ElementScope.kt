@@ -91,13 +91,33 @@ abstract class ElementScopeBase<out TElement : Element> : ElementScope<TElement>
     private var nextDisposableDomEffectKey = 0
     abstract val element: TElement
 
+    // Run DOM effects after hydration commits and Suspense content becomes visible.
+    internal open fun dispatchDomEffect(effect: () -> Unit) = effect()
+
+    internal fun disposableDomEffect(
+        effectScope: DisposableEffectScope,
+        effect: DisposableEffectScope.(TElement) -> DisposableEffectResult,
+    ): DisposableEffectResult {
+        var active = true
+        var result: DisposableEffectResult? = null
+        dispatchDomEffect {
+            if (active) result = effect.invoke(effectScope, element)
+        }
+        return effectScope.onDispose {
+            active = false
+            result?.dispose()
+        }
+    }
+
     @Composable
     @NonRestartableComposable
     override fun DisposableRefEffect(
         key: Any?,
         effect: DisposableEffectScope.(TElement) -> DisposableEffectResult
     ) {
-        DisposableEffect(key) { effect(element) }
+        DisposableEffect(key) {
+            disposableDomEffect(this, effect)
+        }
     }
 
     @Composable
@@ -111,7 +131,9 @@ abstract class ElementScopeBase<out TElement : Element> : ElementScope<TElement>
             DomDisposableEffectHolder(this)
         }
         SideEffect {
-            if (changed) effectHolder.effect(element)
+            if (changed) dispatchDomEffect {
+                if (effectHolder.isRemembered) effectHolder.effect(element)
+            }
         }
     }
 
@@ -138,9 +160,13 @@ private class DomDisposableEffectHolder(
 ) : RememberObserver, DomEffectScope {
     var onDispose: ((Element) -> Unit)? = null
 
-    override fun onRemembered() {}
+    var isRemembered: Boolean = false
+        private set
+
+    override fun onRemembered() { isRemembered = true }
 
     override fun onForgotten() {
+        isRemembered = false
         onDispose?.invoke(elementScope.element)
     }
 

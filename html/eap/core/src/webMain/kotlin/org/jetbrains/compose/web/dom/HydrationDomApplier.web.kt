@@ -9,8 +9,12 @@ import kotlinx.browser.dom.Node
 import kotlinx.browser.dom.Text
 import org.jetbrains.compose.web.HtmlValidationMode
 import org.jetbrains.compose.web.HydrationMismatchException
+import org.jetbrains.compose.web.internal.runtime.DomRangeNodeWrapper
 import org.jetbrains.compose.web.internal.runtime.DomNodeWrapper
+import org.jetbrains.compose.web.internal.runtime.SuspenseMarker
 import org.jetbrains.compose.web.internal.runtime.browserDocument
+
+internal typealias DeferredDomCommit = (() -> Unit) -> Unit
 
 /**
  * Claims the existing DOM during initial composition, then switches to normal DOM mutations.
@@ -19,6 +23,7 @@ import org.jetbrains.compose.web.internal.runtime.browserDocument
 internal class HydrationDomApplier(
     root: DomNodeWrapper,
     val validationMode: HtmlValidationMode,
+    private val deferCommit: DeferredDomCommit? = null,
 ) : AbstractApplier<DomNodeWrapper>(root) {
     private enum class State {
         Hydrating,
@@ -31,8 +36,15 @@ internal class HydrationDomApplier(
         val node: Node,
         // set by AttrsScope.allowHydrationMismatch() on the element owning these children
         val allowsContentMismatch: Boolean = false,
+        val wrapper: DomNodeWrapper,
+        firstNode: Node? = node.firstChild,
+        private val end: Node? = null,
     ) {
-        var nextNode: Node? = node.firstChild // used for traversal
+        // Only parents store children. Only range parents need an adoption callback.
+        var children: MutableList<DomNodeWrapper>? = null
+        var hasRangeChildren = false
+        var nextNode: Node? = firstNode.takeUnless { it === end }
+            set(value) { field = value.takeUnless { it === end } }
         var nextChildIndex: Int = 0           // used for diagnostics
         var mergedTextChildCount: Int = 0
         var expectedMergedText: StringBuilder? = null
@@ -45,8 +57,13 @@ internal class HydrationDomApplier(
         val text: Text,
     )
 
-    private val rootNode = root.node
-    private val frames = mutableListOf(Frame(rootNode))
+    private val rangeRoot = root as? DomRangeNodeWrapper
+    private val rootNode = rangeRoot?.start?.parentNode ?: root.node
+    private val frames = mutableListOf(Frame(
+        node = rootNode, wrapper = root,
+        firstNode = rangeRoot?.start?.nextSibling ?: rootNode.firstChild,
+        end = rangeRoot?.end,
+    ))
     private val claimedNodes = NativeNodeSet()  // claimed nodes that still need to be called by insertBottomUp
     private val nodesWithClaimedRawChildren = NativeNodeSet()
     private val mergedTextsToInitialize = NativeNodeSet()
@@ -56,6 +73,7 @@ internal class HydrationDomApplier(
     private val pendingTextsToInsert = mutableListOf<PendingText>()
     private val pendingDomMutations = mutableListOf<() -> Unit>()
     private val hydrationAbortActions = mutableListOf<() -> Unit>()
+    private var pendingCommit = false
     private var hasClaimedRootNode = false
     private var state = State.Hydrating
 
@@ -69,7 +87,7 @@ internal class HydrationDomApplier(
     fun applyOrDeferDomMutation(mutation: () -> Unit) {
         when (state) {
             State.Hydrating -> pendingDomMutations += mutation
-            State.Complete -> mutation()
+            State.Complete -> if (deferCommit == null) mutation() else deferCommit.invoke(mutation)
             State.Aborted -> Unit
         }
     }
@@ -95,6 +113,41 @@ internal class HydrationDomApplier(
             State.Complete -> if (!text.matchesText(value)) text.data = value
             State.Aborted -> Unit
         }
+    }
+
+    private fun adoptChildren(frame: Frame) {
+        val range = frame.wrapper as? DomRangeNodeWrapper
+        if (range != null && frame.node is Comment) return // The outer boundary is a leaf in this composition.
+        if (range == null && !frame.hasRangeChildren) return
+        val children = frame.children ?: emptyList()
+        if (range != null) range.adoptChildren(children)
+        else frame.wrapper.initializeLogicalChildren(children)
+    }
+
+    /** Claims a completed Suspense range. Its child composition claims the descendants. */
+    fun claimSuspenseRange(): DomRangeNodeWrapper {
+        ensureHydrating()
+        val frame = currentFrame
+        val start = frame.nextNode as? Comment
+        if (start?.data != SuspenseMarker) mismatchAtCurrentNode("expected a completed Suspense boundary")
+        var next = start.nextSibling
+        var depth = 0
+        while (next != null) {
+            if (next is Comment) {
+                if (next.data == SuspenseMarker) depth++
+                if (next.data == "/$SuspenseMarker") {
+                    if (depth == 0) {
+                        frame.nextNode = next.nextSibling
+                        frame.nextChildIndex++
+                        claimedNodes += start
+                        return DomRangeNodeWrapper(start, next)
+                    }
+                    depth--
+                }
+            }
+            next = next.nextSibling
+        }
+        mismatchAtCurrentNode("unterminated Suspense boundary")
     }
 
     /** Claims the next element by local name and namespace in both modes. */
@@ -136,7 +189,7 @@ internal class HydrationDomApplier(
         allowContentMismatch: Boolean,
     ): Element {
         val element = claimElement(tagName, namespace)
-        frames += Frame(element, allowsContentMismatch = allowContentMismatch)
+        frames += Frame(element, allowsContentMismatch = allowContentMismatch, wrapper = DomNodeWrapper(element))
         try {
             claimRawText(rawText, allowContentMismatch)
             verifyComplete(currentFrame)
@@ -293,6 +346,7 @@ internal class HydrationDomApplier(
             }
             frames += Frame(
                 node = node.node,
+                wrapper = node,
                 allowsContentMismatch = node.allowsHydrationMismatch(),
             ).also { frame ->
                 if (nodesWithClaimedRawChildren.remove(node.node) ||
@@ -313,6 +367,7 @@ internal class HydrationDomApplier(
                 mismatchAtCurrentNode("left an unexpected node")
             }
             verifyComplete(frame)
+            if (frame.hasRangeChildren) pendingDomMutations += { adoptChildren(frame) }
             frames.removeAt(frames.lastIndex)
         }
         super.up()
@@ -322,7 +377,13 @@ internal class HydrationDomApplier(
 
     override fun insertBottomUp(index: Int, instance: DomNodeWrapper) {
         when (state) {
-            State.Hydrating -> verifyClaimedChild(index, instance.node)
+            State.Hydrating -> {
+                verifyClaimedChild(index, instance.node)
+                val frame = currentFrame
+                val children = frame.children ?: mutableListOf<DomNodeWrapper>().also { frame.children = it }
+                children.add(index, instance)
+                if (instance.isRange) frame.hasRangeChildren = true
+            }
             State.Complete -> current.insert(index, instance)
             State.Aborted -> Unit
         }
@@ -343,7 +404,7 @@ internal class HydrationDomApplier(
         // already applied if initialization failed during the commit phase.
         if (state == State.Aborted) return
         ensureComplete()
-        rootNode.clearChildren()
+        root.clear()
     }
 
     override fun onEndChanges() {
@@ -368,10 +429,23 @@ internal class HydrationDomApplier(
 
         // Validation is complete. From here, abortHydration can cancel pending work and
         // listeners, but cannot roll back DOM changes (including arbitrary property setters).
-        finalizeHydratedNodes()
-        applyPendingDomMutations()
-        state = State.Complete
-        hydrationAbortActions.clear()
+        val completedFrame = currentFrame
+        val commit = {
+            if (state != State.Aborted) {
+                finalizeHydratedNodes()
+                adoptChildren(completedFrame)
+                applyPendingDomMutations()
+                pendingCommit = false
+                state = State.Complete
+                hydrationAbortActions.clear()
+            }
+        }
+        if (deferCommit == null) commit() else {
+            pendingCommit = true
+            // Claiming is complete. The outer hidden boundary will commit the DOM changes.
+            state = State.Complete
+            deferCommit.invoke(commit)
+        }
         mergedTextsToInitialize.clear()
         allowedTextsToInitialize.clear()
         frames.clear()
@@ -379,7 +453,8 @@ internal class HydrationDomApplier(
 
     /** Cancels pending work and listeners; does not roll back mutations already committed. */
     fun abortHydration() {
-        if (!isHydrating) return
+        if (!isHydrating && !pendingCommit) return
+        pendingCommit = false
         state = State.Aborted
         claimedNodes.clear()
         nodesWithClaimedRawChildren.clear()
