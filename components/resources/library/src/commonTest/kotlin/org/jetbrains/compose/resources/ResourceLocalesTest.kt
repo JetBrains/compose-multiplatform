@@ -42,13 +42,47 @@ class ResourceLocalesTest {
     }
 
     @Test
-    fun defaultDoesNotCountAsEnglishTranslation() {
-        assertEquals("es", resource("es").getResourceItemByEnvironment(environment("en-US", "es")).path)
+    fun defaultCountsAsEnglishWhenEnglishIsRequested() {
+        val resource = resource("ru", "nl")
+        assertEquals("default", resource.getResourceItemByEnvironment(environment("en", "ru", "nl")).path)
+        assertEquals("default", resource.getResourceItemByEnvironment(environment("en-US", "ru", "nl")).path)
+        assertEquals("default", resource.getResourceItemByEnvironment(environment("en-GB", "nl", "ru")).path)
     }
 
     @Test
-    fun explicitEnglishTranslationParticipatesInPreferenceOrder() {
-        assertEquals("en", resource("en", "es").getResourceItemByEnvironment(environment("en-US", "es")).path)
+    fun implicitEnglishParticipatesInPreferenceOrder() {
+        val resource = resource("ru", "nl")
+        assertEquals("default", resource.getResourceItemByEnvironment(environment("fr", "en", "ru")).path)
+        assertEquals("ru", resource.getResourceItemByEnvironment(environment("ru", "en", "nl")).path)
+        assertEquals("nl", resource.getResourceItemByEnvironment(environment("fr", "nl", "en")).path)
+    }
+
+    @Test
+    fun explicitEnglishVariantPreventsImplicitEnglishOnRegionMismatch() {
+        assertEquals("ru", resource("en-GB", "ru")
+            .getResourceItemByEnvironment(environment("en-US", "ru")).path)
+    }
+
+    @Test
+    fun missingDefaultDoesNotPreventTryingSecondaryLanguage() {
+        val resource = StringResource("no_default", "no_default", setOf(
+            ResourceItem(setOf(LanguageQualifier("ru")), "ru", 0, 0)
+        ))
+        assertEquals("ru", resource.getResourceItemByEnvironment(environment("en", "ru")).path)
+    }
+
+    @Test
+    fun explicitEnglishWinsOverDefaultWhenBothArePresent() {
+        val resource = StringResource("explicit_english", "explicit_english", setOf(
+            ResourceItem(emptySet(), "default", 0, 0),
+            ResourceItem(setOf(LanguageQualifier("en")), "en", 0, 0),
+            ResourceItem(setOf(LanguageQualifier("ru")), "ru", 0, 0)
+        ))
+        assertEquals("en", resource.getResourceItemByEnvironment(environment("en", "ru")).path)
+        assertEquals("en", resource.getResourceItemByEnvironment(environment("en-US", "ru")).path)
+        assertEquals("en", resource.getResourceItemByEnvironment(environment("fr", "en", "ru")).path)
+        assertEquals("ru", resource.getResourceItemByEnvironment(environment("ru", "en")).path)
+        assertEquals("default", resource.getResourceItemByEnvironment(environment("fr", "nl")).path)
     }
 
     @Test
@@ -91,6 +125,18 @@ class ResourceLocalesTest {
         ))
         val env = ResourceEnvironment(environment("fr", "de").locales, ThemeQualifier.DARK, DensityQualifier.XHDPI)
         assertEquals("de-dark-xhdpi", resource.getResourceItemByEnvironment(env).path)
+    }
+
+    @Test
+    fun appliesThemeAndDensityAfterSelectingImplicitEnglish() {
+        val resource = DrawableResource("implicit_english_image", setOf(
+            ResourceItem(emptySet(), "default", 0, 0),
+            ResourceItem(setOf(ThemeQualifier.DARK), "default-dark", 0, 0),
+            ResourceItem(setOf(ThemeQualifier.DARK, DensityQualifier.XHDPI), "default-dark-xhdpi", 0, 0),
+            ResourceItem(setOf(LanguageQualifier("ru")), "ru", 0, 0)
+        ))
+        val env = ResourceEnvironment(environment("fr", "en", "ru").locales, ThemeQualifier.DARK, DensityQualifier.XHDPI)
+        assertEquals("default-dark-xhdpi", resource.getResourceItemByEnvironment(env).path)
     }
 
     @Test

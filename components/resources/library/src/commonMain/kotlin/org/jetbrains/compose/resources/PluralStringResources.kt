@@ -78,7 +78,11 @@ private suspend fun loadPluralString(
         language == resourceLanguage &&
             (resourceScript == null || script.isEmpty() || script == resourceScript) &&
             (resourceRegion == null || region == resourceRegion)
-    } ?: environment.locales.first()
+    } ?: if (resourceLanguage == null && resource.items.none { ENGLISH in it.qualifiers }) {
+        environment.locales.firstOrNull { it.language == ENGLISH } ?: environment.locales.first()
+    } else {
+        environment.locales.first()
+    }
     val pluralRuleList = PluralRuleList.getInstance(locale.language, locale.region)
     val pluralCategory = pluralRuleList.getCategory(quantity)
     val str = item.items[pluralCategory]

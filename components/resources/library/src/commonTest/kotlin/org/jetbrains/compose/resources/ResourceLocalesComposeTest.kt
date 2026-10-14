@@ -50,9 +50,15 @@ class ResourceLocalesComposeTest : KmpUiTest() {
         languages = listOf("fr", "pt-BR")
         waitResources()
         assertEquals("pt-one", text) // The generic Portuguese resource uses the requested region's rules.
+        languages = listOf("fr", "en", "es")
+        waitResources()
+        assertEquals("default-other", text) // Implicit English wins over Spanish and uses English plural rules.
+        languages = listOf("en", "es")
+        waitResources()
+        assertEquals("default-other", text)
         languages = listOf("fr", "ja")
         waitResources()
-        assertEquals("default-one", text) // Default resources retain the primary locale's plural rules.
+        assertEquals("default-one", text) // Without an English preference, defaults retain the primary locale's rules.
         assertEquals(listOf("es", "de", "pt", "default"), readPaths)
     }
 }

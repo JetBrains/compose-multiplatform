@@ -5,6 +5,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.intl.Locale
 
+// Without an explicit English variant, unqualified items participate as English when the user explicitly requests it;
+// otherwise they remain the final fallback.
+internal val ENGLISH = LanguageQualifier("en")
+
 internal data class ResourceLocale(
     val language: LanguageQualifier,
     val script: ScriptQualifier,
@@ -118,16 +122,18 @@ internal fun Resource.getResourceItemByEnvironment(environment: ResourceEnvironm
         }
 }
 
-// Try each preferred locale for this resource before falling back to unqualified items.
 private fun List<ResourceItem>.filterByLocales(locales: List<ResourceLocale>): List<ResourceItem> {
     val localizedItems = filter { item -> item.qualifiers.any { it is LanguageQualifier } }
+    val defaultItems = filter { item ->
+        item.qualifiers.none { it is LanguageQualifier || it is ScriptQualifier || it is RegionQualifier }
+    }
+    val hasEnglishItems = localizedItems.any { ENGLISH in it.qualifiers }
     for ((language, script, region) in locales) {
         val matches = localizedItems.filterByLocale(language, script, region)
         if (matches.isNotEmpty()) return matches
+        if (language == ENGLISH && !hasEnglishItems && defaultItems.isNotEmpty()) return defaultItems
     }
-    return filter { item ->
-        item.qualifiers.none { it is LanguageQualifier || it is ScriptQualifier || it is RegionQualifier }
-    }
+    return defaultItems
 }
 
 private fun List<ResourceItem>.filterBy(qualifier: Qualifier): List<ResourceItem> {
