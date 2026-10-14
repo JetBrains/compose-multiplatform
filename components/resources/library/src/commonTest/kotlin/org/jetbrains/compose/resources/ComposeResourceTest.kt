@@ -82,9 +82,7 @@ class ComposeResourceTest : KmpUiTest() {
         val mdpiEnvironment = object : ComposeEnvironment {
             @Composable
             override fun rememberEnvironment() = ResourceEnvironment(
-                language = LanguageQualifier("en"),
-                script = ScriptQualifier(""),
-                region = RegionQualifier("US"),
+                locales = listOf(ResourceLocale(LanguageQualifier("en"), ScriptQualifier(""), RegionQualifier("US"))),
                 theme = ThemeQualifier.LIGHT,
                 density = DensityQualifier.MDPI
             )
@@ -399,9 +397,7 @@ class ComposeResourceTest : KmpUiTest() {
     @Test
     fun rememberResourceStateAffectedByEnvironmentChanges() = clearResourceCachesAndRunUiTest {
         val env2 = ResourceEnvironment(
-            language = LanguageQualifier("en"),
-            script = ScriptQualifier(""),
-            region = RegionQualifier("CA"),
+            locales = listOf(ResourceLocale(LanguageQualifier("en"), ScriptQualifier(""), RegionQualifier("CA"))),
             theme = ThemeQualifier.DARK,
             density = DensityQualifier.MDPI
         )

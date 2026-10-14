@@ -8,7 +8,6 @@ package org.jetbrains.compose.resources
 import org.jetbrains.compose.resources.DensityQualifier.*
 import org.jetbrains.compose.resources.ThemeQualifier.DARK
 import org.jetbrains.compose.resources.ThemeQualifier.LIGHT
-import androidx.compose.ui.text.intl.Locale
 import kotlin.test.*
 
 class ResourceTest {
@@ -36,9 +35,7 @@ class ResourceTest {
             )
         )
         fun env(lang: String, reg: String, theme: ThemeQualifier, density: DensityQualifier) = ResourceEnvironment(
-            language = LanguageQualifier(lang),
-            script = ScriptQualifier(""),
-            region = RegionQualifier(reg),
+            locales = listOf(ResourceLocale(LanguageQualifier(lang), ScriptQualifier(""), RegionQualifier(reg))),
             theme = theme,
             density = density
         )
@@ -130,9 +127,7 @@ class ResourceTest {
             )
         )
         fun env(lang: String, script: String, reg: String) = ResourceEnvironment(
-            language = LanguageQualifier(lang),
-            script = ScriptQualifier(script),
-            region = RegionQualifier(reg),
+            locales = listOf(ResourceLocale(LanguageQualifier(lang), ScriptQualifier(script), RegionQualifier(reg))),
             theme = LIGHT,
             density = XHDPI
         )
