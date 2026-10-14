@@ -19,8 +19,6 @@ internal actual fun canAppendUnescapedHtmlString(value: String, attribute: Boole
 }
 
 internal actual fun StringBuilder.appendHtmlRun(value: String, start: Int, end: Int) {
-    // JVM StringBuilder copies String storage in bulk.
-    // Its CharSequence range overload copies one character at a time.
-    if (end - start >= 32) append(value.substring(start, end))
-    else append(value, start, end)
+    // JDK 21 bulk-copies String ranges; avoid constructing a temporary substring.
+    append(value, start, end)
 }
