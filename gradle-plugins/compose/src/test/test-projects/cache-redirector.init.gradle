@@ -1,0 +1,32 @@
+// Resolves Maven Central artifacts of test projects through JetBrains cache-redirector,
+// to avoid hitting Maven Central rate limits (HTTP 429) on CI.
+// The redirector has to go before Gradle Plugin Portal, as the portal redirects such artifacts to Maven Central.
+
+def redirectorName = "MavenCentralCacheRedirector"
+def redirectorUrl = "https://cache-redirector.jetbrains.com/maven-central"
+
+beforeSettings { settings ->
+    // Repositories declared in settings scripts are added after this one
+    settings.pluginManagement.repositories.maven {
+        name = redirectorName
+        url = redirectorUrl
+    }
+    settings.dependencyResolutionManagement.repositories.maven {
+        name = redirectorName
+        url = redirectorUrl
+    }
+}
+
+settingsEvaluated { settings ->
+    // Direct Maven Central is replaced by the redirector above:
+    // on 429 it fails the resolution instead of falling through to the next repositories (e.g. mavenLocal with snapshots)
+    [settings.pluginManagement.repositories, settings.dependencyResolutionManagement.repositories].each { repositories ->
+        repositories.removeAll { it instanceof MavenArtifactRepository && it.url.host == "repo.maven.apache.org" }
+
+        // Gradle Plugin Portal redirects artifacts it doesn't host (e.g. AGP from Google Maven) to Maven Central,
+        // so it goes last for other repositories to be checked first
+        def pluginPortals = repositories.findAll { it instanceof MavenArtifactRepository && it.url.host == "plugins.gradle.org" }
+        repositories.removeAll(pluginPortals)
+        pluginPortals.each { repositories.addLast(it) }
+    }
+}
