@@ -3,6 +3,8 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+@file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
@@ -44,6 +46,30 @@ internal interface ComposeHtmlContext {
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
         content: RawTextContent,
     )
+
+    @Composable
+    @NonRestartableComposable
+    fun <TElement : Element> TextTagElement(
+        elementBuilder: ElementBuilder<TElement>,
+        applyAttrs: AttrsScope<TElement>.() -> Unit,
+        value: String,
+        encoded: String?,
+    ) {
+        TagElement(elementBuilder, applyAttrs) { TextElement(value) }
+    }
+
+    @Composable
+    @NonRestartableComposable
+    fun <TElement : Element> DynamicTextTagElement(
+        attributes: PrecomputedHtmlAttributes<TElement>,
+        value: @Composable ElementScope<TElement>.() -> String,
+    ) {
+        TagElement(attributes.elementBuilder, attributes.callback) { TextElement(value()) }
+    }
+
+    @Composable
+    @NonRestartableComposable
+    fun StaticHtmlFragment(fragment: PrecomputedHtmlFragment) { fragment.content() }
 
     @Composable
     @NonRestartableComposable

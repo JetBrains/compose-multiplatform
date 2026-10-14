@@ -84,3 +84,7 @@ The page stays static except for three hydration roots. From the repository root
 html/gradlew -p html -Pcompose.html.eap.enabled=true \
     :html-eap-hydration-islands-example:wasmJsBrowserDevelopmentRun
 ```
+
+## Static HTML lowering
+
+The [static HTML source generator](static-lowering/README.md) precomputes checked literal markup and keeps dynamic expressions in their original element scopes. Its default includes bounded literal-loop folding. Apply the same generated common sources to server and browser builds.

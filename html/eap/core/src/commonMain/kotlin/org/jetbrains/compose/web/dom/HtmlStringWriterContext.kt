@@ -3,6 +3,8 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+@file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
@@ -30,6 +32,7 @@ internal class HtmlStringWriterContext(
     private val output: StringBuilder = StringBuilder(),
     private val chunkSink: ((StringBuilder) -> Unit)? = null,
     private val chunkSize: Int = 2048,
+    private val fragmentRootTag: String? = null,
 ) : ComposeHtmlContext {
     private val streaming = chunkSink != null
 
@@ -38,6 +41,7 @@ internal class HtmlStringWriterContext(
         private set
     private val elementScope = StringElementScope<Element>()
     private var finished = false
+    private var immutableOutput: String? = null
 
     // These elements must keep their content in the shared buffer until their end tag is written.
     private var bufferedElementDepth = 0
@@ -149,6 +153,117 @@ internal class HtmlStringWriterContext(
     @Composable
     @NonRestartableComposable
     @ExplicitGroupsComposable
+    override fun <TElement : Element> TextTagElement(
+        elementBuilder: ElementBuilder<TElement>,
+        applyAttrs: AttrsScope<TElement>.() -> Unit,
+        value: String,
+        encoded: String?,
+    ) {
+        checkNotFinished()
+        if (discardingContent) return
+        val metadata = elementBuilder as? HtmlTagMetadata
+        val tagName = elementBuilder.tagName
+        val flags = metadata?.serializationFlags ?: htmlStringTagFlags(tagName, HtmlNamespace)
+        if (metadata?.namespace != HtmlNamespace || flags and (RawTextTagFlag or VoidTagFlag) != 0 || tagName == "noscript") {
+            TagElement(elementBuilder, applyAttrs) { TextElement(value) }
+            return
+        }
+        flushChunk()
+        val override = writeStartTag(tagName, HtmlNamespace, applyAttrs,
+            LocalHtmlValidationMode.current == HtmlValidationMode.Strict, flags and ValidTagFlag != 0)
+        val parentTagName = currentTagName
+        val parentNamespace = currentNamespace
+        currentTagName = tagName
+        currentNamespace = HtmlNamespace
+        previousSiblingWasText = false
+        pendingLeadingNewline = flags and LeadingNewlineTagFlag != 0
+        flushChunk()
+        val start = output.length
+        val text = override.textContent ?: value
+        if (text.isNotEmpty()) {
+            if (encoded == null || override.textContent != null) writeText(text)
+            else {
+                requireHtmlParserStableTableText(currentTagName, text)
+                if (pendingLeadingNewline && text.first() == '\n') output.append('\n')
+                output.append(encoded)
+                pendingLeadingNewline = false
+                previousSiblingWasText = true
+            }
+        }
+        output.appendEndTag(tagName, HtmlNamespace, start)
+        currentTagName = parentTagName
+        currentNamespace = parentNamespace
+        previousSiblingWasText = false
+        pendingLeadingNewline = false
+        flushChunk()
+    }
+
+    @Composable
+    @NonRestartableComposable
+    @ExplicitGroupsComposable
+    override fun <TElement : Element> DynamicTextTagElement(
+        attributes: PrecomputedHtmlAttributes<TElement>,
+        value: @Composable ElementScope<TElement>.() -> String,
+    ) {
+        checkNotFinished()
+        if (discardingContent) {
+            value(elementScope())
+            return
+        }
+        val tagName = attributes.tagName
+        flushChunk()
+        writeStartTag(tagName, HtmlNamespace, attributes.callback,
+            LocalHtmlValidationMode.current == HtmlValidationMode.Strict, true)
+        val parentTagName = currentTagName
+        val parentNamespace = currentNamespace
+        currentTagName = tagName
+        currentNamespace = HtmlNamespace
+        previousSiblingWasText = false
+        pendingLeadingNewline = isHtmlLeadingNewlineElement(tagName, HtmlNamespace)
+        flushChunk()
+        val start = output.length
+        val text = value(elementScope())
+        if (text.isNotEmpty()) {
+            writeText(text)
+            flushChunk()
+        }
+        output.appendEndTag(tagName, HtmlNamespace, start)
+        currentTagName = parentTagName
+        currentNamespace = parentNamespace
+        previousSiblingWasText = false
+        pendingLeadingNewline = false
+        flushChunk()
+    }
+
+    @Composable
+    @NonRestartableComposable
+    @ExplicitGroupsComposable
+    override fun StaticHtmlFragment(fragment: PrecomputedHtmlFragment) {
+        checkNotFinished()
+        if (discardingContent) return
+        // Text boundaries need hydration; use original content for plain output.
+        if (!hydratable && fragment.encoded.contains("<!--")) {
+            fragment.content()
+            return
+        }
+        require(!collectingRawText) { "String rendering does not support element children inside <$currentTagName>" }
+        if (currentNamespace == HtmlNamespace) requireHtmlParserStableTableElement(currentTagName, fragment.rootTag)
+        if (currentTagName == null) {
+            require(fragmentRootTag == null || fragmentRootTag == fragment.rootTag)
+            recordRootChild(isHtml = false)
+        }
+        flushChunk()
+        // Return static pages directly. Buffer mixed or streamed output.
+        if (!streaming && currentTagName == null && output.isEmpty()) immutableOutput = fragment.encoded
+        else output.append(fragment.encoded)
+        previousSiblingWasText = false
+        pendingLeadingNewline = false
+        flushChunk()
+    }
+
+    @Composable
+    @NonRestartableComposable
+    @ExplicitGroupsComposable
     override fun <TElement : Element> RawTextElement(
         tagName: String,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
@@ -191,6 +306,7 @@ internal class HtmlStringWriterContext(
     fun finish(requireHtmlDocumentRoot: Boolean): String {
         check(currentTagName == null) { "String rendering finished inside <$currentTagName>" }
         finished = true
+        if (fragmentRootTag != null) require(rootChildCount == 1) { "Static subtree must have one root" }
         if (requireHtmlDocumentRoot) {
             require(rootChildCount == 1 && firstRootChildIsHtml) {
                 "Hydrated document content must produce exactly one html element"
@@ -198,8 +314,8 @@ internal class HtmlStringWriterContext(
         }
         attrsBuilders.trim(attrsBuilderIndex)
         if (!streaming) {
-            peakBufferSize = output.length
-            return output.toString()
+            peakBufferSize = immutableOutput?.length ?: output.length
+            return immutableOutput ?: output.toString()
         }
 
         flushChunk(force = true)
@@ -217,9 +333,18 @@ internal class HtmlStringWriterContext(
         require(!collectingRawText) {
             "String rendering does not support element children inside <$currentTagName>"
         }
-        if (currentTagName == null) recordRootChild(isHtml = tagName == "html")
+        if (currentTagName == null) {
+            require(fragmentRootTag == null || fragmentRootTag == tagName) { "Static subtree root differs" }
+            recordRootChild(isHtml = tagName == "html")
+        }
         if (currentNamespace == HtmlNamespace) requireHtmlParserStableTableElement(currentTagName, tagName)
 
+        val precomputed = if (namespace == HtmlNamespace) precomputedHtmlCallbackMetadata(applyAttrs) else null
+        if (precomputed != null && precomputed.tagName == tagName) {
+            output.append(precomputed.startTag)
+            pendingLeadingNewline = false
+            return StartTagResult.Ordinary
+        }
         val builder = attrsBuilders.builder<TElement>(attrsBuilderIndex++)
         try {
             applyAttrs?.invoke(builder)
@@ -260,7 +385,10 @@ internal class HtmlStringWriterContext(
     }
 
     private fun writeText(value: String) {
-        if (currentTagName == null) recordRootChild(isHtml = false)
+        if (currentTagName == null) {
+            require(fragmentRootTag == null) { "Static subtree must start with its declared element root" }
+            recordRootChild(isHtml = false)
+        }
         if (currentNamespace == HtmlNamespace) requireHtmlParserStableTableText(currentTagName, value)
         if (pendingLeadingNewline) {
             if (value.first() == '\n') output.append('\n')
@@ -291,6 +419,10 @@ internal class HtmlStringWriterContext(
 
     private fun checkNotFinished() {
         check(!finished) { "String rendering does not support HTML emission after composition" }
+        immutableOutput?.let {
+            output.append(it)
+            immutableOutput = null
+        }
     }
 
     private fun <TElement : Element> elementScope(): ElementScope<TElement> = elementScope.unsafeCast()

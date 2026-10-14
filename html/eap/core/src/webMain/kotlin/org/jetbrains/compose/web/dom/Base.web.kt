@@ -615,6 +615,27 @@ private class HydratingComposeHtmlContext(
 
     @Composable
     @NonRestartableComposable
+    override fun <TElement : Element> DynamicTextTagElement(
+        attributes: PrecomputedHtmlAttributes<TElement>,
+        value: @Composable ElementScope<TElement>.() -> String,
+    ) {
+        TagElement(attributes.elementBuilder, attributes.callback) { TextElement(value()) }
+    }
+
+    @Composable
+    @NonRestartableComposable
+    override fun <TElement : Element> TextTagElement(
+        elementBuilder: ElementBuilder<TElement>,
+        applyAttrs: AttrsScope<TElement>.() -> Unit,
+        value: String,
+        encoded: String?,
+    ) {
+        // Use this context to keep hydration active.
+        TagElement(elementBuilder, applyAttrs) { TextElement(value) }
+    }
+
+    @Composable
+    @NonRestartableComposable
     override fun <TElement : Element> RawTextElement(
         tagName: String,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
