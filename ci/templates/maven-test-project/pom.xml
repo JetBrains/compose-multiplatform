@@ -21,7 +21,7 @@
          The "central" id replaces the default Maven Central repository. -->
     <repositories>
         <repository>
-            <id>central</id>
+            <id>MavenCentralCacheRedirector</id>
             <url>https://cache-redirector.jetbrains.com/maven-central</url>
         </repository>
         <repository>
@@ -36,7 +36,7 @@
 
     <pluginRepositories>
         <pluginRepository>
-            <id>central</id>
+            <id>MavenCentralCacheRedirector</id>
             <url>https://cache-redirector.jetbrains.com/maven-central</url>
         </pluginRepository>
     </pluginRepositories>
