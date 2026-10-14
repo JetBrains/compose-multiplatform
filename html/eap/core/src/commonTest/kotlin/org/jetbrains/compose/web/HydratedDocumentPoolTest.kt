@@ -53,7 +53,7 @@ class HydratedDocumentPoolTest {
             assertContains(rendered, "$request</script>")
             assertEquals(strict, "class=\"first\"" in rendered)
             assertEquals(strict, HydrationValidationAttribute in rendered)
-            assertEquals("outside", snapshotState.value)
+            assertEquals(request, snapshotState.value)
             assertEquals(remembered, disposals)
             assertSame(renderer, pool.borrow())
             pool.recycle(renderer)

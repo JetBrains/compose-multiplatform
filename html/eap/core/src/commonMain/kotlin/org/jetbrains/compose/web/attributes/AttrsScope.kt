@@ -374,15 +374,18 @@ private val setClassList: (HTMLElement, Array<out String>) -> Unit = { e, classL
 
 internal fun Collection<String>.toClassAttributeValue(validate: Boolean = true): String? {
     if (isEmpty()) return null
-    if (validate) {
-        val seen = mutableSetOf<String>()
-        forEach { token ->
-            require(token.isNotEmpty()) { "Class token must not be empty" }
-            require(token.none { it in "\t\n\u000C\r " }) {
-                "Class token must not contain ASCII whitespace: \"$token\""
-            }
-            require(seen.add(token)) { "Class token must not be repeated: \"$token\"" }
-        }
-    }
+    if (validate) validateClassTokens()
     return joinToString(" ")
+}
+
+internal fun Collection<String>.validateClassTokens() {
+    if (isEmpty()) return
+    val seen = mutableSetOf<String>()
+    forEach { token ->
+        require(token.isNotEmpty()) { "Class token must not be empty" }
+        require(token.none { it in "\t\n\u000C\r " }) {
+            "Class token must not contain ASCII whitespace: \"$token\""
+        }
+        require(seen.add(token)) { "Class token must not be repeated: \"$token\"" }
+    }
 }

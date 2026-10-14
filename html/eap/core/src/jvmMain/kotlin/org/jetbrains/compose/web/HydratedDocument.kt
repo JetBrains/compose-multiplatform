@@ -19,6 +19,7 @@ import java.io.Writer
  * consume each write before returning because the character array is reused. The writer is not flushed
  * or closed. Output already written cannot be retracted if rendering, validation or writing throws.
  *
+ * Rendering uses the caller's current snapshot. Use a mutable snapshot around rendering for isolation.
  * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
  * See [composeHtmlToStream] for validation and failure handling.
  *
@@ -43,6 +44,7 @@ fun renderHydratedDocumentToStream(
 /**
  * Streams a complete document with fresh storage.
  *
+ * Rendering uses the caller's current snapshot. Use a mutable snapshot around rendering for isolation.
  * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
  * See [composeHtmlToStream] for validation and failure handling.
  */

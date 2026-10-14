@@ -13,6 +13,8 @@ import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.CompositionGroup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import org.jetbrains.compose.web.dom.ComposeHtmlContext
+import org.jetbrains.compose.web.dom.LocalComposeHtmlContext
 import org.jetbrains.compose.web.internal.unsafeCast
 
 /**
@@ -33,6 +35,8 @@ internal class SinglePassComposer : Composer {
     private var hashes = LongArray(64)
     private var depth = 0
     private var locals = emptyCompositionLocalMap
+    private var htmlContext: ComposeHtmlContext? = null
+    private var validationMode: HtmlValidationMode? = HtmlValidationMode.Fast
     private val providers = ArrayList<PersistentCompositionLocalMap>()
     private val observers = ArrayList<RememberObserver>()
     private val effects = ArrayList<() -> Unit>()
@@ -70,6 +74,8 @@ internal class SinglePassComposer : Composer {
         depth = 0
         children[0] = 0
         locals = emptyCompositionLocalMap
+        htmlContext = null
+        validationMode = HtmlValidationMode.Fast
         providers.clear()
         observers.clear()
         effects.clear()
@@ -118,13 +124,42 @@ internal class SinglePassComposer : Composer {
     override fun changed(value: Double) = true
 
     override val currentCompositionLocalMap: CompositionLocalMap get() = locals
-    override fun <T> consume(key: CompositionLocal<T>): T = locals.read(key)
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> consume(key: CompositionLocal<T>): T = when {
+        key === LocalComposeHtmlContext && htmlContext != null -> htmlContext as T
+        key === LocalHtmlValidationMode && validationMode != null -> validationMode as T
+        else -> locals.read(key)
+    }
+    private fun refreshHtmlLocals() {
+        // Computed providers must remain lazy and read from the current map on every consume.
+        val contextHolder = locals[LocalComposeHtmlContext.unsafeCast<CompositionLocal<Any?>>()]
+        htmlContext = if (contextHolder is StaticValueHolder<*>) locals.read(LocalComposeHtmlContext) else null
+        val validationHolder = locals[LocalHtmlValidationMode.unsafeCast<CompositionLocal<Any?>>()]
+        validationMode = when (validationHolder) {
+            null -> HtmlValidationMode.Fast
+            is StaticValueHolder<*> -> locals.read(LocalHtmlValidationMode)
+            else -> null
+        }
+    }
     override fun startProviders(values: Array<out ProvidedValue<*>>) {
         providers.add(locals)
-        locals = locals.builder().apply { putAll(updateCompositionMap(values, locals)) }.build()
+        val parent = locals
+        // Merge fresh providers into the parent to avoid a temporary map.
+        // Check this and static-value caching against the Compose runtime when upgrading.
+        val builder = parent.builder()
+        @Suppress("UNCHECKED_CAST")
+        for (provided in values) {
+            val local = provided.compositionLocal as ProvidableCompositionLocal<Any?>
+            if (provided.canOverride || !parent.contains(local)) {
+                builder[local] = local.updatedStateOf(provided as ProvidedValue<Any?>, null)
+            }
+        }
+        locals = builder.build()
+        refreshHtmlLocals()
     }
     override fun endProviders() {
         locals = providers.removeAt(providers.lastIndex)
+        refreshHtmlLocals()
     }
     override fun startProvider(value: ProvidedValue<*>) = startProviders(arrayOf(value))
     override fun endProvider() = endProviders()

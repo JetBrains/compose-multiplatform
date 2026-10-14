@@ -14,29 +14,40 @@ fun CSSRuleDeclaration.stringPresentation(
     indent: String = "    ",
     delimiter: String = "\n"
 ): String {
-    val cssRuleDeclaration = this
-    val strings = mutableListOf<String>()
-    strings.add("$baseIndent${cssRuleDeclaration.header} {")
-    when (cssRuleDeclaration) {
+    return buildString { appendRulePresentation(this@stringPresentation, baseIndent, indent, delimiter) }
+}
+
+internal fun StringBuilder.appendRulePresentation(
+    rule: CSSRuleDeclaration,
+    baseIndent: String,
+    indent: String,
+    delimiter: String,
+) {
+    append(baseIndent).append(rule.header).append(" {")
+    when (rule) {
         is CSSStyledRuleDeclaration -> {
-            cssRuleDeclaration.style.properties.forEach { (name, value, important) ->
-                strings.add("$baseIndent$indent$name: $value${if (important) " !important" else ""};")
+            for ((name, value, important) in rule.style.properties) {
+                append(delimiter).append(baseIndent).append(indent).append(name).append(": ").append(value)
+                if (important) append(" !important")
+                append(';')
             }
-            cssRuleDeclaration.style.variables.forEach { (name, value) ->
-                strings.add("$baseIndent$indent--$name: $value;")
+            for ((name, value) in rule.style.variables) {
+                append(delimiter).append(baseIndent).append(indent).append("--").append(name)
+                    .append(": ").append(value).append(';')
             }
         }
         is CSSGroupingRuleDeclaration -> {
-            cssRuleDeclaration.rules.forEach { childRuleDeclaration ->
-                strings.add(childRuleDeclaration.stringPresentation(baseIndent + indent, indent, delimiter))
+            for (child in rule.rules) {
+                append(delimiter)
+                appendRulePresentation(child, baseIndent + indent, indent, delimiter)
             }
         }
         is CSSKeyframesRuleDeclaration -> {
-            cssRuleDeclaration.keys.forEach { childRuleDeclaration ->
-                strings.add(childRuleDeclaration.stringPresentation(baseIndent + indent, indent, delimiter))
+            for (child in rule.keys) {
+                append(delimiter)
+                appendRulePresentation(child, baseIndent + indent, indent, delimiter)
             }
         }
     }
-    strings.add("$baseIndent}")
-    return strings.joinToString(delimiter)
+    append(delimiter).append(baseIndent).append('}')
 }

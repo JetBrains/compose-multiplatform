@@ -44,6 +44,7 @@ interface StyleScope {
      * ```
      */
     fun property(propertyName: String, value: StylePropertyValue)
+
     /**
      * Adds arbitrary CSS property to the inline style of the element. By default throws an error for backward compatibility
      * @param propertyName - the name of css property as [per spec](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)
@@ -62,13 +63,19 @@ interface StyleScope {
      * })
      * ```
      */
-    fun property(propertyName: String, value: StylePropertyValue, important: Boolean): Unit = error("!important is not supported by this implementation")
+    fun property(propertyName: String, value: StylePropertyValue, important: Boolean): Unit =
+        error("!important is not supported by this implementation")
+
     fun variable(variableName: String, value: StylePropertyValue)
 
     fun property(propertyName: String, value: String) = property(propertyName, StylePropertyValue(value))
-    fun property(propertyName: String, value: String, important: Boolean) = property(propertyName, StylePropertyValue(value), important)
+    fun property(propertyName: String, value: String, important: Boolean) =
+        property(propertyName, StylePropertyValue(value), important)
+
     fun property(propertyName: String, value: Number) = property(propertyName, StylePropertyValue(value))
-    fun property(propertyName: String, value: Number, important: Boolean) = property(propertyName, StylePropertyValue(value), important)
+    fun property(propertyName: String, value: Number, important: Boolean) =
+        property(propertyName, StylePropertyValue(value), important)
+
     fun variable(variableName: String, value: String) = variable(variableName, StylePropertyValue(value))
     fun variable(variableName: String, value: Number) = variable(variableName, StylePropertyValue(value))
 
@@ -151,6 +158,7 @@ fun <TValue : StylePropertyValue> variable() =
 interface StyleHolder {
     @ComposeWebInternalApi
     val properties: StylePropertyList
+
     @ComposeWebInternalApi
     val variables: StylePropertyList
 }
@@ -183,7 +191,7 @@ open class StyleScopeBuilder : StyleScope, StyleHolder {
     override fun equals(other: Any?): Boolean {
         return if (other is StyleHolder) {
             properties.nativeEquals(other.properties) &&
-                variables.nativeEquals(other.variables)
+                    variables.nativeEquals(other.variables)
         } else false
     }
 
@@ -213,6 +221,10 @@ typealias MutableStylePropertyList = MutableList<StylePropertyDeclaration>
 @OptIn(ComposeWebInternalApi::class)
 internal fun StyleHolder.toStyleAttributeValue(): String? {
     if (properties.isEmpty() && variables.isEmpty()) return null
+    val ordinary = StringBuilder()
+    if (ordinary.appendOrdinaryDeclarations(properties, "") &&
+        ordinary.appendOrdinaryDeclarations(variables, "--")
+    ) return ordinary.toString()
     val declarations = properties + variables.map { it.copy(name = "--${it.name}") }
     val removedNames = mutableSetOf<String>()
     val resetPriorityNames = mutableSetOf<String>()
@@ -225,6 +237,7 @@ internal fun StyleHolder.toStyleAttributeValue(): String? {
                 removedNames.add(declaration.name)
                 false
             }
+
             declaration.important -> declaration.name !in resetPriorityNames
             else -> {
                 resetPriorityNames.add(declaration.name)
@@ -241,6 +254,18 @@ internal fun StyleHolder.toStyleAttributeValue(): String? {
                 if (declaration.important) append(" !important")
             }
         }
+}
+
+// Convert each ordinary value once, including numeric CSS carriers.
+private fun StringBuilder.appendOrdinaryDeclarations(declarations: StylePropertyList, prefix: String): Boolean {
+    for (declaration in declarations) {
+        if (declaration.important) return false
+        val value = declaration.value.toString()
+        if (value.isEmpty()) return false
+        if (isNotEmpty()) append("; ")
+        append(prefix).append(declaration.name).append(": ").append(value)
+    }
+    return true
 }
 
 internal fun StylePropertyList.nativeEquals(properties: StylePropertyList): Boolean {

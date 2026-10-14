@@ -10,7 +10,6 @@ package org.jetbrains.compose.web
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composer
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.snapshots.Snapshot
 import org.jetbrains.compose.web.dom.AttrsBuilderPool
 import org.jetbrains.compose.web.dom.HtmlStringWriterContext
 import org.jetbrains.compose.web.dom.LocalComposeHtmlContext
@@ -18,8 +17,8 @@ import org.jetbrains.compose.web.dom.LocalComposeHtmlContext
 /**
  * Composes [content] once into an HTML string without creating browser DOM nodes.
  *
- * Snapshot state changes are discarded after rendering. Coroutine effects such as
- * `LaunchedEffect` do not run. `SideEffect` and `DisposableEffect` still execute.
+ * Rendering uses the caller's current snapshot. Use a mutable snapshot around rendering for isolation.
+ * Coroutine effects such as `LaunchedEffect` do not run. `SideEffect` and `DisposableEffect` still execute.
  *
  * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
  * See [composeHtmlToStream] for validation and failure handling.
@@ -63,7 +62,7 @@ internal fun composeHtmlString(
     val pool = getHtmlRendererPool(key)
     val renderer = pool?.borrow() ?: HtmlRenderer()
 
-    // Return storage to the pool only after rendering, effect cleanup and snapshot disposal succeed.
+    // Return storage to the pool only after rendering and effect cleanup succeed.
     val result = renderer.render(hydratable, requireHtmlDocumentRoot, chunkSink, chunkSize, prefix, content)
     pool?.recycle(renderer)
     return result
@@ -90,39 +89,32 @@ internal class HtmlRenderer {
         prefix: String,
         content: @Composable () -> Unit,
     ): String {
-        val snapshot = Snapshot.takeMutableSnapshot()
         try {
             output.append(prefix)
             val context = HtmlStringWriterContext(hydratable, attrsBuilders, output, chunkSink, chunkSize)
-            return snapshot.enter {
-                var failure: Throwable? = null
-                try {
-                    val wrapped: @Composable () -> Unit = {
-                        CompositionLocalProvider(LocalComposeHtmlContext provides context) { content() }
-                    }
-                    @Suppress("UNCHECKED_CAST")
-                    (wrapped as (Composer, Int) -> Unit)(composer, 1)
-                    composer.applyEffects()
-                    context.finish(requireHtmlDocumentRoot).also {
-                        if (isOversized(output.capacity(), context.peakBufferSize)) {
-                            if (chunkSink == null) output.trimToSize()
-                            else output = StringBuilder(context.peakBufferSize)
-                        }
-                    }
-                } catch (cause: Throwable) {
-                    failure = cause
-                    throw cause
-                } finally {
-                    composer.dispose(failure)
+            var failure: Throwable? = null
+            try {
+                val wrapped: @Composable () -> Unit = {
+                    CompositionLocalProvider(LocalComposeHtmlContext provides context) { content() }
                 }
+                @Suppress("UNCHECKED_CAST")
+                (wrapped as (Composer, Int) -> Unit)(composer, 1)
+                composer.applyEffects()
+                return context.finish(requireHtmlDocumentRoot).also {
+                    if (isOversized(output.capacity(), context.peakBufferSize)) {
+                        if (chunkSink == null) output.trimToSize()
+                        else output = StringBuilder(context.peakBufferSize)
+                    }
+                }
+            } catch (cause: Throwable) {
+                failure = cause
+                throw cause
+            } finally {
+                composer.dispose(failure)
             }
         } finally {
-            try {
-                snapshot.dispose()
-            } finally {
-                // Clear the output before reuse. The underlying buffer is not erased.
-                output.setLength(0)
-            }
+            // Clear the output before reuse. The underlying buffer is not erased.
+            output.setLength(0)
         }
     }
 }

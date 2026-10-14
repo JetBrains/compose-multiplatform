@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
  * calls stay intact, as do elements whose contents require validation. A chunk can exceed [chunkSize],
  * and no empty chunks are sent.
  *
+ * Rendering uses the caller's current snapshot. Use a mutable snapshot around rendering for isolation.
  * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
  *
  * [sink] runs synchronously while rendering and may block. Output already sent cannot be retracted

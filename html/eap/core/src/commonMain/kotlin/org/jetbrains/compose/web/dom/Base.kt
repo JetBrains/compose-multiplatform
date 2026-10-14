@@ -15,7 +15,6 @@ import kotlinx.browser.dom.Element
 import kotlinx.browser.dom.HTMLStyleElement
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
-import org.jetbrains.compose.web.css.utils.serializeRules
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 internal interface ComposeHtmlContext {
@@ -34,6 +33,7 @@ internal interface ComposeHtmlContext {
     fun <TElement : Element> TagElement(
         elementBuilder: ElementBuilder<TElement>,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        rawTextContent: RawTextContent?,
         content: (@Composable ElementScope<TElement>.() -> Unit)?,
     )
 
@@ -75,6 +75,7 @@ fun <TElement : Element> TagElement(
     LocalComposeHtmlContext.current.TagElement(
         elementBuilder = elementBuilder,
         applyAttrs = applyAttrs,
+        rawTextContent = null,
         content = content,
     )
 }
@@ -99,6 +100,7 @@ fun <TElement : Element> TagElementNS(
         context.TagElement(
             elementBuilder = context.elementBuilderNS(tagName, namespace),
             applyAttrs = applyAttrs,
+            rawTextContent = null,
             content = content,
         )
     }
@@ -128,6 +130,7 @@ fun <TElement : Element> TagElement(
         context.TagElement(
             elementBuilder = context.elementBuilder(tagName),
             applyAttrs = applyAttrs,
+            rawTextContent = null,
             content = content,
         )
     }
@@ -157,7 +160,12 @@ internal fun <TElement : Element> RawTextElement(
 internal fun prepareStyleRawTextContent(cssRules: CSSRuleDeclarationList): RawTextContent =
     RawTextContent.create(
         tagName = "style",
-        content = cssRules.serializeRules().joinToString("\n"),
+        content = buildString {
+            cssRules.forEachIndexed { index, rule ->
+                if (index != 0) append('\n')
+                appendRulePresentation(rule, baseIndent = "", indent = " ", delimiter = "")
+            }
+        },
     )
 
 internal class RawTextContent private constructor(

@@ -6,6 +6,12 @@
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
+import kotlin.test.Test
+import kotlin.test.assertContains
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertNotSame
+import kotlin.test.assertSame
 import kotlinx.browser.dom.Element
 import kotlinx.browser.dom.HTMLDivElement
 import kotlinx.browser.dom.HTMLInputElement
@@ -14,13 +20,7 @@ import org.jetbrains.compose.web.attributes.disabled
 import org.jetbrains.compose.web.attributes.readOnly
 import org.jetbrains.compose.web.attributes.required
 import org.jetbrains.compose.web.composeHtmlToString
-import kotlin.test.Test
-import kotlin.test.assertContains
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
-import kotlin.test.assertNotSame
-import kotlin.test.assertSame
 
 internal const val TestSvgNamespace = "http://www.w3.org/2000/svg"
 
@@ -746,4 +746,128 @@ class HtmlSerializationTest {
             html,
         )
     }
+    @Test
+    fun attributeNameChecksRejectAllControlsAndProtocolSpoofing() {
+        for (character in (0..31).map(Int::toChar) + (127..159).map(Int::toChar) + " \"'/>=".toList()) {
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString { Div(attrs = { attr("prefix${character}suffix", "value") }) }
+            }
+        }
+        for (name in listOf("data-compose-hydration-root", "DATA-COMPOSE-HYDRATION-STATE",
+                            "Data-Compose-Hydration-For", "data-compose-hydration-validation")) {
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString { Div(attrs = { attr(name, "value") }) }
+            }
+        }
+        assertEquals("<div data-compose-hydration-other=\"allowed\"></div>", composeHtmlToString {
+            Div(attrs = { attr("data-compose-hydration-other", "allowed") })
+        })
+    }
+
+    @Test
+    fun pooledAttributeNamesNeverCacheValues() {
+        repeat(6) { i ->
+            assertEquals("<div data-long-name-for-validation=\"$i&amp;&quot;\"></div>", composeHtmlToString(key = "attribute-name-reuse") {
+                Div({ attr("data-long-name-for-validation", "$i&\"") })
+            })
+        }
+        assertFailsWith<IllegalArgumentException> {
+            composeHtmlToString(key = "attribute-name-reuse") { Div({ attr("invalid name", "value") }) }
+        }
+        assertEquals("<div title=\"next\"></div>", composeHtmlToString(key = "attribute-name-reuse") { Div({ title("next") }) })
+    }
+
+    @Test
+    fun reservedAttributeOwnershipIsCheckedAfterNameReuse() {
+        val reserved = "data-compose-hydration-state"
+        repeat(2) {
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString(key = "reserved-attribute-reuse") { Div({ attr(reserved, "forged") }) }
+            }
+        }
+    }
+
+    @Test
+    fun foreignDuplicateChecksSurviveRepeatedNames() {
+        repeat(2) {
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString(key = "foreign-attribute-reuse", validateStrictly = true) {
+                    TagElementNS<kotlinx.browser.dom.Element>("g", "http://www.w3.org/2000/svg",
+                        {
+                            attr("viewBox", "first")
+                            attr("viewbox", "second")
+                        }, null)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun escapingPreservesEntitiesAndUnicodeAcrossFastPathLengths() {
+        for (length in listOf(0, 1, 30, 31, 32, 33, 63, 64, 65, 1024)) {
+            val prefix = "é😀a".repeat(length)
+            val suffix = "<&>\r\"\n\t&amp;"
+            val html = composeHtmlToString {
+                Div(attrs = { attr("title", prefix + suffix) }) { Text(prefix + suffix) }
+            }
+            assertEquals(
+                "<div title=\"${prefix}&lt;&amp;&gt;&#13;&quot;&#10;&#9;&amp;amp;\">" +
+                    "${prefix}&lt;&amp;&gt;&#13;\"\n\t&amp;amp;</div>",
+                html,
+            )
+        }
+    }
+
+    @Test
+    fun longUnescapedStringsStillRejectNul() {
+        for (position in listOf(0, 31, 32, 1000)) {
+            val value = "x".repeat(position) + '\u0000' + "y".repeat(1000)
+            assertFailsWith<IllegalArgumentException> { composeHtmlToString { Text(value) } }
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString { Div(attrs = { attr("title", value) }) }
+            }
+        }
+    }
+
+    @Test
+    fun classTokensEscapeOnceAndExplicitClassStillOverrides() {
+        for (strict in listOf(false, true)) {
+            assertEquals("<div class=\"a&amp; b&quot;\"></div>", composeHtmlToString(validateStrictly = strict) {
+                Div(attrs = { classes("a&", "b\"") })
+            })
+            assertEquals("<div class=\"explicit\"></div>", composeHtmlToString(validateStrictly = strict) {
+                Div(attrs = {
+                    classes("a&", "b\"")
+                    attr("class", "explicit")
+                })
+            })
+        }
+        assertFailsWith<IllegalArgumentException> {
+            composeHtmlToString(validateStrictly = true) {
+                Div(attrs = {
+                    classes("invalid token")
+                    attr("class", "explicit")
+                })
+            }
+        }
+    }
+
+    @Test
+    fun rendererBuilderCacheSeparatesNamespacesAndStopsAtItsBound() {
+        val pool = AttrsBuilderPool()
+        val html = pool.elementBuilder<Element>("script", HtmlNamespace)
+        val svg = pool.elementBuilder<Element>("script", TestSvgNamespace)
+        assertSame(html, pool.elementBuilder<Element>("script", HtmlNamespace))
+        assertSame(svg, pool.elementBuilder<Element>("script", TestSvgNamespace))
+        assertNotSame(html, svg)
+        assertEquals(RawTextTagFlag or ValidTagFlag, (html as HtmlTagMetadata).serializationFlags)
+        assertEquals(ValidTagFlag, (svg as HtmlTagMetadata).serializationFlags)
+        repeat(126) { pool.elementBuilder<Element>("tag-$it", TestSvgNamespace) }
+        assertNotSame(
+            pool.elementBuilder<Element>("uncached", TestSvgNamespace),
+            pool.elementBuilder<Element>("uncached", TestSvgNamespace),
+        )
+        assertSame(svg, pool.elementBuilder<Element>("script", TestSvgNamespace))
+    }
+
 }

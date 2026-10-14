@@ -5,9 +5,10 @@
 
 package org.jetbrains.compose.web.dom
 
+import org.jetbrains.compose.web.HydrationAttributePrefix
 import org.jetbrains.compose.web.HydrationProtocolAttributes
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
-import org.jetbrains.compose.web.attributes.toClassAttributeValue
+import org.jetbrains.compose.web.attributes.validateClassTokens
 import org.jetbrains.compose.web.css.toStyleAttributeValue
 
 // HTML parsing merges adjacent non-empty text nodes. This comment preserves their boundary.
@@ -89,7 +90,7 @@ internal class StringHtmlAttributes private constructor(
         ): StringHtmlAttributes {
             if (attributes.isEmpty() && classAttributeValue == null && styleAttributeValue == null) return Empty
 
-            validateStringHtmlAttributes(attributes, namespace, validate, hydrationProtocolAttributes)
+            validateStringHtmlAttributes(attributes, namespace, validate, hydrationProtocolAttributes, null)
             val serializedAttributes = linkedMapOf<String, String>().apply { putAll(attributes) }
 
             if ("class" !in serializedAttributes && classAttributeValue != null) {
@@ -120,17 +121,25 @@ internal fun StringBuilder.appendStartTag(
     namespace: String,
     builder: AttrsScopeBuilder<*>,
     validate: Boolean,
-    formState: FormControlState? = null,
+    formState: FormControlState?,
+    nameCache: HtmlAttributeNameCache?,
 ): Boolean {
     // Class validation runs even when an explicit class attribute overrides the class list.
-    val classValue = builder.classes.toClassAttributeValue(validate)
+    if (validate) builder.classes.validateClassTokens()
     val attributes = builder.collect().withFormState(formState).ifEmpty { emptyMap() }
-    validateStringHtmlAttributes(attributes, namespace, validate, builder.hydrationProtocolAttributes)
+    validateStringHtmlAttributes(attributes, namespace, validate, builder.hydrationProtocolAttributes, nameCache)
     val hasScriptSource = tagName == "script" && attributes.keys.any { it.equals("src", ignoreCase = true) }
 
     append('<').append(tagName)
     attributes.forEach { (name, value) -> appendAttribute(tagName, namespace, name, value) }
-    if ("class" !in attributes && classValue != null) appendAttribute(tagName, namespace, "class", classValue)
+    if ("class" !in attributes && builder.classes.isNotEmpty()) {
+        append(" class=\"")
+        builder.classes.forEachIndexed { index, token ->
+            if (index != 0) append(' ')
+            appendEscapedAttribute(token)
+        }
+        append('"')
+    }
     if ("style" !in attributes) {
         builder.styleScopeOrNull?.toStyleAttributeValue()?.let { value ->
             appendAttribute(tagName, namespace, "style", value)
@@ -146,9 +155,10 @@ private fun validateStringHtmlAttributes(
     namespace: String,
     validate: Boolean,
     hydrationProtocolAttributes: Set<String>,
+    nameCache: HtmlAttributeNameCache?,
 ) {
     for (name in attributes.keys) {
-        requireValidHtmlAttributeName(name)
+        if (nameCache == null) requireValidHtmlAttributeName(name) else nameCache.requireValid(name)
         if (validate && namespace != HtmlNamespace) {
             for (previous in attributes.keys) {
                 if (previous == name) break
@@ -157,7 +167,8 @@ private fun validateStringHtmlAttributes(
                 }
             }
         }
-        val protocolName = HydrationProtocolAttributes.firstOrNull { it.equals(name, ignoreCase = true) }
+        val protocolName = if (name.startsWith(HydrationAttributePrefix, ignoreCase = true))
+            HydrationProtocolAttributes.firstOrNull { it.equals(name, ignoreCase = true) } else null
         require(protocolName == null || protocolName in hydrationProtocolAttributes) {
             "Attribute \"$name\" is owned by the Compose hydration protocol"
         }
@@ -194,18 +205,22 @@ internal fun StringBuilder.appendHydrationTextBoundaryMarker() {
 }
 
 internal fun requireValidHtmlTagName(name: String) {
-    require(
-        name.firstOrNull()?.isAsciiLetter() == true &&
-            name.none { it in AsciiWhitespaceCharacters || it in InvalidHtmlTagNameCharacters }
-    ) {
+    require(isValidHtmlTagName(name)) {
         "Invalid HTML tag name: \"$name\""
     }
 }
 
+internal fun isValidHtmlTagName(name: String): Boolean =
+    name.firstOrNull()?.isAsciiLetter() == true &&
+        name.none { it in AsciiWhitespaceCharacters || it in InvalidHtmlTagNameCharacters }
+
 private fun requireValidHtmlAttributeName(name: String) {
     require(
         name.isNotEmpty() &&
-            name.none { it.isISOControl() || it in InvalidHtmlAttributeNameCharacters }
+            name.none {
+                it.code < 0x20 || it.code in 0x7F..0x9F ||
+                    it == ' ' || it == '"' || it == '\'' || it == '/' || it == '>' || it == '='
+            }
     ) {
         "Invalid HTML attribute name: \"$name\""
     }
@@ -213,7 +228,6 @@ private fun requireValidHtmlAttributeName(name: String) {
 
 internal const val AsciiWhitespaceCharacters = "\t\n\u000C\r "
 private const val InvalidHtmlTagNameCharacters = "\u0000/>"
-private const val InvalidHtmlAttributeNameCharacters = " \"'/>="
 
 private fun Char.isAsciiLetter(): Boolean = this in 'A'..'Z' || this in 'a'..'z'
 
@@ -244,6 +258,10 @@ internal fun StringBuilder.appendEscapedText(value: String) {
 // Append ordinary runs in bulk. Besides avoiding an append per character, this lets the
 // JVM copy Latin-1 and UTF-16 runs with its native StringBuilder implementation.
 private fun StringBuilder.appendEscaped(value: String, attribute: Boolean) {
+    if (canAppendUnescapedHtmlString(value, attribute)) {
+        append(value)
+        return
+    }
     var start = 0
     for (index in value.indices) {
         val replacement = when (value[index]) {
@@ -261,10 +279,29 @@ private fun StringBuilder.appendEscaped(value: String, attribute: Boolean) {
             else -> null
         }
         if (replacement != null) {
-            append(value, start, index)
+            appendHtmlRun(value, start, index)
             append(replacement)
             start = index + 1
         }
     }
-    append(value, start, value.length)
+    if (start == 0) append(value) else appendHtmlRun(value, start, value.length)
 }
+
+/** A native search fast path where the platform supports it. */
+internal expect fun canAppendUnescapedHtmlString(value: String, attribute: Boolean): Boolean
+
+/** Per renderer, bounded, and independent of attribute values or protocol ownership. */
+internal class HtmlAttributeNameCache {
+    // Keep the first 128 short names without eviction bookkeeping.
+    // Later names still validate on every use if dynamic names fill the cache.
+    private val names = HashSet<String>()
+    internal val size: Int get() = names.size
+    fun requireValid(name: String) {
+        if (name in names) return
+        requireValidHtmlAttributeName(name)
+        if (name.length <= 128 && names.size < 128) names.add(name)
+    }
+}
+
+/** Copies a range using the platform's string representation. */
+internal expect fun StringBuilder.appendHtmlRun(value: String, start: Int, end: Int)

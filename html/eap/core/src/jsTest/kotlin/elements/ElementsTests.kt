@@ -440,6 +440,7 @@ class ElementsTests {
             override fun <TElement : Element> TagElement(
                 elementBuilder: ElementBuilder<TElement>,
                 applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+                rawTextContent: RawTextContent?,
                 content: (@Composable ElementScope<TElement>.() -> Unit)?,
             ) {
                 val tagName = elementBuilder.tagName
@@ -450,7 +451,7 @@ class ElementsTests {
                     else -> tagName
                 }
                 DefaultComposeHtmlContext.TagElement(
-                    ElementBuilder.createBuilder(replacementTag), applyAttrs, content
+                    ElementBuilder.createBuilder(replacementTag), applyAttrs, rawTextContent, content
                 )
             }
         }
