@@ -84,3 +84,13 @@ The page stays static except for three hydration roots. From the repository root
 html/gradlew -p html -Pcompose.html.eap.enabled=true \
     :html-eap-hydration-islands-example:wasmJsBrowserDevelopmentRun
 ```
+
+## Suspense and asynchronous rendering example
+
+Streams a skeleton immediately, then a profile after a one-second JVM mock lookup.
+
+```shell
+html/gradlew -p html -Pcompose.html.eap.enabled=true \
+    :html-eap-suspense-example:jsRunSuspenseExample
+```
+Use `jsRunSuspenseExample` for Wasm.
