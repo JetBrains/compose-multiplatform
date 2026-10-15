@@ -63,8 +63,8 @@ class ResourceLocalesComposeTest : KmpUiTest() {
     }
 
     @Test
-    fun secondaryEnglishPreservesPluralRulesForRussianDefaults() = clearResourceCachesAndRunUiTest {
-        var languages by mutableStateOf(listOf("ru"))
+    fun secondaryEnglishPreservesPluralRulesForUkrainianDefaults() = clearResourceCachesAndRunUiTest {
+        var languages by mutableStateOf(listOf("uk"))
         val environment = object : ComposeEnvironment {
             @Composable
             override fun rememberEnvironment() = ResourceEnvironment(
@@ -73,8 +73,8 @@ class ResourceLocalesComposeTest : KmpUiTest() {
         }
         val encodedPlurals = listOf(
             "one" to "%1\$d файл",
-            "few" to "%1\$d файла",
-            "many" to "%1\$d файлов",
+            "few" to "%1\$d файли",
+            "many" to "%1\$d файлів",
             "other" to "%1\$d файла"
         ).joinToString(",") { (category, value) ->
             "$category:${Base64.encode(value.encodeToByteArray())}"
@@ -85,8 +85,8 @@ class ResourceLocalesComposeTest : KmpUiTest() {
             override suspend fun readPart(path: String, offset: Long, size: Long) = read(path)
             override fun getUri(path: String): String = error("Not used")
         }
-        val resource = PluralStringResource("russian_default_files", "files", setOf(
-            ResourceItem(emptySet(), "russian-default", 0, 0)
+        val resource = PluralStringResource("ukrainian_default_files", "files", setOf(
+            ResourceItem(emptySet(), "ukrainian-default", 0, 0)
         ))
         var text = ""
         setContent {
@@ -98,10 +98,10 @@ class ResourceLocalesComposeTest : KmpUiTest() {
             }
         }
         waitResources()
-        assertEquals("5 файлов", text)
+        assertEquals("5 файлів", text)
 
-        languages = listOf("ru", "en")
+        languages = listOf("uk", "en")
         waitResources()
-        assertEquals("5 файлов", text, "A secondary English preference must not change Russian default plurals.")
+        assertEquals("5 файлів", text, "A secondary English preference must not change Ukrainian default plurals.")
     }
 }
