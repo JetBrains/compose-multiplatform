@@ -63,6 +63,7 @@ class TestProject(
         "--stacktrace",
         "-Pkotlin.js.yarn=false",
         "-P${ComposeProperties.VERBOSE}=${testEnvironment.composeVerbose}",
+        "--init-script", File("../../ci/cache-redirector.init.gradle").absolutePath,
         if (testEnvironment.parsedGradleVersion < GradleVersion.version("8.0")) {
             null
         } else {

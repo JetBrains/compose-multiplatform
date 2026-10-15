@@ -223,11 +223,13 @@ subprojects {
     }
 
     repositories {
-        gradlePluginPortal()
-        mavenCentral()
+        mavenCentral {
+            url = uri("https://cache-redirector.jetbrains.com/maven-central")
+        }
         maven {
             url = uri("https://packages.jetbrains.team/maven/p/cmp/dev")
         }
+        gradlePluginPortal()
         google()
         mavenLocal()
     }

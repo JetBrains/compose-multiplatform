@@ -17,10 +17,12 @@
         <compose.material3.version>1.9.0</compose.material3.version>
     </properties>
 
+    <!-- Maven Central is resolved through cache-redirector, to avoid its rate limits on CI.
+         The "central" id replaces the default Maven Central repository. -->
     <repositories>
         <repository>
-            <id>mavenCentral</id>
-            <url>https://repo1.maven.org/maven2/</url>
+            <id>MavenCentralCacheRedirector</id>
+            <url>https://cache-redirector.jetbrains.com/maven-central</url>
         </repository>
         <repository>
             <id>gMaven</id>
@@ -31,6 +33,13 @@
             <url>https://packages.jetbrains.team/maven/p/cmp/dev</url>
         </repository>
     </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>MavenCentralCacheRedirector</id>
+            <url>https://cache-redirector.jetbrains.com/maven-central</url>
+        </pluginRepository>
+    </pluginRepositories>
 
     <build>
         <sourceDirectory>src/main/kotlin</sourceDirectory>

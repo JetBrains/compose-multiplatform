@@ -9,7 +9,9 @@ plugins {
 val properties = ComposeUberJarProperties()
 
 repositories {
-    mavenCentral()
+    mavenCentral {
+        url = uri("https://cache-redirector.jetbrains.com/maven-central")
+    }
     maven(properties.composeRepoUrl)
     google()
 }
