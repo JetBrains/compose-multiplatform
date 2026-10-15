@@ -61,4 +61,47 @@ class ResourceLocalesComposeTest : KmpUiTest() {
         assertEquals("default-one", text) // Without an English preference, defaults retain the primary locale's rules.
         assertEquals(listOf("es", "de", "pt", "default"), readPaths)
     }
+
+    @Test
+    fun secondaryEnglishPreservesPluralRulesForRussianDefaults() = clearResourceCachesAndRunUiTest {
+        var languages by mutableStateOf(listOf("ru"))
+        val environment = object : ComposeEnvironment {
+            @Composable
+            override fun rememberEnvironment() = ResourceEnvironment(
+                languages.map { ResourceLocale(Locale(it)) }, ThemeQualifier.LIGHT, DensityQualifier.MDPI
+            )
+        }
+        val encodedPlurals = listOf(
+            "one" to "%1\$d файл",
+            "few" to "%1\$d файла",
+            "many" to "%1\$d файлов",
+            "other" to "%1\$d файла"
+        ).joinToString(",") { (category, value) ->
+            "$category:${Base64.encode(value.encodeToByteArray())}"
+        }
+        val content = "plurals|files|$encodedPlurals".encodeToByteArray()
+        val reader = object : ResourceReader {
+            override suspend fun read(path: String): ByteArray = content
+            override suspend fun readPart(path: String, offset: Long, size: Long) = read(path)
+            override fun getUri(path: String): String = error("Not used")
+        }
+        val resource = PluralStringResource("russian_default_files", "files", setOf(
+            ResourceItem(emptySet(), "russian-default", 0, 0)
+        ))
+        var text = ""
+        setContent {
+            CompositionLocalProvider(
+                LocalComposeEnvironment provides environment,
+                LocalResourceReader provides reader
+            ) {
+                text = pluralStringResource(resource, 5, 5)
+            }
+        }
+        waitResources()
+        assertEquals("5 файлов", text)
+
+        languages = listOf("ru", "en")
+        waitResources()
+        assertEquals("5 файлов", text, "A secondary English preference must not change Russian default plurals.")
+    }
 }
