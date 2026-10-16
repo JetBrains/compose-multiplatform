@@ -213,12 +213,12 @@ internal class HtmlStringWriterContext(
         validate: Boolean,
         tagNameIsValid: Boolean,
     ): StartTagResult {
-        if (!tagNameIsValid) requireValidHtmlTagName(tagName)
+        if (validate && !tagNameIsValid) requireValidHtmlTagName(tagName)
         require(!collectingRawText) {
             "String rendering does not support element children inside <$currentTagName>"
         }
         if (currentTagName == null) recordRootChild(isHtml = tagName == "html")
-        if (currentNamespace == HtmlNamespace) requireHtmlParserStableTableElement(currentTagName, tagName)
+        if (validate && currentNamespace == HtmlNamespace) requireHtmlParserStableTableElement(currentTagName, tagName)
 
         val builder = attrsBuilders.builder<TElement>(attrsBuilderIndex++)
         try {

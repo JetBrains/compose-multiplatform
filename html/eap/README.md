@@ -27,7 +27,8 @@ with strict validation. Browser hydration follows the server's mode. Direct call
 | `allowHydrationMismatch()` | Applies client values | Applies client values |
 | Structure differs | Renders on the client | Renders on the client |
 
-Strict mode also checks class tokens and foreign-attribute collisions.
+Strict mode also checks tag and attribute names, class tokens,
+foreign-attribute collisions and table-element nesting.
 
 ## Published artifacts
 

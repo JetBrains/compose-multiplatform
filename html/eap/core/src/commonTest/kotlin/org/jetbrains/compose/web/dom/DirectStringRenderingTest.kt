@@ -124,7 +124,6 @@ class DirectStringRenderingTest {
             { Div({ attr("data-value", "bad\u0000attribute") }) },
             { TagElement<Element>("script", null) { Text("</scr"); Text("ipt>") } },
             { TagElement<Element>("style", null) { Span { Text("child") } } },
-            { Table { Tr { Td { Text("missing tbody") } } } },
         )
         for (content in invalid) {
             assertFailsWith<IllegalArgumentException> { composeHtmlToString(content = content) }

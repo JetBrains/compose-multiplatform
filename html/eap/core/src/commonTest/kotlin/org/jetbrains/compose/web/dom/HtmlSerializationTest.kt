@@ -70,7 +70,7 @@ class HtmlSerializationTest {
     }
 
     @Test
-    fun rejectsTableChildrenThatRequireParserRepair() {
+    fun strictModeRejectsTableChildrenThatRequireParserRepair() {
         val invalidChildren = mapOf(
             "table" to listOf("tr", "td", "th", "col", "div"),
             "tbody" to listOf("td", "th", "div"),
@@ -83,7 +83,7 @@ class HtmlSerializationTest {
             invalidChildren.forEach { (parent, children) ->
                 children.forEach { child ->
                     val failure = assertFailsWith<IllegalArgumentException>("$parent > $child") {
-                        composeHtmlToString(hydratable) {
+                        composeHtmlToString(hydratable, validateStrictly = true) {
                             TagElement<Element>(parent, null) {
                                 TagElement<Element>(child, null, null)
                             }
@@ -191,6 +191,24 @@ class HtmlSerializationTest {
                 }, null)
             },
         )
+    }
+
+    @Test
+    fun fastModeSkipsNameAndTableElementChecksWithoutAffectingStrictRenders() {
+        val cases: List<Pair<String, @Composable () -> Unit>> = listOf(
+            "<div invalid name=\"value\"></div>" to { Div({ attr("invalid name", "value") }) },
+            "<invalid tag></invalid tag>" to { TagElement<Element>("invalid tag", null, null) },
+            "<table><tr><td>cell</td></tr></table>" to { Table { Tr { Td { Text("cell") } } } },
+        )
+        for (key in listOf(null, "validation-mode-switch")) {
+            for ((expected, content) in cases) {
+                assertEquals(expected, composeHtmlToString(key = key, validateStrictly = false, content = content))
+                assertFailsWith<IllegalArgumentException> {
+                    composeHtmlToString(key = key, validateStrictly = true, content = content)
+                }
+                assertEquals(expected, composeHtmlToString(key = key, validateStrictly = false, content = content))
+            }
+        }
     }
 
     @Test
@@ -750,7 +768,7 @@ class HtmlSerializationTest {
     fun attributeNameChecksRejectAllControlsAndProtocolSpoofing() {
         for (character in (0..31).map(Int::toChar) + (127..159).map(Int::toChar) + " \"'/>=".toList()) {
             assertFailsWith<IllegalArgumentException> {
-                composeHtmlToString { Div(attrs = { attr("prefix${character}suffix", "value") }) }
+                composeHtmlToString(validateStrictly = true) { Div(attrs = { attr("prefix${character}suffix", "value") }) }
             }
         }
         for (name in listOf("data-compose-hydration-root", "DATA-COMPOSE-HYDRATION-STATE",
@@ -772,7 +790,9 @@ class HtmlSerializationTest {
             })
         }
         assertFailsWith<IllegalArgumentException> {
-            composeHtmlToString(key = "attribute-name-reuse") { Div({ attr("invalid name", "value") }) }
+            composeHtmlToString(key = "attribute-name-reuse", validateStrictly = true) {
+                Div({ attr("invalid name", "value") })
+            }
         }
         assertEquals("<div title=\"next\"></div>", composeHtmlToString(key = "attribute-name-reuse") { Div({ title("next") }) })
     }

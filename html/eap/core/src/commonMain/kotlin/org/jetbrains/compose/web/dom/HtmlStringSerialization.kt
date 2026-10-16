@@ -158,7 +158,9 @@ private fun validateStringHtmlAttributes(
     nameCache: HtmlAttributeNameCache?,
 ) {
     for (name in attributes.keys) {
-        if (nameCache == null) requireValidHtmlAttributeName(name) else nameCache.requireValid(name)
+        if (validate) {
+            if (nameCache == null) requireValidHtmlAttributeName(name) else nameCache.requireValid(name)
+        }
         if (validate && namespace != HtmlNamespace) {
             for (previous in attributes.keys) {
                 if (previous == name) break
@@ -217,10 +219,7 @@ internal fun isValidHtmlTagName(name: String): Boolean =
 private fun requireValidHtmlAttributeName(name: String) {
     require(
         name.isNotEmpty() &&
-            name.none {
-                it.code < 0x20 || it.code in 0x7F..0x9F ||
-                    it == ' ' || it == '"' || it == '\'' || it == '/' || it == '>' || it == '='
-            }
+            name.none { it.isISOControl() || it in InvalidHtmlAttributeNameCharacters }
     ) {
         "Invalid HTML attribute name: \"$name\""
     }
@@ -228,6 +227,7 @@ private fun requireValidHtmlAttributeName(name: String) {
 
 internal const val AsciiWhitespaceCharacters = "\t\n\u000C\r "
 private const val InvalidHtmlTagNameCharacters = "\u0000/>"
+private const val InvalidHtmlAttributeNameCharacters = " \"'/>="
 
 private fun Char.isAsciiLetter(): Boolean = this in 'A'..'Z' || this in 'a'..'z'
 
