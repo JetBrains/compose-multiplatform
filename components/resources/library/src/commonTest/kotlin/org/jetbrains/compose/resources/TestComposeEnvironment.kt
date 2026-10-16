@@ -3,9 +3,7 @@ package org.jetbrains.compose.resources
 import androidx.compose.runtime.Composable
 
 internal fun getTestEnvironment() = ResourceEnvironment(
-    language = LanguageQualifier("en"),
-    script = ScriptQualifier(""),
-    region = RegionQualifier("US"),
+    locales = listOf(ResourceLocale(LanguageQualifier("en"), ScriptQualifier(""), RegionQualifier("US"))),
     theme = ThemeQualifier.LIGHT,
     density = DensityQualifier.XHDPI
 )
