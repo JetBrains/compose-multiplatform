@@ -14,61 +14,6 @@ import org.jetbrains.compose.web.css.toStyleAttributeValue
 // HTML parsing merges adjacent non-empty text nodes. This comment preserves their boundary.
 internal const val HydrationTextBoundaryMarker = "c"
 
-private val HtmlRawTextElementNames = setOf(
-    "script", "style", "iframe", "xmp", "noembed", "noframes",
-)
-
-internal fun isHtmlRawTextElement(tagName: String?, namespace: String?): Boolean =
-    namespace == HtmlNamespace && tagName in HtmlRawTextElementNames
-
-internal fun isHtmlRcdataElement(tagName: String?, namespace: String?): Boolean =
-    namespace == HtmlNamespace && (tagName == "title" || tagName == "textarea")
-
-private val HtmlVoidElementNames = setOf(
-    "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr",
-)
-
-// HTML void elements have no content and no end tag.
-internal fun isHtmlVoidElement(tagName: String, namespace: String): Boolean =
-    namespace == HtmlNamespace && tagName in HtmlVoidElementNames
-
-// HTML parsing discards the first LF in these elements.
-private val HtmlLeadingNewlineElementNames = setOf("pre", "textarea", "listing")
-
-internal fun isHtmlLeadingNewlineElement(tagName: String, namespace: String): Boolean =
-    namespace == HtmlNamespace && tagName in HtmlLeadingNewlineElementNames
-
-// Only empty boolean attribute values may be minimized without losing their value.
-internal val HtmlBooleanAttributeNames = setOf(
-    "allowfullscreen",
-    "async",
-    "autofocus",
-    "autoplay",
-    "checked",
-    "controls",
-    "default",
-    "defer",
-    "disabled",
-    "formnovalidate",
-    "inert",
-    "ismap",
-    "itemscope",
-    "loop",
-    "multiple",
-    "muted",
-    "nomodule",
-    "novalidate",
-    "open",
-    "playsinline",
-    "readonly",
-    "required",
-    "reversed",
-    "selected",
-)
-
-internal fun String.isHtmlBooleanAttributeName(): Boolean =
-    this in HtmlBooleanAttributeNames
-
 internal class StringHtmlAttributes private constructor(
     val byName: Map<String, String>,
 ) {
@@ -210,10 +155,6 @@ internal fun requireValidHtmlTagName(name: String) {
     }
 }
 
-internal fun isValidHtmlTagName(name: String): Boolean =
-    name.firstOrNull()?.isAsciiLetter() == true &&
-        name.none { it in AsciiWhitespaceCharacters || it in InvalidHtmlTagNameCharacters }
-
 private fun requireValidHtmlAttributeName(name: String) {
     require(
         name.isNotEmpty() &&
@@ -225,11 +166,6 @@ private fun requireValidHtmlAttributeName(name: String) {
         "Invalid HTML attribute name: \"$name\""
     }
 }
-
-internal const val AsciiWhitespaceCharacters = "\t\n\u000C\r "
-private const val InvalidHtmlTagNameCharacters = "\u0000/>"
-
-private fun Char.isAsciiLetter(): Boolean = this in 'A'..'Z' || this in 'a'..'z'
 
 private fun String.hasSameHtmlParserAttributeName(other: String): Boolean {
     if (length != other.length) return false
@@ -264,20 +200,7 @@ private fun StringBuilder.appendEscaped(value: String, attribute: Boolean) {
     }
     var start = 0
     for (index in value.indices) {
-        val replacement = when (value[index]) {
-            '\u0000' -> throw IllegalArgumentException(
-                if (attribute) "HTML attribute values must not contain NUL (U+0000)"
-                else "HTML text must not contain NUL (U+0000)"
-            )
-            '&' -> "&amp;"
-            '<' -> "&lt;"
-            '>' -> "&gt;"
-            '\r' -> "&#13;"
-            '"' -> if (attribute) "&quot;" else null
-            '\n' -> if (attribute) "&#10;" else null
-            '\t' -> if (attribute) "&#9;" else null
-            else -> null
-        }
+        val replacement = htmlEscapeReplacement(value[index], attribute)
         if (replacement != null) {
             appendHtmlRun(value, start, index)
             append(replacement)

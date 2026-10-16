@@ -8,8 +8,6 @@ package org.jetbrains.compose.web.dom
 import kotlinx.browser.dom.Element
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
-internal const val HtmlNamespace = "http://www.w3.org/1999/xhtml"
-
 fun interface ElementBuilder<TElement : Element> {
     /** The HTML tag name used for string rendering. DOM-only lambda builders may omit it. */
     val tagName: String

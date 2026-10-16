@@ -1,4 +1,8 @@
-/* Copyright 2026 JetBrains s.r.o. Licensed under the Apache License, Version 2.0. */
+/*
+ * Copyright 2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 @file:OptIn(
     org.jetbrains.kotlin.K1Deprecation::class,
     org.jetbrains.kotlin.CoreEnvironmentDeprecation::class,
@@ -358,7 +362,7 @@ fun main(args: Array<String>) {
                             ) {
                                 val holder = uniqueName("__ssrStaticFragment")
                                 declarations +=
-                                    "private val $holder = ${DOM}precomputedHtmlFragment(${quoted(name!!.lowercase())}, ${encodedExpression(html)}) { ${call.text} }"
+                                    "private val $holder = ${DOM}PrecomputedHtmlFragment(${quoted(name!!.lowercase())}, ${encodedExpression(html)}) { ${call.text} }"
                                 replacements +=
                                     Replacement(
                                         call.textRange.startOffset,

@@ -1,4 +1,8 @@
-/* Copyright 2026 JetBrains s.r.o. Licensed under the Apache License, Version 2.0. */
+/*
+ * Copyright 2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 @file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
 
 package org.jetbrains.compose.web.dom
@@ -10,7 +14,9 @@ import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
-/** Generated target for literal HTML attributes. */
+// Runtime support for generated code and tests.
+
+/** Stores prepared HTML attributes. Created by [precomputedHtmlAttributes]. */
 @ComposeWebInternalApi
 class PrecomputedHtmlAttributes<TElement : Element>
 internal constructor(
@@ -35,6 +41,22 @@ internal expect fun <TElement : Element> precomputedHtmlCallbackMetadata(
     callback: (AttrsScope<TElement>.() -> Unit)?
 ): PrecomputedHtmlAttributes<TElement>?
 
+/**
+ * Builds & validates static, reusable attributes. TODO for compiler plugin
+ * ```
+ * private val attributes = precomputedHtmlAttributes<HTMLDivElement>(
+ *     "div", "<div class=\"card\">",
+ * ) {
+ *     classes("card")
+ * }
+ *
+  * fun Page(name: String) {
+ *     LoweredHtmlContainer(attributes) {
+ *         Text(name)
+ *     }
+ * }
+* ```
+ */
 @OptIn(ComposeWebInternalApi::class)
 @ComposeWebInternalApi
 fun <TElement : Element> precomputedHtmlAttributes(
@@ -64,7 +86,7 @@ fun <TElement : Element> precomputedHtmlAttributes(
     return PrecomputedHtmlAttributes(tagName, attrs, expectedStartTag)
 }
 
-/** Forward without adding a composition group. */
+/** Renders a text-only element with prepared attributes. */
 @OptIn(ComposeWebInternalApi::class)
 @ComposeWebInternalApi
 @Composable
@@ -82,16 +104,19 @@ fun <TElement : Element> LoweredTextTag(
     )
 }
 
+/** Stores plain and escaped literal text. Created by [precomputedHtmlText]. */
 @ComposeWebInternalApi
 class PrecomputedHtmlText
 internal constructor(internal val plain: String, internal val encoded: String)
 
+/** Validates and stores escaped literal text during initialization. */
 @ComposeWebInternalApi
 fun precomputedHtmlText(plain: String, encoded: String): PrecomputedHtmlText {
     require(StringBuilder().apply { appendEscapedText(plain) }.toString() == encoded)
     return PrecomputedHtmlText(plain, encoded)
 }
 
+/** Renders an element with prepared attributes and literal text. */
 @OptIn(ComposeWebInternalApi::class)
 @ComposeWebInternalApi
 @Composable
@@ -109,7 +134,7 @@ fun <TElement : Element> LoweredTextTag(
     )
 }
 
-/** Evaluate text after the start tag, inside its element scope. */
+/** Evaluates dynamic text inside the prepared element's scope. */
 @ComposeWebInternalApi
 @Composable
 @NonRestartableComposable
@@ -121,23 +146,27 @@ fun <TElement : Element> LoweredDynamicTextTag(
     LocalComposeHtmlContext.current.DynamicTextTagElement(attributes, value)
 }
 
-/** Generated target for a constant subtree with one HTML root. */
+/**
+ * Stores constant HTML, root-tag metadata, and the original browser composition lambda.
+ * The IR compiler plugin emits constructor calls that execute at file initialization.
+ * It checks the HTML and root tag before emitting those calls.
+ */
 @ComposeWebInternalApi
-class PrecomputedHtmlFragment
-internal constructor(
+class PrecomputedHtmlFragment(
     internal val rootTag: String,
     internal val encoded: String,
     internal val content: @Composable () -> Unit,
 )
 
+/**
+ * Used by tests to render [content] once and check it against [encoded] and [rootTag].
+ */
 @ComposeWebInternalApi
 fun precomputedHtmlFragment(
     rootTag: String,
     encoded: String,
     content: @Composable () -> Unit,
 ): PrecomputedHtmlFragment {
-    require(rootTag in setOf("div", "span", "p", "h1", "h2", "h3", "h4", "h5", "h6"))
-    // Render the original subtree once to check the precomputed HTML.
     val validator = HtmlStringWriterContext(hydratable = true, fragmentRootTag = rootTag)
     org.jetbrains.compose.web.composeHtmlToString(validateStrictly = true) {
         androidx.compose.runtime.CompositionLocalProvider(
@@ -150,6 +179,10 @@ fun precomputedHtmlFragment(
     return PrecomputedHtmlFragment(rootTag, encoded, content)
 }
 
+/**
+ * Called by code emitted by the IR compiler plugin.
+ * SSR writes stored HTML; browser composition invokes the original lambda.
+ */
 @ComposeWebInternalApi
 @Composable
 @NonRestartableComposable
@@ -158,7 +191,10 @@ fun LoweredStaticHtmlFragment(fragment: PrecomputedHtmlFragment) {
     LocalComposeHtmlContext.current.StaticHtmlFragment(fragment)
 }
 
-/** Skip wrapper calls while preserving the content lambda's scope. */
+/**
+ * Called by code emitted by the IR compiler plugin. TODO
+ * Renders a prepared element while composing its children normally.
+ */
 @ComposeWebInternalApi
 @Composable
 @NonRestartableComposable

@@ -3,6 +3,8 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+@file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
@@ -226,6 +228,7 @@ fun Html(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Head(
     attrs: AttrBuilderContext<HTMLHeadElement>? = null,
     content: ContentBuilder<HTMLHeadElement>? = null,
@@ -234,6 +237,7 @@ fun Head(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Body(
     attrs: AttrBuilderContext<HTMLBodyElement>? = null,
     content: ContentBuilder<HTMLBodyElement>? = null,
@@ -242,6 +246,7 @@ fun Body(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Title(
     attrs: AttrBuilderContext<HTMLTitleElement>? = null,
     content: ContentBuilder<HTMLTitleElement>? = null,
@@ -250,6 +255,7 @@ fun Title(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Meta(
     attrs: AttrBuilderContext<HTMLMetaElement>? = null,
 ) = TagElement<HTMLMetaElement>(MetaBuilder, attrs, content = null)
@@ -257,6 +263,7 @@ fun Meta(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Link(
     attrs: AttrBuilderContext<HTMLLinkElement>? = null,
 ) = TagElement<HTMLLinkElement>(LinkBuilder, attrs, content = null)
@@ -264,6 +271,7 @@ fun Link(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Script(
     attrs: AttrBuilderContext<HTMLScriptElement>? = null,
 ) = TagElement<HTMLScriptElement>(ScriptBuilder, attrs, content = null)
@@ -300,6 +308,7 @@ fun Script(
 
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag
 fun Div(
     attrs: AttrBuilderContext<HTMLDivElement>? = null,
     content: ContentBuilder<HTMLDivElement>? = null,
@@ -308,6 +317,7 @@ fun Div(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Span(
     attrs: AttrBuilderContext<HTMLSpanElement>? = null,
     content: ContentBuilder<HTMLSpanElement>? = null,
@@ -316,6 +326,7 @@ fun Span(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Address(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -324,6 +335,7 @@ fun Address(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Article(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -332,6 +344,7 @@ fun Article(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Aside(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -340,6 +353,7 @@ fun Aside(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Header(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -348,6 +362,7 @@ fun Header(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Section(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -356,6 +371,7 @@ fun Section(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Nav(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -364,6 +380,7 @@ fun Nav(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Main(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -372,6 +389,7 @@ fun Main(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Footer(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -380,6 +398,7 @@ fun Footer(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun H1(
     attrs: AttrBuilderContext<HTMLHeadingElement>? = null,
     content: ContentBuilder<HTMLHeadingElement>? = null,
@@ -388,6 +407,7 @@ fun H1(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun H2(
     attrs: AttrBuilderContext<HTMLHeadingElement>? = null,
     content: ContentBuilder<HTMLHeadingElement>? = null,
@@ -396,6 +416,7 @@ fun H2(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun H3(
     attrs: AttrBuilderContext<HTMLHeadingElement>? = null,
     content: ContentBuilder<HTMLHeadingElement>? = null,
@@ -404,6 +425,7 @@ fun H3(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun H4(
     attrs: AttrBuilderContext<HTMLHeadingElement>? = null,
     content: ContentBuilder<HTMLHeadingElement>? = null,
@@ -412,6 +434,7 @@ fun H4(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun H5(
     attrs: AttrBuilderContext<HTMLHeadingElement>? = null,
     content: ContentBuilder<HTMLHeadingElement>? = null,
@@ -420,6 +443,7 @@ fun H5(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun H6(
     attrs: AttrBuilderContext<HTMLHeadingElement>? = null,
     content: ContentBuilder<HTMLHeadingElement>? = null,
@@ -428,6 +452,7 @@ fun H6(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun P(
     attrs: AttrBuilderContext<HTMLParagraphElement>? = null,
     content: ContentBuilder<HTMLParagraphElement>? = null,
@@ -436,6 +461,7 @@ fun P(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Em(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -444,6 +470,7 @@ fun Em(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun I(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -452,6 +479,7 @@ fun I(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun B(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -460,6 +488,7 @@ fun B(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Small(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -468,6 +497,7 @@ fun Small(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Sup(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -476,6 +506,7 @@ fun Sup(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Sub(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -484,6 +515,7 @@ fun Sub(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Blockquote(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -492,6 +524,7 @@ fun Blockquote(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Pre(
     attrs: AttrBuilderContext<HTMLPreElement>? = null,
     content: ContentBuilder<HTMLPreElement>? = null,
@@ -500,6 +533,7 @@ fun Pre(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Code(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -508,6 +542,7 @@ fun Code(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Ul(
     attrs: AttrBuilderContext<HTMLUListElement>? = null,
     content: ContentBuilder<HTMLUListElement>? = null,
@@ -516,6 +551,7 @@ fun Ul(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Ol(
     attrs: AttrBuilderContext<HTMLOListElement>? = null,
     content: ContentBuilder<HTMLOListElement>? = null,
@@ -524,6 +560,7 @@ fun Ol(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Li(
     attrs: AttrBuilderContext<HTMLLIElement>? = null,
     content: ContentBuilder<HTMLLIElement>? = null,
@@ -532,6 +569,7 @@ fun Li(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag("dl")
 fun DList(
     attrs: AttrBuilderContext<HTMLDListElement>? = null,
     content: ContentBuilder<HTMLDListElement>? = null,
@@ -540,6 +578,7 @@ fun DList(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag("dt")
 fun DTerm(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -548,6 +587,7 @@ fun DTerm(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag("dd")
 fun DDescription(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null,
@@ -556,6 +596,7 @@ fun DDescription(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Audio(
     attrs: AttrBuilderContext<HTMLAudioElement>? = null,
     content: ContentBuilder<HTMLAudioElement>? = null,
@@ -564,6 +605,7 @@ fun Audio(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Video(
     attrs: AttrBuilderContext<HTMLVideoElement>? = null,
     content: ContentBuilder<HTMLVideoElement>? = null,
@@ -572,6 +614,7 @@ fun Video(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Picture(
     attrs: AttrBuilderContext<HTMLPictureElement>? = null,
     content: ContentBuilder<HTMLPictureElement>? = null,
@@ -580,6 +623,7 @@ fun Picture(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Canvas(
     attrs: AttrBuilderContext<HTMLCanvasElement>? = null,
     content: ContentBuilder<HTMLCanvasElement>? = null,
@@ -588,6 +632,7 @@ fun Canvas(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag("map")
 fun HTMLMap(
     attrs: AttrBuilderContext<HTMLMapElement>? = null,
     content: ContentBuilder<HTMLMapElement>? = null,
@@ -596,6 +641,7 @@ fun HTMLMap(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Datalist(
     attrs: AttrBuilderContext<HTMLDataListElement>? = null,
     content: ContentBuilder<HTMLDataListElement>? = null,
@@ -604,6 +650,7 @@ fun Datalist(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Fieldset(
     attrs: AttrBuilderContext<HTMLFieldSetElement>? = null,
     content: ContentBuilder<HTMLFieldSetElement>? = null,
@@ -612,6 +659,7 @@ fun Fieldset(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Legend(
     attrs: AttrBuilderContext<HTMLLegendElement>? = null,
     content: ContentBuilder<HTMLLegendElement>? = null,
@@ -620,6 +668,7 @@ fun Legend(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Meter(
     attrs: AttrBuilderContext<HTMLMeterElement>? = null,
     content: ContentBuilder<HTMLMeterElement>? = null,
@@ -628,6 +677,7 @@ fun Meter(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Output(
     attrs: AttrBuilderContext<HTMLOutputElement>? = null,
     content: ContentBuilder<HTMLOutputElement>? = null,
@@ -636,6 +686,7 @@ fun Output(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Progress(
     attrs: AttrBuilderContext<HTMLProgressElement>? = null,
     content: ContentBuilder<HTMLProgressElement>? = null,
@@ -649,6 +700,7 @@ fun Progress(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Iframe(
     attrs: AttrBuilderContext<HTMLIFrameElement>? = null,
     content: ContentBuilder<HTMLIFrameElement>? = null,
@@ -657,6 +709,7 @@ fun Iframe(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Object(
     attrs: AttrBuilderContext<HTMLObjectElement>? = null,
     content: ContentBuilder<HTMLObjectElement>? = null,
@@ -673,6 +726,7 @@ fun Table(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Caption(
     attrs: AttrBuilderContext<HTMLTableCaptionElement>? = null,
     content: ContentBuilder<HTMLTableCaptionElement>? = null,
@@ -689,6 +743,7 @@ fun Colgroup(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Tr(
     attrs: AttrBuilderContext<HTMLTableRowElement>? = null,
     content: ContentBuilder<HTMLTableRowElement>? = null,
@@ -705,6 +760,7 @@ fun Thead(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Th(
     attrs: AttrBuilderContext<HTMLTableCellElement>? = null,
     content: ContentBuilder<HTMLTableCellElement>? = null,
@@ -713,6 +769,7 @@ fun Th(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Td(
     attrs: AttrBuilderContext<HTMLTableCellElement>? = null,
     content: ContentBuilder<HTMLTableCellElement>? = null,
@@ -737,6 +794,7 @@ fun Tfoot(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Button(
     attrs: AttrBuilderContext<HTMLButtonElement>? = null,
     content: ContentBuilder<HTMLButtonElement>? = null,
@@ -883,6 +941,7 @@ fun TextArea(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Area(
     attrs: AttrBuilderContext<HTMLAreaElement>? = null,
     content: ContentBuilder<HTMLAreaElement>? = null,
@@ -891,6 +950,7 @@ fun Area(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Track(
     attrs: AttrBuilderContext<HTMLTrackElement>? = null,
     content: ContentBuilder<HTMLTrackElement>? = null,
@@ -899,6 +959,7 @@ fun Track(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Embed(
     attrs: AttrBuilderContext<HTMLEmbedElement>? = null,
     content: ContentBuilder<HTMLEmbedElement>? = null,
@@ -907,6 +968,7 @@ fun Embed(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Param(
     attrs: AttrBuilderContext<HTMLParamElement>? = null,
     content: ContentBuilder<HTMLParamElement>? = null,
@@ -915,6 +977,7 @@ fun Param(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Source(
     attrs: AttrBuilderContext<HTMLSourceElement>? = null,
     content: ContentBuilder<HTMLSourceElement>? = null,
@@ -923,6 +986,7 @@ fun Source(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Br(
     attrs: AttrBuilderContext<HTMLBRElement>? = null,
 ) = TagElement<HTMLBRElement>(BrBuilder, attrs, content = null)
@@ -930,6 +994,7 @@ fun Br(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Hr(
     attrs: AttrBuilderContext<HTMLHRElement>? = null,
 ) = TagElement<HTMLHRElement>(HrBuilder, attrs, content = null)
@@ -937,6 +1002,7 @@ fun Hr(
 @Composable
 @NonRestartableComposable
 @androidx.compose.runtime.ExplicitGroupsComposable
+@LowerableHtmlTag
 fun Col(
     attrs: AttrBuilderContext<HTMLTableColElement>? = null,
 ) = TagElement<HTMLTableColElement>(ColBuilder, attrs, content = null)
