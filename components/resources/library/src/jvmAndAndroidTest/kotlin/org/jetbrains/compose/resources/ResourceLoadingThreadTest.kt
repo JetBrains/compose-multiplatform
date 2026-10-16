@@ -25,26 +25,25 @@ class ResourceLoadingThreadTest {
     fun testTheSharedRequestIsNotCancelledByTheFirstCaller() = runTest {
         val cache = AsyncCache<String, String>()
         val allowLoadToFinish = CompletableDeferred<Unit>()
-        lateinit var result: String
 
-        val firstCaller = GlobalScope.launch(Dispatchers.Default) {
+        // Start each caller immediately so both are awaiting the shared request before cancellation.
+        val firstCaller = launch(start = CoroutineStart.UNDISPATCHED) {
             cache.getOrLoad("key") {
                 allowLoadToFinish.await()
                 "a value"
             }
         }
-        val secondCaller = GlobalScope.launch(Dispatchers.Default) {
-            result = cache.getOrLoad("key") {
-               error("must reuse the shared request")
-           }
+        val secondCaller = async(start = CoroutineStart.UNDISPATCHED) {
+            cache.getOrLoad("key") {
+                error("must reuse the shared request")
+            }
         }
 
-        delay(100.milliseconds)
-        firstCaller.cancel()
+        // Wait for the first caller to unsubscribe while the shared request is still pending.
+        firstCaller.cancelAndJoin()
         allowLoadToFinish.complete(Unit)
-        secondCaller.join()
 
-        assertEquals("a value", result)
+        assertEquals("a value", secondCaller.await())
     }
 
     @Test
