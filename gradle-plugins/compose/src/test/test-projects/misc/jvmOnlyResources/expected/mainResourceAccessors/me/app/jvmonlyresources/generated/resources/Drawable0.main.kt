@@ -14,7 +14,7 @@ private const val MD: String = "composeResources/me.app.jvmonlyresources.generat
 internal val Res.drawable.vector: DrawableResource by lazy {
       DrawableResource("drawable:vector", setOf(
         ResourceItem(setOf(), "${MD}drawable/vector.xml", -1, -1),
-      ))
+      ), Res.supportedLocales)
     }
 
 @InternalResourceApi

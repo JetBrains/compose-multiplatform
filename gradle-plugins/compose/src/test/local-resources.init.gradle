@@ -1,0 +1,19 @@
+// Test generated accessors against the resource runtime published from the same checkout.
+// Restrict the override to resource artifacts; UI/runtime libraries retain their usual repositories.
+def useLocalResources = { repositories ->
+    repositories.exclusiveContent {
+        forRepository { repositories.mavenLocal() }
+        filter { includeModuleByRegex('org[.]jetbrains[.]compose[.]components', 'components-resources.*') }
+    }
+}
+
+settingsEvaluated { settings ->
+    useLocalResources(settings.dependencyResolutionManagement.repositories)
+    gradle.afterProject { project ->
+        if (settings.dependencyResolutionManagement.repositoriesMode.get() ==
+                org.gradle.api.initialization.resolve.RepositoriesMode.PREFER_PROJECT &&
+                !project.repositories.isEmpty()) {
+            useLocalResources(project.repositories)
+        }
+    }
+}

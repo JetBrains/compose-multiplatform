@@ -8,6 +8,8 @@ import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.MAP
 import com.squareup.kotlinpoet.MUTABLE_MAP
+import com.squareup.kotlinpoet.MUTABLE_SET
+import com.squareup.kotlinpoet.SET
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
@@ -299,6 +301,24 @@ internal fun getAccessorsSpecs(
         }
     }
 
+    val locales = resources.values.asSequence().flatMap { it.values.asSequence().flatten() }.mapNotNull { item ->
+        val bcp = item.qualifiers.firstOrNull { it.startsWith("b+") }
+        if (bcp != null) {
+            val (language, script, region) = expandBcpQualifier(bcp, item.path)
+            listOfNotNull(language, script, region).joinToString("-")
+        } else {
+            val language = item.qualifiers.firstOrNull { it.matches(languageRegex) } ?: return@mapNotNull null
+            val region = item.qualifiers.firstOrNull { it.matches(androidRegionRegex) }?.removePrefix("r")
+            listOfNotNull(language, region).joinToString("-")
+        }
+    }.distinct().sorted().toList()
+    files.add(FileSpec.builder(packageName, "ResourceLocales.$sourceSetName")
+        .addFunction(FunSpec.builder("_collect${sourceSetName.uppercaseFirstChar()}ResourceLocales")
+            .addModifiers(KModifier.INTERNAL)
+            .addParameter("locales", MUTABLE_SET.parameterizedBy(String::class.asClassName()))
+            .apply { locales.forEach { addStatement("locales.add(%S)", it) } }
+            .build())
+        .build())
     return files
 }
 
@@ -344,7 +364,7 @@ private fun getChunkFileSpec(
                         add("\"${'$'}{MD}${item.path.invariantSeparatorsPathString}\", ${item.offset}, ${item.size}")
                         add("),\n")
                     }
-                    add("))\n")
+                    add("), %N.supportedLocales)\n", resClassName)
                 }
                 .endControlFlow()
                 .build()
@@ -390,6 +410,9 @@ internal fun getExpectResourceCollectorsFileSpec(
 ): FileSpec {
     val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
     return FileSpec.builder(packageName, fileName).also { file ->
+        file.addProperty(PropertySpec.builder("supportedLocales", SET.parameterizedBy(String::class.asClassName()),
+            KModifier.INTERNAL, KModifier.EXPECT)
+            .receiver(ClassName(packageName, resClassName)).build())
         ResourceType.values().forEach { type ->
             val typeClassName = type.getClassName()
             file.addProperty(
@@ -413,7 +436,8 @@ internal fun getActualResourceCollectorsFileSpec(
     resClassName: String,
     isPublic: Boolean,
     useActualModifier: Boolean, //e.g. java only project doesn't need actual modifiers
-    typeToCollectorFunctions: Map<ResourceType, List<String>>
+    typeToCollectorFunctions: Map<ResourceType, List<String>>,
+    localeCollectorFunctions: List<String> = emptyList()
 ): FileSpec = FileSpec.builder(packageName, fileName).also { file ->
     val resModifier = if (isPublic) KModifier.PUBLIC else KModifier.INTERNAL
 
@@ -422,6 +446,15 @@ internal fun getActualResourceCollectorsFileSpec(
             .addMember("org.jetbrains.compose.resources.InternalResourceApi::class")
             .build()
     )
+
+    val localeModifiers = if (useActualModifier) listOf(KModifier.INTERNAL, KModifier.ACTUAL) else listOf(KModifier.INTERNAL)
+    val localeInitializer = CodeBlock.builder().beginControlFlow("lazy {")
+        .addStatement("val locales = mutableSetOf<String>()")
+        .apply { localeCollectorFunctions.sorted().forEach { addStatement("%N(locales)", it) } }
+        .addStatement("locales.toSet()")
+        .endControlFlow().build()
+    file.addProperty(PropertySpec.builder("supportedLocales", SET.parameterizedBy(String::class.asClassName()), localeModifiers)
+        .receiver(ClassName(packageName, resClassName)).delegate(localeInitializer).build())
 
     ResourceType.values().forEach { type ->
         val typeClassName = type.getClassName()

@@ -5,11 +5,18 @@ package me.app.jvmonlyresources.generated.resources
 import kotlin.OptIn
 import kotlin.String
 import kotlin.collections.Map
+import kotlin.collections.Set
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.FontResource
 import org.jetbrains.compose.resources.PluralStringResource
 import org.jetbrains.compose.resources.StringArrayResource
 import org.jetbrains.compose.resources.StringResource
+
+internal val Res.supportedLocales: Set<String> by lazy {
+  val locales = mutableSetOf<String>()
+  _collectMainResourceLocales(locales)
+  locales.toSet()
+}
 
 internal val Res.allDrawableResources: Map<String, DrawableResource> by lazy {
   val map = mutableMapOf<String, DrawableResource>()

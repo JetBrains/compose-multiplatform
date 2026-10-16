@@ -81,7 +81,11 @@ internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() 
             dir.walkTopDown().filter { !it.isHidden && it.isFile && it.extension == "kt" }.toList()
         }
         logger.info("Generate actual ResourceCollectors for $kotlinDir")
-        val funNames = inputFiles.mapNotNull { inputFile ->
+        val localeFunNames = inputFiles.filter { it.name.startsWith("ResourceLocales.") }.map { inputFile ->
+            val sourceSet = inputFile.nameWithoutExtension.substringAfter('.')
+            "_collect${sourceSet.uppercaseFirstChar()}ResourceLocales"
+        }.distinct().sorted()
+        val funNames = inputFiles.filterNot { it.name.startsWith("ResourceLocales.") }.mapNotNull { inputFile ->
             if (inputFile.nameWithoutExtension.contains('.')) {
                 val (fileName, suffix) = inputFile.nameWithoutExtension.split('.')
                 val type = ResourceType.entries.firstOrNull { fileName.startsWith(it.accessorName, true) }
@@ -115,7 +119,8 @@ internal abstract class GenerateActualResourceCollectorsTask : IdeaImportTask() 
             resClassName = resClassName,
             isPublic = isPublic,
             useActualModifier = useActual,
-            typeToCollectorFunctions = funNames
+            typeToCollectorFunctions = funNames,
+            localeCollectorFunctions = localeFunNames
         )
         spec.writeTo(kotlinDir)
     }

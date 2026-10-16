@@ -14,49 +14,49 @@ private const val MD: String = "composeResources/app.group.resources_test.genera
 internal val Res.string.PascalCase: StringResource by lazy {
       StringResource("string:PascalCase", "PascalCase", setOf(
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 172, 34),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string._1_kebab_case: StringResource by lazy {
       StringResource("string:_1_kebab_case", "_1_kebab_case", setOf(
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 135, 36),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.app_name: StringResource by lazy {
       StringResource("string:app_name", "app_name", setOf(
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 207, 44),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.camelCase: StringResource by lazy {
       StringResource("string:camelCase", "camelCase", setOf(
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 252, 29),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.hello: StringResource by lazy {
       StringResource("string:hello", "hello", setOf(
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 282, 37),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.`info_using_release_$x`: StringResource by lazy {
       StringResource("string:info_using_release_${'$'}x", "info_using_release_${'$'}x", setOf(
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 320, 57),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.multi_line: StringResource by lazy {
       StringResource("string:multi_line", "multi_line", setOf(
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 378, 178),
-      ))
+      ), Res.supportedLocales)
     }
 
 internal val Res.string.str_template: StringResource by lazy {
       StringResource("string:str_template", "str_template", setOf(
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 557, 76),
-      ))
+      ), Res.supportedLocales)
     }
 
 @InternalResourceApi

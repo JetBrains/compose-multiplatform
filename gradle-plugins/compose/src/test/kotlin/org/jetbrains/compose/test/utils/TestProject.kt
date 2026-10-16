@@ -61,6 +61,7 @@ class TestProject(
     private val additionalArgs = listOfNotNull(
         "--info",
         "--stacktrace",
+        TestProperties.resourcesRepositoryInitScript?.let { "--init-script=$it" },
         "-Pkotlin.js.yarn=false",
         "-P${ComposeProperties.VERBOSE}=${testEnvironment.composeVerbose}",
         "--init-script", File("../../ci/cache-redirector.init.gradle").absolutePath,

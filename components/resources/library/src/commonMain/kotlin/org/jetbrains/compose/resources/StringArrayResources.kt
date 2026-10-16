@@ -18,7 +18,15 @@ import org.jetbrains.compose.resources.vector.xmldom.NodeList
  */
 @Immutable
 class StringArrayResource
-@InternalResourceApi constructor(id: String, val key: String, items: Set<ResourceItem>) : Resource(id, items)
+@InternalResourceApi constructor(
+    id: String,
+    val key: String,
+    items: Set<ResourceItem>,
+    internal override val supportedLocales: Set<String>?
+) : Resource(id, items) {
+    @InternalResourceApi
+    constructor(id: String, key: String, items: Set<ResourceItem>) : this(id, key, items, null)
+}
 
 /**
  * Retrieves a list of strings using the specified string array resource.

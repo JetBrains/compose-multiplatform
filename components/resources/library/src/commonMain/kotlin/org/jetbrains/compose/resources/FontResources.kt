@@ -15,7 +15,14 @@ import androidx.compose.ui.text.font.*
  */
 @Immutable
 class FontResource
-@InternalResourceApi constructor(id: String, items: Set<ResourceItem>) : Resource(id, items)
+@InternalResourceApi constructor(
+    id: String,
+    items: Set<ResourceItem>,
+    internal override val supportedLocales: Set<String>?
+) : Resource(id, items) {
+    @InternalResourceApi
+    constructor(id: String, items: Set<ResourceItem>) : this(id, items, null)
+}
 
 /**
  * Creates a font using the specified font resource, weight, and style.

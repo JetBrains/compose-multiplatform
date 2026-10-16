@@ -17,31 +17,31 @@ private const val MD: String = "composeResources/my.lib.res/"
 public val MyRes.drawable._3_strange_name: DrawableResource by lazy {
       DrawableResource("drawable:_3_strange_name", setOf(
         ResourceItem(setOf(), "${MD}drawable/3-strange-name.xml", -1, -1),
-      ))
+      ), MyRes.supportedLocales)
     }
 
 public val MyRes.drawable.camelCaseName: DrawableResource by lazy {
       DrawableResource("drawable:camelCaseName", setOf(
         ResourceItem(setOf(), "${MD}drawable/camelCaseName.xml", -1, -1),
-      ))
+      ), MyRes.supportedLocales)
     }
 
 public val MyRes.drawable.`is`: DrawableResource by lazy {
       DrawableResource("drawable:is", setOf(
         ResourceItem(setOf(), "${MD}drawable/is.xml", -1, -1),
-      ))
+      ), MyRes.supportedLocales)
     }
 
 public val MyRes.drawable.raster: DrawableResource by lazy {
       DrawableResource("drawable:raster", setOf(
         ResourceItem(setOf(), "${MD}drawable/raster.webp", -1, -1),
-      ))
+      ), MyRes.supportedLocales)
     }
 
 public val MyRes.drawable.svg: DrawableResource by lazy {
       DrawableResource("drawable:svg", setOf(
         ResourceItem(setOf(), "${MD}drawable/svg.svg", -1, -1),
-      ))
+      ), MyRes.supportedLocales)
     }
 
 public val MyRes.drawable.vector: DrawableResource by lazy {
@@ -51,13 +51,13 @@ public val MyRes.drawable.vector: DrawableResource by lazy {
         ResourceItem(setOf(ThemeQualifier.DARK, LanguageQualifier("ge"), ), "${MD}drawable-dark-ge/vector.xml", -1, -1),
         ResourceItem(setOf(LanguageQualifier("en"), ), "${MD}drawable-en/vector.xml", -1, -1),
         ResourceItem(setOf(), "${MD}drawable/vector.xml", -1, -1),
-      ))
+      ), MyRes.supportedLocales)
     }
 
 public val MyRes.drawable.vector_2: DrawableResource by lazy {
       DrawableResource("drawable:vector_2", setOf(
         ResourceItem(setOf(), "${MD}drawable/vector_2.xml", -1, -1),
-      ))
+      ), MyRes.supportedLocales)
     }
 
 @InternalResourceApi

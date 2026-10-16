@@ -2,11 +2,14 @@ package my.lib.res
 
 import kotlin.String
 import kotlin.collections.Map
+import kotlin.collections.Set
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.FontResource
 import org.jetbrains.compose.resources.PluralStringResource
 import org.jetbrains.compose.resources.StringArrayResource
 import org.jetbrains.compose.resources.StringResource
+
+internal expect val MyRes.supportedLocales: Set<String>
 
 public expect val MyRes.allDrawableResources: Map<String, DrawableResource>
 

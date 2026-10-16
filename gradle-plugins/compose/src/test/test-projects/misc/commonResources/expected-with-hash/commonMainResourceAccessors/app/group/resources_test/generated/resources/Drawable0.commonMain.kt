@@ -19,35 +19,35 @@ private const val MD: String = "composeResources/app.group.resources_test.genera
 internal val Res.drawable._3_strange_name: DrawableResource by lazy {
       DrawableResource("drawable:_3_strange_name", setOf(
         ResourceItem(setOf(), "${MD}drawable/3-strange-name.xml", -1, -1),
-      ))
+      ), Res.supportedLocales)
     }
 
 @delegate:ResourceContentHash(1_620_038_668)
 internal val Res.drawable.camelCaseName: DrawableResource by lazy {
       DrawableResource("drawable:camelCaseName", setOf(
         ResourceItem(setOf(), "${MD}drawable/camelCaseName.xml", -1, -1),
-      ))
+      ), Res.supportedLocales)
     }
 
 @delegate:ResourceContentHash(1_620_038_668)
 internal val Res.drawable.`is`: DrawableResource by lazy {
       DrawableResource("drawable:is", setOf(
         ResourceItem(setOf(), "${MD}drawable/is.xml", -1, -1),
-      ))
+      ), Res.supportedLocales)
     }
 
 @delegate:ResourceContentHash(-1_048_824_350)
 internal val Res.drawable.raster: DrawableResource by lazy {
       DrawableResource("drawable:raster", setOf(
         ResourceItem(setOf(), "${MD}drawable/raster.webp", -1, -1),
-      ))
+      ), Res.supportedLocales)
     }
 
 @delegate:ResourceContentHash(2_043_149_192)
 internal val Res.drawable.svg: DrawableResource by lazy {
       DrawableResource("drawable:svg", setOf(
         ResourceItem(setOf(), "${MD}drawable/svg.svg", -1, -1),
-      ))
+      ), Res.supportedLocales)
     }
 
 @delegate:ResourceContentHash(-1_131_835_124)
@@ -58,14 +58,14 @@ internal val Res.drawable.vector: DrawableResource by lazy {
         ResourceItem(setOf(ThemeQualifier.DARK, LanguageQualifier("ge"), ), "${MD}drawable-dark-ge/vector.xml", -1, -1),
         ResourceItem(setOf(LanguageQualifier("en"), ), "${MD}drawable-en/vector.xml", -1, -1),
         ResourceItem(setOf(), "${MD}drawable/vector.xml", -1, -1),
-      ))
+      ), Res.supportedLocales)
     }
 
 @delegate:ResourceContentHash(1_620_038_668)
 internal val Res.drawable.vector_2: DrawableResource by lazy {
       DrawableResource("drawable:vector_2", setOf(
         ResourceItem(setOf(), "${MD}drawable/vector_2.xml", -1, -1),
-      ))
+      ), Res.supportedLocales)
     }
 
 @InternalResourceApi

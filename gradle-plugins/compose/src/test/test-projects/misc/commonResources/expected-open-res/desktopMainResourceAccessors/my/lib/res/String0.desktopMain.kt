@@ -14,7 +14,7 @@ private const val MD: String = "composeResources/my.lib.res/"
 public val MyRes.string.desktop_str: StringResource by lazy {
       StringResource("string:desktop_str", "desktop_str", setOf(
         ResourceItem(setOf(), "${MD}values/desktop_strings.desktopMain.cvr", 10, 39),
-      ))
+      ), MyRes.supportedLocales)
     }
 
 @InternalResourceApi

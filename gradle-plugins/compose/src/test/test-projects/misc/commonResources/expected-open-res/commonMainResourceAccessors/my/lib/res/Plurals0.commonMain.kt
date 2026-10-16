@@ -14,7 +14,7 @@ private const val MD: String = "composeResources/my.lib.res/"
 public val MyRes.plurals.numberOfSongsAvailable: PluralStringResource by lazy {
       PluralStringResource("plurals:numberOfSongsAvailable", "numberOfSongsAvailable", setOf(
         ResourceItem(setOf(), "${MD}values/strings.commonMain.cvr", 10, 124),
-      ))
+      ), MyRes.supportedLocales)
     }
 
 @InternalResourceApi
