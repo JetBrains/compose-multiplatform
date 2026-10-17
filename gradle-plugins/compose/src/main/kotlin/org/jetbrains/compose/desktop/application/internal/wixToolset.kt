@@ -7,12 +7,14 @@ package org.jetbrains.compose.desktop.application.internal
 
 import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.Project
+import org.gradle.api.services.BuildService
+import org.gradle.api.services.BuildServiceParameters
 import org.gradle.api.tasks.Copy
 import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.internal.utils.findLocalOrGlobalProperty
-import org.jetbrains.compose.internal.utils.ioFile
+import org.jetbrains.compose.internal.utils.registerTask
 import java.io.File
 
 internal const val DOWNLOAD_WIX_TOOLSET_TASK_NAME = "downloadWix"
@@ -36,32 +38,39 @@ internal fun JvmApplicationContext.configureWix() {
     val disableWixDownload = project.findLocalOrGlobalProperty(DOWNLOAD_WIX_PROPERTY).map { it == "false" }
     if (disableWixDownload.get()) return
 
-    val root = project.rootProject
+    // Each project registers its own tasks instead of sharing tasks on the root project:
+    // accessing another project's model is not allowed with Gradle isolated projects (CMP-8375).
     val wixDir = project.gradle.gradleUserHomeDir.resolve("compose-jb")
     val fileName = "wix311"
     val zipFile = wixDir.resolve("$fileName.zip")
-    val unzipDir = root.layout.buildDirectory.dir(fileName)
-    val download = root.tasks.findByName(DOWNLOAD_WIX_TOOLSET_TASK_NAME) ?: root.tasks.maybeCreate(
-        DOWNLOAD_WIX_TOOLSET_TASK_NAME,
-        Download::class.java
-    ).apply {
+    val unzipDir = project.layout.buildDirectory.dir(fileName)
+    // The zip is cached in the Gradle user home and shared by all projects of the build,
+    // so downloads are serialized to avoid several projects downloading it concurrently.
+    val downloadLock = project.gradle.sharedServices.registerIfAbsent(
+        "composeWixDownloadLock_${WixDownloadLock::class.java.classLoader.hashCode()}",
+        WixDownloadLock::class.java
+    ) { spec ->
+        spec.maxParallelUsages.set(1)
+    }
+    val download = project.registerTask<Download>(DOWNLOAD_WIX_TOOLSET_TASK_NAME) {
+        usesService(downloadLock)
         onlyIf { !zipFile.isFile }
         src("https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip")
         dest(zipFile)
+        tempAndMove(true)
     }
-    val unzip = root.tasks.findByName(UNZIP_WIX_TOOLSET_TASK_NAME) ?: root.tasks.maybeCreate(
-        UNZIP_WIX_TOOLSET_TASK_NAME,
-        Copy::class.java
-    ).apply {
+    val unzip = project.registerTask<Copy>(UNZIP_WIX_TOOLSET_TASK_NAME) {
         dependsOn(download)
         from(project.zipTree(zipFile))
-        destinationDir = unzipDir.ioFile
+        into(unzipDir)
     }
     project.eachWindowsPackageTask {
         dependsOn(unzip)
         wixToolsetDir.set(unzipDir)
     }
 }
+
+internal abstract class WixDownloadLock : BuildService<BuildServiceParameters.None>
 
 private fun Project.eachWindowsPackageTask(fn: AbstractJPackageTask.() -> Unit) {
     tasks.withType(AbstractJPackageTask::class.java).configureEach { packageTask ->
