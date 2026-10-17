@@ -38,11 +38,13 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
     override fun <TElement : Element> TagElement(
         elementBuilder: ElementBuilder<TElement>,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        rawTextContent: RawTextContent?,
         content: (@Composable ElementScope<TElement>.() -> Unit)?,
     ) = StringTagElement(
         elementBuilder = elementBuilder,
         applyAttrs = applyAttrs,
         content = content,
+        rawText = rawTextContent,
     )
 
     @Composable

@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.web
 
+import org.jetbrains.compose.web.dom.Br
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -12,6 +13,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.snapshots.Snapshot
 import java.io.StringWriter
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CountDownLatch
@@ -36,19 +38,19 @@ import kotlin.test.assertNotNull
 
 class ComposeHtmlConcurrencyTest {
     @Test
-    fun concurrentCallsWithTheSameKeyHaveIndependentStorage() {
+    fun concurrentCallsWithTheSameKeyHaveIndependentStorageInCallerSnapshots() {
         assertIndependentRenders { "concurrent-shared-key" }
     }
 
     @Test
-    fun concurrentCallsWithDifferentKeysHaveIndependentStorage() {
+    fun concurrentCallsWithDifferentKeysHaveIndependentStorageInCallerSnapshots() {
         // Equal hashes also exercise concurrent insertion into the renderer cache.
         val keys = listOf("AaAa", "AaBB", "BBAa", "BBBB", "AaAaAa", "BBAaAa")
         assertIndependentRenders { "concurrent-${keys[it]}" }
     }
 
     @Test
-    fun concurrentUnkeyedCallsHaveIndependentStorage() {
+    fun concurrentUnkeyedCallsHaveIndependentStorageInCallerSnapshots() {
         assertIndependentRenders { null }
     }
 
@@ -91,7 +93,9 @@ class ComposeHtmlConcurrencyTest {
                 val child = if (iteration % 2 == 0) "<span>$request</span>" else ""
                 assertEquals(
                     "<div id=\"$request\">$request${boundary}&lt;&amp;&gt;😀$child</div>",
-                    render((worker + iteration) % 3, keyForWorker(worker), hydratable, content),
+                    inIsolatedSnapshot {
+                        render((worker + iteration) % 3, keyForWorker(worker), hydratable, content)
+                    },
                 )
                 assertEquals(listOf("enter $request", "side $request", "dispose $request"), effects)
                 assertEquals("outside", state.value)
@@ -101,7 +105,7 @@ class ComposeHtmlConcurrencyTest {
     }
 
     @Test
-    fun concurrentDocumentsShareAKeyAcrossStringStreamAndWriterWithIndependentState() {
+    fun concurrentDocumentsShareAKeyAcrossStringStreamAndWriterInCallerSnapshots() {
         val key = "concurrent-documents"
         val state = mutableStateOf("outside")
         val overlap = CyclicBarrier(6)
@@ -125,20 +129,23 @@ class ComposeHtmlConcurrencyTest {
                         }
                     }
                 }
-                val actual = when ((worker + iteration) % 3) {
-                    0 -> renderHydratedDocument(strict, key, content)
-                    1 -> buildString {
-                        renderHydratedDocumentToStream({ append(it) }, 1, strict, key, content)
+                val actual = inIsolatedSnapshot {
+                    when ((worker + iteration) % 3) {
+                        0 -> renderHydratedDocument(strict, key, content)
+                        1 -> buildString {
+                            renderHydratedDocumentToStream({ append(it) }, 1, strict, key, content)
+                        }
+
+                        else -> StringWriter().also {
+                            renderHydratedDocumentToStream(it, 1, strict, key, content)
+                        }.toString()
                     }
-                    else -> StringWriter().also {
-                        renderHydratedDocumentToStream(it, 1, strict, key, content)
-                    }.toString()
                 }
                 val validation = if (strict) " data-compose-hydration-validation=\"on\"" else ""
                 assertEquals(
                     "<!doctype html><html><body><div data-compose-hydration-root=\"app\">$request</div>" +
-                        "<script data-compose-hydration-state=\"escaped-text-v1\" data-compose-hydration-for=\"app\"" +
-                        "$validation type=\"text/plain\">$request</script></body></html>",
+                            "<script data-compose-hydration-state=\"escaped-text-v1\" data-compose-hydration-for=\"app\"" +
+                            "$validation type=\"text/plain\">$request</script></body></html>",
                     actual,
                 )
                 assertEquals(1, disposals)
@@ -356,6 +363,51 @@ class ComposeHtmlConcurrencyTest {
         }
     }
 
+    @Test
+    fun callerSnapshotsKeepReadsConsistentAcrossConcurrentStateChanges() {
+        for (mode in listOf("global", "read-only", "mutable")) {
+            val first = mutableStateOf("before")
+            val second = mutableStateOf("before")
+            val firstRead = CountDownLatch(1)
+            val updateApplied = CountDownLatch(1)
+            runConcurrently(2) { worker ->
+                if (worker == 0) {
+                    val snapshot = when (mode) {
+                        "read-only" -> Snapshot.takeSnapshot()
+                        "mutable" -> Snapshot.takeMutableSnapshot()
+                        else -> null
+                    }
+                    try {
+                        val render = {
+                            composeHtmlToString(hydratable = false) {
+                                Text(first.value)
+                                firstRead.countDown()
+                                assertTrue(updateApplied.await(10, TimeUnit.SECONDS))
+                                Text(second.value)
+                            }
+                        }
+                        assertEquals(
+                            if (snapshot == null) "beforeafter" else "beforebefore",
+                            if (snapshot == null) render() else snapshot.enter(render),
+                        )
+                    } finally {
+                        snapshot?.dispose()
+                    }
+                } else {
+                    assertTrue(firstRead.await(10, TimeUnit.SECONDS))
+                    try {
+                        Snapshot.withMutableSnapshot {
+                            first.value = "after"
+                            second.value = "after"
+                        }
+                    } finally {
+                        updateApplied.countDown()
+                    }
+                }
+            }
+        }
+    }
+
     private fun render(
         mode: Int,
         key: String?,
@@ -366,9 +418,20 @@ class ComposeHtmlConcurrencyTest {
         1 -> buildString {
             composeHtmlToStream(sink = { append(it) }, chunkSize = 1, hydratable, key, content = content)
         }
+
         else -> StringWriter().also {
             composeHtmlToStream(it, chunkSize = 1, hydratable, key, content = content)
         }.toString()
+    }
+
+    // The caller owns isolation when a render mutates shared snapshot state.
+    private fun <T> inIsolatedSnapshot(action: () -> T): T {
+        val snapshot = Snapshot.takeMutableSnapshot()
+        try {
+            return snapshot.enter(action)
+        } finally {
+            snapshot.dispose()
+        }
     }
 
     private fun runConcurrently(workers: Int, action: (Int) -> Unit) {
@@ -387,6 +450,32 @@ class ComposeHtmlConcurrencyTest {
             assertTrue(executor.awaitTermination(10, TimeUnit.SECONDS))
         }
     }
+
+    @Test
+    fun cachedTagMetadataAndNativeSearchPreserveConcurrentRequests() {
+        val prefix = "ordinary native-search content é😀".repeat(32)
+        runConcurrently(8) { worker ->
+            repeat(100) { iteration ->
+                val request = "$worker-$iteration"
+                val html = composeHtmlToString(key = "cached-serialization-concurrent-requests") {
+                    Div(attrs = {
+                        attr("data-request", request)
+                        classes("one", "two")
+                    }) {
+                        Text(prefix)
+                        Span(attrs = { attr("title", "$prefix<&") }) { Text(request) }
+                        Br()
+                    }
+                }
+                assertEquals(
+                    "<div data-request=\"$request\" class=\"one two\">$prefix" +
+                            "<span title=\"$prefix&lt;&amp;\">$request</span><br></div>",
+                    html,
+                )
+            }
+        }
+    }
+
 }
 
 private val LocalRequest = staticCompositionLocalOf { "outside" }
