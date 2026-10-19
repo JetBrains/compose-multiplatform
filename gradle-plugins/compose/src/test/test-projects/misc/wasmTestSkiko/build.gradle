@@ -27,17 +27,13 @@ kotlin {
         commonMain {
             dependencies {
                 implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
+                implementation("org.jetbrains.compose.ui:ui:COMPOSE_VERSION_PLACEHOLDER")
             }
         }
         commonTest {
             dependencies {
                 implementation(kotlin("test"))
                 implementation("org.jetbrains.compose.ui:ui-test:COMPOSE_VERSION_PLACEHOLDER")
-            }
-        }
-        named(providers.gradleProperty("uiSourceSet").getOrElse("commonTest")) {
-            dependencies {
-                implementation("org.jetbrains.compose.ui:ui:COMPOSE_VERSION_PLACEHOLDER")
             }
         }
     }

@@ -19,8 +19,6 @@ import org.jetbrains.compose.test.utils.checkExists
 import org.jetbrains.compose.test.utils.checks
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketTimeoutException
@@ -32,9 +30,8 @@ import kotlin.test.assertFalse
 
 class GradlePluginTest : GradlePluginTestBase() {
     // https://youtrack.jetbrains.com/issue/CMP-7479
-    @ParameterizedTest
-    @ValueSource(strings = ["commonMain", "commonTest"])
-    fun skikoRuntimeIsNotPublished(uiSourceSet: String) = with(
+    @Test
+    fun skikoRuntimeIsNotPublished() = with(
         testProject("misc/wasmTestSkiko")
     ) {
         // Preserve unrelated library resources that share a runtime filename at a different path.
@@ -46,12 +43,9 @@ class GradlePluginTest : GradlePluginTestBase() {
         gradle(
             "publishAllPublicationsToTestRepository",
             "jsTestProcessResources",
-            "-PuiSourceSet=$uiSourceSet",
             "-Pexecutable=false"
         ).checks {
-            val compilationsWithSkiko = if (uiSourceSet == "commonMain") listOf("main", "test") else listOf("test")
-            val runtimeQualifier = if (uiSourceSet == "commonMain") "" else "test-"
-            val runtimeDir = file("build/compose/skiko-js-${runtimeQualifier}runtime")
+            val runtimeDir = file("build/compose/skiko-js-runtime")
             val runtimeFiles = runtimeDir.walkTopDown()
                 .filter { it.isFile && it.relativeTo(runtimeDir).invariantSeparatorsPath.substringBefore('/') != "META-INF" }
                 .toList()
@@ -59,7 +53,7 @@ class GradlePluginTest : GradlePluginTestBase() {
 
             for (runtimeFile in runtimeFiles) {
                 val path = runtimeFile.relativeTo(runtimeDir).invariantSeparatorsPath
-                for (compilation in compilationsWithSkiko) {
+                for (compilation in listOf("main", "test")) {
                     assertArrayEquals(
                         runtimeFile.readBytes(),
                         file("build/processedResources/js/$compilation/$path").readBytes(),
@@ -92,6 +86,11 @@ class GradlePluginTest : GradlePluginTestBase() {
     fun skikoRuntimeFromTestCompilation() = with(
         testProject("misc/wasmTestSkiko")
     ) {
+        // Keep this case limited to UI dependencies from test sources.
+        modifyText("build.gradle") {
+            it.replace("implementation(\"org.jetbrains.compose.ui:ui:${defaultTestEnvironment.composeVersion}\")", "")
+        }
+
         gradle(":unpackTestSkikoRuntimeForJs").checks {
             val jsRuntimeFiles = file("./build/compose/skiko-js-test-runtime")
                 .listFiles()!!.map { it.name }
