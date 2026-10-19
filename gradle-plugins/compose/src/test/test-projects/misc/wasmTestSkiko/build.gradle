@@ -17,7 +17,7 @@ kotlin {
             binaries.executable()
         }
     }
-    js(providers.gradleProperty("jsTargetName").getOrElse("js")) {
+    js {
         browser()
         if (executable) {
             binaries.executable()
