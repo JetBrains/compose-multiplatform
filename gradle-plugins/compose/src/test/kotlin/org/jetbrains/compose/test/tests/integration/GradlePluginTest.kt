@@ -37,6 +37,12 @@ class GradlePluginTest : GradlePluginTestBase() {
     fun skikoRuntimeIsNotPublished(jsTargetName: String, uiSourceSet: String) = with(
         testProject("misc/skikoRuntimePublication")
     ) {
+        // Preserve unrelated library resources that share a runtime filename at a different path.
+        file("src/commonMain/resources/nested/skiko.wasm").apply {
+            parentFile.mkdirs()
+            writeText("A library resource with the same name as a Skiko runtime file.\n")
+        }
+
         gradle(
             "publishAllPublicationsToTestRepository",
             "${jsTargetName}TestProcessResources",
