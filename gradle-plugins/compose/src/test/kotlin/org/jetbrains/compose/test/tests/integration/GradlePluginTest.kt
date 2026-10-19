@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.test.tests.integration
 
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.gradle.util.GradleVersion
@@ -18,15 +19,66 @@ import org.jetbrains.compose.test.utils.checkExists
 import org.jetbrains.compose.test.utils.checks
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketTimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.zip.ZipFile
 import kotlin.concurrent.thread
 import kotlin.test.assertFalse
 
 class GradlePluginTest : GradlePluginTestBase() {
+    // https://youtrack.jetbrains.com/issue/CMP-7479
+    @ParameterizedTest
+    @ValueSource(strings = ["js", "customJs"])
+    fun skikoRuntimeIsNotPublished(jsTargetName: String) = with(
+        testProject("misc/skikoRuntimePublication")
+    ) {
+        gradle(
+            "publishAllPublicationsToTestRepository",
+            "${jsTargetName}TestProcessResources",
+            "-PjsTargetName=$jsTargetName"
+        ).checks {
+            val runtimeDir = file("build/compose/skiko-$jsTargetName-runtime")
+            val runtimeFiles = runtimeDir.walkTopDown()
+                .filter { it.isFile && it.relativeTo(runtimeDir).invariantSeparatorsPath.substringBefore('/') != "META-INF" }
+                .toList()
+            assertTrue(runtimeFiles.any { it.extension == "wasm" }, "Skiko runtime must be resolved")
+
+            for (runtimeFile in runtimeFiles) {
+                val path = runtimeFile.relativeTo(runtimeDir).invariantSeparatorsPath
+                for (compilation in listOf("main", "test")) {
+                    assertArrayEquals(
+                        runtimeFile.readBytes(),
+                        file("build/processedResources/$jsTargetName/$compilation/$path").readBytes(),
+                        "Skiko runtime resource $path must be preserved for $compilation"
+                    )
+                }
+            }
+
+            val klibs = file("build/repo").walkTopDown().filter { it.extension == "klib" }.toList()
+            assertEquals(2, klibs.size, "Both JS and Wasm libraries must be published")
+            val resourcesDir = file("src/commonMain/resources")
+            for (klib in klibs) {
+                ZipFile(klib).use { archive ->
+                    assertTrue(archive.getEntry("default/manifest") != null, "Compiler output must be preserved")
+                    for (runtimeFile in runtimeFiles) {
+                        val path = runtimeFile.relativeTo(runtimeDir).invariantSeparatorsPath
+                        assertFalse(archive.getEntry(path) != null, "$path must not be published in ${klib.name}")
+                    }
+                    for (resource in resourcesDir.walkTopDown().filter { it.isFile }) {
+                        val path = resource.relativeTo(resourcesDir).invariantSeparatorsPath
+                        val entry = requireNotNull(archive.getEntry(path)) { "Missing library resource $path in ${klib.name}" }
+                        assertArrayEquals(resource.readBytes(), archive.getInputStream(entry).use { it.readBytes() })
+                    }
+                }
+            }
+        }
+    }
+
     @Test
     fun skikoRuntimeFromTestCompilation() = with(
         testProject("misc/wasmTestSkiko")

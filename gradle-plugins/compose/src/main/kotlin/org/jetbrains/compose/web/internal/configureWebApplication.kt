@@ -17,6 +17,7 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.file.*
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
+import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.gradle.work.DisableCachingByDefault
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
@@ -75,6 +76,16 @@ private fun KotlinJsIrTarget.configureSkikoWebRuntime() {
                 it.from(unpackedRuntimeDir)
                 it.dependsOn(unpackRuntime)
                 it.exclude("META-INF")
+            }
+
+            if (compilation.name == KotlinCompilation.MAIN_COMPILATION_NAME) {
+                project.tasks.named(target.artifactsTaskName, AbstractArchiveTask::class.java) { archive ->
+                    // Klib archives include processed resources, but Skiko is supplied by the consuming application.
+                    // Use the runtime's relative paths so other library resources are preserved.
+                    archive.exclude { entry ->
+                        unpackedRuntimeDir.get().file(entry.path).asFile.isFile
+                    }
+                }
             }
         }
     }
