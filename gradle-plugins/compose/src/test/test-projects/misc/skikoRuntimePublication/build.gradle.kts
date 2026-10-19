@@ -17,7 +17,12 @@ kotlin {
     }
     sourceSets {
         commonMain.dependencies {
-            implementation("org.jetbrains.compose.ui:ui:COMPOSE_VERSION_PLACEHOLDER")
+            implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
+        }
+        named(providers.gradleProperty("uiSourceSet").getOrElse("commonMain")) {
+            dependencies {
+                implementation("org.jetbrains.compose.ui:ui:COMPOSE_VERSION_PLACEHOLDER")
+            }
         }
     }
 }

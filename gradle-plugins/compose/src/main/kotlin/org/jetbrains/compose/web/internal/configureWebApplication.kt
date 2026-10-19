@@ -80,8 +80,8 @@ private fun KotlinJsIrTarget.configureSkikoWebRuntime() {
 
             if (compilation.name == KotlinCompilation.MAIN_COMPILATION_NAME) {
                 project.tasks.named(target.artifactsTaskName, AbstractArchiveTask::class.java) { archive ->
-                    // Klib archives include processed resources, but Skiko is supplied by the consuming application.
-                    // Use the runtime's relative paths so other library resources are preserved.
+                    // Keep Skiko in processed resources for applications and library tests, while omitting it from publications.
+                    // Match the runtime's relative paths so other library resources are preserved.
                     archive.exclude { entry ->
                         unpackedRuntimeDir.get().file(entry.path).asFile.isFile
                     }

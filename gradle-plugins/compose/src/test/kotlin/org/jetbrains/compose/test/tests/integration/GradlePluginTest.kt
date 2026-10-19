@@ -20,7 +20,7 @@ import org.jetbrains.compose.test.utils.checks
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
+import org.junit.jupiter.params.provider.CsvSource
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketTimeoutException
@@ -33,16 +33,19 @@ import kotlin.test.assertFalse
 class GradlePluginTest : GradlePluginTestBase() {
     // https://youtrack.jetbrains.com/issue/CMP-7479
     @ParameterizedTest
-    @ValueSource(strings = ["js", "customJs"])
-    fun skikoRuntimeIsNotPublished(jsTargetName: String) = with(
+    @CsvSource("js, commonMain", "customJs, commonMain", "js, commonTest", "customJs, commonTest")
+    fun skikoRuntimeIsNotPublished(jsTargetName: String, uiSourceSet: String) = with(
         testProject("misc/skikoRuntimePublication")
     ) {
         gradle(
             "publishAllPublicationsToTestRepository",
             "${jsTargetName}TestProcessResources",
-            "-PjsTargetName=$jsTargetName"
+            "-PjsTargetName=$jsTargetName",
+            "-PuiSourceSet=$uiSourceSet"
         ).checks {
-            val runtimeDir = file("build/compose/skiko-$jsTargetName-runtime")
+            val compilationsWithSkiko = if (uiSourceSet == "commonMain") listOf("main", "test") else listOf("test")
+            val runtimeQualifier = if (uiSourceSet == "commonMain") "" else "test-"
+            val runtimeDir = file("build/compose/skiko-$jsTargetName-${runtimeQualifier}runtime")
             val runtimeFiles = runtimeDir.walkTopDown()
                 .filter { it.isFile && it.relativeTo(runtimeDir).invariantSeparatorsPath.substringBefore('/') != "META-INF" }
                 .toList()
@@ -50,7 +53,7 @@ class GradlePluginTest : GradlePluginTestBase() {
 
             for (runtimeFile in runtimeFiles) {
                 val path = runtimeFile.relativeTo(runtimeDir).invariantSeparatorsPath
-                for (compilation in listOf("main", "test")) {
+                for (compilation in compilationsWithSkiko) {
                     assertArrayEquals(
                         runtimeFile.readBytes(),
                         file("build/processedResources/$jsTargetName/$compilation/$path").readBytes(),
