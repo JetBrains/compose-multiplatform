@@ -2,23 +2,52 @@ plugins {
     id "org.jetbrains.kotlin.multiplatform"
     id "org.jetbrains.kotlin.plugin.compose"
     id "org.jetbrains.compose"
+    id "maven-publish"
 }
+
+group = "me.sample"
+version = "1.0"
+
+def executable = providers.gradleProperty("executable").getOrElse("true").toBoolean()
 
 kotlin {
     wasm {
         browser()
-        binaries.executable()
+        if (executable) {
+            binaries.executable()
+        }
     }
-    js {
+    js(providers.gradleProperty("jsTargetName").getOrElse("js")) {
         browser()
-        binaries.executable()
+        if (executable) {
+            binaries.executable()
+        }
     }
     sourceSets {
+        commonMain {
+            dependencies {
+                implementation("org.jetbrains.compose.runtime:runtime:COMPOSE_VERSION_PLACEHOLDER")
+            }
+        }
         commonTest {
             dependencies {
                 implementation(kotlin("test"))
                 implementation("org.jetbrains.compose.ui:ui-test:COMPOSE_VERSION_PLACEHOLDER")
             }
+        }
+        named(providers.gradleProperty("uiSourceSet").getOrElse("commonTest")) {
+            dependencies {
+                implementation("org.jetbrains.compose.ui:ui:COMPOSE_VERSION_PLACEHOLDER")
+            }
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "Test"
+            url = uri(layout.buildDirectory.dir("repo"))
         }
     }
 }

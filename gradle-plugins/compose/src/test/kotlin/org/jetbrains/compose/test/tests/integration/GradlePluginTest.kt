@@ -35,7 +35,7 @@ class GradlePluginTest : GradlePluginTestBase() {
     @ParameterizedTest
     @CsvSource("js, commonMain", "customJs, commonMain", "js, commonTest", "customJs, commonTest")
     fun skikoRuntimeIsNotPublished(jsTargetName: String, uiSourceSet: String) = with(
-        testProject("misc/skikoRuntimePublication")
+        testProject("misc/wasmTestSkiko")
     ) {
         // Preserve unrelated library resources that share a runtime filename at a different path.
         file("src/commonMain/resources/nested/skiko.wasm").apply {
@@ -47,7 +47,8 @@ class GradlePluginTest : GradlePluginTestBase() {
             "publishAllPublicationsToTestRepository",
             "${jsTargetName}TestProcessResources",
             "-PjsTargetName=$jsTargetName",
-            "-PuiSourceSet=$uiSourceSet"
+            "-PuiSourceSet=$uiSourceSet",
+            "-Pexecutable=false"
         ).checks {
             val compilationsWithSkiko = if (uiSourceSet == "commonMain") listOf("main", "test") else listOf("test")
             val runtimeQualifier = if (uiSourceSet == "commonMain") "" else "test-"
