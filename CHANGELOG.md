@@ -1,3 +1,79 @@
+# 1.13.0-beta01 (October 2026)
+
+_Changes since 1.13.0-alpha02_
+
+## Migration Notes
+
+### Desktop
+
+- Libraries using experimental `DragAndDropTransferAction` must be recompiled because of a binary incompatible change [#3413](https://github.com/JetBrains/compose-multiplatform-core/pull/3413)
+
+## Features
+
+### Multiple Platforms
+
+- Support for rendering bullet list annotations (Bullet) in `AnnotatedString` [#3400](https://github.com/JetBrains/compose-multiplatform-core/pull/3400)
+
+### iOS
+
+- Add `UIKitInteropSafeAreaInsetsPolicy` and `safeAreaInsetsPolicy` to `UIKitInteropProperties`. The policy controls the safe-area insets exposed to an embedded UIKit component [#3490](https://github.com/JetBrains/compose-multiplatform-core/pull/3490)
+
+### Desktop
+
+- _(prerelease fix)_ Bump Compose Hot Reload to [1.3.0-beta01](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.3.0-beta01) [#5741](https://github.com/JetBrains/compose-multiplatform/pull/5741)
+
+## Fixes
+
+### Multiple Platforms
+
+- Detect stale resolved fonts in Skia paragraph intrinsics to better handle async font resolution updates [#2789](https://github.com/JetBrains/compose-multiplatform-core/pull/2789)
+- Propagate font resolution callbacks through paragraph building and layout layers. [#2789](https://github.com/JetBrains/compose-multiplatform-core/pull/2789)
+- Fixed text with `textIndent` wrapping unexpectedly: the indentation is now included into the paragraph's intrinsic width [#3400](https://github.com/JetBrains/compose-multiplatform-core/pull/3400)
+- Fixed `TextAutoSize` not shrinking text with ellipsis overflow on Skiko targets [#3489](https://github.com/JetBrains/compose-multiplatform-core/pull/3489)
+
+### iOS
+
+- _(prerelease fix)_ Fix crash when swiping back with the keyboard open [#3491](https://github.com/JetBrains/compose-multiplatform-core/pull/3491)
+- Fix incorrect `UIStepper` positioning in interop views that overlap UIKit safe areas [#3490](https://github.com/JetBrains/compose-multiplatform-core/pull/3490)
+- _(prerelease fix)_ Fix stale iOS popup layer rendering [#3492](https://github.com/JetBrains/compose-multiplatform-core/pull/3492)
+- Fix a crash when text in a text field is selected right to left in an iOS app running on a Mac [#3504](https://github.com/JetBrains/compose-multiplatform-core/pull/3504)
+
+### Desktop
+
+- _(prerelease fix)_ Fixed sluggish window resizing when `skiko.rendering.windows.direct3DSynchronousLiveResize` is enabled [#3475](https://github.com/JetBrains/compose-multiplatform-core/pull/3475)
+
+### Web
+
+- Fixed text selection issues in Compose text fields on iOS 27 WebKit [#3468](https://github.com/JetBrains/compose-multiplatform-core/pull/3468)
+- Support fonts fallback url customization via `ComposeViewportConfiguration.fontFallbackUrl` config [#3476](https://github.com/JetBrains/compose-multiplatform-core/pull/3476)
+- Fixed window focus recovery after focus loss in iOS Safari [#3477](https://github.com/JetBrains/compose-multiplatform-core/pull/3477)
+- CMP-10885 [Web] Mobile. iOS. Focus is set incorrectly on the first tap in multiline text [#3495](https://github.com/JetBrains/compose-multiplatform-core/pull/3495)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.13.0-beta01`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.13.0-beta01` | [Runtime 1.13.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.13.0-beta01) |
+| UI | `org.jetbrains.compose.ui:ui*:1.13.0-beta01` | [UI 1.13.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.13.0-beta01) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.13.0-beta01` | [Foundation 1.13.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.13.0-beta01) |
+| Material | `org.jetbrains.compose.material:material*:1.13.0-beta01` | [Material 1.13.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.13.0-beta01) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.13.0-beta01` | [Material3 1.5.0-beta01](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-beta01) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.4.0-alpha01` | [Material3 Adaptive 1.4.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.4.0-alpha03) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0` | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.10.0` | [Navigation 2.10.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.10.0) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.2.0` | [Navigation3 1.2.0](https://developer.android.com/jetpack/androidx/releases/navigation3#1.2.0) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0` | [Navigation Event 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.1) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.12.2 (October 2026)
 
 _Changes since 1.12.1_
