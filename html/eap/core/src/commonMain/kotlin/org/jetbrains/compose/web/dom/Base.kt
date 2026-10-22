@@ -226,7 +226,7 @@ internal fun String.rawTextTagIndex(
 }
 
 private fun requireValidRawTextContent(tagName: String, content: String) {
-    require(tagName in listOf("script", "style", "iframe", "xmp", "noembed", "noframes")) {
+    require(isHtmlRawTextElement(tagName, HtmlNamespace)) {
         "Raw text content is not supported for <$tagName>"
     }
     require(content.rawTextTagIndex(tagName, closing = true) < 0) {

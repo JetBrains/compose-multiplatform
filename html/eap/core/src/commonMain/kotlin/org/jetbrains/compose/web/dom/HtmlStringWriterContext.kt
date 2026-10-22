@@ -94,9 +94,8 @@ internal class HtmlStringWriterContext(
         val tagName = elementBuilder.tagName
         val metadata = elementBuilder as? HtmlTagMetadata
         val namespace = metadata?.namespace ?: HtmlNamespace
-        val flags = metadata?.serializationFlags
-        val rawTextElement = if (flags == null) isHtmlRawTextElement(tagName, namespace)
-        else flags and RawTextTagFlag != 0
+        val flags = metadata?.serializationFlags ?: htmlStringTagFlags(tagName, namespace)
+        val rawTextElement = flags and RawTextTagFlag != 0
 
         // Emit any completed chunk before writing this start tag.
         flushChunk()
@@ -104,30 +103,31 @@ internal class HtmlStringWriterContext(
                 (rawTextElement || (namespace == HtmlNamespace && tagName == "noscript"))
         if (bufferElement) bufferedElementDepth++
 
+        val validate = LocalHtmlValidationMode.current == HtmlValidationMode.Strict
         val startTag = writeStartTag(
             tagName = tagName,
             namespace = namespace,
             applyAttrs = applyAttrs,
-            validate = LocalHtmlValidationMode.current == HtmlValidationMode.Strict,
-            tagNameIsValid = flags != null && flags and ValidTagFlag != 0,
+            validate = validate,
+            tagNameIsValid = flags and ValidTagFlag != 0,
         )
         val contentOverride = startTag.textContent
         // A raw-text parent rejects child tags, and a void parent returned above.
         // Only the parent's tag and namespace need saving.
         val parentTagName = currentTagName
         val parentNamespace = currentNamespace
-        val isVoid = if (flags == null) isHtmlVoidElement(tagName, namespace) else flags and VoidTagFlag != 0
-        currentTagName = tagName
-        currentNamespace = namespace
+        val isVoid = flags and VoidTagFlag != 0
+        // Skip unchanged reference stores on the ordinary HTML path.
+        if (currentTagName !== tagName) currentTagName = tagName
+        if (currentNamespace !== namespace) currentNamespace = namespace
         previousSiblingWasText = false
-        pendingLeadingNewline = if (flags == null) isHtmlLeadingNewlineElement(tagName, namespace)
-        else flags and LeadingNewlineTagFlag != 0
+        pendingLeadingNewline = flags and LeadingNewlineTagFlag != 0
         collectingRawText = rawTextElement
 
         flushChunk()
         // For buffered elements this index stays valid until appendEndTag inspects the content.
         val contentStart = output.length
-        if (!contentOverride.isNullOrEmpty()) writeText(contentOverride)
+        if (!contentOverride.isNullOrEmpty()) writeText(contentOverride, validate)
         discardingContent = isVoid || contentOverride != null
         if (rawTextContent != null && !discardingContent) {
             rawTextContent.validateScriptSource(startTag.hasScriptSource)
@@ -136,8 +136,8 @@ internal class HtmlStringWriterContext(
         content?.invoke(elementScope())
 
         if (!isVoid) writeEndTag(tagName, namespace, startTag.hasScriptSource, contentStart)
-        currentTagName = parentTagName
-        currentNamespace = parentNamespace
+        if (currentTagName !== parentTagName) currentTagName = parentTagName
+        if (currentNamespace !== parentNamespace) currentNamespace = parentNamespace
         previousSiblingWasText = false
         pendingLeadingNewline = false // This element's start tag consumed its parent's first content.
         discardingContent = false
@@ -171,7 +171,7 @@ internal class HtmlStringWriterContext(
             }
 
             value.isNotEmpty() -> {
-                writeText(value)
+                writeText(value, LocalHtmlValidationMode.current == HtmlValidationMode.Strict)
                 flushChunk()
             }
         }
@@ -259,9 +259,9 @@ internal class HtmlStringWriterContext(
         output.appendEndTag(tagName, namespace, contentStart)
     }
 
-    private fun writeText(value: String) {
+    private fun writeText(value: String, validate: Boolean) {
         if (currentTagName == null) recordRootChild(isHtml = false)
-        if (currentNamespace == HtmlNamespace) requireHtmlParserStableTableText(currentTagName, value)
+        if (validate && currentNamespace == HtmlNamespace) requireHtmlParserStableTableText(currentTagName, value)
         if (pendingLeadingNewline) {
             if (value.first() == '\n') output.append('\n')
             pendingLeadingNewline = false

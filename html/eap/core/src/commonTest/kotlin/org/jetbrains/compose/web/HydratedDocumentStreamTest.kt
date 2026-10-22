@@ -145,7 +145,7 @@ class HydratedDocumentStreamTest {
     }
 
     @Test
-    fun validatesDocumentShapeInBothModesIncludingWhenOutputHasAlreadyBeenSent() {
+    fun validatesDocumentShapeOnlyInStrictModeIncludingWhenOutputHasAlreadyBeenSent() {
         val invalidDocuments = listOf<@Composable () -> Unit>(
             {},
             { Text("fragment") },
@@ -157,6 +157,11 @@ class HydratedDocumentStreamTest {
             for (size in listOf(1, Int.MAX_VALUE)) {
                 for (content in invalidDocuments) {
                     val chunks = mutableListOf<String>()
+                    if (!strict) {
+                        renderHydratedDocumentToStream(chunks::add, size, strict, content)
+                        assertEquals(renderHydratedDocument(validateStrictly = false, content = content), chunks.joinToString(""))
+                        continue
+                    }
                     val failure = assertFailsWith<IllegalArgumentException> {
                         renderHydratedDocumentToStream(chunks::add, size, strict, content)
                     }
@@ -167,7 +172,7 @@ class HydratedDocumentStreamTest {
         }
         val partial = mutableListOf<String>()
         assertFailsWith<IllegalArgumentException> {
-            renderHydratedDocumentToStream(partial::add, chunkSize = 1) { Div() }
+            renderHydratedDocumentToStream(partial::add, chunkSize = 1, validateStrictly = true) { Div() }
         }
         assertEquals("<!doctype html><div></div>", partial.joinToString(""))
     }

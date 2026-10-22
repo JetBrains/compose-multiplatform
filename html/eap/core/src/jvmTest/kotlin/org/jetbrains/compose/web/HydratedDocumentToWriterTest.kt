@@ -107,7 +107,7 @@ class HydratedDocumentToWriterTest {
         assertFalse(composed)
         assertTrue(writer.chunks.isEmpty())
         assertFailsWith<IllegalArgumentException> {
-            renderHydratedDocumentToStream(writer, chunkSize = 1) { Div() }
+            renderHydratedDocumentToStream(writer, chunkSize = 1, validateStrictly = true) { Div() }
         }
         assertEquals("<!doctype html><div></div>", writer.chunks.joinToString(""))
         assertEquals(0, writer.flushes)
