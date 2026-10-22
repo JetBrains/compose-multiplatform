@@ -28,6 +28,7 @@ internal actual val DefaultComposeHtmlContext: ComposeHtmlContext = object : Com
     override fun <TElement : Element> TagElement(
         elementBuilder: ElementBuilder<TElement>,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        rawTextContent: RawTextContent?,
         content: (@Composable ElementScope<TElement>.() -> Unit)?,
     ) {
         error("HTML rendering implementation is not provided")

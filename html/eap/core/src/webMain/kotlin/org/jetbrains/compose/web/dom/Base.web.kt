@@ -478,8 +478,13 @@ private object BrowserComposeHtmlContext : ComposeHtmlContext {
     override fun <TElement : Element> TagElement(
         elementBuilder: ElementBuilder<TElement>,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        rawTextContent: RawTextContent?,
         content: (@Composable ElementScope<TElement>.() -> Unit)?,
     ) {
+        if (rawTextContent != null) {
+            RawTextElement(elementBuilder.tagName, applyAttrs, rawTextContent)
+            return
+        }
         TagElementImpl(
             elementBuilder = elementBuilder,
             applyAttrs = applyAttrs,
@@ -527,6 +532,7 @@ private object BrowserComposeHtmlContext : ComposeHtmlContext {
         TagElement(
             elementBuilder = elementBuilder("style"),
             applyAttrs = applyAttrs,
+            rawTextContent = null,
         ) {
             StyleSheetEffect(cssRules) { prepareStyleRawTextContent(cssRules) }
         }
@@ -563,8 +569,13 @@ private class HydratingComposeHtmlContext(
     override fun <TElement : Element> TagElement(
         elementBuilder: ElementBuilder<TElement>,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        rawTextContent: RawTextContent?,
         content: (@Composable ElementScope<TElement>.() -> Unit)?,
     ) {
+        if (rawTextContent != null) {
+            RawTextElement(elementBuilder.tagName, applyAttrs, rawTextContent)
+            return
+        }
         val hydrationAwareBuilder = if (
             applier.isHydrating && elementBuilder !is HydratingElementBuilder<*>
         ) {

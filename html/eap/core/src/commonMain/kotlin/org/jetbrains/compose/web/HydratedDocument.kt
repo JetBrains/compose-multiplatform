@@ -28,12 +28,11 @@ private const val HtmlDoctype = "<!doctype html>"
  * Load client code that calls `hydrateRoot` after [HydrationRoot] and its state element are parsed:
  * place the script after them, defer an external classic script, or use a module script.
  *
- * Snapshot state changes are discarded after rendering.
- *
  * On the JVM or Node.js, `COMPOSE_HTML_VALIDATE_STRICTLY=true` enables strict validation.
  * [validateStrictly] overrides it.
  * Without strict validation, browser hydration trusts initial server values.
  *
+ * Rendering uses the caller's current snapshot. Use a mutable snapshot around rendering for isolation.
  * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
  * See [composeHtmlToStream] for validation and failure handling.
  *
@@ -50,6 +49,7 @@ fun renderHydratedDocument(
 /**
  * Renders a complete document with fresh storage.
  *
+ * Rendering uses the caller's current snapshot. Use a mutable snapshot around rendering for isolation.
  * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
  * See [composeHtmlToStream] for validation and failure handling.
  */
@@ -67,6 +67,7 @@ fun renderHydratedDocument(
  * may exceed the target. [sink] runs synchronously, may block, and receives no empty chunks.
  * Emitted output cannot be retracted on failure, including document validation after composition.
  *
+ * Rendering uses the caller's current snapshot. Use a mutable snapshot around rendering for isolation.
  * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
  * See [composeHtmlToStream] for validation and failure handling.
  *
@@ -89,6 +90,7 @@ fun renderHydratedDocumentToStream(
 /**
  * Streams a complete document with fresh storage.
  *
+ * Rendering uses the caller's current snapshot. Use a mutable snapshot around rendering for isolation.
  * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
  * See [composeHtmlToStream] for validation and failure handling.
  */
