@@ -1,0 +1,8 @@
+// Workaround for CMP-10985: schema-utils@4.8+ pulls a second webpack copy, which breaks webpack builds.
+
+gradle.projectsEvaluated {
+    def root = gradle.rootProject
+    ["kotlinNpm", "kotlinWasmNpm"].each { extensionName ->
+        root.extensions.findByName(extensionName)?.override("schema-utils", "4.7.0")
+    }
+}
