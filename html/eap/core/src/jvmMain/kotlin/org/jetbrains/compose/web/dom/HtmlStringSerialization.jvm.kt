@@ -32,7 +32,7 @@ private object HtmlEscapeTable {
 }
 
 internal actual fun StringBuilder.appendEscapedHtmlString(value: String, attribute: Boolean): Boolean {
-    if (value.length < 256) return false
+    if (value.length < HtmlEscapeTableMinLength) return false
     if (canAppendUnescapedHtmlString(value, attribute)) {
         append(value)
         return true

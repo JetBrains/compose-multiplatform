@@ -255,10 +255,13 @@ internal fun StringBuilder.appendEscapedText(value: String) {
     appendEscaped(value, attribute = false)
 }
 
+// Benchmark-based heuristic: keep short strings on the simpler escaping path.
+internal const val HtmlEscapeTableMinLength = 256
+
 // Append ordinary runs in bulk. Besides avoiding an append per character, this lets the
 // JVM copy Latin-1 and UTF-16 runs with its native StringBuilder implementation.
 private fun StringBuilder.appendEscaped(value: String, attribute: Boolean) {
-    if (value.length >= 256 && appendEscapedHtmlString(value, attribute)) return
+    if (value.length >= HtmlEscapeTableMinLength && appendEscapedHtmlString(value, attribute)) return
     if (canAppendUnescapedHtmlString(value, attribute)) {
         append(value)
         return

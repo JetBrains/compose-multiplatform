@@ -218,6 +218,7 @@ data class StylePropertyDeclaration(
 typealias StylePropertyList = List<StylePropertyDeclaration>
 typealias MutableStylePropertyList = MutableList<StylePropertyDeclaration>
 
+// TODO: Investigate an append overload that avoids intermediate strings.
 @OptIn(ComposeWebInternalApi::class)
 internal fun StyleHolder.toStyleAttributeValue(): String? {
     if (properties.isEmpty() && variables.isEmpty()) return null

@@ -45,7 +45,7 @@ class LongHtmlEscapingJvmTest {
                     composeHtmlToString { Div(attrs = { title(value) }) })
                 val output = StringBuilder("prefix:")
                 val handled = output.appendEscapedHtmlString(value, true)
-                if (length < 256) {
+                if (length < HtmlEscapeTableMinLength) {
                     assertFalse(handled)
                     assertEquals("prefix:", output.toString())
                 } else {
