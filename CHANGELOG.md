@@ -44,7 +44,7 @@ _Changes since 1.13.0-alpha02_
 
 ### Web
 
-- Fixed text selection issues in Compose text fields on iOS 27 WebKit [#3468](https://github.com/JetBrains/compose-multiplatform-core/pull/3468)
+- - Fixed text selection issues in Compose text fields in Safari on iOS 27 [#3468](https://github.com/JetBrains/compose-multiplatform-core/pull/3468)
 - Support fonts fallback URL customization via `ComposeViewportConfiguration.fontFallbackUrl` config [#3476](https://github.com/JetBrains/compose-multiplatform-core/pull/3476)
 - Fixed window focus recovery after focus loss in Safari on iOS [#3477](https://github.com/JetBrains/compose-multiplatform-core/pull/3477)
 - _(prerelease fix)_ Fixed the caret jumping to the end of the text on the first tap in a multiline text field in Safari on iOS [#3495](https://github.com/JetBrains/compose-multiplatform-core/pull/3495)
