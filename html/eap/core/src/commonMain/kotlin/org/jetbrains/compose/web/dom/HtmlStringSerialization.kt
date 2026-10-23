@@ -11,64 +11,6 @@ import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
 import org.jetbrains.compose.web.attributes.validateClassTokens
 import org.jetbrains.compose.web.css.toStyleAttributeValue
 
-// HTML parsing merges adjacent non-empty text nodes. This comment preserves their boundary.
-internal const val HydrationTextBoundaryMarker = "c"
-
-private val HtmlRawTextElementNames = setOf(
-    "script", "style", "iframe", "xmp", "noembed", "noframes",
-)
-
-internal fun isHtmlRawTextElement(tagName: String?, namespace: String?): Boolean =
-    namespace == HtmlNamespace && tagName in HtmlRawTextElementNames
-
-internal fun isHtmlRcdataElement(tagName: String?, namespace: String?): Boolean =
-    namespace == HtmlNamespace && (tagName == "title" || tagName == "textarea")
-
-private val HtmlVoidElementNames = setOf(
-    "area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "param", "source", "track", "wbr",
-)
-
-// HTML void elements have no content and no end tag.
-internal fun isHtmlVoidElement(tagName: String, namespace: String): Boolean =
-    namespace == HtmlNamespace && tagName in HtmlVoidElementNames
-
-// HTML parsing discards the first LF in these elements.
-private val HtmlLeadingNewlineElementNames = setOf("pre", "textarea", "listing")
-
-internal fun isHtmlLeadingNewlineElement(tagName: String, namespace: String): Boolean =
-    namespace == HtmlNamespace && tagName in HtmlLeadingNewlineElementNames
-
-// Only empty boolean attribute values may be minimized without losing their value.
-internal val HtmlBooleanAttributeNames = setOf(
-    "allowfullscreen",
-    "async",
-    "autofocus",
-    "autoplay",
-    "checked",
-    "controls",
-    "default",
-    "defer",
-    "disabled",
-    "formnovalidate",
-    "inert",
-    "ismap",
-    "itemscope",
-    "loop",
-    "multiple",
-    "muted",
-    "nomodule",
-    "novalidate",
-    "open",
-    "playsinline",
-    "readonly",
-    "required",
-    "reversed",
-    "selected",
-)
-
-internal fun String.isHtmlBooleanAttributeName(): Boolean =
-    this in HtmlBooleanAttributeNames
-
 internal class StringHtmlAttributes private constructor(
     val byName: Map<String, String>,
 ) {
@@ -202,19 +144,13 @@ internal fun StringBuilder.appendEndTag(
     append("</").append(tagName).append('>')
 }
 
-internal fun StringBuilder.appendHydrationTextBoundaryMarker() {
-    append("<!--").append(HydrationTextBoundaryMarker).append("-->")
-}
-
 internal fun requireValidHtmlTagName(name: String) {
     require(isValidHtmlTagName(name)) {
         "Invalid HTML tag name: \"$name\""
     }
 }
 
-internal fun isValidHtmlTagName(name: String): Boolean =
-    name.firstOrNull()?.isAsciiLetter() == true &&
-        name.none { it in AsciiWhitespaceCharacters || it in InvalidHtmlTagNameCharacters }
+private const val InvalidHtmlAttributeNameCharacters = " \"'/>="
 
 private fun requireValidHtmlAttributeName(name: String) {
     require(
@@ -224,12 +160,6 @@ private fun requireValidHtmlAttributeName(name: String) {
         "Invalid HTML attribute name: \"$name\""
     }
 }
-
-internal const val AsciiWhitespaceCharacters = "\t\n\u000C\r "
-private const val InvalidHtmlTagNameCharacters = "\u0000/>"
-private const val InvalidHtmlAttributeNameCharacters = " \"'/>="
-
-private fun Char.isAsciiLetter(): Boolean = this in 'A'..'Z' || this in 'a'..'z'
 
 private fun String.hasSameHtmlParserAttributeName(other: String): Boolean {
     if (length != other.length) return false
@@ -247,55 +177,65 @@ private fun String.hasSameHtmlParserAttributeName(other: String): Boolean {
     return true
 }
 
-private fun StringBuilder.appendEscapedAttribute(value: String) {
-    appendEscaped(value, attribute = true)
-}
-
-internal fun StringBuilder.appendEscapedText(value: String) {
-    appendEscaped(value, attribute = false)
-}
-
 // Benchmark-based heuristic: keep short strings on the simpler escaping path.
 internal const val HtmlEscapeTableMinLength = 256
 
 // Append ordinary runs in bulk. Besides avoiding an append per character, this lets the
 // JVM copy Latin-1 and UTF-16 runs with its native StringBuilder implementation.
-private fun StringBuilder.appendEscaped(value: String, attribute: Boolean) {
-    if (value.length >= HtmlEscapeTableMinLength && appendEscapedHtmlString(value, attribute)) return
-    if (canAppendUnescapedHtmlString(value, attribute)) {
+// Keep text and attribute scans separate so the inner loop has no mode branch.
+internal fun StringBuilder.appendEscapedAttribute(value: String) {
+    if (value.length >= HtmlEscapeTableMinLength && appendEscapedHtmlString(value, attribute = true)) return
+    if (canAppendUnescapedHtmlString(value, attribute = true)) {
         append(value)
         return
     }
     var start = 0
     for (index in value.indices) {
-        val replacement = when (value[index]) {
-            '\u0000' -> throw IllegalArgumentException(
-                if (attribute) "HTML attribute values must not contain NUL (U+0000)"
-                else "HTML text must not contain NUL (U+0000)"
-            )
-            '&' -> "&amp;"
-            '<' -> "&lt;"
-            '>' -> "&gt;"
-            '\r' -> "&#13;"
-            '"' -> if (attribute) "&quot;" else null
-            '\n' -> if (attribute) "&#10;" else null
-            '\t' -> if (attribute) "&#9;" else null
-            else -> null
-        }
+        val character = value[index]
+        val replacement = htmlAttributeEscapeReplacement(character)
         if (replacement != null) {
             appendHtmlRun(value, start, index)
             append(replacement)
             start = index + 1
+            // Retry after ampersands only, so suffix searches cover disjoint ranges.
+            if (character == '&' && canAppendUnescapedHtmlString(value, attribute = true, startIndex = start)) {
+                appendHtmlRun(value, start, value.length)
+                return
+            }
         }
     }
     if (start == 0) append(value) else appendHtmlRun(value, start, value.length)
 }
 
-/** Handles long strings on platforms with a specialized serializer. */
-internal expect fun StringBuilder.appendEscapedHtmlString(value: String, attribute: Boolean): Boolean
+internal fun StringBuilder.appendEscapedText(value: String) {
+    if (value.length >= HtmlEscapeTableMinLength && appendEscapedHtmlString(value, attribute = false)) return
+    if (canAppendUnescapedHtmlString(value, attribute = false)) {
+        append(value)
+        return
+    }
+    var start = 0
+    for (index in value.indices) {
+        val character = value[index]
+        val replacement = htmlTextEscapeReplacement(character)
+        if (replacement != null) {
+            appendHtmlRun(value, start, index)
+            append(replacement)
+            start = index + 1
+            // Retry after ampersands only, so suffix searches cover disjoint ranges.
+            if (character == '&' && canAppendUnescapedHtmlString(value, attribute = false, startIndex = start)) {
+                appendHtmlRun(value, start, value.length)
+                return
+            }
+        }
+    }
+    if (start == 0) append(value) else appendHtmlRun(value, start, value.length)
+}
 
-/** A native search fast path where the platform supports it. */
-internal expect fun canAppendUnescapedHtmlString(value: String, attribute: Boolean): Boolean
+/** A bulk-copy fast path where the platform supports it. */
+internal expect fun canAppendUnescapedHtmlString(value: String, attribute: Boolean, startIndex: Int = 0): Boolean
+
+/** Appends the entire escaped value when a platform has a specialized serializer. */
+internal expect fun StringBuilder.appendEscapedHtmlString(value: String, attribute: Boolean): Boolean
 
 /** Per renderer, bounded, and independent of attribute values or protocol ownership. */
 internal class HtmlAttributeNameCache {

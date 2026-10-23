@@ -96,6 +96,10 @@ class HtmlSerializationTest {
                         else -> "outside the table"
                     }
                     assertContains(failure.message.orEmpty(), suggestion)
+                    val childHtml = if (child == "col") "<col>" else "<$child></$child>"
+                    assertEquals("<$parent>$childHtml</$parent>", composeHtmlToString(hydratable, validateStrictly = false) {
+                        TagElement<Element>(parent, null) { TagElement<Element>(child, null, null) }
+                    })
                 }
             }
         }
@@ -838,6 +842,27 @@ class HtmlSerializationTest {
                     "${prefix}&lt;&amp;&gt;&#13;\"\n\t&amp;amp;</div>",
                 html,
             )
+        }
+    }
+
+    @Test
+    fun escapingChecksLongSuffixesAfterAmpersands() {
+        for (length in listOf(31, 32, 33, 1024)) {
+            val plain = "é😀a".repeat(length)
+            val value = "<&" + plain + "&\"\n\t" + plain + "<\r>"
+            assertEquals(
+                "<div title=\"&lt;&amp;${plain}&amp;&quot;&#10;&#9;${plain}&lt;&#13;&gt;\">" +
+                    "&lt;&amp;${plain}&amp;\"\n\t${plain}&lt;&#13;&gt;</div>",
+                composeHtmlToString {
+                    Div(attrs = { attr("title", value) }) { Text(value) }
+                },
+            )
+            assertEquals("&lt;&amp;$plain", composeHtmlToString { Text("<&$plain") })
+            val invalid = "&$plain\u0000"
+            assertFailsWith<IllegalArgumentException> { composeHtmlToString { Text(invalid) } }
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString { Div(attrs = { attr("title", invalid) }) }
+            }
         }
     }
 

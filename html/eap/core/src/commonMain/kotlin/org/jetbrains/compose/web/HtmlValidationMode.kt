@@ -2,11 +2,13 @@ package org.jetbrains.compose.web
 
 import androidx.compose.runtime.staticCompositionLocalOf
 
+@PublishedApi
 internal enum class HtmlValidationMode {
     Fast,
     Strict,
 }
 
+@PublishedApi
 internal val LocalHtmlValidationMode = staticCompositionLocalOf { HtmlValidationMode.Fast }
 
 internal fun htmlValidationMode(validateStrictly: Boolean): HtmlValidationMode =

@@ -125,9 +125,9 @@ class DirectStringRenderingTest {
             { TagElement<Element>("script", null) { Text("</scr"); Text("ipt>") } },
             { TagElement<Element>("style", null) { Span { Text("child") } } },
         )
-        for (content in invalid) {
-            assertFailsWith<IllegalArgumentException> { composeHtmlToString(content = content) }
-            assertFailsWith<IllegalArgumentException> { composeHtmlToString(key = "direct-failure", content = content) }
+        for (strict in listOf(false, true)) for (content in invalid) {
+            assertFailsWith<IllegalArgumentException> { composeHtmlToString(validateStrictly = strict, content = content) }
+            assertFailsWith<IllegalArgumentException> { composeHtmlToString(key = "direct-failure", validateStrictly = strict, content = content) }
             assertEquals("<div>ok</div>", composeHtmlToString(key = "direct-failure") { Div { Text("ok") } })
         }
     }

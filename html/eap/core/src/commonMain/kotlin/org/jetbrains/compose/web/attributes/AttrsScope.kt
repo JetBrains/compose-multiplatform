@@ -3,8 +3,11 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+@file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+
 package org.jetbrains.compose.web.attributes
 
+import org.jetbrains.compose.web.dom.LowerableAttribute
 import androidx.compose.runtime.DisposableEffectResult
 import androidx.compose.runtime.DisposableEffectScope
 import org.jetbrains.compose.web.css.StyleScope
@@ -66,24 +69,35 @@ interface AttrsScope<out TElement : Element> : EventsListenerScope {
      */
     fun classes(vararg classes: String) = classes(classes.asList())
 
+    @LowerableAttribute
     fun id(value: String) = attr(ID, value)
+    @LowerableAttribute(value = "true")
     fun hidden() = attr(HIDDEN, true.toString())
+    @LowerableAttribute
     fun title(value: String) = attr(TITLE, value)
+    @LowerableAttribute(conversion = "dirStr")
     fun dir(value: DirType) = attr(DIR, value.dirStr)
+    @LowerableAttribute(conversion = "str")
     fun draggable(value: Draggable) = attr(DRAGGABLE, value.str)
+    @LowerableAttribute
     fun contentEditable(value: Boolean) = attr(CONTENT_EDITABLE, value.toString())
+    @LowerableAttribute
     fun lang(value: String) = attr(LANG, value)
+    @LowerableAttribute
     fun tabIndex(value: Int) = attr(TAB_INDEX, value.toString())
+    @LowerableAttribute
     fun spellCheck(value: Boolean) = attr(SPELLCHECK, value.toString())
 
     /**
      * see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode
      */
+    @LowerableAttribute
     fun inputMode(value: String) = attr("inputmode", value)
 
     /**
      * see https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode
      */
+    @LowerableAttribute(conversion = "str")
     fun inputMode(value: InputMode) = attr("inputmode", value.str)
 
     /**

@@ -12,7 +12,8 @@ import androidx.compose.runtime.Composable
  * produces the same HTML as [composeHtmlToString] with the same arguments.
  *
  * [chunkSize] defaults to 2048 and is a target minimum measured in UTF-16 code units. Tags and individual `Text`
- * calls stay intact, as do elements whose contents require validation. A chunk can exceed [chunkSize],
+ * calls stay intact on the runtime path. Compiler-validated fragments can stream in smaller pieces.
+ * Elements awaiting content validation stay buffered. A chunk can exceed [chunkSize],
  * and no empty chunks are sent.
  *
  * Rendering uses the caller's current snapshot. Use a mutable snapshot around rendering for isolation.
@@ -24,7 +25,7 @@ import androidx.compose.runtime.Composable
  * @param sink receives each non-empty HTML chunk.
  * @param chunkSize target minimum chunk size in UTF-16 code units. Defaults to 2048.
  * @param hydratable whether to emit text-boundary markers needed to hydrate adjacent `Text` calls.
- * Set to `false` when the output will not be hydrated.
+ * Compiler optimization might still emit them.
  * @param key optional key for reusing rendering storage across calls.
  * Use a stable key per template. Reuse is best-effort. `null` disables pooling.
  * @param validateStrictly overrides the default strict-validation setting for this render.

@@ -7,6 +7,7 @@
 
 package org.jetbrains.compose.web.attributes.builders
 
+import org.jetbrains.compose.web.dom.inputValueIsAttribute
 import androidx.compose.web.events.SyntheticEvent
 import org.jetbrains.compose.web.attributes.*
 import org.jetbrains.compose.web.attributes.EventsListenerScope.Companion.BEFOREINPUT
@@ -45,13 +46,7 @@ class InputAttrsScope<ValueType>(
 ) : AttrsScope<HTMLInputElement> by attrsScope {
 
     fun value(value: String): InputAttrsScope<ValueType> {
-        when (inputType) {
-            InputType.Checkbox,
-            InputType.Radio,
-            InputType.Hidden,
-            InputType.Submit -> attr("value", value)
-            else -> prop(setInputValue, value)
-        }
+        if (inputValueIsAttribute(inputType)) attr("value", value) else prop(setInputValue, value)
         return this
     }
 
