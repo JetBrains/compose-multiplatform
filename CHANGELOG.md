@@ -12,7 +12,7 @@ _Changes since 1.13.0-alpha02_
 
 ### Multiple Platforms
 
-- Support for rendering bullet list annotations (Bullet) in `AnnotatedString` [#3400](https://github.com/JetBrains/compose-multiplatform-core/pull/3400)
+- Support for rendering `Bullet` annotations in `AnnotatedString` [#3400](https://github.com/JetBrains/compose-multiplatform-core/pull/3400)
 
 ### iOS
 
@@ -20,14 +20,14 @@ _Changes since 1.13.0-alpha02_
 
 ### Desktop
 
-- _(prerelease fix)_ Bump Compose Hot Reload to [1.3.0-beta01](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.3.0-beta01) [#5741](https://github.com/JetBrains/compose-multiplatform/pull/5741)
+- _(prerelease fix)_ Bump Compose Hot Reload to [1.3.0-beta02](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.3.0-beta02) [#5762](https://github.com/JetBrains/compose-multiplatform/pull/5762)
 
 ## Fixes
 
 ### Multiple Platforms
 
 - Detect stale resolved fonts in Skia paragraph intrinsics to better handle async font resolution updates [#2789](https://github.com/JetBrains/compose-multiplatform-core/pull/2789)
-- Propagate font resolution callbacks through paragraph building and layout layers. [#2789](https://github.com/JetBrains/compose-multiplatform-core/pull/2789)
+  - Propagate font resolution callbacks through paragraph building and layout layers.
 - Fixed text with `textIndent` wrapping unexpectedly: the indentation is now included into the paragraph's intrinsic width [#3400](https://github.com/JetBrains/compose-multiplatform-core/pull/3400)
 - Fixed `TextAutoSize` not shrinking text with ellipsis overflow on Skiko targets [#3489](https://github.com/JetBrains/compose-multiplatform-core/pull/3489)
 
@@ -45,9 +45,9 @@ _Changes since 1.13.0-alpha02_
 ### Web
 
 - Fixed text selection issues in Compose text fields on iOS 27 WebKit [#3468](https://github.com/JetBrains/compose-multiplatform-core/pull/3468)
-- Support fonts fallback url customization via `ComposeViewportConfiguration.fontFallbackUrl` config [#3476](https://github.com/JetBrains/compose-multiplatform-core/pull/3476)
-- Fixed window focus recovery after focus loss in iOS Safari [#3477](https://github.com/JetBrains/compose-multiplatform-core/pull/3477)
-- CMP-10885 [Web] Mobile. iOS. Focus is set incorrectly on the first tap in multiline text [#3495](https://github.com/JetBrains/compose-multiplatform-core/pull/3495)
+- Support fonts fallback URL customization via `ComposeViewportConfiguration.fontFallbackUrl` config [#3476](https://github.com/JetBrains/compose-multiplatform-core/pull/3476)
+- Fixed window focus recovery after focus loss in Safari on iOS [#3477](https://github.com/JetBrains/compose-multiplatform-core/pull/3477)
+- _(prerelease fix)_ Fixed the caret jumping to the end of the text on the first tap in a multiline text field in Safari on iOS [#3495](https://github.com/JetBrains/compose-multiplatform-core/pull/3495)
 
 ## Components
 
