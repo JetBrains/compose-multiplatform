@@ -79,7 +79,7 @@ for creating web user interfaces with HTML and CSS.
 * [Tutorials](tutorials/README.md)
 * [Compatibility and versioning](https://jb.gg/cmp-versioning)
 * [Changelog](CHANGELOG.md)
-* [Contibution guide](CONTRIBUTING.md)
+* [Contribution guide](CONTRIBUTING.md)
 
 ## Get help
 
