@@ -10,6 +10,7 @@ on:
       - 'html/settings.gradle.kts'
       - 'html/gradle.properties'
       - 'html/buildSrc/**'
+      - 'html/gradle/**'
       - '.github/workflows/compose-html-eap.yml'
   push:
     branches:
@@ -22,6 +23,7 @@ on:
       - 'html/settings.gradle.kts'
       - 'html/gradle.properties'
       - 'html/buildSrc/**'
+      - 'html/gradle/**'
       - '.github/workflows/compose-html-eap.yml'
 
 jobs:
@@ -53,3 +55,9 @@ jobs:
             :html-core-eap:publishToMavenLocal \
             :html-svg-eap:publishToMavenLocal \
             :internal-html-core-runtime-eap:publishToMavenLocal
+
+      - name: Test HTML compiler and Gradle plugins, including browser hydration
+        working-directory: html
+        run: |
+          ./gradlew -p eap/compiler-plugin --no-daemon --stacktrace --max-workers=1 \
+            -Pcompose.html.eap.enabled=true check

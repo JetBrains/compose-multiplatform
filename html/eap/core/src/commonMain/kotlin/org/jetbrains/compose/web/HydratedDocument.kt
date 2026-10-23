@@ -22,7 +22,7 @@ private const val HtmlDoctype = "<!doctype html>"
 /**
  * Renders a complete HTML document with optional browser hydration.
  *
- * [content] must produce exactly one `html` element. Output starts with an HTML doctype.
+ * [content] should produce exactly one `html` element; strict validation checks this.
  * Output starts with an HTML doctype.
  * Static documents emit no hydration state.
  *
@@ -65,7 +65,8 @@ fun renderHydratedDocument(
  * [renderHydratedDocument].
  *
  * [chunkSize] defaults to 2048 UTF-16 code units. Tags and `Text` calls stay intact, so chunks
- * may exceed the target. [sink] runs synchronously, may block, and receives no empty chunks.
+ * may exceed the target. Compiler-validated fragments can stream in smaller pieces.
+ * [sink] runs synchronously, may block, and receives no empty chunks.
  * Emitted output cannot be retracted on failure, including document validation after composition.
  *
  * Rendering uses the caller's current snapshot. Use a mutable snapshot around rendering for isolation.

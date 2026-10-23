@@ -3,6 +3,8 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+@file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
@@ -15,6 +17,9 @@ import org.jetbrains.compose.web.LocalHtmlValidationMode
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
 import org.jetbrains.compose.web.css.CSSRuleDeclarationList
+import org.jetbrains.compose.web.css.StyleScope
+import org.jetbrains.compose.web.css.StyleScopeBuilder
+import org.jetbrains.compose.web.css.toStyleAttributeValue
 import org.jetbrains.compose.web.internal.unsafeCast
 
 /**
@@ -24,10 +29,11 @@ import org.jetbrains.compose.web.internal.unsafeCast
  * The fields describe the currently open element. Parent state stays in local variables on the
  * call stack.
  */
+@PublishedApi
 internal class HtmlStringWriterContext(
     private val hydratable: Boolean,
     private val attrsBuilders: AttrsBuilderPool = AttrsBuilderPool(),
-    private val output: StringBuilder = StringBuilder(),
+    @PublishedApi internal val output: StringBuilder = StringBuilder(),
     private val chunkSink: ((StringBuilder) -> Unit)? = null,
     private val chunkSize: Int = 2048,
 ) : ComposeHtmlContext {
@@ -38,6 +44,7 @@ internal class HtmlStringWriterContext(
         private set
     private val elementScope = StringElementScope<Element>()
     private var finished = false
+    private var immutableOutput: String? = null
 
     // These elements must keep their content in the shared buffer until their end tag is written.
     private var bufferedElementDepth = 0
@@ -46,21 +53,21 @@ internal class HtmlStringWriterContext(
     private var attrsBuilderIndex = 0
 
     // A null tag name means that output is being written at the root.
-    private var currentTagName: String? = null
-    private var currentNamespace = HtmlNamespace
-    private var previousSiblingWasText = false
+    internal var currentTagName: String? = null
+    internal var currentNamespace = HtmlNamespace
+    internal var previousSiblingWasText = false
 
     // The HTML parser drops the first LF in pre, textarea, and listing. Repair it when the
     // first content is written, so these elements can stream without retaining their children.
-    private var pendingLeadingNewline = false
+    internal var pendingLeadingNewline = false
 
     // Don't produce children's HTML, but still execute their composables.
-    private var discardingContent = false
+    internal var discardingContent = false
 
     // Raw text is validated at the end tag. Raw-text elements cannot nest, so one buffer suffices.
-    private var collectingRawText = false
-    private var hasRawTextCall = false
-    private val rawText = StringBuilder()
+    internal var collectingRawText = false
+    internal var hasRawTextCall = false
+    internal val rawText = StringBuilder()
 
     // Hydrated document renderers require exactly one html root element.
     private var rootChildCount = 0
@@ -71,10 +78,8 @@ internal class HtmlStringWriterContext(
     override fun <TElement : Element> elementBuilder(tagName: String): ElementBuilder<TElement> =
         attrsBuilders.elementBuilder(tagName, HtmlNamespace)
 
-    override fun <TElement : Element> elementBuilderNS(
-        tagName: String,
-        namespace: String,
-    ): ElementBuilder<TElement> = attrsBuilders.elementBuilder(tagName, namespace)
+    override fun <TElement : Element> elementBuilderNS(tagName: String, namespace: String): ElementBuilder<TElement> =
+        attrsBuilders.elementBuilder(tagName, namespace)
 
     @Composable
     @NonRestartableComposable
@@ -127,7 +132,7 @@ internal class HtmlStringWriterContext(
         flushChunk()
         // For buffered elements this index stays valid until appendEndTag inspects the content.
         val contentStart = output.length
-        if (!contentOverride.isNullOrEmpty()) writeText(contentOverride, validate)
+        if (!contentOverride.isNullOrEmpty()) appendText(contentOverride, validate)
         discardingContent = isVoid || contentOverride != null
         if (rawTextContent != null && !discardingContent) {
             rawTextContent.validateScriptSource(startTag.hasScriptSource)
@@ -149,6 +154,228 @@ internal class HtmlStringWriterContext(
     @Composable
     @NonRestartableComposable
     @ExplicitGroupsComposable
+    override fun <TElement : Element> DynamicTextTagElement(
+        attributes: PreparedHtmlAttributes<TElement>,
+        value: @Composable ElementScope<TElement>.() -> String,
+    ) {
+        checkNotFinished()
+        if (discardingContent) {
+            value(elementScope())
+            return
+        }
+        val tagName = attributes.tagName
+        val validate = LocalHtmlValidationMode.current == HtmlValidationMode.Strict
+        writeStartTag(tagName, HtmlNamespace, attributes.callback, validate, true)
+        val parent = enter(tagName, HtmlNamespace, isHtmlLeadingNewlineElement(tagName, HtmlNamespace))
+        flushChunk()
+        val start = output.length
+        val text = value(elementScope())
+        if (text.isNotEmpty()) {
+            appendText(text, validate)
+            flushChunk()
+        }
+        output.appendEndTag(tagName, HtmlNamespace, start)
+        exit(parent)
+        flushChunk()
+    }
+
+    /** Returns the shared buffer, or null when output is discarded or the stored string can be returned directly. */
+    @PublishedApi
+    internal fun beginStaticHtml(rootTag: String, encoded: String, validate: Boolean): StringBuilder? {
+        if (!beginStaticHtmlFragment(rootTag, validate)) return null
+        // Return small static pages directly. Buffer mixed or streamed output.
+        if (!streaming && currentTagName == null && output.isEmpty()) {
+            immutableOutput = encoded
+            return null
+        }
+        return output
+    }
+
+    /** Begins one compiler-validated fragment, independently of how its HTML is stored. */
+    @PublishedApi
+    internal fun beginStaticHtmlFragment(rootTag: String, validate: Boolean): Boolean {
+        checkNotFinished()
+        if (discardingContent) return false
+        beginChild(rootTag, validate)
+        previousSiblingWasText = false
+        pendingLeadingNewline = false
+        return true
+    }
+
+    /** Inlines each literal append and streams it through the ordinary buffer. */
+    @PublishedApi
+    @Suppress("NOTHING_TO_INLINE")
+    internal inline fun appendStaticHtmlChunk(encoded: String) {
+        output.append(encoded)
+        flushChunk()
+    }
+
+    /**
+     * Only called by compiler plugin. Opens nested elements written as one literal.
+     * Only [rootTag] is checked against the unknown parent; [innermost] receives the following content.
+     * [closeElement] with the returned parent restores the state from before the region.
+     */
+    @PublishedApi
+    internal fun openLoweredRegion(rootTag: String, encoded: String, innermost: String, validate: Boolean, namespace: String = HtmlNamespace): Any? {
+        checkNotFinished()
+        if (discardingContent) return null
+        beginChild(rootTag, validate)
+        output.append(encoded)
+        val parent = enter(innermost, namespace, leadingNewline = false)
+        flushChunk()
+        return parent
+    }
+
+    /** Only called by compiler plugin. The literal ends with a tag inside the region, so no text boundary is pending. */
+    @PublishedApi
+    internal fun advanceLoweredRegion(encoded: String, innermost: String, namespace: String = HtmlNamespace) {
+        checkNotFinished()
+        if (discardingContent) return
+        output.append(encoded)
+        currentTagName = innermost
+        currentNamespace = namespace
+        previousSiblingWasText = false
+        pendingLeadingNewline = false
+        flushChunk()
+    }
+
+    /**
+     * Only called by compiler plugin. Begins an element whose attributes are written directly;
+     * their names and syntax have already been validated by the compiler.
+     */
+    @PublishedApi
+    internal fun beginMixedElement(tagName: String, validate: Boolean): Boolean {
+        checkNotFinished()
+        if (discardingContent) return false
+        beginChild(tagName, validate)
+        return true
+    }
+
+    /** Only called by compiler plugin. Appends compiler-validated attribute syntax. */
+    @PublishedApi
+    internal fun writeMixedLiteral(encoded: String) {
+        output.append(encoded)
+    }
+
+    /** Only called by compiler plugin. Escapes and writes a dynamic attribute value. */
+    @PublishedApi
+    internal fun writeMixedAttribute(prefix: String, value: String?, boolean: Boolean) {
+        if (value == null) return
+        output.append(prefix)
+        if (!boolean || value.isNotEmpty()) {
+            output.append("=\"")
+            output.appendEscapedAttribute(value)
+            output.append('"')
+        }
+    }
+
+    /** Only called by compiler plugin. Writes collected inline styles. */
+    @PublishedApi
+    internal fun writeMixedStyle(scope: StyleScopeBuilder?) {
+        writeMixedAttribute(" style", scope?.toStyleAttributeValue(), false)
+    }
+
+    /** Only called by compiler plugin. Applies strict class-token checks. */
+    @PublishedApi
+    internal fun validateMixedClass(value: String?, validate: Boolean, duplicate: Boolean) {
+        if (!validate || value == null) return
+        require(!duplicate) { "Class token must not be repeated: \"$value\"" }
+        require(value.isNotEmpty()) { "Class token must not be empty" }
+        require(value.none { it in AsciiWhitespaceCharacters }) {
+            "Class token must not contain ASCII whitespace: \"$value\""
+        }
+    }
+
+    /** Only called by compiler plugin. Appends one class token. */
+    @PublishedApi
+    internal fun writeMixedClass(value: String?, previous: Boolean, encoded: Boolean): Boolean {
+        if (value == null) return previous
+        output.append(if (previous) " " else " class=\"")
+        if (encoded) output.append(value) else output.appendEscapedAttribute(value)
+        return true
+    }
+
+    /** Only called by compiler plugin. Closes a class attribute if any tokens were written. */
+    @PublishedApi
+    internal fun finishMixedClasses(written: Boolean) {
+        if (written) output.append('"')
+    }
+
+    /** Only called by compiler plugin. Enters the element after its attributes have been written. */
+    @PublishedApi
+    internal fun finishMixedElement(tagName: String, namespace: String = HtmlNamespace): Any? {
+        output.append('>')
+        if (isHtmlVoidElement(tagName, namespace)) {
+            previousSiblingWasText = false
+            pendingLeadingNewline = false
+            flushChunk()
+            return null
+        }
+        val parent = enter(tagName, namespace, leadingNewline = isHtmlLeadingNewlineElement(tagName, namespace))
+        flushChunk()
+        return parent
+    }
+
+    /** Only called by compiler plugin. */
+    @PublishedApi
+    internal fun closeElement(encoded: String, parent: Any?) {
+        checkNotFinished()
+        if (discardingContent) return
+        output.append(encoded)
+        exit(parent)
+        flushChunk()
+    }
+
+    internal fun beginChild(tagName: String, validate: Boolean) {
+        require(!collectingRawText) { "String rendering does not support element children inside <$currentTagName>" }
+        if (validate && currentNamespace == HtmlNamespace) requireHtmlParserStableTableElement(currentTagName, tagName)
+        if (currentTagName == null) recordRootChild(isHtml = tagName == "html")
+        flushChunk()
+    }
+
+    internal fun enter(tagName: String, namespace: String, leadingNewline: Boolean): Any? {
+        val parent = if (currentNamespace == HtmlNamespace) currentTagName
+        else ForeignParent(currentTagName, currentNamespace)
+        if (currentTagName !== tagName) currentTagName = tagName
+        if (currentNamespace !== namespace) currentNamespace = namespace
+        previousSiblingWasText = false
+        pendingLeadingNewline = leadingNewline
+        return parent
+    }
+
+    internal fun exit(parent: Any?) {
+        val tagName = if (parent is ForeignParent) parent.tagName else parent as String?
+        val namespace = if (parent is ForeignParent) parent.namespace else HtmlNamespace
+        if (currentTagName !== tagName) currentTagName = tagName
+        if (currentNamespace !== namespace) currentNamespace = namespace
+        previousSiblingWasText = false
+        pendingLeadingNewline = false // This element's start tag consumed its parent's first content.
+    }
+
+    // Ordinary HTML parents stay as tag names, with no allocation on the common path.
+    internal class ForeignParent(val tagName: String?, val namespace: String)
+
+    /** Used by compiler-generated calls and ordinary Text rendering. */
+    @PublishedApi
+    internal fun writeText(value: String, validate: Boolean) {
+        checkNotFinished()
+        when {
+            discardingContent -> Unit
+            collectingRawText -> {
+                // Empty Text calls still require validation at the end tag.
+                hasRawTextCall = true
+                rawText.append(value)
+            }
+            value.isNotEmpty() -> {
+                appendText(value, validate)
+                flushChunk()
+            }
+        }
+    }
+
+    @Composable
+    @NonRestartableComposable
+    @ExplicitGroupsComposable
     override fun <TElement : Element> RawTextElement(
         tagName: String,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
@@ -161,20 +388,7 @@ internal class HtmlStringWriterContext(
     @NonRestartableComposable
     @ExplicitGroupsComposable
     override fun TextElement(value: String) {
-        checkNotFinished()
-        when {
-            discardingContent -> Unit
-            collectingRawText -> {
-                // Even an empty text call must go through raw-text validation at the end tag.
-                hasRawTextCall = true
-                rawText.append(value)
-            }
-
-            value.isNotEmpty() -> {
-                writeText(value, LocalHtmlValidationMode.current == HtmlValidationMode.Strict)
-                flushChunk()
-            }
-        }
+        writeText(value, LocalHtmlValidationMode.current == HtmlValidationMode.Strict)
     }
 
     @Composable
@@ -198,8 +412,8 @@ internal class HtmlStringWriterContext(
         }
         attrsBuilders.trim(attrsBuilderIndex)
         if (!streaming) {
-            peakBufferSize = output.length
-            return output.toString()
+            peakBufferSize = immutableOutput?.length ?: output.length
+            return immutableOutput ?: output.toString()
         }
 
         flushChunk(force = true)
@@ -214,12 +428,14 @@ internal class HtmlStringWriterContext(
         tagNameIsValid: Boolean,
     ): StartTagResult {
         if (validate && !tagNameIsValid) requireValidHtmlTagName(tagName)
-        require(!collectingRawText) {
-            "String rendering does not support element children inside <$currentTagName>"
-        }
-        if (currentTagName == null) recordRootChild(isHtml = tagName == "html")
-        if (validate && currentNamespace == HtmlNamespace) requireHtmlParserStableTableElement(currentTagName, tagName)
+        beginChild(tagName, validate)
 
+        val prepared = if (namespace == HtmlNamespace) preparedHtmlCallbackMetadata(applyAttrs) else null
+        if (prepared != null && prepared.tagName == tagName) {
+            output.append(prepared.startTag)
+            pendingLeadingNewline = false
+            return StartTagResult.Ordinary
+        }
         val builder = attrsBuilders.builder<TElement>(attrsBuilderIndex++)
         try {
             applyAttrs?.invoke(builder)
@@ -243,12 +459,7 @@ internal class HtmlStringWriterContext(
         }
     }
 
-    private fun writeEndTag(
-        tagName: String,
-        namespace: String,
-        hasScriptSource: Boolean,
-        contentStart: Int,
-    ) {
+    private fun writeEndTag(tagName: String, namespace: String, hasScriptSource: Boolean, contentStart: Int) {
         if (hasRawTextCall) {
             val content = RawTextContent.create(tagName, rawText.toString())
             content.validateScriptSource(hasScriptSource)
@@ -259,7 +470,7 @@ internal class HtmlStringWriterContext(
         output.appendEndTag(tagName, namespace, contentStart)
     }
 
-    private fun writeText(value: String, validate: Boolean) {
+    internal fun appendText(value: String, validate: Boolean) {
         if (currentTagName == null) recordRootChild(isHtml = false)
         if (validate && currentNamespace == HtmlNamespace) requireHtmlParserStableTableText(currentTagName, value)
         if (pendingLeadingNewline) {
@@ -275,7 +486,8 @@ internal class HtmlStringWriterContext(
     }
 
     /** Emits the shared buffer at a safe boundary once it reaches the target size. */
-    private fun flushChunk(force: Boolean = false) {
+    @PublishedApi
+    internal fun flushChunk(force: Boolean = false) {
         val chunkSink = chunkSink ?: return
         // A buffered element validates its content when its end tag is written.
         if (bufferedElementDepth != 0 || output.isEmpty() || (!force && output.length < chunkSize)) return
@@ -285,12 +497,16 @@ internal class HtmlStringWriterContext(
         output.setLength(0)
     }
 
-    private fun recordRootChild(isHtml: Boolean) {
+    internal fun recordRootChild(isHtml: Boolean) {
         if (rootChildCount++ == 0) firstRootChildIsHtml = isHtml
     }
 
-    private fun checkNotFinished() {
+    internal fun checkNotFinished() {
         check(!finished) { "String rendering does not support HTML emission after composition" }
+        immutableOutput?.let {
+            output.append(it)
+            immutableOutput = null
+        }
     }
 
     private fun <TElement : Element> elementScope(): ElementScope<TElement> = elementScope.unsafeCast()
@@ -325,3 +541,8 @@ internal class AttrsBuilderPool {
         if (size < builders.size) builders.subList(size, builders.size).clear()
     }
 }
+
+/** Only called by compiler plugin. */
+@PublishedApi
+internal fun mixedStyle(scope: StyleScopeBuilder?, block: StyleScope.() -> Unit): StyleScopeBuilder =
+    (scope ?: StyleScopeBuilder()).apply(block)

@@ -52,6 +52,13 @@ Local build versions are configured in `html/gradle.properties`.
 Do not put the regular and EAP Compose HTML artifacts on the same compilation classpath because
 they intentionally expose the same Kotlin packages and declarations.
 
+## Static HTML lowering
+
+The HTML compiler plugin prepares static HTML at compile time to reduce work during
+server-side rendering on the JVM. Dynamic content is still rendered at runtime.
+
+See the [plugin README](compiler-plugin/README.md#activate) for activation and configuration.
+
 ## Examples
 
 ### String Rendering

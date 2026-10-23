@@ -32,11 +32,12 @@ kotlinKarmaConfig.rootDir = rootProject.rootDir.toString()
 
 apply<SeleniumDriverPlugin>()
 
-fun Project.isSampleProject() = projectDir.parentFile.name == "examples"
+// Only the browser samples have bundle-size tasks; EAP examples also include JVM-only projects.
+fun Project.isSampleProject() = path.startsWith(":examples:")
 
 tasks.register("printBundleSize") {
     dependsOn(
-        subprojects.filter { it.isSampleProject() }.map { ":examples:${it.name}:printBundleSize" }
+        subprojects.filter { it.isSampleProject() }.map { "${it.path}:printBundleSize" }
     )
 }
 

@@ -15,7 +15,8 @@ import java.io.Writer
  * for each chunk. The writer is not flushed or closed. The writer must consume each write before returning.
  *
  * [chunkSize] is a target minimum in UTF-16 code units. Tags and individual `Text` calls stay
- * intact. Elements requiring content validation are emitted only after validation succeeds.
+ * intact on the runtime path. Compiler-validated fragments can stream in smaller pieces.
+ * Elements requiring content validation are emitted only after validation succeeds.
  * A write can exceed [chunkSize]. No empty writes are made.
  *
  * Rendering uses the caller's current snapshot. Use a mutable snapshot around rendering for isolation.
