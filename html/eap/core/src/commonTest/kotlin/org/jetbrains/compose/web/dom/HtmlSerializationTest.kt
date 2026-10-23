@@ -107,12 +107,15 @@ class HtmlSerializationTest {
             listOf("table", "tbody", "thead", "tfoot", "tr", "colgroup").forEach { parent ->
                 listOf("x", " x ", "\u00A0", "\u000B").forEach { text ->
                     val failure = assertFailsWith<IllegalArgumentException> {
-                        composeHtmlToString(hydratable) {
+                        composeHtmlToString(hydratable, validateStrictly = true) {
                             TagElement<Element>(parent, null) { Text(text) }
                         }
                     }
                     assertContains(failure.message.orEmpty(), "Non-whitespace text")
                     assertContains(failure.message.orEmpty(), "inside <$parent>")
+                    assertEquals("<$parent>$text</$parent>", composeHtmlToString(hydratable, validateStrictly = false) {
+                        TagElement<Element>(parent, null) { Text(text) }
+                    })
                 }
                 assertEquals("<$parent>\t\n\u000C </$parent>", composeHtmlToString(hydratable) {
                     TagElement<Element>(parent, null) { Text("\t\n\u000C ") }

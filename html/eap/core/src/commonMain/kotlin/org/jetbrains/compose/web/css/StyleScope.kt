@@ -218,49 +218,56 @@ data class StylePropertyDeclaration(
 typealias StylePropertyList = List<StylePropertyDeclaration>
 typealias MutableStylePropertyList = MutableList<StylePropertyDeclaration>
 
+// TODO: Investigate an append overload that avoids intermediate strings.
 @OptIn(ComposeWebInternalApi::class)
 internal fun StyleHolder.toStyleAttributeValue(): String? {
     if (properties.isEmpty() && variables.isEmpty()) return null
+    // Reuse conversions if priority or removal needs a second pass.
+    // Skip removed values as before.
+    val values = arrayOfNulls<String>(properties.size + variables.size)
     val ordinary = StringBuilder()
-    if (ordinary.appendOrdinaryDeclarations(properties, "") &&
-        ordinary.appendOrdinaryDeclarations(variables, "--")
+    if (ordinary.appendOrdinaryDeclarations(properties, "", values, 0) &&
+        ordinary.appendOrdinaryDeclarations(variables, "--", values, properties.size)
     ) return ordinary.toString()
     val declarations = properties + variables.map { it.copy(name = "--${it.name}") }
     val removedNames = mutableSetOf<String>()
     val resetPriorityNames = mutableSetOf<String>()
-    // Walk backwards to retain fallbacks without repeatedly scanning earlier declarations.
-    // Empty assignments remove a property. Normal assignments reset its earlier priority.
-    return declarations.asReversed().filter { declaration ->
+    val included = BooleanArray(declarations.size)
+    for (index in declarations.lastIndex downTo 0) {
+        val declaration = declarations[index]
+        if (declaration.name in removedNames) continue
+        val value = values[index] ?: declaration.value.toString().also { values[index] = it }
         when {
-            declaration.name in removedNames -> false
-            declaration.value.toString().isEmpty() -> {
-                removedNames.add(declaration.name)
-                false
-            }
-
-            declaration.important -> declaration.name !in resetPriorityNames
+            value.isEmpty() -> removedNames.add(declaration.name)
+            declaration.important -> included[index] = declaration.name !in resetPriorityNames
             else -> {
                 resetPriorityNames.add(declaration.name)
-                true
+                included[index] = true
             }
         }
-    }.asReversed()
-        .takeIf { declarations -> declarations.isNotEmpty() }
-        ?.joinToString("; ") { declaration ->
-            buildString {
-                append(declaration.name)
-                append(": ")
-                append(declaration.value)
-                if (declaration.important) append(" !important")
-            }
+    }
+    return buildString {
+        for (index in declarations.indices) {
+            if (!included[index]) continue
+            val declaration = declarations[index]
+            if (isNotEmpty()) append("; ")
+            append(declaration.name).append(": ").append(values[index])
+            if (declaration.important) append(" !important")
         }
+    }.takeIf { it.isNotEmpty() }
 }
 
-// Convert each ordinary value once, including numeric CSS carriers.
-private fun StringBuilder.appendOrdinaryDeclarations(declarations: StylePropertyList, prefix: String): Boolean {
-    for (declaration in declarations) {
+private fun StringBuilder.appendOrdinaryDeclarations(
+    declarations: StylePropertyList,
+    prefix: String,
+    values: Array<String?>,
+    offset: Int,
+): Boolean {
+    for (index in declarations.indices) {
+        val declaration = declarations[index]
         if (declaration.important) return false
         val value = declaration.value.toString()
+        values[offset + index] = value
         if (value.isEmpty()) return false
         if (isNotEmpty()) append("; ")
         append(prefix).append(declaration.name).append(": ").append(value)

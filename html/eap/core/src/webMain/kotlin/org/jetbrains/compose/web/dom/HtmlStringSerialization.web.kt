@@ -10,3 +10,5 @@ internal actual fun canAppendUnescapedHtmlString(value: String, attribute: Boole
 internal actual fun StringBuilder.appendHtmlRun(value: String, start: Int, end: Int) {
     append(value, start, end)
 }
+
+internal actual fun StringBuilder.appendEscapedHtmlString(value: String, attribute: Boolean): Boolean = false

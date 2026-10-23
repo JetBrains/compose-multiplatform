@@ -120,7 +120,7 @@ class HydratedDocumentPoolTest {
                             Html { Body { HydrationRoot("inner", { it }, hydrationId = "app") { Text(it) } } }
                         }
                         assertFailsWith<IllegalArgumentException> {
-                            renderHydratedDocument(key = key) { Div() }
+                            renderHydratedDocument(key = key, validateStrictly = true) { Div() }
                         }
                         Text(it)
                     }

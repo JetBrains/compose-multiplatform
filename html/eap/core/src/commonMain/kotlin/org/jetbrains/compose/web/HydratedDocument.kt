@@ -23,6 +23,7 @@ private const val HtmlDoctype = "<!doctype html>"
  * Renders a complete HTML document with optional browser hydration.
  *
  * [content] must produce exactly one `html` element. Output starts with an HTML doctype.
+ * Output starts with an HTML doctype.
  * Static documents emit no hydration state.
  *
  * Load client code that calls `hydrateRoot` after [HydrationRoot] and its state element are parsed:
@@ -113,7 +114,7 @@ internal fun composeHydratedDocument(
 ): String {
     val seenHydrationIds = if (validateStrictly) mutableSetOf<String>() else null
     return composeHtmlString(
-        requireHtmlDocumentRoot = true,
+        requireHtmlDocumentRoot = validateStrictly,
         chunkSink = chunkSink,
         chunkSize = chunkSize,
         prefix = HtmlDoctype,
