@@ -28,6 +28,7 @@ internal object ComposeProperties {
     internal const val DISABLE_HOT_RELOAD = "org.jetbrains.compose.hot.reload.disable"
     internal const val DISABLE_RESOURCE_CONTENT_HASH_GENERATION = "org.jetbrains.compose.resources.content.hash.generation.disable"
     internal const val DISABLE_LIBRARY_COMPATIBILITY_CHECK = "org.jetbrains.compose.library.compatibility.check.disable"
+    internal const val SUPPRESS_SKIKO_RUNTIME_WARNING = "compose.web.suppressSkikoRuntimeWarning"
 
     fun isVerbose(providers: ProviderFactory): Provider<Boolean> =
         providers.gradleProperty(VERBOSE).toBooleanProvider(false)
@@ -70,6 +71,9 @@ internal object ComposeProperties {
 
     fun disableLibraryCompatibilityCheck(providers: ProviderFactory): Provider<Boolean> =
         providers.gradleProperty(DISABLE_LIBRARY_COMPATIBILITY_CHECK).toBooleanProvider(false)
+
+    fun suppressSkikoRuntimeWarning(providers: ProviderFactory): Provider<Boolean> =
+        providers.gradleProperty(SUPPRESS_SKIKO_RUNTIME_WARNING).toBooleanProvider(false)
 
     //providers.gradleProperty works only with root gradle.properties
     fun dontSyncResources(project: Project): Provider<Boolean> =

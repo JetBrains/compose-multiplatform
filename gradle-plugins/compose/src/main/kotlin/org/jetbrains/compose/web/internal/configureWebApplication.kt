@@ -6,7 +6,6 @@
 package org.jetbrains.compose.web.internal
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedDependency
@@ -19,6 +18,8 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.gradle.language.jvm.tasks.ProcessResources
 import org.gradle.work.DisableCachingByDefault
+import org.jetbrains.compose.desktop.application.internal.ComposeProperties
+import org.jetbrains.compose.desktop.application.internal.ComposeProperties.SUPPRESS_SKIKO_RUNTIME_WARNING
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.utils.joinLowerCamelCase
@@ -136,6 +137,7 @@ private fun KotlinJsIrTarget.configureComposeUiTestExecutableCheck() {
         "checkComposeUiTestConfigurationFor$titledTargetName"
     ) {
         targetName.set(target.name)
+        enabled = !ComposeProperties.suppressSkikoRuntimeWarning(project.providers).get()
         // Computed lazily, after all `afterEvaluate`s: `binaries.executable()` may be declared
         // after this plugin runs, so the binaries set can still be empty here. Reading these
         // through providers (instead of in the task action) also keeps the task free of
@@ -159,10 +161,8 @@ private fun KotlinJsIrTarget.configureComposeUiTestExecutableCheck() {
 }
 
 /**
- * Compose UI browser tests must be bundled by webpack to load the Skiko runtime, which only
- * happens when the target declares an executable `binaries.executable()`. When a target that
- * depends on Skiko has no executable, this task fails with an actionable message instead of
- * letting the tests fail in a confusing way.
+ * Warns when browser tests may fail to load Skiko without `binaries.executable()`.
+ * A dependency on Skiko does not mean the tests use it, so this must not fail the build.
  */
 @DisableCachingByDefault(because = "Not worth caching: only validates the configuration")
 internal abstract class CheckComposeUiTestExecutableTask : DefaultTask() {
@@ -179,11 +179,12 @@ internal abstract class CheckComposeUiTestExecutableTask : DefaultTask() {
     fun check() {
         if (!hasExecutableBinary.get() && testDependsOnSkiko.get()) {
             val target = targetName.get()
-            throw GradleException(
-                "Compose UI tests for the '$target' target are not bundled with webpack: " +
-                        "no executable binary is declared, so the Skiko runtime required by Compose UI " +
-                        "cannot be loaded and the tests may fail. Add `binaries.executable()` to the " +
-                        "'$target' target. See https://youtrack.jetbrains.com/issue/CMP-4906"
+            logger.warn(
+                "The '$target' test compilation depends on Skiko, but no executable binary is declared. " +
+                        "Tests that use Compose UI or Skiko may fail to initialize the Skiko runtime. " +
+                        "If you encounter such failures, add `binaries.executable()` to the '$target' target. " +
+                        "See https://youtrack.jetbrains.com/issue/CMP-4906. " +
+                        "To suppress this warning, set `$SUPPRESS_SKIKO_RUNTIME_WARNING=true` in gradle.properties."
             )
         }
     }
