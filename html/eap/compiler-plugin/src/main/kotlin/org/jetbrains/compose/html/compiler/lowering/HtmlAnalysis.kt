@@ -24,6 +24,7 @@ import org.jetbrains.compose.web.dom.isHtmlRcdataElement
 import org.jetbrains.compose.web.dom.isHtmlVoidElement
 import org.jetbrains.compose.web.dom.isValidRawTextContent
 import org.jetbrains.compose.web.dom.normalizeHtmlInputCharacters
+import org.jetbrains.compose.web.dom.supportsPreparedHtmlAttributes
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.expressions.IrBlockBody
 import org.jetbrains.kotlin.ir.expressions.IrCall
@@ -76,6 +77,7 @@ internal class HtmlAnalysis(
         val movableChildren: List<HtmlChild>? by lazy(LazyThreadSafetyMode.NONE) {
             if (canMoveContent()) children else null
         }
+        val canMergeContent: Boolean get() = hasMergeableContent(element.tag, element.namespace)
         val html: StaticHtml? get() = encode(0) as? StaticHtml
         private var encoded: HtmlEncoding? = null
 
@@ -98,10 +100,8 @@ internal class HtmlAnalysis(
             if (noContent && element.attributes is MixedAttributes && tag != "noscript") return true
             val void = isHtmlVoidElement(tag, element.namespace)
             // Literal regions enter their root, a void root would never leave it.
-            if (!hasMovableContent(
-                    tag,
-                    element.namespace
-                ) || (void && element.attributes is LiteralAttributes)
+            if ((element.namespace == HtmlNamespace && !supportsPreparedHtmlAttributes(tag)) ||
+                (void && element.attributes is LiteralAttributes)
             ) return false
             if (noContent) return true
             val body = statements ?: return false
@@ -277,8 +277,8 @@ internal sealed class HtmlChild(val statement: IrStatement) {
     class Runtime(statement: IrStatement) : HtmlChild(statement)
 }
 
-// These tags allow content to move without changing how the parser or writer handles it.
-private fun hasMovableContent(tag: String, namespace: String): Boolean =
+// These tags allow child writes to merge without losing parser checks or text state.
+private fun hasMergeableContent(tag: String, namespace: String): Boolean =
     (namespace != HtmlNamespace || (tag != "noscript" && tag !in TableTags)) &&
             !isHtmlRawTextElement(tag, namespace) && !isHtmlRcdataElement(tag, namespace) &&
             !isHtmlLeadingNewlineElement(tag, namespace)

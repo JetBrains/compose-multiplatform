@@ -224,27 +224,33 @@ internal class HtmlStringWriterContext(
         encoded: String,
         innermost: String,
         validate: Boolean,
-        namespace: String = HtmlNamespace
+        namespace: String = HtmlNamespace,
+        leadingNewline: Boolean = false,
     ): Any? {
         checkNotFinished()
         if (discardingContent) return null
         beginChild(rootTag, validate)
         output.append(encoded)
-        val parent = enter(innermost, namespace, leadingNewline = false)
+        val parent = enter(innermost, namespace, leadingNewline)
         flushChunk()
         return parent
     }
 
     /** Only called by compiler plugin. The literal ends with a tag inside the region, so no text boundary is pending. */
     @PublishedApi
-    internal fun advanceLoweredRegion(encoded: String, innermost: String, namespace: String = HtmlNamespace) {
+    internal fun advanceLoweredRegion(
+        encoded: String,
+        innermost: String,
+        namespace: String = HtmlNamespace,
+        leadingNewline: Boolean = false,
+    ) {
         checkNotFinished()
         if (discardingContent) return
         output.append(encoded)
         currentTagName = innermost
         currentNamespace = namespace
         previousSiblingWasText = false
-        pendingLeadingNewline = false
+        pendingLeadingNewline = leadingNewline
         flushChunk()
     }
 
@@ -312,7 +318,11 @@ internal class HtmlStringWriterContext(
 
     /** Only called by compiler plugin. Enters the element after its attributes have been written. */
     @PublishedApi
-    internal fun finishMixedElement(tagName: String, namespace: String = HtmlNamespace): Any? {
+    internal fun finishMixedElement(
+        tagName: String,
+        namespace: String = HtmlNamespace,
+        leadingNewline: Boolean = false,
+    ): Any? {
         output.append('>')
         if (isHtmlVoidElement(tagName, namespace)) {
             previousSiblingWasText = false
@@ -320,7 +330,7 @@ internal class HtmlStringWriterContext(
             flushChunk()
             return null
         }
-        val parent = enter(tagName, namespace, leadingNewline = isHtmlLeadingNewlineElement(tagName, namespace))
+        val parent = enter(tagName, namespace, leadingNewline)
         flushChunk()
         return parent
     }
@@ -343,7 +353,8 @@ internal class HtmlStringWriterContext(
     }
 
     internal fun enter(tagName: String, namespace: String, leadingNewline: Boolean): Any? {
-        val parent = if (currentNamespace == HtmlNamespace) currentTagName
+        // The identity check keeps String.equals out of compiled region openings so the JVM can inline them.
+        val parent = if (currentNamespace === HtmlNamespace || currentNamespace == HtmlNamespace) currentTagName
         else ForeignParent(currentTagName, currentNamespace)
         if (currentTagName !== tagName) currentTagName = tagName
         if (currentNamespace !== namespace) currentNamespace = namespace

@@ -11,11 +11,13 @@ package org.jetbrains.compose.html.compiler.lowering
 import org.jetbrains.compose.html.compiler.HtmlSymbols
 import org.jetbrains.compose.html.compiler.ir.irCallWithArgs
 import org.jetbrains.compose.web.dom.escapeHtml
+import org.jetbrains.compose.web.dom.isHtmlLeadingNewlineElement
 import org.jetbrains.compose.web.dom.isHtmlVoidElement
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.builders.irBlock
+import org.jetbrains.kotlin.ir.builders.irBoolean
 import org.jetbrains.kotlin.ir.builders.irGet
 import org.jetbrains.kotlin.ir.builders.irIfThen
 import org.jetbrains.kotlin.ir.builders.irIfThenElse
@@ -147,7 +149,7 @@ internal class ElementLowering(
     ): IrExpression? {
         val node = analysis.analyze(element)
         node.html?.let { lowerStatic(it, builder, owner) }?.let { return it }
-        return lowerRegion(element, node.movableChildren ?: return null, builder, owner)
+        return lowerRegion(element, node, builder, owner)
     }
 
     /**
@@ -165,16 +167,21 @@ internal class ElementLowering(
      */
     private fun lowerRegion(
         element: HtmlElement,
-        children: List<HtmlChild>,
+        node: HtmlAnalysis.Node,
         builder: DeclarationIrBuilder,
         owner: IrSymbol,
     ): IrExpression? {
+        val children = node.movableChildren ?: return null
         val attributes = element.attributes
         if (attributes is MixedAttributes && !attributeWriter.canEmit(attributes)) return null
 
         val plan = RegionPlan(element.tag, element.namespace, attributes, remaining(owner))
         val planned = plan.element(element.tag, element.namespace, element.openingTag.orEmpty()) {
-            add(plan, children, depth = 0)
+            if (node.canMergeContent) add(plan, children, depth = 0)
+            else {
+                // Keep special-element children at runtime for parser checks and text boundaries.
+                for (child in children) plan.statement(child.statement)
+            }
             // Keep opening and closing separate when no runtime statement flushed the opening:
             // otherwise openLoweredRegion and closeElement would write the same chunk.
             if (attributes is LiteralAttributes && plan.operations.isEmpty()) plan.flush()
@@ -227,6 +234,7 @@ internal class ElementLowering(
     private fun absorb(plan: RegionPlan, node: HtmlAnalysis.Node, depth: Int, prefix: String = ""): Boolean {
         val html = node.html
         if (html != null && plan.tryAppend(html, prefix)) return true
+        if (!node.canMergeContent) return false
         if (depth >= MaxHtmlNestingDepth) return false
         val element = node.element
         val opening = element.openingTag ?: return false
@@ -246,7 +254,8 @@ internal class ElementLowering(
                     irCallWithArgs(
                         symbols.openLoweredRegion,
                         irGet(writer), irString(root), irString(first.html), irString(first.parent),
-                        irGet(validate), irString(first.namespace)
+                        irGet(validate), irString(first.namespace),
+                        irBoolean(isHtmlLeadingNewlineElement(first.parent, first.namespace))
                     )
                 }
 
@@ -267,7 +276,8 @@ internal class ElementLowering(
                         irGet(writer),
                         irString(operation.html),
                         irString(operation.parent),
-                        irString(operation.namespace)
+                        irString(operation.namespace),
+                        irBoolean(isHtmlLeadingNewlineElement(operation.parent, operation.namespace))
                     )
                 }
             }

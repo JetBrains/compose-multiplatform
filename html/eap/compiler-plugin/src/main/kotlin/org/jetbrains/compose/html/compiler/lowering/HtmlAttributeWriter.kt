@@ -12,6 +12,7 @@ import org.jetbrains.compose.html.compiler.HtmlSymbols
 import org.jetbrains.compose.html.compiler.ir.irCallWithArgs
 import org.jetbrains.compose.html.compiler.ir.unwrapReturn
 import org.jetbrains.compose.web.dom.escapeHtml
+import org.jetbrains.compose.web.dom.isHtmlLeadingNewlineElement
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.ir.IrStatement
@@ -129,7 +130,10 @@ internal class HtmlAttributeWriter(
             )
         }
         val parent = irTemporary(
-            irCallWithArgs(symbols.finishMixedElement, irGet(writer), irString(plan.tag), irString(plan.namespace)),
+            irCallWithArgs(
+                symbols.finishMixedElement, irGet(writer), irString(plan.tag), irString(plan.namespace),
+                irBoolean(isHtmlLeadingNewlineElement(plan.tag, plan.namespace))
+            ),
             "htmlParent"
         )
         if (plan.tag == "textarea") {

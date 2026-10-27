@@ -49,20 +49,27 @@ import org.jetbrains.kotlin.types.Variance
  * Caches constant attributes when an element still needs runtime rendering.
  * The attributes are stored in a shared field.
  *
+ * Need in cases like:
+ * - Content receiver references.
+ * - Labeled content returns.
+ * - Stored or nullable content.
+ *
  * ```kotlin
  * @Composable
- * fun SourceCode(code: @Composable () -> String) {
- *     Pre(attrs = { classes("source") }) {
- *         Text(code())
+ * fun Label(
+ *     text: @Composable ElementScope<HTMLSpanElement>.() -> String
+ * ) {
+ *     Span(attrs = { classes("label") }) {
+ *         Text(text()) // needs ElementScope receiver
  *     }
  * }
  * private val __htmlAttributes0 = /* prepared attributes */
  *
  * @Composable
- * fun SourceCode(code: @Composable () -> String) {
- *     PreparedTextElement(__htmlAttributes0) {
- *         code()
- *     }
+ * fun Label(
+ *     text: @Composable ElementScope<HTMLSpanElement>.() -> String
+ * ) {
+ *     PreparedTextElement(__htmlAttributes0) { text() }
  * }
  * ```
  */

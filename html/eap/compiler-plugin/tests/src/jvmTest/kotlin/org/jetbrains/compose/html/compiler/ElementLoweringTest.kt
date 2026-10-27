@@ -23,6 +23,7 @@ import org.jetbrains.compose.web.dom.Table
 import org.jetbrains.compose.web.dom.TagElement
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.dom.Title
+import org.jetbrains.org.objectweb.asm.ClassReader
 import org.jetbrains.org.objectweb.asm.MethodVisitor
 import org.jetbrains.org.objectweb.asm.Opcodes
 
@@ -57,7 +58,10 @@ class ElementLoweringTest {
         for (method in listOf("ComposableText", "RememberedText")) {
             val calls = calls(method)
             assertTrue(calls.containsAll(setOf("openLoweredRegion", "Text", "closeElement")), "$method: $calls")
-            assertFalse(calls.any { it in setOf("Span", "PreparedTextElement", "PreparedContainer") }, "$method: $calls")
+            assertFalse(
+                calls.any { it in setOf("Span", "PreparedTextElement", "PreparedContainer") },
+                "$method: $calls"
+            )
             assertFalse(calls.any { it.startsWith("composableLambda") }, "$method: $calls")
             assertTrue(fieldReads("DirectSamplesKt", method).isEmpty(), method)
         }
@@ -95,13 +99,11 @@ class ElementLoweringTest {
     }
 
     @Test
-    fun specialTagsAndLabeledReturnsKeepPreparedCalls() {
-        for ((method, helper) in mapOf(
-            "SpecialText" to "PreparedTextElement",
-            "ContainerReturn" to "PreparedContainer",
-        )) {
-            assertTrue(helper in calls(method), method)
-        }
+    fun specialTagsUseRegionsAndLabeledReturnsKeepPreparedCalls() {
+        assertTrue("openLoweredRegion" in calls("SpecialText"))
+        assertFalse("PreparedTextElement" in calls("SpecialText"))
+        assertTrue(fieldReads("DirectSamplesKt", "SpecialText").isEmpty())
+        assertTrue("PreparedContainer" in calls("ContainerReturn"))
         assertEquals("<div></div><div>shown</div>", composeHtmlToString {
             ContainerReturn(true) {}
             ContainerReturn(false) {}
@@ -295,4 +297,141 @@ class ElementLoweringTest {
 
     private fun runtimeCalls(method: String): Set<String> =
         methodCalls("PreparedSamplesKt", method, "org/jetbrains/compose/web/dom/").toSet()
+
+    @Test
+    fun specialElementsMatchOrdinaryRenderingAndValidation() {
+        comparison.assertEquivalent()
+    }
+
+    @Test
+    fun specialElementsUseWriterRegionsWithoutPreparedCalls() {
+        for (tag in tags) {
+            val method = methodName(tag)
+            val calls = classMethodCalls(comparison.bytecode).getValue(method)
+            assertTrue("openLoweredRegion" in calls, "$method: $calls")
+            assertTrue("closeElement" in calls, "$method: $calls")
+            assertFalse(calls.any { it in setOf("TagElement", "PreparedContainer", "PreparedTextElement") }, method)
+        }
+    }
+
+    @Test
+    fun writerRegionsUsePrecomputedNewlineFlags() {
+        val path = "/org/jetbrains/compose/web/dom/HtmlStringWriterContext.class"
+        val bytecode = requireNotNull(javaClass.getResourceAsStream(path)).use { ClassReader(it.readBytes()) }
+        val calls = classMethodCalls(bytecode)
+        for (method in listOf("openLoweredRegion", "advanceLoweredRegion", "finishMixedElement")) {
+            assertFalse("isHtmlLeadingNewlineElement" in calls.getValue(method), method)
+        }
+    }
+
+    companion object {
+        private val tags = listOf(
+            "pre", "textarea", "listing", "title",
+            "table", "caption", "colgroup", "thead", "tbody", "tfoot", "tr", "td", "th",
+        )
+
+        private fun methodName(tag: String): String = "Text" + tag.replaceFirstChar { it.uppercase() }
+
+        private val comparison by lazy {
+            val cases = tags.associate { tag ->
+                methodName(tag) to """
+                    TagElement<Element>("$tag", { classes("constant") }) {
+                        Text("")
+                        Text("\n")
+                        Text(Mark(name))
+                        Text("tail")
+                    }
+                    Text("after")
+                    Text("adjacent")
+                """.trimIndent()
+            } + mapOf(
+                "MixedLeadingNewline" to """
+                    Pre(attrs = { attr("title", Mark(name)) }) {
+                        Text("")
+                        Text(Mark("\n" + name))
+                    }
+                """.trimIndent(),
+                "ForeignLeadingNewlineNames" to """
+                    TagElementNS<Element>("pre", "urn:test", null) { Text(Mark("\n" + name)) }
+                    TagElementNS<Element>("textarea", "urn:test", { attr("title", name) }) {
+                        Text(Mark("\n" + name))
+                    }
+                """.trimIndent(),
+                "ChunkedSpecialOpening" to """
+                    Pre(attrs = { attr("title", "${"x".repeat(9_000)}") }) {
+                        Text(Mark("\n" + name))
+                    }
+                """.trimIndent(),
+                "LeadingNewlineAfterEmptyText" to """
+                    Pre {
+                        Text("")
+                        Text(Mark("\n" + name))
+                        Text("tail")
+                    }
+                """.trimIndent(),
+                "NestedSpecialElements" to """
+                    Div {
+                        Pre {
+                            Text(Mark("\n" + name))
+                            Span { Text(name) }
+                            Text("tail")
+                        }
+                        Title {
+                            Text("first")
+                            Text(name)
+                        }
+                        TagElement<Element>("textarea", { attr("title", name) }) {
+                            Text("")
+                            Text(Mark("\n" + name))
+                            Text("tail")
+                        }
+                    }
+                """.trimIndent(),
+                "TableValidationOrder" to """
+                    Table {
+                        Text(Mark(" "))
+                        Span { Text(Mark(name)) }
+                    }
+                """.trimIndent(),
+                "TableTextAfterStaticChild" to """
+                    Table {
+                        Tbody {
+                            Tr {
+                                Td { Text("constant") }
+                                Text(Mark(name))
+                            }
+                        }
+                    }
+                """.trimIndent(),
+                "TableCells" to """
+                    Table {
+                        Tbody {
+                            Tr {
+                                Td { Text(Mark(name)) }
+                                Th { Text(name) }
+                            }
+                        }
+                    }
+                """.trimIndent(),
+                "DiscardedSpecialElements" to """
+                    TagElement<Element>("input", null) {
+                        Pre { Text(Mark("\n" + name)) }
+                        Table { Tr { Text(Mark(name)) } }
+                    }
+                """.trimIndent(),
+                "ComposableSpecialText" to """
+                    Pre { Text(Value(name)) }
+                    Title { Text(Value(name)) }
+                """.trimIndent(),
+            )
+            LoweringComparison(
+                cases, declarations = """
+                @Composable private fun Value(name: String): String {
+                    Text("prefix")
+                    return Mark("\n" + name)
+                }
+            """.trimIndent()
+            )
+        }
+    }
 }
