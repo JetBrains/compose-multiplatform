@@ -20,6 +20,13 @@ _Changes since 1.13.0-alpha02_
 
 ### Desktop
 
+- `ComposePanel` with `RenderSettings.SwingGraphics` - pace with the display refresh rate. Disabled by default. To enable, use this: [#3498](https://github.com/JetBrains/compose-multiplatform-core/pull/3498)
+
+  ```
+  System.setProperty("skiko.swing.frame.pacing", "true")
+  // Optional, use system timer signals additionally to vsync display signals. Less precise, but might be needed for Linux systems
+  // System.setProperty("skiko.swing.frame.pacing.forceTimer", "true") 
+  ```
 - _(prerelease fix)_ Bump Compose Hot Reload to [1.3.0-beta02](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.3.0-beta02) [#5762](https://github.com/JetBrains/compose-multiplatform/pull/5762)
 
 ## Fixes

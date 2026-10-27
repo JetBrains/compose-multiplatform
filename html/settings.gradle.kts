@@ -108,6 +108,7 @@ if (composeHtmlEapEnabled) {
     includeBuild("eap/compiler-plugin/gradle-plugin") {
         name = "compose-html-lowering-gradle-plugin"
     }
+    module(":compiler-plugin-test-harness", "eap/plugin-test-harness")
     module(":html-core-eap", "eap/core")
     module(":html-eap-benchmarks", "eap/benchmarks")
     module(":html-svg-eap", "eap/svg")
