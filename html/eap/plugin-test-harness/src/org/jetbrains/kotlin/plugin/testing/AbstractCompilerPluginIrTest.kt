@@ -13,8 +13,8 @@ import java.io.File
  * Optional, test-framework-independent convenience layer over [CompilerPluginTestHarness].
  * Defaults are read when a helper is called, not during construction.
  *
- * Only modules created with [module] receive these defaults. Dependency modules passed to
- * [module] or [verify] are used as-is; their plugins and configuration are never changed.
+ * Only modules created with [module] receive these defaults. Modules passed to [verify],
+ * including their dependencies, are used as-is; their plugins and configuration are never changed.
  */
 abstract class AbstractCompilerPluginIrTest {
     /** Libraries added to the tested module's classpath, in addition to its automatic stdlib. */
@@ -50,28 +50,12 @@ abstract class AbstractCompilerPluginIrTest {
         },
     )
 
-    /** Compiles the tested module using class defaults and compares its IR with [goldenFile]. */
+    /** Compiles [module] as-is and compares its IR with [goldenFile]. */
     protected fun verify(
-        sources: List<KotlinSource>,
+        module: PluginTestModule,
         goldenFile: File,
-        name: String = "main",
-        dependencies: List<PluginTestModule> = emptyList(),
-        additionalClasspath: List<File> = emptyList(),
-        includeStdlib: Boolean = this.includeStdlib,
         mode: GoldenMode = GoldenMode.VERIFY,
-        configure: CompilerConfiguration.() -> Unit = {},
     ) {
-        CompilerPluginTestHarness(renderer).verify(
-            module(
-                sources = sources,
-                name = name,
-                dependencies = dependencies,
-                additionalClasspath = additionalClasspath,
-                includeStdlib = includeStdlib,
-                configure = configure,
-            ),
-            goldenFile,
-            mode,
-        )
+        CompilerPluginTestHarness(renderer).verify(module, goldenFile, mode)
     }
 }

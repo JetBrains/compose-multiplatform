@@ -35,6 +35,10 @@ tasks.test {
 
 ## Write a test
 
+For a complete, runnable starting point, copy
+[ExampleCompilerPluginIrTest.kt](test/org/jetbrains/kotlin/plugin/testing/ExampleCompilerPluginIrTest.kt)
+and its [golden](testData/example.txt). The sample plugin replaces integer constant `1` with `42`.
+
 Replace `MyPluginRegistrar` with your plugin's registrar.
 
 ```kotlin
@@ -50,7 +54,9 @@ class MyPluginTests : AbstractCompilerPluginIrTest() {
     @Test
     fun transformsFunction() {
         verify(
-            sources = listOf(KotlinSource("Example.kt", "fun answer(): Int = 1")),
+            module(
+                sources = listOf(KotlinSource("Example.kt", "fun answer(): Int = 1")),
+            ),
             goldenFile = File("src/test/resources/golden/function.txt"),
         )
     }
@@ -76,7 +82,9 @@ Alternatively, temporarily request an update inside the test:
 
 ```kotlin
 verify(
-    sources = listOf(KotlinSource("Example.kt", "fun answer(): Int = 1")),
+    module(
+        sources = listOf(KotlinSource("Example.kt", "fun answer(): Int = 1")),
+    ),
     goldenFile = File("src/test/resources/golden/function.txt"),
     mode = GoldenMode.UPDATE,
 )
@@ -86,20 +94,40 @@ Remove `mode = GoldenMode.UPDATE` after reviewing the new golden. Normal verific
 never rewrites expectations; missing, empty, or mismatched goldens fail when output differs.
 A successful verification removes stale `.actual` files. Commit goldens, not `.actual` files.
 
-## Share runtime libraries and compiler settings
+## Add a plugin runtime and share compiler settings
 
-Add your runtime as a Gradle test dependency, then locate it with a marker class.
-Replace the registrar, marker, and configuration key with your plugin's types.
+Suppose your runtime library already contains this annotation:
 
 ```kotlin
+// In the runtime library, not in the test sources:
+package my.plugin.runtime
+
+annotation class MyAnnotation
+```
+
+First, add the runtime to the consuming test project's `build.gradle.kts`:
+
+```kotlin
+dependencies {
+    testImplementation(project(":compiler-plugin-test-harness"))
+    testImplementation(project(":my-plugin-runtime")) // Or your runtime's Maven coordinate.
+}
+```
+
+Then add its location to the sources compiled by the harness. Replace the registrar and
+configuration key below with your plugin's types:
+
+```kotlin
+import my.plugin.runtime.MyAnnotation
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.plugin.testing.*
+import org.jetbrains.kotlin.plugin.testing.AbstractCompilerPluginIrTest
+import org.jetbrains.kotlin.plugin.testing.classpathEntryFor
 
 @OptIn(ExperimentalCompilerApi::class)
 abstract class MyPluginIrTest : AbstractCompilerPluginIrTest() {
     override val registrars = listOf(MyPluginRegistrar())
-    override val additionalClasspath = listOf(classpathEntryFor<MyRuntimeMarker>())
+    override val additionalClasspath = listOf(classpathEntryFor<MyAnnotation>())
 
     override fun CompilerConfiguration.configureCompiler() {
         put(MyPluginConfiguration.ENABLED, true)
@@ -107,9 +135,57 @@ abstract class MyPluginIrTest : AbstractCompilerPluginIrTest() {
 }
 ```
 
-`classpathEntryFor<T>()` returns only the JAR or classes directory containing `T`.
-Add entries for any other required libraries; it does not inherit the test runner's classpath
-or discover transitive dependencies.
+`classpathEntryFor<T>()` is a harness helper returning a `java.io.File`: the **JAR or compiled-classes
+directory containing `T`**. Use any existing annotation, class, or interface from the runtime;
+you do not need to create a special marker class.
+
+The two classpaths serve different purposes:
+- `testImplementation` makes `MyAnnotation` available to the **test runner**, so the helper can locate it.
+- `additionalClasspath` makes that library available to **Kotlin sources compiled by the harness**,
+  including references introduced by your plugin.
+
+The helper avoids hard-coded paths; it does not download libraries, add Gradle dependencies,
+or discover transitive libraries. Add each required library explicitly. Apart from automatic
+stdlib inclusion, the harness does not inherit the test runner's classpath.
+
+If you already know the runtime's path, use a `java.io.File` directly in your test base class:
+
+```kotlin
+override val additionalClasspath = listOf(File("libs/my-plugin-runtime.jar"))
+```
+
+## Example: Compose runtime
+
+Copy [ComposeRuntimeExampleTest.kt](test/org/jetbrains/kotlin/plugin/testing/ComposeRuntimeExampleTest.kt)
+and its [golden](testData/composeRuntime.txt) for an example with a custom registrar and an external runtime.
+Add this **test-only** dependency alongside the harness and your test framework:
+
+```kotlin
+dependencies {
+    testImplementation("org.jetbrains.compose.runtime:runtime:1.12.0")
+}
+```
+
+The test declares its own `TestRegistrar` in the same file and uses `Composable` to locate
+the runtime JAR:
+
+```kotlin
+override val registrars: List<CompilerPluginRegistrar> = listOf(TestRegistrar())
+override val additionalClasspath = listOf(classpathEntryFor<Composable>())
+```
+
+It compiles this annotated source, and the custom registrar replaces `1` with `42` in its IR:
+
+```kotlin
+import androidx.compose.runtime.Composable
+
+@Composable
+fun answer(): Int = 1
+```
+
+Compose supplies the annotation only; the custom registrar performs the transformation.
+No Compose compiler or Compose Gradle plugin is used, and no composition is executed.
+The harness's public API remains Compose-independent.
 
 ## Read source files and add per-test settings
 
@@ -119,15 +195,17 @@ Inside a subclass of `MyPluginIrTest`:
 @Test
 fun transformsMultipleFiles() {
     verify(
-        sources = listOf(
-            KotlinSource.fromFile(File("testData/Example.kt")),
-            KotlinSource.fromFile(File("testData/Helper.kt"), name = "helpers/Helper.kt"),
+        module(
+            sources = listOf(
+                KotlinSource.fromFile(File("testData/Example.kt")),
+                KotlinSource.fromFile(File("testData/Helper.kt"), name = "helpers/Helper.kt"),
+            ),
+            additionalClasspath = listOf(File("libs/extra-library.jar")),
+            configure = {
+                put(MyPluginConfiguration.ENABLED, false)
+            },
         ),
         goldenFile = File("src/test/resources/golden/multipleFiles.txt"),
-        additionalClasspath = listOf(classpathEntryFor<ExtraRuntimeMarker>()),
-        configure = {
-            put(MyPluginConfiguration.ENABLED, false)
-        },
     )
 }
 ```
@@ -151,8 +229,10 @@ fun transformsConsumer() {
     )
 
     verify(
-        sources = listOf(KotlinSource("Consumer.kt", "fun answer(): Int = lib.value()")),
-        dependencies = listOf(library),
+        module(
+            sources = listOf(KotlinSource("Consumer.kt", "fun answer(): Int = lib.value()")),
+            dependencies = listOf(library),
+        ),
         goldenFile = File("src/test/resources/golden/consumer.txt"),
     )
 }
@@ -180,7 +260,7 @@ fun transformsWithoutBaseClass() {
         name = "example",
         sources = listOf(KotlinSource("Example.kt", "fun answer(): Int = 1")),
         registrars = listOf(MyPluginRegistrar()),
-        classpath = listOf(classpathEntryFor<MyRuntimeMarker>()),
+        classpath = listOf(classpathEntryFor<MyAnnotation>()),
         configure = {
             put(MyPluginConfiguration.ENABLED, true)
         },
@@ -222,9 +302,11 @@ Inside a base-class test:
 
 ```kotlin
 verify(
-    sources = listOf(KotlinSource.fromFile(File("testData/WithoutStdlib.kt"))),
+    module(
+        sources = listOf(KotlinSource.fromFile(File("testData/WithoutStdlib.kt"))),
+        includeStdlib = false,
+    ),
     goldenFile = File("src/test/resources/golden/withoutStdlib.txt"),
-    includeStdlib = false,
 )
 ```
 
@@ -245,16 +327,25 @@ From the compose-multiplatform repository root, using JDK 17:
 html/gradlew -p html -Pcompose.html.eap.enabled=true :compiler-plugin-test-harness:test
 ```
 
-Regenerate this module's example golden explicitly:
+Regenerate the core harness test's `testData/replaceOne.txt` golden explicitly:
 
 ```shell
 html/gradlew -p html -Pcompose.html.eap.enabled=true :compiler-plugin-test-harness:test \
     -Pkotlin.plugin.tests.update.goldens=true
 ```
 
-That property updates this module's sample test only; it is not a global update switch for consumers.
+That property is handled only by `CompilerPluginTestHarnessTest`; it is not a global update switch.
+
+Run only the starter test:
+
+```shell
+html/gradlew -p html -Pcompose.html.eap.enabled=true :compiler-plugin-test-harness:test \
+    --tests org.jetbrains.kotlin.plugin.testing.ExampleCompilerPluginIrTest
+```
 
 Working examples:
+- [Copyable starter test and sample plugin](test/org/jetbrains/kotlin/plugin/testing/ExampleCompilerPluginIrTest.kt)
+- [Custom test registrar with Compose runtime](test/org/jetbrains/kotlin/plugin/testing/ComposeRuntimeExampleTest.kt)
 - [Plugin transformation, cross-module compilation, and classpaths](test/org/jetbrains/kotlin/plugin/testing/CompilerPluginTestHarnessTest.kt)
 - [Base-class defaults and per-test overrides](test/org/jetbrains/kotlin/plugin/testing/AbstractCompilerPluginIrTestTest.kt)
 - [Golden comparison and update behavior](test/org/jetbrains/kotlin/plugin/testing/GoldenFilesTest.kt)

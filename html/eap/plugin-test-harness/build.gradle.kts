@@ -16,6 +16,9 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.14.4"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // Only the example tests depend on Compose; the harness API remains Compose-independent.
+    testImplementation("org.jetbrains.compose.runtime:runtime:${rootProject.property("compose.version")}")
 }
 
 kotlin {

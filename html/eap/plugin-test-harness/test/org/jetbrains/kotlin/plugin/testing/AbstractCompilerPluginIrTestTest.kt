@@ -72,6 +72,22 @@ class AbstractCompilerPluginIrTestTest {
     }
 
     @Test
+    fun doesNotApplyClassDefaultsToExplicitTestModule() {
+        val calls = mutableListOf<Pair<String, Int?>>()
+        val fixture = Fixture(registrars = listOf(RecordingPlugin(calls)))
+        val module = PluginTestModule(
+            name = "explicit",
+            sources = listOf(KotlinSource("Test.kt", "fun answer() = 1")),
+            registrars = listOf(RecordingPlugin(calls)),
+            configure = { put(SETTING, 9) },
+        )
+
+        fixture.checkModule(module, File(directory, "explicit.txt"), mode = GoldenMode.UPDATE)
+
+        assertEquals(listOf("<explicit>" to 9), calls)
+    }
+
+    @Test
     fun doesNotApplyClassDefaultsToExplicitDependencies() {
         val calls = mutableListOf<Pair<String, Int?>>()
         val dependency = PluginTestModule(
@@ -135,6 +151,10 @@ class AbstractCompilerPluginIrTestTest {
 
         fun makeModule(name: String = "main"): PluginTestModule = module(sources, name)
 
+        fun checkModule(module: PluginTestModule, golden: File, mode: GoldenMode = GoldenMode.VERIFY) {
+            verify(module, golden, mode)
+        }
+
         fun check(
             golden: File,
             mode: GoldenMode = GoldenMode.VERIFY,
@@ -144,13 +164,15 @@ class AbstractCompilerPluginIrTestTest {
             configure: CompilerConfiguration.() -> Unit = {},
         ) {
             verify(
-                sources = sources,
+                module(
+                    sources = sources,
+                    dependencies = dependencies,
+                    additionalClasspath = extraClasspath,
+                    includeStdlib = includeStdlib,
+                    configure = configure,
+                ),
                 goldenFile = golden,
-                dependencies = dependencies,
-                additionalClasspath = extraClasspath,
-                includeStdlib = includeStdlib,
                 mode = mode,
-                configure = configure,
             )
         }
     }
