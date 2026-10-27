@@ -1,0 +1,144 @@
+// Source: main/formControlPrecedence.kt
+// ------------------------------------------
+/*
+ * Copyright 2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.web.attributes.InputType
+import org.jetbrains.compose.web.dom.Input
+
+@Composable
+fun <T> FormControlPrecedence(type: InputType<T>, value: String, selected: Boolean) {
+    Input(type = type) {
+        value(value)
+        defaultValue("default")
+        if (selected) checked(true) else checked(false)
+        onInput { }
+    }
+}
+
+
+// Transformed IR: main
+// ------------------------------------------
+// MODULE: <main>
+// FILE: formControlPrecedence.kt
+
+@Composable
+fun <T : Any?> FormControlPrecedence(type: InputType<T>, value: String, selected: Boolean) {
+  { // BLOCK
+    val tmp0_html_type: InputType<T> = type
+    { // BLOCK
+      val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
+      val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
+      val tmp19_htmlParent: Any? = when {
+        tmp0_htmlWriter.beginMixedElement(tagName = "input", validate = tmp1_htmlValidate) -> { // BLOCK
+          var tmp2_html_type: String? = null
+          var tmp3_html_value: String? = null
+          var tmp4_html_checked: String? = null
+          var tmp5_htmlAttributeOrder: Int = -1
+          var tmp6_htmlAttributeOrder: Int = -1
+          var tmp7_htmlAttributeOrder: Int = -1
+          var tmp8_htmlAttributeCount: Int = 0
+          var tmp9_htmlFormValue: String? = null
+          var tmp10_htmlFormChecked: Boolean? = null
+          { // BLOCK
+            { // BLOCK
+              val tmp11_htmlValue: String = tmp0_html_type.<get-typeStr>()
+              when {
+                EQEQ(arg0 = tmp2_html_type, arg1 = null) -> { // BLOCK
+                  tmp5_htmlAttributeOrder = tmp8_htmlAttributeCount
+                  tmp8_htmlAttributeCount = tmp8_htmlAttributeCount.plus(other = 1)
+                }
+              }
+              tmp2_html_type = tmp11_htmlValue
+            }
+          }
+          { // BLOCK
+            val tmp12_htmlFormValue: String = value
+            when {
+              inputValueIsAttribute(type = tmp0_html_type) -> { // BLOCK
+                val tmp13_htmlValue: String = tmp12_htmlFormValue
+                when {
+                  EQEQ(arg0 = tmp3_html_value, arg1 = null) -> { // BLOCK
+                    tmp6_htmlAttributeOrder = tmp8_htmlAttributeCount
+                    tmp8_htmlAttributeCount = tmp8_htmlAttributeCount.plus(other = 1)
+                  }
+                }
+                tmp3_html_value = tmp13_htmlValue
+              }
+              else -> tmp9_htmlFormValue = tmp12_htmlFormValue
+            }
+          } /*~> Unit */
+          { // BLOCK
+            { // BLOCK
+              val tmp14_htmlValue: String = "default"
+              when {
+                EQEQ(arg0 = tmp3_html_value, arg1 = null) -> { // BLOCK
+                  tmp6_htmlAttributeOrder = tmp8_htmlAttributeCount
+                  tmp8_htmlAttributeCount = tmp8_htmlAttributeCount.plus(other = 1)
+                }
+              }
+              tmp3_html_value = tmp14_htmlValue
+            }
+          } /*~> Unit */
+          when {
+            selected -> { // BLOCK
+              tmp10_htmlFormChecked = true
+            }
+            else -> { // BLOCK
+              tmp10_htmlFormChecked = false
+            }
+          } /*~> Unit */
+          { // BLOCK
+          }
+          when {
+            EQEQ(arg0 = tmp9_htmlFormValue, arg1 = null).not() -> { // BLOCK
+              val tmp15_htmlValue: String? = tmp9_htmlFormValue
+              when {
+                EQEQ(arg0 = tmp3_html_value, arg1 = null) -> { // BLOCK
+                  tmp6_htmlAttributeOrder = tmp8_htmlAttributeCount
+                  tmp8_htmlAttributeCount = tmp8_htmlAttributeCount.plus(other = 1)
+                }
+              }
+              tmp3_html_value = tmp15_htmlValue
+            }
+          }
+          when {
+            EQEQ(arg0 = tmp10_htmlFormChecked, arg1 = null).not() -> when {
+              EQEQ(arg0 = tmp10_htmlFormChecked, arg1 = true) -> { // BLOCK
+                val tmp16_htmlValue: String = ""
+                when {
+                  EQEQ(arg0 = tmp4_html_checked, arg1 = null) -> { // BLOCK
+                    tmp7_htmlAttributeOrder = tmp8_htmlAttributeCount
+                    tmp8_htmlAttributeCount = tmp8_htmlAttributeCount.plus(other = 1)
+                  }
+                }
+                tmp4_html_checked = tmp16_htmlValue
+              }
+              else -> tmp4_html_checked = null
+            }
+          }
+          tmp0_htmlWriter.writeMixedLiteral(encoded = "<input")
+          var tmp17_htmlAttributeIndex: Int = 0
+          while (EQEQ(arg0 = tmp17_htmlAttributeIndex, arg1 = tmp8_htmlAttributeCount).not()) { // BLOCK
+            when {
+              EQEQ(arg0 = tmp17_htmlAttributeIndex, arg1 = tmp5_htmlAttributeOrder) -> tmp0_htmlWriter.writeMixedAttribute(prefix = " type", value = tmp2_html_type, boolean = false)
+            }
+            when {
+              EQEQ(arg0 = tmp17_htmlAttributeIndex, arg1 = tmp6_htmlAttributeOrder) -> tmp0_htmlWriter.writeMixedAttribute(prefix = " value", value = tmp3_html_value, boolean = false)
+            }
+            when {
+              EQEQ(arg0 = tmp17_htmlAttributeIndex, arg1 = tmp7_htmlAttributeOrder) -> tmp0_htmlWriter.writeMixedAttribute(prefix = " checked", value = tmp4_html_checked, boolean = true)
+            }
+            tmp17_htmlAttributeIndex = tmp17_htmlAttributeIndex.plus(other = 1)
+          }
+          val tmp18_htmlParent: Any? = tmp0_htmlWriter.finishMixedElement(tagName = "input", namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+          tmp18_htmlParent
+        }
+        else -> null
+      }
+    }
+  }
+}

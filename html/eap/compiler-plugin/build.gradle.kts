@@ -39,6 +39,17 @@ java {
 dependencies {
     implementation(project(":internal-html-serialization-eap"))
     compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlinVersion")
+
+    testImplementation(project(":compiler-plugin-test-harness"))
+    testImplementation(project(":html-core-eap"))
+    testImplementation("org.jetbrains.compose.runtime:runtime:${rootProject.property("compose.version")}")
+    testImplementation(
+        "org.jetbrains.compose.html:kotlinx-browser-common-subset:" +
+                rootProject.property("compose.html.eap.kotlinx-browser-common-subset.version")
+    )
+    testImplementation(platform("org.junit:junit-bom:5.14.4"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 publishing {
@@ -54,4 +65,11 @@ tasks.named("check") {
         "$compilerPluginPath:tests:check",
         gradle.includedBuild("compose-html-lowering-gradle-plugin").task(":test")
     )
+}
+
+tasks.test {
+    useJUnitPlatform()
+    // Golden IR tests resolve testData/ paths relative to this directory.
+    workingDir = projectDir
+    inputs.dir("testData").withPathSensitivity(PathSensitivity.RELATIVE)
 }

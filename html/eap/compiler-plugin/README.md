@@ -44,3 +44,21 @@ htmlLowering {
 ```
 
 Currently, only JVM rendering is supported. Set it to `emptySet()` to disable lowering for all targets.
+
+## Test
+
+Golden IR tests compare the HTML plugin's output before Compose and JVM backend lowering.
+Source fixtures (`.kt`) and expected IR (`.txt`) live in [testData/ir](testData/ir).
+Run from the repository root with a JDK 11 toolchain available:
+
+```shell
+html/gradlew -p html -Pcompose.html.eap.enabled=true :compose-html-compiler-plugin:test
+```
+
+A mismatch writes a sibling `.txt.actual` file. Review the diff before accepting it.
+For example, from `html/eap/compiler-plugin`:
+
+```shell
+diff -u testData/ir/formControlPrecedence.txt testData/ir/formControlPrecedence.txt.actual
+cp testData/ir/formControlPrecedence.txt.actual testData/ir/formControlPrecedence.txt
+```

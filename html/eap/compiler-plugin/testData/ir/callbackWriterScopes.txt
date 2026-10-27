@@ -1,0 +1,85 @@
+// Source: main/callbackWriterScopes.kt
+// ------------------------------------------
+/*
+ * Copyright 2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ProvidableCompositionLocal
+import org.jetbrains.compose.web.dom.*
+
+@Composable
+fun CallbackWriterScopes(
+    values: List<String>,
+    local: ProvidableCompositionLocal<String>,
+    store: (@Composable () -> Unit) -> Unit,
+) {
+    Div {
+        values.forEachIndexed { index, value ->
+            if (value.isEmpty()) return@forEachIndexed
+            Span { Text("$index:$value") }
+            store { Span { Text("stored:$value") } }
+            CompositionLocalProvider(local provides value) {
+                values.forEach { nested ->
+                    Span { Text(nested) }
+                    Text(local.current)
+                }
+            }
+        }
+    }
+}
+
+
+// Transformed IR: main
+// ------------------------------------------
+// MODULE: <main>
+// FILE: callbackWriterScopes.kt
+
+@Composable
+fun CallbackWriterScopes(values: List<String>, local: ProvidableCompositionLocal<String>, store: Function1<@Composable Function0<Unit>, Unit>) {
+  { // BLOCK
+    val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
+    val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
+    val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "div", encoded = "<div>", innermost = "div", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+    forEachIndexed<String>(/* <this> = values, */ action = local fun <anonymous>(index: Int, value: String) {
+      when {
+        isEmpty(/* <this> = value */) -> return Unit
+      }
+      { // BLOCK
+        val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "span", encoded = "<span>", innermost = "span", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+        tmp0_htmlWriter.writeText(value = index + ":" + value, validate = tmp1_htmlValidate)
+        tmp0_htmlWriter.closeElement(encoded = "</span>", parent = tmp2_htmlParent)
+      }
+      store.invoke(p1 = local fun <anonymous>() {
+        { // BLOCK
+          val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
+          val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
+          val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "span", encoded = "<span>", innermost = "span", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+          tmp0_htmlWriter.writeText(value = "stored:" + value, validate = tmp1_htmlValidate)
+          tmp0_htmlWriter.closeElement(encoded = "</span>", parent = tmp2_htmlParent)
+        }
+      }
+)
+      CompositionLocalProvider(value = local.provides(value = value), content = local fun <anonymous>() {
+        { // BLOCK
+          val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
+          val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
+          forEach<String>(/* <this> = values, */ action = local fun <anonymous>(nested: String) {
+            { // BLOCK
+              val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "span", encoded = "<span>", innermost = "span", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+              tmp0_htmlWriter.writeText(value = nested, validate = tmp1_htmlValidate)
+              tmp0_htmlWriter.closeElement(encoded = "</span>", parent = tmp2_htmlParent)
+            }
+            Text(value = local.<get-current>())
+          }
+)
+        }
+      }
+)
+    }
+)
+    tmp0_htmlWriter.closeElement(encoded = "</div>", parent = tmp2_htmlParent)
+  }
+}

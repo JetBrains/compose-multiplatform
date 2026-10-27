@@ -1,0 +1,61 @@
+// Source: main/controlFlow.kt
+// ------------------------------------------
+/*
+ * Copyright 2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.web.dom.*
+
+@Composable
+fun ControlFlow(values: List<String>, show: Boolean) {
+    Div {
+        if (show) {
+            Span { Text("heading") }
+        }
+        for (value in values) {
+            if (value.isEmpty()) continue
+            Span { Text(value) }
+        }
+        Text("end")
+    }
+}
+
+
+// Transformed IR: main
+// ------------------------------------------
+// MODULE: <main>
+// FILE: controlFlow.kt
+
+@Composable
+fun ControlFlow(values: List<String>, show: Boolean) {
+  { // BLOCK
+    val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
+    val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
+    val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "div", encoded = "<div>", innermost = "div", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+    when {
+      show -> { // BLOCK
+        WriteStaticHtml(rootTag = "span", encoded = "<span>heading</span>")
+      }
+    }
+    { // BLOCK
+      val <iterator>: Iterator<String> = values.iterator()
+      while (<iterator>.hasNext()) { // BLOCK
+        val value: String = <iterator>.next()
+        { // BLOCK
+          when {
+            isEmpty(/* <this> = value */) -> continue
+          }
+          { // BLOCK
+            val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "span", encoded = "<span>", innermost = "span", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+            tmp0_htmlWriter.writeText(value = value, validate = tmp1_htmlValidate)
+            tmp0_htmlWriter.closeElement(encoded = "</span>", parent = tmp2_htmlParent)
+          }
+        }
+      }
+    }
+    tmp0_htmlWriter.writeText(value = "end", validate = tmp1_htmlValidate)
+    tmp0_htmlWriter.closeElement(encoded = "</div>", parent = tmp2_htmlParent)
+  }
+}

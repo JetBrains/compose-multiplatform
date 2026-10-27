@@ -33,6 +33,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v5
 
+      - name: Setup JDK 11 for compiler test harness
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+
       - name: Setup JDK 21
         uses: actions/setup-java@v4
         with:
@@ -62,4 +68,5 @@ jobs:
         working-directory: html
         run: |
           ./gradlew --no-daemon --stacktrace --max-workers=1 \
+            -Porg.gradle.java.installations.fromEnv=JAVA_HOME_11_X64 \
             -Pcompose.html.eap.enabled=true :compose-html-compiler-plugin:check
