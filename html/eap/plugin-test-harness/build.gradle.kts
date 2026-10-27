@@ -22,7 +22,7 @@ dependencies {
 }
 
 kotlin {
-    jvmToolchain(17)
+    jvmToolchain(11)
     sourceSets {
         main { kotlin.setSrcDirs(listOf("src")) }
         test { kotlin.setSrcDirs(listOf("test")) }
@@ -40,9 +40,4 @@ tasks.test {
         "kotlin.plugin.tests.update.goldens",
         providers.gradleProperty("kotlin.plugin.tests.update.goldens").getOrElse("false"),
     )
-}
-
-// The compiler runtime requires JDK 17; keep Java and Kotlin targets aligned despite the root's JVM 11 default.
-tasks.withType<KotlinCompile>().configureEach {
-    compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
 }
