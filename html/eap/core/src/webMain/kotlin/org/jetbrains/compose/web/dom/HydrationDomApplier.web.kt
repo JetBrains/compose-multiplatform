@@ -5,6 +5,9 @@
 
 @file:OptIn(kotlin.js.ExperimentalWasmJsInterop::class)
 
+// Access shared serialization helpers without exposing them as public API.
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.AbstractApplier

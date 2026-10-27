@@ -123,8 +123,13 @@ internal fun fieldReads(file: String, method: String): Set<Pair<String, String>>
 }
 
 internal inline fun forEachRenderMode(test: (strict: Boolean, hydratable: Boolean, stream: Boolean) -> Unit) {
-    for (strict in listOf(false, true)) for (hydratable in listOf(false, true)) for (stream in listOf(false, true)) {
-        test(strict, hydratable, stream)
+    val variants = listOf(false, true)
+    for (strict in variants) {
+        for (hydratable in variants) {
+            for (stream in variants) {
+                test(strict, hydratable, stream)
+            }
+        }
     }
 }
 
@@ -145,10 +150,10 @@ internal fun compileJvm(
     compose: Boolean = false,
 ): Pair<ExitCode, String> {
     val arguments = mutableListOf(
-        "-no-stdlib", "-no-reflect", "-jvm-target", "21", "-Xverify-ir=error",
+        "-no-stdlib", "-no-reflect", "-jvm-target", "11", "-Xverify-ir=error",
         "-classpath", classpath,
         "-d", output.path,
-        "-Xplugin=${System.getProperty("htmlLowering.pluginJar")}",
+        "-Xplugin=${System.getProperty("htmlLowering.pluginClasspath")}",
     )
     if (compose) {
         val composePlugin = File(ComposePluginRegistrar::class.java.protectionDomain.codeSource.location.toURI())
@@ -264,7 +269,9 @@ internal class LoweringComparison(
         """.trimIndent())
         appendLine("@Composable private fun sample(case: String, name: String) {")
         appendLine("    when (case) {")
-        for (name in cases.keys) appendLine("        \"$name\" -> $name(name)")
+        for (name in cases.keys) {
+            appendLine("        \"$name\" -> $name(name)")
+        }
         appendLine("    }")
         appendLine("}")
     }

@@ -9,7 +9,7 @@ Add the plugin to your module's `build.gradle.kts` alongside your existing Kotli
 
 ```kotlin
 plugins {
-    id("org.jetbrains.compose.html.lowering") version "0.0.1"
+    id("org.jetbrains.compose.html.lowering") version "<version>"
 }
 ```
 
@@ -26,7 +26,7 @@ pluginManagement {
     // Keep your existing plugin repositories here.
 }
 
-includeBuild("/path/to/html/eap/compiler-plugin")
+includeBuild("/path/to/html")
 ```
 
 For the local EAP runtime setup, see the [EAP README](../README.md).
@@ -36,10 +36,11 @@ For the local EAP runtime setup, see the [EAP README](../README.md).
 Optional settings in your module's `build.gradle.kts`:
 
 ```kotlin
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+
 htmlLowering {
-    enabled.set(false)        // Disable lowering by default.
-    targets.put("jvm", true)  // Enable it for a specific Kotlin target name.
+    enabledTargets.set(setOf(KotlinPlatformType.jvm, KotlinPlatformType.androidJvm))
 }
 ```
 
-Target settings override `enabled`. Currently, only JVM rendering is supported.
+Currently, only JVM rendering is supported. Set it to `emptySet()` to disable lowering for all targets.

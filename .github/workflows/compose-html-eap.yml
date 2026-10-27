@@ -52,12 +52,14 @@ jobs:
             :html-core-eap:check \
             :html-svg-eap:check \
             :internal-html-core-runtime-eap:check \
+            :internal-html-serialization-eap:check \
             :html-core-eap:publishToMavenLocal \
             :html-svg-eap:publishToMavenLocal \
-            :internal-html-core-runtime-eap:publishToMavenLocal
+            :internal-html-core-runtime-eap:publishToMavenLocal \
+            :internal-html-serialization-eap:publishToMavenLocal
 
       - name: Test HTML compiler and Gradle plugins, including browser hydration
         working-directory: html
         run: |
-          ./gradlew -p eap/compiler-plugin --no-daemon --stacktrace --max-workers=1 \
-            -Pcompose.html.eap.enabled=true check
+          ./gradlew --no-daemon --stacktrace --max-workers=1 \
+            -Pcompose.html.eap.enabled=true :compose-html-compiler-plugin:check

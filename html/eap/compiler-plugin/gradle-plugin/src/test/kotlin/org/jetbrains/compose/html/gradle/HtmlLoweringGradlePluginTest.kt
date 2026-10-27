@@ -9,6 +9,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -24,18 +25,24 @@ class HtmlLoweringGradlePluginTest {
     private val extension = project.extensions.getByType(HtmlLoweringExtension::class.java)
     private val compilations = listOf(
         kotlin.jvm("server"),
+        kotlin.jvm("otherServer"),
         kotlin.js("client").apply { browser() },
         kotlin.wasmJs("wasm").apply { browser() }
     ).flatMap { it.compilations.toList() }
 
     @Test
-    fun globalOverrideCanEnableOrDisableEveryTarget() {
-        extension.enabled.set(true)
+    fun onlyJvmTargetsAreEnabledByDefault() {
+        assertEquals(setOf(KotlinPlatformType.jvm), extension.enabledTargets.get())
         for (compilation in compilations) {
-            assertEquals(true, enabled(compilation))
-            assertEquals(compilation.target.name == "server", ordered(compilation))
+            val isJvm = compilation.platformType == KotlinPlatformType.jvm
+            assertEquals(isJvm, enabled(compilation))
+            assertEquals(isJvm, ordered(compilation))
         }
-        extension.enabled.set(false)
+    }
+
+    @Test
+    fun emptySetDisablesEveryTarget() {
+        extension.enabledTargets.set(emptySet())
         for (compilation in compilations) {
             assertEquals(false, enabled(compilation))
             assertFalse(ordered(compilation))
@@ -43,22 +50,34 @@ class HtmlLoweringGradlePluginTest {
     }
 
     @Test
-    fun namedTargetsOverrideGlobalSettingAndRemainLazy() {
+    fun platformSelectionReplacesDefaultsAndRemainsLazy() {
         val options = compilations.map { plugin.applyToCompilation(it) }
-        extension.enabled.set(false)
-        extension.targets.put("client", true)
+        compilations.forEach { it.compileTaskProvider.get() }
+        extension.enabledTargets.set(setOf(KotlinPlatformType.js))
         for ((compilation, provider) in compilations.zip(options)) {
             assertEquals(
-                (compilation.target.name == "client").toString(),
+                (compilation.platformType == KotlinPlatformType.js).toString(),
                 provider.get().single().value
             )
             assertFalse(ordered(compilation))
         }
-        extension.enabled.set(true)
-        extension.targets.put("server", false)
+        extension.enabledTargets.add(KotlinPlatformType.jvm)
+        for ((compilation, provider) in compilations.zip(options)) {
+            val isJvm = compilation.platformType == KotlinPlatformType.jvm
+            assertEquals(
+                (compilation.platformType != KotlinPlatformType.wasm).toString(),
+                provider.get().single().value
+            )
+            assertEquals(isJvm, ordered(compilation))
+        }
+    }
+
+    @Test
+    fun everyPlatformCanBeSelected() {
+        extension.enabledTargets.set(KotlinPlatformType.entries.toSet())
         for (compilation in compilations) {
-            assertEquals(compilation.target.name != "server", enabled(compilation))
-            assertFalse(ordered(compilation))
+            assertEquals(true, enabled(compilation))
+            assertEquals(compilation.platformType == KotlinPlatformType.jvm, ordered(compilation))
         }
     }
 
@@ -67,6 +86,5 @@ class HtmlLoweringGradlePluginTest {
             compilation.compileTaskProvider.get().compilerOptions.freeCompilerArgs.get()
 
     private fun enabled(compilation: KotlinCompilation<*>): Boolean =
-        plugin.applyToCompilation(compilation).get().singleOrNull()?.value?.toBooleanStrict()
-            ?: (compilation.target.name == "server")
+        plugin.applyToCompilation(compilation).get().single().value.toBooleanStrict()
 }

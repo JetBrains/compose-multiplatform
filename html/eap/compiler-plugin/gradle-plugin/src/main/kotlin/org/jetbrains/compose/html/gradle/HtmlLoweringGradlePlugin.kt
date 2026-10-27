@@ -22,7 +22,9 @@ private val pluginProperties = java.util.Properties().apply {
 /** Adds the HTML compiler plugin and the `htmlLowering` configuration. */
 class HtmlLoweringGradlePlugin : KotlinCompilerPluginSupportPlugin {
     override fun apply(target: Project) {
-        target.extensions.create("htmlLowering", HtmlLoweringExtension::class.java)
+        target.extensions.create("htmlLowering", HtmlLoweringExtension::class.java).apply {
+            enabledTargets.convention(setOf(KotlinPlatformType.jvm))
+        }
     }
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean =
@@ -38,9 +40,7 @@ class HtmlLoweringGradlePlugin : KotlinCompilerPluginSupportPlugin {
 
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
         val extension = kotlinCompilation.target.project.extensions.getByType(HtmlLoweringExtension::class.java)
-        val explicitEnabled = extension.targets.getting(kotlinCompilation.target.name)
-            .orElse(extension.enabled)
-        val enabled = explicitEnabled.orElse(kotlinCompilation.platformType == KotlinPlatformType.jvm)
+        val enabled = extension.enabledTargets.map { kotlinCompilation.platformType in it }
         val supportsLowering = kotlinCompilation.platformType in setOf(KotlinPlatformType.jvm, KotlinPlatformType.androidJvm)
         kotlinCompilation.compileTaskProvider.configure {
             it.compilerOptions.freeCompilerArgs.addAll(enabled.map { lower ->
@@ -50,11 +50,6 @@ class HtmlLoweringGradlePlugin : KotlinCompilerPluginSupportPlugin {
                 ) else emptyList()
             })
         }
-        // Let the compiler distinguish its default from an explicit opt-in.
-        // A runtime mismatch is an error only for an explicit opt-in.
-        // Disable other targets by default, including Android JVM.
-        val defaultOptions = if (kotlinCompilation.platformType == KotlinPlatformType.jvm) emptyList()
-        else listOf(SubpluginOption("enabled", "false"))
-        return explicitEnabled.map { listOf(SubpluginOption("enabled", it.toString())) }.orElse(defaultOptions)
+        return enabled.map { listOf(SubpluginOption("enabled", it.toString())) }
     }
 }

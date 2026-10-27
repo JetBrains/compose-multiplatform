@@ -5,7 +5,8 @@
 
 package org.jetbrains.compose.web.dom
 
-// Pure HTML rules shared with the compiler plugin.
+// HTML rules shared with the compiler plugin.
+
 @PublishedApi
 internal const val HtmlNamespace = "http://www.w3.org/1999/xhtml"
 

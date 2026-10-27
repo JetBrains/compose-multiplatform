@@ -89,7 +89,9 @@ class StaticLoweringTest {
             "<span title=\"-2147483648:true:42:A:null\">-3:1:8</span>" to ::renderPrimitiveExpressions,
             "<span>false:true</span>" to ::renderShortCircuitConstants,
         )
-        for ((expected, render) in cases) assertEquals(expected, render())
+        for ((expected, render) in cases) {
+            assertEquals(expected, render())
+        }
         assertEquals(
             cases.keys + setOf("<span>depth</span>"),
             staticHtmlConstants("ConstantSamplesKt"),

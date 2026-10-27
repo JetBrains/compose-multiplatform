@@ -49,6 +49,7 @@ subprojects {
         "html-core-eap",
         "html-svg-eap",
         "internal-html-core-runtime-eap",
+        "internal-html-serialization-eap",
     )
     if (isComposeHtmlEapProject) {
         group = "org.jetbrains.compose.html.eap"
@@ -107,6 +108,8 @@ subprojects {
                             "html-svg-eap" -> "JetBrains Compose HTML EAP SVG"
                             "internal-html-core-runtime-eap" ->
                                 "JetBrains Compose HTML EAP internal runtime"
+                            "internal-html-serialization-eap" ->
+                                "JetBrains Compose HTML EAP internal serialization"
                             else -> "JetBrains Compose HTML library"
                         }
                     )
@@ -118,6 +121,8 @@ subprojects {
                                 "Experimental commonized JetBrains Compose HTML SVG library"
                             "internal-html-core-runtime-eap" ->
                                 "Experimental commonized JetBrains Compose HTML internal runtime"
+                            "internal-html-serialization-eap" ->
+                                "Shared internal serialization rules for JetBrains Compose HTML EAP and its compiler plugin"
                             else -> "JetBrains Compose HTML library"
                         }
                     )

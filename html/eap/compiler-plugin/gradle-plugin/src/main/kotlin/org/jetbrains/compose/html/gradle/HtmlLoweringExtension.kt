@@ -5,30 +5,23 @@
 
 package org.jetbrains.compose.html.gradle
 
-import org.gradle.api.provider.MapProperty
-import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 /**
  * Configures HTML lowering for Kotlin compilations. Enabled by default for JVM targets.
  *
  * ```kotlin
  * htmlLowering {
- *     enabled.set(false)
- *     targets.put("jvm", true)
+ *     enabledTargets.set(setOf(KotlinPlatformType.jvm, KotlinPlatformType.androidJvm))
  * }
  * ```
  */
 abstract class HtmlLoweringExtension {
     /**
-     * Enables or disables lowering for all targets unless [targets] overrides it.
-     * If unset, only JVM targets are enabled. Android JVM targets require an explicit opt-in.
+     * Kotlin platform types for which lowering is enabled. Defaults to [KotlinPlatformType.jvm].
+     * Set to an empty set to disable lowering for all targets.
      * Enabling an unsupported compiler platform reports a warning and skips lowering.
      */
-    abstract val enabled: Property<Boolean>
-
-    /**
-     * Overrides [enabled] by Kotlin target name, such as `jvm`.
-     * Enabling a target still requires a supported compiler platform.
-     */
-    abstract val targets: MapProperty<String, Boolean>
+    abstract val enabledTargets: SetProperty<KotlinPlatformType>
 }

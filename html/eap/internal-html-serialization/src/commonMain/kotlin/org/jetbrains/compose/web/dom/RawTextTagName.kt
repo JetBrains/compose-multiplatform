@@ -5,6 +5,4 @@
 
 package org.jetbrains.compose.web.dom
 
-// Same region comparison as the JVM runtime.
-internal fun String.matchesRawTextTagName(start: Int, tagName: String): Boolean =
-    regionMatches(start, tagName, 0, tagName.length, ignoreCase = true)
+internal expect fun String.matchesRawTextTagName(start: Int, tagName: String): Boolean

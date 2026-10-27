@@ -5,6 +5,9 @@
 
 @file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
 
+// Access shared serialization helpers without exposing them as public API.
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
@@ -203,5 +206,3 @@ internal class RawTextContent private constructor(
         }
     }
 }
-
-internal expect fun String.matchesRawTextTagName(start: Int, tagName: String): Boolean

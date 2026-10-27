@@ -1,3 +1,6 @@
+// Access shared serialization helpers without exposing them as public API.
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
 package org.jetbrains.compose.web
 
 import androidx.compose.runtime.getValue

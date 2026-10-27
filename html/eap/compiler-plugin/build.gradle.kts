@@ -7,51 +7,48 @@ import java.util.Properties
 
 plugins {
     kotlin("jvm")
-    id("org.jetbrains.kotlin.plugin.compose") apply false
 }
 
 val pluginProperties = Properties().apply {
     file("plugin.properties").inputStream().use(::load)
 }
 val kotlinVersion = Properties().apply {
-    file("../../buildSrc/gradle.properties").inputStream().use(::load)
+    rootProject.file("buildSrc/gradle.properties").inputStream().use(::load)
 }.getProperty("kotlin.version")
 
 group = "org.jetbrains.compose.html"
 version = pluginProperties.getProperty("version")
 
-repositories {
-    mavenCentral()
-}
-
+val compilerPluginPath = path
 subprojects {
     // Resolve the compiler artifact from this build while developing the Gradle plugin.
     configurations.configureEach {
         resolutionStrategy.dependencySubstitution {
-            substitute(module("org.jetbrains.compose.html:compose-html-compiler-plugin")).using(project(":"))
+            substitute(module("org.jetbrains.compose.html:compose-html-compiler-plugin"))
+                .using(project(compilerPluginPath))
         }
     }
 }
 
-val sharedSerializationSources = tasks.register<Sync>("syncSerializationSources") {
-    from("../core/src/commonMain/kotlin") {
-        include("org/jetbrains/compose/web/dom/HtmlSerializationRules.kt")
-        include("org/jetbrains/compose/web/dom/RawTextTagName.kt")
-    }
-    into(layout.buildDirectory.dir("generated/serializationSources"))
-}
-
-kotlin {
-    jvmToolchain(21)
-    sourceSets.main {
-        kotlin.srcDir(sharedSerializationSources)
-    }
+// The HTML root build targets JVM 11. Gradle requires Java to use the same target.
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 dependencies {
+    implementation(project(":internal-html-serialization-eap"))
     compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlinVersion")
 }
 
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+        }
+    }
+}
+
 tasks.named("check") {
-    dependsOn(":tests:check", gradle.includedBuild("gradle-plugin").task(":test"))
+    dependsOn("$compilerPluginPath:tests:check", gradle.includedBuild("compose-html-lowering-gradle-plugin").task(":test"))
 }

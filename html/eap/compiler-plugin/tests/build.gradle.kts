@@ -15,26 +15,17 @@ plugins {
     id("org.jetbrains.compose.html.lowering")
 }
 
-repositories {
-    google()
-    mavenCentral()
-    maven("https://packages.jetbrains.team/maven/p/cmp/dev")
-}
+val compilerProject = project(":compose-html-compiler-plugin")
+val compilerJar = compilerProject.tasks.named<Jar>("jar").flatMap { it.archiveFile }
+val compilerPluginClasspath = files(compilerJar, compilerProject.configurations.named("runtimeClasspath"))
 
-val compilerJar = rootProject.tasks.named<Jar>("jar").flatMap { it.archiveFile }
-
-val htmlProperties = Properties().apply {
-    rootProject.file("../../gradle.properties").inputStream().use(::load)
-}
-val composeVersion = htmlProperties.getProperty("compose.version")
-val htmlVersion = htmlProperties.getProperty("compose.html.eap.version")
-val browserVersion = htmlProperties.getProperty("compose.html.eap.kotlinx-browser-common-subset.version")
+val composeVersion = providers.gradleProperty("compose.version").get()
+val browserVersion = providers.gradleProperty("compose.html.eap.kotlinx-browser-common-subset.version").get()
 val kotlinVersion = Properties().apply {
-    rootProject.file("../../buildSrc/gradle.properties").inputStream().use(::load)
+    rootProject.file("buildSrc/gradle.properties").inputStream().use(::load)
 }.getProperty("kotlin.version")
 
 kotlin {
-    jvmToolchain(21)
     jvm { compilerOptions { freeCompilerArgs.add("-Xverify-ir=error") } }
     js { browser { testTask { useKarma { useChromeHeadless() } } } }
     wasmJs { browser { testTask { useKarma { useChromeHeadless() } } } }
@@ -44,8 +35,8 @@ kotlin {
         commonTest.dependencies {
             implementation(kotlin("test"))
             implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
-            implementation("org.jetbrains.compose.html.eap:html-core-eap:$htmlVersion")
-            implementation("org.jetbrains.compose.html.eap:html-svg-eap:$htmlVersion")
+            implementation(project(":html-core-eap"))
+            implementation(project(":html-svg-eap"))
             implementation("org.jetbrains.compose.html:kotlinx-browser-common-subset:$browserVersion")
         }
         jvmTest.dependencies {
@@ -60,8 +51,11 @@ kotlin {
 
 // The comparison suites compile their own samples with lowering both enabled and disabled.
 tasks.withType<KotlinJvmTest>().configureEach {
-    inputs.file(compilerJar)
-    doFirst { systemProperty("htmlLowering.pluginJar", compilerJar.get().asFile.absolutePath) }
+    jvmArgs("-Xss2m") // needed for nested tests to pass on workflow
+    inputs.files(compilerPluginClasspath)
+    doFirst {
+        systemProperty("htmlLowering.pluginClasspath", compilerPluginClasspath.files.joinToString(",") { it.absolutePath })
+    }
 }
 
 val jvmTest = kotlin.targets.getByName("jvm").compilations.getByName("test")
