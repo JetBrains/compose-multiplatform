@@ -91,7 +91,7 @@ internal class HtmlAnalysis(
         }
 
         // Moving the body must preserve parser behavior and must not need the original lambda's
-        // receiver or return target. A single dynamic Text call is left for prepared-element lowering.
+        // receiver or return target.
         private fun canMoveContent(): Boolean {
             val tag = element.tag
             // Empty elements have no child parser rules to preserve. The mixed writer checks their parent.
@@ -109,9 +109,7 @@ internal class HtmlAnalysis(
             if (void && body.isNotEmpty()) return false
             val references = requireNotNull(element.content).contentScopeReferences()
             if (function.symbol in references || function.parameters.any { it.symbol in references }) return false
-            // Preserve the specialized prepared element for a single composable text value.
-            val text = body.singleOrNull() as? IrCall
-            return text == null || text.symbol != symbols.text || symbols.isPlainText(text)
+            return true
         }
     }
 

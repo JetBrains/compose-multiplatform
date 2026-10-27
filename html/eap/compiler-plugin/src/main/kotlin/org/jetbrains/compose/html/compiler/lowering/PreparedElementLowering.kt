@@ -51,17 +51,17 @@ import org.jetbrains.kotlin.types.Variance
  *
  * ```kotlin
  * @Composable
- * fun UserName(name: @Composable () -> String) {
- *     Span(attrs = { classes("user") }) {
- *         Text(name())
+ * fun SourceCode(code: @Composable () -> String) {
+ *     Pre(attrs = { classes("source") }) {
+ *         Text(code())
  *     }
  * }
  * private val __htmlAttributes0 = /* prepared attributes */
  *
  * @Composable
- * fun UserName(name: @Composable () -> String) {
+ * fun SourceCode(code: @Composable () -> String) {
  *     PreparedTextElement(__htmlAttributes0) {
- *         name()
+ *         code()
  *     }
  * }
  * ```

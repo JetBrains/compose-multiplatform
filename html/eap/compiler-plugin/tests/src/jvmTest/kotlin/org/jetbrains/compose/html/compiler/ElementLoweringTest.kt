@@ -12,6 +12,7 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlinx.browser.dom.HTMLDivElement
+import kotlinx.browser.dom.HTMLElement
 import org.jetbrains.compose.web.composeHtmlToString
 import org.jetbrains.compose.web.dom.ContentBuilder
 import org.jetbrains.compose.web.dom.Div
@@ -19,6 +20,7 @@ import org.jetbrains.compose.web.dom.Iframe
 import org.jetbrains.compose.web.dom.Pre
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Table
+import org.jetbrains.compose.web.dom.TagElement
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.dom.Title
 import org.jetbrains.org.objectweb.asm.MethodVisitor
@@ -51,18 +53,56 @@ class ElementLoweringTest {
     }
 
     @Test
-    fun specialTagsComposableValuesAndLabeledReturnsKeepPreparedCalls() {
+    fun composableTextUsesRegionsWithoutPreparedAttributesOrContentLambdas() {
+        for (method in listOf("ComposableText", "RememberedText")) {
+            val calls = calls(method)
+            assertTrue(calls.containsAll(setOf("openLoweredRegion", "Text", "closeElement")), "$method: $calls")
+            assertFalse(calls.any { it in setOf("Span", "PreparedTextElement", "PreparedContainer") }, "$method: $calls")
+            assertFalse(calls.any { it.startsWith("composableLambda") }, "$method: $calls")
+            assertTrue(fieldReads("DirectSamplesKt", method).isEmpty(), method)
+        }
+        assertTrue("<span class=\"user\">" in methodStrings("DirectSamplesKt", "ComposableText"))
+    }
+
+    @Test
+    fun composableTextPreservesEffectsNestedTextAndDiscardedContent() {
+        forEachRenderMode { strict, hydratable, stream ->
+            val effects = mutableListOf<String>()
+            val boundary = if (hydratable) "<!--c-->" else ""
+            val expected = "before<span class=\"user\">prefix${boundary}&lt;&amp;</span>" +
+                    "<span>remembered</span><input>after${boundary}adjacent"
+            val actual = render(strict, hydratable, stream) {
+                Text("before")
+                ComposableText {
+                    effects.add("value")
+                    Text("prefix")
+                    "<&"
+                }
+                RememberedText("remembered")
+                TagElement<HTMLElement>("input", null) {
+                    ComposableText {
+                        effects.add("discarded")
+                        Text("discarded")
+                        "discarded"
+                    }
+                }
+                Text("after")
+                Text("adjacent")
+            }
+            assertEquals(expected, actual)
+            assertEquals(listOf("value", "discarded"), effects)
+        }
+    }
+
+    @Test
+    fun specialTagsAndLabeledReturnsKeepPreparedCalls() {
         for ((method, helper) in mapOf(
             "SpecialText" to "PreparedTextElement",
-            "ComposableText" to "PreparedTextElement",
-            "RememberedText" to "PreparedTextElement",
             "ContainerReturn" to "PreparedContainer",
         )) {
             assertTrue(helper in calls(method), method)
         }
-        assertEquals("<span>composed</span><span>remembered</span><div></div><div>shown</div>", composeHtmlToString {
-            ComposableText { "composed" }
-            RememberedText("remembered")
+        assertEquals("<div></div><div>shown</div>", composeHtmlToString {
             ContainerReturn(true) {}
             ContainerReturn(false) {}
         })

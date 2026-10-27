@@ -53,7 +53,7 @@ private fun DirectFooter(effect: (String) -> Unit) {
 
 @Composable
 fun ComposableText(value: @Composable () -> String) {
-    Span { Text(value()) }
+    Span(attrs = { classes("user") }) { Text(value()) }
 }
 
 @Composable
