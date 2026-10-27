@@ -105,6 +105,7 @@ module(":html-test-utils", "test-utils")
 
 if (composeHtmlEapEnabled) {
     println("Compose HTML EAP modules enabled")
+    module(":compiler-plugin-test-harness", "eap/plugin-test-harness")
     module(":html-core-eap", "eap/core")
     module(":html-eap-benchmarks", "eap/benchmarks")
     module(":html-svg-eap", "eap/svg")

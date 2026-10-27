@@ -1,0 +1,16 @@
+// Source: main/Example.kt
+// ------------------------------------------
+import androidx.compose.runtime.Composable
+
+@Composable
+fun answer(): Int = 1
+
+// Transformed IR: main
+// ------------------------------------------
+// MODULE: <main>
+// FILE: Example.kt
+
+@Composable
+fun answer(): Int {
+  return 42
+}
