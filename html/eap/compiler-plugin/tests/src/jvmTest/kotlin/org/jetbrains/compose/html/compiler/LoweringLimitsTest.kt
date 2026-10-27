@@ -15,6 +15,14 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import org.jetbrains.compose.html.compiler.samples.InvalidLargeRawFragment
+import org.jetbrains.compose.html.compiler.samples.LargeDirectAttribute
+import org.jetbrains.compose.html.compiler.samples.LargeLeadingNewlineFragment
+import org.jetbrains.compose.html.compiler.samples.LargePreparedAttribute
+import org.jetbrains.compose.html.compiler.samples.LargeRawFragment
+import org.jetbrains.compose.html.compiler.samples.LargeStaticPage
+import org.jetbrains.compose.html.compiler.samples.LargeTableFragment
+import org.jetbrains.compose.html.compiler.samples.LargeUnicodeFragment
 import org.jetbrains.compose.web.composeHtmlToStream
 import org.jetbrains.compose.web.composeHtmlToString
 import org.jetbrains.compose.web.dom.*
@@ -36,7 +44,7 @@ class LoweringLimitsTest {
 
     @Test
     fun literalAppendsBeginEachLogicalFragmentOnceWithoutFieldsOrJoins() {
-        val fields = Class.forName("${javaClass.packageName}.LargeFragmentSamplesKt").declaredFields
+        val fields = Class.forName("${javaClass.packageName}.samples.LargeFragmentKt").declaredFields
         assertFalse(fields.any { it.name.startsWith("__html") })
         for (method in listOf(
             "LargeUnicodeFragment", "LargeStaticPage", "LargeRawFragment",
@@ -44,7 +52,7 @@ class LoweringLimitsTest {
         )) {
             val calls = mutableListOf<String>()
             val literals = mutableListOf<String>()
-            sampleBytecode("LargeFragmentSamplesKt").accept(object : ClassVisitor(Opcodes.ASM9) {
+            sampleBytecode("LargeFragmentKt").accept(object : ClassVisitor(Opcodes.ASM9) {
                 override fun visitMethod(
                     access: Int,
                     name: String,
@@ -204,7 +212,7 @@ class LoweringLimitsTest {
             )
             assertEquals(expected, bytes.toString(Charsets.UTF_8))
         }
-        val fields = Class.forName("${javaClass.packageName}.LargeAttributeSamplesKt").declaredFields
+        val fields = Class.forName("${javaClass.packageName}.samples.LargeAttributeKt").declaredFields
             .filter { it.name.startsWith("__htmlString") }
         assertEquals(2, fields.size)
         for (field in fields) {
@@ -248,7 +256,7 @@ class LoweringLimitsTest {
 
     @Test
     fun functionAndFileBudgetsFallBackWithoutChangingOutput() {
-        val calls = classMethodCalls(comparison.bytecode("sample.BudgetSamplesKt"))
+        val calls = classMethodCalls(comparison.bytecode("sample.BudgetKt"))
         for (index in 0..8) {
             assertEquals(
                 if (index < 8) 64 else 0,
@@ -264,7 +272,7 @@ class LoweringLimitsTest {
 
     @Test
     fun regionsKeepTheirOuterPlanWhenChildrenExceedBudgets() {
-        val calls = classMethodCalls(comparison.bytecode("sample.RegionBudgetSamplesKt"))
+        val calls = classMethodCalls(comparison.bytecode("sample.RegionBudgetKt"))
         for (method in listOf("RegionChunkBudget", "RegionLengthBudget")) {
             val methodCalls = calls.getValue(method)
             val batches = methodCalls.count { it in setOf("openLoweredRegion", "advanceLoweredRegion", "closeElement") }
@@ -305,8 +313,8 @@ class LoweringLimitsTest {
                 ),
                 matrixCases = emptySet(),
                 extraSources = mapOf(
-                    "BudgetSamples.kt" to imports + "private const val BudgetText = \"${"x".repeat(8_001)}\"\n" + fragments,
-                    "RegionBudgetSamples.kt" to imports + "private const val RegionText = \"${"x".repeat(8_000)}\"\n" +
+                    "Budget.kt" to imports + "private const val BudgetText = \"${"x".repeat(8_001)}\"\n" + fragments,
+                    "RegionBudget.kt" to imports + "private const val RegionText = \"${"x".repeat(8_000)}\"\n" +
                             "@Composable fun RegionChunkBudget(value: String) { Div {\n" +
                             "Span { Text(value) }\n".repeat(150) + "} }\n" +
                             "@Composable fun RegionLengthBudget() { Div {\n" +

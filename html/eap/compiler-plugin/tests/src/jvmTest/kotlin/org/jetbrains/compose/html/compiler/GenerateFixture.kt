@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.html.compiler
 
+import org.jetbrains.compose.html.compiler.samples.LargeStaticHydration
 import org.jetbrains.compose.web.composeHtmlToString
 import org.jetbrains.compose.web.composeHtmlToStream
 import java.io.File

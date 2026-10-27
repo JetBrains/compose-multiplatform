@@ -13,6 +13,20 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlinx.browser.dom.HTMLDivElement
 import kotlinx.browser.dom.HTMLElement
+import org.jetbrains.compose.html.compiler.samples.ComposableText
+import org.jetbrains.compose.html.compiler.samples.ContainerReturn
+import org.jetbrains.compose.html.compiler.samples.ContentReturn
+import org.jetbrains.compose.html.compiler.samples.DirectContainer
+import org.jetbrains.compose.html.compiler.samples.DirectGreeting
+import org.jetbrains.compose.html.compiler.samples.OversizedLiteral
+import org.jetbrains.compose.html.compiler.samples.PreparedAttributes
+import org.jetbrains.compose.html.compiler.samples.PreparedContainer
+import org.jetbrains.compose.html.compiler.samples.PreparedDynamicText
+import org.jetbrains.compose.html.compiler.samples.PreparedGetter
+import org.jetbrains.compose.html.compiler.samples.PreparedLiteralText
+import org.jetbrains.compose.html.compiler.samples.PreparedUser
+import org.jetbrains.compose.html.compiler.samples.RememberedText
+import org.jetbrains.compose.html.compiler.samples.__htmlAttributes0
 import org.jetbrains.compose.web.composeHtmlToString
 import org.jetbrains.compose.web.dom.ContentBuilder
 import org.jetbrains.compose.web.dom.Div
@@ -63,9 +77,9 @@ class ElementLoweringTest {
                 "$method: $calls"
             )
             assertFalse(calls.any { it.startsWith("composableLambda") }, "$method: $calls")
-            assertTrue(fieldReads("DirectSamplesKt", method).isEmpty(), method)
+            assertTrue(fieldReads("DirectElementsKt", method).isEmpty(), method)
         }
-        assertTrue("<span class=\"user\">" in methodStrings("DirectSamplesKt", "ComposableText"))
+        assertTrue("<span class=\"user\">" in methodStrings("DirectElementsKt", "ComposableText"))
     }
 
     @Test
@@ -102,7 +116,7 @@ class ElementLoweringTest {
     fun specialTagsUseRegionsAndLabeledReturnsKeepPreparedCalls() {
         assertTrue("openLoweredRegion" in calls("SpecialText"))
         assertFalse("PreparedTextElement" in calls("SpecialText"))
-        assertTrue(fieldReads("DirectSamplesKt", "SpecialText").isEmpty())
+        assertTrue(fieldReads("DirectElementsKt", "SpecialText").isEmpty())
         assertTrue("PreparedContainer" in calls("ContainerReturn"))
         assertEquals("<div></div><div>shown</div>", composeHtmlToString {
             ContainerReturn(true) {}
@@ -137,16 +151,16 @@ class ElementLoweringTest {
 
     @Test
     fun staticChildrenMergeIntoOpeningAndClosingTags() {
-        val constants = methodStrings("DirectSamplesKt", "DirectContainer")
+        val constants = methodStrings("DirectElementsKt", "DirectContainer")
         assertTrue("<div class=\"container\"><span>head</span>" in constants)
         assertTrue("<span>tail</span></div>" in constants)
         assertTrue("<span>middle</span><span>sibling</span>" in constants)
     }
 
-    private fun calls(method: String): Set<String> = methodCalls("DirectSamplesKt", method).toSet()
+    private fun calls(method: String): Set<String> = methodCalls("DirectElementsKt", method).toSet()
 
     private fun visitMethod(method: String, visitor: MethodVisitor) =
-        visitSampleMethod("DirectSamplesKt", method, visitor)
+        visitSampleMethod("DirectElementsKt", method, visitor)
 
     @Test
     fun selectsExpectedLoweringPathsAndRetainsUnsupportedAttributes() {
@@ -168,7 +182,7 @@ class ElementLoweringTest {
         assertTrue("finishMixedElement" in runtimeCalls("AttributeEffects"))
         assertEquals(
             setOf("<span class=\"label\">&lt;&amp;&#13;😀</span>"),
-            staticHtmlConstants("PreparedSamplesKt", "PreparedLiteralText"),
+            staticHtmlConstants("PreparedElementsKt", "PreparedLiteralText"),
         )
     }
 
@@ -296,7 +310,7 @@ class ElementLoweringTest {
     }
 
     private fun runtimeCalls(method: String): Set<String> =
-        methodCalls("PreparedSamplesKt", method, "org/jetbrains/compose/web/dom/").toSet()
+        methodCalls("PreparedElementsKt", method, "org/jetbrains/compose/web/dom/").toSet()
 
     @Test
     fun specialElementsMatchOrdinaryRenderingAndValidation() {

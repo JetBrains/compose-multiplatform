@@ -5,7 +5,7 @@
 
 @file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
 
-package org.jetbrains.compose.html.compiler
+package org.jetbrains.compose.html.compiler.samples
 
 import androidx.compose.runtime.Composable
 import kotlinx.browser.dom.HTMLElement

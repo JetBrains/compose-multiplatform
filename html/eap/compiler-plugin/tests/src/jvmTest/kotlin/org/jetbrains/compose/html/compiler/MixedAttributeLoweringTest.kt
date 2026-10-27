@@ -5,6 +5,24 @@
 
 package org.jetbrains.compose.html.compiler
 
+import org.jetbrains.compose.html.compiler.samples.MixedBranches
+import org.jetbrains.compose.html.compiler.samples.MixedButton
+import org.jetbrains.compose.html.compiler.samples.MixedCard
+import org.jetbrains.compose.html.compiler.samples.MixedControlledInput
+import org.jetbrains.compose.html.compiler.samples.MixedEncodedClasses
+import org.jetbrains.compose.html.compiler.samples.MixedFallback
+import org.jetbrains.compose.html.compiler.samples.MixedFractionalStyle
+import org.jetbrains.compose.html.compiler.samples.MixedInput
+import org.jetbrains.compose.html.compiler.samples.MixedInputMemberAttributes
+import org.jetbrains.compose.html.compiler.samples.MixedInputStyle
+import org.jetbrains.compose.html.compiler.samples.MixedInvalid
+import org.jetbrains.compose.html.compiler.samples.MixedLiteralPrefix
+import org.jetbrains.compose.html.compiler.samples.MixedOverwrite
+import org.jetbrains.compose.html.compiler.samples.MixedSelectStyle
+import org.jetbrains.compose.html.compiler.samples.MixedStyleBranches
+import org.jetbrains.compose.html.compiler.samples.MixedStyleFallback
+import org.jetbrains.compose.html.compiler.samples.MixedStyleOverride
+import org.jetbrains.compose.html.compiler.samples.MixedTooltip
 import org.jetbrains.compose.web.composeHtmlToString
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -23,7 +41,7 @@ class MixedAttributeLoweringTest {
                 )
             }
         }
-        val strings = methodStrings("MixedSamplesKt", "MixedLiteralPrefix")
+        val strings = methodStrings("MixedAttributesKt", "MixedLiteralPrefix")
         assertTrue("<div id=\"card\" title=\"&lt;&amp;&quot;\"" in strings)
         assertFalse("<div" in strings)
     }
@@ -327,5 +345,5 @@ class MixedAttributeLoweringTest {
         assertTrue("Div" in calls("MixedStyleFallback"))
     }
 
-    private fun calls(method: String): Set<String> = methodCalls("MixedSamplesKt", method).toSet()
+    private fun calls(method: String): Set<String> = methodCalls("MixedAttributesKt", method).toSet()
 }

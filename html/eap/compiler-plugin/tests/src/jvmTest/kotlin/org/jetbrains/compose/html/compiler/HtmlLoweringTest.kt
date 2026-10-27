@@ -14,6 +14,10 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertSame
 import kotlinx.browser.dom.HTMLElement
+import org.jetbrains.compose.html.compiler.samples.SharedPage
+import org.jetbrains.compose.html.compiler.samples.UserDefinedPage
+import org.jetbrains.compose.html.compiler.samples.customTagCalls
+import org.jetbrains.compose.html.compiler.samples.sharedContent
 import org.jetbrains.compose.web.composeHtmlToStream
 import org.jetbrains.compose.web.composeHtmlToString
 import org.jetbrains.compose.web.dom.*
@@ -23,11 +27,11 @@ private val htmlAtInitialization = composeHtmlToString { Span { Text("initialize
 class HtmlLoweringTest {
     @Test
     fun standaloneFunctionsAndStoredContentFollowTheCompilerOption() {
-        val fields = Class.forName("${javaClass.packageName}.SupportSamplesKt").declaredFields
+        val fields = Class.forName("${javaClass.packageName}.samples.CrossFileSupportKt").declaredFields
         assertFalse(fields.any { it.name.startsWith("__html") })
         assertEquals(
             setOf("<span>shared lambda</span>", "<span>shared function</span>"),
-            staticHtmlConstants("SupportSamplesKt"),
+            staticHtmlConstants("CrossFileSupportKt"),
         )
         assertEquals("<span>initialized</span>", htmlAtInitialization)
         assertEquals("<span>shared lambda</span>", composeHtmlToString(content = sharedContent))

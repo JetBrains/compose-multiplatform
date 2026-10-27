@@ -11,6 +11,20 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import org.jetbrains.compose.html.compiler.samples.ConstantRepeat
+import org.jetbrains.compose.html.compiler.samples.EffectfulRepeat
+import org.jetbrains.compose.html.compiler.samples.EmptyConstantRepeats
+import org.jetbrains.compose.html.compiler.samples.IndexedRepeat
+import org.jetbrains.compose.html.compiler.samples.LargeRepeat
+import org.jetbrains.compose.html.compiler.samples.LoopCallbacks
+import org.jetbrains.compose.html.compiler.samples.LoopRows
+import org.jetbrains.compose.html.compiler.samples.LoopTextBoundaries
+import org.jetbrains.compose.html.compiler.samples.LoopValidationScope
+import org.jetbrains.compose.html.compiler.samples.NestedLoops
+import org.jetbrains.compose.html.compiler.samples.ShadowedRepeat
+import org.jetbrains.compose.html.compiler.samples.TopLevelForEach
+import org.jetbrains.compose.html.compiler.samples.TopLevelLoop
+import org.jetbrains.compose.html.compiler.samples.TopLevelLoopText
 import org.jetbrains.compose.web.composeHtmlToString
 import org.jetbrains.org.objectweb.asm.ClassVisitor
 import org.jetbrains.org.objectweb.asm.Label
@@ -26,7 +40,7 @@ class ControlFlowLoweringTest {
             val jumps = mutableListOf<Pair<Int, Label>>()
             val contextReads = mutableListOf<Int>()
             var position = 0
-            sampleBytecode("LoopSamplesKt").accept(object : ClassVisitor(Opcodes.ASM9) {
+            sampleBytecode("LoopRenderingKt").accept(object : ClassVisitor(Opcodes.ASM9) {
                 override fun visitMethod(
                     access: Int,
                     name: String,
@@ -117,7 +131,7 @@ class ControlFlowLoweringTest {
     fun onlyBoundedStaticRepeatsFold() {
         val html = "<div>" + "<span>&lt;&amp;</span>".repeat(3) + "</div>"
         assertEquals(html, composeHtmlToString { ConstantRepeat() })
-        assertTrue(html in staticHtmlConstants("LoopSamplesKt", "ConstantRepeat"))
+        assertTrue(html in staticHtmlConstants("LoopRenderingKt", "ConstantRepeat"))
         var effects = 0
         assertEquals("<div></div>", composeHtmlToString { EmptyConstantRepeats { effects++ } })
         assertEquals(0, effects)
@@ -129,7 +143,7 @@ class ControlFlowLoweringTest {
         assertEquals(
             "<div>" + "<span>&lt;&amp;</span>".repeat(10_000) + "</div>",
             composeHtmlToString { LargeRepeat() })
-        assertTrue(staticHtmlConstants("LoopSamplesKt", "LargeRepeat").none { it.length > 8_000 })
+        assertTrue(staticHtmlConstants("LoopRenderingKt", "LargeRepeat").none { it.length > 8_000 })
     }
 
     @Test

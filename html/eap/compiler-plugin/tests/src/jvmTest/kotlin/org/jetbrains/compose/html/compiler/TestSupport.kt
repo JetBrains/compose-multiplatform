@@ -80,8 +80,10 @@ internal fun staticHtmlConstants(file: String, method: String? = null): Set<Stri
 private object TestResources
 
 internal fun sampleBytecode(file: String): ClassReader {
-    val path = "/${TestResources::class.java.packageName.replace('.', '/')}/$file.class"
-    return requireNotNull(TestResources::class.java.getResourceAsStream(path)).use { ClassReader(it.readBytes()) }
+    val path = "/${TestResources::class.java.packageName.replace('.', '/')}/"
+    val stream = TestResources::class.java.getResourceAsStream("${path}samples/$file.class")
+        ?: TestResources::class.java.getResourceAsStream("$path$file.class")
+    return requireNotNull(stream).use { ClassReader(it.readBytes()) }
 }
 
 internal fun visitMethods(reader: ClassReader, method: String? = null, visitor: (String) -> MethodVisitor) {

@@ -5,7 +5,7 @@
 
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
-package org.jetbrains.compose.html.compiler
+package org.jetbrains.compose.html.compiler.samples
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider

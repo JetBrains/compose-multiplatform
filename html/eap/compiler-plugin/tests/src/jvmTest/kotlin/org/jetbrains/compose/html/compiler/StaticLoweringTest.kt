@@ -12,6 +12,30 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 import kotlinx.browser.dom.HTMLSpanElement
+import org.jetbrains.compose.html.compiler.samples.EquivalentFragment
+import org.jetbrains.compose.html.compiler.samples.EquivalentLiteral
+import org.jetbrains.compose.html.compiler.samples.FragmentWithoutBoundary
+import org.jetbrains.compose.html.compiler.samples.OrderedAttributes
+import org.jetbrains.compose.html.compiler.samples.PreparedLiteralText
+import org.jetbrains.compose.html.compiler.samples.ReorderedAttributes
+import org.jetbrains.compose.html.compiler.samples.SharedContainer
+import org.jetbrains.compose.html.compiler.samples.SharedDynamic
+import org.jetbrains.compose.html.compiler.samples.SharedFragment
+import org.jetbrains.compose.html.compiler.samples.SharedLiteral
+import org.jetbrains.compose.html.compiler.samples.constantRuntimeCalls
+import org.jetbrains.compose.html.compiler.samples.renderAfterConstantDepthLimit
+import org.jetbrains.compose.html.compiler.samples.renderConstantExpressions
+import org.jetbrains.compose.html.compiler.samples.renderCrossFileConstants
+import org.jetbrains.compose.html.compiler.samples.renderEffectfulAlias
+import org.jetbrains.compose.html.compiler.samples.renderMutableAlias
+import org.jetbrains.compose.html.compiler.samples.renderOrdinaryVal
+import org.jetbrains.compose.html.compiler.samples.renderPrimitiveExpressions
+import org.jetbrains.compose.html.compiler.samples.renderRuntimeGetters
+import org.jetbrains.compose.html.compiler.samples.renderShadowedConstant
+import org.jetbrains.compose.html.compiler.samples.renderShortCircuitConstants
+import org.jetbrains.compose.html.compiler.samples.renderThrowingExpression
+import org.jetbrains.compose.html.compiler.samples.renderUserToString
+import org.jetbrains.compose.html.compiler.samples.sharedInitialization
 import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
 import org.jetbrains.compose.web.composeHtmlToString
@@ -94,7 +118,7 @@ class StaticLoweringTest {
         }
         assertEquals(
             cases.keys + setOf("<span>depth</span>"),
-            staticHtmlConstants("ConstantSamplesKt"),
+            staticHtmlConstants("ConstantExpressionsKt"),
         )
     }
 
@@ -129,28 +153,28 @@ class StaticLoweringTest {
             "SharedDynamic", "SharedContainer", "SharedAttributesOtherTag",
             "SameTagOtherType", "OrderedAttributes", "ReorderedAttributes", "FirstClassMetadata", "SecondClassMetadata"
         )
-        val reads = methods.associateWith { fieldReads("SharingSamplesKt", it) }
+        val reads = methods.associateWith { fieldReads("StaticSharingKt", it) }
         assertTrue(reads.values.all { it.isEmpty() })
 
         assertEquals(
-            staticHtmlConstants("SharingSamplesKt", "SharedLiteral"),
-            staticHtmlConstants("SharingSamplesKt", "EquivalentLiteral")
+            staticHtmlConstants("StaticSharingKt", "SharedLiteral"),
+            staticHtmlConstants("StaticSharingKt", "EquivalentLiteral")
         )
         assertNotEquals(
-            staticHtmlConstants("SharingSamplesKt", "SharedLiteral"),
-            staticHtmlConstants("SharingSamplesKt", "DistinctLiteral")
+            staticHtmlConstants("StaticSharingKt", "SharedLiteral"),
+            staticHtmlConstants("StaticSharingKt", "DistinctLiteral")
         )
         assertEquals(
-            staticHtmlConstants("SharingSamplesKt", "SharedFragment"),
-            staticHtmlConstants("SharingSamplesKt", "EquivalentFragment")
+            staticHtmlConstants("StaticSharingKt", "SharedFragment"),
+            staticHtmlConstants("StaticSharingKt", "EquivalentFragment")
         )
         assertNotEquals(
-            staticHtmlConstants("SharingSamplesKt", "SharedFragment"),
-            staticHtmlConstants("SharingSamplesKt", "FragmentWithoutBoundary")
+            staticHtmlConstants("StaticSharingKt", "SharedFragment"),
+            staticHtmlConstants("StaticSharingKt", "FragmentWithoutBoundary")
         )
 
-        assertTrue(fieldReads("PreparedSamplesKt", "PreparedSharedAttributes").isEmpty())
-        val fields = Class.forName("${javaClass.packageName}.SharingSamplesKt").declaredFields
+        assertTrue(fieldReads("PreparedElementsKt", "PreparedSharedAttributes").isEmpty())
+        val fields = Class.forName("${javaClass.packageName}.samples.StaticSharingKt").declaredFields
         assertEquals(0, fields.count { it.name.startsWith("__htmlAttributes") })
     }
 
@@ -194,7 +218,7 @@ class StaticLoweringTest {
     fun staticTreesCompileToInlinedBuilderAppends() {
         var appends = 0
         var bridgeCalls = 0
-        sampleBytecode("SharingSamplesKt").accept(object : ClassVisitor(Opcodes.ASM9) {
+        sampleBytecode("StaticSharingKt").accept(object : ClassVisitor(Opcodes.ASM9) {
             override fun visitMethod(
                 access: Int,
                 name: String,

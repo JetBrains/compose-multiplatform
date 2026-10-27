@@ -19,6 +19,7 @@ import kotlinx.browser.dom.HTMLElement
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.promise
+import org.jetbrains.compose.html.compiler.samples.LargeStaticHydration
 import org.jetbrains.compose.web.composeHtmlToString
 import org.jetbrains.compose.web.hydrateComposable
 import org.jetbrains.compose.web.renderComposable

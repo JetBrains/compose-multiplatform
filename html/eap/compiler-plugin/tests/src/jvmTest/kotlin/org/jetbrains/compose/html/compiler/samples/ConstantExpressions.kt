@@ -3,24 +3,24 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.html.compiler
+package org.jetbrains.compose.html.compiler.samples
 
 import org.jetbrains.compose.web.composeHtmlToString
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
-import org.jetbrains.compose.html.compiler.APP_NAME as applicationName
-import org.jetbrains.compose.html.compiler.CARD_CLASS
-import org.jetbrains.compose.html.compiler.COUNT
-import org.jetbrains.compose.html.compiler.Tokens.SUFFIX
+import org.jetbrains.compose.html.compiler.samples.APP_NAME as applicationName
+import org.jetbrains.compose.html.compiler.samples.CARD_CLASS
+import org.jetbrains.compose.html.compiler.samples.COUNT
+import org.jetbrains.compose.html.compiler.samples.Tokens.SUFFIX
 
 private const val SAME_FILE = "same"
 
 fun renderCrossFileConstants() = composeHtmlToString {
     Div(attrs = {
         classes(CARD_CLASS)
-        id(org.jetbrains.compose.html.compiler.Theme.ID)
-        attr(org.jetbrains.compose.html.compiler.ATTRIBUTE, SAME_FILE + SUFFIX)
+        id(org.jetbrains.compose.html.compiler.samples.Theme.ID)
+        attr(org.jetbrains.compose.html.compiler.samples.ATTRIBUTE, SAME_FILE + SUFFIX)
     }) {
         Span { Text(applicationName) }
     }
