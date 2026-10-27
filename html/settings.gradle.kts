@@ -19,7 +19,8 @@ pluginManagement {
 
     val repos = (localProperties?.getProperty("compose.web.repos"))?.split(File.pathSeparator)
 
-    val buildSrcProperties: java.util.Properties = properties(rootProject.projectDir.resolve("buildSrc/gradle.properties").absolutePath)!!
+    val buildSrcProperties: java.util.Properties =
+        properties(rootProject.projectDir.resolve("buildSrc/gradle.properties").absolutePath)!!
     val kotlinVersion = buildSrcProperties["kotlin.version"] as String
 
     repositories {

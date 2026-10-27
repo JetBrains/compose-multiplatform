@@ -15,6 +15,7 @@ internal fun requireHtmlParserStableTableChild(parentTagName: String?, child: St
         is StringHtmlTextNode -> {
             requireHtmlParserStableTableText(parentTagName, child.text)
         }
+
         is StringHtmlRawTextNode -> {
             requireHtmlParserStableTableText(parentTagName, child.content.text)
         }

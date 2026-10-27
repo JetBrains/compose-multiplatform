@@ -158,7 +158,7 @@ private const val InvalidHtmlAttributeNameCharacters = " \"'/>="
 private fun requireValidHtmlAttributeName(name: String) {
     require(
         name.isNotEmpty() &&
-            name.none { it.isISOControl() || it in InvalidHtmlAttributeNameCharacters }
+                name.none { it.isISOControl() || it in InvalidHtmlAttributeNameCharacters }
     ) {
         "Invalid HTML attribute name: \"$name\""
     }

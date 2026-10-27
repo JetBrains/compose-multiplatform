@@ -68,7 +68,10 @@ class MixedAttributeLoweringTest {
                 }
                 val attributes =
                     if (first) " title=\"last\" aria-label=\"label\"" else " aria-label=\"label\" title=\"last\""
-                assertEquals("<div$attributes class=\"${if (explicit) "class" else "dynamic card"}\">body</div>", actual)
+                assertEquals(
+                    "<div$attributes class=\"${if (explicit) "class" else "dynamic card"}\">body</div>",
+                    actual
+                )
                 assertEquals(
                     (if (first) listOf("first") else emptyList()) + listOf("label", "last") + if (explicit) listOf(
                         "class"
@@ -235,10 +238,20 @@ class MixedAttributeLoweringTest {
                 )
             }
         }
-        for (method in listOf("MixedTooltip", "MixedFractionalStyle", "MixedStyleBranches", "MixedStyleOverride", "MixedInputStyle", "MixedSelectStyle")) {
+        for (method in listOf(
+            "MixedTooltip",
+            "MixedFractionalStyle",
+            "MixedStyleBranches",
+            "MixedStyleOverride",
+            "MixedInputStyle",
+            "MixedSelectStyle"
+        )) {
             val calls = calls(method)
             assertTrue("writeMixedStyle" in calls, "$method: $calls")
-            assertFalse(calls.any { it in setOf("Span", "Div", "Input", "Select", "style", "TagElement") }, "$method: $calls")
+            assertFalse(
+                calls.any { it in setOf("Span", "Div", "Input", "Select", "style", "TagElement") },
+                "$method: $calls"
+            )
         }
     }
 

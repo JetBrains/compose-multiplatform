@@ -4,7 +4,9 @@
  */
 
 @file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+
 package org.jetbrains.compose.web.dom
+
 import androidx.compose.runtime.Composable
 import kotlinx.browser.dom.HTMLElement
 import org.jetbrains.compose.web.composeHtmlToString
@@ -32,6 +34,7 @@ class PreparedHtmlAttributesTest {
                                 )
                                 return output.toString()
                             }
+
                             val expected = render {
                                 Pre {
                                     TagElement<HTMLElement>(tag, null) { Text(value) }
@@ -53,22 +56,34 @@ class PreparedHtmlAttributesTest {
         }
     }
 
-    @Test fun preparedAttributesAndTextMatchOrdinaryRendering() {
-        val attrs = preparedHtmlAttributes<HTMLElement>("div", "<div id=\"x&amp;\" class=\"a&amp; b\">") { classes("a&", "b"); id("x&") }
+    @Test
+    fun preparedAttributesAndTextMatchOrdinaryRendering() {
+        val attrs = preparedHtmlAttributes<HTMLElement>("div", "<div id=\"x&amp;\" class=\"a&amp; b\">") {
+            classes(
+                "a&",
+                "b"
+            ); id("x&")
+        }
         val text = "é😀<&>"
         for (strict in listOf(false, true)) {
-            assertEquals("<div id=\"x&amp;\" class=\"a&amp; b\">é😀&lt;&amp;&gt;</div>",
+            assertEquals(
+                "<div id=\"x&amp;\" class=\"a&amp; b\">é😀&lt;&amp;&gt;</div>",
                 composeHtmlToString(validateStrictly = strict) { PreparedTextElement(attrs) { text } })
         }
     }
-    @Test fun changingTextUnderOneKeyDoesNotReuseEarlierValues() {
+
+    @Test
+    fun changingTextUnderOneKeyDoesNotReuseEarlierValues() {
         val attrs = preparedHtmlAttributes<HTMLElement>("div", "<div class=\"stable\">") { classes("stable") }
         for (value in listOf("first", "<&second", "", "é😀")) {
-            assertEquals(composeHtmlToString { Div(attrs = { classes("stable") }) { Text(value) } },
+            assertEquals(
+                composeHtmlToString { Div(attrs = { classes("stable") }) { Text(value) } },
                 composeHtmlToString(key = "static-changing-text") { PreparedTextElement(attrs) { value } })
         }
     }
-    @Test fun incorrectEncodedDataAndUnsupportedTagsAreRejected() {
+
+    @Test
+    fun incorrectEncodedDataAndUnsupportedTagsAreRejected() {
         assertFailsWith<IllegalArgumentException> { preparedHtmlAttributes<HTMLElement>("div", "<div injected>") {} }
         for (tag in listOf("bad tag", "script", "style", "iframe", "area", "meta", "noscript")) {
             assertFailsWith<IllegalArgumentException>(tag) {
@@ -76,18 +91,27 @@ class PreparedHtmlAttributesTest {
             }
         }
     }
-    @Test fun aDifferentTagUsesTheOrdinaryAttributeCallback() {
+
+    @Test
+    fun aDifferentTagUsesTheOrdinaryAttributeCallback() {
         val attrs = preparedHtmlAttributes<HTMLElement>("div", "<div id=\"x\">") { id("x") }
         assertEquals("<span id=\"x\">value</span>", composeHtmlToString {
             TagElement<HTMLElement>("span", attrs.callback) { Text("value") }
         })
     }
 
-    @Test fun parserChecksAndFailureRecoveryStillApplyToStaticLeaves() {
+    @Test
+    fun parserChecksAndFailureRecoveryStillApplyToStaticLeaves() {
         val div = preparedHtmlAttributes<HTMLElement>("div", "<div>") {}
         val tr = preparedHtmlAttributes<HTMLElement>("tr", "<tr>") {}
         assertFailsWith<IllegalArgumentException> {
-            composeHtmlToString(key = "static-parser-recovery", validateStrictly = true) { Table { PreparedTextElement(div) { "invalid child" } } }
+            composeHtmlToString(key = "static-parser-recovery", validateStrictly = true) {
+                Table {
+                    PreparedTextElement(
+                        div
+                    ) { "invalid child" }
+                }
+            }
         }
         assertFailsWith<IllegalArgumentException> {
             composeHtmlToString(validateStrictly = true) { Table { Tbody { PreparedTextElement(tr) { "text" } } } }
@@ -104,7 +128,8 @@ class PreparedHtmlAttributesTest {
         assertFailsWith<IllegalArgumentException> { composeHtmlToString { PreparedTextElement(div) { "bad\u0000" } } }
     }
 
-    @Test fun streamingAndTextBoundariesMatchTheOrdinaryPath() {
+    @Test
+    fun streamingAndTextBoundariesMatchTheOrdinaryPath() {
         val attrs = preparedHtmlAttributes<HTMLElement>("div", "<div class=\"x\">") { classes("x") }
         val text = "\n<&é😀"
         val expected = composeHtmlToString {

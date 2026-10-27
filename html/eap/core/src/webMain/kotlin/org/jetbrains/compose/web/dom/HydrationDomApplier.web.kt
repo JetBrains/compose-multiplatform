@@ -59,6 +59,7 @@ internal class HydrationDomApplier(
     private val nodesWithClaimedRawChildren = NativeNodeSet()
     private val mergedTextsToInitialize = NativeNodeSet()
     private val allowedTextsToInitialize = NativeNodeSet()
+
     // Boundary markers and formatting-only root text must remain in place until hydration succeeds.
     private val nodesToRemoveAfterHydration = mutableListOf<Node>()
     private val pendingTextsToInsert = mutableListOf<PendingText>()
@@ -100,6 +101,7 @@ internal class HydrationDomApplier(
                     pendingDomMutations += { text.data = value }
                 }
             }
+
             State.Complete -> if (!text.matchesText(value)) text.data = value
             State.Aborted -> Unit
         }
@@ -203,6 +205,7 @@ internal class HydrationDomApplier(
                 }
                 candidate
             }
+
             value.isEmpty() || allowed -> {
                 // Empty text is omitted from string rendering but still needs a DOM node. An
                 // allowed mismatch can also be empty on the server and present on the client.
@@ -214,6 +217,7 @@ internal class HydrationDomApplier(
                     )
                 }
             }
+
             else -> mismatchAtChild(
                 "text()",
                 index,
@@ -553,7 +557,7 @@ private fun elementMismatchDescription(
     found: Node?,
 ): String = if (found is Element && found.namespaceURI != expectedNamespace) {
     "expected <$expectedLocalName> in namespace ${expectedNamespace.quoted()}, " +
-        "found <${found.localName}> in namespace ${found.namespaceURI?.quoted() ?: "null"}"
+            "found <${found.localName}> in namespace ${found.namespaceURI?.quoted() ?: "null"}"
 } else {
     "expected <$expectedLocalName>, found ${found.describe()}"
 }
@@ -567,6 +571,7 @@ private fun Node?.describe(): String = when (this) {
     } else {
         "<!--$data-->"
     }
+
     else -> nodeName
 }
 

@@ -112,7 +112,8 @@ internal class WriterScopeSharing(
         if (scope != null && symbols.isPlainText(expression)) {
             val visited = super.visitCall(expression) as IrCall
             val builder = builder(expression)
-            return builder.irCallWithArgs(symbols.writeText,
+            return builder.irCallWithArgs(
+                symbols.writeText,
                 builder.irGet(scope.writer), visited.arguments.single(), builder.irGet(scope.validate)
             )
         }
@@ -154,7 +155,8 @@ internal class WriterScopeSharing(
 
             override fun visitCall(expression: IrCall) {
                 if (expression.symbol == symbols.openLoweredRegion || expression.symbol == symbols.beginMixedElement ||
-                    symbols.isPlainText(expression)) found = true
+                    symbols.isPlainText(expression)
+                ) found = true
                 if (isEagerLoop(expression)) {
                     // Descend through nested eager loops, but never stored or arbitrary callbacks.
                     expression.arguments.filterIsInstance<IrFunctionExpression>().forEach {

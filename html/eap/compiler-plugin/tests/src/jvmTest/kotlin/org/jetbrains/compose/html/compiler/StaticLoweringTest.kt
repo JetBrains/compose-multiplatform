@@ -27,7 +27,7 @@ class StaticLoweringTest {
     fun literalsPreserveEscapingOrderingAndExplicitClasses() {
         assertEquals(
             "<span id=\"greeting\" title=\"&quot;&lt;&amp;&gt;&#13;&#10;&#9;😀\"" +
-                " data-key=\"value\" class=\"label accent last\">text</span>",
+                    " data-key=\"value\" class=\"label accent last\">text</span>",
             composeHtmlToString {
                 Span(attrs = {
                     classes("label", "accent")
@@ -121,21 +121,33 @@ class StaticLoweringTest {
 
     @Test
     fun staticHtmlUsesConstantsAndDirectElementsNeedNoAttributeFields() {
-        val staticMethods = listOf("SharedLiteral", "EquivalentLiteral", "DistinctLiteral",
-            "SharedFragment", "EquivalentFragment", "FragmentWithoutBoundary")
-        val methods = staticMethods + listOf("SharedDynamic", "SharedContainer", "SharedAttributesOtherTag",
-            "SameTagOtherType", "OrderedAttributes", "ReorderedAttributes", "FirstClassMetadata", "SecondClassMetadata")
+        val staticMethods = listOf(
+            "SharedLiteral", "EquivalentLiteral", "DistinctLiteral",
+            "SharedFragment", "EquivalentFragment", "FragmentWithoutBoundary"
+        )
+        val methods = staticMethods + listOf(
+            "SharedDynamic", "SharedContainer", "SharedAttributesOtherTag",
+            "SameTagOtherType", "OrderedAttributes", "ReorderedAttributes", "FirstClassMetadata", "SecondClassMetadata"
+        )
         val reads = methods.associateWith { fieldReads("SharingSamplesKt", it) }
         assertTrue(reads.values.all { it.isEmpty() })
 
-        assertEquals(staticHtmlConstants("SharingSamplesKt", "SharedLiteral"),
-            staticHtmlConstants("SharingSamplesKt", "EquivalentLiteral"))
-        assertNotEquals(staticHtmlConstants("SharingSamplesKt", "SharedLiteral"),
-            staticHtmlConstants("SharingSamplesKt", "DistinctLiteral"))
-        assertEquals(staticHtmlConstants("SharingSamplesKt", "SharedFragment"),
-            staticHtmlConstants("SharingSamplesKt", "EquivalentFragment"))
-        assertNotEquals(staticHtmlConstants("SharingSamplesKt", "SharedFragment"),
-            staticHtmlConstants("SharingSamplesKt", "FragmentWithoutBoundary"))
+        assertEquals(
+            staticHtmlConstants("SharingSamplesKt", "SharedLiteral"),
+            staticHtmlConstants("SharingSamplesKt", "EquivalentLiteral")
+        )
+        assertNotEquals(
+            staticHtmlConstants("SharingSamplesKt", "SharedLiteral"),
+            staticHtmlConstants("SharingSamplesKt", "DistinctLiteral")
+        )
+        assertEquals(
+            staticHtmlConstants("SharingSamplesKt", "SharedFragment"),
+            staticHtmlConstants("SharingSamplesKt", "EquivalentFragment")
+        )
+        assertNotEquals(
+            staticHtmlConstants("SharingSamplesKt", "SharedFragment"),
+            staticHtmlConstants("SharingSamplesKt", "FragmentWithoutBoundary")
+        )
 
         assertTrue(fieldReads("PreparedSamplesKt", "PreparedSharedAttributes").isEmpty())
         val fields = Class.forName("${javaClass.packageName}.SharingSamplesKt").declaredFields
@@ -163,14 +175,15 @@ class StaticLoweringTest {
                 val fragmentBoundary = "<!--c-->"
                 val fragment = "<div><span>&lt;&amp;&#13;😀</span>tail${fragmentBoundary}end</div>"
                 val expected = literal.repeat(3) + "<span class=\"label\">value-${it + 1}</span>" +
-                    "<span class=\"label\">body${boundary}tail</span>" + fragment.repeat(2) +
-                    "<div><span>&lt;&amp;&#13;😀</span>tailend</div>"
+                        "<span class=\"label\">body${boundary}tail</span>" + fragment.repeat(2) +
+                        "<div><span>&lt;&amp;&#13;😀</span>tailend</div>"
                 val actual = render(strict, hydratable, stream, content)
                 assertEquals(expected, actual)
                 assertEquals(it + 1, calls)
             }
         }
-        assertEquals("<span data-a=\"a\" data-b=\"b\">text</span><span data-b=\"b\" data-a=\"a\">text</span>",
+        assertEquals(
+            "<span data-a=\"a\" data-b=\"b\">text</span><span data-b=\"b\" data-a=\"a\">text</span>",
             composeHtmlToString {
                 OrderedAttributes("text")
                 ReorderedAttributes("text")
@@ -182,12 +195,25 @@ class StaticLoweringTest {
         var appends = 0
         var bridgeCalls = 0
         sampleBytecode("SharingSamplesKt").accept(object : ClassVisitor(Opcodes.ASM9) {
-            override fun visitMethod(access: Int, name: String, descriptor: String, signature: String?, exceptions: Array<out String>?): MethodVisitor =
+            override fun visitMethod(
+                access: Int,
+                name: String,
+                descriptor: String,
+                signature: String?,
+                exceptions: Array<out String>?
+            ): MethodVisitor =
                 object : MethodVisitor(Opcodes.ASM9) {
-                    override fun visitMethodInsn(opcode: Int, owner: String, method: String, descriptor: String, isInterface: Boolean) {
+                    override fun visitMethodInsn(
+                        opcode: Int,
+                        owner: String,
+                        method: String,
+                        descriptor: String,
+                        isInterface: Boolean
+                    ) {
                         if (method == "WriteStaticHtml") bridgeCalls++
                         if (name == "SharedFragment" && owner == "java/lang/StringBuilder" && method == "append" &&
-                            descriptor == "(Ljava/lang/String;)Ljava/lang/StringBuilder;") appends++
+                            descriptor == "(Ljava/lang/String;)Ljava/lang/StringBuilder;"
+                        ) appends++
                     }
                 }
         }, ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES)

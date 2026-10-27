@@ -57,6 +57,7 @@ internal class HtmlSymbols private constructor(resolver: Resolver) {
     val anyToString by resolver.member(ClassId.topLevel(FqName("kotlin.Any")), "toString")
     val autoCompleteValue by resolver.htmlFunction("htmlAutoCompleteValue")
     val inputValueIsAttribute by resolver.htmlFunction("inputValueIsAttribute")
+
     // @LowerableHtmlTag identifies tag wrappers that the plugin may lower.
     val tagMarker by resolver.htmlClass("LowerableHtmlTag")
     val text by resolver.htmlFunction("Text")
@@ -65,7 +66,12 @@ internal class HtmlSymbols private constructor(resolver: Resolver) {
     val attr by resolver.attrsFunction("attr")
     val style by resolver.attrsFunction("style")
 
-    data class Attribute(val name: String, val conversion: IrSimpleFunctionSymbol?, val value: String, val defaultValue: String?)
+    data class Attribute(
+        val name: String,
+        val conversion: IrSimpleFunctionSymbol?,
+        val value: String,
+        val defaultValue: String?
+    )
 
     private val attributes = mutableMapOf<IrSimpleFunctionSymbol, Attribute?>()
     private val helpers = mutableMapOf<Pair<String, String>, List<IrSimpleFunctionSymbol>>()
@@ -78,6 +84,7 @@ internal class HtmlSymbols private constructor(resolver: Resolver) {
         val marker = declaration.owner.annotations.single { it.classSymbol == attributeMarker }
         fun string(name: String) =
             (marker.argumentMapping[Name.identifier(name)] as? IrConst)?.value as? String ?: ""
+
         val property = string("conversion").ifEmpty {
             if (declaration.owner.parameters.size == 1 || declaration.owner.parameters.last().type.isString()) "" else "toString"
         }
@@ -88,13 +95,16 @@ internal class HtmlSymbols private constructor(resolver: Resolver) {
             "onOff" -> autoCompleteValue
             else -> {
                 val owner = declaration.owner.parameters.last().type.classOrNull?.owner?.classId ?: return@getOrPut null
-                finder.findProperties(CallableId(owner, Name.identifier(property))).singleOrNull()?.owner?.getter?.symbol
+                finder.findProperties(CallableId(owner, Name.identifier(property)))
+                    .singleOrNull()?.owner?.getter?.symbol
                     ?: return@getOrPut null
             }
         }
         val name = string("name").ifEmpty {
             val name = declaration.owner.name.asString()
-            if (declaration.owner.fqNameWhenAvailable?.parent()?.asString() == SvgPackage.asString()) name else name.lowercase()
+            if (declaration.owner.fqNameWhenAvailable?.parent()
+                    ?.asString() == SvgPackage.asString()
+            ) name else name.lowercase()
         }
         val defaultValue = (marker.argumentMapping[Name.identifier("defaultValue")] as? IrVararg)
             ?.elements?.singleOrNull()?.let { (it as? IrConst)?.value as? String }
@@ -116,6 +126,7 @@ internal class HtmlSymbols private constructor(resolver: Resolver) {
         val HtmlPackage = FqName("org.jetbrains.compose.web.dom")
         val AttributesPackage = FqName("org.jetbrains.compose.web.attributes")
         val SvgPackage = FqName("org.jetbrains.compose.web.svg")
+
         // Standard wrappers use compile-time type names, while generic Input uses the runtime identity check.
         val ValueAttributeInputTypes = setOf("checkbox", "radio", "hidden", "submit")
         const val SvgNamespace = "http://www.w3.org/2000/svg"
@@ -124,9 +135,13 @@ internal class HtmlSymbols private constructor(resolver: Resolver) {
         const val SelectScope = "androidx.compose.web.attributes.SelectAttrsScope"
         const val EventsScope = "org.jetbrains.compose.web.attributes.EventsListenerScope"
         val AttrsScope = ClassId.topLevel(AttributesPackage.child(Name.identifier("AttrsScope")))
-        val DirectTags = setOf(HtmlPackage.child(Name.identifier("TagElement")), HtmlPackage.child(Name.identifier("TagElementNS")))
+        val DirectTags =
+            setOf(HtmlPackage.child(Name.identifier("TagElement")), HtmlPackage.child(Name.identifier("TagElementNS")))
         val CreateBuilder = FqName("org.jetbrains.compose.web.dom.ElementBuilder.Companion.createBuilder")
-        val FormEvents = setOf(AttributesPackage.child(Name.identifier("onSubmit")), AttributesPackage.child(Name.identifier("onReset")))
+        val FormEvents = setOf(
+            AttributesPackage.child(Name.identifier("onSubmit")),
+            AttributesPackage.child(Name.identifier("onReset"))
+        )
 
         // Returns null and reports all missing or ambiguous declarations if the runtime does not match.
         fun resolve(finder: DeclarationFinder, onUnavailable: (List<String>) -> Unit): HtmlSymbols? {
@@ -158,10 +173,12 @@ internal class HtmlSymbols private constructor(resolver: Resolver) {
         )
 
         fun member(owner: ClassId, name: String) = required(
-            "${owner.asSingleFqName()}.$name", finder.findFunctions(CallableId(owner, Name.identifier(name))).singleOrNull()
+            "${owner.asSingleFqName()}.$name",
+            finder.findFunctions(CallableId(owner, Name.identifier(name))).singleOrNull()
         )
 
-        fun writerFunction(name: String) = member(ClassId.topLevel(HtmlPackage.child(Name.identifier("HtmlStringWriterContext"))), name)
+        fun writerFunction(name: String) =
+            member(ClassId.topLevel(HtmlPackage.child(Name.identifier("HtmlStringWriterContext"))), name)
 
         fun getter(pkg: FqName, owner: String, name: String) = required(
             "$pkg.$owner.$name", finder.findProperties(
@@ -183,12 +200,15 @@ internal class HtmlSymbols private constructor(resolver: Resolver) {
                 val names = parameters.map { parameter -> parameter.name.asString() }
                 val inputType = ClassId.topLevel(AttributesPackage.child(Name.identifier("InputType")))
                 if (names !in listOf(listOf("type"), listOf("type", "attrs")) ||
-                    parameters.first().type.classOrNull?.owner?.classId != inputType) return@filter false
+                    parameters.first().type.classOrNull?.owner?.classId != inputType
+                ) return@filter false
                 val attrs = parameters.getOrNull(1)?.type as? IrSimpleType
                 names.size == 1 || (
-                    attrs?.classOrNull?.owner?.fqNameWhenAvailable == FqName("kotlin.Function1") &&
-                        attrs.arguments.firstOrNull()?.typeOrNull?.classOrNull?.owner?.classId == ClassId.topLevel(FqName(InputScope))
-                    )
+                        attrs?.classOrNull?.owner?.fqNameWhenAvailable == FqName("kotlin.Function1") &&
+                                attrs.arguments.firstOrNull()?.typeOrNull?.classOrNull?.owner?.classId == ClassId.topLevel(
+                            FqName(InputScope)
+                        )
+                        )
             }.toSet().takeIf { it.isNotEmpty() }
         )
     }

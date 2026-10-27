@@ -219,7 +219,13 @@ internal class HtmlStringWriterContext(
      * [closeElement] with the returned parent restores the state from before the region.
      */
     @PublishedApi
-    internal fun openLoweredRegion(rootTag: String, encoded: String, innermost: String, validate: Boolean, namespace: String = HtmlNamespace): Any? {
+    internal fun openLoweredRegion(
+        rootTag: String,
+        encoded: String,
+        innermost: String,
+        validate: Boolean,
+        namespace: String = HtmlNamespace
+    ): Any? {
         checkNotFinished()
         if (discardingContent) return null
         beginChild(rootTag, validate)
@@ -369,6 +375,7 @@ internal class HtmlStringWriterContext(
                 hasRawTextCall = true
                 rawText.append(value)
             }
+
             value.isNotEmpty() -> {
                 appendText(value, validate)
                 flushChunk()
@@ -519,6 +526,7 @@ internal class HtmlStringWriterContext(
 internal class AttrsBuilderPool {
     val nameCache = HtmlAttributeNameCache()
     private val builders = mutableListOf<AttrsScopeBuilder<*>>()
+
     // Reuse immutable metadata for SVG elements and keyed renders. Bound both the number
     // and length of retained dynamic names. Only one active renderer owns this storage.
     private val elementBuilders = HashMap<String, MutableMap<String, StringElementBuilder<*>>>()

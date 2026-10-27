@@ -50,5 +50,8 @@ publishing {
 }
 
 tasks.named("check") {
-    dependsOn("$compilerPluginPath:tests:check", gradle.includedBuild("compose-html-lowering-gradle-plugin").task(":test"))
+    dependsOn(
+        "$compilerPluginPath:tests:check",
+        gradle.includedBuild("compose-html-lowering-gradle-plugin").task(":test")
+    )
 }

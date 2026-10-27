@@ -19,7 +19,10 @@ import kotlin.test.assertNull
 class LoweredRegionWriterTest {
     @Test
     fun transitionsMatchOrdinaryElements() {
-        for (strict in listOf(false, true)) for (hydratable in listOf(false, true)) for (stream in listOf(false, true)) {
+        for (strict in listOf(false, true)) for (hydratable in listOf(false, true)) for (stream in listOf(
+            false,
+            true
+        )) {
             val ordinary: @Composable () -> Unit = {
                 Div {
                     H1 { Text("Title") }

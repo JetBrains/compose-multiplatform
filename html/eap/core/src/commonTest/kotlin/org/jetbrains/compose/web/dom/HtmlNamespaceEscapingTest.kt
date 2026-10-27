@@ -38,9 +38,11 @@ class HtmlNamespaceEscapingTest {
         repeat(8) { index ->
             val namespace = if (index % 2 == 0) HtmlNamespace else "http://www.w3.org/2000/svg"
             val tag = if (index % 2 == 0) "div" else "svg"
-            assertEquals("<$tag title=\"$index&amp;\">$index&lt;</$tag>", composeHtmlToString(key = "mixed-namespace-escaping", validateStrictly = true) {
-                TagElementNS<Element>(tag, namespace, { attr("title", "$index&") }) { Text("$index<") }
-            })
+            assertEquals(
+                "<$tag title=\"$index&amp;\">$index&lt;</$tag>",
+                composeHtmlToString(key = "mixed-namespace-escaping", validateStrictly = true) {
+                    TagElementNS<Element>(tag, namespace, { attr("title", "$index&") }) { Text("$index<") }
+                })
         }
     }
 

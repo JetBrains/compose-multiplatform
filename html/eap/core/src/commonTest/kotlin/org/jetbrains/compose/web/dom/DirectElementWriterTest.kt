@@ -65,7 +65,10 @@ class DirectElementWriterTest {
                             Text("after")
                             Text("adjacent")
                         }
-                        assertEquals(render(strict, hydratable, stream, ordinary), render(strict, hydratable, stream, direct))
+                        assertEquals(
+                            render(strict, hydratable, stream, ordinary),
+                            render(strict, hydratable, stream, direct)
+                        )
                     }
                 }
             }
@@ -119,7 +122,8 @@ class DirectElementWriterTest {
 
     @Test
     fun restoresForeignNamespaceAndLeadingNewlineState() {
-        assertEquals("<svg><div></div><table><div></div></table></svg><pre><div></div>\ntext</pre>",
+        assertEquals(
+            "<svg><div></div><table><div></div></table></svg><pre><div></div>\ntext</pre>",
             composeHtmlToString(validateStrictly = true) {
                 TagElementNS<Element>("svg", "urn:test", null) {
                     EmptyDirectDiv()
@@ -153,8 +157,10 @@ class DirectElementWriterTest {
     private fun render(strict: Boolean, hydratable: Boolean, stream: Boolean, content: @Composable () -> Unit): String {
         if (!stream) return composeHtmlToString(validateStrictly = strict, hydratable = hydratable, content = content)
         val output = StringBuilder()
-        composeHtmlToStream(validateStrictly = strict, hydratable = hydratable, chunkSize = 1,
-            sink = { output.append(it) }, content = content)
+        composeHtmlToStream(
+            validateStrictly = strict, hydratable = hydratable, chunkSize = 1,
+            sink = { output.append(it) }, content = content
+        )
         return output.toString()
     }
 

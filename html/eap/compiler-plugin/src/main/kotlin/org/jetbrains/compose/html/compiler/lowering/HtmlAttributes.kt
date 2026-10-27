@@ -115,7 +115,8 @@ internal class HtmlAttributeAnalyzer(
         val lambda = if (expression.isAbsent()) null else (expression as? IrFunctionExpression ?: return null)
         val receiver = lambda?.function?.parameters?.singleOrNull()?.symbol
         if (lambda != null && receiver == null) return null
-        val body = if (lambda == null) context.irFactory.createBlockBody(0, 0) else lambda.function.body as? IrBlockBody ?: return null
+        val body = if (lambda == null) context.irFactory.createBlockBody(0, 0) else lambda.function.body as? IrBlockBody
+            ?: return null
         val analysis = Analysis(receiver, namespace, tag, valueIsAttribute)
         if (!body.statements.all { analysis.analyze(it, unconditional = true) }) return null
         val operations = before + analysis.operations + after
@@ -136,7 +137,8 @@ internal class HtmlAttributeAnalyzer(
                 ?.let { return it }
         }
         if (operations.size + operations.sumOf { it.values.size } > MaxMixedAttributeOperations ||
-            operations.filter { it.kind == AttributeOperationKind.Classes }.sumOf { it.values.size } > MaxMixedClassTokens) return null
+            operations.filter { it.kind == AttributeOperationKind.Classes }
+                .sumOf { it.values.size } > MaxMixedClassTokens) return null
         return MixedAttributes(body, analysis.operations.toList(), analysis.lets, tag, namespace, before, after)
     }
 
@@ -171,7 +173,8 @@ internal class HtmlAttributeAnalyzer(
         // Collect operations from one attrs statement. False rejects the whole callback.
         fun analyze(statement: IrStatement, unconditional: Boolean = false): Boolean {
             if (constants.isConstantAlias(statement)) return true
-            if (statement !is IrCall && (statement !is IrTypeOperatorCall || statement.argument !is IrCall)) literal = false
+            if (statement !is IrCall && (statement !is IrTypeOperatorCall || statement.argument !is IrCall)) literal =
+                false
             return when (statement) {
                 is IrTypeOperatorCall -> statement.operator == IrTypeOperator.IMPLICIT_COERCION_TO_UNIT &&
                         analyze(statement.argument, unconditional)
@@ -198,7 +201,8 @@ internal class HtmlAttributeAnalyzer(
             // Pure ignored callbacks and annotated helpers can join literal attributes.
             if (call.symbol != symbols.classes && call.symbol != symbols.id && call.symbol != symbols.attr &&
                 symbols.attribute(call.symbol) == null &&
-                !(operation.kind == AttributeOperationKind.Ignore && operation.values.isEmpty())) {
+                !(operation.kind == AttributeOperationKind.Ignore && operation.values.isEmpty())
+            ) {
                 literal = false
             }
             if (operation.values.any { !independent(it) }) return false
@@ -282,10 +286,11 @@ internal class HtmlAttributeAnalyzer(
             } == true
         }
         val type = parameterType.makeNotNull()
-        val helper = helpers.firstOrNull { it.owner.parameters.size == 2 && it.owner.parameters[1].type.makeNotNull() == type }
-            ?: helpers.firstOrNull { type.isBoolean() && it.owner.parameters.size == 1 }
-            ?: helpers.firstOrNull { it.owner.parameters.size == 2 && it.owner.parameters[1].type.isString() }
-            ?: return null
+        val helper =
+            helpers.firstOrNull { it.owner.parameters.size == 2 && it.owner.parameters[1].type.makeNotNull() == type }
+                ?: helpers.firstOrNull { type.isBoolean() && it.owner.parameters.size == 1 }
+                ?: helpers.firstOrNull { it.owner.parameters.size == 2 && it.owner.parameters[1].type.isString() }
+                ?: return null
         val expected = helper.owner.parameters.getOrNull(1)?.type
         val converted = if (expected?.isString() == true && !type.isString()) stringValue(value, builder) else
             if (value.type.isNullable()) builder.irImplicitCast(value, type) else value
@@ -303,11 +308,18 @@ internal class HtmlAttributeAnalyzer(
     ): AttributeOperation? {
         if (tag == "input" && isMember(symbol, InputScope, "value", "defaultValue", "checked", "defaultChecked")) {
             return when (symbol.owner.name.asString()) {
-                "checked" -> AttributeOperation(AttributeOperationKind.FormChecked, call, "checked", listOf(value ?: return null))
+                "checked" -> AttributeOperation(
+                    AttributeOperationKind.FormChecked,
+                    call,
+                    "checked",
+                    listOf(value ?: return null)
+                )
+
                 "defaultChecked" -> AttributeOperation(AttributeOperationKind.Attribute, call, "checked", emptyList())
                 "defaultValue" -> AttributeOperation(
                     AttributeOperationKind.Attribute, call, "value", listOf(stringValue(value ?: return null, builder))
                 )
+
                 else -> AttributeOperation(
                     AttributeOperationKind.FormValue, call, "value", listOf(stringValue(value ?: return null, builder)),
                     valueIsAttribute = valueIsAttribute ?: return null
@@ -331,18 +343,25 @@ internal class HtmlAttributeAnalyzer(
     ): AttributeOperation? {
         val helper = symbols.attribute(symbol) ?: return null
         if (value == null && symbol.owner.parameters.size == 2 && helper.defaultValue != null) {
-            return AttributeOperation(AttributeOperationKind.Attribute, call, helper.name, listOf(builder.irString(helper.defaultValue)))
+            return AttributeOperation(
+                AttributeOperationKind.Attribute,
+                call,
+                helper.name,
+                listOf(builder.irString(helper.defaultValue))
+            )
         }
         val values = if (symbol.owner.parameters.size == 1) {
             if (helper.value.isEmpty()) emptyList() else listOf(builder.irString(helper.value))
         } else {
             val argument = value ?: return null
             val integer = if (helper.conversion == symbols.formatNumber) constants.integer(argument) else null
-            listOf(when {
-                integer != null -> builder.irString(integer.toString())
-                helper.conversion != null -> builder.irCallWithArgs(helper.conversion, argument)
-                else -> argument
-            })
+            listOf(
+                when {
+                    integer != null -> builder.irString(integer.toString())
+                    helper.conversion != null -> builder.irCallWithArgs(helper.conversion, argument)
+                    else -> argument
+                }
+            )
         }
         return AttributeOperation(AttributeOperationKind.Attribute, call, helper.name, values)
     }
@@ -354,9 +373,13 @@ internal class HtmlAttributeAnalyzer(
         val fqName = it.owner.fqNameWhenAvailable?.asString().orEmpty()
         val name = it.owner.name.asString()
         it.owner.fqNameWhenAvailable in HtmlSymbols.FormEvents ||
-            fqName.startsWith("${HtmlSymbols.EventsScope}.") ||
-            (name.startsWith("on") && listOf(InputScope, TextAreaScope, HtmlSymbols.SelectScope).any { fqName == "$it.$name" }) ||
-            fqName == "${HtmlSymbols.AttrsScope.asSingleFqName()}.ref"
+                fqName.startsWith("${HtmlSymbols.EventsScope}.") ||
+                (name.startsWith("on") && listOf(
+                    InputScope,
+                    TextAreaScope,
+                    HtmlSymbols.SelectScope
+                ).any { fqName == "$it.$name" }) ||
+                fqName == "${HtmlSymbols.AttrsScope.asSingleFqName()}.ref"
     }
 
     /**
@@ -378,7 +401,11 @@ internal class HtmlAttributeAnalyzer(
      * Returns `null` for dynamic values, NUL, duplicate names, invalid or duplicate class tokens,
      * or attributes that exceed the size limit. The caller can then try runtime attribute writes.
      */
-    private fun literalAttributes(operations: List<AttributeOperation>, tagName: String, namespace: String): LiteralAttributes? {
+    private fun literalAttributes(
+        operations: List<AttributeOperation>,
+        tagName: String,
+        namespace: String
+    ): LiteralAttributes? {
         val classNames = mutableListOf<String>()
         val values = linkedMapOf<String, String>()
 
@@ -391,7 +418,9 @@ internal class HtmlAttributeAnalyzer(
                     classNames.add(value)
                 }
             } else {
-                val value = if (operation.values.isEmpty()) "" else constants.stringWithoutNul(operation.values.single()) ?: return null
+                val value =
+                    if (operation.values.isEmpty()) "" else constants.stringWithoutNul(operation.values.single())
+                        ?: return null
                 if (operation.name in values) return null
                 values[operation.name] = value
             }
@@ -423,7 +452,7 @@ private val LowerableAttributeName = Regex("[a-z][a-z0-9_.:-]*")
 // Keep reserved data-compose names and unsupported names on the runtime path.
 internal fun isLowerableAttributeName(name: String, namespace: String): Boolean =
     (if (namespace == HtmlNamespace) LowerableAttributeName else ForeignAttributeName).matches(name) &&
-        !name.startsWith("data-compose", ignoreCase = true)
+            !name.startsWith("data-compose", ignoreCase = true)
 
 private val ForeignAttributeName = Regex("[a-zA-Z][a-zA-Z0-9_.:-]*")
 

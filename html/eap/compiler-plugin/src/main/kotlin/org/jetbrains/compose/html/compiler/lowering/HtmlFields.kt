@@ -24,7 +24,8 @@ import org.jetbrains.kotlin.name.Name
 // Creates private fields with unique names and shares large strings within one file.
 @OptIn(UnsafeDuringIrConstructionAPI::class)
 internal class HtmlFields(private val context: IrPluginContext, private val file: IrFile) {
-    private val usedNames = file.declarations.filterIsInstance<IrDeclarationWithName>().mapTo(mutableSetOf()) { it.name }
+    private val usedNames =
+        file.declarations.filterIsInstance<IrDeclarationWithName>().mapTo(mutableSetOf()) { it.name }
     private val shared = mutableMapOf<String, IrField>()
     private var length = 0
     val stringFields: Collection<IrField> get() = shared.values

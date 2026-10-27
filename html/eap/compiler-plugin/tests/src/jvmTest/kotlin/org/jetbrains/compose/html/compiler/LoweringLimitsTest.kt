@@ -38,19 +38,33 @@ class LoweringLimitsTest {
     fun literalAppendsBeginEachLogicalFragmentOnceWithoutFieldsOrJoins() {
         val fields = Class.forName("${javaClass.packageName}.LargeFragmentSamplesKt").declaredFields
         assertFalse(fields.any { it.name.startsWith("__html") })
-        for (method in listOf("LargeUnicodeFragment", "LargeStaticPage", "LargeRawFragment",
-            "LargeLeadingNewlineFragment", "LargeTableFragment", "LargeTableRowFragment")) {
+        for (method in listOf(
+            "LargeUnicodeFragment", "LargeStaticPage", "LargeRawFragment",
+            "LargeLeadingNewlineFragment", "LargeTableFragment", "LargeTableRowFragment"
+        )) {
             val calls = mutableListOf<String>()
             val literals = mutableListOf<String>()
             sampleBytecode("LargeFragmentSamplesKt").accept(object : ClassVisitor(Opcodes.ASM9) {
-                override fun visitMethod(access: Int, name: String, descriptor: String, signature: String?, exceptions: Array<out String>?): MethodVisitor? {
+                override fun visitMethod(
+                    access: Int,
+                    name: String,
+                    descriptor: String,
+                    signature: String?,
+                    exceptions: Array<out String>?
+                ): MethodVisitor? {
                     if (name != method) return null
                     return object : MethodVisitor(Opcodes.ASM9) {
                         override fun visitLdcInsn(value: Any) {
                             if (value is String) literals.add(value)
                         }
 
-                        override fun visitMethodInsn(opcode: Int, owner: String, name: String, descriptor: String, isInterface: Boolean) {
+                        override fun visitMethodInsn(
+                            opcode: Int,
+                            owner: String,
+                            name: String,
+                            descriptor: String,
+                            isInterface: Boolean
+                        ) {
                             calls.add(name)
                         }
 
@@ -67,7 +81,14 @@ class LoweringLimitsTest {
             assertEquals(1, calls.count { it == "beginStaticHtmlFragment" }, "$method: $calls")
             assertTrue(calls.count { it == "append" } >= 2, method)
             assertEquals(calls.count { it == "append" }, calls.count { it == "flushChunk\$default" }, method)
-            assertFalse(calls.any { it in setOf("toString", "joinToString", "WriteStaticHtml", "appendStaticHtmlChunk") }, method)
+            assertFalse(calls.any {
+                it in setOf(
+                    "toString",
+                    "joinToString",
+                    "WriteStaticHtml",
+                    "appendStaticHtmlChunk"
+                )
+            }, method)
             assertTrue(literals.all { it.length <= 8_000 }, method)
         }
     }
@@ -86,17 +107,24 @@ class LoweringLimitsTest {
                     pre to { LargeLeadingNewlineFragment() }, table to { LargeTableFragment() },
                 )
                 for ((expected, content) in cases) {
-                    assertEquals(expected, composeHtmlToString(validateStrictly = strict, hydratable = hydratable, content = content))
+                    assertEquals(
+                        expected,
+                        composeHtmlToString(validateStrictly = strict, hydratable = hydratable, content = content)
+                    )
                     for (chunkSize in listOf(1, 2_048, 8_000, 8_001)) {
                         val bytes = ByteArrayOutputStream()
-                        composeHtmlToStream(validateStrictly = strict, hydratable = hydratable, chunkSize = chunkSize,
-                            sink = { bytes.write(it.toByteArray(Charsets.UTF_8)) }, content = content)
+                        composeHtmlToStream(
+                            validateStrictly = strict, hydratable = hydratable, chunkSize = chunkSize,
+                            sink = { bytes.write(it.toByteArray(Charsets.UTF_8)) }, content = content
+                        )
                         assertEquals(expected, bytes.toString(Charsets.UTF_8), "chunkSize=$chunkSize")
                     }
                     val bytes = ByteArrayOutputStream()
                     OutputStreamWriter(bytes, Charsets.UTF_8).use { writer ->
-                        composeHtmlToStream(writer, validateStrictly = strict, hydratable = hydratable,
-                            chunkSize = 1, content = content)
+                        composeHtmlToStream(
+                            writer, validateStrictly = strict, hydratable = hydratable,
+                            chunkSize = 1, content = content
+                        )
                     }
                     assertEquals(expected, bytes.toString(Charsets.UTF_8))
                 }
@@ -113,7 +141,8 @@ class LoweringLimitsTest {
 
     @Test
     fun largePagesCountAsOneDocumentRootAndStreamWithoutJoining() {
-        val expected = "<html><body><div>" + ("<span>" + "界".repeat(3_000) + "</span>").repeat(30) + "</div></body></html>"
+        val expected =
+            "<html><body><div>" + ("<span>" + "界".repeat(3_000) + "</span>").repeat(30) + "</div></body></html>"
         assertEquals(expected, composeHtmlToString { LargeStaticPage() })
         assertEquals("<!doctype html>$expected", renderHydratedDocument(validateStrictly = true) { LargeStaticPage() })
         val chunks = mutableListOf<String>()
@@ -138,7 +167,11 @@ class LoweringLimitsTest {
         for (strict in listOf(false, true)) {
             val chunks = mutableListOf<String>()
             assertFailsWith<IllegalArgumentException> {
-                composeHtmlToStream(validateStrictly = strict, chunkSize = 1, sink = chunks::add) { InvalidLargeRawFragment() }
+                composeHtmlToStream(
+                    validateStrictly = strict,
+                    chunkSize = 1,
+                    sink = chunks::add
+                ) { InvalidLargeRawFragment() }
             }
             assertTrue(chunks.isEmpty())
         }
@@ -164,7 +197,11 @@ class LoweringLimitsTest {
         )) {
             assertEquals(expected, composeHtmlToString(content = content))
             val bytes = ByteArrayOutputStream()
-            composeHtmlToStream(chunkSize = 1, sink = { bytes.write(it.toByteArray(Charsets.UTF_8)) }, content = content)
+            composeHtmlToStream(
+                chunkSize = 1,
+                sink = { bytes.write(it.toByteArray(Charsets.UTF_8)) },
+                content = content
+            )
             assertEquals(expected, bytes.toString(Charsets.UTF_8))
         }
         val fields = Class.forName("${javaClass.packageName}.LargeAttributeSamplesKt").declaredFields
@@ -172,7 +209,11 @@ class LoweringLimitsTest {
         assertEquals(2, fields.size)
         for (field in fields) {
             assertEquals(String::class.java, field.type)
-            assertTrue(Modifier.isPrivate(field.modifiers) && Modifier.isStatic(field.modifiers) && Modifier.isFinal(field.modifiers))
+            assertTrue(
+                Modifier.isPrivate(field.modifiers) && Modifier.isStatic(field.modifiers) && Modifier.isFinal(
+                    field.modifiers
+                )
+            )
             field.isAccessible = true
             assertTrue((field.get(null) as String).length >= 24_000)
         }
@@ -209,7 +250,8 @@ class LoweringLimitsTest {
     fun functionAndFileBudgetsFallBackWithoutChangingOutput() {
         val calls = classMethodCalls(comparison.bytecode("sample.BudgetSamplesKt"))
         for (index in 0..8) {
-            assertEquals(if (index < 8) 64 else 0,
+            assertEquals(
+                if (index < 8) 64 else 0,
                 calls.getValue("BudgetFragment$index").count { it == "beginStaticHtmlFragment" })
         }
         val expected = ("<span>" + "x".repeat(8_001) + "</span>").repeat(65)
@@ -235,15 +277,20 @@ class LoweringLimitsTest {
             }
         }
         comparison.assertEquivalent(listOf("ChunkBudget", "LengthBudget"))
-        assertEquals("<div>" + "<span>&lt;&amp;</span>".repeat(150) + "</div>|events=[]",
-            comparison.ordinary.getValue("ChunkBudget"))
-        assertEquals("<div>" + ("<span>" + "x".repeat(8_000) + "</span>").repeat(125) + "</div>|events=[]",
-            comparison.ordinary.getValue("LengthBudget"))
+        assertEquals(
+            "<div>" + "<span>&lt;&amp;</span>".repeat(150) + "</div>|events=[]",
+            comparison.ordinary.getValue("ChunkBudget")
+        )
+        assertEquals(
+            "<div>" + ("<span>" + "x".repeat(8_000) + "</span>").repeat(125) + "</div>|events=[]",
+            comparison.ordinary.getValue("LengthBudget")
+        )
     }
 
     companion object {
         private val comparison by lazy {
-            val imports = "package sample\nimport androidx.compose.runtime.Composable\nimport org.jetbrains.compose.web.dom.*\n"
+            val imports =
+                "package sample\nimport androidx.compose.runtime.Composable\nimport org.jetbrains.compose.web.dom.*\n"
             // LoweringLimits.kt: cross 8_000-char chunks, 128/1_024-chunk method/file caps and the 1_000_000-char fragment cap.
             val fragments = (0..8).joinToString("\n") { index ->
                 "@Composable fun BudgetFragment$index() {\n" + "Span { Text(BudgetText) }\n".repeat(65) + "}"
@@ -260,10 +307,10 @@ class LoweringLimitsTest {
                 extraSources = mapOf(
                     "BudgetSamples.kt" to imports + "private const val BudgetText = \"${"x".repeat(8_001)}\"\n" + fragments,
                     "RegionBudgetSamples.kt" to imports + "private const val RegionText = \"${"x".repeat(8_000)}\"\n" +
-                        "@Composable fun RegionChunkBudget(value: String) { Div {\n" +
-                        "Span { Text(value) }\n".repeat(150) + "} }\n" +
-                        "@Composable fun RegionLengthBudget() { Div {\n" +
-                        "Span { Text(RegionText) }\n".repeat(125) + "} }\n",
+                            "@Composable fun RegionChunkBudget(value: String) { Div {\n" +
+                            "Span { Text(value) }\n".repeat(150) + "} }\n" +
+                            "@Composable fun RegionLengthBudget() { Div {\n" +
+                            "Span { Text(RegionText) }\n".repeat(125) + "} }\n",
                 ),
             )
         }
@@ -271,6 +318,6 @@ class LoweringLimitsTest {
 }
 
 private const val EscapingText = "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" +
-    "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" +
-    "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" +
-    "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+        "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" +
+        "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" + "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<" +
+        "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"

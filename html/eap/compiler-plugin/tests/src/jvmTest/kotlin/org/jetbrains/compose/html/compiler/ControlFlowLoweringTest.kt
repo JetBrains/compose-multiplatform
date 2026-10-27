@@ -27,12 +27,28 @@ class ControlFlowLoweringTest {
             val contextReads = mutableListOf<Int>()
             var position = 0
             sampleBytecode("LoopSamplesKt").accept(object : ClassVisitor(Opcodes.ASM9) {
-                override fun visitMethod(access: Int, name: String, descriptor: String, signature: String?, exceptions: Array<out String>?): MethodVisitor? {
+                override fun visitMethod(
+                    access: Int,
+                    name: String,
+                    descriptor: String,
+                    signature: String?,
+                    exceptions: Array<out String>?
+                ): MethodVisitor? {
                     if (name != method) return null
                     return object : MethodVisitor(Opcodes.ASM9) {
-                        override fun visitMethodInsn(opcode: Int, owner: String, name: String, descriptor: String, isInterface: Boolean) {
+                        override fun visitMethodInsn(
+                            opcode: Int,
+                            owner: String,
+                            name: String,
+                            descriptor: String,
+                            isInterface: Boolean
+                        ) {
                             calls.add(name)
-                            if (name in setOf("currentHtmlStringWriter", "getLocalHtmlValidationMode")) contextReads.add(position)
+                            if (name in setOf(
+                                    "currentHtmlStringWriter",
+                                    "getLocalHtmlValidationMode"
+                                )
+                            ) contextReads.add(position)
                             position++
                         }
 
@@ -48,10 +64,16 @@ class ControlFlowLoweringTest {
             }, 0)
             assertEquals(1, calls.count { it == "currentHtmlStringWriter" }, "$method: $calls")
             assertEquals(1, calls.count { it == "getLocalHtmlValidationMode" }, "$method: $calls")
-            assertFalse(calls.any { it in setOf("Div", "Span", "Text", "PreparedContainer", "PreparedTextElement") }, "$method: $calls")
+            assertFalse(
+                calls.any { it in setOf("Div", "Span", "Text", "PreparedContainer", "PreparedTextElement") },
+                "$method: $calls"
+            )
             for ((from, label) in jumps) {
                 val target = labels.getValue(label)
-                if (target < from) assertFalse(contextReads.any { it in target..from }, "$method reads context inside a loop")
+                if (target < from) assertFalse(
+                    contextReads.any { it in target..from },
+                    "$method reads context inside a loop"
+                )
             }
         }
     }
@@ -67,10 +89,10 @@ class ControlFlowLoweringTest {
                 NestedLoops(listOf("", "a", "stop", "unused"), effects::add)
             }
             val expected = "<div><div><span>&lt;&amp;</span><span>&lt;&amp;</span></div>" +
-                "<div><span></span><span></span></div><div><span>é😀</span><span>é😀</span></div></div>" +
-                "<span>0:&lt;&amp;</span><span>1:</span>" +
-                "<div><span>aa</span><span>astop</span><span>aunused</span>" +
-                "<span>aa</span><span>astop</span><span>aunused</span><span>done:3</span></div>"
+                    "<div><span></span><span></span></div><div><span>é😀</span><span>é😀</span></div></div>" +
+                    "<span>0:&lt;&amp;</span><span>1:</span>" +
+                    "<div><span>aa</span><span>astop</span><span>aunused</span>" +
+                    "<span>aa</span><span>astop</span><span>aunused</span><span>done:3</span></div>"
             val actual = render(strict, hydratable, stream, content)
             assertEquals(expected, actual)
             assertEquals(listOf("", "a", "stop"), effects)
@@ -104,7 +126,9 @@ class ControlFlowLoweringTest {
         assertEquals(2, effects)
         assertEquals("<div>authored:3</div>", composeHtmlToString { ShadowedRepeat { effects++ } })
         assertEquals(3, effects)
-        assertEquals("<div>" + "<span>&lt;&amp;</span>".repeat(10_000) + "</div>", composeHtmlToString { LargeRepeat() })
+        assertEquals(
+            "<div>" + "<span>&lt;&amp;</span>".repeat(10_000) + "</div>",
+            composeHtmlToString { LargeRepeat() })
         assertTrue(staticHtmlConstants("LoopSamplesKt", "LargeRepeat").none { it.length > 8_000 })
     }
 
@@ -134,7 +158,10 @@ class ControlFlowLoweringTest {
         assertEquals(1, calls.getValue("TextBeforeTrailingAliases")["writeText"])
         assertEquals(1, calls.getValue("TextBeforeAliasesAndBudgetFallback")["writeText"])
         assertEquals(mapOf("openLoweredRegion" to 1, "closeElement" to 1), calls.getValue("DeepConstant"))
-        assertEquals(mapOf("openLoweredRegion" to 1, "writeText" to 1, "closeElement" to 1), calls.getValue("WideSiblings"))
+        assertEquals(
+            mapOf("openLoweredRegion" to 1, "writeText" to 1, "closeElement" to 1),
+            calls.getValue("WideSiblings")
+        )
         assertEquals(5, calls.getValue("LargeBatches")["advanceLoweredRegion"])
     }
 
@@ -156,7 +183,7 @@ class ControlFlowLoweringTest {
             "TextBeforeTrailingAliases" to "Div { Probe(); Span {}; Text(\"tail\"); val unused = \"alias\" }",
             "TextAcrossEffect" to "Div { Text(\"lead\"); val alias = Mark(\"value\"); Span { Text(alias); Probe() } }",
             "TextBeforeAliasesAndBudgetFallback" to "Div { " + "P { Probe() }; ".repeat(126) +
-                "Text(\"tail\"); val alias = \"value\"; val second = alias + \"!\"; Span { Text(second); Probe() } }",
+                    "Text(\"tail\"); val alias = \"value\"; val second = alias + \"!\"; Span { Text(second); Probe() } }",
             "DeepConstant" to "Div { ".repeat(66) + "Text(\"deep\")" + " }".repeat(66),
             "MixedLiteralChildren" to "Div(attrs = { id(Mark(name)) }) { Span { Text(\"prefix\") }; P { Probe() }; Span { Text(\"suffix\") } }",
             "MixedAdjacentText" to """
@@ -209,7 +236,8 @@ class ControlFlowLoweringTest {
             """.trimIndent(),
         )
         private val comparison by lazy {
-            LoweringComparison(cases, declarations = """
+            LoweringComparison(
+                cases, declarations = """
                 private const val Big = "${"y".repeat(20_000)}"
                 @Composable fun Keep(scope: Any) { Text("scope") }
                 @Composable fun Effect() { Mark("effect"); Text("effect") }
@@ -218,7 +246,8 @@ class ControlFlowLoweringTest {
                     Mark("scope")
                     return scope
                 }
-            """.trimIndent())
+            """.trimIndent()
+            )
         }
     }
 }

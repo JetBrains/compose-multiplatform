@@ -71,20 +71,28 @@ interface AttrsScope<out TElement : Element> : EventsListenerScope {
 
     @LowerableAttribute
     fun id(value: String) = attr(ID, value)
+
     @LowerableAttribute(value = "true")
     fun hidden() = attr(HIDDEN, true.toString())
+
     @LowerableAttribute
     fun title(value: String) = attr(TITLE, value)
+
     @LowerableAttribute(conversion = "dirStr")
     fun dir(value: DirType) = attr(DIR, value.dirStr)
+
     @LowerableAttribute(conversion = "str")
     fun draggable(value: Draggable) = attr(DRAGGABLE, value.str)
+
     @LowerableAttribute
     fun contentEditable(value: Boolean) = attr(CONTENT_EDITABLE, value.toString())
+
     @LowerableAttribute
     fun lang(value: String) = attr(LANG, value)
+
     @LowerableAttribute
     fun tabIndex(value: Int) = attr(TAB_INDEX, value.toString())
+
     @LowerableAttribute
     fun spellCheck(value: Boolean) = attr(SPELLCHECK, value.toString())
 
@@ -350,7 +358,7 @@ open class AttrsScopeBuilder<TElement : Element>(
                 }
                 require(
                     normalizedName !in hydrationProtocolAttributes &&
-                        (!sourceOwnsName || !destinationHasName)
+                            (!sourceOwnsName || !destinationHasName)
                 ) {
                     "Attribute \"$name\" is owned by the Compose hydration protocol"
                 }

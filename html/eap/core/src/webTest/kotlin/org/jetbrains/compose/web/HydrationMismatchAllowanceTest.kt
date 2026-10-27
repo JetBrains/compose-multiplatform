@@ -344,12 +344,13 @@ class HydrationMismatchAllowanceTest {
             }
             val serverScript = root.firstChild as HTMLScriptElement
 
-            val composition = hydrateComposable(root, validateStrictly = validateStrictly, onHydrationMismatch = { throw it }) {
-                Script(InlineScript("const renderedAt = '12:05';")) {
-                    allowHydrationMismatch()
-                    type(ScriptType.TextPlain)
+            val composition =
+                hydrateComposable(root, validateStrictly = validateStrictly, onHydrationMismatch = { throw it }) {
+                    Script(InlineScript("const renderedAt = '12:05';")) {
+                        allowHydrationMismatch()
+                        type(ScriptType.TextPlain)
+                    }
                 }
-            }
 
             try {
                 assertSame(serverScript, root.firstChild)
@@ -398,11 +399,12 @@ class HydrationMismatchAllowanceTest {
             }
             val serverStyle = root.firstChild as HTMLStyleElement
 
-            val composition = hydrateComposable(root, validateStrictly = validateStrictly, onHydrationMismatch = { throw it }) {
-                Style(applyAttrs = { allowHydrationMismatch() }) {
-                    "body" style { color(Color.blue) }
+            val composition =
+                hydrateComposable(root, validateStrictly = validateStrictly, onHydrationMismatch = { throw it }) {
+                    Style(applyAttrs = { allowHydrationMismatch() }) {
+                        "body" style { color(Color.blue) }
+                    }
                 }
-            }
 
             try {
                 assertSame(serverStyle, root.firstChild)

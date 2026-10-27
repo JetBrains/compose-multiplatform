@@ -25,7 +25,11 @@ class HtmlStringSerializationJvmTest {
                         assertFailsWith<IllegalArgumentException> { output.appendEscapedHtmlString(value, attribute) }
                     } else {
                         assertTrue(output.appendEscapedHtmlString(value, attribute))
-                        assertEquals("prefix:" + referenceEscape(value, attribute), output.toString(), "Code unit $code")
+                        assertEquals(
+                            "prefix:" + referenceEscape(value, attribute),
+                            output.toString(),
+                            "Code unit $code"
+                        )
                     }
                 }
             }
@@ -62,10 +66,14 @@ class HtmlStringSerializationJvmTest {
                 for (offset in 0..3) {
                     val value = padding + "a".repeat(offset) + character + padding
                     assertEquals(
-                        textSafe, canAppendUnescapedHtmlString(value, attribute = false), "Text code unit $code at $offset",
+                        textSafe,
+                        canAppendUnescapedHtmlString(value, attribute = false),
+                        "Text code unit $code at $offset",
                     )
                     assertEquals(
-                        attributeSafe, canAppendUnescapedHtmlString(value, attribute = true), "Attribute code unit $code at $offset",
+                        attributeSafe,
+                        canAppendUnescapedHtmlString(value, attribute = true),
+                        "Attribute code unit $code at $offset",
                     )
                 }
             }

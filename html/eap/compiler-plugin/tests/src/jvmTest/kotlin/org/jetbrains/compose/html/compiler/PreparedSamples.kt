@@ -28,7 +28,7 @@ fun PreparedAttributes(content: ContentBuilder<HTMLDivElement>?) {
 
 @Composable
 fun PreparedContainer(value: String, effect: (String) -> Unit) {
-    Div(attrs = { classes(CARD_CLASS) }) outer@ {
+    Div(attrs = { classes(CARD_CLASS) }) outer@{
         effect("container")
         Text(value)
         Span(attrs = { classes("details") }) {

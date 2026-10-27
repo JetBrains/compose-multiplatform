@@ -82,13 +82,18 @@ internal class PreparedElementLowering(
     fun lower(element: HtmlElement, builder: DeclarationIrBuilder): IrExpression? {
         val attributes = element.attributes as? LiteralAttributes ?: return null
         if (element.namespace != HtmlNamespace || element.call.arguments.size != 2 ||
-            !supportsPreparedHtmlAttributes(element.tag)) return null
+            !supportsPreparedHtmlAttributes(element.tag)
+        ) return null
         if (attributes.values.size + attributes.classNames.size > MaxPreparedAttributeOperations ||
-            sharedAttributes.size >= MaxPreparedAttributesPerFile) return null
+            sharedAttributes.size >= MaxPreparedAttributesPerFile
+        ) return null
         val types = wrapperTypes(element.call) ?: return null
         val values = attributes.values
-        if (!generatedFields.canStore(values.keys + values.values + attributes.classNames +
-                listOf(requireNotNull(element.openingTag)))) return null
+        if (!generatedFields.canStore(
+                values.keys + values.values + attributes.classNames +
+                        listOf(requireNotNull(element.openingTag))
+            )
+        ) return null
         val attrs = prepareAttributes(element, attributes, types)
         // Read content after the transformer has lowered the children.
         val content = element.call.arguments[1] as? IrFunctionExpression

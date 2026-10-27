@@ -16,6 +16,7 @@ import kotlinx.browser.dom.Text
 internal actual fun Element.hasHtmlNamespace(): Boolean = namespaceURI == HtmlNamespace
 internal actual fun Element.matchesElement(localName: String, namespace: String): Boolean =
     this.localName == localName && namespaceURI == namespace
+
 internal actual fun Text.matchesText(value: String): Boolean = data == value
 internal actual fun Node.isRawTextContainer(): Boolean =
     this is Element && isHtmlRawTextElement(localName, namespaceURI)

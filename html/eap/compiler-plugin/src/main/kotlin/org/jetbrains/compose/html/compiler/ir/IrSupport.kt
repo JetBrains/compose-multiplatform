@@ -60,7 +60,7 @@ internal fun IrElement.anyDescendant(predicate: (IrElement) -> Boolean): Boolean
 internal fun hasComposableCall(expression: IrExpression?): Boolean =
     expression?.anyDescendant {
         it is IrCall && (it.symbol.owner.hasAnnotation(Composable) ||
-            it.dispatchReceiver?.type?.hasAnnotation(Composable) == true)
+                it.dispatchReceiver?.type?.hasAnnotation(Composable) == true)
     } == true
 
 internal fun IrExpression?.isAbsent(): Boolean = this == null || (this is IrConst && kind == IrConstKind.Null)

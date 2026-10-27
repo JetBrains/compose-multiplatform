@@ -13,9 +13,15 @@ internal actual fun canAppendUnescapedHtmlString(value: String, attribute: Boole
     if (value.length - startIndex < 32) return false
     // Use JVM String searches to skip Kotlin's search wrappers.
     val text = value.unsafeCast<java.lang.String>()
-    return text.indexOf('&'.code, startIndex) < 0 && text.indexOf('<'.code, startIndex) < 0 && text.indexOf('>'.code, startIndex) < 0 &&
-        text.indexOf('\r'.code, startIndex) < 0 && text.indexOf('\u0000'.code, startIndex) < 0 &&
-        (!attribute || (text.indexOf('"'.code, startIndex) < 0 && text.indexOf('\n'.code, startIndex) < 0 && text.indexOf('\t'.code, startIndex) < 0))
+    return text.indexOf('&'.code, startIndex) < 0 && text.indexOf('<'.code, startIndex) < 0 && text.indexOf(
+        '>'.code,
+        startIndex
+    ) < 0 &&
+            text.indexOf('\r'.code, startIndex) < 0 && text.indexOf('\u0000'.code, startIndex) < 0 &&
+            (!attribute || (text.indexOf('"'.code, startIndex) < 0 && text.indexOf(
+                '\n'.code,
+                startIndex
+            ) < 0 && text.indexOf('\t'.code, startIndex) < 0))
 }
 
 internal actual fun StringBuilder.appendHtmlRun(value: String, start: Int, end: Int) {
@@ -53,6 +59,7 @@ internal actual fun StringBuilder.appendEscapedHtmlString(value: String, attribu
                 if (attribute) "HTML attribute values must not contain NUL (U+0000)"
                 else "HTML text must not contain NUL (U+0000)"
             )
+
             '&' -> "&amp;"
             '<' -> "&lt;"
             '>' -> "&gt;"

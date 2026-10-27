@@ -78,7 +78,7 @@ internal class ConstantEvaluator(context: IrPluginContext) {
     private fun isPortable(constant: IrConst): Boolean =
         // Compile-time floating-point formatting can differ from the runtime's formatNumber.
         constant.kind != IrConstKind.Float && constant.kind != IrConstKind.Double &&
-            ((constant.value as? String)?.length ?: 0) <= MaxEvaluatedStringLength
+                ((constant.value as? String)?.length ?: 0) <= MaxEvaluatedStringLength
 
     private fun foldExpression(value: IrExpression?, depth: Int): IrConst? {
         if (value == null) return null
@@ -97,6 +97,7 @@ internal class ConstantEvaluator(context: IrPluginContext) {
                 if (!limited) aliases[variable] = constant
                 constant
             }
+
             is IrStringConcatenation -> {
                 val arguments = value.arguments.map { foldPortableConstant(it, depth + 1) ?: return null }
                 // Bound concatenation before asking the interpreter to allocate its result.
@@ -107,6 +108,7 @@ internal class ConstantEvaluator(context: IrPluginContext) {
                 copy.arguments.addAll(arguments)
                 interpreter.interpret(copy) as? IrConst
             }
+
             is IrCall -> {
                 // OnlyBuiltins also accepts property accessors. Do not evaluate those here.
                 if (value.symbol.owner.correspondingPropertySymbol != null ||
@@ -123,6 +125,7 @@ internal class ConstantEvaluator(context: IrPluginContext) {
                 }
                 interpreter.interpret(copy) as? IrConst
             }
+
             is IrWhen -> {
                 // Evaluate only the selected branch, preserving short-circuit behavior.
                 for (branch in value.branches) {
@@ -131,6 +134,7 @@ internal class ConstantEvaluator(context: IrPluginContext) {
                 }
                 null
             }
+
             else -> null
         }
     }

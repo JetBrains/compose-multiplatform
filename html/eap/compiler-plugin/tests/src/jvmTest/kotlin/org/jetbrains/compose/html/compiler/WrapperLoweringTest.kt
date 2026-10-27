@@ -27,15 +27,21 @@ class WrapperLoweringTest {
         for (name in listOf("UnmarkedInputOverloads", "SvgDuplicate", "SvgDuplicateBranches")) {
             assertEquals(emptyMap(), calls.getValue(name), name)
         }
-        assertTrue(methodStrings(comparison.bytecode, "LiteralListener").any { "<button class=\"buy\">Buy</button>" in it })
+        assertTrue(
+            methodStrings(
+                comparison.bytecode,
+                "LiteralListener"
+            ).any { "<button class=\"buy\">Buy</button>" in it })
     }
 
     @Test
     fun metadataNamesAndConversionsUseDirectWriters() {
         comparison.assertEquivalent(metadataCases.keys)
         for (name in metadataCases.keys) {
-            assertTrue((comparison.writerCalls.getValue(name)["finishMixedElement"] ?: 0) > 0,
-                "Expected annotated attributes to lower directly: $name")
+            assertTrue(
+                (comparison.writerCalls.getValue(name)["finishMixedElement"] ?: 0) > 0,
+                "Expected annotated attributes to lower directly: $name"
+            )
         }
     }
 
@@ -43,8 +49,10 @@ class WrapperLoweringTest {
     fun omittedDefaultsMatchExplicitArguments() {
         comparison.assertEquivalent(defaultCases.keys)
         for (name in defaults.keys) {
-            assertEquals(comparison.ordinary.getValue("Omitted$name"), comparison.ordinary.getValue("Explicit$name"),
-                "Marker default drift: $name")
+            assertEquals(
+                comparison.ordinary.getValue("Omitted$name"), comparison.ordinary.getValue("Explicit$name"),
+                "Marker default drift: $name"
+            )
         }
     }
 
@@ -370,8 +378,15 @@ class WrapperLoweringTest {
             """.trimIndent(),
         )
         private val comparison by lazy {
-            LoweringComparison(metadataCases + defaultCases + behaviorCases,
-                matrixCases = setOf("SvgDuplicate", "SvgDuplicateBranches", "StyleException", "TextAreaValues", "SvgCallbackFallback"),
+            LoweringComparison(
+                metadataCases + defaultCases + behaviorCases,
+                matrixCases = setOf(
+                    "SvgDuplicate",
+                    "SvgDuplicateBranches",
+                    "StyleException",
+                    "TextAreaValues",
+                    "SvgCallbackFallback"
+                ),
                 declarations = """
                     @Composable @LowerableHtmlTag("div")
                     fun Uncovered(mode: String? = null, attrs: AttrBuilderContext<kotlinx.browser.dom.HTMLDivElement>? = null) {
@@ -394,12 +409,15 @@ class WrapperLoweringTest {
                         Mark("scope")
                         return scope
                     }
-                """.trimIndent(), extraSources = mapOf("ExtraInput.kt" to """
+                """.trimIndent(), extraSources = mapOf(
+                    "ExtraInput.kt" to """
                     package org.jetbrains.compose.web.dom
                     import androidx.compose.runtime.Composable
                     @Composable fun Input(type: String, attrs: @Composable () -> Unit) { Text(type); attrs() }
                     @Composable fun Input(type: org.jetbrains.compose.web.attributes.InputType<*>, attrs: String?) { Text("custom typed input") }
-                """.trimIndent()))
+                """.trimIndent()
+                )
+            )
         }
     }
 }

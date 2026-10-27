@@ -75,7 +75,8 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
                 update = {
                     val attrsScope = AttrsScopeBuilder<TElement>()
                     applyAttrs?.invoke(attrsScope)
-                    val formState = attrsScope.propertyUpdatesOrEmpty.formControlState(elementBuilder.tagName, namespace)
+                    val formState =
+                        attrsScope.propertyUpdatesOrEmpty.formControlState(elementBuilder.tagName, namespace)
                     val attributes = attrsScope.stringAttributes(namespace, validate, formState)
                     rawText?.validateAttributes(attributes.byName)
 

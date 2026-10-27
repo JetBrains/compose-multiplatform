@@ -28,7 +28,13 @@ internal fun staticHtmlConstants(file: String, method: String? = null): Set<Stri
     val files = if (method == null) listOf(file, "ComposableSingletons\$$file") else listOf(file)
     for (className in files) {
         sampleBytecode(className).accept(object : ClassVisitor(Opcodes.ASM9) {
-            override fun visitMethod(access: Int, name: String, descriptor: String, signature: String?, exceptions: Array<out String>?): MethodVisitor? {
+            override fun visitMethod(
+                access: Int,
+                name: String,
+                descriptor: String,
+                signature: String?,
+                exceptions: Array<out String>?
+            ): MethodVisitor? {
                 if (method != null && method != name) return null
                 return object : MethodVisitor(Opcodes.ASM9) {
                     private val strings = mutableMapOf<Int, String>()
@@ -46,6 +52,7 @@ internal fun staticHtmlConstants(file: String, method: String? = null): Set<Stri
                                 strings.remove(variable)
                                 string?.let { strings[variable] = it }
                             }
+
                             Opcodes.ALOAD -> {
                                 string = strings[variable]
                                 if (string?.startsWith('<') == true) encoded = string
@@ -53,7 +60,13 @@ internal fun staticHtmlConstants(file: String, method: String? = null): Set<Stri
                         }
                     }
 
-                    override fun visitMethodInsn(opcode: Int, owner: String, name: String, descriptor: String, isInterface: Boolean) {
+                    override fun visitMethodInsn(
+                        opcode: Int,
+                        owner: String,
+                        name: String,
+                        descriptor: String,
+                        isInterface: Boolean
+                    ) {
                         if (name == "beginStaticHtml") encoded?.let(constants::add)
                         string = null
                     }
@@ -87,7 +100,13 @@ internal fun classMethodCalls(reader: ClassReader, ownerPrefix: String? = null):
     visitMethods(reader) { method ->
         val targets = calls.getOrPut(method) { mutableListOf() }
         object : MethodVisitor(Opcodes.ASM9) {
-            override fun visitMethodInsn(opcode: Int, owner: String, name: String, descriptor: String, isInterface: Boolean) {
+            override fun visitMethodInsn(
+                opcode: Int,
+                owner: String,
+                name: String,
+                descriptor: String,
+                isInterface: Boolean
+            ) {
                 if (ownerPrefix == null || owner.startsWith(ownerPrefix)) targets.add(name)
             }
         }
@@ -136,8 +155,10 @@ internal inline fun forEachRenderMode(test: (strict: Boolean, hydratable: Boolea
 internal fun render(strict: Boolean, hydratable: Boolean, stream: Boolean, content: @Composable () -> Unit): String {
     if (!stream) return composeHtmlToString(validateStrictly = strict, hydratable = hydratable, content = content)
     val chunks = StringBuilder()
-    composeHtmlToStream(validateStrictly = strict, hydratable = hydratable, chunkSize = 1,
-        sink = { chunks.append(it) }, content = content)
+    composeHtmlToStream(
+        validateStrictly = strict, hydratable = hydratable, chunkSize = 1,
+        sink = { chunks.append(it) }, content = content
+    )
     return chunks.toString()
 }
 
@@ -157,10 +178,12 @@ internal fun compileJvm(
     )
     if (compose) {
         val composePlugin = File(ComposePluginRegistrar::class.java.protectionDomain.codeSource.location.toURI())
-        arguments.addAll(listOf(
-            "-Xplugin=${composePlugin.path}",
-            "-Xcompiler-plugin-order=org.jetbrains.compose.html.lowering>androidx.compose.compiler.plugins.kotlin",
-        ))
+        arguments.addAll(
+            listOf(
+                "-Xplugin=${composePlugin.path}",
+                "-Xcompiler-plugin-order=org.jetbrains.compose.html.lowering>androidx.compose.compiler.plugins.kotlin",
+            )
+        )
     }
     if (lowering != null) arguments.addAll(listOf("-P", "plugin:org.jetbrains.compose.html.lowering:enabled=$lowering"))
     arguments.addAll(sources.map { it.path })
@@ -189,9 +212,16 @@ internal class LoweringComparison(
             val sources = listOf(source) + extraSources.map { (name, body) ->
                 directory.resolve(name).apply { writeText(body) }
             }
+
             fun compile(lowering: Boolean): File {
                 val output = directory.resolve(if (lowering) "lowered" else "ordinary")
-                val (exit, log) = compileJvm(sources, output, System.getProperty("java.class.path"), lowering, compose = true)
+                val (exit, log) = compileJvm(
+                    sources,
+                    output,
+                    System.getProperty("java.class.path"),
+                    lowering,
+                    compose = true
+                )
                 assertEquals(ExitCode.OK, exit, log)
                 return output
             }
@@ -219,7 +249,8 @@ internal class LoweringComparison(
     }
 
     private fun source(declarations: String): String = buildString {
-        appendLine("""
+        appendLine(
+            """
             @file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class,
                 org.jetbrains.compose.web.ExperimentalComposeWebSvgApi::class)
             @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
@@ -242,14 +273,16 @@ internal class LoweringComparison(
                 val writer = currentHtmlStringWriter()
                 Text("[${'$'}{writerField(writer, "currentTagName")}|${'$'}{writerField(writer, "currentNamespace")}|${'$'}{writerField(writer, "previousSiblingWasText")}]")
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         appendLine(declarations)
         for ((name, body) in cases) {
             appendLine("@Composable fun $name(name: String) {")
             appendLine(body.prependIndent("    "))
             appendLine("}")
         }
-        appendLine("""
+        appendLine(
+            """
             fun render(case: String, strict: Boolean, hydratable: Boolean, stream: Boolean): String {
                 events.clear()
                 val observed = StringBuilder()
@@ -266,7 +299,8 @@ internal class LoweringComparison(
                 }
                 return result + "|events=" + events
             }
-        """.trimIndent())
+        """.trimIndent()
+        )
         appendLine("@Composable private fun sample(case: String, name: String) {")
         appendLine("    when (case) {")
         for (name in cases.keys) {
@@ -286,8 +320,10 @@ internal class LoweringComparison(
                 buildList {
                     if (name !in matrixCases) add(method.invoke(null, name, true, false, false).toString())
                     else forEachRenderMode { strict, hydratable, stream ->
-                        add("strict=$strict hydratable=$hydratable stream=$stream: " +
-                            method.invoke(null, name, strict, hydratable, stream))
+                        add(
+                            "strict=$strict hydratable=$hydratable stream=$stream: " +
+                                    method.invoke(null, name, strict, hydratable, stream)
+                        )
                     }
                 }.joinToString("\n")
             }

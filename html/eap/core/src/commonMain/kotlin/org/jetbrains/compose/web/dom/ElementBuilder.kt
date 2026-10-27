@@ -16,7 +16,7 @@ fun interface ElementBuilder<TElement : Element> {
     val tagName: String
         get() = error(
             "String rendering requires a tag name. " +
-                "Override ElementBuilder.tagName or use TagElement(tagName, ...)."
+                    "Override ElementBuilder.tagName or use TagElement(tagName, ...)."
         )
 
     fun create(): TElement

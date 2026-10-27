@@ -36,7 +36,16 @@ class ElementLoweringTest {
             })
             assertTrue(calls.containsAll(setOf("openLoweredRegion", "writeText", "closeElement")), "$method: $calls")
             assertFalse("appendText" in calls, "$method: $calls")
-            assertFalse(calls.any { it in setOf("Div", "Span", "Text", "TagElement", "PreparedTextElement", "PreparedContainer") })
+            assertFalse(calls.any {
+                it in setOf(
+                    "Div",
+                    "Span",
+                    "Text",
+                    "TagElement",
+                    "PreparedTextElement",
+                    "PreparedContainer"
+                )
+            })
             assertFalse(calls.any { it.startsWith("composableLambda") })
         }
     }
@@ -75,9 +84,9 @@ class ElementLoweringTest {
             }
             val boundary = if (hydratable) "<!--c-->" else ""
             val expected = "before<div class=\"container\"><span>head</span><span>value: &lt;&amp;</span>" +
-                "empty<span>value: é😀</span>footer<span>middle</span><span>sibling</span><span>tail</span></div>" +
-                "<div id=\"greeting\" title=\"Hello &amp; goodbye\" class=\"card\">dynamic&lt;&amp;</div>" +
-                "after${boundary}adjacent"
+                    "empty<span>value: é😀</span>footer<span>middle</span><span>sibling</span><span>tail</span></div>" +
+                    "<div id=\"greeting\" title=\"Hello &amp; goodbye\" class=\"card\">dynamic&lt;&amp;</div>" +
+                    "after${boundary}adjacent"
             val actual = render(strict, hydratable, stream, content)
             assertEquals(expected, actual)
             assertEquals(listOf("open", "footer", "close", "greeting"), effects)
@@ -180,7 +189,7 @@ class ElementLoweringTest {
                     Text("after")
                 }
                 val expected = "before<div class=\"card\">user-$render<span class=\"details\">details</span>end</div>" +
-                    "<span class=\"price\">price-$render</span><span class=\"label\">&lt;&amp;&#13;😀</span>after"
+                        "<span class=\"price\">price-$render</span><span class=\"label\">&lt;&amp;&#13;😀</span>after"
                 assertEquals(expected, render(strict, hydratable, stream, content))
                 assertEquals(List(render + 1) { listOf("container", "text", "price") }.flatten(), effects)
             }
@@ -196,10 +205,12 @@ class ElementLoweringTest {
             assertFailsWith<IllegalArgumentException> {
                 render(strict = true, hydratable = true, stream = stream) {
                     Table {
-                        Span { Text(run {
-                            effects.add("text")
-                            "invalid child"
-                        }) }
+                        Span {
+                            Text(run {
+                                effects.add("text")
+                                "invalid child"
+                            })
+                        }
                     }
                 }
             }
@@ -223,7 +234,8 @@ class ElementLoweringTest {
     @Test
     fun textModesAndRuntimeValidationArePreserved() {
         for (stream in listOf(false, true)) {
-            assertEquals("<pre>\n\n&lt;&amp;</pre><title>&lt;&amp;</title><iframe><&</iframe><span></span>",
+            assertEquals(
+                "<pre>\n\n&lt;&amp;</pre><title>&lt;&amp;</title><iframe><&</iframe><span></span>",
                 render(strict = true, hydratable = true, stream = stream) {
                     Pre { Text("\n<&") }
                     Title { Text("<&") }
@@ -231,7 +243,8 @@ class ElementLoweringTest {
                     Span { Text("") }
                 })
             for (value in listOf("\n<&", "")) {
-                assertEquals("<pre>${if (value.isEmpty()) "" else "\n\n&lt;&amp;"}</pre>",
+                assertEquals(
+                    "<pre>${if (value.isEmpty()) "" else "\n\n&lt;&amp;"}</pre>",
                     render(strict = true, hydratable = true, stream = stream) { Pre { Text(value) } })
             }
             assertFailsWith<IllegalArgumentException> {

@@ -68,11 +68,11 @@ private class ElementAttrs(val builder: AttrsScopeBuilder<*>) {
         val a = builder
         val b = other.builder
         return a.collect() == b.collect() &&
-            a.classes == b.classes &&
-            a.styleScopeOrNull == b.styleScopeOrNull &&
-            a.propertyUpdatesOrEmpty == b.propertyUpdatesOrEmpty &&
-            a.eventsListenerScopeBuilder.collectListeners() ==
-            b.eventsListenerScopeBuilder.collectListeners()
+                a.classes == b.classes &&
+                a.styleScopeOrNull == b.styleScopeOrNull &&
+                a.propertyUpdatesOrEmpty == b.propertyUpdatesOrEmpty &&
+                a.eventsListenerScopeBuilder.collectListeners() ==
+                b.eventsListenerScopeBuilder.collectListeners()
     }
 
     override fun hashCode(): Int = builder.collect().hashCode()
@@ -339,7 +339,7 @@ private class HydratingDomElementWrapper(
         }
         applier.mismatch(
             "attribute \"$name\": expected ${expected.describeAttributeValue()}, " +
-                "found ${actual.describeAttributeValue()}",
+                    "found ${actual.describeAttributeValue()}",
         )
     }
 }
@@ -349,6 +349,7 @@ private fun Element.composedAttributeNamespace(name: String): String? =
     if (namespaceURI == HtmlNamespace) null else when (name) {
         "xlink:actuate", "xlink:arcrole", "xlink:href", "xlink:role", "xlink:show",
         "xlink:title", "xlink:type" -> "http://www.w3.org/1999/xlink"
+
         "xml:base", "xml:lang", "xml:space" -> "http://www.w3.org/XML/1998/namespace"
         "xmlns", "xmlns:xlink" -> "http://www.w3.org/2000/xmlns/"
         else -> null
@@ -604,7 +605,7 @@ private class HydratingComposeHtmlContext(
         // Keep scripted <noscript> fallback opaque during direct hydration.
         val preserveServerContent = remember {
             hydrationAwareBuilder is HydratingElementBuilder<*> &&
-                hydrationAwareBuilder.preservesServerContent
+                    hydrationAwareBuilder.preservesServerContent
         }
         TagElementImpl(
             elementBuilder = hydrationAwareBuilder,

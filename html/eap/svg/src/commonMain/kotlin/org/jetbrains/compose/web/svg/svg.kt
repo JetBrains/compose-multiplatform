@@ -44,9 +44,9 @@ private fun <TElement : SVGElement> TagElementSvgNS(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("svg", SVG_NS)
 fun Svg(
-  viewBox: String? = null,
-  attrs: AttrBuilderContext<SVGElement>? = null,
-  content: ContentBuilder<SVGElement>? = null
+    viewBox: String? = null,
+    attrs: AttrBuilderContext<SVGElement>? = null,
+    content: ContentBuilder<SVGElement>? = null
 ) {
     TagElementSvgNS<SVGElement>(
         tagName = "svg",
@@ -62,9 +62,9 @@ fun Svg(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("a", SVG_NS)
 fun ElementScope<SVGElement>.SvgA(
-  href: String,
-  attrs: AttrBuilderContext<SVGAElement>? = null,
-  content: ContentBuilder<SVGAElement>? = null
+    href: String,
+    attrs: AttrBuilderContext<SVGAElement>? = null,
+    content: ContentBuilder<SVGAElement>? = null
 ) {
     TagElementSvgNS<SVGAElement>(
         tagName = "a",
@@ -80,11 +80,11 @@ fun ElementScope<SVGElement>.SvgA(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("circle", SVG_NS)
 fun ElementScope<SVGElement>.Circle(
-  cx: CSSLengthOrPercentageValue,
-  cy: CSSLengthOrPercentageValue,
-  r: CSSLengthOrPercentageValue,
-  attrs: AttrBuilderContext<SVGCircleElement>? = null,
-  content: ContentBuilder<SVGCircleElement>? = null
+    cx: CSSLengthOrPercentageValue,
+    cy: CSSLengthOrPercentageValue,
+    r: CSSLengthOrPercentageValue,
+    attrs: AttrBuilderContext<SVGCircleElement>? = null,
+    content: ContentBuilder<SVGCircleElement>? = null
 ) {
     TagElementSvgNS<SVGCircleElement>(
         tagName = "circle",
@@ -103,11 +103,11 @@ fun ElementScope<SVGElement>.Circle(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("circle", SVG_NS)
 fun ElementScope<SVGElement>.Circle(
-  cx: Number,
-  cy: Number,
-  r: Number,
-  attrs: AttrBuilderContext<SVGCircleElement>? = null,
-  content: ContentBuilder<SVGCircleElement>? = null
+    cx: Number,
+    cy: Number,
+    r: Number,
+    attrs: AttrBuilderContext<SVGCircleElement>? = null,
+    content: ContentBuilder<SVGCircleElement>? = null
 ) {
     TagElementSvgNS<SVGCircleElement>(
         tagName = "circle",
@@ -126,10 +126,10 @@ fun ElementScope<SVGElement>.Circle(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("text", SVG_NS, defaults = ["x=0", "y=0"], text = "text")
 fun ElementScope<SVGElement>.SvgText(
-  text: String,
-  x: Number = 0,
-  y: Number = 0,
-  attrs: AttrBuilderContext<SVGTextElement>? = null,
+    text: String,
+    x: Number = 0,
+    y: Number = 0,
+    attrs: AttrBuilderContext<SVGTextElement>? = null,
 ) {
     TagElementSvgNS<SVGTextElement>(
         tagName = "text",
@@ -148,9 +148,9 @@ fun ElementScope<SVGElement>.SvgText(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("view", SVG_NS)
 fun ElementScope<SVGElement>.View(
-  id: String,
-  viewBox: String,
-  attrs: AttrBuilderContext<SVGViewElement>? = null,
+    id: String,
+    viewBox: String,
+    attrs: AttrBuilderContext<SVGViewElement>? = null,
 ) {
     TagElementSvgNS<SVGViewElement>(
         tagName = "view",
@@ -167,12 +167,12 @@ fun ElementScope<SVGElement>.View(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("rect", SVG_NS)
 fun ElementScope<SVGElement>.Rect(
-  x: Number,
-  y: Number,
-  width: Number,
-  height: Number,
-  attrs: AttrBuilderContext<SVGRectElement>? = null,
-  content: ContentBuilder<SVGRectElement>? = null
+    x: Number,
+    y: Number,
+    width: Number,
+    height: Number,
+    attrs: AttrBuilderContext<SVGRectElement>? = null,
+    content: ContentBuilder<SVGRectElement>? = null
 ) {
     TagElementSvgNS<SVGRectElement>(
         tagName = "rect",
@@ -191,12 +191,12 @@ fun ElementScope<SVGElement>.Rect(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("rect", SVG_NS)
 fun ElementScope<SVGElement>.Rect(
-  x: CSSLengthOrPercentageValue,
-  y: CSSLengthOrPercentageValue,
-  width: CSSLengthOrPercentageValue,
-  height: CSSLengthOrPercentageValue,
-  attrs: AttrBuilderContext<SVGRectElement>? = null,
-  content: ContentBuilder<SVGRectElement>? = null
+    x: CSSLengthOrPercentageValue,
+    y: CSSLengthOrPercentageValue,
+    width: CSSLengthOrPercentageValue,
+    height: CSSLengthOrPercentageValue,
+    attrs: AttrBuilderContext<SVGRectElement>? = null,
+    content: ContentBuilder<SVGRectElement>? = null
 ) {
     TagElementSvgNS<SVGRectElement>(
         tagName = "rect",
@@ -241,12 +241,12 @@ fun ElementScope<SVGElement>.Rect(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("ellipse", SVG_NS)
 fun ElementScope<SVGElement>.Ellipse(
-  cx: CSSLengthOrPercentageValue,
-  cy: CSSLengthOrPercentageValue,
-  rx: CSSLengthOrPercentageValue,
-  ry: CSSLengthOrPercentageValue,
-  attrs: AttrBuilderContext<SVGEllipseElement>? = null,
-  content: ContentBuilder<SVGEllipseElement>? = null
+    cx: CSSLengthOrPercentageValue,
+    cy: CSSLengthOrPercentageValue,
+    rx: CSSLengthOrPercentageValue,
+    ry: CSSLengthOrPercentageValue,
+    attrs: AttrBuilderContext<SVGEllipseElement>? = null,
+    content: ContentBuilder<SVGEllipseElement>? = null
 ) {
     TagElementSvgNS<SVGEllipseElement>(
         tagName = "ellipse",
@@ -265,12 +265,12 @@ fun ElementScope<SVGElement>.Ellipse(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("ellipse", SVG_NS)
 fun ElementScope<SVGElement>.Ellipse(
-  cx: Number,
-  cy: Number,
-  rx: Number,
-  ry: Number,
-  attrs: AttrBuilderContext<SVGEllipseElement>? = null,
-  content: ContentBuilder<SVGEllipseElement>? = null
+    cx: Number,
+    cy: Number,
+    rx: Number,
+    ry: Number,
+    attrs: AttrBuilderContext<SVGEllipseElement>? = null,
+    content: ContentBuilder<SVGEllipseElement>? = null
 ) {
     TagElementSvgNS<SVGEllipseElement>(
         tagName = "ellipse",
@@ -290,9 +290,9 @@ fun ElementScope<SVGElement>.Ellipse(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("symbol", SVG_NS)
 fun ElementScope<SVGElement>.Symbol(
-  id: String? = null,
-  attrs: AttrBuilderContext<SVGSymbolElement>? = null,
-  content: ContentBuilder<SVGSymbolElement>? = null
+    id: String? = null,
+    attrs: AttrBuilderContext<SVGSymbolElement>? = null,
+    content: ContentBuilder<SVGSymbolElement>? = null
 ) {
     TagElementSvgNS<SVGSymbolElement>(
         tagName = "symbol",
@@ -308,9 +308,9 @@ fun ElementScope<SVGElement>.Symbol(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("use", SVG_NS)
 fun ElementScope<SVGElement>.Use(
-  href: String,
-  attrs: AttrBuilderContext<SVGUseElement>? = null,
-  content: ContentBuilder<SVGUseElement>? = null
+    href: String,
+    attrs: AttrBuilderContext<SVGUseElement>? = null,
+    content: ContentBuilder<SVGUseElement>? = null
 ) {
     TagElementSvgNS<SVGUseElement>(
         tagName = "use",
@@ -326,12 +326,12 @@ fun ElementScope<SVGElement>.Use(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("line", SVG_NS)
 fun ElementScope<SVGElement>.Line(
-  x1: CSSLengthOrPercentageValue,
-  y1: CSSLengthOrPercentageValue,
-  x2: CSSLengthOrPercentageValue,
-  y2: CSSLengthOrPercentageValue,
-  attrs: AttrBuilderContext<SVGLineElement>? = null,
-  content: ContentBuilder<SVGLineElement>? = null
+    x1: CSSLengthOrPercentageValue,
+    y1: CSSLengthOrPercentageValue,
+    x2: CSSLengthOrPercentageValue,
+    y2: CSSLengthOrPercentageValue,
+    attrs: AttrBuilderContext<SVGLineElement>? = null,
+    content: ContentBuilder<SVGLineElement>? = null
 ) {
     TagElementSvgNS<SVGLineElement>(
         tagName = "line",
@@ -350,12 +350,12 @@ fun ElementScope<SVGElement>.Line(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("line", SVG_NS)
 fun ElementScope<SVGElement>.Line(
-  x1: Number,
-  y1: Number,
-  x2: Number,
-  y2: Number,
-  attrs: AttrBuilderContext<SVGLineElement>? = null,
-  content: ContentBuilder<SVGLineElement>? = null
+    x1: Number,
+    y1: Number,
+    x2: Number,
+    y2: Number,
+    attrs: AttrBuilderContext<SVGLineElement>? = null,
+    content: ContentBuilder<SVGLineElement>? = null
 ) {
     TagElementSvgNS<SVGLineElement>(
         tagName = "line",
@@ -375,9 +375,9 @@ fun ElementScope<SVGElement>.Line(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("clipPath", SVG_NS)
 fun ElementScope<SVGElement>.ClipPath(
-  id: String,
-  attrs: AttrBuilderContext<SVGClipPathElement>? = null,
-  content: ContentBuilder<SVGClipPathElement>? = null
+    id: String,
+    attrs: AttrBuilderContext<SVGClipPathElement>? = null,
+    content: ContentBuilder<SVGClipPathElement>? = null
 ) {
     TagElementSvgNS<SVGClipPathElement>(
         tagName = "clipPath",
@@ -393,9 +393,9 @@ fun ElementScope<SVGElement>.ClipPath(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("path", SVG_NS)
 fun ElementScope<SVGElement>.Path(
-  d: String,
-  attrs: AttrBuilderContext<SVGPathElement>? = null,
-  content: ContentBuilder<SVGPathElement>? = null
+    d: String,
+    attrs: AttrBuilderContext<SVGPathElement>? = null,
+    content: ContentBuilder<SVGPathElement>? = null
 ) {
     TagElementSvgNS<SVGPathElement>(
         tagName = "path",
@@ -411,8 +411,8 @@ fun ElementScope<SVGElement>.Path(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("g", SVG_NS)
 fun ElementScope<SVGElement>.G(
-  attrs: AttrBuilderContext<SVGElement>? = null,
-  content: ContentBuilder<SVGElement>? = null
+    attrs: AttrBuilderContext<SVGElement>? = null,
+    content: ContentBuilder<SVGElement>? = null
 ) {
     TagElementSvgNS<SVGElement>(
         tagName = "g",
@@ -425,9 +425,9 @@ fun ElementScope<SVGElement>.G(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("image", SVG_NS)
 fun ElementScope<SVGElement>.Image(
-  href: String,
-  attrs: AttrBuilderContext<SVGImageElement>? = null,
-  content: ContentBuilder<SVGImageElement>? = null
+    href: String,
+    attrs: AttrBuilderContext<SVGImageElement>? = null,
+    content: ContentBuilder<SVGImageElement>? = null
 ) {
     TagElementSvgNS<SVGImageElement>(
         tagName = "image",
@@ -443,15 +443,15 @@ fun ElementScope<SVGElement>.Image(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("mask", SVG_NS)
 fun ElementScope<SVGElement>.Mask(
-  id: String? = null,
-  attrs: AttrBuilderContext<SVGMaskElement>? = null,
-  content: ContentBuilder<SVGMaskElement>? = null
+    id: String? = null,
+    attrs: AttrBuilderContext<SVGMaskElement>? = null,
+    content: ContentBuilder<SVGMaskElement>? = null
 ) {
     TagElementSvgNS<SVGMaskElement>(
         tagName = "mask",
         applyAttrs = {
-           id?.let { id(it) }
-           attrs?.invoke(this)
+            id?.let { id(it) }
+            attrs?.invoke(this)
         },
         content = content
     )
@@ -461,8 +461,8 @@ fun ElementScope<SVGElement>.Mask(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("defs", SVG_NS)
 fun ElementScope<SVGElement>.Defs(
-  attrs: AttrBuilderContext<SVGDefsElement>? = null,
-  content: ContentBuilder<SVGDefsElement>? = null
+    attrs: AttrBuilderContext<SVGDefsElement>? = null,
+    content: ContentBuilder<SVGDefsElement>? = null
 ) {
     TagElementSvgNS<SVGDefsElement>(
         tagName = "defs",
@@ -475,9 +475,9 @@ fun ElementScope<SVGElement>.Defs(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("pattern", SVG_NS)
 fun ElementScope<SVGElement>.Pattern(
-  id: String,
-  attrs: AttrBuilderContext<SVGPatternElement>? = null,
-  content: ContentBuilder<SVGPatternElement>? = null
+    id: String,
+    attrs: AttrBuilderContext<SVGPatternElement>? = null,
+    content: ContentBuilder<SVGPatternElement>? = null
 ) {
     TagElementSvgNS<SVGPatternElement>(
         tagName = "pattern",
@@ -493,9 +493,9 @@ fun ElementScope<SVGElement>.Pattern(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("polygon", SVG_NS)
 fun ElementScope<SVGElement>.Polygon(
-  vararg points: Number,
-  attrs: AttrBuilderContext<SVGPolygonElement>? = null,
-  content: ContentBuilder<SVGPolygonElement>? = null
+    vararg points: Number,
+    attrs: AttrBuilderContext<SVGPolygonElement>? = null,
+    content: ContentBuilder<SVGPolygonElement>? = null
 ) {
     TagElementSvgNS<SVGPolygonElement>(
         tagName = "polygon",
@@ -511,9 +511,9 @@ fun ElementScope<SVGElement>.Polygon(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("polyline", SVG_NS)
 fun ElementScope<SVGElement>.Polyline(
-  vararg points: Number,
-  attrs: AttrBuilderContext<SVGPolylineElement>? = null,
-  content: ContentBuilder<SVGPolylineElement>? = null
+    vararg points: Number,
+    attrs: AttrBuilderContext<SVGPolylineElement>? = null,
+    content: ContentBuilder<SVGPolylineElement>? = null
 ) {
     TagElementSvgNS<SVGPolylineElement>(
         tagName = "polyline",
@@ -529,9 +529,9 @@ fun ElementScope<SVGElement>.Polyline(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("textPath", SVG_NS, text = "text")
 fun ElementScope<SVGElement>.TextPath(
-  href: String,
-  text: String,
-  attrs: AttrBuilderContext<SVGTextPathElement>? = null,
+    href: String,
+    text: String,
+    attrs: AttrBuilderContext<SVGTextPathElement>? = null,
 ) {
     TagElementSvgNS<SVGTextPathElement>(
         tagName = "textPath",
@@ -549,8 +549,8 @@ fun ElementScope<SVGElement>.TextPath(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("animate", SVG_NS)
 fun ElementScope<SVGElement>.Animate(
-  attrs: AttrBuilderContext<SVGElement>? = null,
-  content: ContentBuilder<SVGElement>? = null
+    attrs: AttrBuilderContext<SVGElement>? = null,
+    content: ContentBuilder<SVGElement>? = null
 ) {
     TagElementSvgNS<SVGElement>(
         tagName = "animate",
@@ -563,8 +563,8 @@ fun ElementScope<SVGElement>.Animate(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("animateMotion", SVG_NS)
 fun ElementScope<SVGElement>.AnimateMotion(
-  attrs: AttrBuilderContext<SVGElement>? = null,
-  content: ContentBuilder<SVGElement>? = null
+    attrs: AttrBuilderContext<SVGElement>? = null,
+    content: ContentBuilder<SVGElement>? = null
 ) {
     TagElementSvgNS<SVGElement>(
         tagName = "animateMotion",
@@ -577,8 +577,8 @@ fun ElementScope<SVGElement>.AnimateMotion(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("animateTransform", SVG_NS)
 fun ElementScope<SVGElement>.AnimateTransform(
-  attrs: AttrBuilderContext<SVGElement>? = null,
-  content: ContentBuilder<SVGElement>? = null
+    attrs: AttrBuilderContext<SVGElement>? = null,
+    content: ContentBuilder<SVGElement>? = null
 ) {
     TagElementSvgNS<SVGElement>(
         tagName = "animateTransform",
@@ -591,9 +591,9 @@ fun ElementScope<SVGElement>.AnimateTransform(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("linearGradient", SVG_NS)
 fun ElementScope<SVGElement>.LinearGradient(
-  id: String? = null,
-  attrs: AttrBuilderContext<SVGLinearGradientElement>? = null,
-  content: ContentBuilder<SVGLinearGradientElement>? = null
+    id: String? = null,
+    attrs: AttrBuilderContext<SVGLinearGradientElement>? = null,
+    content: ContentBuilder<SVGLinearGradientElement>? = null
 ) {
     TagElementSvgNS<SVGLinearGradientElement>(
         tagName = "linearGradient",
@@ -610,9 +610,9 @@ fun ElementScope<SVGElement>.LinearGradient(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("radialGradient", SVG_NS)
 fun ElementScope<SVGElement>.RadialGradient(
-  id: String? = null,
-  attrs: AttrBuilderContext<SVGRadialGradientElement>? = null,
-  content: ContentBuilder<SVGRadialGradientElement>? = null
+    id: String? = null,
+    attrs: AttrBuilderContext<SVGRadialGradientElement>? = null,
+    content: ContentBuilder<SVGRadialGradientElement>? = null
 ) {
     TagElementSvgNS<SVGRadialGradientElement>(
         tagName = "radialGradient",
@@ -628,8 +628,8 @@ fun ElementScope<SVGElement>.RadialGradient(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("stop", SVG_NS)
 fun ElementScope<SVGElement>.Stop(
-  attrs: AttrBuilderContext<SVGStopElement>? = null,
-  content: ContentBuilder<SVGStopElement>? = null
+    attrs: AttrBuilderContext<SVGStopElement>? = null,
+    content: ContentBuilder<SVGStopElement>? = null
 ) {
     TagElementSvgNS<SVGStopElement>(
         tagName = "stop",
@@ -642,8 +642,8 @@ fun ElementScope<SVGElement>.Stop(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("switch", SVG_NS)
 fun ElementScope<SVGElement>.Switch(
-  attrs: AttrBuilderContext<SVGSwitchElement>? = null,
-  content: ContentBuilder<SVGSwitchElement>? = null
+    attrs: AttrBuilderContext<SVGSwitchElement>? = null,
+    content: ContentBuilder<SVGSwitchElement>? = null
 ) {
     TagElementSvgNS<SVGSwitchElement>(
         tagName = "switch",
@@ -656,8 +656,8 @@ fun ElementScope<SVGElement>.Switch(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("title", SVG_NS, text = "text")
 fun ElementScope<SVGElement>.Title(
-  text: String,
-  attrs: AttrBuilderContext<SVGTitleElement>? = null,
+    text: String,
+    attrs: AttrBuilderContext<SVGTitleElement>? = null,
 ) {
     TagElementSvgNS<SVGTitleElement>(
         tagName = "title",
@@ -672,8 +672,8 @@ fun ElementScope<SVGElement>.Title(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("tspan", SVG_NS)
 fun ElementScope<SVGElement>.Tspan(
-  attrs: AttrBuilderContext<SVGTSpanElement>? = null,
-  content: ContentBuilder<SVGTSpanElement>? = null
+    attrs: AttrBuilderContext<SVGTSpanElement>? = null,
+    content: ContentBuilder<SVGTSpanElement>? = null
 ) {
     TagElementSvgNS<SVGTSpanElement>(
         tagName = "tspan",
@@ -686,8 +686,8 @@ fun ElementScope<SVGElement>.Tspan(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("desc", SVG_NS, text = "content")
 fun ElementScope<SVGElement>.Desc(
-  content: String,
-  attrs: AttrBuilderContext<SVGDescElement>? = null,
+    content: String,
+    attrs: AttrBuilderContext<SVGDescElement>? = null,
 ) {
     TagElementSvgNS<SVGDescElement>(
         tagName = "desc",
@@ -702,8 +702,8 @@ fun ElementScope<SVGElement>.Desc(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("marker", SVG_NS)
 fun ElementScope<SVGElement>.Marker(
-  attrs: AttrBuilderContext<SVGMarkerElement>? = null,
-  content: ContentBuilder<SVGMarkerElement>? = null
+    attrs: AttrBuilderContext<SVGMarkerElement>? = null,
+    content: ContentBuilder<SVGMarkerElement>? = null
 ) {
     TagElementSvgNS<SVGMarkerElement>(
         tagName = "marker",
@@ -716,8 +716,8 @@ fun ElementScope<SVGElement>.Marker(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("mpath", SVG_NS)
 fun ElementScope<SVGElement>.Mpath(
-  attrs: AttrBuilderContext<SVGElement>? = null,
-  content: ContentBuilder<SVGElement>? = null
+    attrs: AttrBuilderContext<SVGElement>? = null,
+    content: ContentBuilder<SVGElement>? = null
 ) {
     TagElementSvgNS<SVGElement>(
         tagName = "mpath",
@@ -730,8 +730,8 @@ fun ElementScope<SVGElement>.Mpath(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("filter", SVG_NS)
 fun ElementScope<SVGElement>.Filter(
-  attrs: AttrBuilderContext<SVGElement>? = null,
-  content: ContentBuilder<SVGElement>? = null
+    attrs: AttrBuilderContext<SVGElement>? = null,
+    content: ContentBuilder<SVGElement>? = null
 ) {
     TagElementSvgNS<SVGElement>(
         tagName = "filter",
@@ -744,10 +744,10 @@ fun ElementScope<SVGElement>.Filter(
 @ExperimentalComposeWebSvgApi
 @LowerableHtmlTag("set", SVG_NS)
 fun ElementScope<SVGElement>.Set(
-  attributeName: String,
-  to: String,
-  attrs: AttrBuilderContext<SVGElement>? = null,
-  content: ContentBuilder<SVGElement>? = null
+    attributeName: String,
+    to: String,
+    attrs: AttrBuilderContext<SVGElement>? = null,
+    content: ContentBuilder<SVGElement>? = null
 ) {
     TagElementSvgNS<SVGElement>(
         tagName = "set",
@@ -773,9 +773,9 @@ fun ElementScope<SVGElement>.Set(
 @Composable
 @ExperimentalComposeWebSvgApi
 fun <T : SVGElement> SvgElement(
-  name: String,
-  attrs: AttrBuilderContext<T>? = null,
-  content: ContentBuilder<T>? = null
+    name: String,
+    attrs: AttrBuilderContext<T>? = null,
+    content: ContentBuilder<T>? = null
 ) {
     TagElementSvgNS<T>(
         tagName = name,

@@ -53,6 +53,7 @@ internal fun List<Pair<(Element, Any) -> Unit, Any>>.formControlState(
             }
             if (inputValue == null && checked == null) null else FormControlState(inputValue, checked)
         }
+
         "textarea" -> {
             var textAreaValue: String? = null
             var textAreaDefaultValue: String? = null
@@ -65,6 +66,7 @@ internal fun List<Pair<(Element, Any) -> Unit, Any>>.formControlState(
             // A controlled value takes precedence over a default, including an explicitly empty value.
             (textAreaValue ?: textAreaDefaultValue)?.let { FormControlState(textContent = it) }
         }
+
         else -> null
     }
 }

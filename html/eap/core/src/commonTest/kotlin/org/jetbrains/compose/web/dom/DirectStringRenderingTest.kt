@@ -52,10 +52,16 @@ class DirectStringRenderingTest {
                             TagElement<Element>("textarea", null) { Text("\nfirst"); Text("second") }
                             TagElement<Element>("script", null) { Text("const x = '<&';") }
                             TagElement<Element>("noscript", null) { Span { Text("fallback") } }
-                            TagElementNS<Element>("svg", "http://www.w3.org/2000/svg", { attr("viewBox", "0 0 1 1") }, null)
+                            TagElementNS<Element>(
+                                "svg",
+                                "http://www.w3.org/2000/svg",
+                                { attr("viewBox", "0 0 1 1") },
+                                null
+                            )
                         }
                     }
-                    val expected = composeHtmlToString(hydratable = hydratable, validateStrictly = strict, content = content)
+                    val expected =
+                        composeHtmlToString(hydratable = hydratable, validateStrictly = strict, content = content)
                     assertEquals(expected, composeHtmlToString(hydratable, "direct-changing", strict, content))
                 }
             }
@@ -67,7 +73,10 @@ class DirectStringRenderingTest {
         var value = ""
         var decorated = true
         val content: @Composable () -> Unit = {
-            Div(attrs = if (decorated) { { id("decorated") } } else null) { Text(value) }
+            Div(
+                attrs = if (decorated) {
+                    { id("decorated") }
+                } else null) { Text(value) }
         }
         for ((index, text) in listOf("Unicode é😀 &<>".repeat(10_000), "short", "", "again").withIndex()) {
             value = text
@@ -114,7 +123,10 @@ class DirectStringRenderingTest {
         val movable = movableContentOf { Span { Text("moved") } }
         val content: @Composable () -> Unit = { Div { movable() }; P { Text("after") } }
         assertEquals("<div><span>moved</span></div><p>after</p>", composeHtmlToString(content = content))
-        assertEquals("<div><span>moved</span></div><p>after</p>", composeHtmlToString(key = "movable", content = content))
+        assertEquals(
+            "<div><span>moved</span></div><p>after</p>",
+            composeHtmlToString(key = "movable", content = content)
+        )
     }
 
     @Test
@@ -126,8 +138,19 @@ class DirectStringRenderingTest {
             { TagElement<Element>("style", null) { Span { Text("child") } } },
         )
         for (strict in listOf(false, true)) for (content in invalid) {
-            assertFailsWith<IllegalArgumentException> { composeHtmlToString(validateStrictly = strict, content = content) }
-            assertFailsWith<IllegalArgumentException> { composeHtmlToString(key = "direct-failure", validateStrictly = strict, content = content) }
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString(
+                    validateStrictly = strict,
+                    content = content
+                )
+            }
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString(
+                    key = "direct-failure",
+                    validateStrictly = strict,
+                    content = content
+                )
+            }
             assertEquals("<div>ok</div>", composeHtmlToString(key = "direct-failure") { Div { Text("ok") } })
         }
     }
@@ -148,7 +171,8 @@ class DirectStringRenderingTest {
     @Test
     fun nestedRenderRestoresContextWithTheSameOrDifferentKey() {
         for (innerKey in listOf("inner", "outer")) {
-            assertEquals("<div>outer<!--c-->&lt;span&gt;inner&lt;/span&gt;<!--c-->tail</div>",
+            assertEquals(
+                "<div>outer<!--c-->&lt;span&gt;inner&lt;/span&gt;<!--c-->tail</div>",
                 composeHtmlToString(key = "outer") {
                     Div {
                         Text("outer")

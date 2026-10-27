@@ -21,7 +21,7 @@ internal const val AsciiWhitespaceCharacters = "\t\n\u000C\r "
 
 internal fun isValidHtmlTagName(name: String): Boolean =
     name.firstOrNull()?.isAsciiLetter() == true &&
-        name.none { it in AsciiWhitespaceCharacters || it in InvalidHtmlTagNameCharacters }
+            name.none { it in AsciiWhitespaceCharacters || it in InvalidHtmlTagNameCharacters }
 
 private const val InvalidHtmlTagNameCharacters = "\u0000/>"
 
@@ -126,14 +126,16 @@ internal fun requireHtmlParserStableTableElement(parentTagName: String?, childTa
         parentTagName == "table" && childTagName == "tr" -> "wrap rows in Tbody { }"
         parentTagName == "table" && (childTagName == "td" || childTagName == "th") ->
             "wrap rows in Tbody { } and cells in Tr { }"
+
         parentTagName == "table" && childTagName == "col" -> "wrap columns in Colgroup { }"
         parentTagName in setOf("tbody", "thead", "tfoot") &&
-            (childTagName == "td" || childTagName == "th") -> "wrap cells in Tr { }"
+                (childTagName == "td" || childTagName == "th") -> "wrap cells in Tr { }"
+
         else -> "use explicit table sections, rows and cells, or move this content outside the table"
     }
     throw IllegalArgumentException(
         "Element <$childTagName> cannot be serialized directly inside <$parentTagName>; " +
-            "the HTML parser would insert wrappers, move or discard content. $suggestion",
+                "the HTML parser would insert wrappers, move or discard content. $suggestion",
     )
 }
 
@@ -143,8 +145,8 @@ internal fun isHtmlParserStableTableText(parentTagName: String?, text: String): 
 internal fun requireHtmlParserStableTableText(parentTagName: String?, text: String) {
     require(isHtmlParserStableTableText(parentTagName, text)) {
         "Non-whitespace text cannot be serialized directly inside <$parentTagName>; " +
-            "the HTML parser would move it outside the table. " +
-            "Wrap text in Td { } or Th { } inside Tr { }, or move it outside the table"
+                "the HTML parser would move it outside the table. " +
+                "Wrap text in Td { } or Th { } inside Tr { }, or move it outside the table"
     }
 }
 
@@ -220,7 +222,8 @@ private fun invalidRawTextContentReason(tagName: String, content: String): Strin
 
 internal fun escapeHtml(value: String, attribute: Boolean): String = buildString {
     for (character in value) {
-        val replacement = if (attribute) htmlAttributeEscapeReplacement(character) else htmlTextEscapeReplacement(character)
+        val replacement =
+            if (attribute) htmlAttributeEscapeReplacement(character) else htmlTextEscapeReplacement(character)
         if (replacement != null) append(replacement) else append(character)
     }
 }

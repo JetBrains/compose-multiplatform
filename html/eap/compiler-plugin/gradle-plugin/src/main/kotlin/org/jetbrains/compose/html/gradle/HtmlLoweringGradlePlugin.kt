@@ -41,7 +41,8 @@ class HtmlLoweringGradlePlugin : KotlinCompilerPluginSupportPlugin {
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
         val extension = kotlinCompilation.target.project.extensions.getByType(HtmlLoweringExtension::class.java)
         val enabled = extension.enabledTargets.map { kotlinCompilation.platformType in it }
-        val supportsLowering = kotlinCompilation.platformType in setOf(KotlinPlatformType.jvm, KotlinPlatformType.androidJvm)
+        val supportsLowering =
+            kotlinCompilation.platformType in setOf(KotlinPlatformType.jvm, KotlinPlatformType.androidJvm)
         kotlinCompilation.compileTaskProvider.configure {
             it.compilerOptions.freeCompilerArgs.addAll(enabled.map { lower ->
                 if (lower && supportsLowering) listOf(

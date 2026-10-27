@@ -102,13 +102,21 @@ internal class HtmlAttributeWriter(
         for (statement in rewriteBody(plan, state, builder)) +statement
         for (operation in plan.after) +operation(operation, operation.values, state, builder)
         state.properties[AttributeOperationKind.FormValue]?.let { slot ->
-            +irIfThen(unit, irNotEquals(irGet(slot), irNull()),
-                assign("value", listOf(irGet(slot)), state, builder))
+            +irIfThen(
+                unit, irNotEquals(irGet(slot), irNull()),
+                assign("value", listOf(irGet(slot)), state, builder)
+            )
         }
         state.properties[AttributeOperationKind.FormChecked]?.let { slot ->
-            +irIfThen(unit, irNotEquals(irGet(slot), irNull()),
-                irIfThenElse(unit, irEquals(irGet(slot), irTrue()),
-                    assign("checked", emptyList(), state, builder), irSet(state.attributes.getValue("checked"), irNull())))
+            +irIfThen(
+                unit, irNotEquals(irGet(slot), irNull()),
+                irIfThenElse(
+                    unit,
+                    irEquals(irGet(slot), irTrue()),
+                    assign("checked", emptyList(), state, builder),
+                    irSet(state.attributes.getValue("checked"), irNull())
+                )
+            )
         }
         validateClasses(state, writer, validate)
         writeAttributes(plan, state, builder, writer)
@@ -121,21 +129,29 @@ internal class HtmlAttributeWriter(
             )
         }
         val parent = irTemporary(
-            irCallWithArgs(symbols.finishMixedElement, irGet(writer), irString(plan.tag), irString(plan.namespace)), "htmlParent"
+            irCallWithArgs(symbols.finishMixedElement, irGet(writer), irString(plan.tag), irString(plan.namespace)),
+            "htmlParent"
         )
         if (plan.tag == "textarea") {
             val text = state.properties[AttributeOperationKind.TextContent]
             val default = state.properties[AttributeOperationKind.TextDefault]
             if (text != null || default != null) {
-                val value = irTemporary(when {
-                    text == null -> irGet(requireNotNull(default))
-                    default == null -> irGet(text)
-                    else -> irIfThenElse(nullableString, irEqualsNull(irGet(text)), irGet(default), irGet(text))
-                }, "htmlTextContent")
-                +irIfThen(unit, irNotEquals(irGet(value), irNull()),
+                val value = irTemporary(
+                    when {
+                        text == null -> irGet(requireNotNull(default))
+                        default == null -> irGet(text)
+                        else -> irIfThenElse(nullableString, irEqualsNull(irGet(text)), irGet(default), irGet(text))
+                    }, "htmlTextContent"
+                )
+                +irIfThen(
+                    unit, irNotEquals(irGet(value), irNull()),
                     irCallWithArgs(
-                        symbols.writeText, irGet(writer), irImplicitCast(irGet(value), context.irBuiltIns.stringType), irGet(validate)
-                    ))
+                        symbols.writeText,
+                        irGet(writer),
+                        irImplicitCast(irGet(value), context.irBuiltIns.stringType),
+                        irGet(validate)
+                    )
+                )
             }
         }
         +irGet(parent)
@@ -182,7 +198,8 @@ internal class HtmlAttributeWriter(
         val properties = plan.operations.map { it.kind }.filter {
             it in PropertySlotKinds
         }.distinct().associateWith { kind ->
-            val type = if (kind == AttributeOperationKind.FormChecked) context.irBuiltIns.booleanType else context.irBuiltIns.stringType
+            val type =
+                if (kind == AttributeOperationKind.FormChecked) context.irBuiltIns.booleanType else context.irBuiltIns.stringType
             irTemporary(irNull(type.makeNullable()), "html${kind.name}", isMutable = true)
         }
         val style = if (plan.styles.isEmpty()) null else irTemporary(
@@ -191,7 +208,12 @@ internal class HtmlAttributeWriter(
         return Slots(names, slots, order, count, classSlots, properties, style)
     }
 
-    private fun assign(name: String, values: List<IrExpression>, state: Slots, builder: DeclarationIrBuilder): IrExpression =
+    private fun assign(
+        name: String,
+        values: List<IrExpression>,
+        state: Slots,
+        builder: DeclarationIrBuilder
+    ): IrExpression =
         builder.irBlock(resultType = unit) {
             val slot = state.attributes.getValue(name)
             val value = irTemporary(values.singleOrNull() ?: irString(""), "htmlValue")
@@ -200,7 +222,10 @@ internal class HtmlAttributeWriter(
                     unit, irEqualsNull(irGet(slot)),
                     irBlock(resultType = unit) {
                         +irSet(state.order.getValue(name), irGet(state.count))
-                        +irSet(state.count, irCallWithArgs(context.irBuiltIns.intPlusSymbol, irGet(state.count), irInt(1)))
+                        +irSet(
+                            state.count,
+                            irCallWithArgs(context.irBuiltIns.intPlusSymbol, irGet(state.count), irInt(1))
+                        )
                     })
             }
             +irSet(slot, irGet(value))
@@ -214,12 +239,15 @@ internal class HtmlAttributeWriter(
     ): IrExpression {
         val result = builder.irBlock(resultType = unit) {
             when (operation.kind) {
-                AttributeOperationKind.Classes -> for ((slot, value) in state.classes.getValue(operation).zip(values)) +irSet(slot, value)
+                AttributeOperationKind.Classes -> for ((slot, value) in state.classes.getValue(operation)
+                    .zip(values)) +irSet(slot, value)
+
                 AttributeOperationKind.Attribute -> +assign(operation.name, values, state, builder)
                 AttributeOperationKind.Style -> {
                     val slot = requireNotNull(state.style)
                     +irSet(slot, irCallWithArgs(symbols.mixedStyle, irGet(slot), values.single()))
                 }
+
                 AttributeOperationKind.FormValue -> {
                     val value = irTemporary(values.single(), "htmlFormValue")
                     val condition = requireNotNull(operation.valueIsAttribute).deepCopyWithSymbols()
@@ -229,10 +257,13 @@ internal class HtmlAttributeWriter(
                     +when (attribute) {
                         true -> setAttribute
                         false -> setProperty
-                        null -> irIfThenElse(unit,
-                            condition, setAttribute, setProperty)
+                        null -> irIfThenElse(
+                            unit,
+                            condition, setAttribute, setProperty
+                        )
                     }
                 }
+
                 AttributeOperationKind.Ignore -> for (value in values) +value
                 else -> +irSet(state.properties.getValue(operation.kind), values.single())
             }
@@ -332,23 +363,34 @@ internal class HtmlAttributeWriter(
             val value = if (operation.values.isEmpty()) "" else
                 constants.stringWithoutNul(operation.values.single()) ?: return null
             val boolean = isMinimizedBooleanAttribute(operation.name, tag, plan.namespace)
-            return " ${operation.name}" + if (boolean && value.isEmpty()) "" else "=\"${escapeHtml(value, attribute = true)}\""
+            return " ${operation.name}" + if (boolean && value.isEmpty()) "" else "=\"${
+                escapeHtml(
+                    value,
+                    attribute = true
+                )
+            }\""
         }
+
         fun fixedLiteral(name: String): String? = singleOperations[name]?.singleOrNull()
             ?.takeIf { it.unconditional && it.condition == null }?.let(::literal)
 
         fun attribute(name: String): IrExpression {
             val controlled = (name == "value" && AttributeOperationKind.FormValue in state.properties) ||
-                (name == "checked" && AttributeOperationKind.FormChecked in state.properties)
+                    (name == "checked" && AttributeOperationKind.FormChecked in state.properties)
             val single = if (controlled) null else singleOperations[name]?.singleOrNull()
             val encoded = single?.let(::literal)
             val boolean = isMinimizedBooleanAttribute(name, tag, plan.namespace)
             if (encoded != null && fields.canStore(listOf(encoded))) return irIfThen(
                 unit,
                 irNotEquals(irGet(state.attributes.getValue(name)), irNull()),
-                irCallWithArgs(symbols.writeMixedLiteral, irGet(writer), fields.string(encoded, builder)))
-            return irCallWithArgs(symbols.writeMixedAttribute,
-                irGet(writer), fields.string(" $name", builder), irGet(state.attributes.getValue(name)), irBoolean(boolean)
+                irCallWithArgs(symbols.writeMixedLiteral, irGet(writer), fields.string(encoded, builder))
+            )
+            return irCallWithArgs(
+                symbols.writeMixedAttribute,
+                irGet(writer),
+                fields.string(" $name", builder),
+                irGet(state.attributes.getValue(name)),
+                irBoolean(boolean)
             )
         }
 
@@ -392,9 +434,15 @@ internal class HtmlAttributeWriter(
                         val value = if (literal == null) irGet(slot) else irIfThenElse(
                             nullableString, irEqualsNull(irGet(slot)), irNull(), fields.string(literal, builder)
                         )
-                        +irSet(written, irCallWithArgs(
-                            symbols.writeMixedClass, irGet(writer), value, irGet(written), irBoolean(literal != null)
-                        ))
+                        +irSet(
+                            written, irCallWithArgs(
+                                symbols.writeMixedClass,
+                                irGet(writer),
+                                value,
+                                irGet(written),
+                                irBoolean(literal != null)
+                            )
+                        )
                     }
                 }
                 +irCallWithArgs(symbols.finishMixedClasses, irGet(writer), irGet(written))

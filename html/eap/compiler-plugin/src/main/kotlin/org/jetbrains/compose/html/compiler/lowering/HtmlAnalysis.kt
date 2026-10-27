@@ -61,8 +61,10 @@ internal class HtmlAnalysis(
     private val elements: Map<IrCall, HtmlElement>,
 ) {
     private object Unsupported : HtmlEncoding
+
     // Hitting the depth limit here must still allow a later attempt starting at this element.
     private object TooDeep : HtmlEncoding
+
     private val cache = IdentityHashMap<IrCall, Node>()
 
     // Children retain original statements until the chosen plan is emitted.
@@ -96,7 +98,11 @@ internal class HtmlAnalysis(
             if (noContent && element.attributes is MixedAttributes && tag != "noscript") return true
             val void = isHtmlVoidElement(tag, element.namespace)
             // Literal regions enter their root, a void root would never leave it.
-            if (!hasMovableContent(tag, element.namespace) || (void && element.attributes is LiteralAttributes)) return false
+            if (!hasMovableContent(
+                    tag,
+                    element.namespace
+                ) || (void && element.attributes is LiteralAttributes)
+            ) return false
             if (noContent) return true
             val body = statements ?: return false
             val function = (element.content as? IrFunctionExpression)?.function ?: return false
@@ -136,7 +142,14 @@ internal class HtmlAnalysis(
                 val html = encodeRawText(tag, opening, children) ?: return Unsupported
                 StaticHtml(tag, html)
             } else {
-                val result = encodeChildren(tag, element.namespace, opening, children, isHtmlRcdataElement(tag, element.namespace), depth)
+                val result = encodeChildren(
+                    tag,
+                    element.namespace,
+                    opening,
+                    children,
+                    isHtmlRcdataElement(tag, element.namespace),
+                    depth
+                )
                 result as? StaticHtml ?: return result
             }
         }
@@ -193,7 +206,11 @@ internal class HtmlAnalysis(
                 val result = element.node.encode(depth + 1)
                 val fragment = result as? StaticHtml ?: return result
                 if (fragment.height + 1 > MaxHtmlNestingDepth) return Unsupported
-                if (namespace == HtmlNamespace && !isHtmlParserStableTableElement(tag, fragment.tagName)) return Unsupported
+                if (namespace == HtmlNamespace && !isHtmlParserStableTableElement(
+                        tag,
+                        fragment.tagName
+                    )
+                ) return Unsupported
                 if (pending.isNotEmpty()) {
                     parts.add(pending.toString())
                     length += pending.length
@@ -245,14 +262,18 @@ internal class HtmlAnalysis(
 internal sealed class HtmlChild(val statement: IrStatement) {
     class Text(statement: IrCall, private val constants: ConstantEvaluator) : HtmlChild(statement) {
         private object Unevaluated
+
         // Cache failed folds too, without allocating a Lazy for each Text call.
         private var constant: Any? = Unevaluated
         val valueWithoutNul: String? get() = value?.withoutNul()
-        val value: String? get() {
-            if (constant === Unevaluated) constant = constants.string((statement as IrCall).arguments.singleOrNull())
-            return constant as? String
-        }
+        val value: String?
+            get() {
+                if (constant === Unevaluated) constant =
+                    constants.string((statement as IrCall).arguments.singleOrNull())
+                return constant as? String
+            }
     }
+
     class Element(val node: HtmlAnalysis.Node) : HtmlChild(node.element.call)
     class Alias(statement: IrStatement) : HtmlChild(statement)
     class Runtime(statement: IrStatement) : HtmlChild(statement)
@@ -261,7 +282,7 @@ internal sealed class HtmlChild(val statement: IrStatement) {
 // These tags allow content to move without changing how the parser or writer handles it.
 private fun hasMovableContent(tag: String, namespace: String): Boolean =
     (namespace != HtmlNamespace || (tag != "noscript" && tag !in TableTags)) &&
-        !isHtmlRawTextElement(tag, namespace) && !isHtmlRcdataElement(tag, namespace) &&
-        !isHtmlLeadingNewlineElement(tag, namespace)
+            !isHtmlRawTextElement(tag, namespace) && !isHtmlRcdataElement(tag, namespace) &&
+            !isHtmlLeadingNewlineElement(tag, namespace)
 
 private val TableTags = setOf("table", "caption", "colgroup", "col", "thead", "tbody", "tfoot", "tr", "td", "th")

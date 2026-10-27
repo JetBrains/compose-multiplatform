@@ -54,7 +54,9 @@ tasks.withType<KotlinJvmTest>().configureEach {
     jvmArgs("-Xss2m") // needed for nested tests to pass on workflow
     inputs.files(compilerPluginClasspath)
     doFirst {
-        systemProperty("htmlLowering.pluginClasspath", compilerPluginClasspath.files.joinToString(",") { it.absolutePath })
+        systemProperty(
+            "htmlLowering.pluginClasspath",
+            compilerPluginClasspath.files.joinToString(",") { it.absolutePath })
     }
 }
 

@@ -35,6 +35,6 @@ internal const val ValidTagFlag = 8
 
 internal fun htmlStringTagFlags(tagName: String, namespace: String): Int =
     (if (isHtmlRawTextElement(tagName, namespace)) RawTextTagFlag else 0) or
-    (if (isHtmlVoidElement(tagName, namespace)) VoidTagFlag else 0) or
-    (if (isHtmlLeadingNewlineElement(tagName, namespace)) LeadingNewlineTagFlag else 0) or
-    (if (isValidHtmlTagName(tagName)) ValidTagFlag else 0)
+            (if (isHtmlVoidElement(tagName, namespace)) VoidTagFlag else 0) or
+            (if (isHtmlLeadingNewlineElement(tagName, namespace)) LeadingNewlineTagFlag else 0) or
+            (if (isValidHtmlTagName(tagName)) ValidTagFlag else 0)

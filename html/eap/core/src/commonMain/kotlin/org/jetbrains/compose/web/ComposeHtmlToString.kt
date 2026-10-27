@@ -44,7 +44,11 @@ fun composeHtmlToString(
     validateStrictly: Boolean = defaultHtmlValidationMode() == HtmlValidationMode.Strict,
     content: @Composable () -> Unit,
 ): String {
-    return composeHtmlString(hydratable = hydratable, key = key, content = htmlValidatedContent(validateStrictly, content))
+    return composeHtmlString(
+        hydratable = hydratable,
+        key = key,
+        content = htmlValidatedContent(validateStrictly, content)
+    )
 }
 
 /** Shared single-pass composition and writer for fragments, documents, and streaming output. */

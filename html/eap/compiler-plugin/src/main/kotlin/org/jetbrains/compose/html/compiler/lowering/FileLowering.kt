@@ -54,7 +54,7 @@ internal class FileLowering(
         if (prepared.fields.isNotEmpty()) {
             configuration.reportInfo(
                 "[compose-html-lowering] ${file.fileEntry.name}: " +
-                    "prepared ${prepared.fields.size} HTML attribute value(s)"
+                        "prepared ${prepared.fields.size} HTML attribute value(s)"
             )
         }
     }

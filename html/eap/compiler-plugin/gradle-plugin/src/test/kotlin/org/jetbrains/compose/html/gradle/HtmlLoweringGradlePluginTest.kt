@@ -83,7 +83,7 @@ class HtmlLoweringGradlePluginTest {
 
     private fun ordered(compilation: KotlinCompilation<*>): Boolean =
         "-Xcompiler-plugin-order=org.jetbrains.compose.html.lowering>androidx.compose.compiler.plugins.kotlin" in
-            compilation.compileTaskProvider.get().compilerOptions.freeCompilerArgs.get()
+                compilation.compileTaskProvider.get().compilerOptions.freeCompilerArgs.get()
 
     private fun enabled(compilation: KotlinCompilation<*>): Boolean =
         plugin.applyToCompilation(compilation).get().single().value.toBooleanStrict()

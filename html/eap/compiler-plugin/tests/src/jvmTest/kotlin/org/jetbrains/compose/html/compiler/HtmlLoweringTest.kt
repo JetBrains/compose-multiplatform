@@ -98,13 +98,25 @@ class HtmlLoweringTest {
             "ConstantTable" to tableHtml("<!--c-->"),
             "NestedConstantTable" to "<div>before<table><tbody><tr><td>cell</td></tr></tbody></table>after</div>",
             "EmptyConstantTable" to "<table><caption></caption><colgroup></colgroup><thead></thead>" +
-                "<tbody></tbody><tfoot></tfoot></table>",
+                    "<tbody></tbody><tfoot></tfoot></table>",
         )
         for ((method, html) in samples) {
             assertEquals(setOf(html), staticHtmlConstants("CompilerHydrationKt", method), method)
             val calls = methodCalls("CompilerHydrationKt", method)
             assertEquals(1, calls.count { it == "beginStaticHtml" }, method)
-            assertFalse(calls.any { it in setOf("Table", "Colgroup", "Thead", "Tbody", "Tfoot", "Tr", "Td", "Th", "Text") }, method)
+            assertFalse(calls.any {
+                it in setOf(
+                    "Table",
+                    "Colgroup",
+                    "Thead",
+                    "Tbody",
+                    "Tfoot",
+                    "Tr",
+                    "Td",
+                    "Th",
+                    "Text"
+                )
+            }, method)
         }
     }
 
@@ -130,8 +142,10 @@ class HtmlLoweringTest {
                 HTMLMap { Text("map") }
             }
         }
-        assertHtml("<div><meta name=\"description\" content=\"Hello &amp; goodbye\">" +
-            "<link rel=\"stylesheet\" href=\"/style.css\"></div>") {
+        assertHtml(
+            "<div><meta name=\"description\" content=\"Hello &amp; goodbye\">" +
+                    "<link rel=\"stylesheet\" href=\"/style.css\"></div>"
+        ) {
             Div {
                 Meta(attrs = { attr("name", "description"); attr("content", "Hello & goodbye") })
                 Link(attrs = { attr("rel", "stylesheet"); attr("href", "/style.css") })
@@ -210,11 +224,14 @@ class HtmlLoweringTest {
                         if (dynamic) DynamicRow("cell") else Row()
                     }
                 }
+
                 fun render(strict: Boolean): String {
                     if (!stream) return composeHtmlToString(validateStrictly = strict, content = page)
                     val output = StringBuilder()
-                    org.jetbrains.compose.web.composeHtmlToStream(sink = { output.append(it) }, chunkSize = 1,
-                        validateStrictly = strict, content = page)
+                    org.jetbrains.compose.web.composeHtmlToStream(
+                        sink = { output.append(it) }, chunkSize = 1,
+                        validateStrictly = strict, content = page
+                    )
                     return output.toString()
                 }
                 assertEquals("<table><tr><td>cell</td></tr></table>", render(false))
@@ -229,10 +246,10 @@ class HtmlLoweringTest {
 
     private fun tableHtml(boundary: String): String {
         val row = "<tr><td title=\"&lt;&amp;&quot;\">a&lt;&amp;${boundary}b</td>" +
-            "<td><table><tbody><tr><td>nested</td></tr></tbody></table></td></tr>"
+                "<td><table><tbody><tr><td>nested</td></tr></tbody></table></td></tr>"
         return "<table id=\"constant-table\"><caption>Results</caption><colgroup><col span=\"2\"></colgroup>" +
-            "<thead><tr><th>Name</th></tr></thead><tbody>\n" + row.repeat(2) +
-            "</tbody><tfoot><tr><td>Total</td></tr></tfoot></table>"
+                "<thead><tr><th>Name</th></tr></thead><tbody>\n" + row.repeat(2) +
+                "</tbody><tfoot><tr><td>Total</td></tr></tfoot></table>"
     }
 }
 
@@ -247,10 +264,14 @@ private fun AdjacentTextPage() {
 }
 
 @Composable
-private fun Row() { Tr { Td { Text("cell") } } }
+private fun Row() {
+    Tr { Td { Text("cell") } }
+}
 
 @Composable
-private fun DynamicRow(value: String) { Tr { Td { Text(value) } } }
+private fun DynamicRow(value: String) {
+    Tr { Td { Text(value) } }
+}
 
 @Composable
 @LowerableHtmlTag("bad tag")

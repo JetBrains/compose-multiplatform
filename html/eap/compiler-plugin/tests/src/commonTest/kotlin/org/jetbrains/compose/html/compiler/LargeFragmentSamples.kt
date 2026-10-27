@@ -8,16 +8,18 @@ package org.jetbrains.compose.html.compiler
 import androidx.compose.runtime.Composable
 import org.jetbrains.compose.web.dom.*
 
-private const val HundredAscii = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+private const val HundredAscii =
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 private const val ThousandAscii = HundredAscii + HundredAscii + HundredAscii + HundredAscii + HundredAscii +
-    HundredAscii + HundredAscii + HundredAscii + HundredAscii + HundredAscii
+        HundredAscii + HundredAscii + HundredAscii + HundredAscii + HundredAscii
 private const val BoundaryPadding = ThousandAscii + ThousandAscii + ThousandAscii + ThousandAscii +
-    ThousandAscii + ThousandAscii + ThousandAscii + HundredAscii + HundredAscii + HundredAscii +
-    HundredAscii + HundredAscii + HundredAscii + HundredAscii + HundredAscii + HundredAscii +
-    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-private const val HundredWide = "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界"
+        ThousandAscii + ThousandAscii + ThousandAscii + HundredAscii + HundredAscii + HundredAscii +
+        HundredAscii + HundredAscii + HundredAscii + HundredAscii + HundredAscii + HundredAscii +
+        "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+private const val HundredWide =
+    "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界"
 private const val ThousandWide = HundredWide + HundredWide + HundredWide + HundredWide + HundredWide +
-    HundredWide + HundredWide + HundredWide + HundredWide + HundredWide
+        HundredWide + HundredWide + HundredWide + HundredWide + HundredWide
 private const val WideText = ThousandWide + ThousandWide + ThousandWide
 
 @Composable

@@ -47,6 +47,6 @@ internal fun htmlAutoCompleteValue(value: Boolean): String = if (value) "on" els
 @PublishedApi
 internal fun inputValueIsAttribute(type: InputType<*>): Boolean =
     type == InputType.Checkbox ||
-        type == InputType.Radio ||
-        type == InputType.Hidden ||
-        type == InputType.Submit
+            type == InputType.Radio ||
+            type == InputType.Hidden ||
+            type == InputType.Submit

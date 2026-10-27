@@ -105,7 +105,9 @@ class CompilerHydrationTest {
                     val literal = root.querySelector("#prepared-literal")!!.firstChild
                     val shared = root.querySelectorAll(".shared-literal, .shared-fragment")
                         .let { nodes -> (0 until nodes.length).map { nodes.item(it)!! } }
-                    assertEquals(listOf("<& literal", "<& literal", "<& fragment", "<& fragment"), shared.map { it.textContent })
+                    assertEquals(
+                        listOf("<& literal", "<& literal", "<& fragment", "<& fragment"),
+                        shared.map { it.textContent })
                     if (hydrate) {
                         assertSame(originalCard, card)
                         assertSame(originalPrice, priceText)

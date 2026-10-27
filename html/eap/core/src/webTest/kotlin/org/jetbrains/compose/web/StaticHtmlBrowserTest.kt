@@ -4,6 +4,7 @@
  */
 
 @file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+
 package org.jetbrains.compose.web
 
 import androidx.compose.runtime.Composable
@@ -19,7 +20,8 @@ import org.jetbrains.compose.web.internal.runtime.browserDocument
 import kotlin.test.*
 
 class StaticHtmlBrowserTest {
-    @Test fun subtreesAndDynamicTextHydrateAndUpdateWithoutReplacingNodes() = MainScope().promise {
+    @Test
+    fun subtreesAndDynamicTextHydrateAndUpdateWithoutReplacingNodes() = MainScope().promise {
         val attrs = preparedHtmlAttributes<HTMLElement>("span", "<span class=\"value\">") { classes("value") }
         for (strict in listOf(false, true)) {
             var value by mutableStateOf("first")
@@ -39,7 +41,8 @@ class StaticHtmlBrowserTest {
             val textElement = root.childNodes.item(1)
             val textNode = textElement!!.firstChild
             val tail = root.lastChild
-            val hydrated = hydrateComposable(root, validateStrictly = strict, onHydrationMismatch = { throw it }) { content() }
+            val hydrated =
+                hydrateComposable(root, validateStrictly = strict, onHydrationMismatch = { throw it }) { content() }
             try {
                 assertSame(subtree, root.firstChild)
                 assertSame(textElement, root.childNodes.item(1))
@@ -50,11 +53,14 @@ class StaticHtmlBrowserTest {
                 assertSame(textNode, textElement.firstChild)
                 assertSame(subtree, root.firstChild)
                 assertSame(tail, root.lastChild)
-            } finally { hydrated.dispose() }
+            } finally {
+                hydrated.dispose()
+            }
         }
     }
 
-    @Test fun staticAttributesAndTextRenderAndHydrateInTheBrowser() {
+    @Test
+    fun staticAttributesAndTextRenderAndHydrateInTheBrowser() {
         val attributes = preparedHtmlAttributes<HTMLElement>("div", "<div id=\"static\" class=\"a&amp; b\">") {
             id("static"); classes("a&", "b")
         }
@@ -65,16 +71,21 @@ class StaticHtmlBrowserTest {
         try {
             assertEquals("a& b", root.firstElementChild!!.getAttribute("class"))
             assertEquals("<&é😀", root.firstElementChild!!.textContent)
-        } finally { fresh.dispose() }
+        } finally {
+            fresh.dispose()
+        }
         for (strict in listOf(false, true)) {
             root.innerHTML = composeHtmlToString(validateStrictly = strict, content = content)
             val node = root.firstElementChild
-            val hydrated = hydrateComposable(root, validateStrictly = strict, onHydrationMismatch = { throw it }) { content() }
+            val hydrated =
+                hydrateComposable(root, validateStrictly = strict, onHydrationMismatch = { throw it }) { content() }
             try {
                 assertSame(node, root.firstElementChild)
                 assertEquals("a& b", node!!.getAttribute("class"))
                 assertEquals("<&é😀", node.textContent)
-            } finally { hydrated.dispose() }
+            } finally {
+                hydrated.dispose()
+            }
         }
     }
 }

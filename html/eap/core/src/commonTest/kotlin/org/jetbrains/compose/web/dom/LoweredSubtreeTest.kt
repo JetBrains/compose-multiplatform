@@ -4,6 +4,7 @@
  */
 
 @file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
@@ -20,7 +21,8 @@ import org.jetbrains.compose.web.renderHydratedDocumentToStream
 import kotlin.test.*
 
 class LoweredSubtreeTest {
-    @Test fun specializedContainersKeepParserChecksAndNewlines() {
+    @Test
+    fun specializedContainersKeepParserChecksAndNewlines() {
         val pre = preparedHtmlAttributes<HTMLElement>("pre", "<pre>") {}
         assertEquals("<pre>\n\nfirst<!--c-->second</pre>", composeHtmlToString {
             PreparedContainer(pre) { Text("\nfirst"); Text("second") }
@@ -40,7 +42,8 @@ class LoweredSubtreeTest {
 
     private val attrs = preparedHtmlAttributes<HTMLElement>("span", "<span class=\"x\">") { classes("x") }
 
-    @Test fun loweredContainersPreserveContentEffectsAndTextBoundaries() {
+    @Test
+    fun loweredContainersPreserveContentEffectsAndTextBoundaries() {
         val trace = mutableListOf<String>()
         val content: @Composable ElementScope<HTMLElement>.() -> Unit = {
             androidx.compose.runtime.remember { trace += "remember"; Unit }
@@ -56,10 +59,12 @@ class LoweredSubtreeTest {
         assertEquals(ordinaryTrace, trace)
     }
 
-    @Test fun dynamicValuesKeepScopeAndCompositionLocals() {
+    @Test
+    fun dynamicValuesKeepScopeAndCompositionLocals() {
         val local = compositionLocalOf { "default" }
         for (value in listOf("<&é😀", "", "next", "\n")) {
-            assertEquals("<span class=\"x\">" + value.replace("&", "&amp;").replace("<", "&lt;") + "</span>",
+            assertEquals(
+                "<span class=\"x\">" + value.replace("&", "&amp;").replace("<", "&lt;") + "</span>",
                 composeHtmlToString(key = "lowered-local") {
                     CompositionLocalProvider(local provides value) {
                         PreparedTextElement(attrs) { local.current }
@@ -68,7 +73,8 @@ class LoweredSubtreeTest {
         }
     }
 
-    @Test fun textEvaluationAndFailuresKeepStreamingOrder() {
+    @Test
+    fun textEvaluationAndFailuresKeepStreamingOrder() {
         fun render(lowered: Boolean): Pair<String, List<String>> {
             val chunks = StringBuilder()
             val events = mutableListOf<String>()
@@ -86,14 +92,21 @@ class LoweredSubtreeTest {
         })
     }
 
-    @Test fun discardedTextStillEvaluatesAndInvalidTextStillFails() {
+    @Test
+    fun discardedTextStillEvaluatesAndInvalidTextStillFails() {
         var calls = 0
-        composeHtmlToString { TagElement<HTMLElement>("input", null) { PreparedTextElement(attrs) { calls++; "discarded" } } }
+        composeHtmlToString {
+            TagElement<HTMLElement>(
+                "input",
+                null
+            ) { PreparedTextElement(attrs) { calls++; "discarded" } }
+        }
         assertEquals(1, calls)
         assertFailsWith<IllegalArgumentException> { composeHtmlToString { PreparedTextElement(attrs) { "bad\u0000" } } }
     }
 
-    @Test fun staticSubtreeMatchesOrdinaryAndStreamingOutput() {
+    @Test
+    fun staticSubtreeMatchesOrdinaryAndStreamingOutput() {
         val original: @Composable () -> Unit = {
             Div {
                 Span {
@@ -122,7 +135,8 @@ class LoweredSubtreeTest {
         }
     }
 
-    @Test fun immutableOutputCanBeReturnedOrExtendedAndReusedUnderOneKey() {
+    @Test
+    fun immutableOutputCanBeReturnedOrExtendedAndReusedUnderOneKey() {
         val html = "<div><span>constant</span></div>"
         val write: @Composable () -> Unit = { WriteStaticHtml("div", html) }
         for (hydratable in listOf(false, true)) {
@@ -139,11 +153,19 @@ class LoweredSubtreeTest {
         }
     }
 
-    @Test fun staticWritesCheckParentsAndDiscardVoidContent() {
+    @Test
+    fun staticWritesCheckParentsAndDiscardVoidContent() {
         val write: @Composable () -> Unit = { WriteStaticHtml("div", "<div><span>safe</span></div>") }
         assertFailsWith<IllegalArgumentException> { composeHtmlToString(validateStrictly = true) { Table { write() } } }
         for (tag in listOf("script", "iframe")) {
-            assertFailsWith<IllegalArgumentException> { composeHtmlToString { TagElement<HTMLElement>(tag, null) { write() } } }
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString {
+                    TagElement<HTMLElement>(
+                        tag,
+                        null
+                    ) { write() }
+                }
+            }
         }
         assertEquals("<input>", composeHtmlToString { TagElement<HTMLElement>("input", null) { write() } })
     }
@@ -158,10 +180,16 @@ class LoweredSubtreeTest {
                     Table { write() }
                 }
             }
+
             fun render(): String {
                 if (!stream) return composeHtmlToString(validateStrictly = !strict, content = content)
                 val output = StringBuilder()
-                composeHtmlToStream(sink = { output.append(it) }, chunkSize = 1, validateStrictly = !strict, content = content)
+                composeHtmlToStream(
+                    sink = { output.append(it) },
+                    chunkSize = 1,
+                    validateStrictly = !strict,
+                    content = content
+                )
                 return output.toString()
             }
             if (strict) assertFailsWith<IllegalArgumentException> { render() }
@@ -169,7 +197,8 @@ class LoweredSubtreeTest {
         }
     }
 
-    @Test fun staticWritesRetainDocumentRootMetadata() {
+    @Test
+    fun staticWritesRetainDocumentRootMetadata() {
         val document = "<html><head></head><body></body></html>"
         val write: @Composable () -> Unit = { WriteStaticHtml("html", document) }
         assertSame(document, composeHtmlString(requireHtmlDocumentRoot = true) { write() })
@@ -189,8 +218,10 @@ class LoweredSubtreeTest {
                 fun render(): String {
                     if (!stream) return renderHydratedDocument(validateStrictly = strict, content = content)
                     val output = StringBuilder()
-                    renderHydratedDocumentToStream(sink = { output.append(it) }, chunkSize = 1,
-                        validateStrictly = strict, content = content)
+                    renderHydratedDocumentToStream(
+                        sink = { output.append(it) }, chunkSize = 1,
+                        validateStrictly = strict, content = content
+                    )
                     return output.toString()
                 }
                 if (strict) assertFailsWith<IllegalArgumentException> { render() }

@@ -22,7 +22,7 @@ fun PreparedHydrationContent(
     inspect: @Composable ElementScope<HTMLSpanElement>.(ElementScope<HTMLDivElement>) -> Unit = {},
 ) {
     val content: ContentBuilder<HTMLDivElement> = {
-        Div(attrs = { classes("card") }) card@ {
+        Div(attrs = { classes("card") }) card@{
             Text("User $count")
             PreparedDetails(count)
             Span(attrs = {

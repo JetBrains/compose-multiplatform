@@ -74,10 +74,10 @@ fun <TElement : Element> preparedHtmlAttributes(
     val attrs = AttrsScopeBuilder<TElement>().apply(initialize)
     require(
         attrs.propertyUpdatesOrEmpty.isEmpty() &&
-            attrs.styleScopeOrNull == null &&
-            attrs.refEffect == null &&
-            attrs.hydrationProtocolAttributes.isEmpty() &&
-            !attrs.allowsHydrationMismatch
+                attrs.styleScopeOrNull == null &&
+                attrs.refEffect == null &&
+                attrs.hydrationProtocolAttributes.isEmpty() &&
+                !attrs.allowsHydrationMismatch
     )
     val encoded =
         StringBuilder()
@@ -111,7 +111,8 @@ fun <TElement : Element> PreparedTextElement(
 @Suppress("NOTHING_TO_INLINE") // Put the append in generated callers, without a callback allocation.
 inline fun WriteStaticHtml(rootTag: String, encoded: String) {
     val writer = currentHtmlStringWriter()
-    val output = writer.beginStaticHtml(rootTag, encoded, LocalHtmlValidationMode.current == HtmlValidationMode.Strict) ?: return
+    val output =
+        writer.beginStaticHtml(rootTag, encoded, LocalHtmlValidationMode.current == HtmlValidationMode.Strict) ?: return
     output.append(encoded)
     writer.flushChunk()
 }

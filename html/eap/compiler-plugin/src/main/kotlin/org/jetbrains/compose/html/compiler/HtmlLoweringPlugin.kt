@@ -52,6 +52,7 @@ class HtmlCommandLineProcessor : CommandLineProcessor {
                 value.toBooleanStrictOrNull()
                     ?: throw CliOptionProcessingException("Expected true or false for enabled, got '$value'")
             )
+
             else -> throw CliOptionProcessingException("Unknown option: ${option.optionName}")
         }
     }
@@ -74,7 +75,7 @@ internal class HtmlIrGenerationExtension(
             configuration.messageCollector.report(
                 CompilerMessageSeverity.WARNING,
                 "[compose-html-lowering] Currently only HTML string rendering on Kotlin/JVM is supported; " +
-                    "skipping lowering for ${pluginContext.platform}."
+                        "skipping lowering for ${pluginContext.platform}."
             )
             return
         }
@@ -83,8 +84,8 @@ internal class HtmlIrGenerationExtension(
             configuration.messageCollector.report(
                 if (explicitEnabled == true) CompilerMessageSeverity.ERROR else CompilerMessageSeverity.WARNING,
                 "[compose-html-lowering] Missing or ambiguous runtime declarations: ${names.joinToString()}. Skipping lowering. " +
-                    "Check that the Compose HTML runtime and compiler plugin versions match. " +
-                    "Set enabled=false to disable lowering for this compilation."
+                        "Check that the Compose HTML runtime and compiler plugin versions match. " +
+                        "Set enabled=false to disable lowering for this compilation."
             )
         } ?: return
         // Replace HTML calls first, then reuse writer lookups in the generated code.

@@ -50,11 +50,17 @@ internal class ElementLowering(
     }
 
     private sealed interface Operation
+
     // An HTML chunk and the parent tag and namespace to use for the following runtime calls.
     private class Write(val html: String, val parent: String, val namespace: String) : Operation
     private class Statement(val ir: IrStatement) : Operation
 
-    private class RegionPlan(val root: String, val namespace: String, val attributes: HtmlAttributes, private val budget: Int) {
+    private class RegionPlan(
+        val root: String,
+        val namespace: String,
+        val attributes: HtmlAttributes,
+        private val budget: Int
+    ) {
         val operations = mutableListOf<Operation>()
         val aliases = mutableListOf<IrStatement>()
         private val pending = StringBuilder()
@@ -71,10 +77,16 @@ internal class ElementLowering(
         // Runtime calls can split the HTML into separate chunks.
         private fun fits(addition: Int, closing: String = ""): Boolean =
             flushedLength + pending.length + addition + closingLength + closing.length <= MaxEncodedFragmentLength &&
-                chunks + chunkBound(pending.length + addition) + closingChunks + chunkBound(closing.length) <= budget
+                    chunks + chunkBound(pending.length + addition) + closingChunks + chunkBound(closing.length) <= budget
 
         // Add the opening, body and closing together, then restore the parent.
-        inline fun element(tag: String, namespace: String, opening: String, prefix: String = "", body: () -> Unit): Boolean {
+        inline fun element(
+            tag: String,
+            namespace: String,
+            opening: String,
+            prefix: String = "",
+            body: () -> Unit
+        ): Boolean {
             val closing = if (isHtmlVoidElement(tag, namespace)) "" else "</$tag>"
             if (!fits(prefix.length + opening.length, closing)) return false
             closingLength += closing.length
@@ -187,6 +199,7 @@ internal class ElementLowering(
                     plan.aliases.add(child.statement)
                     true
                 }
+
                 is HtmlChild.Element -> absorb(plan, child.node, depth)
                 is HtmlChild.Text -> {
                     // Pure aliases are hoisted even when text or the following element stays at runtime.
@@ -196,6 +209,7 @@ internal class ElementLowering(
                     absorbText(plan, child, children.getOrNull(index), depth)
                         .also { if (it && index < children.size) index++ }
                 }
+
                 is HtmlChild.Runtime -> false
             }
             if (!absorbed) plan.statement(child.statement)
@@ -229,11 +243,13 @@ internal class ElementLowering(
             val opening = when (val attributes = plan.attributes) {
                 is LiteralAttributes -> {
                     val first = operations.removeFirst() as Write
-                    irCallWithArgs(symbols.openLoweredRegion,
+                    irCallWithArgs(
+                        symbols.openLoweredRegion,
                         irGet(writer), irString(root), irString(first.html), irString(first.parent),
                         irGet(validate), irString(first.namespace)
                     )
                 }
+
                 is MixedAttributes -> irIfThenElse(
                     symbols.finishMixedElement.owner.returnType,
                     irCallWithArgs(symbols.beginMixedElement, irGet(writer), irString(root), irGet(validate)),
@@ -246,12 +262,17 @@ internal class ElementLowering(
             for (operation in operations) {
                 +when (operation) {
                     is Statement -> transform(operation.ir)
-                    is Write -> irCallWithArgs(symbols.advanceLoweredRegion,
-                        irGet(writer), irString(operation.html), irString(operation.parent), irString(operation.namespace)
+                    is Write -> irCallWithArgs(
+                        symbols.advanceLoweredRegion,
+                        irGet(writer),
+                        irString(operation.html),
+                        irString(operation.parent),
+                        irString(operation.namespace)
                     )
                 }
             }
-            if (closing != null) +irCallWithArgs(symbols.closeElement,
+            if (closing != null) +irCallWithArgs(
+                symbols.closeElement,
                 irGet(writer), irString(closing.html), irGet(parent)
             )
         }
@@ -267,7 +288,8 @@ internal class ElementLowering(
         )
 
         return builder.irWriterScope(symbols, context.irBuiltIns.unitType) { writer, validate ->
-            val begin = irCallWithArgs(symbols.beginStaticHtmlFragment,
+            val begin = irCallWithArgs(
+                symbols.beginStaticHtmlFragment,
                 irGet(writer), irString(html.tagName), irGet(validate)
             )
             +irIfThen(context.irBuiltIns.unitType, begin, irBlock(resultType = context.irBuiltIns.unitType) {

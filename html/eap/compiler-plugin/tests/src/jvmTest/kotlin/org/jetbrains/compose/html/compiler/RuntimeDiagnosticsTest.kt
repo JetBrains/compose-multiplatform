@@ -40,7 +40,12 @@ class RuntimeDiagnosticsTest {
     fun incompatibleRuntimeReportsAllMissingDeclarationsTogether() {
         val (exit, output) = compile("fun answer() = 42", enabled = true)
         assertEquals(ExitCode.COMPILATION_ERROR, exit, output)
-        for (name in listOf("WriteStaticHtml", "preparedHtmlAttributes", "HtmlStringWriterContext.writeText", "AttrsScope.style")) {
+        for (name in listOf(
+            "WriteStaticHtml",
+            "preparedHtmlAttributes",
+            "HtmlStringWriterContext.writeText",
+            "AttrsScope.style"
+        )) {
             assertTrue(name in output, output)
         }
         assertEquals(1, Regex("Missing or ambiguous runtime declarations:").findAll(output).count(), output)
@@ -52,7 +57,8 @@ class RuntimeDiagnosticsTest {
             """
                 package org.jetbrains.compose.web.dom
                 fun WriteStaticHtml(rootTag: String, encoded: String) {}
-            """.trimIndent(), enabled = true,
+            """.trimIndent(),
+            enabled = true,
         )
         assertEquals(ExitCode.COMPILATION_ERROR, exit, output)
         assertTrue("org.jetbrains.compose.web.dom.preparedHtmlAttributes" in output, output)

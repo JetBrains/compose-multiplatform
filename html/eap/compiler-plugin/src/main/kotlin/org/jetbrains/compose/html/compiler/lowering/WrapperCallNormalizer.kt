@@ -93,6 +93,7 @@ internal class WrapperCallNormalizer(
         private val arguments = marker?.argumentMapping.orEmpty()
         private fun string(name: String) =
             (arguments[Name.identifier(name)] as? IrConst)?.value as? String ?: ""
+
         private fun strings(name: String) = (arguments[Name.identifier(name)] as? IrVararg)?.elements
             ?.mapNotNull { (it as? IrConst)?.value as? String }.orEmpty()
 
@@ -167,7 +168,8 @@ internal class WrapperCallNormalizer(
             else -> spec.tagName.ifEmpty { function.name.asString().lowercase() }
         }
         val namespaceParameter = function.parameter("namespace").takeIf { direct }
-        val namespace = if (namespaceParameter != null) constants.string(call.arguments[namespaceParameter]) ?: return null
+        val namespace =
+            if (namespaceParameter != null) constants.string(call.arguments[namespaceParameter]) ?: return null
             else spec.namespace
         // foreignObject switches its children from SVG to HTML; leave that boundary to runtime rendering.
         if (!isValidHtmlTagName(tag) || tag == "foreignObject") return null
@@ -187,7 +189,8 @@ internal class WrapperCallNormalizer(
         function.parameter("tagName")?.let { return constants.string(call.arguments[it]) }
         val factory = call.argument(function.parameter("elementBuilder")) as? IrCall ?: return null
         if (factory.symbol.owner.fqNameWhenAvailable != HtmlSymbols.CreateBuilder ||
-            factory.symbol.owner.parameters.count { it.kind == IrParameterKind.Regular } != 1) return null
+            factory.symbol.owner.parameters.count { it.kind == IrParameterKind.Regular } != 1
+        ) return null
 
         return constants.string(factory.arguments.lastOrNull())
     }
@@ -231,11 +234,19 @@ internal class WrapperCallNormalizer(
         val typeValue = wrapper.inputType?.let { values.getValue(it) }
         val inputType = typeValue?.let { irCallWithArgs(symbols.inputTypeValue, it) }
             ?: typeName?.let(::irString)
-        if (inputType != null) before.add(AttributeOperation(AttributeOperationKind.Attribute, null, "type", listOf(inputType)))
+        if (inputType != null) before.add(
+            AttributeOperation(
+                AttributeOperationKind.Attribute,
+                null,
+                "type",
+                listOf(inputType)
+            )
+        )
         val attrsType = wrapper.attrs?.type?.makeNotNull() as? IrSimpleType
         val attrsReceiver = attrsType?.arguments?.firstOrNull()?.typeOrNull
-        val valueIsAttribute = typeValue?.let { irCallWithArgs(symbols.inputValueIsAttribute, it.deepCopyWithSymbols()) }
-            ?: typeName?.let { irBoolean(it in HtmlSymbols.ValueAttributeInputTypes) }
+        val valueIsAttribute =
+            typeValue?.let { irCallWithArgs(symbols.inputValueIsAttribute, it.deepCopyWithSymbols()) }
+                ?: typeName?.let { irBoolean(it in HtmlSymbols.ValueAttributeInputTypes) }
         for (parameter in wrapper.positional) {
             val name = parameter.name.asString()
             val value = values.getValue(parameter)
@@ -257,11 +268,13 @@ internal class WrapperCallNormalizer(
                     null -> irNotEquals(value.deepCopyWithSymbols(), irString(""))
                     else -> null
                 }
+
                 parameter.type.isBoolean() && operation.values.isEmpty() -> when ((value as? IrConst)?.value) {
                     false -> continue
                     true -> null
                     else -> value.deepCopyWithSymbols()
                 }
+
                 else -> null
             }
             val present = if (value.type.isNullable()) irNotEquals(value.deepCopyWithSymbols(), irNull()) else null
@@ -290,6 +303,7 @@ internal class WrapperCallNormalizer(
     }
 }
 
-private fun IrFunction.parameter(name: String): IrValueParameter? = parameters.firstOrNull { it.name.asString() == name }
+private fun IrFunction.parameter(name: String): IrValueParameter? =
+    parameters.firstOrNull { it.name.asString() == name }
 
 private fun IrCall.argument(parameter: IrValueParameter?): IrExpression? = parameter?.let { arguments[it] }
