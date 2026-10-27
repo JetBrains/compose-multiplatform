@@ -15,12 +15,12 @@ pluginManagement {
         }
     }
 
-    val localProperties: java.util.Properties? = properties("local.properties")
-
+    val localProperties: java.util.Properties? = properties(rootDir.resolve("local.properties").absolutePath)
 
     val repos = (localProperties?.getProperty("compose.web.repos"))?.split(File.pathSeparator)
 
-    val buildSrcProperties: java.util.Properties = properties(rootProject.projectDir.resolve("buildSrc/gradle.properties").absolutePath)!!
+    val buildSrcProperties: java.util.Properties =
+        properties(rootProject.projectDir.resolve("buildSrc/gradle.properties").absolutePath)!!
     val kotlinVersion = buildSrcProperties["kotlin.version"] as String
 
     repositories {
@@ -105,11 +105,17 @@ module(":html-test-utils", "test-utils")
 
 if (composeHtmlEapEnabled) {
     println("Compose HTML EAP modules enabled")
+    includeBuild("eap/compiler-plugin/gradle-plugin") {
+        name = "compose-html-lowering-gradle-plugin"
+    }
     module(":compiler-plugin-test-harness", "eap/plugin-test-harness")
     module(":html-core-eap", "eap/core")
     module(":html-eap-benchmarks", "eap/benchmarks")
     module(":html-svg-eap", "eap/svg")
     module(":internal-html-core-runtime-eap", "eap/internal-html-core-runtime")
+    module(":internal-html-serialization-eap", "eap/internal-html-serialization")
+    module(":compose-html-compiler-plugin", "eap/compiler-plugin")
+    module(":compose-html-compiler-plugin:tests", "eap/compiler-plugin/tests")
     module(":html-eap-example", "eap/examples/string-rendering")
     module(":html-eap-hydration-example", "eap/examples/hydration")
     module(":html-eap-hydration-islands-example", "eap/examples/hydration-islands")

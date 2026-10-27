@@ -9,13 +9,19 @@ package org.jetbrains.compose.web.dom
 
 import org.jetbrains.compose.web.internal.unsafeCast
 
-internal actual fun canAppendUnescapedHtmlString(value: String, attribute: Boolean): Boolean {
-    if (value.length < 32) return false
+internal actual fun canAppendUnescapedHtmlString(value: String, attribute: Boolean, startIndex: Int): Boolean {
+    if (value.length - startIndex < 32) return false
     // Use JVM String searches to skip Kotlin's search wrappers.
     val text = value.unsafeCast<java.lang.String>()
-    return text.indexOf('&'.code) < 0 && text.indexOf('<'.code) < 0 && text.indexOf('>'.code) < 0 &&
-        text.indexOf('\r'.code) < 0 && text.indexOf('\u0000'.code) < 0 &&
-        (!attribute || (text.indexOf('"'.code) < 0 && text.indexOf('\n'.code) < 0 && text.indexOf('\t'.code) < 0))
+    return text.indexOf('&'.code, startIndex) < 0 && text.indexOf('<'.code, startIndex) < 0 && text.indexOf(
+        '>'.code,
+        startIndex
+    ) < 0 &&
+            text.indexOf('\r'.code, startIndex) < 0 && text.indexOf('\u0000'.code, startIndex) < 0 &&
+            (!attribute || (text.indexOf('"'.code, startIndex) < 0 && text.indexOf(
+                '\n'.code,
+                startIndex
+            ) < 0 && text.indexOf('\t'.code, startIndex) < 0))
 }
 
 internal actual fun StringBuilder.appendHtmlRun(value: String, start: Int, end: Int) {
@@ -53,6 +59,7 @@ internal actual fun StringBuilder.appendEscapedHtmlString(value: String, attribu
                 if (attribute) "HTML attribute values must not contain NUL (U+0000)"
                 else "HTML text must not contain NUL (U+0000)"
             )
+
             '&' -> "&amp;"
             '<' -> "&lt;"
             '>' -> "&gt;"
@@ -64,19 +71,9 @@ internal actual fun StringBuilder.appendEscapedHtmlString(value: String, attribu
         appendHtmlRun(value, start, index)
         append(replacement)
         start = index + 1
-        if (character == '&' && canAppendUnescapedHtmlSuffix(value, attribute, start)) {
+        if (character == '&' && canAppendUnescapedHtmlString(value, attribute, start)) {
             appendHtmlRun(value, start, value.length)
             return true
         }
     }
-}
-
-private fun canAppendUnescapedHtmlSuffix(value: String, attribute: Boolean, start: Int): Boolean {
-    if (value.length - start < 32) return false
-    val text = value.unsafeCast<java.lang.String>()
-    return text.indexOf('&'.code, start) < 0 && text.indexOf('<'.code, start) < 0 &&
-        text.indexOf('>'.code, start) < 0 && text.indexOf('\r'.code, start) < 0 &&
-        text.indexOf('\u0000'.code, start) < 0 &&
-        (!attribute || (text.indexOf('"'.code, start) < 0 && text.indexOf('\n'.code, start) < 0 &&
-            text.indexOf('\t'.code, start) < 0))
 }

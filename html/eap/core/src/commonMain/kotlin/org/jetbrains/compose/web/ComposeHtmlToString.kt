@@ -30,7 +30,7 @@ import org.jetbrains.compose.web.dom.LocalComposeHtmlContext
  * duplicate foreign-attribute checks.
  *
  * @param hydratable whether to emit text-boundary markers needed to hydrate adjacent `Text`
- * nodes. Set to `false` when the output will not be hydrated.
+ * nodes. Compiler optimization might still emit them.
  * @param key optional key for reusing rendering storage across calls.
  * Use a stable key per template. Reuse is best-effort. `null` disables pooling.
  * @param validateStrictly overrides the default strict-validation setting for this render.
@@ -44,7 +44,11 @@ fun composeHtmlToString(
     validateStrictly: Boolean = defaultHtmlValidationMode() == HtmlValidationMode.Strict,
     content: @Composable () -> Unit,
 ): String {
-    return composeHtmlString(hydratable = hydratable, key = key, content = htmlValidatedContent(validateStrictly, content))
+    return composeHtmlString(
+        hydratable = hydratable,
+        key = key,
+        content = htmlValidatedContent(validateStrictly, content)
+    )
 }
 
 /** Shared single-pass composition and writer for fragments, documents, and streaming output. */

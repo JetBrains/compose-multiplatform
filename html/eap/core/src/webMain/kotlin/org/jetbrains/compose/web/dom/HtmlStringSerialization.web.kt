@@ -5,7 +5,7 @@
 
 package org.jetbrains.compose.web.dom
 
-internal actual fun canAppendUnescapedHtmlString(value: String, attribute: Boolean): Boolean = false
+internal actual fun canAppendUnescapedHtmlString(value: String, attribute: Boolean, startIndex: Int): Boolean = false
 
 internal actual fun StringBuilder.appendHtmlRun(value: String, start: Int, end: Int) {
     append(value, start, end)

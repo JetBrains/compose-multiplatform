@@ -50,6 +50,7 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.core)
                 implementation("org.jetbrains.compose.html:kotlinx-browser-common-subset:$kotlinxBrowserCommonSubsetVersion")
                 api(project(":internal-html-core-runtime-eap"))
+                implementation(project(":internal-html-serialization-eap"))
             }
         }
 

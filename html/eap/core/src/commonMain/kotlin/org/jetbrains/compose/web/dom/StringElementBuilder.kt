@@ -3,6 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+// Access shared serialization helpers without exposing them as public API.
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
 package org.jetbrains.compose.web.dom
 
 import kotlinx.browser.dom.Element
@@ -32,6 +35,6 @@ internal const val ValidTagFlag = 8
 
 internal fun htmlStringTagFlags(tagName: String, namespace: String): Int =
     (if (isHtmlRawTextElement(tagName, namespace)) RawTextTagFlag else 0) or
-    (if (isHtmlVoidElement(tagName, namespace)) VoidTagFlag else 0) or
-    (if (isHtmlLeadingNewlineElement(tagName, namespace)) LeadingNewlineTagFlag else 0) or
-    (if (isValidHtmlTagName(tagName)) ValidTagFlag else 0)
+            (if (isHtmlVoidElement(tagName, namespace)) VoidTagFlag else 0) or
+            (if (isHtmlLeadingNewlineElement(tagName, namespace)) LeadingNewlineTagFlag else 0) or
+            (if (isValidHtmlTagName(tagName)) ValidTagFlag else 0)

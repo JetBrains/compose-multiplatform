@@ -3,6 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+// Access shared serialization helpers without exposing them as public API.
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
 package org.jetbrains.compose.web.dom
 
 import kotlinx.browser.dom.Element
@@ -13,6 +16,7 @@ import kotlinx.browser.dom.Text
 internal actual fun Element.hasHtmlNamespace(): Boolean = namespaceURI == HtmlNamespace
 internal actual fun Element.matchesElement(localName: String, namespace: String): Boolean =
     this.localName == localName && namespaceURI == namespace
+
 internal actual fun Text.matchesText(value: String): Boolean = data == value
 internal actual fun Node.isRawTextContainer(): Boolean =
     this is Element && isHtmlRawTextElement(localName, namespaceURI)

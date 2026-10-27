@@ -17,6 +17,7 @@ val localProperties = java.util.Properties().apply {
         file.inputStream().use(::load)
     }
 }
+
 fun setting(name: String): String? =
     localProperties.getProperty(name) ?: providers.gradleProperty(name).orNull
 
@@ -32,11 +33,12 @@ kotlinKarmaConfig.rootDir = rootProject.rootDir.toString()
 
 apply<SeleniumDriverPlugin>()
 
-fun Project.isSampleProject() = projectDir.parentFile.name == "examples"
+// Only the browser samples have bundle-size tasks; EAP examples also include JVM-only projects.
+fun Project.isSampleProject() = path.startsWith(":examples:")
 
 tasks.register("printBundleSize") {
     dependsOn(
-        subprojects.filter { it.isSampleProject() }.map { ":examples:${it.name}:printBundleSize" }
+        subprojects.filter { it.isSampleProject() }.map { "${it.path}:printBundleSize" }
     )
 }
 
@@ -48,6 +50,7 @@ subprojects {
         "html-core-eap",
         "html-svg-eap",
         "internal-html-core-runtime-eap",
+        "internal-html-serialization-eap",
     )
     if (isComposeHtmlEapProject) {
         group = "org.jetbrains.compose.html.eap"
@@ -90,7 +93,10 @@ subprojects {
             repositories {
                 maven {
                     name = "internal"
-                    url = uri(COMPOSE_REPO_URL ?: System.getenv("COMPOSE_REPO_URL") ?: "https://packages.jetbrains.team/maven/p/cmp/dev")
+                    url = uri(
+                        COMPOSE_REPO_URL ?: System.getenv("COMPOSE_REPO_URL")
+                        ?: "https://packages.jetbrains.team/maven/p/cmp/dev"
+                    )
                     credentials {
                         username = COMPOSE_REPO_USERNAME ?: System.getenv("COMPOSE_REPO_USERNAME") ?: ""
                         password = COMPOSE_REPO_KEY ?: System.getenv("COMPOSE_REPO_KEY") ?: ""
@@ -106,6 +112,10 @@ subprojects {
                             "html-svg-eap" -> "JetBrains Compose HTML EAP SVG"
                             "internal-html-core-runtime-eap" ->
                                 "JetBrains Compose HTML EAP internal runtime"
+
+                            "internal-html-serialization-eap" ->
+                                "JetBrains Compose HTML EAP internal serialization"
+
                             else -> "JetBrains Compose HTML library"
                         }
                     )
@@ -113,10 +123,16 @@ subprojects {
                         when (projectName) {
                             "html-core-eap" ->
                                 "Experimental commonized JetBrains Compose HTML core library"
+
                             "html-svg-eap" ->
                                 "Experimental commonized JetBrains Compose HTML SVG library"
+
                             "internal-html-core-runtime-eap" ->
                                 "Experimental commonized JetBrains Compose HTML internal runtime"
+
+                            "internal-html-serialization-eap" ->
+                                "Shared internal serialization rules for JetBrains Compose HTML EAP and its compiler plugin"
+
                             else -> "JetBrains Compose HTML library"
                         }
                     )

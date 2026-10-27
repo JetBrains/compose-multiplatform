@@ -21,11 +21,11 @@ Fast validation is the default. Set `COMPOSE_HTML_VALIDATE_STRICTLY=true` on the
 with strict validation. Browser hydration follows the server's mode. Direct callers can pass
 `validateStrictly = true` to `hydrateComposable`.
 
-| During hydration | Fast (default) | Strict |
-| --- | --- | --- |
+| During hydration                   | Fast (default)                             | Strict                                       |
+|------------------------------------|--------------------------------------------|----------------------------------------------|
 | Text, attributes, or styles differ | Keeps server values until a Compose update | Reports a mismatch and renders on the client |
-| `allowHydrationMismatch()` | Applies client values | Applies client values |
-| Structure differs | Renders on the client | Renders on the client |
+| `allowHydrationMismatch()`         | Applies client values                      | Applies client values                        |
+| Structure differs                  | Renders on the client                      | Renders on the client                        |
 
 Strict mode also checks tag and attribute names, class tokens,
 foreign-attribute collisions and table-element nesting.
@@ -47,10 +47,18 @@ dependencies {
     implementation("org.jetbrains.compose.html:kotlinx-browser-common-subset:<version>")
 }
 ```
+
 Local build versions are configured in `html/gradle.properties`.
 
 Do not put the regular and EAP Compose HTML artifacts on the same compilation classpath because
 they intentionally expose the same Kotlin packages and declarations.
+
+## Static HTML lowering
+
+The HTML compiler plugin prepares static HTML at compile time to reduce work during
+server-side rendering on the JVM. Dynamic content is still rendered at runtime.
+
+See the [plugin README](compiler-plugin/README.md#activate) for activation and configuration.
 
 ## Examples
 

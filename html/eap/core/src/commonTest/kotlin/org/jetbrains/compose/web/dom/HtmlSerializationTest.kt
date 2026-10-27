@@ -3,6 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+// Access shared serialization helpers without exposing them as public API.
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
@@ -96,6 +99,12 @@ class HtmlSerializationTest {
                         else -> "outside the table"
                     }
                     assertContains(failure.message.orEmpty(), suggestion)
+                    val childHtml = if (child == "col") "<col>" else "<$child></$child>"
+                    assertEquals(
+                        "<$parent>$childHtml</$parent>",
+                        composeHtmlToString(hydratable, validateStrictly = false) {
+                            TagElement<Element>(parent, null) { TagElement<Element>(child, null, null) }
+                        })
                 }
             }
         }
@@ -345,7 +354,7 @@ class HtmlSerializationTest {
 
         assertEquals(
             "<title>A &amp; B &lt; C</title><textarea>A &amp; B &lt; C</textarea>" +
-                "<div>&lt;script&gt;alert(1)&lt;/script&gt;</div>",
+                    "<div>&lt;script&gt;alert(1)&lt;/script&gt;</div>",
             html,
         )
     }
@@ -458,8 +467,8 @@ class HtmlSerializationTest {
 
         assertEquals(
             "<div class=\"first second first third\"></div>" +
-                "<div class=\"manual  value\"></div>" +
-                "<div></div>",
+                    "<div class=\"manual  value\"></div>" +
+                    "<div></div>",
             html,
         )
     }
@@ -483,7 +492,7 @@ class HtmlSerializationTest {
 
         assertEquals(
             "<div style=\"color: red; display: block !important; color: blue; --accent: orange\"></div>" +
-                "<div style=\"display:none\"></div>",
+                    "<div style=\"display:none\"></div>",
             html,
         )
     }
@@ -512,11 +521,13 @@ class HtmlSerializationTest {
     fun acceptsAdjustedSvgNamesAndLowercaseCustomNames() {
         assertEquals(
             "<svg viewBox=\"0 0 10 10\"><linearGradient gradientUnits=\"userSpaceOnUse\">" +
-                "</linearGradient><sparkline datapoints=\"0,1\" xlink:href=\"#line\"></sparkline></svg>",
+                    "</linearGradient><sparkline datapoints=\"0,1\" xlink:href=\"#line\"></sparkline></svg>",
             composeHtmlToString {
                 TagElementNS<Element>("svg", TestSvgNamespace, { attr("viewBox", "0 0 10 10") }) {
-                    TagElementNS<Element>("linearGradient", TestSvgNamespace,
-                        { attr("gradientUnits", "userSpaceOnUse") }, null)
+                    TagElementNS<Element>(
+                        "linearGradient", TestSvgNamespace,
+                        { attr("gradientUnits", "userSpaceOnUse") }, null
+                    )
                     TagElementNS<Element>("sparkline", TestSvgNamespace, {
                         attr("datapoints", "0,1")
                         attr("xlink:href", "#line")
@@ -618,9 +629,9 @@ class HtmlSerializationTest {
 
         assertEquals(
             "<svg viewBox=\"0 0 10 10\">" +
-                "<defs><linearGradient id=\"gradient\"></linearGradient></defs>" +
-                "<image width=\"10\"></image>" +
-                "</svg>",
+                    "<defs><linearGradient id=\"gradient\"></linearGradient></defs>" +
+                    "<image width=\"10\"></image>" +
+                    "</svg>",
             html,
         )
     }
@@ -706,10 +717,10 @@ class HtmlSerializationTest {
 
         assertEquals(
             "<svg>" +
-                "<foreignObject><div>foreignObject</div></foreignObject>" +
-                "<title><div>title</div></title>" +
-                "<desc><div>desc</div></desc>" +
-                "</svg>",
+                    "<foreignObject><div>foreignObject</div></foreignObject>" +
+                    "<title><div>title</div></title>" +
+                    "<desc><div>desc</div></desc>" +
+                    "</svg>",
             html,
         )
     }
@@ -767,15 +778,25 @@ class HtmlSerializationTest {
             html,
         )
     }
+
     @Test
     fun attributeNameChecksRejectAllControlsAndProtocolSpoofing() {
         for (character in (0..31).map(Int::toChar) + (127..159).map(Int::toChar) + " \"'/>=".toList()) {
             assertFailsWith<IllegalArgumentException> {
-                composeHtmlToString(validateStrictly = true) { Div(attrs = { attr("prefix${character}suffix", "value") }) }
+                composeHtmlToString(validateStrictly = true) {
+                    Div(attrs = {
+                        attr(
+                            "prefix${character}suffix",
+                            "value"
+                        )
+                    })
+                }
             }
         }
-        for (name in listOf("data-compose-hydration-root", "DATA-COMPOSE-HYDRATION-STATE",
-                            "Data-Compose-Hydration-For", "data-compose-hydration-validation")) {
+        for (name in listOf(
+            "data-compose-hydration-root", "DATA-COMPOSE-HYDRATION-STATE",
+            "Data-Compose-Hydration-For", "data-compose-hydration-validation"
+        )) {
             assertFailsWith<IllegalArgumentException> {
                 composeHtmlToString { Div(attrs = { attr(name, "value") }) }
             }
@@ -788,16 +809,20 @@ class HtmlSerializationTest {
     @Test
     fun pooledAttributeNamesNeverCacheValues() {
         repeat(6) { i ->
-            assertEquals("<div data-long-name-for-validation=\"$i&amp;&quot;\"></div>", composeHtmlToString(key = "attribute-name-reuse") {
-                Div({ attr("data-long-name-for-validation", "$i&\"") })
-            })
+            assertEquals(
+                "<div data-long-name-for-validation=\"$i&amp;&quot;\"></div>",
+                composeHtmlToString(key = "attribute-name-reuse") {
+                    Div({ attr("data-long-name-for-validation", "$i&\"") })
+                })
         }
         assertFailsWith<IllegalArgumentException> {
             composeHtmlToString(key = "attribute-name-reuse", validateStrictly = true) {
                 Div({ attr("invalid name", "value") })
             }
         }
-        assertEquals("<div title=\"next\"></div>", composeHtmlToString(key = "attribute-name-reuse") { Div({ title("next") }) })
+        assertEquals(
+            "<div title=\"next\"></div>",
+            composeHtmlToString(key = "attribute-name-reuse") { Div({ title("next") }) })
     }
 
     @Test
@@ -815,11 +840,13 @@ class HtmlSerializationTest {
         repeat(2) {
             assertFailsWith<IllegalArgumentException> {
                 composeHtmlToString(key = "foreign-attribute-reuse", validateStrictly = true) {
-                    TagElementNS<kotlinx.browser.dom.Element>("g", "http://www.w3.org/2000/svg",
+                    TagElementNS<kotlinx.browser.dom.Element>(
+                        "g", "http://www.w3.org/2000/svg",
                         {
                             attr("viewBox", "first")
                             attr("viewbox", "second")
-                        }, null)
+                        }, null
+                    )
                 }
             }
         }
@@ -835,9 +862,30 @@ class HtmlSerializationTest {
             }
             assertEquals(
                 "<div title=\"${prefix}&lt;&amp;&gt;&#13;&quot;&#10;&#9;&amp;amp;\">" +
-                    "${prefix}&lt;&amp;&gt;&#13;\"\n\t&amp;amp;</div>",
+                        "${prefix}&lt;&amp;&gt;&#13;\"\n\t&amp;amp;</div>",
                 html,
             )
+        }
+    }
+
+    @Test
+    fun escapingChecksLongSuffixesAfterAmpersands() {
+        for (length in listOf(31, 32, 33, 1024)) {
+            val plain = "é😀a".repeat(length)
+            val value = "<&" + plain + "&\"\n\t" + plain + "<\r>"
+            assertEquals(
+                "<div title=\"&lt;&amp;${plain}&amp;&quot;&#10;&#9;${plain}&lt;&#13;&gt;\">" +
+                        "&lt;&amp;${plain}&amp;\"\n\t${plain}&lt;&#13;&gt;</div>",
+                composeHtmlToString {
+                    Div(attrs = { attr("title", value) }) { Text(value) }
+                },
+            )
+            assertEquals("&lt;&amp;$plain", composeHtmlToString { Text("<&$plain") })
+            val invalid = "&$plain\u0000"
+            assertFailsWith<IllegalArgumentException> { composeHtmlToString { Text(invalid) } }
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString { Div(attrs = { attr("title", invalid) }) }
+            }
         }
     }
 
