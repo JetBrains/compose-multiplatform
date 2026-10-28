@@ -38,10 +38,8 @@ import external.CARD_CLASS
 import external.Card
 import org.jetbrains.compose.web.dom.Text
 
-// Card is a <section> wrapper, compiled without the HTML plugin.
-// Its annotation lets us optimize calls and supported attrs without reading its body.
-// This is a promise from the external definition. The plugin cannot verify it.
-// Unsupported attrs keep the original call.
+// The annotation says Card forwards attrs to <section>. We don't inspect its body.
+// Unsupported attrs keep the Card call.
 @Composable
 fun UseCard(value: String) {
     Card(attrs = { classes(CARD_CLASS) }) { Text("Hello<&") }

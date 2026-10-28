@@ -8,6 +8,8 @@ import external.CARD_CLASS
 import external.Card
 import org.jetbrains.compose.web.dom.Text
 
+// The annotation says Card forwards attrs to <section>. We don't inspect its body.
+// Unsupported attrs keep the Card call.
 @Composable
 fun UseCard(value: String) {
     Card(attrs = { classes(CARD_CLASS) }) { Text("Hello<&") }
