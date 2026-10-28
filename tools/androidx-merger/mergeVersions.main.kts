@@ -44,6 +44,8 @@ when {
     else -> check(compile()) { "Compilation failed" }
 }
 
+mergeJbMain()
+
 if (!run("git", "remote", "get-url", "aosp")) {
     check(run("git", "remote", "add", "aosp", "https://android.googlesource.com/platform/frameworks/support")) {
         "git remote add aosp error"
@@ -81,6 +83,25 @@ fun needsMergeSolver(commit: String) =
     hasMergeScriptNote(commit) &&
         !hasMergeSolverNoteFixed(commit) &&
         Clock.System.now() - commitTime(commit) < 1.hours
+
+fun mergeJbMain() {
+    val branch = "origin/jb-main"
+    if (run("git", "merge-base", "--is-ancestor", branch, "HEAD")) return
+
+    println("Merge $branch")
+    val hasConflict = !run("git", "merge", "--no-commit", "--no-ff", branch)
+    if (hasConflict) stageConflictingFiles(branch)
+    check(run("git", "commit", "--no-edit")) { "Could not commit merge: $branch" }
+
+    if (hasConflict) {
+        addMergeScriptNote("conflict")
+    } else if (!compile()) {
+        markCompilationFailure()
+    } else {
+        return
+    }
+    check(solveWithMergeSolver()) { "Merge Solver did not fix the merge of $branch" }
+}
 
 fun ensureCompiles() {
     if (output("git", "rev-parse", "HEAD") == lastKnownGood) return
