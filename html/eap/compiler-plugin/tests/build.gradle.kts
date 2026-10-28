@@ -5,7 +5,6 @@
 
 @file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
-import java.util.Properties
 import org.gradle.api.tasks.bundling.Jar
 import org.jetbrains.kotlin.gradle.targets.jvm.tasks.KotlinJvmTest
 
@@ -21,9 +20,6 @@ val compilerPluginClasspath = files(compilerJar, compilerProject.configurations.
 
 val composeVersion = providers.gradleProperty("compose.version").get()
 val browserVersion = providers.gradleProperty("compose.html.eap.kotlinx-browser-common-subset.version").get()
-val kotlinVersion = Properties().apply {
-    rootProject.file("buildSrc/gradle.properties").inputStream().use(::load)
-}.getProperty("kotlin.version")
 
 kotlin {
     jvm { compilerOptions { freeCompilerArgs.add("-Xverify-ir=error") } }
@@ -40,11 +36,11 @@ kotlin {
             implementation("org.jetbrains.compose.html:kotlinx-browser-common-subset:$browserVersion")
         }
         jvmTest.dependencies {
-            implementation("org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlinVersion")
-            implementation("org.jetbrains.kotlin:kotlin-compose-compiler-plugin-embeddable:$kotlinVersion")
+            implementation(kotlin("compiler-embeddable"))
+            implementation(kotlin("compose-compiler-plugin-embeddable"))
         }
         val webTest by getting {
-            dependencies { implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC") }
+            dependencies { implementation(libs.kotlinx.coroutines.core) }
         }
     }
 }
