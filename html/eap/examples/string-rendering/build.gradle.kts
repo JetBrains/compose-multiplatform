@@ -6,6 +6,8 @@
 val kotlinxBrowserCommonSubsetVersion: String =
     providers.gradleProperty("compose.html.eap.kotlinx-browser-common-subset.version").get()
 val composeVersion: String = providers.gradleProperty("compose.version").get()
+val usePublished = rootProject.extra["compose.html.eap.examples.usePublished"] as Boolean
+val htmlVersion = rootProject.extra["compose.html.eap.examples.version"] as String
 
 plugins {
     kotlin("jvm")
@@ -15,11 +17,13 @@ plugins {
     application
 }
 
-// Use the compiler plugin from this checkout, like the EAP runtime below.
-configurations.configureEach {
-    resolutionStrategy.dependencySubstitution {
-        substitute(module("org.jetbrains.compose.html:compose-html-compiler-plugin"))
-            .using(project(":compose-html-compiler-plugin"))
+// Published mode gets the matching compiler artifact from the published Gradle plugin.
+if (!usePublished) {
+    configurations.configureEach {
+        resolutionStrategy.dependencySubstitution {
+            substitute(module("org.jetbrains.compose.html:compose-html-compiler-plugin"))
+                .using(project(":compose-html-compiler-plugin"))
+        }
     }
 }
 
@@ -29,8 +33,11 @@ java {
 }
 
 dependencies {
-    implementation("org.jetbrains.compose.runtime:runtime:$composeVersion")
-    implementation(project(":html-core-eap"))
+    implementation("androidx.compose.runtime:runtime:$composeVersion")
+    implementation(
+        if (usePublished) "org.jetbrains.compose.html.eap:html-core-eap:$htmlVersion"
+        else project(":html-core-eap")
+    )
     implementation(
         "org.jetbrains.compose.html:kotlinx-browser-common-subset:$kotlinxBrowserCommonSubsetVersion"
     )

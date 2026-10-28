@@ -62,8 +62,10 @@ See the [plugin README](compiler-plugin/README.md#activate) for activation and c
 
 ## Examples
 
-### String Rendering
+The examples use published Compose HTML artifacts by default. To use Compose HTML and its compiler plugin from this checkout,
+add `-Pcompose.html.eap.examples.usePublished=false` to any example command below.
 
+### String Rendering
 The example renders a complete page to
 `html/eap/examples/string-rendering/build/index.html` and opens it in your default browser. From
 the repository root, run:

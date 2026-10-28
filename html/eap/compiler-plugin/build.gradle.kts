@@ -50,10 +50,11 @@ publishing {
 }
 
 tasks.named("check") {
-    dependsOn(
-        "$compilerPluginPath:tests:check",
-        gradle.includedBuild("compose-html-lowering-gradle-plugin").task(":test")
-    )
+    dependsOn("$compilerPluginPath:tests:check")
+    // Run the local Gradle plugin tests only when its build is included (local mode).
+    gradle.includedBuilds
+        .find { it.name == "compose-html-lowering-gradle-plugin" }
+        ?.let { dependsOn(it.task(":test")) }
 }
 
 tasks.test {

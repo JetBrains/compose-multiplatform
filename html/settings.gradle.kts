@@ -105,8 +105,22 @@ module(":html-test-utils", "test-utils")
 
 if (composeHtmlEapEnabled) {
     println("Compose HTML EAP modules enabled")
-    includeBuild("eap/compiler-plugin/gradle-plugin") {
-        name = "compose-html-lowering-gradle-plugin"
+    val usePublishedExamples = setting("compose.html.eap.examples.usePublished")?.toBoolean() ?: true
+    val publishedExamplesVersion = requireNotNull(setting("compose.html.eap.examples.version"))
+    gradle.rootProject {
+        extra["compose.html.eap.examples.usePublished"] = usePublishedExamples
+        extra["compose.html.eap.examples.version"] = publishedExamplesVersion
+    }
+    if (usePublishedExamples) {
+        pluginManagement.resolutionStrategy.eachPlugin {
+            if (requested.id.id == "org.jetbrains.compose.html.lowering") {
+                useVersion(publishedExamplesVersion)
+            }
+        }
+    } else {
+        includeBuild("eap/compiler-plugin/gradle-plugin") {
+            name = "compose-html-lowering-gradle-plugin"
+        }
     }
     module(":compiler-plugin-test-harness", "eap/plugin-test-harness")
     module(":html-core-eap", "eap/core")
