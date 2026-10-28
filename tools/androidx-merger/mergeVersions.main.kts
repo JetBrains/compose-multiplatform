@@ -176,6 +176,9 @@ fun waitForMergeSolver(pushedCommit: String): Boolean {
     repeat((timeout / interval).toInt()) {
         Thread.sleep(interval.inWholeMilliseconds)
         fetchNotes()
+        check(!hasNote(pushedCommit, "Merge solver: unresolved")) {
+            "Merge Solver reported unresolved for $pushedCommit:\n${output("git", "notes", "show", pushedCommit)}"
+        }
         if (hasMergeSolverNoteFixed(pushedCommit)) {
             check(pull()) { "Could not fast-forward to the Merge Solver result." }
             return true
