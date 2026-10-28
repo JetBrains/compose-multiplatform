@@ -13,12 +13,6 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 
-private val pluginProperties = java.util.Properties().apply {
-    requireNotNull(HtmlLoweringGradlePlugin::class.java.getResourceAsStream("/compose-html-lowering.properties")) {
-        "Missing Compose HTML lowering plugin metadata"
-    }.use(::load)
-}
-
 /** Adds the HTML compiler plugin and the `htmlLowering` configuration. */
 class HtmlLoweringGradlePlugin : KotlinCompilerPluginSupportPlugin {
     override fun apply(target: Project) {
@@ -30,12 +24,12 @@ class HtmlLoweringGradlePlugin : KotlinCompilerPluginSupportPlugin {
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean =
         kotlinCompilation.platformType != KotlinPlatformType.common
 
-    override fun getCompilerPluginId() = pluginProperties.getProperty("id")
+    override fun getCompilerPluginId() = "org.jetbrains.compose.html.lowering"
 
     override fun getPluginArtifact() = SubpluginArtifact(
         groupId = "org.jetbrains.compose.html",
         artifactId = "compose-html-compiler-plugin",
-        version = pluginProperties.getProperty("version")
+        version = BuildTimeConfig.compilerPluginVersion
     )
 
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {

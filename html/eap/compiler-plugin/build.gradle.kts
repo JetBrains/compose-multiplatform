@@ -3,21 +3,14 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-import java.util.Properties
-
 plugins {
     kotlin("jvm")
 }
 
-val pluginProperties = Properties().apply {
-    file("plugin.properties").inputStream().use(::load)
-}
-val kotlinVersion = Properties().apply {
-    rootProject.file("buildSrc/gradle.properties").inputStream().use(::load)
-}.getProperty("kotlin.version")
+val eapVersion = providers.gradleProperty("compose.html.eap.version").get()
 
 group = "org.jetbrains.compose.html"
-version = pluginProperties.getProperty("version")
+version = eapVersion
 
 val compilerPluginPath = path
 subprojects {
@@ -36,7 +29,7 @@ kotlin {
 
 dependencies {
     implementation(project(":internal-html-serialization-eap"))
-    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:$kotlinVersion")
+    compileOnly(kotlin("compiler-embeddable"))
 
     testImplementation(project(":compiler-plugin-test-harness"))
     testImplementation(project(":html-core-eap"))
