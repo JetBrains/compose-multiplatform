@@ -30,10 +30,8 @@ subprojects {
     }
 }
 
-// The HTML root build targets JVM 11. Gradle requires Java to use the same target.
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+kotlin {
+    jvmToolchain(11)
 }
 
 dependencies {
@@ -47,9 +45,7 @@ dependencies {
         "org.jetbrains.compose.html:kotlinx-browser-common-subset:" +
                 rootProject.property("compose.html.eap.kotlinx-browser-common-subset.version")
     )
-    testImplementation(platform("org.junit:junit-bom:5.14.4"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(kotlin("test"))
 }
 
 publishing {
@@ -68,7 +64,6 @@ tasks.named("check") {
 }
 
 tasks.test {
-    useJUnitPlatform()
     // Golden IR tests resolve testData/ paths relative to this directory.
     workingDir = projectDir
     inputs.dir("testData").withPathSensitivity(PathSensitivity.RELATIVE)
