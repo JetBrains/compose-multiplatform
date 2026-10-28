@@ -203,6 +203,10 @@ gradle.taskGraph.whenReady {
 
         args(appArgs)
     }
+
+    tasks.named<Exec>("wasmJsSdlBenchmark") {
+        args(appArgs)
+    }
 }
 
 
@@ -211,6 +215,22 @@ tasks.register("buildD8Distribution", Zip::class.java) {
     from(rootProject.layout.buildDirectory.file("wasm/packages/compose-benchmarks-benchmarks/kotlin"))
     archiveFileName.set("d8-distribution.zip")
     destinationDirectory.set(rootProject.layout.buildDirectory.dir("distributions"))
+}
+
+tasks.register<Exec>("wasmJsSdlBenchmark") {
+    group = "benchmark"
+    description = "Runs the automated Wasm-in-Native Window (SDL2 / Skiko / Wasmtime) benchmarks."
+    dependsOn("wasmJsProductionExecutableCompileSync")
+
+    val nativeSkiko = project.findProperty("benchmark.nativeSkiko")?.toString()
+        ?: "/Users/dustin.feucht/projects/skiko/samples/SkiaNonWebSample/native-skiko/build/Release/native_skiko.node"
+
+    workingDir = rootProject.layout.buildDirectory.dir("wasm/packages/compose-benchmarks-benchmarks/kotlin").get().asFile
+    environment("BENCHMARK_MODE", "true")
+    environment("SKIKO_NATIVE_GL_ADDON", nativeSkiko)
+
+    executable = "node"
+    args("launcher_sdl.mjs")
 }
 
 tasks.register("runBrowserAndSaveStats") {

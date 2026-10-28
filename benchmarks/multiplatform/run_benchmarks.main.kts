@@ -5,6 +5,7 @@ enum class Platform(val platformName: String) {
     MACOS("macos"),
     DESKTOP("desktop"),
     WEB("web"),
+    WASM_SDL("wasm-sdl"),
     IOS("ios"),
     ANDROID("android");
 
@@ -145,6 +146,11 @@ fun executeBenchmarks(
             null,
             null,
             ":benchmarks:wasmJsBrowserProductionRun"
+        )
+        Platform.WASM_SDL -> Triple(
+            null,
+            null,
+            ":benchmarks:wasmJsSdlBenchmark"
         )
         Platform.IOS -> Triple(
             null,

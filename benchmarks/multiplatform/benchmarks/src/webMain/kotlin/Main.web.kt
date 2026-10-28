@@ -57,7 +57,7 @@ fun mainBrowser() = MainScope().launch {
     }
 }
 
-private suspend fun awaitSkikoWasm() {
+internal suspend fun awaitSkikoWasm() {
     suspendCancellableCoroutine { c ->
         @Suppress("INVISIBLE_REFERENCE")
         androidx.compose.ui.window.onSkikoReady {

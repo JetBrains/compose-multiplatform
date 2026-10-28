@@ -60,7 +60,11 @@ internal actual suspend fun measureComposable(
     graphicsContext: GraphicsContext?,
     content: @Composable () -> Unit
 ): BenchmarkResult  {
-    val surface = graphicsContext?.surface(width, height) ?: Surface.makeNull(width, height)
+    // Fall back to an in-memory raster surface when graphicsContext is null (e.g., in headless or Web/Wasm runs)
+    // so that Skia actively executes CPU software rasterization instead of discarding draw operations like Surface.makeNull,
+    // ensuring benchmark frame times reflect realistic rendering workloads comparable across platforms.
+    val surface = graphicsContext?.surface(width, height)
+        ?: Surface.makeRasterN32Premul(width, height)
     val scene = createBenchmarkComposeScene(width, height)
     try {
         val nanosPerFrame = (1.0 / targetFps.toDouble() * nanosPerSecond).toLong()

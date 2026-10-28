@@ -19,14 +19,24 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import kotlinx.serialization.Serializable
 
+private fun isD8Js(): Boolean = js("typeof globalThis.isD8 !== 'undefined'")
+private fun isSdlJs(): Boolean = js("typeof globalThis.__skikoNativeGL !== 'undefined' || typeof globalThis.isSdl !== 'undefined'")
+private fun isNodeJs(): Boolean = js("typeof process !== 'undefined' && process.release && process.release.name === 'node'")
+
+private fun isServerlessEnvironment(): Boolean = isD8Js() || isSdlJs() || isNodeJs()
+
 /**
  * Browser implementation for saving benchmark results.
- * Instead of trying to save directly to disk (which would fail with UnsupportedOperationException),
- * this implementation sends the results to a server via HTTP.
+ * When running in headless/SDL/D8/Node environments, saves directly to disk.
+ * In a browser environment, sends the results to a server via HTTP.
  */
 actual fun saveBenchmarkStats(name: String, stats: BenchmarkStats) {
-    GlobalScope.launch {
-        BenchmarksSaveServerClient.sendBenchmarkResult(name, stats)
+    if (isServerlessEnvironment()) {
+        saveBenchmarkStatsOnDisk(name, stats)
+    } else {
+        GlobalScope.launch {
+            BenchmarksSaveServerClient.sendBenchmarkResult(name, stats)
+        }
     }
 }
 
