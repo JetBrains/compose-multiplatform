@@ -22,11 +22,10 @@ kotlin {
 			dependencies {
 				implementation(compose.html.core)
 				implementation(compose.runtime)
-				implementation("org.jetbrains.kotlin-wrappers:kotlin-react:17.0.2-pre.201-kotlin-1.5.0")
-				implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:17.0.2-pre.201-kotlin-1.5.0")
-				implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:5.3.0-pre.201-kotlin-1.5.0")
-				implementation(npm("react", "17.0.2"))
-				implementation(npm("react-dom", "17.0.2"))
+				implementation(project.dependencies.platform("org.jetbrains.kotlin-wrappers:kotlin-wrappers-bom:2026.10.5"))
+				implementation("org.jetbrains.kotlin-wrappers:kotlin-react")
+				implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom")
+				implementation("org.jetbrains.kotlin-wrappers:kotlin-emotion-react")
 				implementation(npm("react-youtube-lite", "1.0.1"))
 			}
 		}
