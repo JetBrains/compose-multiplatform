@@ -23,15 +23,22 @@ subprojects {
     }
 }
 
-// The HTML root build targets JVM 11. Gradle requires Java to use the same target.
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+kotlin {
+    jvmToolchain(11)
 }
 
 dependencies {
     implementation(project(":internal-html-serialization-eap"))
     compileOnly(kotlin("compiler-embeddable"))
+
+    testImplementation(project(":compiler-plugin-test-harness"))
+    testImplementation(project(":html-core-eap"))
+    testImplementation("org.jetbrains.compose.runtime:runtime:${rootProject.property("compose.version")}")
+    testImplementation(
+        "org.jetbrains.compose.html:kotlinx-browser-common-subset:" +
+                rootProject.property("compose.html.eap.kotlinx-browser-common-subset.version")
+    )
+    testImplementation(kotlin("test"))
 }
 
 publishing {
@@ -43,8 +50,15 @@ publishing {
 }
 
 tasks.named("check") {
-    dependsOn(
-        "$compilerPluginPath:tests:check",
-        gradle.includedBuild("compose-html-lowering-gradle-plugin").task(":test")
-    )
+    dependsOn("$compilerPluginPath:tests:check")
+    // Run the local Gradle plugin tests only when its build is included (local mode).
+    gradle.includedBuilds
+        .find { it.name == "compose-html-lowering-gradle-plugin" }
+        ?.let { dependsOn(it.task(":test")) }
+}
+
+tasks.test {
+    // Golden IR tests resolve testData/ paths relative to this directory.
+    workingDir = projectDir
+    inputs.dir("testData").withPathSensitivity(PathSensitivity.RELATIVE)
 }

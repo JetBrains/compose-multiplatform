@@ -49,6 +49,7 @@ jobs:
         run: |
           ./gradlew --no-daemon --stacktrace --rerun-tasks --max-workers=1 \
             -Pcompose.html.eap.enabled=true \
+            -Pcompose.html.eap.examples.usePublished=false \
             :html-core-eap:check \
             :html-svg-eap:check \
             :internal-html-core-runtime-eap:check \
@@ -62,4 +63,6 @@ jobs:
         working-directory: html
         run: |
           ./gradlew --no-daemon --stacktrace --max-workers=1 \
-            -Pcompose.html.eap.enabled=true :compose-html-compiler-plugin:check
+            -Pcompose.html.eap.enabled=true \
+            -Pcompose.html.eap.examples.usePublished=false \
+            :compose-html-compiler-plugin:check

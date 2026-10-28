@@ -1,0 +1,93 @@
+// Source: main/dynamicAttributesAndText.kt
+// ------------------------------------------
+/*
+ * Copyright 2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.web.dom.*
+
+@Composable
+fun DynamicAttributesAndText(selected: Boolean, effect: (String) -> String) {
+    Div(attrs = {
+        classes("card")
+        id(effect("id"))
+        if (selected) attr("aria-label", effect("label"))
+        attr("title", "A & B")
+    }) {
+        Span { Text("before") }
+        Text(effect("body"))
+        Span { Text("after") }
+    }
+}
+
+
+// Transformed IR: main
+// ------------------------------------------
+// MODULE: <main>
+// FILE: dynamicAttributesAndText.kt
+
+@Composable
+fun DynamicAttributesAndText(selected: Boolean, effect: Function1<String, String>) {
+  { // BLOCK
+    val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
+    val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
+    val tmp11_htmlParent: Any? = when {
+      tmp0_htmlWriter.beginMixedElement(tagName = "div", validate = tmp1_htmlValidate) -> { // BLOCK
+        var tmp2_html_id: String? = null
+        var tmp3_html_aria_label: String? = null
+        var tmp4_html_title: String? = null
+        var tmp5_htmlClass: String? = null
+        { // BLOCK
+          tmp5_htmlClass = "card"
+        }
+        { // BLOCK
+          { // BLOCK
+            val tmp6_htmlValue: String = effect.invoke(p1 = "id")
+            tmp2_html_id = tmp6_htmlValue
+          }
+        } /*~> Unit */
+        when {
+          selected -> { // BLOCK
+            { // BLOCK
+              val tmp7_htmlValue: String = effect.invoke(p1 = "label")
+              tmp3_html_aria_label = tmp7_htmlValue
+            }
+          } /*~> Unit */
+        }
+        { // BLOCK
+          { // BLOCK
+            val tmp8_htmlValue: String = "A & B"
+            tmp4_html_title = tmp8_htmlValue
+          }
+        } /*~> Unit */
+        when {
+          tmp1_htmlValidate -> { // BLOCK
+            tmp0_htmlWriter.validateMixedClass(value = tmp5_htmlClass, validate = tmp1_htmlValidate, duplicate = false)
+          }
+        }
+        tmp0_htmlWriter.writeMixedLiteral(encoded = "<div")
+        tmp0_htmlWriter.writeMixedAttribute(prefix = " id", value = tmp2_html_id, boolean = false)
+        tmp0_htmlWriter.writeMixedAttribute(prefix = " aria-label", value = tmp3_html_aria_label, boolean = false)
+        when {
+          EQEQ(arg0 = tmp4_html_title, arg1 = null).not() -> tmp0_htmlWriter.writeMixedLiteral(encoded = " title=\"A &amp; B\"")
+        }
+        { // BLOCK
+          var tmp9_htmlClassesWritten: Boolean = false
+          tmp9_htmlClassesWritten = tmp0_htmlWriter.writeMixedClass(value = when {
+            EQEQ(arg0 = tmp5_htmlClass, arg1 = null) -> null
+            else -> "card"
+          }, previous = tmp9_htmlClassesWritten, encoded = true)
+          tmp0_htmlWriter.finishMixedClasses(written = tmp9_htmlClassesWritten)
+        }
+        val tmp10_htmlParent: Any? = tmp0_htmlWriter.finishMixedElement(tagName = "div", namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+        tmp10_htmlParent
+      }
+      else -> null
+    }
+    tmp0_htmlWriter.advanceLoweredRegion(encoded = "<span>before</span>", innermost = "div", namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+    tmp0_htmlWriter.writeText(value = effect.invoke(p1 = "body"), validate = tmp1_htmlValidate)
+    tmp0_htmlWriter.closeElement(encoded = "<span>after</span></div>", parent = tmp11_htmlParent)
+  }
+}

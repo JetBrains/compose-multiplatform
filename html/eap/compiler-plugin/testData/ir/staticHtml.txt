@@ -1,0 +1,37 @@
+// Source: main/staticHtml.kt
+// ------------------------------------------
+/*
+ * Copyright 2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.web.dom.*
+
+private const val CARD = "card"
+
+@Composable
+fun StaticHtml() {
+    Div(attrs = {
+        classes(CARD)
+        attr("title", "A & \"B\"")
+    }) {
+        Span { Text("<&" + "Hello>") }
+        Br()
+    }
+}
+
+
+// Transformed IR: main
+// ------------------------------------------
+// MODULE: <main>
+// FILE: staticHtml.kt
+
+private const val CARD: String
+  field = "card"
+  private get
+
+@Composable
+fun StaticHtml() {
+  WriteStaticHtml(rootTag = "div", encoded = "<div title=\"A &amp; &quot;B&quot;\" class=\"card\"><span>&lt;&amp;Hello&gt;</span><br></div>")
+}

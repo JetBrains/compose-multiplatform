@@ -46,7 +46,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(compose.runtime)
+                implementation("androidx.compose.runtime:runtime:${rootProject.property("compose.version")}")
                 implementation(libs.kotlinx.coroutines.core)
                 implementation("org.jetbrains.compose.html:kotlinx-browser-common-subset:$kotlinxBrowserCommonSubsetVersion")
                 api(project(":internal-html-core-runtime-eap"))

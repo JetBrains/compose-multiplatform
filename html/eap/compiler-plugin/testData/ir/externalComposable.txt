@@ -1,0 +1,55 @@
+// Source: external/Composable.kt
+// ------------------------------------------
+/*
+ * Copyright 2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+package external
+
+import androidx.compose.runtime.Composable
+import org.jetbrains.compose.web.dom.Div
+import org.jetbrains.compose.web.dom.Text
+
+@Composable
+fun Hello() {
+    Div { Text("Hello") }
+}
+
+
+// Source: main/externalComposable.kt
+// ------------------------------------------
+/*
+ * Copyright 2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+import androidx.compose.runtime.Composable
+import external.Hello
+import org.jetbrains.compose.web.dom.*
+
+@Composable
+fun UseHello() {
+    Div {
+        Span { Text("before<&") }
+        Hello()
+        Span { Text("after") }
+    }
+}
+
+
+// Transformed IR: main
+// ------------------------------------------
+// MODULE: <main>
+// FILE: externalComposable.kt
+
+@Composable
+fun UseHello() {
+  { // BLOCK
+    val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
+    val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
+    val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "div", encoded = "<div><span>before&lt;&amp;</span>", innermost = "div", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+    Hello()
+    tmp0_htmlWriter.closeElement(encoded = "<span>after</span></div>", parent = tmp2_htmlParent)
+  }
+}
