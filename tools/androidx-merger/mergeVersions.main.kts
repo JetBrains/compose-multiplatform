@@ -176,7 +176,7 @@ fun waitForMergeSolver(pushedCommit: String): Boolean {
     repeat((timeout / interval).toInt()) {
         Thread.sleep(interval.inWholeMilliseconds)
         fetchNotes()
-        check(!hasNote(pushedCommit, "Merge solver: unresolved")) {
+        check(!hasMergeSolverNoteUnresolved(pushedCommit)) {
             "Merge Solver reported unresolved for $pushedCommit:\n${output("git", "notes", "show", pushedCommit)}"
         }
         if (hasMergeSolverNoteFixed(pushedCommit)) {
@@ -204,6 +204,8 @@ fun markCompilationFailure() = addMergeScriptNote("compilation failure")
 fun hasMergeScriptNote(commit: String) = hasNote(commit, "Merge script:")
 
 fun hasMergeSolverNoteFixed(commit: String) = hasNote(commit, "Merge solver: fixed")
+
+fun hasMergeSolverNoteUnresolved(commit: String) = hasNote(commit, "Merge solver: unresolved")
 
 fun hasNote(commit: String, prefix: String): Boolean =
     execute("git", "notes", "show", commit)
