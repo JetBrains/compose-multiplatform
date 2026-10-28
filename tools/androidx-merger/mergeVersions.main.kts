@@ -147,10 +147,13 @@ fun setMergeTitle(commit: String) {
     messageFile.writeText("$title\n${messageFile.readText().substringAfter('\n')}")
 }
 
-fun compile() = if (System.getProperty("os.name").startsWith("Windows")) {
-    run("cmd", "/c", "gradlew", "assemble", "compileTests")
-} else {
-    run("./gradlew", "assemble", "compileTests")
+fun compile(): Boolean {
+    println("Starting compilation: assemble compileTests")
+    return if (System.getProperty("os.name").startsWith("Windows")) {
+        run("cmd", "/c", "gradlew", "assemble", "compileTests")
+    } else {
+        run("./gradlew", "assemble", "compileTests")
+    }
 }
 
 fun solveWithMergeSolver(): Boolean {
