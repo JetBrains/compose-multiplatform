@@ -1,4 +1,5 @@
 import java.io.File
+import java.time.OffsetDateTime
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -258,7 +259,7 @@ fun getScriptPathFromArgs(): File =
 fun commitTime(revision: String): Instant =
     Instant.fromEpochSeconds(output("git", "show", "-s", "--format=%ct", revision).toLong())
 
-fun logTimestamp() = Clock.System.now().toString()
+fun logTimestamp() = OffsetDateTime.now().toString()
 
 fun println(message: Any?) = kotlin.io.println("${logTimestamp()} $message")
 
