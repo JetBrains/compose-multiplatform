@@ -79,7 +79,7 @@ class ControlFlowLoweringTest {
             assertEquals(1, calls.count { it == "currentHtmlStringWriter" }, "$method: $calls")
             assertEquals(1, calls.count { it == "getLocalHtmlValidationMode" }, "$method: $calls")
             assertFalse(
-                calls.any { it in setOf("Div", "Span", "Text", "PreparedContainer", "PreparedTextElement") },
+                calls.any { it in setOf("Div", "Span", "Text") },
                 "$method: $calls"
             )
             for ((from, label) in jumps) {

@@ -60,25 +60,25 @@ class CompilerHydrationTest {
     }
 
     @Test
-    fun preparedElementsHydrateAndComposeWithTheirOriginalScopes() = MainScope().promise {
-        assertEquals(jvmPreparedHydrationHtml, composeHtmlToString { PreparedHydrationContent(0, {}) })
+    fun scopedElementsHydrateAndComposeWithTheirOriginalScopes() = MainScope().promise {
+        assertEquals(jvmScopedHydrationHtml, composeHtmlToString { ScopedHydrationContent(0, {}) })
         for (hydrate in listOf(false, true)) {
             for (strict in listOf(false, true)) {
                 var count by mutableStateOf(0)
                 val scopes = mutableListOf<String>()
                 val root = browserDocument.createElement("div") as HTMLElement
                 browserDocument.body!!.appendChild(root)
-                if (hydrate) root.innerHTML = jvmPreparedHydrationHtml
+                if (hydrate) root.innerHTML = jvmScopedHydrationHtml
                 val originalCard = root.querySelector(".card")
-                val originalPrice = root.querySelector("#prepared-price")?.firstChild
+                val originalPrice = root.querySelector("#scoped-price")?.firstChild
                 val originalShared = root.querySelectorAll(".shared-literal, .shared-fragment")
                     .let { nodes -> (0 until nodes.length).map { nodes.item(it) } }
                 val content: @Composable () -> Unit = {
-                    PreparedHydrationContent(count, { count++ }) { outer ->
+                    ScopedHydrationContent(count, { count++ }) { outer ->
                         DisposableEffect(count) {
                             val price = scopeElement
                             val card = with(outer) { scopeElement }
-                            assertEquals("prepared-price", price.id)
+                            assertEquals("scoped-price", price.id)
                             assertEquals("card", card.className)
                             assertSame(card, price.parentNode)
                             scopes.add("$count:${price.tagName}:${card.tagName}")
@@ -93,7 +93,7 @@ class CompilerHydrationTest {
                 }
                 try {
                     val card = root.querySelector(".card")!!
-                    val price = root.querySelector("#prepared-price")!!
+                    val price = root.querySelector("#scoped-price")!!
                     val priceText = price.firstChild
                     val details = root.querySelector(".direct-details")!!
                     assertEquals("0", details.getAttribute("data-count"))
@@ -103,7 +103,7 @@ class CompilerHydrationTest {
                     }
                     val prefix = details.firstChild
                     val suffix = details.lastChild
-                    val literal = root.querySelector("#prepared-literal")!!.firstChild
+                    val literal = root.querySelector("#scoped-literal")!!.firstChild
                     val shared = root.querySelectorAll(".shared-literal, .shared-fragment")
                         .let { nodes -> (0 until nodes.length).map { nodes.item(it)!! } }
                     assertEquals(
@@ -117,7 +117,7 @@ class CompilerHydrationTest {
                     assertEquals(listOf("0:SPAN:DIV"), scopes)
                     assertEquals("Price: 0", price.textContent)
                     assertEquals("<& literal", literal!!.textContent)
-                    (root.querySelector("#prepared-increment") as HTMLElement).click()
+                    (root.querySelector("#scoped-increment") as HTMLElement).click()
                     delay(100)
                     assertEquals("Price: 1", price.textContent)
                     assertEquals("Details 1", root.querySelector(".details")!!.textContent)
@@ -134,7 +134,7 @@ class CompilerHydrationTest {
                     assertEquals(listOf("0:SPAN:DIV", "1:SPAN:DIV"), scopes)
                     assertSame(card, root.querySelector(".card"))
                     assertSame(priceText, price.firstChild)
-                    assertSame(literal, root.querySelector("#prepared-literal")!!.firstChild)
+                    assertSame(literal, root.querySelector("#scoped-literal")!!.firstChild)
                     val updatedShared = root.querySelectorAll(".shared-literal, .shared-fragment")
                     shared.forEachIndexed { index, node -> assertSame(node, updatedShared.item(index)) }
                 } finally {

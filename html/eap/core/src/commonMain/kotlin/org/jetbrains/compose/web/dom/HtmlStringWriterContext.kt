@@ -154,34 +154,6 @@ internal class HtmlStringWriterContext(
         flushChunk()
     }
 
-    @Composable
-    @NonRestartableComposable
-    @ExplicitGroupsComposable
-    override fun <TElement : Element> DynamicTextTagElement(
-        attributes: PreparedHtmlAttributes<TElement>,
-        value: @Composable ElementScope<TElement>.() -> String,
-    ) {
-        checkNotFinished()
-        if (discardingContent) {
-            value(elementScope())
-            return
-        }
-        val tagName = attributes.tagName
-        val validate = LocalHtmlValidationMode.current == HtmlValidationMode.Strict
-        writeStartTag(tagName, HtmlNamespace, attributes.callback, validate, true)
-        val parent = enter(tagName, HtmlNamespace, isHtmlLeadingNewlineElement(tagName, HtmlNamespace))
-        flushChunk()
-        val start = output.length
-        val text = value(elementScope())
-        if (text.isNotEmpty()) {
-            appendText(text, validate)
-            flushChunk()
-        }
-        output.appendEndTag(tagName, HtmlNamespace, start)
-        exit(parent)
-        flushChunk()
-    }
-
     /** Returns the shared buffer, or null when output is discarded or the stored string can be returned directly. */
     @PublishedApi
     internal fun beginStaticHtml(rootTag: String, encoded: String, validate: Boolean): StringBuilder? {
@@ -217,6 +189,7 @@ internal class HtmlStringWriterContext(
      * Only called by compiler plugin. Opens nested elements written as one literal.
      * Only [rootTag] is checked against the unknown parent; [innermost] receives the following content.
      * [closeElement] with the returned parent restores the state from before the region.
+     * Keep this and its callees small so the JVM can inline them.
      */
     @PublishedApi
     internal fun openLoweredRegion(
@@ -451,12 +424,6 @@ internal class HtmlStringWriterContext(
         if (validate && !tagNameIsValid) requireValidHtmlTagName(tagName)
         beginChild(tagName, validate)
 
-        val prepared = if (namespace == HtmlNamespace) preparedHtmlCallbackMetadata(applyAttrs) else null
-        if (prepared != null && prepared.tagName == tagName) {
-            output.append(prepared.startTag)
-            pendingLeadingNewline = false
-            return StartTagResult.Ordinary
-        }
         val builder = attrsBuilders.builder<TElement>(attrsBuilderIndex++)
         try {
             applyAttrs?.invoke(builder)

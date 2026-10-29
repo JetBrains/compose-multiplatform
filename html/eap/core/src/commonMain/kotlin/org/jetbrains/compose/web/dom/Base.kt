@@ -52,15 +52,6 @@ internal interface ComposeHtmlContext {
 
     @Composable
     @NonRestartableComposable
-    fun <TElement : Element> DynamicTextTagElement(
-        attributes: PreparedHtmlAttributes<TElement>,
-        value: @Composable ElementScope<TElement>.() -> String,
-    ) {
-        TagElement(attributes.elementBuilder, attributes.callback) { TextElement(value()) }
-    }
-
-    @Composable
-    @NonRestartableComposable
     fun TextElement(value: String)
 
     @Composable

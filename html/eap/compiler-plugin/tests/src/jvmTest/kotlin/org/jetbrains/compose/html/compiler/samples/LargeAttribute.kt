@@ -24,8 +24,18 @@ fun LargeDirectAttribute(value: String) {
 }
 
 @Composable
-fun LargePreparedAttribute(content: ContentBuilder<HTMLSpanElement>?) {
+fun LargeStoredContentAttribute(content: ContentBuilder<HTMLSpanElement>?) {
     val attribute = AttributeUnit + AttributeUnit + AttributeUnit + AttributeUnit +
             AttributeUnit + AttributeUnit + AttributeUnit + AttributeUnit
     Span(attrs = { attr("title", attribute) }, content = content)
+}
+
+@Composable
+fun LargeMixedAttribute(value: String) {
+    val attribute = AttributeUnit + AttributeUnit + AttributeUnit + AttributeUnit +
+            AttributeUnit + AttributeUnit + AttributeUnit + AttributeUnit
+    Span(attrs = {
+        attr("title", attribute)
+        id(value)
+    }) { Text(value) }
 }

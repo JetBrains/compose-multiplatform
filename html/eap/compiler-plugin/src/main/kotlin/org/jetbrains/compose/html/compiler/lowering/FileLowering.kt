@@ -9,8 +9,6 @@ import org.jetbrains.compose.html.compiler.HtmlSymbols
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
-import org.jetbrains.kotlin.cli.reportInfo
-import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrFunction
@@ -23,7 +21,6 @@ import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
 @OptIn(UnsafeDuringIrConstructionAPI::class)
 internal class FileLowering(
     private val context: IrPluginContext,
-    private val configuration: CompilerConfiguration,
     private val symbols: HtmlSymbols,
     private val file: IrFile,
 ) : IrElementTransformerVoidWithContext() {
@@ -35,7 +32,6 @@ internal class FileLowering(
     private val analysis = HtmlAnalysis(symbols, constants, elements)
     private val attributeWriter = HtmlAttributeWriter(context, symbols, constants, fields)
     private val elementLowering = ElementLowering(context, symbols, analysis, attributeWriter, ::transform)
-    private val prepared = PreparedElementLowering(context, symbols, fields)
 
     private var receiverCallsOnly = true
 
@@ -48,19 +44,11 @@ internal class FileLowering(
         receiverCallsOnly = false
         file.transform(this, null)
 
-        file.declarations.addAll(0, prepared.fields)
         file.declarations.addAll(0, fields.stringFields)
-
-        if (prepared.fields.isNotEmpty()) {
-            configuration.reportInfo(
-                "[compose-html-lowering] ${file.fileEntry.name}: " +
-                        "prepared ${prepared.fields.size} HTML attribute value(s)"
-            )
-        }
     }
 
-    // Try static HTML or a mix of HTML and runtime calls. Otherwise lower the children
-    // and try caching the attributes for the original element call.
+    // Try static HTML or a mix of HTML and runtime calls. Otherwise keep the original
+    // element and attribute callback, while still lowering its children.
     override fun visitCall(expression: IrCall): IrExpression {
         if (receiverCallsOnly) {
             val visited = super.visitCall(expression) as IrCall
@@ -72,8 +60,7 @@ internal class FileLowering(
         val lowered = element?.let { elementLowering.lower(it, builder(expression), owner()) }
         if (lowered != null) return lowered
 
-        val visited = super.visitCall(expression)
-        return element?.let { prepared.lower(it, builder(expression)) } ?: visited
+        return super.visitCall(expression)
     }
 
     private fun transform(statement: IrStatement): IrStatement = statement.transform(this, null) as IrStatement

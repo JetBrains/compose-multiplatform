@@ -66,8 +66,8 @@ private val HtmlVoidElementNames = setOf(
 internal fun isHtmlVoidElement(tagName: String, namespace: String): Boolean =
     namespace == HtmlNamespace && tagName in HtmlVoidElementNames
 
-// Prepared containers need an ordinary end tag and the normal text-writing path.
-internal fun supportsPreparedHtmlAttributes(tagName: String): Boolean =
+// Lowered content needs an ordinary end tag and the normal text-writing path.
+internal fun supportsLoweredHtmlContent(tagName: String): Boolean =
     tagName != "noscript" && !isHtmlRawTextElement(tagName, HtmlNamespace) && !isHtmlVoidElement(tagName, HtmlNamespace)
 
 // HTML parsing discards the first LF in these elements.

@@ -1,0 +1,36 @@
+// Source: main/storedContentAttributes.kt
+// ------------------------------------------
+/*
+ * Copyright 2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+import androidx.compose.runtime.Composable
+import kotlinx.browser.dom.HTMLDivElement
+import org.jetbrains.compose.web.dom.*
+
+@Composable
+fun StoredContentAttributes(first: ContentBuilder<HTMLDivElement>?, second: ContentBuilder<HTMLDivElement>?) {
+    Div(attrs = { classes("card"); attr("title", "A & B") }, content = first)
+    Div(attrs = { classes("card"); attr("title", "A & B") }, content = second)
+}
+
+
+// Transformed IR: main
+// ------------------------------------------
+// MODULE: <main>
+// FILE: storedContentAttributes.kt
+
+@Composable
+fun StoredContentAttributes(first: @ExtensionFunctionType @Composable Function1<ElementScope<HTMLDivElement>, Unit>?, second: @ExtensionFunctionType @Composable Function1<ElementScope<HTMLDivElement>, Unit>?) {
+  Div(attrs = local fun AttrsScope<HTMLDivElement>.<anonymous>() {
+    $this$Div.classes(classes = ["card"])
+    $this$Div.attr(attr = "title", value = "A & B") /*~> Unit */
+  }
+, content = first)
+  Div(attrs = local fun AttrsScope<HTMLDivElement>.<anonymous>() {
+    $this$Div.classes(classes = ["card"])
+    $this$Div.attr(attr = "title", value = "A & B") /*~> Unit */
+  }
+, content = second)
+}

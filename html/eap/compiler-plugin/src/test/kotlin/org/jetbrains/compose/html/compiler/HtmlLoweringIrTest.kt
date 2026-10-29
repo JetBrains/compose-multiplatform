@@ -40,7 +40,7 @@ class HtmlLoweringIrTest : AbstractCompilerPluginIrTest() {
     fun controlFlow() = verifyFixture("controlFlow")
 
     @Test
-    fun preparedAttributes() = verifyFixture("preparedAttributes")
+    fun storedContentAttributes() = verifyFixture("storedContentAttributes")
 
     @Test
     fun unsupportedAttributes() = verifyFixture("unsupportedAttributes")

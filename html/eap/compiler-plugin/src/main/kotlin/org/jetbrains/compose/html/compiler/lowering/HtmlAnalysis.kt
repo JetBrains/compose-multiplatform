@@ -24,7 +24,7 @@ import org.jetbrains.compose.web.dom.isHtmlRcdataElement
 import org.jetbrains.compose.web.dom.isHtmlVoidElement
 import org.jetbrains.compose.web.dom.isValidRawTextContent
 import org.jetbrains.compose.web.dom.normalizeHtmlInputCharacters
-import org.jetbrains.compose.web.dom.supportsPreparedHtmlAttributes
+import org.jetbrains.compose.web.dom.supportsLoweredHtmlContent
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.expressions.IrBlockBody
 import org.jetbrains.kotlin.ir.expressions.IrCall
@@ -100,7 +100,7 @@ internal class HtmlAnalysis(
             if (noContent && element.attributes is MixedAttributes && tag != "noscript") return true
             val void = isHtmlVoidElement(tag, element.namespace)
             // Literal regions enter their root, a void root would never leave it.
-            if ((element.namespace == HtmlNamespace && !supportsPreparedHtmlAttributes(tag)) ||
+            if ((element.namespace == HtmlNamespace && !supportsLoweredHtmlContent(tag)) ||
                 (void && element.attributes is LiteralAttributes)
             ) return false
             if (noContent) return true

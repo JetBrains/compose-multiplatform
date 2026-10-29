@@ -89,7 +89,7 @@ internal class HtmlIrGenerationExtension(
             )
         } ?: return
         // Replace HTML calls first, then reuse writer lookups in the generated code.
-        for (file in moduleFragment.files) FileLowering(pluginContext, configuration, symbols, file).lower()
+        for (file in moduleFragment.files) FileLowering(pluginContext, symbols, file).lower()
         moduleFragment.transformChildrenVoid(WriterScopeSharing(pluginContext, symbols))
     }
 }

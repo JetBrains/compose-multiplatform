@@ -32,15 +32,11 @@ internal const val MaxHtmlNestingDepth = 64
 internal const val MaxEncodingRecursion = 4 * MaxHtmlNestingDepth
 internal const val MaxStaticRepeatCount = 10_000
 
-// Attributes: keep callbacks below the JVM's 64 KiB method limit.
-internal const val MaxPreparedAttributeOperations = 128
+// Attributes: keep generated writes below the JVM's 64 KiB method limit.
 internal const val MaxMixedAttributeOperations = 128
 
 // Duplicate checks grow quadratically.
 internal const val MaxMixedClassTokens = 32
-
-// Cap fields and constant-pool use.
-internal const val MaxPreparedAttributesPerFile = 256
 
 // Chunks fit the JVM's 65,535-byte modified UTF-8 constant limit.
 internal const val MaxHtmlChunkLength = 8_000

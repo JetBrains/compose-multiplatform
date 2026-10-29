@@ -19,14 +19,13 @@ import org.jetbrains.compose.html.compiler.samples.ContentReturn
 import org.jetbrains.compose.html.compiler.samples.DirectContainer
 import org.jetbrains.compose.html.compiler.samples.DirectGreeting
 import org.jetbrains.compose.html.compiler.samples.OversizedLiteral
-import org.jetbrains.compose.html.compiler.samples.PreparedAttributes
-import org.jetbrains.compose.html.compiler.samples.PreparedContainer
-import org.jetbrains.compose.html.compiler.samples.PreparedDynamicText
-import org.jetbrains.compose.html.compiler.samples.PreparedGetter
-import org.jetbrains.compose.html.compiler.samples.PreparedLiteralText
-import org.jetbrains.compose.html.compiler.samples.PreparedUser
 import org.jetbrains.compose.html.compiler.samples.RememberedText
-import org.jetbrains.compose.html.compiler.samples.__htmlAttributes0
+import org.jetbrains.compose.html.compiler.samples.ScopedContainer
+import org.jetbrains.compose.html.compiler.samples.ScopedDynamicText
+import org.jetbrains.compose.html.compiler.samples.ScopedGetter
+import org.jetbrains.compose.html.compiler.samples.ScopedLiteralText
+import org.jetbrains.compose.html.compiler.samples.ScopedUser
+import org.jetbrains.compose.html.compiler.samples.StoredContentAttributes
 import org.jetbrains.compose.web.composeHtmlToString
 import org.jetbrains.compose.web.dom.ContentBuilder
 import org.jetbrains.compose.web.dom.Div
@@ -38,19 +37,12 @@ import org.jetbrains.compose.web.dom.TagElement
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.dom.Title
 import org.jetbrains.org.objectweb.asm.ClassReader
-import org.jetbrains.org.objectweb.asm.MethodVisitor
-import org.jetbrains.org.objectweb.asm.Opcodes
 
 class ElementLoweringTest {
     @Test
-    fun directElementsCallTheBridgeWithoutContentLambdasOrAttributeFields() {
+    fun directElementsCallTheBridgeWithoutContentLambdas() {
         for (method in listOf("DirectGreeting", "DirectContainer")) {
             val calls = calls(method)
-            visitMethod(method, object : MethodVisitor(Opcodes.ASM9) {
-                override fun visitFieldInsn(opcode: Int, owner: String, name: String, descriptor: String) {
-                    assertFalse(name.startsWith("__htmlAttributes"))
-                }
-            })
             assertTrue(calls.containsAll(setOf("openLoweredRegion", "writeText", "closeElement")), "$method: $calls")
             assertFalse("appendText" in calls, "$method: $calls")
             assertFalse(calls.any {
@@ -59,8 +51,6 @@ class ElementLoweringTest {
                     "Span",
                     "Text",
                     "TagElement",
-                    "PreparedTextElement",
-                    "PreparedContainer"
                 )
             })
             assertFalse(calls.any { it.startsWith("composableLambda") })
@@ -68,12 +58,12 @@ class ElementLoweringTest {
     }
 
     @Test
-    fun composableTextUsesRegionsWithoutPreparedAttributesOrContentLambdas() {
+    fun composableTextUsesRegionsWithoutContentLambdas() {
         for (method in listOf("ComposableText", "RememberedText")) {
             val calls = calls(method)
             assertTrue(calls.containsAll(setOf("openLoweredRegion", "Text", "closeElement")), "$method: $calls")
             assertFalse(
-                calls.any { it in setOf("Span", "PreparedTextElement", "PreparedContainer") },
+                "Span" in calls,
                 "$method: $calls"
             )
             assertFalse(calls.any { it.startsWith("composableLambda") }, "$method: $calls")
@@ -113,11 +103,10 @@ class ElementLoweringTest {
     }
 
     @Test
-    fun specialTagsUseRegionsAndLabeledReturnsKeepPreparedCalls() {
+    fun specialTagsUseRegionsAndLabeledReturnsKeepOriginalCalls() {
         assertTrue("openLoweredRegion" in calls("SpecialText"))
-        assertFalse("PreparedTextElement" in calls("SpecialText"))
         assertTrue(fieldReads("DirectElementsKt", "SpecialText").isEmpty())
-        assertTrue("PreparedContainer" in calls("ContainerReturn"))
+        assertTrue("Div" in calls("ContainerReturn"))
         assertEquals("<div></div><div>shown</div>", composeHtmlToString {
             ContainerReturn(true) {}
             ContainerReturn(false) {}
@@ -159,36 +148,32 @@ class ElementLoweringTest {
 
     private fun calls(method: String): Set<String> = methodCalls("DirectElementsKt", method).toSet()
 
-    private fun visitMethod(method: String, visitor: MethodVisitor) =
-        visitSampleMethod("DirectElementsKt", method, visitor)
-
     @Test
     fun selectsExpectedLoweringPathsAndRetainsUnsupportedAttributes() {
         val expected = mapOf(
-            "PreparedAttributes" to "getCallback",
-            "PreparedContainer" to "PreparedContainer",
-            "PreparedDynamicText" to "writeText",
-            "PreparedGetter" to "writeText",
+            "StoredContentAttributes" to "Div",
+            "ScopedContainer" to "Div",
+            "ScopedDynamicText" to "writeText",
+            "ScopedGetter" to "writeText",
             "OversizedLiteral" to "beginStaticHtmlFragment",
-            "ContentReturn" to "PreparedContainer",
+            "ContentReturn" to "Span",
         )
         for ((method, helper) in expected) {
             val calls = runtimeCalls(method)
             assertTrue(helper in calls, "$method: $calls")
-            if (method != "PreparedAttributes") {
+            if (method !in setOf("StoredContentAttributes", "ScopedContainer", "ContentReturn")) {
                 assertFalse("Span" in calls || "Div" in calls, "$method: $calls")
             }
         }
         assertTrue("finishMixedElement" in runtimeCalls("AttributeEffects"))
         assertEquals(
             setOf("<span class=\"label\">&lt;&amp;&#13;😀</span>"),
-            staticHtmlConstants("PreparedElementsKt", "PreparedLiteralText"),
+            staticHtmlConstants("ScopedElementsKt", "ScopedLiteralText"),
         )
     }
 
     @Test
-    fun oversizedLiteralsStreamInChunksAndFieldNamesDoNotCollide() {
-        assertEquals("authored", __htmlAttributes0)
+    fun oversizedLiteralsStreamInChunks() {
         val expected = "<span>" + "&lt;".repeat(2_000) + "</span>"
         forEachRenderMode { strict, hydratable, stream ->
             assertEquals(expected, render(strict, hydratable, stream) { OversizedLiteral() })
@@ -198,18 +183,18 @@ class ElementLoweringTest {
     @Test
     fun gettersRunOncePerRenderAndNeverDuringInitialization() {
         var calls = 0
-        val user = PreparedUser { "user-${++calls}" }
+        val user = ScopedUser { "user-${++calls}" }
         assertEquals(0, calls)
         repeat(2) { render ->
             assertEquals("<span class=\"user\">user-${render + 1}</span>", composeHtmlToString {
-                PreparedGetter(user)
+                ScopedGetter(user)
             })
             assertEquals(render + 1, calls)
         }
     }
 
     @Test
-    fun preparedAttributesSupportStoredNullableAndEffectfulContent() {
+    fun originalAttributesSupportStoredNullableAndEffectfulContent() {
         val effects = mutableListOf<String>()
         fun content(): ContentBuilder<HTMLDivElement> {
             effects.add("argument")
@@ -220,12 +205,12 @@ class ElementLoweringTest {
         }
         repeat(2) {
             assertEquals("<div title=\"A &amp; B\" class=\"card\">stored</div>", composeHtmlToString {
-                PreparedAttributes(content())
+                StoredContentAttributes(content())
             })
         }
         assertEquals(listOf("argument", "content", "argument", "content"), effects)
         assertEquals("<div title=\"A &amp; B\" class=\"card\"></div>", composeHtmlToString {
-            PreparedAttributes(null)
+            StoredContentAttributes(null)
         })
     }
 
@@ -236,12 +221,12 @@ class ElementLoweringTest {
             repeat(2) { render ->
                 val content: @Composable () -> Unit = {
                     Text("before")
-                    PreparedContainer("user-$render", effects::add)
-                    PreparedDynamicText {
+                    ScopedContainer("user-$render", effects::add)
+                    ScopedDynamicText {
                         effects.add("price")
                         "price-$render"
                     }
-                    PreparedLiteralText()
+                    ScopedLiteralText()
                     Text("after")
                 }
                 val expected = "before<div class=\"card\">user-$render<span class=\"details\">details</span>end</div>" +
@@ -275,7 +260,7 @@ class ElementLoweringTest {
                 render(strict = true, hydratable = true, stream = stream) {
                     Div {
                         effects.add("before")
-                        PreparedDynamicText {
+                        ScopedDynamicText {
                             effects.add("text")
                             error("text failure")
                         }
@@ -304,13 +289,13 @@ class ElementLoweringTest {
                     render(strict = true, hydratable = true, stream = stream) { Pre { Text(value) } })
             }
             assertFailsWith<IllegalArgumentException> {
-                render(strict = true, hydratable = true, stream = stream) { PreparedDynamicText { "bad\u0000" } }
+                render(strict = true, hydratable = true, stream = stream) { ScopedDynamicText { "bad\u0000" } }
             }
         }
     }
 
     private fun runtimeCalls(method: String): Set<String> =
-        methodCalls("PreparedElementsKt", method, "org/jetbrains/compose/web/dom/").toSet()
+        methodCalls("ScopedElementsKt", method, "org/jetbrains/compose/web/dom/").toSet()
 
     @Test
     fun specialElementsMatchOrdinaryRenderingAndValidation() {
@@ -318,13 +303,13 @@ class ElementLoweringTest {
     }
 
     @Test
-    fun specialElementsUseWriterRegionsWithoutPreparedCalls() {
+    fun specialElementsUseWriterRegions() {
         for (tag in tags) {
             val method = methodName(tag)
             val calls = classMethodCalls(comparison.bytecode).getValue(method)
             assertTrue("openLoweredRegion" in calls, "$method: $calls")
             assertTrue("closeElement" in calls, "$method: $calls")
-            assertFalse(calls.any { it in setOf("TagElement", "PreparedContainer", "PreparedTextElement") }, method)
+            assertFalse("TagElement" in calls, method)
         }
     }
 

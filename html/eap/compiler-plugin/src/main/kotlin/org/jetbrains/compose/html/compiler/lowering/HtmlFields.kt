@@ -8,7 +8,6 @@ package org.jetbrains.compose.html.compiler.lowering
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.declarations.buildField
 import org.jetbrains.kotlin.ir.builders.irGetField
 import org.jetbrains.kotlin.ir.builders.irString
@@ -18,7 +17,6 @@ import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.createExpressionBody
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
-import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.name.Name
 
 // Creates private fields with unique names and shares large strings within one file.
@@ -42,7 +40,7 @@ internal class HtmlFields(private val context: IrPluginContext, private val file
         val field = shared.getOrPut(value) {
             check(canStore(listOf(value)))
             length += value.length
-            create("__htmlString", shared.size, context.irBuiltIns.stringType).apply {
+            createStringField(shared.size).apply {
                 // A plain oversized literal lets the backend split the constant.
                 initializer = context.irFactory.createExpressionBody(builder.irString(value))
             }
@@ -50,19 +48,11 @@ internal class HtmlFields(private val context: IrPluginContext, private val file
         return builder.irGetField(null, field)
     }
 
-    fun create(
-        prefix: String,
-        index: Int,
-        type: IrType,
-        startOffset: Int = UNDEFINED_OFFSET,
-        endOffset: Int = UNDEFINED_OFFSET,
-    ): IrField = context.irFactory.buildField {
-        name = generateSequence(index) { it + 1 }.map { Name.identifier("$prefix$it") }.first(usedNames::add)
-        this.type = type
+    private fun createStringField(index: Int): IrField = context.irFactory.buildField {
+        name = generateSequence(index) { it + 1 }.map { Name.identifier("__htmlString$it") }.first(usedNames::add)
+        type = context.irBuiltIns.stringType
         visibility = DescriptorVisibilities.PRIVATE
         isFinal = true
         isStatic = true
-        this.startOffset = startOffset
-        this.endOffset = endOffset
     }.apply { parent = file }
 }
