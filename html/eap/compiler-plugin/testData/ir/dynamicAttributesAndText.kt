@@ -19,3 +19,12 @@ fun DynamicAttributesAndText(selected: Boolean, effect: (String) -> String) {
         Span { Text("after") }
     }
 }
+
+@Composable
+fun DynamicTable(name: String) {
+    Table {
+        Tbody {
+            Tr { Td { Text(name) } }
+        }
+    }
+}
