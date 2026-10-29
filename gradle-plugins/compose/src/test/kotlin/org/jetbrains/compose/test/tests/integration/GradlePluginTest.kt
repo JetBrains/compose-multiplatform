@@ -135,9 +135,12 @@ class GradlePluginTest : GradlePluginTestBase() {
     fun testJsNoExecutableTests() = with(
         testProject("misc/jsNoExecutableTests")
     ) {
-        gradle("jsBrowserTest").checks {
+        gradle("jsBrowserTest", "--dry-run").checks {
+            check.taskSkipped(":checkComposeUiTestConfigurationForJs")
+            check.taskSkipped(":jsBrowserTest")
+        }
+        gradle("checkComposeUiTestConfigurationForJs").checks {
             check.taskSuccessful(":checkComposeUiTestConfigurationForJs")
-            check.taskSuccessful(":jsBrowserTest")
             check.logContains("The 'js' test compilation depends on Skiko, but no executable binary is declared.")
         }
     }
@@ -147,9 +150,12 @@ class GradlePluginTest : GradlePluginTestBase() {
         testProject("misc/jsNoExecutableTests")
     ) {
         file("gradle.properties").appendText("\ncompose.web.suppressSkikoRuntimeWarning=true\n")
-        gradle("jsBrowserTest").checks {
+        gradle("jsBrowserTest", "--dry-run").checks {
             check.taskSkipped(":checkComposeUiTestConfigurationForJs")
-            check.taskSuccessful(":jsBrowserTest")
+            check.taskSkipped(":jsBrowserTest")
+        }
+        gradle("checkComposeUiTestConfigurationForJs").checks {
+            check.taskSkipped(":checkComposeUiTestConfigurationForJs")
             check.logDoesntContain("The 'js' test compilation depends on Skiko, but no executable binary is declared.")
         }
     }
