@@ -27,6 +27,8 @@ import org.jetbrains.compose.html.compiler.samples.renderAfterConstantDepthLimit
 import org.jetbrains.compose.html.compiler.samples.renderConstantExpressions
 import org.jetbrains.compose.html.compiler.samples.renderCrossFileConstants
 import org.jetbrains.compose.html.compiler.samples.renderEffectfulAlias
+import org.jetbrains.compose.html.compiler.samples.renderFloorDivisionAndNullArguments
+import org.jetbrains.compose.html.compiler.samples.renderIncrementAndDecrement
 import org.jetbrains.compose.html.compiler.samples.renderMutableAlias
 import org.jetbrains.compose.html.compiler.samples.renderOrdinaryVal
 import org.jetbrains.compose.html.compiler.samples.renderPrimitiveExpressions
@@ -34,6 +36,8 @@ import org.jetbrains.compose.html.compiler.samples.renderRuntimeGetters
 import org.jetbrains.compose.html.compiler.samples.renderShadowedConstant
 import org.jetbrains.compose.html.compiler.samples.renderShortCircuitConstants
 import org.jetbrains.compose.html.compiler.samples.renderThrowingExpression
+import org.jetbrains.compose.html.compiler.samples.renderThrowingFloorDivision
+import org.jetbrains.compose.html.compiler.samples.renderThrowingModulo
 import org.jetbrains.compose.html.compiler.samples.renderUserToString
 import org.jetbrains.compose.html.compiler.samples.sharedInitialization
 import org.jetbrains.compose.web.attributes.AttrsScope
@@ -112,6 +116,8 @@ class StaticLoweringTest {
             "<div title=\"items=12\"><span>value=13</span></div>" to ::renderConstantExpressions,
             "<span title=\"-2147483648:true:42:A:null\">-3:1:8</span>" to ::renderPrimitiveExpressions,
             "<span>false:true</span>" to ::renderShortCircuitConstants,
+            "<span>-3:2:abcnull:false</span>" to ::renderFloorDivisionAndNullArguments,
+            "<span>8:6</span>" to ::renderIncrementAndDecrement,
         )
         for ((expected, render) in cases) {
             assertEquals(expected, render())
@@ -141,6 +147,8 @@ class StaticLoweringTest {
         assertEquals("<span>changed</span>", renderMutableAlias())
         assertEquals("<span>user</span>", renderUserToString())
         assertFailsWith<ArithmeticException> { renderThrowingExpression() }
+        assertFailsWith<ArithmeticException> { renderThrowingFloorDivision() }
+        assertFailsWith<ArithmeticException> { renderThrowingModulo() }
     }
 
     @Test
