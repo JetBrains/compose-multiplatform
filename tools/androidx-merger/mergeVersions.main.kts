@@ -325,8 +325,16 @@ fun timestampedOutput(console: PrintStream): PrintStream {
     val pipe = Pipe.open()
     val output = PrintStream(Channels.newOutputStream(pipe.sink()), true, Charsets.UTF_8)
     val reader = thread(isDaemon = true) {
-        Channels.newInputStream(pipe.source()).bufferedReader(Charsets.UTF_8).useLines { lines ->
-            lines.logTo(scriptLogFile, console)
+        Channels.newInputStream(pipe.source()).bufferedReader(Charsets.UTF_8).use { input ->
+            var lineStart = true
+            generateSequence(input::read).takeWhile { it != -1 }
+                .map { it.toChar() }.filter { it != '\r' }
+                .map { char ->
+                    val text = if (lineStart) "${OffsetDateTime.now()} $char" else "$char"
+                    lineStart = char == '\n'
+                    text
+                }.writeTo(scriptLogFile, console)
+            if (!lineStart) sequenceOf("\n").writeTo(scriptLogFile, console)
         }
     }
     Runtime.getRuntime().addShutdownHook(Thread {
