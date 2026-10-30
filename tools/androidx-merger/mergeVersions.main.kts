@@ -1,9 +1,10 @@
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.io.OutputStream
 import java.io.PrintStream
+import java.nio.channels.Channels
+import java.nio.channels.Pipe
 import java.time.OffsetDateTime
+import kotlin.concurrent.thread
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -17,15 +18,8 @@ val buildLogFile = scriptDir.resolve("logBuild.txt")
 scriptLogFile.writeText("")
 buildLogFile.writeText("")
 
-val stdoutLog = PrintStream(TimestampedOutputStream(scriptLogFile, System.out), true, Charsets.UTF_8)
-val stderrLog = PrintStream(TimestampedOutputStream(scriptLogFile, System.err), true, Charsets.UTF_8)
-val scriptOutput = PrintStream(TimestampedOutputStream(scriptLogFile), true, Charsets.UTF_8)
-val buildOutput = PrintStream(TimestampedOutputStream(buildLogFile), true, Charsets.UTF_8)
-System.setOut(stdoutLog)
-System.setErr(stderrLog)
-Runtime.getRuntime().addShutdownHook(Thread {
-    listOf(stdoutLog, stderrLog, scriptOutput, buildOutput).forEach { it.close() }
-})
+System.setOut(timestampedOutput(System.out))
+System.setErr(timestampedOutput(System.err))
 
 val airWebhookFile = File(System.getProperty("user.home"), "androidxMergerAirWebhook.txt")
 val compilationInterval = 1.days
@@ -195,7 +189,7 @@ fun compile(): Boolean {
         listOf("./gradlew")
     }
     val process = ProcessBuilder(command + listOf("assemble", "compileTests")).redirectErrorStream(true).start()
-    process.inputStream.bufferedReader().useLines { lines -> lines.forEach(buildOutput::println) }
+    process.inputStream.bufferedReader().useLines { lines -> lines.logTo(buildLogFile) }
     val success = process.waitFor() == 0
     println("Compilation ${if (success) "succeeded" else "failed"} at $commit")
     return success
@@ -289,7 +283,7 @@ data class UpstreamCommit(val hash: String, val timestamp: Instant)
 fun execute(vararg args: String): Pair<Int, String> {
     val process = ProcessBuilder(*args).redirectErrorStream(true).start()
     val text = process.inputStream.bufferedReader().use { it.readText().trim() }
-    if (text.isNotEmpty()) scriptOutput.println(text)
+    if (text.isNotEmpty()) text.lineSequence().logTo(scriptLogFile)
     return process.waitFor() to text
 }
 
@@ -313,32 +307,29 @@ fun getScriptPathFromArgs(): File =
 fun commitTime(revision: String): Instant =
     Instant.fromEpochSeconds(output("git", "show", "-s", "--format=%ct", revision).toLong())
 
-class TimestampedOutputStream(
-    private val file: File,
-    private val console: PrintStream? = null,
-) : OutputStream() {
-    private val buffer = ByteArrayOutputStream()
-    private val writer = FileOutputStream(file, true).bufferedWriter(Charsets.UTF_8)
-
-    @Synchronized
-    override fun write(value: Int) {
-        if ((value and 0xff) != '\n'.code) {
-            buffer.write(value)
-            return
-        }
-        val message = buffer.toString(Charsets.UTF_8).removeSuffix("\r")
-        buffer.reset()
-        synchronized(file) {
-            val line = "${OffsetDateTime.now()} $message\n"
-            console?.print(line)
-            writer.write(line)
-            writer.flush()
+fun timestampedOutput(console: PrintStream): PrintStream {
+    val pipe = Pipe.open()
+    val output = PrintStream(Channels.newOutputStream(pipe.sink()), true, Charsets.UTF_8)
+    val reader = thread(isDaemon = true) {
+        Channels.newInputStream(pipe.source()).bufferedReader().useLines { lines ->
+            lines.logTo(scriptLogFile, console)
         }
     }
+    Runtime.getRuntime().addShutdownHook(Thread {
+        output.close()
+        reader.join()
+    })
+    return output
+}
 
-    @Synchronized
-    override fun close() {
-        if (buffer.size() > 0) write('\n'.code)
-        writer.close()
+fun Sequence<String>.logTo(file: File, console: PrintStream? = null) {
+    FileOutputStream(file, true).bufferedWriter(Charsets.UTF_8).use { writer ->
+        map { "${OffsetDateTime.now()} $it" }.forEach { line ->
+            synchronized(file) {
+                console?.println(line)
+                writer.appendLine(line)
+                writer.flush()
+            }
+        }
     }
 }
