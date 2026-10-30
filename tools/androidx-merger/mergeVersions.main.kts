@@ -184,7 +184,7 @@ fun setMergeTitle(commit: String) {
 }
 
 fun compile(): Boolean {
-    val commit = output("git", "rev-parse", "--short", "HEAD")
+    val commit = output("git", "rev-parse", "HEAD")
     val command = if (System.getProperty("os.name").startsWith("Windows")) {
         listOf("cmd", "/c", "gradlew")
     } else {
