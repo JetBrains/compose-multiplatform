@@ -15,7 +15,6 @@ import kotlin.time.Instant
 val scriptDir = getScriptPathFromArgs()
 val scriptLogFile = scriptDir.resolve("logScript.txt")
 val buildLogFile = scriptDir.resolve("logBuild.txt")
-scriptLogFile.writeText("")
 buildLogFile.writeText("")
 
 System.setOut(timestampedOutput(System.out))
