@@ -17,7 +17,8 @@ val scriptLogFile = scriptDir.resolve("logScript.txt")
 val buildLogFile = scriptDir.resolve("logBuild.txt")
 buildLogFile.writeText("")
 
-val scriptOutput = timestampedOutput(System.out)
+val consoleOutput = System.out
+val scriptOutput = timestampedOutput(consoleOutput)
 System.setOut(scriptOutput)
 System.setErr(scriptOutput)
 
@@ -27,7 +28,7 @@ val compilationInterval = 1.days
 val airWebhookUrl: String? = System.getenv("MERGER_SCRIPT_AIR_URL")
 val airWebhookToken: String? = System.getenv("MERGER_SCRIPT_AIR_TOKEN")
 if (airWebhookUrl.isNullOrEmpty()) {
-    println("Create an Air Automation to automatically resolve merge and build failures. See AIR_AUTOMATION.md.")
+    log("Create an Air Automation to automatically resolve merge and build failures. See AIR_AUTOMATION.md.")
 }
 
 if (run("git", "rev-parse", "-q", "--verify", "MERGE_HEAD")) {
@@ -137,7 +138,7 @@ fun ensureInitialCompiles() {
     }
     check(previousCompiles) { "Compilation failed on both the current and previous commits. Check the build environment." }
     markCompilationFailure()
-    println("The last commit breaks compilation.")
+    log("The last commit breaks compilation.")
     check(solveWithMergeSolver()) { "Merge Solver did not fix $currentCommit" }
 }
 
@@ -258,7 +259,7 @@ fun hasNote(commit: String, prefix: String): Boolean =
 
 fun bisect(lastKnownGood: String): Boolean {
     if (compile()) {
-        println("Skipping bisect; compilation passed.")
+        log("Skipping bisect; compilation passed.")
         return false
     }
     check(run("git", "bisect", "start", "--first-parent", "HEAD", lastKnownGood))
@@ -270,7 +271,7 @@ fun bisect(lastKnownGood: String): Boolean {
             val firstBad = output("git", "rev-parse", "refs/bisect/bad")
             check(run("git", "bisect", "reset"))
             check(run("git", "reset", "--hard", firstBad))
-            println("Bisect found the first bad commit: $firstBad")
+            log("Bisect found the first bad commit: $firstBad")
             return true
         }
     }
@@ -278,14 +279,16 @@ fun bisect(lastKnownGood: String): Boolean {
 
 data class UpstreamCommit(val hash: String, val timestamp: Instant)
 
+fun log(message: String) = sequenceOf(message).logTo(scriptLogFile, consoleOutput)
+
 fun logOperation(message: String, operation: () -> Boolean): Boolean {
-    print("$message ... ")
+    sequenceOf("${OffsetDateTime.now()} $message ... ").writeTo(scriptLogFile, consoleOutput)
     var success = false
     try {
         success = operation()
         return success
     } finally {
-        println(if (success) "COMPLETED" else "FAILED")
+        sequenceOf(if (success) "COMPLETED\n" else "FAILED\n").writeTo(scriptLogFile, consoleOutput)
     }
 }
 
