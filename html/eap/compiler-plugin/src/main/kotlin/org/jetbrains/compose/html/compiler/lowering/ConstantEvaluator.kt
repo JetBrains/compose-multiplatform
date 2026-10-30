@@ -108,6 +108,7 @@ internal class ConstantEvaluator(context: IrPluginContext) {
                 if (arguments.sumOf { (it.value?.toString() ?: "null").length.toLong() } > MaxEvaluatedStringLength) {
                     return null
                 }
+                // TODO: add IR-golden tests for Constants evaluation at compile time
                 constant(value, arguments.joinToString("") { it.value?.toString() ?: "null" })
             }
 
