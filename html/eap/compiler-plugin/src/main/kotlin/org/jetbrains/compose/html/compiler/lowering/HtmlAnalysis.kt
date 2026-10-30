@@ -279,8 +279,6 @@ internal sealed class HtmlChild(val statement: IrStatement) {
 
 // These tags allow child writes to merge without losing parser checks or text state.
 private fun hasMergeableContent(tag: String, namespace: String): Boolean =
-    (namespace != HtmlNamespace || (tag != "noscript" && tag !in TableTags)) &&
+    (namespace != HtmlNamespace || tag != "noscript") &&
             !isHtmlRawTextElement(tag, namespace) && !isHtmlRcdataElement(tag, namespace) &&
             !isHtmlLeadingNewlineElement(tag, namespace)
-
-private val TableTags = setOf("table", "caption", "colgroup", "col", "thead", "tbody", "tfoot", "tr", "td", "th")

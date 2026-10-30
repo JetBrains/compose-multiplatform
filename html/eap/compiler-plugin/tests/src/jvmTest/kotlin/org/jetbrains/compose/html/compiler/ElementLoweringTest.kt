@@ -329,6 +329,17 @@ class ElementLoweringTest {
     }
 
     @Test
+    fun dynamicTablesMergeSectionsAndCells() {
+        val calls = classMethodCalls(comparison.bytecode).getValue("DynamicTable")
+        assertFalse(calls.any {
+            it in setOf("Table", "Thead", "Tbody", "Tr", "Th", "Td", "PreparedContainer", "PreparedTextElement")
+        }, calls.toString())
+        val html = methodStrings(comparison.bytecode, "DynamicTable")
+        assertTrue("<table><thead><tr><th>symbol</th><th>price</th></tr></thead><tbody>" in html)
+        assertTrue("</td><td><strong>" in html)
+    }
+
+    @Test
     fun writerRegionsUsePrecomputedNewlineFlags() {
         val path = "/org/jetbrains/compose/web/dom/HtmlStringWriterContext.class"
         val bytecode = requireNotNull(javaClass.getResourceAsStream(path)).use { ClassReader(it.readBytes()) }
@@ -427,6 +438,41 @@ class ElementLoweringTest {
                         }
                     }
                 """.trimIndent(),
+                "DynamicTable" to """
+                    Table {
+                        Thead { Tr { Th { Text("symbol") }; Th { Text("price") } } }
+                        Tbody {
+                            listOf(name, "", "last").forEachIndexed { index, value ->
+                                Tr(attrs = { classes(if (index % 2 == 0) "even" else "odd") }) {
+                                    Td { Text(index.toString()) }
+                                    Td {
+                                        A(attrs = { attr("href", Mark("/stocks/" + value)) }) {
+                                            Text(Mark(value))
+                                        }
+                                    }
+                                    Td { TagElement<Element>("strong", null) { Text(value) } }
+                                    if (index > 0) {
+                                        Td { Text(value) }
+                                    } else {
+                                        Td(attrs = { classes("minus") }) { Text(value) }
+                                    }
+                                }
+                            }
+                        }
+                        Tfoot { Tr { Td { Text(Mark("total")) } } }
+                    }
+                """.trimIndent(),
+                "EmptyDynamicTable" to "Table { Tbody { for (value in emptyList<String>()) Tr { Td { Text(value) } } } }",
+                "TableWhitespace" to """
+                    Table {
+                        Text("\n")
+                        Tbody { Text(" "); Tr { Td { Text(Mark(name)) } }; Text(" ") }
+                        Text(" ")
+                    }
+                """.trimIndent(),
+                "InvalidStaticRow" to "Table { Tr { Td { Text(\"constant\") } }; Text(Mark(name)) }",
+                "InvalidDynamicCell" to "Tbody { Td(attrs = { attr(\"title\", Mark(name)) }) { Text(Mark(name)) } }",
+                "InvalidStaticTableText" to "Table { Text(\"invalid\"); Tbody { Tr { Td { Text(Mark(name)) } } } }",
                 "DiscardedSpecialElements" to """
                     TagElement<Element>("input", null) {
                         Pre { Text(Mark("\n" + name)) }

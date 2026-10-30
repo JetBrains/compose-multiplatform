@@ -10,8 +10,11 @@ package org.jetbrains.compose.html.compiler.lowering
 
 import org.jetbrains.compose.html.compiler.HtmlSymbols
 import org.jetbrains.compose.html.compiler.ir.irCallWithArgs
+import org.jetbrains.compose.web.dom.HtmlNamespace
 import org.jetbrains.compose.web.dom.escapeHtml
 import org.jetbrains.compose.web.dom.isHtmlLeadingNewlineElement
+import org.jetbrains.compose.web.dom.isHtmlParserStableTableElement
+import org.jetbrains.compose.web.dom.isHtmlParserStableTableText
 import org.jetbrains.compose.web.dom.isHtmlVoidElement
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
@@ -66,8 +69,10 @@ internal class ElementLowering(
         val operations = mutableListOf<Operation>()
         val aliases = mutableListOf<IrStatement>()
         private val pending = StringBuilder()
-        private var parent = root
-        private var parentNamespace = namespace
+        var parent = root
+            private set
+        var parentNamespace = namespace
+            private set
         private var flushedLength = 0L
         var chunks = 0
             private set
@@ -226,12 +231,17 @@ internal class ElementLowering(
     private fun absorbText(plan: RegionPlan, text: HtmlChild.Text, next: HtmlChild?, depth: Int): Boolean {
         if (!plan.endsWithTag || (next != null && next !is HtmlChild.Element)) return false
         val value = text.valueWithoutNul?.takeIf { it.isNotEmpty() } ?: return false
+        if (plan.parentNamespace == HtmlNamespace && !isHtmlParserStableTableText(plan.parent, value)) return false
         // Admit text together with its following element or the enclosing closing tag.
         val html = escapeHtml(value, attribute = false)
         return if (next is HtmlChild.Element) absorb(plan, next.node, depth, html) else plan.tryAppend(html)
     }
 
     private fun absorb(plan: RegionPlan, node: HtmlAnalysis.Node, depth: Int, prefix: String = ""): Boolean {
+        // Invalid table children must keep their runtime checks, including their evaluation order.
+        if (plan.parentNamespace == HtmlNamespace &&
+            !isHtmlParserStableTableElement(plan.parent, node.element.tag)
+        ) return false
         val html = node.html
         if (html != null && plan.tryAppend(html, prefix)) return true
         if (!node.canMergeContent) return false
