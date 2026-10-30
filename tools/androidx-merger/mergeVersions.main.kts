@@ -258,7 +258,7 @@ fun hasNote(commit: String, prefix: String): Boolean =
 
 fun bisect(lastKnownGood: String): Boolean {
     if (compile()) {
-        println("Bisect after $lastKnownGood ... SKIPPED (compilation passed)")
+        println("Skipping bisect; compilation passed.")
         return false
     }
     check(run("git", "bisect", "start", "--first-parent", "HEAD", lastKnownGood))
@@ -270,7 +270,7 @@ fun bisect(lastKnownGood: String): Boolean {
             val firstBad = output("git", "rev-parse", "refs/bisect/bad")
             check(run("git", "bisect", "reset"))
             check(run("git", "reset", "--hard", firstBad))
-            println("Bisect after $lastKnownGood ... COMPLETED (first bad commit: $firstBad)")
+            println("Bisect found the first bad commit: $firstBad")
             return true
         }
     }
