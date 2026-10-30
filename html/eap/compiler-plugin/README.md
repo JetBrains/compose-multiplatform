@@ -5,6 +5,17 @@ Prepares static HTML at compile time to reduce work during server-side rendering
 ## Activate
 
 Use the [Compose HTML EAP runtime](../README.md#published-artifacts).
+Add the development repository to `settings.gradle.kts`:
+
+```kotlin
+pluginManagement {
+    repositories {
+        maven("https://packages.jetbrains.team/maven/p/cmp/dev")
+        gradlePluginPortal()
+    }
+}
+```
+
 Add the plugin to your module's `build.gradle.kts` alongside your existing Kotlin and Compose compiler plugins:
 
 ```kotlin
