@@ -98,7 +98,7 @@ During merges, there is:
 - If `mergeCommit` has a `Merge script: conflict` note, fix all conflicts.
 - Use `androidMain` changes to determine what other targets need.
 - Run the build and fix it until green.
-- When `./gradlew assemble compileTests` fails, inspect only the last 300 lines of `log.txt` with `tail -n 300 log.txt`. Increase the limit only if the failure summary or relevant stack trace is missing.
+- When `./gradlew assemble compileTests` fails, inspect only the last 300 lines of `logBuild.txt` with `tail -n 300 logBuild.txt`. Increase the limit only if the failure summary or relevant stack trace is missing.
 - If changes are needed, create one commit with a message starting `(AI) Fix `.
 - If you can't verify `./gradlew assemble compileTests`, don't create a commit and treat it as fixed
 
