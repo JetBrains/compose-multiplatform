@@ -14,12 +14,12 @@ val compilationInterval = 1.days
 
 val airWebhookUrl: String? = System.getenv("MERGER_SCRIPT_AIR_URL")
 val airWebhookToken: String? = System.getenv("MERGER_SCRIPT_AIR_TOKEN")
-if (airWebhookUrl.isNullOrEmpty()) {
-    println("Create an Air Automation to automatically resolve merge and build failures. See AIR_AUTOMATION.md.")
-}
-
 if (log.exists()) {
     log.delete()
+}
+
+if (airWebhookUrl.isNullOrEmpty()) {
+    logMessage("Create an Air Automation to automatically resolve merge and build failures. See AIR_AUTOMATION.md.")
 }
 
 if (run("git", "rev-parse", "-q", "--verify", "MERGE_HEAD")) {
@@ -89,10 +89,11 @@ fun mergeJbMain() {
     val branch = "origin/jb-main"
     if (run("git", "merge-base", "--is-ancestor", branch, "HEAD")) return
 
-    println("Merge $branch")
+    logMessage("Merging $branch")
     val hasConflict = !run("git", "merge", "--no-commit", "--no-ff", branch)
     if (hasConflict) stageConflictingFiles(branch)
     check(run("git", "commit", "--no-edit")) { "Could not commit merge: $branch" }
+    logMessage(if (hasConflict) "Merge committed with conflicts: $branch" else "Merge completed: $branch")
 
     if (hasConflict) {
         addMergeScriptNote("conflict")
@@ -109,7 +110,7 @@ fun ensureInitialCompiles() {
 
     val currentCommit = output("git", "rev-parse", "HEAD")
     val (branchCode, currentBranch) = execute("git", "symbolic-ref", "--quiet", "--short", "HEAD")
-    println("Compilation failed. Checking the previous commit.")
+    logMessage("Checking the previous commit: $currentCommit^1")
     check(run("git", "switch", "--detach", "$currentCommit^1")) { "Could not switch to the previous commit." }
     val previousCompiles = try {
         compile()
@@ -120,20 +121,19 @@ fun ensureInitialCompiles() {
             run("git", "switch", "--detach", currentCommit)
         }
         check(restored) { "Could not restore the original checkout at $currentCommit." }
+        logMessage("Restored checkout: ${if (branchCode == 0) currentBranch else currentCommit}")
     }
     check(previousCompiles) { "Compilation failed on both the current and previous commits. Check the build environment." }
     markCompilationFailure()
-    println("The last commit breaks compilation. Solving with Merge Solver.")
+    logMessage("The last commit breaks compilation.")
     check(solveWithMergeSolver()) { "Merge Solver did not fix $currentCommit" }
 }
 
 fun ensureCompiles() {
     if (output("git", "rev-parse", "HEAD") == lastKnownGood) return
     if (!compile()) {
-        println("Compilation failed. Bisecting.")
         if (bisect(lastKnownGood)) {
             markCompilationFailure()
-            println("Build regression found.")
             check(solveWithMergeSolver())
         }
     }
@@ -142,16 +142,16 @@ fun ensureCompiles() {
 }
 
 fun mergeUpstreamCommit(commit: String) {
-    println("Merge $commit")
+    logMessage("Merging $commit")
     val hasConflict = !run("git", "merge", "--no-commit", "--no-ff", commit)
     if (hasConflict) stageConflictingFiles(commit)
 
     setMergeTitle(commit)
     check(run("git", "commit", "--no-edit")) { "Could not commit merge: $commit" }
+    logMessage(if (hasConflict) "Merge committed with conflicts: $commit" else "Merge completed: $commit")
     if (!hasConflict) return
 
     addMergeScriptNote("conflict")
-    println("Conflict committed: $commit")
     check(solveWithMergeSolver())
 }
 
@@ -173,31 +173,36 @@ fun setMergeTitle(commit: String) {
 }
 
 fun compile(): Boolean {
-    println("Starting compilation: assemble compileTests")
-    return if (System.getProperty("os.name").startsWith("Windows")) {
+    val commit = output("git", "rev-parse", "--short", "HEAD")
+    logMessage("Starting compilation at $commit: assemble compileTests")
+    val success = if (System.getProperty("os.name").startsWith("Windows")) {
         run("cmd", "/c", "gradlew", "assemble", "compileTests")
     } else {
         run("./gradlew", "assemble", "compileTests")
     }
+    logMessage("Compilation ${if (success) "succeeded" else "failed"} at $commit")
+    return success
 }
 
 fun solveWithMergeSolver(): Boolean {
     val url = airWebhookUrl?.takeIf(String::isNotEmpty) ?: return false
     val token = airWebhookToken?.takeIf(String::isNotEmpty) ?: return false
-    println("Solving with Merge Solver... ")
     val pushedCommit = output("git", "rev-parse", "HEAD")
+    logMessage("Submitting $pushedCommit to Merge Solver")
     check(run("git", "push"))
     check(run("git", "push", "origin", "refs/notes/commits"))
     val (code, result) = execute("curl", "--fail", "--silent", "--show-error", "--request", "POST", "--header", "Authorization: ApiKey $token", url)
     check(code == 0) { "JetBrains Air Automations webhook failed: $result" }
     if (!waitForMergeSolver(pushedCommit)) return false
     check(compile()) { "Build still fails after Merge Resolver." }
+    logMessage("Merge Solver fix verified for $pushedCommit")
     return true
 }
 
 fun waitForMergeSolver(pushedCommit: String): Boolean {
     val timeout = 80.minutes
     val interval = 60.seconds
+    logMessage("Waiting for Merge Solver to review $pushedCommit (timeout: $timeout)")
     repeat((timeout / interval).toInt()) {
         Thread.sleep(interval.inWholeMilliseconds)
         fetchNotes()
@@ -205,11 +210,12 @@ fun waitForMergeSolver(pushedCommit: String): Boolean {
             check(hasMergeSolverNoteFixed(pushedCommit)) {
                 "Merge Solver did not fix $pushedCommit:\n${output("git", "notes", "show", pushedCommit)}"
             }
+            logMessage("Merge Solver reported a fix for $pushedCommit")
             check(pull()) { "Could not fast-forward to the Merge Solver result." }
             return true
         }
     }
-    println("Timed out waiting for Merge Solver.")
+    logMessage("Timed out waiting for Merge Solver.")
     return false
 }
 
@@ -239,14 +245,15 @@ fun hasNote(commit: String, prefix: String): Boolean =
         }
 
 fun bisect(lastKnownGood: String): Boolean {
-    println("Rechecking the failing commit before bisect.")
+    logMessage("Rechecking the suspected bad commit before bisect.")
     if (compile()) {
-        println("Compilation passed on retry. Continuing merges.")
+        logMessage("Skipping bisect; continuing merges.")
         return false
     }
+    logMessage("Starting bisect after $lastKnownGood")
     check(run("git", "bisect", "start", "--first-parent", "HEAD", lastKnownGood))
     while (true) {
-        println("Bisect ${output("git", "rev-parse", "HEAD")}")
+        logMessage("Bisect testing commit ${output("git", "rev-parse", "HEAD")}")
         val result = if (compile()) "good" else "bad"
         val (code, text) = execute("git", "bisect", result)
         check(code == 0) { text }
@@ -254,6 +261,7 @@ fun bisect(lastKnownGood: String): Boolean {
             val firstBad = output("git", "rev-parse", "refs/bisect/bad")
             check(run("git", "bisect", "reset"))
             check(run("git", "reset", "--hard", firstBad))
+            logMessage("Bisect found the first bad commit: $firstBad")
             return true
         }
     }
@@ -290,7 +298,11 @@ fun commitTime(revision: String): Instant =
 
 fun logTimestamp() = OffsetDateTime.now().toString()
 
-fun println(message: Any?) = kotlin.io.println("${logTimestamp()} $message")
+fun logMessage(message: Any?) {
+    val line = "${logTimestamp()} $message"
+    kotlin.io.println(line)
+    log.appendText("$line\n")
+}
 
 fun check(value: Boolean, lazyMessage: () -> Any = { "Check failed." }) =
     kotlin.check(value) { "${logTimestamp()} ${lazyMessage()}" }
