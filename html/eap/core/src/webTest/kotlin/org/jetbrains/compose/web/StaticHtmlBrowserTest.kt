@@ -22,13 +22,12 @@ import kotlin.test.*
 class StaticHtmlBrowserTest {
     @Test
     fun subtreesAndDynamicTextHydrateAndUpdateWithoutReplacingNodes() = MainScope().promise {
-        val attrs = preparedHtmlAttributes<HTMLElement>("span", "<span class=\"value\">") { classes("value") }
         for (strict in listOf(false, true)) {
             var value by mutableStateOf("first")
             val content: @Composable () -> Unit = {
                 // Browser compilations keep the original composables for static SSR subtrees.
                 Div { Span { Text("<&é😀") } }
-                PreparedTextElement(attrs) { value }
+                Span(attrs = { classes("value") }) { Text(value) }
                 Span { Text("tail") }
             }
             val root = browserDocument.createElement("div") as HTMLElement
@@ -61,11 +60,10 @@ class StaticHtmlBrowserTest {
 
     @Test
     fun staticAttributesAndTextRenderAndHydrateInTheBrowser() {
-        val attributes = preparedHtmlAttributes<HTMLElement>("div", "<div id=\"static\" class=\"a&amp; b\">") {
-            id("static"); classes("a&", "b")
-        }
         val text = "<&é😀"
-        val content: @Composable () -> Unit = { PreparedTextElement(attributes) { text } }
+        val content: @Composable () -> Unit = {
+            Div(attrs = { id("static"); classes("a&", "b") }) { Text(text) }
+        }
         val root = browserDocument.createElement("div") as HTMLElement
         val fresh = renderComposable(root) { content() }
         try {

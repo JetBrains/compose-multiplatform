@@ -16,8 +16,8 @@ fun main(args: Array<String>) {
         appendLine("package org.jetbrains.compose.html.compiler")
         val html = composeHtmlToString { CompilerHydrationContent(0) {} }
         appendLine("val jvmHydrationHtml = ${html.kotlinLiteral()}")
-        val prepared = composeHtmlToString { PreparedHydrationContent(0, {}) }
-        appendLine("val jvmPreparedHydrationHtml = ${prepared.kotlinLiteral()}")
+        val scoped = composeHtmlToString { ScopedHydrationContent(0, {}) }
+        appendLine("val jvmScopedHydrationHtml = ${scoped.kotlinLiteral()}")
         val large = StringBuilder()
         composeHtmlToStream(chunkSize = 1, sink = { large.append(it) }) { LargeStaticHydration(0, {}) }
         appendLine("val jvmLargeHydrationHtml = ${large.toString().kotlinLiteral()}")

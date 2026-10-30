@@ -17,8 +17,9 @@ import kotlin.test.assertSame
 import kotlin.test.assertTrue
 import org.jetbrains.compose.html.compiler.samples.InvalidLargeRawFragment
 import org.jetbrains.compose.html.compiler.samples.LargeDirectAttribute
+import org.jetbrains.compose.html.compiler.samples.LargeMixedAttribute
 import org.jetbrains.compose.html.compiler.samples.LargeLeadingNewlineFragment
-import org.jetbrains.compose.html.compiler.samples.LargePreparedAttribute
+import org.jetbrains.compose.html.compiler.samples.LargeStoredContentAttribute
 import org.jetbrains.compose.html.compiler.samples.LargeRawFragment
 import org.jetbrains.compose.html.compiler.samples.LargeStaticPage
 import org.jetbrains.compose.html.compiler.samples.LargeTableFragment
@@ -197,11 +198,11 @@ class LoweringLimitsTest {
     }
 
     @Test
-    fun singleStringConsumersCacheBackendSplitLiteralsInPrivateFinalFields() {
+    fun largeAttributesRenderWithOriginalLambdasAndCacheMixedLiterals() {
         val title = "界".repeat(24_000)
         val expected = "<span title=\"$title\">value</span>"
         for (content in listOf<@Composable () -> Unit>(
-            { LargeDirectAttribute("value") }, { LargePreparedAttribute { Text("value") } },
+            { LargeDirectAttribute("value") }, { LargeStoredContentAttribute { Text("value") } },
         )) {
             assertEquals(expected, composeHtmlToString(content = content))
             val bytes = ByteArrayOutputStream()
@@ -212,9 +213,12 @@ class LoweringLimitsTest {
             )
             assertEquals(expected, bytes.toString(Charsets.UTF_8))
         }
+        assertEquals("<span title=\"$title\" id=\"value\">value</span>", composeHtmlToString {
+            LargeMixedAttribute("value")
+        })
         val fields = Class.forName("${javaClass.packageName}.samples.LargeAttributeKt").declaredFields
             .filter { it.name.startsWith("__htmlString") }
-        assertEquals(2, fields.size)
+        assertEquals(1, fields.size)
         for (field in fields) {
             assertEquals(String::class.java, field.type)
             assertTrue(
@@ -281,7 +285,7 @@ class LoweringLimitsTest {
             assertTrue(batches in 2..128, "$method: $batches")
             if (method == "RegionChunkBudget") {
                 assertEquals(128, batches)
-                assertTrue("PreparedTextElement" in methodCalls)
+                assertTrue("Span" in methodCalls)
             }
         }
         comparison.assertEquivalent(listOf("ChunkBudget", "LengthBudget"))

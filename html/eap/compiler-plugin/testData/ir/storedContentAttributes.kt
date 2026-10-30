@@ -8,7 +8,7 @@ import kotlinx.browser.dom.HTMLDivElement
 import org.jetbrains.compose.web.dom.*
 
 @Composable
-fun PreparedAttributes(first: ContentBuilder<HTMLDivElement>?, second: ContentBuilder<HTMLDivElement>?) {
+fun StoredContentAttributes(first: ContentBuilder<HTMLDivElement>?, second: ContentBuilder<HTMLDivElement>?) {
     Div(attrs = { classes("card"); attr("title", "A & B") }, content = first)
     Div(attrs = { classes("card"); attr("title", "A & B") }, content = second)
 }

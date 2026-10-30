@@ -42,7 +42,6 @@ class RuntimeDiagnosticsTest {
         assertEquals(ExitCode.COMPILATION_ERROR, exit, output)
         for (name in listOf(
             "WriteStaticHtml",
-            "preparedHtmlAttributes",
             "HtmlStringWriterContext.writeText",
             "AttrsScope.style"
         )) {
@@ -61,7 +60,7 @@ class RuntimeDiagnosticsTest {
             enabled = true,
         )
         assertEquals(ExitCode.COMPILATION_ERROR, exit, output)
-        assertTrue("org.jetbrains.compose.web.dom.preparedHtmlAttributes" in output, output)
+        assertTrue("org.jetbrains.compose.web.attributes.AttrsScope.attr" in output, output)
     }
 
     private fun compile(source: String, enabled: Boolean? = null): Pair<ExitCode, String> {

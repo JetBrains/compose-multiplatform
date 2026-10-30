@@ -58,12 +58,7 @@ import org.jetbrains.kotlin.ir.util.isSubtypeOf
 
 internal sealed interface HtmlAttributes
 
-// Encoded attributes plus their original values for prepared-element rendering.
-internal data class LiteralAttributes(
-    val encoded: String,
-    val values: Map<String, String>,
-    val classNames: List<String>,
-) : HtmlAttributes {
+internal data class LiteralAttributes(val encoded: String) : HtmlAttributes {
     fun openingTag(tag: String): String = "<$tag$encoded>"
 }
 
@@ -441,7 +436,7 @@ internal class HtmlAttributeAnalyzer(
             }
             if (length > MaxEncodedFragmentLength) return null
         }
-        return LiteralAttributes(encoded, values, classNames)
+        return LiteralAttributes(encoded)
     }
 }
 

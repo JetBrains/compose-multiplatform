@@ -14,10 +14,8 @@ import org.jetbrains.compose.web.dom.ElementScope
 import org.jetbrains.compose.web.dom.Span
 import org.jetbrains.compose.web.dom.Text
 
-internal val __htmlAttributes0 = "authored"
-
 @Composable
-fun PreparedAttributes(content: ContentBuilder<HTMLDivElement>?) {
+fun StoredContentAttributes(content: ContentBuilder<HTMLDivElement>?) {
     val card = CARD_CLASS
     Div(attrs = {
         val title = "A & " + "B"
@@ -27,7 +25,7 @@ fun PreparedAttributes(content: ContentBuilder<HTMLDivElement>?) {
 }
 
 @Composable
-fun PreparedContainer(value: String, effect: (String) -> Unit) {
+fun ScopedContainer(value: String, effect: (String) -> Unit) {
     Div(attrs = { classes(CARD_CLASS) }) outer@{
         effect("container")
         Text(value)
@@ -55,26 +53,26 @@ private fun ElementScope<HTMLSpanElement>.scopedValue(
 }
 
 @Composable
-fun PreparedDynamicText(value: () -> String) {
+fun ScopedDynamicText(value: () -> String) {
     Span(attrs = { classes("price") }) { Text(value()) }
 }
 
-class PreparedUser(private val nextName: () -> String) {
+class ScopedUser(private val nextName: () -> String) {
     val name: String get() = nextName()
 }
 
 @Composable
-fun PreparedGetter(user: PreparedUser) {
+fun ScopedGetter(user: ScopedUser) {
     Span(attrs = { classes("user") }) { Text(user.name) }
 }
 
 @Composable
-fun PreparedLiteralText() {
+fun ScopedLiteralText() {
     Span(attrs = { classes("label") }) { Text("<&\r😀") }
 }
 
 @Composable
-fun PreparedSharedAttributes(value: String) {
+fun ScopedSharedAttributes(value: String) {
     Span(attrs = { classes("label") }) { Text(value) }
 }
 

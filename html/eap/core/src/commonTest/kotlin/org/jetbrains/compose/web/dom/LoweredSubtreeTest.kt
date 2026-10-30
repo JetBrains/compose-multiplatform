@@ -9,7 +9,6 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
 import kotlinx.browser.dom.HTMLElement
 import org.jetbrains.compose.web.HtmlValidationMode
 import org.jetbrains.compose.web.LocalHtmlValidationMode
@@ -21,90 +20,6 @@ import org.jetbrains.compose.web.renderHydratedDocumentToStream
 import kotlin.test.*
 
 class LoweredSubtreeTest {
-    @Test
-    fun specializedContainersKeepParserChecksAndNewlines() {
-        val pre = preparedHtmlAttributes<HTMLElement>("pre", "<pre>") {}
-        assertEquals("<pre>\n\nfirst<!--c-->second</pre>", composeHtmlToString {
-            PreparedContainer(pre) { Text("\nfirst"); Text("second") }
-        })
-        assertFailsWith<IllegalArgumentException> {
-            composeHtmlToString(validateStrictly = true) { Table { PreparedContainer(attrs) {} } }
-        }
-        assertFailsWith<IllegalArgumentException> {
-            composeHtmlToString { TagElement<HTMLElement>("script", null) { PreparedContainer(attrs) {} } }
-        }
-        var calls = 0
-        assertEquals("<input>", composeHtmlToString {
-            TagElement<HTMLElement>("input", null) { PreparedContainer(attrs) { calls++; Text("discarded") } }
-        })
-        assertEquals(1, calls)
-    }
-
-    private val attrs = preparedHtmlAttributes<HTMLElement>("span", "<span class=\"x\">") { classes("x") }
-
-    @Test
-    fun loweredContainersPreserveContentEffectsAndTextBoundaries() {
-        val trace = mutableListOf<String>()
-        val content: @Composable ElementScope<HTMLElement>.() -> Unit = {
-            androidx.compose.runtime.remember { trace += "remember"; Unit }
-            androidx.compose.runtime.SideEffect { trace += "side" }
-            androidx.compose.runtime.DisposableEffect(Unit) { trace += "enter"; onDispose { trace += "dispose" } }
-            Text("a"); Text("b"); Span { Text("nested") }
-        }
-        val ordinary = composeHtmlToString { TagElement(attrs.elementBuilder, attrs.callback, content) }
-        val ordinaryTrace = trace.toList()
-        trace.clear()
-        val lowered = composeHtmlToString { PreparedContainer(attrs, content) }
-        assertEquals(ordinary, lowered)
-        assertEquals(ordinaryTrace, trace)
-    }
-
-    @Test
-    fun dynamicValuesKeepScopeAndCompositionLocals() {
-        val local = compositionLocalOf { "default" }
-        for (value in listOf("<&é😀", "", "next", "\n")) {
-            assertEquals(
-                "<span class=\"x\">" + value.replace("&", "&amp;").replace("<", "&lt;") + "</span>",
-                composeHtmlToString(key = "lowered-local") {
-                    CompositionLocalProvider(local provides value) {
-                        PreparedTextElement(attrs) { local.current }
-                    }
-                })
-        }
-    }
-
-    @Test
-    fun textEvaluationAndFailuresKeepStreamingOrder() {
-        fun render(lowered: Boolean): Pair<String, List<String>> {
-            val chunks = StringBuilder()
-            val events = mutableListOf<String>()
-            assertFailsWith<IllegalStateException> {
-                composeHtmlString(chunkSize = 1, chunkSink = { chunks.append(it); events += "chunk:$it" }) {
-                    if (lowered) PreparedTextElement(attrs) { events += "value"; error("failed value") }
-                    else Span(attrs = { classes("x") }) { Text(run { events += "value"; error("failed value") }) }
-                }
-            }
-            return chunks.toString() to events
-        }
-        assertEquals(render(false), render(true))
-        assertEquals("<span class=\"x\">recovered</span>", composeHtmlToString(key = "lowered-local") {
-            PreparedTextElement(attrs) { "recovered" }
-        })
-    }
-
-    @Test
-    fun discardedTextStillEvaluatesAndInvalidTextStillFails() {
-        var calls = 0
-        composeHtmlToString {
-            TagElement<HTMLElement>(
-                "input",
-                null
-            ) { PreparedTextElement(attrs) { calls++; "discarded" } }
-        }
-        assertEquals(1, calls)
-        assertFailsWith<IllegalArgumentException> { composeHtmlToString { PreparedTextElement(attrs) { "bad\u0000" } } }
-    }
-
     @Test
     fun staticSubtreeMatchesOrdinaryAndStreamingOutput() {
         val original: @Composable () -> Unit = {

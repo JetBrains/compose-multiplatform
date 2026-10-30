@@ -16,8 +16,8 @@ import org.jetbrains.compose.html.compiler.samples.EquivalentFragment
 import org.jetbrains.compose.html.compiler.samples.EquivalentLiteral
 import org.jetbrains.compose.html.compiler.samples.FragmentWithoutBoundary
 import org.jetbrains.compose.html.compiler.samples.OrderedAttributes
-import org.jetbrains.compose.html.compiler.samples.PreparedLiteralText
 import org.jetbrains.compose.html.compiler.samples.ReorderedAttributes
+import org.jetbrains.compose.html.compiler.samples.ScopedLiteralText
 import org.jetbrains.compose.html.compiler.samples.SharedContainer
 import org.jetbrains.compose.html.compiler.samples.SharedDynamic
 import org.jetbrains.compose.html.compiler.samples.SharedFragment
@@ -144,7 +144,7 @@ class StaticLoweringTest {
     }
 
     @Test
-    fun staticHtmlUsesConstantsAndDirectElementsNeedNoAttributeFields() {
+    fun staticHtmlUsesConstantsAndDirectElementsReadNoFields() {
         val staticMethods = listOf(
             "SharedLiteral", "EquivalentLiteral", "DistinctLiteral",
             "SharedFragment", "EquivalentFragment", "FragmentWithoutBoundary"
@@ -173,9 +173,7 @@ class StaticLoweringTest {
             staticHtmlConstants("StaticSharingKt", "FragmentWithoutBoundary")
         )
 
-        assertTrue(fieldReads("PreparedElementsKt", "PreparedSharedAttributes").isEmpty())
-        val fields = Class.forName("${javaClass.packageName}.samples.StaticSharingKt").declaredFields
-        assertEquals(0, fields.count { it.name.startsWith("__htmlAttributes") })
+        assertTrue(fieldReads("ScopedElementsKt", "ScopedSharedAttributes").isEmpty())
     }
 
     @Test
@@ -188,7 +186,7 @@ class StaticLoweringTest {
                 val content: @Composable () -> Unit = {
                     SharedLiteral()
                     EquivalentLiteral()
-                    PreparedLiteralText()
+                    ScopedLiteralText()
                     SharedDynamic { "value-${++calls}" }
                     SharedContainer("body")
                     SharedFragment()
