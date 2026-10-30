@@ -18,8 +18,9 @@ val scriptLogFile = scriptDir.resolve("logScript.txt")
 val buildLogFile = scriptDir.resolve("logBuild.txt")
 buildLogFile.writeText("")
 
-System.setOut(timestampedOutput(System.out))
-System.setErr(timestampedOutput(System.err))
+val scriptOutput = timestampedOutput(System.out)
+System.setOut(scriptOutput)
+System.setErr(scriptOutput)
 
 val airWebhookFile = File(System.getProperty("user.home"), "androidxMergerAirWebhook.txt")
 val compilationInterval = 1.days
@@ -326,7 +327,7 @@ fun timestampedOutput(console: PrintStream): PrintStream {
     val pipe = Pipe.open()
     val output = PrintStream(Channels.newOutputStream(pipe.sink()), true, Charsets.UTF_8)
     val reader = thread(isDaemon = true) {
-        Channels.newInputStream(pipe.source()).reader(Charsets.UTF_8).use { input ->
+        Channels.newInputStream(pipe.source()).bufferedReader(Charsets.UTF_8).use { input ->
             input.timestampedChunks().writeTo(scriptLogFile, console)
         }
     }
@@ -338,15 +339,13 @@ fun timestampedOutput(console: PrintStream): PrintStream {
 }
 
 fun Reader.timestampedChunks(): Sequence<String> {
-    val buffer = CharArray(DEFAULT_BUFFER_SIZE)
     var lineStart = true
-    return generateSequence { read(buffer).takeIf { it >= 0 } }
-        .map { count ->
-            buffer.take(count).filter { it != '\r' }.joinToString("") { char ->
-                val prefix = if (lineStart) "${OffsetDateTime.now()} " else ""
-                lineStart = char == '\n'
-                prefix + char
-            }
+    return generateSequence { read().takeIf { it >= 0 }?.toChar() }
+        .filter { it != '\r' }
+        .map { char ->
+            val prefix = if (lineStart) "${OffsetDateTime.now()} " else ""
+            lineStart = char == '\n'
+            prefix + char
         }
         .plus(sequence { if (!lineStart) yield("\n") })
 }
