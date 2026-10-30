@@ -278,11 +278,15 @@ fun bisect(lastKnownGood: String): Boolean {
 
 data class UpstreamCommit(val hash: String, val timestamp: Instant)
 
-fun execute(vararg args: String, logFile: File = scriptLogFile): Pair<Int, String> {
+fun execute(vararg args: String, logFile: File? = null): Pair<Int, String> {
     val process = ProcessBuilder(*args).redirectErrorStream(true).start()
     val text = StringBuilder()
     process.inputStream.bufferedReader().useLines { lines ->
-        lines.onEach { text.appendLine(it) }.logTo(logFile)
+        if (logFile == null) {
+            lines.forEach { text.appendLine(it) }
+        } else {
+            lines.onEach { text.appendLine(it) }.logTo(logFile)
+        }
     }
     return process.waitFor() to text.toString().trim()
 }
