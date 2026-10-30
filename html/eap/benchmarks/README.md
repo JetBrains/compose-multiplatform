@@ -14,30 +14,22 @@ See [third-party notices](../../licenses/third_party/README.md) for adapted work
 
 ## Run
 
-From the repository root, choose a suite:
+From the repository root:
 
 ```shell
 html/gradlew -p html -Pcompose.html.eap.enabled=true :html-eap-benchmarks:ssrBenchmark
-html/gradlew -p html -Pcompose.html.eap.enabled=true :html-eap-benchmarks:streamingBenchmark
 html/gradlew -p html -Pcompose.html.eap.enabled=true :html-eap-benchmarks:hydrationBenchmark
 ```
 
-Hydration runs both JS and Wasm in Chrome. `benchmark` runs all JVM cases, including pooling.
-Add `-Pcompose.html.lowering.enabled=true` to enable JVM compiler lowering (disabled by default).
+SSR defaults to String. Choose `-PrenderMode=writer`, `callback` or `all`.
+Add `-Pcompose.html.lowering.enabled=true` for JVM compiler lowering.
+Use `smokeBenchmark` for a short JVM run or `benchmark` for all JVM cases, including pooling.
 
-Two JVM forks. SSR and streaming use a 5-second warmup and ten 1-second measurements per fork.
-Pooling uses two 1-second warmups, three 1-second measurements, four workers and 1 or 64 rows.
-Results are saved under `html/eap/benchmarks/build/reports/benchmarks`.
+SSR uses two forks, each with 5 seconds of warmup and ten 1-second measurements.
+Hydration runs JS and Wasm in Chrome with two warmups and five samples, excluding HTML parsing and bundle loading.
 
-For a short JVM smoke test:
-
-```shell
-html/gradlew -p html -Pcompose.html.eap.enabled=true \
-    :html-eap-benchmarks:smokeBenchmark
-```
-
-Hydration uses two warmups and five samples, reporting mean, standard deviation and range in
-`html/eap/benchmarks/build/reports/tests` and the test output. Timing excludes HTML parsing and bundle loading.
+Results: `html/eap/benchmarks/build/reports/benchmarks` for JVM.
+`html/eap/benchmarks/build/reports/tests` and test output for hydration (mean, standard deviation and range).
 
 ## Add a benchmark
 

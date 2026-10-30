@@ -77,10 +77,14 @@ benchmark {
             advanced("jvmForks", "definedByJmh")
         }
         register("ssr") {
-            include(".*SsrBenchmark.renderToString")
-        }
-        register("streaming") {
-            include(".*SsrBenchmark.stream.*")
+            val method = when (val mode = providers.gradleProperty("renderMode").orElse("string").get()) {
+                "string" -> "renderToString"
+                "writer" -> "streamToWriter"
+                "callback" -> "streamToCallback"
+                "all" -> ".*"
+                else -> error("Unknown renderMode '$mode': use string, writer, callback or all")
+            }
+            include(".*SsrBenchmark.$method")
         }
         register("smoke") {
             warmups = 1
