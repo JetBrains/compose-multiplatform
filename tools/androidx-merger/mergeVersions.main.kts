@@ -337,18 +337,18 @@ fun timestampedOutput(console: PrintStream): PrintStream {
     return output
 }
 
-fun Reader.timestampedChunks(): Sequence<String> = sequence {
+fun Reader.timestampedChunks(): Sequence<String> {
     val buffer = CharArray(DEFAULT_BUFFER_SIZE)
     var lineStart = true
-    while (true) {
-        val count = read(buffer).takeIf { it >= 0 } ?: break
-        yield(buffer.take(count).filter { it != '\r' }.joinToString("") { char ->
-            val prefix = if (lineStart) "${OffsetDateTime.now()} " else ""
-            lineStart = char == '\n'
-            prefix + char
-        })
-    }
-    if (!lineStart) yield("\n")
+    return generateSequence { read(buffer).takeIf { it >= 0 } }
+        .map { count ->
+            buffer.take(count).filter { it != '\r' }.joinToString("") { char ->
+                val prefix = if (lineStart) "${OffsetDateTime.now()} " else ""
+                lineStart = char == '\n'
+                prefix + char
+            }
+        }
+        .plus(sequence { if (!lineStart) yield("\n") })
 }
 
 fun Sequence<String>.logTo(file: File, console: PrintStream? = null) =
