@@ -108,10 +108,11 @@ fun ensureCompiles() {
     if (output("git", "rev-parse", "HEAD") == lastKnownGood) return
     if (!compile()) {
         println("Compilation failed. Bisecting.")
-        bisect(lastKnownGood)
-        markCompilationFailure()
-        println("Build regression found.")
-        check(solveWithMergeSolver())
+        if (bisect(lastKnownGood)) {
+            markCompilationFailure()
+            println("Build regression found.")
+            check(solveWithMergeSolver())
+        }
     }
     lastKnownGood = output("git", "rev-parse", "HEAD")
     lastCompilationTime = commitTime(output("git", "merge-base", "HEAD", upstream))
@@ -214,7 +215,12 @@ fun hasNote(commit: String, prefix: String): Boolean =
             code == 0 && note.lineSequence().any { it.startsWith(prefix) }
         }
 
-fun bisect(lastKnownGood: String) {
+fun bisect(lastKnownGood: String): Boolean {
+    println("Rechecking the failing commit before bisect.")
+    if (compile()) {
+        println("Compilation passed on retry. Continuing merges.")
+        return false
+    }
     check(run("git", "bisect", "start", "--first-parent", "HEAD", lastKnownGood))
     while (true) {
         println("Bisect ${output("git", "rev-parse", "HEAD")}")
@@ -222,10 +228,10 @@ fun bisect(lastKnownGood: String) {
         val (code, text) = execute("git", "bisect", result)
         check(code == 0) { text }
         if ("is the first bad commit" in text) {
-            val firstBad = output("git", "rev-parse", "HEAD")
+            val firstBad = output("git", "rev-parse", "refs/bisect/bad")
             check(run("git", "bisect", "reset"))
             check(run("git", "reset", "--hard", firstBad))
-            return
+            return true
         }
     }
 }
