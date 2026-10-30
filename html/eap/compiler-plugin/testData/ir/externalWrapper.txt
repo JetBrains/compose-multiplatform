@@ -58,7 +58,7 @@ fun UseCard(value: String) {
   { // BLOCK
     val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
     val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
-    val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "section", encoded = "<section>", innermost = "section", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+    val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "section", encoded = "<section>", innermost = "section", validate = tmp1_htmlValidate, leadingNewline = false)
     tmp0_htmlWriter.writeText(value = value, validate = tmp1_htmlValidate)
     tmp0_htmlWriter.closeElement(encoded = "</section>", parent = tmp2_htmlParent)
   }

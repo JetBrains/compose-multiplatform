@@ -134,7 +134,7 @@ fun <T : Any?> FormControlPrecedence(type: InputType<T>, value: String, selected
             }
             tmp17_htmlAttributeIndex = tmp17_htmlAttributeIndex.plus(other = 1)
           }
-          val tmp18_htmlParent: Any? = tmp0_htmlWriter.finishMixedElement(tagName = "input", namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+          val tmp18_htmlParent: Any? = tmp0_htmlWriter.finishMixedElement(tagName = "input", leadingNewline = false)
           tmp18_htmlParent
         }
         else -> null

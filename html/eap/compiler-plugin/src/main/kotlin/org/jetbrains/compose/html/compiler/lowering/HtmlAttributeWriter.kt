@@ -11,6 +11,7 @@ package org.jetbrains.compose.html.compiler.lowering
 import org.jetbrains.compose.html.compiler.HtmlSymbols
 import org.jetbrains.compose.html.compiler.ir.irCallWithArgs
 import org.jetbrains.compose.html.compiler.ir.unwrapReturn
+import org.jetbrains.compose.web.dom.HtmlNamespace
 import org.jetbrains.compose.web.dom.escapeHtml
 import org.jetbrains.compose.web.dom.isHtmlLeadingNewlineElement
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -131,7 +132,8 @@ internal class HtmlAttributeWriter(
         }
         val parent = irTemporary(
             irCallWithArgs(
-                symbols.finishMixedElement, irGet(writer), irString(plan.tag), irString(plan.namespace),
+                symbols.finishMixedElement, irGet(writer), irString(plan.tag),
+                if (plan.namespace == HtmlNamespace) null else irString(plan.namespace),
                 irBoolean(isHtmlLeadingNewlineElement(plan.tag, plan.namespace))
             ),
             "htmlParent"

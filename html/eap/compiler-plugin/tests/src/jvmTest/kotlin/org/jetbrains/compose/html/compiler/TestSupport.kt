@@ -109,7 +109,8 @@ internal fun classMethodCalls(reader: ClassReader, ownerPrefix: String? = null):
                 descriptor: String,
                 isInterface: Boolean
             ) {
-                if (ownerPrefix == null || owner.startsWith(ownerPrefix)) targets.add(name)
+                // Count default-argument bridges as calls to the underlying method.
+                if (ownerPrefix == null || owner.startsWith(ownerPrefix)) targets.add(name.removeSuffix("\$default"))
             }
         }
     }
@@ -240,7 +241,7 @@ internal class LoweringComparison(
 
     val writerCalls: Map<String, Map<String, Int>> by lazy {
         classMethodCalls(bytecode, "org/jetbrains/compose/web/dom/HtmlStringWriterContext").mapValues { (_, calls) ->
-            calls.filter { it != "flushChunk\$default" }.groupingBy { it }.eachCount()
+            calls.filter { it != "flushChunk" }.groupingBy { it }.eachCount()
         }
     }
 

@@ -37,6 +37,9 @@ class HtmlLoweringIrTest : AbstractCompilerPluginIrTest() {
     fun dynamicAttributesAndText() = verifyFixture("dynamicAttributesAndText")
 
     @Test
+    fun namespaceDefaults() = verifyFixture("namespaceDefaults")
+
+    @Test
     fun controlFlow() = verifyFixture("controlFlow")
 
     @Test

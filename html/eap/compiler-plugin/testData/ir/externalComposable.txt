@@ -48,7 +48,7 @@ fun UseHello() {
   { // BLOCK
     val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
     val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
-    val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "div", encoded = "<div><span>before&lt;&amp;</span>", innermost = "div", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+    val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "div", encoded = "<div><span>before&lt;&amp;</span>", innermost = "div", validate = tmp1_htmlValidate, leadingNewline = false)
     Hello()
     tmp0_htmlWriter.closeElement(encoded = "<span>after</span></div>", parent = tmp2_htmlParent)
   }
