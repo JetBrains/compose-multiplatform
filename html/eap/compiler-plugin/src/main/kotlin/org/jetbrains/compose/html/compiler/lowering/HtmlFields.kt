@@ -48,6 +48,7 @@ internal class HtmlFields(private val context: IrPluginContext, private val file
         return builder.irGetField(null, field)
     }
 
+    // TODO: cover with IR-golden test
     private fun createStringField(index: Int): IrField = context.irFactory.buildField {
         name = generateSequence(index) { it + 1 }.map { Name.identifier("__htmlString$it") }.first(usedNames::add)
         type = context.irBuiltIns.stringType
