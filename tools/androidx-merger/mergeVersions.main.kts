@@ -1,7 +1,6 @@
 import java.io.File
 import java.io.FileOutputStream
 import java.io.PrintStream
-import java.io.Reader
 import java.nio.channels.Channels
 import java.nio.channels.Pipe
 import java.time.OffsetDateTime
@@ -327,8 +326,8 @@ fun timestampedOutput(console: PrintStream): PrintStream {
     val pipe = Pipe.open()
     val output = PrintStream(Channels.newOutputStream(pipe.sink()), true, Charsets.UTF_8)
     val reader = thread(isDaemon = true) {
-        Channels.newInputStream(pipe.source()).bufferedReader(Charsets.UTF_8).use { input ->
-            input.timestampedChunks().writeTo(scriptLogFile, console)
+        Channels.newInputStream(pipe.source()).bufferedReader(Charsets.UTF_8).useLines { lines ->
+            lines.logTo(scriptLogFile, console)
         }
     }
     Runtime.getRuntime().addShutdownHook(Thread {
@@ -336,18 +335,6 @@ fun timestampedOutput(console: PrintStream): PrintStream {
         reader.join()
     })
     return output
-}
-
-fun Reader.timestampedChunks(): Sequence<String> {
-    var lineStart = true
-    return generateSequence { read().takeIf { it >= 0 }?.toChar() }
-        .filter { it != '\r' }
-        .map { char ->
-            val prefix = if (lineStart) "${OffsetDateTime.now()} " else ""
-            lineStart = char == '\n'
-            prefix + char
-        }
-        .plus(sequence { if (!lineStart) yield("\n") })
 }
 
 fun Sequence<String>.logTo(file: File, console: PrintStream? = null) =
