@@ -17,10 +17,6 @@ internal const val MaxFoldDepth = 64
 // Work per expression.
 internal const val MaxFoldSteps = 2_048
 
-// IR interpreter stack and work per operation.
-internal const val MaxInterpreterStackDepth = 64
-internal const val MaxInterpreterCommands = 2_048
-
 // Static HTML: bound fragment size and expansion.
 internal const val MaxEncodedFragmentLength = 1_000_000
 internal const val MaxExpandedHtmlCalls = 8_000

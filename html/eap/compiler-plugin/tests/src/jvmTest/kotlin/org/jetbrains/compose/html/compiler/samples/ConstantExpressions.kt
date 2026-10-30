@@ -50,6 +50,19 @@ fun renderPrimitiveExpressions() = composeHtmlToString {
     }
 }
 
+fun renderFloorDivisionAndNullArguments() = composeHtmlToString {
+    val number = -7
+    val divisor = 3
+    val text = "abc"
+    val absent: Any? = null
+    Span { Text("${number.floorDiv(divisor)}:${number.mod(divisor)}:${text.plus(absent)}:${text.equals(absent)}") }
+}
+
+fun renderIncrementAndDecrement() = composeHtmlToString {
+    val number = 7
+    Span { Text("${number.inc()}:${number.dec()}") }
+}
+
 private fun unreachableEffect(): Boolean = error("Unreachable")
 
 fun renderShortCircuitConstants() = composeHtmlToString {
@@ -91,6 +104,16 @@ fun renderUserToString() = composeHtmlToString {
 fun renderThrowingExpression() = composeHtmlToString {
     val zero = 0
     Span { Text("${1 / zero}") }
+}
+
+fun renderThrowingFloorDivision() = composeHtmlToString {
+    val zero = 0
+    Span { Text("${1.floorDiv(zero)}") }
+}
+
+fun renderThrowingModulo() = composeHtmlToString {
+    val zero = 0
+    Span { Text("${1.mod(zero)}") }
 }
 
 private val ordinaryLabel = "ordinary"

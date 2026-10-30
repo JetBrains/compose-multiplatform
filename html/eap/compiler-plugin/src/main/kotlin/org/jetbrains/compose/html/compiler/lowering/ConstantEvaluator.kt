@@ -7,6 +7,8 @@ package org.jetbrains.compose.html.compiler.lowering
 
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
+import org.jetbrains.kotlin.ir.declarations.IrPackageFragment
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
@@ -15,13 +17,14 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrStringConcatenation
 import org.jetbrains.kotlin.ir.expressions.IrWhen
-import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrStringConcatenationImpl
-import org.jetbrains.kotlin.ir.interpreter.IrInterpreter
-import org.jetbrains.kotlin.ir.interpreter.IrInterpreterConfiguration
-import org.jetbrains.kotlin.ir.interpreter.IrInterpreterEnvironment
-import org.jetbrains.kotlin.ir.interpreter.checker.EvaluationMode
+import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
+import org.jetbrains.kotlin.ir.types.classOrNull
+import org.jetbrains.kotlin.ir.util.callableId
+import org.jetbrains.kotlin.resolve.constants.evaluate.CompileTimeType
+import org.jetbrains.kotlin.resolve.constants.evaluate.canEvalOp
+import org.jetbrains.kotlin.resolve.constants.evaluate.evalBinaryOp
+import org.jetbrains.kotlin.resolve.constants.evaluate.evalUnaryOp
 
 /**
  * Computes constant values without running application code.
@@ -42,15 +45,16 @@ import org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI
  */
 @OptIn(UnsafeDuringIrConstructionAPI::class)
 internal class ConstantEvaluator(context: IrPluginContext) {
-    private val interpreter = IrInterpreter(
-        IrInterpreterEnvironment(
-            context.irBuiltIns,
-            IrInterpreterConfiguration(
-                platform = context.platform,
-                maxStack = MaxInterpreterStackDepth,
-                maxCommands = MaxInterpreterCommands,
-            )
-        )
+    private val builtIns = context.irBuiltIns
+    private val compileTimeTypes = mapOf(
+        builtIns.booleanClass to CompileTimeType.BOOLEAN,
+        builtIns.byteClass to CompileTimeType.BYTE,
+        builtIns.shortClass to CompileTimeType.SHORT,
+        builtIns.intClass to CompileTimeType.INT,
+        builtIns.longClass to CompileTimeType.LONG,
+        builtIns.charClass to CompileTimeType.CHAR,
+        builtIns.stringClass to CompileTimeType.STRING,
+        builtIns.anyClass to CompileTimeType.ANY,
     )
     private val aliases = mutableMapOf<IrVariable, IrConst?>()
     private var work = MaxFoldSteps
@@ -100,30 +104,22 @@ internal class ConstantEvaluator(context: IrPluginContext) {
 
             is IrStringConcatenation -> {
                 val arguments = value.arguments.map { foldPortableConstant(it, depth + 1) ?: return null }
-                // Bound concatenation before asking the interpreter to allocate its result.
+                // Bound concatenation before allocating its result.
                 if (arguments.sumOf { (it.value?.toString() ?: "null").length.toLong() } > MaxEvaluatedStringLength) {
                     return null
                 }
-                val copy = IrStringConcatenationImpl(value.startOffset, value.endOffset, value.type)
-                copy.arguments.addAll(arguments)
-                interpreter.interpret(copy) as? IrConst
+                // TODO: add IR-golden tests for Constants evaluation at compile time
+                constant(value, arguments.joinToString("") { it.value?.toString() ?: "null" })
             }
 
             is IrCall -> {
-                // OnlyBuiltins also accepts property accessors. Do not evaluate those here.
-                if (value.symbol.owner.correspondingPropertySymbol != null ||
-                    !EvaluationMode.OnlyBuiltins.canEvaluateFunction(value.symbol.owner)
-                ) return null
-
-                val copy = IrCallImpl(
-                    value.startOffset, value.endOffset, value.type, value.symbol,
-                    typeArgumentsCount = value.typeArguments.size
-                )
-                for (index in value.typeArguments.indices) copy.typeArguments[index] = value.typeArguments[index]
-                for (index in value.arguments.indices) {
-                    copy.arguments[index] = foldPortableConstant(value.arguments[index], depth + 1) ?: return null
+                val arguments = value.arguments.map { foldPortableConstant(it, depth + 1) ?: return null }
+                try {
+                    constant(value, evaluateCall(value, arguments.map { it.value }))
+                } catch (_: RuntimeException) {
+                    // Leave failures such as division by zero to runtime.
+                    null
                 }
-                interpreter.interpret(copy) as? IrConst
             }
 
             is IrWhen -> {
@@ -135,6 +131,53 @@ internal class ConstantEvaluator(context: IrPluginContext) {
                 null
             }
 
+            else -> null
+        }
+    }
+
+    private fun evaluateCall(call: IrCall, arguments: List<Any?>): Any? = when (call.symbol) {
+        builtIns.eqeqSymbol -> arguments[0] == arguments[1]
+        in builtIns.lessFunByOperandType.values -> compare(arguments) < 0
+        in builtIns.lessOrEqualFunByOperandType.values -> compare(arguments) <= 0
+        in builtIns.greaterFunByOperandType.values -> compare(arguments) > 0
+        in builtIns.greaterOrEqualFunByOperandType.values -> compare(arguments) >= 0
+        else -> evaluateMember(call.symbol.owner, arguments)
+    }
+
+    private fun compare(arguments: List<Any?>): Int =
+        compareValues(arguments[0] as Comparable<*>?, arguments[1] as Comparable<*>?)
+
+    // Evaluate primitive/String members and floorDiv/mod. Property accessors stay at runtime.
+    private fun evaluateMember(function: IrSimpleFunction, arguments: List<Any?>): Any? {
+        if (function.correspondingPropertySymbol != null) return null
+        val name = function.name.asString()
+        if (function.dispatchReceiverParameter == null &&
+            (function.parent !is IrPackageFragment || name !in setOf("floorDiv", "mod"))
+        ) return null
+        val types = function.parameters.map { compileTimeTypes[it.type.classOrNull] ?: return null }
+        if (!canEvalOp(function.callableId, types[0], types.getOrNull(1))) return null
+        val receiver = arguments[0] ?: return null
+        return when (types.size) {
+            1 -> evalUnaryOp(name, types[0], receiver)
+            2 -> when {
+                name == "equals" -> receiver == arguments[1]
+                types[0] == CompileTimeType.STRING && name == "plus" -> (receiver as String) + arguments[1]
+                else -> evalBinaryOp(name, types[0], receiver, types[1], arguments[1] ?: return null)
+            }
+
+            else -> null
+        }
+    }
+
+    private fun constant(expression: IrExpression, value: Any?): IrConst? = with(expression) {
+        when (value) {
+            is Boolean -> IrConstImpl.boolean(startOffset, endOffset, type, value)
+            is Byte -> IrConstImpl.byte(startOffset, endOffset, type, value)
+            is Short -> IrConstImpl.short(startOffset, endOffset, type, value)
+            is Int -> IrConstImpl.int(startOffset, endOffset, type, value)
+            is Long -> IrConstImpl.long(startOffset, endOffset, type, value)
+            is Char -> IrConstImpl.char(startOffset, endOffset, type, value)
+            is String -> IrConstImpl.string(startOffset, endOffset, type, value)
             else -> null
         }
     }
