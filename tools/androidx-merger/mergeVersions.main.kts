@@ -42,7 +42,7 @@ when {
     hasMergeSolverNoteFixed(head) ->
         check(compile()) { "Build still fails after Merge Resolver." }
     needsMergeSolver(head) -> check(solveWithMergeSolver()) { "Merge Solver did not review $head" }
-    else -> check(compile()) { "Compilation failed" }
+    else -> ensureInitialCompiles()
 }
 
 mergeJbMain()
@@ -102,6 +102,29 @@ fun mergeJbMain() {
         return
     }
     check(solveWithMergeSolver()) { "Merge Solver did not fix the merge of $branch" }
+}
+
+fun ensureInitialCompiles() {
+    if (compile()) return
+
+    val currentCommit = output("git", "rev-parse", "HEAD")
+    val (branchCode, currentBranch) = execute("git", "symbolic-ref", "--quiet", "--short", "HEAD")
+    println("Compilation failed. Checking the previous commit.")
+    check(run("git", "switch", "--detach", "$currentCommit^1")) { "Could not switch to the previous commit." }
+    val previousCompiles = try {
+        compile()
+    } finally {
+        val restored = if (branchCode == 0) {
+            run("git", "switch", currentBranch)
+        } else {
+            run("git", "switch", "--detach", currentCommit)
+        }
+        check(restored) { "Could not restore the original checkout at $currentCommit." }
+    }
+    check(previousCompiles) { "Compilation failed on both the current and previous commits. Check the build environment." }
+    markCompilationFailure()
+    println("The last commit breaks compilation. Solving with Merge Solver.")
+    check(solveWithMergeSolver()) { "Merge Solver did not fix $currentCommit" }
 }
 
 fun ensureCompiles() {
