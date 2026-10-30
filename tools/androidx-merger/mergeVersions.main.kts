@@ -96,11 +96,12 @@ fun mergeJbMain() {
     val branch = "origin/jb-main"
     if (run("git", "merge-base", "--is-ancestor", branch, "HEAD")) return
 
-    println("Merging $branch")
-    val hasConflict = !run("git", "merge", "--no-commit", "--no-ff", branch)
-    if (hasConflict) stageConflictingFiles(branch)
-    check(run("git", "commit", "--no-edit")) { "Could not commit merge: $branch" }
-    println(if (hasConflict) "Merge committed with conflicts: $branch" else "Merge completed: $branch")
+    val hasConflict = !logOperation("Merging $branch") {
+        val merged = run("git", "merge", "--no-commit", "--no-ff", branch)
+        if (!merged) stageConflictingFiles(branch)
+        check(run("git", "commit", "--no-edit")) { "Could not commit merge: $branch" }
+        merged
+    }
 
     if (hasConflict) {
         addMergeScriptNote("conflict")
@@ -117,18 +118,21 @@ fun ensureInitialCompiles() {
 
     val currentCommit = output("git", "rev-parse", "HEAD")
     val (branchCode, currentBranch) = execute("git", "symbolic-ref", "--quiet", "--short", "HEAD")
-    println("Checking the previous commit: $currentCommit^1")
-    check(run("git", "switch", "--detach", "$currentCommit^1")) { "Could not switch to the previous commit." }
+    check(logOperation("Checking out $currentCommit^1") {
+        run("git", "switch", "--detach", "$currentCommit^1")
+    }) { "Could not switch to the previous commit." }
     val previousCompiles = try {
         compile()
     } finally {
-        val restored = if (branchCode == 0) {
-            run("git", "switch", currentBranch)
-        } else {
-            run("git", "switch", "--detach", currentCommit)
+        val checkout = if (branchCode == 0) currentBranch else currentCommit
+        val restored = logOperation("Restoring checkout $checkout") {
+            if (branchCode == 0) {
+                run("git", "switch", currentBranch)
+            } else {
+                run("git", "switch", "--detach", currentCommit)
+            }
         }
         check(restored) { "Could not restore the original checkout at $currentCommit." }
-        println("Restored checkout: ${if (branchCode == 0) currentBranch else currentCommit}")
     }
     check(previousCompiles) { "Compilation failed on both the current and previous commits. Check the build environment." }
     markCompilationFailure()
@@ -149,13 +153,13 @@ fun ensureCompiles() {
 }
 
 fun mergeUpstreamCommit(commit: String) {
-    println("Merging $commit")
-    val hasConflict = !run("git", "merge", "--no-commit", "--no-ff", commit)
-    if (hasConflict) stageConflictingFiles(commit)
-
-    setMergeTitle(commit)
-    check(run("git", "commit", "--no-edit")) { "Could not commit merge: $commit" }
-    println(if (hasConflict) "Merge committed with conflicts: $commit" else "Merge completed: $commit")
+    val hasConflict = !logOperation("Merging $commit") {
+        val merged = run("git", "merge", "--no-commit", "--no-ff", commit)
+        if (!merged) stageConflictingFiles(commit)
+        setMergeTitle(commit)
+        check(run("git", "commit", "--no-edit")) { "Could not commit merge: $commit" }
+        merged
+    }
     if (!hasConflict) return
 
     addMergeScriptNote("conflict")
@@ -181,50 +185,49 @@ fun setMergeTitle(commit: String) {
 
 fun compile(): Boolean {
     val commit = output("git", "rev-parse", "--short", "HEAD")
-    println("Starting compilation at $commit: assemble compileTests")
     val command = if (System.getProperty("os.name").startsWith("Windows")) {
         listOf("cmd", "/c", "gradlew")
     } else {
         listOf("./gradlew")
     }
-    val success = execute(*command.toTypedArray(), "assemble", "compileTests", logFile = buildLogFile).first == 0
-    println("Compilation ${if (success) "succeeded" else "failed"} at $commit")
-    return success
+    return logOperation("Compile at $commit") {
+        execute(*command.toTypedArray(), "assemble", "compileTests", logFile = buildLogFile).first == 0
+    }
 }
 
 fun solveWithMergeSolver(): Boolean {
     val url = airWebhookUrl?.takeIf(String::isNotEmpty) ?: return false
     val token = airWebhookToken?.takeIf(String::isNotEmpty) ?: return false
     val pushedCommit = output("git", "rev-parse", "HEAD")
-    println("Submitting $pushedCommit to Merge Solver")
-    check(run("git", "push"))
-    check(run("git", "push", "origin", "refs/notes/commits"))
-    val (code, result) = execute("curl", "--fail", "--silent", "--show-error", "--request", "POST", "--header", "Authorization: ApiKey $token", url)
-    check(code == 0) { "JetBrains Air Automations webhook failed: $result" }
+    logOperation("Submitting $pushedCommit to Merge Solver") {
+        check(run("git", "push"))
+        check(run("git", "push", "origin", "refs/notes/commits"))
+        val (code, result) = execute("curl", "--fail", "--silent", "--show-error", "--request", "POST", "--header", "Authorization: ApiKey $token", url)
+        check(code == 0) { "JetBrains Air Automations webhook failed: $result" }
+        true
+    }
     if (!waitForMergeSolver(pushedCommit)) return false
     check(compile()) { "Build still fails after Merge Resolver." }
-    println("Merge Solver fix verified for $pushedCommit")
     return true
 }
 
 fun waitForMergeSolver(pushedCommit: String): Boolean {
     val timeout = 80.minutes
     val interval = 60.seconds
-    println("Waiting for Merge Solver to review $pushedCommit (timeout: $timeout)")
-    repeat((timeout / interval).toInt()) {
-        Thread.sleep(interval.inWholeMilliseconds)
-        fetchNotes()
-        if (hasMergeSolverNote(pushedCommit)) {
-            check(hasMergeSolverNoteFixed(pushedCommit)) {
-                "Merge Solver did not fix $pushedCommit:\n${output("git", "notes", "show", pushedCommit)}"
+    return logOperation("Resolving $pushedCommit with Merge Solver (timeout: $timeout)") {
+        repeat((timeout / interval).toInt()) {
+            Thread.sleep(interval.inWholeMilliseconds)
+            fetchNotes()
+            if (hasMergeSolverNote(pushedCommit)) {
+                check(hasMergeSolverNoteFixed(pushedCommit)) {
+                    "Merge Solver did not fix $pushedCommit:\n${output("git", "notes", "show", pushedCommit)}"
+                }
+                check(pull()) { "Could not fast-forward to the Merge Solver result." }
+                return@logOperation true
             }
-            println("Merge Solver reported a fix for $pushedCommit")
-            check(pull()) { "Could not fast-forward to the Merge Solver result." }
-            return true
         }
+        false
     }
-    println("Timed out waiting for Merge Solver.")
-    return false
 }
 
 // Not `git pull`: it merges FETCH_HEAD, which a concurrent fetch can fill with multiple branches,
@@ -253,15 +256,12 @@ fun hasNote(commit: String, prefix: String): Boolean =
         }
 
 fun bisect(lastKnownGood: String): Boolean {
-    println("Rechecking the suspected bad commit before bisect.")
     if (compile()) {
-        println("Skipping bisect; continuing merges.")
+        println("Bisect after $lastKnownGood ... SKIPPED (compilation passed)")
         return false
     }
-    println("Starting bisect after $lastKnownGood")
     check(run("git", "bisect", "start", "--first-parent", "HEAD", lastKnownGood))
     while (true) {
-        println("Bisect testing commit ${output("git", "rev-parse", "HEAD")}")
         val result = if (compile()) "good" else "bad"
         val (code, text) = execute("git", "bisect", result)
         check(code == 0) { text }
@@ -269,13 +269,24 @@ fun bisect(lastKnownGood: String): Boolean {
             val firstBad = output("git", "rev-parse", "refs/bisect/bad")
             check(run("git", "bisect", "reset"))
             check(run("git", "reset", "--hard", firstBad))
-            println("Bisect found the first bad commit: $firstBad")
+            println("Bisect after $lastKnownGood ... COMPLETED (first bad commit: $firstBad)")
             return true
         }
     }
 }
 
 data class UpstreamCommit(val hash: String, val timestamp: Instant)
+
+fun logOperation(message: String, operation: () -> Boolean): Boolean {
+    print("$message ... ")
+    var success = false
+    try {
+        success = operation()
+        return success
+    } finally {
+        println(if (success) "COMPLETED" else "FAILED")
+    }
+}
 
 fun execute(vararg args: String, logFile: File? = null): Pair<Int, String> {
     val process = ProcessBuilder(*args).redirectErrorStream(true).start()
@@ -314,8 +325,25 @@ fun timestampedOutput(console: PrintStream): PrintStream {
     val pipe = Pipe.open()
     val output = PrintStream(Channels.newOutputStream(pipe.sink()), true, Charsets.UTF_8)
     val reader = thread(isDaemon = true) {
-        Channels.newInputStream(pipe.source()).bufferedReader().useLines { lines ->
-            lines.logTo(scriptLogFile, console)
+        Channels.newInputStream(pipe.source()).reader(Charsets.UTF_8).use { input ->
+            val buffer = CharArray(8192)
+            var lineStart = true
+            val chunks = generateSequence {
+                input.read(buffer).takeIf { it >= 0 }?.let { String(buffer, 0, it) }
+            }.map { chunk ->
+                buildString {
+                    for (char in chunk) {
+                        if (char == '\r') continue
+                        if (lineStart) append("${OffsetDateTime.now()} ")
+                        append(char)
+                        lineStart = char == '\n'
+                    }
+                }
+            }
+            sequence {
+                yieldAll(chunks)
+                if (!lineStart) yield("\n")
+            }.writeTo(scriptLogFile, console)
         }
     }
     Runtime.getRuntime().addShutdownHook(Thread {
@@ -325,12 +353,16 @@ fun timestampedOutput(console: PrintStream): PrintStream {
     return output
 }
 
-fun Sequence<String>.logTo(file: File, console: PrintStream? = null) {
+fun Sequence<String>.logTo(file: File, console: PrintStream? = null) =
+    map { "${OffsetDateTime.now()} $it\n" }.writeTo(file, console)
+
+fun Sequence<String>.writeTo(file: File, console: PrintStream? = null) {
     FileOutputStream(file, true).bufferedWriter(Charsets.UTF_8).use { writer ->
-        map { "${OffsetDateTime.now()} $it" }.forEach { line ->
+        forEach { text ->
             synchronized(file) {
-                console?.println(line)
-                writer.appendLine(line)
+                console?.print(text)
+                console?.flush()
+                writer.write(text)
                 writer.flush()
             }
         }
