@@ -21,7 +21,6 @@ val scriptOutput = timestampedOutput(System.out)
 System.setOut(scriptOutput)
 System.setErr(scriptOutput)
 
-val airWebhookFile = File(System.getProperty("user.home"), "androidxMergerAirWebhook.txt")
 val compilationInterval = 1.days
 
 val airWebhookUrl: String? = System.getenv("MERGER_SCRIPT_AIR_URL")
