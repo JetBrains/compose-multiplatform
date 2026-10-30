@@ -1,6 +1,7 @@
 import java.io.File
 import java.io.FileOutputStream
 import java.io.PrintStream
+import java.io.Reader
 import java.nio.channels.Channels
 import java.nio.channels.Pipe
 import java.time.OffsetDateTime
@@ -326,24 +327,7 @@ fun timestampedOutput(console: PrintStream): PrintStream {
     val output = PrintStream(Channels.newOutputStream(pipe.sink()), true, Charsets.UTF_8)
     val reader = thread(isDaemon = true) {
         Channels.newInputStream(pipe.source()).reader(Charsets.UTF_8).use { input ->
-            val buffer = CharArray(8192)
-            var lineStart = true
-            val chunks = generateSequence {
-                input.read(buffer).takeIf { it >= 0 }?.let { String(buffer, 0, it) }
-            }.map { chunk ->
-                buildString {
-                    for (char in chunk) {
-                        if (char == '\r') continue
-                        if (lineStart) append("${OffsetDateTime.now()} ")
-                        append(char)
-                        lineStart = char == '\n'
-                    }
-                }
-            }
-            sequence {
-                yieldAll(chunks)
-                if (!lineStart) yield("\n")
-            }.writeTo(scriptLogFile, console)
+            input.timestampedChunks().writeTo(scriptLogFile, console)
         }
     }
     Runtime.getRuntime().addShutdownHook(Thread {
@@ -351,6 +335,23 @@ fun timestampedOutput(console: PrintStream): PrintStream {
         reader.join()
     })
     return output
+}
+
+fun Reader.timestampedChunks(): Sequence<String> = sequence {
+    val buffer = CharArray(DEFAULT_BUFFER_SIZE)
+    val lineStarts = Regex("^", setOf(RegexOption.MULTILINE, RegexOption.UNIX_LINES))
+    var lineStart = true
+    while (true) {
+        val count = read(buffer)
+        if (count < 0) break
+        val chunk = String(buffer, 0, count).replace("\r", "")
+        if (chunk.isEmpty()) continue
+        yield(chunk.replace(lineStarts) {
+            if (it.range.first == 0 && !lineStart) "" else "${OffsetDateTime.now()} "
+        })
+        lineStart = chunk.endsWith('\n')
+    }
+    if (!lineStart) yield("\n")
 }
 
 fun Sequence<String>.logTo(file: File, console: PrintStream? = null) =
