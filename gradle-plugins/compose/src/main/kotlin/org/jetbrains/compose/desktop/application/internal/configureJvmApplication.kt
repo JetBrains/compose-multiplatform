@@ -45,6 +45,7 @@ internal class CommonJvmDesktopTasks(
     val checkRuntime: TaskProvider<AbstractCheckNativeDistributionRuntime>,
     val suggestRuntimeModules: TaskProvider<AbstractSuggestModulesTask>,
     val prepareAppResources: TaskProvider<Sync>,
+    val skikoModule: TaskProvider<AbstractPrepareSkikoModuleTask>,
 )
 
 private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDesktopTasks {
@@ -94,11 +95,14 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         into(jvmTmpDirForTask())
     }
 
+    val skikoModule = registerSkikoModuleTask()
+
     return CommonJvmDesktopTasks(
         unpackDefaultResources = unpackDefaultResources,
         checkRuntime = checkRuntime,
         suggestRuntimeModules = suggestRuntimeModules,
         prepareAppResources = prepareAppResources,
+        skikoModule = skikoModule,
     )
 }
 
@@ -114,6 +118,10 @@ private fun JvmApplicationContext.configurePackagingTasks(
         modules.set(provider { app.nativeDistributions.modules })
         includeAllModules.set(provider { app.nativeDistributions.includeAllModules })
         javaRuntimePropertiesFile.set(commonTasks.checkRuntime.flatMap { it.javaRuntimePropertiesFile })
+        commonTasks.skikoModule.let { module ->
+            modulePath.from(module.flatMap { it.destinationDir }.map { it.asFileTree })
+            runtimeJvmArgs.set(module.runtimeJvmArgs())
+        }
         stripJreFonts.set(app.nativeDistributions.stripJreFonts)
         destinationDir.set(appTmpDir.dir("runtime"))
         stripNativeCommands.set(!buildType.aot.mode.generateJreClassesArchive)  // `java` is needed to generate the JRE CDS archive
@@ -278,6 +286,10 @@ private fun JvmApplicationContext.configureProguardTask(
 
     useAppRuntimeFiles { files ->
         inputFiles.from(files.allRuntimeJars)
+        skikoModuleTask().let { module ->
+            libraryFiles.from(module.flatMap { it.destinationDir }.map { it.asFileTree })
+            inputFiles.setFrom(module.withoutModuleInputs(files.allRuntimeJars))
+        }
         mainJar.set(files.mainJar)
     }
 }
@@ -343,6 +355,12 @@ private fun JvmApplicationContext.configurePackageTask(
         }
     }
 
+    skikoModuleTask().let { module ->
+        packageTask.dependsOn(module)
+        packageTask.files.from(module.flatMap { it.nativeLibrariesDir }.map { it.asFileTree })
+        val originalFiles = project.files(packageTask.files.from.toList())
+        packageTask.files.setFrom(module.withoutModuleInputs(originalFiles))
+    }
     packageTask.launcherMainClass.set(nullableProvider { app.mainClass })
     packageTask.launcherJvmArgs.set(
         provider { defaultJvmArgs + buildType.aot.runtimeJvmArgs + app.jvmArgs }
@@ -455,6 +473,12 @@ private fun JvmApplicationContext.configureRunTask(
         exec.useAppRuntimeFiles { (runtimeJars, _) ->
             classpath = runtimeJars
         }
+    }
+    skikoModuleTask().let { module ->
+        exec.dependsOn(module)
+        val originalClasspath = exec.classpath
+        exec.classpath = module.withoutModuleInputs(originalClasspath)
+        exec.jvmArgumentProviders.add(SkikoModuleArguments(project.files(module.flatMap { it.destinationDir }.map { it.asFileTree })))
     }
 }
 

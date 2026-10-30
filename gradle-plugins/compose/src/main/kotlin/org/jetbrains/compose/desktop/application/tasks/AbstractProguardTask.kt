@@ -26,6 +26,9 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
     @get:Classpath
     val inputFiles: ConfigurableFileCollection = objects.fileCollection()
 
+    @get:Classpath
+    val libraryFiles: ConfigurableFileCollection = objects.fileCollection()
+
     @get:InputFile
     @get:Classpath
     val mainJar: RegularFileProperty = objects.fileProperty()
@@ -118,6 +121,9 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
             if (toSingleOutputJar)
                 writer.writeLn("-outjars '${mainJarInDestinationDir.ioFile.normalizedPath()}'")
 
+            for (library in libraryFiles) {
+                writer.writeLn("-libraryjars '${library.normalizedPath()}'(!module-info.class)")
+            }
             for (jmod in jmods) {
                 writer.writeLn("-libraryjars '${jmod.normalizedPath()}'(!**.jar;!module-info.class)")
             }

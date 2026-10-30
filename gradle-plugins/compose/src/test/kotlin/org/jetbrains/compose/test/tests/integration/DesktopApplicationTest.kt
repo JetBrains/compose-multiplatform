@@ -934,6 +934,61 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun testApplicationWithoutSkikoKeepsClasspathLaunch() = with(testProject("application/jvm")) {
+        file("build.gradle").modify {
+            it.replace("implementation compose.desktop.currentOs", "implementation compose.runtime")
+        }
+        file("src/main/kotlin/main.kt").writeText("""
+            fun main() {
+                check(System.getProperty("jdk.module.addmods") == null)
+                check(System.getProperty("jdk.module.enable.native.access") == null)
+                println("Plain JVM application ran without Skiko module options")
+            }
+        """.trimIndent())
+        gradle(":run").checks {
+            check.taskSuccessful(":run")
+            check.logContains("Plain JVM application ran without Skiko module options")
+        }
+        gradle(":run").checks {
+            check.taskUpToDate(":prepareSkikoModule")
+            check.logContains("Plain JVM application ran without Skiko module options")
+        }
+    }
+
+    @Test
+    fun testModularSkikoPreservesAotModuleGraph() = with(aotProject(AotMode.AotPrebuild, javaVersion = 25)) {
+        // Snapshot Skiko must come from the same local publication as the Compose libraries.
+        file("settings.gradle").modify {
+            it.replace("dependencyResolutionManagement {\n    repositories {",
+                "dependencyResolutionManagement {\n    repositories {\n        mavenLocal()")
+        }
+        file("src/main/kotlin/main.kt").modify {
+            it.replace("fun main() {", """
+                fun main() {
+                    check(Class.forName("org.jetbrains.skiko.Library").module.name == "org.jetbrains.skiko")
+                    org.jetbrains.skia.Surface.makeRasterN32Premul(8, 8).use { surface ->
+                        surface.canvas.clear(0xff123456.toInt())
+                    }
+            """.trimIndent())
+        }
+        gradle(":createReleaseDistributable").checks {
+            check.taskSuccessful(":createReleaseAotArchive")
+            check.logContains("optimized module handling: enabled")
+            check.logContains("full module graph: enabled")
+            check.logDoesntContain("Mismatched values for property jdk.module")
+            check.logDoesntContain("Disabling optimized module handling")
+        }
+        gradle(":runReleaseDistributable").checks {
+            check.taskUpToDate(":createReleaseAotArchive")
+            check.logContains("Using AOT-linked classes: true")
+            check.logContains("optimized module handling: enabled")
+            check.logContains("full module graph: enabled")
+            check.logDoesntContain("Mismatched values for property jdk.module")
+            check.logDoesntContain("Disabling optimized module handling")
+        }
+    }
+
+    @Test
     fun testAotCreateDistributable() = with(aotProject(AotMode.AotPrebuild, javaVersion = 25)) {
         fun testPackageAndRun(release: Boolean) {
             val releaseTag = if (release) "Release" else ""

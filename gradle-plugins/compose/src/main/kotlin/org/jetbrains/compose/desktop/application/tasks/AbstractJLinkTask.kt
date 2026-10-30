@@ -8,6 +8,7 @@ package org.jetbrains.compose.desktop.application.tasks
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Classpath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.Optional
@@ -25,6 +26,9 @@ import java.io.File
 // todo: deduplicate if multiple runtimes are created
 @DisableCachingByDefault(because = "Uses platform-specific JDK tools whose output depends on local JDK installation")
 abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
+    @get:Classpath
+    val modulePath: org.gradle.api.file.ConfigurableFileCollection = objects.fileCollection()
+
     @get:Input
     val modules: ListProperty<String> = objects.listProperty(String::class.java)
 
@@ -57,15 +61,22 @@ abstract class AbstractJLinkTask : AbstractJvmToolOperationTask("jlink") {
     @get:Input
     internal val generateJreCdsArchive: Property<Boolean> = objects.property<Boolean>().value(false)
 
+    @get:Input
+    internal val runtimeJvmArgs: ListProperty<String> = objects.listProperty(String::class.java).convention(emptyList())
+
     override fun makeArgs(tmpDir: File): MutableList<String> = super.makeArgs(tmpDir).apply {
         val modulesToInclude =
             if (includeAllModules.get()) {
                 JvmRuntimeProperties.readFromFile(javaRuntimePropertiesFile.ioFile).availableModules
             } else modules.get()
-        modulesToInclude.forEach { m ->
+        if (!modulePath.isEmpty) cliArg("--module-path", modulePath.asPath)
+        (modulesToInclude + if (!modulePath.isEmpty) listOf("org.jetbrains.skiko") else emptyList()).distinct().forEach { m ->
             cliArg("--add-modules", m)
         }
 
+        if (runtimeJvmArgs.get().isNotEmpty()) {
+            add("--add-options=\"${runtimeJvmArgs.get().joinToString(" ")}\"")
+        }
         cliArg("--strip-debug", stripDebug)
         cliArg("--no-header-files", noHeaderFiles)
         cliArg("--no-man-pages", noManPages)

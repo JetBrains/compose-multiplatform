@@ -17,7 +17,8 @@ import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 internal class JvmApplicationRuntimeFiles(
     val allRuntimeJars: FileCollection,
     val mainJar: Provider<RegularFile>,
-    private val taskDependencies: Array<Any>
+    private val taskDependencies: Array<Any>,
+    val skikoJars: FileCollection = allRuntimeJars.filter { false }
 ) {
     operator fun component1() = allRuntimeJars
     operator fun component2() = mainJar
@@ -34,6 +35,7 @@ internal sealed class JvmApplicationRuntimeFilesProvider {
     abstract class GradleJvmApplicationRuntimeFilesProvider : JvmApplicationRuntimeFilesProvider() {
         protected abstract val jarTaskName: String
         protected abstract val runtimeFiles: FileCollection
+        protected abstract val runtimeConfigurationName: String
 
         override fun jvmApplicationRuntimeFiles(project: Project): JvmApplicationRuntimeFiles {
             val jarTask = project.tasks.named(jarTaskName, Jar::class.java)
@@ -42,7 +44,12 @@ internal sealed class JvmApplicationRuntimeFilesProvider {
                 from(mainJar)
                 from(runtimeFiles.filter { it.path.endsWith(".jar") })
             }
-            return JvmApplicationRuntimeFiles(runtimeJarFiles, mainJar, arrayOf(jarTask))
+            val skikoJars = project.configurations.getByName(runtimeConfigurationName).incoming.artifactView {
+                it.componentFilter { id ->
+                    id is org.gradle.api.artifacts.component.ModuleComponentIdentifier && id.group == "org.jetbrains.skiko"
+                }
+            }.files
+            return JvmApplicationRuntimeFiles(runtimeJarFiles, mainJar, arrayOf(jarTask), skikoJars)
 
         }
     }
@@ -51,6 +58,7 @@ internal sealed class JvmApplicationRuntimeFilesProvider {
         override val jarTaskName: String
             get() = sourceSet.jarTaskName
 
+        override val runtimeConfigurationName: String get() = sourceSet.runtimeClasspathConfigurationName
         override val runtimeFiles: FileCollection
             get() = sourceSet.runtimeClasspath
     }
@@ -59,6 +67,7 @@ internal sealed class JvmApplicationRuntimeFilesProvider {
         override val jarTaskName: String
             get() = target.artifactsTaskName
 
+        override val runtimeConfigurationName: String get() = target.compilations.getByName("main").runtimeDependencyConfigurationName
         override val runtimeFiles: FileCollection
             get() = target.compilations.getByName("main").runtimeDependencyFiles
     }
