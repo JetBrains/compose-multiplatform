@@ -4,17 +4,24 @@ import androidx.compose.runtime.mutableStateOf
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
 import org.jetbrains.compose.web.renderComposable
+import emotion.react.css
 import kotlinx.browser.document
 import kotlinx.browser.window
-import kotlinx.css.*
-import kotlinx.html.InputType
-import kotlinx.html.js.onClickFunction
-import kotlinx.html.js.onInputFunction
-import org.w3c.dom.HTMLElement
+import kotlinx.coroutines.awaitCancellation
 import react.*
-import react.dom.*
-import styled.css
-import styled.styledDiv
+import react.dom.client.createRoot
+import react.dom.html.ReactHTML.a
+import react.dom.html.ReactHTML.button
+import react.dom.html.ReactHTML.div
+import react.dom.html.ReactHTML.h3
+import react.dom.html.ReactHTML.input
+import web.cssom.Display
+import web.cssom.FlexDirection
+import web.cssom.px
+import web.html.HTMLDivElement
+import web.html.HTMLElement
+import web.html.InputType
+import web.html.range
 
 @Composable
 private fun ComposableComponentToUseInReact(count: State<Int>) {
@@ -26,13 +33,13 @@ private fun ComposableComponentToUseInReact(count: State<Int>) {
 }
 
 /**
- * @param containerRef - [RMutableRef] - reference to the HTMLElement that is used as a root for Composition
+ * @param containerRef - [RefObject] - reference to the HTMLElement that is used as a root for Composition
  * @param stateInitialValue - initial state value for the Composition
  * @param stateValueProvider - a lambda that's used to change the state's value
  * @param composable - the content controlled by Compose and mounted in a root provided by [containerRef]
  */
 private fun <T> useCompose(
-    containerRef: RMutableRef<HTMLElement>,
+    containerRef: RefObject<out HTMLElement>,
     stateInitialValue: T,
     stateValueProvider: () -> T,
     composable: @Composable (state: State<T>) -> Unit
@@ -43,22 +50,24 @@ private fun <T> useCompose(
         mutableState.current?.value = stateValueProvider()
     }
 
-    useLayoutEffectWithCleanup(dependencies = emptyList()) {
-        val composition = renderComposable(containerRef.current!!) {
+    useLayoutEffectOnce {
+        val composition = renderComposable(containerRef.current!!.unsafeCast<org.w3c.dom.HTMLElement>()) {
             composable(mutableState.current!!)
         }
-        return@useLayoutEffectWithCleanup {
+        try {
+            awaitCancellation()
+        } finally {
             composition.dispose()
         }
     }
 }
 
-private external interface ListProps : RProps {
+private external interface ListProps : Props {
     var countOfItems: Int
 }
 
-private val composeListComponentWrapper = functionalComponent<ListProps> { props ->
-    val containerRef = useRef<HTMLElement>(null)
+private val composeListComponentWrapper = FC<ListProps> { props ->
+    val containerRef = useRef<HTMLDivElement>(null)
 
     useCompose(
         containerRef = containerRef,
@@ -69,27 +78,26 @@ private val composeListComponentWrapper = functionalComponent<ListProps> { props
     }
 
     // This div will be a root for the Composition managed by Compose
-    div { ref { containerRef.current = it } }
+    div { ref = containerRef }
 }
 
-private val column = functionalComponent<RProps> {
+private val column = FC {
     val (counter, setCounter) = useState(0)
 
-    styledDiv {
+    div {
         css {
-            padding = "25px"
+            padding = 25.px
         }
 
         h3 {
             +"Update items count using slider:"
         }
 
-        input(type = InputType.range) {
-            attrs {
-                onInputFunction = {
-                    setCounter(it.target?.asDynamic().value.toString().toInt())
-                }
-                value = "$counter"
+        input {
+            type = InputType.range
+            value = "$counter"
+            onChange = {
+                setCounter(it.target.value.toInt())
             }
         }
 
@@ -97,53 +105,47 @@ private val column = functionalComponent<RProps> {
             +"Compose controlled items:"
         }
 
-        child(composeListComponentWrapper) {
-            this.attrs {
-                countOfItems = counter
-            }
+        composeListComponentWrapper {
+            countOfItems = counter
         }
     }
 }
 
-private val appContent = functionalComponent<RProps> {
+private val appContent = FC {
     val (columnsCount, setColumnsCount) = useState(3)
 
-    a(href = "${window.location.origin}?app=composeApp") {
+    a {
+        href = "${window.location.origin}?app=composeApp"
         +"GO TO REACT IN COMPOSE EXAMPLE"
     }
 
     button {
-        attrs {
-            onClickFunction = {
-                setColumnsCount(columnsCount - 1)
-            }
+        onClick = {
+            setColumnsCount(columnsCount - 1)
         }
         +"Remove column"
     }
 
     button {
-        attrs {
-            onClickFunction = {
-                setColumnsCount(columnsCount + 1)
-            }
+        onClick = {
+            setColumnsCount(columnsCount + 1)
         }
         +"Add column"
     }
 
-    styledDiv {
+    div {
         css {
             display = Display.flex
             flexDirection = FlexDirection.row
         }
 
         repeat(columnsCount) {
-            child(column)
+            column()
         }
     }
 }
 
 fun composeInReactAppExample() {
-    render(document.getElementById("root")) {
-        child(appContent)
-    }
+    createRoot(document.getElementById("root")!!.unsafeCast<web.dom.Element>())
+        .render(appContent.create())
 }

@@ -47,15 +47,15 @@ fun <T> RadioGroupScope<T>.RadioInput(
 @Composable
 @NonRestartableComposable
 @ExperimentalComposeWebApi
-fun <E, T : Enum<E>?> RadioGroup(
-    checkedValue: T,
+fun <T : Enum<T>> RadioGroup(
+    checkedValue: T?,
     name: String? = null,
     content: @Composable RadioGroupScope<T>.() -> Unit
 ) {
     val radioGroupName = remember { name ?: generateNextRadioGroupName() }
 
     CompositionLocalProvider(
-        radioGroupCompositionLocalValue provides checkedValue.toString(),
+        radioGroupCompositionLocalValue provides checkedValue?.toString(),
         radioGroupCompositionLocalName provides radioGroupName,
         content = {
             // normal cast would fail here!
