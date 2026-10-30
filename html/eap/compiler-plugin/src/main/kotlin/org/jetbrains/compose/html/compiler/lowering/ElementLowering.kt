@@ -264,7 +264,7 @@ internal class ElementLowering(
                     irCallWithArgs(
                         symbols.openLoweredRegion,
                         irGet(writer), irString(root), irString(first.html), irString(first.parent),
-                        irGet(validate), irString(first.namespace),
+                        irGet(validate), if (first.namespace == HtmlNamespace) null else irString(first.namespace),
                         irBoolean(isHtmlLeadingNewlineElement(first.parent, first.namespace))
                     )
                 }
@@ -286,7 +286,7 @@ internal class ElementLowering(
                         irGet(writer),
                         irString(operation.html),
                         irString(operation.parent),
-                        irString(operation.namespace),
+                        if (operation.namespace == HtmlNamespace) null else irString(operation.namespace),
                         irBoolean(isHtmlLeadingNewlineElement(operation.parent, operation.namespace))
                     )
                 }

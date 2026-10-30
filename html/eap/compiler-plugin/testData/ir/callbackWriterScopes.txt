@@ -42,13 +42,13 @@ fun CallbackWriterScopes(values: List<String>, local: ProvidableCompositionLocal
   { // BLOCK
     val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
     val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
-    val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "div", encoded = "<div>", innermost = "div", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+    val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "div", encoded = "<div>", innermost = "div", validate = tmp1_htmlValidate, leadingNewline = false)
     forEachIndexed<String>(/* <this> = values, */ action = local fun <anonymous>(index: Int, value: String) {
       when {
         isEmpty(/* <this> = value */) -> return Unit
       }
       { // BLOCK
-        val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "span", encoded = "<span>", innermost = "span", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+        val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "span", encoded = "<span>", innermost = "span", validate = tmp1_htmlValidate, leadingNewline = false)
         tmp0_htmlWriter.writeText(value = index + ":" + value, validate = tmp1_htmlValidate)
         tmp0_htmlWriter.closeElement(encoded = "</span>", parent = tmp2_htmlParent)
       }
@@ -56,7 +56,7 @@ fun CallbackWriterScopes(values: List<String>, local: ProvidableCompositionLocal
         { // BLOCK
           val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
           val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
-          val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "span", encoded = "<span>", innermost = "span", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+          val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "span", encoded = "<span>", innermost = "span", validate = tmp1_htmlValidate, leadingNewline = false)
           tmp0_htmlWriter.writeText(value = "stored:" + value, validate = tmp1_htmlValidate)
           tmp0_htmlWriter.closeElement(encoded = "</span>", parent = tmp2_htmlParent)
         }
@@ -68,7 +68,7 @@ fun CallbackWriterScopes(values: List<String>, local: ProvidableCompositionLocal
           val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
           forEach<String>(/* <this> = values, */ action = local fun <anonymous>(nested: String) {
             { // BLOCK
-              val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "span", encoded = "<span>", innermost = "span", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+              val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "span", encoded = "<span>", innermost = "span", validate = tmp1_htmlValidate, leadingNewline = false)
               tmp0_htmlWriter.writeText(value = nested, validate = tmp1_htmlValidate)
               tmp0_htmlWriter.closeElement(encoded = "</span>", parent = tmp2_htmlParent)
             }

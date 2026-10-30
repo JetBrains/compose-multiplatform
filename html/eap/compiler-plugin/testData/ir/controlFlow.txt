@@ -33,7 +33,7 @@ fun ControlFlow(values: List<String>, show: Boolean) {
   { // BLOCK
     val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
     val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
-    val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "div", encoded = "<div>", innermost = "div", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+    val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "div", encoded = "<div>", innermost = "div", validate = tmp1_htmlValidate, leadingNewline = false)
     when {
       show -> { // BLOCK
         WriteStaticHtml(rootTag = "span", encoded = "<span>heading</span>")
@@ -48,7 +48,7 @@ fun ControlFlow(values: List<String>, show: Boolean) {
             isEmpty(/* <this> = value */) -> continue
           }
           { // BLOCK
-            val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "span", encoded = "<span>", innermost = "span", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+            val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "span", encoded = "<span>", innermost = "span", validate = tmp1_htmlValidate, leadingNewline = false)
             tmp0_htmlWriter.writeText(value = value, validate = tmp1_htmlValidate)
             tmp0_htmlWriter.closeElement(encoded = "</span>", parent = tmp2_htmlParent)
           }

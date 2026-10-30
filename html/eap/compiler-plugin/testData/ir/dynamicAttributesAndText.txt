@@ -90,12 +90,12 @@ fun DynamicAttributesAndText(selected: Boolean, effect: Function1<String, String
           }, previous = tmp9_htmlClassesWritten, encoded = true)
           tmp0_htmlWriter.finishMixedClasses(written = tmp9_htmlClassesWritten)
         }
-        val tmp10_htmlParent: Any? = tmp0_htmlWriter.finishMixedElement(tagName = "div", namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+        val tmp10_htmlParent: Any? = tmp0_htmlWriter.finishMixedElement(tagName = "div", leadingNewline = false)
         tmp10_htmlParent
       }
       else -> null
     }
-    tmp0_htmlWriter.advanceLoweredRegion(encoded = "<span>before</span>", innermost = "div", namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+    tmp0_htmlWriter.advanceLoweredRegion(encoded = "<span>before</span>", innermost = "div", leadingNewline = false)
     tmp0_htmlWriter.writeText(value = effect.invoke(p1 = "body"), validate = tmp1_htmlValidate)
     tmp0_htmlWriter.closeElement(encoded = "<span>after</span></div>", parent = tmp11_htmlParent)
   }
@@ -106,7 +106,7 @@ fun DynamicTable(name: String) {
   { // BLOCK
     val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
     val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
-    val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "table", encoded = "<table><tbody><tr><td>", innermost = "td", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/1999/xhtml", leadingNewline = false)
+    val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "table", encoded = "<table><tbody><tr><td>", innermost = "td", validate = tmp1_htmlValidate, leadingNewline = false)
     tmp0_htmlWriter.writeText(value = name, validate = tmp1_htmlValidate)
     tmp0_htmlWriter.closeElement(encoded = "</td></tr></tbody></table>", parent = tmp2_htmlParent)
   }
