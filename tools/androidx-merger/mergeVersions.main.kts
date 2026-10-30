@@ -188,9 +188,7 @@ fun compile(): Boolean {
     } else {
         listOf("./gradlew")
     }
-    val process = ProcessBuilder(command + listOf("assemble", "compileTests")).redirectErrorStream(true).start()
-    process.inputStream.bufferedReader().useLines { lines -> lines.logTo(buildLogFile) }
-    val success = process.waitFor() == 0
+    val success = execute(*command.toTypedArray(), "assemble", "compileTests", logFile = buildLogFile).first == 0
     println("Compilation ${if (success) "succeeded" else "failed"} at $commit")
     return success
 }
@@ -280,11 +278,13 @@ fun bisect(lastKnownGood: String): Boolean {
 
 data class UpstreamCommit(val hash: String, val timestamp: Instant)
 
-fun execute(vararg args: String): Pair<Int, String> {
+fun execute(vararg args: String, logFile: File = scriptLogFile): Pair<Int, String> {
     val process = ProcessBuilder(*args).redirectErrorStream(true).start()
-    val text = process.inputStream.bufferedReader().use { it.readText().trim() }
-    if (text.isNotEmpty()) text.lineSequence().logTo(scriptLogFile)
-    return process.waitFor() to text
+    val text = StringBuilder()
+    process.inputStream.bufferedReader().useLines { lines ->
+        lines.onEach { text.appendLine(it) }.logTo(logFile)
+    }
+    return process.waitFor() to text.toString().trim()
 }
 
 fun run(vararg args: String) = execute(*args).first == 0
