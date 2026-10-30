@@ -17,13 +17,14 @@ val buildLogFile = scriptDir.resolve("logBuild.txt")
 scriptLogFile.writeText("")
 buildLogFile.writeText("")
 
-val stdoutLog = TimestampedOutputStream(scriptLogFile, System.out)
-val stderrLog = TimestampedOutputStream(scriptLogFile, System.err)
-System.setOut(PrintStream(stdoutLog, true, Charsets.UTF_8))
-System.setErr(PrintStream(stderrLog, true, Charsets.UTF_8))
+val stdoutLog = PrintStream(TimestampedOutputStream(scriptLogFile, System.out), true, Charsets.UTF_8)
+val stderrLog = PrintStream(TimestampedOutputStream(scriptLogFile, System.err), true, Charsets.UTF_8)
+val scriptOutput = PrintStream(TimestampedOutputStream(scriptLogFile), true, Charsets.UTF_8)
+val buildOutput = PrintStream(TimestampedOutputStream(buildLogFile), true, Charsets.UTF_8)
+System.setOut(stdoutLog)
+System.setErr(stderrLog)
 Runtime.getRuntime().addShutdownHook(Thread {
-    stdoutLog.close()
-    stderrLog.close()
+    listOf(stdoutLog, stderrLog, scriptOutput, buildOutput).forEach { it.close() }
 })
 
 val airWebhookFile = File(System.getProperty("user.home"), "androidxMergerAirWebhook.txt")
@@ -188,11 +189,14 @@ fun setMergeTitle(commit: String) {
 fun compile(): Boolean {
     val commit = output("git", "rev-parse", "--short", "HEAD")
     println("Starting compilation at $commit: assemble compileTests")
-    val success = if (System.getProperty("os.name").startsWith("Windows")) {
-        run("cmd", "/c", "gradlew", "assemble", "compileTests", logFile = buildLogFile)
+    val command = if (System.getProperty("os.name").startsWith("Windows")) {
+        listOf("cmd", "/c", "gradlew")
     } else {
-        run("./gradlew", "assemble", "compileTests", logFile = buildLogFile)
+        listOf("./gradlew")
     }
+    val process = ProcessBuilder(command + listOf("assemble", "compileTests")).redirectErrorStream(true).start()
+    process.inputStream.bufferedReader().useLines { lines -> lines.forEach(buildOutput::println) }
+    val success = process.waitFor() == 0
     println("Compilation ${if (success) "succeeded" else "failed"} at $commit")
     return success
 }
@@ -282,24 +286,14 @@ fun bisect(lastKnownGood: String): Boolean {
 
 data class UpstreamCommit(val hash: String, val timestamp: Instant)
 
-fun execute(vararg args: String, logFile: File = scriptLogFile): Pair<Int, String> {
+fun execute(vararg args: String): Pair<Int, String> {
     val process = ProcessBuilder(*args).redirectErrorStream(true).start()
-    val captured = ByteArrayOutputStream()
-    process.inputStream.use { input ->
-        TimestampedOutputStream(logFile).use { logOutput ->
-            val buffer = ByteArray(8192)
-            while (true) {
-                val count = input.read(buffer)
-                if (count == -1) break
-                captured.write(buffer, 0, count)
-                logOutput.write(buffer, 0, count)
-            }
-        }
-    }
-    return process.waitFor() to captured.toString(Charsets.UTF_8).trim()
+    val text = process.inputStream.bufferedReader().use { it.readText().trim() }
+    if (text.isNotEmpty()) scriptOutput.println(text)
+    return process.waitFor() to text
 }
 
-fun run(vararg args: String, logFile: File = scriptLogFile) = execute(*args, logFile = logFile).first == 0
+fun run(vararg args: String) = execute(*args).first == 0
 
 fun output(vararg args: String): String {
     val (code, text) = execute(*args)
@@ -328,40 +322,23 @@ class TimestampedOutputStream(
 
     @Synchronized
     override fun write(value: Int) {
-        if ((value and 0xff) == '\n'.code) {
-            writeLine()
-        } else {
+        if ((value and 0xff) != '\n'.code) {
             buffer.write(value)
+            return
         }
-    }
-
-    @Synchronized
-    override fun write(bytes: ByteArray, offset: Int, length: Int) {
-        var start = offset
-        for (index in offset until offset + length) {
-            if (bytes[index] == '\n'.code.toByte()) {
-                buffer.write(bytes, start, index - start)
-                writeLine()
-                start = index + 1
-            }
+        val message = buffer.toString(Charsets.UTF_8).removeSuffix("\r")
+        buffer.reset()
+        synchronized(file) {
+            val line = "${OffsetDateTime.now()} $message\n"
+            console?.print(line)
+            writer.write(line)
+            writer.flush()
         }
-        buffer.write(bytes, start, offset + length - start)
     }
 
     @Synchronized
     override fun close() {
-        if (buffer.size() > 0) writeLine()
+        if (buffer.size() > 0) write('\n'.code)
         writer.close()
-    }
-
-    private fun writeLine() {
-        val message = buffer.toString(Charsets.UTF_8).removeSuffix("\r")
-        buffer.reset()
-        synchronized(file) {
-            val line = "${OffsetDateTime.now()} $message"
-            console?.println(line)
-            writer.write("$line\n")
-            writer.flush()
-        }
     }
 }
