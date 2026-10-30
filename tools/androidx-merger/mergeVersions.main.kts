@@ -339,17 +339,14 @@ fun timestampedOutput(console: PrintStream): PrintStream {
 
 fun Reader.timestampedChunks(): Sequence<String> = sequence {
     val buffer = CharArray(DEFAULT_BUFFER_SIZE)
-    val lineStarts = Regex("^", setOf(RegexOption.MULTILINE, RegexOption.UNIX_LINES))
     var lineStart = true
     while (true) {
-        val count = read(buffer)
-        if (count < 0) break
-        val chunk = String(buffer, 0, count).replace("\r", "")
-        if (chunk.isEmpty()) continue
-        yield(chunk.replace(lineStarts) {
-            if (it.range.first == 0 && !lineStart) "" else "${OffsetDateTime.now()} "
+        val count = read(buffer).takeIf { it >= 0 } ?: break
+        yield(buffer.take(count).filter { it != '\r' }.joinToString("") { char ->
+            val prefix = if (lineStart) "${OffsetDateTime.now()} " else ""
+            lineStart = char == '\n'
+            prefix + char
         })
-        lineStart = chunk.endsWith('\n')
     }
     if (!lineStart) yield("\n")
 }
