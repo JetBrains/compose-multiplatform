@@ -33,6 +33,7 @@ kotlin {
 }
 
 tasks.test {
+    javaLauncher.set(javaToolchains.launcherFor {})
     useJUnitPlatform()
     workingDir = projectDir
     inputs.dir("testData").withPathSensitivity(PathSensitivity.RELATIVE)
