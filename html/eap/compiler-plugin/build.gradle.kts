@@ -58,6 +58,7 @@ tasks.named("check") {
 }
 
 tasks.test {
+    javaLauncher.set(javaToolchains.launcherFor {})
     // Golden IR tests resolve testData/ paths relative to this directory.
     workingDir = projectDir
     inputs.dir("testData").withPathSensitivity(PathSensitivity.RELATIVE)
