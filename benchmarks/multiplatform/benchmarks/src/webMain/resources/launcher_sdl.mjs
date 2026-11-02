@@ -7,11 +7,24 @@
  */
 
 import fs from 'fs';
+import { createRequire } from 'module';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { inspect } from 'util';
+import { fileURLToPath, pathToFileURL } from 'url';
+import { registerSkikoRuntimeTransform, createEmscriptenNativeGLBridge } from './skiko_emscripten_native_gl.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+function canonicalPath(targetPath) {
+    let existingPath = path.resolve(targetPath);
+    const remainingSegments = [];
+    while (!fs.existsSync(existingPath)) {
+        remainingSegments.unshift(path.basename(existingPath));
+        existingPath = path.dirname(existingPath);
+    }
+    return path.resolve(fs.realpathSync(existingPath), ...remainingSegments);
+}
 
 // ==========================================
 // Launcher Abstraction Layer
@@ -37,6 +50,8 @@ export class BenchmarkLauncher {
 
 const ALL_AVAILABLE_BENCHMARKS = [
     "AnimatedVisibility",
+    "CanvasDrawing",
+    "HeavyShader",
     "LazyGrid",
     "LazyGrid-ItemLaunchedEffect",
     "LazyGrid-SmoothScroll",
@@ -49,40 +64,143 @@ const ALL_AVAILABLE_BENCHMARKS = [
 ];
 
 /**
+ * SNAPSHOT native-host Skiko looks up GL entry points as `nativeGLHost[name]`.
+ * The addon exposes a few special wrappers by name and the rest via getGLFunction(name),
+ * which already interprets Wasm linear-memory offsets. This host is that lookup table,
+ * not a browser WebGL2 adapter.
+ */
+function createSkikoNativeGLHost(addon) {
+    if (!addon) {
+        throw new Error('[NodeSdlLauncher] Native Skiko addon is required to build the GL host');
+    }
+    const resolved = new Map();
+    return new Proxy(addon, {
+        get(target, prop, receiver) {
+            if (typeof prop !== 'string') {
+                return Reflect.get(target, prop, receiver);
+            }
+            // NAPI exports are non-configurable; returning a bound copy violates Proxy invariants.
+            if (Reflect.has(target, prop)) {
+                return Reflect.get(target, prop, receiver);
+            }
+            if (resolved.has(prop)) {
+                return resolved.get(prop);
+            }
+            if (prop.startsWith('gl') && typeof target.getGLFunction === 'function') {
+                const fn = target.getGLFunction(prop);
+                if (typeof fn === 'function') {
+                    resolved.set(prop, fn);
+                    return fn;
+                }
+            }
+            return undefined;
+        }
+    });
+}
+
+function formatWasmError(error) {
+    if (error instanceof Error) {
+        return error.stack || `${error.name}: ${error.message}`;
+    }
+    const message = error && (error.message || error.stack);
+    if (typeof message === 'string' && message) {
+        return message;
+    }
+    const isWasmException = typeof WebAssembly !== 'undefined' && WebAssembly.Exception && error instanceof WebAssembly.Exception;
+    if (isWasmException || (error && typeof error === 'object' && Object.keys(error).length === 0)) {
+        // Kotlin/Wasm exceptions are opaque to JS; Main.wasmJs.kt prints message + stack trace on the Kotlin side.
+        return '<opaque Kotlin/Wasm exception; see "Benchmark exception during execution" above for the Kotlin message and stack trace>';
+    }
+    return inspect(error, { depth: 8, breakLength: 120, getters: true, showHidden: true });
+}
+
+export class NodeCanvas {
+    constructor(description = {}) {
+        this.width = description.width || 1024;
+        this.height = description.height || 768;
+        this.id = description.id || '';
+        Object.assign(this, description);
+        this.style = description.style || {};
+        this.__skikoNativeContext = 0;
+    }
+
+    getContext(type) {
+        throw new Error(`Unexpected browser canvas context request: ${type}`);
+    }
+
+    setAttribute(key, value) { this[key] = value; }
+    getAttribute(key) { return this[key] ?? null; }
+    removeAttribute(key) { delete this[key]; }
+    addEventListener() {}
+    removeEventListener() {}
+    remove() {}
+    appendChild() {}
+    removeChild() {}
+    focus() {}
+    blur() {}
+    getBoundingClientRect() {
+        return {
+            top: 0,
+            left: 0,
+            width: this.width,
+            height: this.height,
+            right: this.width,
+            bottom: this.height
+        };
+    }
+}
+
+/**
  * Node.js + SDL2 + Native Skiko OpenGL Launcher
  */
 export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
     constructor() {
         super('node_sdl');
         this.nativeGL = null;
+        this.nativeGLContextId = null;
         this.wasmExports = null;
+        this.canvases = new Map();
+        this.isCleanedUp = false;
+        this._exitHandler = () => this.cleanupSync();
+        process.once('exit', this._exitHandler);
     }
 
     async initialize(options) {
         globalThis.isSdl = true;
         globalThis.__isBenchmarkMode = true;
 
-        const nativeSkikoPath = options.nativeSkikoPath ||
-            process.env.SKIKO_NATIVE_GL_ADDON ||
-            '/Users/dustin.feucht/projects/skiko/samples/SkiaNonWebSample/native-skiko/build/Release/native_skiko.node';
+        const nativeSkikoPath = options.nativeSkikoPath || process.env.SKIKO_NATIVE_GL_ADDON;
 
-        if (fs.existsSync(nativeSkikoPath)) {
-            try {
-                const { createRequire } = await import('module');
-                const require = createRequire(import.meta.url);
-                this.nativeGL = require(nativeSkikoPath);
-                globalThis.__skikoNativeGL = this.nativeGL;
+        if (!nativeSkikoPath) {
+            throw new Error('[NodeSdlLauncher] Native Skiko addon path is required. Set SKIKO_NATIVE_GL_ADDON or pass -Pbenchmark.nativeSkiko=/path/to/native_skiko.node to Gradle.');
+        }
 
-                const width = options.width || 1024;
-                const height = options.height || 768;
-                try {
-                    this.nativeGL.createWindow(width, height, "Compose Wasm Benchmark");
-                } catch (e) {
-                    // Window creation fallback
-                }
-            } catch (err) {
-                console.warn(`[NodeSdlLauncher] Native Skiko addon load note: ${err.message}`);
-            }
+        if (!fs.existsSync(nativeSkikoPath)) {
+            throw new Error(`[NodeSdlLauncher] Native Skiko addon not found at path: ${nativeSkikoPath}`);
+        }
+
+        const require = createRequire(import.meta.url);
+        try {
+            this.nativeGL = require(nativeSkikoPath);
+        } catch (err) {
+            throw new Error(`[NodeSdlLauncher] Failed to load native Skiko addon from ${nativeSkikoPath}: ${err.message}`, { cause: err });
+        }
+
+        if (!this.nativeGL) {
+            throw new Error(`[NodeSdlLauncher] Native Skiko addon is null after require`);
+        }
+
+        this.nativeGLHost = createSkikoNativeGLHost(this.nativeGL);
+        globalThis.__skikoNativeGL = this.nativeGLHost;
+
+        const width = options.width || 1024;
+        const height = options.height || 768;
+        const title = "Compose Wasm Benchmark";
+
+        try {
+            this.nativeGL.createWindow(width, height, title);
+        } catch (e) {
+            throw new Error(`[NodeSdlLauncher] Native GL window creation failed: ${e.message}`, { cause: e });
         }
 
         this.setupShims(options);
@@ -199,57 +317,104 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
         const navigatorShim = {
             languages: ['en-US'],
             language: 'en-US',
-            userAgent: 'Mozilla/5.0 (Node.js)'
+            platform: process.platform,
+            userAgent: `Mozilla/5.0 (Node.js ${process.version})`
         };
-        if (typeof globalThis.navigator === 'undefined') {
+        try {
+            Object.defineProperty(globalThis, "navigator", {
+                configurable: true,
+                value: navigatorShim
+            });
+        } catch {
             globalThis.navigator = navigatorShim;
         }
 
-        if (typeof globalThis.window === 'undefined') {
-            globalThis.window = {
-                devicePixelRatio: 1.0,
-                innerWidth: options.width || 1024,
-                innerHeight: options.height || 768,
-                location: { href: 'http://localhost/', search: '' },
-                performance: globalThis.performance,
-                navigator: globalThis.navigator || navigatorShim,
-                fetch: globalThis.fetch,
+        globalThis.window = globalThis;
+        globalThis.self = globalThis;
+        globalThis.HTMLCanvasElement = NodeCanvas;
+        globalThis.devicePixelRatio = 1.0;
+        globalThis.innerWidth = options.width || 1024;
+        globalThis.innerHeight = options.height || 768;
+        globalThis.location = globalThis.location || { href: 'http://localhost/', search: '' };
+        globalThis.isSecureContext = false;
+
+        this.canvases = new Map();
+        let docTitle = "Compose Wasm Benchmark";
+
+        const makeElement = (tag = 'div') => {
+            if (typeof tag === 'string' && tag.toLowerCase() === 'canvas') {
+                return new NodeCanvas({ width: options.width || 1024, height: options.height || 768 });
+            }
+            return {
+                style: {},
+                width: options.width || 1024,
+                height: options.height || 768,
+                setAttribute: () => {},
+                getAttribute: () => null,
+                removeAttribute: () => {},
                 addEventListener: () => {},
                 removeEventListener: () => {},
-                requestAnimationFrame: (cb) => setTimeout(() => cb(performance.now()), 16),
-                cancelAnimationFrame: (id) => clearTimeout(id),
-                isSecureContext: false
+                remove: () => {},
+                appendChild: () => {},
+                removeChild: () => {},
+                focus: () => {},
+                blur: () => {},
+                getBoundingClientRect: () => ({ top: 0, left: 0, width: options.width || 1024, height: options.height || 768, right: options.width || 1024, bottom: options.height || 768 })
             };
-        } else {
-            if (!globalThis.window.performance) globalThis.window.performance = globalThis.performance;
-            if (!globalThis.window.navigator) globalThis.window.navigator = globalThis.navigator || navigatorShim;
-            if (!globalThis.window.fetch) globalThis.window.fetch = globalThis.fetch;
+        };
+
+        globalThis.document = {
+            get title() {
+                return docTitle;
+            },
+            set title(value) {
+                docTitle = String(value);
+                if (globalThis.__skikoNativeGL && typeof globalThis.__skikoNativeGL.setWindowTitle === 'function') {
+                    try { globalThis.__skikoNativeGL.setWindowTitle(docTitle); } catch (err) {
+                        console.warn(`[NodeSdlLauncher] Failed to set window title:`, err);
+                    }
+                }
+            },
+            getElementById: (id) => this.canvases.get(id) || null,
+            createElement: (tag) => {
+                const el = makeElement(tag);
+                if (el instanceof NodeCanvas) {
+                    if (el.id) {
+                        this.canvases.set(el.id, el);
+                    }
+                    this.canvases.set(el, el);
+                }
+                return el;
+            },
+            body: {
+                appendChild: (el) => {
+                    if (el instanceof NodeCanvas) {
+                        if (el.id) this.canvases.set(el.id, el);
+                        this.canvases.set(el, el);
+                    }
+                },
+                removeChild: (el) => {
+                    if (el instanceof NodeCanvas) {
+                        if (el.id) this.canvases.delete(el.id);
+                        this.canvases.delete(el);
+                    }
+                }
+            }
+        };
+
+        if (!globalThis.requestAnimationFrame) {
+            globalThis.requestAnimationFrame = (cb) => setTimeout(() => cb(performance.now()), 16);
         }
-
-        const makeElement = (tag = 'div') => ({
-            getContext: () => ({}),
-            style: {},
-            width: options.width || 1024,
-            height: options.height || 768,
-            setAttribute: () => {},
-            getAttribute: () => null,
-            removeAttribute: () => {},
-            addEventListener: () => {},
-            removeEventListener: () => {},
-            remove: () => {},
-            appendChild: () => {},
-            removeChild: () => {},
-            focus: () => {},
-            blur: () => {},
-            getBoundingClientRect: () => ({ top: 0, left: 0, width: options.width || 1024, height: options.height || 768, right: options.width || 1024, bottom: options.height || 768 })
-        });
-
-        if (typeof globalThis.document === 'undefined') {
-            globalThis.document = {
-                getElementById: (id) => makeElement(id),
-                createElement: (tag) => makeElement(tag),
-                body: { appendChild: () => {}, removeChild: () => {} }
-            };
+        if (!globalThis.cancelAnimationFrame) {
+            globalThis.cancelAnimationFrame = (id) => clearTimeout(id);
+        }
+        globalThis.__skikoRequestAnimationFrame = globalThis.requestAnimationFrame;
+        globalThis.__skikoCancelAnimationFrame = globalThis.cancelAnimationFrame;
+        if (!globalThis.addEventListener) {
+            globalThis.addEventListener = () => {};
+        }
+        if (!globalThis.removeEventListener) {
+            globalThis.removeEventListener = () => {};
         }
     }
 
@@ -267,7 +432,8 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
 
         for (const arg of rawArgs) {
             if (arg.startsWith('launcher=') || arg.startsWith('--launcher=') ||
-                arg.startsWith('nativeSkikoPath=') || arg.startsWith('--nativeSkikoPath=')) {
+                arg.startsWith('nativeSkikoPath=') || arg.startsWith('--nativeSkikoPath=') ||
+                arg.startsWith('reportsDir=') || arg.startsWith('--reportsDir=')) {
                 continue;
             }
             const clean = arg.startsWith('--') ? arg.slice(2) : arg;
@@ -298,9 +464,45 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
         const kotlinArgsStr = kotlinArgs.join(' ');
         let wasmRunSucceeded = false;
 
+        const explicitReportsDir = process.env.BENCHMARK_REPORTS_DIR ||
+            rawArgs.find(a => a.startsWith('reportsDir=') || a.startsWith('--reportsDir='))?.split('=')[1];
+
+        if (explicitReportsDir) {
+            const reportsDir = path.resolve(explicitReportsDir);
+            const kotlinReportsDir = path.resolve(process.cwd(), 'build/benchmarks/json-reports');
+            if (canonicalPath(reportsDir) !== canonicalPath(kotlinReportsDir)) {
+                throw new Error(`[NodeSdlLauncher] reportsDir must match Kotlin's output directory (${kotlinReportsDir}); got ${reportsDir}`);
+            }
+        }
+
+        const candidateOutputDirs = explicitReportsDir
+            ? [path.resolve(explicitReportsDir)]
+            : [
+                path.resolve(process.cwd(), 'build/benchmarks/json-reports'),
+                path.resolve(process.cwd(), '../../../../../benchmarks/build/benchmarks/json-reports'),
+                path.resolve(process.cwd(), 'benchmarks/build/benchmarks/json-reports'),
+                path.resolve(__dirname, 'build/benchmarks/json-reports'),
+                path.resolve(__dirname, '../../../../../benchmarks/build/benchmarks/json-reports')
+            ];
+
+        // Clean stale reports before running to prevent accepting outdated results
+        for (const dir of candidateOutputDirs) {
+            if (fs.existsSync(dir)) {
+                for (const name of benchmarkNames) {
+                    const target = path.join(dir, `${name}.json`);
+                    if (fs.existsSync(target)) {
+                        fs.unlinkSync(target);
+                    }
+                }
+            }
+        }
+
         // Try executing compiled Wasm bundle if present
         try {
-            await import('./polyfills.mjs').catch(() => {});
+            const polyfillsPath = path.resolve(__dirname, './polyfills.mjs');
+            if (fs.existsSync(polyfillsPath)) {
+                await import(polyfillsPath);
+            }
 
             const searchPaths = [
                 path.resolve(__dirname, './compose-benchmarks-benchmarks.mjs'),
@@ -311,109 +513,139 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
             ];
 
             const modulePath = searchPaths.find(p => fs.existsSync(p));
-            if (modulePath) {
-                try {
-                    const jodaDir = path.resolve(path.dirname(modulePath), 'node_modules/@js-joda/core');
-                    if (!fs.existsSync(jodaDir)) {
-                        fs.mkdirSync(jodaDir, { recursive: true });
-                        fs.writeFileSync(path.join(jodaDir, 'package.json'), JSON.stringify({ name: '@js-joda/core', main: 'index.js', type: 'module' }));
-                        fs.writeFileSync(path.join(jodaDir, 'index.js'), 'export default {};\n');
-                    }
-                } catch (e) {}
+            if (!modulePath) {
+                throw new Error(`Could not find compiled Wasm module: compose-benchmarks-benchmarks.mjs in search paths: ${searchPaths.join(', ')}`);
+            }
 
-                try {
-                    const skikoPath = path.resolve(path.dirname(modulePath), 'skiko.mjs');
-                    if (fs.existsSync(skikoPath)) {
-                        const skiko = await import(skikoPath);
-                        if (skiko.awaitSkiko) await skiko.awaitSkiko;
+            const jodaDir = path.resolve(path.dirname(modulePath), 'node_modules/@js-joda/core');
+            if (!fs.existsSync(jodaDir) || !fs.existsSync(path.join(jodaDir, 'package.json'))) {
+                fs.mkdirSync(jodaDir, { recursive: true });
+                fs.writeFileSync(path.join(jodaDir, 'package.json'), JSON.stringify({
+                    name: '@js-joda/core',
+                    version: '1.0.0',
+                    type: 'module',
+                    main: './index.js',
+                    exports: {
+                        '.': './index.js',
+                        './*': './*.js'
                     }
-                } catch (e) {}
+                }, null, 2));
+                fs.writeFileSync(path.join(jodaDir, 'index.js'), 'export default {};\n');
+            }
+            const resolvedJodaPath = createRequire(modulePath).resolve('@js-joda/core');
+            if (!resolvedJodaPath.startsWith(path.resolve(path.dirname(modulePath), 'node_modules') + path.sep)) {
+                throw new Error(`[NodeSdlLauncher] @js-joda/core resolved outside the benchmark package: ${resolvedJodaPath}`);
+            }
 
-                const wasmModule = await import(modulePath);
-                if (wasmModule.sdlBenchmarksRunner) {
-                    await wasmModule.sdlBenchmarksRunner(kotlinArgsStr);
-                    wasmRunSucceeded = true;
-                } else if (wasmModule.d8BenchmarksRunner) {
-                    await wasmModule.d8BenchmarksRunner(kotlinArgsStr);
-                    wasmRunSucceeded = true;
+            const skikoPath = path.resolve(path.dirname(modulePath), 'skiko.mjs');
+            if (!fs.existsSync(skikoPath)) {
+                throw new Error(`[NodeSdlLauncher] skiko.mjs not found next to the benchmark module (${skikoPath}); wasm-sdl needs the packaged Skiko runtime (skiko.mjs + skiko.wasm)`);
+            }
+            // The published (Emscripten) runtime is adapted at load time; a native-host runtime is used as is.
+            const transformState = registerSkikoRuntimeTransform(skikoPath);
+            this.emscriptenBridge = createEmscriptenNativeGLBridge({
+                addon: this.nativeGL,
+                wasmPath: path.resolve(path.dirname(modulePath), 'skiko.wasm'),
+                translateShaders: process.env.SKIKO_NATIVE_GL_TRANSLATE_SHADERS !== '0',
+                checkErrors: process.env.SKIKO_NATIVE_GL_CHECK_ERRORS === '1'
+            });
+            globalThis.__skikoEmscriptenModuleArg = this.emscriptenBridge.moduleArg;
+            const skiko = await import(pathToFileURL(skikoPath).href);
+            this.skikoModule = skiko;
+            if (transformState.nativeHostRuntime) {
+                if (typeof skiko.setSkikoNativeGLHost !== 'function') {
+                    throw new Error(`[NodeSdlLauncher] Native-host skiko.mjs does not export setSkikoNativeGLHost (${skikoPath})`);
+                }
+                this.emscriptenBridge = null;
+                const nativeHost = this.nativeGLHost || createSkikoNativeGLHost(this.nativeGL);
+                this.nativeGLHost = nativeHost;
+                globalThis.__skikoNativeGL = nativeHost;
+                skiko.setSkikoNativeGLHost(nativeHost);
+                if (!skiko.GL || typeof skiko.GL.createContext !== 'function' || typeof skiko.GL.makeContextCurrent !== 'function') {
+                    throw new Error('[NodeSdlLauncher] Native-host Skiko runtime did not export GL.createContext/makeContextCurrent');
+                }
+                await skiko.awaitSkiko;
+                globalThis.__skikoGL = skiko.GL;
+                console.log('[NodeSdlLauncher] Native-host Skiko GL attached via setSkikoNativeGLHost');
+            } else if (transformState.transformed) {
+                await skiko.awaitSkiko;
+                globalThis.__skikoGL = this.emscriptenBridge.installNativeContexts();
+                console.log('[NodeSdlLauncher] Published Skiko runtime attached to native_skiko.node via instantiateWasm');
+            } else {
+                throw new Error(`[NodeSdlLauncher] skiko.mjs was not loaded through the native GL transform (${skikoPath})`);
+            }
+
+            const wasmModule = await import(modulePath);
+            if (wasmModule.sdlBenchmarksRunner) {
+                await wasmModule.sdlBenchmarksRunner(kotlinArgsStr);
+                wasmRunSucceeded = true;
+            } else {
+                throw new Error(`Wasm module does not export sdlBenchmarksRunner`);
+            }
+            this.logGLUsage(console.log, 'Skiko GL import usage');
+            if (this.emscriptenBridge) {
+                for (const id of this.emscriptenBridge.contextIds()) {
+                    console.log(`[NodeSdlLauncher] Native GL context ${id} readback:`, JSON.stringify(this.emscriptenBridge.readbackSummary(id)));
                 }
             }
         } catch (e) {
-            console.error(`[NodeSdlLauncher] Wasm execution error:`, e);
+            this.logGLUsage(console.error, 'Skiko GL import usage at failure');
+            console.error(`[NodeSdlLauncher] Wasm execution error:`, formatWasmError(e));
+            throw e;
         }
 
-        const candidateOutputDirs = [
-            path.resolve(process.cwd(), 'build/benchmarks/json-reports'),
-            path.resolve(process.cwd(), 'benchmarks/build/benchmarks/json-reports'),
-            path.resolve(__dirname, 'build/benchmarks/json-reports'),
-            path.resolve(__dirname, '../../../../benchmarks/build/benchmarks/json-reports'),
-            path.resolve(__dirname, '../../../../../benchmarks/build/benchmarks/json-reports')
-        ];
-
-        const mainReportsDir = candidateOutputDirs.find(d => d.includes('benchmarks/build/benchmarks/json-reports')) || candidateOutputDirs[1];
+        const mainReportsDir = explicitReportsDir
+            ? path.resolve(explicitReportsDir)
+            : (candidateOutputDirs.find(d => fs.existsSync(path.dirname(d)) && d.includes('benchmarks/build/benchmarks/json-reports')) || candidateOutputDirs[1]);
 
         const reports = [];
+        const missing = [];
         if (wasmRunSucceeded) {
-            for (const dir of candidateOutputDirs) {
-                if (fs.existsSync(dir)) {
-                    try {
-                        if (!fs.existsSync(mainReportsDir)) fs.mkdirSync(mainReportsDir, { recursive: true });
-                        const files = fs.readdirSync(dir).filter(f => f.endsWith('.json'));
-                        for (const file of files) {
-                            const srcPath = path.join(dir, file);
-                            const dstPath = path.join(mainReportsDir, file);
-                            if (srcPath !== dstPath) {
-                                fs.copyFileSync(srcPath, dstPath);
-                            }
-                        }
-                    } catch (e) {}
-                }
-            }
-
             for (const benchmarkName of benchmarkNames) {
                 let reportJson = null;
                 for (const dir of candidateOutputDirs) {
                     const reportPath = path.join(dir, `${benchmarkName}.json`);
                     if (fs.existsSync(reportPath)) {
+                        const content = fs.readFileSync(reportPath, 'utf-8');
                         try {
-                            reportJson = JSON.parse(fs.readFileSync(reportPath, 'utf-8'));
-                            break;
-                        } catch {}
+                            reportJson = JSON.parse(content);
+                        } catch (parseErr) {
+                            throw new Error(`Failed to parse benchmark report JSON for ${benchmarkName} at ${reportPath}: ${parseErr.message}`);
+                        }
+                        if (!fs.existsSync(mainReportsDir)) fs.mkdirSync(mainReportsDir, { recursive: true });
+                        const dstPath = path.join(mainReportsDir, `${benchmarkName}.json`);
+                        if (reportPath !== dstPath) {
+                            fs.copyFileSync(reportPath, dstPath);
+                        }
+                        break;
                     }
                 }
                 if (reportJson) {
                     reports.push(this.formatReportFromStats(benchmarkName, reportJson));
+                } else {
+                    missing.push(benchmarkName);
                 }
-            }
-            if (reports.length > 0) {
-                return reports;
             }
         }
 
-        for (const benchmarkName of benchmarkNames) {
-            console.log(`[NodeSdlLauncher] Running benchmark '${benchmarkName}' (${iterations} iterations, ${warmup} warmup)...`);
-            const initialMemory = process.memoryUsage ? process.memoryUsage().heapUsed : 0;
-            const startTime = performance.now();
-            const frameTimes = [];
-
-            for (let i = 0; i < iterations; i++) {
-                const t0 = performance.now();
-                if (this.nativeGL && this.nativeGL.pollEvents) {
-                    try { this.nativeGL.pollEvents(); } catch {}
-                }
-                if (this.nativeGL && this.nativeGL.present) {
-                    try { this.nativeGL.present(); } catch {}
-                }
-                const t1 = performance.now();
-                frameTimes.push(t1 - t0);
-            }
-
-            const totalTime = performance.now() - startTime;
-            const finalMemory = process.memoryUsage ? process.memoryUsage().heapUsed : 0;
-            reports.push(this.calculateStats(benchmarkName, frameTimes, totalTime, initialMemory, finalMemory));
+        if (missing.length > 0) {
+            throw new Error(`Benchmark execution failed to produce reports for: ${missing.join(', ')}`);
+        }
+        if (reports.length === 0) {
+            throw new Error(`No benchmark reports generated for: ${benchmarkNames.join(', ')}`);
         }
 
         return reports;
+    }
+
+    logGLUsage(print, title) {
+        try {
+            if (this.emscriptenBridge) {
+                print(`[NodeSdlLauncher] ${title}:`, JSON.stringify(this.emscriptenBridge.report()));
+            } else if (this.skikoModule && typeof this.skikoModule.getSkikoGLImportUsage === 'function') {
+                print(`[NodeSdlLauncher] ${title}:`, JSON.stringify(this.skikoModule.getSkikoGLImportUsage()));
+            }
+        } catch {}
     }
 
     parseDurationMs(val) {
@@ -439,8 +671,8 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
         return {
             benchmark: name,
             launcher: this.name,
-            iterations: conditions.frameCount || 1000,
-            warmup: conditions.warmupCount || 100,
+            iterations: conditions.frameCount ?? 1000,
+            warmup: conditions.warmupCount ?? 100,
             effectiveFps: fpsInfo.fps ? Number(fpsInfo.fps.toFixed(1)) : (totalMs ? Number((1000 / totalMs).toFixed(1)) : 0),
             cpuAvgMs: cpuMs !== null ? `${cpuMs.toFixed(3)} ms` : 'N/A',
             gpuAvgMs: gpuMs !== null ? `${gpuMs.toFixed(3)} ms` : 'N/A',
@@ -448,43 +680,46 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
         };
     }
 
-    calculateStats(name, frameTimes, totalTimeMs, initialMem, finalMem) {
-        const sorted = [...frameTimes].sort((a, b) => a - b);
-        const count = sorted.length || 1;
-        const sum = sorted.reduce((acc, v) => acc + v, 0);
-        const mean = sum / count;
-
-        const p50 = sorted[Math.floor(count * 0.50)] || 0;
-        const p90 = sorted[Math.floor(count * 0.90)] || 0;
-        const p95 = sorted[Math.floor(count * 0.95)] || 0;
-        const p99 = sorted[Math.floor(count * 0.99)] || 0;
-        const min = sorted[0] || 0;
-        const max = sorted[sorted.length - 1] || 0;
-
-        const effectiveFps = totalTimeMs > 0 ? (count / (totalTimeMs / 1000)) : 0;
-        const heapDeltaMB = ((finalMem - initialMem) / (1024 * 1024)).toFixed(2);
-
-        return {
-            benchmark: name,
-            launcher: this.name,
-            iterations: count,
-            totalTimeMs: Number(totalTimeMs.toFixed(2)),
-            effectiveFps: Number(effectiveFps.toFixed(1)),
-            meanMs: Number(mean.toFixed(3)),
-            minMs: Number(min.toFixed(3)),
-            maxMs: Number(max.toFixed(3)),
-            p50Ms: Number(p50.toFixed(3)),
-            p90Ms: Number(p90.toFixed(3)),
-            p95Ms: Number(p95.toFixed(3)),
-            p99Ms: Number(p99.toFixed(3)),
-            heapDeltaMB: Number(heapDeltaMB)
-        };
+    cleanupSync() {
+        if (this.isCleanedUp) return;
+        this.isCleanedUp = true;
+        if (this._exitHandler) {
+            process.removeListener('exit', this._exitHandler);
+            this._exitHandler = null;
+        }
+        if (this.canvases && this.nativeGL && typeof this.nativeGL.destroyContext === 'function') {
+            for (const canvas of this.canvases.values()) {
+                if (canvas && canvas.__skikoNativeContext) {
+                    try {
+                        this.nativeGL.destroyContext(canvas.__skikoNativeContext);
+                    } catch (e) {
+                        console.warn('Native context teardown error:', e);
+                    }
+                    canvas.__skikoNativeContext = 0;
+                }
+            }
+        }
+        if (this.nativeGLContextId && this.nativeGL && typeof this.nativeGL.destroyContext === 'function') {
+            try {
+                this.nativeGL.destroyContext(this.nativeGLContextId);
+            } catch (e) {
+                console.warn('Native launcher context teardown error:', e);
+            }
+            this.nativeGLContextId = null;
+        }
+        if (this.nativeGL && typeof this.nativeGL.destroyWindow === 'function') {
+            try {
+                this.nativeGL.destroyWindow();
+            } catch (e) {
+                console.warn('Native window teardown error:', e);
+            }
+        }
     }
 
     async cleanup() {
-        if (this.nativeGL && this.nativeGL.destroyWindow) {
-            try { this.nativeGL.destroyWindow(); } catch {}
-        }
+        // Native GL context and window destruction are deferred to the process 'exit' handler.
+        // This keeps the native context alive during event loop wind-down so that any
+        // FinalizationRegistry callbacks on Skia Managed objects can complete without encountering a destroyed GL context.
     }
 }
 
@@ -501,42 +736,7 @@ export class WasmtimeBenchmarkLauncher extends BenchmarkLauncher {
     }
 
     async runBenchmarks(benchmarkNames, options) {
-        const iterations = options.iterations || 1000;
-        const warmup = options.warmup || 100;
-        const reports = [];
-
-        for (const benchmarkName of benchmarkNames) {
-            console.log(`[WasmtimeLauncher] Running benchmark '${benchmarkName}' (${iterations} iterations)...`);
-
-            const t0 = performance.now();
-            const frameTimes = [];
-            for (let i = 0; i < iterations; i++) {
-                const step0 = performance.now();
-                const step1 = performance.now();
-                frameTimes.push(Math.max(0.1, step1 - step0));
-            }
-            const totalTime = performance.now() - t0;
-
-            const sorted = [...frameTimes].sort((a, b) => a - b);
-            const mean = sorted.reduce((a, b) => a + b, 0) / sorted.length;
-
-            reports.push({
-                benchmark: benchmarkName,
-                launcher: this.name,
-                iterations,
-                warmup,
-                totalTimeMs: Number(totalTime.toFixed(2)),
-                effectiveFps: 60.0,
-                meanMs: Number(mean.toFixed(3)),
-                p50Ms: Number((sorted[Math.floor(sorted.length * 0.5)] || 0).toFixed(3)),
-                p90Ms: Number((sorted[Math.floor(sorted.length * 0.9)] || 0).toFixed(3)),
-                p95Ms: Number((sorted[Math.floor(sorted.length * 0.95)] || 0).toFixed(3)),
-                p99Ms: Number((sorted[Math.floor(sorted.length * 0.99)] || 0).toFixed(3)),
-                heapDeltaMB: 0.0
-            });
-        }
-
-        return reports;
+        throw new Error('Standalone Wasmtime launcher without WasmGC and Compose host bindings is not supported. Use the Node.js SDL launcher instead.');
     }
 }
 
@@ -564,42 +764,30 @@ export async function runSdlBenchmarkCli(argv = process.argv.slice(2)) {
     const LauncherClass = LAUNCHERS[launcherName.toLowerCase()] || NodeSdlBenchmarkLauncher;
     const launcher = new LauncherClass();
 
-    await launcher.initialize({
-        nativeSkikoPath: args.nativeSkikoPath,
-        width: parseInt(args.width || '1024', 10),
-        height: parseInt(args.height || '768', 10)
-    });
+    try {
+        await launcher.initialize({
+            nativeSkikoPath: args.nativeSkikoPath,
+            width: parseInt(args.width || '1024', 10),
+            height: parseInt(args.height || '768', 10)
+        });
 
-    const reports = await launcher.runBenchmarks(benchmarksToRun, {
-        iterations,
-        warmup,
-        benchmarkArg,
-        rawArgs: argv
-    });
+        const reports = await launcher.runBenchmarks(benchmarksToRun, {
+            iterations,
+            warmup,
+            benchmarkArg,
+            rawArgs: argv
+        });
 
-    await launcher.cleanup();
+        console.log('\n==========================================');
+        console.log(`Compose Wasm in Native Window Benchmark Results`);
+        console.log('==========================================');
+        console.table(reports);
 
-    console.log('\n==========================================');
-    console.log(`Compose Wasm in Native Window Benchmark Results`);
-    console.log('==========================================');
-    console.table(reports);
-
-    // Save JSON reports if generated by fallback and not already saved by runner
-    const reportsSubpath = process.cwd().endsWith('benchmarks') ? 'build/benchmarks/json-reports' : 'benchmarks/build/benchmarks/json-reports';
-    const outputDir = path.resolve(process.cwd(), reportsSubpath);
-    if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir, { recursive: true });
+        console.log();
+        return reports;
+    } finally {
+        await launcher.cleanup();
     }
-    for (const report of reports) {
-        const outputPath = path.join(outputDir, `${report.benchmark}.json`);
-        if (!fs.existsSync(outputPath)) {
-            fs.writeFileSync(outputPath, JSON.stringify(report, null, 2));
-            console.log(`Saved benchmark report to: ${outputPath}`);
-        }
-    }
-    console.log();
-
-    return reports;
 }
 
 function parseArgs(args) {

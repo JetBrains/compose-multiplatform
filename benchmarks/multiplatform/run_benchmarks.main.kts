@@ -81,7 +81,7 @@ fun main(args: Array<String>) {
             }
             
             executeBenchmarks(version, i, platform, separateProcess, benchmarkName, argMap)
-            collectResults(platform.platformName, version, i)
+            collectResults(platform, version, i, benchmarkName, argMap)
         }
     } finally {
         if (originalTomlContent != null) {
@@ -91,14 +91,50 @@ fun main(args: Array<String>) {
     }
 }
 
-fun collectResults(platform: String, version: String, runIndex: Int) {
+fun collectResults(
+    platform: Platform,
+    version: String,
+    runIndex: Int,
+    benchmarkName: String? = null,
+    extraArgs: Map<String, String> = emptyMap()
+) {
     val resultsDir = File("benchmarks/build/benchmarks/json-reports")
     if (!resultsDir.exists()) return
 
-    resultsDir.listFiles { f -> f.extension == "json" }?.forEach { file ->
-        val archiveDir = File("benchmarks/build/benchmarks/archive/${platform}/${version}_run${runIndex}")
-        archiveDir.mkdirs()
+    val reportFiles = resultsDir.listFiles { f -> f.extension == "json" } ?: return
+    if (reportFiles.isEmpty()) return
+
+    val archiveDirName = if (platform == Platform.WASM_SDL) {
+        val frameCount = extraArgs["frameCount"]
+        val warmupCount = extraArgs["warmupCount"]
+        val forwardedConfig = extraArgs.filterKeys { it !in setOf("benchmarks", "frameCount", "warmupCount") }.toSortedMap()
+        val isDefaultRun = benchmarkName == null &&
+            (frameCount == null || frameCount == "1000") &&
+            (warmupCount == null || warmupCount == "100") &&
+            forwardedConfig.isEmpty()
+
+        if (isDefaultRun) {
+            "${version}_run${runIndex}"
+        } else {
+            val benchTag = (benchmarkName ?: "all").replace(",", "_")
+            val condTag = "${frameCount ?: "1000"}x${warmupCount ?: "100"}"
+            val configTag = forwardedConfig.entries.joinToString("_") { (key, value) ->
+                "${key}-${value}".replace(Regex("[^A-Za-z0-9.-]"), "_")
+            }.takeIf { it.isNotEmpty() }?.let { "_${it}" } ?: ""
+            "${version}_${benchTag}_${condTag}${configTag}_run${runIndex}"
+        }
+    } else {
+        "${version}_run${runIndex}"
+    }
+
+    val archiveDir = File("benchmarks/build/benchmarks/archive/${platform.platformName}/$archiveDirName")
+    archiveDir.mkdirs()
+
+    reportFiles.forEach { file ->
         val targetFile = File(archiveDir, file.name)
+        if (targetFile.exists()) {
+            targetFile.delete()
+        }
         if (file.renameTo(targetFile)) {
             println("Archived ${file.name} to ${targetFile.path}")
         }
@@ -387,6 +423,9 @@ fun executeBenchmarksOnce(
 
         if (exitCode != 0) {
             println("Warning: Benchmark run failed with exit code $exitCode")
+            if (platform == Platform.WASM_SDL) {
+                error("WASM_SDL benchmark run failed with exit code $exitCode")
+            }
         } else if (platform == Platform.MACOS) {
             if (defaultExecutable != null && defaultExecutable.exists()) {
                 if (defaultExecutable.renameTo(versionedExecutable!!)) {

@@ -89,8 +89,8 @@ private fun CanvasDrawingItem(index: Int) {
         drawRect(
             brush = Brush.verticalGradient(
                 colors = listOf(
-                    Color(random.nextInt(0xFFFFFF) or 0xFF000000.toInt()),
-                    Color(random.nextInt(0xFFFFFF) or 0xFF000000.toInt())
+                    random.nextColor(),
+                    random.nextColor()
                 )
             )
         )
@@ -125,8 +125,8 @@ private fun CanvasDrawingItem(index: Int) {
                 path = path,
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        Color(random.nextInt(0xFFFFFF) or 0x80000000.toInt()),
-                        Color(random.nextInt(0xFFFFFF) or 0x40000000.toInt())
+                        random.nextColor(0x80000000L),
+                        random.nextColor(0x40000000L)
                     ),
                     center = Offset(x, y)
                 )
@@ -136,7 +136,7 @@ private fun CanvasDrawingItem(index: Int) {
         repeat(70) { i ->
             val lineY = i * (size.height / 30)
             drawLine(
-                color = Color(random.nextInt(0xFFFFFF) or 0xFF000000.toInt()),
+                color = random.nextColor(),
                 start = Offset(0f, lineY),
                 end = Offset(size.width, lineY + sin(animatedValue * i).toFloat() * 20f),
                 strokeWidth = 2f
@@ -149,11 +149,16 @@ private fun CanvasDrawingItem(index: Int) {
             val circleRadius = 15f + sin(animatedValue + i).toFloat() * 10f
 
             drawCircle(
-                color = Color(random.nextInt(0xFFFFFF) or 0xFF000000.toInt()),
+                color = random.nextColor(),
                 radius = circleRadius,
                 center = Offset(circleX, circleY),
                 alpha = 0.7f
             )
         }
     }
+}
+
+private fun Random.nextColor(alpha: Long = 0xFF000000L): Color {
+    val rgb = nextInt(0x1000000).toLong()
+    return Color(alpha or rgb)
 }

@@ -19,15 +19,6 @@ fun mainSdl(args: Array<String>) {
     println("mainSdl is intentionally doing nothing. Read comments in main.wasmJs.kt")
 }
 
-// HeavyShader and CanvasDrawing perform heavy shader blending and thousands of complex vector paths.
-// In headless Wasm runs without hardware GPU acceleration, Skia software rasterization (Surface.makeRasterN32Premul)
-// causes each frame to take hundreds to thousands of milliseconds, stalling default full suite runs for hours.
-// They can still be executed on demand by explicitly passing e.g. benchmarks=HeavyShader or benchmarks=CanvasDrawing.
-private val defaultDisabledBenchmarksForSdl = setOf(
-    "HeavyShader",
-    "CanvasDrawing"
-)
-
 @JsExport
 fun sdlBenchmarksRunner(args: String): Promise<JsAny?> {
     val argArray = if (args.isBlank()) emptyArray() else args.split(" ").filter { it.isNotBlank() }.toTypedArray()
@@ -35,20 +26,23 @@ fun sdlBenchmarksRunner(args: String): Promise<JsAny?> {
     if (argArray.none { it.startsWith("modes=", ignoreCase = true) }) {
         config = config.copy(modes = setOf(Mode.SIMPLE))
     }
-    if (argArray.none { it.startsWith("disabledBenchmarks=", ignoreCase = true) } && config.benchmarks.isEmpty()) {
-        config = config.copy(disabledBenchmarks = config.disabledBenchmarks + defaultDisabledBenchmarksForSdl.map { it.uppercase() })
-    }
 
     Config.setGlobal(config)
 
     return MainScope().promise {
-        awaitSkikoWasm()
-        runBenchmarks()
-        jsOne
+        try {
+            awaitSkikoWasm()
+            runBenchmarks(graphicsContext = wasmGraphicsContext())
+            jsOne
+        } catch (t: Throwable) {
+            println("Benchmark exception during execution: ${t.message}")
+            println(t.stackTraceToString())
+            throw t
+        }
     }
 }
 
-private fun isSdlEnv(): JsBoolean =
+internal fun isSdlEnv(): JsBoolean =
     js("typeof globalThis.__skikoNativeGL !== 'undefined' || typeof globalThis.isSdl !== 'undefined' || (typeof process !== 'undefined' && Boolean(process.release) && process.release.name === 'node')")
 
 // Currently, the initialization can't be adjusted to avoid calling the fun main, but

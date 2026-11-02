@@ -222,14 +222,28 @@ tasks.register<Exec>("wasmJsSdlBenchmark") {
     description = "Runs the automated Wasm-in-Native Window (SDL2 / Skiko / Wasmtime) benchmarks."
     dependsOn("wasmJsProductionExecutableCompileSync")
 
-    val nativeSkiko = project.findProperty("benchmark.nativeSkiko")?.toString()
-        ?: "/Users/dustin.feucht/projects/skiko/samples/SkiaNonWebSample/native-skiko/build/Release/native_skiko.node"
-
     workingDir = rootProject.layout.buildDirectory.dir("wasm/packages/compose-benchmarks-benchmarks/kotlin").get().asFile
     environment("BENCHMARK_MODE", "true")
-    environment("SKIKO_NATIVE_GL_ADDON", nativeSkiko)
+    doFirst {
+        val nativeSkiko = project.findProperty("benchmark.nativeSkiko")?.toString()
+            ?: System.getenv("SKIKO_NATIVE_GL_ADDON")
+            ?: throw GradleException("wasmJsSdlBenchmark requires the native Skiko addon. Set SKIKO_NATIVE_GL_ADDON or -Pbenchmark.nativeSkiko=/path/to/native_skiko.node.")
+        val nativeSkikoFile = project.file(nativeSkiko)
+        if (!nativeSkikoFile.isFile) {
+            throw GradleException("Native Skiko addon not found at $nativeSkikoFile (configure SKIKO_NATIVE_GL_ADDON or -Pbenchmark.nativeSkiko).")
+        }
+        environment("SKIKO_NATIVE_GL_ADDON", nativeSkikoFile.absolutePath)
+    }
 
-    executable = "node"
+    val nodeExecutable = project.findProperty("node.executable")?.toString()
+        ?: System.getenv("NODE_BINARY")
+        ?: sequenceOf(
+            System.getenv("PATH")?.split(File.pathSeparatorChar)?.map { File(it, "node") }?.asSequence() ?: emptySequence(),
+            sequenceOf(File("/opt/homebrew/bin/node"), File("/usr/local/bin/node"), File("/usr/bin/node"))
+        ).flatten().firstOrNull { it.canExecute() }?.absolutePath
+        ?: "node"
+
+    executable = nodeExecutable
     args("launcher_sdl.mjs")
 }
 
