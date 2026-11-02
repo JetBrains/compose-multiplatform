@@ -19,10 +19,11 @@ hosts=(
   dv-g3b-aaa-noct-emudhra.we-have-a-problem.com
 )
 
-# 0 = connection accepted, 42 = certificate rejected, anything else = error.
-# Expiry, hostname mismatch, and network errors are inconclusive.
+# 0 = accepted, 42 = recognized trust rejection, 43 = Git certificate
+# verification rejected with no specific reason, anything else = error.
+# Network errors remain inconclusive. Git's generic rejection may include expiry.
 certificate_rejected() {
-  grep -Eqi 'CRYPT_E_REVOKED|CERT_E_REVOKED|CERT_E_UNTRUSTEDROOT|CERT_E_CHAINING|certificate (is |has been )?revoked|certificate revoked|CERT_REVOKED|CERT_UNTRUSTED|CERT_REJECTED|UNABLE_TO_GET_ISSUER_CERT|UNABLE_TO_VERIFY_LEAF_SIGNATURE|SELF_SIGNED_CERT_IN_CHAIN|DEPTH_ZERO_SELF_SIGNED_CERT|unable to get (local )?issuer certificate|unable to verify the first certificate|self[- ]signed certificate|issuer.*(unknown|not recognized)|certificate.*not trusted|unknown CA' "$1"
+  grep -Eqi 'CRYPT_E_REVOKED|CERT_E_REVOKED|CERT_E_UNTRUSTEDROOT|CERT_E_CHAINING|certificate (is |has been )?revoked|certificate revoked|CERT_REVOKED|CERT_UNTRUSTED|CERT_REJECTED|UNABLE_TO_GET_ISSUER_CERT|UNABLE_TO_VERIFY_LEAF_SIGNATURE|SELF_SIGNED_CERT_IN_CHAIN|DEPTH_ZERO_SELF_SIGNED_CERT|unable to get (local )?issuer certificate|unable to verify the first certificate|unable to locally verify the issuer.s authority|self[- ]signed certificate|issuer.*(unknown|not recognized)|certificate.*not trusted|unknown CA' "$1"
 }
 
 # A broken installation is unavailable, rather than a certificate-test failure.
@@ -40,7 +41,7 @@ startup_check() {
 }
 
 check() {
-  local name=$1 control=$2 host rc
+  local name=$1 control=$2 host rc reason_unknown=0
   shift 2
   "$@" "$control" >"$tmp/log" 2>&1
   rc=$?
@@ -55,11 +56,16 @@ check() {
     rc=$?
     case $rc in
       42) ;;
+      43) reason_unknown=1 ;;
       0) echo "FAIL $name: accepted $host"; failed=1; return ;;
       *) echo "ERROR $name: inconclusive for $host (exit $rc)"; cat "$tmp/log" >&2; failed=1; return ;;
     esac
   done
-  echo "PASS $name"
+  if [[ $reason_unknown == 1 ]]; then
+    echo "PASS $name: all test certificates rejected (reason unavailable)"
+  else
+    echo "PASS $name"
+  fi
 }
 
 curl_check() {
@@ -67,6 +73,7 @@ curl_check() {
   LC_ALL=C curl --silent --show-error --connect-timeout 10 --max-time 20 \
     --output /dev/null "$1" >"$tmp/curl-log" 2>&1
   rc=$?
+  cat "$tmp/curl-log" >&2
   if [[ $rc == 35 || $rc == 60 ]] && certificate_rejected "$tmp/curl-log"; then
     return 42
   fi
@@ -78,6 +85,7 @@ wget_check() {
   LC_ALL=C wget --tries=1 --timeout=20 --output-document=/dev/null "$1" \
     >"$tmp/wget-log" 2>&1
   rc=$?
+  cat "$tmp/wget-log" >&2
   if [[ $rc == 5 ]] && certificate_rejected "$tmp/wget-log"; then
     return 42
   fi
@@ -92,8 +100,14 @@ git_check() {
     git -c http.lowSpeedLimit=1 -c http.lowSpeedTime=20 \
     ls-remote "$1" >"$tmp/git-log" 2>&1
   rc=$?
+  cat "$tmp/git-log" >&2
   if [[ $rc != 0 ]] && certificate_rejected "$tmp/git-log"; then
     return 42
+  fi
+  # GnuTLS-backed Git may omit the reason. Count an explicit verification
+  # rejection as blocking the connection, without claiming the CA was removed.
+  if [[ $rc != 0 ]] && grep -Fqi 'server certificate verification failed' "$tmp/git-log"; then
+    return 43
   fi
   # A final HTTPS response proves TLS completed, even for a non-Git endpoint.
   if [[ $rc == 0 ]] || grep -Eqi '<= Recv header: HTTP/[0-9.]+ [2345][0-9][0-9]' "$tmp/git-log"; then
@@ -116,6 +130,7 @@ try:
 except request.HTTPError:
     pass  # HTTP errors happen after successful TLS.
 except Exception as error:
+    print('%s: %s' % (type(error).__name__, error), file=sys.stderr)
     reason = getattr(error, 'reason', error)
     if isinstance(reason, ssl.SSLError):
         # OpenSSL: unknown issuer, self-signed, revoked, or untrusted.
@@ -142,9 +157,13 @@ const request = https.get(process.argv[2], response => {
   response.destroy();
   process.exit(0);
 });
-const timer = setTimeout(() => process.exit(1), 20000);
+const timer = setTimeout(() => {
+  console.error('HTTPS request timed out after 20000 ms');
+  process.exit(1);
+}, 20000);
 request.on('error', error => {
   clearTimeout(timer);
+  console.error(error.code ? `${error.code}: ${error.message}` : error.message);
   process.exit(rejected.has(error.code) ? 42 : 1);
 });
 JS
@@ -155,6 +174,7 @@ npm_check() {
   LC_ALL=C npm ping --registry="$1" --fetch-retries=0 --fetch-timeout=20000 \
     >"$tmp/npm-log" 2>&1
   rc=$?
+  cat "$tmp/npm-log" >&2
   if [[ $rc != 0 ]] && certificate_rejected "$tmp/npm-log"; then
     return 42
   fi
@@ -181,6 +201,7 @@ class CheckTLS {
             c.connect();
             c.disconnect();
         } catch (Exception e) {
+            e.printStackTrace(System.err);
             for (Throwable cause = e; cause != null; cause = cause.getCause()) {
                 if (cause instanceof CertPathValidatorException) {
                     CertPathValidatorException.Reason r =
