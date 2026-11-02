@@ -1,10 +1,11 @@
 FROM ubuntu:24.04
 ARG DEBIAN_FRONTEND=noninteractive
+ARG CA_CERTIFICATES_VERSION=20260816ubuntu0.24.04.1
 
 RUN apt update -y && \
     apt install -y \
         binutils \
-        ca-certificates \
+        ca-certificates=${CA_CERTIFICATES_VERSION} \
         curl \
         dpkg \
         dpkg-dev \
@@ -34,19 +35,21 @@ ENV JAVA_HOME=/usr/lib/jvm/java-${JAVA_VERSION}-openjdk-amd64
 ENV PATH="$JAVA_HOME/bin:$PATH"
 
 # Install NodeJS 22
-RUN apt update -y && \
-    wget -qO- https://deb.nodesource.com/gpgkey/nodesource.gpg.key && \
-    wget -qO- https://deb.nodesource.com/setup_22.x | bash - && \
-    apt install -y nodejs && \
-    locale-gen en_US.UTF-8 && \
-    rm -rf /var/lib/apt/lists/*
+ARG NODE_VERSION=22.23.4
+ARG NODE_SHA256=1805bcd35e6815559bd2eb97db438d3fdb0eb3a5e6a977b7c1badca76337e9ce
+RUN wget -q https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz -O /tmp/node.tar.xz && \
+    echo "${NODE_SHA256}  /tmp/node.tar.xz" | sha256sum --check --status && \
+    mkdir -p /opt/node && \
+    tar -xJf /tmp/node.tar.xz -C /opt/node --strip-components=1 && \
+    rm /tmp/node.tar.xz
+ENV PATH="/opt/node/bin:$PATH"
 
 # Use UTF-8 by default
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
-ENV JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8 -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts"
+ENV JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
 
 # Install JBR
-ARG JBR_DISTR=jbr_jcef-25.0.3-linux-x64-b496.62
+ARG JBR_DISTR=jbr_jcef-25.0.4.1-linux-x64-b635.79
 ARG JBR_DISTR_ARCH=$JBR_DISTR.tar.gz
 RUN wget https://cache-redirector.jetbrains.com/intellij-jbr/$JBR_DISTR_ARCH && \
     tar xzf $JBR_DISTR_ARCH && \
@@ -97,20 +100,3 @@ RUN wget -q -O /tmp/firefox.deb https://ftp.mozilla.org/pub/firefox/releases/${F
     mkdir -p /root/.gradle/selenium/gecko && \
     mv geckodriver /root/.gradle/selenium/gecko && \
     rm -rf /var/lib/apt/lists/*
-
-# Remove emSign roots from the system store and make Java and Node use it instead
-# of their bundled CA lists.
-RUN set -eu; \
-    sed -i '/^mozilla\/emSign_/s/^/!/' /etc/ca-certificates.conf; \
-    update-ca-certificates --fresh; \
-    keytool -cacerts -list -storepass changeit > /tmp/java-cacerts; \
-    for cert_alias in $(awk -F, 'tolower($1) ~ /emsign/ { sub(/^[[:space:]]*/, "", $1); print $1 }' /tmp/java-cacerts); do \
-        keytool -cacerts -delete -storepass changeit -alias "$cert_alias"; \
-    done; \
-    keytool -cacerts -list -storepass changeit > /tmp/java-cacerts; \
-    if grep -qi emsign /tmp/java-cacerts; then \
-        echo 'emSign roots remain in the Java trust store' >&2; \
-        exit 1; \
-    fi; \
-    rm /tmp/java-cacerts
-ENV NODE_OPTIONS=--use-openssl-ca
