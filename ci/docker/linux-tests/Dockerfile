@@ -4,6 +4,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt update -y && \
     apt install -y \
         binutils \
+        ca-certificates \
         curl \
         dpkg \
         dpkg-dev \
@@ -42,7 +43,7 @@ RUN apt update -y && \
 
 # Use UTF-8 by default
 ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
-ENV JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
+ENV JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF-8 -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts"
 
 # Install JBR
 ARG JBR_DISTR=jbr_jcef-25.0.3-linux-x64-b496.62
@@ -96,3 +97,20 @@ RUN wget -q -O /tmp/firefox.deb https://ftp.mozilla.org/pub/firefox/releases/${F
     mkdir -p /root/.gradle/selenium/gecko && \
     mv geckodriver /root/.gradle/selenium/gecko && \
     rm -rf /var/lib/apt/lists/*
+
+# Remove emSign roots from the system store and make Java and Node use it instead
+# of their bundled CA lists.
+RUN set -eu; \
+    sed -i '/^mozilla\/emSign_/s/^/!/' /etc/ca-certificates.conf; \
+    update-ca-certificates --fresh; \
+    keytool -cacerts -list -storepass changeit > /tmp/java-cacerts; \
+    for cert_alias in $(awk -F, 'tolower($1) ~ /emsign/ { sub(/^[[:space:]]*/, "", $1); print $1 }' /tmp/java-cacerts); do \
+        keytool -cacerts -delete -storepass changeit -alias "$cert_alias"; \
+    done; \
+    keytool -cacerts -list -storepass changeit > /tmp/java-cacerts; \
+    if grep -qi emsign /tmp/java-cacerts; then \
+        echo 'emSign roots remain in the Java trust store' >&2; \
+        exit 1; \
+    fi; \
+    rm /tmp/java-cacerts
+ENV NODE_OPTIONS=--use-openssl-ca
