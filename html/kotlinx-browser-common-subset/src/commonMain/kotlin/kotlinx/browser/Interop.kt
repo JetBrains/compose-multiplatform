@@ -18,6 +18,7 @@ import kotlin.collections.List
  * val raw: JsAny = media.getStartDate()
  * ```
  */
+@Suppress("EXPECT_ACTUAL_IR_INCOMPATIBILITY")
 public expect interface JsAny
 
 /**
