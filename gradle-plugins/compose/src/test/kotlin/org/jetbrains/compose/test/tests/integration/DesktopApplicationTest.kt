@@ -355,7 +355,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     // TODO remove @Ignore with the fix in https://youtrack.jetbrains.com/issue/CMP-10914
-    @Ignore
+   // @Ignore
     @Test
     fun testFontStripping() =
         // JBR25 comes with bundled fonts, so we can check stripping them on it
@@ -373,7 +373,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             gradle(":createRuntimeImage")
             val runtimeDir = file("build/compose/tmp/main/runtime")
             assertTrue(runtimeDir.isDirectory)
-            assertFalse(runtimeDir.list()!!.contains("fonts"))
+            assertFalse(runtimeDir.resolve("lib/fonts").exists())
         }
 
     private fun customJdkProject(
