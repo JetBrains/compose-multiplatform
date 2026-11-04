@@ -7,7 +7,7 @@ _Changes since 1.13.0-beta01_
 ### Multiple Platforms
 
 - Fix `Stroke(join = StrokeJoin.Round)` and `Stroke(miter = 0f)` being ignored; the default `Paint()` stroke join, miter limit and filter quality now match Android (`Miter`, `4f`, `Low`) [#3528](https://github.com/JetBrains/compose-multiplatform-core/pull/3528)
-- _(prerelease fix)_ - Fixed clicks being detected as drags, sometimes preventing them from being detected as clicks [#3543](https://github.com/JetBrains/compose-multiplatform-core/pull/3543)
+- _(prerelease fix)_ Fixed clicks being detected as drags, sometimes preventing them from being detected as clicks [#3543](https://github.com/JetBrains/compose-multiplatform-core/pull/3543)
 - _(prerelease fix)_ Fixed growing text layout overhead during repeated measurements, which could cause severe scrolling stutters [#3549](https://github.com/JetBrains/compose-multiplatform-core/pull/3549)
 
 ### iOS
