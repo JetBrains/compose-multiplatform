@@ -1,3 +1,54 @@
+# 1.13.0-beta02 (November 2026)
+
+_Changes since 1.13.0-beta01_
+
+## Fixes
+
+### Multiple Platforms
+
+- Fix `Stroke(join = StrokeJoin.Round)` and `Stroke(miter = 0f)` being ignored; the default `Paint()` stroke join, miter limit and filter quality now match Android (`Miter`, `4f`, `Low`) [#3528](https://github.com/JetBrains/compose-multiplatform-core/pull/3528)
+- _(prerelease fix)_ Fixed clicks being detected as drags, sometimes preventing them from being detected as clicks [#3543](https://github.com/JetBrains/compose-multiplatform-core/pull/3543)
+- _(prerelease fix)_ Fixed growing text layout overhead during repeated measurements, which could cause severe scrolling stutters [#3549](https://github.com/JetBrains/compose-multiplatform-core/pull/3549)
+
+### iOS
+
+- Fix possible deadlocks between native calls and GC in Skiko [#3531](https://github.com/JetBrains/compose-multiplatform-core/pull/3531)
+- Fixed an issue where Compose content ignores the Reduce Motion accessibility setting [#3545](https://github.com/JetBrains/compose-multiplatform-core/pull/3545)
+- Fixes Writing Tools menu for text inputs [#3546](https://github.com/JetBrains/compose-multiplatform-core/pull/3546)
+
+### Desktop
+
+- _(prerelease fix)_ Fixed crash when using `rememberVectorPainter()` directly in `application` [#3540](https://github.com/JetBrains/compose-multiplatform-core/pull/3540)
+
+### Web
+
+- _(prerelease fix)_ Fix cursor jumping to the beginning of TextField on re-focus in Safari on iOS [#3544](https://github.com/JetBrains/compose-multiplatform-core/pull/3544)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.13.0-beta02`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.13.0-beta02` | [Runtime 1.13.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.13.0-beta02) |
+| UI | `org.jetbrains.compose.ui:ui*:1.13.0-beta02` | [UI 1.13.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.13.0-beta02) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.13.0-beta02` | [Foundation 1.13.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.13.0-beta02) |
+| Material | `org.jetbrains.compose.material:material*:1.13.0-beta02` | [Material 1.13.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.13.0-beta02) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.13.0-beta02` | [Material3 1.5.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-beta02) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.4.0-alpha01` | [Material3 Adaptive 1.4.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.4.0-alpha03) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0` | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.10.0` | [Navigation 2.10.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.10.0) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.2.0` | [Navigation3 1.2.0](https://developer.android.com/jetpack/androidx/releases/navigation3#1.2.0) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0` | [Navigation Event 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.1) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.13.0-beta01 (October 2026)
 
 _Changes since 1.13.0-alpha02_
