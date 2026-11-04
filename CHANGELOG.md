@@ -12,7 +12,7 @@ _Changes since 1.13.0-beta01_
 
 ### iOS
 
-- Fix possible deadlocks between native skiko calls and GC [#3531](https://github.com/JetBrains/compose-multiplatform-core/pull/3531)
+- Fix possible deadlocks between native calls and GC in Skiko [#3531](https://github.com/JetBrains/compose-multiplatform-core/pull/3531)
 - Fixed an issue where Compose content ignores the Reduce Motion accessibility setting [#3545](https://github.com/JetBrains/compose-multiplatform-core/pull/3545)
 - Fixes Writing Tools menu for text inputs [#3546](https://github.com/JetBrains/compose-multiplatform-core/pull/3546)
 
@@ -22,8 +22,7 @@ _Changes since 1.13.0-beta01_
 
 ### Web
 
-- _(pre-release)_ Ensure that repeated taps on already focused TextField do bring the keyboard [#3519](https://github.com/JetBrains/compose-multiplatform-core/pull/3519)
-- Fix cursor jumping to beginning of TextField on re-focus (iOS Safari) [#3544](https://github.com/JetBrains/compose-multiplatform-core/pull/3544)
+- _(prerelease fix)_ Fix cursor jumping to the beginning of TextField on re-focus in Safari on iOS [#3544](https://github.com/JetBrains/compose-multiplatform-core/pull/3544)
 
 ## Components
 
