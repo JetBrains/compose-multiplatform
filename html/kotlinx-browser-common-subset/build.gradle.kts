@@ -1,5 +1,10 @@
 @file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin
+import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsEnvSpec
+import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsPlugin
+
 import org.gradle.api.publish.maven.MavenPublication
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
@@ -154,5 +159,18 @@ publishing {
                 url.set("https://github.com/jetbrains/compose-multiplatform")
             }
         }
+    }
+}
+
+allprojects {
+    // TODO https://youtrack.jetbrains.com/issue/CMP-11110 Remove compromised root certificate workaround after updating to Kotlin 2.5.0
+    // Override the node version to fix https://youtrack.jetbrains.com/issue/CMP-11011
+    // Workaround is from https://youtrack.jetbrains.com/issue/KT-90732
+    val subproject = this
+    subproject.plugins.withType<NodeJsPlugin>().configureEach {
+        subproject.extensions.getByType(NodeJsEnvSpec::class.java).version.set("26.12.1")
+    }
+    subproject.plugins.withType<WasmNodeJsPlugin>().configureEach {
+        subproject.extensions.getByType(WasmNodeJsEnvSpec::class.java).version.set("26.12.1")
     }
 }
