@@ -266,9 +266,9 @@ subprojects {
 }
 
 allprojects {
-    val subproject = this
     // Override the node version to fix https://youtrack.jetbrains.com/issue/CMP-11011
     // Workaround is from https://youtrack.jetbrains.com/issue/KT-90732
+    val subproject = this
     subproject.plugins.withType<NodeJsPlugin>().configureEach {
         subproject.extensions.getByType(NodeJsEnvSpec::class.java).version.set(libs.versions.node)
     }
