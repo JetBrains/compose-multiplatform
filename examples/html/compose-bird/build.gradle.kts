@@ -1,3 +1,8 @@
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin
+import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsEnvSpec
+import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsPlugin
+
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 
 plugins {
@@ -36,5 +41,15 @@ afterEvaluate {
     rootProject.extensions.configure<NodeJsRootExtension> {
         versions.webpackDevServer.version = "4.0.0"
         versions.webpackCli.version = "4.10.0"
+    }
+}
+
+allprojects {
+    val subproject = this
+    subproject.plugins.withType<NodeJsPlugin>().configureEach {
+        subproject.extensions.getByType(NodeJsEnvSpec::class.java).version.set(libs.versions.node)
+    }
+    subproject.plugins.withType<WasmNodeJsPlugin>().configureEach {
+        subproject.extensions.getByType(WasmNodeJsEnvSpec::class.java).version.set(libs.versions.node)
     }
 }

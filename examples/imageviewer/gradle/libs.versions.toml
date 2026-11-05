@@ -1,4 +1,5 @@
 [versions]
+node = "26.12.1"
 kotlin = "2.4.10" # overriden via gradle.properties
 compose = "1.11.1" # overriden via gradle.properties
 agp = "9.1.1" # overriden via gradle.properties

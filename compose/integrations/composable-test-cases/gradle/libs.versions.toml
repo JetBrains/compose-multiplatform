@@ -1,4 +1,5 @@
 [versions]
+node = "26.12.1"
 kotlin="2.2.10" # should be provided via `-Pkotlin.version=<kotlin version to test with>`
 kotlinx-coroutines = "1.8.0"
 compose = "1.9.0-rc01"

@@ -1,5 +1,10 @@
 @file:OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
 
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin
+import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsEnvSpec
+import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsPlugin
+
 import org.gradle.api.publish.maven.MavenPublication
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.util.Properties
@@ -154,5 +159,15 @@ publishing {
                 url.set("https://github.com/jetbrains/compose-multiplatform")
             }
         }
+    }
+}
+
+allprojects {
+    val subproject = this
+    subproject.plugins.withType<NodeJsPlugin>().configureEach {
+        subproject.extensions.getByType(NodeJsEnvSpec::class.java).version.set(libs.versions.node)
+    }
+    subproject.plugins.withType<WasmNodeJsPlugin>().configureEach {
+        subproject.extensions.getByType(WasmNodeJsEnvSpec::class.java).version.set(libs.versions.node)
     }
 }

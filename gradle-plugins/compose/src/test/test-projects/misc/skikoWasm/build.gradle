@@ -1,3 +1,8 @@
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsEnvSpec
+import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsPlugin
+import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsEnvSpec
+import org.jetbrains.kotlin.gradle.targets.wasm.nodejs.WasmNodeJsPlugin
+
 plugins {
     id "org.jetbrains.kotlin.multiplatform"
     id "org.jetbrains.kotlin.plugin.compose"
@@ -29,5 +34,14 @@ kotlin {
 afterEvaluate {
     afterEvaluate {
         dependencies.add(kotlin.targets.js.compilations.main.compileDependencyConfigurationName, "org.jetbrains.kotlin:kotlin-stdlib")
+    }
+}
+
+allprojects { subproject ->
+    subproject.plugins.withType(NodeJsPlugin).configureEach {
+        subproject.extensions.getByType(NodeJsEnvSpec).version.set(libs.versions.node)
+    }
+    subproject.plugins.withType(WasmNodeJsPlugin).configureEach {
+        subproject.extensions.getByType(WasmNodeJsEnvSpec).version.set(libs.versions.node)
     }
 }
