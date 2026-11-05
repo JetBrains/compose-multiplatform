@@ -52,10 +52,16 @@ class DirectStringRenderingTest {
                             TagElement<Element>("textarea", null) { Text("\nfirst"); Text("second") }
                             TagElement<Element>("script", null) { Text("const x = '<&';") }
                             TagElement<Element>("noscript", null) { Span { Text("fallback") } }
-                            TagElementNS<Element>("svg", "http://www.w3.org/2000/svg", { attr("viewBox", "0 0 1 1") }, null)
+                            TagElementNS<Element>(
+                                "svg",
+                                "http://www.w3.org/2000/svg",
+                                { attr("viewBox", "0 0 1 1") },
+                                null
+                            )
                         }
                     }
-                    val expected = composeHtmlToString(hydratable = hydratable, validateStrictly = strict, content = content)
+                    val expected =
+                        composeHtmlToString(hydratable = hydratable, validateStrictly = strict, content = content)
                     assertEquals(expected, composeHtmlToString(hydratable, "direct-changing", strict, content))
                 }
             }
@@ -67,7 +73,10 @@ class DirectStringRenderingTest {
         var value = ""
         var decorated = true
         val content: @Composable () -> Unit = {
-            Div(attrs = if (decorated) { { id("decorated") } } else null) { Text(value) }
+            Div(
+                attrs = if (decorated) {
+                    { id("decorated") }
+                } else null) { Text(value) }
         }
         for ((index, text) in listOf("Unicode é😀 &<>".repeat(10_000), "short", "", "again").withIndex()) {
             value = text
@@ -80,7 +89,7 @@ class DirectStringRenderingTest {
     }
 
     @Test
-    fun preservesLocalsSnapshotsAndEffectLifecycle() {
+    fun preservesLocalsStateWritesAndEffectLifecycle() {
         val local = staticCompositionLocalOf { "default" }
         val state = mutableStateOf("outside")
         var remembered = 0
@@ -103,19 +112,21 @@ class DirectStringRenderingTest {
                 }
             }
             assertEquals("<div>local-$request:$request:${request + 1}</div>", html)
-            assertEquals("outside", state.value)
+            assertEquals("$request", state.value)
         }
         assertEquals((0..2).flatMap { listOf("enter $it", "side $it", "dispose $it") }, effects)
         assertFalse(launched)
     }
 
     @Test
-    fun movableContentHasTheExistingOneShotRendererLimitation() {
+    fun movableContentRendersInline() {
         val movable = movableContentOf { Span { Text("moved") } }
         val content: @Composable () -> Unit = { Div { movable() }; P { Text("after") } }
-        // The cancelled SSR recomposer has never inserted deferred movable content.
-        assertEquals("<div></div><p>after</p>", composeHtmlToString(content = content))
-        assertEquals("<div></div><p>after</p>", composeHtmlToString(key = "movable", content = content))
+        assertEquals("<div><span>moved</span></div><p>after</p>", composeHtmlToString(content = content))
+        assertEquals(
+            "<div><span>moved</span></div><p>after</p>",
+            composeHtmlToString(key = "movable", content = content)
+        )
     }
 
     @Test
@@ -125,51 +136,52 @@ class DirectStringRenderingTest {
             { Div({ attr("data-value", "bad\u0000attribute") }) },
             { TagElement<Element>("script", null) { Text("</scr"); Text("ipt>") } },
             { TagElement<Element>("style", null) { Span { Text("child") } } },
-            { Table { Tr { Td { Text("missing tbody") } } } },
         )
-        for (content in invalid) {
-            assertFailsWith<IllegalArgumentException> { composeHtmlToString(content = content) }
-            assertFailsWith<IllegalArgumentException> { composeHtmlToString(key = "direct-failure", content = content) }
+        for (strict in listOf(false, true)) for (content in invalid) {
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString(
+                    validateStrictly = strict,
+                    content = content
+                )
+            }
+            assertFailsWith<IllegalArgumentException> {
+                composeHtmlToString(
+                    key = "direct-failure",
+                    validateStrictly = strict,
+                    content = content
+                )
+            }
             assertEquals("<div>ok</div>", composeHtmlToString(key = "direct-failure") { Div { Text("ok") } })
         }
     }
 
     @Test
-    fun capturedCompositionLocalsAndCompositionContextsRemainSupported() {
-        val language = staticCompositionLocalOf { "en" }
-        val content: @Composable () -> Unit = {
-            CompositionLocalProvider(language provides "de") {
-                val captured = currentCompositionLocalContext
-                rememberCompositionContext()
-                CompositionLocalProvider(language provides "fr") {
-                    CompositionLocalProvider(captured) {
-                        P { Text(language.current) }
-                    }
-                }
+    fun compositionContextCaptureFailsExplicitly() {
+        for (renderKey in listOf(null, "captured-locals")) {
+            assertFailsWith<UnsupportedOperationException> {
+                composeHtmlToString(key = renderKey) { currentCompositionLocalContext }
             }
-        }
-        assertEquals("<p>de</p>", composeHtmlToString(content = content))
-        repeat(2) {
-            assertEquals("<p>de</p>", composeHtmlToString(key = "captured-locals", content = content))
+            assertFailsWith<UnsupportedOperationException> {
+                composeHtmlToString(key = renderKey) { rememberCompositionContext() }
+            }
+            assertEquals("<p>recovered</p>", composeHtmlToString(key = renderKey) { P { Text("recovered") } })
         }
     }
 
     @Test
-    fun nestedRenderRestoresContextAndSameKeyReentryIsRejected() {
-        assertEquals("<div>outer<!--c-->&lt;span&gt;inner&lt;/span&gt;<!--c-->tail</div>",
-            composeHtmlToString(key = "outer") {
-                Div {
-                    Text("outer")
-                    Text(composeHtmlToString(key = "inner") { Span { Text("inner") } })
-                    Text("tail")
-                }
-            })
-        assertFailsWith<IllegalStateException> {
-            composeHtmlToString(key = "reentrant") {
-                composeHtmlToString(key = "reentrant") { Text("bad") }
-            }
+    fun nestedRenderRestoresContextWithTheSameOrDifferentKey() {
+        for (innerKey in listOf("inner", "outer")) {
+            assertEquals(
+                "<div>outer<!--c-->&lt;span&gt;inner&lt;/span&gt;<!--c-->tail</div>",
+                composeHtmlToString(key = "outer") {
+                    Div {
+                        Text("outer")
+                        Text(composeHtmlToString(key = innerKey) { Span { Text("inner") } })
+                        Text("tail")
+                    }
+                })
         }
-        assertEquals("ok", composeHtmlToString(key = "reentrant") { Text("ok") })
+        assertEquals("ok", composeHtmlToString(key = "outer") { Text("ok") })
     }
 
 }

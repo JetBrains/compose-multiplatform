@@ -1,3 +1,8 @@
+/*
+ * Copyright 2020-2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
 package org.jetbrains.compose.web
 
 import androidx.compose.runtime.Composable
@@ -15,24 +20,44 @@ import org.jetbrains.compose.web.dom.Script
 private const val HtmlDoctype = "<!doctype html>"
 
 /**
- * Renders one complete HTML document that may contain browser-hydrated content.
+ * Renders a complete HTML document with optional browser hydration.
  *
- * [content] must produce exactly one `html` element. The returned string always starts with an
- * HTML doctype. Static documents emit no hydration state. The application is responsible for
- * loading the client code that calls `hydrateRoot`.
- * Snapshot state changes made while rendering are discarded afterwards.
- * On the JVM or JS/Node, `COMPOSE_HTML_VALIDATE_STRICTLY=true` enables strict validation and records that
- * choice in each hydration state element. Pass `validateStrictly` to override the default.
+ * [content] should produce exactly one `html` element; strict validation checks this.
+ * Output starts with an HTML doctype.
+ * Static documents emit no hydration state.
+ *
+ * Load client code that calls `hydrateRoot` after [HydrationRoot] and its state element are parsed:
+ * place the script after them, defer an external classic script, or use a module script.
+ *
+ * On the JVM or Node.js, `COMPOSE_HTML_VALIDATE_STRICTLY=true` enables strict validation.
+ * [validateStrictly] overrides it.
  * Without strict validation, browser hydration trusts initial server values.
  *
- * That client code must run only after the [HydrationRoot] and its state element have been parsed.
- * Place its script after [HydrationRoot], defer an external classic script, or use a module script.
- * Use [renderHydratedDocumentToStream] to emit the document incrementally.
+ * Rendering uses the caller's current snapshot. Use a mutable snapshot around rendering for isolation.
+ * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
+ * See [composeHtmlToStream] for validation and failure handling.
+ *
+ * Use [renderHydratedDocumentToStream] for incremental output.
+ *
+ * @param key stable key per template for best-effort storage reuse. `null` disables pooling.
+ */
+fun renderHydratedDocument(
+    validateStrictly: Boolean = defaultHtmlValidationMode() == HtmlValidationMode.Strict,
+    key: String?,
+    content: @Composable () -> Unit,
+): String = composeHydratedDocument(validateStrictly = validateStrictly, key = key, content = content)
+
+/**
+ * Renders a complete document with fresh storage.
+ *
+ * Rendering uses the caller's current snapshot. Use a mutable snapshot around rendering for isolation.
+ * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
+ * See [composeHtmlToStream] for validation and failure handling.
  */
 fun renderHydratedDocument(
     validateStrictly: Boolean = defaultHtmlValidationMode() == HtmlValidationMode.Strict,
     content: @Composable () -> Unit,
-): String = composeHydratedDocument(validateStrictly = validateStrictly, content = content)
+): String = renderHydratedDocument(validateStrictly = validateStrictly, key = null, content = content)
 
 /**
  * Streams the same HTML as [renderHydratedDocument], including its doctype and hydration state.
@@ -40,11 +65,15 @@ fun renderHydratedDocument(
  * [renderHydratedDocument].
  *
  * [chunkSize] defaults to 2048 UTF-16 code units. Tags and `Text` calls stay intact, so chunks
- * may exceed the target. [sink] runs synchronously, may block, and receives no empty chunks.
+ * may exceed the target. Compiler-validated fragments can stream in smaller pieces.
+ * [sink] runs synchronously, may block, and receives no empty chunks.
  * Emitted output cannot be retracted on failure, including document validation after composition.
  *
- * Each call disposes its composition. Effects, snapshots, and buffering follow [composeHtmlToStream].
+ * Rendering uses the caller's current snapshot. Use a mutable snapshot around rendering for isolation.
+ * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
+ * See [composeHtmlToStream] for validation and failure handling.
  *
+ * @param key when non-null, enables pooled rendering storage across calls and threads.
  * @param validateStrictly overrides validation and records the choice in hydration state.
  * @throws IllegalArgumentException if [chunkSize] is not positive or [content] is not a valid document.
  */
@@ -52,10 +81,28 @@ fun renderHydratedDocumentToStream(
     sink: (String) -> Unit,
     chunkSize: Int = 2048,
     validateStrictly: Boolean = defaultHtmlValidationMode() == HtmlValidationMode.Strict,
+    key: String?,
     content: @Composable () -> Unit,
 ) {
-    require(chunkSize > 0) { "chunkSize must be positive" }
-    composeHydratedDocument(validateStrictly, chunkSink = { sink(it.toString()) }, chunkSize = chunkSize, content = content)
+    composeHydratedDocument(
+        validateStrictly, key = key, chunkSink = { sink(it.toString()) }, chunkSize = chunkSize, content = content,
+    )
+}
+
+/**
+ * Streams a complete document with fresh storage.
+ *
+ * Rendering uses the caller's current snapshot. Use a mutable snapshot around rendering for isolation.
+ * Calls are thread-safe. Synchronize shared mutable data accessed by [content].
+ * See [composeHtmlToStream] for validation and failure handling.
+ */
+fun renderHydratedDocumentToStream(
+    sink: (String) -> Unit,
+    chunkSize: Int = 2048,
+    validateStrictly: Boolean = defaultHtmlValidationMode() == HtmlValidationMode.Strict,
+    content: @Composable () -> Unit,
+) {
+    renderHydratedDocumentToStream(sink, chunkSize, validateStrictly, key = null, content = content)
 }
 
 /** Shared document context and protocol for complete-string and streaming output. */
@@ -63,14 +110,16 @@ internal fun composeHydratedDocument(
     validateStrictly: Boolean,
     chunkSink: ((StringBuilder) -> Unit)? = null,
     chunkSize: Int = 2048,
+    key: String? = null,
     content: @Composable () -> Unit,
 ): String {
     val seenHydrationIds = if (validateStrictly) mutableSetOf<String>() else null
     return composeHtmlString(
-        requireHtmlDocumentRoot = true,
+        requireHtmlDocumentRoot = validateStrictly,
         chunkSink = chunkSink,
         chunkSize = chunkSize,
         prefix = HtmlDoctype,
+        key = key,
     ) {
         CompositionLocalProvider(
             LocalHydratedDocumentContext provides true,

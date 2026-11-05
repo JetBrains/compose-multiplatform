@@ -3,6 +3,8 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+@file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
@@ -27,6 +29,7 @@ private fun InputAttrsScope<String>.applyAttrsWithStringValue(
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "checkbox", defaults = ["checked=false"])
 fun CheckboxInput(checked: Boolean = false, attrs: InputAttrsScope<Boolean>.() -> Unit = {}) {
     Input(
         type = InputType.Checkbox,
@@ -46,6 +49,7 @@ fun CheckboxInput(checked: Boolean = false, attrs: InputAttrsScope<Boolean>.() -
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "date", defaults = ["value="])
 fun DateInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Date, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
@@ -59,6 +63,7 @@ fun DateInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "datetime-local", defaults = ["value="])
 fun DateTimeLocalInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.DateTimeLocal, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
@@ -72,6 +77,7 @@ fun DateTimeLocalInput(value: String = "", attrs: InputAttrsScope<String>.() -> 
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "email", defaults = ["value="])
 fun EmailInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Email, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
@@ -85,6 +91,7 @@ fun EmailInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "file", defaults = ["value="])
 fun FileInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.File, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
@@ -98,6 +105,7 @@ fun FileInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "hidden")
 fun HiddenInput(attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Hidden, attrs = attrs)
 }
@@ -111,6 +119,7 @@ fun HiddenInput(attrs: InputAttrsScope<String>.() -> Unit = {}) {
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "month", defaults = ["value="])
 fun MonthInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Month, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
@@ -124,6 +133,7 @@ fun MonthInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "number")
 fun NumberInput(
     value: Number? = null,
     min: Number? = null,
@@ -150,6 +160,7 @@ fun NumberInput(
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "password", defaults = ["value="])
 fun PasswordInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Password, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
@@ -163,6 +174,7 @@ fun PasswordInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit 
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "radio", defaults = ["checked=false"])
 fun RadioInput(checked: Boolean = false, attrs: InputAttrsScope<Boolean>.() -> Unit = {}) {
     Input(
         type = InputType.Radio,
@@ -182,6 +194,7 @@ fun RadioInput(checked: Boolean = false, attrs: InputAttrsScope<Boolean>.() -> U
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "range", defaults = ["step=1"])
 fun RangeInput(
     value: Number? = null,
     min: Number? = null,
@@ -210,6 +223,7 @@ fun RangeInput(
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "search", defaults = ["value="])
 fun SearchInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Search, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
@@ -220,6 +234,7 @@ fun SearchInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = 
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "submit")
 fun SubmitInput(attrs: InputAttrsScope<Unit>.() -> Unit = {}) {
     Input(type = InputType.Submit, attrs = attrs)
 }
@@ -233,6 +248,7 @@ fun SubmitInput(attrs: InputAttrsScope<Unit>.() -> Unit = {}) {
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "tel", defaults = ["value="])
 fun TelInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Tel, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
@@ -246,6 +262,7 @@ fun TelInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {})
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "text", defaults = ["value="])
 fun TextInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Text, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
@@ -259,6 +276,7 @@ fun TextInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "time", defaults = ["value="])
 fun TimeInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Time, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
@@ -272,6 +290,7 @@ fun TimeInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "url", defaults = ["value="])
 fun UrlInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Url, attrs = { applyAttrsWithStringValue(value, attrs) })
 }
@@ -285,6 +304,7 @@ fun UrlInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {})
  */
 @Composable
 @NonRestartableComposable
+@LowerableHtmlTag("input", inputType = "week", defaults = ["value="])
 fun WeekInput(value: String = "", attrs: InputAttrsScope<String>.() -> Unit = {}) {
     Input(type = InputType.Week, attrs = { applyAttrsWithStringValue(value, attrs) })
 }

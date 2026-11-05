@@ -3,16 +3,10 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.web.dom
+// Access shared serialization helpers without exposing them as public API.
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
-private val HtmlTableChildNames = mapOf(
-    "table" to setOf("caption", "colgroup", "thead", "tbody", "tfoot", "script", "style", "template"),
-    "thead" to setOf("tr", "script", "style", "template"),
-    "tbody" to setOf("tr", "script", "style", "template"),
-    "tfoot" to setOf("tr", "script", "style", "template"),
-    "tr" to setOf("td", "th", "script", "style", "template"),
-    "colgroup" to setOf("col", "template"),
-)
+package org.jetbrains.compose.web.dom
 
 /** Rejects implied table wrappers and foster parenting before HTML leaves the string renderer. */
 internal fun requireHtmlParserStableTableChild(parentTagName: String?, child: StringHtmlNode) {
@@ -21,36 +15,9 @@ internal fun requireHtmlParserStableTableChild(parentTagName: String?, child: St
         is StringHtmlTextNode -> {
             requireHtmlParserStableTableText(parentTagName, child.text)
         }
+
         is StringHtmlRawTextNode -> {
             requireHtmlParserStableTableText(parentTagName, child.content.text)
         }
-    }
-}
-
-internal fun requireHtmlParserStableTableElement(parentTagName: String?, childTagName: String?) {
-    val allowedChildren = HtmlTableChildNames[parentTagName] ?: return
-    if (childTagName in allowedChildren) return
-
-    val suggestion = when {
-        parentTagName == "table" && childTagName == "tr" -> "wrap rows in Tbody { }"
-        parentTagName == "table" && (childTagName == "td" || childTagName == "th") ->
-            "wrap rows in Tbody { } and cells in Tr { }"
-        parentTagName == "table" && childTagName == "col" -> "wrap columns in Colgroup { }"
-        parentTagName in setOf("tbody", "thead", "tfoot") &&
-            (childTagName == "td" || childTagName == "th") -> "wrap cells in Tr { }"
-        else -> "use explicit table sections, rows and cells, or move this content outside the table"
-    }
-    throw IllegalArgumentException(
-        "Element <$childTagName> cannot be serialized directly inside <$parentTagName>; " +
-            "the HTML parser would insert wrappers, move or discard content. $suggestion",
-    )
-}
-
-internal fun requireHtmlParserStableTableText(parentTagName: String?, text: String) {
-    if (parentTagName !in HtmlTableChildNames) return
-    require(text.all { it in AsciiWhitespaceCharacters }) {
-        "Non-whitespace text cannot be serialized directly inside <$parentTagName>; " +
-            "the HTML parser would move it outside the table. " +
-            "Wrap text in Td { } or Th { } inside Tr { }, or move it outside the table"
     }
 }

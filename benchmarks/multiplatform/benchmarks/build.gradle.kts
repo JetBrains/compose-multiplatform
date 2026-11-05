@@ -72,6 +72,11 @@ kotlin {
                     freeCompilerArgs.add("-Xwasm-use-new-exception-proposal")
                 }
             }
+            linkTask.configure {
+                compilerOptions {
+                    freeCompilerArgs.add("-Xwasm-use-new-exception-proposal")
+                }
+            }
         }
     }
 

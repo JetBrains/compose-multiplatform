@@ -3,6 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+// Access shared serialization helpers without exposing them as public API.
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
@@ -38,11 +41,13 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
     override fun <TElement : Element> TagElement(
         elementBuilder: ElementBuilder<TElement>,
         applyAttrs: (AttrsScope<TElement>.() -> Unit)?,
+        rawTextContent: RawTextContent?,
         content: (@Composable ElementScope<TElement>.() -> Unit)?,
     ) = StringTagElement(
         elementBuilder = elementBuilder,
         applyAttrs = applyAttrs,
         content = content,
+        rawText = rawTextContent,
     )
 
     @Composable
@@ -70,7 +75,8 @@ internal object StringComposeHtmlContext : ComposeHtmlContext {
                 update = {
                     val attrsScope = AttrsScopeBuilder<TElement>()
                     applyAttrs?.invoke(attrsScope)
-                    val formState = attrsScope.propertyUpdatesOrEmpty.formControlState(elementBuilder.tagName, namespace)
+                    val formState =
+                        attrsScope.propertyUpdatesOrEmpty.formControlState(elementBuilder.tagName, namespace)
                     val attributes = attrsScope.stringAttributes(namespace, validate, formState)
                     rawText?.validateAttributes(attributes.byName)
 

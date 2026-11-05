@@ -13,7 +13,9 @@ plugins {
 subprojects {
     repositories {
         google()
-        mavenCentral()
+        mavenCentral {
+            url = uri("https://cache-redirector.jetbrains.com/maven-central")
+        }
         maven("https://packages.jetbrains.team/maven/p/cmp/dev")
     }
 }

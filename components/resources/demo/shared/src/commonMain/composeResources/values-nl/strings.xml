@@ -1,0 +1,9 @@
+<resources>
+    <string name="hello">😊 Hallo wereld!</string>
+    <string name="str_template">Hallo, %1$s!\nJe hebt %2$d nieuwe berichten.</string>
+    <string-array name="str_arr">
+        <item>onderdeel \u2605</item>
+        <item>onderdeel \u2318</item>
+        <item>onderdeel \u00BD</item>
+    </string-array>
+</resources>

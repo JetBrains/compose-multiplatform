@@ -15,17 +15,18 @@ pluginManagement {
         }
     }
 
-    val localProperties: java.util.Properties? = properties("local.properties")
-
+    val localProperties: java.util.Properties? = properties(rootDir.resolve("local.properties").absolutePath)
 
     val repos = (localProperties?.getProperty("compose.web.repos"))?.split(File.pathSeparator)
 
-    val buildSrcProperties: java.util.Properties = properties(rootProject.projectDir.resolve("buildSrc/gradle.properties").absolutePath)!!
+    val buildSrcProperties: java.util.Properties =
+        properties(rootProject.projectDir.resolve("buildSrc/gradle.properties").absolutePath)!!
     val kotlinVersion = buildSrcProperties["kotlin.version"] as String
 
     repositories {
-        gradlePluginPortal()
-        mavenCentral()
+        mavenCentral {
+            url = uri("https://cache-redirector.jetbrains.com/maven-central")
+        }
         repos?.forEach { urlPath ->
             maven {
                 url = uri(urlPath)
@@ -37,6 +38,7 @@ pluginManagement {
         maven {
             url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
         }
+        gradlePluginPortal()
         google()
         mavenLocal()
     }
@@ -56,14 +58,16 @@ pluginManagement {
 dependencyResolutionManagement {
     repositories {
         google()
-        mavenCentral()
+        mavenCentral {
+            url = uri("https://cache-redirector.jetbrains.com/maven-central")
+        }
         maven {
             url = uri("https://packages.jetbrains.team/maven/p/cmp/dev")
         }
     }
     versionCatalogs {
         create("libs") {
-            library("kotlinx-coroutines-core", "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0-RC")
+            library("kotlinx-coroutines-core", "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
             library("kotlinx-browser", "org.jetbrains.kotlinx:kotlinx-browser:0.5.0")
         }
     }
@@ -101,9 +105,31 @@ module(":html-test-utils", "test-utils")
 
 if (composeHtmlEapEnabled) {
     println("Compose HTML EAP modules enabled")
+    val usePublishedExamples = setting("compose.html.eap.examples.usePublished")?.toBoolean() ?: true
+    val publishedExamplesVersion = requireNotNull(setting("compose.html.eap.examples.version"))
+    gradle.rootProject {
+        extra["compose.html.eap.examples.usePublished"] = usePublishedExamples
+        extra["compose.html.eap.examples.version"] = publishedExamplesVersion
+    }
+    if (usePublishedExamples) {
+        pluginManagement.resolutionStrategy.eachPlugin {
+            if (requested.id.id == "org.jetbrains.compose.html.lowering") {
+                useVersion(publishedExamplesVersion)
+            }
+        }
+    } else {
+        includeBuild("eap/compiler-plugin/gradle-plugin") {
+            name = "compose-html-lowering-gradle-plugin"
+        }
+    }
+    module(":compiler-plugin-test-harness", "eap/plugin-test-harness")
     module(":html-core-eap", "eap/core")
+    module(":html-eap-benchmarks", "eap/benchmarks")
     module(":html-svg-eap", "eap/svg")
     module(":internal-html-core-runtime-eap", "eap/internal-html-core-runtime")
+    module(":internal-html-serialization-eap", "eap/internal-html-serialization")
+    module(":compose-html-compiler-plugin", "eap/compiler-plugin")
+    module(":compose-html-compiler-plugin:tests", "eap/compiler-plugin/tests")
     module(":html-eap-example", "eap/examples/string-rendering")
     module(":html-eap-hydration-example", "eap/examples/hydration")
     module(":html-eap-hydration-islands-example", "eap/examples/hydration-islands")

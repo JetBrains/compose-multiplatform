@@ -1,0 +1,41 @@
+// Source: main/unsupportedAttributes.kt
+// ------------------------------------------
+/*
+ * Copyright 2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+import androidx.compose.runtime.Composable
+import kotlinx.browser.dom.HTMLDivElement
+import org.jetbrains.compose.web.attributes.AttrsScope
+import org.jetbrains.compose.web.dom.*
+
+@Composable
+fun UnsupportedAttributes(callback: AttrsScope<HTMLDivElement>.() -> Unit) {
+    Div(attrs = {
+        id("before")
+        callback()
+        attr("title", "after")
+    }) {
+        Span { Text("child") }
+    }
+}
+
+
+// Transformed IR: main
+// ------------------------------------------
+// MODULE: <main>
+// FILE: unsupportedAttributes.kt
+
+@Composable
+fun UnsupportedAttributes(callback: @ExtensionFunctionType Function1<AttrsScope<HTMLDivElement>, Unit>) {
+  Div(attrs = local fun AttrsScope<HTMLDivElement>.<anonymous>() {
+    $this$Div.id(value = "before") /*~> Unit */
+    callback.invoke(p1 = $this$Div)
+    $this$Div.attr(attr = "title", value = "after") /*~> Unit */
+  }
+, content = local fun ElementScope<HTMLDivElement>.<anonymous>() {
+    WriteStaticHtml(rootTag = "span", encoded = "<span>child</span>")
+  }
+)
+}

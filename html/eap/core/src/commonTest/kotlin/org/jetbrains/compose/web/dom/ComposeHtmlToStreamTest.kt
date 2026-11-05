@@ -6,6 +6,8 @@
 package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
 import kotlinx.browser.dom.Element
 import org.jetbrains.compose.web.composeHtmlToStream
 import org.jetbrains.compose.web.composeHtmlToString
@@ -184,5 +186,57 @@ class ComposeHtmlToStreamTest {
             }
         }
         assertEquals("second", composeHtmlToString(key = "stream-sink-failure") { Text("second") })
+    }
+
+    @Test
+    fun sameKeyReentryFromSinkPreservesTheOuterRender() {
+        val chunks = mutableListOf<String>()
+        composeHtmlToStream(
+            sink = {
+                assertEquals("inner", composeHtmlToString(key = "stream-reentry") { Text("inner") })
+                chunks.add(it)
+            },
+            chunkSize = 1,
+            key = "stream-reentry",
+        ) { Div { Text("outer") } }
+        assertEquals("<div>outer</div>", chunks.joinToString(""))
+        assertEquals("next", composeHtmlToString(key = "stream-reentry") { Text("next") })
+    }
+
+    @Test
+    fun differentKeyReentryFromSinkPreservesTheOuterRender() {
+        val chunks = mutableListOf<String>()
+        composeHtmlToStream(
+            sink = {
+                assertEquals("<span>inner</span>", composeHtmlToString(key = "stream-inner") {
+                    Span { Text("inner") }
+                })
+                chunks.add(it)
+            },
+            chunkSize = 1,
+            key = "stream-outer",
+        ) { Div { Text("first"); Text("second") } }
+        assertEquals("<div>first<!--c-->second</div>", chunks.joinToString(""))
+    }
+
+    @Test
+    fun sameKeyReentryFromEffectsPreservesTheOuterRender() {
+        val effects = mutableListOf<String>()
+        fun checkReentry(effect: String) {
+            val chunks = mutableListOf<String>()
+            composeHtmlToStream(sink = chunks::add, key = "effect-reentry") { Text("inner") }
+            assertEquals(listOf("inner"), chunks)
+            effects.add(effect)
+        }
+        assertEquals("outer", composeHtmlToString(key = "effect-reentry") {
+            DisposableEffect(Unit) {
+                checkReentry("enter")
+                onDispose { checkReentry("dispose") }
+            }
+            SideEffect { checkReentry("side") }
+            Text("outer")
+        })
+        assertEquals(listOf("enter", "side", "dispose"), effects)
+        assertEquals("next", composeHtmlToString(key = "effect-reentry") { Text("next") })
     }
 }

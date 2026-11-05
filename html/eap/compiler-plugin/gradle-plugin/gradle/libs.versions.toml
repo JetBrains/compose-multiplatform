@@ -1,0 +1,5 @@
+[versions]
+build-time-config = "2.3.1"
+
+[plugins]
+buildTimeConfig = { id = "dev.limebeck.build-time-config", version.ref = "build-time-config" }

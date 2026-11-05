@@ -14,7 +14,9 @@ subprojects {
     version = BuildProperties.deployVersion(project)
 
     repositories {
-        mavenCentral()
+        mavenCentral {
+            url = uri("https://cache-redirector.jetbrains.com/maven-central")
+        }
         google()
         mavenLocal()
         maven("https://packages.jetbrains.team/maven/p/kt/dev")

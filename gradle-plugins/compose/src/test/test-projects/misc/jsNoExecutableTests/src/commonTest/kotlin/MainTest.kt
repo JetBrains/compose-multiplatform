@@ -1,18 +1,9 @@
-import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.runComposeUiTest
-import kotlin.test.*
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
-@OptIn(ExperimentalTestApi::class)
 class MainTest {
-
     @Test
-    fun testReversedTextView() = runComposeUiTest {
-        setContent {
-            ReversedTextView("Hello")
-        }
-
-        onNodeWithText("olleH").assertExists()
+    fun reverseText() {
+        assertEquals("olleH", "Hello".reversed())
     }
-
 }

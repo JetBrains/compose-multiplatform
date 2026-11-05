@@ -11,6 +11,8 @@ plugins {
     id("org.jetbrains.kotlinx.binary-compatibility-validator")
 }
 
+configureKotlinCompatibility()
+
 kotlin {
     jvm("desktop")
     android {
@@ -151,7 +153,7 @@ kotlin {
         val webMain by getting {
             dependsOn(skikoMain)
             dependencies {
-                 implementation(libs.kotlinx.browser)
+                implementation(libs.kotlinx.browser)
             }
         }
         val webTest by getting {

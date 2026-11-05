@@ -11,11 +11,14 @@ import java.io.IOException
 import java.io.OutputStreamWriter
 import java.io.Writer
 import kotlinx.browser.dom.Element
+import org.jetbrains.compose.web.HtmlRenderer
 import org.jetbrains.compose.web.composeHtmlToStream
 import org.jetbrains.compose.web.composeHtmlToString
+import org.jetbrains.compose.web.htmlWriterSink
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class ComposeHtmlToWriterTest {
@@ -82,9 +85,17 @@ class ComposeHtmlToWriterTest {
         assertTrue(writer.chunks.isEmpty())
         assertEquals(0, writer.flushes)
         assertEquals(0, writer.closes)
-        for (size in listOf(0, -1)) assertFailsWith<IllegalArgumentException> {
-            composeHtmlToStream(writer, chunkSize = size) {}
+        var composed = false
+        for (size in listOf(0, -1)) {
+            val failure = assertFailsWith<IllegalArgumentException> {
+                composeHtmlToStream(writer, chunkSize = size) { composed = true; Text("unused") }
+            }
+            assertEquals("chunkSize must be positive", failure.message)
         }
+        assertFalse(composed)
+        assertTrue(writer.chunks.isEmpty())
+        assertEquals(0, writer.flushes)
+        assertEquals(0, writer.closes)
     }
 
     @Test
@@ -146,28 +157,36 @@ class ComposeHtmlToWriterTest {
 
     @Test
     fun shrinksOldLargeBuffersAfterSmallRendersButReusesRepeatedLargeBuffers() {
-        val key = "writer-buffer-capacity"
+        val renderer = HtmlRenderer()
+        fun render(text: String, writer: Writer? = null): String = renderer.render(
+            hydratable = false,
+            requireHtmlDocumentRoot = false,
+            chunkSink = writer?.let(::htmlWriterSink),
+            chunkSize = 2048,
+            prefix = "",
+        ) { Text(text) }
         val large = "α".repeat(1024 * 1024)
-        composeHtmlToString(key = key) { Text(large) }
-        val output = keyedOutput(key)
-        val largeCapacity = output.capacity()
+        render(large)
+        val largeCapacity = renderer.bufferCapacity
         assertTrue(largeCapacity >= large.length)
-        composeHtmlToString(key = key) { Text(large) }
-        assertEquals(largeCapacity, output.capacity())
-        assertEquals("small", composeHtmlToString(key = key) { Text("small") })
-        assertTrue(output.capacity() <= 65536)
+        render(large)
+        assertEquals(largeCapacity, renderer.bufferCapacity)
+        assertEquals("small", render("small"))
+        assertTrue(renderer.bufferCapacity <= 65536)
 
-        composeHtmlToString(key = key) { Text(large) }
-        assertTrue(output.capacity() >= large.length)
-        composeHtmlToStream(RecordingWriter(), key = key) { Text("small") }
-        assertTrue(output.capacity() <= 65536)
-    }
+        render(large)
+        assertTrue(renderer.bufferCapacity >= large.length)
+        render("small", RecordingWriter())
+        assertTrue(renderer.bufferCapacity <= 65536)
 
-    private fun keyedOutput(key: String): StringBuilder {
-        val field = Class.forName("org.jetbrains.compose.web.ComposeHtmlToStringKt")
-            .getDeclaredField("reusableHtmlCompositions").apply { isAccessible = true }
-        val renderer = (field.get(null) as Map<*, *>)[key]!!
-        val output = renderer.javaClass.getDeclaredField("output").apply { isAccessible = true }
-        return output.get(renderer) as StringBuilder
+        render(large)
+        val chunk = "x".repeat(20 * 1024)
+        val writer = RecordingWriter()
+        render(chunk, writer)
+        assertEquals(listOf(chunk), writer.chunks)
+        assertEquals(chunk.length, renderer.bufferCapacity)
+        assertEquals(0, renderer.bufferLength)
+        render(chunk, RecordingWriter())
+        assertEquals(chunk.length, renderer.bufferCapacity)
     }
 }

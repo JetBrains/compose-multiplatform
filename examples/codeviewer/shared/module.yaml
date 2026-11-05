@@ -1,0 +1,28 @@
+product:
+  type: kmp/lib
+  platforms: [android, iosArm64, iosSimulatorArm64, jvm, wasmJs]
+
+aliases:
+  - jvmAndAndroid: [jvm, android]
+
+dependencies:
+  - $libs.compose.runtime
+  - $libs.compose.foundation
+  - $libs.compose.material
+  - $libs.compose.components.resources
+  - $libs.material.icons.extended
+
+dependencies@android:
+  - $libs.androidx.activity.compose: exported
+  - $libs.androidx.appcompat: exported
+  - $libs.androidx.core.ktx: exported
+
+settings:
+  compose:
+    enabled: true
+    resources:
+      packageName: codeviewer.shared.generated.resources
+  android:
+    namespace: org.jetbrains.codeviewer.common
+    minSdk: 26
+

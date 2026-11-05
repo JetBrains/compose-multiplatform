@@ -1,0 +1,4 @@
+*.bat text eol=crlf
+
+# Kotlin CLI wrapper without extension
+kotlin text eol=lf

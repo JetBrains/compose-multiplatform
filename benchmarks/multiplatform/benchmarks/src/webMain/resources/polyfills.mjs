@@ -50,6 +50,25 @@ class BlobPolyfill {
         return new BlobPolyfill(this._uint8.slice(start, end), type);
     }
 }
+// D8 has no Blob global; compose-resources casts the blob() result to Blob.
+if (typeof globalThis.Blob === 'undefined') {
+    globalThis.Blob = BlobPolyfill;
+}
+
+// Minimal Response polyfill: compose-resources casts the fetch result to Response (`x instanceof Response`).
+class ResponsePolyfill {
+    constructor(uint8) {
+        this._uint8 = uint8;
+        this.ok = true;
+        this.status = 200;
+    }
+    async blob() {
+        return new BlobPolyfill(this._uint8, 'application/octet-stream');
+    }
+}
+if (typeof globalThis.Response === 'undefined') {
+    globalThis.Response = ResponsePolyfill;
+}
 
 const runtimeDirectory = String(import.meta.url)
     .replace(/^file:\/\//, '')
@@ -71,13 +90,5 @@ globalThis.fetch = async (request) => {
         throw error;
     }
 
-    const uint8 = new Uint8Array(data);
-
-    return {
-        ok: true,
-        status: 200,
-        async blob() {
-            return new BlobPolyfill(uint8, 'application/xml');
-        },
-    };
+    return new ResponsePolyfill(new Uint8Array(data));
 };

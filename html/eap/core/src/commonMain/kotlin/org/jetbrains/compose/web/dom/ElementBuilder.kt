@@ -3,19 +3,20 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+// Access shared serialization helpers without exposing them as public API.
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
 package org.jetbrains.compose.web.dom
 
 import kotlinx.browser.dom.Element
 import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
-
-internal const val HtmlNamespace = "http://www.w3.org/1999/xhtml"
 
 fun interface ElementBuilder<TElement : Element> {
     /** The HTML tag name used for string rendering. DOM-only lambda builders may omit it. */
     val tagName: String
         get() = error(
             "String rendering requires a tag name. " +
-                "Override ElementBuilder.tagName or use TagElement(tagName, ...)."
+                    "Override ElementBuilder.tagName or use TagElement(tagName, ...)."
         )
 
     fun create(): TElement

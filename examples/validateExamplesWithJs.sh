@@ -19,20 +19,36 @@ if [ "$#" -eq 2 ]; then
     version_args=("-Pcompose.version=$1" "-Pkotlin.version=$2")
 fi
 
+compose_version="${1:-}"
+kotlin_version="${2:-}"
+
+# Resolves Maven Central through cache-redirector, to avoid its rate limits on CI
+init_script="$(cd "$(dirname "$0")/.." && pwd)/ci/cache-redirector.init.gradle"
 
 runGradle() {
     local example="$1"
     local task="$2"
     pushd "$example"
     if [ "${#version_args[@]}" -gt 0 ]; then
-        ./gradlew "$task" "${version_args[@]}"
+        ./gradlew "$task" --init-script "$init_script" "${version_args[@]}"
     else
-        ./gradlew "$task"
+        ./gradlew "$task" --init-script "$init_script"
     fi
     popd
 }
 
+runKotlin() {
+    local example="$1"
+    local platform="$2"
+    ./buildWithKotlinToolchain.sh "$example" "$platform" "$compose_version" "$kotlin_version"
+}
+
 runGradle html/compose-bird build
+runGradle html/compose-in-js build
 runGradle html/landing build
 runGradle html/with-react build
+runGradle chat :jsApp:jsBrowserDistribution
+runGradle graphics-2d :jsApp:jsBrowserDistribution
 runGradle imageviewer :webApp:wasmJsBrowserDistribution
+runGradle nav_cupcake :webApp:wasmJsBrowserDistribution
+runKotlin codeviewer wasmJs

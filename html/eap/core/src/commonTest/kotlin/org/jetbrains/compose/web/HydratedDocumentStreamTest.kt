@@ -7,7 +7,9 @@ package org.jetbrains.compose.web
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import org.jetbrains.compose.web.dom.Body
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Head
@@ -23,6 +25,25 @@ import kotlin.test.assertSame
 import kotlin.test.assertTrue
 
 class HydratedDocumentStreamTest {
+    @Test
+    fun documentRenderersUseSinglePassMovableContentWithFreshRememberedState() {
+        var remembered = 0
+        val content: @Composable () -> Unit = {
+            val movable = remember {
+                movableContentOf { Div { Text("render ${remember { ++remembered }}") } }
+            }
+            Html { Body { movable() } }
+        }
+        assertEquals(
+            "<!doctype html><html><body><div>render 1</div></body></html>",
+            renderHydratedDocument(content = content),
+        )
+        val chunks = mutableListOf<String>()
+        renderHydratedDocumentToStream(chunks::add, chunkSize = 1, content = content)
+        assertEquals("<!doctype html><html><body><div>render 2</div></body></html>", chunks.joinToString(""))
+        assertEquals(2, remembered)
+    }
+
     @Test
     fun defaultChunkSizeEmitsAt2048CodeUnitsDuringComposition() {
         val text = "x".repeat(2048)
@@ -124,7 +145,7 @@ class HydratedDocumentStreamTest {
     }
 
     @Test
-    fun validatesDocumentShapeInBothModesIncludingWhenOutputHasAlreadyBeenSent() {
+    fun validatesDocumentShapeOnlyInStrictModeIncludingWhenOutputHasAlreadyBeenSent() {
         val invalidDocuments = listOf<@Composable () -> Unit>(
             {},
             { Text("fragment") },
@@ -136,6 +157,11 @@ class HydratedDocumentStreamTest {
             for (size in listOf(1, Int.MAX_VALUE)) {
                 for (content in invalidDocuments) {
                     val chunks = mutableListOf<String>()
+                    if (!strict) {
+                        renderHydratedDocumentToStream(chunks::add, size, strict, content)
+                        assertEquals(renderHydratedDocument(validateStrictly = false, content = content), chunks.joinToString(""))
+                        continue
+                    }
                     val failure = assertFailsWith<IllegalArgumentException> {
                         renderHydratedDocumentToStream(chunks::add, size, strict, content)
                     }
@@ -146,7 +172,7 @@ class HydratedDocumentStreamTest {
         }
         val partial = mutableListOf<String>()
         assertFailsWith<IllegalArgumentException> {
-            renderHydratedDocumentToStream(partial::add, chunkSize = 1) { Div() }
+            renderHydratedDocumentToStream(partial::add, chunkSize = 1, validateStrictly = true) { Div() }
         }
         assertEquals("<!doctype html><div></div>", partial.joinToString(""))
     }
@@ -185,7 +211,7 @@ class HydratedDocumentStreamTest {
     }
 
     @Test
-    fun discardsSnapshotChangesAndDisposesTheCompositionEvenWhenTheSinkFails() {
+    fun retainsSnapshotChangesAndDisposesTheCompositionEvenWhenTheSinkFails() {
         for (fail in listOf(false, true)) {
             val sharedState = mutableStateOf("initial")
             var disposals = 0
@@ -203,7 +229,7 @@ class HydratedDocumentStreamTest {
             }
             if (fail) assertSame(sinkFailure, assertFailsWith<IllegalStateException> { render() })
             else render()
-            assertEquals("initial", sharedState.value)
+            assertEquals("rendered", sharedState.value)
             assertEquals(1, disposals)
             if (!fail) assertContains(chunks.single(), "rendered</script>")
         }

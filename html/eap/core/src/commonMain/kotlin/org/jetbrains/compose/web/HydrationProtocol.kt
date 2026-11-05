@@ -5,10 +5,11 @@ import org.jetbrains.compose.web.attributes.AttrsScope
 import org.jetbrains.compose.web.attributes.AttrsScopeBuilder
 import org.jetbrains.compose.web.attributes.ScriptType
 
-internal const val HydrationRootAttribute = "data-compose-hydration-root"
-internal const val HydrationStateAttribute = "data-compose-hydration-state"
-internal const val HydrationForAttribute = "data-compose-hydration-for"
-internal const val HydrationValidationAttribute = "data-compose-hydration-validation"
+internal const val HydrationAttributePrefix = "data-compose-hydration-"
+internal const val HydrationRootAttribute = "${HydrationAttributePrefix}root"
+internal const val HydrationStateAttribute = "${HydrationAttributePrefix}state"
+internal const val HydrationForAttribute = "${HydrationAttributePrefix}for"
+internal const val HydrationValidationAttribute = "${HydrationAttributePrefix}validation"
 internal const val HydrationValidationEnabled = "on"
 internal const val HydrationStateFormat = "escaped-text-v1"
 internal val HydrationStateMimeType: String = ScriptType.TextPlain.typeStr

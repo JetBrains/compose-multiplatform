@@ -11,7 +11,9 @@ subprojects {
     version = project.property("deploy.version") as String
 
     repositories {
-        mavenCentral()
+        mavenCentral {
+            url = uri("https://cache-redirector.jetbrains.com/maven-central")
+        }
     }
 
     plugins.withType(JavaBasePlugin::class.java) {

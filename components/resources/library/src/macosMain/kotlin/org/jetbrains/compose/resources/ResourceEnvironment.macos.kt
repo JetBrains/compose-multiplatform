@@ -1,19 +1,21 @@
 package org.jetbrains.compose.resources
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import kotlinx.cinterop.*
 import platform.AppKit.NSScreen
 import platform.CoreGraphics.CGDisplayPixelsWide
 import platform.CoreGraphics.CGDisplayScreenSize
 import platform.Foundation.*
 
-internal actual fun getSystemEnvironment(): ResourceEnvironment {
-    val locale = NSLocale.preferredLanguages.firstOrNull()
-        ?.let { NSLocale(it as String) }
-        ?: NSLocale.currentLocale
+@Composable
+internal actual fun getSystemLocales(): List<ResourceLocale> {
+    val locales = getSystemResourceLocales()
+    return remember(locales) { locales }
+}
 
-    val languageCode = locale.languageCode
-    val scriptCode = locale.scriptCode
-    val regionCode = locale.objectForKey(NSLocaleCountryCode) as? String
+internal actual fun getSystemEnvironment(): ResourceEnvironment {
+    val locales = getSystemResourceLocales()
     val isDarkTheme = NSUserDefaults.standardUserDefaults.stringForKey("AppleInterfaceStyle") == "Dark"
 
     val dpi = NSScreen.mainScreen?.let { screen ->
@@ -30,10 +32,24 @@ internal actual fun getSystemEnvironment(): ResourceEnvironment {
     } ?: 0
 
     return ResourceEnvironment(
-        language = LanguageQualifier(languageCode),
-        script = ScriptQualifier(scriptCode.orEmpty()),
-        region = RegionQualifier(regionCode.orEmpty()),
+        locales = locales,
         theme = ThemeQualifier.selectByValue(isDarkTheme),
         density = DensityQualifier.selectByValue(dpi)
     )
+}
+
+private fun getSystemResourceLocales(): List<ResourceLocale> =
+    resourceLocalesForLanguages(NSLocale.preferredLanguages.map { it as String })
+
+private fun resourceLocalesForLanguages(languages: List<String>): List<ResourceLocale> {
+    val locales = languages
+        .map { NSLocale(it) }
+        .ifEmpty { listOf(NSLocale.currentLocale) }
+    return locales.map { locale ->
+        ResourceLocale(
+            LanguageQualifier(locale.languageCode),
+            ScriptQualifier(locale.scriptCode.orEmpty()),
+            RegionQualifier((locale.objectForKey(NSLocaleCountryCode) as? String).orEmpty())
+        )
+    }
 }

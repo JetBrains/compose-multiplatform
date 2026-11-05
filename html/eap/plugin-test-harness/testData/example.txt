@@ -1,0 +1,12 @@
+// Source: main/Example.kt
+// ------------------------------------------
+fun answer(): Int = 1
+
+// Transformed IR: main
+// ------------------------------------------
+// MODULE: <main>
+// FILE: Example.kt
+
+fun answer(): Int {
+  return 42
+}

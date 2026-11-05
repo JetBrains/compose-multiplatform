@@ -19,6 +19,8 @@ if [ "$#" -eq 2 ]; then
     version_args=("-Pcompose.version=$1" "-Pkotlin.version=$2")
 fi
 
+compose_version="${1:-}"
+kotlin_version="${2:-}"
 
 runGradle() {
     local example="$1"
@@ -32,7 +34,13 @@ runGradle() {
     popd
 }
 
+runKotlin() {
+    local example="$1"
+    local platform="$2"
+    ./buildWithKotlinToolchain.sh "$example" "$platform" "$compose_version" "$kotlin_version"
+}
+
 runGradle chat
-runGradle codeviewer
+runKotlin codeviewer iosSimulatorArm64
 runGradle imageviewer
 runGradle graphics-2d

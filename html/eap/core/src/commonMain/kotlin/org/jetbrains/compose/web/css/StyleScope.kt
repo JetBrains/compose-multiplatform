@@ -44,6 +44,7 @@ interface StyleScope {
      * ```
      */
     fun property(propertyName: String, value: StylePropertyValue)
+
     /**
      * Adds arbitrary CSS property to the inline style of the element. By default throws an error for backward compatibility
      * @param propertyName - the name of css property as [per spec](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference)
@@ -62,13 +63,19 @@ interface StyleScope {
      * })
      * ```
      */
-    fun property(propertyName: String, value: StylePropertyValue, important: Boolean): Unit = error("!important is not supported by this implementation")
+    fun property(propertyName: String, value: StylePropertyValue, important: Boolean): Unit =
+        error("!important is not supported by this implementation")
+
     fun variable(variableName: String, value: StylePropertyValue)
 
     fun property(propertyName: String, value: String) = property(propertyName, StylePropertyValue(value))
-    fun property(propertyName: String, value: String, important: Boolean) = property(propertyName, StylePropertyValue(value), important)
+    fun property(propertyName: String, value: String, important: Boolean) =
+        property(propertyName, StylePropertyValue(value), important)
+
     fun property(propertyName: String, value: Number) = property(propertyName, StylePropertyValue(value))
-    fun property(propertyName: String, value: Number, important: Boolean) = property(propertyName, StylePropertyValue(value), important)
+    fun property(propertyName: String, value: Number, important: Boolean) =
+        property(propertyName, StylePropertyValue(value), important)
+
     fun variable(variableName: String, value: String) = variable(variableName, StylePropertyValue(value))
     fun variable(variableName: String, value: Number) = variable(variableName, StylePropertyValue(value))
 
@@ -151,6 +158,7 @@ fun <TValue : StylePropertyValue> variable() =
 interface StyleHolder {
     @ComposeWebInternalApi
     val properties: StylePropertyList
+
     @ComposeWebInternalApi
     val variables: StylePropertyList
 }
@@ -183,7 +191,7 @@ open class StyleScopeBuilder : StyleScope, StyleHolder {
     override fun equals(other: Any?): Boolean {
         return if (other is StyleHolder) {
             properties.nativeEquals(other.properties) &&
-                variables.nativeEquals(other.variables)
+                    variables.nativeEquals(other.variables)
         } else false
     }
 
@@ -210,37 +218,61 @@ data class StylePropertyDeclaration(
 typealias StylePropertyList = List<StylePropertyDeclaration>
 typealias MutableStylePropertyList = MutableList<StylePropertyDeclaration>
 
+// TODO: Investigate an append overload that avoids intermediate strings.
 @OptIn(ComposeWebInternalApi::class)
 internal fun StyleHolder.toStyleAttributeValue(): String? {
     if (properties.isEmpty() && variables.isEmpty()) return null
+    // Reuse conversions if priority or removal needs a second pass.
+    // Skip removed values as before.
+    val values = arrayOfNulls<String>(properties.size + variables.size)
+    val ordinary = StringBuilder()
+    if (ordinary.appendOrdinaryDeclarations(properties, "", values, 0) &&
+        ordinary.appendOrdinaryDeclarations(variables, "--", values, properties.size)
+    ) return ordinary.toString()
     val declarations = properties + variables.map { it.copy(name = "--${it.name}") }
     val removedNames = mutableSetOf<String>()
     val resetPriorityNames = mutableSetOf<String>()
-    // Walk backwards to retain fallbacks without repeatedly scanning earlier declarations.
-    // Empty assignments remove a property. Normal assignments reset its earlier priority.
-    return declarations.asReversed().filter { declaration ->
+    val included = BooleanArray(declarations.size)
+    for (index in declarations.lastIndex downTo 0) {
+        val declaration = declarations[index]
+        if (declaration.name in removedNames) continue
+        val value = values[index] ?: declaration.value.toString().also { values[index] = it }
         when {
-            declaration.name in removedNames -> false
-            declaration.value.toString().isEmpty() -> {
-                removedNames.add(declaration.name)
-                false
-            }
-            declaration.important -> declaration.name !in resetPriorityNames
+            value.isEmpty() -> removedNames.add(declaration.name)
+            declaration.important -> included[index] = declaration.name !in resetPriorityNames
             else -> {
                 resetPriorityNames.add(declaration.name)
-                true
+                included[index] = true
             }
         }
-    }.asReversed()
-        .takeIf { declarations -> declarations.isNotEmpty() }
-        ?.joinToString("; ") { declaration ->
-            buildString {
-                append(declaration.name)
-                append(": ")
-                append(declaration.value)
-                if (declaration.important) append(" !important")
-            }
+    }
+    return buildString {
+        for (index in declarations.indices) {
+            if (!included[index]) continue
+            val declaration = declarations[index]
+            if (isNotEmpty()) append("; ")
+            append(declaration.name).append(": ").append(values[index])
+            if (declaration.important) append(" !important")
         }
+    }.takeIf { it.isNotEmpty() }
+}
+
+private fun StringBuilder.appendOrdinaryDeclarations(
+    declarations: StylePropertyList,
+    prefix: String,
+    values: Array<String?>,
+    offset: Int,
+): Boolean {
+    for (index in declarations.indices) {
+        val declaration = declarations[index]
+        if (declaration.important) return false
+        val value = declaration.value.toString()
+        values[offset + index] = value
+        if (value.isEmpty()) return false
+        if (isNotEmpty()) append("; ")
+        append(prefix).append(declaration.name).append(": ").append(value)
+    }
+    return true
 }
 
 internal fun StylePropertyList.nativeEquals(properties: StylePropertyList): Boolean {

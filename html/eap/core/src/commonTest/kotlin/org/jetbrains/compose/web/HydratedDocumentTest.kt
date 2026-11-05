@@ -228,14 +228,14 @@ class HydratedDocumentTest {
         assertFalse("data-compose-hydration-state" in rendered)
     }
 
-    // Renders invalid top-level shapes to verify that only one html element is accepted.
+    // Strict mode rejects invalid document roots; fast mode omits the shape check.
     @Test
-    fun rejectsFragmentsAndMultipleHtmlElements() {
+    fun validatesDocumentShapeOnlyInStrictMode() {
         val fragmentFailure = assertFailsWith<IllegalArgumentException> {
-            renderHydratedDocument { Div() }
+            renderHydratedDocument(validateStrictly = true) { Div() }
         }
         val multipleDocumentsFailure = assertFailsWith<IllegalArgumentException> {
-            renderHydratedDocument {
+            renderHydratedDocument(validateStrictly = true) {
                 Html()
                 Html()
             }
@@ -243,6 +243,11 @@ class HydratedDocumentTest {
 
         assertContains(fragmentFailure.message.orEmpty(), "exactly one html element")
         assertContains(multipleDocumentsFailure.message.orEmpty(), "exactly one html element")
+        assertEquals("<!doctype html><div></div>", renderHydratedDocument(validateStrictly = false) { Div() })
+        assertEquals("<!doctype html><html></html><html></html>", renderHydratedDocument(validateStrictly = false) {
+            Html()
+            Html()
+        })
     }
 
     // Calls HydrationRoot through the ordinary renderer to verify the context error is clear.

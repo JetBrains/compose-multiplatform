@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.*
 import java.util.jar.JarFile
+import kotlin.test.Ignore
 import kotlin.test.assertTrue
 
 class DesktopApplicationTest : GradlePluginTestBase() {
@@ -353,6 +354,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         testPackageJvmDistributions()
     }
 
+    // TODO remove @Ignore with the fix in https://youtrack.jetbrains.com/issue/CMP-10914
+    @Ignore
     @Test
     fun testFontStripping() =
         // JBR25 comes with bundled fonts, so we can check stripping them on it

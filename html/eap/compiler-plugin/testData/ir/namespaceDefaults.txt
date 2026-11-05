@@ -1,0 +1,107 @@
+// Source: main/namespaceDefaults.kt
+// ------------------------------------------
+/*
+ * Copyright 2026 JetBrains s.r.o. and respective authors and developers.
+ * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
+ */
+
+@file:OptIn(org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi::class)
+
+import androidx.compose.runtime.Composable
+import kotlinx.browser.dom.Element
+import org.jetbrains.compose.web.dom.*
+
+@Composable
+fun HtmlNamespaceDefaults(value: String) {
+    Div {
+        Text(value)
+        Span { Text(value) }
+    }
+    Pre(attrs = { id(value) }) { Text(value) }
+}
+
+@Composable
+fun ExplicitForeignNamespace(value: String) {
+    TagElementNS<Element>("svg", "http://www.w3.org/2000/svg", null) {
+        Text(value)
+        TagElementNS<Element>("g", "http://www.w3.org/2000/svg", null) { Text(value) }
+    }
+    TagElementNS<Element>("g", "http://www.w3.org/2000/svg", { id(value) }) { Text(value) }
+}
+
+
+// Transformed IR: main
+// ------------------------------------------
+// MODULE: <main>
+// FILE: namespaceDefaults.kt
+@file:OptIn(markerClass = [ComposeWebInternalApi::class])
+
+@Composable
+fun HtmlNamespaceDefaults(value: String) {
+  { // BLOCK
+    val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
+    val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
+    val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "div", encoded = "<div>", innermost = "div", validate = tmp1_htmlValidate, leadingNewline = false)
+    tmp0_htmlWriter.writeText(value = value, validate = tmp1_htmlValidate)
+    tmp0_htmlWriter.advanceLoweredRegion(encoded = "<span>", innermost = "span", leadingNewline = false)
+    tmp0_htmlWriter.writeText(value = value, validate = tmp1_htmlValidate)
+    tmp0_htmlWriter.closeElement(encoded = "</span></div>", parent = tmp2_htmlParent)
+  }
+  { // BLOCK
+    val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
+    val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
+    val tmp5_htmlParent: Any? = when {
+      tmp0_htmlWriter.beginMixedElement(tagName = "pre", validate = tmp1_htmlValidate) -> { // BLOCK
+        var tmp2_html_id: String? = null
+        { // BLOCK
+          { // BLOCK
+            val tmp3_htmlValue: String = value
+            tmp2_html_id = tmp3_htmlValue
+          }
+        } /*~> Unit */
+        tmp0_htmlWriter.writeMixedLiteral(encoded = "<pre")
+        tmp0_htmlWriter.writeMixedAttribute(prefix = " id", value = tmp2_html_id, boolean = false)
+        val tmp4_htmlParent: Any? = tmp0_htmlWriter.finishMixedElement(tagName = "pre", leadingNewline = true)
+        tmp4_htmlParent
+      }
+      else -> null
+    }
+    tmp0_htmlWriter.writeText(value = value, validate = tmp1_htmlValidate)
+    tmp0_htmlWriter.closeElement(encoded = "</pre>", parent = tmp5_htmlParent)
+  }
+}
+
+@Composable
+fun ExplicitForeignNamespace(value: String) {
+  { // BLOCK
+    val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
+    val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
+    val tmp2_htmlParent: Any? = tmp0_htmlWriter.openLoweredRegion(rootTag = "svg", encoded = "<svg>", innermost = "svg", validate = tmp1_htmlValidate, namespace = "http://www.w3.org/2000/svg", leadingNewline = false)
+    tmp0_htmlWriter.writeText(value = value, validate = tmp1_htmlValidate)
+    tmp0_htmlWriter.advanceLoweredRegion(encoded = "<g>", innermost = "g", namespace = "http://www.w3.org/2000/svg", leadingNewline = false)
+    tmp0_htmlWriter.writeText(value = value, validate = tmp1_htmlValidate)
+    tmp0_htmlWriter.closeElement(encoded = "</g></svg>", parent = tmp2_htmlParent)
+  }
+  { // BLOCK
+    val tmp0_htmlWriter: HtmlStringWriterContext = currentHtmlStringWriter()
+    val tmp1_htmlValidate: Boolean = currentHtmlValidationIsStrict()
+    val tmp5_htmlParent: Any? = when {
+      tmp0_htmlWriter.beginMixedElement(tagName = "g", validate = tmp1_htmlValidate) -> { // BLOCK
+        var tmp2_html_id: String? = null
+        { // BLOCK
+          { // BLOCK
+            val tmp3_htmlValue: String = value
+            tmp2_html_id = tmp3_htmlValue
+          }
+        } /*~> Unit */
+        tmp0_htmlWriter.writeMixedLiteral(encoded = "<g")
+        tmp0_htmlWriter.writeMixedAttribute(prefix = " id", value = tmp2_html_id, boolean = false)
+        val tmp4_htmlParent: Any? = tmp0_htmlWriter.finishMixedElement(tagName = "g", namespace = "http://www.w3.org/2000/svg", leadingNewline = false)
+        tmp4_htmlParent
+      }
+      else -> null
+    }
+    tmp0_htmlWriter.writeText(value = value, validate = tmp1_htmlValidate)
+    tmp0_htmlWriter.closeElement(encoded = "</g>", parent = tmp5_htmlParent)
+  }
+}

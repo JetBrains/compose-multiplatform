@@ -3,6 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+// Access shared serialization helpers without exposing them as public API.
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
 package org.jetbrains.compose.web.dom
 
 import kotlinx.browser.dom.Element
@@ -17,8 +20,10 @@ internal actual val platformElementBuildersCache: Map<String, ElementBuilder<*>>
 internal actual fun <TElement : Element> createPlatformElementBuilder(
     tagName: String
 ): ElementBuilder<TElement> = htmlBuildersCache.getOrPut(tagName) {
-    object : ElementBuilder<Element> {
+    object : ElementBuilder<Element>, HtmlTagMetadata {
         override val tagName: String = tagName
+        override val namespace: String = HtmlNamespace
+        override val serializationFlags = htmlStringTagFlags(tagName, namespace)
 
         override fun create(): Element = throw UnsupportedOperationException(
             "DOM element creation for <$tagName> is not available on JVM"

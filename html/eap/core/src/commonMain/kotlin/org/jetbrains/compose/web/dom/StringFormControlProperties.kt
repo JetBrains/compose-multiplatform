@@ -3,6 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
+// Access shared serialization helpers without exposing them as public API.
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
 package org.jetbrains.compose.web.dom
 
 import kotlinx.browser.dom.Element
@@ -50,6 +53,7 @@ internal fun List<Pair<(Element, Any) -> Unit, Any>>.formControlState(
             }
             if (inputValue == null && checked == null) null else FormControlState(inputValue, checked)
         }
+
         "textarea" -> {
             var textAreaValue: String? = null
             var textAreaDefaultValue: String? = null
@@ -62,6 +66,7 @@ internal fun List<Pair<(Element, Any) -> Unit, Any>>.formControlState(
             // A controlled value takes precedence over a default, including an explicitly empty value.
             (textAreaValue ?: textAreaDefaultValue)?.let { FormControlState(textContent = it) }
         }
+
         else -> null
     }
 }

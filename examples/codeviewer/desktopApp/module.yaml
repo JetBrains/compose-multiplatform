@@ -1,0 +1,11 @@
+product: jvm/app
+
+dependencies:
+  - //shared
+  - $libs.compose.runtime
+  - $libs.compose.ui
+
+settings:
+  compose: enabled
+  jvm:
+    mainClass: org.jetbrains.codeviewer.MainKt
