@@ -52,4 +52,4 @@ jobs:
         shell: bash
         run: |
           cd benchmarks/multiplatform
-          ./gradlew :benchmarks:wasmJsD8ProductionRun
+          ./gradlew :benchmarks:wasmJsD8ProductionRun compileKotlinJs
