@@ -29,6 +29,7 @@ jobs:
         with:
           distribution: 'jetbrains'
           java-version: '25'
+          check-latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
