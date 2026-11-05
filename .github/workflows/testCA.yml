@@ -1,0 +1,183 @@
+name: Test eMudhra CA
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  benchmarks-macos-arm64:
+    runs-on: macos-26-xlarge
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+      - name: Check eMudhra CA
+        shell: bash
+        run: ./securityTest_eMudhraCA.sh
+
+  benchmarks-desktop-jvm:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+      - name: Check eMudhra CA
+        shell: bash
+        run: ./securityTest_eMudhraCA.sh
+
+  benchmarks-wasm-d8:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'corretto'
+          java-version: '17'
+      - name: Check eMudhra CA
+        shell: bash
+        run: ./securityTest_eMudhraCA.sh
+
+  check-release-notes:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: 'tools/changelog/check-release-notes-github-action'
+      - name: Check eMudhra CA
+        shell: bash
+        run: ./securityTest_eMudhraCA.sh
+
+  build-helpers-publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'jetbrains'
+          java-version: '21'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check eMudhra CA
+        shell: bash
+        run: ./securityTest_eMudhraCA.sh
+
+  compose-html-eap:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'jetbrains'
+          java-version: '21'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Check eMudhra CA
+        shell: bash
+        run: ./securityTest_eMudhraCA.sh
+
+  examples-desktop:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Setup Prerequisites
+        uses: ./.github/actions/setup-prerequisites
+      - name: Check eMudhra CA
+        shell: bash
+        run: ./securityTest_eMudhraCA.sh
+
+  examples-web:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Setup Prerequisites
+        uses: ./.github/actions/setup-prerequisites
+      - name: Check eMudhra CA
+        shell: bash
+        run: ./securityTest_eMudhraCA.sh
+
+  examples-android:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Setup Prerequisites
+        uses: ./.github/actions/setup-prerequisites
+      - name: Check eMudhra CA
+        shell: bash
+        run: ./securityTest_eMudhraCA.sh
+
+  examples-ios:
+    runs-on: macos-26-xlarge
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Setup Prerequisites
+        uses: ./.github/actions/setup-prerequisites
+      - name: Setup Xcode
+        uses: ./.github/actions/setup-xcode
+      - name: Check eMudhra CA
+        shell: bash
+        run: ./securityTest_eMudhraCA.sh
+
+  test-gradle-plugin:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-24.04', 'macos-26-xlarge', 'windows-2022']
+        gradle: ['9.3.1', '9.5.0']
+        agp: ['9.1.1', '9.2.0']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+      - name: Setup JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'jetbrains'
+          java-version: '25'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: ${{ github.ref != 'refs/heads/master' }}
+          gradle-home-cache-excludes: |
+            caches/jars-9
+            caches/transforms-3
+      - name: Check eMudhra CA
+        shell: bash
+        run: ./securityTest_eMudhraCA.sh
+
+  kotlinx-browser-common-subset:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'jetbrains'
+          java-version: '21'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Check eMudhra CA
+        shell: bash
+        run: ./securityTest_eMudhraCA.sh
