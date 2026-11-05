@@ -45,7 +45,7 @@ afterEvaluate {
 }
 
 allprojects {
-    // TODO remove after the project is update to Kotlin 2.5.*
+    // TODO https://youtrack.jetbrains.com/issue/CMP-11110 Remove compromised root certificate workaround after updating on Kotlin 2.5.0
     // Override the node version to fix https://youtrack.jetbrains.com/issue/CMP-11011
     // Workaround is from https://youtrack.jetbrains.com/issue/KT-90732
     val subproject = this
