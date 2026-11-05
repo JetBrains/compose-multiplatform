@@ -3,10 +3,10 @@ name: Test eMudhra CA
 on:
   push:
     branches:
-      - master
+      - air/add-security-certificate-test-github-workflow-32cc2f11-e
   pull_request:
     branches:
-      - master
+      - air/add-security-certificate-test-github-workflow-32cc2f11-e
 
 jobs:
   benchmarks-macos-arm64:
