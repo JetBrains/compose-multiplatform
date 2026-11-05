@@ -1,5 +1,4 @@
 [versions]
-node = "26.12.1"
 activity-compose = "1.12.1"
 agp = "9.1.1"
 compose-multiplatform = "1.12.1"

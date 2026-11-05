@@ -1,7 +1,6 @@
 # Version catalog has been renamed to be imported manually with overriden 'compose' version
 
 [versions]
-node = "26.12.1"
 kotlinx-coroutines = "1.11.0"
 androidx-appcompat = "1.8.0"
 androidx-activity-compose = "1.13.0"
