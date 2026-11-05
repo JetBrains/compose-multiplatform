@@ -18,6 +18,8 @@ actual interface GraphicsContext {
     fun surface(width: Int, height: Int): Surface
 
     suspend fun awaitGPUCompletion()
+
+    fun present() {}
 }
 
 expect fun runGC()
@@ -75,6 +77,7 @@ internal actual suspend fun measureComposable(
             scene.mimicSkikoRender(surface, it * nanosPerFrame, width, height)
             surface.flushAndSubmit(false)
             graphicsContext?.awaitGPUCompletion()
+            graphicsContext?.present()
             yieldEventLoop()
         }
 
@@ -90,6 +93,7 @@ internal actual suspend fun measureComposable(
                     gpuTotalTime += measureTime {
                         graphicsContext?.awaitGPUCompletion()
                     }
+                    graphicsContext?.present()
                     yieldEventLoop()
                 }
             }
@@ -98,6 +102,58 @@ internal actual suspend fun measureComposable(
 
         val frames = MutableList(frameCount) {
             BenchmarkFrame(Duration.INFINITE, Duration.INFINITE)
+        }
+
+        if (Config.isModeEnabled(Mode.REAL)) {
+            runGC()
+            repeat(frameCount) {
+                val frameStart = markNow()
+                scene.mimicSkikoRender(surface, it * nanosPerFrame, width, height)
+                surface.flushAndSubmit(false)
+                val cpuTime = frameStart.elapsedNow()
+                val gpuTime = measureTime {
+                    graphicsContext?.awaitGPUCompletion()
+                }
+                graphicsContext?.present()
+                frames[it] = BenchmarkFrame(cpuTime, gpuTime)
+                cpuTotalTime += cpuTime
+                gpuTotalTime += gpuTime
+                yieldEventLoop()
+            }
+        }
+
+        var startupTimeInfo: StartupTimeInfo? = null
+        if (Config.isModeEnabled(Mode.STARTUP)) {
+            val processStart = getProcessStartTime()
+            val firstFrameMeasureStart = markNow()
+            scene.mimicSkikoRender(surface, 0, width, height)
+            surface.flushAndSubmit(false)
+            graphicsContext?.awaitGPUCompletion()
+            graphicsContext?.present()
+            val firstFrameMark = markNow()
+            val timeOfFirstFrame = firstFrameMark - firstFrameMeasureStart
+
+            val startupFramesCount = Config.startupFrameCount
+            val startupFrames = MutableList(startupFramesCount) { Duration.ZERO }
+            repeat(startupFramesCount) { i ->
+                val frameStart = markNow()
+                scene.mimicSkikoRender(surface, (i + 1) * nanosPerFrame, width, height)
+                surface.flushAndSubmit(false)
+                graphicsContext?.awaitGPUCompletion()
+                graphicsContext?.present()
+                startupFrames[i] = frameStart.elapsedNow()
+            }
+            val nthFrameMark = markNow()
+            val timeToNthFrame = nthFrameMark - firstFrameMark
+
+            startupTimeInfo = StartupTimeInfo(
+                timeToMain = processStart?.let { mainTime - it },
+                timeFromMainToFirstFrame = firstFrameMark - mainTime,
+                timeOfFirstFrame = timeOfFirstFrame,
+                timeToNthFrame = timeToNthFrame,
+                nthFrameCount = startupFramesCount,
+                longestFrames = startupFrames.sortedDescending().take(Config.startupLongestFramesCount)
+            )
         }
 
         if (Config.isModeEnabled(Mode.VSYNC_EMULATION)) {
@@ -117,6 +173,7 @@ internal actual suspend fun measureComposable(
                 val cpuTime = frameStart.elapsedNow()
 
                 graphicsContext?.awaitGPUCompletion()
+                graphicsContext?.present()
 
                 val frameTime = frameStart.elapsedNow()
 
@@ -144,6 +201,7 @@ internal actual suspend fun measureComposable(
             FrameInfo(cpuTotalTime / frameCount, gpuTotalTime / frameCount),
             FPSInfo(frameCount.toDouble() / (cpuTotalTime + gpuTotalTime).toDouble(DurationUnit.SECONDS)),
             frames,
+            startupTimeInfo
         )
     } finally {
         scene.close()

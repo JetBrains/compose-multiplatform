@@ -68,7 +68,17 @@ class SdlGraphicsContext : GraphicsContext {
         context.submit(true)
         nativeGlFinish()
     }
+
+    override fun present() {
+        if (contextPointer != 0) {
+            nativeGlPresent(contextPointer)
+            makeCurrent()
+        }
+    }
 }
+
+private fun nativeGlPresent(contextId: Int): Unit =
+    js("(function(ctxId) { var nativeGL = globalThis.__skikoNativeGL; if (nativeGL && typeof nativeGL.present === 'function') { try { nativeGL.present(ctxId); } catch (e) {} } if (nativeGL && typeof nativeGL.pollEvents === 'function') { try { nativeGL.pollEvents(); } catch (e) {} } })(contextId)")
 
 private fun createGlContext(width: Int, height: Int): Int =
     js("(function() { var canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height; return (globalThis.__skikoGL && typeof globalThis.__skikoGL.createContext === 'function') ? globalThis.__skikoGL.createContext(canvas, { alpha: 1, depth: 1, stencil: 8, antialias: 0, majorVersion: 2 }) : 0; })()")

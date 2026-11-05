@@ -57,6 +57,14 @@ fun mainBrowser() = MainScope().launch {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
+fun launchRealBenchmarksWeb(onComplete: () -> Unit) {
+    val frameRate = 120
+    ComposeViewport("root") {
+        BenchmarkRunner(getBenchmarks(), frameRate, onExit = onComplete)
+    }
+}
+
 internal suspend fun awaitSkikoWasm() {
     suspendCancellableCoroutine { c ->
         @Suppress("INVISIBLE_REFERENCE")

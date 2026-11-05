@@ -310,11 +310,8 @@ export function createEmscriptenNativeGLBridge({ addon, wasmPath, translateShade
             if (!ctx) {
                 throw new Error(`[SkikoNativeGL] unknown native GL context handle ${handle}`);
             }
-            // Re-activating rebinds the context FBO behind Skia's state cache; only switch when needed.
-            if (runtime.current !== handle) {
-                addon.makeContextCurrent(handle);
-                runtime.current = handle;
-            }
+            addon.makeContextCurrent(handle);
+            runtime.current = handle;
             GL.currentContext = ctx;
             return true;
         };

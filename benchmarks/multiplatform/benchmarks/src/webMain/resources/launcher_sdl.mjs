@@ -116,16 +116,30 @@ function formatWasmError(error) {
 
 export class NodeCanvas {
     constructor(description = {}) {
-        this.width = description.width || 1024;
-        this.height = description.height || 768;
+        this.width = description.width || 1920;
+        this.height = description.height || 1080;
+        this.clientWidth = this.width;
+        this.clientHeight = this.height;
+        this.offsetWidth = this.width;
+        this.offsetHeight = this.height;
+        this.scrollWidth = this.width;
+        this.scrollHeight = this.height;
         this.id = description.id || '';
+        this.tagName = 'CANVAS';
+        this.nodeName = 'CANVAS';
+        this.nodeType = 1;
+        this.childNodes = [];
+        this.children = [];
+        this.parentNode = null;
+        this.parentElement = null;
+        this.ownerDocument = null;
         Object.assign(this, description);
         this.style = description.style || {};
         this.__skikoNativeContext = 0;
     }
 
     getContext(type) {
-        throw new Error(`Unexpected browser canvas context request: ${type}`);
+        return null;
     }
 
     setAttribute(key, value) { this[key] = value; }
@@ -133,9 +147,29 @@ export class NodeCanvas {
     removeAttribute(key) { delete this[key]; }
     addEventListener() {}
     removeEventListener() {}
-    remove() {}
-    appendChild() {}
-    removeChild() {}
+    remove() {
+        if (this.parentNode && typeof this.parentNode.removeChild === 'function') {
+            this.parentNode.removeChild(this);
+        }
+    }
+    appendChild(child) {
+        this.childNodes.push(child);
+        this.children.push(child);
+        if (child) {
+            child.parentNode = this;
+            child.parentElement = this;
+        }
+        return child;
+    }
+    removeChild(child) {
+        this.childNodes = this.childNodes.filter(c => c !== child);
+        this.children = this.children.filter(c => c !== child);
+        if (child) {
+            child.parentNode = null;
+            child.parentElement = null;
+        }
+        return child;
+    }
     focus() {}
     blur() {}
     getBoundingClientRect() {
@@ -193,8 +227,8 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
         this.nativeGLHost = createSkikoNativeGLHost(this.nativeGL);
         globalThis.__skikoNativeGL = this.nativeGLHost;
 
-        const width = options.width || 1024;
-        const height = options.height || 768;
+        const width = options.width || 1920;
+        const height = options.height || 1080;
         const title = "Compose Wasm Benchmark";
 
         try {
@@ -329,39 +363,160 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
             globalThis.navigator = navigatorShim;
         }
 
+        globalThis.EventTarget = class EventTarget {
+            addEventListener() {}
+            removeEventListener() {}
+            dispatchEvent() { return true; }
+        };
+        globalThis.Node = class Node extends globalThis.EventTarget {};
+        globalThis.Element = class Element extends globalThis.Node {};
+        globalThis.HTMLElement = class HTMLElement extends globalThis.Element {};
+        globalThis.HTMLDivElement = class HTMLDivElement extends globalThis.HTMLElement {};
+        globalThis.HTMLCanvasElement = NodeCanvas;
+        Object.setPrototypeOf(NodeCanvas.prototype, globalThis.HTMLElement.prototype);
+        globalThis.HTMLTextAreaElement = class HTMLTextAreaElement extends globalThis.HTMLElement {};
+        globalThis.HTMLInputElement = class HTMLInputElement extends globalThis.HTMLElement {};
+        globalThis.HTMLStyleElement = class HTMLStyleElement extends globalThis.HTMLElement {};
+        globalThis.HTMLHeadElement = class HTMLHeadElement extends globalThis.HTMLElement {};
+        globalThis.HTMLBodyElement = class HTMLBodyElement extends globalThis.HTMLElement {};
+        globalThis.HTMLHtmlElement = class HTMLHtmlElement extends globalThis.HTMLElement {};
+        globalThis.DocumentFragment = class DocumentFragment extends globalThis.Node {};
+        globalThis.ShadowRoot = class ShadowRoot extends globalThis.DocumentFragment {};
+
         globalThis.window = globalThis;
         globalThis.self = globalThis;
-        globalThis.HTMLCanvasElement = NodeCanvas;
         globalThis.devicePixelRatio = 1.0;
-        globalThis.innerWidth = options.width || 1024;
-        globalThis.innerHeight = options.height || 768;
+        globalThis.innerWidth = options.width || 1920;
+        globalThis.innerHeight = options.height || 1080;
         globalThis.location = globalThis.location || { href: 'http://localhost/', search: '' };
         globalThis.isSecureContext = false;
 
         this.canvases = new Map();
         let docTitle = "Compose Wasm Benchmark";
 
-        const makeElement = (tag = 'div') => {
-            if (typeof tag === 'string' && tag.toLowerCase() === 'canvas') {
-                return new NodeCanvas({ width: options.width || 1024, height: options.height || 768 });
-            }
-            return {
-                style: {},
-                width: options.width || 1024,
-                height: options.height || 768,
-                setAttribute: () => {},
-                getAttribute: () => null,
-                removeAttribute: () => {},
-                addEventListener: () => {},
-                removeEventListener: () => {},
-                remove: () => {},
-                appendChild: () => {},
-                removeChild: () => {},
-                focus: () => {},
-                blur: () => {},
-                getBoundingClientRect: () => ({ top: 0, left: 0, width: options.width || 1024, height: options.height || 768, right: options.width || 1024, bottom: options.height || 768 })
-            };
+        const elementWidth = options.width || 1920;
+        const elementHeight = options.height || 1080;
+
+        const makeStyle = () => {
+            const s = {};
+            s.setProperty = (k, v) => { s[k] = v; };
+            s.getPropertyValue = (k) => s[k] ?? '';
+            s.removeProperty = (k) => { const v = s[k]; delete s[k]; return v ?? ''; };
+            return s;
         };
+
+        const makeElement = (tag = 'div') => {
+            const tagName = (tag || 'div').toUpperCase();
+            if (tagName === 'CANVAS') {
+                const canvas = new NodeCanvas({ width: elementWidth, height: elementHeight });
+                canvas.style = makeStyle();
+                canvas.setPointerCapture = () => {};
+                canvas.releasePointerCapture = () => {};
+                canvas.hasPointerCapture = () => false;
+                canvas.replaceChildren = () => {};
+                canvas.getRootNode = () => globalThis.document;
+                canvas.ownerDocument = globalThis.document;
+                return canvas;
+            }
+            let proto = globalThis.HTMLElement.prototype;
+            if (tagName === 'DIV') proto = globalThis.HTMLDivElement.prototype;
+            else if (tagName === 'TEXTAREA') proto = globalThis.HTMLTextAreaElement.prototype;
+            else if (tagName === 'INPUT') proto = globalThis.HTMLInputElement.prototype;
+            else if (tagName === 'STYLE') proto = globalThis.HTMLStyleElement.prototype;
+            else if (tagName === 'HEAD') proto = globalThis.HTMLHeadElement.prototype;
+            else if (tagName === 'BODY') proto = globalThis.HTMLBodyElement.prototype;
+            else if (tagName === 'HTML') proto = globalThis.HTMLHtmlElement.prototype;
+
+            const el = Object.create(proto);
+            Object.assign(el, {
+                style: makeStyle(),
+                width: elementWidth,
+                height: elementHeight,
+                clientWidth: elementWidth,
+                clientHeight: elementHeight,
+                offsetWidth: elementWidth,
+                offsetHeight: elementHeight,
+                scrollWidth: elementWidth,
+                scrollHeight: elementHeight,
+                id: '',
+                tagName: tagName,
+                nodeName: tagName,
+                nodeType: 1,
+                childNodes: [],
+                children: [],
+                parentNode: null,
+                parentElement: null,
+                ownerDocument: null,
+                setAttribute(key, value) { el[key] = value; },
+                getAttribute(key) { return el[key] ?? null; },
+                removeAttribute(key) { delete el[key]; },
+                addEventListener() {},
+                removeEventListener() {},
+                remove() {
+                    if (el.parentNode && typeof el.parentNode.removeChild === 'function') {
+                        el.parentNode.removeChild(el);
+                    }
+                },
+                appendChild: (child) => {
+                    el.childNodes.push(child);
+                    el.children.push(child);
+                    if (child) {
+                        child.parentNode = el;
+                        child.parentElement = el;
+                        if (child.id) this.canvases.set(child.id, child);
+                    }
+                    return child;
+                },
+                removeChild: (child) => {
+                    el.childNodes = el.childNodes.filter(c => c !== child);
+                    el.children = el.children.filter(c => c !== child);
+                    if (child) {
+                        child.parentNode = null;
+                        child.parentElement = null;
+                    }
+                    return child;
+                },
+                replaceChildren() {
+                    el.childNodes = [];
+                    el.children = [];
+                },
+                attachShadow: () => {
+                    const shadow = makeElement('div');
+                    Object.setPrototypeOf(shadow, globalThis.ShadowRoot.prototype);
+                    shadow.host = el;
+                    el.shadowRoot = shadow;
+                    return shadow;
+                },
+                shadowRoot: null,
+                focus() {},
+                blur() {},
+                setPointerCapture() {},
+                releasePointerCapture() {},
+                hasPointerCapture: () => false,
+                getRootNode: () => globalThis.document,
+                getBoundingClientRect() {
+                    return {
+                        top: 0,
+                        left: 0,
+                        width: elementWidth,
+                        height: elementHeight,
+                        right: elementWidth,
+                        bottom: elementHeight
+                    };
+                }
+            });
+            return el;
+        };
+
+        const docElement = makeElement('html');
+        const docBody = makeElement('body');
+        const docHead = makeElement('head');
+        const rootElement = makeElement('div');
+        rootElement.id = 'root';
+        docBody.appendChild(rootElement);
+
+        this.canvases.set('root', rootElement);
+        this.canvases.set(rootElement, rootElement);
 
         globalThis.document = {
             get title() {
@@ -375,9 +530,17 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
                     }
                 }
             },
+            visibilityState: 'visible',
+            hidden: false,
+            activeElement: null,
+            documentElement: docElement,
+            body: docBody,
+            head: docHead,
+            defaultView: globalThis.window,
             getElementById: (id) => this.canvases.get(id) || null,
             createElement: (tag) => {
                 const el = makeElement(tag);
+                el.ownerDocument = globalThis.document;
                 if (el instanceof NodeCanvas) {
                     if (el.id) {
                         this.canvases.set(el.id, el);
@@ -386,28 +549,98 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
                 }
                 return el;
             },
-            body: {
-                appendChild: (el) => {
-                    if (el instanceof NodeCanvas) {
-                        if (el.id) this.canvases.set(el.id, el);
-                        this.canvases.set(el, el);
-                    }
-                },
-                removeChild: (el) => {
-                    if (el instanceof NodeCanvas) {
-                        if (el.id) this.canvases.delete(el.id);
-                        this.canvases.delete(el);
+            addEventListener: () => {},
+            removeEventListener: () => {},
+            contains: () => true,
+            hasFocus: () => true
+        };
+
+        docElement.ownerDocument = globalThis.document;
+        docBody.ownerDocument = globalThis.document;
+        docHead.ownerDocument = globalThis.document;
+        rootElement.ownerDocument = globalThis.document;
+
+        globalThis.window.matchMedia = (query) => ({
+            matches: false,
+            media: query,
+            onchange: null,
+            addListener: () => {},
+            removeListener: () => {},
+            addEventListener: () => {},
+            removeEventListener: () => {},
+            dispatchEvent: () => false
+        });
+        globalThis.matchMedia = globalThis.window.matchMedia;
+
+        if (typeof globalThis.ResizeObserver === 'undefined') {
+            globalThis.ResizeObserver = class {
+                observe() {}
+                unobserve() {}
+                disconnect() {}
+            };
+        }
+        if (typeof globalThis.MutationObserver === 'undefined') {
+            globalThis.MutationObserver = class {
+                observe() {}
+                disconnect() {}
+                takeRecords() { return []; }
+            };
+        }
+
+        let rafQueue = [];
+        let rafScheduled = false;
+
+        const pumpRaf = () => {
+            rafScheduled = false;
+            if (this.isCleanedUp) return;
+
+            if (this.nativeGL && typeof this.nativeGL.pollEvents === 'function') {
+                try { this.nativeGL.pollEvents(); } catch (e) {}
+            }
+
+            if (rafQueue.length > 0) {
+                const batch = rafQueue;
+                rafQueue = [];
+                const now = performance.now();
+                for (const item of batch) {
+                    try {
+                        item.cb(now);
+                    } catch (err) {
+                        console.error('[NodeSdlLauncher] Error in requestAnimationFrame callback:', err);
                     }
                 }
+                if (this.nativeGL && typeof this.nativeGL.present === 'function') {
+                    try {
+                        const ids = this.emscriptenBridge ? this.emscriptenBridge.contextIds() : [1];
+                        for (const id of ids) {
+                            this.nativeGL.present(id);
+                            if (typeof this.nativeGL.makeContextCurrent === 'function') {
+                                this.nativeGL.makeContextCurrent(id);
+                            }
+                        }
+                    } catch (e) {}
+                }
+            }
+
+            if (rafQueue.length > 0 && !rafScheduled) {
+                rafScheduled = true;
+                setImmediate(pumpRaf);
             }
         };
 
-        if (!globalThis.requestAnimationFrame) {
-            globalThis.requestAnimationFrame = (cb) => setTimeout(() => cb(performance.now()), 16);
-        }
-        if (!globalThis.cancelAnimationFrame) {
-            globalThis.cancelAnimationFrame = (id) => clearTimeout(id);
-        }
+        globalThis.requestAnimationFrame = (cb) => {
+            const id = Symbol();
+            rafQueue.push({ id, cb });
+            if (!rafScheduled) {
+                rafScheduled = true;
+                setImmediate(pumpRaf);
+            }
+            return id;
+        };
+
+        globalThis.cancelAnimationFrame = (id) => {
+            rafQueue = rafQueue.filter(item => item.id !== id);
+        };
         globalThis.__skikoRequestAnimationFrame = globalThis.requestAnimationFrame;
         globalThis.__skikoCancelAnimationFrame = globalThis.cancelAnimationFrame;
         if (!globalThis.addEventListener) {
