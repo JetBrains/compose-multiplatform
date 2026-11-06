@@ -23,13 +23,15 @@ RUN apt update -y && \
     rm -rf /var/lib/apt/lists/*
 ENV PATH="/usr/lib/x86_64-linux-gnu/:$PATH"
 
-# Install OpenJDK 21
+# Install OpenJDK 21 (default) and OpenJDK 11 (minimal supported JDK for Desktop)
 ARG JAVA_VERSION=21
 RUN apt update -y && \
     apt install -y \
-        openjdk-${JAVA_VERSION}-jdk && \
+        openjdk-${JAVA_VERSION}-jdk \
+        openjdk-11-jdk && \
     rm -rf /var/lib/apt/lists/*
 ENV JAVA_HOME=/usr/lib/jvm/java-${JAVA_VERSION}-openjdk-amd64
+ENV JAVA_11_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 ENV PATH="$JAVA_HOME/bin:$PATH"
 
 # Install NodeJS 22
