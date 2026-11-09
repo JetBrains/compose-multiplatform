@@ -17,8 +17,8 @@ jobs:
     name: Compile JVM, Android, JS and Wasm targets
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           distribution: jetbrains
           java-version: '21'
@@ -27,7 +27,7 @@ jobs:
       - uses: android-actions/setup-android@v4
         with:
           packages: platform-tools
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
       - name: Compile desktop JVM targets
         working-directory: components
         run: ./gradlew compileKotlinDesktop compileKotlinJvm
@@ -42,8 +42,8 @@ jobs:
     name: Compile iOS and macOS targets
     runs-on: macos-26-xlarge
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           distribution: jetbrains
           java-version: '21'
@@ -52,7 +52,7 @@ jobs:
       - uses: android-actions/setup-android@v4
         with:
           packages: platform-tools
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
       - name: Compile iOS and macOS targets
         working-directory: components
         run: ./gradlew compileKotlinIosArm64 compileKotlinIosSimulatorArm64 compileKotlinMacosArm64
