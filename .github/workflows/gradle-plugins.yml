@@ -3,13 +3,13 @@ on:
   pull_request:
     paths:
       - 'gradle-plugins/**'
-      - '.github/workflows/gradle-plugin.yml'
+      - '.github/workflows/gradle-plugins.yml'
   push:
     branches:
       - master
     paths:
       - 'gradle-plugins/**'
-      - '.github/workflows/gradle-plugin.yml'
+      - '.github/workflows/gradle-plugins.yml'
 
 jobs:
   test-gradle-plugin:
