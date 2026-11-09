@@ -1,4 +1,4 @@
-name: Build-Helpers Publish to Maven Local
+name: "ci/build-helpers: Build-Helpers Publish to Maven Local"
 on:
   pull_request:
     paths:

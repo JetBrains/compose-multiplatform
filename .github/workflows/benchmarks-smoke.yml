@@ -1,15 +1,14 @@
-name: Build and run benchmarks/multiplatform
+name: "benchmarks: Build and run"
+
 on:
   pull_request:
     paths:
-      - 'benchmarks/multiplatform/**'
-      - '.github/workflows/benchmarks-smoke.yml'
+      - 'benchmarks/**'
   push:
     branches:
       - master
     paths:
-      - 'benchmarks/multiplatform/**'
-      - '.github/workflows/benchmarks-smoke.yml'
+      - 'benchmarks/**'
 
 jobs:
   benchmarks-macos-arm64:
@@ -53,3 +52,21 @@ jobs:
         run: |
           cd benchmarks/multiplatform
           ./gradlew :benchmarks:wasmJsD8ProductionRun compileKotlinJs
+
+  showcase-web:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v4
+        with:
+          distribution: jetbrains
+          java-version: '21'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Compile JS and Wasm targets
+        working-directory: benchmarks/showcases/LazyGridImageView
+        run: ./gradlew :composeApp:compileKotlinJs :composeApp:compileKotlinWasmJs

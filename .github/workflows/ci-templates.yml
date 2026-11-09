@@ -1,16 +1,14 @@
-name: Compile HTML library template web target
+name: "ci/templates: Compile HTML library web target"
 
 on:
   pull_request:
     paths:
-      - 'ci/templates/html-library-template/**'
-      - '.github/workflows/html-library-template-web.yml'
+      - 'ci/templates/**'
   push:
     branches:
       - master
     paths:
-      - 'ci/templates/html-library-template/**'
-      - '.github/workflows/html-library-template-web.yml'
+      - 'ci/templates/**'
 
 jobs:
   compile:

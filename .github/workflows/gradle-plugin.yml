@@ -1,4 +1,4 @@
-name: Test Gradle plugin
+name: "gradle-plugins: Test Gradle plugin"
 on:
   pull_request:
     paths:

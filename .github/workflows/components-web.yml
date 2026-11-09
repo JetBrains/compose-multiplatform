@@ -1,16 +1,14 @@
-name: Compile components web targets
+name: "components: Compile web targets"
 
 on:
   pull_request:
     paths:
       - 'components/**'
-      - '.github/workflows/components-web.yml'
   push:
     branches:
       - master
     paths:
       - 'components/**'
-      - '.github/workflows/components-web.yml'
 
 jobs:
   compile:
