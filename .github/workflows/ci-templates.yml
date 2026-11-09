@@ -74,6 +74,15 @@ jobs:
           java-version: '21'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Maven 3.9.13
+        shell: bash
+        run: |
+          # Maven 3.10 rejects conflicting transitive lifecycle constraints in Compose's POMs.
+          archive="$RUNNER_TEMP/apache-maven-3.9.13-bin.tar.gz"
+          curl -fsSL https://archive.apache.org/dist/maven/maven-3/3.9.13/binaries/apache-maven-3.9.13-bin.tar.gz -o "$archive"
+          echo "d9ccd44ba2991586e359c29eb86780ae8ff4ec1b88b0b8af3af074803472690cf2017782a9c4401343c62cbcd056231db9612e1e551cbd9747c21746d732c015  $archive" | sha512sum -c -
+          tar -xzf "$archive" -C "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/apache-maven-3.9.13/bin" >> "$GITHUB_PATH"
       - name: Compile Maven project
         working-directory: ci/templates/maven-test-project
         run: mvn -B compile

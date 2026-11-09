@@ -17,17 +17,6 @@
         <compose.material3.version>1.9.0</compose.material3.version>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <!-- Align the lifecycle versions required by Compose's transitive dependencies. -->
-            <dependency>
-                <groupId>androidx.lifecycle</groupId>
-                <artifactId>lifecycle-common-jvm</artifactId>
-                <version>2.11.0</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <!-- Maven Central is resolved through cache-redirector, to avoid its rate limits on CI.
          The "central" id replaces the default Maven Central repository. -->
     <repositories>
