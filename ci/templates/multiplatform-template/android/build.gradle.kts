@@ -3,13 +3,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("com.android.application")
-    kotlin("android")
     kotlin("plugin.compose")
     id("org.jetbrains.compose")
 }
 
 android {
-    compileSdk = 35
+    compileSdk = 37
     namespace = "com.myapplication"
 
     defaultConfig {

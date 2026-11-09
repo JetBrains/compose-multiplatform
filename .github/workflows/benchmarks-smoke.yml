@@ -4,13 +4,13 @@ on:
   pull_request:
     paths:
       - 'benchmarks/**'
-      - '.github/workflows/benchmarks.yml'
+      - '.github/workflows/benchmarks-smoke.yml'
   push:
     branches:
       - master
     paths:
       - 'benchmarks/**'
-      - '.github/workflows/benchmarks.yml'
+      - '.github/workflows/benchmarks-smoke.yml'
 
 jobs:
   benchmarks-macos-arm64:

@@ -62,7 +62,7 @@ jobs:
         run: ./gradlew :common:compileKotlinDesktop :desktop:compileKotlinJvm
       - name: Compile Android targets
         working-directory: ci/templates/multiplatform-template
-        run: ./gradlew :common:compileDebugKotlinAndroid :android:compileDebugKotlin
+        run: ./gradlew :common:compileAndroidMain :android:compileDebugKotlin
 
   maven:
     runs-on: ubuntu-24.04
