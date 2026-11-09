@@ -1,4 +1,4 @@
-name: "html: Build and test"
+name: "html: Compile web targets"
 
 on:
   pull_request:
@@ -33,65 +33,3 @@ jobs:
           kotlin_version=$(sed -n 's/^kotlin.version=//p' ../../buildSrc/gradle.properties)
           compose_version=$(sed -n 's/^compose.version=//p' ../../gradle.properties)
           bash ./gradlew compileKotlinJs "-Pkotlin.version=$kotlin_version" "-Pcompose.version=$compose_version"
-
-  test-eap:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v5
-
-      - name: Setup JDK 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'jetbrains'
-          java-version: '21'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Test and publish Compose HTML EAP artifacts to Maven Local
-        working-directory: html
-        run: |
-          ./gradlew --no-daemon --stacktrace --rerun-tasks --max-workers=1 \
-            -Pcompose.html.eap.enabled=true \
-            -Pcompose.html.eap.examples.usePublished=false \
-            :html-core-eap:check \
-            :html-svg-eap:check \
-            :internal-html-core-runtime-eap:check \
-            :internal-html-serialization-eap:check \
-            :html-core-eap:publishToMavenLocal \
-            :html-svg-eap:publishToMavenLocal \
-            :internal-html-core-runtime-eap:publishToMavenLocal \
-            :internal-html-serialization-eap:publishToMavenLocal
-
-      - name: Test HTML compiler and Gradle plugins, including browser hydration
-        working-directory: html
-        run: |
-          ./gradlew --no-daemon --stacktrace --max-workers=1 \
-            -Pcompose.html.eap.enabled=true \
-            -Pcompose.html.eap.examples.usePublished=false \
-            :compose-html-compiler-plugin:check
-
-  check-and-publish-to-maven-local:
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v5
-
-      - name: Setup JDK 21
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'jetbrains'
-          java-version: '21'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Check and publish to Maven Local
-        working-directory: html/kotlinx-browser-common-subset
-        run: |
-          ./gradlew --no-daemon --stacktrace --rerun-tasks --max-workers=1 check publishToMavenLocal
