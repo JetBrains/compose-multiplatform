@@ -1,4 +1,4 @@
-name: "benchmarks: Build and run"
+name: "benchmarks"
 
 on:
   pull_request:

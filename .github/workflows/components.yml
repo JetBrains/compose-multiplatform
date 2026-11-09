@@ -1,4 +1,4 @@
-name: "components: Compile targets"
+name: "components"
 
 on:
   pull_request:
@@ -14,6 +14,7 @@ on:
 
 jobs:
   compile-jvm-android-web:
+    name: Compile JVM, Android, JS and Wasm targets
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
@@ -38,6 +39,7 @@ jobs:
         run: ./gradlew compileKotlinJs compileKotlinWasmJs
 
   compile-apple:
+    name: Compile iOS and macOS targets
     runs-on: macos-26-xlarge
     steps:
       - uses: actions/checkout@v5

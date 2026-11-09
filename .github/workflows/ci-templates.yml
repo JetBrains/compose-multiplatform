@@ -1,4 +1,4 @@
-name: "ci/templates: Compile templates"
+name: "ci/templates"
 
 on:
   pull_request:

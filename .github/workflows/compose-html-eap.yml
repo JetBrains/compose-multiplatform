@@ -1,4 +1,4 @@
-name: Compose HTML EAP
+name: "html/eap"
 
 on:
   pull_request:

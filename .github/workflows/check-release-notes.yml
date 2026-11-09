@@ -4,7 +4,7 @@
 #   synchronize - New commits appeared.
 #                 We don't use the new content, but we still need to mark this commit Green/Red in GitHub UI
 
-name: "tools/changelog: Check Release Notes in the description"
+name: "tools/changelog"
 on:
   pull_request:
     types: [opened, edited, synchronize]

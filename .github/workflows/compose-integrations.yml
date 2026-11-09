@@ -1,19 +1,20 @@
-name: "compose/integrations: Compile web targets"
+name: "compose/integrations"
 
 on:
   pull_request:
     paths:
-      - 'compose/**'
+      - 'compose/integrations/**'
       - '.github/workflows/compose-integrations.yml'
   push:
     branches:
       - master
     paths:
-      - 'compose/**'
+      - 'compose/integrations/**'
       - '.github/workflows/compose-integrations.yml'
 
 jobs:
   composable-test-cases:
+    name: Compile composable test cases for JS and Wasm
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
@@ -29,6 +30,7 @@ jobs:
         run: ./gradlew compileKotlinJs compileKotlinWasmJs
 
   serialization:
+    name: Compile serialization integration for JS
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5

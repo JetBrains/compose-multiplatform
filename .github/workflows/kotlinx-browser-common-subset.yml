@@ -1,4 +1,4 @@
-name: Kotlinx Browser Common Subset
+name: "html/kotlinx-browser-common-subset"
 
 on:
   pull_request:

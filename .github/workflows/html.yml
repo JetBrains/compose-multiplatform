@@ -1,4 +1,4 @@
-name: "html: Compile web targets"
+name: "html"
 
 on:
   pull_request:
@@ -14,6 +14,7 @@ on:
 
 jobs:
   compile-web:
+    name: Compile web targets
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
