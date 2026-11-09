@@ -4,11 +4,13 @@ on:
   pull_request:
     paths:
       - 'compose/**'
+      - '.github/workflows/compose-web.yml'
   push:
     branches:
       - master
     paths:
       - 'compose/**'
+      - '.github/workflows/compose-web.yml'
 
 jobs:
   composable-test-cases:

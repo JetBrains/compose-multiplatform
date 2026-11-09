@@ -4,11 +4,13 @@ on:
   pull_request:
     paths:
       - 'benchmarks/**'
+      - '.github/workflows/benchmarks-smoke.yml'
   push:
     branches:
       - master
     paths:
       - 'benchmarks/**'
+      - '.github/workflows/benchmarks-smoke.yml'
 
 jobs:
   benchmarks-macos-arm64:
@@ -48,10 +50,11 @@ jobs:
           distribution: 'corretto'
           java-version: '17'
       - name: K/Wasm D8
-        shell: bash
-        run: |
-          cd benchmarks/multiplatform
-          ./gradlew :benchmarks:wasmJsD8ProductionRun compileKotlinJs
+        working-directory: benchmarks/multiplatform
+        run: ./gradlew :benchmarks:wasmJsD8ProductionRun
+      - name: Compile JS
+        working-directory: benchmarks/multiplatform
+        run: ./gradlew compileKotlinJs
 
   showcase-web:
     runs-on: ubuntu-24.04

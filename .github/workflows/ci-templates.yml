@@ -4,11 +4,13 @@ on:
   pull_request:
     paths:
       - 'ci/templates/**'
+      - '.github/workflows/ci-templates.yml'
   push:
     branches:
       - master
     paths:
       - 'ci/templates/**'
+      - '.github/workflows/ci-templates.yml'
 
 jobs:
   compile:

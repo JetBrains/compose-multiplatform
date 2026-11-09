@@ -4,11 +4,13 @@ on:
   pull_request:
     paths:
       - 'html/**'
+      - '.github/workflows/html.yml'
   push:
     branches:
       - master
     paths:
       - 'html/**'
+      - '.github/workflows/html.yml'
 
 jobs:
   compile-web:
