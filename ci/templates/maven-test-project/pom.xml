@@ -12,10 +12,21 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.code.style>official</kotlin.code.style>
         <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
-        <kotlin.version>2.4.20</kotlin.version>
-        <compose.version>1.12.0</compose.version>
+        <kotlin.version>2.4.21</kotlin.version>
+        <compose.version>1.12.2</compose.version>
         <compose.material3.version>1.9.0</compose.material3.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Align the lifecycle versions required by Compose's transitive dependencies. -->
+            <dependency>
+                <groupId>androidx.lifecycle</groupId>
+                <artifactId>lifecycle-common-jvm</artifactId>
+                <version>2.11.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <!-- Maven Central is resolved through cache-redirector, to avoid its rate limits on CI.
          The "central" id replaces the default Maven Central repository. -->
