@@ -1,16 +1,16 @@
-name: "compose: Compile integration web targets"
+name: "compose/integrations: Compile web targets"
 
 on:
   pull_request:
     paths:
       - 'compose/**'
-      - '.github/workflows/compose-web.yml'
+      - '.github/workflows/compose-integrations.yml'
   push:
     branches:
       - master
     paths:
       - 'compose/**'
-      - '.github/workflows/compose-web.yml'
+      - '.github/workflows/compose-integrations.yml'
 
 jobs:
   composable-test-cases:
