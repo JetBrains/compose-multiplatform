@@ -11,7 +11,7 @@ on:
       - 'html/gradle.properties'
       - 'html/buildSrc/**'
       - 'html/gradle/**'
-      - '.github/workflows/compose-html-eap.yml'
+      - '.github/workflows/html-eap.yml'
   push:
     branches:
       - master
@@ -24,7 +24,7 @@ on:
       - 'html/gradle.properties'
       - 'html/buildSrc/**'
       - 'html/gradle/**'
-      - '.github/workflows/compose-html-eap.yml'
+      - '.github/workflows/html-eap.yml'
 
 jobs:
   test:

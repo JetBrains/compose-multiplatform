@@ -5,14 +5,14 @@ on:
     paths:
       - 'html/kotlinx-browser-common-subset/**'
       - 'html/buildSrc/gradle.properties'
-      - '.github/workflows/kotlinx-browser-common-subset.yml'
+      - '.github/workflows/html-kotlinx-browser-common-subset.yml'
   push:
     branches:
       - master
     paths:
       - 'html/kotlinx-browser-common-subset/**'
       - 'html/buildSrc/gradle.properties'
-      - '.github/workflows/kotlinx-browser-common-subset.yml'
+      - '.github/workflows/html-kotlinx-browser-common-subset.yml'
 
 jobs:
   check-and-publish-to-maven-local:
