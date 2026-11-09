@@ -34,7 +34,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
         with:
           # Only save Gradle User Home state for builds on the 'master' branch.
           # Builds on other branches will only read existing entries from the cache.
@@ -53,7 +53,7 @@ jobs:
           ./gradlew --continue check -Pcompose.tests.gradle.versions=${{ matrix.gradle }} -Pcompose.tests.agp.versions=${{ matrix.agp }}
 
       - name: Upload Reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Test-Reports-${{ matrix.os }}-Gradle-${{ matrix.gradle }}-Agp${{ matrix.agp }}
           path: gradle-plugins/compose/build/reports
