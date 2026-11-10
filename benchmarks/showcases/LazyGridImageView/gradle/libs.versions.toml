@@ -1,4 +1,5 @@
 [versions]
+node = "26.12.1"
 agp = "8.9.0"
 android-compileSdk = "35"
 android-minSdk = "24"
