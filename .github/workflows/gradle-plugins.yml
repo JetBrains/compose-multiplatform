@@ -1,15 +1,15 @@
-name: Test Gradle plugin
+name: "gradle-plugins"
 on:
   pull_request:
     paths:
       - 'gradle-plugins/**'
-      - '.github/workflows/gradle-plugin.yml'
+      - '.github/workflows/gradle-plugins.yml'
   push:
     branches:
       - master
     paths:
       - 'gradle-plugins/**'
-      - '.github/workflows/gradle-plugin.yml'
+      - '.github/workflows/gradle-plugins.yml'
 
 jobs:
   test-gradle-plugin:
@@ -22,7 +22,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       # TODO https://github.com/actions/setup-java/issues/1317 Remove this workaround when setup-java supports the fixed JBR release.
       - name: Download JBR 25.0.4.1
@@ -55,7 +55,7 @@ jobs:
           printf '%s\n' "$java_version" | grep -E 'JBR-25\.0\.4\.1.*635\.79'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v6
         with:
           # Only save Gradle User Home state for builds on the 'master' branch.
           # Builds on other branches will only read existing entries from the cache.
@@ -74,7 +74,7 @@ jobs:
           ./gradlew --continue check -Pcompose.tests.gradle.versions=${{ matrix.gradle }} -Pcompose.tests.agp.versions=${{ matrix.agp }}
 
       - name: Upload Reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Test-Reports-${{ matrix.os }}-Gradle-${{ matrix.gradle }}-Agp${{ matrix.agp }}
           path: gradle-plugins/compose/build/reports

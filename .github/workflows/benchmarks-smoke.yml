@@ -1,22 +1,23 @@
-name: Build and run benchmarks/multiplatform
+name: "benchmarks"
+
 on:
   pull_request:
     paths:
-      - 'benchmarks/multiplatform/**'
+      - 'benchmarks/**'
       - '.github/workflows/benchmarks-smoke.yml'
   push:
     branches:
       - master
     paths:
-      - 'benchmarks/multiplatform/**'
+      - 'benchmarks/**'
       - '.github/workflows/benchmarks-smoke.yml'
 
 jobs:
   benchmarks-macos-arm64:
     runs-on: macos-26-xlarge
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           distribution: 'corretto'
           java-version: '17'
@@ -29,8 +30,8 @@ jobs:
   benchmarks-desktop-jvm:
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-java@v4
+    - uses: actions/checkout@v7
+    - uses: actions/setup-java@v6
       with:
         distribution: 'corretto'
         java-version: '17'
@@ -43,13 +44,32 @@ jobs:
   benchmarks-wasm-d8:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           distribution: 'corretto'
           java-version: '17'
       - name: K/Wasm D8
-        shell: bash
-        run: |
-          cd benchmarks/multiplatform
-          ./gradlew :benchmarks:wasmJsD8ProductionRun
+        working-directory: benchmarks/multiplatform
+        run: ./gradlew :benchmarks:wasmJsD8ProductionRun
+      - name: Compile JS
+        working-directory: benchmarks/multiplatform
+        run: ./gradlew compileKotlinJs
+
+  showcase-web:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: jetbrains
+          java-version: '21'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: platform-tools
+      - uses: gradle/actions/setup-gradle@v6
+      - name: Compile JS and Wasm targets
+        working-directory: benchmarks/showcases/LazyGridImageView
+        run: ./gradlew :composeApp:compileKotlinJs :composeApp:compileKotlinWasmJs

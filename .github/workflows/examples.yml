@@ -1,4 +1,4 @@
-name: Validate examples
+name: "examples"
 
 on:
   pull_request:
@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Setup Prerequisites
         uses: ./.github/actions/setup-prerequisites
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Setup Prerequisites
         uses: ./.github/actions/setup-prerequisites
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Setup Prerequisites
         uses: ./.github/actions/setup-prerequisites
@@ -59,7 +59,7 @@ jobs:
     runs-on: macos-26-xlarge
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Setup Prerequisites
         uses: ./.github/actions/setup-prerequisites
