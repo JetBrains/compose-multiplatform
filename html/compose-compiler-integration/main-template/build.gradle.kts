@@ -37,9 +37,7 @@ kotlin {
     }
 }
 
-tasks.findByName("jsBrowserProductionWebpack")!!.mustRunAfter("jsDevelopmentExecutableCompileSync")
-tasks.findByName("jsNodeDevelopmentRun")!!.mustRunAfter("jsProductionExecutableCompileSync")
-
+// Set the Node version before realizing run tasks, which capture the executable path eagerly.
 allprojects {
     // TODO https://youtrack.jetbrains.com/issue/CMP-11110 Remove compromised root certificate workaround after updating to Kotlin 2.5.0
     // Override the node version to fix https://youtrack.jetbrains.com/issue/CMP-11011
@@ -52,3 +50,6 @@ allprojects {
         subproject.extensions.getByType(WasmNodeJsEnvSpec::class.java).version.set("26.12.1")
     }
 }
+
+tasks.findByName("jsBrowserProductionWebpack")!!.mustRunAfter("jsDevelopmentExecutableCompileSync")
+tasks.findByName("jsNodeDevelopmentRun")!!.mustRunAfter("jsProductionExecutableCompileSync")
