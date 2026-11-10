@@ -1,9 +1,7 @@
 import org.jetbrains.compose.compose
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("multiplatform")
-    kotlin("plugin.compose")
     id("org.jetbrains.compose")
     kotlin("plugin.serialization")
 }
@@ -13,17 +11,15 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     jvm("desktop") {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
+        compilations.all {
+            kotlinOptions.jvmTarget = "11"
         }
     }
     js(IR) {
         browser()
         nodejs()
     }
-    iosArm64()
-    iosSimulatorArm64()
-    iosX64()
+    ios()
     macosX64()
     macosArm64()
     mingwX64()
