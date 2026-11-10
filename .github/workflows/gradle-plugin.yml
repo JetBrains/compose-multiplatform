@@ -24,14 +24,35 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v5
 
-      - name: Setup JDK 25
+      # TODO https://github.com/actions/setup-java/issues/1317 Remove this workaround when setup-java supports the fixed JBR release.
+      - name: Download JBR 25.0.4.1
+        shell: bash
+        run: |
+          case "$RUNNER_OS-$RUNNER_ARCH" in
+            Linux-X64) jbr_platform=linux-x64 ;;
+            macOS-ARM64) jbr_platform=osx-aarch64 ;;
+            Windows-X64) jbr_platform=windows-x64 ;;
+            *) echo "Unsupported runner: $RUNNER_OS-$RUNNER_ARCH" >&2; exit 1 ;;
+          esac
+          curl --fail --location --retry 3 \
+            "https://cache-redirector.jetbrains.com/intellij-jbr/jbrsdk-25.0.4.1-${jbr_platform}-b635.79.tar.gz" \
+            --output "$RUNNER_TEMP/jbr.tar.gz"
+
+      - name: Setup JBR 25
         uses: actions/setup-java@v6
         with:
-          distribution: 'jetbrains'
-          java-version: '25'
-          check-latest: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          distribution: 'jdkfile'
+          # setup-java requires a three-component SemVer for its tool-cache key.
+          java-version: '25.0.4+635.79'
+          jdk-file: ${{ runner.temp }}/jbr.tar.gz
+          force-download: true
+
+      - name: Verify JBR version
+        shell: bash
+        run: |
+          java_version=$(java -version 2>&1)
+          printf '%s\n' "$java_version"
+          printf '%s\n' "$java_version" | grep -E 'JBR-25\.0\.4\.1.*635\.79'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
