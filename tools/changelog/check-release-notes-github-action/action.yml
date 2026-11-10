@@ -13,14 +13,14 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         repository: JetBrains/compose-multiplatform
         ref: ${{ inputs.checkout_ref }}
         sparse-checkout: 'tools/changelog'
     - name: Cache Kotlin compiler
       id: cache-kotlin
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: ${{ runner.tool_cache }}/kotlin/${{ inputs.kotlin_version }}
         key: kotlin-compiler-${{ inputs.kotlin_version }}

@@ -2,14 +2,22 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("com.android.library")
+    id("com.android.kotlin.multiplatform.library")
     kotlin("multiplatform")
     kotlin("plugin.compose")
     id("org.jetbrains.compose")
 }
 
 kotlin {
-    androidTarget()
+    android {
+        namespace = "com.myapplication.common"
+        compileSdk = 37
+        minSdk = 26
+        androidResources.enable = true
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
     jvm("desktop")
 
     sourceSets {
@@ -34,24 +42,5 @@ kotlin {
 tasks.withType<KotlinCompile>() {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
-    }
-}
-
-android {
-    compileSdk = 35
-    namespace = "com.myapplication.common"
-
-    defaultConfig {
-        minSdk = 26
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-    sourceSets {
-        named("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-            res.srcDirs("src/androidMain/res")
-        }
     }
 }
