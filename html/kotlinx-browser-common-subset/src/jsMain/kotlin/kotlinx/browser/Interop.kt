@@ -17,6 +17,7 @@ import kotlin.Suppress
 import kotlin.collections.List
 import kotlin.js.Promise as BrowserPromise
 
+@Suppress("EXPECT_ACTUAL_INCOMPATIBLE_CLASS_KIND")
 public actual typealias JsAny = Any
 
 public actual typealias JsString = String
