@@ -53,25 +53,17 @@ kotlin {
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
+        compilerOptions {
+            freeCompilerArgs.add("-Xwasm-use-new-exception-proposal")
+        }
         binaries.executable()
         d8 {
-            compilerOptions.freeCompilerArgs.add("-Xwasm-attach-js-exception")
             runTask {
                 // It aborts even on coroutine cancellation exceptions:
                 // d8Args.add("--abort-on-uncaught-exception")
             }
         }
         browser()
-
-        binaries.configureEach {
-            compilation.compileTaskProvider.configure {
-                compilerOptions {
-                    freeCompilerArgs.apply {
-                        add("-Xwasm-use-new-exception-proposal")
-                    }
-                }
-            }
-        }
     }
 
     js {
@@ -207,6 +199,10 @@ gradle.taskGraph.whenReady {
     tasks.named<Exec>("wasmJsSdlBenchmark") {
         args(appArgs)
     }
+
+    tasks.named<Exec>("wasmJsSdlWasmtimeBenchmark") {
+        args(appArgs)
+    }
 }
 
 
@@ -217,9 +213,25 @@ tasks.register("buildD8Distribution", Zip::class.java) {
     destinationDirectory.set(rootProject.layout.buildDirectory.dir("distributions"))
 }
 
+val buildWasmtimeRunner = tasks.register("buildWasmtimeSdlRunner", Exec::class.java) {
+    group = "build"
+    description = "Builds the native wasmtime-sdl-runner executable using CMake."
+    val runtimeDir = file("runtimes/wasmtime")
+    val runnerBuildDir = layout.buildDirectory.dir("wasmtime-sdl-runner").get().asFile
+    workingDir = runtimeDir
+    doFirst {
+        runnerBuildDir.mkdirs()
+    }
+    commandLine(
+        "bash",
+        "-c",
+        "DEVELOPER_DIR=\${DEVELOPER_DIR:-/Library/Developer/CommandLineTools} cmake -B '${runnerBuildDir.absolutePath}' -S '${runtimeDir.absolutePath}' && DEVELOPER_DIR=\${DEVELOPER_DIR:-/Library/Developer/CommandLineTools} cmake --build '${runnerBuildDir.absolutePath}' --config Release"
+    )
+}
+
 tasks.register<Exec>("wasmJsSdlBenchmark") {
     group = "benchmark"
-    description = "Runs the automated Wasm-in-Native Window (SDL2 / Skiko / Wasmtime) benchmarks."
+    description = "Runs the automated Wasm-in-Native Window (SDL2 / Skiko / Node.js) benchmarks."
     dependsOn("wasmJsProductionExecutableCompileSync")
 
     workingDir = rootProject.layout.buildDirectory.dir("wasm/packages/compose-benchmarks-benchmarks/kotlin").get().asFile
@@ -244,7 +256,38 @@ tasks.register<Exec>("wasmJsSdlBenchmark") {
         ?: "node"
 
     executable = nodeExecutable
-    args("launcher_sdl.mjs")
+    args("launcher_sdl.mjs", "--launcher=node")
+}
+
+tasks.register("wasmJsSdlNodeBenchmark") {
+    group = "benchmark"
+    description = "Runs the automated Wasm-in-Native Window benchmarks on the Node.js runtime."
+    dependsOn("wasmJsSdlBenchmark")
+}
+
+tasks.register<Exec>("wasmJsSdlWasmtimeBenchmark") {
+    group = "benchmark"
+    description = "Runs the automated Wasm-in-Native Window benchmarks on the Wasmtime runtime."
+    dependsOn("wasmJsProductionExecutableCompileSync")
+    dependsOn(buildWasmtimeRunner)
+
+    workingDir = rootProject.layout.buildDirectory.dir("wasm/packages/compose-benchmarks-benchmarks/kotlin").get().asFile
+    environment("BENCHMARK_MODE", "true")
+
+    val runnerBuildDir = layout.buildDirectory.dir("wasmtime-sdl-runner").get().asFile
+    val runnerExe = File(runnerBuildDir, "wasmtime-sdl-runner")
+    environment("WASMTIME_SDL_RUNNER", runnerExe.absolutePath)
+
+    val nodeExecutable = project.findProperty("node.executable")?.toString()
+        ?: System.getenv("NODE_BINARY")
+        ?: sequenceOf(
+            System.getenv("PATH")?.split(File.pathSeparatorChar)?.map { File(it, "node") }?.asSequence() ?: emptySequence(),
+            sequenceOf(File("/opt/homebrew/bin/node"), File("/usr/local/bin/node"), File("/usr/bin/node"))
+        ).flatten().firstOrNull { it.canExecute() }?.absolutePath
+        ?: "node"
+
+    executable = nodeExecutable
+    args("launcher_sdl.mjs", "--launcher=wasmtime")
 }
 
 tasks.register("runBrowserAndSaveStats") {

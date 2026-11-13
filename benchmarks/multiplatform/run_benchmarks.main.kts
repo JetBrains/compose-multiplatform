@@ -6,13 +6,16 @@ enum class Platform(val platformName: String) {
     DESKTOP("desktop"),
     WEB("web"),
     WASM_SDL("wasm-sdl"),
+    WASM_SDL_WASMTIME("wasm-sdl-wasmtime"),
     IOS("ios"),
     ANDROID("android");
 
     companion object {
         fun fromString(name: String): Platform =
-            entries.find { it.platformName == name }
-                ?: throw IllegalArgumentException("Unsupported platform: $name. Supported: ${entries.joinToString { it.platformName }}")
+            entries.find {
+                it.platformName.equals(name, ignoreCase = true) ||
+                    (it == WASM_SDL_WASMTIME && (name.equals("wasmtime", ignoreCase = true) || name.equals("wasm-sdl-wasmtime", ignoreCase = true) || name.equals("wasm_sdl_wasmtime", ignoreCase = true)))
+            } ?: throw IllegalArgumentException("Unsupported platform: $name. Supported: ${entries.joinToString { it.platformName }}")
     }
 }
 
@@ -104,7 +107,7 @@ fun collectResults(
     val reportFiles = resultsDir.listFiles { f -> f.extension == "json" } ?: return
     if (reportFiles.isEmpty()) return
 
-    val archiveDirName = if (platform == Platform.WASM_SDL) {
+    val archiveDirName = if (platform == Platform.WASM_SDL || platform == Platform.WASM_SDL_WASMTIME) {
         val frameCount = extraArgs["frameCount"]
         val warmupCount = extraArgs["warmupCount"]
         val forwardedConfig = extraArgs.filterKeys { it !in setOf("benchmarks", "frameCount", "warmupCount") }.toSortedMap()
@@ -187,6 +190,11 @@ fun executeBenchmarks(
             null,
             null,
             ":benchmarks:wasmJsSdlBenchmark"
+        )
+        Platform.WASM_SDL_WASMTIME -> Triple(
+            null,
+            null,
+            ":benchmarks:wasmJsSdlWasmtimeBenchmark"
         )
         Platform.IOS -> Triple(
             null,
@@ -423,8 +431,8 @@ fun executeBenchmarksOnce(
 
         if (exitCode != 0) {
             println("Warning: Benchmark run failed with exit code $exitCode")
-            if (platform == Platform.WASM_SDL) {
-                error("WASM_SDL benchmark run failed with exit code $exitCode")
+            if (platform == Platform.WASM_SDL || platform == Platform.WASM_SDL_WASMTIME) {
+                error("${platform.platformName} benchmark run failed with exit code $exitCode")
             }
         } else if (platform == Platform.MACOS) {
             if (defaultExecutable != null && defaultExecutable.exists()) {

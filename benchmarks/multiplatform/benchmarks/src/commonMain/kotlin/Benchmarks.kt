@@ -362,17 +362,22 @@ suspend fun runBenchmark(
     warmupCount: Int = Config.warmupCount,
 ) {
     if (Config.isBenchmarkEnabled(benchmark.name)) {
-        val stats = measureComposable(
-            name = benchmark.name,
-            warmupCount = warmupCount,
-            frameCount = benchmark.frameCount,
-            width = width,
-            height = height,
-            targetFps = targetFps,
-            graphicsContext = graphicsContext,
-            content = benchmark.content
-        ).generateStats()
-        reportBenchmarkStats(stats)
+        try {
+            val stats = measureComposable(
+                name = benchmark.name,
+                warmupCount = warmupCount,
+                frameCount = benchmark.frameCount,
+                width = width,
+                height = height,
+                targetFps = targetFps,
+                graphicsContext = graphicsContext,
+                content = benchmark.content
+            ).generateStats()
+            reportBenchmarkStats(stats)
+        } catch (t: Throwable) {
+            println("Error running benchmark ${benchmark.name}: ${t.message}")
+            t.printStackTrace()
+        }
     }
 }
 

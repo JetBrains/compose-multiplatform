@@ -3,7 +3,7 @@ import java.io.File
 import java.util.*
 
 /**
- * Usage: ./compare_benchmarks.main.kts v1=<version1> v2=<version2> [runs=3] [benchmarks=<benchmarkName>] [platform=macos|desktop|web|ios] [skipExisting=true]
+ * Usage: ./compare_benchmarks.main.kts v1=<version1> v2=<version2> [runs=3] [benchmarks=<benchmarkName>] [platform=macos|desktop|web|ios|wasm-sdl|wasm-sdl-wasmtime] [skipExisting=true]
  *
  * Note: to run the script, you need to install Kotlin as described here: https://kotlinlang.org/docs/command-line.html#install-the-compiler
  */
@@ -17,7 +17,7 @@ fun main(args: Array<String>) {
     val v2 = argMap["v2"] ?: args.getOrNull(1)
     
     if (v1 == null || v2 == null) {
-        println("Usage: ./compare_benchmarks.main.kts v1=<version1> v2=<version2> [runs=3] [benchmarks=<benchmarkName>] [platform=macos|desktop|web|ios] [skipExisting=true] [separateProcess=true]")
+        println("Usage: ./compare_benchmarks.main.kts v1=<version1> v2=<version2> [runs=3] [benchmarks=<benchmarkName>] [platform=macos|desktop|web|ios|wasm-sdl|wasm-sdl-wasmtime] [skipExisting=true] [separateProcess=true]")
         return
     }
 

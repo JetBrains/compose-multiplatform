@@ -20,6 +20,8 @@ actual interface GraphicsContext {
     suspend fun awaitGPUCompletion()
 
     fun present() {}
+
+    fun cleanup() {}
 }
 
 expect fun runGC()
@@ -206,6 +208,7 @@ internal actual suspend fun measureComposable(
     } finally {
         scene.close()
         surface.close()
+        graphicsContext?.cleanup()
         runGC() // cleanup for next benchmarks
     }
 }

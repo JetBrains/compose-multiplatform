@@ -19,11 +19,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.yield
 import kotlinx.serialization.Serializable
 
-private fun isD8Js(): Boolean = js("typeof globalThis.isD8 !== 'undefined'")
-private fun isSdlJs(): Boolean = js("typeof globalThis.__skikoNativeGL !== 'undefined' || typeof globalThis.isSdl !== 'undefined'")
-private fun isNodeJs(): Boolean = js("typeof process !== 'undefined' && process.release && process.release.name === 'node'")
+private fun isD8Js(): JsBoolean = js("Boolean(globalThis.isD8)")
+private fun isSdlJs(): JsBoolean = js("Boolean(globalThis.__skikoNativeGL || globalThis.isSdl || globalThis.__isBenchmarkMode)")
+private fun isNodeJs(): JsBoolean = js("Boolean(typeof process !== 'undefined' && process.release && process.release.name === 'node')")
+private fun isWasmtimeJs(): JsBoolean = js("Boolean(globalThis.isWasmtime)")
 
-private fun isServerlessEnvironment(): Boolean = isD8Js() || isSdlJs() || isNodeJs()
+private fun isServerlessEnvironment(): Boolean = isD8Js().toBoolean() || (isSdlJs().toBoolean() && !isWasmtimeJs().toBoolean()) || isNodeJs().toBoolean()
 
 /**
  * Browser implementation for saving benchmark results.
@@ -31,6 +32,10 @@ private fun isServerlessEnvironment(): Boolean = isD8Js() || isSdlJs() || isNode
  * In a browser environment, sends the results to a server via HTTP.
  */
 actual fun saveBenchmarkStats(name: String, stats: BenchmarkStats) {
+    if (isWasmtimeJs().toBoolean()) {
+        // Wasmtime launcher collects JSON from stdout
+        return
+    }
     if (isServerlessEnvironment()) {
         saveBenchmarkStatsOnDisk(name, stats)
     } else {
@@ -40,7 +45,7 @@ actual fun saveBenchmarkStats(name: String, stats: BenchmarkStats) {
     }
 }
 
-actual val printJsonToOutput: Boolean = false
+actual val printJsonToOutput: Boolean = true
 
 /**
  * Client for sending benchmark results to the server

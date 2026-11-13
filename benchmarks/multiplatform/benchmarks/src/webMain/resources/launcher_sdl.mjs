@@ -7,6 +7,7 @@
  */
 
 import fs from 'fs';
+import { spawn, spawnSync } from 'child_process';
 import { createRequire } from 'module';
 import path from 'path';
 import { inspect } from 'util';
@@ -41,6 +42,38 @@ export class BenchmarkLauncher {
 
     async runBenchmarks(benchmarkNames, options) {
         throw new Error('runBenchmarks() must be implemented by launcher');
+    }
+
+    parseDurationMs(val) {
+        if (!val || val === 'N/A') return null;
+        if (typeof val === 'number') return val;
+        if (typeof val === 'string' && val.startsWith('PT')) {
+            const seconds = parseFloat(val.replace('PT', '').replace('S', ''));
+            if (!isNaN(seconds)) {
+                return seconds * 1000;
+            }
+        }
+        const num = parseFloat(val);
+        return isNaN(num) ? null : num;
+    }
+
+    formatReportFromStats(name, stats) {
+        const frameInfo = stats.averageFrameInfo || {};
+        const fpsInfo = stats.averageFPSInfo || {};
+        const conditions = stats.conditions || {};
+        const cpuMs = this.parseDurationMs(frameInfo.cpuTime);
+        const gpuMs = this.parseDurationMs(frameInfo.gpuTime);
+        const totalMs = (cpuMs !== null && gpuMs !== null) ? (cpuMs + gpuMs) : (this.parseDurationMs(frameInfo.totalTime) || null);
+        return {
+            benchmark: name,
+            launcher: this.name,
+            iterations: conditions.frameCount ?? 1000,
+            warmup: conditions.warmupCount ?? 100,
+            effectiveFps: fpsInfo.fps ? Number(fpsInfo.fps.toFixed(1)) : (totalMs ? Number((1000 / totalMs).toFixed(1)) : 0),
+            cpuAvgMs: cpuMs !== null ? `${cpuMs.toFixed(3)} ms` : 'N/A',
+            gpuAvgMs: gpuMs !== null ? `${gpuMs.toFixed(3)} ms` : 'N/A',
+            totalAvgMs: totalMs !== null ? `${totalMs.toFixed(3)} ms` : 'N/A'
+        };
     }
 
     async cleanup() {
@@ -184,6 +217,52 @@ export class NodeCanvas {
     }
 }
 
+function buildKotlinArgs(rawArgs = [], options = {}) {
+    const iterations = options.iterations || 1000;
+    const warmup = options.warmup || 100;
+    const kotlinArgs = [];
+    let hasFrameCount = false;
+    let hasWarmup = false;
+    let hasSaveStats = false;
+    let hasBenchmarksArg = false;
+
+    for (const arg of rawArgs) {
+        if (typeof arg !== 'string') continue;
+        if (arg.startsWith('launcher=') || arg.startsWith('--launcher=') ||
+            arg.startsWith('nativeSkikoPath=') || arg.startsWith('--nativeSkikoPath=') ||
+            arg.startsWith('reportsDir=') || arg.startsWith('--reportsDir=')) {
+            continue;
+        }
+        const clean = arg.startsWith('--') ? arg.slice(2) : arg;
+        if (clean.startsWith('frameCount=') || clean.startsWith('iterations=')) {
+            hasFrameCount = true;
+            kotlinArgs.push(`frameCount=${clean.split('=')[1]}`);
+        } else if (clean.startsWith('warmupCount=') || clean.startsWith('warmup=')) {
+            hasWarmup = true;
+            kotlinArgs.push(`warmupCount=${clean.split('=')[1]}`);
+        } else if (clean.startsWith('saveStatsToJSON=')) {
+            hasSaveStats = true;
+            kotlinArgs.push(clean);
+        } else if (clean.startsWith('benchmarks=') || clean.startsWith('benchmark=')) {
+            hasBenchmarksArg = true;
+            kotlinArgs.push(`benchmarks=${clean.split('=')[1]}`);
+        } else {
+            kotlinArgs.push(clean);
+        }
+    }
+
+    if (!hasFrameCount) kotlinArgs.push(`frameCount=${iterations}`);
+    if (!hasWarmup) kotlinArgs.push(`warmupCount=${warmup}`);
+    if (!hasSaveStats) kotlinArgs.push('saveStatsToJSON=true');
+    if (!hasBenchmarksArg && options.benchmarkArg) {
+        kotlinArgs.push(`benchmarks=${options.benchmarkArg}`);
+    } else if (!hasBenchmarksArg && Array.isArray(options.benchmarkNames) && options.benchmarkNames.length > 0) {
+        kotlinArgs.push(`benchmarks=${options.benchmarkNames.join(',')}`);
+    }
+
+    return kotlinArgs;
+}
+
 /**
  * Node.js + SDL2 + Native Skiko OpenGL Launcher
  */
@@ -202,6 +281,8 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
     async initialize(options) {
         globalThis.isSdl = true;
         globalThis.__isBenchmarkMode = true;
+        globalThis.isNodeAddonRunning = () => true;
+        globalThis.getBenchmarkArgs = () => '';
 
         const nativeSkikoPath = options.nativeSkikoPath || process.env.SKIKO_NATIVE_GL_ADDON;
 
@@ -651,49 +732,12 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
         }
     }
 
-    async runBenchmarks(benchmarkNames, options) {
+    async runBenchmarks(benchmarkNames, options = {}) {
         const iterations = options.iterations || 1000;
         const warmup = options.warmup || 100;
         const rawArgs = options.rawArgs || [];
 
-        // Build args string for Kotlin runner
-        const kotlinArgs = [];
-        let hasFrameCount = false;
-        let hasWarmup = false;
-        let hasSaveStats = false;
-        let hasBenchmarksArg = false;
-
-        for (const arg of rawArgs) {
-            if (arg.startsWith('launcher=') || arg.startsWith('--launcher=') ||
-                arg.startsWith('nativeSkikoPath=') || arg.startsWith('--nativeSkikoPath=') ||
-                arg.startsWith('reportsDir=') || arg.startsWith('--reportsDir=')) {
-                continue;
-            }
-            const clean = arg.startsWith('--') ? arg.slice(2) : arg;
-            if (clean.startsWith('frameCount=') || clean.startsWith('iterations=')) {
-                hasFrameCount = true;
-                kotlinArgs.push(`frameCount=${clean.split('=')[1]}`);
-            } else if (clean.startsWith('warmupCount=') || clean.startsWith('warmup=')) {
-                hasWarmup = true;
-                kotlinArgs.push(`warmupCount=${clean.split('=')[1]}`);
-            } else if (clean.startsWith('saveStatsToJSON=')) {
-                hasSaveStats = true;
-                kotlinArgs.push(clean);
-            } else if (clean.startsWith('benchmarks=') || clean.startsWith('benchmark=')) {
-                hasBenchmarksArg = true;
-                kotlinArgs.push(`benchmarks=${clean.split('=')[1]}`);
-            } else {
-                kotlinArgs.push(clean);
-            }
-        }
-
-        if (!hasFrameCount) kotlinArgs.push(`frameCount=${iterations}`);
-        if (!hasWarmup) kotlinArgs.push(`warmupCount=${warmup}`);
-        if (!hasSaveStats) kotlinArgs.push('saveStatsToJSON=true');
-        if (!hasBenchmarksArg && options.benchmarkArg) {
-            kotlinArgs.push(`benchmarks=${options.benchmarkArg}`);
-        }
-
+        const kotlinArgs = buildKotlinArgs(rawArgs, { iterations, warmup, benchmarkArg: options.benchmarkArg, benchmarkNames });
         const kotlinArgsStr = kotlinArgs.join(' ');
         let wasmRunSucceeded = false;
 
@@ -962,14 +1006,233 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
 export class WasmtimeBenchmarkLauncher extends BenchmarkLauncher {
     constructor() {
         super('wasmtime');
+        this.runnerPath = null;
     }
 
-    async initialize(options) {
-        console.log(`[WasmtimeLauncher] Initializing standalone Wasmtime/WASI execution harness...`);
+    async initialize(options = {}) {
+        console.log(`[WasmtimeLauncher] Initializing standalone Wasmtime native execution harness...`);
+        const searchPaths = [
+            process.env.WASMTIME_SDL_RUNNER,
+            path.resolve(process.cwd(), 'wasmtime-sdl-runner'),
+            path.resolve(process.cwd(), 'build/wasmtime-sdl-runner/wasmtime-sdl-runner'),
+            path.resolve(process.cwd(), 'benchmarks/build/wasmtime-sdl-runner/wasmtime-sdl-runner'),
+            path.resolve(process.cwd(), '../../benchmarks/build/wasmtime-sdl-runner/wasmtime-sdl-runner'),
+            path.resolve(__dirname, '../../../../build/wasmtime-sdl-runner/wasmtime-sdl-runner'),
+            path.resolve(__dirname, '../../../../benchmarks/build/wasmtime-sdl-runner/wasmtime-sdl-runner')
+        ].filter(Boolean);
+
+        this.runnerPath = searchPaths.find(p => fs.existsSync(p));
+        if (!this.runnerPath) {
+            console.warn(`[WasmtimeLauncher] wasmtime-sdl-runner executable not found in search paths: ${searchPaths.join(', ')}`);
+        } else {
+            console.log(`[WasmtimeLauncher] Found wasmtime-sdl-runner at: ${this.runnerPath}`);
+        }
     }
 
-    async runBenchmarks(benchmarkNames, options) {
-        throw new Error('Standalone Wasmtime launcher without WasmGC and Compose host bindings is not supported. Use the Node.js SDL launcher instead.');
+    async runBenchmarks(benchmarkNames, options = {}) {
+        const { iterations = 1000, warmup = 100, rawArgs = [] } = options;
+        const explicitReportsDir = process.env.BENCHMARK_REPORTS_DIR ||
+            rawArgs.find(a => a.startsWith('reportsDir=') || a.startsWith('--reportsDir='))?.split('=')[1];
+
+        const candidateOutputDirs = explicitReportsDir
+            ? [path.resolve(explicitReportsDir)]
+            : [
+                path.resolve(process.cwd(), 'build/benchmarks/json-reports'),
+                path.resolve(process.cwd(), '../../../../../benchmarks/build/benchmarks/json-reports'),
+                path.resolve(process.cwd(), 'benchmarks/build/benchmarks/json-reports'),
+                path.resolve(__dirname, 'build/benchmarks/json-reports'),
+                path.resolve(__dirname, '../../../../../benchmarks/build/benchmarks/json-reports')
+            ];
+
+        // Clean stale reports before running to prevent accepting outdated results
+        for (const dir of candidateOutputDirs) {
+            if (fs.existsSync(dir)) {
+                for (const name of benchmarkNames) {
+                    const target = path.join(dir, `${name}.json`);
+                    if (fs.existsSync(target)) {
+                        fs.unlinkSync(target);
+                    }
+                }
+            }
+        }
+
+        const wasmSearchPaths = [
+            path.resolve(__dirname, './compose-benchmarks-benchmarks.wasm'),
+            path.resolve(process.cwd(), 'build/wasm/packages/compose-benchmarks-benchmarks/kotlin/compose-benchmarks-benchmarks.wasm'),
+            path.resolve(process.cwd(), 'benchmarks/build/wasm/packages/compose-benchmarks-benchmarks/kotlin/compose-benchmarks-benchmarks.wasm'),
+            path.resolve(process.cwd(), '../build/wasm/packages/compose-benchmarks-benchmarks/kotlin/compose-benchmarks-benchmarks.wasm'),
+            path.resolve(__dirname, '../../../../build/wasm/packages/compose-benchmarks-benchmarks/kotlin/compose-benchmarks-benchmarks.wasm')
+        ];
+        const wasmPath = wasmSearchPaths.find(p => fs.existsSync(p));
+
+        const skikoSearchPaths = [
+            process.env.SKIKO_WASM,
+            path.resolve(__dirname, './skiko.wasm'),
+            path.resolve(process.cwd(), 'skiko.wasm'),
+            path.resolve(process.cwd(), 'build/wasm/packages/compose-benchmarks-benchmarks/kotlin/skiko.wasm'),
+            path.resolve(process.cwd(), 'benchmarks/build/wasm/packages/compose-benchmarks-benchmarks/kotlin/skiko.wasm'),
+            path.resolve(process.cwd(), '../build/wasm/packages/compose-benchmarks-benchmarks/kotlin/skiko.wasm'),
+            path.resolve(__dirname, '../../../../build/wasm/packages/compose-benchmarks-benchmarks/kotlin/skiko.wasm'),
+            '/Users/dustin.feucht/projects/skiko/samples/SkiaNonWebSample/build/compose/skiko-wasmJs-runtime/skiko.wasm',
+            '/Users/dustin.feucht/projects/skiko/samples/SkiaNonWebSample/build/processedResources/wasmJs/main/skiko.wasm'
+        ].filter(Boolean);
+        const skikoPath = skikoSearchPaths.find(p => fs.existsSync(p));
+
+        let wasmRunSucceeded = false;
+        const generatedFiles = [];
+
+        if (this.runnerPath && wasmPath && skikoPath) {
+            console.log(`[WasmtimeLauncher] Spawning wasmtime-sdl-runner...`);
+            const kotlinArgs = buildKotlinArgs(rawArgs, { iterations, warmup, benchmarkArg: options.benchmarkArg, benchmarkNames });
+            const runnerArgs = ['--wasm', wasmPath, '--skiko', skikoPath, ...kotlinArgs];
+
+            await new Promise((resolve, reject) => {
+                const child = spawn(this.runnerPath, runnerArgs, {
+                    env: {
+                        ...process.env,
+                        BENCHMARK_MODE: 'true',
+                        BENCHMARK_ITERATIONS: String(iterations),
+                        BENCHMARK_WARMUP: String(warmup)
+                    }
+                });
+
+                let stdoutBuffer = '';
+                let inJson = false;
+                let jsonBuffer = '';
+
+                child.stdout.on('data', (chunk) => {
+                    const text = chunk.toString();
+                    process.stdout.write(text);
+                    stdoutBuffer += text;
+
+                    const lines = stdoutBuffer.split('\n');
+                    stdoutBuffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        if (line.includes('JSON_START')) {
+                            inJson = true;
+                            jsonBuffer = '';
+                        } else if (line.includes('JSON_END')) {
+                            inJson = false;
+                            try {
+                                const parsed = JSON.parse(jsonBuffer);
+                                if (parsed && parsed.name) {
+                                    for (const d of candidateOutputDirs) {
+                                        if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
+                                        const filePath = path.join(d, `${parsed.name}.json`);
+                                        fs.writeFileSync(filePath, JSON.stringify(parsed, null, 2));
+                                        generatedFiles.push(filePath);
+                                    }
+                                }
+                            } catch (e) {}
+                        } else if (inJson) {
+                            jsonBuffer += line + '\n';
+                        }
+                    }
+                });
+
+                child.stderr.on('data', (chunk) => {
+                    process.stderr.write(chunk.toString());
+                });
+
+                child.on('error', (err) => {
+                    console.warn(`[WasmtimeLauncher] Process error: ${err.message}`);
+                    for (const f of generatedFiles) {
+                        if (fs.existsSync(f)) try { fs.unlinkSync(f); } catch {}
+                    }
+                    reject(err);
+                });
+
+                child.on('close', (code, signal) => {
+                    if (stdoutBuffer) {
+                        const lines = [stdoutBuffer];
+                        for (const line of lines) {
+                            if (line.includes('JSON_START')) {
+                                inJson = true;
+                                jsonBuffer = '';
+                            } else if (line.includes('JSON_END')) {
+                                inJson = false;
+                                try {
+                                    const parsed = JSON.parse(jsonBuffer);
+                                    if (parsed && parsed.name) {
+                                        for (const d of candidateOutputDirs) {
+                                            if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
+                                            const filePath = path.join(d, `${parsed.name}.json`);
+                                            fs.writeFileSync(filePath, JSON.stringify(parsed, null, 2));
+                                            generatedFiles.push(filePath);
+                                        }
+                                    }
+                                } catch (e) {}
+                            } else if (inJson) {
+                                jsonBuffer += line + '\n';
+                            }
+                        }
+                    }
+
+                    if (signal) {
+                        for (const f of generatedFiles) {
+                            if (fs.existsSync(f)) try { fs.unlinkSync(f); } catch {}
+                        }
+                        reject(new Error(`[WasmtimeLauncher] wasmtime-sdl-runner was terminated by signal ${signal}`));
+                    } else if (code !== 0 && code !== null) {
+                        for (const f of generatedFiles) {
+                            if (fs.existsSync(f)) try { fs.unlinkSync(f); } catch {}
+                        }
+                        reject(new Error(`[WasmtimeLauncher] wasmtime-sdl-runner exited with error code ${code}`));
+                    } else {
+                        wasmRunSucceeded = true;
+                        resolve();
+                    }
+                });
+            });
+        } else {
+            throw new Error(`[WasmtimeLauncher] Missing required components (runner: ${this.runnerPath}, wasm: ${wasmPath}, skiko: ${skikoPath})`);
+        }
+
+        const mainReportsDir = explicitReportsDir
+            ? path.resolve(explicitReportsDir)
+            : (candidateOutputDirs.find(d => fs.existsSync(path.dirname(d)) && d.includes('benchmarks/build/benchmarks/json-reports')) || candidateOutputDirs[0]);
+
+        const reports = [];
+        const missing = [];
+        if (wasmRunSucceeded) {
+            for (const benchmarkName of benchmarkNames) {
+                let reportJson = null;
+                for (const dir of candidateOutputDirs) {
+                    const reportPath = path.join(dir, `${benchmarkName}.json`);
+                    if (fs.existsSync(reportPath)) {
+                        try {
+                            reportJson = JSON.parse(fs.readFileSync(reportPath, 'utf-8'));
+                        } catch (parseErr) {
+                            throw new Error(`Failed to parse benchmark report JSON for ${benchmarkName} at ${reportPath}: ${parseErr.message}`);
+                        }
+                        if (!fs.existsSync(mainReportsDir)) fs.mkdirSync(mainReportsDir, { recursive: true });
+                        const dstPath = path.join(mainReportsDir, `${benchmarkName}.json`);
+                        if (reportPath !== dstPath) {
+                            fs.copyFileSync(reportPath, dstPath);
+                        }
+                        break;
+                    }
+                }
+                if (reportJson) {
+                    reports.push(this.formatReportFromStats(benchmarkName, reportJson));
+                } else {
+                    missing.push(benchmarkName);
+                }
+            }
+        }
+
+        if (missing.length > 0) {
+            throw new Error(`Benchmark execution failed to produce reports for: ${missing.join(', ')}`);
+        }
+        if (reports.length === 0) {
+            throw new Error(`No benchmark reports generated for: ${benchmarkNames.join(', ')}`);
+        }
+
+        return reports;
+    }
+
+    async cleanup() {
     }
 }
 
@@ -1024,14 +1287,20 @@ export async function runSdlBenchmarkCli(argv = process.argv.slice(2)) {
 }
 
 function parseArgs(args) {
-    const result = {};
+    const tokens = [];
     for (const arg of args) {
+        if (typeof arg === 'string') {
+            tokens.push(...arg.split(/\s+/).filter(Boolean));
+        }
+    }
+    const result = {};
+    for (const arg of tokens) {
         if (arg.startsWith('--')) {
-            const [k, v] = arg.slice(2).split('=');
-            result[k] = v || 'true';
+            const [k, ...v] = arg.slice(2).split('=');
+            result[k] = v.length > 0 ? v.join('=') : 'true';
         } else if (arg.includes('=')) {
-            const [k, v] = arg.split('=');
-            result[k] = v;
+            const [k, ...v] = arg.split('=');
+            result[k] = v.join('=');
         }
     }
     return result;

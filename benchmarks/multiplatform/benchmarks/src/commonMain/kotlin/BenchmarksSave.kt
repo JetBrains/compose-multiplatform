@@ -61,6 +61,8 @@ fun saveBenchmarkStatsOnDisk(name: String, stats: BenchmarkStats) {
         // IOException "Read-only file system" is thrown on iOS without writing permissions
     } catch (_: UnsupportedOperationException) {
         // UnsupportedOperationException is thrown in browser
+    } catch (e: Throwable) {
+        println("Warning: could not save benchmark stats on disk: ${e.message}")
     }
 }
 

@@ -76,6 +76,7 @@ private fun CanvasDrawingItem(index: Int) {
             repeatMode = RepeatMode.Restart
         )
     )
+    val path = remember { Path() }
 
     Canvas(
         modifier = Modifier
@@ -101,7 +102,8 @@ private fun CanvasDrawingItem(index: Int) {
             val x = size.width / 2 + cos(angle * PI / 180.0).toFloat() * radius * random.nextFloat()
             val y = size.height / 2 + sin(angle * PI / 180.0).toFloat() * radius * random.nextFloat()
 
-            val path = Path().apply {
+            path.reset()
+            path.apply {
                 moveTo(x, y)
                 repeat(40) { j ->
                     val pointAngle = angle + j * 45f + animatedValue
