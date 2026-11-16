@@ -1,3 +1,59 @@
+# 1.13.0-rc01 (November 2026)
+
+_Changes since 1.13.0-beta02_
+
+## Features
+
+### Desktop
+
+- _(prerelease fix)_ Bump Compose Hot Reload to [1.3.0-rc01](https://github.com/JetBrains/compose-hot-reload/releases/tag/v1.3.0-rc01) [#5783](https://github.com/JetBrains/compose-multiplatform/pull/5783)
+
+## Fixes
+
+### Multiple Platforms
+
+- Fixed crash when `measureAndLayout` on one `RootNodeOwner` disposes another, such as removing a popup or tooltip in a `BoxWithConstraints` [#3566](https://github.com/JetBrains/compose-multiplatform-core/pull/3566)
+
+### iOS
+
+- Fix extra main-thread work on every frame: the Compose view no longer gets a full-screen CPU bitmap allocated and cleared before each draw [#3584](https://github.com/JetBrains/compose-multiplatform-core/pull/3584)
+- Fix crash caused by `flush()` reentrancy that may occur when a new platform layer is created inside a pointer event handler [#3597](https://github.com/JetBrains/compose-multiplatform-core/pull/3597)
+
+### Desktop
+
+- `LocalAwtWindow` now provides the correct value after re-attaching `ComposePanel` to a new window [#3570](https://github.com/JetBrains/compose-multiplatform-core/pull/3570)
+- _(prerelease fix)_ Fix `IllegalStateException` during `painterResource` call before window creation [#3581](https://github.com/JetBrains/compose-multiplatform-core/pull/3581)
+
+### Web
+
+- _(prerelease fix)_ Ensure that repeated taps on already focused `TextField` do bring the keyboard [#3561](https://github.com/JetBrains/compose-multiplatform-core/pull/3561)
+- _(prerelease fix)_ Fixed `1nMakeRasterN32Premul is not defined` when running `runComposeUiTest` with JS [#3582](https://github.com/JetBrains/compose-multiplatform-core/pull/3582)
+
+## Components
+
+### Gradle plugin
+
+`org.jetbrains.compose` version `1.13.0-rc01`
+
+### Libraries
+
+| Library group | Coordinates | Based on Jetpack |
+|---------------|-------------|------------------|
+| Runtime | `org.jetbrains.compose.runtime:runtime*:1.13.0-rc01` | [Runtime 1.13.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.13.0-rc01) |
+| UI | `org.jetbrains.compose.ui:ui*:1.13.0-rc01` | [UI 1.13.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.13.0-rc01) |
+| Foundation | `org.jetbrains.compose.foundation:foundation*:1.13.0-rc01` | [Foundation 1.13.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.13.0-rc01) |
+| Material | `org.jetbrains.compose.material:material*:1.13.0-rc01` | [Material 1.13.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material#1.13.0-rc01) |
+| Material3 | `org.jetbrains.compose.material3:material3*:1.13.0-rc01` | [Material3 1.5.0-rc01](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.5.0-rc01) |
+| Material3 Adaptive | `org.jetbrains.compose.material3.adaptive:adaptive*:1.4.0-alpha01` | [Material3 Adaptive 1.4.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material3-adaptive#1.4.0-alpha03) |
+| Lifecycle | `org.jetbrains.androidx.lifecycle:lifecycle-*:2.11.0` | [Lifecycle 2.11.0](https://developer.android.com/jetpack/androidx/releases/lifecycle#2.11.0) |
+| Navigation | `org.jetbrains.androidx.navigation:navigation-*:2.10.0` | [Navigation 2.10.0](https://developer.android.com/jetpack/androidx/releases/navigation#2.10.0) |
+| Navigation3 | `org.jetbrains.androidx.navigation3:navigation3-*:1.2.0` | [Navigation3 1.2.0](https://developer.android.com/jetpack/androidx/releases/navigation3#1.2.0) |
+| Navigation Event | `org.jetbrains.androidx.navigationevent:navigationevent-compose:1.1.0` | [Navigation Event 1.1.1](https://developer.android.com/jetpack/androidx/releases/navigationevent#1.1.1) |
+| Savedstate | `org.jetbrains.androidx.savedstate:savedstate*:1.4.0` | [Savedstate 1.4.0](https://developer.android.com/jetpack/androidx/releases/savedstate#1.4.0) |
+| WindowManager Core | `org.jetbrains.androidx.window:window-core:1.5.1` | [WindowManager 1.5.1](https://developer.android.com/jetpack/androidx/releases/window#1.5.1) |
+
+---
+
 # 1.13.0-beta02 (November 2026)
 
 _Changes since 1.13.0-beta01_
