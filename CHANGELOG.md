@@ -12,6 +12,8 @@ _Changes since 1.13.0-beta02_
 
 ### Multiple Platforms
 
+- Fix a text style without an explicit `fontSynthesis` being resolved twice in the font resolver cache on desktop, iOS and web [#3556](https://github.com/JetBrains/compose-multiplatform-core/pull/3556)
+- Fixed a memory leak in font state tracking during repeated text measurements, such as when animating container width [#3556](https://github.com/JetBrains/compose-multiplatform-core/pull/3556)
 - Fixed crash when `measureAndLayout` on one `RootNodeOwner` disposes another, such as removing a popup or tooltip in a `BoxWithConstraints` [#3566](https://github.com/JetBrains/compose-multiplatform-core/pull/3566)
 
 ### iOS
