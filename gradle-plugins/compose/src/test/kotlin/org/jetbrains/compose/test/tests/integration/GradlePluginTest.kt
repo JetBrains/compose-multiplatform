@@ -60,12 +60,23 @@ class GradlePluginTest : GradlePluginTestBase() {
                 checkExists()
                 assertTrue(isDirectory)
                 val distributionFiles = listFiles()!!.map { it.name }.toList()
-                assertFalse(
-                    distributionFiles.contains("skiko.wasm"),
-                    "skiko.wasm is probably a duplicate"
+                val skikoWasmFiles = file("./build/compose/skiko-wasmJs-runtime")
+                    .listFiles()!!
+                    .filter { it.extension == "wasm" }
+                    .map { it.name }
+
+                assertTrue(skikoWasmFiles.isNotEmpty(), "Expected Skiko Wasm modules")
+                skikoWasmFiles.forEach { name ->
+                    assertFalse(
+                        distributionFiles.contains(name),
+                        "$name is probably a duplicate"
+                    )
+                }
+                // One app module plus all Skiko modules, emitted with mangled names.
+                assertEquals(
+                    1 + skikoWasmFiles.size,
+                    distributionFiles.count { it.endsWith(".wasm") }
                 )
-                // one file is the app wasm file and another one is skiko wasm file with a mangled name
-                assertEquals(2, distributionFiles.filter { it.endsWith(".wasm") }.size)
             }
 
             file("./build/dist/js/productionExecutable").apply {
