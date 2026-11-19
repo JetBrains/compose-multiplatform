@@ -3,4 +3,6 @@ modules:
   - desktopApp
   - iosApp
   - shared
-  - webApp
+  # Web support is temporarily disabled due to KTC-6153:
+  # https://youtrack.jetbrains.com/issue/KTC-6153
+  # - webApp
