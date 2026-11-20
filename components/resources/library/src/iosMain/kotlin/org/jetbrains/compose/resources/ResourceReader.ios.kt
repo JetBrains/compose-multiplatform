@@ -3,11 +3,9 @@ package org.jetbrains.compose.resources
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.BooleanVar
 import kotlinx.cinterop.ObjCObjectVar
-import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
-import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.value
 import org.jetbrains.skiko.OS
 import org.jetbrains.skiko.OSVersion
@@ -23,7 +21,6 @@ import platform.Foundation.closeFile
 import platform.Foundation.fileHandleForReadingAtPath
 import platform.Foundation.readDataOfLength
 import platform.Foundation.seekToFileOffset
-import platform.posix.memcpy
 
 @ExperimentalResourceApi
 @OptIn(BetaInteropApi::class)
@@ -35,16 +32,12 @@ internal object DefaultIOsResourceReader : ResourceReader {
 
     override suspend fun read(path: String): ByteArray {
         val data = readData(getPathInBundle(path))
-        return ByteArray(data.length.toInt()).apply {
-            usePinned { memcpy(it.addressOf(0), data.bytes, data.length) }
-        }
+        return data.toByteArray()
     }
 
     override suspend fun readPart(path: String, offset: Long, size: Long): ByteArray {
         val data = readData(getPathInBundle(path), offset, size)
-        return ByteArray(data.length.toInt()).apply {
-            usePinned { memcpy(it.addressOf(0), data.bytes, data.length) }
-        }
+        return data.toByteArray()
     }
 
     override fun getUri(path: String): String {
