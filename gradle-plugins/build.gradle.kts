@@ -20,6 +20,10 @@ subprojects {
         google()
         mavenLocal()
         maven("https://packages.jetbrains.team/maven/p/kt/dev")
+        // Fall back to Maven Central when there is no compose-hot-reload in the cache-redirector.jetbrains.com yet
+        mavenCentral {
+            content { includeGroup("org.jetbrains.compose.hot-reload") }
+        }
     }
 
     plugins.withId("java") {

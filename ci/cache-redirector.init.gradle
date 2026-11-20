@@ -5,8 +5,17 @@
 def redirectorName = "MavenCentralCacheRedirector"
 def redirectorUrl = "https://cache-redirector.jetbrains.com/maven-central"
 
+// Artifacts of a fresh Compose Hot Reload release are not available in the cache-redirector immediately
+// (it negatively caches missing artifacts), so they fall back to direct Maven Central, after the redirector.
+// The content filter keeps all other artifacts on the redirector (see the 429 note above).
+// repo1.maven.org is used intentionally: its host differs from repo.maven.apache.org,
+// so these repositories are not removed/replaced by the logic below.
+def hotReloadRepoName = "MavenCentralHotReload"
+def hotReloadRepoUrl = "https://repo1.maven.org/maven2"
+def hotReloadGroup = "org.jetbrains.compose.hot-reload"
+
 beforeSettings { settings ->
-    // Repositories declared in settings scripts are added after this one
+    // Repositories declared in settings scripts are added after these
     settings.pluginManagement.repositories.maven {
         name = redirectorName
         url = redirectorUrl
@@ -14,6 +23,20 @@ beforeSettings { settings ->
     settings.dependencyResolutionManagement.repositories.maven {
         name = redirectorName
         url = redirectorUrl
+    }
+    settings.pluginManagement.repositories.maven {
+        name = hotReloadRepoName
+        url = hotReloadRepoUrl
+        content {
+            includeGroup(hotReloadGroup)
+        }
+    }
+    settings.dependencyResolutionManagement.repositories.maven {
+        name = hotReloadRepoName
+        url = hotReloadRepoUrl
+        content {
+            includeGroup(hotReloadGroup)
+        }
     }
 }
 
