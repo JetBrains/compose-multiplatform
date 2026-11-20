@@ -51,4 +51,7 @@ runGradle chat :jsApp:jsBrowserDistribution
 runGradle graphics-2d :jsApp:jsBrowserDistribution
 runGradle imageviewer :webApp:wasmJsBrowserDistribution
 runGradle nav_cupcake :webApp:wasmJsBrowserDistribution
-runKotlin codeviewer wasmJs
+# Temporarily disable Code Viewer's web validation due to KTC-6153:
+# https://youtrack.jetbrains.com/issue/KTC-6153
+# Re-enable this build and the sample's web target once the issue is resolved.
+# runKotlin codeviewer wasmJs

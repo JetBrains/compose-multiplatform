@@ -1,6 +1,6 @@
 product:
   type: kmp/lib
-  platforms: [android, iosArm64, iosSimulatorArm64, jvm, wasmJs]
+  platforms: [android, iosArm64, iosSimulatorArm64, jvm]
 
 aliases:
   - jvmAndAndroid: [jvm, android]
