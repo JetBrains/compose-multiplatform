@@ -9,7 +9,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import javax.inject.Inject
 
-// TODO: Mark this DSL as experimental once an appropriate annotation is available.
+@ExperimentalComposeApi
 enum class IosRenderingBackend {
     Ganesh,
     Graphite,
@@ -18,6 +18,7 @@ enum class IosRenderingBackend {
 abstract class IosExtension @Inject constructor(
     objects: ObjectFactory,
 ) {
+    @ExperimentalComposeApi
     val renderingBackend: Property<IosRenderingBackend> =
         objects.property(IosRenderingBackend::class.java).convention(IosRenderingBackend.Ganesh)
 }
