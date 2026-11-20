@@ -28,6 +28,28 @@ import kotlin.test.assertFalse
 
 class GradlePluginTest : GradlePluginTestBase() {
     @Test
+    fun iosRenderingBackendSwitch() = with(testProject("misc/iosRenderingBackend")) {
+        for (backend in listOf(null, "Ganesh", "Graphite", "Ganesh")) {
+            val args = backend?.let { arrayOf("-Pbackend=$it") } ?: emptyArray()
+            for (target in listOf("iosArm64", "iosSimulatorArm64")) {
+                gradle(
+                    "dependencyInsight", "--configuration", "${target}CompileKlibraries",
+                    "--dependency", "skiko-ganesh-gpu-provider", *args,
+                ).checks {
+                    check.logDoesntContain("FAILED")
+                    check.logContains("org.jetbrains.skiko:skiko-ganesh-gpu-provider")
+                    if (backend == "Graphite") {
+                        check.logContains("org.jetbrains.skiko:skiko-graphite-gpu-provider")
+                        check.logContains("Graphite was selected as the iOS rendering backend")
+                    } else {
+                        check.logDoesntContain("org.jetbrains.skiko:skiko-graphite-gpu-provider")
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun skikoRuntimeFromTestCompilation() = with(
         testProject("misc/wasmTestSkiko")
     ) {
