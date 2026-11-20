@@ -29,21 +29,18 @@ jobs:
         working-directory: examples
         run: ./validateExamples.sh
 
-  # Temporarily disable web example validation due to KTC-6153:
-  # https://youtrack.jetbrains.com/issue/KTC-6153
-  # Re-enable this job and Code Viewer's web target once the issue is resolved.
-  # web:
-  #   runs-on: ubuntu-24.04
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v5
+  web:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
-  #     - name: Setup Prerequisites
-  #       uses: ./.github/actions/setup-prerequisites
+      - name: Setup Prerequisites
+        uses: ./.github/actions/setup-prerequisites
 
-  #     - name: Validate web examples
-  #       working-directory: examples
-  #       run: ./validateExamplesWithJs.sh
+      - name: Validate web examples
+        working-directory: examples
+        run: ./validateExamplesWithJs.sh
 
   android:
     runs-on: ubuntu-24.04
