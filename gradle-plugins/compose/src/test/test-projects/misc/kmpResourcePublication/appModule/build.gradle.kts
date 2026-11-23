@@ -8,7 +8,7 @@ plugins {
 kotlin {
     android {
         compileSdk {
-            version = release(37) { minorApiLevel = 1 }
+            version = release(37) { minorApiLevel = 2 }
         }
         namespace = "me.sample.app"
         minSdk = 23

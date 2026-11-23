@@ -11,7 +11,7 @@ kotlin {
     android {
         namespace = "org.jetbrains.compose.testapp"
         compileSdk {
-            version = release(37) { minorApiLevel = 1 }
+            version = release(37) { minorApiLevel = 2 }
         }
         minSdk = 23
     }

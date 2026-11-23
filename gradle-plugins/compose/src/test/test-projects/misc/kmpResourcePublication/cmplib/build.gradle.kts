@@ -19,7 +19,7 @@ publishing {
 kotlin {
     android {
         compileSdk {
-            version = release(37) { minorApiLevel = 1 }
+            version = release(37) { minorApiLevel = 2 }
         }
         namespace = "me.sample.library"
         minSdk = 23

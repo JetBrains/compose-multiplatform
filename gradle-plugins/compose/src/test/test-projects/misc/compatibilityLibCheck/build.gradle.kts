@@ -14,7 +14,7 @@ kotlin {
     android {
         namespace = "org.company.app"
         compileSdk {
-            version = release(37) { minorApiLevel = 1 }
+            version = release(37) { minorApiLevel = 2 }
         }
         minSdk = 23
         androidResources.enable = true

@@ -5,7 +5,7 @@ plugins {
 android {
     namespace = "org.company.app.androidApp"
     compileSdk {
-        version = release(37) { minorApiLevel = 1 }
+        version = release(37) { minorApiLevel = 2 }
     }
 
     defaultConfig {
