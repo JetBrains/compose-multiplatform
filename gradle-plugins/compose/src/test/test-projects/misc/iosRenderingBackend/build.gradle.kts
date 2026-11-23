@@ -1,6 +1,6 @@
 @file:OptIn(org.jetbrains.compose.ExperimentalComposeApi::class)
 
-import org.jetbrains.compose.IosRenderingBackend
+import org.jetbrains.compose.ios.dsl.IosRenderingBackend
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform")

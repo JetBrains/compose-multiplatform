@@ -3,13 +3,15 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.internal
+package org.jetbrains.compose.ios.internal
 
 import org.gradle.api.Project
 import org.gradle.api.artifacts.component.ModuleComponentSelector
 import org.jetbrains.compose.ExperimentalComposeApi
-import org.jetbrains.compose.IosExtension
-import org.jetbrains.compose.IosRenderingBackend
+import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
+import org.jetbrains.compose.internal.mppExt
+import org.jetbrains.compose.ios.IosExtension
+import org.jetbrains.compose.ios.dsl.IosRenderingBackend
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.Family
 

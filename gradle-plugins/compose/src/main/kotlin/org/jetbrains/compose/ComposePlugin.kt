@@ -19,7 +19,8 @@ import org.jetbrains.compose.desktop.application.internal.configureDesktop
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.internal.configureExperimentalTargetsFlagsCheck
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
-import org.jetbrains.compose.internal.configureIos
+import org.jetbrains.compose.ios.IosExtension
+import org.jetbrains.compose.ios.internal.configureIos
 import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.resources.ResourcesExtension

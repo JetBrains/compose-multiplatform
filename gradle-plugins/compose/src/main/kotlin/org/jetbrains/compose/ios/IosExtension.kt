@@ -3,17 +3,13 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose
+package org.jetbrains.compose.ios
 
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
+import org.jetbrains.compose.ExperimentalComposeApi
+import org.jetbrains.compose.ios.dsl.IosRenderingBackend
 import javax.inject.Inject
-
-@ExperimentalComposeApi
-enum class IosRenderingBackend {
-    Ganesh,
-    Graphite,
-}
 
 abstract class IosExtension @Inject constructor(
     objects: ObjectFactory,
