@@ -28,7 +28,14 @@ import kotlin.test.assertFalse
 
 class GradlePluginTest : GradlePluginTestBase() {
     @Test
-    fun iosRenderingBackendSwitch() = with(testProject("misc/iosRenderingBackend")) {
+    fun iosRenderingBackendSwitch() = checkIosRenderingBackendSwitch("build.gradle.kts")
+
+    @Test
+    fun iosRenderingBackendSwitchGroovy() = checkIosRenderingBackendSwitch("build.gradle")
+
+    private fun checkIosRenderingBackendSwitch(buildScript: String) = with(testProject("misc/iosRenderingBackend")) {
+        val unusedBuildScript = if (buildScript == "build.gradle") "build.gradle.kts" else "build.gradle"
+        check(file(unusedBuildScript).delete())
         for (backend in listOf(null, "Ganesh", "Graphite", "Ganesh")) {
             val args = backend?.let { arrayOf("-Pbackend=$it") } ?: emptyArray()
             for (target in listOf("iosArm64", "iosSimulatorArm64")) {
