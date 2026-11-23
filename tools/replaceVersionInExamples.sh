@@ -42,3 +42,6 @@ do
    replaceVersionInFolder $folder "**pom.xml"
    replaceVersionInFolder $folder "**README.md"
 done
+
+echo "Update $ROOT/examples/codeviewer/kotlin"
+"$ROOT/examples/codeviewer/kotlin" update
