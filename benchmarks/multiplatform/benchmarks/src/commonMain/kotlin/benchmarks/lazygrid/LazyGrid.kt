@@ -18,7 +18,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.isActive
-import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.suspendCancellableCoroutine
 
 @Composable
 fun LazyGrid(smoothScroll: Boolean = false, withLaunchedEffectInItem: Boolean = false) {
@@ -90,7 +90,7 @@ private fun ListCell(entry: Entry, withLaunchedEffect: Boolean = false) {
         if (withLaunchedEffect) {
             LaunchedEffect(Unit) {
                 // Never resumed to imitate some async task running in an item's scope
-                suspendCoroutine {  }
+                suspendCancellableCoroutine { }
             }
         }
     }
