@@ -8,13 +8,13 @@ package org.jetbrains.compose.ios
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.jetbrains.compose.ExperimentalComposeApi
-import org.jetbrains.compose.ios.dsl.IosRenderingBackend
+import org.jetbrains.compose.dsl.RenderingBackend
 import javax.inject.Inject
 
 abstract class IosExtension @Inject constructor(
     objects: ObjectFactory,
 ) {
     @ExperimentalComposeApi
-    val renderingBackend: Property<IosRenderingBackend> =
-        objects.property(IosRenderingBackend::class.java).convention(IosRenderingBackend.Ganesh)
+    val renderingBackend: Property<RenderingBackend> =
+        objects.property(RenderingBackend::class.java).convention(RenderingBackend.Ganesh)
 }

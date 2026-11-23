@@ -1,4 +1,4 @@
-import org.jetbrains.compose.ios.dsl.IosRenderingBackend
+import org.jetbrains.compose.dsl.RenderingBackend
 
 plugins {
     id "org.jetbrains.kotlin.multiplatform"
@@ -22,7 +22,7 @@ def backend = providers.gradleProperty("backend").orNull
 if (backend != null) {
     compose {
         ios {
-            renderingBackend = backend == "Graphite" ? IosRenderingBackend.Graphite : IosRenderingBackend.Ganesh
+            renderingBackend = backend == "Graphite" ? RenderingBackend.Graphite : RenderingBackend.Ganesh
         }
     }
 }

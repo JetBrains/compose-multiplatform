@@ -8,10 +8,10 @@ package org.jetbrains.compose.ios.internal
 import org.gradle.api.Project
 import org.gradle.api.artifacts.component.ModuleComponentSelector
 import org.jetbrains.compose.ExperimentalComposeApi
+import org.jetbrains.compose.dsl.RenderingBackend
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.ios.IosExtension
-import org.jetbrains.compose.ios.dsl.IosRenderingBackend
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.Family
 
@@ -30,7 +30,7 @@ internal fun Project.configureIos(iosExtension: IosExtension) {
                     configuration.resolutionStrategy.dependencySubstitution.all { details ->
                         val requestedModule = details.requested as? ModuleComponentSelector ?: return@all
                         if (
-                            iosExtension.renderingBackend.get() == IosRenderingBackend.Graphite &&
+                            iosExtension.renderingBackend.get() == RenderingBackend.Graphite &&
                             requestedModule.group == skikoGroup &&
                             requestedModule.module == skikoGaneshModule
                         ) {

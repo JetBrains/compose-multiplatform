@@ -1,4 +1,4 @@
-rootProject.name = "iosRenderingBackend"
+rootProject.name = "renderingBackend"
 pluginManagement {
     repositories {
         mavenLocal()

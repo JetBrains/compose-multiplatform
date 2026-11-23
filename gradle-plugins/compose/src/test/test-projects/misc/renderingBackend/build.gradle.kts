@@ -1,6 +1,6 @@
 @file:OptIn(org.jetbrains.compose.ExperimentalComposeApi::class)
 
-import org.jetbrains.compose.ios.dsl.IosRenderingBackend
+import org.jetbrains.compose.dsl.RenderingBackend
 
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
@@ -18,6 +18,6 @@ kotlin {
 
 providers.gradleProperty("backend").orNull?.let { backend ->
     compose.ios {
-        renderingBackend.set(IosRenderingBackend.valueOf(backend))
+        renderingBackend.set(RenderingBackend.valueOf(backend))
     }
 }

@@ -3,12 +3,12 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.ios.dsl
+package org.jetbrains.compose.dsl
 
 import org.jetbrains.compose.ExperimentalComposeApi
 
 @ExperimentalComposeApi
-enum class IosRenderingBackend {
+enum class RenderingBackend {
     Ganesh,
     Graphite,
 }
