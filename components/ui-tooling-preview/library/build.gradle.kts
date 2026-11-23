@@ -54,7 +54,7 @@ kotlin {
     }
     android {
         namespace = "org.jetbrains.compose.ui.tooling.preview"
-        compileSdk = 37
+        compileSdk { version = release(37) { minorApiLevel = 2 } }
         minSdk = 23
     }
 }
