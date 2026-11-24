@@ -78,6 +78,8 @@ internal actual suspend fun measureComposable(
         }
 
         runGC()
+        // Let the event loop run the FinalizationRegistry callbacks queued by the GC (on web), so they aren't measured.
+        delay(1)
 
         var cpuTotalTime = Duration.ZERO
         var gpuTotalTime = Duration.ZERO
@@ -106,6 +108,7 @@ internal actual suspend fun measureComposable(
             val vsyncStartTimeNanos = frameTimeNanos
 
             runGC()
+            delay(1)
 
             val start = markNow()
 
