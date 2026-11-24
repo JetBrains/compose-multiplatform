@@ -364,6 +364,53 @@ KotlinAppHost::Callback::~Callback() {
 }
 
 struct KotlinAppHost::HostValue {
+    struct FinalizerEntry {
+        KotlinAppHost* host = nullptr;
+        std::shared_ptr<Callback> callback;
+        HostValue* held_value = nullptr;
+        wasmtime_val_t held_val{};
+        bool has_held_val = false;
+
+        ~FinalizerEntry() {
+            if (has_held_val) {
+                wasmtime_val_unroot(&held_val);
+            }
+        }
+
+        FinalizerEntry() = default;
+        FinalizerEntry(const FinalizerEntry& other)
+            : host(other.host),
+              callback(other.callback),
+              held_value(other.held_value),
+              has_held_val(other.has_held_val) {
+            if (has_held_val) {
+                wasmtime_val_clone(&other.held_val, &held_val);
+            }
+        }
+        FinalizerEntry(FinalizerEntry&& other) noexcept
+            : host(other.host),
+              callback(std::move(other.callback)),
+              held_value(other.held_value),
+              held_val(other.held_val),
+              has_held_val(other.has_held_val) {
+            other.has_held_val = false;
+        }
+        FinalizerEntry& operator=(FinalizerEntry&& other) noexcept {
+            if (this != &other) {
+                if (has_held_val) {
+                    wasmtime_val_unroot(&held_val);
+                }
+                host = other.host;
+                callback = std::move(other.callback);
+                held_value = other.held_value;
+                held_val = other.held_val;
+                has_held_val = other.has_held_val;
+                other.has_held_val = false;
+            }
+            return *this;
+        }
+    };
+
     enum class Kind { String, Number, Boolean, Object, Callback, Poster };
     Kind kind = Kind::Object;
     std::u16string u16_string;
@@ -385,6 +432,7 @@ struct KotlinAppHost::HostValue {
     bool promise_resolved = false;
     std::shared_ptr<XmlNode> xml_node;
     std::vector<std::shared_ptr<XmlNode>> xml_node_list;
+    std::vector<FinalizerEntry> finalizers;
 
     ~HostValue() {
         if (has_target_val) {
@@ -454,6 +502,27 @@ struct KotlinAppHost::HostValue {
         result->target_callback = std::move(target);
         return result;
     }
+    static HostValue* Clone(const HostValue* other) {
+        if (!other) return nullptr;
+        auto* result = new HostValue;
+        result->kind = other->kind;
+        result->u16_string = other->u16_string;
+        result->string = other->string;
+        result->string_valid = other->string_valid;
+        result->number = other->number;
+        result->boolean = other->boolean;
+        result->object = other->object;
+        result->id = other->id;
+        result->callback = other->callback;
+        result->target_callback = other->target_callback;
+        result->string_array = other->string_array;
+        result->byte_buffer = other->byte_buffer;
+        result->promise_result = other->promise_result;
+        result->promise_resolved = other->promise_resolved;
+        result->xml_node = other->xml_node;
+        result->xml_node_list = other->xml_node_list;
+        return result;
+    }
 };
 
 struct KotlinAppHost::Binding {
@@ -477,7 +546,34 @@ KotlinAppHost::KotlinAppHost(
 KotlinAppHost::~KotlinAppHost() = default;
 
 void KotlinAppHost::DeleteHostValue(void* value) {
-    delete static_cast<HostValue*>(value);
+    auto* host_val = static_cast<HostValue*>(value);
+    if (host_val != nullptr) {
+        if (!host_val->finalizers.empty()) {
+            for (auto& entry : host_val->finalizers) {
+                if (entry.host != nullptr && entry.callback != nullptr) {
+                    if (entry.has_held_val) {
+                        entry.host->QueueFinalizer(entry.callback, &entry.held_val, nullptr);
+                    } else {
+                        entry.host->QueueFinalizer(entry.callback, nullptr, entry.held_value);
+                    }
+                }
+            }
+        }
+        delete host_val;
+    }
+}
+
+void KotlinAppHost::QueueFinalizer(
+    std::shared_ptr<Callback> callback,
+    const wasmtime_val_t* held_val,
+    HostValue* held_host
+) {
+    if (!callback) return;
+    if (held_val != nullptr) {
+        ready_callbacks_.emplace_back(std::move(callback), *held_val);
+    } else {
+        ready_callbacks_.emplace_back(std::move(callback), held_host);
+    }
 }
 
 void KotlinAppHost::DeleteBinding(void* value) {
@@ -674,7 +770,8 @@ void KotlinAppHost::Start() {
 bool KotlinAppHost::Invoke(
     const std::shared_ptr<Callback>& callback,
     double timestamp,
-    HostValue* arg
+    HostValue* arg,
+    const wasmtime_val_t* arg_val
 ) {
     if (!callback) return false;
     wasmtime_func_t target_func{};
@@ -718,8 +815,10 @@ bool KotlinAppHost::Invoke(
         if (is_f64_arg) {
             args[1].kind = WASMTIME_F64;
             args[1].of.f64 = timestamp;
+        } else if (arg_val != nullptr) {
+            wasmtime_val_clone(arg_val, &args[1]);
         } else if (arg != nullptr) {
-            SetExternResult(&args[1], arg);
+            SetExternResult(&args[1], HostValue::Clone(arg));
         } else {
             args[1].kind = WASMTIME_EXTERNREF;
             wasmtime_externref_set_null(&args[1].of.externref);
@@ -750,10 +849,20 @@ bool KotlinAppHost::Invoke(
 
 void KotlinAppHost::DrainReadyCallbacks() {
     size_t iterations = 0;
-    while (!ready_callbacks_.empty() && iterations++ < 1000) {
-        auto ready = ready_callbacks_.front();
+    while (!ready_callbacks_.empty() && iterations++ < 2000) {
+        auto ready = std::move(ready_callbacks_.front());
         ready_callbacks_.pop_front();
-        Invoke(ready.callback, 0.0, ready.arg);
+        if (ready.has_arg_val) {
+            Invoke(ready.callback, 0.0, nullptr, &ready.arg_val);
+        } else {
+            Invoke(ready.callback, 0.0, ready.arg, nullptr);
+        }
+        if (iterations % 50 == 0 && context_ != nullptr) {
+            wasmtime_context_gc(context_);
+        }
+    }
+    if (context_ != nullptr) {
+        wasmtime_context_gc(context_);
     }
 }
 
@@ -1379,7 +1488,16 @@ wasm_trap_t* KotlinAppHost::CallHost(
             results[0].of.i32 = ok ? 1 : 0;
         }
     } else if (name == "deleteGlContextJs" || name.find("deleteGlContext") != std::string::npos) {
-        SetExternResult(&results[0], HostValue::BooleanValue(true));
+        int ctx_id = 0;
+        if (nargs > 0) {
+            if (args[0].kind == WASMTIME_I32) ctx_id = args[0].of.i32;
+            else if (HostValue* h = GetHostValue(args[0])) ctx_id = static_cast<int>(h->number);
+        }
+        bool ok = true;
+        if (ctx_id > 0 && skiko_ != nullptr) {
+            ok = skiko_->DeleteContext(ctx_id);
+        }
+        SetExternResult(&results[0], HostValue::BooleanValue(ok));
     } else if (name == "nativeGlPresent" || name.find("nativeGlPresent") != std::string::npos) {
         int ctx_id = skiko_->CurrentContextId();
         if (nargs > 0) {
@@ -1413,7 +1531,11 @@ wasm_trap_t* KotlinAppHost::CallHost(
         SetExternResult(&results[0], HostValue::BooleanValue(true));
     } else if (name == "isNodeJs" || name == "isNodeJsJs" || name.find("isNodeJs") != std::string::npos) {
         SetExternResult(&results[0], HostValue::BooleanValue(false));
-    } else if (name == "gc" || name == "window.gc" || name == "globalThis.gc" || name == "performJsGc" || name.find("performJsGc") != std::string::npos) {
+    } else if (name == "gc" || name == "window.gc" || name == "globalThis.gc" || name == "performJsGc" ||
+               name.find("performJsGc") != std::string::npos ||
+               name.find("typeof gc") != std::string::npos ||
+               name.find("globalThis.gc") != std::string::npos ||
+               name.find("gc()") != std::string::npos) {
         if (context_ != nullptr) {
             wasmtime_context_gc(context_);
         }
@@ -1576,10 +1698,36 @@ wasm_trap_t* KotlinAppHost::CallHost(
         object_result(ObjectKind::Generic);
     } else if (name == "org.jetbrains.skiko.wasm.contextAttributesWithDefaults") {
         object_result(ObjectKind::ContextAttributes);
-    } else if (name == "org.jetbrains.skia.impl.FinalizationRegistry_$external_fun") {
-        object_result(ObjectKind::FinalizationRegistry);
-    } else if (name == "org.jetbrains.skia.impl.unregister_$external_fun") {
-        if (nresults) {
+    } else if (name == "org.jetbrains.skia.impl.FinalizationRegistry_$external_fun" ||
+               name.find("FinalizationRegistry_$external_fun") != std::string::npos ||
+               (name.find("FinalizationRegistry") != std::string::npos && name.find("register") == std::string::npos)) {
+        HostValue* cb_val = nargs > 0 ? GetHostValue(args[0]) : nullptr;
+        auto* reg = HostValue::Object(ObjectKind::FinalizationRegistry);
+        if (cb_val && cb_val->callback) {
+            reg->callback = cb_val->callback;
+        }
+        SetExternResult(&results[0], reg);
+    } else if (name == "org.jetbrains.skia.impl.register_$external_fun" ||
+               name.find("register_$external_fun") != std::string::npos) {
+        HostValue* registry = nargs > 0 ? GetHostValue(args[0]) : nullptr;
+        HostValue* target = nargs > 1 ? GetHostValue(args[1]) : nullptr;
+        HostValue* held_val_host = nargs > 2 ? GetHostValue(args[2]) : nullptr;
+
+        if (registry && registry->callback && target) {
+            HostValue::FinalizerEntry entry;
+            entry.host = this;
+            entry.callback = registry->callback;
+            entry.held_value = held_val_host;
+            if (nargs > 2) {
+                wasmtime_val_clone(&args[2], &entry.held_val);
+                entry.has_held_val = true;
+            }
+            target->finalizers.push_back(std::move(entry));
+        }
+    } else if (name == "org.jetbrains.skia.impl.unregister_$external_fun" ||
+               name.find("unregister_$external_fun") != std::string::npos ||
+               name.find("unregister") != std::string::npos) {
+        if (nresults > 0) {
             results[0].kind = WASMTIME_I32;
             results[0].of.i32 = 1;
         }
@@ -1940,8 +2088,13 @@ wasm_trap_t* KotlinAppHost::CallHost(
         } else {
             null_result();
         }
-    } else if (name.find("FinalizationRegistry") != std::string::npos) {
-        object_result(ObjectKind::FinalizationRegistry);
+    } else if (name.find("FinalizationRegistry") != std::string::npos && name.find("register") == std::string::npos) {
+        HostValue* cb_val = nargs > 0 ? GetHostValue(args[0]) : nullptr;
+        auto* reg = HostValue::Object(ObjectKind::FinalizationRegistry);
+        if (cb_val && cb_val->callback) {
+            reg->callback = cb_val->callback;
+        }
+        SetExternResult(&results[0], reg);
     } else if (name.find("unregister") != std::string::npos) {
         if (nresults > 0) {
             results[0].kind = WASMTIME_I32;
@@ -2011,8 +2164,6 @@ wasm_trap_t* KotlinAppHost::CallHost(
     } else if (name == "org.w3c.dom.close_$external_fun") {
         should_exit_ = true;
     } else if (name == "org.jetbrains.skiko.wasm.patchWebGlContext" ||
-               name.find("register_$external_fun") != std::string::npos ||
-               name.find("unregister_$external_fun") != std::string::npos ||
                name == "org.w3c.dom.addEventListener_$external_fun" ||
                name == "org.w3c.dom.removeEventListener_$external_fun" ||
                name == "org.w3c.dom.setAttribute_$external_fun" ||

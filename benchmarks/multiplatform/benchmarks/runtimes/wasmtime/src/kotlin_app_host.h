@@ -65,6 +65,48 @@ private:
     struct ReadyCallback {
         std::shared_ptr<Callback> callback;
         HostValue* arg = nullptr;
+        wasmtime_val_t arg_val{};
+        bool has_arg_val = false;
+
+        ReadyCallback(std::shared_ptr<Callback> cb, HostValue* a = nullptr)
+            : callback(std::move(cb)), arg(a), has_arg_val(false) {}
+
+        ReadyCallback(std::shared_ptr<Callback> cb, const wasmtime_val_t& val)
+            : callback(std::move(cb)), arg(nullptr), has_arg_val(true) {
+            wasmtime_val_clone(&val, &arg_val);
+        }
+
+        ~ReadyCallback() {
+            if (has_arg_val) {
+                wasmtime_val_unroot(&arg_val);
+            }
+        }
+
+        ReadyCallback(const ReadyCallback& other)
+            : callback(other.callback), arg(other.arg), has_arg_val(other.has_arg_val) {
+            if (has_arg_val) {
+                wasmtime_val_clone(&other.arg_val, &arg_val);
+            }
+        }
+
+        ReadyCallback(ReadyCallback&& other) noexcept
+            : callback(std::move(other.callback)), arg(other.arg), arg_val(other.arg_val), has_arg_val(other.has_arg_val) {
+            other.has_arg_val = false;
+        }
+
+        ReadyCallback& operator=(ReadyCallback&& other) noexcept {
+            if (this != &other) {
+                if (has_arg_val) {
+                    wasmtime_val_unroot(&arg_val);
+                }
+                callback = std::move(other.callback);
+                arg = other.arg;
+                arg_val = other.arg_val;
+                has_arg_val = other.has_arg_val;
+                other.has_arg_val = false;
+            }
+            return *this;
+        }
     };
     struct Timer {
         uint32_t id = 0;
@@ -94,7 +136,8 @@ private:
         wasmtime_val_t* results,
         size_t nresults
     );
-    bool Invoke(const std::shared_ptr<Callback>& callback, double timestamp, HostValue* arg = nullptr);
+    void QueueFinalizer(std::shared_ptr<Callback> callback, const wasmtime_val_t* held_val, HostValue* held_host = nullptr);
+    bool Invoke(const std::shared_ptr<Callback>& callback, double timestamp, HostValue* arg = nullptr, const wasmtime_val_t* arg_val = nullptr);
     void SetExternResult(wasmtime_val_t* result, HostValue* value);
     HostValue* GetHostValue(const wasmtime_val_t& value) const;
     std::string GetString(const wasmtime_val_t& value) const;

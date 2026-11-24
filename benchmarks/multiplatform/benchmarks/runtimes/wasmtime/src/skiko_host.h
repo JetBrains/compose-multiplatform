@@ -27,6 +27,7 @@ public:
 
     bool CreateOffscreenContext(int width, int height, std::string& error);
     int CreateCanvasContext(int width, int height, std::string& error);
+    bool DeleteContext(int context_id);
     bool MakeContextCurrent(int context_id, std::string& error);
     int CurrentContextId() const;
     bool AttachRuntime(

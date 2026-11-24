@@ -12,7 +12,6 @@ import { createRequire } from 'module';
 import path from 'path';
 import { inspect } from 'util';
 import { fileURLToPath, pathToFileURL } from 'url';
-import { registerSkikoRuntimeTransform, createEmscriptenNativeGLBridge } from './skiko_emscripten_native_gl.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -244,8 +243,10 @@ function buildKotlinArgs(rawArgs = [], options = {}) {
             hasSaveStats = true;
             kotlinArgs.push(clean);
         } else if (clean.startsWith('benchmarks=') || clean.startsWith('benchmark=')) {
-            hasBenchmarksArg = true;
-            kotlinArgs.push(`benchmarks=${clean.split('=')[1]}`);
+            if (!options.benchmarkArg && (!options.benchmarkNames || options.benchmarkNames.length === 0)) {
+                hasBenchmarksArg = true;
+                kotlinArgs.push(`benchmarks=${clean.split('=')[1]}`);
+            }
         } else {
             kotlinArgs.push(clean);
         }
@@ -254,7 +255,7 @@ function buildKotlinArgs(rawArgs = [], options = {}) {
     if (!hasFrameCount) kotlinArgs.push(`frameCount=${iterations}`);
     if (!hasWarmup) kotlinArgs.push(`warmupCount=${warmup}`);
     if (!hasSaveStats) kotlinArgs.push('saveStatsToJSON=true');
-    if (!hasBenchmarksArg && options.benchmarkArg) {
+    if (options.benchmarkArg) {
         kotlinArgs.push(`benchmarks=${options.benchmarkArg}`);
     } else if (!hasBenchmarksArg && Array.isArray(options.benchmarkNames) && options.benchmarkNames.length > 0) {
         kotlinArgs.push(`benchmarks=${options.benchmarkNames.join(',')}`);
@@ -692,12 +693,9 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
                 }
                 if (this.nativeGL && typeof this.nativeGL.present === 'function') {
                     try {
-                        const ids = this.emscriptenBridge ? this.emscriptenBridge.contextIds() : [1];
-                        for (const id of ids) {
-                            this.nativeGL.present(id);
-                            if (typeof this.nativeGL.makeContextCurrent === 'function') {
-                                this.nativeGL.makeContextCurrent(id);
-                            }
+                        this.nativeGL.present(1);
+                        if (typeof this.nativeGL.makeContextCurrent === 'function') {
+                            this.nativeGL.makeContextCurrent(1);
                         }
                     } catch (e) {}
                 }
@@ -818,39 +816,21 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
             if (!fs.existsSync(skikoPath)) {
                 throw new Error(`[NodeSdlLauncher] skiko.mjs not found next to the benchmark module (${skikoPath}); wasm-sdl needs the packaged Skiko runtime (skiko.mjs + skiko.wasm)`);
             }
-            // The published (Emscripten) runtime is adapted at load time; a native-host runtime is used as is.
-            const transformState = registerSkikoRuntimeTransform(skikoPath);
-            this.emscriptenBridge = createEmscriptenNativeGLBridge({
-                addon: this.nativeGL,
-                wasmPath: path.resolve(path.dirname(modulePath), 'skiko.wasm'),
-                translateShaders: process.env.SKIKO_NATIVE_GL_TRANSLATE_SHADERS !== '0',
-                checkErrors: process.env.SKIKO_NATIVE_GL_CHECK_ERRORS === '1'
-            });
-            globalThis.__skikoEmscriptenModuleArg = this.emscriptenBridge.moduleArg;
             const skiko = await import(pathToFileURL(skikoPath).href);
             this.skikoModule = skiko;
-            if (transformState.nativeHostRuntime) {
-                if (typeof skiko.setSkikoNativeGLHost !== 'function') {
-                    throw new Error(`[NodeSdlLauncher] Native-host skiko.mjs does not export setSkikoNativeGLHost (${skikoPath})`);
-                }
-                this.emscriptenBridge = null;
-                const nativeHost = this.nativeGLHost || createSkikoNativeGLHost(this.nativeGL);
-                this.nativeGLHost = nativeHost;
-                globalThis.__skikoNativeGL = nativeHost;
-                skiko.setSkikoNativeGLHost(nativeHost);
-                if (!skiko.GL || typeof skiko.GL.createContext !== 'function' || typeof skiko.GL.makeContextCurrent !== 'function') {
-                    throw new Error('[NodeSdlLauncher] Native-host Skiko runtime did not export GL.createContext/makeContextCurrent');
-                }
-                await skiko.awaitSkiko;
-                globalThis.__skikoGL = skiko.GL;
-                console.log('[NodeSdlLauncher] Native-host Skiko GL attached via setSkikoNativeGLHost');
-            } else if (transformState.transformed) {
-                await skiko.awaitSkiko;
-                globalThis.__skikoGL = this.emscriptenBridge.installNativeContexts();
-                console.log('[NodeSdlLauncher] Published Skiko runtime attached to native_skiko.node via instantiateWasm');
-            } else {
-                throw new Error(`[NodeSdlLauncher] skiko.mjs was not loaded through the native GL transform (${skikoPath})`);
+            if (typeof skiko.setSkikoNativeGLHost !== 'function') {
+                throw new Error(`[NodeSdlLauncher] Native-host skiko.mjs does not export setSkikoNativeGLHost (${skikoPath})`);
             }
+            const nativeHost = this.nativeGLHost || createSkikoNativeGLHost(this.nativeGL);
+            this.nativeGLHost = nativeHost;
+            globalThis.__skikoNativeGL = nativeHost;
+            skiko.setSkikoNativeGLHost(nativeHost);
+            if (!skiko.GL || typeof skiko.GL.createContext !== 'function' || typeof skiko.GL.makeContextCurrent !== 'function') {
+                throw new Error('[NodeSdlLauncher] Native-host Skiko runtime did not export GL.createContext/makeContextCurrent');
+            }
+            await skiko.awaitSkiko;
+            globalThis.__skikoGL = skiko.GL;
+            console.log('[NodeSdlLauncher] Native-host Skiko GL attached via setSkikoNativeGLHost');
 
             const wasmModule = await import(modulePath);
             if (wasmModule.sdlBenchmarksRunner) {
@@ -860,11 +840,6 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
                 throw new Error(`Wasm module does not export sdlBenchmarksRunner`);
             }
             this.logGLUsage(console.log, 'Skiko GL import usage');
-            if (this.emscriptenBridge) {
-                for (const id of this.emscriptenBridge.contextIds()) {
-                    console.log(`[NodeSdlLauncher] Native GL context ${id} readback:`, JSON.stringify(this.emscriptenBridge.readbackSummary(id)));
-                }
-            }
         } catch (e) {
             this.logGLUsage(console.error, 'Skiko GL import usage at failure');
             console.error(`[NodeSdlLauncher] Wasm execution error:`, formatWasmError(e));
@@ -917,9 +892,7 @@ export class NodeSdlBenchmarkLauncher extends BenchmarkLauncher {
 
     logGLUsage(print, title) {
         try {
-            if (this.emscriptenBridge) {
-                print(`[NodeSdlLauncher] ${title}:`, JSON.stringify(this.emscriptenBridge.report()));
-            } else if (this.skikoModule && typeof this.skikoModule.getSkikoGLImportUsage === 'function') {
+            if (this.skikoModule && typeof this.skikoModule.getSkikoGLImportUsage === 'function') {
                 print(`[NodeSdlLauncher] ${title}:`, JSON.stringify(this.skikoModule.getSkikoGLImportUsage()));
             }
         } catch {}
@@ -1017,6 +990,8 @@ export class WasmtimeBenchmarkLauncher extends BenchmarkLauncher {
             path.resolve(process.cwd(), 'build/wasmtime-sdl-runner/wasmtime-sdl-runner'),
             path.resolve(process.cwd(), 'benchmarks/build/wasmtime-sdl-runner/wasmtime-sdl-runner'),
             path.resolve(process.cwd(), '../../benchmarks/build/wasmtime-sdl-runner/wasmtime-sdl-runner'),
+            path.resolve(process.cwd(), '../../../../benchmarks/build/wasmtime-sdl-runner/wasmtime-sdl-runner'),
+            path.resolve(process.cwd(), '../../../../../benchmarks/build/wasmtime-sdl-runner/wasmtime-sdl-runner'),
             path.resolve(__dirname, '../../../../build/wasmtime-sdl-runner/wasmtime-sdl-runner'),
             path.resolve(__dirname, '../../../../benchmarks/build/wasmtime-sdl-runner/wasmtime-sdl-runner')
         ].filter(Boolean);
@@ -1082,70 +1057,33 @@ export class WasmtimeBenchmarkLauncher extends BenchmarkLauncher {
         const generatedFiles = [];
 
         if (this.runnerPath && wasmPath && skikoPath) {
-            console.log(`[WasmtimeLauncher] Spawning wasmtime-sdl-runner...`);
-            const kotlinArgs = buildKotlinArgs(rawArgs, { iterations, warmup, benchmarkArg: options.benchmarkArg, benchmarkNames });
-            const runnerArgs = ['--wasm', wasmPath, '--skiko', skikoPath, ...kotlinArgs];
+            for (const benchmarkName of benchmarkNames) {
+                console.log(`[WasmtimeLauncher] Spawning isolated wasmtime-sdl-runner for ${benchmarkName}...`);
+                const kotlinArgs = buildKotlinArgs(rawArgs, { iterations, warmup, benchmarkArg: benchmarkName, benchmarkNames: [benchmarkName] });
+                const runnerArgs = ['--wasm', wasmPath, '--skiko', skikoPath, ...kotlinArgs];
 
-            await new Promise((resolve, reject) => {
-                const child = spawn(this.runnerPath, runnerArgs, {
-                    env: {
-                        ...process.env,
-                        BENCHMARK_MODE: 'true',
-                        BENCHMARK_ITERATIONS: String(iterations),
-                        BENCHMARK_WARMUP: String(warmup)
-                    }
-                });
-
-                let stdoutBuffer = '';
-                let inJson = false;
-                let jsonBuffer = '';
-
-                child.stdout.on('data', (chunk) => {
-                    const text = chunk.toString();
-                    process.stdout.write(text);
-                    stdoutBuffer += text;
-
-                    const lines = stdoutBuffer.split('\n');
-                    stdoutBuffer = lines.pop() || '';
-
-                    for (const line of lines) {
-                        if (line.includes('JSON_START')) {
-                            inJson = true;
-                            jsonBuffer = '';
-                        } else if (line.includes('JSON_END')) {
-                            inJson = false;
-                            try {
-                                const parsed = JSON.parse(jsonBuffer);
-                                if (parsed && parsed.name) {
-                                    for (const d of candidateOutputDirs) {
-                                        if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
-                                        const filePath = path.join(d, `${parsed.name}.json`);
-                                        fs.writeFileSync(filePath, JSON.stringify(parsed, null, 2));
-                                        generatedFiles.push(filePath);
-                                    }
-                                }
-                            } catch (e) {}
-                        } else if (inJson) {
-                            jsonBuffer += line + '\n';
+                await new Promise((resolve, reject) => {
+                    const child = spawn(this.runnerPath, runnerArgs, {
+                        env: {
+                            ...process.env,
+                            BENCHMARK_MODE: 'true',
+                            BENCHMARK_ITERATIONS: String(iterations),
+                            BENCHMARK_WARMUP: String(warmup)
                         }
-                    }
-                });
+                    });
 
-                child.stderr.on('data', (chunk) => {
-                    process.stderr.write(chunk.toString());
-                });
+                    let stdoutBuffer = '';
+                    let inJson = false;
+                    let jsonBuffer = '';
 
-                child.on('error', (err) => {
-                    console.warn(`[WasmtimeLauncher] Process error: ${err.message}`);
-                    for (const f of generatedFiles) {
-                        if (fs.existsSync(f)) try { fs.unlinkSync(f); } catch {}
-                    }
-                    reject(err);
-                });
+                    child.stdout.on('data', (chunk) => {
+                        const text = chunk.toString();
+                        process.stdout.write(text);
+                        stdoutBuffer += text;
 
-                child.on('close', (code, signal) => {
-                    if (stdoutBuffer) {
-                        const lines = [stdoutBuffer];
+                        const lines = stdoutBuffer.split('\n');
+                        stdoutBuffer = lines.pop() || '';
+
                         for (const line of lines) {
                             if (line.includes('JSON_START')) {
                                 inJson = true;
@@ -1167,24 +1105,63 @@ export class WasmtimeBenchmarkLauncher extends BenchmarkLauncher {
                                 jsonBuffer += line + '\n';
                             }
                         }
-                    }
+                    });
 
-                    if (signal) {
+                    child.stderr.on('data', (chunk) => {
+                        process.stderr.write(chunk.toString());
+                    });
+
+                    child.on('error', (err) => {
+                        console.warn(`[WasmtimeLauncher] Process error on ${benchmarkName}: ${err.message}`);
                         for (const f of generatedFiles) {
                             if (fs.existsSync(f)) try { fs.unlinkSync(f); } catch {}
                         }
-                        reject(new Error(`[WasmtimeLauncher] wasmtime-sdl-runner was terminated by signal ${signal}`));
-                    } else if (code !== 0 && code !== null) {
-                        for (const f of generatedFiles) {
-                            if (fs.existsSync(f)) try { fs.unlinkSync(f); } catch {}
+                        reject(err);
+                    });
+
+                    child.on('close', (code, signal) => {
+                        if (stdoutBuffer) {
+                            const lines = [stdoutBuffer];
+                            for (const line of lines) {
+                                if (line.includes('JSON_START')) {
+                                    inJson = true;
+                                    jsonBuffer = '';
+                                } else if (line.includes('JSON_END')) {
+                                    inJson = false;
+                                    try {
+                                        const parsed = JSON.parse(jsonBuffer);
+                                        if (parsed && parsed.name) {
+                                            for (const d of candidateOutputDirs) {
+                                                if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
+                                                const filePath = path.join(d, `${parsed.name}.json`);
+                                                fs.writeFileSync(filePath, JSON.stringify(parsed, null, 2));
+                                                generatedFiles.push(filePath);
+                                            }
+                                        }
+                                    } catch (e) {}
+                                } else if (inJson) {
+                                    jsonBuffer += line + '\n';
+                                }
+                            }
                         }
-                        reject(new Error(`[WasmtimeLauncher] wasmtime-sdl-runner exited with error code ${code}`));
-                    } else {
-                        wasmRunSucceeded = true;
-                        resolve();
-                    }
+
+                        if (signal) {
+                            for (const f of generatedFiles) {
+                                if (fs.existsSync(f)) try { fs.unlinkSync(f); } catch {}
+                            }
+                            reject(new Error(`[WasmtimeLauncher] wasmtime-sdl-runner was terminated by signal ${signal} during benchmark ${benchmarkName}`));
+                        } else if (code !== 0 && code !== null) {
+                            for (const f of generatedFiles) {
+                                if (fs.existsSync(f)) try { fs.unlinkSync(f); } catch {}
+                            }
+                            reject(new Error(`[WasmtimeLauncher] wasmtime-sdl-runner exited with error code ${code} during benchmark ${benchmarkName}`));
+                        } else {
+                            resolve();
+                        }
+                    });
                 });
-            });
+            }
+            wasmRunSucceeded = true;
         } else {
             throw new Error(`[WasmtimeLauncher] Missing required components (runner: ${this.runnerPath}, wasm: ${wasmPath}, skiko: ${skikoPath})`);
         }

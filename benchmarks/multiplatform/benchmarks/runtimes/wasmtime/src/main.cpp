@@ -113,7 +113,7 @@ wasm_trap_t* SetJmp(
     return nullptr;
 }
 
-wasm_trap_t* EmscriptenResizeHeap(
+wasm_trap_t* HostResizeMemory(
     void*,
     wasmtime_caller_t* caller,
     wasmtime_val_raw_t* slots,
@@ -167,7 +167,7 @@ wasm_trap_t* EmscriptenResizeHeap(
     return nullptr;
 }
 
-wasm_trap_t* EmscriptenDateNow(
+wasm_trap_t* HostDateNow(
     void*,
     wasmtime_caller_t*,
     wasmtime_val_raw_t* slots,
@@ -256,7 +256,7 @@ ImportRegistration RegisterEnvironmentImports(
             continue;
         }
 
-        if (name == "emscripten_resize_heap") {
+        if (name == "resize_heap" || name == "emscripten_resize_heap") {
             const wasm_externtype_t* extern_type = wasm_importtype_type(import);
             const wasm_functype_t* function_type = wasm_externtype_as_functype_const(extern_type);
             Check(
@@ -267,16 +267,16 @@ ImportRegistration RegisterEnvironmentImports(
                     item_name->data,
                     item_name->size,
                     function_type,
-                    EmscriptenResizeHeap,
+                    HostResizeMemory,
                     nullptr,
                     nullptr
                 ),
-                "Defining env.emscripten_resize_heap"
+                "Defining env." + name
             );
             continue;
         }
 
-        if (name == "emscripten_date_now") {
+        if (name == "date_now" || name == "emscripten_date_now") {
             const wasm_externtype_t* extern_type = wasm_importtype_type(import);
             const wasm_functype_t* function_type = wasm_externtype_as_functype_const(extern_type);
             Check(
@@ -287,11 +287,11 @@ ImportRegistration RegisterEnvironmentImports(
                     item_name->data,
                     item_name->size,
                     function_type,
-                    EmscriptenDateNow,
+                    HostDateNow,
                     nullptr,
                     nullptr
                 ),
-                "Defining env.emscripten_date_now"
+                "Defining env." + name
             );
             continue;
         }
@@ -316,9 +316,14 @@ ImportRegistration RegisterEnvironmentImports(
             continue;
         }
 
+        std::string gl_name = name;
+        if (gl_name.rfind("emscripten_", 0) == 0) {
+            gl_name = gl_name.substr(11);
+        }
+
         const GLBinding* binding = FindSpecialGLBinding(name);
-        if (binding == nullptr && name.rfind("emscripten_", 0) == 0) {
-            binding = FindSpecialGLBinding(name.substr(11));
+        if (binding == nullptr && gl_name != name) {
+            binding = FindSpecialGLBinding(gl_name);
         }
         if (binding != nullptr) {
             const wasm_externtype_t* extern_type = wasm_importtype_type(import);
@@ -342,8 +347,8 @@ ImportRegistration RegisterEnvironmentImports(
         }
 
         binding = FindGeneratedGLBinding(name);
-        if (binding == nullptr && name.rfind("emscripten_", 0) == 0) {
-            binding = FindGeneratedGLBinding(name.substr(11));
+        if (binding == nullptr && gl_name != name) {
+            binding = FindGeneratedGLBinding(gl_name);
         }
         if (binding != nullptr) {
             const wasm_externtype_t* extern_type = wasm_importtype_type(import);
@@ -596,6 +601,13 @@ int main(int argc, char** argv) {
         wasmtime_config_wasm_gc_set(config, true);
         wasmtime_config_wasm_function_references_set(config, true);
         wasmtime_config_wasm_exceptions_set(config, true);
+        wasmtime_config_wasm_bulk_memory_set(config, true);
+        wasmtime_config_wasm_multi_memory_set(config, true);
+        wasmtime_config_wasm_memory64_set(config, true);
+        wasmtime_config_wasm_custom_page_sizes_set(config, true);
+        wasmtime_config_memory_may_move_set(config, true);
+        wasmtime_config_memory_reservation_set(config, 4ULL * 1024 * 1024 * 1024);
+        wasmtime_config_memory_reservation_for_growth_set(config, 4ULL * 1024 * 1024 * 1024);
         wasmtime_config_parallel_compilation_set(config, true);
         wasmtime_config_cranelift_opt_level_set(config, WASMTIME_OPT_LEVEL_SPEED);
         wasmtime_error_t* cache_err = wasmtime_config_cache_config_load(config, nullptr);
@@ -761,6 +773,7 @@ int main(int argc, char** argv) {
                 const auto now = std::chrono::steady_clock::now();
                 application.RunExpiredTimers(now);
                 application.DrainReadyCallbacks();
+                wasmtime_context_gc(context);
 
                 if (now >= next_frame) {
                     const double timestamp = std::chrono::duration<double, std::milli>(now - start).count();
@@ -781,6 +794,7 @@ int main(int argc, char** argv) {
                     }
                     application.RunExpiredTimers(now);
                     application.DrainReadyCallbacks();
+                    wasmtime_context_gc(context);
 
                     if (window.IsOpen() && callback_count > 0) {
                         host.FlushContexts();

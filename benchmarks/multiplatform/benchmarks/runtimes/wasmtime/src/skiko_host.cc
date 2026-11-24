@@ -59,6 +59,7 @@ SkikoHost::SkikoHost(void* share_context)
 
 SkikoHost::~SkikoHost() {
     for (auto& item : contexts_) {
+        if (!item) continue;
         CGLSetCurrentContext(item->context);
         DeleteFramebufferObjects(
             item->framebuffer,
@@ -178,14 +179,143 @@ int SkikoHost::CreateCanvasContext(
     std::string& error
 ) {
     if (!bootstrap_context_claimed_ && contexts_.size() == 1 &&
-        contexts_[0]->width == width && contexts_[0]->height == height) {
+        contexts_[0] && contexts_[0]->width == width && contexts_[0]->height == height) {
         bootstrap_context_claimed_ = true;
         if (!MakeContextCurrent(1, error)) return 0;
         return 1;
     }
+    for (size_t index = 0; index < contexts_.size(); ++index) {
+        if (!contexts_[index]) {
+            auto item = std::make_unique<OffscreenContext>();
+            CGLPixelFormatAttribute attributes[] = {
+                kCGLPFAOpenGLProfile,
+                static_cast<CGLPixelFormatAttribute>(kCGLOGLPVersion_3_2_Core),
+                kCGLPFAAccelerated,
+                kCGLPFAColorSize,
+                static_cast<CGLPixelFormatAttribute>(24),
+                kCGLPFAAlphaSize,
+                static_cast<CGLPixelFormatAttribute>(8),
+                kCGLPFADepthSize,
+                static_cast<CGLPixelFormatAttribute>(24),
+                kCGLPFAStencilSize,
+                static_cast<CGLPixelFormatAttribute>(8),
+                static_cast<CGLPixelFormatAttribute>(0),
+            };
+
+            CGLPixelFormatObj pixel_format = nullptr;
+            GLint count = 0;
+            if (CGLChoosePixelFormat(attributes, &pixel_format, &count) != kCGLNoError ||
+                pixel_format == nullptr) {
+                error = "CGLChoosePixelFormat failed";
+                return 0;
+            }
+
+            const CGLError create_result =
+                CGLCreateContext(pixel_format, share_context_, &item->context);
+            CGLDestroyPixelFormat(pixel_format);
+            if (create_result != kCGLNoError || item->context == nullptr) {
+                error = "CGLCreateContext failed";
+                return 0;
+            }
+
+            if (CGLSetCurrentContext(item->context) != kCGLNoError) {
+                CGLDestroyContext(item->context);
+                error = "CGLSetCurrentContext failed";
+                return 0;
+            }
+
+            item->width = width;
+            item->height = height;
+            item->gl_interface = GrGLInterfaces::MakeMac();
+            if (!item->gl_interface || !item->gl_interface->validate()) {
+                CGLSetCurrentContext(nullptr);
+                CGLDestroyContext(item->context);
+                error = "Skia could not create a valid native GrGLInterface";
+                return 0;
+            }
+
+            glGenFramebuffers(1, &item->framebuffer);
+            glBindFramebuffer(GL_FRAMEBUFFER, item->framebuffer);
+
+            glGenTextures(1, &item->color);
+            glBindTexture(GL_TEXTURE_2D, item->color);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexImage2D(
+                GL_TEXTURE_2D,
+                0,
+                GL_RGBA8,
+                width,
+                height,
+                0,
+                GL_RGBA,
+                GL_UNSIGNED_BYTE,
+                nullptr
+            );
+            glFramebufferTexture2D(
+                GL_FRAMEBUFFER,
+                GL_COLOR_ATTACHMENT0,
+                GL_TEXTURE_2D,
+                item->color,
+                0
+            );
+
+            glGenRenderbuffers(1, &item->depth_stencil);
+            glBindRenderbuffer(GL_RENDERBUFFER, item->depth_stencil);
+            glRenderbufferStorage(
+                GL_RENDERBUFFER,
+                GL_DEPTH24_STENCIL8,
+                width,
+                height
+            );
+            glFramebufferRenderbuffer(
+                GL_FRAMEBUFFER,
+                GL_DEPTH_STENCIL_ATTACHMENT,
+                GL_RENDERBUFFER,
+                item->depth_stencil
+            );
+
+            if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+                error = "Native OpenGL framebuffer is incomplete";
+                return 0;
+            }
+
+            glGenVertexArrays(1, &item->default_vao);
+            glBindVertexArray(item->default_vao);
+            glViewport(0, 0, width, height);
+            current_ = item.get();
+            contexts_[index] = std::move(item);
+            return static_cast<int>(index + 1);
+        }
+    }
     if (!CreateOffscreenContext(width, height, error)) return 0;
     bootstrap_context_claimed_ = true;
     return static_cast<int>(contexts_.size());
+}
+
+bool SkikoHost::DeleteContext(int context_id) {
+    if (context_id <= 0 || static_cast<size_t>(context_id) > contexts_.size()) {
+        return false;
+    }
+    auto& item = contexts_[static_cast<size_t>(context_id - 1)];
+    if (item) {
+        CGLSetCurrentContext(item->context);
+        DeleteFramebufferObjects(
+            item->framebuffer,
+            item->color,
+            item->depth_stencil,
+            item->default_vao
+        );
+        CGLDestroyContext(item->context);
+        if (current_ == item.get()) {
+            current_ = nullptr;
+            CGLSetCurrentContext(nullptr);
+        }
+        item.reset();
+    }
+    return true;
 }
 
 bool SkikoHost::MakeContextCurrent(int context_id, std::string& error) {
@@ -195,6 +325,10 @@ bool SkikoHost::MakeContextCurrent(int context_id, std::string& error) {
         return false;
     }
     OffscreenContext* item = contexts_[static_cast<size_t>(context_id - 1)].get();
+    if (item == nullptr) {
+        error = "GL context " + std::to_string(context_id) + " has been deleted";
+        return false;
+    }
     if (CGLSetCurrentContext(item->context) != kCGLNoError) {
         error = "CGLSetCurrentContext failed";
         return false;
@@ -219,7 +353,7 @@ GLuint SkikoHost::DefaultVAO() const {
 
 int SkikoHost::CurrentContextId() const {
     for (size_t index = 0; index < contexts_.size(); ++index) {
-        if (contexts_[index].get() == current_) {
+        if (contexts_[index] && contexts_[index].get() == current_) {
             return static_cast<int>(index + 1);
         }
     }
@@ -277,23 +411,27 @@ GLuint SkikoHost::Framebuffer() const {
 GLuint SkikoHost::ContextTexture(int context_id) const {
     if (context_id <= 0 ||
         static_cast<size_t>(context_id) > contexts_.size()) return 0;
-    return contexts_[static_cast<size_t>(context_id - 1)]->color;
+    const auto& ctx = contexts_[static_cast<size_t>(context_id - 1)];
+    return ctx ? ctx->color : 0;
 }
 
 int SkikoHost::ContextWidth(int context_id) const {
     if (context_id <= 0 ||
         static_cast<size_t>(context_id) > contexts_.size()) return 0;
-    return contexts_[static_cast<size_t>(context_id - 1)]->width;
+    const auto& ctx = contexts_[static_cast<size_t>(context_id - 1)];
+    return ctx ? ctx->width : 0;
 }
 
 int SkikoHost::ContextHeight(int context_id) const {
     if (context_id <= 0 ||
         static_cast<size_t>(context_id) > contexts_.size()) return 0;
-    return contexts_[static_cast<size_t>(context_id - 1)]->height;
+    const auto& ctx = contexts_[static_cast<size_t>(context_id - 1)];
+    return ctx ? ctx->height : 0;
 }
 
 void SkikoHost::FlushContexts() {
     for (const auto& item : contexts_) {
+        if (!item) continue;
         CGLSetCurrentContext(item->context);
         glFlush();
     }
