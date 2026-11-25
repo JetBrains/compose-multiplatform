@@ -12,7 +12,6 @@ import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.internal.utils.findLocalOrGlobalProperty
-import org.jetbrains.compose.internal.utils.ioFile
 import java.io.File
 
 internal const val DOWNLOAD_WIX_TOOLSET_TASK_NAME = "downloadWix"
@@ -36,26 +35,24 @@ internal fun JvmApplicationContext.configureWix() {
     val disableWixDownload = project.findLocalOrGlobalProperty(DOWNLOAD_WIX_PROPERTY).map { it == "false" }
     if (disableWixDownload.get()) return
 
-    val root = project.rootProject
+    // The tasks are registered in the project itself (not in the root project)
+    // to be compatible with Gradle isolated projects.
+    // The archive is shared between all projects via Gradle user home.
+    // Gradle doesn't run tasks with overlapping outputs in parallel,
+    // so `downloadWix` tasks of different projects don't race for the archive.
     val wixDir = project.gradle.gradleUserHomeDir.resolve("compose-jb")
     val fileName = "wix311"
     val zipFile = wixDir.resolve("$fileName.zip")
-    val unzipDir = root.layout.buildDirectory.dir(fileName)
-    val download = root.tasks.findByName(DOWNLOAD_WIX_TOOLSET_TASK_NAME) ?: root.tasks.maybeCreate(
-        DOWNLOAD_WIX_TOOLSET_TASK_NAME,
-        Download::class.java
-    ).apply {
-        onlyIf { !zipFile.isFile }
-        src("https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip")
-        dest(zipFile)
+    val unzipDir = project.layout.buildDirectory.dir(fileName)
+    val download = project.tasks.register(DOWNLOAD_WIX_TOOLSET_TASK_NAME, Download::class.java) { task ->
+        task.onlyIf { !zipFile.isFile }
+        task.src("https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip")
+        task.dest(zipFile)
     }
-    val unzip = root.tasks.findByName(UNZIP_WIX_TOOLSET_TASK_NAME) ?: root.tasks.maybeCreate(
-        UNZIP_WIX_TOOLSET_TASK_NAME,
-        Copy::class.java
-    ).apply {
-        dependsOn(download)
-        from(project.zipTree(zipFile))
-        destinationDir = unzipDir.ioFile
+    val unzip = project.tasks.register(UNZIP_WIX_TOOLSET_TASK_NAME, Copy::class.java) { task ->
+        task.dependsOn(download)
+        task.from(project.zipTree(zipFile))
+        task.into(unzipDir)
     }
     project.eachWindowsPackageTask {
         dependsOn(unzip)

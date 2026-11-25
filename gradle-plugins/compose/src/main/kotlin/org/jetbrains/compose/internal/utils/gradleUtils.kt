@@ -24,7 +24,7 @@ internal inline fun Logger.debug(fn: () -> String) {
     }
 }
 
-val Project.localPropertiesFile get() = project.rootProject.file("local.properties")
+val Project.localPropertiesFile get() = project.rootDir.resolve("local.properties")
 
 fun Project.getLocalProperty(key: String): String? {
     if (localPropertiesFile.exists()) {

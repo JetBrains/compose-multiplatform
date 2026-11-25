@@ -54,9 +54,9 @@ settingsEvaluated { settings ->
     }
 }
 
-allprojects {
+gradle.lifecycle.beforeProject { project ->
     // Some projects declare repositories in build scripts, there direct Maven Central is redirected in place
-    repositories.configureEach { repository ->
+    project.repositories.configureEach { repository ->
         if (repository instanceof MavenArtifactRepository && repository.url.host == "repo.maven.apache.org") {
             repository.url = redirectorUrl
         }

@@ -47,7 +47,7 @@ internal fun MacOSSigningSettings.validate(
         ?: error(ERR_UNKNOWN_SIGN_ID)
     val keychainPath = this.keychain.orNull
     val keychainFile = if (keychainPath != null) {
-        val keychainFile = listOf(project.file(keychainPath), project.rootProject.file(keychainPath))
+        val keychainFile = listOf(project.file(keychainPath), project.rootDir.resolve(keychainPath))
             .firstOrNull { it.exists() }
         check(keychainFile != null) {
             "$ERR_PREFIX could not find the specified keychain: $keychainPath"

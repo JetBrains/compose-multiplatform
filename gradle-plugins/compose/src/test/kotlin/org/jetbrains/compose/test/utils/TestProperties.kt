@@ -26,6 +26,9 @@ object TestProperties {
     val gradleConfigurationCache: Boolean
         get() = System.getProperty("compose.tests.gradle.configuration.cache") == "true"
 
+    val gradleIsolatedProjects: Boolean
+        get() = System.getProperty("compose.tests.gradle.isolated.projects") == "true"
+
     val summaryFile: File?
         get() = System.getProperty("compose.tests.summary.file")?.let { File(it) }
 

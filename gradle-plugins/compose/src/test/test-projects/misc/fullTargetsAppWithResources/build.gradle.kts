@@ -13,15 +13,13 @@ plugins {
     id("org.jetbrains.compose").apply(false)
 }
 
-allprojects {
-    // TODO https://youtrack.jetbrains.com/issue/CMP-11110 Remove compromised root certificate workaround after updating to Kotlin 2.5.0
-    // Override the node version to fix https://youtrack.jetbrains.com/issue/CMP-11011
-    // Workaround is from https://youtrack.jetbrains.com/issue/KT-90732
-    val subproject = this
-    subproject.plugins.withType<NodeJsPlugin>().configureEach {
-        subproject.extensions.getByType(NodeJsEnvSpec::class.java).version.set("26.12.1")
-    }
-    subproject.plugins.withType<WasmNodeJsPlugin>().configureEach {
-        subproject.extensions.getByType(WasmNodeJsEnvSpec::class.java).version.set("26.12.1")
-    }
+// TODO https://youtrack.jetbrains.com/issue/CMP-11110 Remove compromised root certificate workaround after updating to Kotlin 2.5.0
+// Override the node version to fix https://youtrack.jetbrains.com/issue/CMP-11011
+// Workaround is from https://youtrack.jetbrains.com/issue/KT-90732
+// Subprojects apply the same workaround themselves: `allprojects` is not compatible with Gradle isolated projects
+plugins.withType<NodeJsPlugin>().configureEach {
+    extensions.getByType(NodeJsEnvSpec::class.java).version.set("26.12.1")
+}
+plugins.withType<WasmNodeJsPlugin>().configureEach {
+    extensions.getByType(WasmNodeJsEnvSpec::class.java).version.set("26.12.1")
 }

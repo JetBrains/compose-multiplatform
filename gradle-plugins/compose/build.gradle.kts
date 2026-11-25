@@ -202,6 +202,10 @@ for (gradleVersion in supportedGradleVersions) {
                 "compose.tests.gradle.configuration.cache",
                 GradleVersion.version(gradleVersion) >= GradleVersion.version("8.0")
             )
+            systemProperty(
+                "compose.tests.gradle.isolated.projects",
+                GradleVersion.version(gradleVersion) >= GradleVersion.version("9.8.0")
+            )
         }
     }
 }

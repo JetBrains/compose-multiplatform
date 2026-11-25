@@ -39,7 +39,7 @@ class WebCompatibilityDistributionTest : GradlePluginTestBase() {
 
     @Test
     fun checkWebCompatibilityDistribution() {
-        with(testProject("application/webApp")) {
+        with(testProject("application/webApp", defaultTestEnvironmentWithoutIsolatedProjects)) {
             applyBuildConfig("WebApp")
             gradle(":composeCompatibilityBrowserDistribution").checks {
                 check.taskSuccessful(":composeCompatibilityBrowserDistribution")
@@ -63,7 +63,7 @@ class WebCompatibilityDistributionTest : GradlePluginTestBase() {
 
     @Test
     fun testWebJsOnly() {
-        with(testProject("application/webApp")) {
+        with(testProject("application/webApp", defaultTestEnvironmentWithoutIsolatedProjects)) {
             applyBuildConfig("WebJsOnly")
             gradle(":composeCompatibilityBrowserDistribution").checks {
                 check.taskSkipped(":composeCompatibilityBrowserDistribution")
@@ -75,7 +75,7 @@ class WebCompatibilityDistributionTest : GradlePluginTestBase() {
 
     @Test
     fun testWebWasmOnly() {
-        with(testProject("application/webApp")) {
+        with(testProject("application/webApp", defaultTestEnvironmentWithoutIsolatedProjects)) {
             applyBuildConfig("WebWasmOnly")
             gradle(":composeCompatibilityBrowserDistribution").checks {
                 check.taskSkipped(":composeCompatibilityBrowserDistribution")
@@ -98,7 +98,7 @@ class WebCompatibilityDistributionTest : GradlePluginTestBase() {
 
     @Test
     fun testWebSingleExecutable() {
-        with(testProject("application/webApp")) {
+        with(testProject("application/webApp", defaultTestEnvironmentWithoutIsolatedProjects)) {
             applyBuildConfig("WebSingleExecutable")
             gradle(":composeCompatibilityBrowserDistribution").checks {
                 check.taskSkipped(":composeCompatibilityBrowserDistribution")
@@ -109,7 +109,7 @@ class WebCompatibilityDistributionTest : GradlePluginTestBase() {
 
     @Test
     fun testWebJsWasmNonStandardTargetNames() {
-        with(testProject("application/webApp")) {
+        with(testProject("application/webApp", defaultTestEnvironmentWithoutIsolatedProjects)) {
             applyBuildConfig("WebJsWasmNonStandardTargetNames")
             file("src/jsMain").renameTo(file("src/webJsMain"))
             file("src/wasmJsMain").renameTo(file("src/webWasmMain"))
@@ -161,7 +161,7 @@ class WebCompatibilityDistributionTest : GradlePluginTestBase() {
 
     @Test
     fun testWebJsWasmRepacked() {
-        with(testProject("application/webApp")) {
+        with(testProject("application/webApp", defaultTestEnvironmentWithoutIsolatedProjects)) {
             applyBuildConfig("WebJsWasmRepacked")
             gradle(":composeCompatibilityBrowserDistribution").checks {
                 check.taskSuccessful(":composeCompatibilityBrowserDistribution")
@@ -188,7 +188,7 @@ class WebCompatibilityDistributionTest : GradlePluginTestBase() {
     //https://youtrack.jetbrains.com/issue/CMP-8760
     @Test
     fun checkWebAppWithKmmBridge() {
-        with(testProject("application/webApp")) {
+        with(testProject("application/webApp", defaultTestEnvironmentWithoutIsolatedProjects)) {
             applyBuildConfig("WebAppWithKmmBridge")
             gradle(":composeCompatibilityBrowserDistribution").checks {
                 check.taskSuccessful(":composeCompatibilityBrowserDistribution")

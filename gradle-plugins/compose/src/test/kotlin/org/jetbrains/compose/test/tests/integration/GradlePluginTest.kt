@@ -29,7 +29,7 @@ import kotlin.test.assertFalse
 class GradlePluginTest : GradlePluginTestBase() {
     @Test
     fun skikoRuntimeFromTestCompilation() = with(
-        testProject("misc/wasmTestSkiko")
+        testProject("misc/wasmTestSkiko", defaultTestEnvironmentWithoutIsolatedProjects)
     ) {
         gradle(":unpackTestSkikoRuntimeForJs").checks {
             val jsRuntimeFiles = file("./build/compose/skiko-js-test-runtime")
@@ -46,7 +46,7 @@ class GradlePluginTest : GradlePluginTestBase() {
 
     @Test
     fun skikoWasm() = with(
-        testProject("misc/skikoWasm")
+        testProject("misc/skikoWasm", defaultTestEnvironmentWithoutIsolatedProjects)
     ) {
         gradle(":build").checks {
             check.taskSuccessful(":unpackSkikoRuntimeForJs")
@@ -102,7 +102,7 @@ class GradlePluginTest : GradlePluginTestBase() {
     @Test
     fun jsMppIsNotBroken() =
         with(
-            testProject("misc/jsMpp")
+            testProject("misc/jsMpp", defaultTestEnvironmentWithoutIsolatedProjects)
         ) {
             gradle(":compileKotlinJs").checks {
                 check.taskSuccessful(":compileKotlinJs")
@@ -133,7 +133,7 @@ class GradlePluginTest : GradlePluginTestBase() {
     fun testOldestKotlinJsMpp() = with(
         testProject(
             "application/jsMpp",
-            testEnvironment = defaultTestEnvironment.copy(kotlinVersion = oldestSupportedKotlinMultiplatformVersion)
+            testEnvironment = defaultTestEnvironmentWithoutIsolatedProjects.copy(kotlinVersion = oldestSupportedKotlinMultiplatformVersion)
         )
     ) {
         gradle(":compileKotlinJs").checks {
@@ -144,7 +144,7 @@ class GradlePluginTest : GradlePluginTestBase() {
     // https://youtrack.jetbrains.com/issue/CMP-11006
     @Test
     fun testJsNoExecutableTests() = with(
-        testProject("misc/jsNoExecutableTests")
+        testProject("misc/jsNoExecutableTests", defaultTestEnvironmentWithoutIsolatedProjects)
     ) {
         gradle("jsBrowserTest", "--dry-run").checks {
             check.taskSkipped(":checkComposeUiTestConfigurationForJs")
@@ -158,7 +158,7 @@ class GradlePluginTest : GradlePluginTestBase() {
 
     @Test
     fun testJsNoExecutableWarningSuppressed() = with(
-        testProject("misc/jsNoExecutableTests")
+        testProject("misc/jsNoExecutableTests", defaultTestEnvironmentWithoutIsolatedProjects)
     ) {
         file("gradle.properties").appendText("\ncompose.web.suppressSkikoRuntimeWarning=true\n")
         gradle("jsBrowserTest", "--dry-run").checks {

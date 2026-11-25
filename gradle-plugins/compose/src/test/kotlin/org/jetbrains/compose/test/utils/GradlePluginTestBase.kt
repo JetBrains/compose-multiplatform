@@ -15,6 +15,18 @@ abstract class GradlePluginTestBase {
     val defaultTestEnvironment: TestEnvironment
         get() = TestEnvironment(workingDir = testWorkDir)
 
+    /**
+     * Kotlin/JS and Kotlin/Wasm support of the current KGP is not compatible with Gradle isolated projects:
+     * - JS/Wasm incremental compilation accesses tasks of the whole task graph:
+     *   https://youtrack.jetbrains.com/issue/KT-80262
+     * - `NpmResolverPlugin` accesses the root project from subprojects:
+     *   https://youtrack.jetbrains.com/issue/KT-75899
+     *
+     * TODO Use [defaultTestEnvironment] instead after updating Kotlin to a version with the fixes
+     */
+    val defaultTestEnvironmentWithoutIsolatedProjects: TestEnvironment
+        get() = defaultTestEnvironment.copy(useGradleIsolatedProjects = false)
+
     fun testProject(
         name: String,
         testEnvironment: TestEnvironment = defaultTestEnvironment

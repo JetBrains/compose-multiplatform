@@ -13,7 +13,7 @@ class RuntimeLibrariesCompatibilityCheckTest : GradlePluginTestBase() {
 
     @Test
     fun correctConfigurationDoesntPrintWarning(): Unit = with(
-        testProject("misc/compatibilityLibCheck")
+        testProject("misc/compatibilityLibCheck", defaultTestEnvironmentWithoutIsolatedProjects)
     ) {
         val logMsg = "w: Compose Multiplatform runtime dependencies' versions don't match with plugin version."
         gradle("assembleAndroidMain").checks {
@@ -54,7 +54,7 @@ class RuntimeLibrariesCompatibilityCheckTest : GradlePluginTestBase() {
 
     @Test
     fun skikoIncompatibleWarning(): Unit = with(
-        testProject("misc/compatibilityLibCheck")
+        testProject("misc/compatibilityLibCheck", defaultTestEnvironmentWithoutIsolatedProjects)
     ) {
         val logMsg = "w: Skiko dependencies' versions are incompatible."
         gradle("metadataMainClasses").checks {
@@ -93,7 +93,7 @@ class RuntimeLibrariesCompatibilityCheckTest : GradlePluginTestBase() {
 
     @Test
     fun excludedLibrariesAreNotChecked(): Unit = with(
-        testProject("misc/compatibilityLibCheck")
+        testProject("misc/compatibilityLibCheck", defaultTestEnvironmentWithoutIsolatedProjects)
     ) {
         val logMsg = "w: Skiko dependencies' versions are incompatible."
         file("build.gradle.kts").modify {
