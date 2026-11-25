@@ -1,0 +1,28 @@
+import org.jetbrains.compose.dsl.RenderingBackend
+
+plugins {
+    id "org.jetbrains.kotlin.multiplatform"
+    id "org.jetbrains.kotlin.plugin.compose"
+    id "org.jetbrains.compose"
+}
+
+kotlin {
+    iosArm64()
+    iosSimulatorArm64()
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation("org.jetbrains.compose.ui:ui:COMPOSE_VERSION_PLACEHOLDER")
+            }
+        }
+    }
+}
+
+def backend = providers.gradleProperty("backend").orNull
+if (backend != null) {
+    compose {
+        ios {
+            renderingBackend = backend == "Graphite" ? RenderingBackend.Graphite : RenderingBackend.Ganesh
+        }
+    }
+}
