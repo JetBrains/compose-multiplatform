@@ -114,6 +114,9 @@ kotlin {
         // Intermediate source set for all Skia/Skiko targets (non-Android)
         val skikoMain by creating {
             dependsOn(commonMain)
+            dependencies {
+                implementation(project(":compose-benchmark-graphics"))
+            }
         }
 
         val desktopMain by getting {

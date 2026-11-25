@@ -32,6 +32,7 @@ kotlin {
                 api(project(":compose-scene-api"))
                 implementation(compose.ui)
                 implementation(compose.runtime)
+                implementation(libs.kotlinx.coroutines.core)
             }
         }
 

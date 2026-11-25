@@ -72,7 +72,7 @@ internal actual suspend fun measureComposable(
         repeat(warmupCount) {
             scene.mimicSkikoRender(surface, frameTimeNanos, width, height)
             frameTimeNanos += nanosPerFrame
-            surface.flushAndSubmit(false)
+            surface.submitBenchmarkFrame()
             graphicsContext?.awaitGPUCompletion()
             yieldEventLoop()
         }
@@ -88,7 +88,7 @@ internal actual suspend fun measureComposable(
                 repeat(frameCount) {
                     scene.mimicSkikoRender(surface, frameTimeNanos, width, height)
                     frameTimeNanos += nanosPerFrame
-                    surface.flushAndSubmit(false)
+                    surface.submitBenchmarkFrame()
                     gpuTotalTime += measureTime {
                         graphicsContext?.awaitGPUCompletion()
                     }
@@ -116,7 +116,7 @@ internal actual suspend fun measureComposable(
                 val frameStart = start + nextVSync
 
                 scene.mimicSkikoRender(surface, vsyncStartTimeNanos + nextVSync.inWholeNanoseconds, width, height)
-                surface.flushAndSubmit(false)
+                surface.submitBenchmarkFrame()
 
                 val cpuTime = frameStart.elapsedNow()
 

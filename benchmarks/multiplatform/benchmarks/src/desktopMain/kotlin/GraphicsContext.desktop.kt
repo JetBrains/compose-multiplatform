@@ -1,9 +1,4 @@
-import org.jetbrains.skia.ColorSpace
-import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skia.Surface
-import org.jetbrains.skia.SurfaceColorFormat
-import org.jetbrains.skia.SurfaceOrigin
-import org.jetbrains.skia.SurfaceProps
 import org.jetbrains.skiko.ExperimentalSkikoApi
 import org.jetbrains.skiko.graphicapi.DirectXOffscreenContext
 import org.jetbrains.skiko.hostOs
@@ -27,14 +22,7 @@ class DirectXGraphicsContext() : GraphicsContext {
     override fun surface(width: Int, height: Int): Surface {
         texture?.close()
         texture = context.Texture(width, height)
-        return Surface.makeFromBackendRenderTarget(
-            context.directContext,
-            texture!!.backendRenderTarget,
-            SurfaceOrigin.TOP_LEFT,
-            SurfaceColorFormat.BGRA_8888,
-            ColorSpace.sRGB,
-            SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)
-        ) ?: throw IllegalStateException("Can't create Surface")
+        return benchmarkSurface(context.directContext, texture!!.backendRenderTarget)
     }
 
     override suspend fun awaitGPUCompletion() {
