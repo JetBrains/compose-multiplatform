@@ -7,9 +7,10 @@ import org.jetbrains.compose.web.dom.*
 import org.jetbrains.compose.web.renderComposable
 import kotlinx.browser.window
 import org.w3c.dom.HTMLElement
-import react.RBuilder
-import react.dom.render
-import react.dom.unmountComponentAtNode
+import react.ChildrenBuilder
+import react.Fragment
+import react.create
+import react.dom.client.createRoot
 
 /**
  * @param key - when UseReactEffect is invoked with a new [key], compose forces react to render with a new content.
@@ -18,18 +19,13 @@ import react.dom.unmountComponentAtNode
 @Composable
 private fun ElementScope<HTMLElement>.UseReactEffect(
     key: Any?,
-    content: RBuilder.() -> Unit
+    content: ChildrenBuilder.() -> Unit
 ) {
     DisposableEffect(key) {
-        render(scopeElement) {
-            content()
-        }
-        onDispose {  }
-    }
-
-    DisposableEffect(Unit) {
+        val root = createRoot(scopeElement.unsafeCast<web.dom.Element>())
+        root.render(Fragment.create(content))
         onDispose {
-            unmountComponentAtNode(scopeElement)
+            root.unmount()
         }
     }
 }
@@ -44,7 +40,7 @@ fun YoutubeReactPlayerWrapper(videoUrl: String) {
     }) {
         UseReactEffect(key = videoUrl) {
             reactPlayer {
-                attrs.url = videoUrl
+                url = videoUrl
             }
         }
     }
