@@ -62,6 +62,9 @@ kotlin {
             runTask {
                 // It aborts even on coroutine cancellation exceptions:
                 // d8Args.add("--abort-on-uncaught-exception")
+
+                // Makes `gc()` available, so runGC() can force a full GC between warmup and measurement.
+                d8Args.set(d8Args.get() + "--expose-gc")
             }
         }
         browser()

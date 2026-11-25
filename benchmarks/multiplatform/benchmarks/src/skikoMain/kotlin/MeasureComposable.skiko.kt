@@ -66,22 +66,28 @@ internal actual suspend fun measureComposable(
         val nanosPerFrame = (1.0 / targetFps.toDouble() * nanosPerSecond).toLong()
         scene.setContent(content)
 
+        var frameTimeNanos = 0L
+
         // warmup
         repeat(warmupCount) {
-            scene.mimicSkikoRender(surface, it * nanosPerFrame, width, height)
+            scene.mimicSkikoRender(surface, frameTimeNanos, width, height)
+            frameTimeNanos += nanosPerFrame
             surface.flushAndSubmit(false)
             graphicsContext?.awaitGPUCompletion()
             yieldEventLoop()
         }
 
         runGC()
+        // Let the event loop run the FinalizationRegistry callbacks queued by the GC (on web), so they aren't measured.
+        delay(1)
 
         var cpuTotalTime = Duration.ZERO
         var gpuTotalTime = Duration.ZERO
         if (Config.isModeEnabled(Mode.SIMPLE)) {
             cpuTotalTime = measureTime {
                 repeat(frameCount) {
-                    scene.mimicSkikoRender(surface, it * nanosPerFrame, width, height)
+                    scene.mimicSkikoRender(surface, frameTimeNanos, width, height)
+                    frameTimeNanos += nanosPerFrame
                     surface.flushAndSubmit(false)
                     gpuTotalTime += measureTime {
                         graphicsContext?.awaitGPUCompletion()
@@ -99,15 +105,17 @@ internal actual suspend fun measureComposable(
         if (Config.isModeEnabled(Mode.VSYNC_EMULATION)) {
             var nextVSync = Duration.ZERO
             var missedFrames = 0;
+            val vsyncStartTimeNanos = frameTimeNanos
 
             runGC()
+            delay(1)
 
             val start = markNow()
 
             repeat(frameCount) {
                 val frameStart = start + nextVSync
 
-                scene.mimicSkikoRender(surface, it * nextVSync.inWholeNanoseconds, width, height)
+                scene.mimicSkikoRender(surface, vsyncStartTimeNanos + nextVSync.inWholeNanoseconds, width, height)
                 surface.flushAndSubmit(false)
 
                 val cpuTime = frameStart.elapsedNow()
