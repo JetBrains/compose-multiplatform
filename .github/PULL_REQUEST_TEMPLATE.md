@@ -1,6 +1,10 @@
-Describe proposed changes and the issue being fixed
+IMPORTANT FOR EXTERNAL CONTRIBUTORS
+Please discuss the proposed change in our issue tracker before creating the PR
+https://youtrack.jetbrains.com/issues/CMP
 
-(Optional) Fixes [link to the issue]
+Describe proposed changes and the issue being fixed.
+
+Fixes [link to the issue]
 
 ## Testing
 (Optional) Describe how you tested your changes (provide a snippet or/and steps)
