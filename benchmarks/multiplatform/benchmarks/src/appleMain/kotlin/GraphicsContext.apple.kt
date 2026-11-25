@@ -1,13 +1,8 @@
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.objcPtr
 import org.jetbrains.skia.BackendRenderTarget
-import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.DirectContext
-import org.jetbrains.skia.PixelGeometry
 import org.jetbrains.skia.Surface
-import org.jetbrains.skia.SurfaceColorFormat
-import org.jetbrains.skia.SurfaceOrigin
-import org.jetbrains.skia.SurfaceProps
 import platform.Metal.MTLCreateSystemDefaultDevice
 import platform.Metal.MTLPixelFormatBGRA8Unorm
 import platform.Metal.MTLTextureDescriptor
@@ -37,14 +32,7 @@ fun graphicsContext() = object : GraphicsContext {
 
         val renderTarget = BackendRenderTarget.makeMetal(width, height, texture.objcPtr())
 
-        return Surface.makeFromBackendRenderTarget(
-            directContext,
-            renderTarget,
-            SurfaceOrigin.TOP_LEFT,
-            SurfaceColorFormat.BGRA_8888,
-            ColorSpace.sRGB,
-            SurfaceProps(pixelGeometry = PixelGeometry.UNKNOWN)
-        ) ?: throw IllegalStateException("Can't create Surface")
+        return benchmarkSurface(directContext, renderTarget)
     }
 
     override suspend fun awaitGPUCompletion() {

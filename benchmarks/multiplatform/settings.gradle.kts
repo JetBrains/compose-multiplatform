@@ -135,21 +135,29 @@ val SCENE_IMPL_BARRIERS = listOf(
 
 val BASELINE_SCENE_IMPL_DIR = "compose-scene-impl-1"
 
-fun Version.hasReached(barrier: SceneImplBarrier): Boolean {
-    if (this > barrier.version) return true
-    if (this < barrier.version) return false
+fun Version.hasReached(version: Version, minDevBuild: Int): Boolean {
+    if (this > version) return true
+    if (this < version) return false
     // Exact match on the barrier version: no +devNNNN suffix means the released version,
     // which includes the change.
     val devBuild = buildMetadata?.removePrefix("dev")?.toIntOrNull() ?: return true
-    return devBuild >= barrier.minDevBuild
+    return devBuild >= minDevBuild
 }
 
 val composeVersion = Version.parse(resolveComposeVersion())
-val implDir = SCENE_IMPL_BARRIERS.lastOrNull { composeVersion.hasReached(it) }?.moduleDir
+val implDir = SCENE_IMPL_BARRIERS.lastOrNull { composeVersion.hasReached(it.version, it.minDevBuild) }?.moduleDir
     ?: BASELINE_SCENE_IMPL_DIR
 
 include(":compose-scene-impl")
 project(":compose-scene-impl").projectDir = file(implDir)
+
+val graphicsDir = if (composeVersion.hasReached(Version.parse("1.13.10-alpha01"), minDevBuild = 5250)) {
+    "compose-benchmark-graphics-current"
+} else {
+    "compose-benchmark-graphics-1.13"
+}
+include(":compose-benchmark-graphics")
+project(":compose-benchmark-graphics").projectDir = file(graphicsDir)
 
 include(":benchmarks")
 include(":benchmarks:androidApp")
