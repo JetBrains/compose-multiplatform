@@ -68,7 +68,7 @@ dependencyResolutionManagement {
     versionCatalogs {
         create("libs") {
             library("kotlinx-coroutines-core", "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
-            library("kotlinx-browser", "org.jetbrains.kotlinx:kotlinx-browser:0.5.0")
+            library("kotlinx-browser", "org.jetbrains.kotlinx:kotlinx-browser:0.6.1")
         }
     }
 }
