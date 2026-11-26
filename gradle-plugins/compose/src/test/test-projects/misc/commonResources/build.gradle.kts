@@ -10,7 +10,7 @@ group = "app.group"
 kotlin {
     android {
         compileSdk {
-            version = release(37) { minorApiLevel = 1 }
+            version = release(37) { minorApiLevel = 2 }
         }
         namespace = "org.jetbrains.compose.resources.test"
         minSdk = 23

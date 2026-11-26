@@ -20,7 +20,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
         namespace = "org.jetbrains.compose.components.resources"
-        compileSdk = 37
+        compileSdk { version = release(37) { minorApiLevel = 2 } }
         minSdk = 23
 
         androidResources.enable = true

@@ -11,7 +11,7 @@ kotlin {
     android {
         namespace = "me.sample.feature"
         compileSdk {
-            version = release(37) { minorApiLevel = 1 }
+            version = release(37) { minorApiLevel = 2 }
         }
         minSdk = 24
         androidResources.enable = true

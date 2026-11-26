@@ -68,7 +68,7 @@ kotlin {
     }
     android {
         namespace = "org.jetbrains.compose.resources.demo.shared"
-        compileSdk = 37
+        compileSdk { version = release(37) { minorApiLevel = 2 } }
         minSdk = 23
     }
 }

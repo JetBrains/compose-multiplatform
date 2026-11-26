@@ -9,7 +9,7 @@ kotlin {
     android {
         namespace = "com.google.samples.apps.diceroller.shared"
         compileSdk {
-            version = release(37) { minorApiLevel = 1 }
+            version = release(37) { minorApiLevel = 2 }
         }
     }
 
