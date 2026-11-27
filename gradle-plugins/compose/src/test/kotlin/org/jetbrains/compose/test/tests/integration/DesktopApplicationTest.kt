@@ -36,7 +36,6 @@ import org.junit.jupiter.api.Test
 import java.io.File
 import java.util.*
 import java.util.jar.JarFile
-import kotlin.test.Ignore
 import kotlin.test.assertTrue
 
 class DesktopApplicationTest : GradlePluginTestBase() {
@@ -354,8 +353,6 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         testPackageJvmDistributions()
     }
 
-    // TODO remove @Ignore with the fix in https://youtrack.jetbrains.com/issue/CMP-10914
-    @Ignore
     @Test
     fun testFontStripping() =
         // JBR25 comes with bundled fonts, so we can check stripping them on it
@@ -365,15 +362,25 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 javaVersion = 25,
                 extraConfig = """
                     nativeDistributions {
-                        stripJreFonts = true
+                        stripJreFonts = false
                     }
                 """.replaceIndent("    ") + "\n"
             )
         ) {
-            gradle(":createRuntimeImage")
             val runtimeDir = file("build/compose/tmp/main/runtime")
+            val fontsDir = runtimeDir.resolve("lib/fonts")
+
+            // Make sure the fonts are present without stripping, to avoid a false positive
+            gradle(":createRuntimeImage")
             assertTrue(runtimeDir.isDirectory)
-            assertFalse(runtimeDir.list()!!.contains("fonts"))
+            assertTrue(fontsDir.isDirectory, "Expected fonts in the runtime when stripJreFonts = false")
+
+            file("build.gradle").modify {
+                it.replace("stripJreFonts = false", "stripJreFonts = true")
+            }
+            gradle(":createRuntimeImage")
+            assertTrue(runtimeDir.isDirectory)
+            assertFalse(fontsDir.exists(), "Expected runtime fonts to be stripped")
         }
 
     private fun customJdkProject(
