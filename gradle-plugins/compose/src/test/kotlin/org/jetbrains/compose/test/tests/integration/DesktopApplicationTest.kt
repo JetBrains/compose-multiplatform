@@ -537,6 +537,15 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         }
     }
 
+    @Test
+    fun testMacNotarizationConfiguration() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+
+        with(macSignProject(identity = "Compose Test", keychainFilename = "compose.test.keychain")) {
+            gradle("--dry-run", ":notarizeDmg")
+        }
+    }
+
     private fun testMacSign(
         identity: String,
         keychainFilename: String,
