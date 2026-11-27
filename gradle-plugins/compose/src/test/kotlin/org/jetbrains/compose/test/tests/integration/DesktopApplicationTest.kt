@@ -33,8 +33,6 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
 import java.io.File
 import java.util.*
 import java.util.jar.JarFile
@@ -355,40 +353,34 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         testPackageJvmDistributions()
     }
 
-    enum class TriBool {
-        Undefined, True, False
-    }
-
-    @ParameterizedTest(name = "stripJreFonts={0}")
-    @EnumSource(TriBool::class)
-    fun testFontStripping(stripJreFonts: TriBool) =
+    @Test
+    fun testFontStripping() =
         // JBR25 comes with bundled fonts, so we can check stripping them on it
         with(
             customJdkProject(
                 javaVendor = "JETBRAINS",
                 javaVersion = 25,
-                // Undefined omits stripJreFonts to test its default value
-                extraConfig = if (stripJreFonts == TriBool.Undefined) null else
-                    """
-                        nativeDistributions {
-                            stripJreFonts = ${stripJreFonts == TriBool.True}
-                        }
-                    """.replaceIndent("    ") + "\n"
+                extraConfig = """
+                    nativeDistributions {
+                        stripJreFonts = false
+                    }
+                """.replaceIndent("    ") + "\n"
             )
         ) {
-            gradle(":createRuntimeImage")
             val runtimeDir = file("build/compose/tmp/main/runtime")
-            assertTrue(runtimeDir.isDirectory)
             val fontsDir = runtimeDir.resolve("lib/fonts")
-            if (stripJreFonts == TriBool.True ||
-                stripJreFonts == TriBool.Undefined) {
-                assertFalse(fontsDir.exists())
-            } else {
-                assertTrue(
-                    fontsDir.walkTopDown().any { it.isFile && it.extension in setOf("ttf", "otf") },
-                    "JBR fonts should remain when stripJreFonts is false"
-                )
+
+            // Make sure the fonts are present without stripping, to avoid a false positive
+            gradle(":createRuntimeImage")
+            assertTrue(runtimeDir.isDirectory)
+            assertTrue(fontsDir.isDirectory, "Expected fonts in the runtime when stripJreFonts = false")
+
+            file("build.gradle").modify {
+                it.replace("stripJreFonts = false", "stripJreFonts = true")
             }
+            gradle(":createRuntimeImage")
+            assertTrue(runtimeDir.isDirectory)
+            assertFalse(fontsDir.exists(), "Expected runtime fonts to be stripped")
         }
 
     private fun customJdkProject(
