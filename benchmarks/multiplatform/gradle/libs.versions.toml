@@ -8,7 +8,7 @@ kotlinx-serialization = "1.11.0"
 kotlinx-io = "0.9.1"
 kotlinx-datetime = "0.8.0"
 ktor = "3.6.0"
-kotlinx-browser = "0.5.0"
+kotlinx-browser = "0.6.1"
 material-icons-core = "1.7.3"
 
 [libraries]
