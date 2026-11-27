@@ -1,7 +1,7 @@
 ## Publish as a library
 This library exists to help to publish artifacts to Maven Central for CMP projects and its dependencies.
 
-For exmaple, for [Skiko](https://github.com/JetBrains/skiko/blob/29d227acb6893171940b120114ac1cbc95f50987/skiko/settings.gradle.kts#L19)
+For example, for [Skiko](https://github.com/JetBrains/skiko/blob/29d227acb6893171940b120114ac1cbc95f50987/skiko/settings.gradle.kts#L19)
 ```
 ./gradlew publish
 ```
