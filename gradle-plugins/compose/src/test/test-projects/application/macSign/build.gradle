@@ -1,3 +1,5 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
 plugins {
     id "org.jetbrains.kotlin.jvm"
     id "org.jetbrains.kotlin.plugin.compose"
@@ -17,6 +19,7 @@ compose.desktop {
                 languageVersion.set(JavaLanguageVersion.of(%JAVA_VERSION%))
             }.get().metadata.installationPath.asFile.absolutePath
 
+            targetFormats(TargetFormat.Dmg)
             packageName = "TestPackage"
             macOS {
                 bundleID = "signing.test.package"
@@ -25,6 +28,12 @@ compose.desktop {
                     sign.set(true)
                     identity.set("%IDENTITY%")
                     keychain.set("%KEYCHAIN%")
+                }
+
+                notarization {
+                    appleID.set("compose.test@example.com")
+                    password.set("compose.test")
+                    teamID.set("COMPOSETEST")
                 }
             }
         }
