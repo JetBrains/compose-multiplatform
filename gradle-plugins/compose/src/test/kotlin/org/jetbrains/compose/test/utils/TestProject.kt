@@ -24,6 +24,7 @@ data class TestEnvironment(
     val composeCompilerArgs: String? = null,
     val composeVerbose: Boolean = true,
     val useGradleConfigurationCache: Boolean = TestProperties.gradleConfigurationCache,
+    val useGradleIsolatedProjects: Boolean = TestProperties.gradleIsolatedProjects,
     val additionalEnvVars: Map<String, String> = mapOf()
 ) {
     private val placeholders = linkedMapOf(
@@ -128,6 +129,9 @@ class TestProject(
         allArgs.addAll(additionalArgs)
         if (testEnvironment.useGradleConfigurationCache) {
             allArgs.add("--configuration-cache")
+        }
+        if (testEnvironment.useGradleIsolatedProjects) {
+            allArgs.add("--isolated-projects")
         }
 
         return GradleRunner.create().apply {

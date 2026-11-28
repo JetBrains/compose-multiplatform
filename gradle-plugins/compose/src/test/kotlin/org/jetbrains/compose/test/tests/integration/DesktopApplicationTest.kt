@@ -766,6 +766,21 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         }
     }
 
+    @Test
+    fun testWixUnzipInMultipleApps() {
+        Assumptions.assumeTrue(currentOS == OS.Windows) { "The test is only relevant for Windows" }
+
+        with(testProject("application/multipleApps")) {
+            gradle(":appA:unzipWix", ":appB:unzipWix").checks {
+                check.taskSuccessful(":appA:unzipWix")
+                check.taskSuccessful(":appB:unzipWix")
+
+                file("appA/build/wix311/light.exe").checkExists()
+                file("appB/build/wix311/light.exe").checkExists()
+            }
+        }
+    }
+
     @Suppress("SameParameterValue")
     private fun aotProject(
         aotMode: AotMode,

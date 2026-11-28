@@ -371,7 +371,7 @@ class ResourcesTest : GradlePluginTestBase() {
 
     @Test
     fun testMultiModuleResources() {
-        val environment = defaultTestEnvironment
+        val environment = defaultTestEnvironmentWithoutIsolatedProjects
         with(
             testProject("misc/kmpResourcePublication", environment)
         ) {
@@ -533,7 +533,7 @@ class ResourcesTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testFinalArtefacts(): Unit = with(testProject("misc/fullTargetsAppWithResources")) {
+    fun testFinalArtefacts(): Unit = with(testProject("misc/fullTargetsAppWithResources", defaultTestEnvironmentWithoutIsolatedProjects)) {
         val commonResourcesDir = file("src/commonMain/composeResources")
         val repackDir = "composeResources/multiplatform_app.sharedui.generated.resources"
         val commonResourcesFiles = commonResourcesDir.walkTopDown()
